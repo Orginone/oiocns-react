@@ -3,16 +3,17 @@ import { CSS } from '@dnd-kit/utilities';
 import React from 'react';
 import OioFormItem from './OioForm/FormItems';
 import { IBelong } from '@/ts/core';
+import { XFormItem } from '@/ts/base/schema';
 
 interface IProps {
   belong: IBelong;
+  item: XFormItem;
+  onClick: Function;
   [key: string]: any;
 }
 
 const OperateItem = (props: IProps) => {
-  const belongId = props.belong.metadata.id;
-  const { item } = props;
-  const { setNodeRef, listeners, transform } = useSortable({ id: item.id });
+  const { setNodeRef, listeners, transform } = useSortable({ id: props.item.id });
   const styles = {
     transform: CSS.Transform.toString(transform),
     cursor: 'move',
@@ -20,16 +21,15 @@ const OperateItem = (props: IProps) => {
 
   return (
     <>
-      {item.belongId !== belongId && (
+      {/* {props.item.belongId !== props.belong.metadata.id ? (
         <div style={{ cursor: 'no-drop' }}>
-          {<OioFormItem item={item} belong={props.belong} />}
+          {<OioFormItem item={props.item} belong={props.belong} />}
         </div>
-      )}
-      {item.belongId == belongId && (
-        <div style={styles} ref={setNodeRef} {...listeners}>
-          {<OioFormItem item={item} belong={props.belong} />}
-        </div>
-      )}
+      ) : ( */}
+      <div style={styles} ref={setNodeRef} {...listeners} onClick={props.cl}>
+        {<OioFormItem item={props.item} belong={props.belong} />}
+      </div>
+      {/* )} */}
     </>
   );
 };

@@ -386,7 +386,7 @@ const Design: React.FC<IProps> = ({ form: operation, current, onBack }) => {
         <DndContext onDragMove={dragMoveEvent} onDragEnd={dragEndFn}>
           <Row>
             <Col span={4}>
-              <SortableContext items={items['attrs']}>
+              <SortableContext key={'attrs'} items={items['attrs']}>
                 <h3 style={{ paddingLeft: '6px' }}>特性</h3>
                 <div
                   style={{
@@ -401,7 +401,7 @@ const Design: React.FC<IProps> = ({ form: operation, current, onBack }) => {
               </SortableContext>
             </Col>
             <Col span={16}>
-              <SortableContext items={items['operationItems']}>
+              <SortableContext key={'operations'} items={items['operationItems']}>
                 <Card
                   style={{
                     maxHeight: '800px',
@@ -466,12 +466,15 @@ const Design: React.FC<IProps> = ({ form: operation, current, onBack }) => {
                       sm: { span: 10 },
                     }}>
                     <Row gutter={24}>
-                      {items['operationItems'] &&
-                        items['operationItems'].map((item: any) => (
-                          <Col span={formLayout.col} key={item.id}>
-                            <OperateItem item={item} belong={current.current.space} />
-                          </Col>
-                        ))}
+                      {items['operationItems']?.map((item: XFormItem) => (
+                        <Col span={formLayout.col} key={item.id}>
+                          <OperateItem
+                            item={item}
+                            belong={current.current.space}
+                            onClick={itemClick}
+                          />
+                        </Col>
+                      ))}
                     </Row>
                   </ProForm>
                 </Card>
@@ -482,7 +485,14 @@ const Design: React.FC<IProps> = ({ form: operation, current, onBack }) => {
                 <Card bordered={false} title={selectedItem?.name}>
                   <Form form={form} onValuesChange={formValuesChange}>
                     <Form.Item label="组件" name="widget">
-                      <Select options={widgetsOpts} />
+                      <Select
+                        options={widgetsOpts}
+                        defaultValue={
+                          selectedItem?.attr?.property?.valueType == '描述型'
+                            ? 'dict'
+                            : ''
+                        }
+                      />
                     </Form.Item>
                     <Form.Item label="必填" name="required">
                       <Radio.Group buttonStyle="solid" defaultValue={true}>
