@@ -8,6 +8,9 @@ interface IProps {
   store?: boolean;
   work?: boolean;
   exit?: boolean;
+  myWork?: boolean;
+  workDone?: boolean;
+  workStart?: boolean;
   selected?: boolean;
   size?: number;
   title?: string;
@@ -27,6 +30,12 @@ const OrgIcons = (props: IProps) => {
     svgName = 'market';
   } else if (props.store) {
     svgName = 'store';
+  } else if (props.workDone) {
+    svgName = 'workDone';
+  } else if (props.myWork) {
+    svgName = 'myWork';
+  } else if (props.workStart) {
+    svgName = 'workStart';
   } else if (props.type) {
     svgName = props.type;
   }

@@ -74,12 +74,9 @@ const Modal = ({ open, handleOk, data, current, handleCancel }: Iprops) => {
         gutter: [24, 0],
       }}
       columns={columns}
+      initialValues={data || {}}
       onOpenChange={(open: boolean) => {
-        if (open) {
-          if (data) {
-            formRef.current?.setFieldsValue(data);
-          }
-        } else {
+        if (!open) {
           formRef.current?.resetFields();
           handleCancel();
         }

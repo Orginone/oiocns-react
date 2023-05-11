@@ -570,6 +570,13 @@ class List<T> {
   public Where(predicate: PredicateType<T>): List<T> {
     return new List<T>(this._elements.filter(predicate));
   }
+
+  /**
+   * 转成JSON
+   */
+  public toJSON() {
+    return this._elements;
+  }
 }
 /**
  * 生成一个可排序列表

@@ -102,10 +102,9 @@ const AttributeModal = (props: Iprops) => {
       rowProps={{
         gutter: [24, 0],
       }}
+      initialValues={current || {}}
       onOpenChange={(open: boolean) => {
-        if (open && current) {
-          formRef.current?.setFieldsValue(current);
-        } else {
+        if (!open) {
           formRef.current?.resetFields();
           handleCancel();
         }

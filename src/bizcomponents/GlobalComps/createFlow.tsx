@@ -130,12 +130,12 @@ const WorkDefineModal = ({ open, handleOk, handleCancel, workItem, current }: Ip
       open={open}
       width={640}
       layoutType="ModalForm"
+      initialValues={current?.metadata || {}}
       title={current ? `编辑[${current.metadata.name}]办事` : '新建办事'}
       onOpenChange={(open: boolean) => {
         if (open) {
           if (current) {
-            setAvatar(parseAvatar(current?.metadata.icon));
-            formRef.current?.setFieldsValue(current.metadata);
+            setAvatar(parseAvatar(current.metadata.icon));
           }
         } else {
           formRef.current?.resetFields();
