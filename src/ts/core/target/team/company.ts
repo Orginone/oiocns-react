@@ -240,7 +240,7 @@ export class Company extends Belong implements ICompany {
                 typeName: i.typeName,
                 avatar: parseAvatar(i.icon),
               },
-              ['同事'],
+              [this.metadata.name, '同事'],
               i.remark,
             ),
           );
