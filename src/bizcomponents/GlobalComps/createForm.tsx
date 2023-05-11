@@ -5,7 +5,6 @@ import SchemaForm from '@/components/SchemaForm';
 import { IWorkForm } from '@/ts/core/thing/app/work/workform';
 
 interface Iprops {
-  title: string;
   open: boolean;
   data?: XForm;
   handleCancel: () => void;
@@ -26,7 +25,7 @@ export const defaultRemark: any = {
 /*
   业务标准编辑模态框
 */
-const Modal = ({ open, title, handleOk, data, current, handleCancel }: Iprops) => {
+const Modal = ({ open, handleOk, data, current, handleCancel }: Iprops) => {
   const formRef = useRef<ProFormInstance>();
   const columns: ProFormColumnsType<XForm>[] = [
     {
@@ -69,7 +68,7 @@ const Modal = ({ open, title, handleOk, data, current, handleCancel }: Iprops) =
       formRef={formRef}
       layoutType="ModalForm"
       width={640}
-      title={data?.name || title}
+      title={data ? `修改[${data.name}]表单` : '新增表单'}
       open={open}
       rowProps={{
         gutter: [24, 0],

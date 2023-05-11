@@ -4,7 +4,7 @@ import { Button, Card, Descriptions, message } from 'antd';
 import React, { useState } from 'react';
 import { DictItemColumns } from '../../config/columns';
 import CardOrTable from '@/components/CardOrTableComp';
-import DictItemModal from './dictItemModal';
+import DictItemModal from '@/bizcomponents/GlobalComps/createDictItem';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import cls from './index.module.less';
 import { IDict } from '@/ts/core';
@@ -92,7 +92,7 @@ const DictInfo: React.FC<any> = ({ current }: { current: IDict }) => {
           setActiveModel('');
           setDictItem(undefined);
         }}
-        handleOk={(success: boolean | undefined) => {
+        handleOk={(success: boolean) => {
           if (success) {
             message.success('操作成功');
             setDictItem(undefined);

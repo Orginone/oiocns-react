@@ -9,7 +9,7 @@ interface Iprops {
   open: boolean;
   data?: XDictItem;
   handleCancel: () => void;
-  handleOk: (newItem: boolean | undefined) => void;
+  handleOk: (success: boolean) => void;
   current: IDict;
 }
 /*
@@ -44,7 +44,7 @@ const DictItemModal = ({ open, handleOk, current, data, handleCancel }: Iprops) 
   return (
     <SchemaForm<DictItemModel>
       formRef={formRef}
-      title={data ? '修改字典项' : '新增字典项'}
+      title={data ? `修改[${data.name}]字典项` : '新增字典项'}
       open={open}
       width={640}
       onOpenChange={(open: boolean) => {

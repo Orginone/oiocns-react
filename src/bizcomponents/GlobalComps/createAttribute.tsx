@@ -6,19 +6,18 @@ import { XAttribute } from '@/ts/base/schema';
 import { IForm } from '@/ts/core';
 
 interface Iprops {
-  title: string;
   open: boolean;
-  data: XAttribute | undefined;
+  current: XAttribute | undefined;
   handleCancel: () => void;
   handleOk: (success: boolean) => void;
-  current: IForm;
+  form: IForm;
 }
 /*
   特性编辑模态框
 */
 const AttributeModal = (props: Iprops) => {
-  const { open, title, handleOk, data, current, handleCancel } = props;
   const formRef = useRef<ProFormInstance>();
+  const { open, handleOk, current, form, handleCancel } = props;
   const columns: ProFormColumnsType<AttributeModel>[] = [
     {
       title: '特性名称',
@@ -40,7 +39,7 @@ const AttributeModal = (props: Iprops) => {
       valueType: 'select',
       formItemProps: { rules: [{ required: true, message: '属性为必填项' }] },
       request: async () => {
-        return (await props.current.loadPropertys()).map((item) => {
+        return (await props.form.loadPropertys()).map((item) => {
           return { label: item.name, value: item.id };
         });
       },
@@ -51,7 +50,7 @@ const AttributeModal = (props: Iprops) => {
       valueType: 'treeSelect',
       formItemProps: { rules: [{ required: true, message: '管理权限为必填项' }] },
       request: async () => {
-        const data = await props.current.current.space.loadSuperAuth();
+        const data = await props.form.current.space.loadSuperAuth();
         return data ? [data.metadata] : [];
       },
       fieldProps: {
@@ -95,7 +94,7 @@ const AttributeModal = (props: Iprops) => {
   return (
     <SchemaForm<AttributeModel>
       formRef={formRef}
-      title={title}
+      title={current ? `编辑[${current.name}]特性` : '新增特性'}
       open={open}
       width={640}
       layoutType="ModalForm"
@@ -104,22 +103,19 @@ const AttributeModal = (props: Iprops) => {
         gutter: [24, 0],
       }}
       onOpenChange={(open: boolean) => {
-        if (open) {
-          if (title.includes('修改')) {
-            formRef.current?.setFieldsValue(data);
-          }
+        if (open && current) {
+          formRef.current?.setFieldsValue(current);
         } else {
           formRef.current?.resetFields();
           handleCancel();
         }
       }}
       onFinish={async (values) => {
-        values = { ...data, ...values };
-        if (title.includes('新增')) {
-          handleOk((await current.createAttribute(values)) != undefined);
+        values = { ...current, ...values };
+        if (current) {
+          handleOk(await form.updateAttribute(values));
         } else {
-          console.log(values);
-          handleOk(await current.updateAttribute(values));
+          handleOk((await form.createAttribute(values)) != undefined);
         }
       }}
     />

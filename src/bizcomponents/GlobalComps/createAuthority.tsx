@@ -137,7 +137,11 @@ const AuthorityModal = (props: Iprops) => {
   ];
   return (
     <SchemaForm
-      title={props.title + '权限'}
+      title={
+        props.title.includes('编辑')
+          ? `编辑[${props.current.metadata.name}]权限`
+          : '新增权限'
+      }
       open={props.open}
       width={640}
       layoutType="ModalForm"

@@ -12,15 +12,15 @@ import orgCtrl from '@/ts/controller';
 interface Iprops {
   open: boolean;
   current?: IFlowDefine;
-  item: IWorkItem;
-  handleOk: () => void;
+  workItem: IWorkItem;
+  handleOk: (success: boolean) => void;
   handleCancel: () => void;
 }
 
 /*
   业务标准编辑模态框
 */
-const WorkDefineModal = ({ open, handleOk, handleCancel, item, current }: Iprops) => {
+const WorkDefineModal = ({ open, handleOk, handleCancel, workItem, current }: Iprops) => {
   const formRef = useRef<ProFormInstance>();
   const [avatar, setAvatar] = useState<FileItemShare>();
   const uploadProps: UploadProps = {
@@ -130,7 +130,7 @@ const WorkDefineModal = ({ open, handleOk, handleCancel, item, current }: Iprops
       open={open}
       width={640}
       layoutType="ModalForm"
-      title={`${current ? '编辑' : '新建'}办事`}
+      title={current ? `编辑[${current.metadata.name}]办事` : '新建办事'}
       onOpenChange={(open: boolean) => {
         if (open) {
           if (current) {
@@ -147,13 +147,10 @@ const WorkDefineModal = ({ open, handleOk, handleCancel, item, current }: Iprops
       }}
       onFinish={async (model) => {
         if (current) {
-          model.id = current.metadata.id;
           model.icon = JSON.stringify(avatar);
-          if (await current.updateDefine(model)) {
-            handleOk();
-          }
-        } else if ((await item.createWorkDefine(model)) != undefined) {
-          handleOk();
+          handleOk(await current.updateDefine(model));
+        } else {
+          handleOk((await workItem.createWorkDefine(model)) != undefined);
         }
       }}
       columns={columns}

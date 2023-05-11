@@ -33,7 +33,6 @@ const OperateIndex = ({ selectMenu, operateKey, confrim }: IProps) => {
       />
       {/** 字典模态框 */}
       <DictModal
-        title={operateKey}
         space={
           selectMenu.itemType == GroupMenuType.DictGroup ? selectMenu.item : undefined
         }

@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import SchemaForm from '@/components/SchemaForm';
 import { DictModel, FileItemShare } from '@/ts/base/model';
-import { ProFormColumnsType } from '@ant-design/pro-components';
+import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components';
 import { IBelong, IDict } from '@/ts/core';
 import { Avatar, Button, Space, Image, Upload, message, UploadProps } from 'antd';
 import { AiOutlineBank } from 'react-icons/ai';
@@ -9,7 +9,6 @@ import { parseAvatar } from '@/ts/base';
 import orgCtrl from '@/ts/controller';
 
 interface Iprops {
-  title: string;
   open: boolean;
   space: IBelong;
   dict: IDict | undefined;
@@ -21,7 +20,8 @@ interface Iprops {
 */
 const DictModal = (props: Iprops) => {
   if (!props.open) return <></>;
-  const { title, open, dict, handleCancel, handleOk } = props;
+  const { open, dict, handleCancel, handleOk } = props;
+  const formRef = useRef<ProFormInstance>();
   const [avatar, setAvatar] = useState<FileItemShare>();
   const uploadProps: UploadProps = {
     multiple: false,
@@ -101,29 +101,28 @@ const DictModal = (props: Iprops) => {
   ];
   return (
     <SchemaForm<DictModel>
-      title={title + '字典'}
+      formRef={formRef}
+      title={dict ? `编辑[${dict.metadata.name}]字典` : '新增字典'}
       open={open}
       width={640}
       layoutType="ModalForm"
       initialValues={dict?.metadata || {}}
+      rowProps={{
+        gutter: [24, 0],
+      }}
       onOpenChange={(open: boolean) => {
-        if (open) {
-          if (dict) {
-            setAvatar(parseAvatar(dict.metadata.icon));
-          }
+        if (open && dict) {
+          setAvatar(parseAvatar(dict.metadata.icon));
         } else {
           handleCancel();
         }
       }}
-      rowProps={{
-        gutter: [24, 0],
-      }}
       onFinish={async (values) => {
         values.icon = JSON.stringify(avatar);
-        if (title.includes('新增')) {
-          handleOk((await props.space.createDict(values)) !== undefined);
-        } else if (dict) {
+        if (dict) {
           handleOk(await dict.update(values));
+        } else {
+          handleOk((await props.space.createDict(values)) !== undefined);
         }
       }}
       columns={columns}

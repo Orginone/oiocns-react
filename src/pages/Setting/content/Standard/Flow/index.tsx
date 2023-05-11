@@ -6,7 +6,7 @@ import CardOrTable from '@/components/CardOrTableComp';
 import FlowCard from './Comp/FlowCard';
 import { FlowColumn } from '@/pages/Setting/config/columns';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
-import WorkDefineModal from './modal';
+import WorkDefineModal from '@/bizcomponents/GlobalComps/createFlow';
 import Design from './Design';
 import { IWorkItem } from '@/ts/core/thing/app/work/workitem';
 import { orgAuth } from '@/ts/core/public/consts';
@@ -158,28 +158,31 @@ const FlowList: React.FC<IProps> = ({ current }: IProps) => {
     <div className={cls['company-top-content']} key={key}>
       <PageCard
         key={key}
+        tabList={items}
         bordered={false}
         activeTabKey={activeTab}
-        tabList={items}
+        bodyStyle={{ paddingTop: 16 }}
+        tabBarExtraContent={renderButton()}
         onTabChange={(key) => {
           setActiveTab(key);
-        }}
-        tabBarExtraContent={renderButton()}
-        bodyStyle={{ paddingTop: 16 }}>
+        }}>
         {content()}
       </PageCard>
       {
         <WorkDefineModal
-          item={current}
+          workItem={current}
           current={define}
           open={['edit', 'create'].includes(modalType)}
           handleCancel={function (): void {
             setModalType('');
           }}
-          handleOk={() => {
-            setDefine(undefined);
-            setForceUpdate();
-            setModalType('');
+          handleOk={(success: boolean) => {
+            if (success) {
+              message.info('操作成功');
+              setDefine(undefined);
+              setForceUpdate();
+              setModalType('');
+            }
           }}
         />
       }

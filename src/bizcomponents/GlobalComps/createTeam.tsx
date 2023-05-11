@@ -135,7 +135,11 @@ const CreateTeamModal = (props: Iprops) => {
   ];
   return (
     <SchemaForm<TargetModel>
-      title={props.title}
+      title={
+        props.title.includes('编辑')
+          ? `编辑[${props.current?.metadata.name}]用户`
+          : props.title
+      }
       open={props.open}
       width={640}
       initialValues={props.isEdit ? props.current.metadata : {}}

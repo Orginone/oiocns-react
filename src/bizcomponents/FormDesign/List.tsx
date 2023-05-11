@@ -3,7 +3,7 @@ import { FormColumns } from '@/pages/Setting/config/columns';
 import { XForm } from '@/ts/base/schema';
 import { message, Popconfirm } from 'antd';
 import React, { useState } from 'react';
-import OperationModel from './modal';
+import OperationModel from '@/bizcomponents/GlobalComps/createForm';
 import ViewFormModal from './Design/viewFormModal';
 import { IWorkForm } from '@/ts/core/thing/app/work/workform';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
@@ -22,7 +22,7 @@ interface IProps {
 const FormList = (props: IProps) => {
   const [modalType, setModalType] = useState('');
   const [key, forceUpdate] = useObjectUpdate('');
-  const [editData, setEditData] = useState<XForm>();
+  const [selectForm, setSelectForm] = useState<XForm>();
 
   let data = props.current.forms;
   if (!props.recursionOrg) {
@@ -39,7 +39,7 @@ const FormList = (props: IProps) => {
         key: '修改',
         label: '编辑表单',
         onClick: () => {
-          setEditData(item);
+          setSelectForm(item);
           setModalType('编辑表单');
         },
       },
@@ -47,7 +47,7 @@ const FormList = (props: IProps) => {
         key: '设计表单',
         label: '设计表单',
         onClick: () => {
-          setEditData(item);
+          setSelectForm(item);
           props.setSelectedOperation(item);
         },
       },
@@ -55,7 +55,7 @@ const FormList = (props: IProps) => {
         key: '预览表单',
         label: '预览表单',
         onClick: () => {
-          setEditData(item);
+          setSelectForm(item);
           setModalType('预览表单');
         },
       },
@@ -67,9 +67,9 @@ const FormList = (props: IProps) => {
             trigger={'click'}
             title={'确定删除吗？'}
             onConfirm={async () => {
-             if (await props.current.deleteForm(item)) {
-               forceUpdate();
-             }
+              if (await props.current.deleteForm(item)) {
+                forceUpdate();
+              }
             }}
             okText="确定"
             cancelText="取消">
@@ -92,14 +92,13 @@ const FormList = (props: IProps) => {
       />
       {/** 表单模态框 */}
       <OperationModel
-        data={editData}
-        title={modalType}
+        data={selectForm}
         current={props.current}
         open={modalType == '编辑表单'}
         handleCancel={() => setModalType('')}
         handleOk={async () => {
           setModalType('');
-          setEditData(undefined);
+          setSelectForm(undefined);
           forceUpdate();
           message.success('保存成功');
         }}
@@ -107,7 +106,7 @@ const FormList = (props: IProps) => {
       ;{/** 预览表单 */}
       <ViewFormModal
         belong={props.current.current.space}
-        data={editData}
+        data={selectForm}
         open={modalType == '预览表单'}
         handleCancel={() => {
           setModalType('');

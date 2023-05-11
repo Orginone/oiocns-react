@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { message, Upload, UploadProps, Image, Button, Space, Avatar } from 'antd';
-import { ProFormColumnsType } from '@ant-design/pro-components';
+import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components';
 import SchemaForm from '@/components/SchemaForm';
 import orgCtrl from '@/ts/controller';
 import { FileItemShare } from '@/ts/base/model';
@@ -23,6 +23,7 @@ interface Iprops {
 */
 const CreateSpeciesModal = (props: Iprops) => {
   if (!props.open) return <></>;
+  const formRef = useRef<ProFormInstance>();
   const [avatar, setAvatar] = useState<FileItemShare>();
   const speciesTypes: string[] = [];
   let target = props.current;
@@ -180,17 +181,25 @@ const CreateSpeciesModal = (props: Iprops) => {
   ];
   return (
     <SchemaForm<SpeciesModel>
-      title={props.title}
+      formRef={formRef}
+      title={
+        props.title.includes('编辑')
+          ? `编辑[${props.species?.metadata.name}]类别`
+          : props.title
+      }
+      columns={columns}
       open={props.open}
       width={640}
       initialValues={props.title.includes('编辑') ? props.current.metadata : {}}
       onOpenChange={(open: boolean) => {
-        if (open) {
+        if (open && props.species) {
           if (props.title.includes('编辑')) {
             setAvatar(parseAvatar(props.species?.metadata.icon));
+            formRef.current?.setFieldsValue(props.species?.metadata);
           }
         } else {
           setAvatar(undefined);
+          formRef.current?.resetFields();
           props.handleCancel();
         }
       }}
@@ -210,8 +219,7 @@ const CreateSpeciesModal = (props: Iprops) => {
         } else {
           props.handleOk(await props.current.createSpecies(values));
         }
-      }}
-      columns={columns}></SchemaForm>
+      }}></SchemaForm>
   );
 };
 

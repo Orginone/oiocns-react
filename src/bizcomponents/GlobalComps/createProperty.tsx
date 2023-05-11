@@ -124,7 +124,7 @@ const PropertyModal = ({ open, handleOk, species, data, handleCancel }: Iprops) 
       width={640}
       layoutType="ModalForm"
       initialValues={data || {}}
-      title={`${data ? '编辑' : '新建'}属性`}
+      title={data ? `编辑[${data.name}]属性` : '新建属性'}
       onOpenChange={(open: boolean) => {
         if (open) {
           if (data) {

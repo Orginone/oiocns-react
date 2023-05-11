@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import CardOrTable from '@/components/CardOrTableComp';
 import { XAttribute } from '@/ts/base/schema';
 import { AttributeColumns } from '@/pages/Setting/config/columns';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
-import AttributeModal from './modal';
+import AttributeModal from '@/bizcomponents/GlobalComps/createAttribute';
 import { IWorkForm } from '@/ts/core/thing/app/work/workform';
+import { message } from 'antd';
 
 interface IProps {
   current: IWorkForm;
@@ -25,9 +26,16 @@ const Attritube = ({
   recursionSpecies,
   setModalType,
 }: IProps) => {
-  const [tkey, tforceUpdate] = useObjectUpdate(current);
-  const [editData, setEditData] = useState<XAttribute>();
-  const [dataSource, setDataSource] = useState<XAttribute[]>([]);
+  const [tkey, tforceUpdate] = useObjectUpdate('');
+  const [selectAttribute, setSelectAttribute] = useState<XAttribute>();
+
+  let attrs = current.attributes;
+  if (!recursionOrg) {
+    attrs = attrs.filter((i) => i.shareId === current.current.metadata.id);
+  }
+  if (!recursionSpecies) {
+    attrs = attrs.filter((i) => i.speciesId === current.metadata.id);
+  }
   // 操作内容渲染函数
   const renderOperate = (item: XAttribute) => {
     if (
@@ -40,7 +48,7 @@ const Attritube = ({
           key: '修改特性',
           label: '编辑特性',
           onClick: () => {
-            setEditData(item);
+            setSelectAttribute(item);
             setModalType('修改特性');
           },
         },
@@ -61,7 +69,7 @@ const Attritube = ({
           key: '关联属性',
           label: '关联属性',
           onClick: () => {
-            setEditData(item);
+            setSelectAttribute(item);
             setModalType('关联属性');
           },
         },
@@ -89,17 +97,6 @@ const Attritube = ({
     return [];
   };
 
-  useEffect(() => {
-    let temp = current.attributes;
-    if (!recursionOrg) {
-      temp = temp.filter((i) => i.shareId === current.current.metadata.id);
-    }
-    if (!recursionSpecies) {
-      temp = temp.filter((i) => i.speciesId === current.metadata.id);
-    }
-    setDataSource(temp);
-  }, [current, recursionOrg, recursionSpecies]);
-
   return (
     <>
       <CardOrTable<XAttribute>
@@ -109,23 +106,23 @@ const Attritube = ({
         operation={renderOperate}
         columns={AttributeColumns(current)}
         showChangeBtn={false}
-        dataSource={dataSource}
+        dataSource={attrs}
       />
       {/** 新增/编辑特性模态框 */}
       <AttributeModal
-        data={editData}
-        title={modalType}
+        form={current}
+        current={selectAttribute}
         open={modalType.includes('特性')}
         handleCancel={function (): void {
           setModalType('');
         }}
         handleOk={function (success: boolean): void {
-          setModalType('');
           if (success) {
+            message.info('操作成功');
+            setModalType('');
             tforceUpdate();
           }
         }}
-        current={current}
       />
       {/** 关联属性模态框 */}
       <div></div>
