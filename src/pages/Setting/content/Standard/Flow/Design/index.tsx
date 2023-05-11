@@ -42,34 +42,34 @@ const Design: React.FC<IProps> = ({
     const load = async () => {
       let nodes = await current.loadWorkNode();
       // content字段可能取消
-      let resourceData = loadResource(nodes, 'flowNode', '', '', undefined, '');
-      if (nodes == undefined) {
-        resourceData = {
-          nodeId: `node_${getUuid()}`,
-          parentId: '',
-          type: 'ROOT',
-          name: '发起角色',
-          props: {
-            assignedType: 'JOB',
-            mode: 'AND',
-            assignedUser: [
-              {
-                id: '0',
-                name: undefined,
-                type: undefined,
-                orgIds: undefined,
+      let resourceData = nodes?.id
+        ? loadResource(nodes, 'flowNode', '', '', undefined, '')
+        : {
+            nodeId: `node_${getUuid()}`,
+            parentId: '',
+            type: 'ROOT',
+            name: '发起角色',
+            props: {
+              assignedType: 'JOB',
+              mode: 'AND',
+              assignedUser: [
+                {
+                  id: '0',
+                  name: undefined,
+                  type: undefined,
+                  orgIds: undefined,
+                },
+              ],
+              refuse: {
+                type: 'TO_END', //驳回规则 TO_END  TO_NODE  TO_BEFORE
+                target: '', //驳回到指定ID的节点
               },
-            ],
-            refuse: {
-              type: 'TO_END', //驳回规则 TO_END  TO_NODE  TO_BEFORE
-              target: '', //驳回到指定ID的节点
+              friendDialogmode: false,
+              num: 0,
             },
-            friendDialogmode: false,
-            num: 0,
-          },
-          children: {},
-        };
-      }
+            children: {},
+          };
+
       if (instance) {
         showTask(instance, resourceData);
       } else {
