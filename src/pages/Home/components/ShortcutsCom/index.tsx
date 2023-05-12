@@ -76,9 +76,10 @@ const BannerCom: React.FC<ShortcutsComType> = () => {
       case '邀成员':
         break;
       case '逛商场':
-        history.push('/market/shop');
+        history.push('/market');
         break;
-      case '添数据':
+      case '查数据':
+        history.push('/store');
         break;
       default:
         break;

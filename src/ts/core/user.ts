@@ -19,6 +19,10 @@ export class UserProvider extends common.Emitter {
         this._preMessages.push(data);
       }
     });
+    kernel.on('RecvTags', (data) => {
+      console.log('RecvTag', data);
+      this.changCallbackPart('tags', data);
+    });
     kernel.on('RecvTask', (data: XWorkTask) => {
       if (this._inited && this._work) {
         this._work.updateTask(data);

@@ -14,14 +14,13 @@ const showMessage = (response: any) => {
   }
 };
 
-const debounce = (fun: any, delay?: number) => {
+const debounce = (fun: Function, delay?: number) => {
   let timer: any = '';
   let that = this;
-  return (args: any) => {
-    let _args = args;
+  return function (...args: any) {
     clearTimeout(timer);
     timer = setTimeout(function () {
-      fun.call(that, _args);
+      fun.call(that, ...args);
     }, delay ?? 300);
   };
 };
@@ -267,9 +266,19 @@ const findMenuItemByKey = (item: MenuItemType, key: string): MenuItemType | unde
   return undefined;
 };
 
+const downloadByUrl = (url: string) => {
+  if (!url) {
+    return message.error('资源路径不存在，请重试！');
+  }
+  const DownA = document.createElement('a'); // 创建a标签
+  DownA.setAttribute('download', url); // download属性(为下载的文件起个名)
+  DownA.setAttribute('href', url); // href链接（文件的url地址）（如果是下载图片需要使用代理，不然图片不会是下载而是打开）
+  DownA.click(); // 自执行点击事件
+};
 export {
   dateFormat,
   debounce,
+  downloadByUrl,
   findAimObj,
   findMenuItemByKey,
   getNewKeyWithString,

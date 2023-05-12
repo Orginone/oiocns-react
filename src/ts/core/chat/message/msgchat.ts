@@ -201,7 +201,9 @@ export abstract class MsgChat extends common.Entity implements IMsgChat {
     }
   }
   async tagMessage(ids: string[], tags: string[]): Promise<void> {
-    ids = this.messages.filter((i) => ids.includes(i.id)).map((i) => i.id);
+    ids = Array.from(
+      new Set(this.messages.filter((i) => ids.includes(i.id)).map((i) => i.id)),
+    );
     if (ids.length > 0 && tags.length > 0) {
       await kernel.tagImMsg({
         ids: ids,

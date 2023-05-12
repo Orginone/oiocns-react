@@ -20,6 +20,7 @@ import {
 } from '@/ts/core';
 import { IWorkItem } from '@/ts/core/thing/app/work/workitem';
 import { IWorkForm } from '@/ts/core/thing/app/work/workform';
+import { SettingOutlined } from '@ant-design/icons';
 
 /** 加载分组菜单参数 */
 interface groupMenuParams {

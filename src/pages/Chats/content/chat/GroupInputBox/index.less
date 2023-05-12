@@ -2,6 +2,7 @@
   width: 360px;
   display: flex;
   flex-wrap: wrap;
+
   .emoji_box {
     .emoji {
       width: 20px;
@@ -13,6 +14,7 @@
 
 .group_input_wrap {
   display: flex;
+  // height: 100%;
   flex-direction: column;
   justify-content: space-between;
   // background-color: #fff;
@@ -22,11 +24,13 @@
     display: flex;
     align-items: center;
     padding: 0 12px;
+
     .icons_oneself {
       margin-right: 8px;
       font-size: 18px;
       cursor: pointer;
       color: #909399;
+
       &:hover {
         color: #db2828;
       }
@@ -35,21 +39,29 @@
 
   .input_content {
     display: flex;
-    height: 100%;
+    // height: 100%;
+    flex-flow: column;
     justify-content: space-between;
     // background-color: #fff;
     padding: 12px 24px 0 12px;
+    overflow-y: auto;
 
     .textarea {
       flex: 1;
-      height: 160px;
+      max-height: 130px;
       overflow-y: auto;
       outline: none;
       border: none;
+
       .emoji {
         width: 20px;
         height: 20px;
         margin: 3px;
+      }
+
+      .cutImg {
+        width: 150px !important;
+        max-height: 300px;
       }
     }
 
@@ -60,12 +72,43 @@
       background-color: transparent;
     }
 
-    .send_box {
+    .showTxtContent {
       display: flex;
-      justify-content: flex-end;
-      align-items: center;
-      margin-left: 30px;
-      margin-top: 100px;
+      width: 160px;
+      .showText {
+        background-color: #c6d6f0;
+        // display: flex;
+        max-width: 500px;
+        width: fit-content;
+        overflow: auto;
+        border-radius: 5px;
+        padding: 5px;
+        font-size: 12px;
+        color: #535050;
+        .con_content_txt {
+          img {
+            width: 100%;
+          }
+        }
+      }
+
+      .closeIcon {
+        cursor: pointer;
+        height: 14px;
+        max-width: 16px;
+      }
+    }
+
+    .send_box {
+      // display: flex;
+      // justify-content: flex-end;
+      // align-items: center;
+      // margin-left: 30px;
+      // margin-bottom: 10px;
+      // margin-top: 100px;
+      position: absolute;
+      right: 20px;
+      bottom: 16px;
     }
   }
 }
