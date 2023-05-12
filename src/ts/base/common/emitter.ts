@@ -75,8 +75,6 @@ export class Emitter {
    */
   public changCallbackPart = debounce((p: string, data?: any) => {
     this.changCallback();
-    console.log('changCallbackPart', p, data);
-
     Object.keys(this._partRefreshCallback).forEach((key) => {
       const callback = this._partRefreshCallback[key][p];
       if (callback) {

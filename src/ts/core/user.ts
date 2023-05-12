@@ -20,7 +20,6 @@ export class UserProvider extends common.Emitter {
       }
     });
     kernel.on('RecvTags', (data) => {
-      console.log('RecvTag', data);
       this.changCallbackPart('tags', data);
     });
     kernel.on('RecvTask', (data: XWorkTask) => {
