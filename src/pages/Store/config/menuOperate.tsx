@@ -68,6 +68,11 @@ export const loadFileSysItemMenus = (rightClick: boolean = false) => {
       icon: <im.ImPen />,
     },
     {
+      key: '下载文件',
+      label: '下载文件',
+      icon: <im.ImDownload />,
+    },
+    {
       key: '移动',
       label: '移动到',
       icon: <im.ImRedo />,

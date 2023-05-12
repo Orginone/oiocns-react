@@ -1,3 +1,4 @@
+import React from 'react';
 import CompanySetting from './Company';
 import StationSetting from './Station';
 import AgencySetting from './Agency';
@@ -5,7 +6,6 @@ import CohortSetting from './Cohort';
 import PersonSetting from './Person';
 import StandardSetting from './Standard';
 import { MenuItemType } from 'typings/globelType';
-import React from 'react';
 import DictSetting from './Dict';
 import AuthoritySetting from './Authority';
 import { MenuType } from '../config/menuType';

@@ -4,6 +4,7 @@ import { Input, message, Modal, Upload, UploadProps } from 'antd';
 import CopyOrMoveModal from './CopyOrMove';
 import FilePreview from './FilePreview';
 import { FileItemShare } from '@/ts/base/model';
+import { downloadByUrl } from '@/utils/tools';
 import { IFileSystemItem } from '@/ts/core';
 
 interface IProps {
@@ -58,6 +59,14 @@ const FileSysOperate: React.FC<IProps> = (props: IProps) => {
         setTarget(target);
         setNewName(target.metadata.name);
         return;
+      case '下载文件': {
+        const url = target.shareInfo().shareLink;
+        if (!url) {
+          return message.error('资源路径不存在，请重试！');
+        }
+        downloadByUrl(url);
+        return;
+      }
       case '复制':
       case '移动':
         setModalType(key);

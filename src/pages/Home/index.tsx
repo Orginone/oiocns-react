@@ -4,7 +4,6 @@ import './index.less';
 import React, { useEffect } from 'react';
 
 import BannerCom from './components/BannerCom';
-import Charts from './components/Charts';
 import SelfAppCom from './components/SelfAppCom';
 import Shortcuts from './components/ShortcutsCom';
 
@@ -30,7 +29,7 @@ getImgAssets();
 const Home: React.FC = () => {
   useEffect(() => {}, []);
   return (
-    <div className="work-home">
+    <div className="work-home-wrap">
       {/* 顶部图片11111 */}
       <BannerCom imgList={imgList} />
       {/* 快捷入口及应用 */}
@@ -38,7 +37,6 @@ const Home: React.FC = () => {
         <Shortcuts props={[]} /> <SelfAppCom props={[]} />
       </div>
       {/* 底部区域 //TODO:临时*/}
-      <Charts />
     </div>
   );
 };

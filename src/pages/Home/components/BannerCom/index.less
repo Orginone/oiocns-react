@@ -1,12 +1,27 @@
 .img-con {
   width: 100%;
-  height: 300px;
+  height: 100%;
+  min-height: 200px;
   cursor: pointer;
-
+  max-height: 500px;
   // 隐藏banner 底部切换按钮
 }
 
-.banner-wrap {
+.banner-wrap,
+.ogo-carousel {
+  width: 100%;
+  height: 100%;
+  max-height: 500px;
+
+  .slick-list,
+  .slick-track {
+    height: 100% !important;
+  }
+
+  .slick-slide > div {
+    height: 100%;
+  }
+
   .slick-dots {
     display: none !important;
   }

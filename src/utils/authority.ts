@@ -19,7 +19,7 @@ const IsAuthorityAdmin = async (
     return true;
   }
   if(!target || !target.judgeHasIdentity) {
-    debugger
+    // debugger
   }
   return await target.judgeHasIdentity(authoritys);
 };

@@ -1,15 +1,20 @@
+/* eslint-disable react/jsx-no-target-blank */
 /* eslint-disable no-unused-vars */
-import { Button, Popover, Image, Spin } from 'antd';
+import { Button, Popover, Image, Spin, Tag } from 'antd';
 import moment from 'moment';
 import React, { useEffect, useRef, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 import css from './index.module.less';
-import { showChatTime } from '@/utils/tools';
+import { debounce, downloadByUrl, showChatTime } from '@/utils/tools';
 import { FileItemShare } from '@/ts/base/model';
 import orgCtrl from '@/ts/controller';
 import { IMsgChat, MessageType } from '@/ts/core';
 import { model, parseAvatar } from '@/ts/base';
+import { filetrText, isShowLink, showCiteText } from './common';
+import ForwardModal from './forwardModal';
+import { IconFont } from '@/components/IconFont';
+import { FileTypes } from '@/ts/core/public/consts';
 
 /**
  * @description: 聊天区域
@@ -20,51 +25,154 @@ interface Iprops {
   chat: IMsgChat;
   filter: string;
   handleReWrites: Function;
+  /** 返回值，引用 */
+  citeText: any;
+  /** 回车设置引用消息 */
+  enterCiteMsg: model.MsgSaveModel;
 }
-
+interface tagsMsgType {
+  belongId: string;
+  ids: string[];
+  tags: string[];
+}
+let isFirst = false;
 const GroupContent = (props: Iprops) => {
+  const { citeText, enterCiteMsg, chat } = props;
   const [loading, setLoading] = useState(false);
   const [messages, setMessages] = useState(props.chat.messages);
+  const [messagesTags, setMessagesTags] = useState<tagsMsgType>();
   const { handleReWrites } = props;
   const [selectId, setSelectId] = useState<string>('');
   const body = useRef<HTMLDivElement>(null);
   const [beforescrollHeight, setBeforescrollHeight] = useState(0);
+  // 设置转发打开窗口
+  const [forwardOpen, setForwardOpen] = useState(false);
+  // 转发时用户
+  const [formwardCode, setFormwardCode] = useState<model.MsgSaveModel>();
 
+  useEffect(() => {
+    isFirst = true;
+    const id = orgCtrl.provider.subscribePart('tags', (data: tagsMsgType) => {
+      setMessagesTags(data);
+    });
+    return () => {
+      orgCtrl.provider.unsubscribe(id);
+    };
+  }, []);
   useEffect(() => {
     setMessages([...props.chat.messages]);
     props.chat.onMessage((ms) => {
+      // 标记已获取信息为已读
+      if (ms.length > 0 && ms[0].belongId !== orgCtrl.user.userId) {
+        handleTagMsg(ms);
+      }
       setMessages([...ms]);
     });
     return () => {
       props.chat.unMessage();
     };
   }, [props]);
+  // const updataMessage(newTags: tagsMsgType) {
+  //   if (
+  //     newTags.tags?.[0] === '已读' &&
+  //     newTags.ids.includes(messages[messages.length - 1].id)
+  //   ) {
+  //     const resultArr = messages.map((item) => {
+  //       if (item.id === messages[messages.length - 1].id) {
+  //         const tsgItem = { label: '已读', userId: orgCtrl.user.userId, time: '' };
+  //         item['tags'] = [...(item['tags'] ?? []), tsgItem];
+  //       }
+  //       return item;
+  //     });
+  //     setMessages(resultArr);
+  //   }
+  // }
 
   useEffect(() => {
     if (body && body.current) {
       if (loading) {
         setLoading(false);
-        body.current.scrollTop = body.current.scrollHeight - beforescrollHeight;
+        if (body.current) {
+          body.current.scrollHeight > beforescrollHeight &&
+            (body.current.scrollTop = body.current.scrollHeight - beforescrollHeight);
+        }
       } else {
-        body.current.scrollTop = body.current.scrollHeight;
+        // 判断是否在向上滚动；若处于向上滚动则，不到底部
+        if (body.current.scrollTop > 30 || isFirst) {
+          // 新消息，滚动置底
+          body.current.scrollTop = body.current.scrollHeight;
+        }
       }
     }
   }, [messages]);
+  // 处理消息打标签--已读未读功能 //TODO: 通过Intersection Observer来实现监听 是否进入可视区域
+  const handleTagMsg = debounce((ms: model.MsgSaveModel[]) => {
+    //  获取未打标签数据
+    const needTagMsgs = ms.filter((v) => {
+      if (!v?.tags) {
+        return true;
+      }
+      return !v.tags.some((s) => s.userId === orgCtrl.user.userId && s.label === '已读');
+    });
+    // 过滤消息  过滤条件 belongId 不属于个人的私有消息；消息已有标签中没有自己打的‘已读’标签
+    console.log('过滤消息', needTagMsgs, orgCtrl.user.userId);
+    // 未知原因。最后一条消息无法添加tag
+    if (needTagMsgs.length < 2) {
+      return;
+    } else {
+      // 触发事件
+      props.chat.tagMessage(
+        needTagMsgs.map((v) => v.id),
+        ['已读'],
+      );
+    }
+  }, 500);
 
   const isShowTime = (curDate: string, beforeDate: string) => {
     if (beforeDate === '') return true;
     return moment(curDate).diff(beforeDate, 'minute') > 3;
   };
+
   // 滚动事件
-  const onScroll = async () => {
+  const onScroll = debounce(async () => {
     if (!loading && body.current && props.chat && body.current.scrollTop < 10) {
       setLoading(true);
       setBeforescrollHeight(body.current.scrollHeight);
       if ((await props.chat.moreMessage()) < 1) {
+        isFirst = false;
         setLoading(false);
       }
     }
+  }, 50);
+
+  /** 过滤非http链接字符 */
+  const linkText = (val: string) => {
+    const reg = /[\u4e00-\u9fa5]+/g;
+    const link = val.substring(val.indexOf('http'), val.length);
+    return (
+      <div className={`${css.con_content_a}`}>
+        <span className={`${css.con_content_span}`}>
+          {val?.substring(val.indexOf('http'), 0)}
+        </span>
+        <a
+          dangerouslySetInnerHTML={{ __html: link }}
+          href={val.replace(reg, '')}
+          target="_blank"></a>
+      </div>
+    );
   };
+
+  /** 引用*/
+  const cite = (item: model.MsgSaveModel) => {
+    citeText(item);
+  };
+
+  /** 转发消息 */
+  const forward = (item: model.MsgSaveModel) => {
+    setForwardOpen(true);
+    setFormwardCode(item);
+  };
+
   /**
    * 显示消息
    * @param msg 消息
@@ -84,39 +192,132 @@ const GroupContent = (props: Iprops) => {
       }
       case MessageType.File: {
         const file: FileItemShare = parseAvatar(item.showTxt);
+        const showSize: (size: number) => string = (size) => {
+          if (size > 1024000) {
+            return (size / 1024000).toFixed(2) + 'M';
+          } else {
+            return (size / 1024).toFixed(2) + 'KB';
+          }
+        };
+        const showFileIcon: (fileName: string) => string = (fileName) => {
+          const parts = fileName.split('.');
+          const fileTypeStr: string = parts[parts.length - 1];
+          const iconName = FileTypes[fileTypeStr] ?? 'icon-weizhi';
+          return iconName;
+        };
         return (
           <>
             <div className={`${css.con_content_link}`}></div>
-            <div className={`${css.con_content_txt} ${css.con_content_img}`}>
-              <Image src={file.thumbnail} preview={{ src: file.shareLink }} />
-              {file.name}
+            <div className={`${css.con_content_file}`}>
+              {/* <Image src={file.thumbnail} preview={{ src: file.shareLink }} /> */}
+              {/* <Button type="primary" icon={<DownloadOutlined />}>
+                {file.name}
+              </Button> */}
+              <div className={css.con_content_file_info}>
+                <span className={css.con_content_file_info_label}>{file.name}</span>
+                <span className={css.con_content_file_info_value}>
+                  {showSize(file?.size ?? 0)}
+                </span>
+              </div>
+              <IconFont
+                className={css.con_content_file_Icon}
+                type={showFileIcon(file.name)}
+              />
             </div>
           </>
         );
       }
-      default:
+      default: {
+        // 优化截图展示问题
+        if (item.showTxt.includes('$IMG')) {
+          let str = item.showTxt;
+          const matches = [...str.matchAll(/\$IMG\[([^\]]*)\]/g)];
+          // 获取消息包含的图片地址
+          const imgUrls = matches.map((match) => match[1]);
+          // 替换消息里 图片信息特殊字符
+          const willReplaceStr = matches.map((match) => match[0]);
+          willReplaceStr.forEach((strItem) => {
+            // str = str.replace(strItem, '图(' + (idx + 1) + ')');
+            str = str.replace(strItem, ' ');
+          });
+          // 垂直展示截图信息。把文字消息统一放在底部
+          return (
+            <>
+              <div className={`${css.con_content_link}`}></div>
+              <div className={`${css.con_content_txt}`}>
+                {imgUrls.map((url, idx) => (
+                  <Image
+                    className={css.cut_img}
+                    src={url}
+                    key={idx}
+                    preview={{ src: url }}
+                  />
+                ))}
+                {str.trim() && <p style={{ whiteSpace: 'pre-wrap', margin: 0 }}>{str}</p>}
+              </div>
+            </>
+          );
+        }
+        // 默认文本展示
         return (
           <>
             <div className={`${css.con_content_link}`}></div>
-            <div
-              className={`${css.con_content_txt}`}
-              dangerouslySetInnerHTML={{ __html: item.showTxt }}></div>
+            {/* 设置文本为超链接时打开新页面 */}
+            {isShowLink(item.showTxt) ? (
+              linkText(item.showTxt)
+            ) : (
+              <div
+                className={`${css.con_content_txt}`}
+                dangerouslySetInnerHTML={{ __html: filetrText(item) }}></div>
+            )}
           </>
         );
+      }
     }
+  };
+  // 显示已读未读信息
+  const isReadTxt = (msgTags: { label: string; userId: string }[]) => {
+    let showText = '';
+    const allMember = props.chat.members.length - 1;
+    // 获取消息标签数量； 条件：已读标签且标记人不为自己
+    const hasReadNum = msgTags.filter(
+      (v) => v.label === '已读' && v.userId !== orgCtrl.user.userId,
+    )?.length;
+
+    // 同事之间通信
+    if (allMember === -1 || allMember === 0) {
+      showText = hasReadNum > 0 ? '已读' : '未读';
+    } else {
+      // 群组内部通信
+      showText =
+        allMember - hasReadNum > 0 ? allMember - hasReadNum + '人未读' : '全部已读';
+    }
+    return (
+      <span style={{ margin: '4px 10px 0 0', fontSize: '10px', color: '#154ad8' }}>
+        {showText}
+      </span>
+    );
   };
 
   const viewMsg = (item: model.MsgSaveModel, right: boolean = false) => {
+    const isCite = item.showTxt.includes('$CITEMESSAGE[');
     if (right) {
       return (
         <>
-          <div className={`${css.con_content}`}>{parseMsg(item)}</div>
+          <div className={`${css.con_content}`}>
+            {/* 主体展示文字 */}
+            {parseMsg(item)}
+            {/* 引用消息的展示 */}
+            {isCite && showCiteText(item)}
+            {item.belongId !== orgCtrl.user.userId && isReadTxt(item?.tags ?? [])}
+          </div>
           <div style={{ color: '#888', paddingLeft: 10 }}>
             <TeamIcon share={orgCtrl.user.share} preview size={36} fontSize={32} />
           </div>
         </>
       );
     } else {
+      // 左侧的聊天内容
       const share = orgCtrl.user.findShareById(item.fromId);
       return (
         <>
@@ -126,6 +327,7 @@ const GroupContent = (props: Iprops) => {
           <div className={`${css.con_content}`}>
             <div className={`${css.name}`}>{share.name}</div>
             {parseMsg(item)}
+            {isCite && showCiteText(item)}
           </div>
         </>
       );
@@ -140,17 +342,33 @@ const GroupContent = (props: Iprops) => {
             复制
           </Button>
         </CopyToClipboard>
-        <Button type="text" style={{ color: '#3e5ed8' }}>
+        <Button type="text" style={{ color: '#3e5ed8' }} onClick={() => forward(item)}>
           转发
         </Button>
-        <Button
-          type="text"
-          style={{ color: '#3e5ed8' }}
-          onClick={async () => {
-            await props.chat.recallMessage(item.id);
-          }}>
-          撤回
+        {item.fromId === orgCtrl.user.userId && (
+          <Button
+            type="text"
+            style={{ color: '#3e5ed8' }}
+            onClick={async () => {
+              await props.chat.recallMessage(item.id);
+            }}>
+            撤回
+          </Button>
+        )}
+        <Button type="text" style={{ color: '#3e5ed8' }} onClick={() => cite(item)}>
+          引用
         </Button>
+        {['文件', '视频', '图片'].includes(item.msgType) && (
+          <Button
+            type="text"
+            onClick={() => {
+              const url = parseAvatar(item.showTxt).shareLink;
+              downloadByUrl(url);
+            }}
+            style={{ color: '#3e5ed8' }}>
+            下载
+          </Button>
+        )}
         <Button
           type="text"
           danger
@@ -221,9 +439,9 @@ const GroupContent = (props: Iprops) => {
                           <div
                             className={css.con_body}
                             onContextMenu={(e) => {
+                              setSelectId(item.id);
                               e.preventDefault();
                               e.stopPropagation();
-                              setSelectId(item.id);
                             }}>
                             {viewMsg(item)}
                           </div>
@@ -266,6 +484,13 @@ const GroupContent = (props: Iprops) => {
             })}
         </div>
       </Spin>
+      {forwardOpen && (
+        <ForwardModal
+          visible={forwardOpen}
+          onCancel={() => setForwardOpen(false)}
+          formwardCode={formwardCode}
+        />
+      )}
     </div>
   );
 };
