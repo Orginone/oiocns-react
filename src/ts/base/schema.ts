@@ -1108,6 +1108,8 @@ export type XWorkInstance = {
   shareId: string;
   // 归属用户ID
   belongId: string;
+  // 备注
+  remark: string;
   // 状态
   status: number;
   // 创建人员ID
@@ -1302,6 +1304,8 @@ export type XWorkTask = {
   instanceId: string;
   // 身份Id
   identityId: string;
+  // 内容
+  content: string;
   // 备注
   remark: string;
   // 状态

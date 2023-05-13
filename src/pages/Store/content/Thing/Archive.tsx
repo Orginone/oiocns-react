@@ -54,17 +54,13 @@ const ThingArchive: React.FC<IThingCardProps> = ({ thingId, species }) => {
 
   const loadTaskContent = (instance: XWorkInstance) => {
     if (instance.tasks == undefined) return <></>;
-    let tasks = instance.tasks!.sort((a, b) => {
-      let date1 = new Date(a.createTime).getTime();
-      let date2 = new Date(b.createTime).getTime();
-      return date1 - date2;
-    });
+    let tasks = instance.tasks!.sort(
+      (a, b) => new Date(a.createTime).getTime() - new Date(b.createTime).getTime(),
+    );
     return tasks.map((a) => {
-      const records = a.records?.sort((a, b) => {
-        let date1 = new Date(a.createTime).getTime();
-        let date2 = new Date(b.createTime).getTime();
-        return date1 - date2;
-      });
+      const records = a.records?.sort(
+        (a, b) => new Date(a.createTime).getTime() - new Date(b.createTime).getTime(),
+      );
       if (records) {
         return records?.map((record) => (
           <Timeline.Item key={record.id}>
