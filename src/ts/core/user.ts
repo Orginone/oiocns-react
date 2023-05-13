@@ -1,5 +1,5 @@
 import { common, kernel, model, schema } from '../base';
-import { XWorkTask } from '../base/schema';
+import { XTarget, XTeam, XWorkTask } from '../base/schema';
 import { TargetType } from './public/enums';
 import { IPerson, Person } from './target/person';
 import { IWorkProvider, WorkProvider } from './work/provider';
@@ -22,6 +22,11 @@ export class UserProvider extends common.Emitter {
     kernel.on('RecvTask', (data: XWorkTask) => {
       if (this._inited && this._work) {
         this._work.updateTask(data);
+      }
+    });
+    kernel.on('RecvTarget', (data) => {
+      if (this._inited) {
+        this._recvTarget(data);
       }
     });
     const userJson = sessionStorage.getItem(sessionUserName);
@@ -121,6 +126,37 @@ export class UserProvider extends common.Emitter {
       if (isMatch) {
         c.receiveMessage(data);
       }
+    }
+  }
+  /**
+   * 接收到用户信息
+   * @param data 新消息
+   * @param cache 是否缓存
+   */
+  private _recvTarget(data: any): void {
+    switch (data['TypeName']) {
+      case 'Relation':
+        let subTarget = data['SubTarget'] as XTarget;
+        let target = [this._user!, ...this.user!.targets].find(
+          (a) => a.metadata.id == (data['Target'] as XTarget).id,
+        );
+        if (target) {
+          switch (data['Operate']) {
+            case 'Add':
+              target.members.push(subTarget);
+              target.loadMemberChats([subTarget], true);
+              break;
+            case 'Remove':
+              target.members = target.members.filter((a) => a.id != subTarget.id);
+              target.loadMemberChats(target.members, false);
+              break;
+            default:
+              break;
+          }
+        }
+        break;
+      default:
+        break;
     }
   }
 }

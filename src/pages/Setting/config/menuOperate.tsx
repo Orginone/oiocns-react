@@ -76,8 +76,7 @@ const buildSpeciesTree = (species: ISpeciesItem) => {
       switch (species.metadata.typeName) {
         case SpeciesType.Commodity:
         case SpeciesType.WorkForm:
-          await (species as IWorkForm).loadForms();
-          await (species as IWorkForm).loadAttributes();
+          await(species as IWorkForm).loadForms();
           break;
         case SpeciesType.Market:
         case SpeciesType.WorkItem:

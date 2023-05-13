@@ -219,7 +219,7 @@ const CompanySetting: React.FC<IProps> = ({ current }) => {
             selectPerson.forEach(async (group) => {
               if (await current.applyJoin([group])) {
                 message.success('添加成功');
-                orgCtrl.changCallback();
+                forceUpdate();
                 setActiveModal('');
               } else {
                 message.error('添加失败');
