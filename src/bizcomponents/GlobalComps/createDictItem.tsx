@@ -47,12 +47,9 @@ const DictItemModal = ({ open, handleOk, current, data, handleCancel }: Iprops) 
       title={data ? `修改[${data.name}]字典项` : '新增字典项'}
       open={open}
       width={640}
+      initialValues={data || {}}
       onOpenChange={(open: boolean) => {
-        if (open) {
-          if (data) {
-            formRef.current?.setFieldsValue(data);
-          }
-        } else {
+        if (!open) {
           formRef.current?.resetFields();
           handleCancel();
         }

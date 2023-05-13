@@ -332,14 +332,14 @@ export type AttributeModel = {
   name: string;
   // 编号
   code: string;
-  // 类别Id
-  speciesId: string;
+  // 规则
+  rule: string;
   // 属性Id
   propId: string;
   // 工作职权Id
   authId: string;
-  // 共享用户Id
-  shareId: string;
+  // 表单项Id
+  formId: string;
   // 备注
   remark: string;
 };
@@ -357,23 +357,6 @@ export type FormModel = {
   speciesId: string;
   // 共享用户Id
   shareId: string;
-  // 单项集合
-  items: FormItemModel[] | undefined;
-};
-
-export type FormItemModel = {
-  // 唯一ID
-  id: string;
-  // 名称
-  name: string;
-  // 编号
-  code: string;
-  // 规则
-  rule: string;
-  // 备注
-  remark: string;
-  // 特性Id
-  attrId: string;
 };
 
 export type ThingModel = {
@@ -418,8 +401,6 @@ export type GetSpeciesResourceModel = {
   belongId: string;
   // 是否向上递归用户
   upTeam: boolean;
-  // 是否向上递归分类
-  upSpecies: boolean;
   // 分页
   page: PageModel;
 };

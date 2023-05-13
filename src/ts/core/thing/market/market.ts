@@ -4,6 +4,7 @@ import { ISpeciesItem } from '../base/species';
 import { ITarget } from '../../target/base/target';
 import { Commodity, ICommodity } from './commodity';
 import { IWork, Work } from '../base/work';
+import { IForm } from '../base/form';
 export interface IMarket extends IWork {}
 
 export class Market extends Work implements IMarket {
@@ -23,17 +24,10 @@ export class Market extends Work implements IMarket {
   ): ISpeciesItem | undefined {
     return new Commodity(_metadata, _current, this, this);
   }
-  async loadForms(): Promise<schema.XForm[]> {
-    const result: schema.XForm[] = [];
+  async loadForms(): Promise<IForm[]> {
+    const result: IForm[] = [];
     for (const item of this.children) {
       result.push(...(await (item as ICommodity).loadAllForms()));
-    }
-    return result;
-  }
-  async loadAttributes(): Promise<schema.XAttribute[]> {
-    const result: schema.XAttribute[] = [];
-    for (const item of this.children) {
-      result.push(...(await (item as ICommodity).loadAllAttributes()));
     }
     return result;
   }
