@@ -148,7 +148,7 @@ export class UserProvider extends common.Emitter {
               break;
             case 'Remove':
               target.members = target.members.filter((a) => a.id != subTarget.id);
-              target.loadMemberChats(target.members, false);
+              target.loadMemberChats([subTarget], false);
               break;
             default:
               break;
