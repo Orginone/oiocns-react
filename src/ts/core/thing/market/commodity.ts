@@ -1,19 +1,22 @@
-import { SpeciesType } from '../../public/enums';
-import { ISpeciesItem } from '../base/species';
-import { schema } from '@/ts/base';
+import { SpeciesType, TargetType } from '../../public/enums';
+import { ISpeciesItem, SpeciesItem } from '../base/species';
+import { kernel, schema } from '@/ts/base';
 import { ITarget } from '../../target/base/target';
 import { Form, IForm } from '../base/form';
 import { IMarket } from './market';
-export interface ICommodity extends IForm {
+import { PageAll } from '../../public/consts';
+export interface ICommodity extends ISpeciesItem {
   /** 市场接口 */
   market: IMarket;
+  /** 商品对应的表单 */
+  form: IForm | undefined;
+  /** 加载表单 */
+  loadForm(reload?: boolean): Promise<IForm | undefined>;
   /** 所有的表单 */
-  loadAllForms(): Promise<schema.XForm[]>;
-  /** 所有的表单特性 */
-  loadAllAttributes(): Promise<schema.XAttribute[]>;
+  loadAllForms(): Promise<IForm[]>;
 }
 
-export class Commodity extends Form implements ICommodity {
+export class Commodity extends SpeciesItem implements ICommodity {
   constructor(
     _metadata: schema.XSpecies,
     _current: ITarget,
@@ -30,39 +33,38 @@ export class Commodity extends Form implements ICommodity {
       }
     }
   }
+  form: IForm | undefined;
   market: IMarket;
+  async loadForm(reload: boolean = false): Promise<IForm | undefined> {
+    if (!this.form || reload) {
+      const res = await kernel.querySpeciesForms({
+        id: this.current.metadata.id,
+        speciesId: this.metadata.id,
+        belongId: this.current.space.metadata.id,
+        upTeam: this.current.metadata.typeName === TargetType.Group,
+        page: PageAll,
+      });
+      if (res.success && res.data.result && res.data.result.length > 0) {
+        this.form = new Form(res.data.result[0], this);
+      }
+    }
+    return this.form;
+  }
+  async loadAllForms(): Promise<IForm[]> {
+    const result = [];
+    await this.loadForm();
+    if (this.form) {
+      result.push(this.form);
+    }
+    for (const item of this.children) {
+      result.push(...(await (item as Commodity).loadAllForms()));
+    }
+    return result;
+  }
   override createChildren(
     _metadata: schema.XSpecies,
     _current: ITarget,
   ): ISpeciesItem | undefined {
     return new Commodity(_metadata, _current, this, this.market);
-  }
-  async loadAllForms(): Promise<schema.XForm[]> {
-    const result = [];
-    await this.loadForms();
-    result.push(...this.forms);
-    for (const item of this.children) {
-      const subForms = await (item as Commodity).loadAllForms();
-      for (const sub of subForms) {
-        if (result.findIndex((i) => i.id === sub.id) < 0) {
-          result.push(sub);
-        }
-      }
-    }
-    return result;
-  }
-  async loadAllAttributes(): Promise<schema.XAttribute[]> {
-    const result = [];
-    await this.loadAttributes();
-    result.push(...this.attributes);
-    for (const item of this.children) {
-      const subAttribute = await (item as Commodity).loadAllAttributes();
-      for (const sub of subAttribute) {
-        if (result.findIndex((i) => i.id === sub.id) < 0) {
-          result.push(sub);
-        }
-      }
-    }
-    return result;
   }
 }

@@ -963,12 +963,12 @@ export default class KernelApi {
    * @param {model.GetSpeciesResourceModel} params 请求参数
    * @returns {model.ResultType<schema.XAttributeArray>} 请求结果
    */
-  public async querySpeciesAttrs(
-    params: model.GetSpeciesResourceModel,
+  public async queryFormAttribute(
+    params: model.GainModel,
   ): Promise<model.ResultType<schema.XAttributeArray>> {
     return await this.request({
       module: 'thing',
-      action: 'QuerySpeciesAttrs',
+      action: 'QueryFormAttribute',
       params: params,
     });
   }
