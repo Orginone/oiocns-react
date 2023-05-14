@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import * as echarts from 'echarts';
+
 type SeriesType = {
   // type: 'bar' | 'line' | 'pie'; // 柱状图｜折线图｜饼图;
   type: string; // 柱状图｜折线图｜饼图;
@@ -33,7 +34,6 @@ type yNameType = string; // Y坐标轴name
 
 interface Iprops {
   id?: any;
-  index?:number;
   SeriesType?: SeriesType;
   FooterTitleType?: FooterTitleType;
   GridType?: GridType;
@@ -42,9 +42,9 @@ interface Iprops {
   legendType?: legendType;
   yNameType?: yNameType;
 }
+
 const Echart: React.FC<Iprops> = ({
   id = 'main',
-  index,
   SeriesType,
   FooterTitleType,
   xAxisType,
@@ -68,24 +68,17 @@ const Echart: React.FC<Iprops> = ({
           type: 'shadow',
         },
         formatter: (params:any) => {
-          var total1 = ['12712.66', '13170.48', '14212.19', '15767.99', '28705.94'];
-      var total2 = ['104374.61', '138119.96', '167168.46', '206826.16', '249968.87'];
-      if(index == 1){
-        var sumtext =  total1[params[0].dataIndex];
-      }else if(index == 2){
-        var sumtext =  total2[params[0].dataIndex];
-      }
           return params[0].name + '<br>' +
-            params[0].marker + ' ' + params[0].seriesName + ': ' + params[0].data + '<br>' +
-            params[1].marker + ' ' + params[1].seriesName + ': ' + params[1].data + '<br>' +
-            params[2].marker + ' ' + params[2].seriesName + ': ' +sumtext
+            params[0].marker + ' ' + params[0].seriesName + ': ' + params[0].data + ' 万公顷' + '<br>' +
+            params[1].marker + ' ' + params[1].seriesName + ': ' + params[1].data + ' 种' + '<br>' +
+            params[2].marker + ' ' + params[2].seriesName + ': ' + params[2].data + ' 亿立方米';
         },
       },
       // 图表距离边缘位置的距离
       grid:   {
-        top: '6%',
-        right: '6%',
-        left: '10%',
+        top: '0%',
+        right: '0%',
+        left: '0%',
         bottom: '20%',
       },
       xAxis: [
@@ -94,7 +87,7 @@ const Echart: React.FC<Iprops> = ({
           data: FooterTitleType,
           axisLine: {
             lineStyle: {
-              color: 'rgba(255,255,255,0.12)',
+              color: 'rgba(0,0,0,0.12)',
             },
           },
           axisLabel: {
@@ -108,15 +101,19 @@ const Echart: React.FC<Iprops> = ({
       ],
       yAxis: [
         {
+          axisTick:{
+            show:false
+          },
           type: yAxisType,
           name: yNameType,
           axisLabel: {
+            show: false,
             type: yAxisType,
             formatter: '{value}',
             color: '#606266',
           },
           axisLine: {
-            show: true,
+            show: false,
           },
           /* splitLine: {
             lineStyle: {
