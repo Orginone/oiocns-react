@@ -6,9 +6,11 @@ import React, { useEffect } from 'react';
 import BannerCom from './components/BannerCom';
 import SelfAppCom from './components/SelfAppCom';
 import Shortcuts from './components/ShortcutsCom';
+import Charts from './components/Charts';
 
 //TODO: 临时获取本地banner
 let imgList: any[] = [];
+
 
 /**
  * @desc: 获取图片列表资源
@@ -37,6 +39,7 @@ const Home: React.FC = () => {
         <Shortcuts props={[]} /> <SelfAppCom props={[]} />
       </div>
       {/* 底部区域 //TODO:临时*/}
+      <Charts/>
     </div>
   );
 };

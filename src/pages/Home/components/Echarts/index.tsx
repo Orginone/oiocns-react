@@ -8,7 +8,7 @@ type SeriesType = {
   name?: string; // 图例名称和鼠标移入展示名称
   stack?: string;
 }[];
-type FooterTitleType = string[] | number[]; // 图表横向坐标轴展示项
+type FooterTitleType = string[] | number[]; // 示图表横向坐标轴展项
 type GridType = {
   top?: string;
   right?: string;
@@ -27,7 +27,7 @@ type legendType = {
     color?: string; // 字体颜色
     fontWeight?: string | number; // 字体粗细
     fontSize?: number; // 字体大小
-    lineHeight?: number; // 行高
+    lineHeight?: number; // 行高2
   };
 }; // 图例
 type yNameType = string; // Y坐标轴name
@@ -60,7 +60,7 @@ const Echart: React.FC<Iprops> = ({
     // 初始化echats图表
     const histogramChart = echarts.init(chartDom);
     const option = {
-      backgroundColor: '#00265f',
+      backgroundColor: '#ffffff',
       // 提示框
       tooltip: {
         trigger: 'axis',
@@ -86,7 +86,7 @@ const Echart: React.FC<Iprops> = ({
           },
           axisLabel: {
             margin: 10,
-            color: '#e2e9ff',
+            color: '#606266',
             textStyle: {
               fontSize: 14,
             },
@@ -100,7 +100,7 @@ const Echart: React.FC<Iprops> = ({
           axisLabel: {
             type: yAxisType,
             formatter: '{value}',
-            color: '#e2e9ff',
+            color: '#606266',
           },
           axisLine: {
             show: false,
