@@ -3,7 +3,6 @@ import { Tag } from 'antd';
 import orgCtrl from '@/ts/controller';
 import { ProColumns } from '@ant-design/pro-table';
 import { schema } from '@/ts/base';
-import { XWorkTask } from '@/ts/base/schema';
 import { IFlowDefine } from '@/ts/core';
 
 export const DefineColumns: ProColumns<IFlowDefine>[] = [
@@ -22,15 +21,6 @@ export const DefineColumns: ProColumns<IFlowDefine>[] = [
     title: '编码',
     width: 100,
     dataIndex: ['metadata', 'code'],
-  },
-  {
-    key: 'isCreate',
-    width: 200,
-    title: '创建类',
-    dataIndex: ['metadata', 'isCreate'],
-    render: (_: any, record: IFlowDefine) => {
-      return record.metadata.isCreate ? '是' : '否';
-    },
   },
   {
     key: 'belongId',
@@ -84,9 +74,17 @@ export const WorkColumns: ProColumns<schema.XWorkTask>[] = [
     width: 80,
   },
   {
-    title: '内容',
+    title: '标题',
     width: 100,
     dataIndex: 'title',
+    render: (_: any, record: schema.XWorkTask) => {
+      let strs = record.title.split('&&');
+      if (strs.length > 1) {
+        let name = orgCtrl.provider.user!.findShareById(strs[0]).name;
+        return `[${name}]${strs[1]}`;
+      }
+      return record.title;
+    },
   },
   {
     key: 'shareId',
@@ -116,8 +114,8 @@ export const WorkColumns: ProColumns<schema.XWorkTask>[] = [
     },
   },
   {
-    title: '备注',
-    dataIndex: 'remark',
+    title: '内容',
+    dataIndex: 'content',
     render: (_: any, record: schema.XWorkTask) => {
       if (record.taskType === '加用户') {
         const targets: schema.XTarget[] = JSON.parse(record.content);
@@ -135,6 +133,7 @@ export const WorkColumns: ProColumns<schema.XWorkTask>[] = [
     dataIndex: 'createTime',
   },
 ];
+
 export const DoneColumns: ProColumns<schema.XWorkRecord>[] = [
   {
     title: '序号',
@@ -183,63 +182,6 @@ export const DoneColumns: ProColumns<schema.XWorkRecord>[] = [
   {
     title: '审批时间',
     valueType: 'dateTime',
-    dataIndex: 'createTime',
-  },
-];
-
-export const ApplyColumns: ProColumns<XWorkTask>[] = [
-  {
-    title: '序号',
-    dataIndex: 'index',
-    valueType: 'index',
-    width: 60,
-  },
-  {
-    title: '类型',
-    dataIndex: 'taskType',
-    width: 80,
-  },
-  {
-    title: '内容',
-    width: 100,
-    dataIndex: 'title',
-  },
-  {
-    key: 'shareId',
-    width: 200,
-    title: '共享组织',
-    dataIndex: 'shareId',
-    render: (_: any, record: XWorkTask) => {
-      return orgCtrl.provider.user?.findShareById(record.shareId).name;
-    },
-  },
-  {
-    key: 'createUser',
-    width: 100,
-    title: '申请人',
-    dataIndex: 'createUser',
-    render: (_: any, record: XWorkTask) => {
-      return orgCtrl.provider.user?.findShareById(record.createUser).name;
-    },
-  },
-  {
-    title: '状态',
-    width: 80,
-    dataIndex: 'status',
-    render: (_: any, record: XWorkTask) => {
-      const status = statusMap.get(record.status as number);
-      return <Tag color={status!.color}>{status!.text}</Tag>;
-    },
-  },
-  {
-    title: '备注',
-    width: 200,
-    dataIndex: 'content',
-  },
-  {
-    title: '申请时间',
-    valueType: 'dateTime',
-    width: 200,
     dataIndex: 'createTime',
   },
 ];

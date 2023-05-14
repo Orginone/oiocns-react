@@ -1064,6 +1064,8 @@ export type XWorkInstance = {
   shareId: string;
   // 归属用户ID
   belongId: string;
+  // 备注
+  remark: string;
   // 状态
   status: number;
   // 创建人员ID

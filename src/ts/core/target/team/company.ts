@@ -226,30 +226,35 @@ export class Company extends Belong implements ICompany {
     return targets;
   }
   override loadMemberChats(_newMembers: schema.XTarget[], _isAdd: boolean): void {
-    _newMembers
-      .filter((i) => i.id != this.user.metadata.id)
-      .forEach((i) => {
-        if (_isAdd) {
-          this.memberChats.push(
-            new PersonMsgChat(
-              this.user.metadata.id,
-              this.metadata.id,
-              i.id,
-              {
-                name: i.name,
-                typeName: i.typeName,
-                avatar: parseAvatar(i.icon),
-              },
-              [this.metadata.name, '同事'],
-              i.remark,
-            ),
-          );
-        } else {
-          this.memberChats = this.memberChats.filter(
-            (a) => !(a.belongId === i.id && a.chatId === i.id),
-          );
-        }
+    _newMembers = _newMembers.filter((i) => i.id != this.user.metadata.id);
+    if (_isAdd) {
+      _newMembers.forEach((i) => {
+        this.memberChats.push(
+          new PersonMsgChat(
+            this.user.metadata.id,
+            this.metadata.id,
+            i.id,
+            {
+              name: i.name,
+              typeName: i.typeName,
+              avatar: parseAvatar(i.icon),
+            },
+            [this.metadata.name, '同事'],
+            i.remark,
+          ),
+        );
       });
+    } else {
+      let chats: PersonMsgChat[] = [];
+      this.memberChats.forEach((a) => {
+        _newMembers.forEach((i) => {
+          if (a.chatId != i.id) {
+            chats.push(a);
+          }
+        });
+      });
+      this.memberChats = chats;
+    }
   }
   async deepLoad(reload: boolean = false): Promise<void> {
     await this.loadGroups(reload);

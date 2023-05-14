@@ -207,28 +207,35 @@ export class Person extends Belong implements IPerson {
     this.superAuth?.deepLoad(reload);
   }
   override loadMemberChats(_newMembers: schema.XTarget[], _isAdd: boolean): void {
-    _newMembers.forEach((i) => {
-      if (_isAdd) {
-        this.memberChats.push(
-          new PersonMsgChat(
-            this.metadata.id,
-            this.metadata.id,
-            i.id,
-            {
-              name: i.name,
-              typeName: i.typeName,
-              avatar: parseAvatar(i.icon),
-            },
-            ['好友'],
-            i.remark,
-          ),
-        );
-      } else {
-        this.memberChats = this.memberChats.filter(
-          (a) => !(a.belongId === i.id && a.chatId === i.id),
-        );
-      }
-    });
+   _newMembers = _newMembers.filter((i) => i.id != this.user.metadata.id);
+   if (_isAdd) {
+     _newMembers.forEach((i) => {
+       this.memberChats.push(
+         new PersonMsgChat(
+           this.metadata.id,
+           this.metadata.id,
+           i.id,
+           {
+             name: i.name,
+             typeName: i.typeName,
+             avatar: parseAvatar(i.icon),
+           },
+           ['好友'],
+           i.remark,
+         ),
+       );
+     });
+   } else {
+     let chats: PersonMsgChat[] = [];
+     this.memberChats.forEach((a) => {
+       _newMembers.forEach((i) => {
+         if (a.chatId != i.id) {
+           chats.push(a);
+         }
+       });
+     });
+     this.memberChats = chats;
+   }
   }
   findShareById(id: string): model.ShareIcon {
     const share = ShareIdSet.get(id) || {
