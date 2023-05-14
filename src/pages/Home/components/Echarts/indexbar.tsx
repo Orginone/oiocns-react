@@ -8,7 +8,7 @@ type SeriesType = {
   name?: string; // 图例名称和鼠标移入展示名称
   stack?: string;
 }[];
-type FooterTitleType = string[] | number[]; // 图表横向坐标轴展示项
+type FooterTitleType = string[] | number[]; // 示图表横向坐标轴展项
 type GridType = {
   top?: string;
   right?: string;
@@ -27,41 +27,59 @@ type legendType = {
     color?: string; // 字体颜色
     fontWeight?: string | number; // 字体粗细
     fontSize?: number; // 字体大小
-    lineHeight?: number; // 行高
+    lineHeight?: number; // 行高2
   };
 }; // 图例
 type yNameType = string; // Y坐标轴name
 
-export const onEcharts = (
-  SeriesType?: SeriesType,
-  FooterTitleType?: FooterTitleType,
-  xAxisType?: xAxisType,
-  yAxisType?: yAxisType,
-  yNameType?: yNameType,
-  GridType?: GridType,
-  legendType?: legendType,
-) => {
-  const chartsRef = useRef(null) as any;
+interface Iprops {
+  id?: any;
+  SeriesType?: SeriesType;
+  FooterTitleType?: FooterTitleType;
+  GridType?: GridType;
+  xAxisType?: xAxisType;
+  yAxisType?: yAxisType;
+  legendType?: legendType;
+  yNameType?: yNameType;
+}
+
+const Echart: React.FC<Iprops> = ({
+  id = 'main',
+  SeriesType,
+  FooterTitleType,
+  xAxisType,
+  yAxisType,
+  yNameType,
+  GridType,
+  legendType,
+}) => {
+  const chartsRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
     // 绑定展示图
-    const chartDom = chartsRef.current;
+    const chartDom: any = chartsRef.current;
     // 初始化echats图表
     const histogramChart = echarts.init(chartDom);
     const option = {
-      backgroundColor: '#00265f',
+      backgroundColor: '#ffffff',
       // 提示框
       tooltip: {
         trigger: 'axis',
         axisPointer: {
           type: 'shadow',
         },
+        formatter: (params:any) => {
+          return params[0].name + '<br>' +
+            params[0].marker + ' ' + params[0].seriesName + ': ' + params[0].data + ' 万公顷' + '<br>' +
+            params[1].marker + ' ' + params[1].seriesName + ': ' + params[1].data + ' 种' + '<br>' +
+            params[2].marker + ' ' + params[2].seriesName + ': ' + params[2].data + ' 亿立方米';
+        },
       },
       // 图表距离边缘位置的距离
-      grid: GridType || {
-        top: '15%',
-        right: '3%',
-        left: '10%',
-        bottom: '12%',
+      grid:   {
+        top: '0%',
+        right: '0%',
+        left: '0%',
+        bottom: '20%',
       },
       xAxis: [
         {
@@ -69,12 +87,12 @@ export const onEcharts = (
           data: FooterTitleType,
           axisLine: {
             lineStyle: {
-              color: 'rgba(255,255,255,0.12)',
+              color: 'rgba(0,0,0,0.12)',
             },
           },
           axisLabel: {
             margin: 10,
-            color: '#e2e9ff',
+            color: '#606266',
             textStyle: {
               fontSize: 14,
             },
@@ -83,21 +101,25 @@ export const onEcharts = (
       ],
       yAxis: [
         {
+          axisTick:{
+            show:false
+          },
           type: yAxisType,
           name: yNameType,
           axisLabel: {
+            show: false,
             type: yAxisType,
             formatter: '{value}',
-            color: '#e2e9ff',
+            color: '#606266',
           },
           axisLine: {
             show: false,
           },
-          splitLine: {
+          /* splitLine: {
             lineStyle: {
               color: 'rgba(255,255,255,0.12)',
             },
-          },
+          }, */
         },
       ],
       legend: legendType,
@@ -115,12 +137,8 @@ export const onEcharts = (
       ],
     };
     option && histogramChart.setOption(option);
-    // 根据页面大小重新渲染图表
-    const handleResize = () => {
-      histogramChart?.resize();
-    };
-    window.addEventListener('resize', handleResize);
   }, []);
-  //  图表容器
-  return <div ref={chartsRef} style={{ width: '100%', height: '100%' }} />;
+  return <div id={id} ref={chartsRef} style={{ width: '100%', height: '100%' }} />;
 };
+
+export default Echart;

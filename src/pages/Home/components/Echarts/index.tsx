@@ -1,6 +1,5 @@
-import React, {useEffect, useRef} from 'react';
+import React, { useEffect, useRef } from 'react';
 import * as echarts from 'echarts';
-
 type SeriesType = {
   // type: 'bar' | 'line' | 'pie'; // 柱状图｜折线图｜饼图;
   type: string; // 柱状图｜折线图｜饼图;
@@ -34,6 +33,7 @@ type yNameType = string; // Y坐标轴name
 
 interface Iprops {
   id?: any;
+  index?:number;
   SeriesType?: SeriesType;
   FooterTitleType?: FooterTitleType;
   GridType?: GridType;
@@ -42,17 +42,17 @@ interface Iprops {
   legendType?: legendType;
   yNameType?: yNameType;
 }
-
 const Echart: React.FC<Iprops> = ({
-                                    id = 'main',
-                                    SeriesType,
-                                    FooterTitleType,
-                                    xAxisType,
-                                    yAxisType,
-                                    yNameType,
-                                    GridType,
-                                    legendType,
-                                  }) => {
+  id = 'main',
+  index,
+  SeriesType,
+  FooterTitleType,
+  xAxisType,
+  yAxisType,
+  yNameType,
+  GridType,
+  legendType,
+}) => {
   const chartsRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
     // 绑定展示图
@@ -67,13 +67,26 @@ const Echart: React.FC<Iprops> = ({
         axisPointer: {
           type: 'shadow',
         },
+        formatter: (params:any) => {
+          var total1 = ['12712.66', '13170.48', '14212.19', '15767.99', '28705.94'];
+      var total2 = ['104374.61', '138119.96', '167168.46', '206826.16', '249968.87'];
+      if(index == 1){
+        var sumtext =  total1[params[0].dataIndex];
+      }else if(index == 2){
+        var sumtext =  total2[params[0].dataIndex];
+      }
+          return params[0].name + '<br>' +
+            params[0].marker + ' ' + params[0].seriesName + ': ' + params[0].data + '<br>' +
+            params[1].marker + ' ' + params[1].seriesName + ': ' + params[1].data + '<br>' +
+            params[2].marker + ' ' + params[2].seriesName + ': ' +sumtext
+        },
       },
       // 图表距离边缘位置的距离
-      grid: GridType || {
-        top: '15%',
-        right: '3%',
+      grid:   {
+        top: '6%',
+        right: '6%',
         left: '10%',
-        bottom: '15%',
+        bottom: '20%',
       },
       xAxis: [
         {
@@ -81,7 +94,7 @@ const Echart: React.FC<Iprops> = ({
           data: FooterTitleType,
           axisLine: {
             lineStyle: {
-              color: '#333',
+              color: 'rgba(255,255,255,0.12)',
             },
           },
           axisLabel: {
@@ -105,11 +118,11 @@ const Echart: React.FC<Iprops> = ({
           axisLine: {
             show: true,
           },
-          splitLine: {
+          /* splitLine: {
             lineStyle: {
               color: 'rgba(255,255,255,0.12)',
             },
-          },
+          }, */
         },
       ],
       legend: legendType,
@@ -118,9 +131,9 @@ const Echart: React.FC<Iprops> = ({
         {
           option: {
             series: [
-              {center: ['25%', '50%']},
-              {center: ['50%', '50%']},
-              {center: ['75%', '50%']},
+              { center: ['25%', '50%'] },
+              { center: ['50%', '50%'] },
+              { center: ['75%', '50%'] },
             ],
           },
         },
@@ -128,7 +141,7 @@ const Echart: React.FC<Iprops> = ({
     };
     option && histogramChart.setOption(option);
   }, []);
-  return <div id={id} ref={chartsRef} style={{width: '100%', height: '94%'}}/>;
+  return <div id={id} ref={chartsRef} style={{ width: '100%', height: '100%' }} />;
 };
 
 export default Echart;
