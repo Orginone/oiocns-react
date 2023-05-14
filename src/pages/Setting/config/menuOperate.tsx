@@ -165,6 +165,7 @@ const buildFormMenu = (form: IWorkForm): MenuItemType => {
             },
           },
         ],
+        children: [],
         beforeLoad: async () => {
           await i.loadPropertys();
           await i.loadAttributes();
