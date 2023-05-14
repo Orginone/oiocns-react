@@ -25,7 +25,7 @@ export class WorkForm extends SpeciesItem implements IWorkForm {
       const res = await kernel.querySpeciesForms({
         id: this.current.metadata.id,
         speciesId: this.metadata.id,
-        belongId: this.current.space.metadata.id,
+        belongId: this.belongId,
         upTeam: this.current.metadata.typeName === TargetType.Group,
         page: PageAll,
       });

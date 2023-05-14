@@ -1,9 +1,9 @@
 import { AiOutlineEllipsis, AiOutlineSearch } from 'react-icons/ai';
-import { Badge, Dropdown, Input, MenuProps, Tag, Tree } from 'antd';
+import { Badge, Dropdown, Input, MenuProps, Tag, Tree, TreeProps } from 'antd';
 import React, { ReactElement, useEffect, useState } from 'react';
 import cls from './index.module.less';
 
-interface TreeType {
+interface TreeType extends TreeProps {
   treeData: any[];
   draggable?: boolean; //是否可拖拽
   searchable?: boolean; //是否展示搜索区域
@@ -21,11 +21,10 @@ interface TreeType {
     key: string;
     children: string;
   };
-  [key: string]: any; // 其他属性方法
 }
 
 const { DirectoryTree } = Tree;
-const StoreClassifyTree: React.FC<TreeType> = ({
+const CustomTree: React.FC<TreeType> = ({
   isDirectoryTree = false,
   title,
   treeData,
@@ -193,7 +192,11 @@ const StoreClassifyTree: React.FC<TreeType> = ({
       )}
       {searchable && (
         <div className={cls.title}>
-          <Input prefix={<AiOutlineSearch />} onChange={onChange} placeholder="搜索内容" />
+          <Input
+            prefix={<AiOutlineSearch />}
+            onChange={onChange}
+            placeholder="搜索内容"
+          />
         </div>
       )}
       {isDirectoryTree ? (
@@ -223,4 +226,4 @@ const StoreClassifyTree: React.FC<TreeType> = ({
   );
 };
 
-export default React.memo(StoreClassifyTree);
+export default React.memo(CustomTree);

@@ -6,6 +6,8 @@ import { ITarget } from '../../target/base/target';
 export interface ISpeciesItem extends common.IEntity {
   /** 数据实体 */
   metadata: schema.XSpecies;
+  /** 当前归属用户Id */
+  belongId: string;
   /** 当前加载分类的用户 */
   current: ITarget;
   /** 支持的类别类型 */
@@ -16,6 +18,8 @@ export interface ISpeciesItem extends common.IEntity {
   children: ISpeciesItem[];
   /** 共享信息 */
   share: model.ShareIcon;
+  /** 是否为继承的类别 */
+  isInherited: boolean;
   /** 删除 */
   delete(): Promise<boolean>;
   /** 更新 */
@@ -37,6 +41,7 @@ export abstract class SpeciesItem extends common.Entity implements ISpeciesItem 
       avatar: parseAvatar(this.metadata.icon),
     };
     ShareIdSet.set(this.metadata.id, this.share);
+    this.isInherited = _metadata.belongId != _current.metadata.belongId;
   }
   share: model.ShareIcon;
   parent: ISpeciesItem | undefined;
@@ -44,6 +49,10 @@ export abstract class SpeciesItem extends common.Entity implements ISpeciesItem 
   current: ITarget;
   metadata: schema.XSpecies;
   speciesTypes: string[] = [];
+  isInherited: boolean;
+  get belongId() {
+    return this.current.space.metadata.id;
+  }
   async delete(): Promise<boolean> {
     const res = await kernel.deleteSpecies({
       id: this.metadata.id,

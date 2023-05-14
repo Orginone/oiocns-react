@@ -2,36 +2,32 @@ import React, { useEffect, useState } from 'react';
 import { Card, Collapse, Timeline } from 'antd';
 import orgCtrl from '@/ts/controller';
 import { kernel } from '@/ts/base';
-import { ISpeciesItem } from '@/ts/core';
-import OioForm from '@/bizcomponents/FormDesign/Design/OioForm';
+import OioForm from '@/bizcomponents/FormDesign/OioForm';
 import { XWorkInstance } from '@/ts/base/schema';
 
 const { Panel } = Collapse;
 
 interface IThingCardProps {
-  species: ISpeciesItem;
+  belongId: string;
   thingId: string;
 }
 /**
  * 存储-物-归档日志
  */
-const ThingArchive: React.FC<IThingCardProps> = ({ thingId, species }) => {
+const ThingArchive: React.FC<IThingCardProps> = ({ thingId, belongId }) => {
   const [instances, setInstances] = useState<XWorkInstance[]>([]);
   useEffect(() => {
     const findThing = async () => {
-      const res = await kernel.anystore.loadThingArchives(
-        species.current.space.metadata.id,
-        {
-          options: {
-            match: {
-              _id: {
-                _eq_: thingId,
-              },
+      const res = await kernel.anystore.loadThingArchives(belongId, {
+        options: {
+          match: {
+            _id: {
+              _eq_: thingId,
             },
           },
-          userData: [],
         },
-      );
+        userData: [],
+      });
       const resData = res.data as { data: any };
       const ts = (resData?.data || [])[0];
       let data = [];
@@ -93,7 +89,6 @@ const ThingArchive: React.FC<IThingCardProps> = ({ thingId, species }) => {
                   return (
                     <Panel header={form.name} key={form.id}>
                       <OioForm
-                        belong={species.current.space}
                         key={form.id}
                         form={form}
                         formRef={undefined}

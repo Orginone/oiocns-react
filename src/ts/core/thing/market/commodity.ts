@@ -35,17 +35,39 @@ export class Commodity extends SpeciesItem implements ICommodity {
   }
   form: IForm | undefined;
   market: IMarket;
+  override async delete(): Promise<boolean> {
+    await this.loadForm();
+    if (this.form) {
+      await this.form.delete();
+    }
+    return await super.delete();
+  }
   async loadForm(reload: boolean = false): Promise<IForm | undefined> {
     if (!this.form || reload) {
       const res = await kernel.querySpeciesForms({
         id: this.current.metadata.id,
         speciesId: this.metadata.id,
-        belongId: this.current.space.metadata.id,
+        belongId: this.belongId,
         upTeam: this.current.metadata.typeName === TargetType.Group,
         page: PageAll,
       });
-      if (res.success && res.data.result && res.data.result.length > 0) {
-        this.form = new Form(res.data.result[0], this);
+      if (res.success) {
+        if (res.data.result && res.data.result.length > 0) {
+          this.form = new Form(res.data.result[0], this);
+        } else {
+          const res = await kernel.createForm({
+            name: this.metadata.name,
+            id: '0',
+            rule: '{}',
+            code: this.metadata.code,
+            remark: this.metadata.remark,
+            speciesId: this.metadata.id,
+            shareId: this.metadata.shareId,
+          });
+          if (res.success && res.data.id) {
+            this.form = new Form(res.data, this);
+          }
+        }
       }
     }
     return this.form;

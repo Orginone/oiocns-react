@@ -102,7 +102,7 @@ export abstract class Work extends SpeciesItem implements IWork {
       const res = await kernel.queryWorkDefine({
         id: this.current.metadata.id,
         speciesId: this.metadata.id,
-        belongId: this.current.space.metadata.id,
+        belongId: this.belongId,
         upTeam: this.current.metadata.typeName === TargetType.Group,
         page: PageAll,
       });

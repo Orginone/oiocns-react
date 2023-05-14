@@ -4,6 +4,7 @@ import { ISpeciesItem } from './species';
 import { common, kernel, model, schema } from '@/ts/base';
 import { IPropClass } from '../store/propclass';
 import { IWorkForm } from '../app/work/workform';
+import { XProperty } from '@/ts/base/schema';
 export interface IForm extends common.IEntity {
   /** 表单元数据 */
   metadata: schema.XForm;
@@ -20,9 +21,15 @@ export interface IForm extends common.IEntity {
   /** 加载表单特性 */
   loadAttributes(reload?: boolean): Promise<schema.XAttribute[]>;
   /** 新建表单特性 */
-  createAttribute(data: model.AttributeModel): Promise<schema.XAttribute | undefined>;
+  createAttribute(
+    data: model.AttributeModel,
+    property: XProperty,
+  ): Promise<schema.XAttribute | undefined>;
   /** 更新表单特性 */
-  updateAttribute(data: model.AttributeModel): Promise<boolean>;
+  updateAttribute(
+    data: model.AttributeModel,
+    property?: schema.XProperty,
+  ): Promise<boolean>;
   /** 删除表单特性 */
   deleteAttribute(data: schema.XAttribute): Promise<boolean>;
 }
@@ -71,9 +78,9 @@ export class Form extends common.Entity implements IForm {
   }
   async loadAttributes(reload: boolean = false): Promise<schema.XAttribute[]> {
     if (!this._attributeLoaded || reload) {
-      const res = await kernel.queryFormAttribute({
+      const res = await kernel.queryFormAttributes({
         id: this.metadata.id,
-        subId: this.species.current.space.metadata.id,
+        subId: this.species.belongId,
       });
       if (res.success) {
         this._attributeLoaded = true;
@@ -84,20 +91,38 @@ export class Form extends common.Entity implements IForm {
   }
   async createAttribute(
     data: model.AttributeModel,
+    property: XProperty,
   ): Promise<schema.XAttribute | undefined> {
     data.formId = this.metadata.id;
+    data.propId = property.id;
+    if (!data.authId || data.authId.length < 5) {
+      data.authId = this.species.metadata.authId;
+    }
     const res = await kernel.createAttribute(data);
     if (res.success && res.data.id) {
+      res.data.property = property;
+      res.data.linkPropertys = [property];
       this.attributes.push(res.data);
       return res.data;
     }
   }
-  async updateAttribute(data: model.AttributeModel): Promise<boolean> {
+  async updateAttribute(
+    data: model.AttributeModel,
+    property?: schema.XProperty,
+  ): Promise<boolean> {
     const index = this.attributes.findIndex((i) => i.id === data.id);
     if (index > -1) {
       data.formId = this.metadata.id;
+      if (property) {
+        data.propId = property.id;
+      }
       const res = await kernel.updateAttribute(data);
       if (res.success && res.data.id) {
+        res.data.property = this.attributes[index].property;
+        res.data.linkPropertys = this.attributes[index].linkPropertys;
+        if (property) {
+          res.data.linkPropertys = [property];
+        }
         this.attributes[index] = res.data;
       }
       return res.success;

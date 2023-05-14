@@ -46,6 +46,8 @@ export type XAttribute = {
   name: string;
   // 编号
   code: string;
+  // 规则
+  rule: string;
   // 备注
   remark: string;
   // 共享用户ID
@@ -254,6 +256,8 @@ export type XForm = {
   name: string;
   // 编号
   code: string;
+  // 规则
+  rule: string;
   // 备注
   remark: string;
   // 类别ID
@@ -275,7 +279,7 @@ export type XForm = {
   // 更新时间
   updateTime: string;
   // 单设计详情项
-  items: XAttribute[] | undefined;
+  attributes: XAttribute[] | undefined;
   // 单设计针对的分类
   bindNodes: XWorkNode[] | undefined;
   // 单设计针对的分类

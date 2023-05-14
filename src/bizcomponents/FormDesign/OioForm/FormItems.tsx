@@ -22,18 +22,19 @@ import ProFormDict from './widgets/ProFormDict';
 import ProFormGroup from './widgets/ProFormGroup';
 import ProFormPerson from './widgets/ProFormPerson';
 import ProFormIdentity from './widgets/ProFormIdentity';
-import { XFormItem } from '@/ts/base/schema';
 import { IBelong } from '@/ts/core';
+import { XAttribute } from '@/ts/base/schema';
 
 interface IProps {
+  disabled?: boolean;
   belong: IBelong;
-  item: XFormItem;
+  item: XAttribute;
 }
 
 /**
  * 表单项渲染
  */
-const OioFormItem = ({ item, belong }: IProps) => {
+const OioFormItem = ({ item, belong, disabled }: IProps) => {
   const rule = JSON.parse(item.rule);
   // 规则校验
   let rules: Rule[] = [];
@@ -55,8 +56,9 @@ const OioFormItem = ({ item, belong }: IProps) => {
     case 'text':
       return (
         <ProFormText
-          name={item.attrId}
-          label={rule.title}
+          disabled={disabled}
+          name={item.name}
+          label={item.name}
           required={rule.required}
           fieldProps={rule}
           rules={rules}
@@ -68,8 +70,9 @@ const OioFormItem = ({ item, belong }: IProps) => {
     case 'number':
       return (
         <ProFormDigit
-          name={item.attrId}
-          label={rule.title}
+          disabled={disabled}
+          name={item.name}
+          label={item.name}
           fieldProps={rule}
           rules={rules}
           tooltip={rule.description}
@@ -79,8 +82,9 @@ const OioFormItem = ({ item, belong }: IProps) => {
     case 'select':
       return (
         <ProFormSelect
-          name={item.attrId}
-          label={rule.title}
+          disabled={disabled}
+          name={item.name}
+          label={item.name}
           fieldProps={rule}
           rules={rules}
           tooltip={rule.description}
@@ -90,8 +94,9 @@ const OioFormItem = ({ item, belong }: IProps) => {
     case 'treeSelect':
       return (
         <ProFormTreeSelect
-          name={item.attrId}
-          label={rule.title}
+          disabled={disabled}
+          name={item.name}
+          label={item.name}
           rules={rules}
           tooltip={rule.description}
           labelAlign="right"
@@ -101,8 +106,9 @@ const OioFormItem = ({ item, belong }: IProps) => {
     case 'upload':
       return (
         <ProFormUploadButton
-          name={item.attrId}
-          label={rule.title}
+          disabled={disabled}
+          name={item.name}
+          label={item.name}
           fieldProps={rule}
           rules={rules}
           tooltip={rule.description}
@@ -112,8 +118,9 @@ const OioFormItem = ({ item, belong }: IProps) => {
     case 'date':
       return (
         <ProFormDatePicker
-          name={item.attrId}
-          label={rule.title}
+          disabled={disabled}
+          name={item.name}
+          label={item.name}
           rules={rules}
           tooltip={rule.description}
           labelAlign="right"
@@ -122,8 +129,9 @@ const OioFormItem = ({ item, belong }: IProps) => {
     case 'datetime':
       return (
         <ProFormDateTimePicker
-          name={item.attrId}
-          label={rule.title}
+          disabled={disabled}
+          name={item.name}
+          label={item.name}
           rules={rules}
           tooltip={rule.description}
           labelAlign="right"
@@ -132,8 +140,9 @@ const OioFormItem = ({ item, belong }: IProps) => {
     case 'dateRange':
       return (
         <ProFormDateRangePicker
-          name={item.attrId}
-          label={rule.title}
+          disabled={disabled}
+          name={item.name}
+          label={item.name}
           rules={rules}
           tooltip={rule.description}
           labelAlign="right"
@@ -142,8 +151,9 @@ const OioFormItem = ({ item, belong }: IProps) => {
     case 'dateTimeRange':
       return (
         <ProFormDateTimeRangePicker
-          name={item.attrId}
-          label={rule.title}
+          disabled={disabled}
+          name={item.name}
+          label={item.name}
           rules={rules}
           tooltip={rule.description}
           labelAlign="right"
@@ -152,8 +162,9 @@ const OioFormItem = ({ item, belong }: IProps) => {
     case 'checkbox':
       return (
         <ProFormCheckbox
-          name={item.attrId}
-          label={rule.title}
+          disabled={disabled}
+          name={item.name}
+          label={item.name}
           rules={rules}
           tooltip={rule.description}
           labelAlign="right"
@@ -162,8 +173,9 @@ const OioFormItem = ({ item, belong }: IProps) => {
     case 'radio':
       return (
         <ProFormRadio
-          name={item.attrId}
-          label={rule.title}
+          disabled={disabled}
+          name={item.name}
+          label={item.name}
           rules={rules}
           tooltip={rule.description}
           labelAlign="right"
@@ -172,8 +184,9 @@ const OioFormItem = ({ item, belong }: IProps) => {
     case 'money':
       return (
         <ProFormMoney
-          name={item.attrId}
-          label={rule.title}
+          disabled={disabled}
+          name={item.name}
+          label={item.name}
           rules={rules}
           tooltip={rule.description}
           labelAlign="right"
@@ -184,8 +197,8 @@ const OioFormItem = ({ item, belong }: IProps) => {
         <ProFormDict
           dictId={rule.dictId}
           belong={belong}
-          name={item.attrId}
-          label={rule.title}
+          name={item.name}
+          label={item.name}
           rules={rules}
           tooltip={rule.description}
           labelAlign="right"
@@ -197,8 +210,8 @@ const OioFormItem = ({ item, belong }: IProps) => {
       return (
         <ProFormDept
           belong={belong}
-          name={item.attrId}
-          label={rule.title}
+          name={item.name}
+          label={item.name}
           rules={rules}
           tooltip={rule.description}
           labelAlign="right"
@@ -208,8 +221,8 @@ const OioFormItem = ({ item, belong }: IProps) => {
       return (
         <ProFormPerson
           belong={belong}
-          name={item.attrId}
-          label={rule.title}
+          name={item.name}
+          label={item.name}
           rules={rules}
           tooltip={rule.description}
           labelAlign="right"
@@ -219,8 +232,8 @@ const OioFormItem = ({ item, belong }: IProps) => {
       return (
         <ProFormGroup
           belong={belong}
-          name={item.attrId}
-          label={rule.title}
+          name={item.name}
+          label={item.name}
           rules={rules}
           tooltip={rule.description}
           labelAlign="right"
@@ -230,8 +243,8 @@ const OioFormItem = ({ item, belong }: IProps) => {
       return (
         <ProFormAuth
           belong={belong}
-          name={item.attrId}
-          label={rule.title}
+          name={item.name}
+          label={item.name}
           rules={rules}
           tooltip={rule.description}
           labelAlign="right"
@@ -241,8 +254,8 @@ const OioFormItem = ({ item, belong }: IProps) => {
       return (
         <ProFormIdentity
           belong={belong}
-          name={item.attrId}
-          label={rule.title}
+          name={item.name}
+          label={item.name}
           rules={rules}
           tooltip={rule.description}
           labelAlign="right"
@@ -251,8 +264,8 @@ const OioFormItem = ({ item, belong }: IProps) => {
     default:
       return (
         <ProFormText
-          name={item.attrId}
-          label={rule.title}
+          name={item.name}
+          label={item.name}
           fieldProps={rule}
           rules={rules}
           tooltip={rule.description}

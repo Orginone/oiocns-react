@@ -3,15 +3,15 @@ import CardOrTable from '@/components/CardOrTableComp';
 import { XAttribute } from '@/ts/base/schema';
 import { AttributeColumns } from '@/pages/Setting/config/columns';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
+import { IForm } from '@/ts/core';
+import PropertyConfig from './propConfig';
+import AttributeConfig from '@/bizcomponents/FormDesign/attributeConfig';
 import AttributeModal from '@/bizcomponents/GlobalComps/createAttribute';
-import { IWorkForm } from '@/ts/core/thing/app/work/workform';
-import { message } from 'antd';
 
 interface IProps {
-  current: IWorkForm;
+  current: IForm;
   modalType: string;
   recursionOrg: boolean;
-  recursionSpecies: boolean;
   setModalType: (modalType: string) => void;
 }
 
@@ -19,36 +19,30 @@ interface IProps {
  * @description: 分类特性标准
  * @return {*}
  */
-const Attritube = ({
-  current,
-  modalType,
-  recursionOrg,
-  recursionSpecies,
-  setModalType,
-}: IProps) => {
+const Attritube = ({ current, modalType, setModalType }: IProps) => {
   const [tkey, tforceUpdate] = useObjectUpdate('');
-  const [selectAttribute, setSelectAttribute] = useState<XAttribute>();
-
-  let attrs = current.attributes;
-  if (!recursionOrg) {
-    attrs = attrs.filter((i) => i.shareId === current.current.metadata.id);
-  }
-  if (!recursionSpecies) {
-    attrs = attrs.filter((i) => i.speciesId === current.metadata.id);
-  }
+  const [selectedItem, setSelectedItem] = useState<XAttribute>();
+  // 项配置改变
+  const formValuesChange = (changedValues: any) => {
+    if (selectedItem) {
+      selectedItem.rule = selectedItem.rule || '{}';
+      const rule = { ...JSON.parse(selectedItem.rule), ...changedValues };
+      setSelectedItem({
+        ...selectedItem,
+        rule: JSON.stringify(rule),
+      });
+      current.updateAttribute({ ...selectedItem, ...rule, rule: JSON.stringify(rule) });
+    }
+  };
   // 操作内容渲染函数
   const renderOperate = (item: XAttribute) => {
-    if (
-      item.speciesId === current.metadata.id &&
-      (item.belongId === current.current.metadata.id ||
-        item.belongId === current.current.space.metadata.id)
-    ) {
+    if (!current.species.isInherited) {
       return [
         {
           key: '修改特性',
           label: '编辑特性',
           onClick: () => {
-            setSelectAttribute(item);
+            setSelectedItem(item);
             setModalType('修改特性');
           },
         },
@@ -62,39 +56,26 @@ const Attritube = ({
           },
         },
       ];
-    }
-    if (item.belongId) {
+    } else {
       return [
         {
           key: '关联属性',
           label: '关联属性',
           onClick: () => {
-            setSelectAttribute(item);
+            setSelectedItem(item);
             setModalType('关联属性');
           },
         },
-        // {
-        //   key: '复制属性',
-        //   label: '复制属性',
-        //   onClick: async () => {
-        //     if (item.property) {
-        //       const property = await current.team.space.property?.createProperty({
-        //         ...item.property,
-        //         belongId: current.team.target.belongId,
-        //         sourceId: item.property.belongId,
-        //       });
-        //       if (property) {
-        //         await current.updateAttribute({
-        //           ...item,
-        //           propId: property.id,
-        //         });
-        //       }
-        //     }
-        //   },
-        // },
+        {
+          key: '复制属性',
+          label: '复制属性',
+          onClick: async () => {
+            setSelectedItem(item);
+            setModalType('复制属性');
+          },
+        },
       ];
     }
-    return [];
   };
 
   return (
@@ -104,28 +85,52 @@ const Attritube = ({
         rowKey={'id'}
         params={tkey}
         operation={renderOperate}
-        columns={AttributeColumns(current)}
+        columns={AttributeColumns()}
         showChangeBtn={false}
-        dataSource={attrs}
+        dataSource={current.attributes}
       />
-      {/** 新增/编辑特性模态框 */}
-      <AttributeModal
-        form={current}
-        current={selectAttribute}
-        open={modalType.includes('特性')}
-        handleCancel={function (): void {
-          setModalType('');
-        }}
-        handleOk={function (success: boolean): void {
-          if (success) {
-            message.info('操作成功');
+      {/** 新增特性模态框 */}
+      {modalType.includes('新增特性') && (
+        <AttributeModal
+          form={current}
+          open={modalType.includes('特性')}
+          handleCancel={function (): void {
+            setModalType('');
+          }}
+          handleOk={function (success: boolean): void {
+            if (success) {
+              setModalType('');
+              tforceUpdate();
+            }
+          }}
+        />
+      )}
+      {/** 编辑特性模态框 */}
+      {modalType.includes('修改特性') && selectedItem && (
+        <AttributeConfig
+          attr={selectedItem}
+          onChanged={formValuesChange}
+          onClose={() => {
+            setSelectedItem(undefined);
             setModalType('');
             tforceUpdate();
-          }
-        }}
-      />
-      {/** 关联属性模态框 */}
-      <div></div>
+          }}
+          superAuth={current.species.current.space.superAuth!.metadata}
+        />
+      )}
+      {/** 属性相关操作 */}
+      {modalType.includes('属性') && selectedItem && (
+        <PropertyConfig
+          form={current}
+          onFinish={() => {
+            setSelectedItem(undefined);
+            setModalType('');
+            tforceUpdate();
+          }}
+          attr={selectedItem}
+          modalType={modalType}
+        />
+      )}
     </>
   );
 };

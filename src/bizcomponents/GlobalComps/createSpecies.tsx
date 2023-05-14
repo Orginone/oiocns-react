@@ -1,6 +1,6 @@
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { message, Upload, UploadProps, Image, Button, Space, Avatar } from 'antd';
-import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components';
+import { ProFormColumnsType } from '@ant-design/pro-components';
 import SchemaForm from '@/components/SchemaForm';
 import orgCtrl from '@/ts/controller';
 import { FileItemShare } from '@/ts/base/model';
@@ -15,23 +15,21 @@ interface Iprops {
   open: boolean;
   handleCancel: () => void;
   handleOk: (newItem: ISpeciesItem | undefined) => void;
-  current: ITarget;
+  current?: ITarget;
   species?: ISpeciesItem;
 }
 /*
   编辑
 */
 const CreateSpeciesModal = (props: Iprops) => {
-  if (!props.open) return <></>;
-  const formRef = useRef<ProFormInstance>();
   const [avatar, setAvatar] = useState<FileItemShare>();
+  if (!props.open) return <></>;
   const speciesTypes: string[] = [];
-  let target = props.current;
   if (props.species) {
-    target = props.species.current;
     speciesTypes.push(...props.species.speciesTypes);
-  } else {
-    speciesTypes.push(...target.speciesTypes);
+  }
+  if (props.current) {
+    speciesTypes.push(...props.current.speciesTypes);
   }
   const uploadProps: UploadProps = {
     multiple: false,
@@ -119,13 +117,12 @@ const CreateSpeciesModal = (props: Iprops) => {
       title: '制定组织',
       dataIndex: 'shareId',
       valueType: 'select',
-      initialValue: target.metadata.id,
       formItemProps: { rules: [{ required: true, message: '组织为必填项' }] },
       fieldProps: {
         options: [
           {
-            value: target.metadata.id,
-            label: target.metadata.name,
+            value: props.current?.metadata.id || props.species?.current.metadata.id,
+            label: props.current?.metadata.name || props.species?.current.metadata.name,
           },
         ],
       },
@@ -134,11 +131,19 @@ const CreateSpeciesModal = (props: Iprops) => {
       title: '管理权限',
       dataIndex: 'authId',
       valueType: 'treeSelect',
-      initialValue: orgAuth.SuperAuthId,
       formItemProps: { rules: [{ required: true, message: '管理权限为必填项' }] },
       request: async () => {
-        const data = await target.space.loadSuperAuth();
-        return data ? [data.metadata] : [];
+        if (props.current && props.current.space.superAuth) {
+          return [props.current.space.superAuth.metadata];
+        }
+        if (
+          props.species &&
+          props.species.current &&
+          props.species.current.space.superAuth
+        ) {
+          return [props.species.current.space.superAuth.metadata];
+        }
+        return [];
       },
       fieldProps: {
         fieldNames: { label: 'name', value: 'id', children: 'nodes' },
@@ -181,7 +186,6 @@ const CreateSpeciesModal = (props: Iprops) => {
   ];
   return (
     <SchemaForm<SpeciesModel>
-      formRef={formRef}
       title={
         props.title.includes('编辑')
           ? `编辑[${props.species?.metadata.name}]类别`
@@ -190,16 +194,21 @@ const CreateSpeciesModal = (props: Iprops) => {
       columns={columns}
       open={props.open}
       width={640}
-      initialValues={props.title.includes('编辑') ? props.current.metadata : {}}
+      initialValues={
+        props.species && props.title.includes('编辑')
+          ? props.species.metadata
+          : {
+              shareId: props.current?.metadata.id || props.species?.current.metadata.id,
+              authId: orgAuth.SuperAuthId,
+            }
+      }
       onOpenChange={(open: boolean) => {
-        if (open && props.species) {
+        if (open) {
           if (props.title.includes('编辑')) {
             setAvatar(parseAvatar(props.species?.metadata.icon));
-            formRef.current?.setFieldsValue(props.species?.metadata);
           }
         } else {
           setAvatar(undefined);
-          formRef.current?.resetFields();
           props.handleCancel();
         }
       }}
@@ -216,7 +225,7 @@ const CreateSpeciesModal = (props: Iprops) => {
           } else {
             props.handleOk(await props.species.create(values));
           }
-        } else {
+        } else if (props.current) {
           props.handleOk(await props.current.createSpecies(values));
         }
       }}></SchemaForm>

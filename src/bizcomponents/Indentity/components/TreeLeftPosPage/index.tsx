@@ -1,7 +1,7 @@
 import { Button } from 'antd';
 import React, { useState, useEffect } from 'react';
 import { AiOutlinePlus, AiOutlineUser } from 'react-icons/ai';
-import MarketClassifyTree from '@/components/CustomTreeComp';
+import CustomTree from '@/components/CustomTree';
 import cls from './index.module.less';
 import AddPosttionModal from '../AddPositionMoadl';
 import { IIdentity, ITarget } from '@/ts/core';
@@ -55,7 +55,7 @@ const CreatePosition: React.FC<CreateGroupPropsType> = (props) => {
   };
 
   const positionList = (
-    <MarketClassifyTree
+    <CustomTree
       searchable
       childIcon={<AiOutlineUser />}
       selectedKeys={[selectMenu]}

@@ -2,6 +2,7 @@
 export enum MenuType {
   'Dict' = '字典',
   'Species' = '分类',
+  'Form' = '表单',
   'Authority' = '权限',
   'Template' = '业务设置',
 }

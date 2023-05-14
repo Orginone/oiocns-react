@@ -351,6 +351,8 @@ export type FormModel = {
   name: string;
   // 编号
   code: string;
+  // 规则
+  rule: string;
   // 备注
   remark: string;
   // 类别Id

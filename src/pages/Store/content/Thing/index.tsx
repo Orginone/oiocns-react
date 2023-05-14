@@ -1,28 +1,31 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import Thing from './Thing';
 import ThingView from './View';
-import { ISpeciesItem } from '@/ts/core';
+import { XProperty } from '@/ts/base/schema';
+import { IForm } from '@/ts/core';
 
 interface IProps {
-  species: ISpeciesItem;
+  labels: string[];
+  forms: IForm[];
+  propertys: XProperty[];
+  belongId: string;
   selectable?: boolean;
 }
 /**
  * 存储-物
  */
-const ThingIndex: React.FC<IProps> = ({ species, selectable }) => {
+const ThingIndex: React.FC<IProps> = (props) => {
   const [tabKey, setTabKey] = useState(0);
   const [thingId, setThingId] = useState<string>('');
-  useEffect(() => {
-    setTabKey(0);
-  }, [species]);
 
   switch (tabKey) {
     case 0:
       return (
         <Thing
-          species={species}
-          selectable={selectable}
+          labels={props.labels}
+          propertys={props.propertys}
+          belongId={props.belongId}
+          selectable={props.selectable}
           onBack={() => setTabKey(1)}
           setThingId={setThingId}
           menuItems={[
@@ -66,7 +69,14 @@ const ThingIndex: React.FC<IProps> = ({ species, selectable }) => {
         />
       );
     case 1:
-      return <ThingView thingId={thingId} setTabKey={setTabKey} species={species} />;
+      return (
+        <ThingView
+          thingId={thingId}
+          setTabKey={setTabKey}
+          belongId={props.belongId}
+          forms={props.forms}
+        />
+      );
     default:
       return <></>;
   }

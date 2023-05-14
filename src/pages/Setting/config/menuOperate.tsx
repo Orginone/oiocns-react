@@ -7,6 +7,7 @@ import { GroupMenuType, MenuType } from './menuType';
 import {
   IAuthority,
   IBelong,
+  ICommodity,
   IDepartment,
   IDict,
   IGroup,
@@ -62,8 +63,11 @@ const buildGroupTree = (groups: IGroup[]): MenuItemType[] => {
 };
 
 /** 编译类别树 */
-const buildSpeciesTree = (species: ISpeciesItem) => {
-  const result: MenuItemType = {
+const buildSpeciesTree = (species: ISpeciesItem): MenuItemType => {
+  if (species.metadata.typeName === SpeciesType.WorkForm) {
+    return buildFormMenu(species as IWorkForm);
+  }
+  return {
     key: species.key,
     item: species,
     label: species.metadata.name,
@@ -72,12 +76,10 @@ const buildSpeciesTree = (species: ISpeciesItem) => {
     itemType: MenuType.Species,
     menus: loadSpeciesMenus(species),
     children: species.children.map((i) => buildSpeciesTree(i)),
-    clickEvent: async () => {
+    beforeLoad: async () => {
       switch (species.metadata.typeName) {
         case SpeciesType.Commodity:
-        case SpeciesType.WorkForm:
-          await (species as IWorkForm).loadForms();
-          await (species as IWorkForm).loadAttributes();
+          await (species as ICommodity).loadForm();
           break;
         case SpeciesType.Market:
         case SpeciesType.WorkItem:
@@ -88,7 +90,59 @@ const buildSpeciesTree = (species: ISpeciesItem) => {
       }
     },
   };
-  return result;
+};
+
+/** 编译表单项菜单 */
+const buildFormMenu = (form: IWorkForm): MenuItemType => {
+  return {
+    key: form.key,
+    item: form,
+    label: form.metadata.name,
+    tag: [form.metadata.typeName],
+    icon: <TeamIcon share={form.share} size={18} fontSize={16} />,
+    itemType: MenuType.Species,
+    menus: [
+      {
+        key: '新增表单',
+        icon: <im.ImPencil />,
+        label: '新增表单',
+        model: 'outside',
+      },
+      ...loadSpeciesMenus(form),
+    ],
+    children: form.forms.map((i) => {
+      return {
+        key: i.key,
+        item: i,
+        label: i.metadata.name,
+        icon: <TeamIcon share={form.share} size={18} fontSize={16} />,
+        itemType: MenuType.Form,
+        menus: [
+          {
+            key: '编辑表单',
+            icon: <im.ImPencil />,
+            label: '编辑表单',
+            model: 'outside',
+          },
+          {
+            key: '删除表单',
+            icon: <im.ImPencil />,
+            label: '删除表单',
+            beforeLoad: async () => {
+              await i.delete();
+            },
+          },
+        ],
+        beforeLoad: async () => {
+          await i.loadPropertys();
+          await i.loadAttributes();
+        },
+      } as MenuItemType;
+    }),
+    beforeLoad: async () => {
+      await form.loadForms();
+    },
+  };
 };
 
 /** 编译权限树 */
@@ -127,13 +181,13 @@ const buildDictMenus = (dict: IDict) => {
         icon: <im.ImCross />,
         label: '删除字典',
         model: 'outside',
-        clickEvent: async () => {
+        beforeLoad: async () => {
           return await dict.delete();
         },
       },
     ],
     children: [],
-    clickEvent: async () => {
+    beforeLoad: async () => {
       await dict.loadItems();
     },
   };
@@ -197,7 +251,7 @@ const loadSpeciesMenus = (species: ISpeciesItem) => {
       key: '删除类别',
       icon: <im.ImBin />,
       label: '删除类别',
-      clickEvent: async () => {
+      beforeLoad: async () => {
         return await species.delete();
       },
     },
@@ -336,7 +390,7 @@ const loadGroupMenus = (param: groupMenuParams, teamTypes: string[]) => {
       icon: <im.ImSpinner9 />,
       label: '刷新' + param.typeName,
       model: 'inside',
-      clickEvent: async () => {
+      beforeLoad: async () => {
         await param.item.deepLoad(true);
         return false;
       },
@@ -399,7 +453,7 @@ const loadAuthorityMenus = (item: IAuthority) => {
         key: '删除权限',
         icon: <im.ImBin />,
         label: '删除权限',
-        clickEvent: async () => {
+        beforeLoad: async () => {
           return await item.delete();
         },
       },
@@ -433,7 +487,7 @@ const loadTypeMenus = (item: ITeam, subTypes: string[], allowDelete: boolean) =>
         key: '删除',
         icon: <im.ImBin />,
         label: '删除用户',
-        clickEvent: async () => {
+        beforeLoad: async () => {
           return await item.delete();
         },
       });
@@ -443,7 +497,7 @@ const loadTypeMenus = (item: ITeam, subTypes: string[], allowDelete: boolean) =>
           key: '退出',
           icon: <im.ImBin />,
           label: '退出' + item.metadata.typeName,
-          clickEvent: async () => {
+          beforeLoad: async () => {
             return await (item as ITarget).exit();
           },
         });

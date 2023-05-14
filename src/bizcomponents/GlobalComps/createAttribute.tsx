@@ -7,7 +7,7 @@ import { IForm } from '@/ts/core';
 
 interface Iprops {
   open: boolean;
-  current: XAttribute | undefined;
+  current?: XAttribute;
   handleCancel: () => void;
   handleOk: (success: boolean) => void;
   form: IForm;
@@ -50,7 +50,7 @@ const AttributeModal = (props: Iprops) => {
       valueType: 'treeSelect',
       formItemProps: { rules: [{ required: true, message: '管理权限为必填项' }] },
       request: async () => {
-        const data = await props.form.current.space.loadSuperAuth();
+        const data = await props.form.species.current.space.loadSuperAuth();
         return data ? [data.metadata] : [];
       },
       fieldProps: {
@@ -110,11 +110,17 @@ const AttributeModal = (props: Iprops) => {
         }
       }}
       onFinish={async (values) => {
-        values = { ...current, ...values };
         if (current) {
+          values = { ...current, ...values };
           handleOk(await form.updateAttribute(values));
         } else {
-          handleOk((await form.createAttribute(values)) != undefined);
+          const property = (await props.form.loadPropertys()).find(
+            (i) => i.id === values.propId,
+          );
+          if (property) {
+            await form.createAttribute(values, property);
+          }
+          handleOk(true);
         }
       }}
     />
