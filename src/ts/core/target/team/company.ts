@@ -210,6 +210,9 @@ export class Company extends Belong implements ICompany {
     for (const item of this.stations) {
       chats.push(...item.chats);
     }
+    for (const item of this.cohorts) {
+      chats.push(...item.chats);
+    }
     if (this.superAuth) {
       chats.push(...this.superAuth.chats);
     }

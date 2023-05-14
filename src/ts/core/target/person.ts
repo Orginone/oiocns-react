@@ -118,10 +118,11 @@ export class Person extends Belong implements IPerson {
     );
   }
   async applyJoin(members: schema.XTarget[]): Promise<boolean> {
-    members = members.filter((i) =>
-      [TargetType.Person, TargetType.Cohort, ...companyTypes].includes(
-        i.typeName as TargetType,
-      ),
+    members = members.filter(
+      (i) =>
+        [TargetType.Person, TargetType.Cohort, ...companyTypes].includes(
+          i.typeName as TargetType,
+        ) && i.id != this.metadata.id,
     );
     for (const member of members) {
       if (member.typeName === TargetType.Person) {
@@ -163,9 +164,6 @@ export class Person extends Belong implements IPerson {
   }
   get chats(): IMsgChat[] {
     const chats: IMsgChat[] = [this];
-    for (const item of this.companys) {
-      chats.push(...item.chats);
-    }
     chats.push(...this.cohortChats);
     chats.push(...this.memberChats);
     return chats;
@@ -207,35 +205,35 @@ export class Person extends Belong implements IPerson {
     this.superAuth?.deepLoad(reload);
   }
   override loadMemberChats(_newMembers: schema.XTarget[], _isAdd: boolean): void {
-   _newMembers = _newMembers.filter((i) => i.id != this.user.metadata.id);
-   if (_isAdd) {
-     _newMembers.forEach((i) => {
-       this.memberChats.push(
-         new PersonMsgChat(
-           this.metadata.id,
-           this.metadata.id,
-           i.id,
-           {
-             name: i.name,
-             typeName: i.typeName,
-             avatar: parseAvatar(i.icon),
-           },
-           ['好友'],
-           i.remark,
-         ),
-       );
-     });
-   } else {
-     let chats: PersonMsgChat[] = [];
-     this.memberChats.forEach((a) => {
-       _newMembers.forEach((i) => {
-         if (a.chatId != i.id) {
-           chats.push(a);
-         }
-       });
-     });
-     this.memberChats = chats;
-   }
+    _newMembers = _newMembers.filter((i) => i.id != this.user.metadata.id);
+    if (_isAdd) {
+      _newMembers.forEach((i) => {
+        this.memberChats.push(
+          new PersonMsgChat(
+            this.metadata.id,
+            this.metadata.id,
+            i.id,
+            {
+              name: i.name,
+              typeName: i.typeName,
+              avatar: parseAvatar(i.icon),
+            },
+            ['好友'],
+            i.remark,
+          ),
+        );
+      });
+    } else {
+      let chats: PersonMsgChat[] = [];
+      this.memberChats.forEach((a) => {
+        _newMembers.forEach((i) => {
+          if (a.chatId != i.id) {
+            chats.push(a);
+          }
+        });
+      });
+      this.memberChats = chats;
+    }
   }
   findShareById(id: string): model.ShareIcon {
     const share = ShareIdSet.get(id) || {

@@ -20,7 +20,7 @@ const Book: React.FC<any> = ({
 }) => {
   const [msgKey] = useCtrlUpdate(msgChatNotify);
   if (chats === undefined) {
-    chats = orgCtrl.user.chats.filter((i) => i.isMyChat);
+    chats = orgCtrl.chat.chats.filter((i) => i.isMyChat);
   }
   chats = chats
     .filter(

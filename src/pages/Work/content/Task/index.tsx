@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import orgCtrl from '@/ts/controller';
 import { IBelong, TaskStatus } from '@/ts/core';
 import { XWorkTask } from '@/ts/base/schema';
@@ -16,7 +16,7 @@ interface IProps {
 }
 
 const TaskContent = (props: IProps) => {
-  const [key, tforceUpdate] = useCtrlUpdate(orgCtrl.work.notity);
+  const [key] = useCtrlUpdate(orgCtrl.work.notity);
   const [task, setTask] = useState<TaskDetailType>();
   const [selectedRows, setSelectRows] = useState<schema.XWorkTask[]>([]);
 
@@ -55,21 +55,23 @@ const TaskContent = (props: IProps) => {
         });
         break;
       default:
-        let todos = orgCtrl.work.todos;
-        if (props.space) {
-          todos = todos.filter(
-            (a) =>
-              a.belongId == props.space!.metadata.id ||
-              a.shareId == props.space!.metadata.id,
-          );
+        {
+          let todos = orgCtrl.work.todos;
+          if (props.space) {
+            todos = todos.filter(
+              (a) =>
+                a.belongId == props.space!.metadata.id ||
+                a.shareId == props.space!.metadata.id,
+            );
+          }
+          if (props.filter != '') {
+            todos = todos.filter(
+              (a) => a.title.includes(props.filter) || a.remark.includes(props.filter),
+            );
+          }
+          taskList.total = todos.length;
+          taskList.result = todos.slice(page.offset, page.limit);
         }
-        if (props.filter != '') {
-          todos = todos.filter(
-            (a) => a.title.includes(props.filter) || a.remark.includes(props.filter),
-          );
-        }
-        taskList.total = todos.length;
-        taskList.result = todos.slice(page.offset, page.limit);
         break;
     }
     return taskList;

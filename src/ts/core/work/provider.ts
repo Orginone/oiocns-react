@@ -37,6 +37,11 @@ export class WorkProvider implements IWorkProvider {
   constructor(_user: IPerson) {
     this.user = _user;
     this.notity = new common.Emitter();
+    kernel.on('RecvTask', (data: schema.XWorkTask) => {
+      if (this._todoLoaded) {
+        this.updateTask(data);
+      }
+    });
   }
   user: IPerson;
   notity: common.Emitter;

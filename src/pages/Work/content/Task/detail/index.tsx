@@ -171,6 +171,9 @@ const Detail: React.FC<TaskDetailType> = ({ task, define, instance, onBack }) =>
                 height={'400px'}
                 byIds={instance.thingIds.split(',').filter((id: any) => id != '')}
                 selectable={false}
+                labels={[]}
+                propertys={[]}
+                belongId={instance.belongId}
               />
             )}
           </div>
