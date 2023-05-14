@@ -1,4 +1,4 @@
-import React, {useEffect, useRef} from 'react';
+import React, { useEffect, useRef } from 'react';
 import * as echarts from 'echarts';
 
 type SeriesType = {
@@ -8,7 +8,7 @@ type SeriesType = {
   name?: string; // 图例名称和鼠标移入展示名称
   stack?: string;
 }[];
-type FooterTitleType = string[] | number[]; // 示图表横向坐标轴展项
+type FooterTitleType = string[] | number[]; // 图表横向坐标轴展示项
 type GridType = {
   top?: string;
   right?: string;
@@ -27,40 +27,28 @@ type legendType = {
     color?: string; // 字体颜色
     fontWeight?: string | number; // 字体粗细
     fontSize?: number; // 字体大小
-    lineHeight?: number; // 行高2
+    lineHeight?: number; // 行高
   };
 }; // 图例
 type yNameType = string; // Y坐标轴name
 
-interface Iprops {
-  id?: any;
-  SeriesType?: SeriesType;
-  FooterTitleType?: FooterTitleType;
-  GridType?: GridType;
-  xAxisType?: xAxisType;
-  yAxisType?: yAxisType;
-  legendType?: legendType;
-  yNameType?: yNameType;
-}
-
-const Echart: React.FC<Iprops> = ({
-                                    id = 'main',
-                                    SeriesType,
-                                    FooterTitleType,
-                                    xAxisType,
-                                    yAxisType,
-                                    yNameType,
-                                    GridType,
-                                    legendType,
-                                  }) => {
-  const chartsRef = useRef<HTMLDivElement | null>(null);
+export const onEcharts = (
+  SeriesType?: SeriesType,
+  FooterTitleType?: FooterTitleType,
+  xAxisType?: xAxisType,
+  yAxisType?: yAxisType,
+  yNameType?: yNameType,
+  GridType?: GridType,
+  legendType?: legendType,
+) => {
+  const chartsRef = useRef(null) as any;
   useEffect(() => {
     // 绑定展示图
-    const chartDom: any = chartsRef.current;
+    const chartDom = chartsRef.current;
     // 初始化echats图表
     const histogramChart = echarts.init(chartDom);
     const option = {
-      backgroundColor: '#ffffff',
+      backgroundColor: '#00265f',
       // 提示框
       tooltip: {
         trigger: 'axis',
@@ -73,7 +61,7 @@ const Echart: React.FC<Iprops> = ({
         top: '15%',
         right: '3%',
         left: '10%',
-        bottom: '15%',
+        bottom: '12%',
       },
       xAxis: [
         {
@@ -81,12 +69,12 @@ const Echart: React.FC<Iprops> = ({
           data: FooterTitleType,
           axisLine: {
             lineStyle: {
-              color: '#333',
+              color: 'rgba(255,255,255,0.12)',
             },
           },
           axisLabel: {
             margin: 10,
-            color: '#606266',
+            color: '#e2e9ff',
             textStyle: {
               fontSize: 14,
             },
@@ -100,10 +88,10 @@ const Echart: React.FC<Iprops> = ({
           axisLabel: {
             type: yAxisType,
             formatter: '{value}',
-            color: '#606266',
+            color: '#e2e9ff',
           },
           axisLine: {
-            show: true,
+            show: false,
           },
           splitLine: {
             lineStyle: {
@@ -118,17 +106,21 @@ const Echart: React.FC<Iprops> = ({
         {
           option: {
             series: [
-              {center: ['25%', '50%']},
-              {center: ['50%', '50%']},
-              {center: ['75%', '50%']},
+              { center: ['25%', '50%'] },
+              { center: ['50%', '50%'] },
+              { center: ['75%', '50%'] },
             ],
           },
         },
       ],
     };
     option && histogramChart.setOption(option);
+    // 根据页面大小重新渲染图表
+    const handleResize = () => {
+      histogramChart?.resize();
+    };
+    window.addEventListener('resize', handleResize);
   }, []);
-  return <div id={id} ref={chartsRef} style={{width: '100%', height: '94%'}}/>;
+  //  图表容器
+  return <div ref={chartsRef} style={{ width: '100%', height: '100%' }} />;
 };
-
-export default Echart;
