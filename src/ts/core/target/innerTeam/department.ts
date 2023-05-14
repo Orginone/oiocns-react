@@ -83,6 +83,7 @@ export class Department extends Target implements IDepartment {
     const metadata = await this.create(data);
     if (metadata) {
       const department = new Department(metadata, this.company, this);
+      await department.deepLoad();
       if (await this.pullSubTarget(department)) {
         this.children.push(department);
         return department;

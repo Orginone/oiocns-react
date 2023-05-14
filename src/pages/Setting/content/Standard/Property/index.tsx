@@ -1,19 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import CardOrTable from '@/components/CardOrTableComp';
-import { XAttribute, XProperty } from '@/ts/base/schema';
-import { AttributeColumns, PropertyColumns } from '@/pages/Setting/config/columns';
+import { XProperty } from '@/ts/base/schema';
+import { PropertyColumns } from '@/pages/Setting/config/columns';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import PropertyModal from '@/bizcomponents/GlobalComps/createProperty';
 import { Button, message } from 'antd';
 import { IPropClass } from '@/ts/core';
 import PageCard from '@/components/PageCard';
 /**
- * @description: 分类特性标准
+ * @description: 属性标准
  * @return {*}
  */
 const Property: React.FC<any> = ({ current }: { current: IPropClass }) => {
   const [modalType, setModalType] = useState('');
-  const [attributes, setAttributes] = useState<XAttribute[]>([]);
   const [tkey, tforceUpdate] = useObjectUpdate(current);
   const [editData, setEditData] = useState<XProperty>();
   useEffect(() => {
@@ -79,22 +78,7 @@ const Property: React.FC<any> = ({ current }: { current: IPropClass }) => {
           operation={renderOperate}
           columns={PropertyColumns(current)}
           showChangeBtn={false}
-          onRow={(record) => {
-            return {
-              onClick: async () => {
-                setAttributes(await current.loadPropAttributes(record));
-                tforceUpdate();
-              },
-            };
-          }}
           dataSource={current.propertys}
-        />
-        <CardOrTable<XAttribute>
-          rowKey={'id'}
-          params={tkey}
-          columns={AttributeColumns()}
-          showChangeBtn={false}
-          dataSource={attributes}
         />
       </PageCard>
       {/** 新增/编辑属性模态框 */}

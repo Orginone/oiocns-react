@@ -6,11 +6,11 @@ import { MenuItemType, OperateMenuType } from 'typings/globelType';
 import { GroupMenuType, MenuType } from './menuType';
 import {
   IAuthority,
-  IBelong,
   ICommodity,
   IDepartment,
   IDict,
   IGroup,
+  IPropClass,
   ISpeciesItem,
   ITarget,
   ITeam,
@@ -21,6 +21,7 @@ import {
 } from '@/ts/core';
 import { IWorkItem } from '@/ts/core/thing/app/work/workitem';
 import { IWorkForm } from '@/ts/core/thing/app/work/workform';
+import { XProperty } from '@/ts/base/schema';
 
 /** 加载分组菜单参数 */
 interface groupMenuParams {
@@ -64,8 +65,39 @@ const buildGroupTree = (groups: IGroup[]): MenuItemType[] => {
 
 /** 编译类别树 */
 const buildSpeciesTree = (species: ISpeciesItem): MenuItemType => {
-  if (species.metadata.typeName === SpeciesType.WorkForm) {
-    return buildFormMenu(species as IWorkForm);
+  const children: MenuItemType[] = [];
+  switch (species.metadata.typeName) {
+    case SpeciesType.WorkForm:
+      return buildFormMenu(species as IWorkForm);
+    case SpeciesType.Store:
+      children.push({
+        key: species.key + MenuType.PropPackage,
+        item: species,
+        label: MenuType.PropPackage,
+        icon: <TeamIcon share={species.share} size={18} fontSize={16} />,
+        itemType: MenuType.PropPackage,
+        menus: loadPropertyMenus(species as IPropClass, true),
+        children: (species as IPropClass).propertys.map((i) => {
+          return {
+            key: i.id,
+            item: {
+              property: i,
+              species: species,
+            },
+            label: i.name,
+            itemType: MenuType.Property,
+            icon: (
+              <TeamIcon
+                share={{ name: i.name, typeName: '未知' }}
+                size={18}
+                fontSize={16}
+              />
+            ),
+            menus: loadPropertyMenus(species as IPropClass, false, i),
+            children: [],
+          };
+        }),
+      });
   }
   return {
     key: species.key,
@@ -75,7 +107,7 @@ const buildSpeciesTree = (species: ISpeciesItem): MenuItemType => {
     icon: <TeamIcon share={species.share} size={18} fontSize={16} />,
     itemType: MenuType.Species,
     menus: loadSpeciesMenus(species),
-    children: species.children.map((i) => buildSpeciesTree(i)),
+    children: [...children, ...species.children.map((i) => buildSpeciesTree(i))],
     beforeLoad: async () => {
       switch (species.metadata.typeName) {
         case SpeciesType.Commodity:
@@ -205,32 +237,6 @@ const LoadStandardMenus = (target: ITarget) => {
   ];
 };
 
-/** 加载标准菜单 */
-const loadStandardSetting = (belong: IBelong) => {
-  const result: MenuItemType[] = [];
-  if (belong.superAuth) {
-    result.push(buildAuthorityTree(belong.superAuth));
-  }
-  result.push({
-    children: belong.dicts.map((item) => buildDictMenus(item)),
-    key: belong.key + GroupMenuType.DictGroup,
-    label: GroupMenuType.DictGroup,
-    itemType: GroupMenuType.DictGroup,
-    item: belong,
-    icon: <im.ImNewspaper />,
-    menus: [
-      {
-        key: '新增字典',
-        icon: <im.ImPlus />,
-        label: '新增字典',
-        model: 'outside',
-      },
-    ],
-  });
-  result.push(...belong.species.map((i) => buildSpeciesTree(i)));
-  return result;
-};
-
 /** 加载右侧菜单 */
 const loadSpeciesMenus = (species: ISpeciesItem) => {
   const items: OperateMenuType[] = [];
@@ -259,6 +265,39 @@ const loadSpeciesMenus = (species: ISpeciesItem) => {
   return items;
 };
 
+/** 加载右侧菜单 */
+const loadPropertyMenus = (
+  species: IPropClass,
+  group: boolean = true,
+  property?: XProperty,
+) => {
+  const items: OperateMenuType[] = [];
+  if (group) {
+    items.push({
+      key: '新增属性',
+      icon: <im.ImPlus />,
+      label: '新增属性',
+    });
+  } else {
+    items.push(
+      {
+        key: '编辑属性',
+        icon: <im.ImCog />,
+        label: '编辑属性',
+      },
+      {
+        key: '删除属性',
+        icon: <im.ImBin />,
+        label: '删除属性',
+        beforeLoad: async () => {
+          return await species.deleteProperty(property!);
+        },
+      },
+    );
+  }
+  return items;
+};
+
 /** 获取个人菜单 */
 const getUserMenu = () => {
   return createMenu(
@@ -284,6 +323,23 @@ const getUserMenu = () => {
       },
     ],
     [
+      buildAuthorityTree(orgCtrl.user.superAuth!),
+      {
+        children: orgCtrl.user.dicts.map((item) => buildDictMenus(item)),
+        key: orgCtrl.user.key + GroupMenuType.DictGroup,
+        label: GroupMenuType.DictGroup,
+        itemType: GroupMenuType.DictGroup,
+        item: orgCtrl.user,
+        icon: <im.ImNewspaper />,
+        menus: [
+          {
+            key: '新增字典',
+            icon: <im.ImPlus />,
+            label: '新增字典',
+            model: 'outside',
+          },
+        ],
+      },
       {
         key: orgCtrl.user.key + GroupMenuType.StandardGroup,
         item: orgCtrl.user,
@@ -291,7 +347,7 @@ const getUserMenu = () => {
         itemType: GroupMenuType.StandardGroup,
         menus: LoadStandardMenus(orgCtrl.user),
         icon: <im.ImNewspaper />,
-        children: loadStandardSetting(orgCtrl.user),
+        children: orgCtrl.user.species.map((i) => buildSpeciesTree(i)),
       },
       loadGroupMenus(
         {
@@ -319,6 +375,23 @@ const getTeamMenu = () => {
   for (const company of orgCtrl.user.companys) {
     children.push(
       createMenu(company, loadTypeMenus(company, [], false), [
+        buildAuthorityTree(company.superAuth!),
+        {
+          children: company.dicts.map((item) => buildDictMenus(item)),
+          key: company.key + GroupMenuType.DictGroup,
+          label: GroupMenuType.DictGroup,
+          itemType: GroupMenuType.DictGroup,
+          item: company,
+          icon: <im.ImNewspaper />,
+          menus: [
+            {
+              key: '新增字典',
+              icon: <im.ImPlus />,
+              label: '新增字典',
+              model: 'outside',
+            },
+          ],
+        },
         {
           key: company.key + GroupMenuType.StandardGroup,
           item: company,
@@ -326,7 +399,7 @@ const getTeamMenu = () => {
           itemType: GroupMenuType.StandardGroup,
           menus: LoadStandardMenus(company),
           icon: <im.ImNewspaper />,
-          children: loadStandardSetting(company),
+          children: company.species.map((i) => buildSpeciesTree(i)),
         },
         loadGroupMenus(
           {

@@ -76,7 +76,10 @@ const Design: React.FC<IProps> = ({
         setResource(resourceData);
       }
       if (IsEdit && species) {
-        let attrs: XAttribute[] = await species.loadAttributes();
+        let attrs: XAttribute[] = [];
+        for (const form of await species.loadForms()) {
+          attrs.push(...(await form.loadAttributes()));
+        }
         let fields: FieldCondition[] = [];
         for (let attr of attrs) {
           switch (attr.property!.valueType) {

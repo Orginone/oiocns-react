@@ -132,6 +132,7 @@ export class Company extends Belong implements ICompany {
     const metadata = await this.create(data);
     if (metadata) {
       const department = new Department(metadata, this);
+      await department.deepLoad();
       if (await this.pullSubTarget(department)) {
         this.departments.push(department);
         return department;

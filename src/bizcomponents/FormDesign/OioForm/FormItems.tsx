@@ -35,7 +35,7 @@ interface IProps {
  * 表单项渲染
  */
 const OioFormItem = ({ item, belong, disabled }: IProps) => {
-  const rule = JSON.parse(item.rule);
+  const rule = JSON.parse(item.rule || '{}');
   // 规则校验
   let rules: Rule[] = [];
   if (rule.rules) {

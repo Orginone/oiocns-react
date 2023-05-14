@@ -11,6 +11,7 @@ import React, { useState } from 'react';
 import { Modal, message } from 'antd';
 import { XTarget } from '@/ts/base/schema';
 import { TargetType } from '@/ts/core';
+import PropertyModal from '@/bizcomponents/GlobalComps/createProperty';
 
 interface IProps {
   operateKey: string;
@@ -74,6 +75,18 @@ const OperateIndex = ({ selectMenu, operateKey, confrim }: IProps) => {
           open={operateKey.includes('表单')}
           current={operateKey.includes('编辑') ? selectMenu.item : undefined}
           species={operateKey.includes('新增') ? selectMenu.item : undefined}
+          handleCancel={confrim}
+          handleOk={confrim}
+        />
+      )}
+      {/** 属性模态框 */}
+      {operateKey.includes('属性') && (
+        <PropertyModal
+          species={
+            operateKey.includes('新增') ? selectMenu.item : selectMenu.item.species
+          }
+          data={operateKey.includes('编辑') ? selectMenu.item.property : undefined}
+          open={operateKey.includes('属性')}
           handleCancel={confrim}
           handleOk={confrim}
         />

@@ -27,7 +27,7 @@ const SelectOperation: React.FC<IProps> = ({ current, showData, setShowData }) =
     setLeftTreeSelectedKeys(selectedKeys);
     const species: IWorkForm = info.node.item;
     let forms = await species.loadForms();
-    setCenterTreeData(forms);
+    setCenterTreeData(forms.map((i) => i.metadata));
   };
   // 左侧树选中事件
   const handleCheckChange: TreeProps['onCheck'] = (checkedKeys, info: any) => {

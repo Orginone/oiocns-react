@@ -188,7 +188,14 @@ const ApprovalNode: React.FC<IProps> = (props) => {
           multiple={false}
           onChecked={(params: any) => {
             props.current.props.assignedUser = [{ name: params.title, id: params.key }];
-            setCurrentData(params);
+            setCurrentData({
+              key: params.key,
+              title: params.title,
+              data: {
+                id: params.key,
+                name: params.title,
+              },
+            });
           }}
           space={props.species.current.space}
         />

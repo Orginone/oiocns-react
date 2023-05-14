@@ -9,6 +9,7 @@ import { IForm, IPropClass, SpeciesType } from '@/ts/core';
 import { XAttribute, XProperty } from '@/ts/base/schema';
 import { model } from '@/ts/base';
 import AttributeConfig from './attributeConfig';
+import useObjectUpdate from '@/hooks/useObjectUpdate';
 
 type IProps = {
   current: IForm;
@@ -33,6 +34,7 @@ type TreeNode = {
  * @param props
  */
 const Design: React.FC<IProps> = ({ current }) => {
+  const [tkey, tforceUpdate] = useObjectUpdate(current);
   const [showConfig, setShowConfig] = useState<boolean>(false);
   const [formLayout, setFormLayout] = useState<FormLayout>(
     current.metadata.rule
@@ -196,6 +198,7 @@ const Design: React.FC<IProps> = ({ current }) => {
                   await current.deleteAttribute(attr);
                 }
               }
+              tforceUpdate();
             }}
             treeData={propertyTree}
           />
@@ -229,6 +232,7 @@ const Design: React.FC<IProps> = ({ current }) => {
           />
         </div>
         <ProForm
+          key={tkey}
           submitter={{
             searchConfig: {
               resetText: '重置',
