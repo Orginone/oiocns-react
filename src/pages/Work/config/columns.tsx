@@ -120,12 +120,12 @@ export const WorkColumns: ProColumns<schema.XWorkTask>[] = [
     dataIndex: 'remark',
     render: (_: any, record: schema.XWorkTask) => {
       if (record.taskType === '加用户') {
-        const targets: schema.XTarget[] = JSON.parse(record.remark);
+        const targets: schema.XTarget[] = JSON.parse(record.content);
         if (targets.length === 2) {
           return `${targets[0].name}[${targets[0].typeName}]申请加入${targets[1].name}[${targets[1].typeName}]`;
         }
       }
-      return record.remark;
+      return record.content;
     },
   },
   {

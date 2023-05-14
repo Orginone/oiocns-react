@@ -1258,6 +1258,8 @@ export type XWorkTask = {
   instanceId: string;
   // 身份Id
   identityId: string;
+  // 内容
+  content: string;
   // 备注
   remark: string;
   // 状态
