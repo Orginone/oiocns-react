@@ -196,7 +196,7 @@ let legendType: any = {
 
 const Charts: React.FC<any> = () => {
   return (
-    <CardWidthTitlemid title="数据监测" title2="浙江省国有资产概况">
+    <CardWidthTitlemid title="数据监测" title2="">
       <StatisticCard.Group direction={'row'}>
         <StatisticCard
           statistic={{
