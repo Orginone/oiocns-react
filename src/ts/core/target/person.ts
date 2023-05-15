@@ -171,8 +171,16 @@ export class Person extends Belong implements IPerson {
   }
   get cohortChats(): IMsgChat[] {
     const chats: IMsgChat[] = [];
+    const companyChatIds: string[] = [];
+    this.companys.forEach((company) => {
+      company.cohorts.forEach((item) => {
+        companyChatIds.push(item.chatdata.fullId);
+      });
+    });
     for (const item of this.cohorts) {
-      chats.push(...item.chats);
+      if (!companyChatIds.includes(item.chatdata.fullId)) {
+        chats.push(...item.chats);
+      }
     }
     if (this.superAuth) {
       chats.push(...this.superAuth.chats);
