@@ -253,12 +253,12 @@ export class Person extends Belong implements IPerson {
         case 'Add':
           if (companyTypes.includes(target.typeName as TargetType)) {
             let company = createCompany(target, this);
-            company.deepLoad(true);
+            company.deepLoad();
             this.companys.push(company);
           } else if (target.typeName == TargetType.Cohort) {
             if (this._cohortLoaded) {
               let cohort = new Cohort(target, this);
-              cohort.deepLoad(true);
+              cohort.deepLoad();
               this.cohorts.push(cohort);
             }
           }

@@ -260,6 +260,43 @@ export class Company extends Belong implements ICompany {
       this.memberChats = chats;
     }
   }
+  override recvTarget(operate: string, isChild: boolean, target: schema.XTarget): void {
+    super.recvTarget(operate, isChild, target);
+    switch (operate) {
+      case 'Add':
+        if (isChild) {
+          if (this.departmentTypes.includes(target.typeName as TargetType)) {
+            let department = new Department(target, this);
+            department.deepLoad();
+            this.departments.push(department);
+          }
+          if ((target.typeName as TargetType) == TargetType.Station) {
+            let station = new Station(target, this);
+            station.deepLoad();
+            this.stations.push(station);
+          }
+        } else if (target.typeName == TargetType.Group) {
+          let group = new Group(target, this);
+          group.deepLoad(true);
+          this.groups.push(group);
+        }
+        break;
+      case 'Remove':
+        if (isChild) {
+          if (this.departmentTypes.includes(target.typeName as TargetType)) {
+            this.departments = this.departments.filter((a) => a.metadata.id != target.id);
+          }
+          if ((target.typeName as TargetType) == TargetType.Station) {
+            this.stations = this.stations.filter((a) => a.metadata.id != target.id);
+          }
+        } else if (target.typeName == TargetType.Group) {
+          this.groups = this.groups.filter((a) => a.metadata.id == target.id);
+        }
+        break;
+      default:
+        break;
+    }
+  }
   async deepLoad(reload: boolean = false): Promise<void> {
     await this.loadGroups(reload);
     await this.loadDepartments(reload);
