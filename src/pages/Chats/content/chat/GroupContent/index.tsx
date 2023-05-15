@@ -40,7 +40,6 @@ const GroupContent = (props: Iprops) => {
   const { citeText, enterCiteMsg, chat } = props;
   const [loading, setLoading] = useState(false);
   const [messages, setMessages] = useState(props.chat.messages);
-  const [messagesTags, setMessagesTags] = useState<tagsMsgType>();
   const { handleReWrites } = props;
   const [selectId, setSelectId] = useState<string>('');
   const body = useRef<HTMLDivElement>(null);
@@ -52,15 +51,10 @@ const GroupContent = (props: Iprops) => {
 
   useEffect(() => {
     isFirst = true;
-    const id = orgCtrl.provider.subscribePart('tags', (data: tagsMsgType) => {
-      setMessagesTags(data);
-    });
-    return () => {
-      orgCtrl.provider.unsubscribe(id);
-    };
   }, []);
   useEffect(() => {
     setMessages([...props.chat.messages]);
+
     props.chat.onMessage((ms) => {
       // 标记已获取信息为已读
       if (ms.length > 0 && ms[0].belongId !== orgCtrl.user.userId) {
@@ -72,21 +66,6 @@ const GroupContent = (props: Iprops) => {
       props.chat.unMessage();
     };
   }, [props]);
-  // const updataMessage(newTags: tagsMsgType) {
-  //   if (
-  //     newTags.tags?.[0] === '已读' &&
-  //     newTags.ids.includes(messages[messages.length - 1].id)
-  //   ) {
-  //     const resultArr = messages.map((item) => {
-  //       if (item.id === messages[messages.length - 1].id) {
-  //         const tsgItem = { label: '已读', userId: orgCtrl.user.userId, time: '' };
-  //         item['tags'] = [...(item['tags'] ?? []), tsgItem];
-  //       }
-  //       return item;
-  //     });
-  //     setMessages(resultArr);
-  //   }
-  // }
 
   useEffect(() => {
     if (body && body.current) {
@@ -105,7 +84,6 @@ const GroupContent = (props: Iprops) => {
       }
     }
   }, [messages]);
-
 
   const isShowTime = (curDate: string, beforeDate: string) => {
     if (beforeDate === '') return true;

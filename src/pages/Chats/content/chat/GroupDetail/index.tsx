@@ -1,4 +1,4 @@
-import { Col, Modal, Row, Typography } from 'antd';
+import { Button, Col, Modal, Row, Typography } from 'antd';
 import React, { useState } from 'react';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 import detailStyle from './index.module.less';
@@ -163,6 +163,7 @@ const Groupdetail: React.FC<any> = ({
           <div className={`${detailStyle.img_list} ${detailStyle.con}`}>
             {grouppeoples}
           </div>
+
           <div
             className={`${detailStyle.find_history}`}
             onClick={() => {
@@ -171,6 +172,18 @@ const Groupdetail: React.FC<any> = ({
             查找聊天记录
             <AiOutlineRight />
           </div>
+
+          <Button
+            block
+            onClick={() =>
+              Modal.confirm({
+                title: '是否清空历史记录？',
+                content: '请注意：清空记录后无法恢复',
+                onOk: () => chat.clearMessage(),
+              })
+            }>
+            清空记录
+          </Button>
         </div>
       </div>
       {/* 历史记录搜索弹窗 */}

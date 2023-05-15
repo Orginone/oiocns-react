@@ -3,11 +3,13 @@ import { XWorkTask } from '../base/schema';
 import { TargetType } from './public/enums';
 import { IPerson, Person } from './target/person';
 import { IWorkProvider, WorkProvider } from './work/provider';
+import { IMsgChat, MsgChat } from './chat/message/msgchat';
 const sessionUserName = 'sessionUser';
 
 export class UserProvider extends common.Emitter {
   private _user: IPerson | undefined;
   private _work: IWorkProvider | undefined;
+  private _chat: IMsgChat | undefined;
   private _inited: boolean = false;
   private _preMessages: model.MsgSaveModel[] = [];
   constructor() {
@@ -20,7 +22,7 @@ export class UserProvider extends common.Emitter {
       }
     });
     kernel.on('RecvTags', (data) => {
-      this.changCallbackPart('tags', data);
+      this._user?.chats.find((v) => v.chatId === data.id)?.overwriteMessagesTags(data);
     });
     kernel.on('RecvTask', (data: XWorkTask) => {
       if (this._inited && this._work) {
