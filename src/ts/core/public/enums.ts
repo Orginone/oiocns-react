@@ -27,7 +27,7 @@ export enum SpeciesType {
   'FileSystem' = '文件类',
   'Market' = '流通类',
   'Resource' = '资源类',
-  'Store' = '物资类',
+  'Store' = '属性类',
   'Application' = '应用类',
   /** 类别类目 */
   'Commodity' = '商品类',
