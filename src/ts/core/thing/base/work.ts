@@ -45,7 +45,10 @@ export class FlowDefine extends common.Entity implements IWorkDefine {
   async createWorkInstance(
     data: model.WorkInstanceModel,
   ): Promise<schema.XWorkInstance | undefined> {
-    return (await kernel.createWorkInstance(data)).data;
+    let result = await kernel.createWorkInstance(data);
+    if (result.success) {
+      return result.data;
+    }
   }
   async deleteDefine(): Promise<boolean> {
     const res = await kernel.deleteWorkDefine({
