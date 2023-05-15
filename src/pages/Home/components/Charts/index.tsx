@@ -196,12 +196,10 @@ let legendType: any = {
 
 const Charts: React.FC<any> = () => {
   return (
-    <CardWidthTitlemid title="数据监测" title2="">
+    <CardWidthTitlemid title="浙江省国有资产概况" title2="">
       <StatisticCard.Group direction={'row'}>
         <StatisticCard
-          statistic={{
-            value: '单位:亿元',
-          }}
+          title={'单位:亿元'}
           chart={
             <EchartsCom
               id={'a'}
@@ -216,12 +214,10 @@ const Charts: React.FC<any> = () => {
             />
           }
         />
-        <div className="home-position1">行政事业性国有资产总额</div>
+        <div className="home-position1">行政事业性国有资产</div>
         <Divider type={'vertical'} />
         <StatisticCard
-          statistic={{
-            value: '单位:亿元',
-          }}
+          title={'单位:亿元'}
           chart={
             <EchartsCom
               id={'aa'}
@@ -236,7 +232,7 @@ const Charts: React.FC<any> = () => {
             />
           }
         />
-        <div className="home-position2">企业国有资产总额</div>
+        <div className="home-position2">企业国有资产</div>
         <Divider type={'vertical'} />
         <StatisticCard
           statistic={{
