@@ -8,7 +8,7 @@ import { XForm } from '@/ts/base/schema';
 import ShareShowComp from '@/bizcomponents/IndentityManage/ShareShowComp';
 import SelectOperation from '@/pages/Setting/content/Standard/Flow/Comp/SelectOperation';
 import ViewFormModal from '@/bizcomponents/FormDesign/viewFormModal';
-import { IWork } from '@/ts/core';
+import { IAppModule, IWork } from '@/ts/core';
 interface IProps {
   current: NodeType;
   species: IWork;
@@ -170,7 +170,7 @@ const ApprovalNode: React.FC<IProps> = (props) => {
           }}
           onCancel={() => setOperationModal(undefined)}>
           <SelectOperation
-            current={props.species}
+            current={props.species?.parent as IAppModule}
             showData={showData}
             setShowData={setShowData}></SelectOperation>
         </Modal>
