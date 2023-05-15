@@ -1,23 +1,23 @@
 import React, { useState } from 'react';
 import Content from './content';
-import Supervise from './components/Supervise';
 import * as config from './config/menuOperate';
 import MainLayout from '@/components/MainLayout';
+import Supervise from './components/Supervise';
 import useMenuUpdate from '@/hooks/useMenuUpdate';
-import { Input, Button } from 'antd';
+import { Input } from 'antd';
 import { ImSearch } from 'react-icons/im';
-import { orgAuth } from '@/ts/core/public/consts';
 import { IMsgChat, msgChatNotify } from '@/ts/core';
+import { flatten } from './commont';
 const Setting: React.FC<any> = () => {
   const [filter, setFilter] = useState('');
+  const [isSupervise, setIsSupervise] = useState<boolean>(false); // 查看所有会话
   const [openDetail, setOpenDetail] = useState<boolean>(false);
-  const [isSupervise, setIsSupervise] = useState<boolean>(false);
   const [key, rootMenu, selectMenu, setSelectMenu] = useMenuUpdate(config.loadChatMenu);
 
-  const changeSupervise = () => {
-    setIsSupervise(false);
-  };
   if (!selectMenu || !rootMenu) return <></>;
+  [selectMenu].map((res) => {
+    // console.log(flatten(res.children));
+  });
   return (
     <MainLayout
       selectMenu={selectMenu}
@@ -25,45 +25,21 @@ const Setting: React.FC<any> = () => {
         setSelectMenu(data);
       }}
       rightBar={
-        <React.Fragment>
-          {selectMenu?.company?.hasAuthoritys([orgAuth.RelationAuthId]) ? (
-            <React.Fragment>
-              {isSupervise ? (
-                <Button
-                  type="primary"
-                  size="small"
-                  onClick={() => {
-                    setIsSupervise(false);
-                  }}>
-                  沟通
-                </Button>
-              ) : (
-                <Button
-                  type="primary"
-                  size="small"
-                  onClick={() => {
-                    setIsSupervise(true);
-                  }}>
-                  监察
-                </Button>
-              )}
-            </React.Fragment>
-          ) : (
-            ''
-          )}
-          <Input
-            style={{ height: 30, fontSize: 15 }}
-            placeholder="搜索"
-            prefix={<ImSearch />}
-            onChange={(e) => {
-              setFilter(e.target.value);
-            }}
-          />
-        </React.Fragment>
+        <Input
+          style={{ height: 30, fontSize: 15 }}
+          placeholder="搜索"
+          prefix={<ImSearch />}
+          onChange={(e) => {
+            setFilter(e.target.value);
+          }}
+        />
       }
       onMenuClick={async (data, key) => {
         const chat = data.item as IMsgChat;
         switch (key) {
+          case '查看会话':
+            setIsSupervise(!isSupervise);
+            break;
           case '清空消息':
             await chat.clearMessage();
             break;
@@ -79,12 +55,7 @@ const Setting: React.FC<any> = () => {
       }}
       siderMenuData={rootMenu}>
       {isSupervise ? (
-        <Supervise
-          key={key}
-          selectMenu={selectMenu}
-          current={selectMenu.company}
-          changeSupervise={changeSupervise}
-        />
+        <Supervise belong={selectMenu.company!} />
       ) : (
         <Content
           key={key}

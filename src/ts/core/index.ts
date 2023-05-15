@@ -1,3 +1,5 @@
+export type { IChatMessage } from './chat/message/message';
+export { ChatMessage } from './chat/message/message';
 export type { IMsgChat } from './chat/message/msgchat';
 export { msgChatNotify } from './chat/message/msgchat';
 export { companyTypes, departmentTypes, orgAuth as OrgAuth } from './public/consts';
