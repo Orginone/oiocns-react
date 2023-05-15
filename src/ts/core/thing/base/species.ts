@@ -41,7 +41,7 @@ export abstract class SpeciesItem extends common.Entity implements ISpeciesItem 
       avatar: parseAvatar(this.metadata.icon),
     };
     ShareIdSet.set(this.metadata.id, this.share);
-    this.isInherited = _metadata.belongId != _current.metadata.belongId;
+    this.isInherited = _metadata.belongId != _current.space.metadata.belongId;
   }
   share: model.ShareIcon;
   parent: ISpeciesItem | undefined;
