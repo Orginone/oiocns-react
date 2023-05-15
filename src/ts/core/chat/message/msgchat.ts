@@ -66,6 +66,8 @@ export interface IMsgChat extends common.IEntity {
   recallMessage(id: string): Promise<void>;
   /** 标记消息 */
   tagMessage(ids: string[], tags: string[]): Promise<void>;
+  /** 标记已读消息 */
+  tagHasReadMsg(ms: model.MsgSaveModel[]): void;
   /** 删除消息 */
   deleteMessage(id: string): Promise<boolean>;
   /** 清空历史记录 */
@@ -216,6 +218,28 @@ export abstract class MsgChat extends common.Entity implements IMsgChat {
         id: this.chatId,
         belongId: this.belongId,
       });
+    }
+  }
+  // 标记已读信息 //TODO: 通过Intersection Observer来实现监听 是否进入可视区域
+  tagHasReadMsg(ms: model.MsgSaveModel[]) {
+    //  获取未打标签数据
+    const needTagMsgs = ms.filter((v) => {
+      if (!v?.tags) {
+        return true;
+      }
+      return !v.tags.some((s) => s.userId === this.userId && s.label === '已读');
+    });
+    // 过滤消息  过滤条件 belongId 不属于个人的私有消息；消息已有标签中没有自己打的‘已读’标签
+    console.log('过滤消息', needTagMsgs, this.userId);
+    // 未知原因。最后一条消息无法添加tag
+    if (needTagMsgs.length < 2) {
+      return;
+    } else {
+      // 触发事件
+      this.tagMessage(
+        needTagMsgs.map((v) => v.id),
+        ['已读'],
+      );
     }
   }
   async deleteMessage(id: string): Promise<boolean> {

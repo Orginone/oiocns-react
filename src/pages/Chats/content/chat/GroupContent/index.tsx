@@ -11,7 +11,7 @@ import { FileItemShare } from '@/ts/base/model';
 import orgCtrl from '@/ts/controller';
 import { IMsgChat, MessageType } from '@/ts/core';
 import { model, parseAvatar } from '@/ts/base';
-import { filetrText, isShowLink, showCiteText } from './common';
+import { filetrText, isShowLink, renderHasReadTxt, showCiteText } from './common';
 import ForwardModal from './forwardModal';
 import { IconFont } from '@/components/IconFont';
 import { FileTypes } from '@/ts/core/public/consts';
@@ -64,7 +64,7 @@ const GroupContent = (props: Iprops) => {
     props.chat.onMessage((ms) => {
       // 标记已获取信息为已读
       if (ms.length > 0 && ms[0].belongId !== orgCtrl.user.userId) {
-        handleTagMsg(ms);
+        props.chat.tagHasReadMsg(ms);
       }
       setMessages([...ms]);
     });
@@ -105,28 +105,7 @@ const GroupContent = (props: Iprops) => {
       }
     }
   }, [messages]);
-  // 处理消息打标签--已读未读功能 //TODO: 通过Intersection Observer来实现监听 是否进入可视区域
-  const handleTagMsg = debounce((ms: model.MsgSaveModel[]) => {
-    //  获取未打标签数据
-    const needTagMsgs = ms.filter((v) => {
-      if (!v?.tags) {
-        return true;
-      }
-      return !v.tags.some((s) => s.userId === orgCtrl.user.userId && s.label === '已读');
-    });
-    // 过滤消息  过滤条件 belongId 不属于个人的私有消息；消息已有标签中没有自己打的‘已读’标签
-    console.log('过滤消息', needTagMsgs, orgCtrl.user.userId);
-    // 未知原因。最后一条消息无法添加tag
-    if (needTagMsgs.length < 2) {
-      return;
-    } else {
-      // 触发事件
-      props.chat.tagMessage(
-        needTagMsgs.map((v) => v.id),
-        ['已读'],
-      );
-    }
-  }, 500);
+
 
   const isShowTime = (curDate: string, beforeDate: string) => {
     if (beforeDate === '') return true;
@@ -205,6 +184,7 @@ const GroupContent = (props: Iprops) => {
           const iconName = FileTypes[fileTypeStr] ?? 'icon-weizhi';
           return iconName;
         };
+        // 文件展示样式
         return (
           <>
             <div className={`${css.con_content_link}`}></div>
@@ -275,29 +255,6 @@ const GroupContent = (props: Iprops) => {
       }
     }
   };
-  // 显示已读未读信息
-  const isReadTxt = (msgTags: { label: string; userId: string }[]) => {
-    let showText = '';
-    const allMember = props.chat.members.length - 1;
-    // 获取消息标签数量； 条件：已读标签且标记人不为自己
-    const hasReadNum = msgTags.filter(
-      (v) => v.label === '已读' && v.userId !== orgCtrl.user.userId,
-    )?.length;
-
-    // 同事之间通信
-    if (allMember === -1 || allMember === 0) {
-      showText = hasReadNum > 0 ? '已读' : '未读';
-    } else {
-      // 群组内部通信
-      showText =
-        allMember - hasReadNum > 0 ? allMember - hasReadNum + '人未读' : '全部已读';
-    }
-    return (
-      <span style={{ margin: '4px 10px 0 0', fontSize: '10px', color: '#154ad8' }}>
-        {showText}
-      </span>
-    );
-  };
 
   const viewMsg = (item: model.MsgSaveModel, right: boolean = false) => {
     const isCite = item.showTxt.includes('$CITEMESSAGE[');
@@ -309,7 +266,8 @@ const GroupContent = (props: Iprops) => {
             {parseMsg(item)}
             {/* 引用消息的展示 */}
             {isCite && showCiteText(item)}
-            {item.belongId !== orgCtrl.user.userId && isReadTxt(item?.tags ?? [])}
+            {/*  显示已读未读信息 */}
+            {renderHasReadTxt(item, chat.members)}
           </div>
           <div style={{ color: '#888', paddingLeft: 10 }}>
             <TeamIcon share={orgCtrl.user.share} preview size={36} fontSize={32} />

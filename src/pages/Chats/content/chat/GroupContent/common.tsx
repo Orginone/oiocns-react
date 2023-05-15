@@ -1,13 +1,14 @@
 import { model, parseAvatar } from '@/ts/base';
 import { FileItemShare } from '@/ts/base/model';
 import { MessageType } from '@/ts/core';
-import { CaretUpOutlined, DownloadOutlined } from '@ant-design/icons';
-import { Button, Image } from 'antd';
+import { CaretUpOutlined } from '@ant-design/icons';
+import { Image } from 'antd';
 import React from 'react';
 import style from './text.module.less';
 import css from './index.module.less';
 import { IconFont } from '@/components/IconFont';
 import { FileTypes } from '@/ts/core/public/consts';
+import orgCtrl from '@/ts/controller';
 /** 处理返回的文字*/
 export const filetrText = (val: model.MsgSaveModel) => {
   //后端返回的值
@@ -124,6 +125,7 @@ export const filterCite = (item: string, type: string) => {
         });
       }
     }
+    // eslint-disable-next-line no-fallthrough
     default:
       null;
       break;
@@ -178,4 +180,46 @@ export const showCiteText = (item: model.MsgSaveModel) => {
       return <>{filterCite(item.showTxt, item.msgType)}</>;
     }
   }
+};
+
+export const renderHasReadTxt: (
+  msg: model.MsgSaveModel,
+  members: any[],
+) => React.ReactElement = (msg, members) => {
+  const { tags: msgTags = [], belongId } = msg;
+  let isPersonal = false;
+  const currentChat = orgCtrl.provider.user?.findShareById(belongId);
+  if (currentChat?.typeName === '人员') {
+    isPersonal = true;
+  } else {
+    // 群组：判断群组归属权；个人群组不展示，单位群要展示
+    isPersonal =
+      orgCtrl.provider.user?.cohortChats.find((v) => v.belongId === belongId)?.isMyChat ??
+      false;
+  }
+  // 判断是否展示已读未读
+  if (isPersonal) {
+    return <></>;
+  }
+  let showText = '';
+
+  // 获取消息标签数量； 条件：已读标签且标记人不为自己
+  const hasReadNum = msgTags.filter(
+    (v) => v.label === '已读' && v.userId !== orgCtrl.user.userId,
+  )?.length;
+
+  //同事之间单独通信
+  if (members.length === 0) {
+    showText = hasReadNum > 0 ? '已读' : '未读';
+  } else {
+    const allMember = members.length - 1;
+    // 群组内部通信
+    showText =
+      allMember - hasReadNum > 0 ? allMember - hasReadNum + '人未读' : '全部已读';
+  }
+  return (
+    <span style={{ margin: '4px 10px 0 0', fontSize: '10px', color: '#154ad8' }}>
+      {showText}
+    </span>
+  );
 };
