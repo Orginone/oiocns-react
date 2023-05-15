@@ -165,6 +165,7 @@ const buildFormMenu = (form: IWorkForm): MenuItemType => {
             },
           },
         ],
+        children: [],
         beforeLoad: async () => {
           await i.loadPropertys();
           await i.loadAttributes();
@@ -187,7 +188,7 @@ const buildAuthorityTree = (authority: IAuthority) => {
     itemType: MenuType.Authority,
     tag: [MenuType.Authority],
     menus: loadAuthorityMenus(authority),
-    children: authority.children?.map((i) => buildAuthorityTree(i)) ?? [],
+    children: authority.children.map((i) => buildAuthorityTree(i)) ?? [],
   };
   return result;
 };
