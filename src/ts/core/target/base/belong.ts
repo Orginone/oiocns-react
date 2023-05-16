@@ -61,8 +61,8 @@ export abstract class Belong extends Target implements IBelong {
     for (const item of this.species) {
       switch (item.metadata.typeName) {
         case SpeciesType.Dict: {
-          const dicts = await (item as IDictClass).loadAllDicts();
-          for (const item of dicts) {
+          const subDicts = await (item as IDictClass).loadAllDicts();
+          for (const item of subDicts) {
             if (dicts.findIndex((i) => i.metadata.id === item.metadata.id) < 0) {
               dicts.push(item);
             }

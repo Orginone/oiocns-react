@@ -31,7 +31,8 @@ export class DictClass extends SpeciesItem implements IDictClass {
   dicts: IDict[] = [];
   private _dictLoaded: boolean = false;
   async loadAllDicts(): Promise<IDict[]> {
-    const dicts: IDict[] = [...this.dicts];
+    const dicts: IDict[] = [];
+    dicts.push(...(await this.loadDicts()));
     for (const item of this.children) {
       const subDicts = await (item as IDictClass).loadAllDicts();
       for (const sub of subDicts) {
