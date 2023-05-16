@@ -3,7 +3,7 @@ import { Input, TreeProps } from 'antd';
 import React, { useState, useEffect, Key } from 'react';
 import ShareShowComp from '@/bizcomponents/IndentityManage/ShareShowComp';
 import cls from './index.module.less';
-import CustomTree from '@/components/CustomTreeComp';
+import CustomTree from '@/components/CustomTree';
 import { IWorkForm } from '@/ts/core/thing/app/work/workform';
 import { IAppModule } from '@/ts/core/thing/app/appmodule';
 import { SpeciesType } from '@/ts/core';
@@ -27,7 +27,7 @@ const SelectOperation: React.FC<IProps> = ({ current, showData, setShowData }) =
     setLeftTreeSelectedKeys(selectedKeys);
     const species: IWorkForm = info.node.item;
     let forms = await species.loadForms();
-    setCenterTreeData(forms);
+    setCenterTreeData(forms.map((i) => i.metadata));
   };
   // 左侧树选中事件
   const handleCheckChange: TreeProps['onCheck'] = (checkedKeys, info: any) => {

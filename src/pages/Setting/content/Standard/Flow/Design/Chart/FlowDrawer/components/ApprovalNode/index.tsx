@@ -7,7 +7,7 @@ import { NodeType } from '../../processType';
 import { XForm } from '@/ts/base/schema';
 import ShareShowComp from '@/bizcomponents/IndentityManage/ShareShowComp';
 import SelectOperation from '@/pages/Setting/content/Standard/Flow/Comp/SelectOperation';
-import ViewFormModal from '@/bizcomponents/FormDesign/Design/viewFormModal';
+import ViewFormModal from '@/bizcomponents/FormDesign/viewFormModal';
 import { IWork } from '@/ts/core';
 interface IProps {
   current: NodeType;
@@ -188,7 +188,14 @@ const ApprovalNode: React.FC<IProps> = (props) => {
           multiple={false}
           onChecked={(params: any) => {
             props.current.props.assignedUser = [{ name: params.title, id: params.key }];
-            setCurrentData(params);
+            setCurrentData({
+              key: params.key,
+              title: params.title,
+              data: {
+                id: params.key,
+                name: params.title,
+              },
+            });
           }}
           space={props.species.current.space}
         />

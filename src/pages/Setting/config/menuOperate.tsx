@@ -6,10 +6,11 @@ import { MenuItemType, OperateMenuType } from 'typings/globelType';
 import { GroupMenuType, MenuType } from './menuType';
 import {
   IAuthority,
-  IBelong,
+  ICommodity,
   IDepartment,
   IDict,
   IGroup,
+  IPropClass,
   ISpeciesItem,
   ITarget,
   ITeam,
@@ -20,7 +21,7 @@ import {
 } from '@/ts/core';
 import { IWorkItem } from '@/ts/core/thing/app/work/workitem';
 import { IWorkForm } from '@/ts/core/thing/app/work/workform';
-import { SettingOutlined } from '@ant-design/icons';
+import { XProperty } from '@/ts/base/schema';
 
 /** 加载分组菜单参数 */
 interface groupMenuParams {
@@ -63,8 +64,42 @@ const buildGroupTree = (groups: IGroup[]): MenuItemType[] => {
 };
 
 /** 编译类别树 */
-const buildSpeciesTree = (species: ISpeciesItem) => {
-  const result: MenuItemType = {
+const buildSpeciesTree = (species: ISpeciesItem): MenuItemType => {
+  const children: MenuItemType[] = [];
+  switch (species.metadata.typeName) {
+    case SpeciesType.WorkForm:
+      return buildFormMenu(species as IWorkForm);
+    case SpeciesType.Store:
+      children.push({
+        key: species.key + MenuType.PropPackage,
+        item: species,
+        label: MenuType.PropPackage,
+        icon: <TeamIcon share={species.share} size={18} fontSize={16} />,
+        itemType: MenuType.PropPackage,
+        menus: loadPropertyMenus(species as IPropClass, true),
+        children: (species as IPropClass).propertys.map((i) => {
+          return {
+            key: i.id,
+            item: {
+              property: i,
+              species: species,
+            },
+            label: i.name,
+            itemType: MenuType.Property,
+            icon: (
+              <TeamIcon
+                share={{ name: i.name, typeName: '未知' }}
+                size={18}
+                fontSize={16}
+              />
+            ),
+            menus: loadPropertyMenus(species as IPropClass, false, i),
+            children: [],
+          };
+        }),
+      });
+  }
+  return {
     key: species.key,
     item: species,
     label: species.metadata.name,
@@ -72,13 +107,11 @@ const buildSpeciesTree = (species: ISpeciesItem) => {
     icon: <TeamIcon share={species.share} size={18} fontSize={16} />,
     itemType: MenuType.Species,
     menus: loadSpeciesMenus(species),
-    children: species.children.map((i) => buildSpeciesTree(i)),
-    clickEvent: async () => {
+    children: [...children, ...species.children.map((i) => buildSpeciesTree(i))],
+    beforeLoad: async () => {
       switch (species.metadata.typeName) {
         case SpeciesType.Commodity:
-        case SpeciesType.WorkForm:
-          await (species as IWorkForm).loadForms();
-          await (species as IWorkForm).loadAttributes();
+          await (species as ICommodity).loadForm();
           break;
         case SpeciesType.Market:
         case SpeciesType.WorkItem:
@@ -89,7 +122,60 @@ const buildSpeciesTree = (species: ISpeciesItem) => {
       }
     },
   };
-  return result;
+};
+
+/** 编译表单项菜单 */
+const buildFormMenu = (form: IWorkForm): MenuItemType => {
+  return {
+    key: form.key,
+    item: form,
+    label: form.metadata.name,
+    tag: [form.metadata.typeName],
+    icon: <TeamIcon share={form.share} size={18} fontSize={16} />,
+    itemType: MenuType.Species,
+    menus: [
+      {
+        key: '新增表单',
+        icon: <im.ImPencil />,
+        label: '新增表单',
+        model: 'outside',
+      },
+      ...loadSpeciesMenus(form),
+    ],
+    children: form.forms.map((i) => {
+      return {
+        key: i.key,
+        item: i,
+        label: i.metadata.name,
+        icon: <TeamIcon share={form.share} size={18} fontSize={16} />,
+        itemType: MenuType.Form,
+        menus: [
+          {
+            key: '编辑表单',
+            icon: <im.ImPencil />,
+            label: '编辑表单',
+            model: 'outside',
+          },
+          {
+            key: '删除表单',
+            icon: <im.ImPencil />,
+            label: '删除表单',
+            beforeLoad: async () => {
+              await i.delete();
+            },
+          },
+        ],
+        children: [],
+        beforeLoad: async () => {
+          await i.loadPropertys();
+          await i.loadAttributes();
+        },
+      } as MenuItemType;
+    }),
+    beforeLoad: async () => {
+      await form.loadForms();
+    },
+  };
 };
 
 /** 编译权限树 */
@@ -102,7 +188,7 @@ const buildAuthorityTree = (authority: IAuthority) => {
     itemType: MenuType.Authority,
     tag: [MenuType.Authority],
     menus: loadAuthorityMenus(authority),
-    children: authority.children?.map((i) => buildAuthorityTree(i)) ?? [],
+    children: authority.children.map((i) => buildAuthorityTree(i)) ?? [],
   };
   return result;
 };
@@ -128,13 +214,13 @@ const buildDictMenus = (dict: IDict) => {
         icon: <im.ImCross />,
         label: '删除字典',
         model: 'outside',
-        clickEvent: async () => {
+        beforeLoad: async () => {
           return await dict.delete();
         },
       },
     ],
     children: [],
-    clickEvent: async () => {
+    beforeLoad: async () => {
       await dict.loadItems();
     },
   };
@@ -150,32 +236,6 @@ const LoadStandardMenus = (target: ITarget) => {
       model: 'outside',
     },
   ];
-};
-
-/** 加载标准菜单 */
-const loadStandardSetting = (belong: IBelong) => {
-  const result: MenuItemType[] = [];
-  if (belong.superAuth) {
-    result.push(buildAuthorityTree(belong.superAuth));
-  }
-  result.push({
-    children: belong.dicts.map((item) => buildDictMenus(item)),
-    key: belong.key + GroupMenuType.DictGroup,
-    label: GroupMenuType.DictGroup,
-    itemType: GroupMenuType.DictGroup,
-    item: belong,
-    icon: <im.ImNewspaper />,
-    menus: [
-      {
-        key: '新增字典',
-        icon: <im.ImPlus />,
-        label: '新增字典',
-        model: 'outside',
-      },
-    ],
-  });
-  result.push(...belong.species.map((i) => buildSpeciesTree(i)));
-  return result;
 };
 
 /** 加载右侧菜单 */
@@ -198,11 +258,44 @@ const loadSpeciesMenus = (species: ISpeciesItem) => {
       key: '删除类别',
       icon: <im.ImBin />,
       label: '删除类别',
-      clickEvent: async () => {
+      beforeLoad: async () => {
         return await species.delete();
       },
     },
   );
+  return items;
+};
+
+/** 加载右侧菜单 */
+const loadPropertyMenus = (
+  species: IPropClass,
+  group: boolean = true,
+  property?: XProperty,
+) => {
+  const items: OperateMenuType[] = [];
+  if (group) {
+    items.push({
+      key: '新增属性',
+      icon: <im.ImPlus />,
+      label: '新增属性',
+    });
+  } else {
+    items.push(
+      {
+        key: '编辑属性',
+        icon: <im.ImCog />,
+        label: '编辑属性',
+      },
+      {
+        key: '删除属性',
+        icon: <im.ImBin />,
+        label: '删除属性',
+        beforeLoad: async () => {
+          return await species.deleteProperty(property!);
+        },
+      },
+    );
+  }
   return items;
 };
 
@@ -231,6 +324,23 @@ const getUserMenu = () => {
       },
     ],
     [
+      buildAuthorityTree(orgCtrl.user.superAuth!),
+      {
+        children: orgCtrl.user.dicts.map((item) => buildDictMenus(item)),
+        key: orgCtrl.user.key + GroupMenuType.DictGroup,
+        label: GroupMenuType.DictGroup,
+        itemType: GroupMenuType.DictGroup,
+        item: orgCtrl.user,
+        icon: <im.ImNewspaper />,
+        menus: [
+          {
+            key: '新增字典',
+            icon: <im.ImPlus />,
+            label: '新增字典',
+            model: 'outside',
+          },
+        ],
+      },
       {
         key: orgCtrl.user.key + GroupMenuType.StandardGroup,
         item: orgCtrl.user,
@@ -238,7 +348,7 @@ const getUserMenu = () => {
         itemType: GroupMenuType.StandardGroup,
         menus: LoadStandardMenus(orgCtrl.user),
         icon: <im.ImNewspaper />,
-        children: loadStandardSetting(orgCtrl.user),
+        children: orgCtrl.user.species.map((i) => buildSpeciesTree(i)),
       },
       loadGroupMenus(
         {
@@ -266,6 +376,23 @@ const getTeamMenu = () => {
   for (const company of orgCtrl.user.companys) {
     children.push(
       createMenu(company, loadTypeMenus(company, [], false), [
+        buildAuthorityTree(company.superAuth!),
+        {
+          children: company.dicts.map((item) => buildDictMenus(item)),
+          key: company.key + GroupMenuType.DictGroup,
+          label: GroupMenuType.DictGroup,
+          itemType: GroupMenuType.DictGroup,
+          item: company,
+          icon: <im.ImNewspaper />,
+          menus: [
+            {
+              key: '新增字典',
+              icon: <im.ImPlus />,
+              label: '新增字典',
+              model: 'outside',
+            },
+          ],
+        },
         {
           key: company.key + GroupMenuType.StandardGroup,
           item: company,
@@ -273,7 +400,7 @@ const getTeamMenu = () => {
           itemType: GroupMenuType.StandardGroup,
           menus: LoadStandardMenus(company),
           icon: <im.ImNewspaper />,
-          children: loadStandardSetting(company),
+          children: company.species.map((i) => buildSpeciesTree(i)),
         },
         loadGroupMenus(
           {
@@ -337,7 +464,7 @@ const loadGroupMenus = (param: groupMenuParams, teamTypes: string[]) => {
       icon: <im.ImSpinner9 />,
       label: '刷新' + param.typeName,
       model: 'inside',
-      clickEvent: async () => {
+      beforeLoad: async () => {
         await param.item.deepLoad(true);
         return false;
       },
@@ -400,7 +527,7 @@ const loadAuthorityMenus = (item: IAuthority) => {
         key: '删除权限',
         icon: <im.ImBin />,
         label: '删除权限',
-        clickEvent: async () => {
+        beforeLoad: async () => {
           return await item.delete();
         },
       },
@@ -434,7 +561,7 @@ const loadTypeMenus = (item: ITeam, subTypes: string[], allowDelete: boolean) =>
         key: '删除',
         icon: <im.ImBin />,
         label: '删除用户',
-        clickEvent: async () => {
+        beforeLoad: async () => {
           return await item.delete();
         },
       });
@@ -444,7 +571,7 @@ const loadTypeMenus = (item: ITeam, subTypes: string[], allowDelete: boolean) =>
           key: '退出',
           icon: <im.ImBin />,
           label: '退出' + item.metadata.typeName,
-          clickEvent: async () => {
+          beforeLoad: async () => {
             return await (item as ITarget).exit();
           },
         });

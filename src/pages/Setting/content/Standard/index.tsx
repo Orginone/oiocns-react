@@ -1,8 +1,7 @@
-import { ISpeciesItem, SpeciesType } from '@/ts/core';
+import { ICommodity, ISpeciesItem, SpeciesType } from '@/ts/core';
 import React from 'react';
 import Property from './Property';
 import WorkForm from './WorkForm';
-import { IWorkForm } from '@/ts/core/thing/app/work/workform';
 import WorkItem from './Flow';
 import { IWorkItem } from '@/ts/core/thing/app/work/workitem';
 import Description from './Description';
@@ -20,9 +19,8 @@ const SettingStandrad: React.FC<IProps> = ({ current }: IProps) => {
     switch (current.metadata.typeName) {
       case SpeciesType.Store:
         return <Property current={current} />;
-      case SpeciesType.WorkForm:
       case SpeciesType.Commodity:
-        return <WorkForm current={current as IWorkForm} />;
+        return <WorkForm commodity={current as ICommodity} />;
       case SpeciesType.Market:
       case SpeciesType.WorkItem:
         return <WorkItem current={current as IWorkItem} />;

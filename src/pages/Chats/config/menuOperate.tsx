@@ -4,7 +4,7 @@ import * as im from 'react-icons/im';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 import orgCtrl from '@/ts/controller';
 import { MenuItemType } from 'typings/globelType';
-import { IMsgChat, TargetType } from '@/ts/core';
+import { IMsgChat } from '@/ts/core';
 import OrgIcons from '@/bizcomponents/GlobalComps/orgIcons';
 
 /** 创建会话菜单 */
@@ -51,11 +51,7 @@ const loadBookMenu = () => {
       key: orgCtrl.user.key,
       label: orgCtrl.user.chatdata.chatName,
       itemType: orgCtrl.user.chatdata.chatName,
-      item: orgCtrl.user.chats.filter(
-        (i) =>
-          i.isMyChat &&
-          (i.belongId === i.userId || i.share.typeName === TargetType.Cohort),
-      ),
+      item: orgCtrl.user.chats.filter((i) => i.isMyChat),
       children: [
         createChatMenu(
           orgCtrl.user,

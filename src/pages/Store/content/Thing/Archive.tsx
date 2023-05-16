@@ -2,36 +2,32 @@ import React, { useEffect, useState } from 'react';
 import { Card, Collapse, Timeline } from 'antd';
 import orgCtrl from '@/ts/controller';
 import { kernel } from '@/ts/base';
-import { ISpeciesItem } from '@/ts/core';
-import OioForm from '@/bizcomponents/FormDesign/Design/OioForm';
+import OioForm from '@/bizcomponents/FormDesign/OioForm';
 import { XWorkInstance } from '@/ts/base/schema';
 
 const { Panel } = Collapse;
 
 interface IThingCardProps {
-  species: ISpeciesItem;
+  belongId: string;
   thingId: string;
 }
 /**
  * 存储-物-归档日志
  */
-const ThingArchive: React.FC<IThingCardProps> = ({ thingId, species }) => {
+const ThingArchive: React.FC<IThingCardProps> = ({ thingId, belongId }) => {
   const [instances, setInstances] = useState<XWorkInstance[]>([]);
   useEffect(() => {
     const findThing = async () => {
-      const res = await kernel.anystore.loadThingArchives(
-        species.current.space.metadata.id,
-        {
-          options: {
-            match: {
-              _id: {
-                _eq_: thingId,
-              },
+      const res = await kernel.anystore.loadThingArchives(belongId, {
+        options: {
+          match: {
+            _id: {
+              _eq_: thingId,
             },
           },
-          userData: [],
         },
-      );
+        userData: [],
+      });
       const resData = res.data as { data: any };
       const ts = (resData?.data || [])[0];
       let data = [];
@@ -54,17 +50,13 @@ const ThingArchive: React.FC<IThingCardProps> = ({ thingId, species }) => {
 
   const loadTaskContent = (instance: XWorkInstance) => {
     if (instance.tasks == undefined) return <></>;
-    let tasks = instance.tasks!.sort((a, b) => {
-      let date1 = new Date(a.createTime).getTime();
-      let date2 = new Date(b.createTime).getTime();
-      return date1 - date2;
-    });
+    let tasks = instance.tasks!.sort(
+      (a, b) => new Date(a.createTime).getTime() - new Date(b.createTime).getTime(),
+    );
     return tasks.map((a) => {
-      const records = a.records?.sort((a, b) => {
-        let date1 = new Date(a.createTime).getTime();
-        let date2 = new Date(b.createTime).getTime();
-        return date1 - date2;
-      });
+      const records = a.records?.sort(
+        (a, b) => new Date(a.createTime).getTime() - new Date(b.createTime).getTime(),
+      );
       if (records) {
         return records?.map((record) => (
           <Timeline.Item key={record.id}>
@@ -93,7 +85,6 @@ const ThingArchive: React.FC<IThingCardProps> = ({ thingId, species }) => {
                   return (
                     <Panel header={form.name} key={form.id}>
                       <OioForm
-                        belong={species.current.space}
                         key={form.id}
                         form={form}
                         formRef={undefined}

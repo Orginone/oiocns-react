@@ -70,13 +70,7 @@ const FlowDrawer: React.FC<IProps> = ({
             />
           );
         case AddNodeType.APPROVAL:
-          return (
-            <ApprovalNode
-              current={current}
-              orgId={operateOrgId || designOrgId}
-              species={species as IWorkItem}
-            />
-          );
+          return <ApprovalNode current={current} species={species as IWorkItem} />;
         case AddNodeType.CHILDWORK:
           return (
             <WorkFlowNode

@@ -1,30 +1,20 @@
 import { common, kernel, model, schema } from '../base';
-import { XWorkTask } from '../base/schema';
-import { TargetType } from './public/enums';
+import { XTarget } from '../base/schema';
 import { IPerson, Person } from './target/person';
+import { IChatProvider, ChatProvider } from './chat/provider';
 import { IWorkProvider, WorkProvider } from './work/provider';
 const sessionUserName = 'sessionUser';
 
 export class UserProvider extends common.Emitter {
   private _user: IPerson | undefined;
   private _work: IWorkProvider | undefined;
+  private _chat: IChatProvider | undefined;
   private _inited: boolean = false;
-  private _preMessages: model.MsgSaveModel[] = [];
   constructor() {
     super();
-    kernel.on('RecvMsg', (data) => {
+    kernel.on('RecvTarget', (data) => {
       if (this._inited) {
-        this._recvMessage(data);
-      } else {
-        this._preMessages.push(data);
-      }
-    });
-    kernel.on('RecvTags', (data) => {
-      this.changCallbackPart('tags', data);
-    });
-    kernel.on('RecvTask', (data: XWorkTask) => {
-      if (this._inited && this._work) {
-        this._work.updateTask(data);
+        this._recvTarget(data);
       }
     });
     const userJson = sessionStorage.getItem(sessionUserName);
@@ -39,6 +29,10 @@ export class UserProvider extends common.Emitter {
   /** 办事提供层 */
   get work(): IWorkProvider | undefined {
     return this._work;
+  }
+  /** 会话 */
+  get chat(): IChatProvider | undefined {
+    return this._chat;
   }
   /** 是否完成初始化 */
   get inited(): boolean {
@@ -85,6 +79,7 @@ export class UserProvider extends common.Emitter {
   private _loadUser(person: schema.XTarget) {
     sessionStorage.setItem(sessionUserName, JSON.stringify(person));
     this._user = new Person(person);
+    this._chat = new ChatProvider(this._user);
     this._work = new WorkProvider(this._user);
     this.changCallback();
   }
@@ -95,35 +90,43 @@ export class UserProvider extends common.Emitter {
   /** 重载数据 */
   public async refresh(): Promise<void> {
     this._inited = false;
+    this._chat?.PreMessage();
     await this._user?.deepLoad(true);
     await this.work?.loadTodos(true);
     this._inited = true;
-    this._preMessages = this._preMessages
-      .sort((a, b) => {
-        return new Date(a.createTime).getTime() - new Date(b.createTime).getTime();
-      })
-      .filter((item) => {
-        this._recvMessage(item);
-        return false;
-      });
+    this._chat?.loadPreMessage();
   }
   /**
-   * 接收到新信息
+   * 接收到用户信息
    * @param data 新消息
    * @param cache 是否缓存
    */
-  private _recvMessage(data: model.MsgSaveModel): void {
-    for (const c of this._user?.chats || []) {
-      let isMatch = data.sessionId === c.chatId;
-      if (
-        (c.share.typeName === TargetType.Person || c.share.typeName === '权限') &&
-        isMatch
-      ) {
-        isMatch = data.belongId == c.belongId;
-      }
-      if (isMatch) {
-        c.receiveMessage(data);
-      }
+  private _recvTarget(data: any): void {
+    switch (data['TypeName']) {
+      case 'Relation':
+        {
+          let subTarget = data['SubTarget'] as XTarget;
+          let target = [this._user!, ...this.user!.targets].find(
+            (a) => a.metadata.id == (data['Target'] as XTarget).id,
+          );
+          if (target) {
+            switch (data['Operate']) {
+              case 'Add':
+                target.members.push(subTarget);
+                target.loadMemberChats([subTarget], true);
+                break;
+              case 'Remove':
+                target.members = target.members.filter((a) => a.id != subTarget.id);
+                target.loadMemberChats([subTarget], false);
+                break;
+              default:
+                break;
+            }
+          }
+        }
+        break;
+      default:
+        break;
     }
   }
 }

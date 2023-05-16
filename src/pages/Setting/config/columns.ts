@@ -198,9 +198,7 @@ export const PropertyColumns = (
   },
 ];
 
-export const AttributeColumns = (
-  species: ISpeciesItem,
-): ProColumns<schema.XAttribute>[] => [
+export const AttributeColumns = (): ProColumns<schema.XAttribute>[] => [
   {
     title: '序号',
     valueType: 'index',
@@ -219,31 +217,15 @@ export const AttributeColumns = (
     width: 200,
   },
   {
-    title: '特性分类',
-    dataIndex: 'speciesId',
-    key: 'speciesId',
-    width: 150,
-    render: (_, record) => {
-      const find = getSpeciesName(record.speciesId, [species]);
-      if (find != undefined) {
-        return find.metadata.name;
-      }
-      return '未知';
-    },
-  },
-  {
-    title: '属性',
-    dataIndex: ['property', 'name'],
+    title: '关联属性',
+    dataIndex: 'property',
     key: 'propId',
     width: 150,
-  },
-  {
-    title: '共享组织',
-    dataIndex: 'shareId',
-    key: 'shareId',
-    width: 200,
     render: (_, record) => {
-      return orgCtrl.user.findShareById(record.shareId).name;
+      if (record.linkPropertys && record.linkPropertys.length > 0) {
+        return record.linkPropertys[0].name;
+      }
+      return '请关联属性';
     },
   },
   {
@@ -302,13 +284,6 @@ export const FormColumns = (species: ISpeciesItem): ProColumns<schema.XForm>[] =
       return orgCtrl.user.findShareById(record.belongId).name;
     },
   },
-];
-
-export const FormItemColumns: ProColumns<schema.XFormItem>[] = [
-  { title: '字段名称', dataIndex: 'name', key: 'name', width: 140 },
-  { title: '字段编码', dataIndex: 'code', key: 'code', width: 160 },
-  { title: '字段类型', dataIndex: 'remark', key: 'remark', width: 120 },
-  { title: '规则', dataIndex: 'rule', key: 'rule', ellipsis: true },
 ];
 
 export const FlowColumn: ProColumns<IWorkDefine>[] = [

@@ -14,4 +14,5 @@ export enum MenuType {
   'FileSystemItem' = '文件系统项',
   'Resource' = '资源',
   'Species' = '分类',
+  'Form' = '表单',
 }

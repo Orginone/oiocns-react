@@ -5,6 +5,7 @@ import { TargetType } from '../../public/enums';
 import { ITarget } from '../../target/base/target';
 import { ISpeciesItem, SpeciesItem } from './species';
 import { ShareIcon } from '@/ts/base/model';
+import { IForm } from './form';
 
 export interface IWorkDefine extends common.IEntity {
   /** 办事分类 */
@@ -83,9 +84,7 @@ export interface IWork extends ISpeciesItem {
   /** 流程定义 */
   defines: IWorkDefine[];
   /** 加载所有可选表单 */
-  loadForms(): Promise<schema.XForm[]>;
-  /** 表单特性 */
-  loadAttributes(): Promise<schema.XAttribute[]>;
+  loadForms(): Promise<IForm[]>;
   /** 加载办事 */
   loadWorkDefines(reload?: boolean): Promise<IWorkDefine[]>;
   /** 新建办事 */
@@ -103,9 +102,8 @@ export abstract class Work extends SpeciesItem implements IWork {
       const res = await kernel.queryWorkDefine({
         id: this.current.metadata.id,
         speciesId: this.metadata.id,
-        belongId: this.current.space.metadata.id,
+        belongId: this.belongId,
         upTeam: this.current.metadata.typeName === TargetType.Group,
-        upSpecies: true,
         page: PageAll,
       });
       if (res.success) {
@@ -125,6 +123,5 @@ export abstract class Work extends SpeciesItem implements IWork {
       return define;
     }
   }
-  abstract loadForms(): Promise<schema.XForm[]>;
-  abstract loadAttributes(): Promise<schema.XAttribute[]>;
+  abstract loadForms(): Promise<IForm[]>;
 }

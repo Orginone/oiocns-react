@@ -97,6 +97,7 @@ export class Person extends Belong implements IPerson {
     const res = await kernel.createTarget(data);
     if (res.success && res.data?.id) {
       const company = createCompany(res.data, this);
+      await company.deepLoad();
       this.companys.push(company);
       await company.pullMembers([this.metadata]);
       return company;
@@ -118,10 +119,11 @@ export class Person extends Belong implements IPerson {
     );
   }
   async applyJoin(members: schema.XTarget[]): Promise<boolean> {
-    members = members.filter((i) =>
-      [TargetType.Person, TargetType.Cohort, ...companyTypes].includes(
-        i.typeName as TargetType,
-      ),
+    members = members.filter(
+      (i) =>
+        [TargetType.Person, TargetType.Cohort, ...companyTypes].includes(
+          i.typeName as TargetType,
+        ) && i.id != this.metadata.id,
     );
     for (const member of members) {
       if (member.typeName === TargetType.Person) {
@@ -163,17 +165,22 @@ export class Person extends Belong implements IPerson {
   }
   get chats(): IMsgChat[] {
     const chats: IMsgChat[] = [this];
-    for (const item of this.companys) {
-      chats.push(...item.chats);
-    }
     chats.push(...this.cohortChats);
     chats.push(...this.memberChats);
     return chats;
   }
   get cohortChats(): IMsgChat[] {
     const chats: IMsgChat[] = [];
+    const companyChatIds: string[] = [];
+    this.companys.forEach((company) => {
+      company.cohorts.forEach((item) => {
+        companyChatIds.push(item.chatdata.fullId);
+      });
+    });
     for (const item of this.cohorts) {
-      chats.push(...item.chats);
+      if (!companyChatIds.includes(item.chatdata.fullId)) {
+        chats.push(...item.chats);
+      }
     }
     if (this.superAuth) {
       chats.push(...this.superAuth.chats);
@@ -207,8 +214,9 @@ export class Person extends Belong implements IPerson {
     this.superAuth?.deepLoad(reload);
   }
   override loadMemberChats(_newMembers: schema.XTarget[], _isAdd: boolean): void {
-    _newMembers.forEach((i) => {
-      if (_isAdd) {
+    _newMembers = _newMembers.filter((i) => i.id != this.user.metadata.id);
+    if (_isAdd) {
+      _newMembers.forEach((i) => {
         this.memberChats.push(
           new PersonMsgChat(
             this.metadata.id,
@@ -223,12 +231,18 @@ export class Person extends Belong implements IPerson {
             i.remark,
           ),
         );
-      } else {
-        this.memberChats = this.memberChats.filter(
-          (a) => !(a.belongId === i.id && a.chatId === i.id),
-        );
-      }
-    });
+      });
+    } else {
+      let chats: PersonMsgChat[] = [];
+      this.memberChats.forEach((a) => {
+        _newMembers.forEach((i) => {
+          if (a.chatId != i.id) {
+            chats.push(a);
+          }
+        });
+      });
+      this.memberChats = chats;
+    }
   }
   findShareById(id: string): model.ShareIcon {
     const share = ShareIdSet.get(id) || {

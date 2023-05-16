@@ -21,7 +21,7 @@ const buildSpeciesTree = (species: ISpeciesItem[]): MenuItemType[] => {
           menus: [],
           tag: [item.metadata.typeName],
           children: buildSpeciesTree(item.children),
-          clickEvent: async () => {
+          beforeLoad: async () => {
             switch (item.metadata.typeName) {
               case SpeciesType.Market:
                 await (item as IWork).loadWorkDefines();

@@ -1,6 +1,7 @@
 import { IPerson, UserProvider } from '@/ts/core';
 import { common } from '@/ts/base';
 import { IWorkProvider } from '../core/work/provider';
+import { IChatProvider } from '../core/chat/provider';
 /**
  * 设置控制器
  */
@@ -31,6 +32,10 @@ class IndexController extends common.Emitter {
   /** 办事提供者 */
   get work(): IWorkProvider {
     return this._provider.work!;
+  }
+  /** 会话提供者 */
+  get chat(): IChatProvider {
+    return this._provider.chat!;
   }
 }
 

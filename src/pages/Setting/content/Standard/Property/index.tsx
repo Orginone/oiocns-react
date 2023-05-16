@@ -8,7 +8,7 @@ import { Button, message } from 'antd';
 import { IPropClass } from '@/ts/core';
 import PageCard from '@/components/PageCard';
 /**
- * @description: 分类特性标准
+ * @description: 属性标准
  * @return {*}
  */
 const Property: React.FC<any> = ({ current }: { current: IPropClass }) => {

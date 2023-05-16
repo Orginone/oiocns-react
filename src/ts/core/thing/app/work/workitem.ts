@@ -3,6 +3,7 @@ import { ITarget } from '../../../target/base/target';
 import { IAppModule } from '../appmodule';
 import { IWork, Work } from '../../base/work';
 import { PageAll } from '@/ts/core/public/consts';
+import { IForm } from '../../base/form';
 export interface IWorkItem extends IWork {
   /** 对应的模块/应用 */
   appModule: IAppModule;
@@ -17,11 +18,8 @@ export class WorkItem extends Work implements IWorkItem {
     this.appModule = _parent;
   }
   appModule: IAppModule;
-  async loadForms(): Promise<schema.XForm[]> {
+  async loadForms(): Promise<IForm[]> {
     return await this.appModule.loadForms();
-  }
-  async loadAttributes(): Promise<schema.XAttribute[]> {
-    return await this.appModule.loadAttributes();
   }
   /** 删除办事实例 */
   async deleteInstance(id: string): Promise<boolean> {

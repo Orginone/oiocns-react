@@ -1,6 +1,5 @@
 import Design from '@/pages/Setting/content/Standard/Flow/Design';
 import Thing from '@/pages/Store/content/Thing/Thing';
-import { XForm } from '@/ts/base/schema';
 import orgCtrl from '@/ts/controller';
 import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
 import { ProFormInstance } from '@ant-design/pro-form';
@@ -8,10 +7,11 @@ import { Button, Card, Collapse, Input, Tabs, TabsProps, Timeline } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import { ImUndo2 } from 'react-icons/im';
 import cls from './index.module.less';
-import OioForm from '@/bizcomponents/FormDesign/Design/OioForm';
+import OioForm from '@/bizcomponents/FormDesign/OioForm';
 import { WorkNodeModel } from '@/ts/base/model';
 import { schema } from '@/ts/base';
 import { IWorkDefine } from '@/ts/core/thing/base/work';
+import { IForm } from '@/ts/core';
 const { Panel } = Collapse;
 
 export interface TaskDetailType {
@@ -26,7 +26,7 @@ const Detail: React.FC<TaskDetailType> = ({ task, define, instance, onBack }) =>
   const [comment, setComment] = useState<string>('');
   const [nodes, setNodes] = useState<WorkNodeModel>();
   const [loading, setLoading] = useState<boolean>(false);
-  const [allForms, setAllForms] = useState<XForm[]>([]);
+  const [allForms, setAllForms] = useState<IForm[]>([]);
   useEffect(() => {
     setTimeout(async () => {
       setNodes(await define.loadWorkNode());
@@ -35,22 +35,23 @@ const Detail: React.FC<TaskDetailType> = ({ task, define, instance, onBack }) =>
   }, []);
 
   /** 加载表单 */
-  const loadForm = (forms: XForm[], disabled: boolean, data?: any) => {
+  const loadForm = (forms: schema.XForm[], disabled: boolean, data?: any) => {
     let content = [];
-    for (let form of forms) {
-      form = allForms.find((a) => a.id == form.id) || form;
-      content.push(
-        <Panel header={form.name} key={form.id}>
-          <OioForm
-            key={form.id}
-            form={form}
-            formRef={undefined}
-            fieldsValue={data}
-            disabled={disabled}
-            belong={define.workItem.current.space}
-          />
-        </Panel>,
-      );
+    for (let item of forms) {
+      const form = allForms.find((a) => a.metadata.id == item.id);
+      if (form) {
+        content.push(
+          <Panel header={form.metadata.name} key={form.metadata.id}>
+            <OioForm
+              key={form.metadata.id}
+              form={form}
+              formRef={undefined}
+              fieldsValue={data}
+              disabled={disabled}
+            />
+          </Panel>,
+        );
+      }
     }
     return content;
   };
@@ -170,6 +171,9 @@ const Detail: React.FC<TaskDetailType> = ({ task, define, instance, onBack }) =>
                 height={'400px'}
                 byIds={instance.thingIds.split(',').filter((id: any) => id != '')}
                 selectable={false}
+                labels={[]}
+                propertys={[]}
+                belongId={instance.belongId}
               />
             )}
           </div>
