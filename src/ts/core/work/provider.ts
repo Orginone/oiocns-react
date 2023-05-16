@@ -83,6 +83,9 @@ export class WorkProvider implements IWorkProvider {
           status: {
             _gte_: 100,
           },
+          records: {
+            _exists_: true,
+          },
         },
         sort: {
           createTime: -1,
