@@ -128,7 +128,8 @@ const buildSpeciesTree = (species: ISpeciesItem[]): MenuItemType[] => {
                   beforeLoad: async () => {
                     await i.loadAttributes();
                   },
-                } as MenuItemType;
+                  children: [],
+                };
               }),
             );
           }
