@@ -9,6 +9,8 @@ import { Data } from './data';
 import { IWorkThing, WorkThing } from './workthing';
 /** 应用的基类接口 */
 export interface IApplication extends ISpeciesItem {
+  /** 流程定义 */
+  defines: IWorkDefine[];
   /** 查询所有的表单 */
   loadForms(): Promise<IForm[]>;
   /** 查询所有办事 */
@@ -27,6 +29,7 @@ export class Application extends SpeciesItem implements IApplication {
       }
     }
   }
+  defines: IWorkDefine[] = [];
   async loadForms(): Promise<IForm[]> {
     const result: IForm[] = [];
     for (const item of this.children) {
@@ -43,6 +46,7 @@ export class Application extends SpeciesItem implements IApplication {
         result.push(...(await (item as IWorkItem).loadAllWorkDefines()));
       }
     }
+    this.defines = result;
     return result;
   }
   override createChildren(
