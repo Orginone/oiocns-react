@@ -296,8 +296,8 @@ export type DictModel = {
   icon: string;
   // 备注
   remark: string;
-  // 归属用户ID
-  belongId: string;
+  // 分类ID
+  speciesId: string;
 };
 
 export type DictItemModel = {

@@ -9,6 +9,7 @@ import {
   ICommodity,
   IDepartment,
   IDict,
+  IDictClass,
   IGroup,
   IPropClass,
   ISpeciesItem,
@@ -70,34 +71,11 @@ const buildSpeciesTree = (species: ISpeciesItem): MenuItemType => {
     case SpeciesType.WorkForm:
       return buildFormMenu(species as IWorkForm);
     case SpeciesType.Store:
-      children.push({
-        key: species.key + MenuType.PropPackage,
-        item: species,
-        label: MenuType.PropPackage,
-        icon: <TeamIcon share={species.share} size={18} fontSize={16} />,
-        itemType: MenuType.PropPackage,
-        menus: loadPropertyMenus(species as IPropClass, true),
-        children: (species as IPropClass).propertys.map((i) => {
-          return {
-            key: i.id,
-            item: {
-              property: i,
-              species: species,
-            },
-            label: i.name,
-            itemType: MenuType.Property,
-            icon: (
-              <TeamIcon
-                share={{ name: i.name, typeName: '未知' }}
-                size={18}
-                fontSize={16}
-              />
-            ),
-            menus: loadPropertyMenus(species as IPropClass, false, i),
-            children: [],
-          };
-        }),
-      });
+      children.push(buildProperty(species as IPropClass));
+      break;
+    case SpeciesType.Dict:
+      children.push(buildDict(species as IDictClass));
+      break;
   }
   return {
     key: species.key,
@@ -124,6 +102,62 @@ const buildSpeciesTree = (species: ISpeciesItem): MenuItemType => {
   };
 };
 
+/** 编译属性菜单 */
+const buildProperty = (propClass: IPropClass): MenuItemType => {
+  return {
+    key: propClass.key + MenuType.PropPackage,
+    item: propClass,
+    label: MenuType.PropPackage,
+    icon: <TeamIcon share={propClass.share} size={18} fontSize={16} />,
+    itemType: MenuType.PropPackage,
+    menus: loadPropertyMenus(propClass, true),
+    children: propClass.propertys.map((i) => {
+      return {
+        key: i.id,
+        item: {
+          property: i,
+          species: propClass,
+        },
+        label: i.name,
+        itemType: MenuType.Property,
+        icon: (
+          <TeamIcon share={{ name: i.name, typeName: '未知' }} size={18} fontSize={16} />
+        ),
+        menus: loadPropertyMenus(propClass, false, i),
+        children: [],
+      };
+    }),
+  };
+};
+
+/** 编译字典菜单 */
+const buildDict = (dictClass: IDictClass): MenuItemType => {
+  return {
+    key: dictClass.key + MenuType.DictPackage,
+    item: dictClass,
+    label: MenuType.DictPackage,
+    icon: <TeamIcon share={dictClass.share} size={18} fontSize={16} />,
+    itemType: MenuType.DictPackage,
+    menus: loadDictMenus(),
+    children: dictClass.dicts.map((dict) => {
+      return {
+        key: dict.metadata.id,
+        item: dict,
+        label: dict.metadata.name,
+        itemType: MenuType.Property,
+        icon: <TeamIcon share={dict.share} size={18} fontSize={16} />,
+        menus: loadDictMenus(dict),
+        children: [],
+        beforeLoad: async () => {
+          await dict.loadItems();
+        },
+      };
+    }),
+    beforeLoad: async () => {
+      await dictClass.loadDicts();
+    },
+  };
+};
 /** 编译表单项菜单 */
 const buildFormMenu = (form: IWorkForm): MenuItemType => {
   return {
@@ -179,50 +213,16 @@ const buildFormMenu = (form: IWorkForm): MenuItemType => {
 };
 
 /** 编译权限树 */
-const buildAuthorityTree = (authority: IAuthority) => {
+const buildAuthorityTree = (authority: IAuthority, name?: string) => {
   const result: MenuItemType = {
     key: authority.key,
     item: authority,
-    label: authority.metadata.name,
+    label: name || authority.metadata.name,
     icon: <im.ImTree />,
     itemType: MenuType.Authority,
     tag: [MenuType.Authority],
     menus: loadAuthorityMenus(authority),
     children: authority.children.map((i) => buildAuthorityTree(i)) ?? [],
-  };
-  return result;
-};
-
-/** 加载字典菜单 */
-const buildDictMenus = (dict: IDict) => {
-  const result: MenuItemType = {
-    key: dict.key,
-    item: dict,
-    label: dict.metadata.name,
-    tag: ['字典'],
-    icon: <TeamIcon share={dict.share} size={18} fontSize={16} />,
-    itemType: MenuType.Dict,
-    menus: [
-      {
-        key: '编辑字典',
-        icon: <im.ImPencil />,
-        label: '编辑字典',
-        model: 'outside',
-      },
-      {
-        key: '删除字典',
-        icon: <im.ImCross />,
-        label: '删除字典',
-        model: 'outside',
-        beforeLoad: async () => {
-          return await dict.delete();
-        },
-      },
-    ],
-    children: [],
-    beforeLoad: async () => {
-      await dict.loadItems();
-    },
   };
   return result;
 };
@@ -298,7 +298,34 @@ const loadPropertyMenus = (
   }
   return items;
 };
-
+/** 加载右侧菜单 */
+const loadDictMenus = (dict?: IDict) => {
+  const items: OperateMenuType[] = [];
+  if (dict) {
+    items.push(
+      {
+        key: '编辑属性',
+        icon: <im.ImCog />,
+        label: '编辑属性',
+      },
+      {
+        key: '删除属性',
+        icon: <im.ImBin />,
+        label: '删除属性',
+        beforeLoad: async () => {
+          return await dict.delete();
+        },
+      },
+    );
+  } else {
+    items.push({
+      key: '新增属性',
+      icon: <im.ImPlus />,
+      label: '新增属性',
+    });
+  }
+  return items;
+};
 /** 获取个人菜单 */
 const getUserMenu = () => {
   return createMenu(
@@ -324,23 +351,7 @@ const getUserMenu = () => {
       },
     ],
     [
-      buildAuthorityTree(orgCtrl.user.superAuth!),
-      {
-        children: orgCtrl.user.dicts.map((item) => buildDictMenus(item)),
-        key: orgCtrl.user.key + GroupMenuType.DictGroup,
-        label: GroupMenuType.DictGroup,
-        itemType: GroupMenuType.DictGroup,
-        item: orgCtrl.user,
-        icon: <im.ImNewspaper />,
-        menus: [
-          {
-            key: '新增字典',
-            icon: <im.ImPlus />,
-            label: '新增字典',
-            model: 'outside',
-          },
-        ],
-      },
+      buildAuthorityTree(orgCtrl.user.superAuth!, '权限定义'),
       {
         key: orgCtrl.user.key + GroupMenuType.StandardGroup,
         item: orgCtrl.user,
@@ -376,23 +387,7 @@ const getTeamMenu = () => {
   for (const company of orgCtrl.user.companys) {
     children.push(
       createMenu(company, loadTypeMenus(company, [], false), [
-        buildAuthorityTree(company.superAuth!),
-        {
-          children: company.dicts.map((item) => buildDictMenus(item)),
-          key: company.key + GroupMenuType.DictGroup,
-          label: GroupMenuType.DictGroup,
-          itemType: GroupMenuType.DictGroup,
-          item: company,
-          icon: <im.ImNewspaper />,
-          menus: [
-            {
-              key: '新增字典',
-              icon: <im.ImPlus />,
-              label: '新增字典',
-              model: 'outside',
-            },
-          ],
-        },
+        buildAuthorityTree(company.superAuth!, '权限定义'),
         {
           key: company.key + GroupMenuType.StandardGroup,
           item: company,
