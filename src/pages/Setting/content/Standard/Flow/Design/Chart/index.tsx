@@ -2,20 +2,14 @@ import cls from './index.module.less';
 import FlowDrawer from './FlowDrawer';
 import ProcessTree from './ProcessTree';
 import React, { useEffect, useState } from 'react';
-import { AddNodeType, FieldCondition, NodeType } from './FlowDrawer/processType';
-import { ISpeciesItem } from '@/ts/core';
-import { XWorkDefine } from '@/ts/base/schema';
+import { AddNodeType, NodeType } from './FlowDrawer/processType';
+import { IWorkDefine } from '@/ts/core/thing/base/work';
 
 interface IProps {
-  current: XWorkDefine | undefined;
-  operateOrgId?: string;
-  designOrgId?: string;
+  current: IWorkDefine;
   scale?: number;
   resource: any;
-  conditions?: FieldCondition[]; //内置条件选择器
-  species: ISpeciesItem;
   defaultEditable: boolean;
-  disableIds: string[];
 }
 
 const ChartDesign: React.FC<IProps> = (props) => {
@@ -34,8 +28,6 @@ const ChartDesign: React.FC<IProps> = (props) => {
             {/* 树结构展示 */}
             <ProcessTree
               defaultEditable={props.defaultEditable}
-              operateOrgId={props.operateOrgId}
-              conditions={props.conditions}
               resource={props.resource}
               onSelectedNode={(params) => {
                 if (
@@ -43,7 +35,7 @@ const ChartDesign: React.FC<IProps> = (props) => {
                   params.type !== AddNodeType.ORGANIZATIONA
                 ) {
                   //设置当前操作的节点，后续都是对当前节点的操作
-                  params.designId = props.current?.id;
+                  params.designId = props.current.metadata.id;
                   setCurrentNode(params);
                   setIsOpen(true);
                 } else {
@@ -55,21 +47,19 @@ const ChartDesign: React.FC<IProps> = (props) => {
         </div>
       </div>
       {/* 侧边数据填充 */}
-      <FlowDrawer
-        disableIds={props.disableIds}
-        defaultEditable={props.defaultEditable}
-        species={props.species}
-        operateOrgId={props.operateOrgId}
-        designOrgId={props.designOrgId}
-        isOpen={
-          isOpen && (props.defaultEditable || currentNode?.task?.records?.length > 0)
-        }
-        current={currentNode}
-        conditions={props.conditions}
-        onClose={() => {
-          setIsOpen(false);
-        }}
-      />
+      {currentNode && (
+        <FlowDrawer
+          define={props.current}
+          defaultEditable={props.defaultEditable}
+          isOpen={
+            isOpen && (props.defaultEditable || currentNode?.task?.records?.length > 0)
+          }
+          current={currentNode!}
+          onClose={() => {
+            setIsOpen(false);
+          }}
+        />
+      )}
     </div>
   );
 };

@@ -1,12 +1,5 @@
 import React from 'react';
-import {
-  IAppModule,
-  IBelong,
-  IMarket,
-  ISpeciesItem,
-  IWorkItem,
-  SpeciesType,
-} from '@/ts/core';
+import { IBelong, IMarket, ISpeciesItem, IWorkItem, SpeciesType } from '@/ts/core';
 import { MenuItemType } from 'typings/globelType';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 import orgCtrl from '@/ts/controller';
@@ -39,21 +32,18 @@ const buildSpeciesTree = (species: ISpeciesItem[]) => {
     switch (item.metadata.typeName) {
       case SpeciesType.Market:
         defines.push(...(item as IMarket).defines);
-        children.push(...buildWorkItem(defines));
         break;
-      case SpeciesType.AppModule:
       case SpeciesType.Application:
-        defines.push(...(item as IAppModule).defines);
+        defines.push(...(item as IApplication).defines);
+        children.push(...buildSpeciesTree(item.children));
         break;
       case SpeciesType.WorkItem:
         defines.push(...(item as IWorkItem).defines);
-        children.push(...buildWorkItem(defines));
+        children.push(...buildWorkItem(defines), ...buildSpeciesTree(item.children));
         break;
+      default:
+        continue;
     }
-    if (defines.length < 1) {
-      continue;
-    }
-    children.push(...buildSpeciesTree(item.children));
     items.push({
       key: item.key,
       item: defines,
@@ -62,14 +52,6 @@ const buildSpeciesTree = (species: ISpeciesItem[]) => {
       menus: [],
       icon: <TeamIcon notAvatar={true} share={item.share} size={18} fontSize={16} />,
       children: children,
-      beforeLoad: async () => {
-        switch (item.metadata.typeName) {
-          case SpeciesType.AppModule:
-          case SpeciesType.Application:
-            await (item as IAppModule).loadWorkDefines();
-            break;
-        }
-      },
     });
   }
   return items;
@@ -78,16 +60,14 @@ const buildSpeciesTree = (species: ISpeciesItem[]) => {
 const loadChildren = (team: IBelong) => {
   const defines: IWorkDefine[] = [];
   const species: ISpeciesItem[] = [];
-  for (const item of team.targets) {
-    if (item.space === team.space) {
-      species.push(...item.species);
-      for (const species of item.species) {
-        switch (species.metadata.typeName) {
+  for (const t of team.targets) {
+    if (t.space === team.space) {
+      for (const s of t.species) {
+        switch (s.metadata.typeName) {
           case SpeciesType.Market:
-            defines.push(...(species as IMarket).defines);
-            break;
           case SpeciesType.Application:
-            defines.push(...(species as IApplication).defines);
+            species.push(s);
+            defines.push(...(s as IApplication).defines);
             break;
         }
       }
@@ -104,17 +84,8 @@ const loadChildren = (team: IBelong) => {
       menus: [],
       children: buildSpeciesTree(species),
       beforeLoad: async () => {
-        for (const item of team.targets) {
-          for (const species of item.species) {
-            switch (species.metadata.typeName) {
-              case SpeciesType.Market:
-                await (species as IMarket).loadWorkDefines();
-                break;
-              case SpeciesType.Application:
-                await (species as IApplication).loadWorkDefines();
-                break;
-            }
-          }
+        for (const s of species) {
+          await (s as IApplication).loadWorkDefines();
         }
       },
     },

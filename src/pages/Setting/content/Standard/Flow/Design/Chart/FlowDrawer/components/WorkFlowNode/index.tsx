@@ -1,20 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { AiOutlineSetting } from 'react-icons/ai';
 import { Row, Button, Space, Modal, message } from 'antd';
 import cls from './index.module.less';
 import { NodeType } from '../../processType';
-import { ISpeciesItem } from '@/ts/core';
+import { IWork } from '@/ts/core';
 import WorkSelectTable from './WorkSelectTable';
 import ShareShowComp from '@/bizcomponents/IndentityManage/ShareShowComp';
 import { schema } from '@/ts/base';
 import orgCtrl from '@/ts/controller';
-import { IAppModule } from '@/ts/core/thing/app/appmodule';
 
 interface IProps {
   current: NodeType;
-  orgId?: string;
-  species: ISpeciesItem;
-  disableIds: string[];
+  work: IWork;
 }
 
 /**
@@ -33,11 +30,6 @@ const WorkFlowNode: React.FC<IProps> = (props) => {
       name: props.current.props.assignedUser[0]?.name,
     },
   });
-  useEffect(() => {
-    if (!props.current.belongId) {
-      props.current.belongId = props.orgId;
-    }
-  }, []);
 
   return (
     <div className={cls[`app-roval-node`]}>
@@ -104,11 +96,9 @@ const WorkFlowNode: React.FC<IProps> = (props) => {
           setIsOpen(false);
         }}
         onCancel={() => setIsOpen(false)}>
-        {props.species && (
+        {props.work && (
           <WorkSelectTable
-            species={props.species.parent as IAppModule}
-            space={props.species?.current.space}
-            disableIds={props.disableIds}
+            work={props.work}
             searchFn={(params: schema.XWorkDefine) => {
               setSelectChildWork(params);
             }}

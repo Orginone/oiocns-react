@@ -3,7 +3,7 @@ import { SpeciesType } from '@/ts/core/public/enums';
 import { ISpeciesItem } from './species';
 import { common, kernel, model, schema } from '@/ts/base';
 import { IPropClass } from '../store/propclass';
-import { IWorkForm } from '../app/work/workform';
+import { IWorkThing } from '../app/workthing';
 import { XProperty } from '@/ts/base/schema';
 export interface IForm extends common.IEntity {
   /** 表单元数据 */
@@ -69,8 +69,8 @@ export class Form extends common.Entity implements IForm {
       page: PageAll,
     });
     if (res.success) {
-      if (this.species.metadata.typeName === SpeciesType.WorkForm) {
-        const species = this.species as IWorkForm;
+      if (this.species.metadata.typeName === SpeciesType.WorkThing) {
+        const species = this.species as IWorkThing;
         species.forms = species.forms.filter((i) => i.key != this.key);
       }
     }

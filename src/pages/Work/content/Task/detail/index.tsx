@@ -213,13 +213,7 @@ const Detail: React.FC<TaskDetailType> = ({ task, define, instance, onBack }) =>
       key: '2',
       label: `流程图`,
       children: instance?.define ? (
-        <Design
-          species={define.workItem}
-          current={define}
-          instance={instance}
-          IsEdit={false}
-          onBack={() => {}}
-        />
+        <Design current={define} instance={instance} IsEdit={false} onBack={() => {}} />
       ) : (
         <></>
       ),

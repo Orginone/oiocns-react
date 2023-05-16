@@ -1,100 +1,70 @@
 import { AiOutlineSearch } from 'react-icons/ai';
 import { Input, TreeProps } from 'antd';
-import React, { useState, useEffect, Key } from 'react';
+import React, { useState, Key } from 'react';
 import ShareShowComp from '@/bizcomponents/IndentityManage/ShareShowComp';
 import cls from './index.module.less';
 import CustomTree from '@/components/CustomTree';
-import { IWorkForm } from '@/ts/core/thing/app/work/workform';
-import { IAppModule } from '@/ts/core/thing/app/appmodule';
-import { ISpeciesItem, SpeciesType } from '@/ts/core';
+import { IWork, IWorkThing, SpeciesType } from '@/ts/core';
 import { XForm } from '@/ts/base/schema';
-let originalSelected: any[] = []; //存储当前选择 以获分配数据
 
 interface IProps {
-  current: IAppModule;
-  showData: any[];
-  setShowData: (forms: XForm[]) => void;
+  current: IWork;
+  selected: XForm[];
+  setSelected: (forms: XForm[]) => void;
 }
 
-const SelectOperation: React.FC<IProps> = ({ current, showData, setShowData }) => {
-  const [leftTreeSelectedKeys, setLeftTreeSelectedKeys] = useState<Key[]>([]); //组织群列表
-  const [leftCheckedKeys, setLeftCheckedKeys] = useState<Key[]>([]);
-  const [leftTreeData, setLeftTreeData] = useState<any>([]);
+const SelectOperation: React.FC<IProps> = ({ current, selected, setSelected }) => {
   const [centerTreeData, setCenterTreeData] = useState<any>([]);
-  const [centerCheckedKeys, setCenterCheckedKeys] = useState<Key[]>([]);
+  const [centerCheckedKeys, setCenterCheckedKeys] = useState<Key[]>(
+    selected.map((i) => i.id),
+  );
 
-  const onSelect: TreeProps['onSelect'] = async (selectedKeys, info: any) => {
-    setLeftTreeSelectedKeys(selectedKeys);
-    const species: IWorkForm = info.node.item;
+  const onSelect: TreeProps['onSelect'] = async (_, info: any) => {
+    const species: IWorkThing = info.node.item;
     let forms = await species.loadForms();
-    setCenterTreeData(forms.map((i) => i.metadata));
-  };
-  // 左侧树选中事件
-  const handleCheckChange: TreeProps['onCheck'] = (checkedKeys, info: any) => {
-    // console.log('点击左侧', checkedKeys, info, info.checked);
-    Array.isArray(checkedKeys) && setLeftCheckedKeys(checkedKeys);
-  };
-  // 中间树形点击事件
-  const onCheck: TreeProps['onCheck'] = (checkedKeys, info: any) => {
-    // console.log('onCheck', checkedKeys, info);
-    if (Array.isArray(checkedKeys)) {
-      setCenterCheckedKeys(checkedKeys);
-    }
-    const isOriginal = originalSelected.includes(info.node.id);
-    let newArr = showData.filter((v: any) => {
-      return v.id !== info.node.id;
-    });
-    let obj = {
-      id: info.node.id,
-      name: info.node.name,
-      type: 'has',
-      item: info.node,
-    };
-
-    let newShowData = [...newArr];
-    if (info.checked) {
-      obj.type = isOriginal ? 'has' : 'add';
-      newShowData = [...newArr, obj];
-    } else {
-      if (isOriginal) {
-        obj.type = 'del';
-        newShowData = [...newArr, obj];
-      }
-    }
-    setShowData(newShowData);
-    // setShowData(info.checkedNodes.map((node: any) => node.item));
-  };
-
-  const buildSpeciesChildrenTree = (species: ISpeciesItem[]): any[] => {
-    const result: any[] = [];
-    for (const item of species) {
-      const children: any[] = [];
-      if (item.metadata.typeName === SpeciesType.AppModule) {
-        children.push(...buildSpeciesChildrenTree(item.children));
-      }
-      if (children.length > 0 || item.metadata.typeName === SpeciesType.WorkForm) {
-        result.push({
+    setCenterTreeData(
+      forms.map((item) => {
+        return {
           key: item.metadata.id,
           title: item.metadata.name,
           value: item.metadata.id,
-          item: item,
-          children: children,
-        });
-      }
+          item: item.metadata,
+          children: [],
+        };
+      }),
+    );
+  };
+  // 中间树形点击事件
+  const onCheck: TreeProps['onCheck'] = (checkedKeys, info) => {
+    if (Array.isArray(checkedKeys)) {
+      setCenterCheckedKeys(checkedKeys);
+    }
+    const form: XForm = (info.node as any).item;
+    if (info.checked) {
+      selected.push(form);
+    } else {
+      selected = selected.filter((i) => i.id != form.id);
+    }
+    setSelected([...selected]);
+  };
+
+  const buildWorkThingTree = (species: IWorkThing[]): any[] => {
+    const result: any[] = [];
+    for (const item of species) {
+      result.push({
+        key: item.metadata.id,
+        title: item.metadata.name,
+        value: item.metadata.id,
+        item: item,
+        children: buildWorkThingTree(item.children.map((i) => i as IWorkThing)),
+      });
     }
     return result;
   };
 
-  useEffect(() => {
-    const load = async () => {
-      setLeftTreeData(buildSpeciesChildrenTree(current.appliction.children));
-    };
-    load();
-  }, []);
-
   const handelDel = (id: string) => {
     setCenterCheckedKeys(centerCheckedKeys.filter((data) => data != id));
-    setShowData(showData.filter((data) => data.id != id));
+    setSelected(selected.filter((i) => i.id != id));
   };
 
   return (
@@ -109,12 +79,13 @@ const SelectOperation: React.FC<IProps> = ({ current, showData, setShowData }) =
           <div className={cls.leftContent}>
             <CustomTree
               checkable={false}
-              checkedKeys={leftCheckedKeys}
               autoExpandParent={true}
-              selectedKeys={leftTreeSelectedKeys}
               onSelect={onSelect}
-              onCheck={handleCheckChange}
-              treeData={leftTreeData}
+              treeData={buildWorkThingTree(
+                current.app.children
+                  .filter((i) => i.metadata.typeName === SpeciesType.WorkThing)
+                  .map((i) => i as IWorkThing),
+              )}
             />
           </div>
         </div>
@@ -129,11 +100,6 @@ const SelectOperation: React.FC<IProps> = ({ current, showData, setShowData }) =
               checkable
               checkedKeys={centerCheckedKeys}
               autoExpandParent={true}
-              fieldNames={{
-                title: 'name',
-                key: 'id',
-                children: 'nodes',
-              }}
               onCheck={onCheck}
               treeData={centerTreeData}
             />
@@ -141,7 +107,7 @@ const SelectOperation: React.FC<IProps> = ({ current, showData, setShowData }) =
         </div>
 
         <div style={{ width: '33%' }} className={cls.right}>
-          <ShareShowComp departData={showData} deleteFuc={handelDel}></ShareShowComp>
+          <ShareShowComp departData={selected} deleteFuc={handelDel}></ShareShowComp>
         </div>
       </div>
     </div>

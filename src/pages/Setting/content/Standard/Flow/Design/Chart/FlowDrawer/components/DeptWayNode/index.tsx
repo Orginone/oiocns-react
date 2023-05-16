@@ -5,11 +5,10 @@ import orgCtrl from '@/ts/controller';
 import DeptWayGroupItemConfig from '../DeptWayGroupItemConfig';
 interface IProps {
   current: NodeType;
-  orgId?: string;
   conditions?: FieldCondition[];
 }
 /**
- * @description: 并行节点
+ * @description: 组织节点
  * @return {*}
  */
 
@@ -45,11 +44,7 @@ const DeptWayNode: React.FC<IProps> = (props) => {
     <div className={cls[`app-roval-node`]}>
       <div className={cls[`roval-node`]}>
         <div style={{ marginBottom: '10px' }}>
-          <DeptWayGroupItemConfig
-            orgId={props.orgId}
-            currnet={props.current}
-            conditions={conditions}
-          />
+          <DeptWayGroupItemConfig currnet={props.current} conditions={conditions} />
         </div>
       </div>
     </div>

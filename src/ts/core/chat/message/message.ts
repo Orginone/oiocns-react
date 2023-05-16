@@ -1,7 +1,6 @@
 import { common, kernel, model } from '@/ts/base';
 import { IBelong } from '../../target/base/belong';
-// 历史会话存储集合名称
-const hisMsgCollName = 'chat-message';
+import { storeCollName } from '../../public/consts';
 /** 归属会话消息 */
 export interface IChatMessage {
   /** 归属用户 */
@@ -42,19 +41,23 @@ export class ChatMessage implements IChatMessage {
         minTime = this.messages[this.messages.length].createTime;
       }
     }
-    const res = await kernel.anystore.aggregate(this.belong.metadata.id, hisMsgCollName, {
-      match: {
-        belongId: this.belong.metadata.id,
-        createTime: {
-          _gt_: minTime,
-          _lt_: maxTime,
+    const res = await kernel.anystore.aggregate(
+      this.belong.metadata.id,
+      storeCollName.ChatMessage,
+      {
+        match: {
+          belongId: this.belong.metadata.id,
+          createTime: {
+            _gt_: minTime,
+            _lt_: maxTime,
+          },
         },
+        sort: {
+          createTime: -1,
+        },
+        limit: 30,
       },
-      sort: {
-        createTime: -1,
-      },
-      limit: 30,
-    });
+    );
     if (res && res.success && Array.isArray(res.data)) {
       this.loadMessages(res.data, before);
       return res.data.length;
