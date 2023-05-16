@@ -128,7 +128,7 @@ export abstract class MsgChat extends common.Entity implements IMsgChat {
   members: schema.XTarget[] = [];
   chatdata: MsgChatData;
   memberChats: PersonMsgChat[] = [];
-  newTagInfo: string[] = [];
+  _newTagInfo: string[] = [];
   private messageNotify?: (messages: model.MsgSaveModel[]) => void;
   get isMyChat(): boolean {
     if (this.chatdata.noReadCount > 0 || this.share.typeName === TargetType.Person) {
@@ -253,15 +253,16 @@ export abstract class MsgChat extends common.Entity implements IMsgChat {
     if (needTagMsgs.length > 0) {
       const willtagMsgIds: string[] = Array.from(new Set(needTagMsgs.map((v) => v.id)));
       //拦截重复提交
-      if (this.newTagInfo.join('-') === willtagMsgIds.join('-')) {
+      if (this._newTagInfo.join('-') === willtagMsgIds.join('-')) {
         console.log('拦截重复提交tag');
         return;
       }
-      this.newTagInfo = willtagMsgIds;
+      this._newTagInfo = willtagMsgIds;
       // 触发事件
       this.tagMessage(willtagMsgIds, ['已读']);
     }
   }
+  // 根据tags反馈重写 消息体 标记信息
   overwriteMessagesTags = (newTag: tagsMsgType) => {
     if (newTag.id !== this.chatId) {
       return;
