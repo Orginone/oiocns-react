@@ -144,7 +144,8 @@ const buildDict = (dictClass: IDictClass): MenuItemType => {
         key: dict.metadata.id,
         item: dict,
         label: dict.metadata.name,
-        itemType: MenuType.Property,
+        itemType: MenuType.Dict,
+        tag: ['字典'],
         icon: <TeamIcon share={dict.share} size={18} fontSize={16} />,
         menus: loadDictMenus(dict),
         children: [],
@@ -351,7 +352,7 @@ const getUserMenu = () => {
       },
     ],
     [
-      buildAuthorityTree(orgCtrl.user.superAuth!, '权限定义'),
+      buildAuthorityTree(orgCtrl.user.superAuth!, '权限标准'),
       {
         key: orgCtrl.user.key + GroupMenuType.StandardGroup,
         item: orgCtrl.user,
@@ -387,7 +388,7 @@ const getTeamMenu = () => {
   for (const company of orgCtrl.user.companys) {
     children.push(
       createMenu(company, loadTypeMenus(company, [], false), [
-        buildAuthorityTree(company.superAuth!, '权限定义'),
+        buildAuthorityTree(company.superAuth!, '权限标准'),
         {
           key: company.key + GroupMenuType.StandardGroup,
           item: company,
