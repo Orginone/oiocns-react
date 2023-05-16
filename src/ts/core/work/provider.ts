@@ -5,6 +5,8 @@ import { IPerson } from '../target/person';
 import { IApplication } from '../thing/app/application';
 import { IWorkDefine } from '../thing/base/work';
 import { IMarket } from '../thing/market/market';
+// 历史任务存储集合名称
+const hisWorkCollName = 'work-task';
 export interface IWorkProvider {
   /** 当前用户 */
   user: IPerson;
@@ -72,10 +74,52 @@ export class WorkProvider implements IWorkProvider {
     return this.todos;
   }
   async loadDones(req: model.IdModel): Promise<schema.XWorkRecordArray> {
-    return (await kernel.queryWorkRecord(req)).data;
+    const res = await kernel.anystore.pageRequest<schema.XWorkTask>(
+      this.user.metadata.id,
+      hisWorkCollName,
+      {
+        match: {
+          belongId: req.id,
+          status: {
+            _gte_: 100,
+          },
+        },
+        sort: {
+          createTime: -1,
+        },
+      },
+      req.page,
+    );
+    return {
+      ...res.data,
+      result: (res.data.result || [])
+        .map((i) => {
+          if (i.records && i.records.length > 0) {
+            i.records[0].task = i;
+            return i.records[0];
+          }
+          return undefined;
+        })
+        .filter((i) => i != undefined)
+        .map((i) => i!),
+    };
   }
   async loadApply(req: model.IdModel): Promise<schema.XWorkTaskArray> {
-    return (await kernel.queryMyApply(req)).data;
+    const res = await kernel.anystore.pageRequest<schema.XWorkTask>(
+      this.user.metadata.id,
+      hisWorkCollName,
+      {
+        match: {
+          belongId: req.id,
+          createUser: req.id,
+        },
+        sort: {
+          createTime: -1,
+        },
+      },
+      req.page,
+    );
+    return res.data;
   }
   async approvalTask(
     tasks: schema.XWorkTask[],

@@ -1,4 +1,10 @@
-import { badRequest, BucketOpreateModel, ResultType } from '../model';
+import {
+  badRequest,
+  BucketOpreateModel,
+  PageModel,
+  PageResult,
+  ResultType,
+} from '../model';
 import StoreHub from './storehub';
 import { logger } from '../common';
 import axios from 'axios';
@@ -285,6 +291,36 @@ export default class AnyStore {
       },
       options,
     );
+  }
+  /**
+   * 从数据集查询数据
+   * @param {string} collName 数据集名称（eg: history-message）
+   * @param {any} options 聚合管道(eg: {match:{a:1},skip:10,limit:10})
+   * @param {string} belongId 对象所在域, 个人域(user),单位域(company),开放域(all)
+   * @returns {ResultType} 移除异步结果
+   */
+  public async pageRequest<T>(
+    belongId: string,
+    collName: string,
+    options: any,
+    page: PageModel,
+  ): Promise<ResultType<PageResult<T>>> {
+    const total = await this.aggregate(belongId, collName, options);
+    if (total.data && Array.isArray(total.data) && total.data.length > 0) {
+      options.skip = page.offset;
+      options.limit = page.limit;
+      const res = await this.aggregate(belongId, collName, options);
+      return {
+        ...res,
+        data: {
+          offset: page.offset,
+          limit: page.limit,
+          total: total.data[0].count,
+          result: res.data,
+        },
+      };
+    }
+    return total;
   }
   /**
    * 桶操作

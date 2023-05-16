@@ -6,6 +6,7 @@ import { PropClass } from './store/propclass';
 import { FileSystem } from './filesys/filesystem';
 import { Application } from './app/application';
 import { Market } from './market/market';
+import { DictClass } from './dict/dictclass';
 
 export type { ISpeciesItem } from './base/species';
 
@@ -14,6 +15,8 @@ export const createSpecies = (
   _current: ITarget,
 ): ISpeciesItem => {
   switch (_metadata.typeName as SpeciesType) {
+    case SpeciesType.Dict:
+      return new DictClass(_metadata, _current);
     case SpeciesType.Store:
       return new PropClass(_metadata, _current);
     case SpeciesType.Application:

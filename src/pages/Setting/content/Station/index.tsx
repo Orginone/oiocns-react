@@ -212,7 +212,7 @@ const Station: React.FC<IProps> = ({ current }: IProps) => {
         onCancel={() => {
           setIsOpenPerson(false);
         }}>
-        <AssignPosts members={current.members} searchFn={setSelectPersons} />
+        <AssignPosts members={current.space.members} searchFn={setSelectPersons} />
       </Modal>
     </div>
   );

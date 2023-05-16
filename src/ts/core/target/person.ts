@@ -203,7 +203,6 @@ export class Person extends Belong implements IPerson {
     await this.loadCohorts(reload);
     await this.loadMembers(reload);
     await this.loadSuperAuth(reload);
-    await this.loadDicts(reload);
     await this.loadSpecies(reload);
     for (const company of this.companys) {
       await company.deepLoad(reload);
@@ -242,6 +241,37 @@ export class Person extends Belong implements IPerson {
         });
       });
       this.memberChats = chats;
+    }
+  }
+
+  override recvTarget(operate: string, isChild: boolean, target: schema.XTarget): void {
+    if (isChild) {
+      super.recvTarget(operate, isChild, target);
+    } else {
+      switch (operate) {
+        case 'Add':
+          if (companyTypes.includes(target.typeName as TargetType)) {
+            let company = createCompany(target, this);
+            company.deepLoad();
+            this.companys.push(company);
+          } else if (target.typeName == TargetType.Cohort) {
+            if (this._cohortLoaded) {
+              let cohort = new Cohort(target, this);
+              cohort.deepLoad();
+              this.cohorts.push(cohort);
+            }
+          }
+          break;
+        case 'Remove':
+          if (companyTypes.includes(target.typeName as TargetType)) {
+            this.companys = this.companys.filter((a) => a.metadata.id != target.id);
+          } else if (target.typeName == TargetType.Cohort) {
+            this.cohorts = this.cohorts.filter((a) => a.metadata.id != target.id);
+          }
+          break;
+        default:
+          break;
+      }
     }
   }
   findShareById(id: string): model.ShareIcon {

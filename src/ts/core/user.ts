@@ -122,23 +122,15 @@ export class UserProvider extends common.Emitter {
     switch (data['TypeName']) {
       case 'Relation':
         {
-          let subTarget = data['SubTarget'] as XTarget;
+          let xTarget = data['Target'] as XTarget;
+          let xSubTarget = data['SubTarget'] as XTarget;
           let target = [this._user!, ...this.user!.targets].find(
-            (a) => a.metadata.id == (data['Target'] as XTarget).id,
+            (a) => a.metadata.id == xTarget.id,
           );
           if (target) {
-            switch (data['Operate']) {
-              case 'Add':
-                target.members.push(subTarget);
-                target.loadMemberChats([subTarget], true);
-                break;
-              case 'Remove':
-                target.members = target.members.filter((a) => a.id != subTarget.id);
-                target.loadMemberChats([subTarget], false);
-                break;
-              default:
-                break;
-            }
+            target.recvTarget(data['Operate'], true, xSubTarget);
+          } else if (this._user?.metadata.id == xSubTarget.id) {
+            this._user.recvTarget(data['Operate'], false, xTarget);
           }
         }
         break;

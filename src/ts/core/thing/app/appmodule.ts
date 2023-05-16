@@ -7,7 +7,10 @@ import { WorkItem } from './work/workitem';
 import { ReportBI } from './work/reportbi';
 import { IForm } from '../base/form';
 import { IWork, IWorkDefine } from '../base/work';
+import { IApplication } from './application';
 export interface IAppModule extends ISpeciesItem {
+  /** 模块应用 */
+  appliction: IApplication;
   /** 所有办事项 */
   defines: IWorkDefine[];
   /** 表单 */
@@ -32,17 +35,19 @@ export class AppModule extends SpeciesItem implements IAppModule {
       }
     }
     this.parent = _parent;
+    this.appliction = _parent || this;
   }
+  appliction: IApplication;
   defines: IWorkDefine[] = [];
   async loadForms(): Promise<IForm[]> {
     const result: IForm[] = [];
+    if (this.parent) {
+      result.push(...(await (this.parent as IAppModule).loadForms()));
+    }
     for (const item of this.children) {
       switch (item.metadata.typeName) {
         case SpeciesType.WorkForm:
           result.push(...(await (item as IWorkForm).loadForms()));
-          break;
-        case SpeciesType.AppModule:
-          result.push(...(await (item as IAppModule).loadForms()));
           break;
       }
     }
