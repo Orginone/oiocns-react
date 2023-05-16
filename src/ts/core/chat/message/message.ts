@@ -9,7 +9,7 @@ export interface IChatMessage {
   /** 会话的历史消息 */
   messages: model.MsgSaveModel[];
   /** 加载更多历史消息 */
-  moreMessage(before: boolean): Promise<number>;
+  moreMessage(before: boolean, members?: string[]): Promise<any>;
   /** 禁用通知 */
   unMessage(): void;
   /** 消息变更通知 */
@@ -32,7 +32,7 @@ export class ChatMessage implements IChatMessage {
       this.moreMessage();
     }
   }
-  async moreMessage(before: boolean = true): Promise<number> {
+  async moreMessage(before: boolean = true, members?: string[]): Promise<any> {
     let minTime = '2023-05-03 09:00:00.000';
     let maxTime = 'sysdate()';
     if (this.messages.length > 0) {
@@ -49,15 +49,28 @@ export class ChatMessage implements IChatMessage {
           _gt_: minTime,
           _lt_: maxTime,
         },
+        _or_: [
+          {
+            fromId: {
+              _in_: members,
+            },
+          },
+          {
+            toId: {
+              _in_: members,
+            },
+          },
+        ],
       },
       sort: {
         createTime: -1,
       },
-      limit: 30,
+      limit: 100000,
     });
+
     if (res && res.success && Array.isArray(res.data)) {
       this.loadMessages(res.data, before);
-      return res.data.length;
+      return res.data;
     }
     return 0;
   }

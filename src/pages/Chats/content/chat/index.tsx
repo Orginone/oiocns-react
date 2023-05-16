@@ -54,7 +54,7 @@ const Chat: React.FC<any> = ({
           />
         </div>
       </div>
-      {/**回话详情 */}
+      {/**会话详情 */}
       {openDetail && <GroupDetail chat={chat} filter={filter} />}
     </div>
   );
