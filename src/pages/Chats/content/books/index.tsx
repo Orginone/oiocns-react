@@ -5,6 +5,7 @@ import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 import { AiOutlineWechat } from 'react-icons/ai';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import { IMsgChat, MessageType, msgChatNotify } from '@/ts/core';
+import { filetrText } from '../chat/GroupContent/common';
 
 /**
  * @description: 通讯录
@@ -40,7 +41,8 @@ const Book: React.FC<any> = ({
     if (chat.chatdata.lastMessage) {
       let text = '最新消息[' + chat.chatdata.lastMessage.createTime + ']:';
       if (chat.chatdata.lastMessage.msgType === MessageType.Text) {
-        return text + chat.chatdata.lastMessage.showTxt;
+        // return text + chat.chatdata.lastMessage.showTxt;
+        return text + filetrText(chat.chatdata.lastMessage);
       }
       return text + '[' + chat.chatdata.lastMessage.msgType + ']';
     }

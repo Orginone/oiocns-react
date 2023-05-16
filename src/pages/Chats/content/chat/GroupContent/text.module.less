@@ -1,0 +1,63 @@
+.citeText {
+  margin-right: 10px;
+  margin-top: -7px;
+  padding: 6px;
+  font-size: 12px;
+  border-radius: 4px;
+  max-width: 130px;
+  max-height: 100px;
+  overflow-x: auto;
+  background-color: rgba(218, 229, 245, 0.823);
+  transform: scale(0.8);
+}
+.citeIcon {
+  margin-right: 18px;
+  font-size: 12px;
+  color: #89c6ff85;
+  transform: scale(0.9);
+}
+.imageCite {
+  width: 30%;
+}
+
+// 文件的样式
+.fileContent {
+  max-width: 260px;
+  transform: scale(0.8);
+  margin-right: -10px;
+  margin-top: -12px;
+  border-radius: 6px;
+  margin-left: -22px;
+  display: flex;
+  background-color: rgba(218, 229, 245, 0.823);
+  height: 80px;
+  padding: 7px 10px;
+  color: #3e5ed8;
+  text-align: left;
+  word-wrap: break-word;
+  word-break: normal;
+  position: relative;
+  .fileContent_text {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    height: 100%;
+    .fileContent_Text_name {
+      width: 130px;
+      flex-grow: 1;
+      padding-right: 10px;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      box-sizing: border-box;
+    }
+  }
+  .fileContent_Text_icon {
+    padding: 5px;
+    display: flex;
+    width: 60px;
+    font-size: 50px;
+    justify-content: center;
+    align-items: center;
+    background-color: aliceblue;
+  }
+}

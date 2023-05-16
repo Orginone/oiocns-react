@@ -251,6 +251,7 @@ export type MsgSaveModel = {
   showTxt: string;
   // 允许编辑
   allowEdit: boolean;
+  tags?: { label: string; userId: string; time: string }[];
 };
 
 export type PropertyModel = {

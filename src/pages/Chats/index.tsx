@@ -2,15 +2,22 @@ import React, { useState } from 'react';
 import Content from './content';
 import * as config from './config/menuOperate';
 import MainLayout from '@/components/MainLayout';
+import Supervise from './components/Supervise';
 import useMenuUpdate from '@/hooks/useMenuUpdate';
 import { Input } from 'antd';
 import { ImSearch } from 'react-icons/im';
 import { IMsgChat, msgChatNotify } from '@/ts/core';
+import { flatten } from './commont';
 const Setting: React.FC<any> = () => {
   const [filter, setFilter] = useState('');
+  const [isSupervise, setIsSupervise] = useState<boolean>(false); // 查看所有会话
   const [openDetail, setOpenDetail] = useState<boolean>(false);
   const [key, rootMenu, selectMenu, setSelectMenu] = useMenuUpdate(config.loadChatMenu);
+
   if (!selectMenu || !rootMenu) return <></>;
+  [selectMenu].map((res) => {
+    // console.log(flatten(res.children));
+  });
   return (
     <MainLayout
       selectMenu={selectMenu}
@@ -24,11 +31,15 @@ const Setting: React.FC<any> = () => {
           prefix={<ImSearch />}
           onChange={(e) => {
             setFilter(e.target.value);
-          }}></Input>
+          }}
+        />
       }
       onMenuClick={async (data, key) => {
         const chat = data.item as IMsgChat;
         switch (key) {
+          case '查看会话':
+            setIsSupervise(!isSupervise);
+            break;
           case '清空消息':
             await chat.clearMessage();
             break;
@@ -43,12 +54,16 @@ const Setting: React.FC<any> = () => {
         }
       }}
       siderMenuData={rootMenu}>
-      <Content
-        key={key}
-        selectMenu={selectMenu}
-        openDetail={openDetail}
-        filter={filter}
-      />
+      {isSupervise ? (
+        <Supervise belong={selectMenu.company!} />
+      ) : (
+        <Content
+          key={key}
+          selectMenu={selectMenu}
+          openDetail={openDetail}
+          filter={filter}
+        />
+      )}
     </MainLayout>
   );
 };

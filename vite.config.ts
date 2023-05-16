@@ -107,6 +107,7 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
     define: {
       // 设置应用信息
       __APP_INFO__: JSON.stringify(__APP_INFO__),
+      'process.env': {},
     },
   };
 };

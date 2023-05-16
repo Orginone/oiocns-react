@@ -6,12 +6,21 @@ import { parseAvatar, schema } from '@/ts/base';
 import AssignPosts from '@/bizcomponents/Indentity/components/AssignPosts';
 import { getUuid } from '@/utils/tools';
 import { ICohort, IMsgChat, TargetType } from '@/ts/core';
+import ChatHistoryModal from '../ChatHistoryModal';
+import { AiOutlineRight } from 'react-icons/ai';
 import orgCtrl from '@/ts/controller';
 
-const Groupdetail: React.FC<any> = ({ chat }: { chat: IMsgChat }) => {
+const Groupdetail: React.FC<any> = ({
+  chat,
+  filter,
+}: {
+  chat: IMsgChat;
+  filter: string;
+}) => {
   const [open, setOpen] = useState<boolean>(false); // 邀请弹窗开关
   const [removeOpen, setRemoveOpen] = useState<boolean>(false); // 移出弹窗开关
   const [selectPerson, setSelectPerson] = useState<schema.XTarget[]>([]); // 需要邀请的部门成员
+  const [historyOpen, setHistoryOpen] = useState<boolean>(false); // 历史消息搜索
 
   /**
    * @description: 邀请确认
@@ -42,6 +51,15 @@ const Groupdetail: React.FC<any> = ({ chat }: { chat: IMsgChat }) => {
     setOpen(false);
     setRemoveOpen(false);
   };
+
+  /**
+   * @description: 历史消息搜索弹窗
+   * @return {*}
+   */
+  const onHistoryCancel = () => {
+    setHistoryOpen(false);
+  };
+
   /**
    * @description: 头像
    * @return {*}
@@ -63,6 +81,30 @@ const Groupdetail: React.FC<any> = ({ chat }: { chat: IMsgChat }) => {
           )}
         </h4>
         <div className={detailStyle.base_info_desc}>{chat.chatdata.chatRemark}</div>
+      </Col>
+    </Row>
+  );
+
+  /**
+   * @description: 历史记录头像
+   * @return {*}
+   */
+  const historyheard = (
+    <Row style={{ paddingBottom: '12px' }}>
+      <Col>
+        <div style={{ color: '#888', width: 42 }}>
+          <TeamIcon share={chat.share} size={32} fontSize={28} />
+        </div>
+      </Col>
+      <Col>
+        <h4 className={detailStyle.title}>
+          {/* {chat.target.name}
+          {chat.target.typeName !== '人员' ? (
+            <span className={detailStyle.number}>({chat.personCount})</span>
+          ) : (
+            ''
+          )} */}
+        </h4>
       </Col>
     </Row>
   );
@@ -121,8 +163,24 @@ const Groupdetail: React.FC<any> = ({ chat }: { chat: IMsgChat }) => {
           <div className={`${detailStyle.img_list} ${detailStyle.con}`}>
             {grouppeoples}
           </div>
+          <div
+            className={`${detailStyle.find_history}`}
+            onClick={() => {
+              setHistoryOpen(true);
+            }}>
+            查找聊天记录
+            <AiOutlineRight />
+          </div>
         </div>
       </div>
+      {/* 历史记录搜索弹窗 */}
+      <ChatHistoryModal
+        open={historyOpen}
+        title={historyheard}
+        onCancel={onHistoryCancel}
+        chat={chat}
+        filter={filter}
+      />
       <Modal
         title={'邀请成员'}
         destroyOnClose
