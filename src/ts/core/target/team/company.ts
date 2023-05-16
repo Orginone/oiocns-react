@@ -10,6 +10,8 @@ import { TargetType } from '../../public/enums';
 import { IMsgChat, PersonMsgChat } from '../../chat/message/msgchat';
 import { ITarget } from '../base/target';
 import { ITeam } from '../base/team';
+import { OperateType as OperateType } from '../provider';
+import orgCtrl from '@/ts/controller';
 
 /** 单位类型接口 */
 export interface ICompany extends IBelong {
@@ -121,6 +123,7 @@ export class Company extends Belong implements ICompany {
       await group.deepLoad();
       this.groups.push(group);
       await group.pullMembers([this.metadata]);
+      orgCtrl.target.prodRelationChange(OperateType.Add, group, this.metadata);
       return group;
     }
   }
@@ -135,6 +138,7 @@ export class Company extends Belong implements ICompany {
       await department.deepLoad();
       if (await this.pullSubTarget(department)) {
         this.departments.push(department);
+        orgCtrl.target.prodRelationChange(OperateType.Add, this, metadata);
         return department;
       }
     }
@@ -147,6 +151,7 @@ export class Company extends Belong implements ICompany {
       const station = new Station(metadata, this);
       if (await this.pullSubTarget(station)) {
         this.stations.push(station);
+        orgCtrl.target.prodRelationChange(OperateType.Add, this, metadata);
         return station;
       }
     }
@@ -188,6 +193,10 @@ export class Company extends Belong implements ICompany {
     });
     if (res.success) {
       this.user.companys = this.user.companys.filter((i) => i.key != this.key);
+      orgCtrl.target.prodTargetChange(OperateType.Delete, this);
+      this.groups.forEach((a) => {
+        orgCtrl.target.prodRelationChange(OperateType.Remove, a, this.metadata);
+      });
     }
     return res.success;
   }
@@ -260,11 +269,23 @@ export class Company extends Belong implements ICompany {
       this.memberChats = chats;
     }
   }
-  override recvTarget(operate: string, isChild: boolean, target: schema.XTarget): void {
-    super.recvTarget(operate, isChild, target);
+  override recvTarget(operate: string, target: schema.XTarget): void {
     switch (operate) {
-      case 'Add':
-        if (isChild) {
+      case OperateType.Update:
+        this.metadata = target;
+        break;
+      case OperateType.Delete:
+        this.user.companys = this.user.companys.filter((i) => i.key != this.key);
+        break;
+      default:
+        break;
+    }
+  }
+  override recvRelation(operate: string, isTeam: boolean, target: schema.XTarget): void {
+    super.recvRelation(operate, isTeam, target);
+    switch (operate) {
+      case OperateType.Add:
+        if (isTeam) {
           if (this.departmentTypes.includes(target.typeName as TargetType)) {
             let department = new Department(target, this);
             department.deepLoad();
@@ -275,19 +296,27 @@ export class Company extends Belong implements ICompany {
             station.deepLoad();
             this.stations.push(station);
           }
+          if ((target.typeName as TargetType) == TargetType.Cohort) {
+            let cohort = new Cohort(target, this);
+            cohort.deepLoad();
+            this.cohorts.push(cohort);
+          }
         } else if (target.typeName == TargetType.Group) {
           let group = new Group(target, this);
           group.deepLoad(true);
           this.groups.push(group);
         }
         break;
-      case 'Remove':
-        if (isChild) {
+      case OperateType.Remove:
+        if (isTeam) {
           if (this.departmentTypes.includes(target.typeName as TargetType)) {
             this.departments = this.departments.filter((a) => a.metadata.id != target.id);
           }
           if ((target.typeName as TargetType) == TargetType.Station) {
             this.stations = this.stations.filter((a) => a.metadata.id != target.id);
+          }
+          if ((target.typeName as TargetType) == TargetType.Cohort) {
+            this.cohorts = this.cohorts.filter((a) => a.metadata.id != target.id);
           }
         } else if (target.typeName == TargetType.Group) {
           this.groups = this.groups.filter((a) => a.metadata.id == target.id);

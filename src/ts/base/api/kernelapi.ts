@@ -402,6 +402,20 @@ export default class KernelApi {
     });
   }
   /**
+   * 根据ID查询关系
+   * @param {model.IdModel} params 请求参数
+   * @returns {model.ResultType<schema.XRelation>} 请求结果
+   */
+  public async queryRelationById(
+    params: model.IdModel,
+  ): Promise<model.ResultType<schema.XRelation>> {
+    return await this.request({
+      module: 'target',
+      action: 'QueryRelationById',
+      params: params,
+    });
+  }
+  /**
    * 模糊查找用户
    * @param {model.SearchModel} params 请求参数
    * @returns {model.ResultType<schema.XTargetArray>} 请求结果

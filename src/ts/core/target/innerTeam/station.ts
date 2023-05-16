@@ -3,7 +3,9 @@ import { IMsgChat } from '../../chat/message/msgchat';
 import { PageAll } from '../../public/consts';
 import { ITeam, Team } from '../base/team';
 import { IIdentity, Identity } from '../identity/identity';
+import { OperateType } from '../provider';
 import { ICompany } from '../team/company';
+import orgCtrl from '@/ts/controller';
 
 /** 岗位接口 */
 export interface IStation extends ITeam {
@@ -70,12 +72,25 @@ export class Station extends Team implements IStation {
     }
     return true;
   }
+  override recvTarget(operate: string, target: schema.XTarget): void {
+    switch (operate) {
+      case OperateType.Update:
+        this.metadata = target;
+        break;
+      case OperateType.Delete:
+        this.company.stations = this.company.stations.filter((i) => i.key != this.key);
+        break;
+      default:
+        break;
+    }
+  }
   async delete(): Promise<boolean> {
     const res = await kernel.deleteTarget({
       id: this.metadata.id,
       page: PageAll,
     });
     if (res.success) {
+      orgCtrl.target.prodRelationChange(OperateType.Remove, this.company, this.metadata);
       this.company.stations = this.company.stations.filter((i) => i.key != this.key);
     }
     return res.success;

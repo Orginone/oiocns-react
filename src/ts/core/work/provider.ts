@@ -2,9 +2,11 @@ import { common, kernel, model, schema } from '../../base';
 import { PageAll } from '../public/consts';
 import { SpeciesType, TaskStatus } from '../public/enums';
 import { IPerson } from '../target/person';
+import { OperateType } from '../target/provider';
 import { IApplication } from '../thing/app/application';
 import { IWorkDefine } from '../thing/base/work';
 import { IMarket } from '../thing/market/market';
+import orgCtrl from '@/ts/controller';
 // 历史任务存储集合名称
 const hisWorkCollName = 'work-task';
 export interface IWorkProvider {
@@ -135,12 +137,31 @@ export class WorkProvider implements IWorkProvider {
             page: PageAll,
           });
         } else {
-          await kernel.approvalTask({
+          const res = await kernel.approvalTask({
             id: task.id,
             status: status,
             comment: comment,
             data: data,
           });
+          if (res.data && status < TaskStatus.RefuseStart && task.relationId != '') {
+            let res = await kernel.queryRelationById({
+              id: task.relationId,
+              page: PageAll,
+            });
+            if (res.success && res.data.target && res.data.team) {
+              let target = this.user.targets.find(
+                (a) => a.metadata.id == res.data.team!.targetId,
+              );
+              if (target) {
+                orgCtrl.target.prodRelationChange(
+                  OperateType.Add,
+                  target,
+                  res.data.target,
+                  false,
+                );
+              }
+            }
+          }
         }
       }
     }

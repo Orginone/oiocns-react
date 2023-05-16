@@ -6,6 +6,8 @@ import { ICompany } from '../team/company';
 import { IMsgChat } from '../../chat/message/msgchat';
 import { ITeam } from '../base/team';
 import { IMarket } from '../../thing/market/market';
+import { OperateType } from '../provider';
+import orgCtrl from '@/ts/controller';
 
 /** 组织群接口 */
 export interface IGroup extends ITarget {
@@ -54,6 +56,7 @@ export class Group extends Target implements IGroup {
       const group = new Group(metadata, this.company);
       if (await this.pullSubTarget(group)) {
         this.children.push(group);
+        orgCtrl.target.prodRelationChange(OperateType.Add, this, metadata);
         return group;
       }
     }
@@ -74,6 +77,22 @@ export class Group extends Target implements IGroup {
     }
     return false;
   }
+  override recvTarget(operate: string, target: schema.XTarget): void {
+    switch (operate) {
+      case OperateType.Update:
+        this.metadata = target;
+        break;
+      case OperateType.Delete:
+        if (this.parent) {
+          this.parent.children = this.parent.children.filter((i) => i.key != this.key);
+        } else {
+          this.company.groups = this.company.groups.filter((i) => i.key != this.key);
+        }
+        break;
+      default:
+        break;
+    }
+  }
   async delete(): Promise<boolean> {
     const res = await kernel.deleteTarget({
       id: this.metadata.id,
@@ -81,10 +100,12 @@ export class Group extends Target implements IGroup {
     });
     if (res.success) {
       if (this.parent) {
+        orgCtrl.target.prodRelationChange(OperateType.Remove, this.parent, this.metadata);
         this.parent.children = this.parent.children.filter((i) => i.key != this.key);
       } else {
         this.company.groups = this.company.groups.filter((i) => i.key != this.key);
       }
+      orgCtrl.target.prodTargetChange(OperateType.Delete, this);
     }
     return res.success;
   }

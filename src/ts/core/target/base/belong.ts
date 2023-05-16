@@ -9,6 +9,8 @@ import { IChatMessage, ChatMessage } from '../../chat/message/message';
 import { IMsgChat } from '../../chat/message/msgchat';
 import { IDict } from '../../thing/dict/dict';
 import { IDictClass } from '../../thing/dict/dictclass';
+import { OperateType } from '../provider';
+import orgCtrl from '@/ts/controller';
 
 /** 自归属用户接口类 */
 export interface IBelong extends ITarget {
@@ -96,6 +98,7 @@ export abstract class Belong extends Target implements IBelong {
           return;
         }
       }
+      orgCtrl.target.prodRelationChange(OperateType.Add, this, metadata);
       this.cohorts.push(cohort);
       await cohort.pullMembers([this.user.metadata]);
       return cohort;

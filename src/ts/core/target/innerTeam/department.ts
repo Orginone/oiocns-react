@@ -5,6 +5,8 @@ import { TargetType } from '../../public/enums';
 import { PageAll } from '../../public/consts';
 import { IMsgChat } from '../../chat/message/msgchat';
 import { ITeam } from '../base/team';
+import orgCtrl from '@/ts/controller';
+import { OperateType } from '../provider';
 
 /** 单位内部机构（部门）接口 */
 export interface IDepartment extends ITarget {
@@ -86,8 +88,27 @@ export class Department extends Target implements IDepartment {
       await department.deepLoad();
       if (await this.pullSubTarget(department)) {
         this.children.push(department);
+        orgCtrl.target.prodRelationChange(OperateType.Add, this, metadata);
         return department;
       }
+    }
+  }
+  override recvTarget(operate: string, target: schema.XTarget): void {
+    switch (operate) {
+      case OperateType.Update:
+        this.metadata = target;
+        break;
+      case OperateType.Delete:
+        if (this.parent) {
+          this.parent.children = this.parent.children.filter((i) => i.key != this.key);
+        } else {
+          this.company.departments = this.company.departments.filter(
+            (i) => i.key != this.key,
+          );
+        }
+        break;
+      default:
+        break;
     }
   }
   async createTarget(data: model.TargetModel): Promise<ITeam | undefined> {
@@ -113,8 +134,14 @@ export class Department extends Target implements IDepartment {
     });
     if (res.success) {
       if (this.parent) {
+        orgCtrl.target.prodRelationChange(OperateType.Remove, this.parent, this.metadata);
         this.parent.children = this.parent.children.filter((i) => i.key != this.key);
       } else {
+        orgCtrl.target.prodRelationChange(
+          OperateType.Remove,
+          this.company,
+          this.metadata,
+        );
         this.company.departments = this.company.departments.filter(
           (i) => i.key != this.key,
         );

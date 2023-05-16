@@ -9,6 +9,8 @@ import { IMsgChat, PersonMsgChat } from '../chat/message/msgchat';
 import { IFileSystem, FileSystem } from '../thing/filesys/filesystem';
 import { ITarget } from './base/target';
 import { ITeam } from './base/team';
+import { OperateType } from './provider';
+import orgCtrl from '@/ts/controller';
 
 /** 人员类型接口 */
 export interface IPerson extends IBelong {
@@ -155,6 +157,15 @@ export class Person extends Belong implements IPerson {
       id: this.metadata.id,
       page: PageAll,
     });
+    if (res.success) {
+      orgCtrl.target.prodTargetChange(OperateType.Delete, this);
+      this.cohorts.forEach((a) => {
+        orgCtrl.target.prodRelationChange(OperateType.Remove, a, this.metadata);
+      });
+      this.companys.forEach((a) => {
+        orgCtrl.target.prodRelationChange(OperateType.Remove, a, this.metadata);
+      });
+    }
     return res.success;
   }
   get subTarget(): ITarget[] {
@@ -244,12 +255,12 @@ export class Person extends Belong implements IPerson {
     }
   }
 
-  override recvTarget(operate: string, isChild: boolean, target: schema.XTarget): void {
-    if (isChild) {
-      super.recvTarget(operate, isChild, target);
+  override recvRelation(operate: string, isTeam: boolean, target: schema.XTarget): void {
+    if (isTeam) {
+      super.recvRelation(operate, isTeam, target);
     } else {
       switch (operate) {
-        case 'Add':
+        case OperateType.Add:
           if (companyTypes.includes(target.typeName as TargetType)) {
             let company = createCompany(target, this);
             company.deepLoad();
@@ -262,7 +273,7 @@ export class Person extends Belong implements IPerson {
             }
           }
           break;
-        case 'Remove':
+        case OperateType.Remove:
           if (companyTypes.includes(target.typeName as TargetType)) {
             this.companys = this.companys.filter((a) => a.metadata.id != target.id);
           } else if (target.typeName == TargetType.Cohort) {

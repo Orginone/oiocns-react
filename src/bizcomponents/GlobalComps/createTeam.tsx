@@ -7,6 +7,7 @@ import { FileItemShare, TargetModel } from '@/ts/base/model';
 import { ITeam } from '@/ts/core';
 import { AiOutlineBank } from 'react-icons/ai';
 import { parseAvatar } from '@/ts/base';
+import { OperateType } from '@/ts/core/target/provider';
 
 interface Iprops {
   title: string;
@@ -164,6 +165,7 @@ const CreateTeamModal = (props: Iprops) => {
         if (props.isEdit) {
           if (await props.current.update(values)) {
             orgCtrl.provider.update(orgCtrl.user.metadata);
+            orgCtrl.target.prodTargetChange(OperateType.Update, props.current);
           }
           props.handleOk(props.current);
         } else {

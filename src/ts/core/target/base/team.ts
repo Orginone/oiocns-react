@@ -3,6 +3,8 @@ import { TargetType } from '../../public/enums';
 import { PageAll } from '../../public/consts';
 import { IBelong } from './belong';
 import { IMsgChat, MsgChat } from '../../chat/message/msgchat';
+import orgCtrl from '@/ts/controller';
+import { OperateType } from '../provider';
 
 /** 团队抽象接口类 */
 export interface ITeam extends IMsgChat {
@@ -26,8 +28,20 @@ export interface ITeam extends IMsgChat {
   pullMembers(members: schema.XTarget[]): Promise<boolean>;
   /** 用户移除成员 */
   removeMembers(members: schema.XTarget[]): Promise<boolean>;
-  /** 接受新用户 */
-  recvTarget(operate: string, isChild: boolean, target: schema.XTarget): void;
+  /**
+   * 接受用户变更
+   * @param operate 操作
+   * @param isTeam 是否是主体容易
+   * @param target 变更的用户
+   */
+  recvTarget(operate: string, target: schema.XTarget): void;
+  /**
+   * 接受用户关系变更
+   * @param operate 操作
+   * @param isTeam 是否是主体容易
+   * @param target 变更的用户
+   */
+  recvRelation(operate: string, isTeam: boolean, target: schema.XTarget): void;
   /** 加载成员会话 */
   loadMemberChats(newMembers: schema.XTarget[], _isAdd: boolean): void;
   /** 判断是否拥有某些权限 */
@@ -95,6 +109,9 @@ export abstract class Team extends MsgChat implements ITeam {
       if (res.success) {
         this.members.push(...members);
         this.loadMemberChats(members, true);
+        members.forEach((a) => {
+          orgCtrl.target.prodRelationChange(OperateType.Add, this, a);
+        });
       }
       return res.success;
     }
@@ -110,6 +127,7 @@ export abstract class Team extends MsgChat implements ITeam {
         if (res.success) {
           this.members = this.members.filter((i) => i.id != member.id);
           this.loadMemberChats([member], false);
+          orgCtrl.target.prodRelationChange(OperateType.Remove, this, member);
         }
       }
     }
@@ -152,14 +170,14 @@ export abstract class Team extends MsgChat implements ITeam {
   loadMemberChats(_newMembers: schema.XTarget[], _isAdd: boolean): void {
     this.memberChats = [];
   }
-  recvTarget(operate: string, isChild: boolean, target: schema.XTarget): void {
-    if (isChild && this.memberTypes.includes(target.typeName as TargetType)) {
+  recvRelation(operate: string, isTeam: boolean, target: schema.XTarget): void {
+    if (isTeam && this.memberTypes.includes(target.typeName as TargetType)) {
       switch (operate) {
-        case 'Add':
+        case OperateType.Add:
           this.members.push(target);
           this.loadMemberChats([target], true);
           break;
-        case 'Remove':
+        case OperateType.Remove:
           this.members = this.members.filter((a) => a.id != target.id);
           this.loadMemberChats([target], false);
           break;
@@ -168,6 +186,7 @@ export abstract class Team extends MsgChat implements ITeam {
       }
     }
   }
+  recvTarget(_operate: string, _target: schema.XTarget): void {}
   hasAuthoritys(authIds: string[]): boolean {
     authIds = this.space.superAuth?.loadParentAuthIds(authIds) ?? authIds;
     const orgIds = [this.metadata.belongId, this.metadata.id];
