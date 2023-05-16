@@ -39,6 +39,21 @@ const Design: React.FC<IProps> = ({
   const [resource, setResource] = useState<WorkNodeModel>();
 
   useEffect(() => {
+    const loadDictItem = async (dictId: string) => {
+      const dictItems: any[] = [];
+      const dicts = await species.current.space.loadDicts();
+      for (const item of dicts) {
+        if (item.metadata.id === dictId) {
+          dictItems.push(
+            ...(await item.loadItems()).map((a) => {
+              return { label: a.name, value: a.value };
+            }),
+          );
+          return dictItems;
+        }
+      }
+      return dictItems;
+    };
     const load = async () => {
       let nodes = await current.loadWorkNode();
       // content字段可能取消
@@ -88,18 +103,12 @@ const Design: React.FC<IProps> = ({
               break;
             case '选择型':
               {
-                const dict = species.current.space.dicts.find(
-                  (a) => a.metadata.id == attr.property?.dictId,
-                );
-                if (dict) {
+                if (attr.property?.dictId) {
                   fields.push({
                     label: attr.name,
                     value: attr.id,
                     type: dataType.DICT,
-                    dict:
-                      (await dict.loadItems())?.map((a) => {
-                        return { label: a.name, value: a.value };
-                      }) || [],
+                    dict: await loadDictItem(attr.property.dictId),
                   });
                 }
               }

@@ -35,6 +35,7 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
           formIds.includes(i.metadata.id),
         );
         if (forms.length > 0) {
+          await forms[0].loadAttributes();
           setForm(forms[0]);
           return;
         }

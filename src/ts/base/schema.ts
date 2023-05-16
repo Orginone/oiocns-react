@@ -168,6 +168,8 @@ export type XDict = {
   icon: string;
   // 备注
   remark: string;
+  // 类别ID
+  speciesId: string;
   // 归属用户ID
   belongId: string;
   // 状态

@@ -42,6 +42,17 @@ export type ReceiveType = {
   // 数据
   data: any;
 };
+// 分页返回定义
+export type PageResult<T> = {
+  // 便宜量
+  offset: number;
+  // 最大数量
+  limit: number;
+  // 总数
+  total: number;
+  // 结果
+  result: T[];
+};
 
 // 注册消息类型
 export type RegisterType = {
@@ -286,8 +297,8 @@ export type DictModel = {
   icon: string;
   // 备注
   remark: string;
-  // 归属用户ID
-  belongId: string;
+  // 分类ID
+  speciesId: string;
 };
 
 export type DictItemModel = {

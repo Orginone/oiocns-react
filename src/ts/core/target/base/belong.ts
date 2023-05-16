@@ -1,13 +1,14 @@
 import { schema, kernel, model } from '../../../base';
 import { PageAll } from '../../public/consts';
 import { SpeciesType, TargetType } from '../../public/enums';
-import { IDict, Dict } from '../../thing/dict/dict';
 import { IAuthority, Authority } from '../authority/authority';
 import { Cohort, ICohort } from '../outTeam/cohort';
 import { IPerson } from '../person';
 import { ITarget, Target } from './target';
 import { IChatMessage, ChatMessage } from '../../chat/message/message';
 import { IMsgChat } from '../../chat/message/msgchat';
+import { IDict } from '../../thing/dict/dict';
+import { IDictClass } from '../../thing/dict/dictclass';
 
 /** 自归属用户接口类 */
 export interface IBelong extends ITarget {
@@ -25,16 +26,14 @@ export interface IBelong extends ITarget {
   parentTarget: ITarget[];
   /** 群会话 */
   cohortChats: IMsgChat[];
+  /** 加载字典 */
+  loadDicts(): Promise<IDict[]>;
   /** 加载群 */
   loadCohorts(reload?: boolean): Promise<ICohort[]>;
   /** 加载超管权限 */
   loadSuperAuth(reload?: boolean): Promise<IAuthority | undefined>;
-  /** 加载元数据字典 */
-  loadDicts(reload?: boolean): Promise<IDict[]>;
   /** 申请加用户 */
   applyJoin(members: schema.XTarget[]): Promise<boolean>;
-  /** 添加字典 */
-  createDict(data: model.DictModel): Promise<IDict | undefined>;
   /** 设立人员群 */
   createCohort(data: model.TargetModel): Promise<ICohort | undefined>;
 }
@@ -49,7 +48,7 @@ export abstract class Belong extends Target implements IBelong {
   ) {
     super(_metadata, _labels, undefined, _memberTypes);
     this.user = _user || (this as unknown as IPerson);
-    this.speciesTypes.unshift(SpeciesType.Store);
+    this.speciesTypes.unshift(SpeciesType.Store, SpeciesType.Dict);
     this.message = new ChatMessage(this);
   }
   user: IPerson;
@@ -57,7 +56,23 @@ export abstract class Belong extends Target implements IBelong {
   cohorts: ICohort[] = [];
   message: IChatMessage;
   superAuth: IAuthority | undefined;
-  private _dictLoaded: boolean = false;
+  async loadDicts(): Promise<IDict[]> {
+    const dicts: IDict[] = [];
+    for (const item of this.species) {
+      switch (item.metadata.typeName) {
+        case SpeciesType.Dict: {
+          const subDicts = await (item as IDictClass).loadAllDicts();
+          for (const item of subDicts) {
+            if (dicts.findIndex((i) => i.metadata.id === item.metadata.id) < 0) {
+              dicts.push(item);
+            }
+          }
+        }
+      }
+    }
+    this.dicts = dicts;
+    return dicts;
+  }
   async loadSuperAuth(reload: boolean = false): Promise<IAuthority | undefined> {
     if (!this.superAuth || reload) {
       const res = await kernel.queryAuthorityTree({
@@ -69,30 +84,6 @@ export abstract class Belong extends Target implements IBelong {
       }
     }
     return this.superAuth;
-  }
-  async loadDicts(reload: boolean = false): Promise<IDict[]> {
-    if (!this._dictLoaded || reload) {
-      const res = await kernel.queryDicts({
-        id: this.metadata.id,
-        page: PageAll,
-      });
-      if (res.success) {
-        this._dictLoaded = true;
-        this.dicts = (res.data.result || []).map((item) => {
-          return new Dict(item, this);
-        });
-      }
-    }
-    return this.dicts;
-  }
-  async createDict(data: model.DictModel): Promise<IDict | undefined> {
-    data.belongId = this.metadata.id;
-    const res = await kernel.createDict(data);
-    if (res.success && res.data?.id) {
-      const dict = new Dict(res.data, this);
-      this.dicts.push(dict);
-      return dict;
-    }
   }
   async createCohort(data: model.TargetModel): Promise<ICohort | undefined> {
     data.typeName = TargetType.Cohort;

@@ -111,8 +111,10 @@ const DictModal = (props: Iprops) => {
         gutter: [24, 0],
       }}
       onOpenChange={(open: boolean) => {
-        if (open && dict) {
-          setAvatar(parseAvatar(dict.metadata.icon));
+        if (open) {
+          if (dict) {
+            setAvatar(parseAvatar(dict.metadata.icon));
+          }
         } else {
           handleCancel();
         }
