@@ -21,13 +21,11 @@ interface IProps {
 const ApprovalNode: React.FC<IProps> = (props) => {
   const [isOpen, setIsOpen] = useState<boolean>(false); // 打开弹窗
   const [radioValue, setRadioValue] = useState(1);
-  const [operations, setOperations] = useState<XForm[]>([]);
+  const [operations, setOperations] = useState<XForm[]>(
+    props.current.props.operations || [],
+  );
   const [operationModal, setOperationModal] = useState<any>();
   const [showData, setShowData] = useState<any[]>([]);
-  // 操作内容渲染函数
-  useEffect(() => {
-    setOperations(props.current.props.operations || []);
-  }, []);
 
   useEffect(() => {
     // 加载业务表单列表
