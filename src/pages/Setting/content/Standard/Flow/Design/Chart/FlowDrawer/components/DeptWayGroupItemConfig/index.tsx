@@ -6,7 +6,6 @@ import cls from './index.module.less';
 import orgCtrl from '@/ts/controller';
 
 interface IProps {
-  orgId?: string;
   currnet: NodeType;
   conditions?: FieldCondition[];
 }

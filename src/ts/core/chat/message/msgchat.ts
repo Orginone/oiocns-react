@@ -1,8 +1,6 @@
 import { model, common, schema, kernel, List } from '../../../base';
-import { ShareIdSet } from '../../public/consts';
+import { ShareIdSet, storeCollName } from '../../public/consts';
 import { MessageType, TargetType } from '../../public/enums';
-// 历史会话存储集合名称
-const hisMsgCollName = 'chat-message';
 // 空时间
 const nullTime = new Date('2022-07-01').getTime();
 // 消息变更推送
@@ -99,13 +97,6 @@ export abstract class MsgChat extends common.Entity implements IMsgChat {
     };
     this.labels = new List(_labels);
     ShareIdSet.set(this.chatId, this.share);
-    kernel.anystore.subscribed(
-      '0',
-      hisMsgCollName + '.T' + this.chatdata.fullId,
-      (data: MsgChatData) => {
-        this.loadCache(data);
-      },
-    );
   }
   chatId: string;
   userId: string;
@@ -139,10 +130,14 @@ export abstract class MsgChat extends common.Entity implements IMsgChat {
   }
   cache(): void {
     this.chatdata.labels = this.labels.ToArray();
-    kernel.anystore.set('0', hisMsgCollName + '.T' + this.chatdata.fullId, {
-      operation: 'replaceAll',
-      data: this.chatdata,
-    });
+    kernel.anystore.set(
+      this.userId,
+      storeCollName.ChatMessage + '.T' + this.chatdata.fullId,
+      {
+        operation: 'replaceAll',
+        data: this.chatdata,
+      },
+    );
   }
   loadCache(cache: MsgChatData): void {
     if (this.chatdata.fullId === cache.fullId) {
@@ -171,7 +166,7 @@ export abstract class MsgChat extends common.Entity implements IMsgChat {
     }
   }
   async moreMessage(): Promise<number> {
-    const res = await kernel.anystore.aggregate('0', hisMsgCollName, {
+    const res = await kernel.anystore.aggregate(this.userId, storeCollName.ChatMessage, {
       match: {
         sessionId: this.chatId,
         belongId: this.belongId,
@@ -217,7 +212,7 @@ export abstract class MsgChat extends common.Entity implements IMsgChat {
     }
   }
   async deleteMessage(id: string): Promise<boolean> {
-    const res = await kernel.anystore.remove('0', hisMsgCollName, {
+    const res = await kernel.anystore.remove(this.userId, storeCollName.ChatMessage, {
       chatId: id,
     });
     if (res.success && res.data > 0) {
@@ -234,7 +229,7 @@ export abstract class MsgChat extends common.Entity implements IMsgChat {
     return false;
   }
   async clearMessage(): Promise<boolean> {
-    const res = await kernel.anystore.remove('0', hisMsgCollName, {
+    const res = await kernel.anystore.remove(this.userId, storeCollName.ChatMessage, {
       sessionId: this.chatId,
       belongId: this.belongId,
     });

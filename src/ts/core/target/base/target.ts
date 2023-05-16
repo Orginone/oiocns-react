@@ -73,14 +73,18 @@ export abstract class Target extends Team implements ITarget {
         this._speciesLoaded = true;
         let hasFilesystem = false;
         let hasMarket = false;
-        this.species = (res.data.result || []).map((item) => {
+        this.species = [];
+        (res.data.result || []).forEach((item) => {
           if (item.typeName === SpeciesType.FileSystem) {
             hasFilesystem = true;
           }
           if (item.typeName === SpeciesType.Market) {
             hasMarket = true;
           }
-          return createSpecies(item, this);
+          const newSpecies = createSpecies(item, this);
+          if (newSpecies) {
+            this.species.push(newSpecies);
+          }
         });
         if (!hasFilesystem) {
           this.speciesTypes.push(SpeciesType.FileSystem);
@@ -111,7 +115,9 @@ export abstract class Target extends Team implements ITarget {
     const res = await kernel.createSpecies(data);
     if (res.success && res.data?.id) {
       const species = createSpecies(res.data, this);
-      this.species.push(species);
+      if (species) {
+        this.species.push(species);
+      }
       return species;
     }
   }

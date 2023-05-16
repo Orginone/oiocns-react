@@ -31,10 +31,9 @@ export enum SpeciesType {
   'Dict' = '字典类',
   'Application' = '应用类',
   /** 类别类目 */
-  'Commodity' = '商品类',
-  'WorkItem' = '应用办事',
-  'WorkForm' = '应用表单',
-  'ReportBI' = '应用报表',
+  'WorkItem' = '办事类',
+  'WorkThing' = '事物类',
+  'Data' = '数据类',
 }
 
 /** 消息类型 */

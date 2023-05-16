@@ -2,17 +2,17 @@ import { schema } from '../../../base';
 import { ITarget } from '../../target/base/target';
 import { ISpeciesItem, SpeciesItem } from '../base/species';
 import { IApplication } from './application';
-export interface IReportBI extends ISpeciesItem {
+export interface IData extends ISpeciesItem {
   /** 对应的应用 */
   app: IApplication;
 }
 
-export class ReportBI extends SpeciesItem implements IReportBI {
-  constructor(_metadata: schema.XSpecies, _app: IApplication, _parent?: IReportBI) {
+export class Data extends SpeciesItem implements IData {
+  constructor(_metadata: schema.XSpecies, _app: IApplication, _parent?: IData) {
     super(_metadata, _app.current, _parent);
     this.app = _app;
     for (const item of _metadata.nodes || []) {
-      this.children.push(new ReportBI(item, this.app, this));
+      this.children.push(new Data(item, this.app, this));
     }
     this.speciesTypes = [_metadata.typeName];
   }
@@ -21,6 +21,6 @@ export class ReportBI extends SpeciesItem implements IReportBI {
     _metadata: schema.XSpecies,
     _current: ITarget,
   ): ISpeciesItem | undefined {
-    return new ReportBI(_metadata, this.app, this);
+    return new Data(_metadata, this.app, this);
   }
 }

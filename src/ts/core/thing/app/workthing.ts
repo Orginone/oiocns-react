@@ -5,7 +5,7 @@ import { ISpeciesItem, SpeciesItem } from '../base/species';
 import { PageAll } from '@/ts/core/public/consts';
 import { IApplication } from './application';
 import { ITarget } from '../../target/base/target';
-export interface IWorkForm extends ISpeciesItem {
+export interface IWorkThing extends ISpeciesItem {
   /** 对应的应用 */
   app: IApplication;
   /** 分类下的表单 */
@@ -18,12 +18,12 @@ export interface IWorkForm extends ISpeciesItem {
   loadAllForms(reload?: boolean): Promise<IForm[]>;
 }
 
-export class WorkForm extends SpeciesItem implements IWorkForm {
-  constructor(_metadata: schema.XSpecies, _app: IApplication, _parent?: IWorkForm) {
+export class WorkThing extends SpeciesItem implements IWorkThing {
+  constructor(_metadata: schema.XSpecies, _app: IApplication, _parent?: IWorkThing) {
     super(_metadata, _app.current, _parent);
     this.app = _app;
     for (const item of _metadata.nodes || []) {
-      this.children.push(new WorkForm(item, this.app, this));
+      this.children.push(new WorkThing(item, this.app, this));
     }
     this.speciesTypes = [_metadata.typeName];
   }
@@ -59,7 +59,7 @@ export class WorkForm extends SpeciesItem implements IWorkForm {
   async loadAllForms(): Promise<IForm[]> {
     const result = [...(await this.loadForms())];
     for (const item of this.children) {
-      result.push(...(await (item as IWorkForm).loadAllForms()));
+      result.push(...(await (item as IWorkThing).loadAllForms()));
     }
     return result;
   }
@@ -67,6 +67,6 @@ export class WorkForm extends SpeciesItem implements IWorkForm {
     _metadata: schema.XSpecies,
     _current: ITarget,
   ): ISpeciesItem | undefined {
-    return new WorkForm(_metadata, this.app, this);
+    return new WorkThing(_metadata, this.app, this);
   }
 }

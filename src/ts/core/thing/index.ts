@@ -14,7 +14,7 @@ export type { ISpeciesItem } from './base/species';
 export const createSpecies = (
   _metadata: schema.XSpecies,
   _current: ITarget,
-): ISpeciesItem => {
+): ISpeciesItem | undefined => {
   switch (_metadata.typeName as SpeciesType) {
     case SpeciesType.Dict:
       return new DictClass(_metadata, _current);
@@ -28,7 +28,5 @@ export const createSpecies = (
       return new Market(_metadata, _current);
     case SpeciesType.Resource:
       return new Resource(_metadata, _current);
-    default:
-      return new PropClass(_metadata, _current);
   }
 };

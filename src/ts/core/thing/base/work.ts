@@ -2,10 +2,11 @@ import { XWorkDefine } from '@/ts/base/schema';
 import { common, kernel, model, parseAvatar, schema } from '../../../base';
 import { PageAll } from '../../public/consts';
 import { TargetType } from '../../public/enums';
-import { ITarget } from '../../target/base/target';
 import { ISpeciesItem, SpeciesItem } from './species';
 import { ShareIcon } from '@/ts/base/model';
 import { IForm } from './form';
+import { IApplication } from '../app/application';
+import { ITarget } from '../../target/base/target';
 
 export interface IWorkDefine extends common.IEntity {
   /** 办事分类 */
@@ -84,6 +85,8 @@ export class FlowDefine extends common.Entity implements IWorkDefine {
 }
 
 export interface IWork extends ISpeciesItem {
+  /** 对应的应用 */
+  app: IApplication;
   /** 流程定义 */
   defines: IWorkDefine[];
   /** 加载所有可选表单 */
@@ -97,9 +100,16 @@ export interface IWork extends ISpeciesItem {
 }
 
 export abstract class Work extends SpeciesItem implements IWork {
-  constructor(_metadata: schema.XSpecies, _current: ITarget, _parent?: ISpeciesItem) {
+  constructor(
+    _metadata: schema.XSpecies,
+    _current: ITarget,
+    _app?: IApplication,
+    _parent?: ISpeciesItem,
+  ) {
     super(_metadata, _current, _parent);
+    this.app = _app || this;
   }
+  app: IApplication;
   defines: IWorkDefine[] = [];
   private _defineLoaded: boolean = false;
   async loadWorkDefines(reload: boolean = false): Promise<IWorkDefine[]> {

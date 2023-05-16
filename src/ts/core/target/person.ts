@@ -275,11 +275,9 @@ export class Person extends Belong implements IPerson {
     }
   }
   findShareById(id: string): model.ShareIcon {
-    const share = ShareIdSet.get(id) || {
-      name: '未知',
-      typeName: '未知',
-    };
-    if (!share.avatar) {
+    if (ShareIdSet.has(id)) {
+      return ShareIdSet.get(id)!;
+    } else if (id && id.length > 10) {
       kernel
         .queryTargetById({
           ids: [id],
@@ -288,6 +286,7 @@ export class Person extends Belong implements IPerson {
         .then((res) => {
           if (res.success && res.data.result) {
             res.data.result.forEach((item) => {
+              console.log(2, item.id);
               ShareIdSet.set(item.id, {
                 name: item.name,
                 typeName: item.typeName,
@@ -297,6 +296,9 @@ export class Person extends Belong implements IPerson {
           }
         });
     }
-    return share;
+    return {
+      name: '请稍等...',
+      typeName: '未知',
+    };
   }
 }

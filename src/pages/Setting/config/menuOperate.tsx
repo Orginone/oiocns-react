@@ -6,21 +6,22 @@ import { MenuItemType, OperateMenuType } from 'typings/globelType';
 import { GroupMenuType, MenuType } from './menuType';
 import {
   IAuthority,
-  ICommodity,
   IDepartment,
   IDict,
   IDictClass,
+  IForm,
   IGroup,
   IPropClass,
   ISpeciesItem,
   ITarget,
   ITeam,
-  IWorkForm,
+  IWorkThing,
   IWorkItem,
   OrgAuth,
   SpeciesType,
   TargetType,
   companyTypes,
+  IBelong,
 } from '@/ts/core';
 import { XProperty } from '@/ts/base/schema';
 
@@ -34,6 +35,12 @@ interface groupMenuParams {
 }
 /** 创建团队菜单 */
 const createMenu = (team: ITeam, menus: OperateMenuType[], children: MenuItemType[]) => {
+  if (team.metadata.id === team.metadata.belongId) {
+    const superAuth = (team as IBelong).superAuth;
+    if (superAuth) {
+      children.unshift(buildAuthorityTree(superAuth));
+    }
+  }
   return {
     key: team.key,
     item: team,
@@ -68,8 +75,8 @@ const buildGroupTree = (groups: IGroup[]): MenuItemType[] => {
 const buildSpeciesTree = (species: ISpeciesItem): MenuItemType => {
   const children: MenuItemType[] = [];
   switch (species.metadata.typeName) {
-    case SpeciesType.WorkForm:
-      children.push(buildFormMenu(species as IWorkForm));
+    case SpeciesType.WorkThing:
+      children.push(buildFormMenu(species as IWorkThing));
       break;
     case SpeciesType.Store:
       children.push(buildProperty(species as IPropClass));
@@ -89,9 +96,6 @@ const buildSpeciesTree = (species: ISpeciesItem): MenuItemType => {
     children: [...children, ...species.children.map((i) => buildSpeciesTree(i))],
     beforeLoad: async () => {
       switch (species.metadata.typeName) {
-        case SpeciesType.Commodity:
-          await (species as ICommodity).loadForm();
-          break;
         case SpeciesType.Market:
         case SpeciesType.WorkItem:
           await (species as IWorkItem).loadWorkDefines();
@@ -161,23 +165,14 @@ const buildDict = (dictClass: IDictClass): MenuItemType => {
   };
 };
 /** 编译表单项菜单 */
-const buildFormMenu = (form: IWorkForm): MenuItemType => {
+const buildFormMenu = (form: IWorkThing): MenuItemType => {
   return {
-    key: form.key,
+    key: form.key + MenuType.FormPackage,
     item: form,
-    label: form.metadata.name,
-    tag: [form.metadata.typeName],
+    label: MenuType.FormPackage,
     icon: <TeamIcon share={form.share} size={18} fontSize={16} />,
-    itemType: MenuType.Species,
-    menus: [
-      {
-        key: '新增表单',
-        icon: <im.ImPencil />,
-        label: '新增表单',
-        model: 'outside',
-      },
-      ...loadSpeciesMenus(form),
-    ],
+    itemType: MenuType.FormPackage,
+    menus: loadFormMenus(),
     children: form.forms.map((i) => {
       return {
         key: i.key,
@@ -185,22 +180,7 @@ const buildFormMenu = (form: IWorkForm): MenuItemType => {
         label: i.metadata.name,
         icon: <TeamIcon share={form.share} size={18} fontSize={16} />,
         itemType: MenuType.Form,
-        menus: [
-          {
-            key: '编辑表单',
-            icon: <im.ImPencil />,
-            label: '编辑表单',
-            model: 'outside',
-          },
-          {
-            key: '删除表单',
-            icon: <im.ImPencil />,
-            label: '删除表单',
-            beforeLoad: async () => {
-              await i.delete();
-            },
-          },
-        ],
+        menus: loadFormMenus(i),
         children: [],
         beforeLoad: async () => {
           await i.loadPropertys();
@@ -269,6 +249,34 @@ const loadSpeciesMenus = (species: ISpeciesItem) => {
 };
 
 /** 加载右侧菜单 */
+const loadFormMenus = (form?: IForm) => {
+  const items: OperateMenuType[] = [];
+  if (form) {
+    items.push(
+      {
+        key: '编辑表单',
+        icon: <im.ImCog />,
+        label: '编辑表单',
+      },
+      {
+        key: '删除表单',
+        icon: <im.ImBin />,
+        label: '删除表单',
+        beforeLoad: async () => {
+          return await form.delete();
+        },
+      },
+    );
+  } else {
+    items.push({
+      key: '新增表单',
+      icon: <im.ImPlus />,
+      label: '新增表单',
+    });
+  }
+  return items;
+};
+/** 加载右侧菜单 */
 const loadPropertyMenus = (
   species: IPropClass,
   group: boolean = true,
@@ -306,14 +314,14 @@ const loadDictMenus = (dict?: IDict) => {
   if (dict) {
     items.push(
       {
-        key: '编辑属性',
+        key: '编辑字典',
         icon: <im.ImCog />,
-        label: '编辑属性',
+        label: '编辑字典',
       },
       {
-        key: '删除属性',
+        key: '删除字典',
         icon: <im.ImBin />,
-        label: '删除属性',
+        label: '删除字典',
         beforeLoad: async () => {
           return await dict.delete();
         },
@@ -321,9 +329,9 @@ const loadDictMenus = (dict?: IDict) => {
     );
   } else {
     items.push({
-      key: '新增属性',
+      key: '新增字典',
       icon: <im.ImPlus />,
-      label: '新增属性',
+      label: '新增字典',
     });
   }
   return items;
@@ -353,7 +361,6 @@ const getUserMenu = () => {
       },
     ],
     [
-      buildAuthorityTree(orgCtrl.user.superAuth!, '权限标准'),
       {
         key: orgCtrl.user.key + GroupMenuType.StandardGroup,
         item: orgCtrl.user,
@@ -389,7 +396,6 @@ const getTeamMenu = () => {
   for (const company of orgCtrl.user.companys) {
     children.push(
       createMenu(company, loadTypeMenus(company, [], false), [
-        buildAuthorityTree(company.superAuth!, '权限标准'),
         {
           key: company.key + GroupMenuType.StandardGroup,
           item: company,

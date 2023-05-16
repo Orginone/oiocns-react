@@ -5,15 +5,13 @@ import { IForm } from '../base/form';
 import { IApplication } from './application';
 import { ISpeciesItem } from '../base/species';
 export interface IWorkItem extends IWork {
-  /** 对应的应用 */
-  app: IApplication;
   /** 加载所有的办事 */
   loadAllWorkDefines(reload?: boolean): Promise<IWorkDefine[]>;
 }
 
 export class WorkItem extends Work implements IWorkItem {
   constructor(_metadata: schema.XSpecies, _app: IApplication, _parent?: IWorkItem) {
-    super(_metadata, _app.current, _parent);
+    super(_metadata, _app.current, _app, _parent);
     this.app = _app;
     for (const item of _metadata.nodes || []) {
       this.children.push(new WorkItem(item, this.app, this));
