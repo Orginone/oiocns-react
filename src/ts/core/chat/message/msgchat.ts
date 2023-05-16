@@ -1,4 +1,3 @@
-import { debounce } from '@/utils/tools';
 import { model, common, schema, kernel, List } from '../../../base';
 import { ShareIdSet } from '../../public/consts';
 import { MessageType, TargetType } from '../../public/enums';
@@ -250,7 +249,7 @@ export abstract class MsgChat extends common.Entity implements IMsgChat {
       return !v.tags.some((s) => s.userId === this.userId && s.label === '已读');
     });
     // 过滤消息  过滤条件 belongId 不属于个人的私有消息；消息已有标签中没有自己打的‘已读’标签
-    console.log('获取未打标签数据', needTagMsgs, this.userId);
+    // console.log('获取未打标签数据', needTagMsgs, this.userId);
     if (needTagMsgs.length > 0) {
       const willtagMsgIds: string[] = Array.from(new Set(needTagMsgs.map((v) => v.id)));
       //拦截重复提交
@@ -264,18 +263,17 @@ export abstract class MsgChat extends common.Entity implements IMsgChat {
     }
   }
   overwriteMessagesTags = (newTag: tagsMsgType) => {
-    if (newTag.belongId !== this.belongId) {
+    // console.log('接受新标记反馈', newTag, this.belongId, this.messages);
+    if (newTag.id !== this.chatId) {
       return;
     }
-    console.log('newTag', newTag, this.messages);
     this.messages = this.messages.map((msg) => {
-      if (newTag.tags[0] === '已读' && newTag.ids.includes(msg.id) && !newTag?.tags) {
+      //&& newTag.ids.includes(msg.id) &&
+      if (newTag.tags[0] === '已读' && !msg?.tags) {
         msg['tags'] = [{ label: '已读', userId: '123', time: '' }];
       }
       return msg;
     });
-    console.log('this.messagesthis.messages', this.messages);
-
     this.messageNotify?.apply(this, [this.messages]);
   };
   async deleteMessage(id: string): Promise<boolean> {
@@ -337,7 +335,6 @@ export abstract class MsgChat extends common.Entity implements IMsgChat {
       item.showTxt = common.StringPako.inflate(item.msgBody);
       this.messages.unshift(item);
     });
-    console.log('loadMessages', msgs, this.messages, this.newTagInfo);
 
     if (this.chatdata.lastMsgTime === nullTime && msgs.length > 0) {
       this.chatdata.lastMsgTime = new Date(msgs[0].createTime).getTime();

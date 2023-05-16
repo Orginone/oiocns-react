@@ -3,13 +3,11 @@ import { XWorkTask } from '../base/schema';
 import { TargetType } from './public/enums';
 import { IPerson, Person } from './target/person';
 import { IWorkProvider, WorkProvider } from './work/provider';
-import { IMsgChat, MsgChat } from './chat/message/msgchat';
 const sessionUserName = 'sessionUser';
 
 export class UserProvider extends common.Emitter {
   private _user: IPerson | undefined;
   private _work: IWorkProvider | undefined;
-  private _chat: IMsgChat | undefined;
   private _inited: boolean = false;
   private _preMessages: model.MsgSaveModel[] = [];
   constructor() {
@@ -22,7 +20,18 @@ export class UserProvider extends common.Emitter {
       }
     });
     kernel.on('RecvTags', (data) => {
-      this._user?.chats.find((v) => v.chatId === data.id)?.overwriteMessagesTags(data);
+      const currentChat = this._user?.chats.find(
+        (v) => v.chatId === data.id && v.belongId === data.belongId,
+      );
+      //TODO: 单位下同事之间聊天，tag反馈无法匹配到自己发出消息后，对方读取tag后，无法匹配到对应聊天会话
+      // console.log(
+      //   data,
+      //   this._user?.chats,
+      //   currentChat,
+      //   'currentChat----------',
+      //   this._user?.chats.filter((v) => v.chatId === data.id),
+      // );
+      currentChat?.overwriteMessagesTags(data);
     });
     kernel.on('RecvTask', (data: XWorkTask) => {
       if (this._inited && this._work) {
