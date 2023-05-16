@@ -21,6 +21,7 @@ export type { ISpeciesItem } from './thing/base/species';
 export type { IWorkDefine as IFlowDefine } from './thing/base/work';
 export type { IWork } from './thing/base/work';
 export type { IDict } from './thing/dict/dict';
+export type { IDictClass } from './thing/dict/dictclass';
 export type { IFileSystemItem } from './thing/filesys/filesysItem';
 export type { IFileSystem, TaskModel } from './thing/filesys/filesystem';
 export type { ICommodity } from './thing/market/commodity';

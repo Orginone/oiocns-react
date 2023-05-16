@@ -26,6 +26,8 @@ export interface ITeam extends IMsgChat {
   pullMembers(members: schema.XTarget[]): Promise<boolean>;
   /** 用户移除成员 */
   removeMembers(members: schema.XTarget[]): Promise<boolean>;
+  /** 接受新用户 */
+  recvTarget(operate: string, isChild: boolean, target: schema.XTarget): void;
   /** 加载成员会话 */
   loadMemberChats(newMembers: schema.XTarget[], _isAdd: boolean): void;
   /** 判断是否拥有某些权限 */
@@ -149,6 +151,22 @@ export abstract class Team extends MsgChat implements ITeam {
   abstract createTarget(data: model.TargetModel): Promise<ITeam | undefined>;
   loadMemberChats(_newMembers: schema.XTarget[], _isAdd: boolean): void {
     this.memberChats = [];
+  }
+  recvTarget(operate: string, isChild: boolean, target: schema.XTarget): void {
+    if (isChild && this.memberTypes.includes(target.typeName as TargetType)) {
+      switch (operate) {
+        case 'Add':
+          this.members.push(target);
+          this.loadMemberChats([target], true);
+          break;
+        case 'Remove':
+          this.members = this.members.filter((a) => a.id != target.id);
+          this.loadMemberChats([target], false);
+          break;
+        default:
+          break;
+      }
+    }
   }
   hasAuthoritys(authIds: string[]): boolean {
     authIds = this.space.superAuth?.loadParentAuthIds(authIds) ?? authIds;
