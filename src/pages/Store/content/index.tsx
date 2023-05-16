@@ -6,7 +6,7 @@ import ThingIndex from '@/pages/Store/content/Thing';
 import TaskListComp from '../components/TaskListComp';
 import { Badge, Typography } from 'antd';
 import { FaTasks } from 'react-icons/fa';
-import { ICommodity, IForm, IPropClass, ISpeciesItem, SpeciesType } from '@/ts/core';
+import { IForm, IPropClass, ISpeciesItem, SpeciesType } from '@/ts/core';
 
 interface IProps {
   selectMenu: MenuItemType;
@@ -33,24 +33,6 @@ const ContentIndex = (props: IProps) => {
               />
             );
           }
-          case SpeciesType.Commodity: {
-            const commodity = props.selectMenu.item as ICommodity;
-            const propertys = [];
-            for (const item of commodity.form?.attributes || []) {
-              if (item.linkPropertys && item.linkPropertys.length > 0) {
-                item.linkPropertys[0].name = item.name;
-                propertys.push(item.linkPropertys[0]);
-              }
-            }
-            return (
-              <ThingIndex
-                belongId={commodity.belongId}
-                labels={[`S${commodity.metadata.id}`]}
-                forms={[]}
-                propertys={propertys}
-              />
-            );
-          }
         }
       }
       return <></>;
@@ -65,10 +47,10 @@ const ContentIndex = (props: IProps) => {
       }
       return (
         <ThingIndex
-          belongId={form.species.belongId}
-          labels={[`S${form.species.metadata.id}`]}
+          belongId={form.metadata.belongId}
+          labels={[`S${form.metadata.id}`]}
           forms={[form]}
-          propertys={[]}
+          propertys={propertys}
         />
       );
     }
