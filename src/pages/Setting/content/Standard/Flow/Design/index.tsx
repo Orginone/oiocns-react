@@ -76,7 +76,10 @@ const Design: React.FC<IProps> = ({
         setResource(resourceData);
       }
       if (IsEdit && species) {
-        let attrs: XAttribute[] = await species.loadAttributes();
+        let attrs: XAttribute[] = [];
+        for (const form of await species.loadForms()) {
+          attrs.push(...(await form.loadAttributes()));
+        }
         let fields: FieldCondition[] = [];
         for (let attr of attrs) {
           switch (attr.property!.valueType) {
@@ -165,12 +168,7 @@ const Design: React.FC<IProps> = ({
       errors.push(getErrorItem('ROOT节点未绑定表单'));
     }
     //校验Root类型节点角色不为空
-    let rootNodes = allNodes.filter((item) => item.type == 'ROOT');
-    for (let rootNode of rootNodes) {
-      if (rootNode.destId == undefined) {
-        rootNode.destId = '0';
-      }
-    }
+    resource.destId = resource.destId ? resource.destId : '0';
     //每个节点的 belongId  审核和抄送和子流程的destId
     for (let node of allNodes) {
       if (

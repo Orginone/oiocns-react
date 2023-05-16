@@ -20,7 +20,7 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
   useEffect(() => {
     const id = msgChatNotify.subscribe((key) => {
       let noReadCount = 0;
-      for (const item of orgCtrl.user.chats) {
+      for (const item of orgCtrl.chat.chats) {
         noReadCount += item.chatdata.noReadCount;
       }
       setMsgCount(noReadCount);

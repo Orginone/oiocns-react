@@ -2,25 +2,24 @@ import React, { useEffect, useState } from 'react';
 import { Card } from 'antd';
 import { kernel } from '@/ts/base';
 import CardDescriptions from '@/components/CardDescriptions';
-import { IWorkForm } from '@/ts/core';
+import { IForm } from '@/ts/core';
 
 interface IThingCardProps {
   thingId: string;
-  species: IWorkForm;
+  belongId: string;
+  forms: IForm[];
 }
 /**
  * 存储-物-卡片
  */
-const ThingCard: React.FC<IThingCardProps> = ({ thingId, species }) => {
+const ThingCard: React.FC<IThingCardProps> = (props) => {
   const [formValue, setFormValue] = useState<any>({});
   useEffect(() => {
     kernel.anystore
-      .loadThing<any>(species.current.space.metadata.id, {
+      .loadThing<any>(props.belongId, {
         options: {
           match: {
-            _id: {
-              _eq_: thingId,
-            },
+            _id: props.thingId,
           },
         },
         userData: [],
@@ -28,17 +27,17 @@ const ThingCard: React.FC<IThingCardProps> = ({ thingId, species }) => {
       .then((res) => {
         setFormValue(res.data.data[0].Propertys);
       });
-  }, [thingId]);
+  }, []);
 
   return (
     <Card bordered={false} title="资产卡片">
-      {species.forms.map((form) => {
+      {props.forms.map((form) => {
         return (
-          <div key={form.id} style={{ paddingBottom: '16px' }}>
+          <div key={form.metadata.id} style={{ paddingBottom: '16px' }}>
             <CardDescriptions
-              form={form}
+              form={form.metadata}
               fieldsValue={formValue}
-              attrs={species.attributes}
+              attrs={form.attributes}
             />
           </div>
         );

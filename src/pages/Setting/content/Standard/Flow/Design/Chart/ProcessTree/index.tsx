@@ -19,13 +19,13 @@ import {
   FieldCondition,
   TRIGGER_PROPS,
 } from '../FlowDrawer/processType';
-import { FlowNode } from '@/ts/base/model';
+import { WorkNodeModel } from '@/ts/base/model';
 import { getUuid } from '@/utils/tools';
 
 type IProps = {
   operateOrgId?: string;
   conditions?: FieldCondition[]; //内置条件选择器
-  resource: FlowNode;
+  resource: WorkNodeModel;
   onSelectedNode: (params: any) => void;
   defaultEditable: boolean;
   [key: string]: any;

@@ -3,11 +3,11 @@ import { CSS } from '@dnd-kit/utilities';
 import React from 'react';
 import OioFormItem from './OioForm/FormItems';
 import { IBelong } from '@/ts/core';
-import { XFormItem } from '@/ts/base/schema';
+import { XAttribute } from '@/ts/base/schema';
 
 interface IProps {
   belong: IBelong;
-  item: XFormItem;
+  item: XAttribute;
   onClick: Function;
   [key: string]: any;
 }
@@ -20,17 +20,15 @@ const OperateItem = (props: IProps) => {
   };
 
   return (
-    <>
-      {/* {props.item.belongId !== props.belong.metadata.id ? (
-        <div style={{ cursor: 'no-drop' }}>
-          {<OioFormItem item={props.item} belong={props.belong} />}
-        </div>
-      ) : ( */}
-      <div style={styles} ref={setNodeRef} {...listeners} onClick={props.cl}>
-        {<OioFormItem item={props.item} belong={props.belong} />}
-      </div>
-      {/* )} */}
-    </>
+    <div
+      style={styles}
+      ref={setNodeRef}
+      {...listeners}
+      onClick={() => {
+        props.onClick();
+      }}>
+      {<OioFormItem item={props.item} belong={props.belong} disabled={true} />}
+    </div>
   );
 };
 

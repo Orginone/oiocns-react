@@ -2,13 +2,10 @@ import { ProForm } from '@ant-design/pro-components';
 import { Col, Row } from 'antd';
 import React from 'react';
 import OioFormItem from './FormItems';
-import { XForm, XFormItem } from '@/ts/base/schema';
-import { IBelong } from '@/ts/core/target/base/belong';
+import { IForm } from '@/ts/core';
 
 type IProps = {
-  belong: IBelong;
-  form: XForm;
-  formItems?: XFormItem[];
+  form: IForm;
   submitter?: any;
   onValuesChange?: (changedValues: any, values: Record<string, any>) => void;
   onFinished?: Function;
@@ -21,9 +18,7 @@ type IProps = {
  * 资产共享云表单
  */
 const OioForm: React.FC<IProps> = ({
-  belong,
   form,
-  formItems,
   submitter,
   onValuesChange,
   onFinished,
@@ -32,10 +27,9 @@ const OioForm: React.FC<IProps> = ({
   disabled,
 }) => {
   let config: any =
-    form.remark != undefined
-      ? JSON.parse(form.remark)
+    form.metadata.rule != undefined
+      ? JSON.parse(form.metadata.rule)
       : { col: 12, layout: 'horizontal' };
-  let items = formItems ? formItems : form.items;
   if (fieldsValue) {
     formRef?.current?.setFieldsValue(fieldsValue);
   }
@@ -49,7 +43,7 @@ const OioForm: React.FC<IProps> = ({
           fontSize: 16,
           marginBottom: 20,
         }}>
-        {form.name}
+        {form.metadata.name}
       </div>
       <ProForm
         disabled={disabled === true}
@@ -82,15 +76,11 @@ const OioForm: React.FC<IProps> = ({
           sm: { span: 10 },
         }}>
         <Row gutter={24}>
-          {items && items.length > 0 ? (
-            items.map((item: XFormItem) => (
-              <Col span={config.col} key={item.id}>
-                <OioFormItem item={item} belong={belong} />
-              </Col>
-            ))
-          ) : (
-            <>请先完成设计表单!</>
-          )}
+          {form.attributes.map((item) => (
+            <Col span={config.col} key={item.id}>
+              <OioFormItem item={item} belong={form.species.current.space} />
+            </Col>
+          ))}
         </Row>
       </ProForm>
     </>

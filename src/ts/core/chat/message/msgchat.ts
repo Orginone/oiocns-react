@@ -144,8 +144,8 @@ export abstract class MsgChat extends common.Entity implements IMsgChat {
     if (this.chatdata.noReadCount > 0) {
       this.chatdata.noReadCount = 0;
       msgChatNotify.changCallback();
+      this.cache();
     }
-    this.cache();
     if (this.messages.length < 10) {
       this.moreMessage();
     }

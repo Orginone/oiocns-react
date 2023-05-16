@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Card, Dropdown } from 'antd';
 import orgCtrl from '@/ts/controller';
 import { XProperty } from '@/ts/base/schema';
@@ -19,7 +19,6 @@ import DataGrid, {
   HeaderFilter,
   Scrolling,
 } from 'devextreme-react/data-grid';
-import { IForm, IPropClass, ISpeciesItem, SpeciesType } from '@/ts/core';
 import CustomStore from 'devextreme/data/custom_store';
 import { kernel } from '@/ts/base';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
@@ -29,7 +28,9 @@ import { ItemType } from 'antd/lib/menu/hooks/useItems';
 type ThingItemType = ItemType & { click: (data: any) => void };
 
 interface IProps {
-  species?: ISpeciesItem;
+  labels: string[];
+  propertys: XProperty[];
+  belongId: string;
   selectable?: boolean;
   height?: any;
   width?: any;
@@ -51,7 +52,6 @@ interface IProps {
  */
 const Thing: React.FC<IProps> = (props: IProps) => {
   const { menuItems, selectable = true, deferred = false } = props;
-  const [propertys, setPropertys] = useState<XProperty[]>([]);
 
   const allMenuItems: ThingItemType[] = [...(menuItems || [])];
 
@@ -61,30 +61,6 @@ const Thing: React.FC<IProps> = (props: IProps) => {
       menu.click(data);
     }
   };
-
-  useEffect(() => {
-    const temp: XProperty[] = [];
-    switch (props.species?.metadata.typeName) {
-      case SpeciesType.WorkForm:
-      case SpeciesType.Commodity:
-        (props.species as IForm).attributes.forEach((i) => {
-          if (i.linkPropertys && i.linkPropertys.length > 0) {
-            const item = i.linkPropertys.find(
-              (a) => a.belongId === props.species?.current.space.metadata.id,
-            );
-            if (item) {
-              item.name = i.name;
-              temp.push(item);
-            }
-          }
-        });
-        break;
-      case SpeciesType.Store:
-        temp.push(...(props.species as IPropClass).propertys);
-        break;
-    }
-    setPropertys(temp);
-  }, [props.species]);
 
   const getColumns = () => {
     const columns = [];
@@ -104,7 +80,7 @@ const Thing: React.FC<IProps> = (props: IProps) => {
     );
     columns.push(getColumn('4', '创建时间', '时间型', 'CreateTime'));
     columns.push(getColumn('5', '修改时间', '时间型', 'ModifiedTime'));
-    for (const p of propertys) {
+    for (const p of props.propertys) {
       columns.push(
         getColumn(
           p.id,
@@ -232,9 +208,7 @@ const Thing: React.FC<IProps> = (props: IProps) => {
           new CustomStore({
             key: 'Id',
             async load(loadOptions) {
-              loadOptions.userData = props.species
-                ? [`S${props.species.metadata.id}`]
-                : [];
+              loadOptions.userData = props.labels;
               let request: any = { ...loadOptions };
               if (props.byIds) {
                 request.options = {
@@ -246,11 +220,11 @@ const Thing: React.FC<IProps> = (props: IProps) => {
                 };
               }
               const result = await kernel.anystore.loadThing<any>(
-                props.species?.current.space.metadata.id ?? orgCtrl.user.metadata.id,
+                props.belongId,
                 request,
               );
               if (result.success) {
-                return result.data?.data || [];
+                return result.data;
               }
               return [];
             },

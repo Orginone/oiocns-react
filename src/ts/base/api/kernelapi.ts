@@ -917,6 +917,20 @@ export default class KernelApi {
     });
   }
   /**
+   * 查询属性关联的特性
+   * @param {model.IdModel} params 请求参数
+   * @returns {model.ResultType<schema.XAttributeArray>} 请求结果
+   */
+  public async queryPropAttributes(
+    params: model.IdModel,
+  ): Promise<model.ResultType<schema.XAttributeArray>> {
+    return await this.request({
+      module: 'thing',
+      action: 'QueryPropAttributes',
+      params: params,
+    });
+  }
+  /**
    * 查询用户字典集
    * @param {model.IdModel} params 请求参数
    * @returns {model.ResultType<schema.XDictArray>} 请求结果
@@ -963,12 +977,12 @@ export default class KernelApi {
    * @param {model.GetSpeciesResourceModel} params 请求参数
    * @returns {model.ResultType<schema.XAttributeArray>} 请求结果
    */
-  public async querySpeciesAttrs(
-    params: model.GetSpeciesResourceModel,
+  public async queryFormAttributes(
+    params: model.GainModel,
   ): Promise<model.ResultType<schema.XAttributeArray>> {
     return await this.request({
       module: 'thing',
-      action: 'QuerySpeciesAttrs',
+      action: 'QueryFormAttributes',
       params: params,
     });
   }

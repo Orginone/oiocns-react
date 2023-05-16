@@ -78,7 +78,7 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
   const [key, setKey] = useState<number>(0);
   const isEditable = (): boolean => {
     let editable = props.defaultEditable;
-    if (props.belongId && props.belongId != '' && props.belongId != orgCtrl.user.id) {
+    if (props.belongId && props.belongId != '' && props.belongId != orgCtrl.user.metadata.id) {
       editable = false;
     }
     return editable;

@@ -46,10 +46,10 @@ export type XAttribute = {
   name: string;
   // 编号
   code: string;
+  // 规则
+  rule: string;
   // 备注
   remark: string;
-  // 类别ID
-  speciesId: string;
   // 共享用户ID
   shareId: string;
   // 归属用户ID
@@ -58,6 +58,8 @@ export type XAttribute = {
   authId: string;
   // 属性Id
   propId: string;
+  // 表单Id
+  formId: string;
   // 状态
   status: number;
   // 创建人员ID
@@ -76,12 +78,10 @@ export type XAttribute = {
   links: XAttrLinkProp[] | undefined;
   // 关联属性
   property: XProperty | undefined;
-  // 单设计项
-  formItems: XFormItem[] | undefined;
-  // 特性对应的类别
-  species: XSpecies | undefined;
   // 工作职权
   authority: XAuthority | undefined;
+  // 特性对应的表单
+  form: XForm | undefined;
   // 创建度量标准的用户
   belong: XTarget | undefined;
 };
@@ -256,6 +256,8 @@ export type XForm = {
   name: string;
   // 编号
   code: string;
+  // 规则
+  rule: string;
   // 备注
   remark: string;
   // 类别ID
@@ -277,7 +279,7 @@ export type XForm = {
   // 更新时间
   updateTime: string;
   // 单设计详情项
-  items: XFormItem[] | undefined;
+  attributes: XAttribute[] | undefined;
   // 单设计针对的分类
   bindNodes: XWorkNode[] | undefined;
   // 单设计针对的分类
@@ -296,52 +298,6 @@ export type XFormArray = {
   total: number;
   // 结果
   result: XForm[] | undefined;
-};
-
-//单项定义
-export type XFormItem = {
-  // 雪花ID
-  id: string;
-  // 名称
-  name: string;
-  // 编号
-  code: string;
-  // 规则
-  rule: string;
-  // 备注
-  remark: string;
-  // 特性Id
-  attrId: string;
-  // 业务Id
-  formId: string;
-  // 状态
-  status: number;
-  // 创建人员ID
-  createUser: string;
-  // 更新人员ID
-  updateUser: string;
-  // 修改次数
-  version: string;
-  // 创建时间
-  createTime: string;
-  // 更新时间
-  updateTime: string;
-  // 业务单
-  form: XForm | undefined;
-  // 单项关联的特性
-  attr: XAttribute | undefined;
-};
-
-//单项定义查询返回集合
-export type XFormItemArray = {
-  // 便宜量
-  offset: number;
-  // 最大数量
-  limit: number;
-  // 总数
-  total: number;
-  // 结果
-  result: XFormItem[] | undefined;
 };
 
 //身份证明
@@ -1108,6 +1064,8 @@ export type XWorkInstance = {
   shareId: string;
   // 归属用户ID
   belongId: string;
+  // 备注
+  remark: string;
   // 状态
   status: number;
   // 创建人员ID
@@ -1302,6 +1260,8 @@ export type XWorkTask = {
   instanceId: string;
   // 身份Id
   identityId: string;
+  // 内容
+  content: string;
   // 备注
   remark: string;
   // 状态
