@@ -20,7 +20,6 @@ import { FileTypes } from '@/ts/core/public/consts';
 interface Iprops {
   chat: IMsgChat;
   writeContent: any;
-  // citeText: model.MsgSaveModel;
   citeText: model.MsgSaveModel;
   closeCite: any;
   /** 回车传递引用消息 */
@@ -277,6 +276,8 @@ const Groupinputbox = (props: Iprops) => {
             createTime: new Date(),
           });
         });
+        console.log(result?.shareInfo(), '1');
+
         setTask(undefined);
         if (result) {
           await chat.sendMessage(

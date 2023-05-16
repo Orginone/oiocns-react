@@ -34,9 +34,10 @@ const ForwardModal: React.FC<ModalPageProps> = (props) => {
   // 确认按钮
   const okHandle = async () => {
     // TODO 可以在这里做一些组件内部的事，再调用回调
+    let allPromise: Array<string> = [];
     for (let index = 0; index < sendData.length; index++) {
       const element = sendData[index];
-      await kernel
+      kernel
         .createImMsg({
           msgType: formwardCode.msgType,
           toId: element.toId,
@@ -47,12 +48,14 @@ const ForwardModal: React.FC<ModalPageProps> = (props) => {
         })
         .then((value: ResultType<boolean>) => {
           if (value.success) {
-            message.success('消息转发成功');
-            onCancel();
+            allPromise.push(element.toId);
           }
         });
     }
-
+    Promise.all(allPromise).then(() => {
+      message.success('消息转发成功');
+      onCancel();
+    });
     // onOk();
   };
 
