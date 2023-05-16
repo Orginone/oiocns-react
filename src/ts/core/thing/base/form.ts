@@ -3,7 +3,7 @@ import { SpeciesType } from '@/ts/core/public/enums';
 import { ISpeciesItem } from './species';
 import { common, kernel, model, schema } from '@/ts/base';
 import { IPropClass } from '../store/propclass';
-import { IWorkForm } from '../app/work/workform';
+import { IWorkForm } from '../app/workform';
 import { XProperty } from '@/ts/base/schema';
 export interface IForm extends common.IEntity {
   /** 表单元数据 */

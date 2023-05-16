@@ -32,7 +32,6 @@ export enum SpeciesType {
   'Application' = '应用类',
   /** 类别类目 */
   'Commodity' = '商品类',
-  'AppModule' = '应用模块',
   'WorkItem' = '应用办事',
   'WorkForm' = '应用表单',
   'ReportBI' = '应用报表',

@@ -92,6 +92,8 @@ export interface IWork extends ISpeciesItem {
   loadWorkDefines(reload?: boolean): Promise<IWorkDefine[]>;
   /** 新建办事 */
   createWorkDefine(data: model.WorkDefineModel): Promise<IWorkDefine | undefined>;
+  /** 删除办事实例 */
+  deleteInstance(id: string): Promise<boolean>;
 }
 
 export abstract class Work extends SpeciesItem implements IWork {
@@ -125,6 +127,15 @@ export abstract class Work extends SpeciesItem implements IWork {
       this.defines.push(define);
       return define;
     }
+  }
+  /** 删除办事实例 */
+  async deleteInstance(id: string): Promise<boolean> {
+    return (
+      await kernel.recallWorkInstance({
+        id,
+        page: PageAll,
+      })
+    ).data;
   }
   abstract loadForms(): Promise<IForm[]>;
 }

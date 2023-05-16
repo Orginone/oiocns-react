@@ -15,13 +15,13 @@ import {
   ISpeciesItem,
   ITarget,
   ITeam,
+  IWorkForm,
+  IWorkItem,
   OrgAuth,
   SpeciesType,
   TargetType,
   companyTypes,
 } from '@/ts/core';
-import { IWorkItem } from '@/ts/core/thing/app/work/workitem';
-import { IWorkForm } from '@/ts/core/thing/app/work/workform';
 import { XProperty } from '@/ts/base/schema';
 
 /** 加载分组菜单参数 */
@@ -69,7 +69,8 @@ const buildSpeciesTree = (species: ISpeciesItem): MenuItemType => {
   const children: MenuItemType[] = [];
   switch (species.metadata.typeName) {
     case SpeciesType.WorkForm:
-      return buildFormMenu(species as IWorkForm);
+      children.push(buildFormMenu(species as IWorkForm));
+      break;
     case SpeciesType.Store:
       children.push(buildProperty(species as IPropClass));
       break;
