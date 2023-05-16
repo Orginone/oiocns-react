@@ -1,22 +1,18 @@
-import { common, kernel, model, schema } from '../base';
-import { XTarget } from '../base/schema';
 import { IPerson, Person } from './target/person';
+import { common, kernel, model, schema } from '../base';
 import { IChatProvider, ChatProvider } from './chat/provider';
 import { IWorkProvider, WorkProvider } from './work/provider';
+import { ITargetProvider, TargetProvider } from './target/provider';
 const sessionUserName = 'sessionUser';
 
 export class UserProvider extends common.Emitter {
   private _user: IPerson | undefined;
   private _work: IWorkProvider | undefined;
   private _chat: IChatProvider | undefined;
+  private _target: ITargetProvider | undefined;
   private _inited: boolean = false;
   constructor() {
     super();
-    kernel.on('RecvTarget', (data) => {
-      if (this._inited) {
-        this._recvTarget(data);
-      }
-    });
     const userJson = sessionStorage.getItem(sessionUserName);
     if (userJson && userJson.length > 0) {
       this._loadUser(JSON.parse(userJson));
@@ -33,6 +29,10 @@ export class UserProvider extends common.Emitter {
   /** 会话 */
   get chat(): IChatProvider | undefined {
     return this._chat;
+  }
+  /** 用户 */
+  get target(): ITargetProvider | undefined {
+    return this._target;
   }
   /** 是否完成初始化 */
   get inited(): boolean {
@@ -81,6 +81,7 @@ export class UserProvider extends common.Emitter {
     this._user = new Person(person);
     this._chat = new ChatProvider(this._user);
     this._work = new WorkProvider(this._user);
+    this._target = new TargetProvider(this._user);
     this.changCallback();
   }
   /** 更新用户 */
@@ -95,30 +96,5 @@ export class UserProvider extends common.Emitter {
     await this.work?.loadTodos(true);
     this._inited = true;
     this._chat?.loadPreMessage();
-  }
-  /**
-   * 接收到用户信息
-   * @param data 新消息
-   * @param cache 是否缓存
-   */
-  private _recvTarget(data: any): void {
-    switch (data['TypeName']) {
-      case 'Relation':
-        {
-          let xTarget = data['Target'] as XTarget;
-          let xSubTarget = data['SubTarget'] as XTarget;
-          let target = [this._user!, ...this.user!.targets].find(
-            (a) => a.metadata.id == xTarget.id,
-          );
-          if (target) {
-            target.recvTarget(data['Operate'], true, xSubTarget);
-          } else if (this._user?.metadata.id == xSubTarget.id) {
-            this._user.recvTarget(data['Operate'], false, xTarget);
-          }
-        }
-        break;
-      default:
-        break;
-    }
   }
 }
