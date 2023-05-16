@@ -263,14 +263,13 @@ export abstract class MsgChat extends common.Entity implements IMsgChat {
     }
   }
   overwriteMessagesTags = (newTag: tagsMsgType) => {
-    // console.log('接受新标记反馈', newTag, this.belongId, this.messages);
     if (newTag.id !== this.chatId) {
       return;
     }
     this.messages = this.messages.map((msg) => {
-      //&& newTag.ids.includes(msg.id) &&
+      //暂时无法从tag ids精确匹配消息临时处理 && newTag.ids.includes(msg.id) &&
       if (newTag.tags[0] === '已读' && !msg?.tags) {
-        msg['tags'] = [{ label: '已读', userId: '123', time: '' }];
+        msg['tags'] = [{ label: '已读', userId: newTag.id, time: '' }];
       }
       return msg;
     });
