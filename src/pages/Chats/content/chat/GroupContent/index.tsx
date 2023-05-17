@@ -1,6 +1,6 @@
 /* eslint-disable react/jsx-no-target-blank */
 /* eslint-disable no-unused-vars */
-import { Button, Popover, Image, Spin, Tag } from 'antd';
+import { Button, Popover, Image, Spin } from 'antd';
 import moment from 'moment';
 import React, { useEffect, useRef, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
@@ -37,7 +37,7 @@ interface tagsMsgType {
 }
 let isFirst = false;
 const GroupContent = (props: Iprops) => {
-  const { citeText, enterCiteMsg, chat } = props;
+  const { citeText } = props;
   const [loading, setLoading] = useState(false);
   const [messages, setMessages] = useState(props.chat.messages);
   const [messagesTags, setMessagesTags] = useState<tagsMsgType>();
