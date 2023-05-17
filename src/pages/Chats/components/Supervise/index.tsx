@@ -195,7 +195,7 @@ const Supervise: React.FC<IProps> = ({ belong }) => {
                       <div className={`${css.other_name}`}>
                         <div>
                           {share.name}
-                          &emsp;to:&emsp;
+                          &emsp;发送给&emsp;
                           {own_name.name}
                         </div>
                         <div>{showChatTime(item.createTime)}</div>
