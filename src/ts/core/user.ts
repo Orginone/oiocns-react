@@ -1,8 +1,8 @@
-import { common, kernel, model, schema } from '../base';
-import { XTarget } from '../base/schema';
 import { IPerson, Person } from './target/person';
+import { common, kernel, model, schema } from '../base';
 import { IChatProvider, ChatProvider } from './chat/provider';
 import { IWorkProvider, WorkProvider } from './work/provider';
+import { OperateType } from './public/enums';
 const sessionUserName = 'sessionUser';
 
 export class UserProvider extends common.Emitter {
@@ -12,15 +12,15 @@ export class UserProvider extends common.Emitter {
   private _inited: boolean = false;
   constructor() {
     super();
-    kernel.on('RecvTarget', (data) => {
-      if (this._inited) {
-        this._recvTarget(data);
-      }
-    });
     const userJson = sessionStorage.getItem(sessionUserName);
     if (userJson && userJson.length > 0) {
       this._loadUser(JSON.parse(userJson));
     }
+    kernel.on('RecvTarget', (data) => {
+      if (this._inited) {
+        this._updateTarget(data);
+      }
+    });
   }
   /** 当前用户 */
   get user(): IPerson | undefined {
@@ -96,29 +96,46 @@ export class UserProvider extends common.Emitter {
     this._inited = true;
     this._chat?.loadPreMessage();
   }
-  /**
-   * 接收到用户信息
-   * @param data 新消息
-   * @param cache 是否缓存
-   */
-  private _recvTarget(data: any): void {
-    switch (data['TypeName']) {
-      case 'Relation':
-        {
-          let xTarget = data['Target'] as XTarget;
-          let xSubTarget = data['SubTarget'] as XTarget;
-          let target = [this._user!, ...this.user!.targets].find(
-            (a) => a.id == xTarget.id,
-          );
-          if (target) {
-            target.recvTarget(data['Operate'], true, xSubTarget);
-          } else if (this._user?.id == xSubTarget.id) {
-            this._user.recvTarget(data['Operate'], false, xTarget);
-          }
+
+  async _updateTarget(recvData: string) {
+    const data: model.TargetOperateModel = JSON.parse(recvData);
+    if (!this.user || !data) return;
+    switch (data.operate) {
+      case OperateType.Delete:
+        this.user.targets
+          .filter((i) => i.id === data.target.id)
+          .forEach((i) => i.delete(true));
+        break;
+      case OperateType.Update:
+        this.user.targets
+          .filter((i) => i.id === data.target.id)
+          .forEach((i) => (i.metadata = data.target));
+        break;
+      case OperateType.Remove:
+        if (data.subTarget) {
+          this.user.targets
+            .filter(
+              (i) => i.id === data.target.id || data.target.id === data.subTarget!.id,
+            )
+            .forEach((i) => i.removeMembers([data.subTarget!], true));
         }
         break;
-      default:
-        break;
+      case OperateType.Add:
+        if (data.subTarget) {
+          for (const item of [this.user, ...this.user.companys]) {
+            if (
+              item.id === data.subTarget.id &&
+              (await item.teamChangedNotity(data.target))
+            ) {
+              return;
+            }
+          }
+          for (const item of this.user.targets) {
+            if (item.id === data.target.id) {
+              await item.teamChangedNotity(data.target);
+            }
+          }
+        }
     }
   }
 }

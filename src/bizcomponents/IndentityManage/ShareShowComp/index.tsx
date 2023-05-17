@@ -7,11 +7,12 @@ type ShareShowRecentProps = {
   onClick?: Function;
 };
 const ShareShowRecent: React.FC<ShareShowRecentProps> = (props) => {
+  const data = props.departData || [];
   return (
     <div className={cls.layout}>
-      <div className={cls.title}>已选{props.departData.length}条数据</div>
+      <div className={cls.title}>已选{data.length}条数据</div>
       <div className={cls.content}>
-        {props.departData.map((el: any) => {
+        {data.map((el: any) => {
           return (
             <div
               style={{

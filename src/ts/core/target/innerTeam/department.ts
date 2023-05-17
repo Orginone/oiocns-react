@@ -1,7 +1,7 @@
 import { kernel, model, schema } from '@/ts/base';
 import { ITarget, Target } from '../base/target';
 import { ICompany } from '../team/company';
-import { TargetType } from '../../public/enums';
+import { OperateType, TargetType } from '../../public/enums';
 import { PageAll } from '../../public/consts';
 import { IMsgChat } from '../../chat/message/msgchat';
 import { ITeam } from '../base/team';
@@ -86,6 +86,7 @@ export class Department extends Target implements IDepartment {
       await department.deepLoad();
       if (await this.pullSubTarget(department)) {
         this.children.push(department);
+        this.createTargetMsg(OperateType.Add, metadata);
         return department;
       }
     }
@@ -102,16 +103,14 @@ export class Department extends Target implements IDepartment {
           (i) => i.key != this.key,
         );
       }
+      this.createTargetMsg(OperateType.Remove, this.space.user.metadata);
       return true;
     }
     return false;
   }
-  async delete(): Promise<boolean> {
-    const res = await kernel.deleteTarget({
-      id: this.id,
-      page: PageAll,
-    });
-    if (res.success) {
+  override async delete(notity: boolean = false): Promise<boolean> {
+    notity = await super.delete(notity);
+    if (notity) {
       if (this.parent) {
         this.parent.children = this.parent.children.filter((i) => i.key != this.key);
       } else {
@@ -120,7 +119,7 @@ export class Department extends Target implements IDepartment {
         );
       }
     }
-    return res.success;
+    return notity;
   }
   get subTarget(): ITarget[] {
     return this.children;
@@ -142,5 +141,14 @@ export class Department extends Target implements IDepartment {
     for (const department of this.children) {
       await department.deepLoad(reload);
     }
+  }
+  async teamChangedNotity(target: schema.XTarget): Promise<boolean> {
+    if (this.childrenTypes.includes(target.typeName as TargetType)) {
+      const department = new Department(target, this.company);
+      await department.deepLoad();
+      this.children.push(department);
+      return true;
+    }
+    return await this.pullMembers([target], true);
   }
 }

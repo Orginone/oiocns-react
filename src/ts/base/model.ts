@@ -1,4 +1,4 @@
-import { XForm } from './schema';
+import { XForm, XTarget } from './schema';
 // 请求类型定义
 export type ReqestType = {
   // 模块
@@ -226,6 +226,21 @@ export type MsgSendModel = {
   msgType: string;
   // 消息体
   msgBody: string;
+};
+
+export type TargetMsgModel = {
+  // 接收方Id
+  data: string;
+  // 是否剔除操作人
+  excludeOperater: boolean;
+  // 用户Id
+  targetId: string;
+};
+
+export type TargetOperateModel = {
+  operate: string;
+  target: XTarget;
+  subTarget?: XTarget;
 };
 
 export type MsgTagModel = {

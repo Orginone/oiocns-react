@@ -1,7 +1,6 @@
-import { kernel, schema } from '@/ts/base';
+import { schema } from '@/ts/base';
 import { ITarget, Target } from '../base/target';
 import { IBelong } from '../base/belong';
-import { PageAll } from '../../public/consts';
 import { IMsgChat } from '../../chat/message/msgchat';
 import { IMarket } from '../../thing/market/market';
 import { SpeciesType } from '../../public/enums';
@@ -24,15 +23,12 @@ export class Cohort extends Target implements ICohort {
     }
     return false;
   }
-  async delete(): Promise<boolean> {
-    const res = await kernel.deleteTarget({
-      id: this.id,
-      page: PageAll,
-    });
-    if (res.success) {
+  override async delete(notity: boolean = false): Promise<boolean> {
+    notity = await super.delete(notity);
+    if (notity) {
       this.space.cohorts = this.space.cohorts.filter((i) => i.key != this.key);
     }
-    return res.success;
+    return notity;
   }
   get subTarget(): ITarget[] {
     return [];
@@ -53,5 +49,8 @@ export class Cohort extends Target implements ICohort {
   async deepLoad(reload: boolean = false): Promise<void> {
     await this.loadMembers(reload);
     await this.loadSpecies(reload);
+  }
+  async teamChangedNotity(target: schema.XTarget): Promise<boolean> {
+    return await this.pullMembers([target], true);
   }
 }

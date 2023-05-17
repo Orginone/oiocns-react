@@ -362,18 +362,6 @@ export default class KernelApi {
     });
   }
   /**
-   * 取消申请加入用户
-   * @param {model.IdModel} params 请求参数
-   * @returns {model.ResultType<boolean>} 请求结果
-   */
-  public async cancelJoinTeam(params: model.IdModel): Promise<model.ResultType<boolean>> {
-    return await this.request({
-      module: 'target',
-      action: 'CancelJoinTeam',
-      params: params,
-    });
-  }
-  /**
    * 移除或退出用户的团队
    * @param {model.GainModel} params 请求参数
    * @returns {model.ResultType<boolean>} 请求结果
@@ -398,6 +386,20 @@ export default class KernelApi {
     return await this.request({
       module: 'target',
       action: 'QueryTargetById',
+      params: params,
+    });
+  }
+  /**
+   * 根据ID查询关系
+   * @param {model.IdModel} params 请求参数
+   * @returns {model.ResultType<schema.XRelation>} 请求结果
+   */
+  public async queryRelationById(
+    params: model.IdModel,
+  ): Promise<model.ResultType<schema.XRelation>> {
+    return await this.request({
+      module: 'target',
+      action: 'QueryRelationById',
       params: params,
     });
   }
@@ -440,34 +442,6 @@ export default class KernelApi {
     return await this.request({
       module: 'target',
       action: 'QueryJoinedTargetById',
-      params: params,
-    });
-  }
-  /**
-   * 查询加入用户申请
-   * @param {model.IdModel} params 请求参数
-   * @returns {model.ResultType<schema.XRelationArray>} 请求结果
-   */
-  public async queryJoinTeamApply(
-    params: model.IdModel,
-  ): Promise<model.ResultType<schema.XRelationArray>> {
-    return await this.request({
-      module: 'target',
-      action: 'QueryJoinTeamApply',
-      params: params,
-    });
-  }
-  /**
-   * 查询用户加入审批
-   * @param {model.IdModel} params 请求参数
-   * @returns {model.ResultType<schema.XRelationArray>} 请求结果
-   */
-  public async queryTeamJoinApproval(
-    params: model.IdModel,
-  ): Promise<model.ResultType<schema.XRelationArray>> {
-    return await this.request({
-      module: 'target',
-      action: 'QueryTeamJoinApproval',
       params: params,
     });
   }
@@ -577,6 +551,20 @@ export default class KernelApi {
     return await this.request({
       module: 'chat',
       action: 'CreateImMsg',
+      params: params,
+    });
+  }
+  /**
+   * 创建组织变更消息
+   * @param {model.TargetMsgModel} params 请求参数
+   * @returns {model.ResultType<boolean>} 请求结果
+   */
+  public async createTargetMsg(
+    params: model.TargetMsgModel,
+  ): Promise<model.ResultType<boolean>> {
+    return await this.request({
+      module: 'chat',
+      action: 'CreateTargetMsg',
       params: params,
     });
   }

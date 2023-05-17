@@ -52,3 +52,11 @@ export enum TaskStatus {
   ApprovalStart = 100,
   RefuseStart = 200,
 }
+
+/** 变更操作 */
+export enum OperateType {
+  'Add' = '新增',
+  'Remove' = '移除',
+  'Update' = '更新',
+  'Delete' = '删除',
+}

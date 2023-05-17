@@ -18,7 +18,7 @@ interface IProps {
  */
 
 const RootNode: React.FC<IProps> = (props) => {
-  const [forms, setForms] = useState<XForm[]>(props.current.props.operations);
+  const [forms, setForms] = useState<XForm[]>(props.current.props.operations || []);
   const [operationModal, setOperationModal] = useState<any>();
   const [selectAuthValue, setSelectAuthValue] = useState<any>(
     props.current.props.assignedUser[0]?.id,

@@ -1,7 +1,7 @@
 import { kernel, model, schema } from '@/ts/base';
 import { ITarget, Target } from '../base/target';
 import { PageAll, companyTypes } from '../../public/consts';
-import { SpeciesType, TargetType } from '../../public/enums';
+import { OperateType, SpeciesType, TargetType } from '../../public/enums';
 import { ICompany } from '../team/company';
 import { IMsgChat } from '../../chat/message/msgchat';
 import { ITeam } from '../base/team';
@@ -55,6 +55,7 @@ export class Group extends Target implements IGroup {
       const group = new Group(metadata, this.company);
       if (await this.pullSubTarget(group)) {
         this.children.push(group);
+        this.createTargetMsg(OperateType.Add, metadata);
         return group;
       }
     }
@@ -70,24 +71,22 @@ export class Group extends Target implements IGroup {
         } else {
           this.company.groups = this.company.groups.filter((i) => i.key != this.key);
         }
+        this.createTargetMsg(OperateType.Remove, this.company.metadata);
         return true;
       }
     }
     return false;
   }
-  async delete(): Promise<boolean> {
-    const res = await kernel.deleteTarget({
-      id: this.id,
-      page: PageAll,
-    });
-    if (res.success) {
+  override async delete(notity: boolean = false): Promise<boolean> {
+    notity = await super.delete(notity);
+    if (notity) {
       if (this.parent) {
         this.parent.children = this.parent.children.filter((i) => i.key != this.key);
       } else {
         this.company.groups = this.company.groups.filter((i) => i.key != this.key);
       }
     }
-    return res.success;
+    return notity;
   }
   get subTarget(): ITarget[] {
     return this.children;
@@ -115,6 +114,19 @@ export class Group extends Target implements IGroup {
     await this.loadSpecies(reload);
     for (const group of this.children) {
       await group.deepLoad(reload);
+    }
+  }
+  async teamChangedNotity(target: schema.XTarget): Promise<boolean> {
+    switch (target.typeName) {
+      case TargetType.Group:
+        {
+          const group = new Group(target, this.company);
+          await group.deepLoad();
+          this.children.push(group);
+        }
+        return true;
+      default:
+        return await this.pullMembers([target], true);
     }
   }
 }

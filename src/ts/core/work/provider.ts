@@ -138,12 +138,22 @@ export class WorkProvider implements IWorkProvider {
             page: PageAll,
           });
         } else {
-          await kernel.approvalTask({
+          const res = await kernel.approvalTask({
             id: task.id,
             status: status,
             comment: comment,
             data: data,
           });
+          if (res.data && status < TaskStatus.RefuseStart && task.taskType == '加用户') {
+            let targets = <Array<schema.XTarget>>JSON.parse(task.content);
+            if (targets.length == 2) {
+              for (const item of [this.user, ...this.user.targets]) {
+                if (item.id === targets[1].id) {
+                  item.pullMembers(targets.slice(0, 1));
+                }
+              }
+            }
+          }
         }
       }
     }

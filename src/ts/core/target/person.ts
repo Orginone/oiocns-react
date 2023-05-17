@@ -3,7 +3,7 @@ import { IBelong, Belong } from './base/belong';
 import { ICohort, Cohort } from './outTeam/cohort';
 import { createCompany } from './team';
 import { PageAll, ShareIdSet, companyTypes } from '../public/consts';
-import { TargetType } from '../public/enums';
+import { OperateType, TargetType } from '../public/enums';
 import { ICompany } from './team/company';
 import { IMsgChat, PersonMsgChat } from '../chat/message/msgchat';
 import { ITarget } from './base/target';
@@ -140,11 +140,14 @@ export class Person extends Belong implements IPerson {
   async exit(): Promise<boolean> {
     return false;
   }
-  async delete(): Promise<boolean> {
+  override async delete(): Promise<boolean> {
     const res = await kernel.deleteTarget({
       id: this.id,
       page: PageAll,
     });
+    if (res.success) {
+      this.createTargetMsg(OperateType.Remove, this.metadata);
+    }
     return res.success;
   }
   get subTarget(): ITarget[] {
@@ -222,48 +225,34 @@ export class Person extends Belong implements IPerson {
         );
       });
     } else {
-      let chats: PersonMsgChat[] = [];
-      this.memberChats.forEach((a) => {
-        _newMembers.forEach((i) => {
-          if (a.chatId != i.id) {
-            chats.push(a);
-          }
-        });
-      });
-      this.memberChats = chats;
+      this.memberChats = this.memberChats.filter((i) =>
+        _newMembers.every((a) => a.id != i.chatId),
+      );
     }
+  }
+  async teamChangedNotity(target: schema.XTarget): Promise<boolean> {
+    switch (target.typeName) {
+      case TargetType.Person:
+        await this.pullMembers([target], true);
+        return true;
+      case TargetType.Cohort:
+        {
+          const cohort = new Cohort(target, this);
+          await cohort.deepLoad();
+          this.cohorts.push(cohort);
+        }
+        return true;
+      default:
+        if (companyTypes.includes(target.typeName as TargetType)) {
+          const company = createCompany(target, this);
+          await company.deepLoad();
+          this.companys.push(company);
+          return true;
+        }
+    }
+    return false;
   }
 
-  override recvTarget(operate: string, isChild: boolean, target: schema.XTarget): void {
-    if (isChild) {
-      super.recvTarget(operate, isChild, target);
-    } else {
-      switch (operate) {
-        case 'Add':
-          if (companyTypes.includes(target.typeName as TargetType)) {
-            let company = createCompany(target, this);
-            company.deepLoad();
-            this.companys.push(company);
-          } else if (target.typeName == TargetType.Cohort) {
-            if (this._cohortLoaded) {
-              let cohort = new Cohort(target, this);
-              cohort.deepLoad();
-              this.cohorts.push(cohort);
-            }
-          }
-          break;
-        case 'Remove':
-          if (companyTypes.includes(target.typeName as TargetType)) {
-            this.companys = this.companys.filter((a) => a.id != target.id);
-          } else if (target.typeName == TargetType.Cohort) {
-            this.cohorts = this.cohorts.filter((a) => a.id != target.id);
-          }
-          break;
-        default:
-          break;
-      }
-    }
-  }
   findShareById(id: string): model.ShareIcon {
     if (ShareIdSet.has(id)) {
       return ShareIdSet.get(id)!;

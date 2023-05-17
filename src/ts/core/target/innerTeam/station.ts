@@ -70,15 +70,12 @@ export class Station extends Team implements IStation {
     }
     return true;
   }
-  async delete(): Promise<boolean> {
-    const res = await kernel.deleteTarget({
-      id: this.id,
-      page: PageAll,
-    });
-    if (res.success) {
+  override async delete(notity: boolean = false): Promise<boolean> {
+    notity = await super.delete(notity);
+    if (notity) {
       this.company.stations = this.company.stations.filter((i) => i.key != this.key);
     }
-    return res.success;
+    return notity;
   }
   get chats(): IMsgChat[] {
     return [this];
@@ -90,5 +87,8 @@ export class Station extends Team implements IStation {
     return new Promise((resolve) => {
       resolve(undefined);
     });
+  }
+  async teamChangedNotity(target: schema.XTarget): Promise<boolean> {
+    return await this.pullMembers([target], true);
   }
 }

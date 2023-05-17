@@ -16,7 +16,7 @@ interface IProps {
 const SelectOperation: React.FC<IProps> = ({ current, selected, setSelected }) => {
   const [centerTreeData, setCenterTreeData] = useState<any>([]);
   const [centerCheckedKeys, setCenterCheckedKeys] = useState<Key[]>(
-    selected.map((i) => i.id),
+    (selected || []).map((i) => i.id),
   );
 
   const onSelect: TreeProps['onSelect'] = async (_, info: any) => {

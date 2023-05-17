@@ -1,5 +1,5 @@
 import { schema, kernel, model, parseAvatar } from '../../../base';
-import { TargetType } from '../../public/enums';
+import { OperateType, TargetType } from '../../public/enums';
 import { PageAll } from '../../public/consts';
 import { IBelong } from './belong';
 import { IMsgChat, MsgChat } from '../../chat/message/msgchat';
@@ -21,17 +21,17 @@ export interface ITeam extends IMsgChat {
   /** 更新团队信息 */
   update(data: model.TargetModel): Promise<boolean>;
   /** 删除(注销)团队 */
-  delete(): Promise<boolean>;
+  delete(notity?: boolean): Promise<boolean>;
   /** 用户拉入新成员 */
-  pullMembers(members: schema.XTarget[]): Promise<boolean>;
+  pullMembers(members: schema.XTarget[], notity?: boolean): Promise<boolean>;
   /** 用户移除成员 */
-  removeMembers(members: schema.XTarget[]): Promise<boolean>;
-  /** 接受新用户 */
-  recvTarget(operate: string, isChild: boolean, target: schema.XTarget): void;
+  removeMembers(members: schema.XTarget[], notity?: boolean): Promise<boolean>;
   /** 加载成员会话 */
   loadMemberChats(newMembers: schema.XTarget[], _isAdd: boolean): void;
   /** 判断是否拥有某些权限 */
   hasAuthoritys(authIds: string[]): boolean;
+  /** 接收相关用户增加变更 */
+  teamChangedNotity(target: schema.XTarget): Promise<boolean>;
 }
 
 /** 团队基类实现 */
@@ -78,33 +78,53 @@ export abstract class Team extends MsgChat implements ITeam {
     }
     return this.members;
   }
-  async pullMembers(members: schema.XTarget[]): Promise<boolean> {
+  async pullMembers(
+    members: schema.XTarget[],
+    notity: boolean = false,
+  ): Promise<boolean> {
     members = members
       .filter((i) => this.memberTypes.includes(i.typeName as TargetType))
       .filter((i) => {
         return this.members.filter((m) => m.id === i.id).length < 1;
       });
     if (members.length > 0) {
-      const res = await kernel.pullAnyToTeam({
-        id: this.id,
-        subIds: members.map((i) => i.id),
-      });
-      if (res.success) {
+      if (!notity) {
+        const res = await kernel.pullAnyToTeam({
+          id: this.id,
+          subIds: members.map((i) => i.id),
+        });
+        if (res.success) {
+          members.forEach((a) => {
+            this.createTargetMsg(OperateType.Add, a);
+          });
+        }
+        notity = res.success;
+      }
+      if (notity) {
         this.members.push(...members);
         this.loadMemberChats(members, true);
       }
-      return res.success;
+      return notity;
     }
     return true;
   }
-  async removeMembers(members: schema.XTarget[]): Promise<boolean> {
+  async removeMembers(
+    members: schema.XTarget[],
+    notity: boolean = false,
+  ): Promise<boolean> {
     for (const member of members) {
       if (this.memberTypes.includes(member.typeName as TargetType)) {
-        const res = await kernel.removeOrExitOfTeam({
-          id: this.id,
-          subId: member.id,
-        });
-        if (res.success) {
+        if (!notity) {
+          const res = await kernel.removeOrExitOfTeam({
+            id: this.id,
+            subId: member.id,
+          });
+          if (res.success) {
+            this.createTargetMsg(OperateType.Remove, member);
+          }
+          notity = res.success;
+        }
+        if (notity) {
           this.members = this.members.filter((i) => i.id != member.id);
           this.loadMemberChats([member], false);
         }
@@ -139,35 +159,44 @@ export abstract class Team extends MsgChat implements ITeam {
         typeName: this.metadata.typeName,
         avatar: parseAvatar(this.metadata.icon),
       };
+      this.createTargetMsg(OperateType.Update);
     }
     return res.success;
   }
+  async delete(notity: boolean = false): Promise<boolean> {
+    if (!notity) {
+      const res = await kernel.deleteTarget({
+        id: this.id,
+        page: PageAll,
+      });
+      if (res.success) {
+        this.createTargetMsg(OperateType.Delete);
+      }
+      notity = res.success;
+    }
+    return notity;
+  }
   abstract get chats(): IMsgChat[];
-  abstract delete(): Promise<boolean>;
   abstract deepLoad(reload?: boolean): Promise<void>;
   abstract createTarget(data: model.TargetModel): Promise<ITeam | undefined>;
+  abstract teamChangedNotity(target: schema.XTarget): Promise<boolean>;
   loadMemberChats(_newMembers: schema.XTarget[], _isAdd: boolean): void {
     this.memberChats = [];
-  }
-  recvTarget(operate: string, isChild: boolean, target: schema.XTarget): void {
-    if (isChild && this.memberTypes.includes(target.typeName as TargetType)) {
-      switch (operate) {
-        case 'Add':
-          this.members.push(target);
-          this.loadMemberChats([target], true);
-          break;
-        case 'Remove':
-          this.members = this.members.filter((a) => a.id != target.id);
-          this.loadMemberChats([target], false);
-          break;
-        default:
-          break;
-      }
-    }
   }
   hasAuthoritys(authIds: string[]): boolean {
     authIds = this.space.superAuth?.loadParentAuthIds(authIds) ?? authIds;
     const orgIds = [this.metadata.belongId, this.id];
     return this.space.user.authenticate(orgIds, authIds);
+  }
+  async createTargetMsg(operate: OperateType, sub?: schema.XTarget): Promise<void> {
+    await kernel.createTargetMsg({
+      targetId: sub && this.userId === this.id ? sub.id : this.id,
+      excludeOperater: true,
+      data: JSON.stringify({
+        operate,
+        target: this.metadata,
+        subTarget: sub,
+      }),
+    });
   }
 }
