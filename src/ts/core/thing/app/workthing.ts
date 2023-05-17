@@ -33,8 +33,8 @@ export class WorkThing extends SpeciesItem implements IWorkThing {
   async loadForms(reload: boolean = false): Promise<IForm[]> {
     if (!this._formLoaded || reload) {
       const res = await kernel.querySpeciesForms({
-        id: this.current.metadata.id,
-        speciesId: this.metadata.id,
+        id: this.current.id,
+        speciesId: this.id,
         belongId: this.belongId,
         upTeam: this.current.metadata.typeName === TargetType.Group,
         page: PageAll,
@@ -47,8 +47,8 @@ export class WorkThing extends SpeciesItem implements IWorkThing {
     return this.forms;
   }
   async createForm(data: model.FormModel): Promise<IForm | undefined> {
-    data.shareId = this.current.metadata.id;
-    data.speciesId = this.metadata.id;
+    data.shareId = this.current.id;
+    data.speciesId = this.id;
     const res = await kernel.createForm(data);
     if (res.success && res.data.id) {
       const form = new Form(res.data, this);

@@ -32,7 +32,7 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
       if (node && node.forms) {
         const formIds = node.forms.map((i) => i.id);
         const forms = (await current.workItem.loadForms()).filter((i) =>
-          formIds.includes(i.metadata.id),
+          formIds.includes(i.id),
         );
         if (forms.length > 0) {
           await forms[0].loadAttributes();
@@ -62,7 +62,7 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
         content: content,
         contentType: 'Text',
         title: current.metadata.name,
-        defineId: current.metadata.id,
+        defineId: current.id,
         data: JSON.stringify(data),
         thingIds: rows_.map((row: any) => row['Id']),
       })

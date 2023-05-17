@@ -102,9 +102,9 @@ const Design: React.FC<IProps> = ({ current }) => {
         });
       });
       treeNode.push({
-        key: prop.metadata.id,
+        key: prop.id,
         title: prop.metadata.name,
-        value: prop.metadata.id,
+        value: prop.id,
         item: prop,
         checkable: false,
         children: children,

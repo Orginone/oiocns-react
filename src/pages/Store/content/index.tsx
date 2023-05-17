@@ -27,7 +27,7 @@ const ContentIndex = (props: IProps) => {
             return (
               <ThingIndex
                 belongId={propClass.belongId}
-                labels={[`S${propClass.metadata.id}`]}
+                labels={[`S${propClass.id}`]}
                 forms={[]}
                 propertys={propClass.propertys}
               />
@@ -48,7 +48,7 @@ const ContentIndex = (props: IProps) => {
       return (
         <ThingIndex
           belongId={form.metadata.belongId}
-          labels={[`S${form.metadata.id}`]}
+          labels={[`S${form.id}`]}
           forms={[form]}
           propertys={propertys}
         />

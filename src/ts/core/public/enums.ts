@@ -24,7 +24,6 @@ export enum TargetType {
 /** 分类基础类型 */
 export enum SpeciesType {
   /** 类别目录 */
-  'FileSystem' = '文件类',
   'Market' = '流通类',
   'Resource' = '资源类',
   'Store' = '属性类',

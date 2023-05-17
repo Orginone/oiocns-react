@@ -57,7 +57,7 @@ const DeptWayGroupItemConfig: React.FC<IProps> = (props) => {
                       <SelectOrg
                         key={key}
                         onChange={onChange}
-                        orgId={orgCtrl.user.metadata.id}
+                        orgId={orgCtrl.user.id}
                         value={condition.val}
                         rootDisable={false}></SelectOrg>
                     </div>

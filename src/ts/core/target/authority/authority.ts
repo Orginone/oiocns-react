@@ -5,12 +5,12 @@ import { IBelong } from '../base/belong';
 
 /** 权限接口 */
 export interface IAuthority extends IMsgChat {
+  /** 唯一标识 */
+  id: string;
   /** 数据实体 */
   metadata: schema.XAuthority;
   /** 拥有该权限的成员 */
   members: schema.XTarget[];
-  /** 加载权限的自归属用户 */
-  space: IBelong;
   /** 父级权限 */
   parent: IAuthority | undefined;
   /** 子级权限 */
@@ -39,8 +39,7 @@ export interface IAuthority extends IMsgChat {
 export class Authority extends MsgChat implements IAuthority {
   constructor(_metadata: schema.XAuthority, _space: IBelong, _parent?: IAuthority) {
     super(
-      _space.user.metadata.id,
-      _space.metadata.id,
+      _space.id,
       _metadata.id,
       {
         name: _metadata.name,
@@ -49,6 +48,7 @@ export class Authority extends MsgChat implements IAuthority {
       },
       [_space.metadata.name ?? '', '角色群'],
       _metadata.remark,
+      _space,
     );
     this.space = _space;
     this.parent = _parent;
@@ -63,10 +63,13 @@ export class Authority extends MsgChat implements IAuthority {
   parent: IAuthority | undefined;
   children: IAuthority[] = [];
   private _memberLoaded: boolean = false;
+  get id(): string {
+    return this.metadata.id;
+  }
   async loadMembers(reload: boolean = false): Promise<schema.XTarget[]> {
     if (!this._memberLoaded || reload) {
       const res = await kernel.queryAuthorityTargets({
-        id: this.metadata.id,
+        id: this.id,
         subId: this.space.metadata.belongId,
       });
       if (res.success) {
@@ -77,7 +80,7 @@ export class Authority extends MsgChat implements IAuthority {
     return this.members;
   }
   async create(data: model.AuthorityModel): Promise<IAuthority | undefined> {
-    data.parentId = this.metadata.id;
+    data.parentId = this.id;
     const res = await kernel.createAuthority(data);
     if (res.success && res.data?.id) {
       const authority = new Authority(res.data, this.space, this);
@@ -86,7 +89,7 @@ export class Authority extends MsgChat implements IAuthority {
     }
   }
   async update(data: model.AuthorityModel): Promise<boolean> {
-    data.id = this.metadata.id;
+    data.id = this.id;
     data.shareId = this.metadata.shareId;
     data.parentId = this.metadata.parentId;
     data.name = data.name || this.metadata.name;
@@ -106,7 +109,7 @@ export class Authority extends MsgChat implements IAuthority {
   }
   async delete(): Promise<boolean> {
     const res = await kernel.deleteAuthority({
-      id: this.metadata.id,
+      id: this.id,
       page: PageAll,
     });
     if (res.success && this.parent) {
@@ -126,7 +129,7 @@ export class Authority extends MsgChat implements IAuthority {
   }
   findAuthById(authId: string, auth?: IAuthority): IAuthority | undefined {
     auth = auth || this.space.superAuth!;
-    if (auth.metadata.id === authId) {
+    if (auth.id === authId) {
       return auth;
     } else {
       for (const item of auth.children) {
@@ -159,8 +162,8 @@ export class Authority extends MsgChat implements IAuthority {
     return this.space.user.authenticate(orgIds, authIds);
   }
   private _appendParentId(auth: IAuthority, authIds: string[]) {
-    if (!authIds.includes(auth.metadata.id)) {
-      authIds.push(auth.metadata.id);
+    if (!authIds.includes(auth.id)) {
+      authIds.push(auth.id);
     }
     if (auth.parent) {
       this._appendParentId(auth.parent, authIds);

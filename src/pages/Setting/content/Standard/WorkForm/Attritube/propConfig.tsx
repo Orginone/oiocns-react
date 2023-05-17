@@ -42,9 +42,9 @@ const PropertyConfig = (props: IProps) => {
         });
       }
       treeNode.push({
-        key: prop.metadata.id,
+        key: prop.id,
         title: prop.metadata.name,
-        value: prop.metadata.id,
+        value: prop.id,
         item: prop,
         children: children,
       });

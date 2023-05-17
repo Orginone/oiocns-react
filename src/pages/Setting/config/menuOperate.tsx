@@ -35,10 +35,10 @@ interface groupMenuParams {
 }
 /** 创建团队菜单 */
 const createMenu = (team: ITeam, menus: OperateMenuType[], children: MenuItemType[]) => {
-  if (team.metadata.id === team.metadata.belongId) {
+  if (team.id === team.metadata.belongId) {
     const superAuth = (team as IBelong).superAuth;
     if (superAuth) {
-      children.unshift(buildAuthorityTree(superAuth));
+      children.unshift(buildAuthorityTree(superAuth, '权限标准'));
     }
   }
   return {
@@ -76,13 +76,13 @@ const buildSpeciesTree = (species: ISpeciesItem): MenuItemType => {
   const children: MenuItemType[] = [];
   switch (species.metadata.typeName) {
     case SpeciesType.WorkThing:
-      children.push(buildFormMenu(species as IWorkThing));
+      children.push(...buildFormMenu(species as IWorkThing));
       break;
     case SpeciesType.Store:
-      children.push(buildProperty(species as IPropClass));
+      children.push(...buildProperty(species as IPropClass));
       break;
     case SpeciesType.Dict:
-      children.push(buildDict(species as IDictClass));
+      children.push(...buildDict(species as IDictClass));
       break;
   }
   return {
@@ -100,7 +100,14 @@ const buildSpeciesTree = (species: ISpeciesItem): MenuItemType => {
         case SpeciesType.WorkItem:
           await (species as IWorkItem).loadWorkDefines();
           break;
-        default:
+        case SpeciesType.Dict:
+          await (species as IDictClass).loadDicts();
+          break;
+        case SpeciesType.Store:
+          await (species as IPropClass).loadPropertys();
+          break;
+        case SpeciesType.WorkThing:
+          await (species as IWorkThing).loadForms();
           break;
       }
     },
@@ -108,90 +115,58 @@ const buildSpeciesTree = (species: ISpeciesItem): MenuItemType => {
 };
 
 /** 编译属性菜单 */
-const buildProperty = (propClass: IPropClass): MenuItemType => {
-  return {
-    key: propClass.key + MenuType.PropPackage,
-    item: propClass,
-    label: MenuType.PropPackage,
-    icon: <TeamIcon share={propClass.share} size={18} fontSize={16} />,
-    itemType: MenuType.PropPackage,
-    menus: loadPropertyMenus(propClass, true),
-    children: propClass.propertys.map((i) => {
-      return {
-        key: i.id,
-        item: {
-          property: i,
-          species: propClass,
-        },
-        label: i.name,
-        itemType: MenuType.Property,
-        icon: (
-          <TeamIcon share={{ name: i.name, typeName: '未知' }} size={18} fontSize={16} />
-        ),
-        menus: loadPropertyMenus(propClass, false, i),
-        children: [],
-      };
-    }),
-  };
+const buildProperty = (propClass: IPropClass) => {
+  return propClass.propertys.map((i) => {
+    return {
+      key: i.id,
+      item: {
+        property: i,
+        species: propClass,
+      },
+      label: i.name,
+      itemType: MenuType.Property,
+      icon: <im.ImJoomla fontSize={22} />,
+      menus: loadPropertyMenus(propClass, false, i),
+      children: [],
+    };
+  });
 };
 
 /** 编译字典菜单 */
-const buildDict = (dictClass: IDictClass): MenuItemType => {
-  return {
-    key: dictClass.key + MenuType.DictPackage,
-    item: dictClass,
-    label: MenuType.DictPackage,
-    icon: <TeamIcon share={dictClass.share} size={18} fontSize={16} />,
-    itemType: MenuType.DictPackage,
-    menus: loadDictMenus(),
-    children: dictClass.dicts.map((dict) => {
-      return {
-        key: dict.metadata.id,
-        item: dict,
-        label: dict.metadata.name,
-        itemType: MenuType.Dict,
-        tag: ['字典'],
-        icon: <TeamIcon share={dict.share} size={18} fontSize={16} />,
-        menus: loadDictMenus(dict),
-        children: [],
-        beforeLoad: async () => {
-          await dict.loadItems();
-        },
-      };
-    }),
-    beforeLoad: async () => {
-      await dictClass.loadDicts();
-    },
-  };
+const buildDict = (dictClass: IDictClass) => {
+  return dictClass.dicts.map((dict) => {
+    return {
+      key: dict.id,
+      item: dict,
+      label: dict.metadata.name,
+      itemType: MenuType.Dict,
+      tag: ['字典'],
+      icon: <im.ImBook fontSize={22} />,
+      menus: loadDictMenus(dict),
+      children: [],
+      beforeLoad: async () => {
+        await dict.loadItems();
+      },
+    };
+  });
 };
 /** 编译表单项菜单 */
-const buildFormMenu = (form: IWorkThing): MenuItemType => {
-  return {
-    key: form.key + MenuType.FormPackage,
-    item: form,
-    label: MenuType.FormPackage,
-    icon: <TeamIcon share={form.share} size={18} fontSize={16} />,
-    itemType: MenuType.FormPackage,
-    menus: loadFormMenus(),
-    children: form.forms.map((i) => {
-      return {
-        key: i.key,
-        item: i,
-        label: i.metadata.name,
-        icon: <TeamIcon share={form.share} size={18} fontSize={16} />,
-        itemType: MenuType.Form,
-        menus: loadFormMenus(i),
-        children: [],
-        beforeLoad: async () => {
-          await i.loadPropertys();
-          await i.loadAttributes();
-        },
-      } as MenuItemType;
-    }),
-    beforeLoad: async () => {
-      await form.loadForms();
-    },
-  };
+const buildFormMenu = (form: IWorkThing) => {
+  return form.forms.map((i) => {
+    return {
+      key: i.key,
+      item: i,
+      label: i.metadata.name,
+      icon: <im.ImInsertTemplate fontSize={22} />,
+      itemType: MenuType.Form,
+      menus: loadFormMenus(i),
+      children: [],
+      beforeLoad: async () => {
+        await i.loadPropertys();
+        await i.loadAttributes();
+      },
+    } as MenuItemType;
+  });
 };
 
 /** 编译权限树 */

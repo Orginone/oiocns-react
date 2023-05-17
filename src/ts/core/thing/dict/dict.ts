@@ -4,6 +4,8 @@ import { DictClass } from './dictclass';
 
 /** 元数据字典接口 */
 export interface IDict extends common.IEntity {
+  /** 唯一标识 */
+  id: string;
   /** 数据实体 */
   metadata: schema.XDict;
   /** 加载权限的自归属用户 */
@@ -44,9 +46,12 @@ export class Dict extends common.Entity implements IDict {
   metadata: schema.XDict;
   items: schema.XDictItem[] = [];
   private _itemLoaded: boolean = false;
+  get id(): string {
+    return this.metadata.id;
+  }
   async update(data: model.DictModel): Promise<boolean> {
-    data.id = this.metadata.id;
-    data.speciesId = this.species.metadata.id;
+    data.id = this.id;
+    data.speciesId = this.species.id;
     const res = await kernel.updateDict(data);
     if (res.success && res.data?.id) {
       this.metadata = res.data;
@@ -55,7 +60,7 @@ export class Dict extends common.Entity implements IDict {
   }
   async delete(): Promise<boolean> {
     const res = await kernel.deleteDict({
-      id: this.metadata.id,
+      id: this.id,
       page: PageAll,
     });
     if (res.success) {
@@ -66,7 +71,7 @@ export class Dict extends common.Entity implements IDict {
   async loadItems(reload: boolean = false): Promise<schema.XDictItem[]> {
     if (!this._itemLoaded || reload) {
       const res = await kernel.queryDictItems({
-        id: this.metadata.id,
+        id: this.id,
         page: PageAll,
       });
       if (res.success) {
@@ -76,7 +81,7 @@ export class Dict extends common.Entity implements IDict {
     return this.items;
   }
   async createItem(data: model.DictItemModel): Promise<schema.XDictItem | undefined> {
-    data.dictId = this.metadata.id;
+    data.dictId = this.id;
     const res = await kernel.createDictItem(data);
     if (res.success && res.data?.id) {
       this.items.push(res.data);
@@ -94,7 +99,7 @@ export class Dict extends common.Entity implements IDict {
     return res.success;
   }
   async updateItem(data: model.DictItemModel): Promise<boolean> {
-    data.dictId = this.metadata.id;
+    data.dictId = this.id;
     const res = await kernel.updateDictItem(data);
     if (res.success) {
       this.items = this.items.filter((i) => i.id != data.id);

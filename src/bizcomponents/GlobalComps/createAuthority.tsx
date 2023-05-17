@@ -100,7 +100,7 @@ const AuthorityModal = (props: Iprops) => {
         options: props.current.space.parentTarget.map((i) => {
           return {
             label: i.metadata.name,
-            value: i.metadata.id,
+            value: i.id,
           };
         }),
       },

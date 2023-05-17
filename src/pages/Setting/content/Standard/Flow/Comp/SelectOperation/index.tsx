@@ -25,9 +25,9 @@ const SelectOperation: React.FC<IProps> = ({ current, selected, setSelected }) =
     setCenterTreeData(
       forms.map((item) => {
         return {
-          key: item.metadata.id,
+          key: item.id,
           title: item.metadata.name,
-          value: item.metadata.id,
+          value: item.id,
           item: item.metadata,
           children: [],
         };
@@ -52,9 +52,9 @@ const SelectOperation: React.FC<IProps> = ({ current, selected, setSelected }) =
     const result: any[] = [];
     for (const item of species) {
       result.push({
-        key: item.metadata.id,
+        key: item.id,
         title: item.metadata.name,
-        value: item.metadata.id,
+        value: item.id,
         item: item,
         children: buildWorkThingTree(item.children.map((i) => i as IWorkThing)),
       });

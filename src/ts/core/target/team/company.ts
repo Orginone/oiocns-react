@@ -60,7 +60,7 @@ export class Company extends Belong implements ICompany {
   async loadGroups(reload: boolean = false): Promise<IGroup[]> {
     if (!this._groupLoaded || reload) {
       const res = await kernel.queryJoinedTargetById({
-        id: this.metadata.id,
+        id: this.id,
         typeNames: [TargetType.Group],
         page: PageAll,
       });
@@ -74,7 +74,7 @@ export class Company extends Belong implements ICompany {
   async loadCohorts(reload?: boolean | undefined): Promise<ICohort[]> {
     if (!this._cohortLoaded || reload) {
       const res = await kernel.querySubTargetById({
-        id: this.metadata.id,
+        id: this.id,
         subTypeNames: [TargetType.Cohort],
         page: PageAll,
       });
@@ -88,7 +88,7 @@ export class Company extends Belong implements ICompany {
   async loadStations(reload?: boolean | undefined): Promise<IStation[]> {
     if (!this._stationLoaded || reload) {
       const res = await kernel.querySubTargetById({
-        id: this.metadata.id,
+        id: this.id,
         subTypeNames: [TargetType.Station],
         page: PageAll,
       });
@@ -102,7 +102,7 @@ export class Company extends Belong implements ICompany {
   async loadDepartments(reload?: boolean | undefined): Promise<IDepartment[]> {
     if (!this._departmentLoaded || reload) {
       const res = await kernel.querySubTargetById({
-        id: this.metadata.id,
+        id: this.id,
         subTypeNames: this.departmentTypes,
         page: PageAll,
       });
@@ -168,7 +168,7 @@ export class Company extends Belong implements ICompany {
       if (member.typeName === TargetType.Group) {
         await kernel.applyJoinTeam({
           id: member.id,
-          subId: this.metadata.id,
+          subId: this.id,
         });
       }
     }
@@ -183,7 +183,7 @@ export class Company extends Belong implements ICompany {
   }
   async delete(): Promise<boolean> {
     const res = await kernel.deleteTarget({
-      id: this.metadata.id,
+      id: this.id,
       page: PageAll,
     });
     if (res.success) {
@@ -230,13 +230,12 @@ export class Company extends Belong implements ICompany {
     return targets;
   }
   override loadMemberChats(_newMembers: schema.XTarget[], _isAdd: boolean): void {
-    _newMembers = _newMembers.filter((i) => i.id != this.user.metadata.id);
+    _newMembers = _newMembers.filter((i) => i.id != this.userId);
     if (_isAdd) {
       _newMembers.forEach((i) => {
         this.memberChats.push(
           new PersonMsgChat(
-            this.user.metadata.id,
-            this.metadata.id,
+            this.id,
             i.id,
             {
               name: i.name,
@@ -245,6 +244,7 @@ export class Company extends Belong implements ICompany {
             },
             [this.metadata.name, '同事'],
             i.remark,
+            this,
           ),
         );
       });
@@ -284,13 +284,13 @@ export class Company extends Belong implements ICompany {
       case 'Remove':
         if (isChild) {
           if (this.departmentTypes.includes(target.typeName as TargetType)) {
-            this.departments = this.departments.filter((a) => a.metadata.id != target.id);
+            this.departments = this.departments.filter((a) => a.id != target.id);
           }
           if ((target.typeName as TargetType) == TargetType.Station) {
-            this.stations = this.stations.filter((a) => a.metadata.id != target.id);
+            this.stations = this.stations.filter((a) => a.id != target.id);
           }
         } else if (target.typeName == TargetType.Group) {
-          this.groups = this.groups.filter((a) => a.metadata.id == target.id);
+          this.groups = this.groups.filter((a) => a.id == target.id);
         }
         break;
       default:

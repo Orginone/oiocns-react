@@ -188,7 +188,7 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
         <Sider>
           <TreeLeftDeptPage
             setCurrent={setTreeCurrent}
-            currentKey={indentity ? indentity?.metadata.id : ''}
+            currentKey={indentity ? indentity?.id : ''}
             indentitys={indentitys}
             current={current}
           />

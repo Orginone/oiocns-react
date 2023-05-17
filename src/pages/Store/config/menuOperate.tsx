@@ -6,11 +6,11 @@ import { MenuItemType, OperateMenuType } from 'typings/globelType';
 import { GroupMenuType, MenuType } from './menuType';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 import {
+  IBelong,
   IFileSystem,
   IFileSystemItem,
   IPropClass,
   ISpeciesItem,
-  ITarget,
   IWorkThing,
   SpeciesType,
 } from '@/ts/core';
@@ -27,7 +27,7 @@ const buildFileSysTree = (targets: IFileSystemItem[]) => {
         label: item.metadata.name,
         tag: ['目录'],
         itemType: MenuType.FileSystemItem,
-        menus: loadFileSysItemMenus(),
+        menus: loadFileSysItemMenus(item),
         icon: <im.ImFolder color="#c09553" />,
         expIcon: <im.ImFolderOpen color="#c09553" />,
         children: buildFileSysTree(item.children),
@@ -41,7 +41,10 @@ const buildFileSysTree = (targets: IFileSystemItem[]) => {
 };
 
 /** 加载文件系统操作菜单 */
-export const loadFileSysItemMenus = (rightClick: boolean = false) => {
+export const loadFileSysItemMenus = (
+  item: IFileSystemItem,
+  rightClick: boolean = false,
+) => {
   const menus: OperateMenuType[] = [
     {
       key: '新建',
@@ -59,7 +62,7 @@ export const loadFileSysItemMenus = (rightClick: boolean = false) => {
       icon: <im.ImUpload />,
     },
   ];
-  if (rightClick) return menus;
+  if (rightClick || !item.hasOperateAuth(false)) return menus;
   menus.push(
     {
       key: '重命名',
@@ -90,26 +93,6 @@ const buildSpeciesTree = (species: ISpeciesItem[]): MenuItemType[] => {
   const result: MenuItemType[] = [];
   for (const item of species) {
     switch (item.metadata.typeName) {
-      case SpeciesType.FileSystem:
-        {
-          const filesys = item as IFileSystem;
-          result.push({
-            key: item.key,
-            item: filesys.home,
-            label: item.metadata.name,
-            icon: (
-              <TeamIcon notAvatar={true} share={item.share} size={18} fontSize={16} />
-            ),
-            itemType: MenuType.FileSystemItem,
-            menus: loadFileSysItemMenus(),
-            tag: [item.metadata.typeName],
-            children: buildFileSysTree(filesys.home ? filesys.home.children : []),
-            beforeLoad: async () => {
-              await filesys.home?.loadChildren();
-            },
-          });
-        }
-        break;
       case SpeciesType.Store:
       case SpeciesType.Market:
       case SpeciesType.WorkThing:
@@ -162,26 +145,41 @@ const buildSpeciesTree = (species: ISpeciesItem[]): MenuItemType[] => {
   return result;
 };
 
-/** 编译组织树 */
-const buildTargetTree = (targets: ITarget[]) => {
-  const result: MenuItemType[] = [];
-  for (const item of targets) {
-    if (item.species.length > 0) {
-      result.push({
-        key: item.key,
-        item: item,
-        label: item.metadata.name,
-        itemType: item.metadata.typeName,
-        menus: [],
-        tag: [item.metadata.typeName],
-        icon: <TeamIcon notAvatar={true} share={item.share} size={18} fontSize={16} />,
-        children: buildSpeciesTree(item.species),
-      });
-    }
-  }
-  return result;
+/** 加载文件系统 */
+const buileFileSystem = (filesys: IFileSystem) => {
+  return {
+    key: filesys.key,
+    item: filesys.home,
+    label: '文件存储',
+    icon: <im.ImDrawer fontSize={22} />,
+    expIcon: <im.ImDrawer2 fontSize={22} />,
+    itemType: MenuType.FileSystemItem,
+    menus: loadFileSysItemMenus(filesys.home),
+    tag: ['根目录'],
+    children: buildFileSysTree(filesys.home.children),
+    beforeLoad: async () => {
+      await filesys.home?.loadChildren();
+    },
+  };
 };
 
+const loadChildren = (team: IBelong) => {
+  const species: ISpeciesItem[] = [];
+  for (const t of team.targets) {
+    if (t.space === team.space) {
+      for (const s of t.species) {
+        switch (s.metadata.typeName) {
+          case SpeciesType.Store:
+          case SpeciesType.Market:
+          case SpeciesType.Application:
+            species.push(s);
+            break;
+        }
+      }
+    }
+  }
+  return [buileFileSystem(team.filesys), ...buildSpeciesTree(species)];
+};
 /** 获取个人菜单 */
 const getUserMenu = () => {
   return {
@@ -191,10 +189,7 @@ const getUserMenu = () => {
     itemType: GroupMenuType.User,
     icon: <TeamIcon share={orgCtrl.user.share} size={18} fontSize={16} />,
     menus: [],
-    children: [
-      ...buildSpeciesTree(orgCtrl.user.species),
-      ...buildTargetTree(orgCtrl.user.cohorts),
-    ],
+    children: loadChildren(orgCtrl.user),
   };
 };
 
@@ -209,10 +204,7 @@ const getTeamMenu = () => {
       itemType: GroupMenuType.Company,
       menus: [],
       icon: <TeamIcon share={company.share} size={18} fontSize={16} />,
-      children: [
-        ...buildSpeciesTree(company.species),
-        ...buildTargetTree(company.targets.slice(1)),
-      ],
+      children: loadChildren(company),
     });
   }
   return children;

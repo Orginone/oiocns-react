@@ -127,13 +127,13 @@ const FlowList: React.FC<IProps> = ({ current }: IProps) => {
                       parentRef={parentRef}
                       dataSource={current.defines}
                       operation={renderOperation}
-                      rowKey={(record: IFlowDefine) => record.metadata.id}
+                      rowKey={(record: IFlowDefine) => record.id}
                       renderCardContent={(items) => {
                         return items.map((item) => (
                           <FlowCard
                             className="card"
                             data={item}
-                            key={item.metadata.id}
+                            key={item.id}
                             operation={renderOperation}
                           />
                         ));

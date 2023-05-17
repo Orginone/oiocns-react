@@ -203,7 +203,7 @@ const GroupContent = (props: Iprops) => {
                     ''
                   )}
                   {/* 左侧聊天内容显示 */}
-                  {item.fromId !== orgCtrl.user.metadata.id ? (
+                  {item.fromId !== orgCtrl.user.id ? (
                     <div className={`${css.group_content_left} ${css.con}`}>
                       <Popover
                         trigger="hover"

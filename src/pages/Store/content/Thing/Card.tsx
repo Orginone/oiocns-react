@@ -33,7 +33,7 @@ const ThingCard: React.FC<IThingCardProps> = (props) => {
     <Card bordered={false} title="资产卡片">
       {props.forms.map((form) => {
         return (
-          <div key={form.metadata.id} style={{ paddingBottom: '16px' }}>
+          <div key={form.id} style={{ paddingBottom: '16px' }}>
             <CardDescriptions
               form={form.metadata}
               fieldsValue={formValue}

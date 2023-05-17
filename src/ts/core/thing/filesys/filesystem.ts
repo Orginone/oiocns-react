@@ -1,7 +1,6 @@
-import { schema } from '../../../base';
-import { ITarget } from '../../target/base/target';
-import { ISpeciesItem, SpeciesItem } from '../base/species';
+import { Entity, IEntity } from '@/ts/base/common';
 import { FileSystemItem, IFileSystemItem } from './filesysItem';
+import { IBelong } from '../../target/base/belong';
 
 /** 任务模型 */
 export type TaskModel = {
@@ -13,9 +12,11 @@ export type TaskModel = {
 };
 
 /** 文件系统类型接口 */
-export interface IFileSystem extends ISpeciesItem {
+export interface IFileSystem extends IEntity {
+  /** 归属用户 */
+  belong: IBelong;
   /** 主目录 */
-  home: IFileSystemItem | undefined;
+  home: IFileSystemItem;
   /** 上传任务列表 */
   taskList: TaskModel[];
   /** 任务变更通知 */
@@ -27,13 +28,23 @@ export interface IFileSystem extends ISpeciesItem {
 }
 
 /** 文件系统类型实现 */
-export class FileSystem extends SpeciesItem implements IFileSystem {
-  constructor(_metadata: schema.XSpecies, _current: ITarget) {
-    super(_metadata, _current);
+export class FileSystem extends Entity implements IFileSystem {
+  constructor(_belong: IBelong) {
+    super();
+    this.belong = _belong;
     this._taskIdSet = new Map<string, TaskModel>();
-    this.loadTeamHome();
+    this.home = new FileSystemItem(this, {
+      size: 0,
+      key: '',
+      name: '根目录',
+      isDirectory: true,
+      dateCreated: new Date(),
+      dateModified: new Date(),
+      hasSubDirectories: true,
+    });
   }
-  home: IFileSystemItem | undefined;
+  belong: IBelong;
+  home: IFileSystemItem;
   private _taskIdSet: Map<string, TaskModel>;
   taskChangeNotify?: (taskList: TaskModel[]) => void;
   get taskList(): TaskModel[] {
@@ -51,27 +62,5 @@ export class FileSystem extends SpeciesItem implements IFileSystem {
   taskChanged(id: string, task: TaskModel): void {
     this._taskIdSet.set(id, task);
     this.taskChangeNotify?.apply(this, [this.taskList]);
-  }
-  private async loadTeamHome(): Promise<void> {
-    let root: IFileSystemItem = new FileSystemItem(this, {
-      size: 0,
-      key: '',
-      name: '根目录',
-      isDirectory: true,
-      dateCreated: new Date(),
-      dateModified: new Date(),
-      hasSubDirectories: true,
-    });
-    if (this.current.metadata.belongId != this.current.metadata.id) {
-      const teamRoot = await root.create(this.current.metadata.name);
-      if (teamRoot) {
-        this.home = await teamRoot.create(this.metadata.name);
-      }
-    } else {
-      this.home = root;
-    }
-  }
-  createChildren(_metadata: schema.XSpecies, _current: ITarget): ISpeciesItem {
-    return new FileSystem(_metadata, _current);
   }
 }

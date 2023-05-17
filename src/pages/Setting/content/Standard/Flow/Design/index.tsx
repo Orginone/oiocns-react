@@ -321,7 +321,7 @@ const Design: React.FC<IProps> = ({ current, instance, onBack, IsEdit = true }) 
     if (type == 'flowNode') {
       let flowNode: WorkNodeModel = {
         id: resource.id,
-        defineId: current.metadata.id,
+        defineId: current.id,
         code: resource.nodeId,
         type: resource.type,
         name: resource.name,
@@ -450,7 +450,7 @@ const Design: React.FC<IProps> = ({ current, instance, onBack, IsEdit = true }) 
                   await current.updateDefine({
                     ...current.metadata,
                     resource: resource_,
-                    speciesId: current.workItem.metadata.id,
+                    speciesId: current.workItem.id,
                   })
                 ) {
                   message.success('保存成功');

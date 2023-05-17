@@ -108,11 +108,11 @@ export class UserProvider extends common.Emitter {
           let xTarget = data['Target'] as XTarget;
           let xSubTarget = data['SubTarget'] as XTarget;
           let target = [this._user!, ...this.user!.targets].find(
-            (a) => a.metadata.id == xTarget.id,
+            (a) => a.id == xTarget.id,
           );
           if (target) {
             target.recvTarget(data['Operate'], true, xSubTarget);
-          } else if (this._user?.metadata.id == xSubTarget.id) {
+          } else if (this._user?.id == xSubTarget.id) {
             this._user.recvTarget(data['Operate'], false, xTarget);
           }
         }

@@ -6,6 +6,8 @@ import { IPropClass } from '../store/propclass';
 import { IWorkThing } from '../app/workthing';
 import { XProperty } from '@/ts/base/schema';
 export interface IForm extends common.IEntity {
+  /** 唯一标识 */
+  id: string;
   /** 表单元数据 */
   metadata: schema.XForm;
   /** 表单分类 */
@@ -44,6 +46,9 @@ export class Form extends common.Entity implements IForm {
   species: ISpeciesItem;
   attributes: schema.XAttribute[] = [];
   private _attributeLoaded: boolean = false;
+  get id(): string {
+    return this.metadata.id;
+  }
   async loadPropertys(): Promise<schema.XProperty[]> {
     const result = [];
     for (const item of this.species.current.space.species) {
@@ -65,7 +70,7 @@ export class Form extends common.Entity implements IForm {
   }
   async delete(): Promise<boolean> {
     const res = await kernel.deleteForm({
-      id: this.metadata.id,
+      id: this.id,
       page: PageAll,
     });
     if (res.success) {
@@ -79,7 +84,7 @@ export class Form extends common.Entity implements IForm {
   async loadAttributes(reload: boolean = false): Promise<schema.XAttribute[]> {
     if (!this._attributeLoaded || reload) {
       const res = await kernel.queryFormAttributes({
-        id: this.metadata.id,
+        id: this.id,
         subId: this.species.belongId,
       });
       if (res.success) {
@@ -93,7 +98,7 @@ export class Form extends common.Entity implements IForm {
     data: model.AttributeModel,
     property: XProperty,
   ): Promise<schema.XAttribute | undefined> {
-    data.formId = this.metadata.id;
+    data.formId = this.id;
     data.propId = property.id;
     if (!data.authId || data.authId.length < 5) {
       data.authId = this.species.metadata.authId;
@@ -112,7 +117,7 @@ export class Form extends common.Entity implements IForm {
   ): Promise<boolean> {
     const index = this.attributes.findIndex((i) => i.id === data.id);
     if (index > -1) {
-      data.formId = this.metadata.id;
+      data.formId = this.id;
       if (property) {
         data.propId = property.id;
       }

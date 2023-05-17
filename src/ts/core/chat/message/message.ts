@@ -42,11 +42,11 @@ export class ChatMessage implements IChatMessage {
       }
     }
     const res = await kernel.anystore.aggregate(
-      this.belong.metadata.id,
+      this.belong.id,
       storeCollName.ChatMessage,
       {
         match: {
-          belongId: this.belong.metadata.id,
+          belongId: this.belong.id,
           createTime: {
             _gt_: minTime,
             _lt_: maxTime,

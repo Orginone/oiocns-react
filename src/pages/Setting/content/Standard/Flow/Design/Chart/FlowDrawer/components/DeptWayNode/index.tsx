@@ -36,7 +36,7 @@ const DeptWayNode: React.FC<IProps> = (props) => {
         key: 'EQ',
         label: '=',
         type: dataType.BELONG,
-        val: orgCtrl.user.metadata.id,
+        val: orgCtrl.user.id,
       });
     }
   }, []);
