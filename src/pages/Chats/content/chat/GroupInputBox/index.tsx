@@ -11,6 +11,8 @@ import { filetrText, isShowLink } from '../GroupContent/common';
 import { model, parseAvatar } from '@/ts/base';
 import { FileItemShare } from '@/ts/base/model';
 import { FileTypes } from '@/ts/core/public/consts';
+import PullDown from './component/pullDown';
+import { XTarget } from '@/ts/base/schema';
 
 /**
  * @description: 输入区域
@@ -32,6 +34,11 @@ const Groupinputbox = (props: Iprops) => {
   const [task, setTask] = useState<TaskModel>();
   const [IsCut, setIsCut] = useState<boolean>(false); // 是否截屏
   const [imgUrls, setImgUrls] = useState<Array<string>>([]); // 表情图片
+  const [citePeople, setCitePeople] = useState<XTarget[]>([]); // @人员
+  const [citeShow, setCiteShow] = useState<boolean>(false); // @展示
+  const [optionVal, setOptionVal] = useState<Object>();
+  console.log(optionVal, '------options');
+
   /**
    * @description: 提交聊天内容
    * @return {*}
@@ -44,7 +51,7 @@ const Groupinputbox = (props: Iprops) => {
           ? reCreatChatContent(insterHtml.childNodes ?? [])
           : [insterHtml.innerHTML];
       let massage = text.join('').trim();
-      console.log(massage, 'massgar');
+      console.log(massage, '11111');
 
       if (massage.length > 0) {
         insterHtml.innerHTML = '发送中,请稍后...';
@@ -52,7 +59,6 @@ const Groupinputbox = (props: Iprops) => {
       }
       insterHtml.innerHTML = '';
       closeCite('');
-      console.log('消息内容', text);
     }
   };
 
@@ -257,8 +263,22 @@ const Groupinputbox = (props: Iprops) => {
       } else {
         return message.warning('不能发送空值');
       }
+    } else if (e.key === '@' && chat.members.length > 0) {
+      const members = [];
+      members.push(...chat.members, { id: '00100', name: '所有人' });
+      setCitePeople(members);
+      setCiteShow(true);
+    } else if (e.key === 'Escape') {
+      setCiteShow(false);
     }
   };
+
+  const onSelect = (e: any) => {
+    setCiteShow(false);
+    setOptionVal(e);
+    document.getElementById('insterHtml')?.append(`@${e.children}`);
+  };
+
   /** 文件上传参数 */
   const uploadProps: UploadProps = {
     multiple: false,
@@ -364,9 +384,22 @@ const Groupinputbox = (props: Iprops) => {
             }}
           />
         </div>
+        {/* @功能 */}
+        {/* {citePeople.length > 0 && <PullDown people={citePeople} />} */}
         <div className={'input_content'}>
+          {citePeople.length > 0 && (
+            <PullDown
+              style={{ display: `${!citeShow ? 'none' : 'block'}` }}
+              pullDownRef={(ref: any) => ref && ref.focus()}
+              people={citePeople}
+              open={citeShow}
+              onSelect={onSelect}
+            />
+          )}
           <div
             id="insterHtml"
+            autoFocus={true}
+            ref={(ref) => ref && !citeShow && ref.focus()}
             className={'textarea'}
             contentEditable="true"
             spellCheck="false"
