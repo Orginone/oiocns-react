@@ -76,6 +76,16 @@ const MarketRouter: IRouteConfig[] = [
   },
 ];
 
+/* 模板 */
+const DowloadRouter: IRouteConfig[] = [
+  {
+    path: '/dowload',
+    component: React.lazy(() => import('@/pages/Dowload')),
+    title: '模板',
+    icon: 'icon-myWork',
+  },
+];
+
 const StoreRouter: IRouteConfig[] = [
   {
     path: '/store',
@@ -121,6 +131,7 @@ const Routers: IRouteConfig[] = [
       ...StoreRouter,
       ...MarketRouter,
       ...SettingRouter,
+      ...DowloadRouter,
       {
         path: '/online',
         title: '第三方应用',
