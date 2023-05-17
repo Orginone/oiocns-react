@@ -1,16 +1,18 @@
 /* eslint-disable react/jsx-no-target-blank */
 /* eslint-disable no-unused-vars */
-import { Button, Popover, Image, Spin, Tag } from 'antd';
+import { Button, Popover, Image, Spin } from 'antd';
 import moment from 'moment';
 import React, { useEffect, useRef, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
+import ChatReadPopover from '../ChatReadPopover';
 import css from './index.module.less';
 import { debounce, downloadByUrl, showChatTime } from '@/utils/tools';
 import { FileItemShare } from '@/ts/base/model';
 import orgCtrl from '@/ts/controller';
-import { IMsgChat, MessageType } from '@/ts/core';
+import { IMsgChat, MessageType, msgChatNotify } from '@/ts/core';
 import { model, parseAvatar } from '@/ts/base';
+import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import { filetrText, isShowLink, showCiteText } from './common';
 import ForwardModal from './forwardModal';
 import { IconFont } from '@/components/IconFont';
@@ -38,6 +40,7 @@ interface tagsMsgType {
 let isFirst = false;
 const GroupContent = (props: Iprops) => {
   const { citeText, enterCiteMsg, chat } = props;
+  const [msgKey] = useCtrlUpdate(msgChatNotify);
   const [loading, setLoading] = useState(false);
   const [messages, setMessages] = useState(props.chat.messages);
   const [messagesTags, setMessagesTags] = useState<tagsMsgType>();
@@ -63,7 +66,6 @@ const GroupContent = (props: Iprops) => {
     setMessages([...props.chat.messages]);
     props.chat.onMessage((ms) => {
       // 标记已获取信息为已读
-      console.log('setMessages', ms);
       if (ms.length > 0 && ms[0].belongId !== orgCtrl.user.userId) {
         handleTagMsg(ms);
       }
@@ -286,6 +288,14 @@ const GroupContent = (props: Iprops) => {
       (v) => v.label === '已读' && v.userId !== orgCtrl.user.userId,
     )?.length;
 
+    // 未读人数
+    let NotReadPerson = props.chat.members
+      .filter((item) => !msgTags.some((ia) => item.id === ia.userId))
+      .filter((itez) => itez.id !== orgCtrl.user.userId);
+
+    // 已读人数
+    let readPerson = msgTags.filter((i) => i.userId !== orgCtrl.user.userId);
+
     // 同事之间通信
     if (allMember === -1 || allMember === 0) {
       showText = hasReadNum > 0 ? '已读' : '未读';
@@ -294,10 +304,63 @@ const GroupContent = (props: Iprops) => {
       showText =
         allMember - hasReadNum > 0 ? allMember - hasReadNum + '人未读' : '全部已读';
     }
+
+    // 显示信息
+    const description = (
+      <div className={'read_content'}>
+        <div className={'read_readed'}>
+          <div className="read_readed_title">
+            <span className="read_num">{NotReadPerson.length}</span>&nbsp;人未读
+          </div>
+          {NotReadPerson.map((j, index) => {
+            return (
+              <div key={msgKey + index} className="read_readed_item">
+                <TeamIcon
+                  share={orgCtrl.user.findShareById(j.id)}
+                  preview
+                  size={36}
+                  fontSize={32}
+                />
+                <span className="read_name">
+                  {orgCtrl.user.findShareById(j.id).name}(
+                  {orgCtrl.user.findShareById(j.id).name})
+                </span>
+              </div>
+            );
+          })}
+        </div>
+        <div className={'read_ing'}>
+          <div className="read_ing_title">
+            <span className="read_num">{readPerson.length}</span>&nbsp;人已读
+          </div>
+          {readPerson.map((j, index) => {
+            return (
+              <div key={msgKey + index} className="read_reading_item">
+                <TeamIcon
+                  key={msgKey}
+                  share={orgCtrl.user.findShareById(j.userId)}
+                  preview
+                  size={36}
+                  fontSize={32}
+                />
+                <span className="read_name">
+                  {orgCtrl.user.findShareById(j.userId).name}(
+                  {orgCtrl.user.findShareById(j.userId).name})
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
     return (
-      <span style={{ margin: '4px 10px 0 0', fontSize: '10px', color: '#154ad8' }}>
-        {showText}
-      </span>
+      <>
+        <ChatReadPopover content={description}>
+          <span style={{ margin: '4px 10px 0 0', fontSize: '10px', color: '#154ad8' }}>
+            {showText}
+          </span>
+        </ChatReadPopover>
+      </>
     );
   };
 
