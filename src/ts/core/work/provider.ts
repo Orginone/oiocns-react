@@ -143,22 +143,20 @@ export class WorkProvider implements IWorkProvider {
             comment: comment,
             data: data,
           });
-          if (res.data && status < TaskStatus.RefuseStart && task.relationId != '') {
-            let res = await kernel.queryRelationById({
-              id: task.relationId,
-              page: PageAll,
-            });
-            if (res.success && res.data.target && res.data.team) {
-              let target = this.user.targets.find(
-                (a) => a.metadata.id == res.data.team!.targetId,
+          if (res.data && status < TaskStatus.RefuseStart && task.taskType == '加用户') {
+            let targets = <Array<schema.XTarget>>JSON.parse(task.content);
+            if (targets.length == 2) {
+              let teamTarget = this.user.targets.find(
+                (a) => a.metadata.id == targets[1].id,
               );
-              if (target) {
-                orgCtrl.target.prodRelationChange(
-                  OperateType.Add,
-                  target,
-                  res.data.target,
-                  false,
-                );
+              if (teamTarget) {
+                if (await teamTarget.pullMembers([targets[0]])) {
+                  orgCtrl.target.prodRelationChange(
+                    OperateType.Add,
+                    teamTarget,
+                    targets[0],
+                  );
+                }
               }
             }
           }

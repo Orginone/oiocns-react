@@ -228,6 +228,15 @@ export type MsgSendModel = {
   msgBody: string;
 };
 
+export type TargetMsgModel = {
+  // 接收方Id
+  data: string;
+  // 是否剔除操作人
+  excludeOperater: boolean;
+  // 用户Id
+  targetId: string;
+};
+
 export type MsgTagModel = {
   // 会话ID
   id: string;

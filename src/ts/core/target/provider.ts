@@ -10,7 +10,7 @@ export enum OperateType {
   'Delete' = '删除',
 }
 
-type MessaeModel = {
+type TargetMsgDataModel = {
   operate: OperateType;
   typeName: string;
   target: schema.XTarget;
@@ -59,39 +59,13 @@ export class TargetProvider implements ITargetProvider {
     team: ITeam,
     isExcludeSelf: boolean = true,
   ): Promise<void> {
-    let targetIds = new Set<string>();
-    let teamIds: string[] = [];
-    switch (team.metadata.typeName) {
-      case TargetType.Group:
-        teamIds.push(team.metadata.id);
-        break;
-      case TargetType.Cohort:
-        if (team.space.metadata.typeName != TargetType.Person) {
-          teamIds.push(team.space.metadata.id);
-        }
-        teamIds.push(team.metadata.id);
-        break;
-      case TargetType.Person:
-        teamIds.push(...(team as IPerson).cohorts.map((a) => a.metadata.id));
-        teamIds.push(...(team as IPerson).companys.map((a) => a.metadata.id));
-        break;
-      default:
-        if (team.space) {
-          teamIds.push(team.space.metadata.id);
-        } else {
-          teamIds.push(team.metadata.id);
-        }
-        break;
-    }
-    console.log({
-      teamIds,
-      targetIds,
-      isExcludeSelf,
-      data: {
+    await kernel.createTargetMsg({
+      targetId: team.metadata.id,
+      excludeOperater: isExcludeSelf,
+      data: JSON.stringify({
         operate,
-        typeName: 'Target',
         target: team.metadata,
-      },
+      }),
     });
   }
   async prodRelationChange(
@@ -100,64 +74,53 @@ export class TargetProvider implements ITargetProvider {
     subTarget: schema.XTarget,
     isExcludeSelf: boolean = true,
   ): Promise<void> {
-    let teamIds: string[] = [];
-    let targetIds = new Set<string>();
-    switch (team.metadata.typeName) {
-      case TargetType.Group:
-        teamIds = team.members.map((a) => a.id);
-        teamIds.push(subTarget.id);
-        break;
-      case TargetType.Cohort:
-        if (team.space.metadata.typeName != TargetType.Person) {
-          teamIds.push(team.space.metadata.id);
-        }
-        teamIds.push(team.metadata.id);
-        targetIds.add(subTarget.id);
-        break;
-      case TargetType.Person:
-        targetIds.add(subTarget.id);
-        break;
-      default:
-        if (team.space) {
-          teamIds.push(team.space.metadata.id);
-        } else {
-          teamIds.push(team.metadata.id);
-        }
-        targetIds.add(subTarget.id);
-        break;
+    let targetId = team.metadata.id;
+    if (team.metadata.typeName == TargetType.Person) {
+      targetId = subTarget.id;
     }
-    console.log({
-      targetIds,
-      teamIds,
-      isExcludeSelf,
-      data: {
+    await kernel.createTargetMsg({
+      targetId,
+      excludeOperater: isExcludeSelf,
+      data: JSON.stringify({
         operate,
-        typeName: 'Relation',
         target: team.metadata,
         subTarget,
-      },
+      }),
     });
   }
 
   async _recvTarget(recvData: any) {
-    let data = JSON.parse(recvData) as MessaeModel;
-    let target = this.user.targets.find((a) => a.metadata.id == data.target.id);
-    switch (data.typeName) {
-      case 'Target':
-        target?.recvTarget(data.operate, data.target);
-        break;
-      case 'Relation':
-        let subTarget = [this.user, ...this.user.targets].find(
-          (a) => a.metadata.id == data.subTarget!.id,
-        );
-        if (target) {
-          target.recvRelation(data.operate, true, data.subTarget!);
-        } else if (subTarget) {
-          subTarget.recvRelation(data.operate, false, data.target);
-        }
-        break;
-      default:
-        break;
+    const data = JSON.parse(recvData) as TargetMsgDataModel;
+    if (data) {
+      switch (data.typeName) {
+        case 'Target':
+          for (const target of this.user.targets) {
+            if (target.metadata.id == data.target.id) {
+              target.recvTarget(data.operate, data.target);
+            }
+            const index = target.members.findIndex((a) => a.id == data.target.id);
+            if (index > -1) {
+              target.members[index] = data.target;
+            }
+          }
+          break;
+        case 'Relation':
+          let subTarget = [this.user, ...this.user.companys].find(
+            (a) => a.metadata.id == data.subTarget!.id,
+          );
+          if (subTarget) {
+            subTarget.recvRelation(data.operate, false, data.target);
+            return;
+          }
+          for (const target of this.user.targets) {
+            if (target.metadata.id == data.target.id) {
+              target.recvRelation(data.operate, true, data.subTarget!);
+            }
+          }
+          break;
+        default:
+          break;
+      }
     }
   }
 }

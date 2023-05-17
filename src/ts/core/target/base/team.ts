@@ -41,7 +41,12 @@ export interface ITeam extends IMsgChat {
    * @param isTeam 是否是主体容易
    * @param target 变更的用户
    */
-  recvRelation(operate: string, isTeam: boolean, target: schema.XTarget): void;
+  recvRelation(
+    operate: string,
+    isTeam: boolean,
+    curTarget: schema.XTarget,
+    newTarget?: schema.XTarget,
+  ): void;
   /** 加载成员会话 */
   loadMemberChats(newMembers: schema.XTarget[], _isAdd: boolean): void;
   /** 判断是否拥有某些权限 */

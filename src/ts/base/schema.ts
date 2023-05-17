@@ -1258,8 +1258,8 @@ export type XWorkTask = {
   shareId: string;
   // 归属组织Id
   belongId: string;
-  // 关系Id
-  relationId: string;
+  // 申请组织Id
+  applyId: string;
   // 办事实例id
   instanceId: string;
   // 身份Id

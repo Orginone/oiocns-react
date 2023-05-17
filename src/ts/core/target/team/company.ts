@@ -319,7 +319,7 @@ export class Company extends Belong implements ICompany {
             this.cohorts = this.cohorts.filter((a) => a.metadata.id != target.id);
           }
         } else if (target.typeName == TargetType.Group) {
-          this.groups = this.groups.filter((a) => a.metadata.id == target.id);
+          this.groups = this.groups.filter((a) => a.metadata.id != target.id);
         }
         break;
       default:
