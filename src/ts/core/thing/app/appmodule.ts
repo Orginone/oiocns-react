@@ -2,20 +2,21 @@ import { schema } from '../../../base';
 import { SpeciesType } from '../../public/enums';
 import { ITarget } from '../../target/base/target';
 import { ISpeciesItem, SpeciesItem } from '../base/species';
-import { WorkForm } from './work/workform';
+import { IWorkForm, WorkForm } from './work/workform';
 import { WorkItem } from './work/workitem';
 import { ReportBI } from './work/reportbi';
 import { IForm } from '../base/form';
 import { IWork, IWorkDefine } from '../base/work';
+import { IApplication } from './application';
 export interface IAppModule extends ISpeciesItem {
+  /** 模块应用 */
+  appliction: IApplication;
   /** 所有办事项 */
   defines: IWorkDefine[];
   /** 表单 */
-  loadForms(): Promise<schema.XForm[]>;
+  loadForms(): Promise<IForm[]>;
   /** 查询所有办事 */
   loadWorkDefines(): Promise<IWorkDefine[]>;
-  /** 表单特性 */
-  loadAttributes(): Promise<schema.XAttribute[]>;
 }
 
 export class AppModule extends SpeciesItem implements IAppModule {
@@ -34,37 +35,37 @@ export class AppModule extends SpeciesItem implements IAppModule {
       }
     }
     this.parent = _parent;
+    this.appliction = _parent || this;
   }
+  appliction: IApplication;
   defines: IWorkDefine[] = [];
-  async loadForms(): Promise<schema.XForm[]> {
-    const result: schema.XForm[] = [];
+  async loadForms(): Promise<IForm[]> {
+    const result: IForm[] = [];
+    if (this.parent) {
+      result.push(...(await (this.parent as IAppModule).loadForms()));
+    }
     for (const item of this.children) {
       switch (item.metadata.typeName) {
         case SpeciesType.WorkForm:
-          await (item as IForm).loadForms();
-          result.push(...(item as IForm).forms);
-          break;
-        case SpeciesType.AppModule:
-          result.push(...(await (item as IAppModule).loadForms()));
+          result.push(...(await (item as IWorkForm).loadForms()));
           break;
       }
     }
     return result;
   }
-  async loadAttributes(): Promise<schema.XAttribute[]> {
-    const result: schema.XAttribute[] = [];
+  async loadWorkDefines(): Promise<IWorkDefine[]> {
+    this.defines = [];
     for (const item of this.children) {
       switch (item.metadata.typeName) {
-        case SpeciesType.WorkForm:
-          await (item as IForm).loadAttributes();
-          result.push(...(item as IForm).attributes);
+        case SpeciesType.WorkItem:
+          this.defines.push(...(await (item as IWork).loadWorkDefines()));
           break;
         case SpeciesType.AppModule:
-          result.push(...(await (item as IAppModule).loadAttributes()));
+          this.defines.push(...(await (item as IAppModule).loadWorkDefines()));
           break;
       }
     }
-    return result;
+    return this.defines;
   }
   override createChildren(
     _metadata: schema.XSpecies,
@@ -80,19 +81,5 @@ export class AppModule extends SpeciesItem implements IAppModule {
       case SpeciesType.AppModule:
         return new AppModule(_metadata, _current, this);
     }
-  }
-  async loadWorkDefines(): Promise<IWorkDefine[]> {
-    this.defines = [];
-    for (const item of this.children) {
-      switch (item.metadata.typeName) {
-        case SpeciesType.WorkItem:
-          this.defines.push(...(await (item as IWork).loadWorkDefines()));
-          break;
-        case SpeciesType.AppModule:
-          this.defines.push(...(await (item as IAppModule).loadWorkDefines()));
-          break;
-      }
-    }
-    return this.defines;
   }
 }

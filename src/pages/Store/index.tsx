@@ -9,7 +9,7 @@ import { ProFormInstance } from '@ant-design/pro-components';
 import * as config from './config/menuOperate';
 import useMenuUpdate from '@/hooks/useMenuUpdate';
 import SelectOperation from '../Setting/content/Standard/Flow/Comp/SelectOperation';
-import OioForm from '@/bizcomponents/FormDesign/Design/OioForm';
+import OioForm from '@/bizcomponents/FormDesign/OioForm';
 /** 存储模块 */
 const Package: React.FC = () => {
   const formRef = useRef<ProFormInstance<any>>();
@@ -102,7 +102,6 @@ const Package: React.FC = () => {
                 style: { display: 'none' },
               },
             }}
-            belong={selectMenu.item.space}
           />
         </Modal>
       )}

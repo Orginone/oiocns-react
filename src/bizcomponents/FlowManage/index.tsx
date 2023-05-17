@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import { TreeProps } from 'antd';
-import StoreClassifyTree from '@/components/CustomTreeComp';
+import CustomTree from '@/components/CustomTree';
 import React, { useState, useEffect } from 'react';
 import ShareShowComp from './ShareShowComp';
 import cls from './index.module.less';
@@ -223,7 +223,7 @@ const FlowSelect = (props: Iprops) => {
     <div id={key} className={cls.layout}>
       <div className={cls.content}>
         <div className={`${props.multiple ? cls.leftContent : cls.newLeftContent}`}>
-          <StoreClassifyTree
+          <CustomTree
             className={cls.docTree}
             isDirectoryTree
             searchable
@@ -233,7 +233,7 @@ const FlowSelect = (props: Iprops) => {
           />
         </div>
         <div className={`${props.multiple ? cls.center : cls.newCenter}`}>
-          <StoreClassifyTree
+          <CustomTree
             className={cls.docTree}
             searchable
             showIcon
@@ -243,7 +243,7 @@ const FlowSelect = (props: Iprops) => {
           />
         </div>
         <div className={`${props.multiple ? cls.center : cls.newCenter}`}>
-          <StoreClassifyTree
+          <CustomTree
             className={cls.docTree}
             searchable
             showIcon

@@ -26,6 +26,14 @@ export type MsgChatData = {
   /** 最新消息 */
   lastMessage?: model.MsgSaveModel;
 };
+
+// 标签类型
+interface tagsMsgType {
+  belongId: string;
+  id: string;
+  ids: string[];
+  tags: string[];
+}
 // 消息类会话接口
 export interface IMsgChat extends common.IEntity {
   /** 消息类会话元数据 */
@@ -66,6 +74,10 @@ export interface IMsgChat extends common.IEntity {
   recallMessage(id: string): Promise<void>;
   /** 标记消息 */
   tagMessage(ids: string[], tags: string[]): Promise<void>;
+  /** 标记已读消息 */
+  tagHasReadMsg(ms: model.MsgSaveModel[]): void;
+  /** 重写消息标记信息 */
+  overwriteMessagesTags(tag: tagsMsgType): void;
   /** 删除消息 */
   deleteMessage(id: string): Promise<boolean>;
   /** 清空历史记录 */
@@ -116,6 +128,7 @@ export abstract class MsgChat extends common.Entity implements IMsgChat {
   members: schema.XTarget[] = [];
   chatdata: MsgChatData;
   memberChats: PersonMsgChat[] = [];
+  _newTagInfo: string[] = [];
   private messageNotify?: (messages: model.MsgSaveModel[]) => void;
   get isMyChat(): boolean {
     if (this.chatdata.noReadCount > 0 || this.share.typeName === TargetType.Person) {
@@ -131,8 +144,8 @@ export abstract class MsgChat extends common.Entity implements IMsgChat {
     if (this.chatdata.noReadCount > 0) {
       this.chatdata.noReadCount = 0;
       msgChatNotify.changCallback();
+      this.cache();
     }
-    this.cache();
     if (this.messages.length < 10) {
       this.moreMessage();
     }
@@ -206,9 +219,7 @@ export abstract class MsgChat extends common.Entity implements IMsgChat {
     }
   }
   async tagMessage(ids: string[], tags: string[]): Promise<void> {
-    ids = Array.from(
-      new Set(this.messages.filter((i) => ids.includes(i.id)).map((i) => i.id)),
-    );
+    ids = this.messages.filter((i) => ids.includes(i.id)).map((i) => i.id);
     if (ids.length > 0 && tags.length > 0) {
       await kernel.tagImMsg({
         ids: ids,
@@ -218,6 +229,53 @@ export abstract class MsgChat extends common.Entity implements IMsgChat {
       });
     }
   }
+  // 标记已读信息 //TODO: 通过Intersection Observer来实现监听 是否进入可视区域
+  tagHasReadMsg(ms: model.MsgSaveModel[]) {
+    // 是否标记权限设置
+    if (!this.isMyChat) {
+      return;
+    }
+    //  获取未打标签数据
+    const needTagMsgs = ms.filter((v) => {
+      // 非当前会话de信息 或者自己发出的消息 不加标记
+      if (this.belongId !== v.belongId || v.fromId === this.userId) {
+        return false;
+      }
+      // 会话信息是否包含标签
+      if (!v?.tags) {
+        return true;
+      }
+      // 会话标签信息 不包含自己标记已读标签
+      return !v.tags.some((s) => s.userId === this.userId && s.label === '已读');
+    });
+    // 过滤消息  过滤条件 belongId 不属于个人的私有消息；消息已有标签中没有自己打的‘已读’标签
+    // console.log('获取未打标签数据', needTagMsgs, this.userId);
+    if (needTagMsgs.length > 0) {
+      const willtagMsgIds: string[] = Array.from(new Set(needTagMsgs.map((v) => v.id)));
+      //拦截重复提交
+      if (this._newTagInfo.join('-') === willtagMsgIds.join('-')) {
+        console.log('拦截重复提交tag');
+        return;
+      }
+      this._newTagInfo = willtagMsgIds;
+      // 触发事件
+      this.tagMessage(willtagMsgIds, ['已读']);
+    }
+  }
+  // 根据tags反馈重写 消息体 标记信息
+  overwriteMessagesTags = (newTag: tagsMsgType) => {
+    if (newTag.id !== this.chatId) {
+      return;
+    }
+    this.messages = this.messages.map((msg) => {
+      //暂时无法从tag ids精确匹配消息临时处理 && newTag.ids.includes(msg.id) &&
+      if (newTag.tags[0] === '已读' && !msg?.tags) {
+        msg['tags'] = [{ label: '已读', userId: newTag.id, time: '' }];
+      }
+      return msg;
+    });
+    this.messageNotify?.apply(this, [this.messages]);
+  };
   async deleteMessage(id: string): Promise<boolean> {
     const res = await kernel.anystore.remove('0', hisMsgCollName, {
       chatId: id,
@@ -277,6 +335,7 @@ export abstract class MsgChat extends common.Entity implements IMsgChat {
       item.showTxt = common.StringPako.inflate(item.msgBody);
       this.messages.unshift(item);
     });
+
     if (this.chatdata.lastMsgTime === nullTime && msgs.length > 0) {
       this.chatdata.lastMsgTime = new Date(msgs[0].createTime).getTime();
     }

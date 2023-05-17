@@ -1,13 +1,12 @@
 import React, { useEffect, ChangeEvent, useState, useRef } from 'react';
-import { Modal, Spin, Image, Empty } from 'antd';
+import { Modal, Spin, Image, Button, Empty } from 'antd';
+import { DownloadOutlined } from '@ant-design/icons';
 import { animateScroll } from 'react-scroll';
 import SearchInput from '@/components/SearchInput';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
-import { IconFont } from '@/components/IconFont';
 import { IMsgChat, MessageType } from '@/ts/core';
 import { FileItemShare } from '@/ts/base/model';
 import { model, parseAvatar } from '@/ts/base';
-import { FileTypes } from '@/ts/core/public/consts';
 import orgCtrl from '@/ts/controller';
 import { filetrText, isShowLink } from '../GroupContent/common';
 import { showChatTime } from '@/utils/tools';
@@ -131,39 +130,15 @@ const ChatHistoryModal: React.FC<Iprops> = ({ open, title, onCancel, chat, filte
       }
       case MessageType.File: {
         const file: FileItemShare = parseAvatar(item.showTxt);
-        const showSize: (size: number) => string = (size) => {
-          if (size > 1024000) {
-            return (size / 1024000).toFixed(2) + 'M';
-          } else {
-            return (size / 1024).toFixed(2) + 'KB';
-          }
-        };
-        const showFileIcon: (fileName: string) => string = (fileName) => {
-          const parts = fileName.split('.');
-          const fileTypeStr: string = parts[parts.length - 1];
-          const iconName = FileTypes[fileTypeStr] ?? 'icon-weizhi';
-          return iconName;
-        };
         return (
           <>
             <div className={`${ChatHistoryStyle.con_content_link}`}></div>
-            <div className={`${ChatHistoryStyle.con_content_file}`}>
-              {/* <Image src={file.thumbnail} preview={{ src: file.shareLink }} /> */}
-              {/* <Button type="primary" icon={<DownloadOutlined />}>
-              {file.name}
-            </Button> */}
-              <div className={ChatHistoryStyle.con_content_file_info}>
-                <span className={ChatHistoryStyle.con_content_file_info_label}>
-                  {file.name}
-                </span>
-                <span className={ChatHistoryStyle.con_content_file_info_value}>
-                  {showSize(file?.size ?? 0)}
-                </span>
-              </div>
-              <IconFont
-                className={ChatHistoryStyle.con_content_file_Icon}
-                type={showFileIcon(file.name)}
-              />
+            <div
+              className={`${ChatHistoryStyle.con_content_file} ${ChatHistoryStyle.con_content_img}`}>
+              <Image src={file.thumbnail} preview={{ src: file.shareLink }} />
+              <Button type="primary" icon={<DownloadOutlined />}>
+                {file.name}
+              </Button>
             </div>
           </>
         );
@@ -187,19 +162,13 @@ const ChatHistoryModal: React.FC<Iprops> = ({ open, title, onCancel, chat, filte
               <div className={`${ChatHistoryStyle.con_content_link}`}></div>
               <div className={`${ChatHistoryStyle.con_content_txt}`}>
                 {imgUrls.map((url, idx) => (
-                  <Image
-                    className={ChatHistoryStyle.cut_img}
-                    src={url}
-                    key={idx}
-                    preview={{ src: url }}
-                  />
+                  <Image src={url} key={idx} preview={{ src: url }} />
                 ))}
                 {str.trim() && <p style={{ whiteSpace: 'pre-wrap', margin: 0 }}>{str}</p>}
               </div>
             </>
           );
         }
-        // 默认文本展示
         return (
           <>
             <div className={`${ChatHistoryStyle.con_content_link}`}></div>

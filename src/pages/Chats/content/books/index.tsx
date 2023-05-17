@@ -28,7 +28,7 @@ const Book: React.FC<any> = ({
   const [isSupervise, setIsSupervise] = useState<boolean>(false); // 是否有超管权限
   const [msgKey] = useCtrlUpdate(msgChatNotify);
   if (chats === undefined) {
-    chats = orgCtrl.user.chats.filter((i) => i.isMyChat);
+    chats = orgCtrl.chat.chats.filter((i) => i.isMyChat);
   }
   chats = chats
     .filter(

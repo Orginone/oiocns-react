@@ -1,13 +1,13 @@
 import { common, kernel, model, parseAvatar, schema } from '../../../base';
 import { PageAll, ShareIdSet } from '../../public/consts';
-import { IBelong } from '../../target/base/belong';
+import { DictClass } from './dictclass';
 
 /** 元数据字典接口 */
 export interface IDict extends common.IEntity {
   /** 数据实体 */
   metadata: schema.XDict;
   /** 加载权限的自归属用户 */
-  space: IBelong;
+  species: DictClass;
   /** 共享信息 */
   share: model.ShareIcon;
   /** 字典项 */
@@ -28,9 +28,9 @@ export interface IDict extends common.IEntity {
 
 /** 元数据字典实现 */
 export class Dict extends common.Entity implements IDict {
-  constructor(_metadata: schema.XDict, _space: IBelong) {
+  constructor(_metadata: schema.XDict, _species: DictClass) {
     super();
-    this.space = _space;
+    this.species = _species;
     this.metadata = _metadata;
     this.share = {
       name: this.metadata.name,
@@ -39,14 +39,14 @@ export class Dict extends common.Entity implements IDict {
     };
     ShareIdSet.set(this.metadata.id, this.share);
   }
-  space: IBelong;
+  species: DictClass;
   share: model.ShareIcon;
   metadata: schema.XDict;
   items: schema.XDictItem[] = [];
   private _itemLoaded: boolean = false;
   async update(data: model.DictModel): Promise<boolean> {
     data.id = this.metadata.id;
-    data.belongId = this.space.metadata.id;
+    data.speciesId = this.species.metadata.id;
     const res = await kernel.updateDict(data);
     if (res.success && res.data?.id) {
       this.metadata = res.data;
@@ -59,7 +59,7 @@ export class Dict extends common.Entity implements IDict {
       page: PageAll,
     });
     if (res.success) {
-      this.space.dicts = this.space.dicts.filter((i) => i.key != this.key);
+      this.species._propertyChanged('deleted', [this]);
     }
     return res.success;
   }

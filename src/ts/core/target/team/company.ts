@@ -132,6 +132,7 @@ export class Company extends Belong implements ICompany {
     const metadata = await this.create(data);
     if (metadata) {
       const department = new Department(metadata, this);
+      await department.deepLoad();
       if (await this.pullSubTarget(department)) {
         this.departments.push(department);
         return department;
@@ -210,6 +211,9 @@ export class Company extends Belong implements ICompany {
     for (const item of this.stations) {
       chats.push(...item.chats);
     }
+    for (const item of this.cohorts) {
+      chats.push(...item.chats);
+    }
     if (this.superAuth) {
       chats.push(...this.superAuth.chats);
     }
@@ -226,30 +230,72 @@ export class Company extends Belong implements ICompany {
     return targets;
   }
   override loadMemberChats(_newMembers: schema.XTarget[], _isAdd: boolean): void {
-    _newMembers
-      .filter((i) => i.id != this.user.metadata.id)
-      .forEach((i) => {
-        if (_isAdd) {
-          this.memberChats.push(
-            new PersonMsgChat(
-              this.user.metadata.id,
-              this.metadata.id,
-              i.id,
-              {
-                name: i.name,
-                typeName: i.typeName,
-                avatar: parseAvatar(i.icon),
-              },
-              [this.metadata.name, '同事'],
-              i.remark,
-            ),
-          );
-        } else {
-          this.memberChats = this.memberChats.filter(
-            (a) => !(a.belongId === i.id && a.chatId === i.id),
-          );
-        }
+    _newMembers = _newMembers.filter((i) => i.id != this.user.metadata.id);
+    if (_isAdd) {
+      _newMembers.forEach((i) => {
+        this.memberChats.push(
+          new PersonMsgChat(
+            this.user.metadata.id,
+            this.metadata.id,
+            i.id,
+            {
+              name: i.name,
+              typeName: i.typeName,
+              avatar: parseAvatar(i.icon),
+            },
+            [this.metadata.name, '同事'],
+            i.remark,
+          ),
+        );
       });
+    } else {
+      let chats: PersonMsgChat[] = [];
+      this.memberChats.forEach((a) => {
+        _newMembers.forEach((i) => {
+          if (a.chatId != i.id) {
+            chats.push(a);
+          }
+        });
+      });
+      this.memberChats = chats;
+    }
+  }
+  override recvTarget(operate: string, isChild: boolean, target: schema.XTarget): void {
+    super.recvTarget(operate, isChild, target);
+    switch (operate) {
+      case 'Add':
+        if (isChild) {
+          if (this.departmentTypes.includes(target.typeName as TargetType)) {
+            let department = new Department(target, this);
+            department.deepLoad();
+            this.departments.push(department);
+          }
+          if ((target.typeName as TargetType) == TargetType.Station) {
+            let station = new Station(target, this);
+            station.deepLoad();
+            this.stations.push(station);
+          }
+        } else if (target.typeName == TargetType.Group) {
+          let group = new Group(target, this);
+          group.deepLoad(true);
+          this.groups.push(group);
+        }
+        break;
+      case 'Remove':
+        if (isChild) {
+          if (this.departmentTypes.includes(target.typeName as TargetType)) {
+            this.departments = this.departments.filter((a) => a.metadata.id != target.id);
+          }
+          if ((target.typeName as TargetType) == TargetType.Station) {
+            this.stations = this.stations.filter((a) => a.metadata.id != target.id);
+          }
+        } else if (target.typeName == TargetType.Group) {
+          this.groups = this.groups.filter((a) => a.metadata.id == target.id);
+        }
+        break;
+      default:
+        break;
+    }
   }
   async deepLoad(reload: boolean = false): Promise<void> {
     await this.loadGroups(reload);
@@ -258,7 +304,6 @@ export class Company extends Belong implements ICompany {
     await this.loadCohorts(reload);
     await this.loadMembers(reload);
     await this.loadSuperAuth(reload);
-    await this.loadDicts(reload);
     await this.loadSpecies(reload);
     for (const group of this.groups) {
       await group.deepLoad(reload);

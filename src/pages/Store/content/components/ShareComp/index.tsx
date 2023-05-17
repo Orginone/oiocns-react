@@ -6,7 +6,7 @@ import ShareShowComp from '../ShareShowComp';
 import cls from './index.module.less';
 import orgCtrl from '@/ts/controller';
 import { ICompany, IResource, ITarget } from '@/ts/core';
-import CustomTree from '@/components/CustomTreeComp';
+import CustomTree from '@/components/CustomTree';
 interface Iprops {
   shareType: '分配' | '共享';
   onCheckeds?: (

@@ -6,13 +6,14 @@ import { MenuItemType, OperateMenuType } from 'typings/globelType';
 import { GroupMenuType, MenuType } from './menuType';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 import {
+  ICommodity,
   IFileSystem,
   IFileSystemItem,
-  IForm,
   IPropClass,
   ISpeciesItem,
   ITarget,
   IWork,
+  IWorkForm,
   SpeciesType,
 } from '@/ts/core';
 import OrgIcons from '@/bizcomponents/GlobalComps/orgIcons';
@@ -32,7 +33,7 @@ const buildFileSysTree = (targets: IFileSystemItem[]) => {
         icon: <im.ImFolder color="#c09553" />,
         expIcon: <im.ImFolderOpen color="#c09553" />,
         children: buildFileSysTree(item.children),
-        clickEvent: async () => {
+        beforeLoad: async () => {
           await item.loadChildren();
         },
       });
@@ -95,63 +96,94 @@ export const loadFileSysItemMenus = (rightClick: boolean = false) => {
 const buildSpeciesTree = (species: ISpeciesItem[]): MenuItemType[] => {
   const result: MenuItemType[] = [];
   for (const item of species) {
-    switch (item.metadata.typeName) {
-      case SpeciesType.FileSystem:
-        {
-          const filesys = item as IFileSystem;
+    if (item.metadata.typeName === SpeciesType.WorkForm) {
+      result.push(buildFormMenu(item as IWorkForm));
+    } else {
+      switch (item.metadata.typeName) {
+        case SpeciesType.FileSystem:
+          {
+            const filesys = item as IFileSystem;
+            result.push({
+              key: item.key,
+              item: filesys.home,
+              label: item.metadata.name,
+              icon: (
+                <TeamIcon notAvatar={true} share={item.share} size={18} fontSize={16} />
+              ),
+              itemType: MenuType.FileSystemItem,
+              menus: loadFileSysItemMenus(),
+              tag: [item.metadata.typeName],
+              children: buildFileSysTree(filesys.home ? filesys.home.children : []),
+              beforeLoad: async () => {
+                await filesys.home?.loadChildren();
+              },
+            });
+          }
+          break;
+        case SpeciesType.Store:
+        case SpeciesType.Market:
+        case SpeciesType.WorkForm:
+        case SpeciesType.AppModule:
+        case SpeciesType.Commodity:
+        case SpeciesType.Application:
           result.push({
             key: item.key,
-            item: filesys.home,
+            item: item,
             label: item.metadata.name,
             icon: (
               <TeamIcon notAvatar={true} share={item.share} size={18} fontSize={16} />
             ),
-            itemType: MenuType.FileSystemItem,
-            menus: loadFileSysItemMenus(),
+            itemType: MenuType.Species,
+            menus: [],
             tag: [item.metadata.typeName],
-            children: buildFileSysTree(filesys.home ? filesys.home.children : []),
-            clickEvent: async () => {
-              await filesys.home?.loadChildren();
+            children: buildSpeciesTree(item.children),
+            beforeLoad: async () => {
+              switch (item.metadata.typeName) {
+                case SpeciesType.Market:
+                case SpeciesType.WorkItem:
+                  await (item as IWork).loadWorkDefines();
+                  break;
+                case SpeciesType.Commodity:
+                  await (item as ICommodity).loadForm();
+                  break;
+                case SpeciesType.Store:
+                  await (item as IPropClass).loadPropertys();
+                  break;
+              }
             },
           });
-        }
-        break;
-      case SpeciesType.Store:
-      case SpeciesType.Market:
-      case SpeciesType.WorkForm:
-      case SpeciesType.AppModule:
-      case SpeciesType.Commodity:
-      case SpeciesType.Application:
-        result.push({
-          key: item.key,
-          item: item,
-          label: item.metadata.name,
-          icon: <TeamIcon notAvatar={true} share={item.share} size={18} fontSize={16} />,
-          itemType: MenuType.Species,
-          menus: [],
-          tag: [item.metadata.typeName],
-          children: buildSpeciesTree(item.children),
-          clickEvent: async () => {
-            switch (item.metadata.typeName) {
-              case SpeciesType.Market:
-              case SpeciesType.WorkItem:
-                await (item as IWork).loadWorkDefines();
-                break;
-              case SpeciesType.WorkForm:
-              case SpeciesType.Commodity:
-                await (item as IForm).loadAttributes();
-                await (item as IForm).loadForms();
-                break;
-              case SpeciesType.Store:
-                await (item as IPropClass).loadPropertys();
-                break;
-            }
-          },
-        });
-        break;
+          break;
+      }
     }
   }
   return result;
+};
+
+/** 编译表单项菜单 */
+const buildFormMenu = (form: IWorkForm): MenuItemType => {
+  return {
+    key: form.key,
+    item: form,
+    label: form.metadata.name,
+    tag: [form.metadata.typeName],
+    icon: <TeamIcon share={form.share} size={18} fontSize={16} />,
+    itemType: MenuType.Species,
+    children: form.forms.map((i) => {
+      return {
+        key: i.key,
+        item: i,
+        label: i.metadata.name,
+        icon: <TeamIcon share={form.share} size={18} fontSize={16} />,
+        itemType: MenuType.Form,
+        beforeLoad: async () => {
+          await i.loadAttributes();
+        },
+      } as MenuItemType;
+    }),
+    beforeLoad: async () => {
+      await form.loadForms();
+    },
+  };
 };
 
 /** 编译组织树 */

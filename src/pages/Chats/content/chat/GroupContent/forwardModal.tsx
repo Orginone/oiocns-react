@@ -30,13 +30,15 @@ const ForwardModal: React.FC<ModalPageProps> = (props) => {
   const allUser = orgCtrl.user.chats.filter((i) => i.isMyChat);
   // 这里是页面状态
   const [sendData, setSendData] = useState<Array<forwardType>>([]); // 需要传输的卡片
+  const [filterCode, setFilterCode] = useState('');
 
   // 确认按钮
   const okHandle = async () => {
     // TODO 可以在这里做一些组件内部的事，再调用回调
+    let allPromise: Array<string> = [];
     for (let index = 0; index < sendData.length; index++) {
       const element = sendData[index];
-      await kernel
+      kernel
         .createImMsg({
           msgType: formwardCode.msgType,
           toId: element.toId,
@@ -47,12 +49,14 @@ const ForwardModal: React.FC<ModalPageProps> = (props) => {
         })
         .then((value: ResultType<boolean>) => {
           if (value.success) {
-            message.success('消息转发成功');
-            onCancel();
+            allPromise.push(element.toId);
           }
         });
     }
-
+    Promise.all(allPromise).then(() => {
+      message.success('消息转发成功');
+      onCancel();
+    });
     // onOk();
   };
 
@@ -204,17 +208,18 @@ const ForwardModal: React.FC<ModalPageProps> = (props) => {
             style={{ height: 36, fontSize: 14, marginTop: '10px' }}
             placeholder="搜索"
             prefix={<ImSearch />}
+            allowClear
+            onChange={(e) => {
+              setFilterCode(e.target.value);
+            }}
           />
           <Divider />
           <div className={style.leftContent}>
-            {allUser.map((item) => {
-              return (
+            {allUser
+              .filter((res) => res?.chatdata?.chatName?.includes(filterCode))
+              .map((item) => (
                 <div className={style.leftContentUser} key={item.chatId}>
-                  <Checkbox
-                    onChange={(e) => handleCheck(item, e)}
-                    key={item.chatId}
-                    // checked={item.chatdata.fullId}
-                  >
+                  <Checkbox onChange={(e) => handleCheck(item, e)} key={item.chatId}>
                     <div className={style.leftCheckSpan}>
                       <p className={style.leftText}>{item.chatdata.chatName}</p>
                       {item.chatdata.labels
@@ -229,8 +234,7 @@ const ForwardModal: React.FC<ModalPageProps> = (props) => {
                     </div>
                   </Checkbox>
                 </div>
-              );
-            })}
+              ))}
           </div>
         </Col>
         <Col span={14}>

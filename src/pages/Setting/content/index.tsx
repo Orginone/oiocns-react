@@ -5,6 +5,8 @@ import AgencySetting from './Agency';
 import CohortSetting from './Cohort';
 import PersonSetting from './Person';
 import StandardSetting from './Standard';
+import WorkForm from './Standard/WorkForm';
+import Attribute from './Standard/Attribute';
 import { MenuItemType } from 'typings/globelType';
 import DictSetting from './Dict';
 import AuthoritySetting from './Authority';
@@ -32,6 +34,15 @@ const ContentIndex = ({ selectMenu }: IProps) => {
       return <DictSetting current={selectMenu.item} />;
     case MenuType.Authority:
       return <AuthoritySetting current={selectMenu.item} />;
+    case MenuType.Form:
+      return <WorkForm current={selectMenu.item} />;
+    case MenuType.Property:
+      return (
+        <Attribute
+          current={selectMenu.item.species}
+          property={selectMenu.item.property}
+        />
+      );
     default:
       if (companyTypes.includes(selectMenu.itemType as TargetType)) {
         return <CompanySetting current={selectMenu.item} />;

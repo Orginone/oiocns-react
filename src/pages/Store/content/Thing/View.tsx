@@ -3,11 +3,12 @@ import React from 'react';
 import { ImUndo2 } from 'react-icons/im';
 import ThingArchive from './Archive';
 import ThingCard from './Card';
-import { ISpeciesItem, IWorkForm } from '@/ts/core';
+import { IForm } from '@/ts/core';
 
 interface IThingViewProps {
   thingId: string;
-  species: ISpeciesItem;
+  belongId: string;
+  forms: IForm[];
   setTabKey?: (tabKey: number) => void;
 }
 
@@ -15,29 +16,39 @@ interface IThingViewProps {
  * 物-查看
  * @returns
  */
-const ThingView: React.FC<IThingViewProps> = ({ thingId, species, setTabKey }) => {
+const ThingView: React.FC<IThingViewProps> = (props) => {
+  const getItems = () => {
+    const items = [
+      {
+        key: '2',
+        label: `归档痕迹`,
+        children: <ThingArchive thingId={props.thingId} belongId={props.belongId} />,
+      },
+    ];
+    if (props.forms.length > 0) {
+      items.unshift({
+        key: '1',
+        label: `卡片信息`,
+        children: (
+          <ThingCard
+            thingId={props.thingId}
+            forms={props.forms}
+            belongId={props.belongId}
+          />
+        ),
+      });
+    }
+    return items;
+  };
   return (
     <Card>
       <Tabs
-        items={[
-          {
-            key: '1',
-            label: `资产卡片`,
-            children: <ThingCard thingId={thingId} species={species as IWorkForm} />,
-          },
-          {
-            key: '2',
-            label: `归档痕迹`,
-            children: <ThingArchive thingId={thingId} species={species} />,
-          },
-        ]}
+        items={getItems()}
         tabBarExtraContent={
           <div
             style={{ display: 'flex', cursor: 'pointer' }}
             onClick={() => {
-              if (setTabKey) {
-                setTabKey(0);
-              }
+              props.setTabKey?.apply(this, [0]);
             }}>
             <a style={{ paddingTop: '2px' }}>
               <ImUndo2 />

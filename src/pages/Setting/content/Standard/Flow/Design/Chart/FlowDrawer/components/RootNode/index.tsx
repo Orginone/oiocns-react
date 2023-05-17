@@ -9,7 +9,7 @@ import SelectOperation from '@/pages/Setting/content/Standard/Flow/Comp/SelectOp
 import { AiOutlineSetting } from 'react-icons/ai';
 import SelectAuth from '../../../../../Comp/selectAuth';
 import { IAppModule } from '@/ts/core/thing/app/appmodule';
-import ViewFormModal from '@/bizcomponents/FormDesign/Design/viewFormModal';
+import ViewFormModal from '@/bizcomponents/FormDesign/viewFormModal';
 interface IProps {
   current: NodeType;
   orgId?: string;

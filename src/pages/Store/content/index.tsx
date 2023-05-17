@@ -6,7 +6,7 @@ import ThingIndex from '@/pages/Store/content/Thing';
 import TaskListComp from '../components/TaskListComp';
 import { Badge, Typography } from 'antd';
 import { FaTasks } from 'react-icons/fa';
-import { ISpeciesItem, SpeciesType } from '@/ts/core';
+import { ICommodity, IForm, IPropClass, ISpeciesItem, SpeciesType } from '@/ts/core';
 
 interface IProps {
   selectMenu: MenuItemType;
@@ -22,13 +22,56 @@ const ContentIndex = (props: IProps) => {
       {
         const species = props.selectMenu.item as ISpeciesItem;
         switch (species.metadata.typeName) {
-          case SpeciesType.Store:
-          case SpeciesType.WorkForm:
-          case SpeciesType.Commodity:
-            return <ThingIndex species={props.selectMenu.item} />;
+          case SpeciesType.Store: {
+            const propClass = props.selectMenu.item as IPropClass;
+            return (
+              <ThingIndex
+                belongId={propClass.belongId}
+                labels={[`S${propClass.metadata.id}`]}
+                forms={[]}
+                propertys={propClass.propertys}
+              />
+            );
+          }
+          case SpeciesType.Commodity: {
+            const commodity = props.selectMenu.item as ICommodity;
+            const propertys = [];
+            for (const item of commodity.form?.attributes || []) {
+              if (item.linkPropertys && item.linkPropertys.length > 0) {
+                item.linkPropertys[0].name = item.name;
+                propertys.push(item.linkPropertys[0]);
+              }
+            }
+            return (
+              <ThingIndex
+                belongId={commodity.belongId}
+                labels={[`S${commodity.metadata.id}`]}
+                forms={[]}
+                propertys={propertys}
+              />
+            );
+          }
         }
       }
       return <></>;
+    case MenuType.Form: {
+      const form = props.selectMenu.item as IForm;
+      const propertys = [];
+      for (const item of form.attributes) {
+        if (item.linkPropertys && item.linkPropertys.length > 0) {
+          item.linkPropertys[0].name = item.name;
+          propertys.push(item.linkPropertys[0]);
+        }
+      }
+      return (
+        <ThingIndex
+          belongId={form.species.belongId}
+          labels={[`S${form.species.metadata.id}`]}
+          forms={[form]}
+          propertys={[]}
+        />
+      );
+    }
     default:
       return <></>;
   }

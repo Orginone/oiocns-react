@@ -3,10 +3,10 @@ import { Input, TreeProps } from 'antd';
 import React, { useState, useEffect, Key } from 'react';
 import ShareShowComp from '@/bizcomponents/IndentityManage/ShareShowComp';
 import cls from './index.module.less';
-import CustomTree from '@/components/CustomTreeComp';
+import CustomTree from '@/components/CustomTree';
 import { IWorkForm } from '@/ts/core/thing/app/work/workform';
 import { IAppModule } from '@/ts/core/thing/app/appmodule';
-import { SpeciesType } from '@/ts/core';
+import { ISpeciesItem, SpeciesType } from '@/ts/core';
 import { XForm } from '@/ts/base/schema';
 let originalSelected: any[] = []; //存储当前选择 以获分配数据
 
@@ -27,7 +27,7 @@ const SelectOperation: React.FC<IProps> = ({ current, showData, setShowData }) =
     setLeftTreeSelectedKeys(selectedKeys);
     const species: IWorkForm = info.node.item;
     let forms = await species.loadForms();
-    setCenterTreeData(forms);
+    setCenterTreeData(forms.map((i) => i.metadata));
   };
   // 左侧树选中事件
   const handleCheckChange: TreeProps['onCheck'] = (checkedKeys, info: any) => {
@@ -65,28 +65,29 @@ const SelectOperation: React.FC<IProps> = ({ current, showData, setShowData }) =
     // setShowData(info.checkedNodes.map((node: any) => node.item));
   };
 
-  const buildSpeciesChildrenTree = (parent: any[]): any[] => {
-    if (parent.length > 0) {
-      return parent.map((species) => {
-        return {
-          key: species.id,
-          title: species.metadata.name,
-          value: species.metadata.id,
-          item: species,
-          children: species.children ? buildSpeciesChildrenTree(species.children) : [],
-        };
-      });
+  const buildSpeciesChildrenTree = (species: ISpeciesItem[]): any[] => {
+    const result: any[] = [];
+    for (const item of species) {
+      const children: any[] = [];
+      if (item.metadata.typeName === SpeciesType.AppModule) {
+        children.push(...buildSpeciesChildrenTree(item.children));
+      }
+      if (children.length > 0 || item.metadata.typeName === SpeciesType.WorkForm) {
+        result.push({
+          key: item.metadata.id,
+          title: item.metadata.name,
+          value: item.metadata.id,
+          item: item,
+          children: children,
+        });
+      }
     }
-    return [];
+    return result;
   };
 
   useEffect(() => {
     const load = async () => {
-      setLeftTreeData(
-        buildSpeciesChildrenTree(
-          current.children.filter((a) => a.metadata.typeName == SpeciesType.WorkForm),
-        ),
-      );
+      setLeftTreeData(buildSpeciesChildrenTree(current.appliction.children));
     };
     load();
   }, []);

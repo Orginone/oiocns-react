@@ -62,7 +62,7 @@ const buildSpeciesTree = (species: ISpeciesItem[]) => {
       menus: [],
       icon: <TeamIcon notAvatar={true} share={item.share} size={18} fontSize={16} />,
       children: children,
-      clickEvent: async () => {
+      beforeLoad: async () => {
         switch (item.metadata.typeName) {
           case SpeciesType.AppModule:
           case SpeciesType.Application:
@@ -103,7 +103,7 @@ const loadChildren = (team: IBelong) => {
       expIcon: <OrgIcons size={22} workStart selected />,
       menus: [],
       children: buildSpeciesTree(species),
-      clickEvent: async () => {
+      beforeLoad: async () => {
         for (const item of team.targets) {
           for (const species of item.species) {
             switch (species.metadata.typeName) {

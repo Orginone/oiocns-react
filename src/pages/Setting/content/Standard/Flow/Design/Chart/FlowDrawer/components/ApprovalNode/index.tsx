@@ -7,8 +7,8 @@ import { NodeType } from '../../processType';
 import { XForm } from '@/ts/base/schema';
 import ShareShowComp from '@/bizcomponents/IndentityManage/ShareShowComp';
 import SelectOperation from '@/pages/Setting/content/Standard/Flow/Comp/SelectOperation';
-import ViewFormModal from '@/bizcomponents/FormDesign/Design/viewFormModal';
-import { IWork } from '@/ts/core';
+import ViewFormModal from '@/bizcomponents/FormDesign/viewFormModal';
+import { IAppModule, IWork } from '@/ts/core';
 interface IProps {
   current: NodeType;
   species: IWork;
@@ -170,7 +170,7 @@ const ApprovalNode: React.FC<IProps> = (props) => {
           }}
           onCancel={() => setOperationModal(undefined)}>
           <SelectOperation
-            current={props.species}
+            current={props.species?.parent as IAppModule}
             showData={showData}
             setShowData={setShowData}></SelectOperation>
         </Modal>
@@ -188,7 +188,14 @@ const ApprovalNode: React.FC<IProps> = (props) => {
           multiple={false}
           onChecked={(params: any) => {
             props.current.props.assignedUser = [{ name: params.title, id: params.key }];
-            setCurrentData(params);
+            setCurrentData({
+              key: params.key,
+              title: params.title,
+              data: {
+                id: params.key,
+                name: params.title,
+              },
+            });
           }}
           space={props.species.current.space}
         />

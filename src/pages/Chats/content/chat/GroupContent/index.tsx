@@ -63,6 +63,7 @@ const GroupContent = (props: Iprops) => {
     setMessages([...props.chat.messages]);
     props.chat.onMessage((ms) => {
       // 标记已获取信息为已读
+      console.log('setMessages', ms);
       if (ms.length > 0 && ms[0].belongId !== orgCtrl.user.userId) {
         handleTagMsg(ms);
       }
@@ -92,6 +93,7 @@ const GroupContent = (props: Iprops) => {
     if (body && body.current) {
       if (loading) {
         setLoading(false);
+        // 等待消息渲染
         if (body.current) {
           body.current.scrollHeight > beforescrollHeight &&
             (body.current.scrollTop = body.current.scrollHeight - beforescrollHeight);
@@ -115,7 +117,7 @@ const GroupContent = (props: Iprops) => {
       return !v.tags.some((s) => s.userId === orgCtrl.user.userId && s.label === '已读');
     });
     // 过滤消息  过滤条件 belongId 不属于个人的私有消息；消息已有标签中没有自己打的‘已读’标签
-    console.log('过滤消息', needTagMsgs, orgCtrl.user.userId);
+    console.log('过滤消息', needTagMsgs, messagesTags, orgCtrl.user.userId);
     // 未知原因。最后一条消息无法添加tag
     if (needTagMsgs.length < 2) {
       return;
@@ -276,7 +278,7 @@ const GroupContent = (props: Iprops) => {
     }
   };
   // 显示已读未读信息
-  const isReadTxt = (msgTags: { label: string; userId: string }[]) => {
+  const isReadTxt = (msgTags: { label: string; userId: string }[], isSelf = false) => {
     let showText = '';
     const allMember = props.chat.members.length - 1;
     // 获取消息标签数量； 条件：已读标签且标记人不为自己
@@ -309,7 +311,7 @@ const GroupContent = (props: Iprops) => {
             {parseMsg(item)}
             {/* 引用消息的展示 */}
             {isCite && showCiteText(item)}
-            {item.belongId !== orgCtrl.user.userId && isReadTxt(item?.tags ?? [])}
+            {item.belongId !== orgCtrl.user.userId && isReadTxt(item?.tags ?? [], true)}
           </div>
           <div style={{ color: '#888', paddingLeft: 10 }}>
             <TeamIcon share={orgCtrl.user.share} preview size={36} fontSize={32} />

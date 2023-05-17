@@ -1,16 +1,14 @@
 import Thing from '@/pages/Store/content/Thing/Thing';
-import { XForm, XFormItem } from '@/ts/base/schema';
-import { IFlowDefine } from '@/ts/core';
+import { IFlowDefine, IForm } from '@/ts/core';
 import { ProFormInstance } from '@ant-design/pro-form';
 import { Button, Card, Input, message } from 'antd';
 import orgCtrl from '@/ts/controller';
 import { Editing } from 'devextreme-react/data-grid';
 import React, { useEffect, useRef, useState } from 'react';
 import cls from './index.module.less';
-import OioForm from '@/bizcomponents/FormDesign/Design/OioForm';
+import OioForm from '@/bizcomponents/FormDesign/OioForm';
 import { kernel } from '@/ts/base';
 import { GroupMenuType } from '../../config/menuType';
-import { CheckOutlined } from '@ant-design/icons';
 
 // 卡片渲染
 interface IProps {
@@ -23,7 +21,7 @@ interface IProps {
  */
 const WorkStartDo: React.FC<IProps> = ({ current }) => {
   const [data, setData] = useState<any>({});
-  const [forms, setForms] = useState<XForm[]>([]);
+  const [form, setForm] = useState<IForm>();
   const [rows, setRows] = useState<any>([]);
   const [content, setContent] = useState<string>('');
   const formRef = useRef<ProFormInstance<any>>();
@@ -31,21 +29,20 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
   useEffect(() => {
     setTimeout(async () => {
       let node = await current.loadWorkNode();
-      if (!node?.forms) {
-        message.error('流程未绑定表单');
-        return;
+      if (node && node.forms) {
+        const formIds = node.forms.map((i) => i.id);
+        const forms = (await current.workItem.loadForms()).filter((i) =>
+          formIds.includes(i.metadata.id),
+        );
+        if (forms.length > 0) {
+          await forms[0].loadAttributes();
+          setForm(forms[0]);
+          return;
+        }
       }
-      setForms(node.forms);
+      message.error('流程未绑定表单');
     }, 100);
   }, [current]);
-
-  const getItems = () => {
-    const items: XFormItem[] = [];
-    forms.forEach((form) => {
-      items.push(...(form.items || []));
-    });
-    return items;
-  };
 
   const submit = async () => {
     let rows_ = rows;
@@ -78,12 +75,9 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
 
   return (
     <div className={cls.content}>
-      {forms.length > 0 && (
+      {form && (
         <OioForm
-          key={forms[0].id}
-          belong={current.workItem.current.space}
-          form={forms[0]}
-          formItems={getItems()}
+          form={form}
           formRef={formRef}
           submitter={{
             resetButtonProps: {
@@ -100,6 +94,9 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
         <Thing
           keyExpr="Id"
           height={500}
+          labels={[]}
+          propertys={[]}
+          belongId={current.workItem.belongId}
           dataSource={rows}
           selectable={false}
           menuItems={[
