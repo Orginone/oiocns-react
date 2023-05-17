@@ -406,14 +406,14 @@ const Groupinputbox = (props: Iprops) => {
             placeholder="请输入内容"
             onKeyDown={keyDown}></div>
           {citeText && citeShowText(citeText)}
-          <div className={'send_box'}>
-            <Button
-              type="primary"
-              style={{ color: '#fff', border: 'none' }}
-              onClick={() => submit()}>
-              发送
-            </Button>
-          </div>
+        </div>
+        <div className={'send_box'}>
+          <Button
+            type="primary"
+            style={{ color: '#fff', border: 'none' }}
+            onClick={() => submit()}>
+            发送
+          </Button>
         </div>
       </div>
       {/* 截图功能 */}

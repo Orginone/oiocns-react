@@ -58,6 +58,7 @@ const Setting: React.FC<any> = () => {
       ) : (
         <Content
           key={key}
+          belong={selectMenu.company!}
           selectMenu={selectMenu}
           openDetail={openDetail}
           filter={filter}
