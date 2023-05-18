@@ -71,7 +71,6 @@ export class Group extends Target implements IGroup {
         } else {
           this.company.groups = this.company.groups.filter((i) => i.key != this.key);
         }
-        this.createTargetMsg(OperateType.Remove, this.company.metadata);
         return true;
       }
     }

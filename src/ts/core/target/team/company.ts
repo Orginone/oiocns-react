@@ -121,7 +121,6 @@ export class Company extends Belong implements ICompany {
       await group.deepLoad();
       this.groups.push(group);
       await group.pullMembers([this.metadata]);
-      group.createTargetMsg(OperateType.Add, this.metadata);
       return group;
     }
   }
@@ -180,7 +179,6 @@ export class Company extends Belong implements ICompany {
   async exit(): Promise<boolean> {
     if (await this.removeMembers([this.user.metadata])) {
       this.user.companys = this.user.companys.filter((i) => i.key != this.key);
-      this.createTargetMsg(OperateType.Remove, this.user.metadata);
       return true;
     }
     return false;

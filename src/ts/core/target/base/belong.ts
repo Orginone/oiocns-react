@@ -1,6 +1,6 @@
 import { schema, kernel, model } from '../../../base';
 import { PageAll } from '../../public/consts';
-import { OperateType, SpeciesType, TargetType } from '../../public/enums';
+import { SpeciesType, TargetType } from '../../public/enums';
 import { IAuthority, Authority } from '../authority/authority';
 import { Cohort, ICohort } from '../outTeam/cohort';
 import { IPerson } from '../person';
@@ -103,7 +103,6 @@ export abstract class Belong extends Target implements IBelong {
       }
       this.cohorts.push(cohort);
       await cohort.pullMembers([this.user.metadata]);
-      cohort.createTargetMsg(OperateType.Add, this.user.metadata);
       return cohort;
     }
   }

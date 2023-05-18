@@ -141,13 +141,11 @@ export class Person extends Belong implements IPerson {
     return false;
   }
   override async delete(): Promise<boolean> {
+    await this.createTargetMsg(OperateType.Remove, this.metadata);
     const res = await kernel.deleteTarget({
       id: this.id,
       page: PageAll,
     });
-    if (res.success) {
-      this.createTargetMsg(OperateType.Remove, this.metadata);
-    }
     return res.success;
   }
   get subTarget(): ITarget[] {

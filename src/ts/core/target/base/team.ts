@@ -1,6 +1,6 @@
 import { schema, kernel, model } from '../../../base';
 import { OperateType, TargetType } from '../../public/enums';
-import { PageAll } from '../../public/consts';
+import { PageAll, orgAuth } from '../../public/consts';
 import { IBelong } from './belong';
 import { IMsgChatT, IMsgChat, MsgChat } from '../../chat/message/msgchat';
 
@@ -94,13 +94,15 @@ export abstract class Team extends MsgChat<schema.XTarget> implements ITeam {
     for (const member of members) {
       if (this.memberTypes.includes(member.typeName as TargetType)) {
         if (!notity) {
+          if (this.hasAuthoritys([orgAuth.RelationAuthId])) {
+            await this.createTargetMsg(OperateType.Remove, member);
+          }
           const res = await kernel.removeOrExitOfTeam({
             id: this.id,
             subId: member.id,
           });
           if (!res.success) return false;
           notity = res.success;
-          this.createTargetMsg(OperateType.Remove, member);
         }
         if (notity) {
           this.members = this.members.filter((i) => i.id != member.id);
@@ -138,13 +140,13 @@ export abstract class Team extends MsgChat<schema.XTarget> implements ITeam {
   }
   async delete(notity: boolean = false): Promise<boolean> {
     if (!notity) {
+      if (this.hasAuthoritys([orgAuth.RelationAuthId])) {
+        await this.createTargetMsg(OperateType.Delete);
+      }
       const res = await kernel.deleteTarget({
         id: this.id,
         page: PageAll,
       });
-      if (res.success) {
-        this.createTargetMsg(OperateType.Delete);
-      }
       notity = res.success;
     }
     return notity;

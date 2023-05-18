@@ -103,7 +103,6 @@ export class Department extends Target implements IDepartment {
           (i) => i.key != this.key,
         );
       }
-      this.createTargetMsg(OperateType.Remove, this.space.user.metadata);
       return true;
     }
     return false;
