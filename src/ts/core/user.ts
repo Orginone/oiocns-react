@@ -117,12 +117,19 @@ export class UserProvider {
         break;
       case OperateType.Remove:
         if (data.subTarget) {
-          logger.info(`成员${data.subTarget.name}已被从${data.target.name}移除.`);
-          this.user.targets
-            .filter(
-              (i) => i.id === data.target.id || data.target.id === data.subTarget!.id,
-            )
-            .forEach((i) => i.removeMembers([data.subTarget!], true));
+          if (data.subTarget.id === this.user.id) {
+            logger.info(`您已被从${data.target.name}移除.`);
+            this.user.targets
+              .filter((i) => i.id === data.target.id)
+              .forEach((i) => i.delete(true));
+          } else {
+            logger.info(`成员${data.subTarget.name}已被从${data.target.name}移除.`);
+            this.user.targets
+              .filter(
+                (i) => i.id === data.target.id || data.target.id === data.subTarget!.id,
+              )
+              .forEach((i) => i.removeMembers([data.subTarget!], true));
+          }
         }
         break;
       case OperateType.Add:

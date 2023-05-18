@@ -253,7 +253,7 @@ export class Company extends Belong implements ICompany {
     members: schema.XTarget[],
     notity: boolean = false,
   ): Promise<boolean> {
-    notity = await super.removeMembers(members);
+    notity = await super.removeMembers(members, notity);
     if (notity) {
       this.subTarget.forEach((a) => a.removeMembers(members, true));
     }
