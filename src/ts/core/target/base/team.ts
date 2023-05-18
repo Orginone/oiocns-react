@@ -97,7 +97,7 @@ export abstract class Team extends MsgChat<schema.XTarget> implements ITeam {
     for (const member of members) {
       if (this.memberTypes.includes(member.typeName as TargetType)) {
         if (!notity) {
-          if (member.id === this.userId && this.hasRelationAuth()) {
+          if (member.id === this.userId || this.hasRelationAuth()) {
             await this.createTargetMsg(OperateType.Remove, member);
           }
           const res = await kernel.removeOrExitOfTeam({
