@@ -4,12 +4,11 @@ import IndentityManage from '@/bizcomponents/IndentityManage';
 import cls from './index.module.less';
 import { NodeType } from '../../processType';
 import ShareShowComp from '@/bizcomponents/IndentityManage/ShareShowComp';
-import { IWorkItem } from '@/ts/core/thing/app/work/workitem';
+import { IWork } from '@/ts/core';
 
 interface IProps {
   current: NodeType;
-  orgId?: string;
-  species: IWorkItem;
+  work: IWork;
 }
 /**
  * @description: 抄送对象
@@ -76,7 +75,7 @@ const CcNode: React.FC<IProps> = (props) => {
         }}
         onCancel={() => setIsApprovalOpen(false)}>
         <IndentityManage
-          space={props.species.current.space}
+          space={props.work.current.space}
           multiple={false}
           onChecked={(params: any) => {
             props.current.props.assignedUser = [{ name: params.title, id: params.key }];

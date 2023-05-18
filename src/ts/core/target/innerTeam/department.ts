@@ -62,7 +62,7 @@ export class Department extends Target implements IDepartment {
   async loadChildren(reload?: boolean | undefined): Promise<IDepartment[]> {
     if (this.childrenTypes.length > 0 && (!this._childrenLoaded || reload)) {
       const res = await kernel.querySubTargetById({
-        id: this.metadata.id,
+        id: this.id,
         subTypeNames: this.childrenTypes,
         page: PageAll,
       });
@@ -108,7 +108,7 @@ export class Department extends Target implements IDepartment {
   }
   async delete(): Promise<boolean> {
     const res = await kernel.deleteTarget({
-      id: this.metadata.id,
+      id: this.id,
       page: PageAll,
     });
     if (res.success) {

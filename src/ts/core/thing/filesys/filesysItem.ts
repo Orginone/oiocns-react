@@ -1,8 +1,9 @@
-import { blobToDataUrl, generateUuid } from '@/ts/base/common';
+import { blobToDataUrl, generateUuid, logger } from '@/ts/base/common';
 import { BucketOpreateModel, BucketOpreates, FileItemModel } from '@/ts/base/model';
 import { model, kernel, common } from '@/ts/base';
 import { IFileSystem, TaskModel } from './filesystem';
 import { FileItemShare } from '../../../base/model';
+import { orgAuth } from '../../public/consts';
 /** 分片大小 */
 const chunkSize = 1024 * 1024;
 /** 可为空的进度回调 */
@@ -19,6 +20,8 @@ export interface IFileSystemItem extends common.IEntity {
   children: IFileSystemItem[];
   /** 分享信息 */
   shareInfo(): FileItemShare;
+  /** 是否有操作权限 */
+  hasOperateAuth(log?: boolean): boolean;
   /**
    * 创建文件系统项（目录）
    * @param {string} name 文件系统项名称
@@ -76,7 +79,7 @@ export class FileSystemItem extends common.Entity implements IFileSystemItem {
     this.metadata = _metadata;
     this.parent = _parent;
     this.filesys = _filesys;
-    this.belongId = this.filesys.metadata.belongId;
+    this.belongId = this.filesys.belong.id;
   }
   belongId: string;
   filesys: IFileSystem;
@@ -99,15 +102,17 @@ export class FileSystemItem extends common.Entity implements IFileSystemItem {
     });
   }
   async rename(name: string): Promise<boolean> {
-    if (this.metadata.name != name && !(await this._findByName(name))) {
-      const res = await kernel.anystore.bucketOpreate<FileItemModel>(this.belongId, {
-        name: name,
-        key: this._formatKey(),
-        operate: BucketOpreates.Rename,
-      });
-      if (res.success && res.data) {
-        this.metadata = res.data;
-        return true;
+    if (this.hasOperateAuth()) {
+      if (this.metadata.name != name && !(await this._findByName(name))) {
+        const res = await kernel.anystore.bucketOpreate<FileItemModel>(this.belongId, {
+          name: name,
+          key: this._formatKey(),
+          operate: BucketOpreates.Rename,
+        });
+        if (res.success && res.data) {
+          this.metadata = res.data;
+          return true;
+        }
       }
     }
     return false;
@@ -129,59 +134,65 @@ export class FileSystemItem extends common.Entity implements IFileSystemItem {
     return exist;
   }
   async delete(): Promise<boolean> {
-    const res = await kernel.anystore.bucketOpreate<FileItemModel[]>(this.belongId, {
-      key: this._formatKey(),
-      operate: BucketOpreates.Delete,
-    });
-    if (res.success) {
-      const index = this.parent?.children.findIndex((item) => {
-        return item.metadata.key == this.metadata.key;
-      });
-      if (index != undefined && index > -1) {
-        this.parent?.children.splice(index, 1);
-      }
-      return true;
-    }
-    return false;
-  }
-  async copy(destination: IFileSystemItem): Promise<boolean> {
-    if (
-      destination.metadata.isDirectory &&
-      this.metadata.key != destination.metadata.key
-    ) {
+    if (this.hasOperateAuth()) {
       const res = await kernel.anystore.bucketOpreate<FileItemModel[]>(this.belongId, {
         key: this._formatKey(),
-        destination: destination.metadata.key,
-        operate: BucketOpreates.Copy,
-      });
-      if (res.success) {
-        destination.metadata.hasSubDirectories = true;
-        destination.children.push(this._newItemForDes(this, destination));
-        return true;
-      }
-    }
-    return false;
-  }
-  async move(destination: IFileSystemItem): Promise<boolean> {
-    if (
-      destination.metadata.isDirectory &&
-      this.metadata.key != destination.metadata.key
-    ) {
-      const res = await kernel.anystore.bucketOpreate<FileItemModel[]>(this.belongId, {
-        key: this._formatKey(),
-        destination: destination.metadata.key,
-        operate: BucketOpreates.Move,
+        operate: BucketOpreates.Delete,
       });
       if (res.success) {
         const index = this.parent?.children.findIndex((item) => {
           return item.metadata.key == this.metadata.key;
         });
-        if (index && index > -1) {
+        if (index != undefined && index > -1) {
           this.parent?.children.splice(index, 1);
         }
-        destination.metadata.hasSubDirectories = true;
-        destination.children.push(this._newItemForDes(this, destination));
         return true;
+      }
+    }
+    return false;
+  }
+  async copy(destination: IFileSystemItem): Promise<boolean> {
+    if (this.hasOperateAuth()) {
+      if (
+        destination.metadata.isDirectory &&
+        this.metadata.key != destination.metadata.key
+      ) {
+        const res = await kernel.anystore.bucketOpreate<FileItemModel[]>(this.belongId, {
+          key: this._formatKey(),
+          destination: destination.metadata.key,
+          operate: BucketOpreates.Copy,
+        });
+        if (res.success) {
+          destination.metadata.hasSubDirectories = true;
+          destination.children.push(this._newItemForDes(this, destination));
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+  async move(destination: IFileSystemItem): Promise<boolean> {
+    if (this.hasOperateAuth()) {
+      if (
+        destination.metadata.isDirectory &&
+        this.metadata.key != destination.metadata.key
+      ) {
+        const res = await kernel.anystore.bucketOpreate<FileItemModel[]>(this.belongId, {
+          key: this._formatKey(),
+          destination: destination.metadata.key,
+          operate: BucketOpreates.Move,
+        });
+        if (res.success) {
+          const index = this.parent?.children.findIndex((item) => {
+            return item.metadata.key == this.metadata.key;
+          });
+          if (index && index > -1) {
+            this.parent?.children.splice(index, 1);
+          }
+          destination.metadata.hasSubDirectories = true;
+          destination.children.push(this._newItemForDes(this, destination));
+          return true;
+        }
       }
     }
     return false;
@@ -263,6 +274,16 @@ export class FileSystemItem extends common.Entity implements IFileSystemItem {
   }
   download(path: string, onProgress: OnProgressType): Promise<void> {
     throw new Error('Method not implemented.');
+  }
+  /** 校验权限 */
+  hasOperateAuth(log: boolean = true): boolean {
+    if (!this.filesys.belong.hasAuthoritys([orgAuth.ThingAuthId])) {
+      if (log) {
+        logger.warn('抱歉,您没有权限操作.');
+      }
+      return false;
+    }
+    return true;
   }
   /**
    * 格式化key,主要针对路径中的中文

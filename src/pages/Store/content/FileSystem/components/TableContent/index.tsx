@@ -98,7 +98,7 @@ const TableContent = ({
                 <Dropdown
                   className={style['operation-btn']}
                   menu={{
-                    items: loadFileSysItemMenus(),
+                    items: loadFileSysItemMenus(record),
                     onClick: ({ key }) => {
                       handleMenuClick(key, record);
                     },

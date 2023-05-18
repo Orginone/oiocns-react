@@ -32,7 +32,7 @@ const CreatePosition: React.FC<CreateGroupPropsType> = (props) => {
       for (const a of target) {
         result.push({
           title: a.metadata.name,
-          key: a.metadata.id,
+          key: a.id,
           object: a,
         });
       }

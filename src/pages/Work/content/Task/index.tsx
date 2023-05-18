@@ -37,7 +37,7 @@ const TaskContent = (props: IProps) => {
         {
           const res = await orgCtrl.work.loadDones({
             page: { ...page, filter: props.filter },
-            id: props.space?.metadata.id || '0',
+            id: props.space?.id || '0',
           });
           taskList.total = res.total;
           for (const item of res.result || []) {
@@ -51,7 +51,7 @@ const TaskContent = (props: IProps) => {
       case GroupMenuType.Apply:
         taskList = await orgCtrl.work.loadApply({
           page: { ...page, filter: props.filter },
-          id: props.space?.metadata.id || '0',
+          id: props.space?.id || '0',
         });
         break;
       default:
@@ -59,9 +59,7 @@ const TaskContent = (props: IProps) => {
           let todos = orgCtrl.work.todos;
           if (props.space) {
             todos = todos.filter(
-              (a) =>
-                a.belongId == props.space!.metadata.id ||
-                a.shareId == props.space!.metadata.id,
+              (a) => a.belongId == props.space!.id || a.shareId == props.space!.id,
             );
           }
           if (props.filter != '') {

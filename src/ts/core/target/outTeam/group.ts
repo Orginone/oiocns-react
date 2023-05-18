@@ -27,6 +27,7 @@ export interface IGroup extends ITarget {
 export class Group extends Target implements IGroup {
   constructor(_metadata: schema.XTarget, _company: ICompany) {
     super(_metadata, [_metadata.belong?.name ?? '', '组织群'], _company, companyTypes);
+    this.speciesTypes.push(SpeciesType.Market);
     this.company = _company;
   }
   company: ICompany;
@@ -36,7 +37,7 @@ export class Group extends Target implements IGroup {
   async loadChildren(reload?: boolean | undefined): Promise<IGroup[]> {
     if (!this._childrenLoaded || reload) {
       const res = await kernel.querySubTargetById({
-        id: this.metadata.id,
+        id: this.id,
         subTypeNames: [TargetType.Group],
         page: PageAll,
       });
@@ -62,7 +63,7 @@ export class Group extends Target implements IGroup {
     return this.createChildren(data);
   }
   async exit(): Promise<boolean> {
-    if (this.metadata.belongId !== this.company.metadata.id) {
+    if (this.metadata.belongId !== this.company.id) {
       if (await this.removeMembers([this.company.metadata])) {
         if (this.parent) {
           this.parent.children = this.parent.children.filter((i) => i.key != this.key);
@@ -76,7 +77,7 @@ export class Group extends Target implements IGroup {
   }
   async delete(): Promise<boolean> {
     const res = await kernel.deleteTarget({
-      id: this.metadata.id,
+      id: this.id,
       page: PageAll,
     });
     if (res.success) {

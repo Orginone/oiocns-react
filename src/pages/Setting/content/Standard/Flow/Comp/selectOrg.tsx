@@ -29,10 +29,10 @@ const SelectOrg: React.FC<IProps> = (props: IProps) => {
     if (targets) {
       for (const item of targets) {
         if (props.orgId && !isChild) {
-          if (item.metadata.id == props.orgId) {
+          if (item.id == props.orgId) {
             result.push({
               label: item.metadata.name,
-              value: item.metadata.id,
+              value: item.id,
               disabled: props.rootDisable && level == 0,
               children: [
                 ...[{ label: '其他', value: '0' }],
@@ -48,7 +48,7 @@ const SelectOrg: React.FC<IProps> = (props: IProps) => {
         } else {
           result.push({
             label: item.metadata.name,
-            value: item.metadata.id,
+            value: item.id,
             disabled: props.rootDisable && level == 0,
             children: buildTargetTree(item.subTarget, isChild, level + 1),
           });

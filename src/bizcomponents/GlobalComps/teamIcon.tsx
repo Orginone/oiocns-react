@@ -84,7 +84,7 @@ const TeamIcon = (info: teamTypeInfo) => {
       icon = <im.ImUserTie fontSize={fontSize} />;
       break;
     default:
-      icon = <im.ImClubs fontSize={fontSize} />;
+      icon = <im.ImTree fontSize={fontSize} />;
       break;
   }
   if (info.notAvatar) {

@@ -38,12 +38,12 @@ const Detail: React.FC<TaskDetailType> = ({ task, define, instance, onBack }) =>
   const loadForm = (forms: schema.XForm[], disabled: boolean, data?: any) => {
     let content = [];
     for (let item of forms) {
-      const form = allForms.find((a) => a.metadata.id == item.id);
+      const form = allForms.find((a) => a.id == item.id);
       if (form) {
         content.push(
-          <Panel header={form.metadata.name} key={form.metadata.id}>
+          <Panel header={form.metadata.name} key={form.id}>
             <OioForm
-              key={form.metadata.id}
+              key={form.id}
               form={form}
               formRef={undefined}
               fieldsValue={data}
@@ -213,13 +213,7 @@ const Detail: React.FC<TaskDetailType> = ({ task, define, instance, onBack }) =>
       key: '2',
       label: `流程图`,
       children: instance?.define ? (
-        <Design
-          species={define.workItem}
-          current={define}
-          instance={instance}
-          IsEdit={false}
-          onBack={() => {}}
-        />
+        <Design current={define} instance={instance} IsEdit={false} onBack={() => {}} />
       ) : (
         <></>
       ),

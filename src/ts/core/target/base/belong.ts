@@ -9,6 +9,7 @@ import { IChatMessage, ChatMessage } from '../../chat/message/message';
 import { IMsgChat } from '../../chat/message/msgchat';
 import { IDict } from '../../thing/dict/dict';
 import { IDictClass } from '../../thing/dict/dictclass';
+import { IFileSystem, FileSystem } from '../../thing/filesys/filesystem';
 
 /** 自归属用户接口类 */
 export interface IBelong extends ITarget {
@@ -26,6 +27,8 @@ export interface IBelong extends ITarget {
   parentTarget: ITarget[];
   /** 群会话 */
   cohortChats: IMsgChat[];
+  /** 文件系统 */
+  filesys: IFileSystem;
   /** 加载字典 */
   loadDicts(): Promise<IDict[]>;
   /** 加载群 */
@@ -50,9 +53,11 @@ export abstract class Belong extends Target implements IBelong {
     this.user = _user || (this as unknown as IPerson);
     this.speciesTypes.unshift(SpeciesType.Store, SpeciesType.Dict);
     this.message = new ChatMessage(this);
+    this.filesys = new FileSystem(this);
   }
   user: IPerson;
   dicts: IDict[] = [];
+  filesys: IFileSystem;
   cohorts: ICohort[] = [];
   message: IChatMessage;
   superAuth: IAuthority | undefined;
@@ -63,7 +68,7 @@ export abstract class Belong extends Target implements IBelong {
         case SpeciesType.Dict: {
           const subDicts = await (item as IDictClass).loadAllDicts();
           for (const item of subDicts) {
-            if (dicts.findIndex((i) => i.metadata.id === item.metadata.id) < 0) {
+            if (dicts.findIndex((i) => i.id === item.id) < 0) {
               dicts.push(item);
             }
           }
@@ -76,7 +81,7 @@ export abstract class Belong extends Target implements IBelong {
   async loadSuperAuth(reload: boolean = false): Promise<IAuthority | undefined> {
     if (!this.superAuth || reload) {
       const res = await kernel.queryAuthorityTree({
-        id: this.metadata.id,
+        id: this.id,
         page: PageAll,
       });
       if (res.success && res.data?.id) {
