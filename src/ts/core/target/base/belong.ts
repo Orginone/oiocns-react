@@ -27,6 +27,8 @@ export interface IBelong extends ITarget {
   parentTarget: ITarget[];
   /** 群会话 */
   cohortChats: IMsgChat[];
+  /** 共享组织 */
+  shareTarget: ITarget[];
   /** 文件系统 */
   filesys: IFileSystem;
   /** 加载字典 */
@@ -119,6 +121,7 @@ export abstract class Belong extends Target implements IBelong {
       );
     }
   }
+  abstract get shareTarget(): ITarget[];
   abstract cohortChats: IMsgChat[];
   abstract get parentTarget(): ITarget[];
   abstract applyJoin(members: schema.XTarget[]): Promise<boolean>;

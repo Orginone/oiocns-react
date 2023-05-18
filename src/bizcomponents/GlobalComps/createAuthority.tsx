@@ -97,7 +97,7 @@ const AuthorityModal = (props: Iprops) => {
       initialValue: props.current.metadata.shareId,
       formItemProps: { rules: [{ required: true, message: '请选择共享组织' }] },
       fieldProps: {
-        options: props.current.space.parentTarget.map((i) => {
+        options: props.current.space.shareTarget.map((i) => {
           return {
             label: i.name,
             value: i.id,
