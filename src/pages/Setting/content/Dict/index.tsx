@@ -64,9 +64,9 @@ const DictInfo: React.FC<any> = ({ current }: { current: IDict }) => {
           width: 120,
         }}
         contentStyle={{ textAlign: 'left', color: '#606266' }}>
-        <Descriptions.Item label="字典名称">{current.metadata.name}</Descriptions.Item>
+        <Descriptions.Item label="字典名称">{current.name}</Descriptions.Item>
         <Descriptions.Item label="字典代码">{current.metadata.code}</Descriptions.Item>
-        <Descriptions.Item label="备注">{current.metadata.remark}</Descriptions.Item>
+        <Descriptions.Item label="备注">{current.remark}</Descriptions.Item>
       </Descriptions>
 
       <PageCard

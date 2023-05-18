@@ -21,7 +21,7 @@ const SelectAuth: React.FC<IProps> = (props: IProps) => {
   const getTreeData = (targets: IAuthority[]): DefaultOptionType[] => {
     return targets.map((item: IAuthority) => {
       return {
-        label: item.metadata.name,
+        label: item.name,
         value: item.id,
         children:
           item.children && item.children.length > 0 ? getTreeData(item.children) : [],

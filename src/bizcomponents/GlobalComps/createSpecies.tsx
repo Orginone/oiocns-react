@@ -122,7 +122,7 @@ const CreateSpeciesModal = (props: Iprops) => {
         options: [
           {
             value: props.current?.id || props.species?.current.id,
-            label: props.current?.metadata.name || props.species?.current.metadata.name,
+            label: props.current?.name || props.species?.current.name,
           },
         ],
       },
@@ -187,9 +187,7 @@ const CreateSpeciesModal = (props: Iprops) => {
   return (
     <SchemaForm<SpeciesModel>
       title={
-        props.title.includes('编辑')
-          ? `编辑[${props.species?.metadata.name}]类别`
-          : props.title
+        props.title.includes('编辑') ? `编辑[${props.species?.name}]类别` : props.title
       }
       columns={columns}
       open={props.open}

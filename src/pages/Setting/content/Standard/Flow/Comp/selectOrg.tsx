@@ -31,7 +31,7 @@ const SelectOrg: React.FC<IProps> = (props: IProps) => {
         if (props.orgId && !isChild) {
           if (item.id == props.orgId) {
             result.push({
-              label: item.metadata.name,
+              label: item.name,
               value: item.id,
               disabled: props.rootDisable && level == 0,
               children: [
@@ -47,7 +47,7 @@ const SelectOrg: React.FC<IProps> = (props: IProps) => {
           }
         } else {
           result.push({
-            label: item.metadata.name,
+            label: item.name,
             value: item.id,
             disabled: props.rootDisable && level == 0,
             children: buildTargetTree(item.subTarget, isChild, level + 1),

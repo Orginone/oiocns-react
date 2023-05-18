@@ -1,7 +1,7 @@
 import { kernel, model, schema } from '@/ts/base';
 import { ITarget, Target } from '../base/target';
 import { PageAll, companyTypes } from '../../public/consts';
-import { OperateType, SpeciesType, TargetType } from '../../public/enums';
+import { SpeciesType, TargetType } from '../../public/enums';
 import { ICompany } from '../team/company';
 import { IMsgChat } from '../../chat/message/msgchat';
 import { ITeam } from '../base/team';
@@ -55,7 +55,6 @@ export class Group extends Target implements IGroup {
       const group = new Group(metadata, this.company);
       if (await this.pullSubTarget(group)) {
         this.children.push(group);
-        this.createTargetMsg(OperateType.Add, metadata);
         return group;
       }
     }
@@ -71,7 +70,6 @@ export class Group extends Target implements IGroup {
         } else {
           this.company.groups = this.company.groups.filter((i) => i.key != this.key);
         }
-        this.createTargetMsg(OperateType.Remove, this.company.metadata);
         return true;
       }
     }
@@ -102,7 +100,7 @@ export class Group extends Target implements IGroup {
     return targets;
   }
   get market(): IMarket | undefined {
-    const find = this.species.find((i) => i.metadata.typeName === SpeciesType.Market);
+    const find = this.species.find((i) => i.typeName === SpeciesType.Market);
     if (find) {
       return find as IMarket;
     }
@@ -119,12 +117,13 @@ export class Group extends Target implements IGroup {
   async teamChangedNotity(target: schema.XTarget): Promise<boolean> {
     switch (target.typeName) {
       case TargetType.Group:
-        {
+        if (this.children.every((i) => i.id != target.id)) {
           const group = new Group(target, this.company);
           await group.deepLoad();
           this.children.push(group);
+          return true;
         }
-        return true;
+        return false;
       default:
         return await this.pullMembers([target], true);
     }

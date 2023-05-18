@@ -1,15 +1,12 @@
 import { PageAll } from '@/ts/core/public/consts';
 import { SpeciesType } from '@/ts/core/public/enums';
 import { ISpeciesItem } from './species';
-import { common, kernel, model, schema } from '@/ts/base';
+import { kernel, model, schema } from '@/ts/base';
 import { IPropClass } from '../store/propclass';
 import { IWorkThing } from '../app/workthing';
 import { XProperty } from '@/ts/base/schema';
-export interface IForm extends common.IEntity {
-  /** 唯一标识 */
-  id: string;
-  /** 表单元数据 */
-  metadata: schema.XForm;
+import { Entity, IEntity } from '../../public';
+export interface IForm extends IEntity<schema.XForm> {
   /** 表单分类 */
   species: ISpeciesItem;
   /** 表单特性 */
@@ -36,23 +33,21 @@ export interface IForm extends common.IEntity {
   deleteAttribute(data: schema.XAttribute): Promise<boolean>;
 }
 
-export class Form extends common.Entity implements IForm {
+export class Form extends Entity<schema.XForm> implements IForm {
   constructor(_metadata: schema.XForm, _species: ISpeciesItem) {
-    super();
-    this.metadata = _metadata;
+    super({
+      ..._metadata,
+      typeName: '表单',
+    });
     this.species = _species;
   }
-  metadata: schema.XForm;
   species: ISpeciesItem;
   attributes: schema.XAttribute[] = [];
   private _attributeLoaded: boolean = false;
-  get id(): string {
-    return this.metadata.id;
-  }
   async loadPropertys(): Promise<schema.XProperty[]> {
     const result = [];
     for (const item of this.species.current.space.species) {
-      switch (item.metadata.typeName) {
+      switch (item.typeName) {
         case SpeciesType.Store:
           result.push(...(await (item as IPropClass).loadAllProperty()));
       }
@@ -64,7 +59,8 @@ export class Form extends common.Entity implements IForm {
     data.speciesId = this.metadata.speciesId;
     const res = await kernel.updateForm(data);
     if (res.success && res.data.id) {
-      this.metadata = res.data;
+      res.data.typeName = '表单';
+      this.setMetadata(res.data);
     }
     return res.success;
   }
@@ -74,7 +70,7 @@ export class Form extends common.Entity implements IForm {
       page: PageAll,
     });
     if (res.success) {
-      if (this.species.metadata.typeName === SpeciesType.WorkThing) {
+      if (this.species.typeName === SpeciesType.WorkThing) {
         const species = this.species as IWorkThing;
         species.forms = species.forms.filter((i) => i.key != this.key);
       }

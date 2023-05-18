@@ -23,14 +23,14 @@ const Description = (props: { title: any; current: ITarget; extra: any }) => {
           width: 120,
         }}
         contentStyle={{ textAlign: 'left', color: '#606266' }}>
-        <Descriptions.Item label={current.metadata.typeName + '名称'}>
+        <Descriptions.Item label={current.typeName + '名称'}>
           <Space>
             {current.share?.avatar && <Avatar src={current.share?.avatar.thumbnail} />}
-            <strong>{current.metadata.name}</strong>
+            <strong>{current.name}</strong>
           </Space>
         </Descriptions.Item>
-        <Descriptions.Item label={current.metadata.typeName + '代码'}>
-          {current.metadata.code || ''}
+        <Descriptions.Item label={current.typeName + '代码'}>
+          {current.code || ''}
         </Descriptions.Item>
         <Descriptions.Item label="归属用户">
           {current.metadata.belong?.name}
@@ -42,7 +42,7 @@ const Description = (props: { title: any; current: ITarget; extra: any }) => {
           {current.metadata.createTime}
         </Descriptions.Item>
         <Descriptions.Item label="简介" span={3}>
-          {current.metadata.remark}
+          {current.remark}
         </Descriptions.Item>
       </Descriptions>
     </Card>

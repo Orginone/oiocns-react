@@ -1,4 +1,4 @@
-import { TargetType } from '@/ts/core/public/enums';
+import { SpeciesType, TargetType } from '@/ts/core/public/enums';
 import { kernel, model, schema } from '../../../base';
 import { Form, IForm } from '../base/form';
 import { ISpeciesItem, SpeciesItem } from '../base/species';
@@ -23,7 +23,10 @@ export class WorkThing extends SpeciesItem implements IWorkThing {
     super(_metadata, _app.current, _parent);
     this.app = _app;
     for (const item of _metadata.nodes || []) {
-      this.children.push(new WorkThing(item, this.app, this));
+      const subItem = this.createChildren(item, _app.current);
+      if (subItem) {
+        this.children.push(subItem);
+      }
     }
     this.speciesTypes = [_metadata.typeName];
   }
@@ -36,7 +39,7 @@ export class WorkThing extends SpeciesItem implements IWorkThing {
         id: this.current.id,
         speciesId: this.id,
         belongId: this.belongId,
-        upTeam: this.current.metadata.typeName === TargetType.Group,
+        upTeam: this.current.typeName === TargetType.Group,
         page: PageAll,
       });
       if (res.success) {
@@ -67,6 +70,9 @@ export class WorkThing extends SpeciesItem implements IWorkThing {
     _metadata: schema.XSpecies,
     _current: ITarget,
   ): ISpeciesItem | undefined {
-    return new WorkThing(_metadata, this.app, this);
+    switch (_metadata.typeName) {
+      case SpeciesType.WorkItem:
+        return new WorkThing(_metadata, this.app, this);
+    }
   }
 }

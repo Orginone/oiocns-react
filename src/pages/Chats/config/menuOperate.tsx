@@ -30,7 +30,7 @@ const loadBookMenu = () => {
     }
     companyItems.push({
       key: company.key + '同事',
-      label: company.metadata.name,
+      label: company.name,
       item: company.chats.filter((i) => i.isMyChat),
       itemType: MenuType.Books,
       icon: <TeamIcon share={company.share} size={18} fontSize={16} />,

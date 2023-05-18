@@ -10,11 +10,7 @@ class IndexController extends common.Emitter {
   private _provider: UserProvider;
   constructor() {
     super();
-    this._provider = new UserProvider();
-    this._provider.subscribe(async () => {
-      await this._provider.refresh();
-      this.changCallback();
-    });
+    this._provider = new UserProvider(this);
   }
   /** 是否已登录 */
   get logined(): boolean {

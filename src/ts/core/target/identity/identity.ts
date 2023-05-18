@@ -1,15 +1,12 @@
-import { common, kernel, model, schema } from '../../../base';
+import { kernel, model, schema } from '../../../base';
+import { Entity, IEntity } from '../../public';
 import { PageAll } from '../../public/consts';
 import { IBelong } from '../base/belong';
 
 /** 身份（角色）接口 */
-export interface IIdentity extends common.IEntity {
-  /** 唯一标识 */
-  id: string;
+export interface IIdentity extends IEntity<schema.XIdentity> {
   /** 设置身份（角色）的用户 */
   space: IBelong;
-  /** 数据实体 */
-  metadata: schema.XIdentity;
   /** 赋予身份（角色）的成员用户 */
   members: schema.XTarget[];
   /** 加载成员用户实体 */
@@ -25,19 +22,17 @@ export interface IIdentity extends common.IEntity {
 }
 
 /** 身份（角色）实现类 */
-export class Identity extends common.Entity implements IIdentity {
+export class Identity extends Entity<schema.XIdentity> implements IIdentity {
   constructor(_metadata: schema.XIdentity, _space: IBelong) {
-    super();
+    super({
+      ..._metadata,
+      typeName: '角色',
+    });
     this.space = _space;
-    this.metadata = _metadata;
   }
   space: IBelong;
-  metadata: schema.XIdentity;
   members: schema.XTarget[] = [];
   private _memberLoaded: boolean = false;
-  get id(): string {
-    return this.metadata.id;
-  }
   async loadMembers(reload?: boolean | undefined): Promise<schema.XTarget[]> {
     if (!this._memberLoaded || reload) {
       const res = await kernel.queryIdentityTargets({
@@ -82,13 +77,14 @@ export class Identity extends common.Entity implements IIdentity {
   async update(data: model.IdentityModel): Promise<boolean> {
     data.id = this.id;
     data.shareId = this.metadata.shareId;
-    data.name = data.name || this.metadata.name;
-    data.code = data.code || this.metadata.code;
+    data.name = data.name || this.name;
+    data.code = data.code || this.code;
     data.authId = data.authId || this.metadata.authId;
-    data.remark = data.remark || this.metadata.remark;
+    data.remark = data.remark || this.remark;
     const res = await kernel.updateIdentity(data);
     if (res.success && res.data?.id) {
-      this.metadata = res.data;
+      res.data.typeName = '角色';
+      this.setMetadata(res.data);
     }
     return res.success;
   }

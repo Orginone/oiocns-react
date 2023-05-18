@@ -16,7 +16,7 @@ interface IProps {
 const ViewFormModal = ({ open, form, handleCancel, handleOk }: IProps) => {
   return (
     <Modal
-      title={form.metadata.name}
+      title={form.name}
       open={open}
       onOk={() => handleOk(true)}
       onCancel={handleCancel}

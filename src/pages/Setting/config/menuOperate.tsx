@@ -44,10 +44,10 @@ const createMenu = (team: ITeam, menus: OperateMenuType[], children: MenuItemTyp
   return {
     key: team.key,
     item: team,
-    label: team.metadata.name,
-    itemType: team.metadata.typeName,
+    label: team.name,
+    itemType: team.typeName,
     menus: menus,
-    tag: [team.metadata.typeName],
+    tag: [team.typeName],
     icon: <TeamIcon notAvatar={true} share={team.share} size={18} fontSize={16} />,
     children: children,
   };
@@ -74,7 +74,7 @@ const buildGroupTree = (groups: IGroup[]): MenuItemType[] => {
 /** 编译类别树 */
 const buildSpeciesTree = (species: ISpeciesItem): MenuItemType => {
   const children: MenuItemType[] = [];
-  switch (species.metadata.typeName) {
+  switch (species.typeName) {
     case SpeciesType.WorkThing:
       children.push(...buildFormMenu(species as IWorkThing));
       break;
@@ -88,14 +88,14 @@ const buildSpeciesTree = (species: ISpeciesItem): MenuItemType => {
   return {
     key: species.key,
     item: species,
-    label: species.metadata.name,
-    tag: [species.metadata.typeName],
+    label: species.name,
+    tag: [species.typeName],
     icon: <TeamIcon share={species.share} size={18} fontSize={16} />,
     itemType: MenuType.Species,
     menus: loadSpeciesMenus(species),
     children: [...children, ...species.children.map((i) => buildSpeciesTree(i))],
     beforeLoad: async () => {
-      switch (species.metadata.typeName) {
+      switch (species.typeName) {
         case SpeciesType.Market:
         case SpeciesType.WorkItem:
           await (species as IWorkItem).loadWorkDefines();
@@ -138,7 +138,7 @@ const buildDict = (dictClass: IDictClass) => {
     return {
       key: dict.id,
       item: dict,
-      label: dict.metadata.name,
+      label: dict.name,
       itemType: MenuType.Dict,
       tag: ['字典'],
       icon: <im.ImBook fontSize={22} />,
@@ -156,7 +156,7 @@ const buildFormMenu = (form: IWorkThing) => {
     return {
       key: i.key,
       item: i,
-      label: i.metadata.name,
+      label: i.name,
       icon: <im.ImInsertTemplate fontSize={22} />,
       itemType: MenuType.Form,
       menus: loadFormMenus(i),
@@ -174,7 +174,7 @@ const buildAuthorityTree = (authority: IAuthority, name?: string) => {
   const result: MenuItemType = {
     key: authority.key,
     item: authority,
-    label: name || authority.metadata.name,
+    label: name || authority.name,
     icon: <im.ImTree />,
     itemType: MenuType.Authority,
     tag: [MenuType.Authority],
@@ -198,6 +198,11 @@ const LoadStandardMenus = (target: ITarget) => {
 /** 加载右侧菜单 */
 const loadSpeciesMenus = (species: ISpeciesItem) => {
   const items: OperateMenuType[] = [];
+  switch (species.typeName) {
+    case SpeciesType.Dict:
+      items.push(...loadDictMenus());
+      break;
+  }
   if (species.speciesTypes.length > 0) {
     items.push({
       key: '新增类别',

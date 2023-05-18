@@ -1,17 +1,12 @@
-import { common, kernel, model, parseAvatar, schema } from '../../../base';
-import { PageAll, ShareIdSet } from '../../public/consts';
+import { kernel, model, schema } from '../../../base';
+import { Entity, IEntity } from '../../public';
+import { PageAll } from '../../public/consts';
 import { DictClass } from './dictclass';
 
 /** 元数据字典接口 */
-export interface IDict extends common.IEntity {
-  /** 唯一标识 */
-  id: string;
-  /** 数据实体 */
-  metadata: schema.XDict;
+export interface IDict extends IEntity<schema.XDict> {
   /** 加载权限的自归属用户 */
   species: DictClass;
-  /** 共享信息 */
-  share: model.ShareIcon;
   /** 字典项 */
   items: schema.XDictItem[];
   /** 更新字典 */
@@ -29,32 +24,24 @@ export interface IDict extends common.IEntity {
 }
 
 /** 元数据字典实现 */
-export class Dict extends common.Entity implements IDict {
+export class Dict extends Entity<schema.XDict> implements IDict {
   constructor(_metadata: schema.XDict, _species: DictClass) {
-    super();
-    this.species = _species;
-    this.metadata = _metadata;
-    this.share = {
-      name: this.metadata.name,
+    super({
+      ..._metadata,
       typeName: '字典',
-      avatar: parseAvatar(this.metadata.icon),
-    };
-    ShareIdSet.set(this.metadata.id, this.share);
+    });
+    this.species = _species;
   }
   species: DictClass;
-  share: model.ShareIcon;
-  metadata: schema.XDict;
   items: schema.XDictItem[] = [];
   private _itemLoaded: boolean = false;
-  get id(): string {
-    return this.metadata.id;
-  }
   async update(data: model.DictModel): Promise<boolean> {
     data.id = this.id;
     data.speciesId = this.species.id;
     const res = await kernel.updateDict(data);
     if (res.success && res.data?.id) {
-      this.metadata = res.data;
+      res.data.typeName = '字典';
+      this.setMetadata(res.data);
     }
     return res.success;
   }

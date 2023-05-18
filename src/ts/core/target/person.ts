@@ -2,10 +2,10 @@ import { kernel, model, parseAvatar, schema } from '@/ts/base';
 import { IBelong, Belong } from './base/belong';
 import { ICohort, Cohort } from './outTeam/cohort';
 import { createCompany } from './team';
-import { PageAll, ShareIdSet, companyTypes } from '../public/consts';
+import { PageAll, companyTypes } from '../public/consts';
 import { OperateType, TargetType } from '../public/enums';
 import { ICompany } from './team/company';
-import { IMsgChat, PersonMsgChat } from '../chat/message/msgchat';
+import { IMsgChat } from '../chat/message/msgchat';
 import { ITarget } from './base/target';
 import { ITeam } from './base/team';
 
@@ -141,13 +141,11 @@ export class Person extends Belong implements IPerson {
     return false;
   }
   override async delete(): Promise<boolean> {
+    await this.createTargetMsg(OperateType.Remove, this.metadata);
     const res = await kernel.deleteTarget({
       id: this.id,
       page: PageAll,
     });
-    if (res.success) {
-      this.createTargetMsg(OperateType.Remove, this.metadata);
-    }
     return res.success;
   }
   get subTarget(): ITarget[] {
@@ -205,58 +203,32 @@ export class Person extends Belong implements IPerson {
     }
     this.superAuth?.deepLoad(reload);
   }
-  override loadMemberChats(_newMembers: schema.XTarget[], _isAdd: boolean): void {
-    _newMembers = _newMembers.filter((i) => i.id != this.userId);
-    if (_isAdd) {
-      _newMembers.forEach((i) => {
-        this.memberChats.push(
-          new PersonMsgChat(
-            this.id,
-            i.id,
-            {
-              name: i.name,
-              typeName: i.typeName,
-              avatar: parseAvatar(i.icon),
-            },
-            ['好友'],
-            i.remark,
-            this,
-          ),
-        );
-      });
-    } else {
-      this.memberChats = this.memberChats.filter((i) =>
-        _newMembers.every((a) => a.id != i.chatId),
-      );
-    }
-  }
   async teamChangedNotity(target: schema.XTarget): Promise<boolean> {
     switch (target.typeName) {
-      case TargetType.Person:
-        await this.pullMembers([target], true);
-        return true;
       case TargetType.Cohort:
-        {
+        if (this.cohorts.every((i) => i.id != target.id)) {
           const cohort = new Cohort(target, this);
           await cohort.deepLoad();
           this.cohorts.push(cohort);
+          return true;
         }
-        return true;
+        break;
       default:
         if (companyTypes.includes(target.typeName as TargetType)) {
-          const company = createCompany(target, this);
-          await company.deepLoad();
-          this.companys.push(company);
-          return true;
+          if (this.companys.every((i) => i.id != target.id)) {
+            const company = createCompany(target, this);
+            await company.deepLoad();
+            this.companys.push(company);
+            return true;
+          }
         }
     }
     return false;
   }
 
   findShareById(id: string): model.ShareIcon {
-    if (ShareIdSet.has(id)) {
-      return ShareIdSet.get(id)!;
-    } else if (id && id.length > 10) {
+    const metadata = this.findMetadata<schema.XEntity>(id);
+    if (!metadata) {
       kernel
         .queryTargetById({
           ids: [id],
@@ -265,18 +237,15 @@ export class Person extends Belong implements IPerson {
         .then((res) => {
           if (res.success && res.data.result) {
             res.data.result.forEach((item) => {
-              ShareIdSet.set(item.id, {
-                name: item.name,
-                typeName: item.typeName,
-                avatar: parseAvatar(item.icon),
-              });
+              this.updateMetadata(item);
             });
           }
         });
     }
     return {
-      name: '请稍等...',
-      typeName: '未知',
+      name: metadata?.name ?? '请稍后...',
+      typeName: metadata?.typeName ?? '未知',
+      avatar: parseAvatar(metadata?.icon),
     };
   }
 }

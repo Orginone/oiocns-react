@@ -4,6 +4,7 @@ import { IWork, IWorkDefine, Work } from '../base/work';
 import { IForm } from '../base/form';
 import { IApplication } from './application';
 import { ISpeciesItem } from '../base/species';
+import { SpeciesType } from '../../public';
 export interface IWorkItem extends IWork {
   /** 加载所有的办事 */
   loadAllWorkDefines(reload?: boolean): Promise<IWorkDefine[]>;
@@ -14,7 +15,10 @@ export class WorkItem extends Work implements IWorkItem {
     super(_metadata, _app.current, _app, _parent);
     this.app = _app;
     for (const item of _metadata.nodes || []) {
-      this.children.push(new WorkItem(item, this.app, this));
+      const subItem = this.createChildren(item, _app.current);
+      if (subItem) {
+        this.children.push(subItem);
+      }
     }
     this.speciesTypes = [_metadata.typeName];
   }
@@ -33,6 +37,9 @@ export class WorkItem extends Work implements IWorkItem {
     _metadata: schema.XSpecies,
     _current: ITarget,
   ): ISpeciesItem | undefined {
-    return new WorkItem(_metadata, this.app, this);
+    switch (_metadata.typeName) {
+      case SpeciesType.WorkItem:
+        return new WorkItem(_metadata, this.app, this);
+    }
   }
 }

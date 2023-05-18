@@ -61,7 +61,7 @@ const Attribute: React.FC<IProps> = ({ current, property }) => {
             {current.metadata.createTime}
           </Descriptions.Item>
           <Descriptions.Item contentStyle={{ textAlign: 'left' }} label="分类定义">
-            {current.metadata.remark}
+            {current.remark}
           </Descriptions.Item>
         </Descriptions>
       </Card>

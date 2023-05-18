@@ -1,5 +1,5 @@
 import { XWorkDefine } from '@/ts/base/schema';
-import { common, kernel, model, parseAvatar, schema } from '../../../base';
+import { kernel, model, schema } from '../../../base';
 import { PageAll } from '../../public/consts';
 import { TargetType } from '../../public/enums';
 import { ISpeciesItem, SpeciesItem } from './species';
@@ -7,14 +7,11 @@ import { ShareIcon } from '@/ts/base/model';
 import { IForm } from './form';
 import { IApplication } from '../app/application';
 import { ITarget } from '../../target/base/target';
+import { Entity, IEntity } from '../../public';
 
-export interface IWorkDefine extends common.IEntity {
-  /** 唯一标识 */
-  id: string;
+export interface IWorkDefine extends IEntity<schema.XWorkDefine> {
   /** 办事分类 */
   workItem: IWork;
-  /** 数据 */
-  metadata: XWorkDefine;
   /** 共享信息 */
   share: ShareIcon;
   /** 更新办事定义 */
@@ -31,22 +28,14 @@ export interface IWorkDefine extends common.IEntity {
   ): Promise<schema.XWorkInstance | undefined>;
 }
 
-export class FlowDefine extends common.Entity implements IWorkDefine {
+export class FlowDefine extends Entity<schema.XWorkDefine> implements IWorkDefine {
   workItem: IWork;
-  metadata: XWorkDefine;
-  constructor(define: XWorkDefine, work: IWork) {
-    super();
+  constructor(_metadata: XWorkDefine, work: IWork) {
+    super({
+      ..._metadata,
+      typeName: '事项',
+    });
     this.workItem = work;
-    this.metadata = define;
-    this.share = {
-      name: this.metadata.name,
-      typeName: '办事项',
-      avatar: parseAvatar(this.metadata.icon),
-    };
-  }
-  share: model.ShareIcon;
-  get id(): string {
-    return this.metadata.id;
   }
   async createWorkInstance(
     data: model.WorkInstanceModel,
@@ -72,7 +61,8 @@ export class FlowDefine extends common.Entity implements IWorkDefine {
     data.speciesId = this.metadata.speciesId;
     const res = await kernel.createWorkDefine(data);
     if (res.success && res.data.id) {
-      this.metadata = res.data;
+      res.data.typeName = '事项';
+      this.setMetadata(res.data);
     }
     return res.success;
   }
@@ -121,7 +111,7 @@ export abstract class Work extends SpeciesItem implements IWork {
         id: this.current.id,
         speciesId: this.id,
         belongId: this.belongId,
-        upTeam: this.current.metadata.typeName === TargetType.Group,
+        upTeam: this.current.typeName === TargetType.Group,
         page: PageAll,
       });
       if (res.success) {

@@ -1,7 +1,6 @@
 import { model, common, schema, kernel, List } from '../../../base';
-import { ShareIdSet, storeCollName } from '../../public/consts';
-import { MessageType, TargetType } from '../../public/enums';
 import { IBelong } from '../../target/base/belong';
+import { IEntity, Entity, MessageType, TargetType, storeCollName } from '../../public';
 // 空时间
 const nullTime = new Date('2022-07-01').getTime();
 // 消息变更推送
@@ -25,8 +24,9 @@ export type MsgChatData = {
   /** 最新消息 */
   lastMessage?: model.MsgSaveModel;
 };
+
 // 消息类会话接口
-export interface IMsgChat extends common.IEntity {
+interface IChat {
   /** 消息类会话元数据 */
   chatdata: MsgChatData;
   /** 回话的标签列表 */
@@ -75,37 +75,35 @@ export interface IMsgChat extends common.IEntity {
   receiveMessage(msg: model.MsgSaveModel): void;
 }
 
-export abstract class MsgChat extends common.Entity implements IMsgChat {
-  constructor(
-    _belongId: string,
-    _chatId: string,
-    _share: model.ShareIcon,
-    _labels: string[],
-    _remark: string,
-    _space?: IBelong,
-  ) {
-    super();
-    this.share = _share;
-    this.chatId = _chatId;
+// 消息类会话接口
+export interface IMsgChat extends IChat, IEntity<schema.XEntity> {}
+
+export interface IMsgChatT<T extends schema.XEntity> extends IChat, IEntity<T> {}
+
+export abstract class MsgChat<T extends schema.XEntity>
+  extends Entity<T>
+  implements IMsgChatT<T>
+{
+  constructor(_metadata: T, _belongId: string, _labels: string[], _space?: IBelong) {
+    super(_metadata);
+    this.chatId = _metadata.id;
     this.space = _space || (this as unknown as IBelong);
     this.belongId = _belongId;
     this.chatdata = {
       noReadCount: 0,
       isToping: false,
       labels: _labels,
-      chatRemark: _remark,
-      chatName: _share.name,
+      chatRemark: _metadata.remark,
+      chatName: _metadata.name,
       lastMsgTime: nullTime,
-      fullId: `${_belongId}-${_chatId}`,
+      fullId: `${_belongId}-${_metadata.id}`,
     };
     this.labels = new List(_labels);
-    ShareIdSet.set(this.chatId, this.share);
   }
   space: IBelong;
   chatId: string;
   belongId: string;
   labels: List<string>;
-  share: model.ShareIcon;
   messages: model.MsgSaveModel[] = [];
   members: schema.XTarget[] = [];
   chatdata: MsgChatData;
@@ -133,6 +131,7 @@ export abstract class MsgChat extends common.Entity implements IMsgChat {
     if (this.messages.length < 10) {
       this.moreMessage();
     }
+    this.loadMembers();
   }
   cache(): void {
     this.chatdata.labels = this.labels.ToArray();
@@ -150,7 +149,6 @@ export abstract class MsgChat extends common.Entity implements IMsgChat {
       this.labels = this.labels.Union(new List<string>(cache.labels ?? []));
       this.chatdata.chatName = cache.chatName || this.chatdata.chatName;
       this.share.name = this.chatdata.chatName;
-      ShareIdSet.set(this.chatId, this.share);
       cache.noReadCount = cache.noReadCount || this.chatdata.noReadCount;
       if (this.chatdata.noReadCount != cache.noReadCount) {
         this.chatdata.noReadCount = cache.noReadCount;
@@ -283,16 +281,17 @@ export abstract class MsgChat extends common.Entity implements IMsgChat {
   }
 }
 
-export class PersonMsgChat extends MsgChat implements IMsgChat {
+export class PersonMsgChat
+  extends MsgChat<schema.XTarget>
+  implements IMsgChatT<schema.XTarget>
+{
   constructor(
+    _metadata: schema.XTarget,
     _belongId: string,
-    _chatId: string,
-    _share: model.ShareIcon,
     _labels: string[],
-    _remark: string,
-    _space: IBelong,
+    _space?: IBelong,
   ) {
-    super(_belongId, _chatId, _share, _labels, _remark, _space);
+    super(_metadata, _belongId, _labels, _space);
   }
   async loadMembers(_reload: boolean = false): Promise<schema.XTarget[]> {
     return [];

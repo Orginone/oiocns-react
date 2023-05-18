@@ -14,7 +14,7 @@ interface IProps {
  */
 const SettingStandrad: React.FC<IProps> = ({ current }: IProps) => {
   const Content = () => {
-    switch (current.metadata.typeName) {
+    switch (current.typeName) {
       case SpeciesType.Store:
         return <Property current={current} />;
       case SpeciesType.Market:

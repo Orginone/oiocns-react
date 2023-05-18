@@ -102,7 +102,7 @@ const DictModal = (props: Iprops) => {
   return (
     <SchemaForm<DictModel>
       formRef={formRef}
-      title={dict ? `编辑[${dict.metadata.name}]字典` : '新增字典'}
+      title={dict ? `编辑[${dict.name}]字典` : '新增字典'}
       open={open}
       width={640}
       layoutType="ModalForm"

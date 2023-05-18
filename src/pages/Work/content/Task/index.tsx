@@ -26,7 +26,7 @@ const TaskContent = (props: IProps) => {
 
   /** 查询任务项 */
   const getTaskList = async (page: model.PageModel) => {
-    let taskList: schema.XWorkTaskArray = {
+    let taskList: model.PageResult<XWorkTask> = {
       offset: page.offset,
       limit: page.limit,
       total: 0,

@@ -185,7 +185,7 @@ export const PropertyColumns = (
     render: (_, record) => {
       const find = getSpeciesName(record.speciesId, [species]);
       if (find != undefined) {
-        return find.metadata.name;
+        return find.name;
       }
       return '未知';
     },
@@ -261,7 +261,7 @@ export const FormColumns = (species: ISpeciesItem): ProColumns<schema.XForm>[] =
     render: (_, record) => {
       const find = getSpeciesName(record.speciesId, [species]);
       if (find != undefined) {
-        return find.metadata.name;
+        return find.name;
       }
       return '未知';
     },

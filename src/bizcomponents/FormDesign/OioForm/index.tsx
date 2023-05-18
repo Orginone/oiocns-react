@@ -43,7 +43,7 @@ const OioForm: React.FC<IProps> = ({
           fontSize: 16,
           marginBottom: 20,
         }}>
-        {form.metadata.name}
+        {form.name}
       </div>
       <ProForm
         disabled={disabled === true}

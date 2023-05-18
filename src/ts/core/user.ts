@@ -3,15 +3,18 @@ import { common, kernel, model, schema } from '../base';
 import { IChatProvider, ChatProvider } from './chat/provider';
 import { IWorkProvider, WorkProvider } from './work/provider';
 import { OperateType } from './public/enums';
+import { logger } from '../base/common';
+import { msgChatNotify } from './chat/message/msgchat';
 const sessionUserName = 'sessionUser';
 
-export class UserProvider extends common.Emitter {
+export class UserProvider {
   private _user: IPerson | undefined;
   private _work: IWorkProvider | undefined;
   private _chat: IChatProvider | undefined;
   private _inited: boolean = false;
-  constructor() {
-    super();
+  private _emiter: common.Emitter;
+  constructor(emiter: common.Emitter) {
+    this._emiter = emiter;
     const userJson = sessionStorage.getItem(sessionUserName);
     if (userJson && userJson.length > 0) {
       this._loadUser(JSON.parse(userJson));
@@ -81,7 +84,7 @@ export class UserProvider extends common.Emitter {
     this._user = new Person(person);
     this._chat = new ChatProvider(this._user);
     this._work = new WorkProvider(this._user);
-    this.changCallback();
+    this.refresh();
   }
   /** 更新用户 */
   public update(person: schema.XTarget) {
@@ -95,47 +98,68 @@ export class UserProvider extends common.Emitter {
     await this.work?.loadTodos(true);
     this._inited = true;
     this._chat?.loadPreMessage();
+    this._emiter.changCallback();
   }
 
   async _updateTarget(recvData: string) {
     const data: model.TargetOperateModel = JSON.parse(recvData);
     if (!this.user || !data) return;
+    let message = '';
     switch (data.operate) {
       case OperateType.Delete:
+        message = `${data.operater?.name}将${data.target.name}删除.`;
         this.user.targets
           .filter((i) => i.id === data.target.id)
           .forEach((i) => i.delete(true));
         break;
       case OperateType.Update:
-        this.user.targets
-          .filter((i) => i.id === data.target.id)
-          .forEach((i) => (i.metadata = data.target));
+        message = `${data.operater?.name}将${data.target.name}信息更新.`;
+        this.user.updateMetadata(data.target);
         break;
       case OperateType.Remove:
         if (data.subTarget) {
-          this.user.targets
-            .filter(
-              (i) => i.id === data.target.id || data.target.id === data.subTarget!.id,
-            )
-            .forEach((i) => i.removeMembers([data.subTarget!], true));
+          if (data.subTarget.id === this.user.id) {
+            message = `您已被${data.operater?.name}从${data.target.name}移除.`;
+            this.user.targets
+              .filter((i) => i.id === data.target.id)
+              .forEach((i) => i.delete(true));
+          } else {
+            message = `${data.operater?.name}把${data.subTarget.name}从${data.target.name}移除.`;
+            this.user.targets
+              .filter(
+                (i) => i.id === data.target.id || data.target.id === data.subTarget!.id,
+              )
+              .forEach((i) => i.removeMembers([data.subTarget!], true));
+          }
         }
         break;
       case OperateType.Add:
         if (data.subTarget) {
+          let operated = false;
+          message = `${data.operater?.name}把${data.subTarget.name}与${data.target.name}建立关系.`;
           for (const item of [this.user, ...this.user.companys]) {
             if (
               item.id === data.subTarget.id &&
               (await item.teamChangedNotity(data.target))
             ) {
-              return;
+              operated = true;
             }
           }
-          for (const item of this.user.targets) {
-            if (item.id === data.target.id) {
-              await item.teamChangedNotity(data.subTarget);
+          if (!operated) {
+            for (const item of this.user.targets) {
+              if (item.id === data.target.id) {
+                await item.teamChangedNotity(data.subTarget);
+              }
             }
           }
         }
+    }
+    if (message.length > 0) {
+      if (data.operater?.id != this.user.id) {
+        logger.info(message);
+      }
+      msgChatNotify.changCallback();
+      this._emiter.changCallback();
     }
   }
 }

@@ -1,4 +1,4 @@
-import { PageModel, ShareIcon } from '../../base/model';
+import { PageModel } from '../../base/model';
 import { TargetType } from './enums';
 
 /** 资产共享云模块权限Id */
@@ -41,5 +41,3 @@ export const PageAll: PageModel = {
   limit: (2 << 15) - 1, //ushort.max
   filter: '',
 };
-/** 共享信息数据集 */
-export const ShareIdSet = new Map<string, ShareIcon>();

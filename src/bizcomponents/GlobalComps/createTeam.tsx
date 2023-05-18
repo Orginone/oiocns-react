@@ -23,7 +23,7 @@ interface Iprops {
 const CreateTeamModal = (props: Iprops) => {
   const [avatar, setAvatar] = useState<FileItemShare>();
   if (props.isEdit) {
-    props.typeNames.unshift(props.current.metadata.typeName);
+    props.typeNames.unshift(props.current.typeName);
     props.typeNames.splice(1);
   } else if (props.typeNames.includes(props.title)) {
     props.typeNames.splice(0, 1);
@@ -136,9 +136,7 @@ const CreateTeamModal = (props: Iprops) => {
   return (
     <SchemaForm<TargetModel>
       title={
-        props.title.includes('编辑')
-          ? `编辑[${props.current?.metadata.name}]用户`
-          : props.title
+        props.title.includes('编辑') ? `编辑[${props.current?.name}]用户` : props.title
       }
       open={props.open}
       width={640}

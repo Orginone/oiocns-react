@@ -77,7 +77,7 @@ const Modal = ({ open, handleOk, species, current, handleCancel }: Iprops) => {
       formRef={formRef}
       layoutType="ModalForm"
       width={640}
-      title={current ? `修改[${current.metadata.name}]表单` : '新增表单'}
+      title={current ? `修改[${current.name}]表单` : '新增表单'}
       open={open}
       rowProps={{
         gutter: [24, 0],

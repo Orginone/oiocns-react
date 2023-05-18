@@ -92,20 +92,20 @@ export const loadFileSysItemMenus = (
 const buildSpeciesTree = (species: ISpeciesItem[]): MenuItemType[] => {
   const result: MenuItemType[] = [];
   for (const item of species) {
-    switch (item.metadata.typeName) {
+    switch (item.typeName) {
       case SpeciesType.Store:
       case SpeciesType.Market:
       case SpeciesType.WorkThing:
       case SpeciesType.Application:
         {
           const children: MenuItemType[] = [];
-          if (item.metadata.typeName === SpeciesType.WorkThing) {
+          if (item.typeName === SpeciesType.WorkThing) {
             children.push(
               ...(item as IWorkThing).forms.map((i) => {
                 return {
                   key: i.key,
                   item: i,
-                  label: i.metadata.name,
+                  label: i.name,
                   icon: <TeamIcon share={item.share} size={18} fontSize={16} />,
                   itemType: MenuType.Form,
                   beforeLoad: async () => {
@@ -119,16 +119,16 @@ const buildSpeciesTree = (species: ISpeciesItem[]): MenuItemType[] => {
           result.push({
             key: item.key,
             item: item,
-            label: item.metadata.name,
+            label: item.name,
             icon: (
               <TeamIcon notAvatar={true} share={item.share} size={18} fontSize={16} />
             ),
             itemType: MenuType.Species,
             menus: [],
-            tag: [item.metadata.typeName],
+            tag: [item.typeName],
             children: [...children, ...buildSpeciesTree(item.children)],
             beforeLoad: async () => {
-              switch (item.metadata.typeName) {
+              switch (item.typeName) {
                 case SpeciesType.WorkThing:
                   await (item as IWorkThing).loadForms();
                   break;
@@ -168,7 +168,7 @@ const loadChildren = (team: IBelong) => {
   for (const t of team.targets) {
     if (t.space === team.space) {
       for (const s of t.species) {
-        switch (s.metadata.typeName) {
+        switch (s.typeName) {
           case SpeciesType.Store:
           case SpeciesType.Market:
           case SpeciesType.Application:
@@ -185,7 +185,7 @@ const getUserMenu = () => {
   return {
     key: orgCtrl.user.key,
     item: orgCtrl.user,
-    label: orgCtrl.user.metadata.name,
+    label: orgCtrl.user.name,
     itemType: GroupMenuType.User,
     icon: <TeamIcon share={orgCtrl.user.share} size={18} fontSize={16} />,
     menus: [],
@@ -200,7 +200,7 @@ const getTeamMenu = () => {
     children.push({
       key: company.key,
       item: company,
-      label: company.metadata.name,
+      label: company.name,
       itemType: GroupMenuType.Company,
       menus: [],
       icon: <TeamIcon share={company.share} size={18} fontSize={16} />,

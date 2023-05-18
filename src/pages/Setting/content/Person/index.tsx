@@ -13,6 +13,7 @@ import SearchCompany from '@/bizcomponents/SearchCompany';
 import { TargetType } from '@/ts/core';
 import PageCard from '@/components/PageCard';
 import { common } from 'typings/common';
+import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 
 /**
  * 个人信息
@@ -21,6 +22,7 @@ import { common } from 'typings/common';
 const PersonSetting: React.FC = () => {
   const history = useHistory();
   const parentRef = useRef<any>(null);
+  const [key, refreshKey] = useCtrlUpdate(orgCtrl);
   const [tabKey, setTabKey] = useState<string>('friends');
   const [modalType, setModalType] = useState('');
   const [searchCallback, setSearchCallback] = useState<schema.XTarget[]>();
@@ -53,16 +55,14 @@ const PersonSetting: React.FC = () => {
           ]}>
           <Descriptions.Item label="昵称">
             <TeamIcon share={orgCtrl.user.share} size={40} preview={true} />
-            {orgCtrl.user.metadata.name}
+            {orgCtrl.user.name}
           </Descriptions.Item>
           <Descriptions.Item label="账号">
             <Typography.Paragraph copyable>
               {orgCtrl.user.metadata.code}
             </Typography.Paragraph>
           </Descriptions.Item>
-          <Descriptions.Item label="座右铭">
-            {orgCtrl.user.metadata.remark}
-          </Descriptions.Item>
+          <Descriptions.Item label="座右铭">{orgCtrl.user.remark}</Descriptions.Item>
         </Descriptions>
       </Card>
     </div>
@@ -82,6 +82,7 @@ const PersonSetting: React.FC = () => {
         label: '移除',
         onClick: async () => {
           await orgCtrl.user.removeMembers([item]);
+          refreshKey();
         },
       },
     ];
@@ -92,6 +93,7 @@ const PersonSetting: React.FC = () => {
       <Layout className={cls.container}>{content}</Layout>
       <Layout className={cls.container}>
         <PageCard
+          key={key}
           bordered={false}
           tabList={TitleItems}
           onTabChange={(key) => setTabKey(key)}

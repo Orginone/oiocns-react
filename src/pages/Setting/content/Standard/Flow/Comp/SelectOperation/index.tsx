@@ -26,7 +26,7 @@ const SelectOperation: React.FC<IProps> = ({ current, selected, setSelected }) =
       forms.map((item) => {
         return {
           key: item.id,
-          title: item.metadata.name,
+          title: item.name,
           value: item.id,
           item: item.metadata,
           children: [],
@@ -53,7 +53,7 @@ const SelectOperation: React.FC<IProps> = ({ current, selected, setSelected }) =
     for (const item of species) {
       result.push({
         key: item.id,
-        title: item.metadata.name,
+        title: item.name,
         value: item.id,
         item: item,
         children: buildWorkThingTree(item.children.map((i) => i as IWorkThing)),
@@ -83,7 +83,7 @@ const SelectOperation: React.FC<IProps> = ({ current, selected, setSelected }) =
               onSelect={onSelect}
               treeData={buildWorkThingTree(
                 current.app.children
-                  .filter((i) => i.metadata.typeName === SpeciesType.WorkThing)
+                  .filter((i) => i.typeName === SpeciesType.WorkThing)
                   .map((i) => i as IWorkThing),
               )}
             />

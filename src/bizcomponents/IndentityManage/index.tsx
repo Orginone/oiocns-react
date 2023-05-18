@@ -31,7 +31,7 @@ const ShareRecent = (props: Iprops) => {
       for (const item of targets) {
         result.push({
           key: item.id,
-          title: item.metadata.name,
+          title: item.name,
           item: item,
           isLeaf: item.subTarget.length === 0,
           icon: <TeamIcon share={item.share} size={18} />,
@@ -63,7 +63,7 @@ const ShareRecent = (props: Iprops) => {
       }
       const result = (await item.loadIdentitys()).map((i) => {
         return {
-          title: `[${item.metadata.name}]` + i.metadata.name,
+          title: `[${item.name}]` + i.name,
           key: i.id,
           data: i,
         };
@@ -104,7 +104,7 @@ const ShareRecent = (props: Iprops) => {
       for (const item of data.identitys) {
         result.push({
           id: item.id,
-          name: item.metadata.name,
+          name: item.name,
           type: 'add',
         });
       }

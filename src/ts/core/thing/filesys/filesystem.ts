@@ -1,6 +1,6 @@
-import { Entity, IEntity } from '@/ts/base/common';
 import { FileSystemItem, IFileSystemItem } from './filesysItem';
 import { IBelong } from '../../target/base/belong';
+import { generateUuid } from '@/ts/base/common';
 
 /** 任务模型 */
 export type TaskModel = {
@@ -12,7 +12,9 @@ export type TaskModel = {
 };
 
 /** 文件系统类型接口 */
-export interface IFileSystem extends IEntity {
+export interface IFileSystem {
+  /** 实体唯一键 */
+  key: string;
   /** 归属用户 */
   belong: IBelong;
   /** 主目录 */
@@ -28,9 +30,9 @@ export interface IFileSystem extends IEntity {
 }
 
 /** 文件系统类型实现 */
-export class FileSystem extends Entity implements IFileSystem {
+export class FileSystem implements IFileSystem {
   constructor(_belong: IBelong) {
-    super();
+    this.key = generateUuid();
     this.belong = _belong;
     this._taskIdSet = new Map<string, TaskModel>();
     this.home = new FileSystemItem(this, {
@@ -43,6 +45,7 @@ export class FileSystem extends Entity implements IFileSystem {
       hasSubDirectories: true,
     });
   }
+  key: string;
   belong: IBelong;
   home: IFileSystemItem;
   private _taskIdSet: Map<string, TaskModel>;

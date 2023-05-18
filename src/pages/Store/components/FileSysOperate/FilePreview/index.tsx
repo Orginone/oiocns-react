@@ -24,14 +24,14 @@ const FilePreview = ({ share, previewDone }: IProps) => {
   }, []);
 
   const getBody = () => {
-    if (share.thumbnail.length > 0) {
+    if (share.thumbnail && share.thumbnail.length > 0) {
       return <Image src={share.shareLink} title={share.name} preview={false} />;
     }
 
     return (
       <FileViewer
         key={view}
-        fileType={share.extension.substring(1)}
+        fileType={share.extension?.substring(1)}
         filePath={share.shareLink}
         errorComponent={(val: any) => {
           console.log('err=', val);

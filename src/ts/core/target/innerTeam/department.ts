@@ -1,7 +1,7 @@
 import { kernel, model, schema } from '@/ts/base';
 import { ITarget, Target } from '../base/target';
 import { ICompany } from '../team/company';
-import { OperateType, TargetType } from '../../public/enums';
+import { TargetType } from '../../public/enums';
 import { PageAll } from '../../public/consts';
 import { IMsgChat } from '../../chat/message/msgchat';
 import { ITeam } from '../base/team';
@@ -86,7 +86,6 @@ export class Department extends Target implements IDepartment {
       await department.deepLoad();
       if (await this.pullSubTarget(department)) {
         this.children.push(department);
-        this.createTargetMsg(OperateType.Add, metadata);
         return department;
       }
     }
@@ -103,7 +102,6 @@ export class Department extends Target implements IDepartment {
           (i) => i.key != this.key,
         );
       }
-      this.createTargetMsg(OperateType.Remove, this.space.user.metadata);
       return true;
     }
     return false;
@@ -144,10 +142,13 @@ export class Department extends Target implements IDepartment {
   }
   async teamChangedNotity(target: schema.XTarget): Promise<boolean> {
     if (this.childrenTypes.includes(target.typeName as TargetType)) {
-      const department = new Department(target, this.company);
-      await department.deepLoad();
-      this.children.push(department);
-      return true;
+      if (this.children.every((i) => i.id != target.id)) {
+        const department = new Department(target, this.company);
+        await department.deepLoad();
+        this.children.push(department);
+        return true;
+      }
+      return false;
     }
     return await this.pullMembers([target], true);
   }

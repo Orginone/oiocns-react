@@ -1,6 +1,6 @@
 import { blobToDataUrl, generateUuid, logger } from '@/ts/base/common';
 import { BucketOpreateModel, BucketOpreates, FileItemModel } from '@/ts/base/model';
-import { model, kernel, common } from '@/ts/base';
+import { model, kernel } from '@/ts/base';
 import { IFileSystem, TaskModel } from './filesystem';
 import { FileItemShare } from '../../../base/model';
 import { orgAuth } from '../../public/consts';
@@ -9,7 +9,9 @@ const chunkSize = 1024 * 1024;
 /** 可为空的进度回调 */
 export type OnProgressType = (p: number) => void | undefined;
 /** 文件系统目录接口 */
-export interface IFileSystemItem extends common.IEntity {
+export interface IFileSystemItem {
+  /** 实体唯一键 */
+  key: string;
   /** 文件系统 */
   filesys: IFileSystem;
   /** 文件系统项对应的目标 */
@@ -69,18 +71,19 @@ export interface IFileSystemItem extends common.IEntity {
 }
 
 /** 文件系统项实现 */
-export class FileSystemItem extends common.Entity implements IFileSystemItem {
+export class FileSystemItem implements IFileSystemItem {
   constructor(
     _filesys: IFileSystem,
     _metadata: model.FileItemModel,
     _parent?: IFileSystemItem,
   ) {
-    super();
+    this.key = generateUuid();
     this.metadata = _metadata;
     this.parent = _parent;
     this.filesys = _filesys;
     this.belongId = this.filesys.belong.id;
   }
+  key: string;
   belongId: string;
   filesys: IFileSystem;
   metadata: FileItemModel;

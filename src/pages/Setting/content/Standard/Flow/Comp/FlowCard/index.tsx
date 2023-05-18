@@ -19,7 +19,7 @@ const FlowCard: React.FC<FlowCardType> = ({ className, data, onClick, operation 
           <ImStackoverflow />
           <div className="card-title-left-info">
             <div className="app-name">
-              <span className="app-name-label">{data.metadata.name || '--'}</span>
+              <span className="app-name-label">{data.name || '--'}</span>
             </div>
           </div>
         </div>
@@ -37,7 +37,7 @@ const FlowCard: React.FC<FlowCardType> = ({ className, data, onClick, operation 
     <div className={`customCardWrap ${className}`}>
       <Title />
       <ul className="card-content">
-        <li className="card-content-desc con">{data.metadata.remark || '暂无描述'}</li>
+        <li className="card-content-desc con">{data.remark || '暂无描述'}</li>
         <li className="card-content-date">创建于 {data.metadata.createTime}</li>
       </ul>
     </div>

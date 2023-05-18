@@ -9,29 +9,29 @@ import OrgIcons from '@/bizcomponents/GlobalComps/orgIcons';
 const buildSpeciesTree = (species: ISpeciesItem[]): MenuItemType[] => {
   const result: MenuItemType[] = [];
   for (const item of species) {
-    switch (item.metadata.typeName) {
+    switch (item.typeName) {
       case SpeciesType.WorkThing:
         {
           const thing = item as IWorkThing;
           result.push({
             key: item.key,
             item: item,
-            label: item.metadata.name,
+            label: item.name,
             icon: (
               <TeamIcon notAvatar={true} share={item.share} size={18} fontSize={16} />
             ),
-            itemType: item.metadata.typeName,
+            itemType: item.typeName,
             menus: [],
-            tag: [item.metadata.typeName],
+            tag: [item.typeName],
             children: [
               ...buildSpeciesTree(item.children),
               ...thing.forms.map((i) => {
                 return {
                   key: i.key,
                   item: i,
-                  label: i.metadata.name,
+                  label: i.name,
                   icon: <TeamIcon share={item.share} size={18} fontSize={16} />,
-                  itemType: '表单',
+                  itemType: i.typeName,
                   beforeLoad: async () => {
                     await i.loadAttributes();
                   },
@@ -56,10 +56,10 @@ const buildMarketTree = (markets: IMarket[]) => {
     return {
       key: market.current.key,
       item: market,
-      label: market.metadata.name,
-      itemType: market.metadata.typeName,
+      label: market.name,
+      itemType: market.typeName,
       menus: [],
-      tag: [market.current.space.metadata.name],
+      tag: [market.current.space.name],
       icon: <TeamIcon notAvatar={true} share={market.share} size={18} fontSize={16} />,
       children: buildSpeciesTree(market.children),
     };

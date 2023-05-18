@@ -33,7 +33,7 @@ export class Application extends SpeciesItem implements IApplication {
   async loadForms(): Promise<IForm[]> {
     const result: IForm[] = [];
     for (const item of this.children) {
-      if (item.metadata.typeName === SpeciesType.WorkThing) {
+      if (item.typeName === SpeciesType.WorkThing) {
         result.push(...(await (item as IWorkThing).loadAllForms()));
       }
     }
@@ -42,7 +42,7 @@ export class Application extends SpeciesItem implements IApplication {
   async loadWorkDefines(): Promise<IWorkDefine[]> {
     const result: IWorkDefine[] = [];
     for (const item of this.children) {
-      if (item.metadata.typeName === SpeciesType.WorkItem) {
+      if (item.typeName === SpeciesType.WorkItem) {
         result.push(...(await (item as IWorkItem).loadAllWorkDefines()));
       }
     }

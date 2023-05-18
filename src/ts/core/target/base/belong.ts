@@ -1,12 +1,12 @@
 import { schema, kernel, model } from '../../../base';
 import { PageAll } from '../../public/consts';
-import { OperateType, SpeciesType, TargetType } from '../../public/enums';
+import { SpeciesType, TargetType } from '../../public/enums';
 import { IAuthority, Authority } from '../authority/authority';
 import { Cohort, ICohort } from '../outTeam/cohort';
 import { IPerson } from '../person';
 import { ITarget, Target } from './target';
 import { IChatMessage, ChatMessage } from '../../chat/message/message';
-import { IMsgChat } from '../../chat/message/msgchat';
+import { IMsgChat, PersonMsgChat } from '../../chat/message/msgchat';
 import { IDict } from '../../thing/dict/dict';
 import { IDictClass } from '../../thing/dict/dictclass';
 import { IFileSystem, FileSystem } from '../../thing/filesys/filesystem';
@@ -64,7 +64,7 @@ export abstract class Belong extends Target implements IBelong {
   async loadDicts(): Promise<IDict[]> {
     const dicts: IDict[] = [];
     for (const item of this.species) {
-      switch (item.metadata.typeName) {
+      switch (item.typeName) {
         case SpeciesType.Dict: {
           const subDicts = await (item as IDictClass).loadAllDicts();
           for (const item of subDicts) {
@@ -96,15 +96,33 @@ export abstract class Belong extends Target implements IBelong {
     if (metadata) {
       const cohort = new Cohort(metadata, this);
       await cohort.deepLoad();
-      if (this.metadata.typeName != TargetType.Person) {
+      if (this.typeName != TargetType.Person) {
         if (!(await this.pullSubTarget(cohort))) {
           return;
         }
       }
       this.cohorts.push(cohort);
       await cohort.pullMembers([this.user.metadata]);
-      cohort.createTargetMsg(OperateType.Add, this.user.metadata);
       return cohort;
+    }
+  }
+  override loadMemberChats(_newMembers: schema.XTarget[], _isAdd: boolean): void {
+    _newMembers = _newMembers.filter((i) => i.id != this.userId);
+    if (_isAdd) {
+      _newMembers.forEach((i) => {
+        this.memberChats.push(
+          new PersonMsgChat(
+            i,
+            this.id,
+            this.id === this.user.id ? ['好友'] : ['同事'],
+            this,
+          ),
+        );
+      });
+    } else {
+      this.memberChats = this.memberChats.filter((i) =>
+        _newMembers.every((a) => a.id != i.chatId),
+      );
     }
   }
   abstract cohortChats: IMsgChat[];
