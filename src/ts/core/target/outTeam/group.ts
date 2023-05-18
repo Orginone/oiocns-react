@@ -102,7 +102,7 @@ export class Group extends Target implements IGroup {
     return targets;
   }
   get market(): IMarket | undefined {
-    const find = this.species.find((i) => i.metadata.typeName === SpeciesType.Market);
+    const find = this.species.find((i) => i.typeName === SpeciesType.Market);
     if (find) {
       return find as IMarket;
     }

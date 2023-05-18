@@ -92,9 +92,7 @@ const CohortSetting: React.FC<IProps> = ({ current }: IProps) => {
   return (
     <div key={key} className={cls.companyContainer}>
       <Description
-        title={
-          <Typography.Title level={5}>{current.metadata.typeName}信息</Typography.Title>
-        }
+        title={<Typography.Title level={5}>{current.typeName}信息</Typography.Title>}
         current={current}
         extra={[]}
       />

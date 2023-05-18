@@ -1,4 +1,4 @@
-import { kernel, model, parseAvatar, schema } from '@/ts/base';
+import { kernel, model, schema } from '@/ts/base';
 import { IBelong, Belong } from '../base/belong';
 import { ICohort, Cohort } from '../outTeam/cohort';
 import { IGroup, Group } from '../outTeam/group';
@@ -7,7 +7,7 @@ import { IStation, Station } from '../innerTeam/station';
 import { IPerson } from '../person';
 import { PageAll } from '../../public/consts';
 import { OperateType, TargetType } from '../../public/enums';
-import { IMsgChat, PersonMsgChat } from '../../chat/message/msgchat';
+import { IMsgChat } from '../../chat/message/msgchat';
 import { ITarget } from '../base/target';
 import { ITeam } from '../base/team';
 
@@ -229,31 +229,6 @@ export class Company extends Belong implements ICompany {
       targets.push(...item.targets);
     }
     return targets;
-  }
-  override loadMemberChats(_newMembers: schema.XTarget[], _isAdd: boolean): void {
-    _newMembers = _newMembers.filter((i) => i.id != this.userId);
-    if (_isAdd) {
-      _newMembers.forEach((i) => {
-        this.memberChats.push(
-          new PersonMsgChat(
-            this.id,
-            i.id,
-            {
-              name: i.name,
-              typeName: i.typeName,
-              avatar: parseAvatar(i.icon),
-            },
-            [this.metadata.name, '同事'],
-            i.remark,
-            this,
-          ),
-        );
-      });
-    } else {
-      this.memberChats = this.memberChats.filter((i) =>
-        _newMembers.every((a) => a.id != i.chatId),
-      );
-    }
   }
   async deepLoad(reload: boolean = false): Promise<void> {
     await this.loadGroups(reload);

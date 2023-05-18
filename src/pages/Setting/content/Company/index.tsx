@@ -103,7 +103,7 @@ const CompanySetting: React.FC<IProps> = ({ current }) => {
           <Descriptions.Item label="单位名称" contentStyle={{ textAlign: 'center' }}>
             <Space>
               {current.share.avatar && <Avatar src={current.share.avatar.thumbnail} />}
-              <strong>{current.metadata.name}</strong>
+              <strong>{current.name}</strong>
             </Space>
           </Descriptions.Item>
           <Descriptions.Item
@@ -114,7 +114,7 @@ const CompanySetting: React.FC<IProps> = ({ current }) => {
           <Descriptions.Item label="单位简介" span={2}>
             <Typography.Paragraph
               ellipsis={ellipsis ? { rows: 2, expandable: true, symbol: '更多' } : false}>
-              {current.metadata.remark}
+              {current.remark}
             </Typography.Paragraph>
           </Descriptions.Item>
         </Descriptions>

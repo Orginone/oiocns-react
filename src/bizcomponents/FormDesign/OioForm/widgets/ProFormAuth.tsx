@@ -33,7 +33,7 @@ const ProFormAuth = (props: IProps) => {
     return targets.map((item: IAuthority) => {
       return {
         key: item.id,
-        label: item.metadata.name,
+        label: item.name,
         value: item.id,
         children:
           item.children && item.children.length > 0 ? getTreeData(item.children) : [],

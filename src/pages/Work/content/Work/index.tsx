@@ -61,7 +61,7 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
         hook: '',
         content: content,
         contentType: 'Text',
-        title: current.metadata.name,
+        title: current.name,
         defineId: current.id,
         data: JSON.stringify(data),
         thingIds: rows_.map((row: any) => row['Id']),

@@ -99,7 +99,7 @@ const AuthorityModal = (props: Iprops) => {
       fieldProps: {
         options: props.current.space.parentTarget.map((i) => {
           return {
-            label: i.metadata.name,
+            label: i.name,
             value: i.id,
           };
         }),
@@ -138,9 +138,7 @@ const AuthorityModal = (props: Iprops) => {
   return (
     <SchemaForm
       title={
-        props.title.includes('编辑')
-          ? `编辑[${props.current.metadata.name}]权限`
-          : '新增权限'
+        props.title.includes('编辑') ? `编辑[${props.current.name}]权限` : '新增权限'
       }
       open={props.open}
       width={640}

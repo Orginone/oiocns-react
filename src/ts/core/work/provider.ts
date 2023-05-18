@@ -19,7 +19,7 @@ export interface IWorkProvider {
   /** 加载已办任务 */
   loadDones(req: model.IdModel): Promise<schema.XWorkRecordArray>;
   /** 加载我发起的办事任务 */
-  loadApply(req: model.IdModel): Promise<schema.XWorkTaskArray>;
+  loadApply(req: model.IdModel): Promise<model.PageResult<schema.XWorkTask>>;
   /** 任务更新 */
   updateTask(task: schema.XWorkTask): void;
   /** 任务审批 */
@@ -107,7 +107,7 @@ export class WorkProvider implements IWorkProvider {
         .map((i) => i!),
     };
   }
-  async loadApply(req: model.IdModel): Promise<schema.XWorkTaskArray> {
+  async loadApply(req: model.IdModel): Promise<model.PageResult<schema.XWorkTask>> {
     const res = await kernel.anystore.pageRequest<schema.XWorkTask>(
       this.user.id,
       hisWorkCollName,
@@ -171,7 +171,7 @@ export class WorkProvider implements IWorkProvider {
     for (const target of this.user.targets) {
       for (const species of target.species) {
         const defines: IWorkDefine[] = [];
-        switch (species.metadata.typeName) {
+        switch (species.typeName) {
           case SpeciesType.Market:
             defines.push(...(await (species as IMarket).loadWorkDefines()));
             break;

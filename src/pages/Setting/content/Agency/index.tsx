@@ -31,7 +31,7 @@ const AgencySetting: React.FC<IProps> = ({ current }: IProps) => {
   const TitleItems = () => {
     let items = [
       {
-        tab: current.metadata.typeName + `成员`,
+        tab: current.typeName + `成员`,
         key: 'members',
       },
     ];
@@ -39,14 +39,14 @@ const AgencySetting: React.FC<IProps> = ({ current }: IProps) => {
   };
 
   const getColumns = () => {
-    if (current.metadata.typeName === TargetType.Group) {
+    if (current.typeName === TargetType.Group) {
       return CompanyColumn;
     }
     return PersonColumns;
   };
 
   const getFindMember = () => {
-    switch (current.metadata.typeName) {
+    switch (current.typeName) {
       case TargetType.Group:
         return (
           <SearchTarget
@@ -98,9 +98,7 @@ const AgencySetting: React.FC<IProps> = ({ current }: IProps) => {
   return (
     <div className={cls[`dept-content-box`]}>
       <Description
-        title={
-          <Typography.Title level={5}>{current.metadata.typeName}信息</Typography.Title>
-        }
+        title={<Typography.Title level={5}>{current.typeName}信息</Typography.Title>}
         current={current}
         extra={[]}
       />

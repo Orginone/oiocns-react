@@ -88,9 +88,7 @@ const Station: React.FC<IProps> = ({ current }: IProps) => {
       <div className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
         <Card className={cls['app-tabs']} bordered={false} title={'岗位设置'}>
           <div className={cls.topMes} style={{ marginRight: '25px' }}>
-            <strong style={{ marginLeft: '20px', fontSize: 15 }}>
-              {current.metadata.name}
-            </strong>
+            <strong style={{ marginLeft: '20px', fontSize: 15 }}>{current.name}</strong>
             {current.hasAuthoritys([orgAuth.RelationAuthId]) && (
               <Button
                 className={cls.creatgroup}

@@ -65,7 +65,7 @@ export abstract class Target extends Team implements ITarget {
     if (!this._speciesLoaded || reload) {
       const res = await kernel.querySpeciesTree({
         id: this.id,
-        upTeam: this.metadata.typeName === TargetType.Group,
+        upTeam: this.typeName === TargetType.Group,
         belongId: this.space.id,
         filter: '',
       });

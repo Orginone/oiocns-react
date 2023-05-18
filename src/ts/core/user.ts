@@ -3,6 +3,7 @@ import { common, kernel, model, schema } from '../base';
 import { IChatProvider, ChatProvider } from './chat/provider';
 import { IWorkProvider, WorkProvider } from './work/provider';
 import { OperateType } from './public/enums';
+import { logger } from '../base/common';
 const sessionUserName = 'sessionUser';
 
 export class UserProvider extends common.Emitter {
@@ -102,17 +103,18 @@ export class UserProvider extends common.Emitter {
     if (!this.user || !data) return;
     switch (data.operate) {
       case OperateType.Delete:
+        logger.info(`${data.target.name}已被删除.`);
         this.user.targets
           .filter((i) => i.id === data.target.id)
           .forEach((i) => i.delete(true));
         break;
       case OperateType.Update:
-        this.user.targets
-          .filter((i) => i.id === data.target.id)
-          .forEach((i) => (i.metadata = data.target));
+        logger.info(`${data.target.name}已被更新.`);
+        this.user.updateMetadata(data.target);
         break;
       case OperateType.Remove:
         if (data.subTarget) {
+          logger.info(`成员${data.subTarget.name}已被从${data.target.name}移除.`);
           this.user.targets
             .filter(
               (i) => i.id === data.target.id || data.target.id === data.subTarget!.id,
@@ -122,6 +124,7 @@ export class UserProvider extends common.Emitter {
         break;
       case OperateType.Add:
         if (data.subTarget) {
+          logger.info(`${data.subTarget.name}与${data.target.name}建立关系.`);
           for (const item of [this.user, ...this.user.companys]) {
             if (
               item.id === data.subTarget.id &&

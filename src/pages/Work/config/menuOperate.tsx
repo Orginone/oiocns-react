@@ -14,7 +14,7 @@ const buildWorkItem = (defines: IWorkDefine[]) => {
     items.push({
       key: item.key,
       item: item,
-      label: item.metadata.name,
+      label: item.name,
       itemType: GroupMenuType.WorkItem,
       menus: [],
       icon: <TeamIcon notAvatar={true} share={item.share} size={18} fontSize={16} />,
@@ -29,7 +29,7 @@ const buildSpeciesTree = (species: ISpeciesItem[]) => {
   for (const item of species) {
     const children: MenuItemType[] = [];
     const defines: IWorkDefine[] = [];
-    switch (item.metadata.typeName) {
+    switch (item.typeName) {
       case SpeciesType.Market:
         defines.push(...(item as IMarket).defines);
         break;
@@ -47,7 +47,7 @@ const buildSpeciesTree = (species: ISpeciesItem[]) => {
     items.push({
       key: item.key,
       item: defines,
-      label: item.metadata.name,
+      label: item.name,
       itemType: GroupMenuType.Species,
       menus: [],
       icon: <TeamIcon notAvatar={true} share={item.share} size={18} fontSize={16} />,
@@ -63,7 +63,7 @@ const loadChildren = (team: IBelong) => {
   for (const t of team.targets) {
     if (t.space === team.space) {
       for (const s of t.species) {
-        switch (s.metadata.typeName) {
+        switch (s.typeName) {
           case SpeciesType.Market:
           case SpeciesType.Application:
             species.push(s);
@@ -127,8 +127,8 @@ const createMenu = (team: IBelong) => {
   return {
     key: team.key,
     item: team,
-    label: team.metadata.name,
-    itemType: team.metadata.typeName,
+    label: team.name,
+    itemType: team.typeName,
     menus: [],
     icon: <TeamIcon notAvatar={true} share={team.share} size={18} fontSize={16} />,
     children: loadChildren(team),

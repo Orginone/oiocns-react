@@ -1159,11 +1159,11 @@ export default class KernelApi {
   /**
    * 查询待审批任务、抄送
    * @param {model.IdModel} params 请求参数
-   * @returns {model.ResultType<schema.XWorkTaskHistoryArray>} 请求结果
+   * @returns {model.ResultType<model.PageResult<schema.XWorkTask>>} 请求结果
    */
   public async queryApproveTask(
     params: model.IdModel,
-  ): Promise<model.ResultType<schema.XWorkTaskArray>> {
+  ): Promise<model.ResultType<model.PageResult<schema.XWorkTask>>> {
     return await this.request({
       module: 'work',
       action: 'QueryApproveTask',
@@ -1215,11 +1215,11 @@ export default class KernelApi {
   /**
    * 查询发起的办事
    * @param {model.IdModel} params 请求参数
-   * @returns {model.ResultType<schema.XWorkInstance>} 请求结果
+   * @returns {model.ResultType<model.PageResult<schema.XWorkTask>>} 请求结果
    */
   public async queryMyApply(
     params: model.IdModel,
-  ): Promise<model.ResultType<schema.XWorkTaskArray>> {
+  ): Promise<model.ResultType<model.PageResult<schema.XWorkTask>>> {
     return await this.request({
       module: 'work',
       action: 'QueryMyApply',

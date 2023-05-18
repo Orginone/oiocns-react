@@ -6,7 +6,6 @@ import { model } from '@/ts/base';
 import SchemaForm from '@/components/SchemaForm';
 import { FileItemShare, WorkDefineModel } from '@/ts/base/model';
 import { AiOutlineBank } from 'react-icons/ai';
-import { parseAvatar } from '@/ts/base';
 import orgCtrl from '@/ts/controller';
 
 interface Iprops {
@@ -131,11 +130,11 @@ const WorkDefineModal = ({ open, handleOk, handleCancel, workItem, current }: Ip
       width={640}
       layoutType="ModalForm"
       initialValues={current?.metadata || {}}
-      title={current ? `编辑[${current.metadata.name}]办事` : '新建办事'}
+      title={current ? `编辑[${current.name}]办事` : '新建办事'}
       onOpenChange={(open: boolean) => {
         if (open) {
           if (current) {
-            setAvatar(parseAvatar(current.metadata.icon));
+            setAvatar(current.share.avatar);
           }
         } else {
           formRef.current?.resetFields();

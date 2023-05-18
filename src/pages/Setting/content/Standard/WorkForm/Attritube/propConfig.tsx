@@ -43,7 +43,7 @@ const PropertyConfig = (props: IProps) => {
       }
       treeNode.push({
         key: prop.id,
-        title: prop.metadata.name,
+        title: prop.name,
         value: prop.id,
         item: prop,
         children: children,
@@ -54,7 +54,7 @@ const PropertyConfig = (props: IProps) => {
   useEffect(() => {
     const propClasses: IPropClass[] = [];
     for (const item of props.form.species.current.space.species) {
-      switch (item.metadata.typeName) {
+      switch (item.typeName) {
         case SpeciesType.Store:
           propClasses.push(item as IPropClass);
           break;

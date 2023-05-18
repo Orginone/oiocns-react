@@ -5,18 +5,13 @@ import cls from '../index.module.less';
 import PageCard from '@/components/PageCard';
 import Attribute from './Attritube';
 import orgCtrl from '@/ts/controller';
-import { ICommodity, IForm } from '@/ts/core';
+import { IForm } from '@/ts/core';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 
 interface IProps {
-  commodity?: ICommodity;
-  current?: IForm;
+  current: IForm;
 }
-const WorkForm: React.FC<IProps> = ({ current, commodity }: IProps) => {
-  if (commodity) {
-    current = commodity.form;
-  }
-  if (!current) return <></>;
+const WorkForm: React.FC<IProps> = ({ current }: IProps) => {
   const [modalType, setModalType] = useState<string>('');
   const [activeTab, setActiveTab] = useState<string>('attr');
   const share = orgCtrl.provider.user!.findShareById(current.metadata.shareId);
@@ -77,9 +72,7 @@ const WorkForm: React.FC<IProps> = ({ current, commodity }: IProps) => {
           <Descriptions
             size="middle"
             title={
-              <Typography.Title level={5}>
-                表单[{current.metadata.name}]基本信息
-              </Typography.Title>
+              <Typography.Title level={5}>表单[{current.name}]基本信息</Typography.Title>
             }
             bordered
             column={3}
@@ -110,7 +103,7 @@ const WorkForm: React.FC<IProps> = ({ current, commodity }: IProps) => {
               {current.metadata.createTime}
             </Descriptions.Item>
             <Descriptions.Item contentStyle={{ textAlign: 'left' }} label="表单定义">
-              {current.metadata.remark}
+              {current.remark}
             </Descriptions.Item>
           </Descriptions>
         </Card>

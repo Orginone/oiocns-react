@@ -16,9 +16,7 @@ interface IProps {
  */
 
 const WorkItem: React.FC<any> = ({ current, filter }: IProps) => {
-  current = current.filter(
-    (a) => a.metadata.name.includes(filter) || a.metadata.code.includes(filter),
-  );
+  current = current.filter((a) => a.name.includes(filter) || a.code.includes(filter));
   return (
     <Card>
       {current.length > 0 && (
@@ -53,7 +51,7 @@ const WorkItem: React.FC<any> = ({ current, filter }: IProps) => {
                   }
                   title={
                     <div>
-                      <span style={{ marginRight: 10 }}>{item.metadata.name}</span>
+                      <span style={{ marginRight: 10 }}>{item.name}</span>
                       <Tag key={item.metadata.code} color="success">
                         {item.metadata.code}
                       </Tag>
@@ -67,7 +65,7 @@ const WorkItem: React.FC<any> = ({ current, filter }: IProps) => {
                       )}
                     </div>
                   }
-                  description={item.metadata.remark}
+                  description={item.remark}
                 />
               </List.Item>
             );

@@ -41,7 +41,7 @@ const Detail: React.FC<TaskDetailType> = ({ task, define, instance, onBack }) =>
       const form = allForms.find((a) => a.id == item.id);
       if (form) {
         content.push(
-          <Panel header={form.metadata.name} key={form.id}>
+          <Panel header={form.name} key={form.id}>
             <OioForm
               key={form.id}
               form={form}

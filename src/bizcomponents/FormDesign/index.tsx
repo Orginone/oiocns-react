@@ -103,7 +103,7 @@ const Design: React.FC<IProps> = ({ current }) => {
       });
       treeNode.push({
         key: prop.id,
-        title: prop.metadata.name,
+        title: prop.name,
         value: prop.id,
         item: prop,
         checkable: false,
@@ -158,7 +158,7 @@ const Design: React.FC<IProps> = ({ current }) => {
   useEffect(() => {
     const propClasses: IPropClass[] = [];
     for (const item of current.species.current.space.species) {
-      switch (item.metadata.typeName) {
+      switch (item.typeName) {
         case SpeciesType.Store:
           propClasses.push(item as IPropClass);
           break;

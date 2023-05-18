@@ -36,7 +36,7 @@ export class WorkThing extends SpeciesItem implements IWorkThing {
         id: this.current.id,
         speciesId: this.id,
         belongId: this.belongId,
-        upTeam: this.current.metadata.typeName === TargetType.Group,
+        upTeam: this.current.typeName === TargetType.Group,
         page: PageAll,
       });
       if (res.success) {

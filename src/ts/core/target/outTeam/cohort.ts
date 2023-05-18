@@ -40,7 +40,7 @@ export class Cohort extends Target implements ICohort {
     return [this];
   }
   get market(): IMarket | undefined {
-    const find = this.species.find((i) => i.metadata.typeName === SpeciesType.Market);
+    const find = this.species.find((i) => i.typeName === SpeciesType.Market);
     if (find) {
       return find as IMarket;
     }

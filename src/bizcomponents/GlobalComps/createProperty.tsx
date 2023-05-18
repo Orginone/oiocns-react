@@ -99,7 +99,7 @@ const PropertyModal = ({ open, handleOk, species, data, handleCancel }: Iprops) 
           options: dicts.map((i) => {
             return {
               value: i.id,
-              label: i.metadata.name,
+              label: i.name,
             };
           }),
         },

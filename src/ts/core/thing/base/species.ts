@@ -1,13 +1,9 @@
-import { common, kernel, model, parseAvatar, schema } from '../../../base';
-import { PageAll, ShareIdSet } from '../../public/consts';
+import { kernel, model, schema } from '../../../base';
+import { Entity, IEntity, PageAll } from '../../public';
 import { ITarget } from '../../target/base/target';
 
 /** 分类的抽象接口 */
-export interface ISpeciesItem extends common.IEntity {
-  /** 唯一标识 */
-  id: string;
-  /** 数据实体 */
-  metadata: schema.XSpecies;
+export interface ISpeciesItem extends IEntity<schema.XSpecies> {
   /** 当前归属用户Id */
   belongId: string;
   /** 当前加载分类的用户 */
@@ -18,8 +14,6 @@ export interface ISpeciesItem extends common.IEntity {
   parent: ISpeciesItem | undefined;
   /** 子级类别 */
   children: ISpeciesItem[];
-  /** 共享信息 */
-  share: model.ShareIcon;
   /** 是否为继承的类别 */
   isInherited: boolean;
   /** 删除 */
@@ -31,30 +25,21 @@ export interface ISpeciesItem extends common.IEntity {
 }
 
 /** 分类的基类实现 */
-export abstract class SpeciesItem extends common.Entity implements ISpeciesItem {
+export abstract class SpeciesItem
+  extends Entity<schema.XSpecies>
+  implements ISpeciesItem
+{
   constructor(_metadata: schema.XSpecies, _current: ITarget, _parent?: ISpeciesItem) {
-    super();
+    super(_metadata);
     this.parent = _parent;
     this.current = _current;
-    this.metadata = _metadata;
-    this.share = {
-      name: this.metadata.name,
-      typeName: this.metadata.typeName,
-      avatar: parseAvatar(this.metadata.icon),
-    };
-    ShareIdSet.set(this.metadata.id, this.share);
     this.isInherited = _metadata.belongId != _current.space.metadata.belongId;
   }
-  share: model.ShareIcon;
   parent: ISpeciesItem | undefined;
   children: ISpeciesItem[] = [];
   current: ITarget;
-  metadata: schema.XSpecies;
   speciesTypes: string[] = [];
   isInherited: boolean;
-  get id(): string {
-    return this.metadata.id;
-  }
   get belongId() {
     return this.current.space.id;
   }
@@ -76,15 +61,10 @@ export abstract class SpeciesItem extends common.Entity implements ISpeciesItem 
     data.shareId = this.metadata.shareId;
     data.parentId = this.metadata.parentId;
     data.id = this.id;
-    data.typeName = this.metadata.typeName;
+    data.typeName = this.typeName;
     const res = await kernel.updateSpecies(data);
     if (res.success && res.data.id) {
-      this.metadata = res.data;
-      this.share = {
-        name: this.metadata.name,
-        typeName: this.metadata.typeName,
-        avatar: parseAvatar(this.metadata.icon),
-      };
+      this.setMetadata(res.data);
     }
     return res.success;
   }

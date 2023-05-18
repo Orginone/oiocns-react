@@ -45,7 +45,7 @@ const AuthorityStandrad: React.FC<IProps> = ({ current }: IProps) => {
                             }}
                             contentStyle={{ textAlign: 'left', color: '#606266' }}>
                             <Descriptions.Item label="权限名称">
-                              {current.metadata.name}
+                              {current.name}
                             </Descriptions.Item>
                             <Descriptions.Item label="共享组织">
                               <Space>
@@ -64,7 +64,7 @@ const AuthorityStandrad: React.FC<IProps> = ({ current }: IProps) => {
                               {current.metadata.createTime || ''}
                             </Descriptions.Item>
                             <Descriptions.Item label="备注" span={2}>
-                              {current.metadata.remark}
+                              {current.remark}
                             </Descriptions.Item>
                           </Descriptions>
                         </Card>

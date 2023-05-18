@@ -53,16 +53,14 @@ const PersonSetting: React.FC = () => {
           ]}>
           <Descriptions.Item label="昵称">
             <TeamIcon share={orgCtrl.user.share} size={40} preview={true} />
-            {orgCtrl.user.metadata.name}
+            {orgCtrl.user.name}
           </Descriptions.Item>
           <Descriptions.Item label="账号">
             <Typography.Paragraph copyable>
               {orgCtrl.user.metadata.code}
             </Typography.Paragraph>
           </Descriptions.Item>
-          <Descriptions.Item label="座右铭">
-            {orgCtrl.user.metadata.remark}
-          </Descriptions.Item>
+          <Descriptions.Item label="座右铭">{orgCtrl.user.remark}</Descriptions.Item>
         </Descriptions>
       </Card>
     </div>

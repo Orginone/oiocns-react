@@ -31,7 +31,7 @@ const CreatePosition: React.FC<CreateGroupPropsType> = (props) => {
     if (target != undefined) {
       for (const a of target) {
         result.push({
-          title: a.metadata.name,
+          title: a.name,
           key: a.id,
           object: a,
         });
@@ -43,10 +43,7 @@ const CreatePosition: React.FC<CreateGroupPropsType> = (props) => {
   const close = () => {
     setIsOpenModal(false);
   };
-  const onSelect = async (
-    _: string[],
-    info: { selected: boolean; node: { object: IIdentity } },
-  ) => {
+  const onSelect = async (_: any[], info: any) => {
     setSelectMenu(_.length > 0 ? _[0] : '');
     // 触发内容去变化
     if (info.selected) {

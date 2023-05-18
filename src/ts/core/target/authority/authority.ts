@@ -1,14 +1,10 @@
-import { kernel, model, parseAvatar, schema } from '../../../base';
-import { IMsgChat, MsgChat } from '../../chat/message/msgchat';
+import { kernel, model, schema } from '../../../base';
+import { IMsgChat, IMsgChatT, MsgChat } from '../../chat/message/msgchat';
 import { PageAll } from '../../public/consts';
 import { IBelong } from '../base/belong';
 
 /** 权限接口 */
-export interface IAuthority extends IMsgChat {
-  /** 唯一标识 */
-  id: string;
-  /** 数据实体 */
-  metadata: schema.XAuthority;
+export interface IAuthority extends IMsgChatT<schema.XAuthority> {
   /** 拥有该权限的成员 */
   members: schema.XTarget[];
   /** 父级权限 */
@@ -36,36 +32,27 @@ export interface IAuthority extends IMsgChat {
 }
 
 /** 权限实现类 */
-export class Authority extends MsgChat implements IAuthority {
+export class Authority extends MsgChat<schema.XAuthority> implements IAuthority {
   constructor(_metadata: schema.XAuthority, _space: IBelong, _parent?: IAuthority) {
     super(
-      _space.id,
-      _metadata.id,
       {
-        name: _metadata.name,
+        ..._metadata,
         typeName: '权限',
-        avatar: parseAvatar(_metadata.icon),
       },
-      [_space.metadata.name ?? '', '角色群'],
-      _metadata.remark,
+      _space.id,
+      [_space.name ?? '', '权限群'],
       _space,
     );
     this.space = _space;
     this.parent = _parent;
-    this.metadata = _metadata;
     for (const node of _metadata.nodes || []) {
       this.children.push(new Authority(node, _space, this));
     }
   }
-  space: IBelong;
-  metadata: schema.XAuthority;
   members: schema.XTarget[] = [];
   parent: IAuthority | undefined;
   children: IAuthority[] = [];
   private _memberLoaded: boolean = false;
-  get id(): string {
-    return this.metadata.id;
-  }
   async loadMembers(reload: boolean = false): Promise<schema.XTarget[]> {
     if (!this._memberLoaded || reload) {
       const res = await kernel.queryAuthorityTargets({
@@ -92,18 +79,14 @@ export class Authority extends MsgChat implements IAuthority {
     data.id = this.id;
     data.shareId = this.metadata.shareId;
     data.parentId = this.metadata.parentId;
-    data.name = data.name || this.metadata.name;
-    data.code = data.code || this.metadata.code;
+    data.name = data.name || this.name;
+    data.code = data.code || this.code;
     data.icon = data.icon || this.metadata.icon;
-    data.remark = data.remark || this.metadata.remark;
+    data.remark = data.remark || this.remark;
     const res = await kernel.updateAuthority(data);
     if (res.success && res.data?.id) {
-      this.metadata = res.data;
-      this.share = {
-        name: this.metadata.name,
-        typeName: '权限',
-        avatar: parseAvatar(this.metadata.icon),
-      };
+      res.data.typeName = '权限';
+      this.setMetadata(res.data);
     }
     return res.success;
   }

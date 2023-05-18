@@ -18,9 +18,7 @@ const Description = ({ current }: { current: ISpeciesItem }) => {
       <Descriptions
         size="middle"
         title={
-          <Typography.Title level={5}>
-            分类[{current.metadata.name}]基本信息
-          </Typography.Title>
+          <Typography.Title level={5}>分类[{current.name}]基本信息</Typography.Title>
         }
         bordered
         column={3}
@@ -47,14 +45,14 @@ const Description = ({ current }: { current: ISpeciesItem }) => {
         <Descriptions.Item label="分类代码">{current.metadata.code}</Descriptions.Item>
         <Descriptions.Item label="类型">
           <Space>
-            <strong>{current.metadata.typeName}</strong>
+            <strong>{current.typeName}</strong>
           </Space>
         </Descriptions.Item>
         <Descriptions.Item label="创建时间">
           {current.metadata.createTime}
         </Descriptions.Item>
         <Descriptions.Item contentStyle={{ textAlign: 'left' }} label="分类定义">
-          {current.metadata.remark}
+          {current.remark}
         </Descriptions.Item>
       </Descriptions>
     </Card>

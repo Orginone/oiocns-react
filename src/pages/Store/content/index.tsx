@@ -21,7 +21,7 @@ const ContentIndex = (props: IProps) => {
     case MenuType.Species:
       {
         const species = props.selectMenu.item as ISpeciesItem;
-        switch (species.metadata.typeName) {
+        switch (species.typeName) {
           case SpeciesType.Store: {
             const propClass = props.selectMenu.item as IPropClass;
             return (

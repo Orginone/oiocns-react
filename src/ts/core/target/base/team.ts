@@ -1,15 +1,11 @@
-import { schema, kernel, model, parseAvatar } from '../../../base';
+import { schema, kernel, model } from '../../../base';
 import { OperateType, TargetType } from '../../public/enums';
 import { PageAll } from '../../public/consts';
 import { IBelong } from './belong';
-import { IMsgChat, MsgChat } from '../../chat/message/msgchat';
+import { IMsgChatT, IMsgChat, MsgChat } from '../../chat/message/msgchat';
 
 /** 团队抽象接口类 */
-export interface ITeam extends IMsgChat {
-  /** 唯一标识 */
-  id: string;
-  /** 数据实体 */
-  metadata: schema.XTarget;
+export interface ITeam extends IMsgChatT<schema.XTarget> {
   /** 限定成员类型 */
   memberTypes: TargetType[];
   /** 用户相关的所有会话 */
@@ -26,8 +22,6 @@ export interface ITeam extends IMsgChat {
   pullMembers(members: schema.XTarget[], notity?: boolean): Promise<boolean>;
   /** 用户移除成员 */
   removeMembers(members: schema.XTarget[], notity?: boolean): Promise<boolean>;
-  /** 加载成员会话 */
-  loadMemberChats(newMembers: schema.XTarget[], _isAdd: boolean): void;
   /** 判断是否拥有某些权限 */
   hasAuthoritys(authIds: string[]): boolean;
   /** 接收相关用户增加变更 */
@@ -35,34 +29,18 @@ export interface ITeam extends IMsgChat {
 }
 
 /** 团队基类实现 */
-export abstract class Team extends MsgChat implements ITeam {
+export abstract class Team extends MsgChat<schema.XTarget> implements ITeam {
   constructor(
     _metadata: schema.XTarget,
     _labels: string[],
     _space?: IBelong,
     _memberTypes: TargetType[] = [TargetType.Person],
   ) {
-    super(
-      _metadata.belongId,
-      _metadata.id,
-      {
-        name: _metadata.name,
-        typeName: _metadata.typeName,
-        avatar: parseAvatar(_metadata.icon),
-      },
-      _labels,
-      _metadata.remark,
-      _space,
-    );
-    this.metadata = _metadata;
+    super(_metadata, _metadata.belongId, _labels, _space);
     this.memberTypes = _memberTypes;
   }
-  metadata: schema.XTarget;
   memberTypes: TargetType[];
   private _memberLoaded: boolean = false;
-  get id(): string {
-    return this.metadata.id;
-  }
   async loadMembers(reload: boolean = false): Promise<schema.XTarget[]> {
     if (!this._memberLoaded || reload) {
       const res = await kernel.querySubTargetById({
@@ -73,6 +51,7 @@ export abstract class Team extends MsgChat implements ITeam {
       if (res.success) {
         this._memberLoaded = true;
         this.members = res.data.result || [];
+        this.members.forEach((i) => this.updateMetadata(i));
         this.loadMemberChats(this.members, true);
       }
     }
@@ -143,22 +122,17 @@ export abstract class Team extends MsgChat implements ITeam {
   }
   async update(data: model.TargetModel): Promise<boolean> {
     data.id = this.id;
-    data.typeName = this.metadata.typeName;
+    data.typeName = this.typeName;
     data.belongId = this.metadata.belongId;
-    data.name = data.name || this.metadata.name;
-    data.code = data.code || this.metadata.code;
+    data.name = data.name || this.name;
+    data.code = data.code || this.code;
     data.icon = data.icon || this.metadata.icon;
     data.teamName = data.teamName || data.name;
     data.teamCode = data.teamCode || data.code;
-    data.remark = data.remark || this.metadata.remark;
+    data.remark = data.remark || this.remark;
     const res = await kernel.updateTarget(data);
     if (res.success && res.data?.id) {
-      this.metadata = res.data;
-      this.share = {
-        name: this.metadata.name,
-        typeName: this.metadata.typeName,
-        avatar: parseAvatar(this.metadata.icon),
-      };
+      this.setMetadata(res.data);
       this.createTargetMsg(OperateType.Update);
     }
     return res.success;

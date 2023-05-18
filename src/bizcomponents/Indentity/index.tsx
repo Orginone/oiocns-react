@@ -125,8 +125,8 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
         labelStyle={{ textAlign: 'center' }}
         contentStyle={{ textAlign: 'center' }}
         extra={buttons}>
-        <Descriptions.Item label="名称">{indentity?.metadata.name}</Descriptions.Item>
-        <Descriptions.Item label="编码">{indentity?.metadata.code}</Descriptions.Item>
+        <Descriptions.Item label="名称">{indentity?.name}</Descriptions.Item>
+        <Descriptions.Item label="编码">{indentity?.code}</Descriptions.Item>
         <Descriptions.Item label="创建人">
           {indentity?.metadata.createUser}
         </Descriptions.Item>
@@ -134,7 +134,7 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
           {indentity?.metadata.createTime}
         </Descriptions.Item>
         <Descriptions.Item label="描述" span={2}>
-          {indentity?.metadata.remark}
+          {indentity?.remark}
         </Descriptions.Item>
       </Descriptions>
     </div>
@@ -154,7 +154,7 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
     <div className={`${cls['dept-wrap-pages']}`}>
       <div className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
         <Card
-          title={indentity?.metadata.name}
+          title={indentity?.name}
           className={cls['app-tabs']}
           extra={renderBtns}
           bordered={false}>
