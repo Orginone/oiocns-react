@@ -539,26 +539,26 @@ const loadTypeMenus = (item: ITeam, subTypes: string[], allowDelete: boolean) =>
       icon: <im.ImPencil />,
       label: '编辑信息',
     });
-    if (allowDelete) {
+  }
+  if (allowDelete && item.hasAuthoritys([OrgAuth.RelationAuthId])) {
+    menus.push({
+      key: '删除',
+      icon: <im.ImBin />,
+      label: '删除用户',
+      beforeLoad: async () => {
+        return await item.delete();
+      },
+    });
+  } else {
+    if ('species' in item) {
       menus.push({
-        key: '删除',
+        key: '退出',
         icon: <im.ImBin />,
-        label: '删除用户',
+        label: '退出' + item.typeName,
         beforeLoad: async () => {
-          return await item.delete();
+          return await (item as ITarget).exit();
         },
       });
-    } else {
-      if ('species' in item) {
-        menus.push({
-          key: '退出',
-          icon: <im.ImBin />,
-          label: '退出' + item.typeName,
-          beforeLoad: async () => {
-            return await (item as ITarget).exit();
-          },
-        });
-      }
     }
   }
   return menus;

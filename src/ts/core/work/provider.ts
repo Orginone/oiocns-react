@@ -147,9 +147,9 @@ export class WorkProvider implements IWorkProvider {
           if (res.data && status < TaskStatus.RefuseStart && task.taskType == '加用户') {
             let targets = <Array<schema.XTarget>>JSON.parse(task.content);
             if (targets.length == 2) {
-              for (const item of [this.user, ...this.user.targets]) {
+              for (const item of this.user.targets) {
                 if (item.id === targets[1].id) {
-                  item.pullMembers(targets.slice(0, 1));
+                  item.pullMembers([targets[0]]);
                 }
               }
             }

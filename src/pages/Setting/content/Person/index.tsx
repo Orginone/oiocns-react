@@ -1,4 +1,4 @@
-import { Button, Card, Descriptions, message, Modal, Typography } from 'antd';
+import { Button, Card, Descriptions, Modal, Typography } from 'antd';
 import Layout from 'antd/lib/layout/layout';
 import React, { useRef, useState } from 'react';
 
@@ -28,7 +28,7 @@ const PersonSetting: React.FC = () => {
   const [searchCallback, setSearchCallback] = useState<schema.XTarget[]>();
   const handleOk = async () => {
     if (await orgCtrl.user.applyJoin(searchCallback || [])) {
-      message.success('操作成功!');
+      refreshKey();
       setModalType('');
     }
   };
