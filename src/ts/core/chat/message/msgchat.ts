@@ -94,19 +94,17 @@ export interface IMsgChat extends common.IEntity {
 export abstract class MsgChat extends common.Entity implements IMsgChat {
   findMe: any;
   constructor(
-    _userId: string,
     _belongId: string,
     _chatId: string,
     _share: model.ShareIcon,
     _labels: string[],
     _remark: string,
-    _isFindMe: any,
     _space?: IBelong,
+    _isFindMe?: any,
   ) {
     super();
     this.share = _share;
     this.chatId = _chatId;
-    this.userId = _userId;
     this.findMe = _isFindMe;
     this.space = _space || (this as unknown as IBelong);
     this.belongId = _belongId;
@@ -361,14 +359,13 @@ export abstract class MsgChat extends common.Entity implements IMsgChat {
 export class PersonMsgChat extends MsgChat implements IMsgChat {
   constructor(
     _belongId: string,
-    _userId: string,
     _chatId: string,
     _share: model.ShareIcon,
     _labels: string[],
     _remark: string,
-    _findMe: boolean,
+    _space: IBelong,
   ) {
-    super(_userId, _belongId, _chatId, _share, _labels, _remark, _findMe);
+    super(_belongId, _chatId, _share, _labels, _remark, _space);
   }
   async loadMembers(_reload: boolean = false): Promise<schema.XTarget[]> {
     return [];
