@@ -36,8 +36,7 @@ const Groupinputbox = (props: Iprops) => {
   const [imgUrls, setImgUrls] = useState<Array<string>>([]); // 表情图片
   const [citePeople, setCitePeople] = useState<XTarget[]>([]); // @人员
   const [citeShow, setCiteShow] = useState<boolean>(false); // @展示
-  const [optionVal, setOptionVal] = useState<Object>();
-  console.log(optionVal, '------options');
+  const [optionVal, setOptionVal] = useState<any>();
 
   /**
    * @description: 提交聊天内容
@@ -51,7 +50,6 @@ const Groupinputbox = (props: Iprops) => {
           ? reCreatChatContent(insterHtml.childNodes ?? [])
           : [insterHtml.innerHTML];
       let massage = text.join('').trim();
-      console.log(massage, '11111');
 
       if (massage.length > 0) {
         insterHtml.innerHTML = '发送中,请稍后...';
@@ -78,11 +76,26 @@ const Groupinputbox = (props: Iprops) => {
             const newContent = n.textContent.substring(0, 2048);
             return newContent;
           } else {
-            const newContent = citeText
-              ? `${n.textContent}$CITEMESSAGE[${filetrText(citeText)}]`
-              : `${n.textContent}`;
-
-            return newContent;
+            // 判断是否存在艾特字符
+            const matches = n.textContent.indexOf('@') !== -1;
+            if (citeText && matches) {
+              // 引用加@走这一块
+              const newContent = `${n.textContent}$CITEMESSAGE[${filetrText(
+                citeText,
+              )}]$FINDME[${optionVal.key}]`;
+              return newContent;
+            } else if (matches) {
+              // 单纯@走这里
+              const newContent = `${n.textContent}$FINDME[${optionVal.key}]`;
+              return newContent;
+            } else if (citeText) {
+              // 为引用类型走这里
+              const newContent = `${n.textContent}$CITEMESSAGE[${filetrText(citeText)}]`;
+              return newContent;
+            } else {
+              const newContent = `${n.textContent}`;
+              return newContent;
+            }
           }
         } else if (n.nodeName == 'IMG') {
           switch (n.className) {
@@ -264,15 +277,13 @@ const Groupinputbox = (props: Iprops) => {
         return message.warning('不能发送空值');
       }
     } else if (e.key === '@' && chat.members.length > 0) {
-      const members = [];
-      members.push(...chat.members, { id: '00100', name: '所有人' });
-      setCitePeople(members);
+      const filterPeople = chat.members.filter((val: any) => val.id !== chat.userId);
+      setCitePeople(filterPeople);
       setCiteShow(true);
-    } else if (e.key === 'Escape') {
-      setCiteShow(false);
     }
   };
 
+  /** 艾特触发人员选择 */
   const onSelect = (e: any) => {
     setCiteShow(false);
     setOptionVal(e);
@@ -385,7 +396,6 @@ const Groupinputbox = (props: Iprops) => {
           />
         </div>
         {/* @功能 */}
-        {/* {citePeople.length > 0 && <PullDown people={citePeople} />} */}
         <div className={'input_content'}>
           {citePeople.length > 0 && (
             <PullDown
@@ -394,6 +404,7 @@ const Groupinputbox = (props: Iprops) => {
               people={citePeople}
               open={citeShow}
               onSelect={onSelect}
+              onClose={() => setCiteShow(false)}
             />
           )}
           <div
