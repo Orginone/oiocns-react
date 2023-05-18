@@ -13,7 +13,6 @@ import AssignModal from '@/bizcomponents/AssignModal';
 import Description from '../../components/Description';
 import orgCtrl from '@/ts/controller';
 import { AiOutlineExclamationCircle } from 'react-icons/ai';
-import { orgAuth } from '@/ts/core/public/consts';
 interface IProps {
   current: ICohort;
 }
@@ -60,7 +59,7 @@ const CohortSetting: React.FC<IProps> = ({ current }: IProps) => {
           },
         ],
       );
-      if (current.hasAuthoritys([orgAuth.RelationAuthId])) {
+      if (current.hasRelationAuth()) {
         operations.push({
           key: 'remove',
           label: '踢出',
@@ -104,7 +103,7 @@ const CohortSetting: React.FC<IProps> = ({ current }: IProps) => {
               <Button type="link" onClick={() => setActiveModal('indentity')}>
                 角色设置
               </Button>
-              {current.hasAuthoritys([orgAuth.RelationAuthId]) && (
+              {current.hasRelationAuth() && (
                 <Button type="link" onClick={() => setActiveModal('addOne')}>
                   邀请成员
                 </Button>

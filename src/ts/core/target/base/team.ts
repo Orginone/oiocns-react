@@ -22,6 +22,8 @@ export interface ITeam extends IMsgChatT<schema.XTarget> {
   pullMembers(members: schema.XTarget[], notity?: boolean): Promise<boolean>;
   /** 用户移除成员 */
   removeMembers(members: schema.XTarget[], notity?: boolean): Promise<boolean>;
+  /** 是否有管理关系的权限 */
+  hasRelationAuth(): boolean;
   /** 判断是否拥有某些权限 */
   hasAuthoritys(authIds: string[]): boolean;
   /** 接收相关用户增加变更 */
@@ -95,7 +97,7 @@ export abstract class Team extends MsgChat<schema.XTarget> implements ITeam {
     for (const member of members) {
       if (this.memberTypes.includes(member.typeName as TargetType)) {
         if (!notity) {
-          if (this.hasAuthoritys([orgAuth.RelationAuthId])) {
+          if (member.id === this.userId && this.hasRelationAuth()) {
             await this.createTargetMsg(OperateType.Remove, member);
           }
           const res = await kernel.removeOrExitOfTeam({
@@ -141,7 +143,7 @@ export abstract class Team extends MsgChat<schema.XTarget> implements ITeam {
   }
   async delete(notity: boolean = false): Promise<boolean> {
     if (!notity) {
-      if (this.hasAuthoritys([orgAuth.RelationAuthId])) {
+      if (this.hasRelationAuth()) {
         await this.createTargetMsg(OperateType.Delete);
       }
       const res = await kernel.deleteTarget({
@@ -158,6 +160,9 @@ export abstract class Team extends MsgChat<schema.XTarget> implements ITeam {
   abstract teamChangedNotity(target: schema.XTarget): Promise<boolean>;
   loadMemberChats(_newMembers: schema.XTarget[], _isAdd: boolean): void {
     this.memberChats = [];
+  }
+  hasRelationAuth(): boolean {
+    return this.hasAuthoritys([orgAuth.RelationAuthId]);
   }
   hasAuthoritys(authIds: string[]): boolean {
     authIds = this.space.superAuth?.loadParentAuthIds(authIds) ?? authIds;

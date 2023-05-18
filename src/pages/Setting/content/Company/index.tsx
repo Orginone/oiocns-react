@@ -19,7 +19,6 @@ import IndentityManage from '@/bizcomponents/Indentity';
 import cls from './index.module.less';
 import SearchCompany from '@/bizcomponents/SearchCompany';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
-import { orgAuth } from '@/ts/core/public/consts';
 
 interface IProps {
   current: ICompany;
@@ -133,7 +132,7 @@ const CompanySetting: React.FC<IProps> = ({ current }) => {
               <Button type="link" onClick={() => setActiveModal('indentity')}>
                 角色设置
               </Button>
-              {current.hasAuthoritys([orgAuth.RelationAuthId]) && (
+              {current.hasRelationAuth() && (
                 <>
                   <Button type="link" onClick={() => setActiveModal('addOne')}>
                     邀请成员
