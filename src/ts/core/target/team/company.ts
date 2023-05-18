@@ -261,6 +261,17 @@ export class Company extends Belong implements ICompany {
     return cohort;
   }
 
+  override async removeMembers(
+    members: schema.XTarget[],
+    notity: boolean = false,
+  ): Promise<boolean> {
+    notity = await super.removeMembers(members);
+    if (notity) {
+      this.subTarget.forEach((a) => a.removeMembers(members, true));
+    }
+    return notity;
+  }
+
   async teamChangedNotity(target: schema.XTarget): Promise<boolean> {
     switch (target.typeName) {
       case TargetType.Person:
