@@ -265,32 +265,37 @@ export class Company extends Belong implements ICompany {
       case TargetType.Person:
         return this.pullMembers([target], true);
       case TargetType.Group:
-        {
+        if (this.groups.every((i) => i.id != target.id)) {
           const group = new Group(target, this);
           await group.deepLoad();
           this.groups.push(group);
+          return true;
         }
-        return true;
+        break;
       case TargetType.Station:
-        {
+        if (this.stations.every((i) => i.id != target.id)) {
           const station = new Station(target, this);
           await station.deepLoad();
           this.stations.push(station);
+          return true;
         }
-        return true;
+        break;
       case TargetType.Cohort:
-        {
+        if (this.cohorts.every((i) => i.id != target.id)) {
           const cohort = new Cohort(target, this);
           await cohort.deepLoad();
           this.cohorts.push(cohort);
+          return true;
         }
-        return true;
+        break;
       default:
         if (this.departmentTypes.includes(target.typeName as TargetType)) {
-          const department = new Department(target, this);
-          await department.deepLoad();
-          this.departments.push(department);
-          return true;
+          if (this.departments.every((i) => i.id != target.id)) {
+            const department = new Department(target, this);
+            await department.deepLoad();
+            this.departments.push(department);
+            return true;
+          }
         }
     }
     return false;

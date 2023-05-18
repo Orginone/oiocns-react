@@ -117,12 +117,13 @@ export class Group extends Target implements IGroup {
   async teamChangedNotity(target: schema.XTarget): Promise<boolean> {
     switch (target.typeName) {
       case TargetType.Group:
-        {
+        if (this.children.every((i) => i.id != target.id)) {
           const group = new Group(target, this.company);
           await group.deepLoad();
           this.children.push(group);
+          return true;
         }
-        return true;
+        return false;
       default:
         return await this.pullMembers([target], true);
     }

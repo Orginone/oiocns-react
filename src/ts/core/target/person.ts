@@ -209,18 +209,21 @@ export class Person extends Belong implements IPerson {
         await this.pullMembers([target], true);
         return true;
       case TargetType.Cohort:
-        {
+        if (this.cohorts.every((i) => i.id != target.id)) {
           const cohort = new Cohort(target, this);
           await cohort.deepLoad();
           this.cohorts.push(cohort);
+          return true;
         }
-        return true;
+        break;
       default:
         if (companyTypes.includes(target.typeName as TargetType)) {
-          const company = createCompany(target, this);
-          await company.deepLoad();
-          this.companys.push(company);
-          return true;
+          if (this.companys.every((i) => i.id != target.id)) {
+            const company = createCompany(target, this);
+            await company.deepLoad();
+            this.companys.push(company);
+            return true;
+          }
         }
     }
     return false;

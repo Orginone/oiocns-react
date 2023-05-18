@@ -63,9 +63,7 @@ export abstract class Team extends MsgChat<schema.XTarget> implements ITeam {
   ): Promise<boolean> {
     members = members
       .filter((i) => this.memberTypes.includes(i.typeName as TargetType))
-      .filter((i) => {
-        return this.members.filter((m) => m.id === i.id).length < 1;
-      });
+      .filter((i) => this.members.every((a) => a.id != i.id));
     if (members.length > 0) {
       if (!notity) {
         const res = await kernel.pullAnyToTeam({
@@ -91,6 +89,9 @@ export abstract class Team extends MsgChat<schema.XTarget> implements ITeam {
     members: schema.XTarget[],
     notity: boolean = false,
   ): Promise<boolean> {
+    members = members
+      .filter((i) => this.memberTypes.includes(i.typeName as TargetType))
+      .filter((i) => this.members.some((a) => a.id == i.id));
     for (const member of members) {
       if (this.memberTypes.includes(member.typeName as TargetType)) {
         if (!notity) {
