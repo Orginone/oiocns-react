@@ -1,6 +1,7 @@
 import { model, common, schema, kernel, List } from '../../../base';
 import { ShareIdSet } from '../../public/consts';
 import { MessageType, TargetType } from '../../public/enums';
+import { filetrFindText, findTextId } from '@/utils/common';
 // 历史会话存储集合名称
 const hisMsgCollName = 'chat-message';
 // 空时间
@@ -19,6 +20,8 @@ export type MsgChatData = {
   chatRemark: string;
   /** 是否置顶 */
   isToping: boolean;
+  /** 是否艾特我 */
+  isFindme: any;
   /** 会话未读消息数量 */
   noReadCount: number;
   /** 最后一次消息时间 */
@@ -87,6 +90,7 @@ export interface IMsgChat extends common.IEntity {
 }
 
 export abstract class MsgChat extends common.Entity implements IMsgChat {
+  findMe: any;
   constructor(
     _userId: string,
     _belongId: string,
@@ -94,11 +98,13 @@ export abstract class MsgChat extends common.Entity implements IMsgChat {
     _share: model.ShareIcon,
     _labels: string[],
     _remark: string,
+    _isFindMe: any,
   ) {
     super();
     this.share = _share;
     this.chatId = _chatId;
     this.userId = _userId;
+    this.findMe = _isFindMe;
     this.belongId = _belongId;
     this.chatdata = {
       noReadCount: 0,
@@ -107,6 +113,7 @@ export abstract class MsgChat extends common.Entity implements IMsgChat {
       chatRemark: _remark,
       chatName: _share.name,
       lastMsgTime: nullTime,
+      isFindme: _isFindMe,
       fullId: `${_belongId}-${_chatId}`,
     };
     this.labels = new List(_labels);
@@ -318,15 +325,19 @@ export abstract class MsgChat extends common.Entity implements IMsgChat {
         this.messages[index] = msg;
       }
     } else {
-      msg.showTxt = common.StringPako.inflate(msg.msgBody);
+      // 过滤掉@的消息内容
+      msg.showTxt = filetrFindText(common.StringPako.inflate(msg.msgBody));
       this.messages.push(msg);
     }
     if (!this.messageNotify) {
       this.chatdata.noReadCount += 1;
       msgChatNotify.changCallback();
     }
+
+    // 将消息提供给页面
     this.chatdata.lastMsgTime = new Date().getTime();
     this.chatdata.lastMessage = msg;
+    this.chatdata.isFindme = findTextId(common.StringPako.inflate(msg.msgBody)); // 用来往对象中添加艾特值
     this.cache();
     this.messageNotify?.apply(this, [this.messages]);
   }
@@ -351,8 +362,9 @@ export class PersonMsgChat extends MsgChat implements IMsgChat {
     _share: model.ShareIcon,
     _labels: string[],
     _remark: string,
+    _findMe: boolean,
   ) {
-    super(_userId, _belongId, _chatId, _share, _labels, _remark);
+    super(_userId, _belongId, _chatId, _share, _labels, _remark, _findMe);
   }
   async loadMembers(_reload: boolean = false): Promise<schema.XTarget[]> {
     return [];

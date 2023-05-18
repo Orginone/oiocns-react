@@ -262,6 +262,7 @@ export type MsgSaveModel = {
   showTxt: string;
   // 允许编辑
   allowEdit: boolean;
+  // 已读
   tags?: { label: string; userId: string; time: string }[];
 };
 
