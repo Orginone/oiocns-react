@@ -39,7 +39,7 @@ interface tagsMsgType {
 }
 let isFirst = false;
 const GroupContent = (props: Iprops) => {
-  const { citeText, enterCiteMsg, chat } = props;
+  const { citeText } = props;
   const [msgKey] = useCtrlUpdate(msgChatNotify);
   const [loading, setLoading] = useState(false);
   const [messages, setMessages] = useState(props.chat.messages);

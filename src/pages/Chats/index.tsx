@@ -7,7 +7,6 @@ import useMenuUpdate from '@/hooks/useMenuUpdate';
 import { Input } from 'antd';
 import { ImSearch } from 'react-icons/im';
 import { IMsgChat, msgChatNotify } from '@/ts/core';
-import { flatten } from './commont';
 const Setting: React.FC<any> = () => {
   const [filter, setFilter] = useState('');
   const [isSupervise, setIsSupervise] = useState<boolean>(false); // 查看所有会话

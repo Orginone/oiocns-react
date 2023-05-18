@@ -6,6 +6,7 @@ import OrgIcons from '@/bizcomponents/GlobalComps/orgIcons';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 import orgCtrl from '@/ts/controller';
 import { msgChatNotify } from '@/ts/core';
+import { FileExcelFilled } from '@ant-design/icons';
 
 /**
  * 顶部导航
@@ -88,6 +89,18 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
       icon: 'market',
       count: 0,
       fath: '/market',
+      onClick: () => {
+        orgCtrl.currentKey = '';
+        orgCtrl.changCallback();
+      },
+    },
+    {
+      key: 'dowload',
+      path: '/dowload',
+      title: '下载',
+      icon: 'myWork',
+      count: 0,
+      fath: '/dowload',
       onClick: () => {
         orgCtrl.currentKey = '';
         orgCtrl.changCallback();
