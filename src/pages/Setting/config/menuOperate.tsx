@@ -198,6 +198,11 @@ const LoadStandardMenus = (target: ITarget) => {
 /** 加载右侧菜单 */
 const loadSpeciesMenus = (species: ISpeciesItem) => {
   const items: OperateMenuType[] = [];
+  switch (species.typeName) {
+    case SpeciesType.Dict:
+      items.push(...loadDictMenus());
+      break;
+  }
   if (species.speciesTypes.length > 0) {
     items.push({
       key: '新增类别',

@@ -205,9 +205,6 @@ export class Person extends Belong implements IPerson {
   }
   async teamChangedNotity(target: schema.XTarget): Promise<boolean> {
     switch (target.typeName) {
-      case TargetType.Person:
-        await this.pullMembers([target], true);
-        return true;
       case TargetType.Cohort:
         if (this.cohorts.every((i) => i.id != target.id)) {
           const cohort = new Cohort(target, this);
