@@ -75,13 +75,16 @@ export class WorkProvider implements IWorkProvider {
   }
   async loadDones(req: model.IdModel): Promise<schema.XWorkRecordArray> {
     const res = await kernel.anystore.pageRequest<schema.XWorkTask>(
-      this.user.metadata.id,
+      this.user.id,
       hisWorkCollName,
       {
         match: {
           belongId: req.id,
           status: {
             _gte_: 100,
+          },
+          records: {
+            _exists_: true,
           },
         },
         sort: {
@@ -106,7 +109,7 @@ export class WorkProvider implements IWorkProvider {
   }
   async loadApply(req: model.IdModel): Promise<schema.XWorkTaskArray> {
     const res = await kernel.anystore.pageRequest<schema.XWorkTask>(
-      this.user.metadata.id,
+      this.user.id,
       hisWorkCollName,
       {
         match: {
@@ -167,7 +170,7 @@ export class WorkProvider implements IWorkProvider {
             break;
         }
         for (const define of defines) {
-          if (define.metadata.id === defineId) {
+          if (define.id === defineId) {
             return define;
           }
         }

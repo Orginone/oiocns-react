@@ -6,8 +6,8 @@ import { IMsgChat, MsgChat } from '../../chat/message/msgchat';
 
 /** 团队抽象接口类 */
 export interface ITeam extends IMsgChat {
-  /** 加载用户的自归属用户 */
-  space: IBelong;
+  /** 唯一标识 */
+  id: string;
   /** 数据实体 */
   metadata: schema.XTarget;
   /** 限定成员类型 */
@@ -43,7 +43,6 @@ export abstract class Team extends MsgChat implements ITeam {
     _memberTypes: TargetType[] = [TargetType.Person],
   ) {
     super(
-      _metadata.id,
       _metadata.belongId,
       _metadata.id,
       {
@@ -53,23 +52,21 @@ export abstract class Team extends MsgChat implements ITeam {
       },
       _labels,
       _metadata.remark,
+      _space,
     );
     this.metadata = _metadata;
     this.memberTypes = _memberTypes;
-    this.space = _space || (this as unknown as IBelong);
-    this.userId = this.space.metadata.id;
-    if (this.space.user) {
-      this.userId = this.space.user.metadata.id;
-    }
   }
-  space: IBelong;
   metadata: schema.XTarget;
   memberTypes: TargetType[];
   private _memberLoaded: boolean = false;
+  get id(): string {
+    return this.metadata.id;
+  }
   async loadMembers(reload: boolean = false): Promise<schema.XTarget[]> {
     if (!this._memberLoaded || reload) {
       const res = await kernel.querySubTargetById({
-        id: this.metadata.id,
+        id: this.id,
         subTypeNames: this.memberTypes,
         page: PageAll,
       });
@@ -89,7 +86,7 @@ export abstract class Team extends MsgChat implements ITeam {
       });
     if (members.length > 0) {
       const res = await kernel.pullAnyToTeam({
-        id: this.metadata.id,
+        id: this.id,
         subIds: members.map((i) => i.id),
       });
       if (res.success) {
@@ -104,7 +101,7 @@ export abstract class Team extends MsgChat implements ITeam {
     for (const member of members) {
       if (this.memberTypes.includes(member.typeName as TargetType)) {
         const res = await kernel.removeOrExitOfTeam({
-          id: this.metadata.id,
+          id: this.id,
           subId: member.id,
         });
         if (res.success) {
@@ -116,7 +113,7 @@ export abstract class Team extends MsgChat implements ITeam {
     return true;
   }
   protected async create(data: model.TargetModel): Promise<schema.XTarget | undefined> {
-    data.belongId = this.space.metadata.id;
+    data.belongId = this.space.id;
     data.teamCode = data.teamCode || data.code;
     data.teamName = data.teamName || data.name;
     const res = await kernel.createTarget(data);
@@ -125,7 +122,7 @@ export abstract class Team extends MsgChat implements ITeam {
     }
   }
   async update(data: model.TargetModel): Promise<boolean> {
-    data.id = this.metadata.id;
+    data.id = this.id;
     data.typeName = this.metadata.typeName;
     data.belongId = this.metadata.belongId;
     data.name = data.name || this.metadata.name;
@@ -170,7 +167,7 @@ export abstract class Team extends MsgChat implements ITeam {
   }
   hasAuthoritys(authIds: string[]): boolean {
     authIds = this.space.superAuth?.loadParentAuthIds(authIds) ?? authIds;
-    const orgIds = [this.metadata.belongId, this.metadata.id];
+    const orgIds = [this.metadata.belongId, this.id];
     return this.space.user.authenticate(orgIds, authIds);
   }
 }

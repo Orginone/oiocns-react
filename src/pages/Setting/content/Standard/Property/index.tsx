@@ -22,7 +22,7 @@ const Property: React.FC<any> = ({ current }: { current: IPropClass }) => {
   }, []);
   // 操作内容渲染函数
   const renderOperate = (item: XProperty) => {
-    if (item.speciesId === current.metadata.id) {
+    if (item.speciesId === current.id) {
       return [
         {
           key: '修改属性',

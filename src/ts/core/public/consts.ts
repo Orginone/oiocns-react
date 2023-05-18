@@ -12,6 +12,12 @@ export const orgAuth = {
   // 办事管理权限
   WorkAuthId: '361356410774228992',
 };
+/** 数据存储集合名称 */
+export const storeCollName = {
+  WorkTask: 'work-task',
+  WorkInstance: 'work-instances',
+  ChatMessage: 'chat-message',
+};
 /** 支持的单位类型 */
 export const companyTypes = [
   TargetType.Company,

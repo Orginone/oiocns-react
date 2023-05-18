@@ -98,7 +98,7 @@ const PropertyModal = ({ open, handleOk, species, data, handleCancel }: Iprops) 
           showSearch: true,
           options: dicts.map((i) => {
             return {
-              value: i.metadata.id,
+              value: i.id,
               label: i.metadata.name,
             };
           }),

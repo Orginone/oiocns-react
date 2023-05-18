@@ -47,7 +47,7 @@ const DeptWayNode: React.FC<DeptWayNodeProps> = (props: DeptWayNodeProps) => {
     if (
       props.config.belongId &&
       props.config.belongId != '' &&
-      props.config.belongId != orgCtrl.user.metadata.id
+      props.config.belongId != orgCtrl.user.id
     ) {
       editable = false;
     }
@@ -64,7 +64,7 @@ const DeptWayNode: React.FC<DeptWayNodeProps> = (props: DeptWayNodeProps) => {
           key: 'EQ',
           label: '=',
           type: dataType.BELONG,
-          val: orgCtrl.user.metadata.id,
+          val: orgCtrl.user.id,
         },
       ];
       setKey(key + 1);
@@ -72,7 +72,7 @@ const DeptWayNode: React.FC<DeptWayNodeProps> = (props: DeptWayNodeProps) => {
     if (!isEditable()) {
       setOrgId(props.config.conditions[0]?.val);
     } else {
-      setOrgId(orgCtrl.user.metadata.id);
+      setOrgId(orgCtrl.user.id);
     }
   }, []);
 

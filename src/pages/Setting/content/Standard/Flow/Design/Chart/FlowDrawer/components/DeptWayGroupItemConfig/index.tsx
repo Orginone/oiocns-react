@@ -6,7 +6,6 @@ import cls from './index.module.less';
 import orgCtrl from '@/ts/controller';
 
 interface IProps {
-  orgId?: string;
   currnet: NodeType;
   conditions?: FieldCondition[];
 }
@@ -58,7 +57,7 @@ const DeptWayGroupItemConfig: React.FC<IProps> = (props) => {
                       <SelectOrg
                         key={key}
                         onChange={onChange}
-                        orgId={orgCtrl.user.metadata.id}
+                        orgId={orgCtrl.user.id}
                         value={condition.val}
                         rootDisable={false}></SelectOrg>
                     </div>

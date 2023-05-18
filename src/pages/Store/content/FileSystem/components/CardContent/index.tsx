@@ -18,7 +18,7 @@ const CardListContent = ({
   const FileCard = (el: IFileSystemItem) => (
     <Dropdown
       menu={{
-        items: loadFileSysItemMenus(),
+        items: loadFileSysItemMenus(el),
         onClick: ({ key }) => {
           handleMenuClick(key, el);
         },
@@ -54,7 +54,7 @@ const CardListContent = ({
   return (
     <Dropdown
       menu={{
-        items: loadFileSysItemMenus(),
+        items: loadFileSysItemMenus(current),
         onClick: ({ key }) => {
           handleMenuClick(key, current);
         },

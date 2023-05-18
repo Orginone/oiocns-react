@@ -31,7 +31,7 @@ const ProFormDict = (props: IProps) => {
   useEffect(() => {
     const initOptions = async () => {
       const dicts = await props.belong.loadDicts();
-      const dict = dicts.find((a) => a.metadata.id == props.dictId);
+      const dict = dicts.find((a) => a.id == props.dictId);
       const dictItems = await dict?.loadItems();
       setOptions(
         dictItems?.map((item) => {

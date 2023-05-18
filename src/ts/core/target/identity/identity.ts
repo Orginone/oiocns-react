@@ -4,6 +4,8 @@ import { IBelong } from '../base/belong';
 
 /** 身份（角色）接口 */
 export interface IIdentity extends common.IEntity {
+  /** 唯一标识 */
+  id: string;
   /** 设置身份（角色）的用户 */
   space: IBelong;
   /** 数据实体 */
@@ -33,10 +35,13 @@ export class Identity extends common.Entity implements IIdentity {
   metadata: schema.XIdentity;
   members: schema.XTarget[] = [];
   private _memberLoaded: boolean = false;
+  get id(): string {
+    return this.metadata.id;
+  }
   async loadMembers(reload?: boolean | undefined): Promise<schema.XTarget[]> {
     if (!this._memberLoaded || reload) {
       const res = await kernel.queryIdentityTargets({
-        id: this.metadata.id,
+        id: this.id,
         page: PageAll,
       });
       if (res.success) {
@@ -52,7 +57,7 @@ export class Identity extends common.Entity implements IIdentity {
     });
     if (members.length > 0) {
       const res = await kernel.giveIdentity({
-        id: this.metadata.id,
+        id: this.id,
         subIds: members.map((i) => i.id),
       });
       if (res.success) {
@@ -64,7 +69,7 @@ export class Identity extends common.Entity implements IIdentity {
   }
   async removeMembers(members: schema.XTarget[]): Promise<boolean> {
     const res = await kernel.removeIdentity({
-      id: this.metadata.id,
+      id: this.id,
       subIds: members.map((i) => i.id),
     });
     if (res.success) {
@@ -75,7 +80,7 @@ export class Identity extends common.Entity implements IIdentity {
     return true;
   }
   async update(data: model.IdentityModel): Promise<boolean> {
-    data.id = this.metadata.id;
+    data.id = this.id;
     data.shareId = this.metadata.shareId;
     data.name = data.name || this.metadata.name;
     data.code = data.code || this.metadata.code;
@@ -89,7 +94,7 @@ export class Identity extends common.Entity implements IIdentity {
   }
   async delete(): Promise<boolean> {
     const res = await kernel.deleteAuthority({
-      id: this.metadata.id,
+      id: this.id,
       page: PageAll,
     });
     if (res.success) {
