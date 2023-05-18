@@ -132,7 +132,7 @@ export class UserProvider extends common.Emitter {
           }
           for (const item of this.user.targets) {
             if (item.id === data.target.id) {
-              await item.teamChangedNotity(data.target);
+              await item.teamChangedNotity(data.subTarget);
             }
           }
         }

@@ -119,10 +119,9 @@ export abstract class Team extends MsgChat implements ITeam {
             id: this.id,
             subId: member.id,
           });
-          if (res.success) {
-            this.createTargetMsg(OperateType.Remove, member);
-          }
+          if (!res.success) return false;
           notity = res.success;
+          this.createTargetMsg(OperateType.Remove, member);
         }
         if (notity) {
           this.members = this.members.filter((i) => i.id != member.id);
