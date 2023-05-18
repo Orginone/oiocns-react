@@ -10,8 +10,7 @@ import { orgAuth } from '@/ts/core/public/consts';
 import css from './index.module.less';
 import { CheckboxChangeEvent } from 'antd/lib/checkbox';
 import SuperMsgs from '@/ts/core/chat/message/supermsg';
-import moment from 'moment';
-moment.locale('zh-cn');
+import { showChatTime } from '@/utils/tools';
 /**
  * @description: 通讯录
  * @return {*}
@@ -75,12 +74,8 @@ const Book: React.FC<any> = ({
 
   const showMessage = (chat: IMsgChat) => {
     if (chat.chatdata.lastMessage) {
-      let text =
-        '最新消息[' +
-        moment(chat.chatdata.lastMessage.createTime).format('YYYY年MM月DD日 HH:mm:ss') +
-        ']:';
+      let text = '最新消息[' + showChatTime(chat.chatdata.lastMessage.createTime) + ']:';
       if (chat.chatdata.lastMessage.msgType === MessageType.Text) {
-        // return text + chat.chatdata.lastMessage.showTxt;
         return text + filetrText(chat.chatdata.lastMessage);
       }
       return text + '[' + chat.chatdata.lastMessage.msgType + ']';
