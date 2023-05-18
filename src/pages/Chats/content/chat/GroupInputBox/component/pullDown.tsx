@@ -12,14 +12,24 @@ interface AppProps {
   onSelect?: any;
   onChange?: any;
   pullDownRef?: any;
+  /** 关闭事件 */
+  onClose: any;
 }
 
 const PullDown: React.FC<AppProps> = (props) => {
-  const { people, open, style, onSelect, pullDownRef } = props; // 在这里将属性从props 中解构出来
+  const { people, open, style, onSelect, pullDownRef, onClose } = props; // 在这里将属性从props 中解构出来
   const [defaultValue, setDefaultValue] = useState<string | number | null>('00100');
+
+  const onKeyDown = (e: { key: string }) => {
+    if (e.key === 'Escape') {
+      onClose(false);
+    }
+  };
+
   useEffect(() => {
     setDefaultValue('00100');
   }, [open]);
+
   return (
     <Select
       style={style}
@@ -30,14 +40,13 @@ const PullDown: React.FC<AppProps> = (props) => {
       defaultValue={defaultValue}
       onSelect={(value, option) => onSelect(option)}
       placement="topLeft"
+      onKeyDown={onKeyDown}
       className="citeSelect">
-      {people?.map((res: any) => {
-        return (
-          <Option value={res.id} key={res.id}>
-            {res.name}
-          </Option>
-        );
-      })}
+      {people?.map((res: any) => (
+        <Option value={res.id} key={res.id}>
+          {res.name}
+        </Option>
+      ))}
     </Select>
   );
 };
