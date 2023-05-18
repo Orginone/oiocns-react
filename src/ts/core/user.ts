@@ -4,15 +4,17 @@ import { IChatProvider, ChatProvider } from './chat/provider';
 import { IWorkProvider, WorkProvider } from './work/provider';
 import { OperateType } from './public/enums';
 import { logger } from '../base/common';
+import { msgChatNotify } from './chat/message/msgchat';
 const sessionUserName = 'sessionUser';
 
-export class UserProvider extends common.Emitter {
+export class UserProvider {
   private _user: IPerson | undefined;
   private _work: IWorkProvider | undefined;
   private _chat: IChatProvider | undefined;
   private _inited: boolean = false;
-  constructor() {
-    super();
+  private _emiter: common.Emitter;
+  constructor(emiter: common.Emitter) {
+    this._emiter = emiter;
     const userJson = sessionStorage.getItem(sessionUserName);
     if (userJson && userJson.length > 0) {
       this._loadUser(JSON.parse(userJson));
@@ -82,7 +84,7 @@ export class UserProvider extends common.Emitter {
     this._user = new Person(person);
     this._chat = new ChatProvider(this._user);
     this._work = new WorkProvider(this._user);
-    this.changCallback();
+    this.refresh();
   }
   /** 更新用户 */
   public update(person: schema.XTarget) {
@@ -96,6 +98,7 @@ export class UserProvider extends common.Emitter {
     await this.work?.loadTodos(true);
     this._inited = true;
     this._chat?.loadPreMessage();
+    this._emiter.changCallback();
   }
 
   async _updateTarget(recvData: string) {
@@ -130,6 +133,7 @@ export class UserProvider extends common.Emitter {
               item.id === data.subTarget.id &&
               (await item.teamChangedNotity(data.target))
             ) {
+              this._emiter.changCallback();
               return;
             }
           }
@@ -140,5 +144,7 @@ export class UserProvider extends common.Emitter {
           }
         }
     }
+    msgChatNotify.changCallback();
+    this._emiter.changCallback();
   }
 }
