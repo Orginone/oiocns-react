@@ -1,6 +1,6 @@
 import { schema, model, kernel } from '../../../base';
 import { IIdentity, Identity } from '../identity/identity';
-import { SpeciesType, TargetType } from '../../public/enums';
+import { OperateType, SpeciesType, TargetType } from '../../public/enums';
 import { PageAll } from '../../public/consts';
 import { ISpeciesItem, createSpecies } from '../../thing/';
 import { ITeam, Team } from './team';
@@ -105,6 +105,9 @@ export abstract class Target extends Team implements ITarget {
       id: this.id,
       subIds: [team.id],
     });
+    if (res.success) {
+      this.createTargetMsg(OperateType.Add, team.metadata);
+    }
     return res.success;
   }
   abstract exit(): Promise<boolean>;

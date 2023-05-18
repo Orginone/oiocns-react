@@ -1,7 +1,7 @@
 import { kernel, model, schema } from '@/ts/base';
 import { ITarget, Target } from '../base/target';
 import { PageAll, companyTypes } from '../../public/consts';
-import { OperateType, SpeciesType, TargetType } from '../../public/enums';
+import { SpeciesType, TargetType } from '../../public/enums';
 import { ICompany } from '../team/company';
 import { IMsgChat } from '../../chat/message/msgchat';
 import { ITeam } from '../base/team';
@@ -55,7 +55,6 @@ export class Group extends Target implements IGroup {
       const group = new Group(metadata, this.company);
       if (await this.pullSubTarget(group)) {
         this.children.push(group);
-        this.createTargetMsg(OperateType.Add, metadata);
         return group;
       }
     }

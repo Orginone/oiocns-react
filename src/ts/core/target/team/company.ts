@@ -6,7 +6,7 @@ import { IDepartment, Department } from '../innerTeam/department';
 import { IStation, Station } from '../innerTeam/station';
 import { IPerson } from '../person';
 import { PageAll } from '../../public/consts';
-import { OperateType, TargetType } from '../../public/enums';
+import { TargetType } from '../../public/enums';
 import { IMsgChat } from '../../chat/message/msgchat';
 import { ITarget } from '../base/target';
 import { ITeam } from '../base/team';
@@ -135,7 +135,6 @@ export class Company extends Belong implements ICompany {
       await department.deepLoad();
       if (await this.pullSubTarget(department)) {
         this.departments.push(department);
-        this.createTargetMsg(OperateType.Add, metadata);
         return department;
       }
     }
@@ -148,7 +147,6 @@ export class Company extends Belong implements ICompany {
       const station = new Station(metadata, this);
       if (await this.pullSubTarget(station)) {
         this.stations.push(station);
-        this.createTargetMsg(OperateType.Add, metadata);
         return station;
       }
     }
@@ -249,14 +247,6 @@ export class Company extends Belong implements ICompany {
       await cohort.deepLoad(reload);
     }
     this.superAuth?.deepLoad(reload);
-  }
-
-  override async createCohort(data: model.TargetModel): Promise<ICohort | undefined> {
-    const cohort = await super.createCohort(data);
-    if (cohort) {
-      this.createTargetMsg(OperateType.Add, cohort.metadata);
-    }
-    return cohort;
   }
 
   override async removeMembers(
