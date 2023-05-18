@@ -23,9 +23,9 @@ export const filetrText = (val: model.MsgSaveModel) => {
     return citeText;
   } else {
     const userText = val?.showTxt?.substring(spanText, val?.showTxt?.length);
-    const typeofText = userText.indexOf('$CITEMESSAGE');
+    const typeofText = userText?.indexOf('$CITEMESSAGE');
     if (typeofText !== -1) {
-      const textGroup = userText.substring(0, typeofText);
+      const textGroup = userText?.substring(0, typeofText);
       return textGroup;
     } else {
       return userText;

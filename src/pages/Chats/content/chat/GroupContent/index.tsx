@@ -451,7 +451,7 @@ const GroupContent = (props: Iprops) => {
       <Spin tip="加载中..." spinning={loading}>
         <div className={css.group_content_wrap}>
           {messages
-            .filter((i) => i.showTxt.includes(props.filter))
+            .filter((i) => i?.showTxt?.includes(props.filter))
             .map((item, index: any) => {
               return (
                 <React.Fragment key={item.fromId + index}>

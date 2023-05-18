@@ -11,6 +11,7 @@ import css from './index.module.less';
 import { CheckboxChangeEvent } from 'antd/lib/checkbox';
 import SuperMsgs from '@/ts/core/chat/message/supermsg';
 import { showChatTime } from '@/utils/tools';
+import { showCiteName } from '@/utils/common';
 /**
  * @description: 通讯录
  * @return {*}
@@ -76,7 +77,11 @@ const Book: React.FC<any> = ({
     if (chat.chatdata.lastMessage) {
       let text = '最新消息[' + showChatTime(chat.chatdata.lastMessage.createTime) + ']:';
       if (chat.chatdata.lastMessage.msgType === MessageType.Text) {
-        return text + filetrText(chat.chatdata.lastMessage);
+        return (
+          text +
+          filetrText(chat.chatdata.lastMessage) +
+          showCiteName(chat.chatdata.isFindme, chat.userId)
+        );
       }
       return text + '[' + chat.chatdata.lastMessage.msgType + ']';
     }
