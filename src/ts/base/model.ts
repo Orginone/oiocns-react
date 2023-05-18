@@ -241,6 +241,7 @@ export type TargetOperateModel = {
   operate: string;
   target: XTarget;
   subTarget?: XTarget;
+  operater: XTarget;
 };
 
 export type MsgTagModel = {

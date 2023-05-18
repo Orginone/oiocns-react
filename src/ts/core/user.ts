@@ -104,26 +104,27 @@ export class UserProvider {
   async _updateTarget(recvData: string) {
     const data: model.TargetOperateModel = JSON.parse(recvData);
     if (!this.user || !data) return;
+    let message = '';
     switch (data.operate) {
       case OperateType.Delete:
-        logger.info(`${data.target.name}已被删除.`);
+        message = `${data.operater?.name}将${data.target.name}删除.`;
         this.user.targets
           .filter((i) => i.id === data.target.id)
           .forEach((i) => i.delete(true));
         break;
       case OperateType.Update:
-        logger.info(`${data.target.name}已被更新.`);
+        message = `${data.operater?.name}将${data.target.name}信息更新.`;
         this.user.updateMetadata(data.target);
         break;
       case OperateType.Remove:
         if (data.subTarget) {
           if (data.subTarget.id === this.user.id) {
-            logger.info(`您已被从${data.target.name}移除.`);
+            message = `您已被${data.operater?.name}从${data.target.name}移除.`;
             this.user.targets
               .filter((i) => i.id === data.target.id)
               .forEach((i) => i.delete(true));
           } else {
-            logger.info(`成员${data.subTarget.name}已被从${data.target.name}移除.`);
+            message = `${data.operater?.name}把${data.subTarget.name}从${data.target.name}移除.`;
             this.user.targets
               .filter(
                 (i) => i.id === data.target.id || data.target.id === data.subTarget!.id,
@@ -134,24 +135,31 @@ export class UserProvider {
         break;
       case OperateType.Add:
         if (data.subTarget) {
-          logger.info(`${data.subTarget.name}与${data.target.name}建立关系.`);
+          let operated = false;
+          message = `${data.operater?.name}把${data.subTarget.name}与${data.target.name}建立关系.`;
           for (const item of [this.user, ...this.user.companys]) {
             if (
               item.id === data.subTarget.id &&
               (await item.teamChangedNotity(data.target))
             ) {
-              this._emiter.changCallback();
-              return;
+              operated = true;
             }
           }
-          for (const item of this.user.targets) {
-            if (item.id === data.target.id) {
-              await item.teamChangedNotity(data.subTarget);
+          if (!operated) {
+            for (const item of this.user.targets) {
+              if (item.id === data.target.id) {
+                await item.teamChangedNotity(data.subTarget);
+              }
             }
           }
         }
     }
-    msgChatNotify.changCallback();
-    this._emiter.changCallback();
+    if (message.length > 0) {
+      if (data.operater?.id != this.user.id) {
+        logger.info(message);
+      }
+      msgChatNotify.changCallback();
+      this._emiter.changCallback();
+    }
   }
 }
