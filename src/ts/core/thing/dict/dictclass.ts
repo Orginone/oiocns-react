@@ -36,7 +36,7 @@ export class DictClass extends SpeciesItem implements IDictClass {
     for (const item of this.children) {
       const subDicts = await (item as IDictClass).loadAllDicts();
       for (const sub of subDicts) {
-        if (dicts.findIndex((i) => i.metadata.id === sub.metadata.id) < 0) {
+        if (dicts.findIndex((i) => i.id === sub.id) < 0) {
           dicts.push(sub);
         }
       }
@@ -46,7 +46,7 @@ export class DictClass extends SpeciesItem implements IDictClass {
   async loadDicts(reload: boolean = false): Promise<IDict[]> {
     if (!this._dictLoaded || reload) {
       const res = await kernel.queryDicts({
-        id: this.metadata.id,
+        id: this.id,
         page: PageAll,
       });
       if (res.success) {
@@ -59,7 +59,7 @@ export class DictClass extends SpeciesItem implements IDictClass {
     return this.dicts;
   }
   async createDict(data: model.DictModel): Promise<IDict | undefined> {
-    data.speciesId = this.metadata.id;
+    data.speciesId = this.id;
     const res = await kernel.createDict(data);
     if (res.success && res.data?.id) {
       const dict = new Dict(res.data, this);
@@ -72,16 +72,14 @@ export class DictClass extends SpeciesItem implements IDictClass {
       for (const item of props) {
         switch (type) {
           case 'deleted':
-            this.dicts = this.dicts.filter((i) => i.metadata.id != item.metadata.id);
+            this.dicts = this.dicts.filter((i) => i.id != item.id);
             break;
           case 'added':
             this.dicts.push(item);
             break;
           case 'updated':
             {
-              const index = this.dicts.findIndex(
-                (i) => i.metadata.id === item.metadata.id,
-              );
+              const index = this.dicts.findIndex((i) => i.id === item.id);
               if (index > -1) {
                 this.dicts[index] = item;
               }

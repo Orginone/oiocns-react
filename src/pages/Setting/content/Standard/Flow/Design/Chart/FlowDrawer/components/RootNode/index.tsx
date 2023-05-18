@@ -1,19 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Button, Divider, Modal, Row } from 'antd';
 import cls from './index.module.less';
 import { NodeType } from '../../processType';
-import { XForm } from '@/ts/base/schema';
-import { ISpeciesItem } from '@/ts/core';
 import ShareShowComp from '@/bizcomponents/IndentityManage/ShareShowComp';
-import SelectOperation from '@/pages/Setting/content/Standard/Flow/Comp/SelectOperation';
 import { AiOutlineSetting } from 'react-icons/ai';
 import SelectAuth from '../../../../../Comp/selectAuth';
-import { IAppModule } from '@/ts/core/thing/app/appmodule';
-import ViewFormModal from '@/bizcomponents/FormDesign/viewFormModal';
+import SelectOperation from '../../../../../Comp/SelectOperation';
+import { IWork } from '@/ts/core';
+import { XForm } from '@/ts/base/schema';
 interface IProps {
   current: NodeType;
-  orgId?: string;
-  species?: ISpeciesItem;
+  work: IWork;
 }
 /**
  * @description: 角色
@@ -21,18 +18,11 @@ interface IProps {
  */
 
 const RootNode: React.FC<IProps> = (props) => {
-  const [operations, setOperations] = useState<XForm[]>([]);
+  const [forms, setForms] = useState<XForm[]>(props.current.props.operations);
   const [operationModal, setOperationModal] = useState<any>();
-  const [viewFormOpen, setViewFormOpen] = useState<boolean>(false);
-  const [editData, setEditData] = useState<XForm>();
-  const [showData, setShowData] = useState<any[]>([]);
   const [selectAuthValue, setSelectAuthValue] = useState<any>(
     props.current.props.assignedUser[0]?.id,
   );
-  // 操作内容渲染函数
-  useEffect(() => {
-    setOperations(props.current.props.operations || []);
-  }, []);
   return (
     <div className={cls[`app-roval-node`]}>
       <div className={cls[`roval-node`]}>
@@ -41,7 +31,7 @@ const RootNode: React.FC<IProps> = (props) => {
           <span className={cls[`roval-node-title`]}>选择角色</span>
         </Row>
         <SelectAuth
-          space={props.species!.current.space}
+          space={props.work.current.space}
           onChange={(newValue: string, label: string) => {
             if (props.current.props.assignedUser[0]) {
               props.current.props.assignedUser[0].id = newValue;
@@ -67,19 +57,17 @@ const RootNode: React.FC<IProps> = (props) => {
         </Button>
         {/* </div> */}
         <div>
-          {operations && operations.length > 0 && (
+          {forms && forms.length > 0 && (
             <span>
               <ShareShowComp
-                departData={operations}
-                onClick={(item: any) => {
-                  setEditData(item);
-                  setViewFormOpen(true);
-                }}
+                departData={forms}
+                // onClick={(item: XForm) => {
+                //   const form = forms.find((i) => i.id === item.id);
+                //   setEditData(form);
+                //   setViewFormOpen(true);
+                // }}
                 deleteFuc={(id: string) => {
-                  props.current.props.operations = props.current.props.operations.filter(
-                    (op) => op.id != id,
-                  );
-                  setOperations(props.current.props.operations);
+                  setForms([...forms.filter((i) => i.id != id)]);
                 }}></ShareShowComp>
             </span>
           )}
@@ -90,20 +78,18 @@ const RootNode: React.FC<IProps> = (props) => {
             open={operationModal != undefined}
             okText="确定"
             onOk={() => {
-              props.current.props.operations = showData;
-              setOperations(showData);
+              props.current.props.operations = forms;
               setOperationModal(undefined);
             }}
             onCancel={() => setOperationModal(undefined)}>
             <SelectOperation
-              current={props.species?.parent as IAppModule}
-              showData={showData}
-              setShowData={setShowData}></SelectOperation>
+              current={props.work}
+              selected={forms}
+              setSelected={setForms}></SelectOperation>
           </Modal>
-          {props.species && (
+          {/* {viewFormOpen && editData && (
             <ViewFormModal
-              belong={props.species!.current.space}
-              data={editData}
+              form={editData}
               open={viewFormOpen}
               handleCancel={() => {
                 setViewFormOpen(false);
@@ -112,7 +98,7 @@ const RootNode: React.FC<IProps> = (props) => {
                 setViewFormOpen(false);
               }}
             />
-          )}
+          )} */}
         </div>
       </div>
     </div>

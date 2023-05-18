@@ -7,13 +7,14 @@ import { FileSystem } from './filesys/filesystem';
 import { Application } from './app/application';
 import { Market } from './market/market';
 import { DictClass } from './dict/dictclass';
+import { Resource } from './resource/resource';
 
 export type { ISpeciesItem } from './base/species';
 
 export const createSpecies = (
   _metadata: schema.XSpecies,
   _current: ITarget,
-): ISpeciesItem => {
+): ISpeciesItem | undefined => {
   switch (_metadata.typeName as SpeciesType) {
     case SpeciesType.Dict:
       return new DictClass(_metadata, _current);
@@ -23,11 +24,9 @@ export const createSpecies = (
       return new Application(_metadata, _current);
     case SpeciesType.FileSystem:
       return new FileSystem(_metadata, _current);
-    // case SpeciesType.Resource:
-    //   break;
     case SpeciesType.Market:
       return new Market(_metadata, _current);
-    default:
-      return new PropClass(_metadata, _current);
+    case SpeciesType.Resource:
+      return new Resource(_metadata, _current);
   }
 };

@@ -6,14 +6,11 @@ import { PageAll, ShareIdSet, companyTypes } from '../public/consts';
 import { TargetType } from '../public/enums';
 import { ICompany } from './team/company';
 import { IMsgChat, PersonMsgChat } from '../chat/message/msgchat';
-import { IFileSystem, FileSystem } from '../thing/filesys/filesystem';
 import { ITarget } from './base/target';
 import { ITeam } from './base/team';
 
 /** 人员类型接口 */
 export interface IPerson extends IBelong {
-  /** 文件系统 */
-  filesys: IFileSystem;
   /** 加入/管理的单位 */
   companys: ICompany[];
   /** 赋予人的身份(角色)实体 */
@@ -36,14 +33,7 @@ export interface IPerson extends IBelong {
 export class Person extends Belong implements IPerson {
   constructor(_metadata: schema.XTarget) {
     super(_metadata, ['本人']);
-    this.filesys = new FileSystem(
-      {
-        id: this.metadata.id,
-      } as schema.XSpecies,
-      this,
-    );
   }
-  filesys: IFileSystem;
   companys: ICompany[] = [];
   private _cohortLoaded: boolean = false;
   private _companyLoaded: boolean = false;
@@ -62,7 +52,7 @@ export class Person extends Belong implements IPerson {
   async loadCohorts(reload?: boolean | undefined): Promise<ICohort[]> {
     if (!this._cohortLoaded || reload) {
       const res = await kernel.queryJoinedTargetById({
-        id: this.metadata.id,
+        id: this.id,
         typeNames: [TargetType.Cohort],
         page: PageAll,
       });
@@ -76,7 +66,7 @@ export class Person extends Belong implements IPerson {
   async loadCompanys(reload?: boolean | undefined): Promise<ICompany[]> {
     if (!this._companyLoaded || reload) {
       const res = await kernel.queryJoinedTargetById({
-        id: this.metadata.id,
+        id: this.id,
         typeNames: companyTypes,
         page: PageAll,
       });
@@ -123,7 +113,7 @@ export class Person extends Belong implements IPerson {
       (i) =>
         [TargetType.Person, TargetType.Cohort, ...companyTypes].includes(
           i.typeName as TargetType,
-        ) && i.id != this.metadata.id,
+        ) && i.id != this.id,
     );
     for (const member of members) {
       if (member.typeName === TargetType.Person) {
@@ -131,7 +121,7 @@ export class Person extends Belong implements IPerson {
       }
       await kernel.applyJoinTeam({
         id: member.id,
-        subId: this.metadata.id,
+        subId: this.id,
       });
     }
     return true;
@@ -152,7 +142,7 @@ export class Person extends Belong implements IPerson {
   }
   async delete(): Promise<boolean> {
     const res = await kernel.deleteTarget({
-      id: this.metadata.id,
+      id: this.id,
       page: PageAll,
     });
     return res.success;
@@ -213,13 +203,12 @@ export class Person extends Belong implements IPerson {
     this.superAuth?.deepLoad(reload);
   }
   override loadMemberChats(_newMembers: schema.XTarget[], _isAdd: boolean): void {
-    _newMembers = _newMembers.filter((i) => i.id != this.user.metadata.id);
+    _newMembers = _newMembers.filter((i) => i.id != this.userId);
     if (_isAdd) {
       _newMembers.forEach((i) => {
         this.memberChats.push(
           new PersonMsgChat(
-            this.metadata.id,
-            this.metadata.id,
+            this.id,
             i.id,
             {
               name: i.name,
@@ -228,6 +217,7 @@ export class Person extends Belong implements IPerson {
             },
             ['好友'],
             i.remark,
+            this,
           ),
         );
       });
@@ -264,9 +254,9 @@ export class Person extends Belong implements IPerson {
           break;
         case 'Remove':
           if (companyTypes.includes(target.typeName as TargetType)) {
-            this.companys = this.companys.filter((a) => a.metadata.id != target.id);
+            this.companys = this.companys.filter((a) => a.id != target.id);
           } else if (target.typeName == TargetType.Cohort) {
-            this.cohorts = this.cohorts.filter((a) => a.metadata.id != target.id);
+            this.cohorts = this.cohorts.filter((a) => a.id != target.id);
           }
           break;
         default:
@@ -275,11 +265,9 @@ export class Person extends Belong implements IPerson {
     }
   }
   findShareById(id: string): model.ShareIcon {
-    const share = ShareIdSet.get(id) || {
-      name: '未知',
-      typeName: '未知',
-    };
-    if (!share.avatar) {
+    if (ShareIdSet.has(id)) {
+      return ShareIdSet.get(id)!;
+    } else if (id && id.length > 10) {
       kernel
         .queryTargetById({
           ids: [id],
@@ -297,6 +285,9 @@ export class Person extends Belong implements IPerson {
           }
         });
     }
-    return share;
+    return {
+      name: '请稍等...',
+      typeName: '未知',
+    };
   }
 }

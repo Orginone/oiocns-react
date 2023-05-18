@@ -1,8 +1,7 @@
 import { model, common, schema, kernel, List } from '../../../base';
-import { ShareIdSet } from '../../public/consts';
+import { ShareIdSet, storeCollName } from '../../public/consts';
 import { MessageType, TargetType } from '../../public/enums';
-// 历史会话存储集合名称
-const hisMsgCollName = 'chat-message';
+import { IBelong } from '../../target/base/belong';
 // 空时间
 const nullTime = new Date('2022-07-01').getTime();
 // 消息变更推送
@@ -38,6 +37,8 @@ export interface IMsgChat extends common.IEntity {
   userId: string;
   /** 会话归属Id */
   belongId: string;
+  /** 加载会话的自归属用户 */
+  space: IBelong;
   /** 共享信息 */
   share: model.ShareIcon;
   /** 会话的历史消息 */
@@ -76,17 +77,17 @@ export interface IMsgChat extends common.IEntity {
 
 export abstract class MsgChat extends common.Entity implements IMsgChat {
   constructor(
-    _userId: string,
     _belongId: string,
     _chatId: string,
     _share: model.ShareIcon,
     _labels: string[],
     _remark: string,
+    _space?: IBelong,
   ) {
     super();
     this.share = _share;
     this.chatId = _chatId;
-    this.userId = _userId;
+    this.space = _space || (this as unknown as IBelong);
     this.belongId = _belongId;
     this.chatdata = {
       noReadCount: 0,
@@ -99,16 +100,9 @@ export abstract class MsgChat extends common.Entity implements IMsgChat {
     };
     this.labels = new List(_labels);
     ShareIdSet.set(this.chatId, this.share);
-    kernel.anystore.subscribed(
-      '0',
-      hisMsgCollName + '.T' + this.chatdata.fullId,
-      (data: MsgChatData) => {
-        this.loadCache(data);
-      },
-    );
   }
+  space: IBelong;
   chatId: string;
-  userId: string;
   belongId: string;
   labels: List<string>;
   share: model.ShareIcon;
@@ -117,6 +111,9 @@ export abstract class MsgChat extends common.Entity implements IMsgChat {
   chatdata: MsgChatData;
   memberChats: PersonMsgChat[] = [];
   private messageNotify?: (messages: model.MsgSaveModel[]) => void;
+  get userId(): string {
+    return this.space.user.id;
+  }
   get isMyChat(): boolean {
     if (this.chatdata.noReadCount > 0 || this.share.typeName === TargetType.Person) {
       return true;
@@ -139,10 +136,14 @@ export abstract class MsgChat extends common.Entity implements IMsgChat {
   }
   cache(): void {
     this.chatdata.labels = this.labels.ToArray();
-    kernel.anystore.set('0', hisMsgCollName + '.T' + this.chatdata.fullId, {
-      operation: 'replaceAll',
-      data: this.chatdata,
-    });
+    kernel.anystore.set(
+      this.userId,
+      storeCollName.ChatMessage + '.T' + this.chatdata.fullId,
+      {
+        operation: 'replaceAll',
+        data: this.chatdata,
+      },
+    );
   }
   loadCache(cache: MsgChatData): void {
     if (this.chatdata.fullId === cache.fullId) {
@@ -171,7 +172,7 @@ export abstract class MsgChat extends common.Entity implements IMsgChat {
     }
   }
   async moreMessage(): Promise<number> {
-    const res = await kernel.anystore.aggregate('0', hisMsgCollName, {
+    const res = await kernel.anystore.aggregate(this.userId, storeCollName.ChatMessage, {
       match: {
         sessionId: this.chatId,
         belongId: this.belongId,
@@ -219,7 +220,7 @@ export abstract class MsgChat extends common.Entity implements IMsgChat {
     }
   }
   async deleteMessage(id: string): Promise<boolean> {
-    const res = await kernel.anystore.remove('0', hisMsgCollName, {
+    const res = await kernel.anystore.remove(this.userId, storeCollName.ChatMessage, {
       chatId: id,
     });
     if (res.success && res.data > 0) {
@@ -236,7 +237,7 @@ export abstract class MsgChat extends common.Entity implements IMsgChat {
     return false;
   }
   async clearMessage(): Promise<boolean> {
-    const res = await kernel.anystore.remove('0', hisMsgCollName, {
+    const res = await kernel.anystore.remove(this.userId, storeCollName.ChatMessage, {
       sessionId: this.chatId,
       belongId: this.belongId,
     });
@@ -286,14 +287,14 @@ export abstract class MsgChat extends common.Entity implements IMsgChat {
 
 export class PersonMsgChat extends MsgChat implements IMsgChat {
   constructor(
-    _userId: string,
     _belongId: string,
     _chatId: string,
     _share: model.ShareIcon,
     _labels: string[],
     _remark: string,
+    _space: IBelong,
   ) {
-    super(_userId, _belongId, _chatId, _share, _labels, _remark);
+    super(_belongId, _chatId, _share, _labels, _remark, _space);
   }
   async loadMembers(_reload: boolean = false): Promise<schema.XTarget[]> {
     return [];

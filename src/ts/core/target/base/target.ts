@@ -49,7 +49,7 @@ export abstract class Target extends Team implements ITarget {
   async loadIdentitys(reload?: boolean | undefined): Promise<IIdentity[]> {
     if (!this._identityLoaded || reload) {
       const res = await kernel.queryTargetIdentitys({
-        id: this.metadata.id,
+        id: this.id,
         page: PageAll,
       });
       if (res.success) {
@@ -64,40 +64,23 @@ export abstract class Target extends Team implements ITarget {
   async loadSpecies(reload?: boolean | undefined): Promise<ISpeciesItem[]> {
     if (!this._speciesLoaded || reload) {
       const res = await kernel.querySpeciesTree({
-        id: this.metadata.id,
+        id: this.id,
         upTeam: this.metadata.typeName === TargetType.Group,
-        belongId: this.space.metadata.id,
+        belongId: this.space.id,
         filter: '',
       });
       if (res.success) {
         this._speciesLoaded = true;
-        let hasFilesystem = false;
-        let hasMarket = false;
-        this.species = (res.data.result || []).map((item) => {
-          if (item.typeName === SpeciesType.FileSystem) {
-            hasFilesystem = true;
-          }
-          if (item.typeName === SpeciesType.Market) {
-            hasMarket = true;
-          }
-          return createSpecies(item, this);
-        });
-        if (!hasFilesystem) {
-          this.speciesTypes.push(SpeciesType.FileSystem);
-        }
-        if (
-          !hasMarket &&
-          (this.metadata.typeName === TargetType.Cohort ||
-            this.metadata.typeName === TargetType.Group)
-        ) {
-          this.speciesTypes.push(SpeciesType.Market);
-        }
+        this.species = (res.data.result || [])
+          .map((i) => createSpecies(i, this))
+          .filter((i) => i != undefined)
+          .map((i) => i!);
       }
     }
     return this.species;
   }
   async createIdentity(data: model.IdentityModel): Promise<IIdentity | undefined> {
-    data.shareId = this.metadata.id;
+    data.shareId = this.id;
     const res = await kernel.createIdentity(data);
     if (res.success && res.data?.id) {
       const identity = new Identity(res.data, this.space);
@@ -106,19 +89,21 @@ export abstract class Target extends Team implements ITarget {
     }
   }
   async createSpecies(data: model.SpeciesModel): Promise<ISpeciesItem | undefined> {
-    data.shareId = this.metadata.id;
+    data.shareId = this.id;
     data.parentId = '0';
     const res = await kernel.createSpecies(data);
     if (res.success && res.data?.id) {
       const species = createSpecies(res.data, this);
-      this.species.push(species);
+      if (species) {
+        this.species.push(species);
+      }
       return species;
     }
   }
   protected async pullSubTarget(team: ITeam): Promise<boolean> {
     const res = await kernel.pullAnyToTeam({
-      id: this.metadata.id,
-      subIds: [team.metadata.id],
+      id: this.id,
+      subIds: [team.id],
     });
     return res.success;
   }

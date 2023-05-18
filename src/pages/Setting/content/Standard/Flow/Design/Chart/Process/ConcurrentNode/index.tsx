@@ -43,7 +43,7 @@ const ConcurrentNode: React.FC<ConcurrentNodeProps> = (props: ConcurrentNodeProp
     if (
       props.config.belongId &&
       props.config.belongId != '' &&
-      props.config.belongId != orgCtrl.user.metadata.id
+      props.config.belongId != orgCtrl.user.id
     ) {
       editable = false;
     }

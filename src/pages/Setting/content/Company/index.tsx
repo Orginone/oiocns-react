@@ -4,13 +4,11 @@ import {
   Button,
   Card,
   Descriptions,
-  Dropdown,
   message,
   Modal,
   Space,
   Typography,
 } from 'antd';
-import { AiOutlineExclamationCircle } from 'react-icons/ai';
 import orgCtrl from '@/ts/controller';
 import { ICompany, TargetType } from '@/ts/core';
 import { schema } from '@/ts/base';
@@ -21,7 +19,6 @@ import IndentityManage from '@/bizcomponents/Indentity';
 import cls from './index.module.less';
 import SearchCompany from '@/bizcomponents/SearchCompany';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
-import { RiMore2Fill } from 'react-icons/ri';
 import { orgAuth } from '@/ts/core/public/consts';
 
 interface IProps {
@@ -39,30 +36,6 @@ const CompanySetting: React.FC<IProps> = ({ current }) => {
   const [activeTab, setActiveTab] = useState<string>('members');
   const [selectPerson, setSelectPerson] = useState<schema.XTarget[]>(); // 需要邀请的部门成员
 
-  const menu = [
-    { key: 'auth', label: '认证' },
-    {
-      key: 'quit',
-      label: <span style={{ color: 'red' }}>退出</span>,
-      onClick: async () => {
-        Modal.confirm({
-          title: `是否退出${current.metadata.name}?`,
-          icon: <AiOutlineExclamationCircle />,
-          okText: '确认',
-          okType: 'danger',
-          cancelText: '取消',
-          async onOk() {
-            if (await current.exit()) {
-              message.success(`退出${current.metadata.name}单位成功!`);
-            } else {
-              message.error('退出单位失败!');
-            }
-          },
-          onCancel() {},
-        });
-      },
-    },
-  ];
   // 标题tabs页
   const TitleItems = [
     {
@@ -120,18 +93,13 @@ const CompanySetting: React.FC<IProps> = ({ current }) => {
 
   return (
     <div className={cls.companyContainer}>
-      <Card bordered={false} className={cls['company-info-content']} extra={[]}>
+      <Card bordered={false} className={cls['company-info-content']}>
         <Descriptions
           title={'当前单位'}
           bordered
           size="middle"
           column={2}
-          labelStyle={{ textAlign: 'center', width: '200px' }}
-          extra={[
-            <Dropdown menu={{ items: menu }} placement="bottom" key="more">
-              <RiMore2Fill fontSize={20} />
-            </Dropdown>,
-          ]}>
+          labelStyle={{ textAlign: 'center', width: '200px' }}>
           <Descriptions.Item label="单位名称" contentStyle={{ textAlign: 'center' }}>
             <Space>
               {current.share.avatar && <Avatar src={current.share.avatar.thumbnail} />}

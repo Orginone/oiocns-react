@@ -1,4 +1,5 @@
 import { kernel, model } from '../../base';
+import { storeCollName } from '../public/consts';
 import { TargetType } from '../public/enums';
 import { IPerson } from '../target/person';
 import { IMsgChat } from './message/msgchat';
@@ -32,15 +33,28 @@ export class ChatProvider implements IChatProvider {
   }
   /** 加载挂起的消息 */
   loadPreMessage(): void {
-    this._preMessages = this._preMessages
-      .sort((a, b) => {
-        return new Date(a.createTime).getTime() - new Date(b.createTime).getTime();
-      })
-      .filter((item) => {
-        this._recvMessage(item);
-        return false;
-      });
-    this._preMessage = false;
+    kernel.anystore.get<any>(this.user.id, storeCollName.ChatMessage).then((res) => {
+      if (res.success) {
+        if (typeof res.data === 'object') {
+          Object.keys(res.data).forEach((key) => {
+            if (key && key.startsWith('T') && 'fullId' in res.data[key]) {
+              const fullId = key.substring(1);
+              const find = this.chats.find((i) => i.chatdata.fullId === fullId);
+              find?.loadCache(res.data[key]);
+            }
+          });
+        }
+        this._preMessages = this._preMessages
+          .sort((a, b) => {
+            return new Date(a.createTime).getTime() - new Date(b.createTime).getTime();
+          })
+          .filter((item) => {
+            this._recvMessage(item);
+            return false;
+          });
+        this._preMessage = false;
+      }
+    });
   }
   get chats(): IMsgChat[] {
     const chats: IMsgChat[] = [...this.user.chats];

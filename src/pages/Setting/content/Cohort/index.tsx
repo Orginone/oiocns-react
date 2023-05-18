@@ -38,7 +38,7 @@ const CohortSetting: React.FC<IProps> = ({ current }: IProps) => {
   // 操作内容渲染函数
   const renderOperation = (item: schema.XTarget): common.OperationType[] => {
     let operations: common.OperationType[] = [];
-    if (item.id != orgCtrl.user.metadata.id) {
+    if (item.id != orgCtrl.user.id) {
       operations.push(
         ...[
           {

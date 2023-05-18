@@ -13,9 +13,10 @@ export interface ICohort extends ITarget {
 export class Cohort extends Target implements ICohort {
   constructor(_metadata: schema.XTarget, _space: IBelong) {
     super(_metadata, [_metadata.belong?.name ?? '', _metadata.typeName], _space);
+    this.speciesTypes.push(SpeciesType.Market);
   }
   async exit(): Promise<boolean> {
-    if (this.metadata.belongId !== this.space.metadata.id) {
+    if (this.metadata.belongId !== this.space.id) {
       if (await this.removeMembers([this.space.user.metadata])) {
         this.space.cohorts = this.space.cohorts.filter((i) => i.key != this.key);
         return true;
@@ -25,7 +26,7 @@ export class Cohort extends Target implements ICohort {
   }
   async delete(): Promise<boolean> {
     const res = await kernel.deleteTarget({
-      id: this.metadata.id,
+      id: this.id,
       page: PageAll,
     });
     if (res.success) {

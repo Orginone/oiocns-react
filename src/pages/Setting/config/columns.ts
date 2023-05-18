@@ -9,7 +9,7 @@ const getSpeciesName = (
   species: ISpeciesItem[],
 ): ISpeciesItem | undefined => {
   for (const item of species) {
-    if (id === item.metadata.id) {
+    if (id === item.id) {
       return item;
     }
     const find = getSpeciesName(id, item.children);
