@@ -12,7 +12,6 @@ import useObjectUpdate from '@/hooks/useObjectUpdate';
 import { CompanyColumn, PersonColumns } from '../../config/columns';
 import SearchTarget from '@/bizcomponents/SearchCompany';
 import { schema } from '@/ts/base';
-import { orgAuth } from '@/ts/core/public/consts';
 interface IProps {
   current: ITarget;
 }
@@ -74,7 +73,7 @@ const AgencySetting: React.FC<IProps> = ({ current }: IProps) => {
         rowKey={'id'}
         parentRef={parentRef}
         operation={(item) => {
-          return current.hasAuthoritys([orgAuth.RelationAuthId])
+          return current.hasRelationAuth()
             ? [
                 {
                   key: 'remove',
@@ -110,7 +109,7 @@ const AgencySetting: React.FC<IProps> = ({ current }: IProps) => {
               <Button type="link" onClick={() => setActiveModal('indentity')}>
                 角色设置
               </Button>
-              {current.hasAuthoritys([orgAuth.RelationAuthId]) && (
+              {current.hasRelationAuth() && (
                 <>
                   <Button type="link" onClick={() => setActiveModal('addOne')}>
                     添加成员

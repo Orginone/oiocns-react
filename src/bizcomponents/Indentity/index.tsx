@@ -10,7 +10,6 @@ import AssignPosts from './components/AssignPosts';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import cls from './index.module.less';
 import { IIdentity, ITarget } from '@/ts/core';
-import { orgAuth } from '@/ts/core/public/consts';
 
 const { Sider, Content } = Layout;
 type IndentityManageType = {
@@ -48,7 +47,7 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
   // 操作内容渲染函数
   const renderOperation = (item: XTarget) => {
     return [
-      current.hasAuthoritys([orgAuth.RelationAuthId]) ? (
+      current.hasRelationAuth() ? (
         {
           key: 'remove',
           label: <span style={{ color: 'red' }}>移除</span>,
@@ -77,7 +76,7 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
     setIndentity(current);
   };
   // 角色信息操作
-  const buttons = current.hasAuthoritys([orgAuth.RelationAuthId])
+  const buttons = current.hasRelationAuth()
     ? [
         <Button
           key="edit"
@@ -140,7 +139,7 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
     </div>
   );
   // 按钮
-  const renderBtns = current.hasAuthoritys([orgAuth.RelationAuthId]) ? (
+  const renderBtns = current.hasRelationAuth() ? (
     <Button type="link" onClick={async () => setIsOpenAssign(true)}>
       指派角色
     </Button>

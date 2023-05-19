@@ -191,8 +191,11 @@ export class Company extends Belong implements ICompany {
   get subTarget(): ITarget[] {
     return [...this.departments, ...this.cohorts];
   }
-  get parentTarget(): ITarget[] {
+  get shareTarget(): ITarget[] {
     return [this, ...this.groups];
+  }
+  get parentTarget(): ITarget[] {
+    return this.groups;
   }
   get chats(): IMsgChat[] {
     const chats: IMsgChat[] = [this];

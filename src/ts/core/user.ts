@@ -118,12 +118,19 @@ export class UserProvider {
         break;
       case OperateType.Remove:
         if (data.subTarget) {
-          if (data.subTarget.id === this.user.id) {
-            message = `您已被${data.operater?.name}从${data.target.name}移除.`;
-            this.user.targets
-              .filter((i) => i.id === data.target.id)
-              .forEach((i) => i.delete(true));
-          } else {
+          let operated = false;
+          for (const item of [this.user, ...this.user.companys]) {
+            if (item.id === data.subTarget.id) {
+              message = `${item.id === this.user.id ? '您' : item.name}已被${
+                data.operater?.name
+              }从${data.target.name}移除.`;
+              item.parentTarget
+                .filter((i) => i.id === data.target.id)
+                .forEach((i) => i.delete(true));
+              operated = true;
+            }
+          }
+          if (!operated) {
             message = `${data.operater?.name}把${data.subTarget.name}从${data.target.name}移除.`;
             this.user.targets
               .filter(

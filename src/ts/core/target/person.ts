@@ -151,8 +151,11 @@ export class Person extends Belong implements IPerson {
   get subTarget(): ITarget[] {
     return [];
   }
-  get parentTarget(): ITarget[] {
+  get shareTarget(): ITarget[] {
     return [this, ...this.cohorts];
+  }
+  get parentTarget(): ITarget[] {
+    return [...this.cohorts, ...this.companys];
   }
   get chats(): IMsgChat[] {
     const chats: IMsgChat[] = [this];

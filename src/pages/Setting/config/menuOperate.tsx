@@ -17,13 +17,13 @@ import {
   ITeam,
   IWorkThing,
   IWorkItem,
-  OrgAuth,
   SpeciesType,
   TargetType,
   companyTypes,
   IBelong,
 } from '@/ts/core';
 import { XProperty } from '@/ts/base/schema';
+import { orgAuth } from '@/ts/core/public';
 
 /** 加载分组菜单参数 */
 interface groupMenuParams {
@@ -461,7 +461,7 @@ const loadGroupMenus = (param: groupMenuParams, teamTypes: string[]) => {
       model: 'outside',
     });
   }
-  if (param.item.hasAuthoritys([OrgAuth.RelationAuthId])) {
+  if (param.item.hasRelationAuth()) {
     menus.push({
       key: '新建用户|' + teamTypes.join('|'),
       icon: <im.ImPlus />,
@@ -499,7 +499,7 @@ const loadAuthorityMenus = (item: IAuthority) => {
       label: '新增权限',
     },
   ];
-  if (item.hasAuthoritys([OrgAuth.RelationAuthId])) {
+  if (item.hasAuthoritys([orgAuth.RelationAuthId])) {
     items.push(
       {
         key: '编辑权限',
@@ -522,7 +522,7 @@ const loadAuthorityMenus = (item: IAuthority) => {
 /** 加载类型更多操作 */
 const loadTypeMenus = (item: ITeam, subTypes: string[], allowDelete: boolean) => {
   const menus: OperateMenuType[] = [];
-  if (item.hasAuthoritys([OrgAuth.RelationAuthId])) {
+  if (item.hasRelationAuth()) {
     menus.push({
       key: '新增类别',
       icon: <im.ImPlus />,
@@ -539,13 +539,24 @@ const loadTypeMenus = (item: ITeam, subTypes: string[], allowDelete: boolean) =>
       icon: <im.ImPencil />,
       label: '编辑信息',
     });
-    if (allowDelete) {
+  }
+  if (allowDelete && item.hasRelationAuth()) {
+    menus.push({
+      key: '删除',
+      icon: <im.ImBin />,
+      label: '删除用户',
+      beforeLoad: async () => {
+        return await item.delete();
+      },
+    });
+  } else {
+    if ('species' in item) {
       menus.push({
-        key: '删除',
+        key: '退出',
         icon: <im.ImBin />,
-        label: '删除用户',
+        label: '退出' + item.typeName,
         beforeLoad: async () => {
-          return await item.delete();
+          return await (item as ITarget).exit();
         },
       });
     }

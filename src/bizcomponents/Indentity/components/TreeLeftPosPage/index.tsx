@@ -5,7 +5,6 @@ import CustomTree from '@/components/CustomTree';
 import cls from './index.module.less';
 import AddPosttionModal from '../AddPositionMoadl';
 import { IIdentity, ITarget } from '@/ts/core';
-import { orgAuth } from '@/ts/core/public/consts';
 type CreateGroupPropsType = {
   currentKey: string;
   setCurrent: (current: IIdentity) => void; // 点击操作触发的事件
@@ -64,7 +63,7 @@ const CreatePosition: React.FC<CreateGroupPropsType> = (props) => {
   return (
     <div>
       <div className={cls.topMes}>
-        {current.hasAuthoritys([orgAuth.RelationAuthId]) && (
+        {current.hasRelationAuth() && (
           <Button
             className={cls.creatgroup}
             type="text"

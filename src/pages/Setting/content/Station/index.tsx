@@ -9,7 +9,6 @@ import IndentityManage, { ResultType } from '@/bizcomponents/IndentityManage';
 import { IIdentity, IStation } from '@/ts/core';
 import { IdentityColumn, PersonColumns } from '../../config/columns';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
-import { orgAuth } from '@/ts/core/public/consts';
 
 interface IProps {
   current: IStation;
@@ -29,7 +28,7 @@ const Station: React.FC<IProps> = ({ current }: IProps) => {
   // 人员表格操作内容渲染函数
   const personOperation = (item: schema.XTarget): any[] => {
     return [
-      current.hasAuthoritys([orgAuth.RelationAuthId]) ? (
+      current.hasRelationAuth() ? (
         {
           key: 'remove',
           label: <span style={{ color: 'red' }}>移除</span>,
@@ -48,7 +47,7 @@ const Station: React.FC<IProps> = ({ current }: IProps) => {
   // 角色表格操作内容渲染函数
   const identityOperation = (item: IIdentity): any[] => {
     return [
-      current.hasAuthoritys([orgAuth.RelationAuthId]) ? (
+      current.hasRelationAuth() ? (
         {
           key: 'remove',
           label: <span style={{ color: 'red' }}>移除</span>,
@@ -89,7 +88,7 @@ const Station: React.FC<IProps> = ({ current }: IProps) => {
         <Card className={cls['app-tabs']} bordered={false} title={'岗位设置'}>
           <div className={cls.topMes} style={{ marginRight: '25px' }}>
             <strong style={{ marginLeft: '20px', fontSize: 15 }}>{current.name}</strong>
-            {current.hasAuthoritys([orgAuth.RelationAuthId]) && (
+            {current.hasRelationAuth() && (
               <Button
                 className={cls.creatgroup}
                 type="link"
@@ -131,7 +130,7 @@ const Station: React.FC<IProps> = ({ current }: IProps) => {
                 rowKey={'id'}
                 params={key}
                 toolBarRender={() => [
-                  current.hasAuthoritys([orgAuth.RelationAuthId]) ? (
+                  current.hasRelationAuth() ? (
                     <Button
                       key={'addperson'}
                       className={cls.creatgroup}

@@ -41,7 +41,7 @@ const ShareRecent = (props: Iprops) => {
     }
     return result;
   };
-  const agency = buildTargetTree(props.space.parentTarget);
+  const agency = buildTargetTree(props.space.shareTarget);
 
   const onSelect: TreeProps['onSelect'] = async (_, info: any) => {
     const item: ITarget = info.node.item;
