@@ -1,4 +1,4 @@
-import { Col, Modal, Row, Typography } from 'antd';
+import { Button, Col, Modal, Row, Typography } from 'antd';
 import React, { useState } from 'react';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 import detailStyle from './index.module.less';
@@ -171,6 +171,18 @@ const Groupdetail: React.FC<any> = ({
             查找聊天记录
             <AiOutlineRight />
           </div>
+          <Button
+            block
+            onClick={() =>
+              Modal.confirm({
+                title: '确认清除当前会话聊天记录？',
+                onOk: () => {
+                  chat.clearMessage();
+                },
+              })
+            }>
+            清除聊天记录
+          </Button>
         </div>
       </div>
       {/* 历史记录搜索弹窗 */}
