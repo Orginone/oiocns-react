@@ -9,6 +9,7 @@ import PassportLogin from '@/pages/Passport/Login';
 import PassportRegister from '@/pages/Passport/Register';
 import Redirect from '@/pages/Redirect';
 import BasicLayout from '@/layouts/Basic';
+// import PageDesign from '@/pages/PageDesign';
 export interface RouteComponentConfig extends Omit<IRouteConfig, 'component' | 'routes'> {
   routes?: RouteComponentConfig[];
   component?: React.LazyExoticComponent<React.FC<Record<string, unknown>>>;
@@ -75,6 +76,16 @@ const MarketRouter: IRouteConfig[] = [
   },
 ];
 
+/* 模板 */
+const DowloadRouter: IRouteConfig[] = [
+  {
+    path: '/dowload',
+    component: React.lazy(() => import('@/pages/Dowload')),
+    title: '模板',
+    icon: 'icon-myWork',
+  },
+];
+
 const StoreRouter: IRouteConfig[] = [
   {
     path: '/store',
@@ -120,6 +131,7 @@ const Routers: IRouteConfig[] = [
       ...StoreRouter,
       ...MarketRouter,
       ...SettingRouter,
+      ...DowloadRouter,
       {
         path: '/online',
         title: '第三方应用',

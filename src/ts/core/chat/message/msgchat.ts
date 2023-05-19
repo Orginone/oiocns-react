@@ -1,6 +1,8 @@
 import { model, common, schema, kernel, List } from '../../../base';
 import { ShareIdSet, storeCollName } from '../../public/consts';
 import { MessageType, TargetType } from '../../public/enums';
+import { filetrFindText, findTextId } from '@/utils/common';
+// 历史会话存储集合名称
 import { IBelong } from '../../target/base/belong';
 // 空时间
 const nullTime = new Date('2022-07-01').getTime();
@@ -18,6 +20,8 @@ export type MsgChatData = {
   chatRemark: string;
   /** 是否置顶 */
   isToping: boolean;
+  /** 是否艾特我 */
+  isFindme: any;
   /** 会话未读消息数量 */
   noReadCount: number;
   /** 最后一次消息时间 */
@@ -25,6 +29,14 @@ export type MsgChatData = {
   /** 最新消息 */
   lastMessage?: model.MsgSaveModel;
 };
+
+// 标签类型
+interface tagsMsgType {
+  belongId: string;
+  id: string;
+  ids: string[];
+  tags: string[];
+}
 // 消息类会话接口
 export interface IMsgChat extends common.IEntity {
   /** 消息类会话元数据 */
@@ -67,6 +79,10 @@ export interface IMsgChat extends common.IEntity {
   recallMessage(id: string): Promise<void>;
   /** 标记消息 */
   tagMessage(ids: string[], tags: string[]): Promise<void>;
+  /** 标记已读消息 */
+  tagHasReadMsg(ms: model.MsgSaveModel[]): void;
+  /** 重写消息标记信息 */
+  overwriteMessagesTags(tag: tagsMsgType): void;
   /** 删除消息 */
   deleteMessage(id: string): Promise<boolean>;
   /** 清空历史记录 */
@@ -76,6 +92,7 @@ export interface IMsgChat extends common.IEntity {
 }
 
 export abstract class MsgChat extends common.Entity implements IMsgChat {
+  findMe: any;
   constructor(
     _belongId: string,
     _chatId: string,
@@ -83,10 +100,12 @@ export abstract class MsgChat extends common.Entity implements IMsgChat {
     _labels: string[],
     _remark: string,
     _space?: IBelong,
+    _isFindMe?: any,
   ) {
     super();
     this.share = _share;
     this.chatId = _chatId;
+    this.findMe = _isFindMe;
     this.space = _space || (this as unknown as IBelong);
     this.belongId = _belongId;
     this.chatdata = {
@@ -96,6 +115,7 @@ export abstract class MsgChat extends common.Entity implements IMsgChat {
       chatRemark: _remark,
       chatName: _share.name,
       lastMsgTime: nullTime,
+      isFindme: _isFindMe,
       fullId: `${_belongId}-${_chatId}`,
     };
     this.labels = new List(_labels);
@@ -110,6 +130,7 @@ export abstract class MsgChat extends common.Entity implements IMsgChat {
   members: schema.XTarget[] = [];
   chatdata: MsgChatData;
   memberChats: PersonMsgChat[] = [];
+  _newTagInfo: string[] = [];
   private messageNotify?: (messages: model.MsgSaveModel[]) => void;
   get userId(): string {
     return this.space.user.id;
@@ -217,6 +238,53 @@ export abstract class MsgChat extends common.Entity implements IMsgChat {
       });
     }
   }
+  // 标记已读信息 //TODO: 通过Intersection Observer来实现监听 是否进入可视区域
+  tagHasReadMsg(ms: model.MsgSaveModel[]) {
+    // 是否标记权限设置
+    if (!this.isMyChat) {
+      return;
+    }
+    //  获取未打标签数据
+    const needTagMsgs = ms.filter((v) => {
+      // 非当前会话de信息 或者自己发出的消息 不加标记
+      if (this.belongId !== v.belongId || v.fromId === this.userId) {
+        return false;
+      }
+      // 会话信息是否包含标签
+      if (!v?.tags) {
+        return true;
+      }
+      // 会话标签信息 不包含自己标记已读标签
+      return !v.tags.some((s) => s.userId === this.userId && s.label === '已读');
+    });
+    // 过滤消息  过滤条件 belongId 不属于个人的私有消息；消息已有标签中没有自己打的‘已读’标签
+    // console.log('获取未打标签数据', needTagMsgs, this.userId);
+    if (needTagMsgs.length > 0) {
+      const willtagMsgIds: string[] = Array.from(new Set(needTagMsgs.map((v) => v.id)));
+      //拦截重复提交
+      if (this._newTagInfo.join('-') === willtagMsgIds.join('-')) {
+        console.log('拦截重复提交tag');
+        return;
+      }
+      this._newTagInfo = willtagMsgIds;
+      // 触发事件
+      this.tagMessage(willtagMsgIds, ['已读']);
+    }
+  }
+  // 根据tags反馈重写 消息体 标记信息
+  overwriteMessagesTags = (newTag: tagsMsgType) => {
+    if (newTag.id !== this.chatId) {
+      return;
+    }
+    this.messages = this.messages.map((msg) => {
+      //暂时无法从tag ids精确匹配消息临时处理 && newTag.ids.includes(msg.id) &&
+      if (newTag.tags[0] === '已读' && !msg?.tags) {
+        msg['tags'] = [{ label: '已读', userId: newTag.id, time: '' }];
+      }
+      return msg;
+    });
+    this.messageNotify?.apply(this, [this.messages]);
+  };
   async deleteMessage(id: string): Promise<boolean> {
     const res = await kernel.anystore.remove(this.userId, storeCollName.ChatMessage, {
       chatId: id,
@@ -259,15 +327,19 @@ export abstract class MsgChat extends common.Entity implements IMsgChat {
         this.messages[index] = msg;
       }
     } else {
-      msg.showTxt = common.StringPako.inflate(msg.msgBody);
+      // 过滤掉@的消息内容
+      msg.showTxt = filetrFindText(common.StringPako.inflate(msg.msgBody));
       this.messages.push(msg);
     }
     if (!this.messageNotify) {
       this.chatdata.noReadCount += 1;
       msgChatNotify.changCallback();
     }
+
+    // 将消息提供给页面
     this.chatdata.lastMsgTime = new Date().getTime();
     this.chatdata.lastMessage = msg;
+    this.chatdata.isFindme = findTextId(common.StringPako.inflate(msg.msgBody)); // 用来往对象中添加艾特值
     this.cache();
     this.messageNotify?.apply(this, [this.messages]);
   }
@@ -276,6 +348,7 @@ export abstract class MsgChat extends common.Entity implements IMsgChat {
       item.showTxt = common.StringPako.inflate(item.msgBody);
       this.messages.unshift(item);
     });
+
     if (this.chatdata.lastMsgTime === nullTime && msgs.length > 0) {
       this.chatdata.lastMsgTime = new Date(msgs[0].createTime).getTime();
     }

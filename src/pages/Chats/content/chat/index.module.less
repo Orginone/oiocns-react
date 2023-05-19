@@ -5,6 +5,7 @@
   justify-content: space-between;
   overflow: hidden;
   position: relative;
+  margin: -16px;
   // margin-top: -10px;
   // border-top: 1px solid #f2f2f2;
   .custom_group_silder_menu {
@@ -21,14 +22,21 @@
     flex: 1;
     overflow: hidden;
     background-color: #f2f2f25c;
-    padding-left: 12px;
-
+    position: relative;
     .chart_input {
       height: max-content;
       min-height: 227px;
       border-top: 1px solid #dde4f3;
       .el-textarea__inner {
         // color: #fff;
+      }
+      :global {
+        .ogo-spin-nested-loading {
+          height: 100%;
+          .ogo-spin-container {
+            height: 100%;
+          }
+        }
       }
     }
 

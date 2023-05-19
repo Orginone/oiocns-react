@@ -1,9 +1,10 @@
+import { debounce } from '@/utils/tools';
 import { generateUuid } from './uuid';
 
 export class Emitter {
   private _refreshCallback: { [name: string]: (key: string) => void } = {};
   private _partRefreshCallback: {
-    [name: string]: { [p: string]: (key: string) => void };
+    [name: string]: { [p: string]: (data?: any) => void };
   } = {};
   constructor() {
     this._refreshCallback = {};
@@ -27,7 +28,7 @@ export class Emitter {
    * @param callback 变更回调
    * @returns 订阅ID
    */
-  public subscribePart(p: string | string[], callback: (key: string) => void): string {
+  public subscribePart(p: string | string[], callback: (info?: any) => void): string {
     const key = generateUuid();
     if (p.length > 0) {
       callback(key);
@@ -72,13 +73,13 @@ export class Emitter {
    * @desc 局部变更回调
    * @param {string} p 订阅方法名称
    */
-  public changCallbackPart(p: string): void {
+  public changCallbackPart = debounce((p: string, data?: any) => {
     this.changCallback();
     Object.keys(this._partRefreshCallback).forEach((key) => {
       const callback = this._partRefreshCallback[key][p];
       if (callback) {
-        callback.apply(this, [generateUuid()]);
+        callback(data ?? [generateUuid()]);
       }
     });
-  }
+  }, 100);
 }

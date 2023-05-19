@@ -35,6 +35,25 @@ export const departmentTypes = [
   TargetType.Research,
   TargetType.Laboratory,
 ];
+/** 文件类型 对应CSS Icon*/
+export const FileTypes: { [key: string]: string } = {
+  mp4: 'icon-mp4',
+  gif: 'icon-gif',
+  exe: 'icon-exe',
+  file: 'icon-file',
+  css: 'icon-css',
+  txt: 'icon-txt',
+  ppt: 'icon-ppt',
+  pdf: 'icon-pdf',
+  xlsx: 'icon-xlsx',
+  xls: 'icon-xlsx',
+  doc: 'icon-word',
+  docx: 'icon-word',
+  svg: 'icon-svg',
+  zip: 'icon-a-ziprar',
+  rar: 'icon-a-ziprar',
+  json: 'icon-json',
+};
 /** 用于获取全部的分页模型 */
 export const PageAll: PageModel = {
   offset: 0,

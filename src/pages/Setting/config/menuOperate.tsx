@@ -172,14 +172,14 @@ const buildFormMenu = (form: IWorkThing) => {
 /** 编译权限树 */
 const buildAuthorityTree = (authority: IAuthority, name?: string) => {
   const result: MenuItemType = {
-    key: authority.key,
+    key: authority?.key,
     item: authority,
     label: name || authority.metadata.name,
     icon: <im.ImTree />,
     itemType: MenuType.Authority,
     tag: [MenuType.Authority],
     menus: loadAuthorityMenus(authority),
-    children: authority.children.map((i) => buildAuthorityTree(i)) ?? [],
+    children: authority?.children.map((i) => buildAuthorityTree(i)) ?? [],
   };
   return result;
 };
@@ -456,7 +456,7 @@ const loadGroupMenus = (param: groupMenuParams, teamTypes: string[]) => {
       model: 'outside',
     });
   }
-  if (param.item.hasAuthoritys([OrgAuth.RelationAuthId])) {
+  if (param.item?.hasAuthoritys([OrgAuth.RelationAuthId])) {
     menus.push({
       key: '新建用户|' + teamTypes.join('|'),
       icon: <im.ImPlus />,
@@ -494,7 +494,7 @@ const loadAuthorityMenus = (item: IAuthority) => {
       label: '新增权限',
     },
   ];
-  if (item.hasAuthoritys([OrgAuth.RelationAuthId])) {
+  if (item?.hasAuthoritys([OrgAuth.RelationAuthId])) {
     items.push(
       {
         key: '编辑权限',
@@ -517,7 +517,7 @@ const loadAuthorityMenus = (item: IAuthority) => {
 /** 加载类型更多操作 */
 const loadTypeMenus = (item: ITeam, subTypes: string[], allowDelete: boolean) => {
   const menus: OperateMenuType[] = [];
-  if (item.hasAuthoritys([OrgAuth.RelationAuthId])) {
+  if (item?.hasAuthoritys([OrgAuth.RelationAuthId])) {
     menus.push({
       key: '新增类别',
       icon: <im.ImPlus />,

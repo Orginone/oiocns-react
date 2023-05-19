@@ -6,6 +6,7 @@ import orgCtrl from '@/ts/controller';
 import { MenuItemType } from 'typings/globelType';
 import { IMsgChat } from '@/ts/core';
 import OrgIcons from '@/bizcomponents/GlobalComps/orgIcons';
+import { orgAuth } from '@/ts/core/public/consts';
 
 /** 创建会话菜单 */
 const createChatMenu = (chat: IMsgChat, children: MenuItemType[]) => {
@@ -30,7 +31,18 @@ const loadBookMenu = () => {
     }
     companyItems.push({
       key: company.key + '同事',
+      company,
       label: company.metadata.name,
+      menus: company.hasAuthoritys([orgAuth.SuperAuthId])
+        ? [
+            {
+              key: '查看会话',
+              label: `查看${company.metadata.typeName}所有消息`,
+              icon: <im.ImFilter />,
+              model: 'outside',
+            },
+          ]
+        : [],
       item: company.chats.filter((i) => i.isMyChat),
       itemType: MenuType.Books,
       icon: <TeamIcon share={company.share} size={18} fontSize={16} />,

@@ -8,6 +8,7 @@ import { IChatProvider } from '../core/chat/provider';
 class IndexController extends common.Emitter {
   public currentKey: string = '';
   private _provider: UserProvider;
+  public _screenshot: string = ''; //存放截图文件
   constructor() {
     super();
     this._provider = new UserProvider();
