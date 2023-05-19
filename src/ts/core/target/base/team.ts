@@ -173,6 +173,7 @@ export abstract class Team extends MsgChat<schema.XTarget> implements ITeam {
     await kernel.createTargetMsg({
       targetId: sub && this.userId === this.id ? sub.id : this.id,
       excludeOperater: false,
+      group: this.typeName === TargetType.Group,
       data: JSON.stringify({
         operate,
         target: this.metadata,
