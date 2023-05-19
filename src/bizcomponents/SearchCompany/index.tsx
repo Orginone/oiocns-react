@@ -8,7 +8,7 @@ import styles from './index.module.less';
 import { XTarget } from '@/ts/base/schema';
 import orgCtrl from '@/ts/controller';
 import { TargetType, companyTypes } from '@/ts/core';
-import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
+import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
 import { parseAvatar } from '@/ts/base';
 
 type CompanySearchTableProps = {
@@ -44,7 +44,7 @@ const CompanySearchList: React.FC<CompanySearchTableProps> = (props) => {
         setSearchPlace('请输入单位的社会统一信用代码');
         break;
       case TargetType.Group:
-        setSearchPlace('请输入组织群的编码');
+        setSearchPlace('请输入组织集群的编码');
         break;
       case TargetType.Cohort:
         setSearchPlace('请输入群组的编码');

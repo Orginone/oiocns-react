@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, RouteComponentProps, withRouter } from 'react-router-dom';
 import cls from './index.module.less';
 import OrgIcons from '@/bizcomponents/GlobalComps/orgIcons';
-import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
+import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
 import orgCtrl from '@/ts/controller';
 import { msgChatNotify } from '@/ts/core';
 

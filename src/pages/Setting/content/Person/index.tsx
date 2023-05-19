@@ -1,10 +1,9 @@
-import { Button, Card, Descriptions, Modal, Typography } from 'antd';
+import { Button, Modal } from 'antd';
 import Layout from 'antd/lib/layout/layout';
 import React, { useRef, useState } from 'react';
 
 import orgCtrl from '@/ts/controller';
 import cls from './index.module.less';
-import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 import { useHistory } from 'react-router-dom';
 import { schema } from '@/ts/base';
 import CardOrTable from '@/components/CardOrTableComp';
@@ -39,34 +38,6 @@ const PersonSetting: React.FC = () => {
       key: 'friends',
     },
   ];
-  // 信息内容
-  const content = (
-    <div className={cls['person-info-info']}>
-      <Card bordered={false}>
-        <Descriptions
-          bordered
-          size="middle"
-          title={'个人信息'}
-          column={2}
-          extra={[
-            <Button type="link" key="updatePassword">
-              修改密码
-            </Button>,
-          ]}>
-          <Descriptions.Item label="昵称">
-            <TeamIcon share={orgCtrl.user.share} size={40} preview={true} />
-            {orgCtrl.user.name}
-          </Descriptions.Item>
-          <Descriptions.Item label="账号">
-            <Typography.Paragraph copyable>
-              {orgCtrl.user.metadata.code}
-            </Typography.Paragraph>
-          </Descriptions.Item>
-          <Descriptions.Item label="座右铭">{orgCtrl.user.remark}</Descriptions.Item>
-        </Descriptions>
-      </Card>
-    </div>
-  );
   // 操作内容渲染函数
   const renderOperation = (item: schema.XTarget): common.OperationType[] => {
     return [
@@ -90,7 +61,6 @@ const PersonSetting: React.FC = () => {
 
   return (
     <div className={cls['person-info-container']}>
-      <Layout className={cls.container}>{content}</Layout>
       <Layout className={cls.container}>
         <PageCard
           key={key}

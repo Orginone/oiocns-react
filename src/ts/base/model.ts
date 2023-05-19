@@ -235,6 +235,8 @@ export type TargetMsgModel = {
   excludeOperater: boolean;
   // 用户Id
   targetId: string;
+  // 组织集群
+  group: boolean;
 };
 
 export type TargetOperateModel = {

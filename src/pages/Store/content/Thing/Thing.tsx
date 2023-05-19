@@ -21,7 +21,7 @@ import DataGrid, {
 } from 'devextreme-react/data-grid';
 import CustomStore from 'devextreme/data/custom_store';
 import { kernel } from '@/ts/base';
-import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
+import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
 import { AiOutlineEllipsis } from 'react-icons/ai';
 import { ItemType } from 'antd/lib/menu/hooks/useItems';
 

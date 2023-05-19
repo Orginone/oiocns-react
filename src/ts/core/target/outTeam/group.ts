@@ -7,26 +7,26 @@ import { IMsgChat } from '../../chat/message/msgchat';
 import { ITeam } from '../base/team';
 import { IMarket } from '../../thing/market/market';
 
-/** 组织群接口 */
+/** 组织集群接口 */
 export interface IGroup extends ITarget {
-  /** 加载组织群的单位 */
+  /** 加载组织集群的单位 */
   company: ICompany;
-  /** 父级组织群  */
+  /** 父级组织集群  */
   parent?: IGroup;
-  /** 子组织群 */
+  /** 子组织集群 */
   children: IGroup[];
   /** 流通交易 */
   market: IMarket | undefined;
-  /** 加载子组织群 */
+  /** 加载子组织集群 */
   loadChildren(reload?: boolean): Promise<IGroup[]>;
-  /** 设立子组织群 */
+  /** 设立子组织集群 */
   createChildren(data: model.TargetModel): Promise<IGroup | undefined>;
 }
 
-/** 组织群实现 */
+/** 组织集群实现 */
 export class Group extends Target implements IGroup {
   constructor(_metadata: schema.XTarget, _company: ICompany) {
-    super(_metadata, [_metadata.belong?.name ?? '', '组织群'], _company, companyTypes);
+    super(_metadata, [_metadata.belong?.name ?? '', '组织集群'], _company, companyTypes);
     this.speciesTypes.push(SpeciesType.Market);
     this.company = _company;
   }

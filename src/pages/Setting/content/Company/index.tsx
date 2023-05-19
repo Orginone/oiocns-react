@@ -1,14 +1,5 @@
 import React, { useRef, useState } from 'react';
-import {
-  Avatar,
-  Button,
-  Card,
-  Descriptions,
-  message,
-  Modal,
-  Space,
-  Typography,
-} from 'antd';
+import { Button, message, Modal } from 'antd';
 import orgCtrl from '@/ts/controller';
 import { ICompany, TargetType } from '@/ts/core';
 import { schema } from '@/ts/base';
@@ -28,7 +19,6 @@ interface IProps {
  * @returns
  */
 const CompanySetting: React.FC<IProps> = ({ current }) => {
-  const [ellipsis] = useState(true);
   const parentRef = useRef<any>(null);
   const [key, forceUpdate] = useObjectUpdate(current);
   const [activeModal, setActiveModal] = useState<string>(''); // 模态框
@@ -42,7 +32,7 @@ const CompanySetting: React.FC<IProps> = ({ current }) => {
       key: 'members',
     },
     {
-      tab: `加入的组织群`,
+      tab: `加入的组织集群`,
       key: 'groups',
     },
   ];
@@ -92,32 +82,6 @@ const CompanySetting: React.FC<IProps> = ({ current }) => {
 
   return (
     <div className={cls.companyContainer}>
-      <Card bordered={false} className={cls['company-info-content']}>
-        <Descriptions
-          title={'当前单位'}
-          bordered
-          size="middle"
-          column={2}
-          labelStyle={{ textAlign: 'center', width: '200px' }}>
-          <Descriptions.Item label="单位名称" contentStyle={{ textAlign: 'center' }}>
-            <Space>
-              {current.share.avatar && <Avatar src={current.share.avatar.thumbnail} />}
-              <strong>{current.name}</strong>
-            </Space>
-          </Descriptions.Item>
-          <Descriptions.Item
-            label="社会统一信用代码"
-            contentStyle={{ textAlign: 'center' }}>
-            {current.metadata.code}
-          </Descriptions.Item>
-          <Descriptions.Item label="单位简介" span={2}>
-            <Typography.Paragraph
-              ellipsis={ellipsis ? { rows: 2, expandable: true, symbol: '更多' } : false}>
-              {current.remark}
-            </Typography.Paragraph>
-          </Descriptions.Item>
-        </Descriptions>
-      </Card>
       <div className={cls['pages-wrap']}>
         <PageCard
           key={key}
@@ -138,7 +102,7 @@ const CompanySetting: React.FC<IProps> = ({ current }) => {
                     邀请成员
                   </Button>
                   <Button type="link" onClick={() => setActiveModal('joinGroup')}>
-                    加入组织群
+                    加入组织集群
                   </Button>
                 </>
               )}
@@ -174,9 +138,9 @@ const CompanySetting: React.FC<IProps> = ({ current }) => {
         }}>
         <SearchCompany searchCallback={setSelectPerson} searchType={TargetType.Person} />
       </Modal>
-      {/* 申请加入组织群*/}
+      {/* 申请加入组织集群*/}
       <Modal
-        title="申请加入组织群"
+        title="申请加入组织集群"
         destroyOnClose
         open={activeModal === 'joinGroup'}
         width={600}

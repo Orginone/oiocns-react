@@ -1,7 +1,7 @@
 import React from 'react';
 import { MenuType } from './menuType';
 import * as im from 'react-icons/im';
-import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
+import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
 import orgCtrl from '@/ts/controller';
 import { MenuItemType } from 'typings/globelType';
 import { IMsgChat } from '@/ts/core';

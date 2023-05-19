@@ -4,7 +4,7 @@ import * as im from 'react-icons/im';
 import * as fa from 'react-icons/fa';
 import { MenuItemType, OperateMenuType } from 'typings/globelType';
 import { GroupMenuType, MenuType } from './menuType';
-import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
+import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
 import {
   IBelong,
   IFileSystem,

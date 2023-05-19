@@ -1,11 +1,10 @@
 import React, { useState, useRef } from 'react';
-import { Button, message, Modal, Typography } from 'antd';
+import { Button, message, Modal } from 'antd';
 import { XTarget } from '@/ts/base/schema';
 import { ITarget, TargetType } from '@/ts/core';
 import CardOrTable from '@/components/CardOrTableComp';
 import PageCard from '@/components/PageCard';
 import IndentityManage from '@/bizcomponents/Indentity';
-import Description from '../../components/Description';
 import cls from './index.module.less';
 import AssignModal from '@/bizcomponents/AssignModal';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
@@ -53,6 +52,10 @@ const AgencySetting: React.FC<IProps> = ({ current }: IProps) => {
             searchType={TargetType.Company}
           />
         );
+      case TargetType.Cohort:
+        return (
+          <SearchTarget searchCallback={setSelectMember} searchType={TargetType.Person} />
+        );
       default:
         return (
           <AssignModal<schema.XTarget>
@@ -96,11 +99,6 @@ const AgencySetting: React.FC<IProps> = ({ current }: IProps) => {
 
   return (
     <div className={cls[`dept-content-box`]}>
-      <Description
-        title={<Typography.Title level={5}>{current.typeName}信息</Typography.Title>}
-        current={current}
-        extra={[]}
-      />
       <div className={cls['pages-wrap']}>
         <PageCard
           key={key}

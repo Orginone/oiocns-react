@@ -17,7 +17,7 @@ export enum GroupMenuType {
   'StandardGroup' = '数据标准',
   'Authority' = '权限定义',
   'InnerAgency' = '内部机构',
-  'OutAgency' = '组织群组',
+  'OutAgency' = '组织集群',
   'Friends' = '我的好友',
   'Cohort' = '外部群组',
   'Station' = '单位岗位',

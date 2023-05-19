@@ -1,7 +1,7 @@
 import { Badge, Card, Empty, List, Tag } from 'antd';
 import React from 'react';
 import orgCtrl from '@/ts/controller';
-import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
+import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
 import { AiOutlineWechat } from 'react-icons/ai';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import { IMsgChat, MessageType, msgChatNotify } from '@/ts/core';

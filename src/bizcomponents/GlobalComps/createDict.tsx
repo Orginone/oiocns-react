@@ -2,7 +2,7 @@ import React, { useRef, useState } from 'react';
 import SchemaForm from '@/components/SchemaForm';
 import { DictModel, FileItemShare } from '@/ts/base/model';
 import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components';
-import { IBelong, IDict } from '@/ts/core';
+import { IDict, IDictClass } from '@/ts/core';
 import { Avatar, Button, Space, Image, Upload, message, UploadProps } from 'antd';
 import { AiOutlineBank } from 'react-icons/ai';
 import { parseAvatar } from '@/ts/base';
@@ -10,8 +10,7 @@ import orgCtrl from '@/ts/controller';
 
 interface Iprops {
   open: boolean;
-  space: IBelong;
-  dict: IDict | undefined;
+  current: IDict | IDictClass;
   handleCancel: () => void;
   handleOk: (success: boolean) => void;
 }
@@ -20,9 +19,11 @@ interface Iprops {
 */
 const DictModal = (props: Iprops) => {
   if (!props.open) return <></>;
-  const { open, dict, handleCancel, handleOk } = props;
+  const { open, current, handleCancel, handleOk } = props;
   const formRef = useRef<ProFormInstance>();
   const [avatar, setAvatar] = useState<FileItemShare>();
+  const dict = 'items' in current ? current : undefined;
+  const dictClass = dict ? dict.species : (current as IDictClass);
   const uploadProps: UploadProps = {
     multiple: false,
     showUploadList: false,
@@ -124,7 +125,7 @@ const DictModal = (props: Iprops) => {
         if (dict) {
           handleOk(await dict.update(values));
         } else {
-          handleOk((await props.space.createDict(values)) !== undefined);
+          handleOk((await dictClass.createDict(values)) !== undefined);
         }
       }}
       columns={columns}
