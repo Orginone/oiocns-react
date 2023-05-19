@@ -43,7 +43,7 @@ const TableContent = ({
         options={false}
         columns={[
           {
-            dataIndex: ['target', 'name'],
+            dataIndex: ['metadata', 'name'],
             title: '名称',
             ellipsis: {
               showTitle: false,
@@ -69,7 +69,7 @@ const TableContent = ({
             },
           },
           {
-            dataIndex: ['target', 'size'],
+            dataIndex: ['metadata', 'size'],
             title: '大小',
             valueType: 'number',
             width: 100,
@@ -78,13 +78,13 @@ const TableContent = ({
             ),
           },
           {
-            dataIndex: ['target', 'dateCreated'],
+            dataIndex: ['metadata', 'dateCreated'],
             title: '创建时间',
             valueType: 'dateTime',
             width: 200,
           },
           {
-            dataIndex: ['target', 'dateModified'],
+            dataIndex: ['metadata', 'dateModified'],
             title: '更新时间',
             valueType: 'dateTime',
             width: 200,

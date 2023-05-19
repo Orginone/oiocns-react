@@ -73,26 +73,32 @@ const GroupContent = (props: Iprops) => {
     switch (item.msgType) {
       case MessageType.Image: {
         const img: FileItemShare = parseAvatar(item.showTxt);
-        return (
-          <>
-            <div className={`${css.con_content_link}`}></div>
-            <div className={`${css.con_content_txt} ${css.con_content_img}`}>
-              <Image src={img.thumbnail} preview={{ src: img.shareLink }} />
-            </div>
-          </>
-        );
+        if (img && img.thumbnail) {
+          return (
+            <>
+              <div className={`${css.con_content_link}`}></div>
+              <div className={`${css.con_content_txt} ${css.con_content_img}`}>
+                <Image src={img.thumbnail} preview={{ src: img.shareLink }} />
+              </div>
+            </>
+          );
+        }
+        return <div className={`${css.con_content_txt}`}>消息异常</div>;
       }
       case MessageType.File: {
         const file: FileItemShare = parseAvatar(item.showTxt);
-        return (
-          <>
-            <div className={`${css.con_content_link}`}></div>
-            <div className={`${css.con_content_txt} ${css.con_content_img}`}>
-              <Image src={file.thumbnail} preview={{ src: file.shareLink }} />
-              {file.name}
-            </div>
-          </>
-        );
+        if (file && file.thumbnail) {
+          return (
+            <>
+              <div className={`${css.con_content_link}`}></div>
+              <div className={`${css.con_content_txt} ${css.con_content_img}`}>
+                <Image src={file.thumbnail} preview={{ src: file.shareLink }} />
+                {file.name}
+              </div>
+            </>
+          );
+        }
+        return <div className={`${css.con_content_txt}`}>消息异常</div>;
       }
       default:
         return (
