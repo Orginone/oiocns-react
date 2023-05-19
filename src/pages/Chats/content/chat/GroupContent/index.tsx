@@ -67,7 +67,7 @@ const GroupContent = (props: Iprops) => {
     props.chat.onMessage((ms) => {
       // 标记已获取信息为已读
       if (ms.length > 0 && ms[0].belongId !== orgCtrl.user.userId) {
-        handleTagMsg(ms);
+        props.chat.tagHasReadMsg(ms);
       }
       setMessages([...ms]);
     });
@@ -75,21 +75,6 @@ const GroupContent = (props: Iprops) => {
       props.chat.unMessage();
     };
   }, [props]);
-  // const updataMessage(newTags: tagsMsgType) {
-  //   if (
-  //     newTags.tags?.[0] === '已读' &&
-  //     newTags.ids.includes(messages[messages.length - 1].id)
-  //   ) {
-  //     const resultArr = messages.map((item) => {
-  //       if (item.id === messages[messages.length - 1].id) {
-  //         const tsgItem = { label: '已读', userId: orgCtrl.user.userId, time: '' };
-  //         item['tags'] = [...(item['tags'] ?? []), tsgItem];
-  //       }
-  //       return item;
-  //     });
-  //     setMessages(resultArr);
-  //   }
-  // }
 
   useEffect(() => {
     if (body && body.current) {
@@ -109,28 +94,6 @@ const GroupContent = (props: Iprops) => {
       }
     }
   }, [messages]);
-  // 处理消息打标签--已读未读功能 //TODO: 通过Intersection Observer来实现监听 是否进入可视区域
-  const handleTagMsg = debounce((ms: model.MsgSaveModel[]) => {
-    //  获取未打标签数据
-    const needTagMsgs = ms.filter((v) => {
-      if (!v?.tags) {
-        return true;
-      }
-      return !v.tags.some((s) => s.userId === orgCtrl.user.userId && s.label === '已读');
-    });
-    // 过滤消息  过滤条件 belongId 不属于个人的私有消息；消息已有标签中没有自己打的‘已读’标签
-    console.log('过滤消息', needTagMsgs, messagesTags, orgCtrl.user.userId);
-    // 未知原因。最后一条消息无法添加tag
-    if (needTagMsgs.length < 2) {
-      return;
-    } else {
-      // 触发事件
-      props.chat.tagMessage(
-        needTagMsgs.map((v) => v.id),
-        ['已读'],
-      );
-    }
-  }, 500);
 
   const isShowTime = (curDate: string, beforeDate: string) => {
     if (beforeDate === '') return true;
@@ -289,13 +252,20 @@ const GroupContent = (props: Iprops) => {
     )?.length;
 
     // 未读人数
-    let NotReadPerson = props.chat.members
+    let NotReadPerson: any = props.chat.members
       .filter((item) => !msgTags.some((ia) => item.id === ia.userId))
       .filter((itez) => itez.id !== orgCtrl.user.userId);
+    NotReadPerson = [...new Set(NotReadPerson.map((item: any) => item.id))].map((id) => {
+      return NotReadPerson.find((item: any) => item.id === id);
+    });
 
     // 已读人数
-    let readPerson = msgTags.filter((i) => i.userId !== orgCtrl.user.userId);
-
+    let readPerson: any = msgTags.filter((i) => i.userId !== orgCtrl.user.userId);
+    readPerson = [...new Set(readPerson.map((item: any) => item.userId))].map(
+      (userId) => {
+        return readPerson.find((item: any) => item.userId === userId);
+      },
+    );
     // 同事之间通信
     if (allMember === -1 || allMember === 0) {
       showText = hasReadNum > 0 ? '已读' : '未读';
@@ -312,7 +282,7 @@ const GroupContent = (props: Iprops) => {
           <div className="read_readed_title">
             <span className="read_num">{NotReadPerson.length}</span>&nbsp;人未读
           </div>
-          {NotReadPerson.map((j, index) => {
+          {NotReadPerson.map((j: any, index: number) => {
             return (
               <div key={msgKey + index} className="read_readed_item">
                 <TeamIcon
@@ -333,7 +303,7 @@ const GroupContent = (props: Iprops) => {
           <div className="read_ing_title">
             <span className="read_num">{readPerson.length}</span>&nbsp;人已读
           </div>
-          {readPerson.map((j, index) => {
+          {readPerson.map((j: any, index: number) => {
             return (
               <div key={msgKey + index} className="read_reading_item">
                 <TeamIcon
@@ -355,11 +325,19 @@ const GroupContent = (props: Iprops) => {
     );
     return (
       <>
-        <ChatReadPopover content={description}>
+        {/* 个人 / 同事 */}
+        {allMember === -1 || allMember === 0 ? (
           <span style={{ margin: '4px 10px 0 0', fontSize: '10px', color: '#154ad8' }}>
             {showText}
           </span>
-        </ChatReadPopover>
+        ) : (
+          <ChatReadPopover content={description}>
+            {/* 群组 / 部门 */}
+            <span style={{ margin: '4px 10px 0 0', fontSize: '10px', color: '#154ad8' }}>
+              {showText}
+            </span>
+          </ChatReadPopover>
+        )}
       </>
     );
   };
