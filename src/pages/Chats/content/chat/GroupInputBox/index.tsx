@@ -290,6 +290,11 @@ const Groupinputbox = (props: Iprops) => {
     document.getElementById('insterHtml')?.append(`@${e.children}`);
   };
 
+  /** 点击空白处取消 @ 弹窗 */
+  window.addEventListener('click', () => {
+    setCiteShow(false);
+  });
+
   /** 文件上传参数 */
   const uploadProps: UploadProps = {
     multiple: false,
