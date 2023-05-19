@@ -173,6 +173,18 @@ const Groupdetail: React.FC<any> = ({
               查找聊天记录 <AiOutlineRight />
             </Button>
           </div>
+          <Button
+            block
+            onClick={() =>
+              Modal.confirm({
+                title: '确认清除当前会话聊天记录？',
+                onOk: () => {
+                  chat.clearMessage();
+                },
+              })
+            }>
+            清除聊天记录
+          </Button>
         </div>
       </div>
       {/* 历史记录搜索弹窗 */}

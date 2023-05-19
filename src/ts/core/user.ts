@@ -20,17 +20,9 @@ export class UserProvider extends common.Emitter {
     kernel.on(
       'RecvTags',
       (data: { id: string; belongId: string; ids: string[]; tags: string[] }) => {
-        const currentChat = this._user?.chats.find(
+        const currentChat = this.chat?.chats.find(
           (v) => v.chatId === data.id && v.belongId === data.belongId,
         );
-        //TODO: 单位下同事之间聊天，tag反馈无法匹配到自己发出消息后，对方读取tag后，无法匹配到对应聊天会话
-        // console.log(
-        //   data,
-        //   this._user?.chats,
-        //   currentChat,
-        //   'currentChat----------',
-        //   this._user?.chats.filter((v) => v.chatId === data.id),
-        // );
         currentChat?.overwriteMessagesTags(data);
       },
     );

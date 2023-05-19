@@ -67,7 +67,7 @@ const GroupContent = (props: Iprops) => {
     props.chat.onMessage((ms) => {
       // 标记已获取信息为已读
       if (ms.length > 0 && ms[0].belongId !== orgCtrl.user.userId) {
-        handleTagMsg(ms);
+        props.chat.tagHasReadMsg(ms);
       }
       setMessages([...ms]);
     });
@@ -75,21 +75,6 @@ const GroupContent = (props: Iprops) => {
       props.chat.unMessage();
     };
   }, [props]);
-  // const updataMessage(newTags: tagsMsgType) {
-  //   if (
-  //     newTags.tags?.[0] === '已读' &&
-  //     newTags.ids.includes(messages[messages.length - 1].id)
-  //   ) {
-  //     const resultArr = messages.map((item) => {
-  //       if (item.id === messages[messages.length - 1].id) {
-  //         const tsgItem = { label: '已读', userId: orgCtrl.user.userId, time: '' };
-  //         item['tags'] = [...(item['tags'] ?? []), tsgItem];
-  //       }
-  //       return item;
-  //     });
-  //     setMessages(resultArr);
-  //   }
-  // }
 
   useEffect(() => {
     if (body && body.current) {
@@ -109,28 +94,6 @@ const GroupContent = (props: Iprops) => {
       }
     }
   }, [messages]);
-  // 处理消息打标签--已读未读功能 //TODO: 通过Intersection Observer来实现监听 是否进入可视区域
-  const handleTagMsg = debounce((ms: model.MsgSaveModel[]) => {
-    //  获取未打标签数据
-    const needTagMsgs = ms.filter((v) => {
-      if (!v?.tags) {
-        return true;
-      }
-      return !v.tags.some((s) => s.userId === orgCtrl.user.userId && s.label === '已读');
-    });
-    // 过滤消息  过滤条件 belongId 不属于个人的私有消息；消息已有标签中没有自己打的‘已读’标签
-    console.log('过滤消息', needTagMsgs, messagesTags, orgCtrl.user.userId);
-    // 未知原因。最后一条消息无法添加tag
-    if (needTagMsgs.length < 2) {
-      return;
-    } else {
-      // 触发事件
-      props.chat.tagMessage(
-        needTagMsgs.map((v) => v.id),
-        ['已读'],
-      );
-    }
-  }, 500);
 
   const isShowTime = (curDate: string, beforeDate: string) => {
     if (beforeDate === '') return true;
