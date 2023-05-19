@@ -44,7 +44,7 @@ const CompanySearchList: React.FC<CompanySearchTableProps> = (props) => {
         setSearchPlace('请输入单位的社会统一信用代码');
         break;
       case TargetType.Group:
-        setSearchPlace('请输入组织群的编码');
+        setSearchPlace('请输入组织集群的编码');
         break;
       case TargetType.Cohort:
         setSearchPlace('请输入群组的编码');

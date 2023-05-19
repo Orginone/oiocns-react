@@ -61,7 +61,7 @@ const buildDepartmentTree = (departments: IDepartment[]): MenuItemType[] => {
     ]),
   );
 };
-/** 编译组织群树 */
+/** 编译组织集群树 */
 const buildGroupTree = (groups: IGroup[]): MenuItemType[] => {
   return groups.map((item) =>
     createMenu(item, loadTypeMenus(item, [TargetType.Group], true), [

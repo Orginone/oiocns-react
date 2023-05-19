@@ -13,7 +13,7 @@ import { ITeam } from '../base/team';
 
 /** 单位类型接口 */
 export interface ICompany extends IBelong {
-  /** 加入/管理的组织群 */
+  /** 加入/管理的组织集群 */
   groups: IGroup[];
   /** 设立的岗位 */
   stations: IStation[];
@@ -23,7 +23,7 @@ export interface ICompany extends IBelong {
   departmentTypes: string[];
   /** 退出单位 */
   exit(): Promise<boolean>;
-  /** 加载组织群 */
+  /** 加载组织集群 */
   loadGroups(reload?: boolean): Promise<IGroup[]>;
   /** 加载创建的群 */
   loadStations(reload?: boolean): Promise<IStation[]>;
@@ -31,7 +31,7 @@ export interface ICompany extends IBelong {
   loadDepartments(reload?: boolean): Promise<IDepartment[]>;
   /** 设立岗位 */
   createStation(data: model.TargetModel): Promise<IStation | undefined>;
-  /** 设立组织群 */
+  /** 设立组织集群 */
   createGroup(data: model.TargetModel): Promise<IGroup | undefined>;
   /** 设立内部机构 */
   createDepartment(data: model.TargetModel): Promise<IDepartment | undefined>;

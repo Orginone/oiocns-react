@@ -51,12 +51,12 @@ const updateTreeData = (list: any[], key: React.Key, children: any[]): any[] =>
     }
     return node;
   });
-//个人空间-只有共享 展示我的群组/好友  ; 单位空间 - 共享/分配 组织群单位 部门
+//个人空间-只有共享 展示我的群组/好友  ; 单位空间 - 共享/分配 组织集群单位 部门
 let originalSelected: any[] = []; //存储当前选择 以获分配数据
 
 const ShareRecent = (props: Iprops) => {
   const { onCheckeds, shareType } = props;
-  const [leftTreeSelectedKeys, setLeftTreeSelectedKeys] = useState<Key[]>([]); //组织群列表
+  const [leftTreeSelectedKeys, setLeftTreeSelectedKeys] = useState<Key[]>([]); //组织集群列表
   const [leftCheckedKeys, setLeftCheckedKeys] = useState<Key[]>([]);
 
   const [resourceList, setResourceList] = useState<any[]>([]); //所选应用的资源列表

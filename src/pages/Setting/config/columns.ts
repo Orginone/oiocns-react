@@ -61,10 +61,10 @@ export const CompanyColumn: ProColumns<schema.XTarget>[] = [
 
 export const GroupColumn: ProColumns<schema.XTarget>[] = [
   { title: '序号', valueType: 'index', width: 50 },
-  { title: '组织群名称', dataIndex: 'name' },
-  { title: '组织群编码', dataIndex: 'code' },
+  { title: '组织集群名称', dataIndex: 'name' },
+  { title: '组织集群编码', dataIndex: 'code' },
   {
-    title: '组织群简介',
+    title: '组织集群简介',
     ellipsis: true,
     dataIndex: 'remark',
   },
