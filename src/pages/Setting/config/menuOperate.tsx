@@ -1,4 +1,4 @@
-import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
+import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
 import orgCtrl from '@/ts/controller';
 import React from 'react';
 import * as im from 'react-icons/im';
@@ -141,7 +141,7 @@ const buildDict = (dictClass: IDictClass) => {
       label: dict.name,
       itemType: MenuType.Dict,
       tag: ['字典'],
-      icon: <im.ImBook fontSize={22} />,
+      icon: <TeamIcon notAvatar={true} share={dict.share} size={18} fontSize={16} />,
       menus: loadDictMenus(dict),
       children: [],
       beforeLoad: async () => {
@@ -157,7 +157,7 @@ const buildFormMenu = (form: IWorkThing) => {
       key: i.key,
       item: i,
       label: i.name,
-      icon: <im.ImInsertTemplate fontSize={22} />,
+      icon: <TeamIcon notAvatar={true} share={i.share} size={18} fontSize={16} />,
       itemType: MenuType.Form,
       menus: loadFormMenus(i),
       children: [],
@@ -175,7 +175,7 @@ const buildAuthorityTree = (authority: IAuthority, name?: string) => {
     key: authority.key,
     item: authority,
     label: name || authority.name,
-    icon: <im.ImTree />,
+    icon: <TeamIcon notAvatar={true} share={authority.share} size={18} fontSize={16} />,
     itemType: MenuType.Authority,
     tag: [MenuType.Authority],
     menus: loadAuthorityMenus(authority),

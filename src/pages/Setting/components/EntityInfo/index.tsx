@@ -1,0 +1,91 @@
+import React, { useState } from 'react';
+import { Card, Descriptions, Typography } from 'antd';
+import { IEntity } from '@/ts/core';
+import cls from './index.module.less';
+import { schema } from '@/ts/base';
+import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
+import useCtrlUpdate from '@/hooks/useCtrlUpdate';
+interface IProps {
+  entity: IEntity<schema.XEntity>;
+  other?: any;
+  extra?: any;
+}
+/**
+ * @description: 机构信息内容
+ * @return {*}
+ */
+const Description: React.FC<IProps> = ({ entity, other, extra }: IProps) => {
+  const [tkey] = useCtrlUpdate(entity);
+  const [ellipsis] = useState(true);
+  return (
+    <Card bordered={false} className={cls['company-dept-content']}>
+      <Descriptions
+        size="middle"
+        title={`${entity.typeName}[${entity.name}]基本信息`}
+        extra={extra}
+        bordered
+        colon
+        column={3}
+        labelStyle={{
+          textAlign: 'left',
+          color: '#606266',
+          width: 120,
+        }}
+        key={tkey}
+        contentStyle={{ textAlign: 'left', color: '#606266' }}>
+        <Descriptions.Item label="名称">
+          <TeamIcon share={entity.share} fontSize={22} />
+          <strong>{entity.name}</strong>
+        </Descriptions.Item>
+        <Descriptions.Item label="代码">
+          <Typography.Paragraph copyable>{entity.code}</Typography.Paragraph>
+        </Descriptions.Item>
+        {other}
+        {entity.metadata.belongId != entity.id && (
+          <Descriptions.Item label="归属">
+            <TeamIcon share={entity.belong} fontSize={22} />
+            <strong>{entity.belong.name}</strong>
+          </Descriptions.Item>
+        )}
+        {entity.metadata.createUser != entity.id && (
+          <Descriptions.Item label="创建人">
+            <TeamIcon share={entity.creater} fontSize={22} />
+            <strong>{entity.creater.name}</strong>
+          </Descriptions.Item>
+        )}
+        <Descriptions.Item label="创建时间">
+          {entity.metadata.createTime}
+        </Descriptions.Item>
+        {entity.metadata.createUser != entity.metadata.updateUser && (
+          <>
+            <Descriptions.Item label="更新人">
+              <TeamIcon share={entity.updater} fontSize={22} />
+              <strong>{entity.updater.name}</strong>
+            </Descriptions.Item>
+            <Descriptions.Item label="更新时间">
+              {entity.metadata.updateTime}
+            </Descriptions.Item>
+          </>
+        )}
+      </Descriptions>
+      <Descriptions
+        bordered
+        colon
+        column={3}
+        labelStyle={{
+          textAlign: 'left',
+          color: '#606266',
+          width: 120,
+        }}
+        contentStyle={{ textAlign: 'left', color: '#606266' }}>
+        <Descriptions.Item label="描述信息" span={3}>
+          <Typography.Paragraph
+            ellipsis={ellipsis ? { rows: 2, expandable: true, symbol: '更多' } : false}>
+            {entity.remark}
+          </Typography.Paragraph>
+        </Descriptions.Item>
+      </Descriptions>
+    </Card>
+  );
+};
+export default Description;

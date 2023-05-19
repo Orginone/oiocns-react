@@ -4,7 +4,7 @@ import TeamModal from '@/bizcomponents/GlobalComps/createTeam';
 import SpeciesModal from '@/bizcomponents/GlobalComps/createSpecies';
 import AuthorityModal from '@/bizcomponents/GlobalComps/createAuthority';
 import DictModal from '@/bizcomponents/GlobalComps/createDict';
-import { GroupMenuType, MenuType } from '../config/menuType';
+import { MenuType } from '../config/menuType';
 import SearchTarget from '@/bizcomponents/SearchCompany';
 import { MenuItemType } from 'typings/globelType';
 import React, { useState } from 'react';
@@ -39,13 +39,10 @@ const OperateIndex = ({ selectMenu, operateKey, confrim }: IProps) => {
       {/** 字典模态框 */}
       {operateKey.includes('字典') && (
         <DictModal
-          space={
-            selectMenu.itemType == GroupMenuType.DictGroup ? selectMenu.item : undefined
-          }
           open={operateKey.includes('字典')}
           handleCancel={confrim}
           handleOk={confrim}
-          dict={selectMenu.itemType == MenuType.Dict ? selectMenu.item : undefined}
+          current={selectMenu.item}
         />
       )}
       {/** 分类模态框 */}

@@ -1,6 +1,6 @@
 import { Col, Modal, Row, Typography } from 'antd';
 import React, { useState } from 'react';
-import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
+import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
 import detailStyle from './index.module.less';
 import { parseAvatar, schema } from '@/ts/base';
 import AssignPosts from '@/bizcomponents/Indentity/components/AssignPosts';

@@ -1,7 +1,7 @@
 import orgCtrl from '@/ts/controller';
 import React from 'react';
 import { MenuItemType } from 'typings/globelType';
-import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
+import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
 import { IMarket, ISpeciesItem, IWorkThing, SpeciesType } from '@/ts/core';
 import OrgIcons from '@/bizcomponents/GlobalComps/orgIcons';
 

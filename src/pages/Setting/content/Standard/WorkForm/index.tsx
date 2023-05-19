@@ -6,7 +6,7 @@ import PageCard from '@/components/PageCard';
 import Attribute from './Attritube';
 import orgCtrl from '@/ts/controller';
 import { IForm } from '@/ts/core';
-import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
+import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
 
 interface IProps {
   current: IForm;

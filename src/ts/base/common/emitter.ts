@@ -23,27 +23,6 @@ export class Emitter {
   }
 
   /**
-   * @desc 订阅局部变更
-   * @param callback 变更回调
-   * @returns 订阅ID
-   */
-  public subscribePart(p: string | string[], callback: (key: string) => void): string {
-    const key = generateUuid();
-    if (p.length > 0) {
-      callback(key);
-      this._partRefreshCallback[key] = {};
-      if (typeof p === 'string') {
-        this._partRefreshCallback[key][p] = callback;
-      } else {
-        for (const i of p) {
-          this._partRefreshCallback[key][i] = callback;
-        }
-      }
-    }
-    return key;
-  }
-
-  /**
    * @desc 取消订阅 支持取消多个
    * @param key 订阅ID
    */
@@ -65,20 +44,6 @@ export class Emitter {
   public changCallback() {
     Object.keys(this._refreshCallback).forEach((key) => {
       this._refreshCallback[key].apply(this, [generateUuid()]);
-    });
-  }
-
-  /**
-   * @desc 局部变更回调
-   * @param {string} p 订阅方法名称
-   */
-  public changCallbackPart(p: string): void {
-    this.changCallback();
-    Object.keys(this._partRefreshCallback).forEach((key) => {
-      const callback = this._partRefreshCallback[key][p];
-      if (callback) {
-        callback.apply(this, [generateUuid()]);
-      }
     });
   }
 }

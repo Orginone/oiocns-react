@@ -7,7 +7,7 @@ import cls from './index.module.less';
 import { IBelong, IIdentity, ITarget } from '@/ts/core';
 import { XTarget } from '@/ts/base/schema';
 import { generateUuid } from '@/ts/base/common';
-import TeamIcon from '../GlobalComps/teamIcon';
+import EntityIcon from '../GlobalComps/entityIcon';
 export type ResultType = {
   id: string;
   target: XTarget;
@@ -34,7 +34,7 @@ const ShareRecent = (props: Iprops) => {
           title: item.name,
           item: item,
           isLeaf: item.subTarget.length === 0,
-          icon: <TeamIcon share={item.share} size={18} />,
+          icon: <EntityIcon share={item.share} size={18} />,
           children: buildTargetTree(item.subTarget),
         });
       }

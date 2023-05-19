@@ -1,7 +1,7 @@
 import React from 'react';
 import { IBelong, IMarket, ISpeciesItem, IWorkItem, SpeciesType } from '@/ts/core';
 import { MenuItemType } from 'typings/globelType';
-import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
+import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
 import orgCtrl from '@/ts/controller';
 import { GroupMenuType } from './menuType';
 import { IWorkDefine } from '@/ts/core/thing/base/work';

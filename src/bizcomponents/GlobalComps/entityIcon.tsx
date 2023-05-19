@@ -14,7 +14,7 @@ interface teamTypeInfo {
 }
 
 /** 组织图标 */
-const TeamIcon = (info: teamTypeInfo) => {
+const EntityIcon = (info: teamTypeInfo) => {
   const [preview, setPreview] = useState(false);
   const size = info.size ?? 22;
   const fontSize = info.fontSize ?? 18;
@@ -53,6 +53,15 @@ const TeamIcon = (info: teamTypeInfo) => {
       break;
     case '权限':
       icon = <im.ImAddressBook fontSize={fontSize} />;
+      break;
+    case '字典':
+      icon = <im.ImBook fontSize={fontSize} />;
+      break;
+    case '属性':
+      icon = <im.ImJoomla fontSize={fontSize} />;
+      break;
+    case '表单':
+      icon = <im.ImInsertTemplate fontSize={fontSize} />;
       break;
     case TargetType.Company:
       icon = <im.ImOffice fontSize={fontSize} />;
@@ -99,4 +108,4 @@ const TeamIcon = (info: teamTypeInfo) => {
   );
 };
 
-export default TeamIcon;
+export default EntityIcon;

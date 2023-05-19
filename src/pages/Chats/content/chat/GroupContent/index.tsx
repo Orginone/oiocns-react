@@ -3,7 +3,7 @@ import { Button, Popover, Image, Spin } from 'antd';
 import moment from 'moment';
 import React, { useEffect, useRef, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
-import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
+import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
 import css from './index.module.less';
 import { showChatTime } from '@/utils/tools';
 import { FileItemShare } from '@/ts/base/model';

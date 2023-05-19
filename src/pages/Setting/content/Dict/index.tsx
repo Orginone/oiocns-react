@@ -1,6 +1,6 @@
 import PageCard from '@/components/PageCard';
 import { XDictItem } from '@/ts/base/schema';
-import { Button, Card, Descriptions, message } from 'antd';
+import { Button, message } from 'antd';
 import React, { useState } from 'react';
 import { DictItemColumns } from '../../config/columns';
 import CardOrTable from '@/components/CardOrTableComp';
@@ -52,23 +52,7 @@ const DictInfo: React.FC<any> = ({ current }: { current: IDict }) => {
   ];
 
   return (
-    <Card bordered={false}>
-      <Descriptions
-        size="middle"
-        title="字典"
-        bordered
-        column={2}
-        labelStyle={{
-          textAlign: 'left',
-          color: '#606266',
-          width: 120,
-        }}
-        contentStyle={{ textAlign: 'left', color: '#606266' }}>
-        <Descriptions.Item label="字典名称">{current.name}</Descriptions.Item>
-        <Descriptions.Item label="字典代码">{current.metadata.code}</Descriptions.Item>
-        <Descriptions.Item label="备注">{current.remark}</Descriptions.Item>
-      </Descriptions>
-
+    <>
       <PageCard
         className={cls[`card-wrap`]}
         bordered={false}
@@ -101,7 +85,7 @@ const DictInfo: React.FC<any> = ({ current }: { current: IDict }) => {
           }
         }}
       />
-    </Card>
+    </>
   );
 };
 export default DictInfo;

@@ -8,7 +8,7 @@ import styles from './index.module.less';
 import { XTarget } from '@/ts/base/schema';
 import orgCtrl from '@/ts/controller';
 import { TargetType, companyTypes } from '@/ts/core';
-import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
+import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
 import { parseAvatar } from '@/ts/base';
 
 type CompanySearchTableProps = {

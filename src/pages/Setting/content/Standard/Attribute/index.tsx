@@ -4,7 +4,7 @@ import { XAttribute, XProperty } from '@/ts/base/schema';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import { IPropClass } from '@/ts/core';
 import { Card, Descriptions, Space, Typography } from 'antd';
-import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
+import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
 import orgCtrl from '@/ts/controller';
 
 interface IProps {

@@ -8,7 +8,7 @@ import orgCtrl from '@/ts/controller';
 import { ISpace, ITarget } from '@/ts/core';
 import { XFlowDefine } from '@/ts/base/schema';
 import { generateUuid } from '@/ts/base/common';
-import TeamIcon from '../GlobalComps/teamIcon';
+import TeamIcon from '../GlobalComps/entityIcon';
 import { INullSpeciesItem, ISpeciesItem } from '@/ts/core/target/thing/ispecies';
 import { loadSpeciesTree } from '@/ts/core/target/thing';
 export type ResultType = {

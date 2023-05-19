@@ -1,3 +1,4 @@
+import { Emitter } from '@/ts/base/common';
 import { schema, model, parseAvatar } from '../../base';
 import { generateUuid } from '../../base/common/uuid';
 
@@ -5,7 +6,7 @@ import { generateUuid } from '../../base/common/uuid';
 export const ShareIdSet = new Map<string, any>();
 
 /** 实体类接口 */
-export interface IEntity<T> {
+export interface IEntity<T> extends Emitter {
   /** 实体唯一键 */
   key: string;
   /** 唯一标识 */
@@ -22,6 +23,12 @@ export interface IEntity<T> {
   metadata: T;
   /** 共享信息 */
   share: model.ShareIcon;
+  /** 创建人 */
+  creater: model.ShareIcon;
+  /** 变更人 */
+  updater: model.ShareIcon;
+  /** 归属 */
+  belong: model.ShareIcon;
   /** 查找元数据 */
   findMetadata<U>(id: string): U | undefined;
   /** 更新元数据 */
@@ -29,8 +36,12 @@ export interface IEntity<T> {
 }
 
 /** 实体类实现 */
-export abstract class Entity<T extends schema.XEntity> implements IEntity<T> {
+export abstract class Entity<T extends schema.XEntity>
+  extends Emitter
+  implements IEntity<T>
+{
   constructor(_metadata: T) {
+    super();
     this.key = generateUuid();
     this._metadata = _metadata;
     ShareIdSet.set(this.id, _metadata);
@@ -59,16 +70,22 @@ export abstract class Entity<T extends schema.XEntity> implements IEntity<T> {
     return this._metadata;
   }
   get share(): model.ShareIcon {
-    return {
-      name: this.name,
-      typeName: this.typeName,
-      avatar: parseAvatar(this.metadata.icon),
-    };
+    return this.findShare(this.id);
+  }
+  get creater(): model.ShareIcon {
+    return this.findShare(this.metadata.createUser);
+  }
+  get updater(): model.ShareIcon {
+    return this.findShare(this.metadata.updateUser);
+  }
+  get belong(): model.ShareIcon {
+    return this.findShare(this.metadata.belongId);
   }
   setMetadata(_metadata: T): void {
     if (_metadata.id === this.id) {
       this._metadata = _metadata;
       ShareIdSet.set(this.id, _metadata);
+      this.changCallback();
     }
   }
   findMetadata<U>(id: string): U | undefined {
@@ -79,5 +96,13 @@ export abstract class Entity<T extends schema.XEntity> implements IEntity<T> {
   }
   updateMetadata<U extends schema.XEntity>(data: U): void {
     ShareIdSet.set(data.id, data);
+  }
+  findShare(id: string): model.ShareIcon {
+    const metadata = this.findMetadata<schema.XTarget>(id);
+    return {
+      name: metadata?.name ?? '加载中...',
+      typeName: metadata?.typeName ?? '未知',
+      avatar: parseAvatar(metadata?.icon),
+    };
   }
 }
