@@ -121,7 +121,7 @@ const CreateSpeciesModal = (props: Iprops) => {
       fieldProps: {
         options: [
           {
-            value: props.current?.metadata.id || props.species?.current.metadata.id,
+            value: props.current?.id || props.species?.current.id,
             label: props.current?.metadata.name || props.species?.current.metadata.name,
           },
         ],
@@ -198,7 +198,7 @@ const CreateSpeciesModal = (props: Iprops) => {
         props.species && props.title.includes('编辑')
           ? props.species.metadata
           : {
-              shareId: props.current?.metadata.id || props.species?.current.metadata.id,
+              shareId: props.current?.id || props.species?.current.id,
               authId: orgAuth.SuperAuthId,
             }
       }

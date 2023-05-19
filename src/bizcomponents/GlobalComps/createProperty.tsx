@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ProFormColumnsType } from '@ant-design/pro-components';
 import SchemaForm from '@/components/SchemaForm';
 import { PropertyModel } from '@/ts/base/model';
 import { XProperty } from '@/ts/base/schema';
-import { IPropClass } from '@/ts/core';
+import { IDict, IPropClass } from '@/ts/core';
 
 interface Iprops {
   open: boolean;
@@ -17,7 +17,14 @@ interface Iprops {
 */
 const PropertyModal = ({ open, handleOk, species, data, handleCancel }: Iprops) => {
   if (!open) return <></>;
+  const [dicts, setDicts] = useState<IDict[]>([]);
   const [selectType, setSelectType] = useState<string>();
+  useEffect(() => {
+    species.current.space.loadDicts().then((value) => {
+      console.log(value);
+      setDicts([...value]);
+    });
+  }, [selectType]);
   const getFromColumns = () => {
     const columns: ProFormColumnsType<PropertyModel>[] = [
       {
@@ -89,9 +96,9 @@ const PropertyModal = ({ open, handleOk, species, data, handleCancel }: Iprops) 
         fieldProps: {
           disabled: selectType !== '选择型',
           showSearch: true,
-          options: species.current.space.dicts.map((i) => {
+          options: dicts.map((i) => {
             return {
-              value: i.metadata.id,
+              value: i.id,
               label: i.metadata.name,
             };
           }),

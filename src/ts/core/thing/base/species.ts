@@ -4,6 +4,8 @@ import { ITarget } from '../../target/base/target';
 
 /** 分类的抽象接口 */
 export interface ISpeciesItem extends common.IEntity {
+  /** 唯一标识 */
+  id: string;
   /** 数据实体 */
   metadata: schema.XSpecies;
   /** 当前归属用户Id */
@@ -50,12 +52,15 @@ export abstract class SpeciesItem extends common.Entity implements ISpeciesItem 
   metadata: schema.XSpecies;
   speciesTypes: string[] = [];
   isInherited: boolean;
+  get id(): string {
+    return this.metadata.id;
+  }
   get belongId() {
-    return this.current.space.metadata.id;
+    return this.current.space.id;
   }
   async delete(): Promise<boolean> {
     const res = await kernel.deleteSpecies({
-      id: this.metadata.id,
+      id: this.id,
       page: PageAll,
     });
     if (res.success) {
@@ -70,7 +75,7 @@ export abstract class SpeciesItem extends common.Entity implements ISpeciesItem 
   async update(data: model.SpeciesModel): Promise<boolean> {
     data.shareId = this.metadata.shareId;
     data.parentId = this.metadata.parentId;
-    data.id = this.metadata.id;
+    data.id = this.id;
     data.typeName = this.metadata.typeName;
     const res = await kernel.updateSpecies(data);
     if (res.success && res.data.id) {
@@ -84,7 +89,7 @@ export abstract class SpeciesItem extends common.Entity implements ISpeciesItem 
     return res.success;
   }
   async create(data: model.SpeciesModel): Promise<ISpeciesItem | undefined> {
-    data.parentId = this.metadata.id;
+    data.parentId = this.id;
     data.shareId = this.metadata.shareId;
     if (this.speciesTypes.includes(data.typeName)) {
       const res = await kernel.createSpecies(data);

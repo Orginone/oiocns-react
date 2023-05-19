@@ -30,6 +30,7 @@ const ForwardModal: React.FC<ModalPageProps> = (props) => {
   const allUser = orgCtrl.user.chats.filter((i) => i.isMyChat);
   // 这里是页面状态
   const [sendData, setSendData] = useState<Array<forwardType>>([]); // 需要传输的卡片
+  const [filterCode, setFilterCode] = useState('');
 
   // 确认按钮
   const okHandle = async () => {
@@ -207,17 +208,18 @@ const ForwardModal: React.FC<ModalPageProps> = (props) => {
             style={{ height: 36, fontSize: 14, marginTop: '10px' }}
             placeholder="搜索"
             prefix={<ImSearch />}
+            allowClear
+            onChange={(e) => {
+              setFilterCode(e.target.value);
+            }}
           />
           <Divider />
           <div className={style.leftContent}>
-            {allUser.map((item) => {
-              return (
+            {allUser
+              .filter((res) => res?.chatdata?.chatName?.includes(filterCode))
+              .map((item) => (
                 <div className={style.leftContentUser} key={item.chatId}>
-                  <Checkbox
-                    onChange={(e) => handleCheck(item, e)}
-                    key={item.chatId}
-                    // checked={item.chatdata.fullId}
-                  >
+                  <Checkbox onChange={(e) => handleCheck(item, e)} key={item.chatId}>
                     <div className={style.leftCheckSpan}>
                       <p className={style.leftText}>{item.chatdata.chatName}</p>
                       {item.chatdata.labels
@@ -232,8 +234,7 @@ const ForwardModal: React.FC<ModalPageProps> = (props) => {
                     </div>
                   </Checkbox>
                 </div>
-              );
-            })}
+              ))}
           </div>
         </Col>
         <Col span={14}>

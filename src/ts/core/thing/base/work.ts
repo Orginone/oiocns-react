@@ -2,12 +2,15 @@ import { XWorkDefine } from '@/ts/base/schema';
 import { common, kernel, model, parseAvatar, schema } from '../../../base';
 import { PageAll } from '../../public/consts';
 import { TargetType } from '../../public/enums';
-import { ITarget } from '../../target/base/target';
 import { ISpeciesItem, SpeciesItem } from './species';
 import { ShareIcon } from '@/ts/base/model';
 import { IForm } from './form';
+import { IApplication } from '../app/application';
+import { ITarget } from '../../target/base/target';
 
 export interface IWorkDefine extends common.IEntity {
+  /** 唯一标识 */
+  id: string;
   /** 办事分类 */
   workItem: IWork;
   /** 数据 */
@@ -42,26 +45,30 @@ export class FlowDefine extends common.Entity implements IWorkDefine {
     };
   }
   share: model.ShareIcon;
+  get id(): string {
+    return this.metadata.id;
+  }
   async createWorkInstance(
     data: model.WorkInstanceModel,
   ): Promise<schema.XWorkInstance | undefined> {
-    return (await kernel.createWorkInstance(data)).data;
+    let result = await kernel.createWorkInstance(data);
+    if (result.success) {
+      return result.data;
+    }
   }
   async deleteDefine(): Promise<boolean> {
     const res = await kernel.deleteWorkDefine({
-      id: this.metadata.id,
+      id: this.id,
       page: PageAll,
     });
     if (res.success) {
-      this.workItem.defines = this.workItem.defines.filter(
-        (a) => a.metadata.id != this.metadata.id,
-      );
+      this.workItem.defines = this.workItem.defines.filter((a) => a.id != this.id);
     }
     return res.success;
   }
   async updateDefine(data: model.WorkDefineModel): Promise<boolean> {
-    data.id = this.metadata.id;
-    data.shareId = this.workItem.current.metadata.id;
+    data.id = this.id;
+    data.shareId = this.workItem.current.id;
     data.speciesId = this.metadata.speciesId;
     const res = await kernel.createWorkDefine(data);
     if (res.success && res.data.id) {
@@ -70,7 +77,7 @@ export class FlowDefine extends common.Entity implements IWorkDefine {
     return res.success;
   }
   async loadWorkNode(): Promise<model.WorkNodeModel | undefined> {
-    const res = await kernel.queryWorkNodes({ id: this.metadata.id, page: PageAll });
+    const res = await kernel.queryWorkNodes({ id: this.id, page: PageAll });
     if (res.success) {
       return res.data;
     }
@@ -81,6 +88,8 @@ export class FlowDefine extends common.Entity implements IWorkDefine {
 }
 
 export interface IWork extends ISpeciesItem {
+  /** 对应的应用 */
+  app: IApplication;
   /** 流程定义 */
   defines: IWorkDefine[];
   /** 加载所有可选表单 */
@@ -89,19 +98,28 @@ export interface IWork extends ISpeciesItem {
   loadWorkDefines(reload?: boolean): Promise<IWorkDefine[]>;
   /** 新建办事 */
   createWorkDefine(data: model.WorkDefineModel): Promise<IWorkDefine | undefined>;
+  /** 删除办事实例 */
+  deleteInstance(id: string): Promise<boolean>;
 }
 
 export abstract class Work extends SpeciesItem implements IWork {
-  constructor(_metadata: schema.XSpecies, _current: ITarget, _parent?: ISpeciesItem) {
+  constructor(
+    _metadata: schema.XSpecies,
+    _current: ITarget,
+    _app?: IApplication,
+    _parent?: ISpeciesItem,
+  ) {
     super(_metadata, _current, _parent);
+    this.app = _app || this;
   }
+  app: IApplication;
   defines: IWorkDefine[] = [];
   private _defineLoaded: boolean = false;
   async loadWorkDefines(reload: boolean = false): Promise<IWorkDefine[]> {
     if (!this._defineLoaded || reload) {
       const res = await kernel.queryWorkDefine({
-        id: this.current.metadata.id,
-        speciesId: this.metadata.id,
+        id: this.current.id,
+        speciesId: this.id,
         belongId: this.belongId,
         upTeam: this.current.metadata.typeName === TargetType.Group,
         page: PageAll,
@@ -114,14 +132,23 @@ export abstract class Work extends SpeciesItem implements IWork {
     return this.defines;
   }
   async createWorkDefine(data: model.WorkDefineModel): Promise<IWorkDefine | undefined> {
-    data.shareId = this.current.metadata.id;
-    data.speciesId = this.metadata.id;
+    data.shareId = this.current.id;
+    data.speciesId = this.id;
     const res = await kernel.createWorkDefine(data);
     if (res.success && res.data.id) {
       let define = new FlowDefine(res.data, this);
       this.defines.push(define);
       return define;
     }
+  }
+  /** 删除办事实例 */
+  async deleteInstance(id: string): Promise<boolean> {
+    return (
+      await kernel.recallWorkInstance({
+        id,
+        page: PageAll,
+      })
+    ).data;
   }
   abstract loadForms(): Promise<IForm[]>;
 }

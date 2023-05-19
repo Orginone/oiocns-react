@@ -63,7 +63,6 @@ export type NodeType = {
   parentId: string;
   nodeId: string;
   name: string;
-  belongId?: string;
   task?: any;
   conditions: conditiondType[];
   props: {

@@ -5,6 +5,8 @@ export enum MenuType {
   'Form' = '表单',
   'Property' = '属性',
   'PropPackage' = '类别属性',
+  'DictPackage' = '类别字典',
+  'FormPackage' = '类别表单',
   'Authority' = '权限',
   'Template' = '业务设置',
 }

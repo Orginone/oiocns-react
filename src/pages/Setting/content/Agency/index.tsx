@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { Button, message, Modal, Typography } from 'antd';
 import { XTarget } from '@/ts/base/schema';
 import { ITarget, TargetType } from '@/ts/core';
@@ -12,7 +12,7 @@ import useObjectUpdate from '@/hooks/useObjectUpdate';
 import { CompanyColumn, PersonColumns } from '../../config/columns';
 import SearchTarget from '@/bizcomponents/SearchCompany';
 import { schema } from '@/ts/base';
-import { IsRelationAdmin, IsSuperAdmin } from '@/utils/authority';
+import { orgAuth } from '@/ts/core/public/consts';
 interface IProps {
   current: ITarget;
 }
@@ -24,17 +24,8 @@ interface IProps {
 const AgencySetting: React.FC<IProps> = ({ current }: IProps) => {
   const parentRef = useRef<any>(null); //父级容器Dom
   const [key, forceUpdate] = useObjectUpdate(current);
-  const [isSuperAdmin, SetIsSuperAdmin] = useState(false);
-  const [isRelationAdmin, SetIsRelationAdmin] = useState(false);
   const [activeModal, setActiveModal] = useState<string>(''); // 模态框
   const [selectMember, setSelectMember] = useState<XTarget[]>([]); // 选中的要拉的人
-
-  useEffect(() => {
-    setTimeout(async () => {
-      SetIsSuperAdmin(await IsSuperAdmin(current));
-      SetIsRelationAdmin(await IsRelationAdmin(current));
-    }, 10);
-  }, [current]);
 
   // 标题tabs页
   const TitleItems = () => {
@@ -83,7 +74,7 @@ const AgencySetting: React.FC<IProps> = ({ current }: IProps) => {
         rowKey={'id'}
         parentRef={parentRef}
         operation={(item) => {
-          return isSuperAdmin
+          return current.hasAuthoritys([orgAuth.RelationAuthId])
             ? [
                 {
                   key: 'remove',
@@ -121,7 +112,7 @@ const AgencySetting: React.FC<IProps> = ({ current }: IProps) => {
               <Button type="link" onClick={() => setActiveModal('indentity')}>
                 角色设置
               </Button>
-              {isRelationAdmin && (
+              {current.hasAuthoritys([orgAuth.RelationAuthId]) && (
                 <>
                   <Button type="link" onClick={() => setActiveModal('addOne')}>
                     添加成员

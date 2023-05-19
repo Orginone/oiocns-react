@@ -50,20 +50,12 @@ const ProcessTree: React.FC<IProps> = ({
   var nodeMap = useAppwfConfig((state: any) => state.nodeMap);
   // const nodeMap = processCtrl.nodeMap;
 
-  const getDomTree = (h: any, node: any) => {
-    if (!node || !node.nodeId) {
-      return [];
-    }
+  const getDomTree = (h: any, node: WorkNodeModel) => {
     toMapping(node);
     if (isPrimaryNode(node)) {
       //普通业务节点
-      let childDoms: any = getDomTree(h, node.children);
-      decodeAppendDom(h, node, childDoms, {
-        _disabled: node?._disabled,
-        _executable: node?._executable,
-        _passed: node?._passed,
-        _flowRecords: node?._flowRecords,
-      });
+      let childDoms: any = node.children ? getDomTree(h, node.children) : [];
+      decodeAppendDom(h, node, childDoms, {});
       return [
         h(
           'div',
@@ -77,15 +69,15 @@ const ProcessTree: React.FC<IProps> = ({
     } else if (isBranchNode(node)) {
       let index = 0;
       //遍历分支节点，包含并行及条件节点
-      let branchItems = node.branches?.map((branchNode: any) => {
+      let branchItems = (node.branches || []).map((branchNode: any) => {
         //处理每个分支内子节点
         toMapping(branchNode);
-        let childDoms = branchNode.children
+        let childDoms: any = branchNode.children
           ? getDomTree(React.createElement, branchNode.children)
           : [];
         decodeAppendDom(React.createElement, branchNode, childDoms, {
           level: index + 1,
-          size: node.branches.length,
+          size: node.branches?.length ?? 0,
           _disabled: branchNode?._disabled,
           _executable: branchNode?._executable,
           _passed: branchNode?._passed,
@@ -116,11 +108,7 @@ const ProcessTree: React.FC<IProps> = ({
             h(
               'button',
               {
-                className:
-                  !node.belongId || node.belongId == operateOrgId
-                    ? cls[`add-branch-btn-el`]
-                    : cls[`add-branch-btn-el-unEdit`],
-                // className: cls[`add-branch-btn-el`],
+                className: cls[`add-branch-btn-el`],
                 key: getRandomId(),
                 props: {
                   size: 'small',
@@ -154,11 +142,7 @@ const ProcessTree: React.FC<IProps> = ({
 
       let childDoms: any = node.children ? getDomTree(h, node.children) : [];
 
-      decodeAppendDom(h, node, childDoms, {
-        _disabled: node?._disabled,
-        _executable: node?._executable,
-        _passed: node?._passed,
-      });
+      decodeAppendDom(h, node, childDoms, {});
       // setKey(key + 1);
       return [
         h(

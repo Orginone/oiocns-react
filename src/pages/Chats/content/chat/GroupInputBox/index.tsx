@@ -11,6 +11,8 @@ import { filetrText, isShowLink } from '../GroupContent/common';
 import { model, parseAvatar } from '@/ts/base';
 import { FileItemShare } from '@/ts/base/model';
 import { FileTypes } from '@/ts/core/public/consts';
+import PullDown from './component/pullDown';
+import { XTarget } from '@/ts/base/schema';
 
 /**
  * @description: 输入区域
@@ -32,6 +34,10 @@ const Groupinputbox = (props: Iprops) => {
   const [task, setTask] = useState<TaskModel>();
   const [IsCut, setIsCut] = useState<boolean>(false); // 是否截屏
   const [imgUrls, setImgUrls] = useState<Array<string>>([]); // 表情图片
+  const [citePeople, setCitePeople] = useState<XTarget[]>([]); // @人员
+  const [citeShow, setCiteShow] = useState<boolean>(false); // @展示
+  const [optionVal, setOptionVal] = useState<any>();
+
   /**
    * @description: 提交聊天内容
    * @return {*}
@@ -44,7 +50,6 @@ const Groupinputbox = (props: Iprops) => {
           ? reCreatChatContent(insterHtml.childNodes ?? [])
           : [insterHtml.innerHTML];
       let massage = text.join('').trim();
-      console.log(massage, 'massgar');
 
       if (massage.length > 0) {
         insterHtml.innerHTML = '发送中,请稍后...';
@@ -52,7 +57,6 @@ const Groupinputbox = (props: Iprops) => {
       }
       insterHtml.innerHTML = '';
       closeCite('');
-      console.log('消息内容', text);
     }
   };
 
@@ -72,11 +76,26 @@ const Groupinputbox = (props: Iprops) => {
             const newContent = n.textContent.substring(0, 2048);
             return newContent;
           } else {
-            const newContent = citeText
-              ? `${n.textContent}$CITEMESSAGE[${filetrText(citeText)}]`
-              : `${n.textContent}`;
-
-            return newContent;
+            // 判断是否存在艾特字符
+            const matches = n.textContent.indexOf('@') !== -1;
+            if (citeText && matches) {
+              // 引用加@走这一块
+              const newContent = `${n.textContent}$CITEMESSAGE[${filetrText(
+                citeText,
+              )}]$FINDME[${optionVal.key}]`;
+              return newContent;
+            } else if (matches) {
+              // 单纯@走这里
+              const newContent = `${n.textContent}$FINDME[${optionVal.key}]`;
+              return newContent;
+            } else if (citeText) {
+              // 为引用类型走这里
+              const newContent = `${n.textContent}$CITEMESSAGE[${filetrText(citeText)}]`;
+              return newContent;
+            } else {
+              const newContent = `${n.textContent}`;
+              return newContent;
+            }
           }
         } else if (n.nodeName == 'IMG') {
           switch (n.className) {
@@ -257,8 +276,25 @@ const Groupinputbox = (props: Iprops) => {
       } else {
         return message.warning('不能发送空值');
       }
+    } else if (e.key === '@' && chat.members.length > 0) {
+      const filterPeople = chat.members.filter((val: any) => val.id !== chat.userId);
+      setCitePeople(filterPeople);
+      setCiteShow(true);
     }
   };
+
+  /** 艾特触发人员选择 */
+  const onSelect = (e: any) => {
+    setCiteShow(false);
+    setOptionVal(e);
+    document.getElementById('insterHtml')?.append(`@${e.children}`);
+  };
+
+  /** 点击空白处取消 @ 弹窗 */
+  window.addEventListener('click', () => {
+    setCiteShow(false);
+  });
+
   /** 文件上传参数 */
   const uploadProps: UploadProps = {
     multiple: false,
@@ -364,23 +400,36 @@ const Groupinputbox = (props: Iprops) => {
             }}
           />
         </div>
+        {/* @功能 */}
         <div className={'input_content'}>
+          {citePeople.length > 0 && (
+            <PullDown
+              style={{ display: `${!citeShow ? 'none' : 'block'}` }}
+              pullDownRef={(ref: any) => ref && ref.focus()}
+              people={citePeople}
+              open={citeShow}
+              onSelect={onSelect}
+              onClose={() => setCiteShow(false)}
+            />
+          )}
           <div
             id="insterHtml"
+            autoFocus={true}
+            ref={(ref) => ref && !citeShow && ref.focus()}
             className={'textarea'}
             contentEditable="true"
             spellCheck="false"
             placeholder="请输入内容"
             onKeyDown={keyDown}></div>
           {citeText && citeShowText(citeText)}
-          <div className={'send_box'}>
-            <Button
-              type="primary"
-              style={{ color: '#fff', border: 'none' }}
-              onClick={() => submit()}>
-              发送
-            </Button>
-          </div>
+        </div>
+        <div className={'send_box'}>
+          <Button
+            type="primary"
+            style={{ color: '#fff', border: 'none' }}
+            onClick={() => submit()}>
+            发送
+          </Button>
         </div>
       </div>
       {/* 截图功能 */}

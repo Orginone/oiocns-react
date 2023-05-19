@@ -11,30 +11,19 @@ import {
   AiOutlineClockCircle,
 } from 'react-icons/ai';
 import { getUuid } from '@/utils/tools';
-import { FieldCondition } from './Chart/FlowDrawer/processType';
-import { dataType } from './Chart/FlowDrawer/processType';
-import { XAttribute, XWorkInstance } from '@/ts/base/schema';
-import { IWork } from '@/ts/core';
+import { XWorkInstance } from '@/ts/base/schema';
 import { ImUndo2, ImWarning } from 'react-icons/im';
-import { IFlowDefine } from '@/ts/core';
+import { IWorkDefine } from '@/ts/core/thing/base/work';
 
 interface IProps {
   IsEdit: boolean;
-  current: IFlowDefine;
-  species: IWork;
+  current: IWorkDefine;
   instance?: XWorkInstance;
   onBack: () => void;
 }
 
-const Design: React.FC<IProps> = ({
-  species,
-  current,
-  instance,
-  onBack,
-  IsEdit = true,
-}) => {
+const Design: React.FC<IProps> = ({ current, instance, onBack, IsEdit = true }) => {
   const [scale, setScale] = useState<number>(100);
-  const [conditions, setConditions] = useState<FieldCondition[]>([]);
   const [showErrorsModal, setShowErrorsModal] = useState<ReactNode[]>([]);
   const [resource, setResource] = useState<WorkNodeModel>();
 
@@ -75,42 +64,6 @@ const Design: React.FC<IProps> = ({
       } else {
         setResource(resourceData);
       }
-      if (IsEdit && species) {
-        let attrs: XAttribute[] = [];
-        for (const form of await species.loadForms()) {
-          attrs.push(...(await form.loadAttributes()));
-        }
-        let fields: FieldCondition[] = [];
-        for (let attr of attrs) {
-          switch (attr.property!.valueType) {
-            case '数值型':
-              fields.push({ label: attr.name, value: attr.id, type: dataType.NUMERIC });
-              break;
-            case '选择型':
-              {
-                const dict = species.current.space.dicts.find(
-                  (a) => a.metadata.id == attr.property?.dictId,
-                );
-                if (dict) {
-                  fields.push({
-                    label: attr.name,
-                    value: attr.id,
-                    type: dataType.DICT,
-                    dict:
-                      (await dict.loadItems())?.map((a) => {
-                        return { label: a.name, value: a.value };
-                      }) || [],
-                  });
-                }
-              }
-              break;
-            default:
-              fields.push({ label: attr.name, value: attr.id, type: dataType.STRING });
-              break;
-          }
-        }
-        setConditions(fields);
-      }
     };
     load();
   }, [current]);
@@ -133,22 +86,6 @@ const Design: React.FC<IProps> = ({
     }
     return array;
   };
-
-  /** 获取所有分支节点 */
-  // const getAllBranches = (resource: WorkNodeModel, array: Branche[]): Branche[] => {
-  //   if (resource.children) {
-  //     array = getAllBranches(resource.children, array);
-  //   }
-  //   if (resource.branches && resource.branches.length > 0) {
-  //     array.push(...resource.branches);
-  //     for (let branch of resource.branches) {
-  //       if (branch.children) {
-  //         array = getAllBranches(branch.children, array);
-  //       }
-  //     }
-  //   }
-  //   return array;
-  // };
 
   const getErrorItem = (text: string | ReactNode): ReactNode => {
     return (
@@ -184,46 +121,6 @@ const Design: React.FC<IProps> = ({
         );
       }
     }
-    //条件节点条件不为空  分支下最多只能有n个分支children为空
-    // let n = 0;
-    // let parentIdSet: Set<string> = new Set();
-    // let allBranches: Branche[] = getAllBranches(resource, []);
-    // for (let branch of allBranches) {
-    //   if (branch.conditions && branch.conditions.length > 0) {
-    //     for (let condition of branch.conditions) {
-    //       if (!condition.key || !condition.paramKey || !condition.val) {
-    //         errors.push(getErrorItem(`分支: branch.name的条件未完成`));
-    //       }
-    //     }
-    //   } else {
-    //     let parent = allNodes.filter((item) => item.code == branch.parentId)[0];
-    //     if (parent.type == 'CONDITIONS') {
-    //       errors.push(getErrorItem(`条件分支: 缺少条件`));
-    //     }
-    //     if (parent.type == 'ORGANIZATIONAL') {
-    //       errors.push(getErrorItem(`组织分支: 请选择组织`));
-    //     }
-    //   }
-    //   parentIdSet.add(branch.parentId as string);
-    // }
-
-    // for (let parentId of Array.from(parentIdSet)) {
-    //   let parent = allNodes.filter((item) => item.code == parentId)[0];
-    //   let branches = allBranches.filter(
-    //     (item) => item.parentId == parentId && !item.children,
-    //   );
-    //   if (branches.length > n) {
-    //     errors.push(
-    //       getErrorItem(
-    //         n == 0
-    //           ? `${parent.type == 'CONDITIONS' ? '条件' : '并行'}节点分支下不能为空`
-    //           : `${
-    //               parent.type == 'CONDITIONS' ? '条件' : '并行'
-    //             }节点分支下最多只能有${n}个分支节点为空`,
-    //       ),
-    //     );
-    //   }
-    // }
     return errors;
   };
 
@@ -424,7 +321,7 @@ const Design: React.FC<IProps> = ({
     if (type == 'flowNode') {
       let flowNode: WorkNodeModel = {
         id: resource.id,
-        defineId: current.metadata.id,
+        defineId: current.id,
         code: resource.nodeId,
         type: resource.type,
         name: resource.name,
@@ -553,7 +450,7 @@ const Design: React.FC<IProps> = ({
                   await current.updateDefine({
                     ...current.metadata,
                     resource: resource_,
-                    speciesId: species.metadata.id,
+                    speciesId: current.workItem.id,
                   })
                 ) {
                   message.success('保存成功');
@@ -633,11 +530,7 @@ const Design: React.FC<IProps> = ({
               {/* 基本信息组件 */}
               <div>
                 <ChartDesign
-                  disableIds={[current.metadata.id]}
-                  // key={key}
-                  current={current.metadata}
-                  conditions={conditions}
-                  species={species}
+                  current={current}
                   defaultEditable={IsEdit}
                   resource={resource}
                   scale={scale}

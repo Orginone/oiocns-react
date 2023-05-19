@@ -3,12 +3,12 @@ import { Spin, Image, Empty } from 'antd';
 import { IconFont } from '@/components/IconFont';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 import { FileItemShare } from '@/ts/base/model';
-import Filtrate from '../Filtrate';
 import { ICompany, MessageType, ChatMessage } from '@/ts/core';
 import { model, parseAvatar } from '@/ts/base';
 import { showChatTime } from '@/utils/tools';
 import orgCtrl from '@/ts/controller';
 import { FileTypes } from '@/ts/core/public/consts';
+import SuperMsgs from '@/ts/core/chat/message/supermsg';
 import { filetrText, isShowLink } from '../../content/chat/GroupContent/common';
 import css from './index.module.less';
 
@@ -19,7 +19,6 @@ interface IProps {
 const Supervise: React.FC<IProps> = ({ belong }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [messages, setMessages] = useState<model.MsgSaveModel[]>([]);
-  const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [companyPerson] = useState(
     belong.chats.filter(
       (i) =>
@@ -33,11 +32,11 @@ const Supervise: React.FC<IProps> = ({ belong }) => {
 
   useEffect(() => {
     getAllMessage();
-  }, [selectedRows]);
+  }, [SuperMsgs.chatIds]);
   const getAllMessage = async () => {
     let chatsa = await ChatsMessage.moreMessage(
       true,
-      selectedRows.length === 0 ? [companyPerson[0].chatId] : selectedRows,
+      SuperMsgs.chatIds.length === 0 ? [companyPerson[0].chatId] : SuperMsgs.chatIds,
     );
     setMessages(chatsa);
   };
@@ -69,13 +68,6 @@ const Supervise: React.FC<IProps> = ({ belong }) => {
       //   setLoading(false);
       // }
     }
-  };
-
-  // 选中项
-  const rowSelection = {
-    onChange: (_selectedRowKeys: React.Key[], selectedRows: any[]) => {
-      setSelectedRows(selectedRows.map((it) => it.chatId));
-    },
   };
 
   /**
@@ -203,7 +195,7 @@ const Supervise: React.FC<IProps> = ({ belong }) => {
                       <div className={`${css.other_name}`}>
                         <div>
                           {share.name}
-                          &emsp;to:&emsp;
+                          &emsp;发送给&emsp;
                           {own_name.name}
                         </div>
                         <div>{showChatTime(item.createTime)}</div>
@@ -218,23 +210,12 @@ const Supervise: React.FC<IProps> = ({ belong }) => {
         </div>
       </Spin>
     );
-  }, [messages, selectedRows]);
-
-  /**
-   * @description: 右侧筛选模块
-   * @return {*}
-   */
-  const filtrate = (
-    <div className={css.filtrate}>
-      <Filtrate dataSource={companyPerson} rowSelection={rowSelection} />
-    </div>
-  );
+  }, [messages]);
 
   return (
     <React.Fragment>
       <div className={`${css.supervise}`}>
         <div className={`${css.supervise_left}`}>{historyMsg}</div>
-        <div className={`${css.supervise_right}`}>{filtrate}</div>
       </div>
     </React.Fragment>
   );

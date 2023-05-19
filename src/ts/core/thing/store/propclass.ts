@@ -65,7 +65,7 @@ export class PropClass extends SpeciesItem implements IPropClass {
   async loadPropertys(reload: boolean = false): Promise<schema.XProperty[]> {
     if (!this._propertyLoaded || reload) {
       const res = await kernel.queryPropertys({
-        id: this.metadata.id,
+        id: this.id,
         page: PageAll,
       });
       if (res.success) {
@@ -83,7 +83,7 @@ export class PropClass extends SpeciesItem implements IPropClass {
     return new PropClass(_metadata, _current, this);
   }
   async createProperty(data: model.PropertyModel): Promise<schema.XProperty | undefined> {
-    data.speciesId = this.metadata.id;
+    data.speciesId = this.id;
     const res = await kernel.createProperty(data);
     if (res.success && res.data.id) {
       this._propertyChanged('added', [res.data]);
@@ -93,7 +93,7 @@ export class PropClass extends SpeciesItem implements IPropClass {
   async updateProperty(data: model.PropertyModel): Promise<boolean> {
     const index = this.propertys.findIndex((i) => i.id === data.id);
     if (index > -1) {
-      data.speciesId = this.metadata.id;
+      data.speciesId = this.id;
       const res = await kernel.updateProperty(data);
       if (res.success && res.data.id) {
         this._propertyChanged('updated', [res.data]);

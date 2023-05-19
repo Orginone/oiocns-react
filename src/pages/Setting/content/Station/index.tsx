@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import { Card, Modal, Button } from 'antd';
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import cls from './index.module.less';
 import CardOrTable from '@/components/CardOrTableComp';
 import AssignPosts from '@/bizcomponents/Indentity/components/AssignPosts';
@@ -9,8 +9,7 @@ import IndentityManage, { ResultType } from '@/bizcomponents/IndentityManage';
 import { IIdentity, IStation } from '@/ts/core';
 import { IdentityColumn, PersonColumns } from '../../config/columns';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
-import { IsSuperAdmin } from '@/utils/authority';
-import orgCtrl from '@/ts/controller';
+import { orgAuth } from '@/ts/core/public/consts';
 
 interface IProps {
   current: IStation;
@@ -22,22 +21,15 @@ interface IProps {
 const Station: React.FC<IProps> = ({ current }: IProps) => {
   const [key, forceUpdate] = useObjectUpdate(current);
   const parentRef = useRef<any>(null); //父级容器Dom
-  const [isSuperAdmin, SetIsSuperAdmin] = useState(false);
   const [isOpenPerson, setIsOpenPerson] = useState<boolean>(false);
   const [selectPersons, setSelectPersons] = useState<schema.XTarget[]>(); //选中的待指派人员列表
   const [selectIdentitys, setSelectIdentitys] = useState<IIdentity[]>(); //待添加的角色数据集
   const [isOpenSelectIdentityModal, setIsOpenIdentityModal] = useState<boolean>(false); //角色选择模态框
 
-  useEffect(() => {
-    setTimeout(async () => {
-      SetIsSuperAdmin(await IsSuperAdmin(orgCtrl.user));
-    }, 10);
-  }, [current]);
-
   // 人员表格操作内容渲染函数
   const personOperation = (item: schema.XTarget): any[] => {
     return [
-      isSuperAdmin ? (
+      current.hasAuthoritys([orgAuth.RelationAuthId]) ? (
         {
           key: 'remove',
           label: <span style={{ color: 'red' }}>移除</span>,
@@ -56,7 +48,7 @@ const Station: React.FC<IProps> = ({ current }: IProps) => {
   // 角色表格操作内容渲染函数
   const identityOperation = (item: IIdentity): any[] => {
     return [
-      isSuperAdmin ? (
+      current.hasAuthoritys([orgAuth.RelationAuthId]) ? (
         {
           key: 'remove',
           label: <span style={{ color: 'red' }}>移除</span>,
@@ -99,7 +91,7 @@ const Station: React.FC<IProps> = ({ current }: IProps) => {
             <strong style={{ marginLeft: '20px', fontSize: 15 }}>
               {current.metadata.name}
             </strong>
-            {isSuperAdmin && (
+            {current.hasAuthoritys([orgAuth.RelationAuthId]) && (
               <Button
                 className={cls.creatgroup}
                 type="link"
@@ -141,7 +133,7 @@ const Station: React.FC<IProps> = ({ current }: IProps) => {
                 rowKey={'id'}
                 params={key}
                 toolBarRender={() => [
-                  isSuperAdmin ? (
+                  current.hasAuthoritys([orgAuth.RelationAuthId]) ? (
                     <Button
                       key={'addperson'}
                       className={cls.creatgroup}
@@ -212,7 +204,7 @@ const Station: React.FC<IProps> = ({ current }: IProps) => {
         onCancel={() => {
           setIsOpenPerson(false);
         }}>
-        <AssignPosts members={current.members} searchFn={setSelectPersons} />
+        <AssignPosts members={current.space.members} searchFn={setSelectPersons} />
       </Modal>
     </div>
   );

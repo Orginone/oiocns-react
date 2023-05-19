@@ -1,13 +1,15 @@
 import { common, kernel, model, parseAvatar, schema } from '../../../base';
 import { PageAll, ShareIdSet } from '../../public/consts';
-import { IBelong } from '../../target/base/belong';
+import { DictClass } from './dictclass';
 
 /** 元数据字典接口 */
 export interface IDict extends common.IEntity {
+  /** 唯一标识 */
+  id: string;
   /** 数据实体 */
   metadata: schema.XDict;
   /** 加载权限的自归属用户 */
-  space: IBelong;
+  species: DictClass;
   /** 共享信息 */
   share: model.ShareIcon;
   /** 字典项 */
@@ -28,9 +30,9 @@ export interface IDict extends common.IEntity {
 
 /** 元数据字典实现 */
 export class Dict extends common.Entity implements IDict {
-  constructor(_metadata: schema.XDict, _space: IBelong) {
+  constructor(_metadata: schema.XDict, _species: DictClass) {
     super();
-    this.space = _space;
+    this.species = _species;
     this.metadata = _metadata;
     this.share = {
       name: this.metadata.name,
@@ -39,14 +41,17 @@ export class Dict extends common.Entity implements IDict {
     };
     ShareIdSet.set(this.metadata.id, this.share);
   }
-  space: IBelong;
+  species: DictClass;
   share: model.ShareIcon;
   metadata: schema.XDict;
   items: schema.XDictItem[] = [];
   private _itemLoaded: boolean = false;
+  get id(): string {
+    return this.metadata.id;
+  }
   async update(data: model.DictModel): Promise<boolean> {
-    data.id = this.metadata.id;
-    data.belongId = this.space.metadata.id;
+    data.id = this.id;
+    data.speciesId = this.species.id;
     const res = await kernel.updateDict(data);
     if (res.success && res.data?.id) {
       this.metadata = res.data;
@@ -55,18 +60,18 @@ export class Dict extends common.Entity implements IDict {
   }
   async delete(): Promise<boolean> {
     const res = await kernel.deleteDict({
-      id: this.metadata.id,
+      id: this.id,
       page: PageAll,
     });
     if (res.success) {
-      this.space.dicts = this.space.dicts.filter((i) => i.key != this.key);
+      this.species._propertyChanged('deleted', [this]);
     }
     return res.success;
   }
   async loadItems(reload: boolean = false): Promise<schema.XDictItem[]> {
     if (!this._itemLoaded || reload) {
       const res = await kernel.queryDictItems({
-        id: this.metadata.id,
+        id: this.id,
         page: PageAll,
       });
       if (res.success) {
@@ -76,7 +81,7 @@ export class Dict extends common.Entity implements IDict {
     return this.items;
   }
   async createItem(data: model.DictItemModel): Promise<schema.XDictItem | undefined> {
-    data.dictId = this.metadata.id;
+    data.dictId = this.id;
     const res = await kernel.createDictItem(data);
     if (res.success && res.data?.id) {
       this.items.push(res.data);
@@ -94,7 +99,7 @@ export class Dict extends common.Entity implements IDict {
     return res.success;
   }
   async updateItem(data: model.DictItemModel): Promise<boolean> {
-    data.dictId = this.metadata.id;
+    data.dictId = this.id;
     const res = await kernel.updateDictItem(data);
     if (res.success) {
       this.items = this.items.filter((i) => i.id != data.id);

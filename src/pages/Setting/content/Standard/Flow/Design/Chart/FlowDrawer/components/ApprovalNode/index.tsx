@@ -7,11 +7,10 @@ import { NodeType } from '../../processType';
 import { XForm } from '@/ts/base/schema';
 import ShareShowComp from '@/bizcomponents/IndentityManage/ShareShowComp';
 import SelectOperation from '@/pages/Setting/content/Standard/Flow/Comp/SelectOperation';
-import ViewFormModal from '@/bizcomponents/FormDesign/viewFormModal';
 import { IWork } from '@/ts/core';
 interface IProps {
   current: NodeType;
-  species: IWork;
+  work: IWork;
 }
 
 /**
@@ -24,8 +23,6 @@ const ApprovalNode: React.FC<IProps> = (props) => {
   const [radioValue, setRadioValue] = useState(1);
   const [operations, setOperations] = useState<XForm[]>([]);
   const [operationModal, setOperationModal] = useState<any>();
-  const [viewFormOpen, setViewFormOpen] = useState<boolean>(false);
-  const [editData, setEditData] = useState<XForm>();
   const [showData, setShowData] = useState<any[]>([]);
   // 操作内容渲染函数
   useEffect(() => {
@@ -135,10 +132,10 @@ const ApprovalNode: React.FC<IProps> = (props) => {
             <Space size={[0, 10]}> */}
             <ShareShowComp
               departData={operations}
-              onClick={(item: any) => {
-                setEditData(item);
-                setViewFormOpen(true);
-              }}
+              // onClick={(item: any) => {
+              //   setEditData(item);
+              //   setViewFormOpen(true);
+              // }}
               deleteFuc={(id: string) => {
                 props.current.props.operations = props.current.props.operations.filter(
                   (op) => op.id != id,
@@ -170,9 +167,9 @@ const ApprovalNode: React.FC<IProps> = (props) => {
           }}
           onCancel={() => setOperationModal(undefined)}>
           <SelectOperation
-            current={props.species}
-            showData={showData}
-            setShowData={setShowData}></SelectOperation>
+            current={props.work}
+            selected={showData}
+            setSelected={setShowData}></SelectOperation>
         </Modal>
       </div>
       <Modal
@@ -197,10 +194,10 @@ const ApprovalNode: React.FC<IProps> = (props) => {
               },
             });
           }}
-          space={props.species.current.space}
+          space={props.work.current.space}
         />
       </Modal>
-      <ViewFormModal
+      {/* <ViewFormModal
         belong={props.species.current.space}
         data={editData}
         open={viewFormOpen}
@@ -210,7 +207,7 @@ const ApprovalNode: React.FC<IProps> = (props) => {
         handleOk={() => {
           setViewFormOpen(false);
         }}
-      />
+      /> */}
     </div>
   );
 };

@@ -7,42 +7,28 @@ import RootNode from './components/RootNode';
 import ConcurrentNode from './components/ConcurrentNode';
 import DeptWayNode from './components/DeptWayNode';
 import ConditionNode from './components/ConditionNode';
-import { AddNodeType, dataType, FieldCondition, NodeType } from './processType';
+import { AddNodeType, NodeType } from './processType';
 import orgCtrl from '@/ts/controller';
 import { getUuid } from '@/utils/tools';
-import { ISpeciesItem } from '@/ts/core';
-import { IWorkItem } from '@/ts/core/thing/app/work/workitem';
+import { IWorkDefine } from '@/ts/core/thing/base/work';
 /**
  * @description: 流程设置抽屉
  * @return {*}
  */
 
 interface IProps {
-  operateOrgId?: string;
-  designOrgId?: string;
   isOpen: boolean;
-  current?: NodeType;
-  conditions?: FieldCondition[];
+  current: NodeType;
   onClose: () => void;
-  species: ISpeciesItem;
-  disableIds: string[];
+  define: IWorkDefine;
   defaultEditable: boolean;
 }
 
-const FlowDrawer: React.FC<IProps> = ({
-  isOpen,
-  onClose,
-  conditions,
-  current,
-  operateOrgId,
-  designOrgId,
-  species,
-  disableIds,
-}) => {
+const FlowDrawer: React.FC<IProps> = (props) => {
   const [key, setKey] = useState<string>();
-  const Component = (current: any) => {
-    if (current.task?.records?.length > 0) {
-      return current.task?.records.map((record: any) => {
+  const Component = () => {
+    if (props.current.task?.records?.length > 0) {
+      return props.current.task?.records.map((record: any) => {
         let handleResult = '通过';
         if (record.status >= 200) {
           handleResult = '不通过';
@@ -58,97 +44,52 @@ const FlowDrawer: React.FC<IProps> = ({
           </>
         );
       });
-      // return (<div><div>审核人：{}</dev></div>)
     } else {
-      switch (current?.type) {
+      switch (props.current.type) {
         case AddNodeType.ROOT:
-          return (
-            <RootNode
-              current={current}
-              orgId={operateOrgId || designOrgId}
-              species={species}
-            />
-          );
+          return <RootNode current={props.current} work={props.define.workItem} />;
         case AddNodeType.APPROVAL:
-          return <ApprovalNode current={current} species={species as IWorkItem} />;
+          return <ApprovalNode current={props.current} work={props.define.workItem} />;
         case AddNodeType.CHILDWORK:
-          return (
-            <WorkFlowNode
-              disableIds={disableIds}
-              current={current}
-              orgId={operateOrgId || designOrgId}
-              species={species}
-            />
-          );
+          return <WorkFlowNode current={props.current} work={props.define.workItem} />;
         case AddNodeType.CC:
-          return (
-            <CcNode
-              current={current}
-              orgId={operateOrgId || designOrgId}
-              species={species as IWorkItem}
-            />
-          );
+          return <CcNode current={props.current} work={props.define.workItem} />;
         case AddNodeType.CONDITION:
-          if (conditions) {
-            return (
-              <ConditionNode
-                current={current}
-                conditions={conditions}
-                orgId={operateOrgId || designOrgId}
-              />
-            );
-          }
-          return <div>请先在字段设计中，设置条件字段</div>;
+          return <ConditionNode current={props.current} />;
         case AddNodeType.CONCURRENTS:
-          return (
-            <ConcurrentNode
-              current={current}
-              orgId={operateOrgId || designOrgId}></ConcurrentNode>
-          );
+          return <ConcurrentNode current={props.current} />;
         case AddNodeType.ORGANIZATIONA:
-          return (
-            <DeptWayNode
-              current={current}
-              conditions={[{ label: '组织', value: 'belongId', type: dataType.BELONG }]}
-              orgId={operateOrgId || designOrgId}></DeptWayNode>
-          );
+          return <DeptWayNode current={props.current} />;
         default:
           return <div>暂无需要处理的数据</div>;
       }
     }
   };
 
-  return current ? (
+  return (
     <Drawer
       title={
         <div key={key}>
-          {(!current.belongId || !operateOrgId || current.belongId == operateOrgId) && (
-            <Typography.Title
-              editable={{
-                onChange: (e: any) => {
-                  current.name = e;
-                  setKey(getUuid());
-                },
-              }}
-              level={5}
-              style={{ margin: 0 }}>
-              {current.name}
-            </Typography.Title>
-          )}
-          {current.belongId && operateOrgId && current.belongId != operateOrgId && (
-            <div>{current.name}</div>
-          )}
+          <Typography.Title
+            editable={{
+              onChange: (e: any) => {
+                props.current.name = e;
+                setKey(getUuid());
+              },
+            }}
+            level={5}
+            style={{ margin: 0 }}>
+            {props.current.name}
+          </Typography.Title>
         </div>
       }
       destroyOnClose
       placement="right"
-      open={isOpen}
-      onClose={() => onClose()}
+      open={props.isOpen}
+      onClose={() => props.onClose()}
       width={500}>
-      {Component(current)}
+      {Component()}
     </Drawer>
-  ) : (
-    <></>
   );
 };
 

@@ -30,7 +30,7 @@ const ShareRecent = (props: Iprops) => {
     if (targets) {
       for (const item of targets) {
         result.push({
-          key: item.metadata.id,
+          key: item.id,
           title: item.metadata.name,
           item: item,
           isLeaf: item.subTarget.length === 0,
@@ -47,13 +47,13 @@ const ShareRecent = (props: Iprops) => {
     const item: ITarget = info.node.item;
     if (item) {
       const index = resultData.findIndex((i) => {
-        return i.id === item.metadata.id;
+        return i.id === item.id;
       });
       if (index > -1) {
         setCurrent(resultData[index]);
       } else {
         const newItem: ResultType = {
-          id: item.metadata.id,
+          id: item.id,
           target: item.metadata,
           identitys: [],
         };
@@ -64,7 +64,7 @@ const ShareRecent = (props: Iprops) => {
       const result = (await item.loadIdentitys()).map((i) => {
         return {
           title: `[${item.metadata.name}]` + i.metadata.name,
-          key: i.metadata.id,
+          key: i.id,
           data: i,
         };
       });
@@ -103,7 +103,7 @@ const ShareRecent = (props: Iprops) => {
     for (const data of resultData) {
       for (const item of data.identitys) {
         result.push({
-          id: item.metadata.id,
+          id: item.id,
           name: item.metadata.name,
           type: 'add',
         });
@@ -114,7 +114,7 @@ const ShareRecent = (props: Iprops) => {
 
   const getSelectKeys = () => {
     if (current) {
-      return current.identitys.map((item) => item.metadata.id);
+      return current.identitys.map((item) => item.id);
     }
     return [];
   };
@@ -122,7 +122,7 @@ const ShareRecent = (props: Iprops) => {
   const deleteItem = (id: string) => {
     for (const item of resultData) {
       item.identitys = item.identitys.filter((i) => {
-        return i.metadata.id != id;
+        return i.id != id;
       });
     }
     setKey(generateUuid());

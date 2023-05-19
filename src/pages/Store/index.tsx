@@ -64,8 +64,8 @@ const Package: React.FC = () => {
           }}>
           <SelectOperation
             current={selectMenu.item}
-            showData={showData}
-            setShowData={setShowData}></SelectOperation>
+            selected={showData}
+            setSelected={setShowData}></SelectOperation>
         </Modal>
       )}
       {showForm && (

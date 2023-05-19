@@ -30,7 +30,7 @@ export class Station extends Team implements IStation {
   async loadIdentitys(reload?: boolean | undefined): Promise<IIdentity[]> {
     if (!this._identityLoaded || reload) {
       const res = await kernel.queryTeamIdentitys({
-        id: this.metadata.id,
+        id: this.id,
         page: PageAll,
       });
       if (res.success) {
@@ -44,12 +44,12 @@ export class Station extends Team implements IStation {
   }
   async pullIdentitys(identitys: IIdentity[]): Promise<boolean> {
     identitys = identitys.filter((i) => {
-      return this.identitys.filter((m) => m.metadata.id === i.metadata.id).length < 1;
+      return this.identitys.filter((m) => m.id === i.id).length < 1;
     });
     if (identitys.length > 0) {
       const res = await kernel.pullAnyToTeam({
-        id: this.metadata.id,
-        subIds: identitys.map((i) => i.metadata.id),
+        id: this.id,
+        subIds: identitys.map((i) => i.id),
       });
       if (res.success) {
         this.identitys.push(...identitys);
@@ -61,8 +61,8 @@ export class Station extends Team implements IStation {
   async removeIdentitys(identitys: IIdentity[]): Promise<boolean> {
     for (const identity of identitys) {
       const res = await kernel.removeOrExitOfTeam({
-        id: this.metadata.id,
-        subId: identity.metadata.id,
+        id: this.id,
+        subId: identity.id,
       });
       if (res.success) {
         this.identitys = this.identitys.filter((i) => i.key != identity.key);
@@ -72,7 +72,7 @@ export class Station extends Team implements IStation {
   }
   async delete(): Promise<boolean> {
     const res = await kernel.deleteTarget({
-      id: this.metadata.id,
+      id: this.id,
       page: PageAll,
     });
     if (res.success) {

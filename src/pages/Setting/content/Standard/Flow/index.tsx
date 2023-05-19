@@ -8,10 +8,9 @@ import { FlowColumn } from '@/pages/Setting/config/columns';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import WorkDefineModal from '@/bizcomponents/GlobalComps/createFlow';
 import Design from './Design';
-import { IWorkItem } from '@/ts/core/thing/app/work/workitem';
 import { orgAuth } from '@/ts/core/public/consts';
 import PageCard from '@/components/PageCard';
-import { IFlowDefine } from '@/ts/core';
+import { IFlowDefine, IWorkItem } from '@/ts/core';
 
 interface IProps {
   current: IWorkItem;
@@ -35,6 +34,7 @@ const FlowList: React.FC<IProps> = ({ current }: IProps) => {
     },
   ];
   const renderOperation = (record: IFlowDefine): any[] => {
+    if (record.workItem.isInherited) return [];
     let operations: any[] = [
       {
         key: 'editor',
@@ -103,12 +103,7 @@ const FlowList: React.FC<IProps> = ({ current }: IProps) => {
           case 'design':
             if (define) {
               return (
-                <Design
-                  IsEdit={true}
-                  current={define}
-                  species={current}
-                  onBack={() => setModalType('')}
-                />
+                <Design IsEdit={true} current={define} onBack={() => setModalType('')} />
               );
             }
             return <></>;
@@ -132,13 +127,13 @@ const FlowList: React.FC<IProps> = ({ current }: IProps) => {
                       parentRef={parentRef}
                       dataSource={current.defines}
                       operation={renderOperation}
-                      rowKey={(record: IFlowDefine) => record.metadata.id}
+                      rowKey={(record: IFlowDefine) => record.id}
                       renderCardContent={(items) => {
                         return items.map((item) => (
                           <FlowCard
                             className="card"
                             data={item}
-                            key={item.metadata.id}
+                            key={item.id}
                             operation={renderOperation}
                           />
                         ));

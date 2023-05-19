@@ -1,13 +1,14 @@
 import { model, parseAvatar } from '@/ts/base';
 import { FileItemShare } from '@/ts/base/model';
 import { MessageType } from '@/ts/core';
-import { CaretUpOutlined, DownloadOutlined } from '@ant-design/icons';
-import { Button, Image } from 'antd';
+import { CaretUpOutlined } from '@ant-design/icons';
+import { Image } from 'antd';
 import React from 'react';
 import style from './text.module.less';
 import css from './index.module.less';
 import { IconFont } from '@/components/IconFont';
 import { FileTypes } from '@/ts/core/public/consts';
+
 /** 处理返回的文字*/
 export const filetrText = (val: model.MsgSaveModel) => {
   //后端返回的值
@@ -22,9 +23,9 @@ export const filetrText = (val: model.MsgSaveModel) => {
     return citeText;
   } else {
     const userText = val?.showTxt?.substring(spanText, val?.showTxt?.length);
-    const typeofText = userText.indexOf('$CITEMESSAGE');
+    const typeofText = userText?.indexOf('$CITEMESSAGE');
     if (typeofText !== -1) {
-      const textGroup = userText.substring(0, typeofText);
+      const textGroup = userText?.substring(0, typeofText);
       return textGroup;
     } else {
       return userText;
