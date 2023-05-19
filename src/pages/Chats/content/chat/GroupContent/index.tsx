@@ -289,13 +289,20 @@ const GroupContent = (props: Iprops) => {
     )?.length;
 
     // 未读人数
-    let NotReadPerson = props.chat.members
+    let NotReadPerson: any = props.chat.members
       .filter((item) => !msgTags.some((ia) => item.id === ia.userId))
       .filter((itez) => itez.id !== orgCtrl.user.userId);
+    NotReadPerson = [...new Set(NotReadPerson.map((item: any) => item.id))].map((id) => {
+      return NotReadPerson.find((item: any) => item.id === id);
+    });
 
     // 已读人数
-    let readPerson = msgTags.filter((i) => i.userId !== orgCtrl.user.userId);
-
+    let readPerson: any = msgTags.filter((i) => i.userId !== orgCtrl.user.userId);
+    readPerson = [...new Set(readPerson.map((item: any) => item.userId))].map(
+      (userId) => {
+        return readPerson.find((item: any) => item.userId === userId);
+      },
+    );
     // 同事之间通信
     if (allMember === -1 || allMember === 0) {
       showText = hasReadNum > 0 ? '已读' : '未读';
@@ -312,7 +319,7 @@ const GroupContent = (props: Iprops) => {
           <div className="read_readed_title">
             <span className="read_num">{NotReadPerson.length}</span>&nbsp;人未读
           </div>
-          {NotReadPerson.map((j, index) => {
+          {NotReadPerson.map((j: any, index: number) => {
             return (
               <div key={msgKey + index} className="read_readed_item">
                 <TeamIcon
@@ -333,7 +340,7 @@ const GroupContent = (props: Iprops) => {
           <div className="read_ing_title">
             <span className="read_num">{readPerson.length}</span>&nbsp;人已读
           </div>
-          {readPerson.map((j, index) => {
+          {readPerson.map((j: any, index: number) => {
             return (
               <div key={msgKey + index} className="read_reading_item">
                 <TeamIcon
@@ -355,11 +362,19 @@ const GroupContent = (props: Iprops) => {
     );
     return (
       <>
-        <ChatReadPopover content={description}>
+        {/* 个人 / 同事 */}
+        {allMember === -1 || allMember === 0 ? (
           <span style={{ margin: '4px 10px 0 0', fontSize: '10px', color: '#154ad8' }}>
             {showText}
           </span>
-        </ChatReadPopover>
+        ) : (
+          <ChatReadPopover content={description}>
+            {/* 群组 / 部门 */}
+            <span style={{ margin: '4px 10px 0 0', fontSize: '10px', color: '#154ad8' }}>
+              {showText}
+            </span>
+          </ChatReadPopover>
+        )}
       </>
     );
   };

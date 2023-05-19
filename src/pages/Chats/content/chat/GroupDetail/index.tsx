@@ -1,4 +1,4 @@
-import { Col, Modal, Row, Typography } from 'antd';
+import { Button, Col, Modal, Row, Typography } from 'antd';
 import React, { useState } from 'react';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 import detailStyle from './index.module.less';
@@ -98,12 +98,12 @@ const Groupdetail: React.FC<any> = ({
       </Col>
       <Col>
         <h4 className={detailStyle.title}>
-          {/* {chat.target.name}
-          {chat.target.typeName !== '人员' ? (
-            <span className={detailStyle.number}>({chat.personCount})</span>
+          {chat.chatdata.chatName}
+          {chat.members.length > 0 ? (
+            <span className={detailStyle.number}>({chat.members.length})</span>
           ) : (
             ''
-          )} */}
+          )}
         </h4>
       </Col>
     </Row>
@@ -163,13 +163,15 @@ const Groupdetail: React.FC<any> = ({
           <div className={`${detailStyle.img_list} ${detailStyle.con}`}>
             {grouppeoples}
           </div>
-          <div
-            className={`${detailStyle.find_history}`}
-            onClick={() => {
-              setHistoryOpen(true);
-            }}>
-            查找聊天记录
-            <AiOutlineRight />
+          <div className={`${detailStyle.find_history}`}>
+            <Button
+              className={`${detailStyle.find_history_button}`}
+              type="ghost"
+              onClick={() => {
+                setHistoryOpen(true);
+              }}>
+              查找聊天记录 <AiOutlineRight />
+            </Button>
           </div>
         </div>
       </div>
