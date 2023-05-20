@@ -71,7 +71,7 @@ export class WorkThing extends SpeciesItem implements IWorkThing {
     _current: ITarget,
   ): ISpeciesItem | undefined {
     switch (_metadata.typeName) {
-      case SpeciesType.WorkItem:
+      case SpeciesType.WorkThing:
         return new WorkThing(_metadata, this.app, this);
     }
   }
