@@ -53,6 +53,8 @@ export interface IMessage {
   msgTitle: string;
   /** 消息内容 */
   msgBody: string;
+  /** 源消息 */
+  msgSource: string;
   /** 创建时间 */
   createTime: string;
   /** 允许撤回 */
@@ -73,6 +75,9 @@ export class Message implements IMessage {
   constructor(_metadata: model.MsgSaveModel, _chat: IMsgChat) {
     this._chat = _chat;
     this.user = _chat.space.user;
+    if (_metadata.msgType === 'recall') {
+      _metadata.msgType = MessageType.Recall;
+    }
     this._msgBody = common.StringPako.inflate(_metadata.msgBody);
     this.metadata = _metadata;
     _metadata.tags?.map((tag) => {
@@ -135,15 +140,15 @@ export class Message implements IMessage {
     );
   }
   get allowEdit(): boolean {
-    return this.msgType === MessageType.Recall;
+    return this.isMySend && this.msgType === MessageType.Recall;
   }
   get msgTitle(): string {
-    let header = ``;
+    let header = `${this.createTime} >`;
     if (
       this._chat.metadata.typeName != TargetType.Person &&
       this.metadata.fromId != this.user.id
     ) {
-      header = `${this.from.name}`;
+      header += `${this.from.name}`;
     }
     switch (this.msgType) {
       case MessageType.Text:
@@ -158,8 +163,11 @@ export class Message implements IMessage {
   }
   get msgBody(): string {
     if (this.msgType === MessageType.Recall) {
-      return '撤回了一条消息';
+      return (this.isMySend ? '我' : this.from.name) + '撤回了一条消息';
     }
+    return this._msgBody;
+  }
+  get msgSource(): string {
     return this._msgBody;
   }
   recall(): void {

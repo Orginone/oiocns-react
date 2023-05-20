@@ -212,26 +212,22 @@ const GroupContent = (props: Iprops) => {
                     ''
                   )}
                   {/* 重新编辑 */}
-                  {item.msgType === 'recall' ? (
+                  {item.msgType === MessageType.Recall && (
                     <div className={`${css.group_content_left} ${css.con} ${css.recall}`}>
-                      撤回了一条消息
-                      {item.allowEdit ? (
+                      {item.msgBody}
+                      {item.allowEdit && (
                         <span
                           className={css.reWrite}
                           onClick={() => {
-                            handleReWrites(item.msgBody);
+                            handleReWrites(item.msgSource);
                           }}>
                           重新编辑
                         </span>
-                      ) : (
-                        ''
                       )}
                     </div>
-                  ) : (
-                    ''
                   )}
                   {/* 左侧聊天内容显示 */}
-                  {!item.isMySend ? (
+                  {!item.isMySend && item.msgType != MessageType.Recall && (
                     <div className={`${css.group_content_left} ${css.con}`}>
                       <Popover
                         trigger="hover"
@@ -258,36 +254,35 @@ const GroupContent = (props: Iprops) => {
                         )}
                       </Popover>
                     </div>
-                  ) : (
-                    <>
-                      {/* 右侧聊天内容显示 */}
-                      <div className={`${css.group_content_right} ${css.con}`}>
-                        <Popover
-                          trigger="hover"
-                          overlayClassName={css.targerBoxClass}
-                          open={selectId == item.id}
-                          key={item.id}
-                          placement="bottom"
-                          onOpenChange={() => {
-                            setSelectId('');
-                          }}
-                          content={msgAction(item)}>
-                          {item.msgType === 'recall' ? (
-                            ''
-                          ) : (
-                            <div
-                              className={css.con_body}
-                              onContextMenu={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                setSelectId(item.id);
-                              }}>
-                              {viewMsg(item)}
-                            </div>
-                          )}
-                        </Popover>
-                      </div>
-                    </>
+                  )}
+                  {/* 右侧聊天内容显示 */}
+                  {item.isMySend && item.msgType != MessageType.Recall && (
+                    <div className={`${css.group_content_right} ${css.con}`}>
+                      <Popover
+                        trigger="hover"
+                        overlayClassName={css.targerBoxClass}
+                        open={selectId == item.id}
+                        key={item.id}
+                        placement="bottom"
+                        onOpenChange={() => {
+                          setSelectId('');
+                        }}
+                        content={msgAction(item)}>
+                        {item.msgType === 'recall' ? (
+                          ''
+                        ) : (
+                          <div
+                            className={css.con_body}
+                            onContextMenu={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              setSelectId(item.id);
+                            }}>
+                            {viewMsg(item)}
+                          </div>
+                        )}
+                      </Popover>
+                    </div>
                   )}
                 </React.Fragment>
               );
