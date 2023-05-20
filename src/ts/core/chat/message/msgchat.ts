@@ -180,9 +180,7 @@ export abstract class MsgChat<T extends schema.XEntity>
       if (cache.lastMessage && cache.lastMessage.id != this.chatdata.lastMessage?.id) {
         this.chatdata.lastMessage = cache.lastMessage;
         const index = this.messages.findIndex((i) => i.id === cache.lastMessage?.id);
-        if (index > -1) {
-          this.messages[index] = new Message(cache.lastMessage, this);
-        } else {
+        if (index < 0) {
           this.messages.push(new Message(cache.lastMessage, this));
           this.messageNotify?.apply(this, [this.messages]);
         }
@@ -296,6 +294,7 @@ export abstract class MsgChat<T extends schema.XEntity>
           })
           ?.receiveTags(tags);
       });
+      this.cache();
       this.messageNotify?.apply(this, [this.messages]);
     }
   }
