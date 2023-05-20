@@ -143,7 +143,7 @@ export class Message implements IMessage {
     return this.isMySend && this.msgType === MessageType.Recall;
   }
   get msgTitle(): string {
-    let header = `${this.createTime} >`;
+    let header = ``;
     if (
       this._chat.metadata.typeName != TargetType.Person &&
       this.metadata.fromId != this.user.id

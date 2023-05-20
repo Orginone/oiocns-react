@@ -32,7 +32,6 @@ const GroupContent = (props: Iprops) => {
   const [beforescrollHeight, setBeforescrollHeight] = useState(0);
 
   useEffect(() => {
-    setMessages([...props.chat.messages]);
     props.chat.onMessage((ms) => {
       setMessages([...ms]);
     });
@@ -77,7 +76,6 @@ const GroupContent = (props: Iprops) => {
         if (img && img.thumbnail) {
           return (
             <>
-              <div className={`${css.con_content_link}`}></div>
               <div className={`${css.con_content_txt} ${css.con_content_img}`}>
                 <Image src={img.thumbnail} preview={{ src: img.shareLink }} />
               </div>
@@ -86,25 +84,11 @@ const GroupContent = (props: Iprops) => {
         }
         return <div className={`${css.con_content_txt}`}>消息异常</div>;
       }
-      case MessageType.File: {
-        const file: FileItemShare = parseAvatar(item.msgBody);
-        if (file && file.thumbnail) {
-          return (
-            <>
-              <div className={`${css.con_content_link}`}></div>
-              <div className={`${css.con_content_txt} ${css.con_content_img}`}>
-                <Image src={file.thumbnail} preview={{ src: file.shareLink }} />
-                {file.name}
-              </div>
-            </>
-          );
-        }
-        return <div className={`${css.con_content_txt}`}>消息异常</div>;
-      }
+      case MessageType.File:
+        return <div className={`${css.con_content_txt}`}>{item.msgTitle}</div>;
       default:
         return (
           <>
-            <div className={`${css.con_content_link}`}></div>
             <div
               className={`${css.con_content_txt}`}
               dangerouslySetInnerHTML={{ __html: item.msgBody }}></div>
@@ -140,7 +124,7 @@ const GroupContent = (props: Iprops) => {
               </>
             )}
           </div>
-          <div style={{ color: '#888', paddingLeft: 10 }}>
+          <div style={{ color: '#888' }}>
             <TeamIcon share={item.from} preview size={36} fontSize={32} />
           </div>
         </>
@@ -160,30 +144,61 @@ const GroupContent = (props: Iprops) => {
     }
   };
 
+  const loadMsgItem = (item: IMessage) => {
+    return (
+      <Popover
+        trigger="hover"
+        open={selectId == item.id}
+        key={item.id}
+        placement="bottomRight"
+        onOpenChange={() => {
+          setSelectId('');
+        }}
+        content={msgAction(item)}>
+        <div
+          className={css.con_body}
+          onContextMenu={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setSelectId(item.id);
+          }}>
+          {viewMsg(item)}
+        </div>
+      </Popover>
+    );
+  };
+
   const msgAction = (item: IMessage) => {
+    const onClose = () => {
+      setSelectId('');
+    };
     return (
       <>
         <CopyToClipboard text={item.msgBody}>
-          <Button type="text" style={{ color: '#3e5ed8' }}>
+          <Button type="text" style={{ color: '#3e5ed8' }} onClick={onClose}>
             复制
           </Button>
         </CopyToClipboard>
         <Button type="text" style={{ color: '#3e5ed8' }}>
           转发
         </Button>
-        <Button
-          type="text"
-          style={{ color: '#3e5ed8' }}
-          onClick={async () => {
-            await props.chat.recallMessage(item.id);
-          }}>
-          撤回
-        </Button>
+        {item.isMySend && (
+          <Button
+            type="text"
+            style={{ color: '#3e5ed8' }}
+            onClick={async () => {
+              await props.chat.recallMessage(item.id);
+              onClose();
+            }}>
+            撤回
+          </Button>
+        )}
         <Button
           type="text"
           danger
           onClick={async () => {
             await props.chat.deleteMessage(item.id);
+            onClose();
           }}>
           删除
         </Button>
@@ -229,59 +244,13 @@ const GroupContent = (props: Iprops) => {
                   {/* 左侧聊天内容显示 */}
                   {!item.isMySend && item.msgType != MessageType.Recall && (
                     <div className={`${css.group_content_left} ${css.con}`}>
-                      <Popover
-                        trigger="hover"
-                        overlayClassName={css.targerBoxClass}
-                        open={selectId == item.id}
-                        key={item.id}
-                        placement="bottom"
-                        onOpenChange={() => {
-                          setSelectId('');
-                        }}
-                        content={msgAction(item)}>
-                        {item.msgType === 'recall' ? (
-                          ''
-                        ) : (
-                          <div
-                            className={css.con_body}
-                            onContextMenu={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              setSelectId(item.id);
-                            }}>
-                            {viewMsg(item)}
-                          </div>
-                        )}
-                      </Popover>
+                      {loadMsgItem(item)}
                     </div>
                   )}
                   {/* 右侧聊天内容显示 */}
                   {item.isMySend && item.msgType != MessageType.Recall && (
                     <div className={`${css.group_content_right} ${css.con}`}>
-                      <Popover
-                        trigger="hover"
-                        overlayClassName={css.targerBoxClass}
-                        open={selectId == item.id}
-                        key={item.id}
-                        placement="bottom"
-                        onOpenChange={() => {
-                          setSelectId('');
-                        }}
-                        content={msgAction(item)}>
-                        {item.msgType === 'recall' ? (
-                          ''
-                        ) : (
-                          <div
-                            className={css.con_body}
-                            onContextMenu={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              setSelectId(item.id);
-                            }}>
-                            {viewMsg(item)}
-                          </div>
-                        )}
-                      </Popover>
+                      {loadMsgItem(item)}
                     </div>
                   )}
                 </React.Fragment>

@@ -118,22 +118,21 @@ const Book: React.FC<any> = ({
           dataSource={chats}
           renderItem={(item: IMsgChat) => {
             return (
-              <List.Item style={{ cursor: 'pointer' }} actions={loadChatOperation(item)}>
+              <List.Item
+                style={{ cursor: 'pointer' }}
+                actions={loadChatOperation(item)}
+                onDoubleClick={() => {
+                  orgCtrl.currentKey = item.chatdata.fullId;
+                  orgCtrl.changCallback();
+                }}>
                 <List.Item.Meta
                   avatar={
-                    <Badge
-                      count={item.chatdata.noReadCount}
-                      overflowCount={99}
-                      size="small">
+                    <Badge count={item.chatdata.noReadCount} size="small">
                       <TeamIcon share={item.share} size={40} fontSize={40} />
                     </Badge>
                   }
                   title={
-                    <div
-                      onClick={() => {
-                        orgCtrl.currentKey = item.chatdata.fullId;
-                        orgCtrl.changCallback();
-                      }}>
+                    <div>
                       <span style={{ marginRight: 10 }}>{item.chatdata.chatName}</span>
                       {item.chatdata.labels
                         .filter((i) => i.length > 0)

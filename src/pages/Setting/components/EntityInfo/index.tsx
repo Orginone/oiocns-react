@@ -68,23 +68,25 @@ const Description: React.FC<IProps> = ({ entity, other, extra }: IProps) => {
           </>
         )}
       </Descriptions>
-      <Descriptions
-        bordered
-        colon
-        column={3}
-        labelStyle={{
-          textAlign: 'left',
-          color: '#606266',
-          width: 120,
-        }}
-        contentStyle={{ textAlign: 'left', color: '#606266' }}>
-        <Descriptions.Item label="描述信息" span={3}>
-          <Typography.Paragraph
-            ellipsis={ellipsis ? { rows: 2, expandable: true, symbol: '更多' } : false}>
-            {entity.remark}
-          </Typography.Paragraph>
-        </Descriptions.Item>
-      </Descriptions>
+      {entity.remark && entity.remark.length > 0 && (
+        <Descriptions
+          bordered
+          colon
+          column={3}
+          labelStyle={{
+            textAlign: 'left',
+            color: '#606266',
+            width: 120,
+          }}
+          contentStyle={{ textAlign: 'left', color: '#606266' }}>
+          <Descriptions.Item label="描述信息" span={3}>
+            <Typography.Paragraph
+              ellipsis={ellipsis ? { rows: 2, expandable: true, symbol: '更多' } : false}>
+              {entity.remark}
+            </Typography.Paragraph>
+          </Descriptions.Item>
+        </Descriptions>
+      )}
     </Card>
   );
 };
