@@ -1,6 +1,8 @@
 import { model, common, schema, kernel, List } from '../../../base';
 import { IBelong } from '../../target/base/belong';
+import { IMessage, Message } from './message';
 import { IEntity, Entity, MessageType, TargetType, storeCollName } from '../../public';
+import { XTarget } from '@/ts/base/schema';
 // 空时间
 const nullTime = new Date('2022-07-01').getTime();
 // 消息变更推送
@@ -42,17 +44,19 @@ interface IChat {
   /** 共享信息 */
   share: model.ShareIcon;
   /** 会话的历史消息 */
-  messages: model.MsgSaveModel[];
+  messages: IMessage[];
   /** 会话的成员 */
   members: schema.XTarget[];
   /** 会话的成员的会话 */
   memberChats: PersonMsgChat[];
   /** 是否为我的会话 */
   isMyChat: boolean;
+  /** 是否归属人员用户 */
+  isBelongPerson: boolean;
   /** 禁用通知 */
   unMessage(): void;
   /** 消息变更通知 */
-  onMessage(callback: (messages: model.MsgSaveModel[]) => void): void;
+  onMessage(callback: (messages: IMessage[]) => void): void;
   /** 缓存会话 */
   cache(): void;
   /** 加载缓存 */
@@ -73,6 +77,8 @@ interface IChat {
   clearMessage(): Promise<boolean>;
   /** 会话接收到消息 */
   receiveMessage(msg: model.MsgSaveModel): void;
+  /** 会话接收标签 */
+  receiveTags(ids: string[], tags: string[]): void;
 }
 
 // 消息类会话接口
@@ -84,11 +90,16 @@ export abstract class MsgChat<T extends schema.XEntity>
   extends Entity<T>
   implements IMsgChatT<T>
 {
-  constructor(_metadata: T, _belongId: string, _labels: string[], _space?: IBelong) {
+  constructor(
+    _metadata: T,
+    _labels: string[],
+    _space?: IBelong,
+    _belong?: schema.XTarget,
+  ) {
     super(_metadata);
     this.chatId = _metadata.id;
     this.space = _space || (this as unknown as IBelong);
-    this.belongId = _belongId;
+    this._belong = _belong || this.space.metadata;
     this.chatdata = {
       noReadCount: 0,
       isToping: false,
@@ -96,21 +107,27 @@ export abstract class MsgChat<T extends schema.XEntity>
       chatRemark: _metadata.remark,
       chatName: _metadata.name,
       lastMsgTime: nullTime,
-      fullId: `${_belongId}-${_metadata.id}`,
+      fullId: `${this._belong.id}-${_metadata.id}`,
     };
     this.labels = new List(_labels);
   }
   space: IBelong;
   chatId: string;
-  belongId: string;
   labels: List<string>;
-  messages: model.MsgSaveModel[] = [];
+  messages: IMessage[] = [];
   members: schema.XTarget[] = [];
   chatdata: MsgChatData;
+  _belong: schema.XTarget;
   memberChats: PersonMsgChat[] = [];
-  private messageNotify?: (messages: model.MsgSaveModel[]) => void;
+  private messageNotify?: (messages: IMessage[]) => void;
   get userId(): string {
     return this.space.user.id;
+  }
+  get belongId(): string {
+    return this._belong.id;
+  }
+  get isBelongPerson(): boolean {
+    return this._belong.typeName === TargetType.Person;
   }
   get isMyChat(): boolean {
     if (this.chatdata.noReadCount > 0 || this.share.typeName === TargetType.Person) {
@@ -121,17 +138,20 @@ export abstract class MsgChat<T extends schema.XEntity>
   unMessage(): void {
     this.messageNotify = undefined;
   }
-  onMessage(callback: (messages: model.MsgSaveModel[]) => void): void {
+  onMessage(callback: (messages: IMessage[]) => void): void {
     this.messageNotify = callback;
-    if (this.chatdata.noReadCount > 0) {
-      this.chatdata.noReadCount = 0;
-      msgChatNotify.changCallback();
-      this.cache();
-    }
-    if (this.messages.length < 10) {
-      this.moreMessage();
-    }
-    this.loadMembers();
+    this.moreMessage().then(async () => {
+      await this.loadMembers();
+      if (this.chatdata.noReadCount > 0) {
+        const ids = this.messages.filter((i) => !i.isReaded).map((i) => i.id);
+        if (ids.length > 0) {
+          this.tagMessage(ids, ['已读']);
+        }
+        this.chatdata.noReadCount = 0;
+        msgChatNotify.changCallback();
+        this.cache();
+      }
+    });
   }
   cache(): void {
     this.chatdata.labels = this.labels.ToArray();
@@ -161,9 +181,9 @@ export abstract class MsgChat<T extends schema.XEntity>
         this.chatdata.lastMessage = cache.lastMessage;
         const index = this.messages.findIndex((i) => i.id === cache.lastMessage?.id);
         if (index > -1) {
-          this.messages[index] = cache.lastMessage;
+          this.messages[index] = new Message(cache.lastMessage, this);
         } else {
-          this.messages.push(cache.lastMessage);
+          this.messages.push(new Message(cache.lastMessage, this));
           this.messageNotify?.apply(this, [this.messages]);
         }
       }
@@ -200,7 +220,7 @@ export abstract class MsgChat<T extends schema.XEntity>
   async recallMessage(id: string): Promise<void> {
     for (const item of this.messages) {
       if (item.id === id) {
-        await kernel.recallImMsg(item);
+        await kernel.recallImMsg(item.metadata);
       }
     }
   }
@@ -246,33 +266,42 @@ export abstract class MsgChat<T extends schema.XEntity>
     return false;
   }
   receiveMessage(msg: model.MsgSaveModel): void {
-    if (msg.msgType === 'recall') {
-      msg.showTxt = '撤回一条消息';
-      msg.allowEdit = true;
-      msg.msgBody = common.StringPako.inflate(msg.msgBody);
-      const index = this.messages.findIndex((m) => {
-        return m.id === msg.id;
-      });
-      if (index > -1) {
-        this.messages[index] = msg;
-      }
+    const imsg = new Message(msg, this);
+    if (imsg.msgType === 'recall') {
+      this.messages
+        .find((m) => {
+          return m.id === msg.id;
+        })
+        ?.recall();
     } else {
-      msg.showTxt = common.StringPako.inflate(msg.msgBody);
-      this.messages.push(msg);
+      this.messages.push(imsg);
     }
     if (!this.messageNotify) {
       this.chatdata.noReadCount += 1;
       msgChatNotify.changCallback();
+    } else if (!imsg.isMySend) {
+      this.tagMessage([imsg.id], ['已读']);
     }
     this.chatdata.lastMsgTime = new Date().getTime();
     this.chatdata.lastMessage = msg;
     this.cache();
     this.messageNotify?.apply(this, [this.messages]);
   }
+  receiveTags(ids: string[], tags: string[]): void {
+    if (ids && tags && ids.length > 0 && tags.length > 0) {
+      ids.forEach((id) => {
+        this.messages
+          .find((m) => {
+            return m.id === id;
+          })
+          ?.receiveTags(tags);
+      });
+      this.messageNotify?.apply(this, [this.messages]);
+    }
+  }
   private loadMessages(msgs: model.MsgSaveModel[]): void {
-    msgs.forEach((item: any) => {
-      item.showTxt = common.StringPako.inflate(item.msgBody);
-      this.messages.unshift(item);
+    msgs.forEach((msg) => {
+      this.messages.unshift(new Message(msg, this));
     });
     if (this.chatdata.lastMsgTime === nullTime && msgs.length > 0) {
       this.chatdata.lastMsgTime = new Date(msgs[0].createTime).getTime();
@@ -287,11 +316,11 @@ export class PersonMsgChat
 {
   constructor(
     _metadata: schema.XTarget,
-    _belongId: string,
     _labels: string[],
     _space?: IBelong,
+    _belong?: XTarget,
   ) {
-    super(_metadata, _belongId, _labels, _space);
+    super(_metadata, _labels, _space, _belong);
   }
   async loadMembers(_reload: boolean = false): Promise<schema.XTarget[]> {
     return [];

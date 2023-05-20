@@ -5,7 +5,7 @@ import { IAuthority, Authority } from '../authority/authority';
 import { Cohort, ICohort } from '../outTeam/cohort';
 import { IPerson } from '../person';
 import { ITarget, Target } from './target';
-import { IChatMessage, ChatMessage } from '../../chat/message/message';
+import { IChatMessage, ChatMessage } from '../../chat/message/chatmsg';
 import { IMsgChat, PersonMsgChat } from '../../chat/message/msgchat';
 import { IDict } from '../../thing/dict/dict';
 import { IDictClass } from '../../thing/dict/dictclass';
@@ -113,7 +113,7 @@ export abstract class Belong extends Target implements IBelong {
     if (_isAdd) {
       const labels = this.id === this.user.id ? ['好友'] : [this.name, '同事'];
       _newMembers.forEach((i) => {
-        this.memberChats.push(new PersonMsgChat(i, this.id, labels, this));
+        this.memberChats.push(new PersonMsgChat(i, labels, this));
       });
     } else {
       this.memberChats = this.memberChats.filter((i) =>

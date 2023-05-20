@@ -1,15 +1,15 @@
 /* eslint-disable no-unused-vars */
-import { Button, Popover, Image, Spin } from 'antd';
+import { Button, Popover, Image, Spin, Badge } from 'antd';
 import moment from 'moment';
 import React, { useEffect, useRef, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
+import Information from './information';
 import css from './index.module.less';
 import { showChatTime } from '@/utils/tools';
 import { FileItemShare } from '@/ts/base/model';
-import orgCtrl from '@/ts/controller';
-import { IMsgChat, MessageType } from '@/ts/core';
-import { model, parseAvatar } from '@/ts/base';
+import { IMessage, IMsgChat, MessageType } from '@/ts/core';
+import { parseAvatar } from '@/ts/base';
 
 /**
  * @description: 聊天区域
@@ -24,6 +24,7 @@ interface Iprops {
 
 const GroupContent = (props: Iprops) => {
   const [loading, setLoading] = useState(false);
+  const [infoMsg, setInfoMsg] = useState<IMessage>();
   const [messages, setMessages] = useState(props.chat.messages);
   const { handleReWrites } = props;
   const [selectId, setSelectId] = useState<string>('');
@@ -69,10 +70,10 @@ const GroupContent = (props: Iprops) => {
    * 显示消息
    * @param msg 消息
    */
-  const parseMsg = (item: model.MsgSaveModel) => {
+  const parseMsg = (item: IMessage) => {
     switch (item.msgType) {
       case MessageType.Image: {
-        const img: FileItemShare = parseAvatar(item.showTxt);
+        const img: FileItemShare = parseAvatar(item.msgBody);
         if (img && img.thumbnail) {
           return (
             <>
@@ -86,7 +87,7 @@ const GroupContent = (props: Iprops) => {
         return <div className={`${css.con_content_txt}`}>消息异常</div>;
       }
       case MessageType.File: {
-        const file: FileItemShare = parseAvatar(item.showTxt);
+        const file: FileItemShare = parseAvatar(item.msgBody);
         if (file && file.thumbnail) {
           return (
             <>
@@ -106,31 +107,46 @@ const GroupContent = (props: Iprops) => {
             <div className={`${css.con_content_link}`}></div>
             <div
               className={`${css.con_content_txt}`}
-              dangerouslySetInnerHTML={{ __html: item.showTxt }}></div>
+              dangerouslySetInnerHTML={{ __html: item.msgBody }}></div>
           </>
         );
     }
   };
 
-  const viewMsg = (item: model.MsgSaveModel, right: boolean = false) => {
-    if (right) {
+  const viewMsg = (item: IMessage) => {
+    if (item.isMySend) {
       return (
         <>
-          <div className={`${css.con_content}`}>{parseMsg(item)}</div>
+          <div className={`${css.con_content}`}>
+            <Badge
+              key={item.id}
+              count={item.comments}
+              size="small"
+              style={{ zIndex: 2 }}
+              offset={[-15, -12]}>
+              {parseMsg(item)}
+            </Badge>
+            <div
+              className={`${css.information} ${
+                item.readedinfo.includes('已读') ? css.readed : ''
+              }`}
+              onClick={() => setInfoMsg(item)}>
+              {item.readedinfo}
+            </div>
+          </div>
           <div style={{ color: '#888', paddingLeft: 10 }}>
-            <TeamIcon share={orgCtrl.user.share} preview size={36} fontSize={32} />
+            <TeamIcon share={item.from} preview size={36} fontSize={32} />
           </div>
         </>
       );
     } else {
-      const share = orgCtrl.user.findShareById(item.fromId);
       return (
         <>
           <div style={{ color: '#888', paddingRight: 10 }}>
-            <TeamIcon preview share={share} size={36} fontSize={32} />
+            <TeamIcon preview share={item.from} size={36} fontSize={32} />
           </div>
           <div className={`${css.con_content}`}>
-            <div className={`${css.name}`}>{share.name}</div>
+            <div className={`${css.name}`}>{item.from.name}</div>
             {parseMsg(item)}
           </div>
         </>
@@ -138,10 +154,10 @@ const GroupContent = (props: Iprops) => {
     }
   };
 
-  const msgAction = (item: model.MsgSaveModel) => {
+  const msgAction = (item: IMessage) => {
     return (
       <>
-        <CopyToClipboard text={item.showTxt}>
+        <CopyToClipboard text={item.msgBody}>
           <Button type="text" style={{ color: '#3e5ed8' }}>
             复制
           </Button>
@@ -174,10 +190,10 @@ const GroupContent = (props: Iprops) => {
       <Spin tip="加载中..." spinning={loading}>
         <div className={css.group_content_wrap}>
           {messages
-            .filter((i) => i.showTxt.includes(props.filter))
+            .filter((i) => i.msgBody.includes(props.filter))
             .map((item, index: any) => {
               return (
-                <React.Fragment key={item.fromId + index}>
+                <React.Fragment key={item.metadata.fromId + index}>
                   {/* 聊天间隔时间3分钟则 显示时间 */}
                   {isShowTime(
                     item.createTime,
@@ -209,7 +225,7 @@ const GroupContent = (props: Iprops) => {
                     ''
                   )}
                   {/* 左侧聊天内容显示 */}
-                  {item.fromId !== orgCtrl.user.id ? (
+                  {!item.isMySend ? (
                     <div className={`${css.group_content_left} ${css.con}`}>
                       <Popover
                         trigger="hover"
@@ -260,7 +276,7 @@ const GroupContent = (props: Iprops) => {
                                 e.stopPropagation();
                                 setSelectId(item.id);
                               }}>
-                              {viewMsg(item, true)}
+                              {viewMsg(item)}
                             </div>
                           )}
                         </Popover>
@@ -271,6 +287,7 @@ const GroupContent = (props: Iprops) => {
               );
             })}
         </div>
+        {infoMsg && <Information msg={infoMsg} onClose={() => setInfoMsg(undefined)} />}
       </Spin>
     </div>
   );

@@ -38,7 +38,7 @@ export abstract class Team extends MsgChat<schema.XTarget> implements ITeam {
     _space?: IBelong,
     _memberTypes: TargetType[] = [TargetType.Person],
   ) {
-    super(_metadata, _metadata.belongId, _labels, _space);
+    super(_metadata, _labels, _space, _metadata.belong);
     this.memberTypes = _memberTypes;
   }
   memberTypes: TargetType[];

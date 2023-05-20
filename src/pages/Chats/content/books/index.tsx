@@ -4,7 +4,7 @@ import orgCtrl from '@/ts/controller';
 import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
 import { AiOutlineWechat } from 'react-icons/ai';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
-import { IMsgChat, MessageType, msgChatNotify } from '@/ts/core';
+import { IMsgChat, msgChatNotify } from '@/ts/core';
 
 /**
  * @description: 通讯录
@@ -37,12 +37,8 @@ const Book: React.FC<any> = ({
       return num;
     });
   const showMessage = (chat: IMsgChat) => {
-    if (chat.chatdata.lastMessage) {
-      let text = '最新消息[' + chat.chatdata.lastMessage.createTime + ']:';
-      if (chat.chatdata.lastMessage.msgType === MessageType.Text) {
-        return text + chat.chatdata.lastMessage.showTxt;
-      }
-      return text + '[' + chat.chatdata.lastMessage.msgType + ']';
+    if (chat.messages.length > 0) {
+      return chat.messages[chat.messages.length - 1].msgTitle;
     }
     return '简介信息:' + chat.chatdata.chatRemark;
   };

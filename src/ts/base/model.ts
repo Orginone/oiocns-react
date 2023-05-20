@@ -276,11 +276,18 @@ export type MsgSaveModel = {
   createTime: string;
   // 消息变更时间
   updateTime: string;
-  // 消息显示文本
-  showTxt: string;
-  // 允许编辑
-  allowEdit: boolean;
+  // 消息标签
+  tags?: MsgTagLabel[];
 };
+
+export type MsgTagLabel = {
+  // 标签名称
+  label: string;
+  // 人员Id
+  userId: string;
+  // 时间
+  time: string;
+}
 
 export type PropertyModel = {
   // 唯一ID

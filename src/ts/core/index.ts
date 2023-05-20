@@ -1,3 +1,4 @@
+export type { IMessage } from './chat/message/message';
 export type { IMsgChat } from './chat/message/msgchat';
 export { msgChatNotify } from './chat/message/msgchat';
 export type { IEntity } from './public';

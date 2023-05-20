@@ -134,7 +134,6 @@
 
   .group_content_right {
     justify-content: flex-end;
-    cursor: pointer;
     .con_content {
       margin-top: 10px;
       max-width: 100%;
@@ -151,6 +150,16 @@
         background-color: #b4ccf9;
         margin-right: 10px;
         max-width: 100%;
+      }
+      .information {
+        padding-right: 10px;
+        cursor: pointer;
+        color: #3e5ed8;
+        transform: scale(0.8);
+        font-weight: 700;
+      }
+      .readed {
+        color: #888;
       }
     }
   }
@@ -172,5 +181,16 @@
         // background-color: var(--el-bg-color-page);
       }
     }
+  }
+}
+.moreInfo {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex-wrap: nowrap;
+  align-items: flex-start;
+
+  li {
+    padding: 10px 2px;
   }
 }

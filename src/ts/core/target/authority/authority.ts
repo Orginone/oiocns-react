@@ -39,7 +39,6 @@ export class Authority extends MsgChat<schema.XAuthority> implements IAuthority 
         ..._metadata,
         typeName: '权限',
       },
-      _space.id,
       [_space.name ?? '', '权限群'],
       _space,
     );
