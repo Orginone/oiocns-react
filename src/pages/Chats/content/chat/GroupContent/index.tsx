@@ -118,21 +118,27 @@ const GroupContent = (props: Iprops) => {
       return (
         <>
           <div className={`${css.con_content}`}>
-            <Badge
-              key={item.id}
-              count={item.comments}
-              size="small"
-              style={{ zIndex: 2 }}
-              offset={[-15, -12]}>
-              {parseMsg(item)}
-            </Badge>
-            <div
-              className={`${css.information} ${
-                item.readedinfo.includes('已读') ? css.readed : ''
-              }`}
-              onClick={() => setInfoMsg(item)}>
-              {item.readedinfo}
-            </div>
+            {props.chat.isBelongPerson ? (
+              parseMsg(item)
+            ) : (
+              <>
+                <Badge
+                  key={item.id}
+                  count={item.comments}
+                  size="small"
+                  style={{ zIndex: 2 }}
+                  offset={[-15, -12]}>
+                  {parseMsg(item)}
+                </Badge>
+                <div
+                  className={`${css.information} ${
+                    item.readedinfo.includes('已读') ? css.readed : ''
+                  }`}
+                  onClick={() => setInfoMsg(item)}>
+                  {item.readedinfo}
+                </div>
+              </>
+            )}
           </div>
           <div style={{ color: '#888', paddingLeft: 10 }}>
             <TeamIcon share={item.from} preview size={36} fontSize={32} />
