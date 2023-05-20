@@ -38,10 +38,10 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
     }
   }, [open]);
   // 左侧角色数据
-  const getDataList = async () => {
+  const getDataList = async (reflash: boolean = true) => {
     const data = await current.loadIdentitys();
     setIndentitys(data);
-    if (!indentity && data.length > 0) {
+    if (reflash && data.length > 0) {
       await setTreeCurrent(data[0]);
     }
   };
@@ -100,9 +100,12 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
               onOk: async () => {
                 const success = await indentity?.delete();
                 if (success) {
+                  current.identitys = current.identitys.filter(
+                    (a) => a.id != indentity?.id,
+                  );
                   message.success('删除成功');
-                  getDataList();
                   setIndentity(undefined);
+                  getDataList();
                 } else {
                   message.error('删除失败');
                 }
@@ -208,7 +211,7 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
               handleCancel={() => setIsOpenModal(false)}
               open={isOpenModal}
               handleOk={() => {
-                getDataList();
+                getDataList(false);
                 setIsOpenModal(false);
               }}
               editData={indentity!}
@@ -227,7 +230,16 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
                 }
                 forceUpdate();
               }}>
-              <AssignPosts members={current.members} searchFn={setPerson} />
+              <AssignPosts
+                members={
+                  indentity
+                    ? current.members.filter((a) =>
+                        indentity.members.every((s) => s.id != a.id),
+                      )
+                    : current.members
+                }
+                searchFn={setPerson}
+              />
             </Modal>
           </div>
         </Content>

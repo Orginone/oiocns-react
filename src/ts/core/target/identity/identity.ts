@@ -89,7 +89,7 @@ export class Identity extends Entity<schema.XIdentity> implements IIdentity {
     return res.success;
   }
   async delete(): Promise<boolean> {
-    const res = await kernel.deleteAuthority({
+    const res = await kernel.deleteIdentity({
       id: this.id,
       page: PageAll,
     });
