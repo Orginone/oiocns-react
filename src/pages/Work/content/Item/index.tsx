@@ -56,11 +56,11 @@ const WorkItem: React.FC<any> = ({ current, filter }: IProps) => {
                         {item.metadata.code}
                       </Tag>
                       <Tag key={item.metadata.belongId} color="success">
-                        {orgCtrl.user.findShareById(item.metadata.belongId).name}
+                        {item.belong.name}
                       </Tag>{' '}
                       {item.metadata.belongId != item.metadata.shareId && (
                         <Tag key={item.metadata.shareId} color="success">
-                          {orgCtrl.user.findShareById(item.metadata.shareId).name}
+                          {item.share.name}
                         </Tag>
                       )}
                     </div>

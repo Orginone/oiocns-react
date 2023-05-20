@@ -77,7 +77,6 @@ const ShareRecent = (props: Iprops) => {
     const item = getIdentityItem(info.node.key);
     if (current && item) {
       if (info.checked) {
-        item.data.name = info.node.title;
         current.identitys.push(item.data);
       } else {
         current.identitys = current.identitys.filter((i: any) => {
