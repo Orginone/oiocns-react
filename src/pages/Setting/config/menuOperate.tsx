@@ -202,6 +202,9 @@ const loadSpeciesMenus = (species: ISpeciesItem) => {
     case SpeciesType.Dict:
       items.push(...loadDictMenus());
       break;
+    case SpeciesType.WorkThing:
+      items.push(...loadFormMenus());
+      break;
   }
   if (species.speciesTypes.length > 0) {
     items.push({
