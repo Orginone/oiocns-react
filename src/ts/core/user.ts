@@ -104,13 +104,15 @@ export class UserProvider {
   async _updateTarget(recvData: string) {
     const data: model.TargetOperateModel = JSON.parse(recvData);
     if (!this.user || !data) return;
+    let allTarget = this.user.targets;
+    this.user.companys.forEach((a) => {
+      allTarget.push(...a.cohorts);
+    });
     let message = '';
     switch (data.operate) {
       case OperateType.Delete:
         message = `${data.operater?.name}将${data.target.name}删除.`;
-        this.user.targets
-          .filter((i) => i.id === data.target.id)
-          .forEach((i) => i.delete(true));
+        allTarget.filter((i) => i.id === data.target.id).forEach((i) => i.delete(true));
         break;
       case OperateType.Update:
         message = `${data.operater?.name}将${data.target.name}信息更新.`;
@@ -132,7 +134,7 @@ export class UserProvider {
           }
           if (!operated) {
             message = `${data.operater?.name}把${data.subTarget.name}从${data.target.name}移除.`;
-            this.user.targets
+            allTarget
               .filter(
                 (i) => i.id === data.target.id || data.target.id === data.subTarget!.id,
               )
@@ -153,7 +155,7 @@ export class UserProvider {
             }
           }
           if (!operated) {
-            for (const item of this.user.targets) {
+            for (const item of allTarget) {
               if (item.id === data.target.id) {
                 await item.teamChangedNotity(data.subTarget);
               }

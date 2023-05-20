@@ -10,6 +10,7 @@ import AssignPosts from './components/AssignPosts';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import cls from './index.module.less';
 import { IIdentity, ITarget } from '@/ts/core';
+import TeamIcon from '../GlobalComps/entityIcon';
 
 const { Sider, Content } = Layout;
 type IndentityManageType = {
@@ -115,28 +116,33 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
 
   // 角色信息内容
   const content = (
-    <div className={cls['company-dept-content']}>
-      <Descriptions
-        title="角色信息"
-        bordered
-        column={2}
-        size="small"
-        labelStyle={{ textAlign: 'center' }}
-        contentStyle={{ textAlign: 'center' }}
-        extra={buttons}>
-        <Descriptions.Item label="名称">{indentity?.name}</Descriptions.Item>
-        <Descriptions.Item label="编码">{indentity?.code}</Descriptions.Item>
-        <Descriptions.Item label="创建人">
-          {indentity?.metadata.createUser}
-        </Descriptions.Item>
-        <Descriptions.Item label="创建时间">
-          {indentity?.metadata.createTime}
-        </Descriptions.Item>
-        <Descriptions.Item label="描述" span={2}>
-          {indentity?.remark}
-        </Descriptions.Item>
-      </Descriptions>
-    </div>
+    <>
+      {indentity && (
+        <div className={cls['company-dept-content']}>
+          <Descriptions
+            title="角色信息"
+            bordered
+            column={2}
+            size="small"
+            labelStyle={{ textAlign: 'center' }}
+            contentStyle={{ textAlign: 'center' }}
+            extra={buttons}>
+            <Descriptions.Item label="名称">{indentity.name}</Descriptions.Item>
+            <Descriptions.Item label="编码">{indentity.code}</Descriptions.Item>
+            <Descriptions.Item label="创建人">
+              <TeamIcon share={indentity.creater} fontSize={22} />
+              <strong>{indentity.creater.name}</strong>
+            </Descriptions.Item>
+            <Descriptions.Item label="创建时间">
+              {indentity.metadata.createTime}
+            </Descriptions.Item>
+            <Descriptions.Item label="描述" span={2}>
+              {indentity.remark}
+            </Descriptions.Item>
+          </Descriptions>
+        </div>
+      )}
+    </>
   );
   // 按钮
   const renderBtns = current.hasRelationAuth() ? (

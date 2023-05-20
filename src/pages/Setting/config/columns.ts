@@ -1,5 +1,5 @@
 import { schema } from '@/ts/base';
-import { ISpeciesItem } from '@/ts/core';
+import { IIdentity, ISpeciesItem } from '@/ts/core';
 import { ProColumns } from '@ant-design/pro-table';
 import orgCtrl from '@/ts/controller';
 import { IWorkDefine } from '@/ts/core/thing/base/work';
@@ -55,7 +55,7 @@ export const CompanyColumn: ProColumns<schema.XTarget>[] = [
   {
     title: '单位简介',
     ellipsis: true,
-    dataIndex: ['team', 'remark'],
+    dataIndex: 'remark',
   },
 ];
 
@@ -98,7 +98,7 @@ export const CohortColumn: ProColumns<schema.XTarget>[] = [
   },
 ];
 
-export const IdentityColumn: ProColumns<schema.XIdentity>[] = [
+export const IdentityColumn: ProColumns<IIdentity>[] = [
   {
     title: '序号',
     valueType: 'index',
@@ -122,7 +122,10 @@ export const IdentityColumn: ProColumns<schema.XIdentity>[] = [
   },
   {
     title: '组织',
-    dataIndex: 'belongId',
+    dataIndex: ['metadata', 'shareId'],
+    render: (_, record) => {
+      return orgCtrl.user.findShareById(record.metadata.shareId).name;
+    },
   },
   {
     title: '备注',

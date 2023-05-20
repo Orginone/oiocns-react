@@ -4,7 +4,6 @@ import SpeciesForm from '@/bizcomponents/FormDesign';
 import cls from '../index.module.less';
 import PageCard from '@/components/PageCard';
 import Attribute from './Attritube';
-import orgCtrl from '@/ts/controller';
 import { IForm } from '@/ts/core';
 import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
 
@@ -14,9 +13,9 @@ interface IProps {
 const WorkForm: React.FC<IProps> = ({ current }: IProps) => {
   const [modalType, setModalType] = useState<string>('');
   const [activeTab, setActiveTab] = useState<string>('attr');
-  const share = orgCtrl.provider.user!.findShareById(current.metadata.shareId);
-  const belong = orgCtrl.provider.user!.findShareById(current.metadata.belongId);
-  const create = orgCtrl.provider.user!.findShareById(current.metadata.createUser);
+  const share = current.share;
+  const belong = current.belong;
+  const create = current.creater;
 
   const items = [
     {

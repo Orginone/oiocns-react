@@ -51,8 +51,6 @@ const PassportRegister: React.FC = () => {
       message.success('注册成功！');
       setPrivateKey(res.data.privateKey);
       setIsModalOpen(true);
-    } else {
-      message.error(res.msg || '注册失败！');
     }
   };
   // 去登录
@@ -102,6 +100,7 @@ const PassportRegister: React.FC = () => {
         maskClosable={false}
         open={isModalOpen}
         onOk={handleOk}
+        onCancel={handleOk}
         footer={[
           <Button key="login" type="primary" onClick={handleOk}>
             已记住？去登录

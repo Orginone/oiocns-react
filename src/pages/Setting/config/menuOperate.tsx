@@ -561,16 +561,6 @@ const loadTypeMenus = (item: ITeam, subTypes: string[], allowDelete: boolean) =>
       });
     }
   }
-  if (!allowDelete && 'species' in item) {
-    menus.push({
-      key: '退出',
-      icon: <im.ImBin />,
-      label: '退出' + item.metadata.typeName,
-      beforeLoad: async () => {
-        return await (item as ITarget).exit();
-      },
-    });
-  }
   return menus;
 };
 
