@@ -138,18 +138,23 @@ export class Message implements IMessage {
     return this.msgType === MessageType.Recall;
   }
   get msgTitle(): string {
+    let header = ``;
+    if (
+      this._chat.metadata.typeName != TargetType.Person &&
+      this.metadata.fromId != this.user.id
+    ) {
+      header = `${this.from.name}`;
+    }
     switch (this.msgType) {
       case MessageType.Text:
       case MessageType.Recall:
-        return `${this.createTime}[消息]:${this.msgBody.substring(0, 50)}`;
+        return `${header}[消息]:${this.msgBody.substring(0, 50)}`;
     }
     const file: model.FileItemShare = parseAvatar(this.msgBody);
     if (file) {
-      return `${this.createTime}[${this.msgType}]:${file.name}(${common.formatSize(
-        file.size,
-      )})`;
+      return `${header}[${this.msgType}]:${file.name}(${common.formatSize(file.size)})`;
     }
-    return `${this.createTime}[${this.msgType}]:解析异常`;
+    return `${header}[${this.msgType}]:解析异常`;
   }
   get msgBody(): string {
     if (this.msgType === MessageType.Recall) {

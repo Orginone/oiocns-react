@@ -43,6 +43,8 @@ interface IChat {
   space: IBelong;
   /** 共享信息 */
   share: model.ShareIcon;
+  /** 会话描述 */
+  information: string;
   /** 会话的历史消息 */
   messages: IMessage[];
   /** 会话的成员 */
@@ -53,6 +55,8 @@ interface IChat {
   isMyChat: boolean;
   /** 是否归属人员用户 */
   isBelongPerson: boolean;
+  /** 是否为我的好友 */
+  isFriend: boolean;
   /** 禁用通知 */
   unMessage(): void;
   /** 消息变更通知 */
@@ -135,6 +139,20 @@ export abstract class MsgChat<T extends schema.XEntity>
     }
     return this.members.filter((i) => i.id === this.userId).length > 0;
   }
+  get information(): string {
+    if (this.chatdata.lastMessage) {
+      return new Message(this.chatdata.lastMessage, this).msgTitle;
+    }
+    return this.remark;
+  }
+  get isFriend(): boolean {
+    if (this.typeName === TargetType.Person && this.id != this.userId) {
+      if (this.space.user.members.every((i) => i.id != this.id)) {
+        return false;
+      }
+    }
+    return true;
+  }
   unMessage(): void {
     this.messageNotify = undefined;
   }
@@ -177,14 +195,7 @@ export abstract class MsgChat<T extends schema.XEntity>
       if (Number.isInteger(cache.lastMsgTime)) {
         this.chatdata.lastMsgTime = cache.lastMsgTime;
       }
-      if (cache.lastMessage && cache.lastMessage.id != this.chatdata.lastMessage?.id) {
-        this.chatdata.lastMessage = cache.lastMessage;
-        const index = this.messages.findIndex((i) => i.id === cache.lastMessage?.id);
-        if (index < 0) {
-          this.messages.push(new Message(cache.lastMessage, this));
-          this.messageNotify?.apply(this, [this.messages]);
-        }
-      }
+      this.chatdata.lastMessage = cache.lastMessage;
     }
   }
   async moreMessage(): Promise<number> {

@@ -2,9 +2,10 @@ import { Badge, Card, Empty, List, Tag } from 'antd';
 import React from 'react';
 import orgCtrl from '@/ts/controller';
 import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
-import { AiOutlineWechat } from 'react-icons/ai';
+import * as im from 'react-icons/im';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import { IMsgChat, msgChatNotify } from '@/ts/core';
+import { XTarget } from '@/ts/base/schema';
 
 /**
  * @description: 通讯录
@@ -36,11 +37,77 @@ const Book: React.FC<any> = ({
       }
       return num;
     });
-  const showMessage = (chat: IMsgChat) => {
-    if (chat.messages.length > 0) {
-      return chat.messages[chat.messages.length - 1].msgTitle;
+
+  const loadChatOperation = (item: IMsgChat) => {
+    const operates: any[] = [
+      <a
+        key="聊天"
+        title="聊天"
+        onClick={async () => {
+          orgCtrl.currentKey = item.chatdata.fullId;
+          orgCtrl.changCallback();
+        }}>
+        <im.ImBubbles3 style={{ fontSize: 18 }}></im.ImBubbles3>
+      </a>,
+    ];
+    if (item.chatdata.noReadCount < 1) {
+      operates.push(
+        <a
+          key="标记为未读"
+          title="标记为未读"
+          onClick={async () => {
+            item.chatdata.noReadCount += 1;
+            item.cache();
+            msgChatNotify.changCallback();
+          }}>
+          <im.ImBell style={{ fontSize: 18 }}></im.ImBell>
+        </a>,
+      );
     }
-    return '简介信息:' + chat.chatdata.chatRemark;
+    if (item.chatdata.isToping) {
+      operates.push(
+        <a
+          key="取消置顶"
+          title="取消置顶"
+          onClick={async () => {
+            item.labels.Remove('置顶');
+            item.chatdata.isToping = false;
+            item.cache();
+            msgChatNotify.changCallback();
+          }}>
+          <im.ImDownload style={{ fontSize: 18 }}></im.ImDownload>
+        </a>,
+      );
+    } else {
+      operates.push(
+        <a
+          key="置顶会话"
+          title="置顶会话"
+          onClick={async () => {
+            item.chatdata.isToping = true;
+            item.labels.Add('置顶');
+            item.cache();
+            msgChatNotify.changCallback();
+          }}>
+          <im.ImUpload style={{ fontSize: 18 }}></im.ImUpload>
+        </a>,
+      );
+    }
+    if (!item.isFriend) {
+      operates.push(
+        <a
+          key="加好友"
+          title="加好友"
+          onClick={async () => {
+            if (await item.space.user.pullMembers([item.metadata as XTarget])) {
+              msgChatNotify.changCallback();
+            }
+          }}>
+          <im.ImUserPlus style={{ fontSize: 18 }}></im.ImUserPlus>
+        </a>,
+      );
+    }
+    return operates;
   };
   return (
     <Card key={msgKey}>
@@ -51,23 +118,7 @@ const Book: React.FC<any> = ({
           dataSource={chats}
           renderItem={(item: IMsgChat) => {
             return (
-              <List.Item
-                style={{ cursor: 'pointer' }}
-                onClick={async () => {
-                  orgCtrl.currentKey = item.chatdata.fullId;
-                  orgCtrl.changCallback();
-                }}
-                actions={[
-                  <a
-                    key="打开会话"
-                    title="打开会话"
-                    onClick={async () => {
-                      orgCtrl.currentKey = item.chatdata.fullId;
-                      orgCtrl.changCallback();
-                    }}>
-                    <AiOutlineWechat style={{ fontSize: 18 }}></AiOutlineWechat>
-                  </a>,
-                ]}>
+              <List.Item style={{ cursor: 'pointer' }} actions={loadChatOperation(item)}>
                 <List.Item.Meta
                   avatar={
                     <Badge
@@ -78,20 +129,24 @@ const Book: React.FC<any> = ({
                     </Badge>
                   }
                   title={
-                    <div>
+                    <div
+                      onClick={() => {
+                        orgCtrl.currentKey = item.chatdata.fullId;
+                        orgCtrl.changCallback();
+                      }}>
                       <span style={{ marginRight: 10 }}>{item.chatdata.chatName}</span>
                       {item.chatdata.labels
                         .filter((i) => i.length > 0)
                         .map((label) => {
                           return (
-                            <Tag key={label} color="success">
+                            <Tag key={label} color={label === '置顶' ? 'red' : 'success'}>
                               {label}
                             </Tag>
                           );
                         })}
                     </div>
                   }
-                  description={showMessage(item)}
+                  description={item.information}
                 />
               </List.Item>
             );

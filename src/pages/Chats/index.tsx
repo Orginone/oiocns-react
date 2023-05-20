@@ -38,6 +38,7 @@ const Setting: React.FC<any> = () => {
           case '标记为未读':
             setSelectMenu(rootMenu);
             chat.chatdata.noReadCount += 1;
+            chat.cache();
             msgChatNotify.changCallback();
             break;
         }
