@@ -385,7 +385,7 @@ const getTeamMenu = () => {
           label: GroupMenuType.StandardGroup,
           itemType: GroupMenuType.StandardGroup,
           menus: LoadStandardMenus(company),
-          icon: <im.ImNewspaper />,
+          icon: <im.ImDatabase fontSize={22} />,
           children: company.species.map((i) => buildSpeciesTree(i)),
         },
         loadGroupMenus(

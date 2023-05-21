@@ -21,7 +21,7 @@ export interface IDictClass extends ISpeciesItem {
 export class DictClass extends SpeciesItem implements IDictClass {
   constructor(_metadata: schema.XSpecies, _current: ITarget, _parent?: IDictClass) {
     super(_metadata, _current, _parent);
-    if (_parent) {
+    if (_parent && _parent.dicts) {
       this.dicts.push(..._parent.dicts);
     }
     this.speciesTypes = [_metadata.typeName];

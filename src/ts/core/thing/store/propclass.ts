@@ -26,7 +26,7 @@ export interface IPropClass extends ISpeciesItem {
 export class PropClass extends SpeciesItem implements IPropClass {
   constructor(_metadata: schema.XSpecies, _current: ITarget, _parent?: IPropClass) {
     super(_metadata, _current, _parent);
-    if (_parent) {
+    if (_parent && _parent.propertys) {
       this.propertys.push(..._parent.propertys);
     }
     this.speciesTypes = [_metadata.typeName];
