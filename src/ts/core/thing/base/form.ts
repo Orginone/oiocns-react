@@ -3,7 +3,7 @@ import { SpeciesType } from '@/ts/core/public/enums';
 import { ISpeciesItem } from './species';
 import { kernel, model, schema } from '@/ts/base';
 import { IPropClass } from '../store/propclass';
-import { IWorkThing } from '../app/workthing';
+import { IThingClass } from '../store/thingclass';
 import { XProperty } from '@/ts/base/schema';
 import { Entity, IEntity } from '../../public';
 export interface IForm extends IEntity<schema.XForm> {
@@ -70,8 +70,8 @@ export class Form extends Entity<schema.XForm> implements IForm {
       page: PageAll,
     });
     if (res.success) {
-      if (this.species.typeName === SpeciesType.WorkThing) {
-        const species = this.species as IWorkThing;
+      if (this.species.typeName === SpeciesType.Thing) {
+        const species = this.species as IThingClass;
         species.forms = species.forms.filter((i) => i.key != this.key);
       }
     }

@@ -16,7 +16,7 @@ const SettingStandrad: React.FC<IProps> = ({ current }: IProps) => {
     case SpeciesType.Store:
       return <Property current={current} />;
     case SpeciesType.Market:
-    case SpeciesType.WorkItem:
+    case SpeciesType.Work:
       return <WorkItem current={current as IWorkItem} />;
     default:
       return <></>;

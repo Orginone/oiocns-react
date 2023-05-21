@@ -37,7 +37,7 @@ const buildSpeciesTree = (species: ISpeciesItem[]) => {
         defines.push(...(item as IApplication).defines);
         children.push(...buildSpeciesTree(item.children));
         break;
-      case SpeciesType.WorkItem:
+      case SpeciesType.Work:
         defines.push(...(item as IWorkItem).defines);
         children.push(...buildWorkItem(defines), ...buildSpeciesTree(item.children));
         break;

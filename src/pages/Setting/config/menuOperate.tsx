@@ -75,7 +75,7 @@ const buildGroupTree = (groups: IGroup[]): MenuItemType[] => {
 const buildSpeciesTree = (species: ISpeciesItem): MenuItemType => {
   const children: MenuItemType[] = [];
   switch (species.typeName) {
-    case SpeciesType.WorkThing:
+    case SpeciesType.Thing:
       children.push(...buildFormMenu(species as IWorkThing));
       break;
     case SpeciesType.Store:
@@ -97,7 +97,7 @@ const buildSpeciesTree = (species: ISpeciesItem): MenuItemType => {
     beforeLoad: async () => {
       switch (species.typeName) {
         case SpeciesType.Market:
-        case SpeciesType.WorkItem:
+        case SpeciesType.Work:
           await (species as IWorkItem).loadWorkDefines();
           break;
         case SpeciesType.Dict:
@@ -106,7 +106,7 @@ const buildSpeciesTree = (species: ISpeciesItem): MenuItemType => {
         case SpeciesType.Store:
           await (species as IPropClass).loadPropertys();
           break;
-        case SpeciesType.WorkThing:
+        case SpeciesType.Thing:
           await (species as IWorkThing).loadForms();
           break;
       }
@@ -202,7 +202,7 @@ const loadSpeciesMenus = (species: ISpeciesItem) => {
     case SpeciesType.Dict:
       items.push(...loadDictMenus());
       break;
-    case SpeciesType.WorkThing:
+    case SpeciesType.Thing:
       items.push(...loadFormMenus());
       break;
   }

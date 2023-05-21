@@ -14,12 +14,6 @@ export class WorkItem extends Work implements IWorkItem {
   constructor(_metadata: schema.XSpecies, _app: IApplication, _parent?: IWorkItem) {
     super(_metadata, _app.current, _app, _parent);
     this.app = _app;
-    for (const item of _metadata.nodes || []) {
-      const subItem = this.createChildren(item, _app.current);
-      if (subItem) {
-        this.children.push(subItem);
-      }
-    }
     this.speciesTypes = [_metadata.typeName];
   }
   app: IApplication;
@@ -38,7 +32,7 @@ export class WorkItem extends Work implements IWorkItem {
     _current: ITarget,
   ): ISpeciesItem | undefined {
     switch (_metadata.typeName) {
-      case SpeciesType.WorkItem:
+      case SpeciesType.Work:
         return new WorkItem(_metadata, this.app, this);
     }
   }

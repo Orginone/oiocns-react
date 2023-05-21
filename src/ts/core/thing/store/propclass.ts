@@ -1,4 +1,5 @@
 import { kernel, model, schema } from '../../../base';
+import { SpeciesType } from '../../public';
 import { PageAll } from '../../public/consts';
 import { ITarget } from '../../target/base/target';
 import { ISpeciesItem, SpeciesItem } from '../base/species';
@@ -27,9 +28,6 @@ export class PropClass extends SpeciesItem implements IPropClass {
     super(_metadata, _current, _parent);
     if (_parent) {
       this.propertys.push(..._parent.propertys);
-    }
-    for (const item of _metadata.nodes || []) {
-      this.children.push(new PropClass(item, this.current, this));
     }
     this.speciesTypes = [_metadata.typeName];
   }
@@ -80,7 +78,10 @@ export class PropClass extends SpeciesItem implements IPropClass {
     _metadata: schema.XSpecies,
     _current: ITarget,
   ): ISpeciesItem | undefined {
-    return new PropClass(_metadata, _current, this);
+    switch (_metadata.typeName) {
+      case SpeciesType.Store:
+        return new PropClass(_metadata, _current, this);
+    }
   }
   async createProperty(data: model.PropertyModel): Promise<schema.XProperty | undefined> {
     data.speciesId = this.id;

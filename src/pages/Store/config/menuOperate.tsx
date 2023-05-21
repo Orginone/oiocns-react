@@ -95,11 +95,11 @@ const buildSpeciesTree = (species: ISpeciesItem[]): MenuItemType[] => {
     switch (item.typeName) {
       case SpeciesType.Store:
       case SpeciesType.Market:
-      case SpeciesType.WorkThing:
+      case SpeciesType.Thing:
       case SpeciesType.Application:
         {
           const children: MenuItemType[] = [];
-          if (item.typeName === SpeciesType.WorkThing) {
+          if (item.typeName === SpeciesType.Thing) {
             children.push(
               ...(item as IWorkThing).forms.map((i) => {
                 return {
@@ -129,7 +129,7 @@ const buildSpeciesTree = (species: ISpeciesItem[]): MenuItemType[] => {
             children: [...children, ...buildSpeciesTree(item.children)],
             beforeLoad: async () => {
               switch (item.typeName) {
-                case SpeciesType.WorkThing:
+                case SpeciesType.Thing:
                   await (item as IWorkThing).loadForms();
                   break;
                 case SpeciesType.Store:

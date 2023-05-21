@@ -34,6 +34,12 @@ export abstract class SpeciesItem
     this.parent = _parent;
     this.current = _current;
     this.isInherited = _metadata.belongId != _current.space.metadata.belongId;
+    for (const item of _metadata.nodes || []) {
+      const subItem = this.createChildren(item, _current);
+      if (subItem) {
+        this.children.push(subItem);
+      }
+    }
   }
   parent: ISpeciesItem | undefined;
   children: ISpeciesItem[] = [];

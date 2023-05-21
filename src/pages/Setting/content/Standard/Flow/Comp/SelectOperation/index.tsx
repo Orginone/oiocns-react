@@ -83,7 +83,7 @@ const SelectOperation: React.FC<IProps> = ({ current, selected, setSelected }) =
               onSelect={onSelect}
               treeData={buildWorkThingTree(
                 current.app.children
-                  .filter((i) => i.typeName === SpeciesType.WorkThing)
+                  .filter((i) => i.typeName === SpeciesType.Thing)
                   .map((i) => i as IWorkThing),
               )}
             />

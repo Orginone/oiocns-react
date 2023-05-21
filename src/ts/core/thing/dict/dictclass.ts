@@ -1,4 +1,5 @@
 import { kernel, model, schema } from '../../../base';
+import { SpeciesType } from '../../public';
 import { PageAll } from '../../public/consts';
 import { ITarget } from '../../target/base/target';
 import { ISpeciesItem, SpeciesItem } from '../base/species';
@@ -22,9 +23,6 @@ export class DictClass extends SpeciesItem implements IDictClass {
     super(_metadata, _current, _parent);
     if (_parent) {
       this.dicts.push(..._parent.dicts);
-    }
-    for (const item of _metadata.nodes || []) {
-      this.children.push(new DictClass(item, this.current, this));
     }
     this.speciesTypes = [_metadata.typeName];
   }
@@ -65,6 +63,15 @@ export class DictClass extends SpeciesItem implements IDictClass {
       const dict = new Dict(res.data, this);
       this.dicts.push(dict);
       return dict;
+    }
+  }
+  override createChildren(
+    _metadata: schema.XSpecies,
+    _current: ITarget,
+  ): ISpeciesItem | undefined {
+    switch (_metadata.typeName) {
+      case SpeciesType.Dict:
+        return new DictClass(_metadata, this.current, this);
     }
   }
   _propertyChanged(type: string, props: IDict[]) {

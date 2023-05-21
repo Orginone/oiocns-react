@@ -1,4 +1,5 @@
 import { schema } from '../../../base';
+import { SpeciesType } from '../../public';
 import { ITarget } from '../../target/base/target';
 import { ISpeciesItem, SpeciesItem } from '../base/species';
 import { IApplication } from './application';
@@ -11,9 +12,6 @@ export class Data extends SpeciesItem implements IData {
   constructor(_metadata: schema.XSpecies, _app: IApplication, _parent?: IData) {
     super(_metadata, _app.current, _parent);
     this.app = _app;
-    for (const item of _metadata.nodes || []) {
-      this.children.push(new Data(item, this.app, this));
-    }
     this.speciesTypes = [_metadata.typeName];
   }
   app: IApplication;
@@ -21,6 +19,9 @@ export class Data extends SpeciesItem implements IData {
     _metadata: schema.XSpecies,
     _current: ITarget,
   ): ISpeciesItem | undefined {
-    return new Data(_metadata, this.app, this);
+    switch (_metadata.typeName) {
+      case SpeciesType.Data:
+        return new Data(_metadata, this.app, this);
+    }
   }
 }

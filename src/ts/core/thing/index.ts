@@ -6,7 +6,7 @@ import { PropClass } from './store/propclass';
 import { Application } from './app/application';
 import { Market } from './market/market';
 import { DictClass } from './dict/dictclass';
-import { Resource } from './resource/resource';
+import { ThingClass } from './store/thingclass';
 
 export type { ISpeciesItem } from './base/species';
 
@@ -19,11 +19,11 @@ export const createSpecies = (
       return new DictClass(_metadata, _current);
     case SpeciesType.Store:
       return new PropClass(_metadata, _current);
+    case SpeciesType.Thing:
+      return new ThingClass(_metadata, _current);
     case SpeciesType.Application:
       return new Application(_metadata, _current);
     case SpeciesType.Market:
       return new Market(_metadata, _current);
-    case SpeciesType.Resource:
-      return new Resource(_metadata, _current);
   }
 };

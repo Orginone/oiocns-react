@@ -10,7 +10,7 @@ const buildSpeciesTree = (species: ISpeciesItem[]): MenuItemType[] => {
   const result: MenuItemType[] = [];
   for (const item of species) {
     switch (item.typeName) {
-      case SpeciesType.WorkThing:
+      case SpeciesType.Thing:
         {
           const thing = item as IWorkThing;
           result.push({

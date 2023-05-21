@@ -24,14 +24,13 @@ export enum TargetType {
 /** 分类基础类型 */
 export enum SpeciesType {
   /** 类别目录 */
-  'Market' = '流通类',
-  'Resource' = '资源类',
   'Store' = '属性类',
   'Dict' = '字典类',
+  'Market' = '流通类',
   'Application' = '应用类',
   /** 类别类目 */
-  'WorkItem' = '办事类',
-  'WorkThing' = '事物类',
+  'Work' = '事项类',
+  'Thing' = '实体类',
   'Data' = '数据类',
 }
 

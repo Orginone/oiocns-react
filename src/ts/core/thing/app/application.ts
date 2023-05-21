@@ -6,7 +6,7 @@ import { IWorkItem, WorkItem } from './workitem';
 import { IForm } from '../base/form';
 import { IWorkDefine } from '../base/work';
 import { Data } from './data';
-import { IWorkThing, WorkThing } from './workthing';
+import { IThingClass } from '../store/thingclass';
 /** 应用的基类接口 */
 export interface IApplication extends ISpeciesItem {
   /** 流程定义 */
@@ -21,20 +21,14 @@ export interface IApplication extends ISpeciesItem {
 export class Application extends SpeciesItem implements IApplication {
   constructor(_metadata: schema.XSpecies, _current: ITarget) {
     super(_metadata, _current);
-    this.speciesTypes = [SpeciesType.WorkThing, SpeciesType.WorkItem, SpeciesType.Data];
-    for (const item of _metadata.nodes || []) {
-      const subItem = this.createChildren(item, _current);
-      if (subItem) {
-        this.children.push(subItem);
-      }
-    }
+    this.speciesTypes = [SpeciesType.Thing, SpeciesType.Work, SpeciesType.Data];
   }
   defines: IWorkDefine[] = [];
   async loadForms(): Promise<IForm[]> {
     const result: IForm[] = [];
     for (const item of this.children) {
-      if (item.typeName === SpeciesType.WorkThing) {
-        result.push(...(await (item as IWorkThing).loadAllForms()));
+      if (item.typeName === SpeciesType.Thing) {
+        result.push(...(await (item as IThingClass).loadAllForms()));
       }
     }
     return result;
@@ -42,7 +36,7 @@ export class Application extends SpeciesItem implements IApplication {
   async loadWorkDefines(): Promise<IWorkDefine[]> {
     const result: IWorkDefine[] = [];
     for (const item of this.children) {
-      if (item.typeName === SpeciesType.WorkItem) {
+      if (item.typeName === SpeciesType.Work) {
         result.push(...(await (item as IWorkItem).loadAllWorkDefines()));
       }
     }
@@ -54,9 +48,7 @@ export class Application extends SpeciesItem implements IApplication {
     _current: ITarget,
   ): ISpeciesItem | undefined {
     switch (_metadata.typeName) {
-      case SpeciesType.WorkThing:
-        return new WorkThing(_metadata, this);
-      case SpeciesType.WorkItem:
+      case SpeciesType.Work:
         return new WorkItem(_metadata, this);
       case SpeciesType.Data:
         return new Data(_metadata, this);

@@ -39,7 +39,7 @@ export abstract class Target extends Team implements ITarget {
     _memberTypes: TargetType[] = [TargetType.Person],
   ) {
     super(_metadata, _labels, _space, _memberTypes);
-    this.speciesTypes = [SpeciesType.Application, SpeciesType.Resource];
+    this.speciesTypes = [SpeciesType.Application];
   }
   speciesTypes: string[] = [];
   identitys: IIdentity[] = [];

@@ -3,11 +3,8 @@ import { kernel, model, schema } from '../../../base';
 import { Form, IForm } from '../base/form';
 import { ISpeciesItem, SpeciesItem } from '../base/species';
 import { PageAll } from '@/ts/core/public/consts';
-import { IApplication } from './application';
 import { ITarget } from '../../target/base/target';
-export interface IWorkThing extends ISpeciesItem {
-  /** 对应的应用 */
-  app: IApplication;
+export interface IThingClass extends ISpeciesItem {
   /** 分类下的表单 */
   forms: IForm[];
   /** 加载表单 */
@@ -18,19 +15,11 @@ export interface IWorkThing extends ISpeciesItem {
   loadAllForms(reload?: boolean): Promise<IForm[]>;
 }
 
-export class WorkThing extends SpeciesItem implements IWorkThing {
-  constructor(_metadata: schema.XSpecies, _app: IApplication, _parent?: IWorkThing) {
-    super(_metadata, _app.current, _parent);
-    this.app = _app;
-    for (const item of _metadata.nodes || []) {
-      const subItem = this.createChildren(item, _app.current);
-      if (subItem) {
-        this.children.push(subItem);
-      }
-    }
+export class ThingClass extends SpeciesItem implements IThingClass {
+  constructor(_metadata: schema.XSpecies, _current: ITarget, _parent?: IThingClass) {
+    super(_metadata, _current, _parent);
     this.speciesTypes = [_metadata.typeName];
   }
-  app: IApplication;
   forms: IForm[] = [];
   private _formLoaded: boolean = false;
   async loadForms(reload: boolean = false): Promise<IForm[]> {
@@ -62,7 +51,7 @@ export class WorkThing extends SpeciesItem implements IWorkThing {
   async loadAllForms(): Promise<IForm[]> {
     const result = [...(await this.loadForms())];
     for (const item of this.children) {
-      result.push(...(await (item as IWorkThing).loadAllForms()));
+      result.push(...(await (item as IThingClass).loadAllForms()));
     }
     return result;
   }
@@ -71,8 +60,8 @@ export class WorkThing extends SpeciesItem implements IWorkThing {
     _current: ITarget,
   ): ISpeciesItem | undefined {
     switch (_metadata.typeName) {
-      case SpeciesType.WorkThing:
-        return new WorkThing(_metadata, this.app, this);
+      case SpeciesType.Thing:
+        return new ThingClass(_metadata, this.current, this);
     }
   }
 }
