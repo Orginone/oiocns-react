@@ -1,12 +1,12 @@
 import { kernel, model, schema } from '../../../base';
 import { Entity, IEntity } from '../../public';
 import { PageAll } from '../../public/consts';
-import { IBelong } from '../base/belong';
+import { ITarget } from '../base/target';
 
 /** 身份（角色）接口 */
 export interface IIdentity extends IEntity<schema.XIdentity> {
   /** 设置身份（角色）的用户 */
-  space: IBelong;
+  current: ITarget;
   /** 赋予身份（角色）的成员用户 */
   members: schema.XTarget[];
   /** 加载成员用户实体 */
@@ -23,14 +23,14 @@ export interface IIdentity extends IEntity<schema.XIdentity> {
 
 /** 身份（角色）实现类 */
 export class Identity extends Entity<schema.XIdentity> implements IIdentity {
-  constructor(_metadata: schema.XIdentity, _space: IBelong) {
+  constructor(_metadata: schema.XIdentity, _current: ITarget) {
     super({
       ..._metadata,
       typeName: '角色',
     });
-    this.space = _space;
+    this.current = _current;
   }
-  space: IBelong;
+  current: ITarget;
   members: schema.XTarget[] = [];
   private _memberLoaded: boolean = false;
   async loadMembers(reload?: boolean | undefined): Promise<schema.XTarget[]> {
@@ -94,7 +94,7 @@ export class Identity extends Entity<schema.XIdentity> implements IIdentity {
       page: PageAll,
     });
     if (res.success) {
-      this.space.identitys = this.space.identitys.filter((i) => i.key != this.key);
+      this.current.identitys = this.current.identitys.filter((i) => i.key != this.key);
     }
     return res.success;
   }

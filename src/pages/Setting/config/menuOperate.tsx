@@ -21,6 +21,7 @@ import {
   TargetType,
   companyTypes,
   IBelong,
+  IFlowDefine,
 } from '@/ts/core';
 import { XProperty } from '@/ts/base/schema';
 import { orgAuth } from '@/ts/core/public';
@@ -83,6 +84,9 @@ const buildSpeciesTree = (species: ISpeciesItem): MenuItemType => {
       break;
     case SpeciesType.Dict:
       children.push(...buildDict(species as IDictClass));
+      break;
+    case SpeciesType.Work:
+      children.push(...buildDefineMenu(species as IWorkItem));
       break;
   }
   return {
@@ -150,6 +154,25 @@ const buildDict = (dictClass: IDictClass) => {
     };
   });
 };
+
+/** 编译表单项菜单 */
+const buildDefineMenu = (form: IWorkItem) => {
+  return form.defines.map((i) => {
+    return {
+      key: i.key,
+      item: i,
+      label: i.name,
+      icon: <TeamIcon notAvatar={true} share={i.share} size={18} fontSize={16} />,
+      itemType: MenuType.Form,
+      menus: loadDefineMenus(i),
+      children: [],
+      beforeLoad: async () => {
+        await i.loadWorkNode();
+      },
+    } as MenuItemType;
+  });
+};
+
 /** 编译表单项菜单 */
 const buildFormMenu = (form: IWorkThing) => {
   return form.forms.map((i) => {
@@ -228,6 +251,35 @@ const loadSpeciesMenus = (species: ISpeciesItem) => {
       },
     },
   );
+  return items;
+};
+
+/** 加载右侧菜单 */
+const loadDefineMenus = (define?: IFlowDefine) => {
+  const items: OperateMenuType[] = [];
+  if (define) {
+    items.push(
+      {
+        key: '编辑事项',
+        icon: <im.ImCog />,
+        label: '编辑事项',
+      },
+      {
+        key: '删除事项',
+        icon: <im.ImBin />,
+        label: '删除事项',
+        beforeLoad: async () => {
+          return await define.deleteDefine();
+        },
+      },
+    );
+  } else {
+    items.push({
+      key: '新增事项',
+      icon: <im.ImPlus />,
+      label: '新增事项',
+    });
+  }
   return items;
 };
 

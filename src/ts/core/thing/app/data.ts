@@ -13,6 +13,12 @@ export class Data extends SpeciesItem implements IData {
     super(_metadata, _app.current, _parent);
     this.app = _app;
     this.speciesTypes = [_metadata.typeName];
+    for (const item of _metadata.nodes || []) {
+      const subItem = this.createChildren(item, _app.current);
+      if (subItem) {
+        this.children.push(subItem);
+      }
+    }
   }
   app: IApplication;
   override createChildren(

@@ -12,6 +12,12 @@ export class Market extends Work implements IMarket, IApplication {
   constructor(_metadata: schema.XSpecies, _current: ITarget) {
     super(_metadata, _current);
     this.speciesTypes = [SpeciesType.Thing];
+    for (const item of _metadata.nodes || []) {
+      const subItem = this.createChildren(item, _current);
+      if (subItem) {
+        this.children.push(subItem);
+      }
+    }
   }
   override createChildren(
     _metadata: schema.XSpecies,

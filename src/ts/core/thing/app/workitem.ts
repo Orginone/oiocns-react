@@ -13,10 +13,14 @@ export interface IWorkItem extends IWork {
 export class WorkItem extends Work implements IWorkItem {
   constructor(_metadata: schema.XSpecies, _app: IApplication, _parent?: IWorkItem) {
     super(_metadata, _app.current, _app, _parent);
-    this.app = _app;
     this.speciesTypes = [_metadata.typeName];
+    for (const item of _metadata.nodes || []) {
+      const subItem = this.createChildren(item, _app.current);
+      if (subItem) {
+        this.children.push(subItem);
+      }
+    }
   }
-  app: IApplication;
   async loadForms(): Promise<IForm[]> {
     return await this.app.loadForms();
   }

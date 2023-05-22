@@ -70,7 +70,7 @@ const Book: React.FC<any> = ({
           key="取消置顶"
           title="取消置顶"
           onClick={async () => {
-            item.labels.Remove('置顶');
+            item.labels = item.labels.RemoveAll((i) => i === '置顶');
             item.chatdata.isToping = false;
             item.cache();
             msgChatNotify.changCallback();
@@ -119,6 +119,7 @@ const Book: React.FC<any> = ({
           renderItem={(item: IMsgChat) => {
             return (
               <List.Item
+                title="双击打开"
                 style={{ cursor: 'pointer' }}
                 actions={loadChatOperation(item)}
                 onDoubleClick={() => {
@@ -152,7 +153,6 @@ const Book: React.FC<any> = ({
           }}
         />
       )}
-
       {chats.length == 0 && <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />}
     </Card>
   );

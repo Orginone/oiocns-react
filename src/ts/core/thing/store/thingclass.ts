@@ -19,6 +19,12 @@ export class ThingClass extends SpeciesItem implements IThingClass {
   constructor(_metadata: schema.XSpecies, _current: ITarget, _parent?: IThingClass) {
     super(_metadata, _current, _parent);
     this.speciesTypes = [_metadata.typeName];
+    for (const item of _metadata.nodes || []) {
+      const subItem = this.createChildren(item, _current);
+      if (subItem) {
+        this.children.push(subItem);
+      }
+    }
   }
   forms: IForm[] = [];
   private _formLoaded: boolean = false;

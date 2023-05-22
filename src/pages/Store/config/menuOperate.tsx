@@ -93,10 +93,8 @@ const buildSpeciesTree = (species: ISpeciesItem[]): MenuItemType[] => {
   const result: MenuItemType[] = [];
   for (const item of species) {
     switch (item.typeName) {
-      case SpeciesType.Store:
       case SpeciesType.Market:
       case SpeciesType.Thing:
-      case SpeciesType.Application:
         {
           const children: MenuItemType[] = [];
           if (item.typeName === SpeciesType.Thing) {

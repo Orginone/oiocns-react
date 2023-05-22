@@ -30,6 +30,12 @@ export class PropClass extends SpeciesItem implements IPropClass {
       this.propertys.push(..._parent.propertys);
     }
     this.speciesTypes = [_metadata.typeName];
+    for (const item of _metadata.nodes || []) {
+      const subItem = this.createChildren(item, _current);
+      if (subItem) {
+        this.children.push(subItem);
+      }
+    }
   }
   propertys: schema.XProperty[] = [];
   private _propertyLoaded: boolean = false;

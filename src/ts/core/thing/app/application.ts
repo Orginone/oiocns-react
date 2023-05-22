@@ -22,6 +22,12 @@ export class Application extends SpeciesItem implements IApplication {
   constructor(_metadata: schema.XSpecies, _current: ITarget) {
     super(_metadata, _current);
     this.speciesTypes = [SpeciesType.Thing, SpeciesType.Work, SpeciesType.Data];
+    for (const item of _metadata.nodes || []) {
+      const subItem = this.createChildren(item, _current);
+      if (subItem) {
+        this.children.push(subItem);
+      }
+    }
   }
   defines: IWorkDefine[] = [];
   async loadForms(): Promise<IForm[]> {

@@ -25,6 +25,12 @@ export class DictClass extends SpeciesItem implements IDictClass {
       this.dicts.push(..._parent.dicts);
     }
     this.speciesTypes = [_metadata.typeName];
+    for (const item of _metadata.nodes || []) {
+      const subItem = this.createChildren(item, _current);
+      if (subItem) {
+        this.children.push(subItem);
+      }
+    }
   }
   dicts: IDict[] = [];
   private _dictLoaded: boolean = false;
