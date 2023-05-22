@@ -1,0 +1,108 @@
+.coverCardList {
+  .card {
+    :global {
+      .ant-card-meta-title {
+        margin-bottom: 4px;
+        & > a {
+          display: inline-block;
+          max-width: 100%;
+          color: #333333;
+        }
+      }
+      .ant-card-meta-description {
+        height: 44px;
+        overflow: hidden;
+        line-height: 22px;
+      }
+    }
+
+    &:hover {
+      :global {
+        .ant-card-meta-title > a {
+          color: #333333;
+        }
+      }
+    }
+  }
+
+  .cardItemContent {
+    display: flex;
+    height: 20px;
+    margin-top: 16px;
+    margin-bottom: -4px;
+    line-height: 20px;
+    & > span {
+      flex: 1;
+      // color: @text-color-secondary;
+      font-size: 12px;
+    }
+    .avatarList {
+      flex: 0 1 auto;
+    }
+  }
+  .cardList {
+    display: flex;
+    flex-wrap: wrap;
+    grid-template-columns: repeat(6, 16.66%);
+    margin-top: 10px;
+    .cardMes{
+      width:16.6%;
+      margin-right:20px;
+      box-sizing: border-box;
+      margin-bottom: 10px;
+      .price{
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        .priceStyle{
+          color:red;
+          font-weight: 700;
+        }
+        .bottomStyle{
+          color: #333333;
+        }
+        .leftText{
+          display: flex;
+          align-items: center;
+          color:#333333;
+        }
+        .rightStyle{
+          color:#333333;
+        }
+      }
+      :global {
+        .ogo-card-body{
+          padding:24px 8px;
+        }
+        .ogo-card-meta-title{
+          a{
+            color: #333333;
+          }
+        }
+      }
+      .cardBottom{
+        margin-top:10px;
+        span{
+          display: inline-block;
+          border:1px solid #4EFD02;
+          padding:2px 10px;
+          font-size: 12px;
+          color:#4EFD02;
+          border-radius: 3px;
+          margin-right:10px;
+        }
+      }
+    }
+    .avatarList {
+      flex: 0 1 auto;
+    }
+  }
+
+ 
+
+  :global {
+    .ant-list .ant-list-item-content-single {
+      max-width: 100%;
+    }
+  }
+}
