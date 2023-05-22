@@ -1,4 +1,4 @@
-import { XForm, XTarget } from './schema';
+import { XForm, XIdentity, XTarget } from './schema';
 // 请求类型定义
 export type ReqestType = {
   // 模块
@@ -228,8 +228,21 @@ export type MsgSendModel = {
   msgBody: string;
 };
 
+export type IdentityMsgModel = {
+  // 接受数据
+  data: string;
+  // 是否剔除操作人
+  excludeOperater: boolean;
+  // 岗位Id
+  stationId: string;
+  // 身份Id
+  identityId: string;
+  // 组织集群
+  group: boolean;
+};
+
 export type TargetMsgModel = {
-  // 接收方Id
+  // 接受数据
   data: string;
   // 是否剔除操作人
   excludeOperater: boolean;
@@ -244,6 +257,14 @@ export type TargetOperateModel = {
   target: XTarget;
   subTarget?: XTarget;
   operater: XTarget;
+};
+
+export type IdentityOperateModel = {
+  operate: string;
+  operater: XTarget;
+  identity: XIdentity;
+  station?: XTarget;
+  subTarget?: XTarget;
 };
 
 export type MsgTagModel = {
@@ -287,7 +308,7 @@ export type MsgTagLabel = {
   userId: string;
   // 时间
   time: string;
-}
+};
 
 export type PropertyModel = {
   // 唯一ID

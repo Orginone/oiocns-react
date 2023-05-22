@@ -517,9 +517,9 @@ export default class KernelApi {
   }
   /**
    * 查询赋予的身份
-   * @returns {model.ResultType<schema.XIdentityArray>} 请求结果
+   * @returns {model.ResultType<schema.XIdProofArray>} 请求结果
    */
-  public async queryGivedIdentitys(): Promise<model.ResultType<schema.XIdentityArray>> {
+  public async queryGivedIdentitys(): Promise<model.ResultType<schema.XIdProofArray>> {
     return await this.request({
       module: 'target',
       action: 'QueryGivedIdentitys',
@@ -565,6 +565,20 @@ export default class KernelApi {
     return await this.request({
       module: 'chat',
       action: 'CreateTargetMsg',
+      params: params,
+    });
+  }
+  /**
+   * 创建身份变更消息
+   * @param {model.IdentityMsgModel} params 请求参数
+   * @returns {model.ResultType<boolean>} 请求结果
+   */
+  public async createIdentityMsg(
+    params: model.IdentityMsgModel,
+  ): Promise<model.ResultType<boolean>> {
+    return await this.request({
+      module: 'chat',
+      action: 'CreateIdentityMsg',
       params: params,
     });
   }

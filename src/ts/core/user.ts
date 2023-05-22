@@ -2,9 +2,12 @@ import { IPerson, Person } from './target/person';
 import { common, kernel, model, schema } from '../base';
 import { IChatProvider, ChatProvider } from './chat/provider';
 import { IWorkProvider, WorkProvider } from './work/provider';
-import { OperateType } from './public/enums';
+import { OperateType, TargetType } from './public/enums';
 import { logger } from '../base/common';
 import { msgChatNotify } from './chat/message/msgchat';
+import { IIdentity, Identity } from './target/identity/identity';
+import { IStation } from './target/innerTeam/station';
+import { ITeam } from './target/base/team';
 const sessionUserName = 'sessionUser';
 
 export class UserProvider {
@@ -22,6 +25,11 @@ export class UserProvider {
     kernel.on('RecvTarget', (data) => {
       if (this._inited) {
         this._updateTarget(data);
+      }
+    });
+    kernel.on('RecvIdentity', (data) => {
+      if (this._inited) {
+        this._updateIdentity(data);
       }
     });
   }
@@ -100,13 +108,14 @@ export class UserProvider {
     this._chat?.loadPreMessage();
     this._emiter.changCallback();
   }
-
+  /** 接受组织变更 */
   async _updateTarget(recvData: string) {
     const data: model.TargetOperateModel = JSON.parse(recvData);
     if (!this.user || !data) return;
-    let allTarget = this.user.targets;
+    let allTarget: ITeam[] = this.user.targets;
     this.user.companys.forEach((a) => {
       allTarget.push(...a.cohorts);
+      allTarget.push(...a.stations);
     });
     let message = '';
     switch (data.operate) {
@@ -121,15 +130,17 @@ export class UserProvider {
       case OperateType.Remove:
         if (data.subTarget) {
           let operated = false;
-          for (const item of [this.user, ...this.user.companys]) {
-            if (item.id === data.subTarget.id) {
-              message = `${item.id === this.user.id ? '您' : item.name}已被${
-                data.operater?.name
-              }从${data.target.name}移除.`;
-              item.parentTarget
-                .filter((i) => i.id === data.target.id)
-                .forEach((i) => i.delete(true));
-              operated = true;
+          if (data.target.typeName !== TargetType.Station) {
+            for (const item of [this.user, ...this.user.companys]) {
+              if (item.id === data.subTarget.id) {
+                message = `${item.id === this.user.id ? '您' : item.name}已被${
+                  data.operater?.name
+                }从${data.target.name}移除.`;
+                item.parentTarget
+                  .filter((i) => i.id === data.target.id)
+                  .forEach((i) => i.delete(true));
+                operated = true;
+              }
             }
           }
           if (!operated) {
@@ -138,7 +149,9 @@ export class UserProvider {
               .filter(
                 (i) => i.id === data.target.id || data.target.id === data.subTarget!.id,
               )
-              .forEach((i) => i.removeMembers([data.subTarget!], true));
+              .forEach((i) => {
+                i.removeMembers([data.subTarget!], true);
+              });
           }
         }
         break;
@@ -168,6 +181,75 @@ export class UserProvider {
         logger.info(message);
       }
       msgChatNotify.changCallback();
+      this._emiter.changCallback();
+    }
+  }
+
+  /** 接受身份变更 */
+  async _updateIdentity(recvData: string) {
+    const data: model.IdentityOperateModel = JSON.parse(recvData);
+    if (!this.user || !data) return;
+    let targets = this.user.targets;
+    this.user.companys.forEach((a) => {
+      targets.push(...a.cohorts);
+    });
+    let identitys: IIdentity[] = [];
+    let stations: IStation[] = [];
+    targets
+      .filter((i) => i.id === data.identity.shareId)
+      .forEach((a) => {
+        identitys.push(...(a.identitys.filter((s) => s.id == data.identity.id) || []));
+      });
+    this.user.companys.forEach((a) => stations.push(...a.stations));
+    let message = '';
+    switch (data.operate) {
+      case OperateType.Create:
+        message = `${data.operater?.name}新增身份【${data.identity.name}】.`;
+        targets.forEach((a) => {
+          if (a.identitys.every((q) => q.id !== data.identity.id)) {
+            a.identitys.push(new Identity(data.identity, a));
+          }
+        });
+        break;
+      case OperateType.Delete:
+        message = `${data.operater?.name}将身份【${data.identity.name}】删除.`;
+        identitys.forEach((a) => a.delete(true));
+        stations.forEach((i) => i.removeIdentitys([data.identity], true));
+        break;
+      case OperateType.Update:
+        message = `${data.operater?.name}将身份【${data.identity.name}】信息更新.`;
+        this.user.updateMetadata(data.identity);
+        break;
+      case OperateType.Remove:
+        if (data.station) {
+          message = `${data.operater?.name}移除岗位【${data.station.name}】中的身份【${data.identity.name}】.`;
+          stations
+            .find((s) => s.id === data.station!.id)
+            ?.removeIdentitys([data.identity], true);
+        } else {
+          message = `${data.operater?.name}移除赋予【${data.subTarget!.name}】的身份【${
+            data.identity.name
+          }】.`;
+          identitys.forEach((i) => i.removeMembers([data.subTarget!], true));
+        }
+        break;
+      case OperateType.Add:
+        if (data.station) {
+          message = `${data.operater?.name}向岗位【${data.station.name}】添加身份【${data.identity.name}】.`;
+          stations
+            .find((s) => s.id === data.station?.id)
+            ?.pullIdentitys([data.identity], true);
+        } else {
+          message = `${data.operater?.name}赋予{${data.subTarget!.name}身份【${
+            data.identity.name
+          }】.`;
+          identitys.forEach((i) => i.pullMembers([data.subTarget!], true));
+        }
+    }
+    if (message.length > 0) {
+      if (data.operater?.id != this.user.id) {
+        logger.info(message);
+      }
       this._emiter.changCallback();
     }
   }

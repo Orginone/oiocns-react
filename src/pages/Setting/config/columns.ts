@@ -98,7 +98,7 @@ export const CohortColumn: ProColumns<schema.XTarget>[] = [
   },
 ];
 
-export const IdentityColumn: ProColumns<IIdentity>[] = [
+export const IdentityColumn: ProColumns<schema.XIdentity>[] = [
   {
     title: '序号',
     valueType: 'index',
@@ -122,9 +122,9 @@ export const IdentityColumn: ProColumns<IIdentity>[] = [
   },
   {
     title: '组织',
-    dataIndex: ['metadata', 'shareId'],
+    dataIndex: 'shareId',
     render: (_, record) => {
-      return orgCtrl.user.findShareById(record.metadata.shareId).name;
+      return orgCtrl.user.findShareById(record.shareId).name;
     },
   },
   {

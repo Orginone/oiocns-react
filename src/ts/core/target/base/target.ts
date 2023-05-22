@@ -55,7 +55,7 @@ export abstract class Target extends Team implements ITarget {
       if (res.success) {
         this._identityLoaded = true;
         this.identitys = (res.data.result || []).map((item) => {
-          return new Identity(item, this.space);
+          return new Identity(item, this);
         });
       }
     }
@@ -83,8 +83,9 @@ export abstract class Target extends Team implements ITarget {
     data.shareId = this.id;
     const res = await kernel.createIdentity(data);
     if (res.success && res.data?.id) {
-      const identity = new Identity(res.data, this.space);
+      const identity = new Identity(res.data, this);
       this.identitys.push(identity);
+      identity.createIdentityMsg(OperateType.Create, this.metadata);
       return identity;
     }
   }

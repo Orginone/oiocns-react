@@ -14,13 +14,15 @@ export interface IPerson extends IBelong {
   /** 加入/管理的单位 */
   companys: ICompany[];
   /** 赋予人的身份(角色)实体 */
-  givedIdentitys: schema.XIdentity[];
+  givedIdentitys: schema.XIdProof[];
   /** 根据ID查询共享信息 */
   findShareById(id: string): model.ShareIcon;
   /** 判断是否拥有某些用户的权限 */
   authenticate(orgIds: string[], authIds: string[]): boolean;
   /** 加载赋予人的身份(角色)实体 */
-  loadGivedIdentitys(reload?: boolean): Promise<schema.XIdentity[]>;
+  loadGivedIdentitys(reload?: boolean): Promise<schema.XIdProof[]>;
+  /** 移除赋予人的身份(角色) */
+  removeGivedIdentity(identityIds: string[], teamId?: string): void;
   /** 加载单位 */
   loadCompanys(reload?: boolean): Promise<ICompany[]>;
   /** 创建单位 */
@@ -37,9 +39,9 @@ export class Person extends Belong implements IPerson {
   companys: ICompany[] = [];
   private _cohortLoaded: boolean = false;
   private _companyLoaded: boolean = false;
-  givedIdentitys: schema.XIdentity[] = [];
+  givedIdentitys: schema.XIdProof[] = [];
   private _givedIdentityLoaded: boolean = false;
-  async loadGivedIdentitys(reload: boolean = false): Promise<schema.XIdentity[]> {
+  async loadGivedIdentitys(reload: boolean = false): Promise<schema.XIdProof[]> {
     if (!this._givedIdentityLoaded || reload) {
       const res = await kernel.queryGivedIdentitys();
       if (res.success) {
@@ -48,6 +50,17 @@ export class Person extends Belong implements IPerson {
       }
     }
     return this.givedIdentitys;
+  }
+  removeGivedIdentity(identityIds: string[], teamId?: string): void {
+    let idProofs = this.givedIdentitys.filter((a) => identityIds.includes(a.identityId));
+    if (teamId) {
+      idProofs = idProofs.filter((a) => a.teamId == teamId);
+    } else {
+      idProofs = idProofs.filter((a) => a.teamId == undefined);
+    }
+    this.givedIdentitys = this.givedIdentitys.filter((a) =>
+      idProofs.every((i) => i.id !== a.identity?.id),
+    );
   }
   async loadCohorts(reload?: boolean | undefined): Promise<ICohort[]> {
     if (!this._cohortLoaded || reload) {
@@ -104,8 +117,9 @@ export class Person extends Belong implements IPerson {
   authenticate(orgIds: string[], authIds: string[]): boolean {
     return (
       this.givedIdentitys
-        .filter((i) => orgIds.includes(i.shareId))
-        .filter((i) => authIds.includes(i.authId)).length > 0
+        .filter((i) => i.identity)
+        .filter((i) => orgIds.includes(i.identity!.shareId))
+        .filter((i) => authIds.includes(i.identity!.authId)).length > 0
     );
   }
   async applyJoin(members: schema.XTarget[]): Promise<boolean> {
