@@ -14,7 +14,6 @@ import {
   SpeciesType,
 } from '@/ts/core';
 import OrgIcons from '@/bizcomponents/GlobalComps/orgIcons';
-import { IThingClass } from '@/ts/core/thing/store/thingclass';
 
 /** 编译文件系统树 */
 const buildFileSysTree = (targets: IFileSystemItem[]) => {

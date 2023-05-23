@@ -47,11 +47,11 @@ const FlowDrawer: React.FC<IProps> = (props) => {
     } else {
       switch (props.current.type) {
         case AddNodeType.ROOT:
-          return <RootNode current={props.current} work={props.define.workItem} />;
+          return <RootNode current={props.current} define={props.define} />;
         case AddNodeType.APPROVAL:
-          return <ApprovalNode current={props.current} work={props.define.workItem} />;
+          return <ApprovalNode current={props.current} define={props.define} />;
         case AddNodeType.CHILDWORK:
-          return <WorkFlowNode current={props.current} work={props.define.workItem} />;
+          return <WorkFlowNode current={props.current} define={props.define} />;
         case AddNodeType.CC:
           return <CcNode current={props.current} work={props.define.workItem} />;
         case AddNodeType.CONDITION:

@@ -53,7 +53,7 @@ export abstract class Belong extends Target implements IBelong {
   ) {
     super(_metadata, _labels, undefined, _memberTypes);
     this.user = _user || (this as unknown as IPerson);
-    this.speciesTypes.unshift(SpeciesType.Dict, SpeciesType.Store, SpeciesType.Thing);
+    this.speciesTypes = [SpeciesType.Dict, SpeciesType.Store, SpeciesType.Thing];
     this.message = new ChatMessage(this);
     this.filesys = new FileSystem(this);
   }

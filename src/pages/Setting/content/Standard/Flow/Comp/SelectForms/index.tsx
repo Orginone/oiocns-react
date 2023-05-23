@@ -4,16 +4,16 @@ import React, { useState, Key } from 'react';
 import ShareShowComp from '@/bizcomponents/IndentityManage/ShareShowComp';
 import cls from './index.module.less';
 import CustomTree from '@/components/CustomTree';
-import { IWork, IThingClass, SpeciesType } from '@/ts/core';
+import { IThingClass } from '@/ts/core';
 import { XForm } from '@/ts/base/schema';
 
 interface IProps {
-  current: IWork;
+  species: IThingClass[];
   selected: XForm[];
   setSelected: (forms: XForm[]) => void;
 }
 
-const SelectOperation: React.FC<IProps> = ({ current, selected, setSelected }) => {
+const SelectForms: React.FC<IProps> = ({ species, selected, setSelected }) => {
   const [centerTreeData, setCenterTreeData] = useState<any>([]);
   const [centerCheckedKeys, setCenterCheckedKeys] = useState<Key[]>(
     (selected || []).map((i) => i.id),
@@ -81,11 +81,7 @@ const SelectOperation: React.FC<IProps> = ({ current, selected, setSelected }) =
               checkable={false}
               autoExpandParent={true}
               onSelect={onSelect}
-              treeData={buildWorkThingTree(
-                current.app.children
-                  .filter((i) => i.typeName === SpeciesType.Thing)
-                  .map((i) => i as IThingClass),
-              )}
+              treeData={buildWorkThingTree(species.map((i) => i as IThingClass))}
             />
           </div>
         </div>
@@ -114,4 +110,4 @@ const SelectOperation: React.FC<IProps> = ({ current, selected, setSelected }) =
   );
 };
 
-export default SelectOperation;
+export default SelectForms;

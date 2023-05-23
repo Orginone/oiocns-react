@@ -11,8 +11,6 @@ export interface IThingClass extends ISpeciesItem {
   loadForms(reload?: boolean): Promise<IForm[]>;
   /** 新建表单 */
   createForm(data: model.FormModel): Promise<IForm | undefined>;
-  /** 加载所有的办事 */
-  loadAllForms(reload?: boolean): Promise<IForm[]>;
 }
 
 export class ThingClass extends SpeciesItem implements IThingClass {
@@ -53,13 +51,6 @@ export class ThingClass extends SpeciesItem implements IThingClass {
       this.forms.push(form);
       return form;
     }
-  }
-  async loadAllForms(): Promise<IForm[]> {
-    const result = [...(await this.loadForms())];
-    for (const item of this.children) {
-      result.push(...(await (item as IThingClass).loadAllForms()));
-    }
-    return result;
   }
   override createChildren(
     _metadata: schema.XSpecies,

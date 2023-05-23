@@ -5,6 +5,7 @@ import { ISpeciesItem, SpeciesItem } from '../base/species';
 import { IWorkItem, WorkItem } from './workitem';
 import { IWorkDefine } from '../base/work';
 import { Data } from './data';
+import { ThingClass } from '../store/thingclass';
 /** 应用的基类接口 */
 export interface IApplication extends ISpeciesItem {
   /** 流程定义 */
@@ -41,6 +42,8 @@ export class Application extends SpeciesItem implements IApplication {
     _current: ITarget,
   ): ISpeciesItem | undefined {
     switch (_metadata.typeName) {
+      case SpeciesType.Thing:
+        return new ThingClass(_metadata, this.current);
       case SpeciesType.Work:
         return new WorkItem(_metadata, this);
       case SpeciesType.Data:

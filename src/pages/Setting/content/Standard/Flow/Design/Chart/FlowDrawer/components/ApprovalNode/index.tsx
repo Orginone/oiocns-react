@@ -6,11 +6,12 @@ import cls from './index.module.less';
 import { NodeType } from '../../processType';
 import { XForm } from '@/ts/base/schema';
 import ShareShowComp from '@/bizcomponents/IndentityManage/ShareShowComp';
-import SelectOperation from '@/pages/Setting/content/Standard/Flow/Comp/SelectOperation';
-import { IWork } from '@/ts/core';
+import SelectForms from '../../../../../Comp/SelectForms';
+import { IThingClass, IWorkDefine, SpeciesType } from '@/ts/core';
+import ViewFormModal from '@/bizcomponents/FormDesign/viewFormModal';
 interface IProps {
   current: NodeType;
-  work: IWork;
+  define: IWorkDefine;
 }
 
 /**
@@ -19,6 +20,7 @@ interface IProps {
  */
 
 const ApprovalNode: React.FC<IProps> = (props) => {
+  const [viewForm, setViewForm] = useState<XForm>();
   const [isOpen, setIsOpen] = useState<boolean>(false); // 打开弹窗
   const [radioValue, setRadioValue] = useState(1);
   const [operations, setOperations] = useState<XForm[]>(
@@ -126,14 +128,11 @@ const ApprovalNode: React.FC<IProps> = (props) => {
       <div>
         {operations && operations.length > 0 && (
           <span>
-            {/* 点击预览：{' '}
-            <Space size={[0, 10]}> */}
             <ShareShowComp
               departData={operations}
-              // onClick={(item: any) => {
-              //   setEditData(item);
-              //   setViewFormOpen(true);
-              // }}
+              onClick={(item: any) => {
+                setViewForm(item);
+              }}
               deleteFuc={(id: string) => {
                 props.current.props.operations = props.current.props.operations.filter(
                   (op) => op.id != id,
@@ -143,15 +142,6 @@ const ApprovalNode: React.FC<IProps> = (props) => {
             {/* </Space> */}
           </span>
         )}
-        {/* <ChooseOperation
-          open={operationModal != undefined}
-          onOk={(item: any) => {
-            props.current.props.operations = [item.operation];
-            setOperations([item.operation]);
-            setOperationModal(undefined);
-          }}
-          onCancel={() => setOperationModal(undefined)}></ChooseOperation> */}
-
         <Modal
           title={`选择表单`}
           width={800}
@@ -164,10 +154,12 @@ const ApprovalNode: React.FC<IProps> = (props) => {
             setOperationModal(undefined);
           }}
           onCancel={() => setOperationModal(undefined)}>
-          <SelectOperation
-            current={props.work}
+          <SelectForms
+            species={props.define.workItem.app.children
+              .filter((i) => i.typeName === SpeciesType.Thing)
+              .map((i) => i as IThingClass)}
             selected={showData}
-            setSelected={setShowData}></SelectOperation>
+            setSelected={setShowData}></SelectForms>
         </Modal>
       </div>
       <Modal
@@ -192,20 +184,22 @@ const ApprovalNode: React.FC<IProps> = (props) => {
               },
             });
           }}
-          space={props.work.current.space}
+          space={props.define.workItem.current.space}
         />
       </Modal>
-      {/* <ViewFormModal
-        belong={props.species.current.space}
-        data={editData}
-        open={viewFormOpen}
-        handleCancel={() => {
-          setViewFormOpen(false);
-        }}
-        handleOk={() => {
-          setViewFormOpen(false);
-        }}
-      /> */}
+      {viewForm && (
+        <ViewFormModal
+          form={viewForm}
+          open={true}
+          define={props.define}
+          handleCancel={() => {
+            setViewForm(undefined);
+          }}
+          handleOk={() => {
+            setViewForm(undefined);
+          }}
+        />
+      )}
     </div>
   );
 };

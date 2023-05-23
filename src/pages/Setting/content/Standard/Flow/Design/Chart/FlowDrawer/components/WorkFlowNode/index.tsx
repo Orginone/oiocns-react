@@ -3,15 +3,14 @@ import { AiOutlineSetting } from 'react-icons/ai';
 import { Row, Button, Space, Modal, message } from 'antd';
 import cls from './index.module.less';
 import { NodeType } from '../../processType';
-import { IWork } from '@/ts/core';
-import WorkSelectTable from './WorkSelectTable';
+import { IWorkDefine } from '@/ts/core';
+import SelectDefine from '../../../../../Comp/SelectDefine';
 import ShareShowComp from '@/bizcomponents/IndentityManage/ShareShowComp';
 import { schema } from '@/ts/base';
-import orgCtrl from '@/ts/controller';
 
 interface IProps {
   current: NodeType;
-  work: IWork;
+  define: IWorkDefine;
 }
 
 /**
@@ -76,9 +75,10 @@ const WorkFlowNode: React.FC<IProps> = (props) => {
             message.warn('请选择办事');
             return;
           }
-          let name = `${selectChildWork.name} [${orgCtrl.provider.user?.findShareById(
+          const b = props.define.workItem.current.space.user.findShareById(
             selectChildWork.belongId,
-          )}]`;
+          );
+          let name = `${selectChildWork.name} [${b.name}]`;
           props.current.props.assignedUser = [
             {
               name: name,
@@ -96,14 +96,11 @@ const WorkFlowNode: React.FC<IProps> = (props) => {
           setIsOpen(false);
         }}
         onCancel={() => setIsOpen(false)}>
-        {props.work && (
-          <WorkSelectTable
-            work={props.work}
-            searchFn={(params: schema.XWorkDefine) => {
-              setSelectChildWork(params);
-            }}
-          />
-        )}
+        <SelectDefine
+          exclude={props.define.metadata}
+          belong={props.define.workItem.current.space}
+          onChecked={setSelectChildWork}
+        />
       </Modal>
     </div>
   );

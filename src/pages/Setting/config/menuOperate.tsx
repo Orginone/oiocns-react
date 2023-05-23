@@ -185,7 +185,6 @@ const buildFormMenu = (form: IThingClass) => {
       menus: loadFormMenus(i),
       children: [],
       beforeLoad: async () => {
-        await i.loadPropertys();
         await i.loadAttributes();
       },
     } as MenuItemType;
