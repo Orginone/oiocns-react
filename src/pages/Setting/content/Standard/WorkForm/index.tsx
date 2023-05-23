@@ -1,6 +1,6 @@
 import { Button } from 'antd';
 import React, { useState } from 'react';
-import SpeciesForm from '@/bizcomponents/FormDesign';
+import FormDesign from '@/bizcomponents/FormDesign';
 import cls from '../index.module.less';
 import PageCard from '@/components/PageCard';
 import Attribute from './Attritube';
@@ -55,7 +55,7 @@ const WorkForm: React.FC<IProps> = ({ current }: IProps) => {
           />
         );
       case 'form':
-        return <SpeciesForm current={current!} />;
+        return <FormDesign current={current!} />;
     }
   };
 

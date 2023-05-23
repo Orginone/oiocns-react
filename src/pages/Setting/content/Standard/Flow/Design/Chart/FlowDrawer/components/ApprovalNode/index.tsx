@@ -4,11 +4,12 @@ import { Row, Button, Divider, Col, Radio, Space, Form, InputNumber, Modal } fro
 import IndentitySelect from '@/bizcomponents/IndentityManage';
 import cls from './index.module.less';
 import { NodeType } from '../../processType';
-import { XForm } from '@/ts/base/schema';
+// import { XForm } from '@/ts/base/schema';
 import ShareShowComp from '@/bizcomponents/IndentityManage/ShareShowComp';
-import SelectForms from '../../../../../Comp/SelectForms';
-import { IThingClass, IWorkDefine, SpeciesType } from '@/ts/core';
-import ViewFormModal from '@/bizcomponents/FormDesign/viewFormModal';
+import { IWorkDefine } from '@/ts/core';
+// import SelectForms from '../../../../../Comp/SelectForms';
+// import { IThingClass, IWorkDefine, SpeciesType } from '@/ts/core';
+// import ViewFormModal from '@/bizcomponents/FormDesign/viewFormModal';
 interface IProps {
   current: NodeType;
   define: IWorkDefine;
@@ -20,14 +21,14 @@ interface IProps {
  */
 
 const ApprovalNode: React.FC<IProps> = (props) => {
-  const [viewForm, setViewForm] = useState<XForm>();
+  // const [viewForm, setViewForm] = useState<XForm>();
   const [isOpen, setIsOpen] = useState<boolean>(false); // 打开弹窗
   const [radioValue, setRadioValue] = useState(1);
-  const [operations, setOperations] = useState<XForm[]>(
-    props.current.props.operations || [],
-  );
-  const [operationModal, setOperationModal] = useState<any>();
-  const [showData, setShowData] = useState<any[]>([]);
+  // const [operations, setOperations] = useState<XForm[]>(
+  //   props.current.props.operations || [],
+  // );
+  // const [operationModal, setOperationModal] = useState<any>();
+  // const [showData, setShowData] = useState<any[]>([]);
 
   useEffect(() => {
     // 加载业务表单列表
@@ -114,7 +115,7 @@ const ApprovalNode: React.FC<IProps> = (props) => {
         </div>
       </div>
       <Divider />
-      <div style={{ marginBottom: '10px' }}>
+      {/* <div style={{ marginBottom: '10px' }}>
         <Button
           type="primary"
           shape="round"
@@ -124,9 +125,9 @@ const ApprovalNode: React.FC<IProps> = (props) => {
           }}>
           绑定表单
         </Button>
-      </div>
+      </div> */}
       <div>
-        {operations && operations.length > 0 && (
+        {/* {operations && operations.length > 0 && (
           <span>
             <ShareShowComp
               departData={operations}
@@ -139,10 +140,9 @@ const ApprovalNode: React.FC<IProps> = (props) => {
                 );
                 setOperations(props.current.props.operations);
               }}></ShareShowComp>
-            {/* </Space> */}
           </span>
-        )}
-        <Modal
+        )} */}
+        {/* <Modal
           title={`选择表单`}
           width={800}
           destroyOnClose={true}
@@ -160,7 +160,7 @@ const ApprovalNode: React.FC<IProps> = (props) => {
               .map((i) => i as IThingClass)}
             selected={showData}
             setSelected={setShowData}></SelectForms>
-        </Modal>
+        </Modal> */}
       </div>
       <Modal
         width="650px"
@@ -187,7 +187,7 @@ const ApprovalNode: React.FC<IProps> = (props) => {
           space={props.define.workItem.current.space}
         />
       </Modal>
-      {viewForm && (
+      {/* {viewForm && (
         <ViewFormModal
           form={viewForm}
           open={true}
@@ -199,7 +199,7 @@ const ApprovalNode: React.FC<IProps> = (props) => {
             setViewForm(undefined);
           }}
         />
-      )}
+      )} */}
     </div>
   );
 };

@@ -155,7 +155,7 @@ const Design: React.FC<IProps> = ({ current }) => {
       });
   };
 
-  useEffect(() => {
+  const reloadPropertyTree = () => {
     const propClasses: IPropClass[] = [];
     for (const item of current.species.current.space.species) {
       switch (item.typeName) {
@@ -170,6 +170,10 @@ const Design: React.FC<IProps> = ({ current }) => {
         .filter((i) => i.propId && i.propId.length > 0)
         .map((i) => i.propId),
     );
+  };
+
+  useEffect(() => {
+    reloadPropertyTree();
   }, []);
   return (
     <div style={{ display: 'flex' }}>
@@ -179,6 +183,12 @@ const Design: React.FC<IProps> = ({ current }) => {
             checkable={true}
             defaultExpandAll={true}
             checkedKeys={selectKeys}
+            onSelect={async (_, info: any) => {
+              if (!info.node.checkable) {
+                await (info.node.item as IPropClass).loadPropertys();
+                reloadPropertyTree();
+              }
+            }}
             onCheck={async (keys, info) => {
               setSelectKeys(keys as string[]);
               const prop = (info.node as any).item;

@@ -3,13 +3,12 @@ import { IWorkDefine } from '@/ts/core';
 import { ProFormInstance } from '@ant-design/pro-form';
 import { Button, Card, Input, message } from 'antd';
 import orgCtrl from '@/ts/controller';
-import { Editing } from 'devextreme-react/data-grid';
 import React, { useEffect, useRef, useState } from 'react';
 import cls from './index.module.less';
 import OioForm from '@/bizcomponents/FormDesign/OioForm';
-import { kernel } from '@/ts/base';
 import { GroupMenuType } from '../../config/menuType';
-import { XForm } from '@/ts/base/schema';
+import { XForm, XProperty } from '@/ts/base/schema';
+import PageCard from '@/components/PageCard';
 
 // 卡片渲染
 interface IProps {
@@ -21,23 +20,15 @@ interface IProps {
  */
 const WorkStartDo: React.FC<IProps> = ({ current }) => {
   const [data, setData] = useState<any>({});
-  const [rows, setRows] = useState<any>([]);
-  const [forms, setForms] = useState<XForm[]>([]);
+  const [rows, setRows] = useState<any[]>([]);
+  const [activeTab, setActiveTab] = useState<string>();
+  const [propertys, setPropertys] = useState<XProperty[]>([]);
+  const [thingForms, setThingForms] = useState<XForm[]>([]);
+  const [workForms, setWorkForms] = useState<XForm[]>([]);
   const [content, setContent] = useState<string>('');
   const formRef = useRef<ProFormInstance<any>>();
 
   const submit = async () => {
-    let rows_ = rows;
-    if (rows.length == 0) {
-      let res = await kernel.anystore.createThing(current.metadata.belongId, 1);
-      if (res && res.success) {
-        rows_ = res.data;
-      } else {
-        message.error('创建物失败!');
-        return;
-      }
-    }
-    //发起流程tableKey
     if (
       await current.createWorkInstance({
         hook: '',
@@ -46,7 +37,7 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
         title: current.name,
         defineId: current.id,
         data: JSON.stringify(data),
-        thingIds: rows_.map((row: any) => row['Id']),
+        thingIds: rows.map((row: any) => row['Id']),
       })
     ) {
       message.success('发起成功!');
@@ -58,61 +49,71 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
   useEffect(() => {
     current.loadWorkNode().then((value) => {
       if (value && value.forms && value.forms?.length > 0) {
-        setForms(value.forms);
+        setThingForms(value.forms.filter((i) => i.belongId === i.shareId));
+        setWorkForms(value.forms.filter((i) => i.belongId != i.shareId));
       }
     });
   }, []);
 
+  useEffect(() => {
+    if (thingForms.length > 0) {
+      if (!activeTab) {
+        setActiveTab(thingForms[0].id);
+      } else {
+        current.loadAttributes(activeTab).then((attributes) => {
+          setPropertys(
+            attributes
+              .filter((i) => i.linkPropertys && i.linkPropertys.length > 0)
+              .map((i) => i.linkPropertys![0]),
+          );
+        });
+      }
+    }
+  }, [thingForms, activeTab]);
+
   return (
     <div className={cls.content}>
-      {forms.length > 0 && (
-        <OioForm
-          form={forms[0]}
-          define={current}
-          formRef={formRef}
-          submitter={{
-            resetButtonProps: {
-              style: { display: 'none' },
-            },
-            render: (_: any, _dom: any) => <></>,
-          }}
-          onValuesChange={(_changedValues, values) => {
-            setData({ ...data, ...values });
-          }}
-        />
-      )}
-      {
-        <Thing
-          keyExpr="Id"
-          height={500}
-          labels={[]}
-          propertys={[]}
-          belongId={current.workItem.belongId}
-          dataSource={rows}
-          selectable={false}
-          menuItems={[
-            {
-              key: 'remove',
-              label: '删除',
-              click(row) {
-                if (rows.length > 1) {
-                  setRows(rows.filter((item: any) => item.Id != row.Id));
-                } else {
-                  message.error('删除失败,至少需要一条数据');
-                }
+      {workForms.map((form) => {
+        return (
+          <OioForm
+            key={form.id}
+            form={form}
+            define={current}
+            formRef={formRef}
+            submitter={{
+              resetButtonProps: {
+                style: { display: 'none' },
               },
-            },
-          ]}
-          editingTool={
-            <Editing
-              allowAdding={false}
-              allowDeleting={false}
-              selectTextOnEditStart={true}
-              useIcons={true}
+              render: (_: any, _dom: any) => <></>,
+            }}
+            onValuesChange={(_changedValues, values) => {
+              setData({ ...data, ...values });
+            }}
+          />
+        );
+      })}
+      {activeTab && (
+        <PageCard
+          key={activeTab}
+          bordered={false}
+          tabList={thingForms.map((i) => {
+            return { tab: i.name, key: i.id };
+          })}
+          onTabChange={async (tabKey) => {
+            setActiveTab(tabKey);
+          }}>
+          <div className={cls['page-content-table']}>
+            <Thing
+              height={500}
+              selectable
+              labels={[`S${activeTab}`]}
+              propertys={propertys}
+              onSelected={setRows}
+              belongId={current.workItem.belongId}
             />
-          }
-        />
-      }
+          </div>
+        </PageCard>
+      )}
       <Card className={cls['bootom_content']}>
         <div style={{ display: 'flex', width: '100%' }}>
           <Input.TextArea

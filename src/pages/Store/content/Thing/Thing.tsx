@@ -45,6 +45,7 @@ interface IProps {
   setThingId?: (thingId: string) => void;
   scrolling?: boolean;
   keyExpr?: string;
+  onSelected?: (data: any[]) => void;
 }
 
 /**
@@ -250,6 +251,9 @@ const Thing: React.FC<IProps> = (props: IProps) => {
           if (props.onBack) {
             props.onBack();
           }
+        }}
+        onSelectionChanged={(e) => {
+          props.onSelected?.apply(this, [e.selectedRowsData]);
         }}
         columnResizingMode={'widget'}
         height={props.height || 'calc(100vh - 175px)'}

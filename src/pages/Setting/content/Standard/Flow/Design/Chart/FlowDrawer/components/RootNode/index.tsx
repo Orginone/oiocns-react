@@ -20,8 +20,13 @@ interface IProps {
 
 const RootNode: React.FC<IProps> = (props) => {
   const [viewForm, setViewForm] = useState<XForm>();
-  const [forms, setForms] = useState<XForm[]>(props.current.props.operations || []);
-  const [operationModal, setOperationModal] = useState<any>();
+  const [workforms, setWorkForms] = useState<XForm[]>(
+    (props.current.props.operations || []).filter((i) => i.belongId != i.shareId),
+  );
+  const [thingforms, setThingForms] = useState<XForm[]>(
+    (props.current.props.operations || []).filter((i) => i.belongId == i.shareId),
+  );
+  const [formModel, setFormModel] = useState<string>('');
   const [selectAuthValue, setSelectAuthValue] = useState<any>(
     props.current.props.assignedUser[0]?.id,
   );
@@ -44,49 +49,78 @@ const RootNode: React.FC<IProps> = (props) => {
           value={selectAuthValue}></SelectAuth>
         <Divider />
         <Row style={{ marginBottom: '10px' }}>
-          <AiOutlineSetting style={{ marginTop: '3px' }} />
-          <span className={cls[`roval-node-title`]}>实体表单</span>
+          <Button
+            type="primary"
+            shape="round"
+            size="small"
+            onClick={() => {
+              setFormModel('workForm');
+            }}>
+            选择业务表单
+          </Button>
         </Row>
-        <Button
-          type="primary"
-          shape="round"
-          size="small"
-          onClick={() => {
-            setOperationModal('');
-          }}>
-          选择实体表单
-        </Button>
+        {workforms && workforms.length > 0 && (
+          <span>
+            <ShareShowComp
+              departData={workforms}
+              onClick={(item: XForm) => {
+                setViewForm(item);
+              }}
+              deleteFuc={(id: string) => {
+                setWorkForms([...workforms.filter((i) => i.id != id)]);
+              }}></ShareShowComp>
+          </span>
+        )}
+        <Row style={{ marginBottom: '10px' }}>
+          <Button
+            type="primary"
+            shape="round"
+            size="small"
+            onClick={() => {
+              setFormModel('thingForm');
+            }}>
+            选择实体表单
+          </Button>
+        </Row>
+        {thingforms && thingforms.length > 0 && (
+          <span>
+            <ShareShowComp
+              departData={thingforms}
+              onClick={(item: XForm) => {
+                setViewForm(item);
+              }}
+              deleteFuc={(id: string) => {
+                setThingForms([...thingforms.filter((i) => i.id != id)]);
+              }}></ShareShowComp>
+          </span>
+        )}
         {/* </div> */}
         <div>
-          {forms && forms.length > 0 && (
-            <span>
-              <ShareShowComp
-                departData={forms}
-                onClick={(item: XForm) => {
-                  setViewForm(item);
-                }}
-                deleteFuc={(id: string) => {
-                  setForms([...forms.filter((i) => i.id != id)]);
-                }}></ShareShowComp>
-            </span>
-          )}
           <Modal
-            title={`选择实体表单`}
+            title={`选择表单`}
             width={800}
             destroyOnClose={true}
-            open={operationModal != undefined}
+            open={formModel != ''}
             okText="确定"
             onOk={() => {
-              props.current.props.operations = forms;
-              setOperationModal(undefined);
+              props.current.props.operations = [...workforms, ...thingforms];
+              setFormModel('');
             }}
-            onCancel={() => setOperationModal(undefined)}>
+            onCancel={() => setFormModel('')}>
             <SelectForms
-              species={props.define.workItem.current.space.species
-                .filter((i) => i.typeName === SpeciesType.Thing)
-                .map((i) => i as IThingClass)}
-              selected={forms}
-              setSelected={setForms}></SelectForms>
+              species={
+                formModel === 'thingForm'
+                  ? props.define.workItem.current.space.species
+                      .filter((i) => i.typeName === SpeciesType.Thing)
+                      .map((i) => i as IThingClass)
+                  : props.define.workItem.app.children
+                      .filter((i) => i.typeName === SpeciesType.Thing)
+                      .map((i) => i as IThingClass)
+              }
+              selected={formModel === 'thingForm' ? thingforms : workforms}
+              setSelected={
+                formModel === 'thingForm' ? setThingForms : setWorkForms
+              }></SelectForms>
           </Modal>
           {viewForm && (
             <ViewFormModal

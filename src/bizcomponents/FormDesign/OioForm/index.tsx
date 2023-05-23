@@ -30,7 +30,7 @@ const OioForm: React.FC<IProps> = ({
   disabled,
 }) => {
   const [attributes, setAttributes] = useState<XAttribute[]>([]);
-  let config: any = JSON.parse(form.rule || `{ col: 12, layout: 'horizontal' }`);
+  let config: any = form.rule ? JSON.parse(form.rule) : { col: 12, layout: 'horizontal' };
   useEffect(() => {
     define.loadAttributes(form.id).then((value) => {
       setAttributes(value);
