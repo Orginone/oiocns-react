@@ -20,12 +20,6 @@ export interface IWorkDefine extends IEntity<schema.XWorkDefine> {
   createWorkInstance(
     data: model.WorkInstanceModel,
   ): Promise<schema.XWorkInstance | undefined>;
-  /** 删除办事实例 */
-  deleteInstance(id: string): Promise<boolean>;
-  /** 根据表单id查询表单特性 */
-  loadAttributes(id: string): Promise<schema.XAttribute[]>;
-  /** 根据字典id查询字典项 */
-  loadItems(id: string): Promise<schema.XDictItem[]>;
 }
 
 export class FlowDefine extends Entity<schema.XWorkDefine> implements IWorkDefine {
@@ -71,30 +65,6 @@ export class FlowDefine extends Entity<schema.XWorkDefine> implements IWorkDefin
     if (res.success) {
       return res.data;
     }
-  }
-  async deleteInstance(id: string): Promise<boolean> {
-    const res = await kernel.recallWorkInstance({ id, page: PageAll });
-    return res.success;
-  }
-  async loadAttributes(id: string): Promise<schema.XAttribute[]> {
-    const res = await kernel.queryFormAttributes({
-      id: id,
-      subId: this.workItem.belongId,
-    });
-    if (res.success) {
-      return res.data.result || [];
-    }
-    return [];
-  }
-  async loadItems(id: string): Promise<schema.XDictItem[]> {
-    const res = await kernel.queryDictItems({
-      id: id,
-      page: PageAll,
-    });
-    if (res.success) {
-      return res.data.result || [];
-    }
-    return [];
   }
 }
 

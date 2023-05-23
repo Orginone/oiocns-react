@@ -32,6 +32,12 @@ export interface IWorkProvider {
   loadTaskDetail(task: schema.XWorkTask): Promise<schema.XWorkInstance | undefined>;
   /** 查询流程定义 */
   findFlowDefine(defineId: string): Promise<IWorkDefine | undefined>;
+  /** 删除办事实例 */
+  deleteInstance(id: string): Promise<boolean>;
+  /** 根据表单id查询表单特性 */
+  loadAttributes(id: string, belongId: string): Promise<schema.XAttribute[]>;
+  /** 根据字典id查询字典项 */
+  loadItems(id: string): Promise<schema.XDictItem[]>;
 }
 
 export class WorkProvider implements IWorkProvider {
@@ -183,5 +189,29 @@ export class WorkProvider implements IWorkProvider {
         }
       }
     }
+  }
+  async deleteInstance(id: string): Promise<boolean> {
+    const res = await kernel.recallWorkInstance({ id, page: PageAll });
+    return res.success;
+  }
+  async loadAttributes(id: string, belongId: string): Promise<schema.XAttribute[]> {
+    const res = await kernel.queryFormAttributes({
+      id: id,
+      subId: belongId,
+    });
+    if (res.success) {
+      return res.data.result || [];
+    }
+    return [];
+  }
+  async loadItems(id: string): Promise<schema.XDictItem[]> {
+    const res = await kernel.queryDictItems({
+      id: id,
+      page: PageAll,
+    });
+    if (res.success) {
+      return res.data.result || [];
+    }
+    return [];
   }
 }

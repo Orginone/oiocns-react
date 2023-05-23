@@ -1,14 +1,13 @@
 import Thing from '@/pages/Store/content/Thing/Thing';
 import { IWorkDefine } from '@/ts/core';
 import { ProFormInstance } from '@ant-design/pro-form';
-import { Button, Card, Input, message } from 'antd';
+import { Button, Card, Input, Modal, Tabs, message } from 'antd';
 import orgCtrl from '@/ts/controller';
 import React, { useEffect, useRef, useState } from 'react';
 import cls from './index.module.less';
 import OioForm from '@/bizcomponents/FormDesign/OioForm';
 import { GroupMenuType } from '../../config/menuType';
 import { XForm, XProperty } from '@/ts/base/schema';
-import PageCard from '@/components/PageCard';
 
 // 卡片渲染
 interface IProps {
@@ -21,6 +20,8 @@ interface IProps {
 const WorkStartDo: React.FC<IProps> = ({ current }) => {
   const [data, setData] = useState<any>({});
   const [rows, setRows] = useState<any[]>([]);
+  const [form, setForm] = useState<XForm>();
+  const [operateModel, setOperateModel] = useState<string>();
   const [activeTab, setActiveTab] = useState<string>();
   const [propertys, setPropertys] = useState<XProperty[]>([]);
   const [thingForms, setThingForms] = useState<XForm[]>([]);
@@ -60,13 +61,15 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
       if (!activeTab) {
         setActiveTab(thingForms[0].id);
       } else {
-        current.loadAttributes(activeTab).then((attributes) => {
-          setPropertys(
-            attributes
-              .filter((i) => i.linkPropertys && i.linkPropertys.length > 0)
-              .map((i) => i.linkPropertys![0]),
-          );
-        });
+        orgCtrl.work
+          .loadAttributes(activeTab, current.workItem.belongId)
+          .then((attributes) => {
+            setPropertys(
+              attributes
+                .filter((i) => i.linkPropertys && i.linkPropertys.length > 0)
+                .map((i) => i.linkPropertys![0]),
+            );
+          });
       }
     }
   }, [thingForms, activeTab]);
@@ -93,26 +96,56 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
         );
       })}
       {activeTab && (
-        <PageCard
-          key={activeTab}
-          bordered={false}
-          tabList={thingForms.map((i) => {
-            return { tab: i.name, key: i.id };
-          })}
-          onTabChange={async (tabKey) => {
-            setActiveTab(tabKey);
-          }}>
-          <div className={cls['page-content-table']}>
-            <Thing
-              height={500}
-              selectable
-              labels={[`S${activeTab}`]}
-              propertys={propertys}
-              onSelected={setRows}
-              belongId={current.workItem.belongId}
-            />
-          </div>
-        </PageCard>
+        <Tabs
+          activeKey={activeTab}
+          tabPosition="left"
+          onTabClick={(tabKey) => setActiveTab(tabKey)}
+          items={thingForms.map((i) => {
+            return {
+              label: i.name,
+              key: i.id,
+              children: (
+                <Thing
+                  keyExpr="Id"
+                  height={500}
+                  selectable={false}
+                  dataSource={rows}
+                  labels={[`S${activeTab}`]}
+                  propertys={propertys}
+                  toolBarItems={[
+                    <Button
+                      key="1"
+                      type="default"
+                      onClick={() => {
+                        setForm(i);
+                        setOperateModel('add');
+                      }}>
+                      新增{i.name}
+                    </Button>,
+                    <Button
+                      key="2"
+                      type="default"
+                      onClick={() => {
+                        setForm(i);
+                        setOperateModel('select');
+                      }}>
+                      选择{i.name}
+                    </Button>,
+                  ]}
+                  belongId={current.workItem.belongId}
+                  menuItems={[
+                    {
+                      key: 'edit',
+                      label: '变更',
+                      click(data) {
+                        console.log(data);
+                      },
+                    },
+                  ]}
+                />
+              ),
+            };
+          })}></Tabs>
       )}
       <Card className={cls['bootom_content']}>
         <div style={{ display: 'flex', width: '100%' }}>
@@ -136,6 +169,41 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
           </div>
         </div>
       </Card>
+      {form && operateModel === 'add' && (
+        <Modal
+          open={true}
+          onOk={() => {}}
+          onCancel={() => {
+            setOperateModel('');
+            setForm(undefined);
+          }}
+          destroyOnClose={true}
+          cancelText={'关闭'}
+          width={1000}>
+          <OioForm form={form} formRef={undefined} define={current} />
+        </Modal>
+      )}
+      {form && operateModel === 'select' && (
+        <Modal
+          open={true}
+          onOk={() => {}}
+          onCancel={() => {
+            setOperateModel('');
+            setForm(undefined);
+          }}
+          destroyOnClose={true}
+          cancelText={'关闭'}
+          width={1000}>
+          <Thing
+            height={500}
+            selectable
+            labels={[`S${activeTab}`]}
+            propertys={propertys}
+            onSelected={setRows}
+            belongId={current.workItem.belongId}
+          />
+        </Modal>
+      )}
     </div>
   );
 };

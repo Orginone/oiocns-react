@@ -6,7 +6,6 @@ import DataGrid, {
   Column,
   ColumnChooser,
   ColumnFixing,
-  Editing,
   Pager,
   Paging,
   Lookup,
@@ -53,9 +52,7 @@ interface IProps {
  */
 const Thing: React.FC<IProps> = (props: IProps) => {
   const { menuItems, selectable = true, deferred = false } = props;
-
   const allMenuItems: ThingItemType[] = [...(menuItems || [])];
-
   const menuClick = (key: string, data: any) => {
     const menu = allMenuItems.find((i) => i.key == key);
     if (menu && menu.click) {
@@ -229,6 +226,9 @@ const Thing: React.FC<IProps> = (props: IProps) => {
               }
               return [];
             },
+            async insert(values) {
+              console.log(values);
+            },
           })
         }
         onInitialized={(e) => {
@@ -265,7 +265,6 @@ const Thing: React.FC<IProps> = (props: IProps) => {
           title={'列选择器'}
           height={'500px'}
           allowSearch={true}
-          // mode={'select'}
           sortOrder={'asc'}
         />
         <ColumnFixing enabled={true} />
@@ -276,15 +275,6 @@ const Thing: React.FC<IProps> = (props: IProps) => {
             selectAllMode="allPages"
             showCheckBoxesMode="always"
             deferred={deferred}
-          />
-        )}
-        {props.editingTool || (
-          <Editing
-            allowAdding={false}
-            allowUpdating={false}
-            allowDeleting={false}
-            selectTextOnEditStart={true}
-            useIcons={true}
           />
         )}
         <Pager
@@ -301,7 +291,14 @@ const Thing: React.FC<IProps> = (props: IProps) => {
         <FilterRow visible={true} />
         <HeaderFilter visible={true} />
         <Toolbar>
-          {props.toolBarItems}
+          {props.toolBarItems &&
+            props.toolBarItems.map((item) => {
+              return (
+                <Item key={item.key} location="after">
+                  {item}
+                </Item>
+              );
+            })}
           <Item name="searchPanel" />
           <Item name="columnChooserButton" locateInMenu="auto" location="after" />
         </Toolbar>

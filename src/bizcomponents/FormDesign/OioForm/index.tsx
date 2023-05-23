@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import OioFormItem from './FormItems';
 import { IWorkDefine } from '@/ts/core';
 import { XAttribute, XForm } from '@/ts/base/schema';
+import orgCtrl from '@/ts/controller';
 
 type IProps = {
   form: XForm;
@@ -32,7 +33,7 @@ const OioForm: React.FC<IProps> = ({
   const [attributes, setAttributes] = useState<XAttribute[]>([]);
   let config: any = form.rule ? JSON.parse(form.rule) : { col: 12, layout: 'horizontal' };
   useEffect(() => {
-    define.loadAttributes(form.id).then((value) => {
+    orgCtrl.work.loadAttributes(form.id, define.workItem.belongId).then((value) => {
       setAttributes(value);
       if (fieldsValue) {
         formRef?.current?.setFieldsValue(fieldsValue);
@@ -83,7 +84,7 @@ const OioForm: React.FC<IProps> = ({
         <Row gutter={24}>
           {attributes.map((item) => (
             <Col span={config.col} key={item.id}>
-              <OioFormItem item={item} define={define} />
+              <OioFormItem item={item} belong={define.workItem.current.space} />
             </Col>
           ))}
         </Row>
