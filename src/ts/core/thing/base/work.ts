@@ -3,8 +3,6 @@ import { kernel, model, schema } from '../../../base';
 import { PageAll } from '../../public/consts';
 import { TargetType } from '../../public/enums';
 import { ISpeciesItem, SpeciesItem } from './species';
-import { ShareIcon } from '@/ts/base/model';
-import { IForm } from './form';
 import { IApplication } from '../app/application';
 import { ITarget } from '../../target/base/target';
 import { Entity, IEntity } from '../../public';
@@ -12,20 +10,22 @@ import { Entity, IEntity } from '../../public';
 export interface IWorkDefine extends IEntity<schema.XWorkDefine> {
   /** 办事分类 */
   workItem: IWork;
-  /** 共享信息 */
-  share: ShareIcon;
   /** 更新办事定义 */
   updateDefine(req: model.WorkDefineModel): Promise<boolean>;
   /** 加载事项定义节点 */
   loadWorkNode(): Promise<model.WorkNodeModel | undefined>;
   /** 删除办事定义 */
   deleteDefine(): Promise<boolean>;
-  /** 删除办事实例 */
-  deleteInstance(id: string): Promise<boolean>;
   /** 新建办事实例 */
   createWorkInstance(
     data: model.WorkInstanceModel,
   ): Promise<schema.XWorkInstance | undefined>;
+  /** 删除办事实例 */
+  deleteInstance(id: string): Promise<boolean>;
+  /** 根据表单id查询表单特性 */
+  loadAttributes(id: string): Promise<schema.XAttribute[]>;
+  /** 根据字典id查询字典项 */
+  loadItems(id: string): Promise<schema.XDictItem[]>;
 }
 
 export class FlowDefine extends Entity<schema.XWorkDefine> implements IWorkDefine {
@@ -36,14 +36,6 @@ export class FlowDefine extends Entity<schema.XWorkDefine> implements IWorkDefin
       typeName: '事项',
     });
     this.workItem = work;
-  }
-  async createWorkInstance(
-    data: model.WorkInstanceModel,
-  ): Promise<schema.XWorkInstance | undefined> {
-    let result = await kernel.createWorkInstance(data);
-    if (result.success) {
-      return result.data;
-    }
   }
   async deleteDefine(): Promise<boolean> {
     const res = await kernel.deleteWorkDefine({
@@ -72,8 +64,37 @@ export class FlowDefine extends Entity<schema.XWorkDefine> implements IWorkDefin
       return res.data;
     }
   }
+  async createWorkInstance(
+    data: model.WorkInstanceModel,
+  ): Promise<schema.XWorkInstance | undefined> {
+    let res = await kernel.createWorkInstance(data);
+    if (res.success) {
+      return res.data;
+    }
+  }
   async deleteInstance(id: string): Promise<boolean> {
-    return (await kernel.recallWorkInstance({ id, page: PageAll })).success;
+    const res = await kernel.recallWorkInstance({ id, page: PageAll });
+    return res.success;
+  }
+  async loadAttributes(id: string): Promise<schema.XAttribute[]> {
+    const res = await kernel.queryFormAttributes({
+      id: id,
+      subId: this.workItem.belongId,
+    });
+    if (res.success) {
+      return res.data.result || [];
+    }
+    return [];
+  }
+  async loadItems(id: string): Promise<schema.XDictItem[]> {
+    const res = await kernel.queryDictItems({
+      id: id,
+      page: PageAll,
+    });
+    if (res.success) {
+      return res.data.result || [];
+    }
+    return [];
   }
 }
 
@@ -82,14 +103,10 @@ export interface IWork extends ISpeciesItem {
   app: IApplication;
   /** 流程定义 */
   defines: IWorkDefine[];
-  /** 加载所有可选表单 */
-  loadForms(): Promise<IForm[]>;
   /** 加载办事 */
   loadWorkDefines(reload?: boolean): Promise<IWorkDefine[]>;
   /** 新建办事 */
   createWorkDefine(data: model.WorkDefineModel): Promise<IWorkDefine | undefined>;
-  /** 删除办事实例 */
-  deleteInstance(id: string): Promise<boolean>;
 }
 
 export abstract class Work extends SpeciesItem implements IWork {
@@ -131,14 +148,4 @@ export abstract class Work extends SpeciesItem implements IWork {
       return define;
     }
   }
-  /** 删除办事实例 */
-  async deleteInstance(id: string): Promise<boolean> {
-    return (
-      await kernel.recallWorkInstance({
-        id,
-        page: PageAll,
-      })
-    ).data;
-  }
-  abstract loadForms(): Promise<IForm[]>;
 }

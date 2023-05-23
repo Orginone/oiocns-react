@@ -2,7 +2,7 @@ import orgCtrl from '@/ts/controller';
 import React from 'react';
 import { MenuItemType } from 'typings/globelType';
 import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
-import { IMarket, ISpeciesItem, IWorkThing, SpeciesType } from '@/ts/core';
+import { IMarket, ISpeciesItem, IThingClass, SpeciesType } from '@/ts/core';
 import OrgIcons from '@/bizcomponents/GlobalComps/orgIcons';
 
 /** 编译组织分类树 */
@@ -12,7 +12,7 @@ const buildSpeciesTree = (species: ISpeciesItem[]): MenuItemType[] => {
     switch (item.typeName) {
       case SpeciesType.Thing:
         {
-          const thing = item as IWorkThing;
+          const thing = item as IThingClass;
           result.push({
             key: item.key,
             item: item,

@@ -3,16 +3,12 @@ import { SpeciesType } from '../../public/enums';
 import { ITarget } from '../../target/base/target';
 import { ISpeciesItem, SpeciesItem } from '../base/species';
 import { IWorkItem, WorkItem } from './workitem';
-import { IForm } from '../base/form';
 import { IWorkDefine } from '../base/work';
 import { Data } from './data';
-import { IThingClass } from '../store/thingclass';
 /** 应用的基类接口 */
 export interface IApplication extends ISpeciesItem {
   /** 流程定义 */
   defines: IWorkDefine[];
-  /** 查询所有的表单 */
-  loadForms(): Promise<IForm[]>;
   /** 查询所有办事 */
   loadWorkDefines(): Promise<IWorkDefine[]>;
 }
@@ -30,15 +26,6 @@ export class Application extends SpeciesItem implements IApplication {
     }
   }
   defines: IWorkDefine[] = [];
-  async loadForms(): Promise<IForm[]> {
-    const result: IForm[] = [];
-    for (const item of this.children) {
-      if (item.typeName === SpeciesType.Thing) {
-        result.push(...(await (item as IThingClass).loadAllForms()));
-      }
-    }
-    return result;
-  }
   async loadWorkDefines(): Promise<IWorkDefine[]> {
     const result: IWorkDefine[] = [];
     for (const item of this.children) {

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ProFormSelect } from '@ant-design/pro-components';
-import { IBelong } from '@/ts/core';
+import { IWorkDefine } from '@/ts/core';
 import { Rule } from 'antd/lib/form';
 import { FormLabelAlign } from 'antd/lib/form/interface';
 import { LabelTooltipType } from 'antd/es/form/FormItemLabel';
@@ -9,7 +9,7 @@ interface IProps {
   dictId: string;
   rules: Rule[];
   name: string;
-  belong: IBelong;
+  define: IWorkDefine;
   label: React.ReactNode;
   labelAlign: FormLabelAlign;
   tooltip: LabelTooltipType;
@@ -29,17 +29,13 @@ const ProFormDict = (props: IProps) => {
       .localeCompare(((optionB?.label ?? '') as string).toLowerCase());
 
   useEffect(() => {
-    const initOptions = async () => {
-      const dicts = await props.belong.loadDicts();
-      const dict = dicts.find((a) => a.id == props.dictId);
-      const dictItems = await dict?.loadItems();
+    props.define.loadItems(props.dictId).then((value) => {
       setOptions(
-        dictItems?.map((item) => {
+        value.map((item) => {
           return { label: item.name, value: item.value };
-        }) || [],
+        }),
       );
-    };
-    initOptions();
+    });
   }, []);
   return (
     <ProFormSelect

@@ -3,9 +3,9 @@ import { Tag } from 'antd';
 import orgCtrl from '@/ts/controller';
 import { ProColumns } from '@ant-design/pro-table';
 import { schema } from '@/ts/base';
-import { IFlowDefine } from '@/ts/core';
+import { IWorkDefine } from '@/ts/core';
 
-export const DefineColumns: ProColumns<IFlowDefine>[] = [
+export const DefineColumns: ProColumns<IWorkDefine>[] = [
   {
     title: '序号',
     dataIndex: 'index',
@@ -27,7 +27,7 @@ export const DefineColumns: ProColumns<IFlowDefine>[] = [
     width: 100,
     title: '归属用户',
     dataIndex: ['metadata', 'belongId'],
-    render: (_: any, record: IFlowDefine) => {
+    render: (_: any, record: IWorkDefine) => {
       return orgCtrl.provider.user?.findShareById(record.metadata.belongId).name;
     },
   },
@@ -36,7 +36,7 @@ export const DefineColumns: ProColumns<IFlowDefine>[] = [
     width: 100,
     title: '共享用户',
     dataIndex: ['metadata', 'shareId'],
-    render: (_: any, record: IFlowDefine) => {
+    render: (_: any, record: IWorkDefine) => {
       return orgCtrl.provider.user?.findShareById(record.metadata.shareId).name;
     },
   },
@@ -45,7 +45,7 @@ export const DefineColumns: ProColumns<IFlowDefine>[] = [
     width: 100,
     title: '创建人员',
     dataIndex: 'createUser',
-    render: (_: any, record: IFlowDefine) => {
+    render: (_: any, record: IWorkDefine) => {
       return orgCtrl.provider.user?.findShareById(record.metadata.createUser).name;
     },
   },

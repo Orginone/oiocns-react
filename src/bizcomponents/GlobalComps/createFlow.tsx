@@ -1,7 +1,7 @@
 import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components';
 import { Avatar, Button, Space, Upload, UploadProps, Image, message } from 'antd';
 import React, { useRef, useState } from 'react';
-import { IFlowDefine, IWorkItem } from '@/ts/core';
+import { IWorkDefine, IWorkItem } from '@/ts/core';
 import { model } from '@/ts/base';
 import SchemaForm from '@/components/SchemaForm';
 import { FileItemShare, WorkDefineModel } from '@/ts/base/model';
@@ -10,7 +10,7 @@ import orgCtrl from '@/ts/controller';
 
 interface Iprops {
   open: boolean;
-  current?: IFlowDefine;
+  current?: IWorkDefine;
   workItem: IWorkItem;
   handleOk: (success: boolean) => void;
   handleCancel: () => void;

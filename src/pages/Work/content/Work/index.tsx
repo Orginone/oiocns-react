@@ -1,5 +1,5 @@
 import Thing from '@/pages/Store/content/Thing/Thing';
-import { IFlowDefine, IForm } from '@/ts/core';
+import { IWorkDefine } from '@/ts/core';
 import { ProFormInstance } from '@ant-design/pro-form';
 import { Button, Card, Input, message } from 'antd';
 import orgCtrl from '@/ts/controller';
@@ -9,40 +9,22 @@ import cls from './index.module.less';
 import OioForm from '@/bizcomponents/FormDesign/OioForm';
 import { kernel } from '@/ts/base';
 import { GroupMenuType } from '../../config/menuType';
+import { XForm } from '@/ts/base/schema';
 
 // 卡片渲染
 interface IProps {
-  current: IFlowDefine;
+  current: IWorkDefine;
 }
-
 /**
  * 办事-业务流程--发起
  * @returns
  */
 const WorkStartDo: React.FC<IProps> = ({ current }) => {
   const [data, setData] = useState<any>({});
-  const [form, setForm] = useState<IForm>();
   const [rows, setRows] = useState<any>([]);
+  const [forms, setForms] = useState<XForm[]>([]);
   const [content, setContent] = useState<string>('');
   const formRef = useRef<ProFormInstance<any>>();
-
-  useEffect(() => {
-    setTimeout(async () => {
-      let node = await current.loadWorkNode();
-      if (node && node.forms) {
-        const formIds = node.forms.map((i) => i.id);
-        const forms = (await current.workItem.loadForms()).filter((i) =>
-          formIds.includes(i.id),
-        );
-        if (forms.length > 0) {
-          await forms[0].loadAttributes();
-          setForm(forms[0]);
-          return;
-        }
-      }
-      message.error('流程未绑定表单');
-    }, 100);
-  }, [current]);
 
   const submit = async () => {
     let rows_ = rows;
@@ -73,11 +55,20 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
     }
   };
 
+  useEffect(() => {
+    current.loadWorkNode().then((value) => {
+      if (value && value.forms && value.forms?.length > 0) {
+        setForms(value.forms);
+      }
+    });
+  }, []);
+
   return (
     <div className={cls.content}>
-      {form && (
+      {forms.length > 0 && (
         <OioForm
-          form={form}
+          form={forms[0]}
+          define={current}
           formRef={formRef}
           submitter={{
             resetButtonProps: {

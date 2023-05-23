@@ -174,7 +174,6 @@ export class Message implements IMessage {
     this.metadata.msgType = MessageType.Recall;
   }
   receiveTags(tags: string[]): void {
-    console.log(this.metadata, tags);
     tags.forEach((tag) => {
       this.labels.push(new MessageLabel(JSON.parse(tag), this.user));
     });

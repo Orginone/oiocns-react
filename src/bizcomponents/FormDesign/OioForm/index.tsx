@@ -1,11 +1,13 @@
 import { ProForm } from '@ant-design/pro-components';
 import { Col, Row } from 'antd';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import OioFormItem from './FormItems';
-import { IForm } from '@/ts/core';
+import { IWorkDefine } from '@/ts/core';
+import { XAttribute, XForm } from '@/ts/base/schema';
 
 type IProps = {
-  form: IForm;
+  form: XForm;
+  define: IWorkDefine;
   submitter?: any;
   onValuesChange?: (changedValues: any, values: Record<string, any>) => void;
   onFinished?: Function;
@@ -19,6 +21,7 @@ type IProps = {
  */
 const OioForm: React.FC<IProps> = ({
   form,
+  define,
   submitter,
   onValuesChange,
   onFinished,
@@ -26,14 +29,16 @@ const OioForm: React.FC<IProps> = ({
   formRef,
   disabled,
 }) => {
-  let config: any =
-    form.metadata.rule != undefined
-      ? JSON.parse(form.metadata.rule)
-      : { col: 12, layout: 'horizontal' };
-  if (fieldsValue) {
-    formRef?.current?.setFieldsValue(fieldsValue);
-  }
-
+  const [attributes, setAttributes] = useState<XAttribute[]>([]);
+  let config: any = JSON.parse(form.rule || `{ col: 12, layout: 'horizontal' }`);
+  useEffect(() => {
+    define.loadAttributes(form.id).then((value) => {
+      setAttributes(value);
+      if (fieldsValue) {
+        formRef?.current?.setFieldsValue(fieldsValue);
+      }
+    });
+  }, []);
   return (
     <>
       <div
@@ -76,9 +81,9 @@ const OioForm: React.FC<IProps> = ({
           sm: { span: 10 },
         }}>
         <Row gutter={24}>
-          {form.attributes.map((item) => (
+          {attributes.map((item) => (
             <Col span={config.col} key={item.id}>
-              <OioFormItem item={item} belong={form.species.current.space} />
+              <OioFormItem item={item} define={define} />
             </Col>
           ))}
         </Row>

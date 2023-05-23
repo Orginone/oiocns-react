@@ -15,13 +15,13 @@ import {
   ISpeciesItem,
   ITarget,
   ITeam,
-  IWorkThing,
+  IThingClass,
   IWorkItem,
   SpeciesType,
   TargetType,
   companyTypes,
   IBelong,
-  IFlowDefine,
+  IWorkDefine,
 } from '@/ts/core';
 import { XProperty } from '@/ts/base/schema';
 import { orgAuth } from '@/ts/core/public';
@@ -77,7 +77,7 @@ const buildSpeciesTree = (species: ISpeciesItem): MenuItemType => {
   const children: MenuItemType[] = [];
   switch (species.typeName) {
     case SpeciesType.Thing:
-      children.push(...buildFormMenu(species as IWorkThing));
+      children.push(...buildFormMenu(species as IThingClass));
       break;
     case SpeciesType.Store:
       children.push(...buildProperty(species as IPropClass));
@@ -111,7 +111,7 @@ const buildSpeciesTree = (species: ISpeciesItem): MenuItemType => {
           await (species as IPropClass).loadPropertys();
           break;
         case SpeciesType.Thing:
-          await (species as IWorkThing).loadForms();
+          await (species as IThingClass).loadForms();
           break;
       }
     },
@@ -174,7 +174,7 @@ const buildDefineMenu = (form: IWorkItem) => {
 };
 
 /** 编译表单项菜单 */
-const buildFormMenu = (form: IWorkThing) => {
+const buildFormMenu = (form: IThingClass) => {
   return form.forms.map((i) => {
     return {
       key: i.key,
@@ -255,7 +255,7 @@ const loadSpeciesMenus = (species: ISpeciesItem) => {
 };
 
 /** 加载右侧菜单 */
-const loadDefineMenus = (define?: IFlowDefine) => {
+const loadDefineMenus = (define?: IWorkDefine) => {
   const items: OperateMenuType[] = [];
   if (define) {
     items.push(
@@ -402,7 +402,7 @@ const getUserMenu = () => {
         label: GroupMenuType.StandardGroup,
         itemType: GroupMenuType.StandardGroup,
         menus: LoadStandardMenus(orgCtrl.user),
-        icon: <im.ImNewspaper />,
+        icon: <im.ImDatabase fontSize={22} />,
         children: orgCtrl.user.species.map((i) => buildSpeciesTree(i)),
       },
       loadGroupMenus(

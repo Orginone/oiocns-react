@@ -4,7 +4,6 @@ import { SpeciesType, TaskStatus } from '../public/enums';
 import { IPerson } from '../target/person';
 import { IApplication } from '../thing/app/application';
 import { IWorkDefine } from '../thing/base/work';
-import { IMarket } from '../thing/market/market';
 // 历史任务存储集合名称
 const hisWorkCollName = 'work-task';
 export interface IWorkProvider {
@@ -173,8 +172,6 @@ export class WorkProvider implements IWorkProvider {
         const defines: IWorkDefine[] = [];
         switch (species.typeName) {
           case SpeciesType.Market:
-            defines.push(...(await (species as IMarket).loadWorkDefines()));
-            break;
           case SpeciesType.Application:
             defines.push(...(await (species as IApplication).loadWorkDefines()));
             break;

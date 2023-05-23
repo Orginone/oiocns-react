@@ -2,7 +2,6 @@ import { PageAll } from '@/ts/core/public/consts';
 import { SpeciesType } from '@/ts/core/public/enums';
 import { ISpeciesItem } from './species';
 import { kernel, model, schema } from '@/ts/base';
-import { IPropClass } from '../store/propclass';
 import { IThingClass } from '../store/thingclass';
 import { XProperty } from '@/ts/base/schema';
 import { Entity, IEntity } from '../../public';
@@ -15,8 +14,6 @@ export interface IForm extends IEntity<schema.XForm> {
   update(data: model.FormModel): Promise<boolean>;
   /** 删除表单 */
   delete(): Promise<boolean>;
-  /** 加载可选属性 */
-  loadPropertys(): Promise<schema.XProperty[]>;
   /** 加载表单特性 */
   loadAttributes(reload?: boolean): Promise<schema.XAttribute[]>;
   /** 新建表单特性 */
@@ -44,16 +41,6 @@ export class Form extends Entity<schema.XForm> implements IForm {
   species: ISpeciesItem;
   attributes: schema.XAttribute[] = [];
   private _attributeLoaded: boolean = false;
-  async loadPropertys(): Promise<schema.XProperty[]> {
-    const result = [];
-    for (const item of this.species.current.space.species) {
-      switch (item.typeName) {
-        case SpeciesType.Store:
-          result.push(...(await (item as IPropClass).loadAllProperty()));
-      }
-    }
-    return result;
-  }
   async update(data: model.FormModel): Promise<boolean> {
     data.shareId = this.metadata.shareId;
     data.speciesId = this.metadata.speciesId;

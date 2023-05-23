@@ -22,19 +22,19 @@ import ProFormDict from './widgets/ProFormDict';
 import ProFormGroup from './widgets/ProFormGroup';
 import ProFormPerson from './widgets/ProFormPerson';
 import ProFormIdentity from './widgets/ProFormIdentity';
-import { IBelong } from '@/ts/core';
 import { XAttribute } from '@/ts/base/schema';
+import { IWorkDefine } from '@/ts/core/thing/base/work';
 
 interface IProps {
   disabled?: boolean;
-  belong: IBelong;
+  define: IWorkDefine;
   item: XAttribute;
 }
 
 /**
  * 表单项渲染
  */
-const OioFormItem = ({ item, belong, disabled }: IProps) => {
+const OioFormItem = ({ item, define, disabled }: IProps) => {
   const rule = JSON.parse(item.rule || '{}');
   // 规则校验
   let rules: Rule[] = [];
@@ -196,7 +196,7 @@ const OioFormItem = ({ item, belong, disabled }: IProps) => {
       return (
         <ProFormDict
           dictId={rule.dictId}
-          belong={belong}
+          define={define}
           name={item.name}
           label={item.name}
           rules={rules}
@@ -209,7 +209,7 @@ const OioFormItem = ({ item, belong, disabled }: IProps) => {
     case 'dept':
       return (
         <ProFormDept
-          belong={belong}
+          belong={define.workItem.current.space}
           name={item.name}
           label={item.name}
           rules={rules}
@@ -220,7 +220,7 @@ const OioFormItem = ({ item, belong, disabled }: IProps) => {
     case 'person':
       return (
         <ProFormPerson
-          belong={belong}
+          belong={define.workItem.current.space}
           name={item.name}
           label={item.name}
           rules={rules}
@@ -231,7 +231,7 @@ const OioFormItem = ({ item, belong, disabled }: IProps) => {
     case 'group':
       return (
         <ProFormGroup
-          belong={belong}
+          belong={define.workItem.current.space}
           name={item.name}
           label={item.name}
           rules={rules}
@@ -242,7 +242,7 @@ const OioFormItem = ({ item, belong, disabled }: IProps) => {
     case 'auth':
       return (
         <ProFormAuth
-          belong={belong}
+          belong={define.workItem.current.space}
           name={item.name}
           label={item.name}
           rules={rules}
@@ -253,7 +253,7 @@ const OioFormItem = ({ item, belong, disabled }: IProps) => {
     case 'identity':
       return (
         <ProFormIdentity
-          belong={belong}
+          belong={define.workItem.current.space}
           name={item.name}
           label={item.name}
           rules={rules}

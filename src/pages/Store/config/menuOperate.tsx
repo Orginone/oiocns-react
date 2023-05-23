@@ -9,12 +9,12 @@ import {
   IBelong,
   IFileSystem,
   IFileSystemItem,
-  IPropClass,
   ISpeciesItem,
-  IWorkThing,
+  IThingClass,
   SpeciesType,
 } from '@/ts/core';
 import OrgIcons from '@/bizcomponents/GlobalComps/orgIcons';
+import { IThingClass } from '@/ts/core/thing/store/thingclass';
 
 /** 编译文件系统树 */
 const buildFileSysTree = (targets: IFileSystemItem[]) => {
@@ -89,31 +89,12 @@ export const loadFileSysItemMenus = (
 };
 
 /** 编译组织分类树 */
-const buildSpeciesTree = (species: ISpeciesItem[]): MenuItemType[] => {
+const buildThingTree = (species: ISpeciesItem[]): MenuItemType[] => {
   const result: MenuItemType[] = [];
   for (const item of species) {
     switch (item.typeName) {
-      case SpeciesType.Market:
       case SpeciesType.Thing:
         {
-          const children: MenuItemType[] = [];
-          if (item.typeName === SpeciesType.Thing) {
-            children.push(
-              ...(item as IWorkThing).forms.map((i) => {
-                return {
-                  key: i.key,
-                  item: i,
-                  label: i.name,
-                  icon: <TeamIcon share={item.share} size={18} fontSize={16} />,
-                  itemType: MenuType.Form,
-                  beforeLoad: async () => {
-                    await i.loadAttributes();
-                  },
-                  children: [],
-                };
-              }),
-            );
-          }
           result.push({
             key: item.key,
             item: item,
@@ -124,14 +105,14 @@ const buildSpeciesTree = (species: ISpeciesItem[]): MenuItemType[] => {
             itemType: MenuType.Species,
             menus: [],
             tag: [item.typeName],
-            children: [...children, ...buildSpeciesTree(item.children)],
+            children: [
+              ...buildThingMenus(item as IThingClass),
+              ...buildThingTree(item.children),
+            ],
             beforeLoad: async () => {
               switch (item.typeName) {
                 case SpeciesType.Thing:
-                  await (item as IWorkThing).loadForms();
-                  break;
-                case SpeciesType.Store:
-                  await (item as IPropClass).loadPropertys();
+                  await (item as IThingClass).loadForms();
                   break;
               }
             },
@@ -143,8 +124,29 @@ const buildSpeciesTree = (species: ISpeciesItem[]): MenuItemType[] => {
   return result;
 };
 
+/** 加载实体类菜单 */
+const buildThingMenus = (thing: IThingClass) => {
+  const children: MenuItemType[] = [];
+  if (thing.typeName === SpeciesType.Thing) {
+    thing.forms.forEach((form) => {
+      children.push({
+        key: form.key,
+        item: form,
+        label: form.name,
+        icon: <TeamIcon share={form.share} size={18} fontSize={16} />,
+        itemType: MenuType.Form,
+        beforeLoad: async () => {
+          await form.loadAttributes();
+        },
+        children: [],
+      });
+    });
+  }
+  return children;
+};
+
 /** 加载文件系统 */
-const buileFileSystem = (filesys: IFileSystem) => {
+const buildFileSystem = (filesys: IFileSystem) => {
   return {
     key: filesys.key,
     item: filesys.home,
@@ -162,21 +164,15 @@ const buileFileSystem = (filesys: IFileSystem) => {
 };
 
 const loadChildren = (team: IBelong) => {
-  const species: ISpeciesItem[] = [];
-  for (const t of team.targets) {
-    if (t.space === team.space) {
-      for (const s of t.species) {
-        switch (s.typeName) {
-          case SpeciesType.Store:
-          case SpeciesType.Market:
-          case SpeciesType.Application:
-            species.push(s);
-            break;
-        }
-      }
+  const things: ISpeciesItem[] = [];
+  for (const s of team.species) {
+    switch (s.typeName) {
+      case SpeciesType.Thing:
+        things.push(s);
+        break;
     }
   }
-  return [buileFileSystem(team.filesys), ...buildSpeciesTree(species)];
+  return [buildFileSystem(team.filesys), ...buildThingTree(things)];
 };
 /** 获取个人菜单 */
 const getUserMenu = () => {

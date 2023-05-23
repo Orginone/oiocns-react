@@ -11,7 +11,6 @@ import OioForm from '@/bizcomponents/FormDesign/OioForm';
 import { WorkNodeModel } from '@/ts/base/model';
 import { schema } from '@/ts/base';
 import { IWorkDefine } from '@/ts/core/thing/base/work';
-import { IForm } from '@/ts/core';
 const { Panel } = Collapse;
 
 export interface TaskDetailType {
@@ -26,11 +25,9 @@ const Detail: React.FC<TaskDetailType> = ({ task, define, instance, onBack }) =>
   const [comment, setComment] = useState<string>('');
   const [nodes, setNodes] = useState<WorkNodeModel>();
   const [loading, setLoading] = useState<boolean>(false);
-  const [allForms, setAllForms] = useState<IForm[]>([]);
   useEffect(() => {
     setTimeout(async () => {
       setNodes(await define.loadWorkNode());
-      setAllForms(await define.workItem.loadForms());
     }, 100);
   }, []);
 
@@ -38,20 +35,18 @@ const Detail: React.FC<TaskDetailType> = ({ task, define, instance, onBack }) =>
   const loadForm = (forms: schema.XForm[], disabled: boolean, data?: any) => {
     let content = [];
     for (let item of forms) {
-      const form = allForms.find((a) => a.id == item.id);
-      if (form) {
-        content.push(
-          <Panel header={form.name} key={form.id}>
-            <OioForm
-              key={form.id}
-              form={form}
-              formRef={undefined}
-              fieldsValue={data}
-              disabled={disabled}
-            />
-          </Panel>,
-        );
-      }
+      content.push(
+        <Panel header={item.name} key={item.id}>
+          <OioForm
+            key={item.id}
+            form={item}
+            define={define}
+            formRef={undefined}
+            fieldsValue={data}
+            disabled={disabled}
+          />
+        </Panel>,
+      );
     }
     return content;
   };

@@ -10,7 +10,7 @@ import WorkDefineModal from '@/bizcomponents/GlobalComps/createFlow';
 import Design from './Design';
 import { orgAuth } from '@/ts/core/public/consts';
 import PageCard from '@/components/PageCard';
-import { IFlowDefine, IWorkItem } from '@/ts/core';
+import { IWorkDefine, IWorkItem } from '@/ts/core';
 
 interface IProps {
   current: IWorkItem;
@@ -24,7 +24,7 @@ const FlowList: React.FC<IProps> = ({ current }: IProps) => {
   const parentRef = useRef<any>(null);
   const [activeTab, setActiveTab] = useState<string>('work');
   const [key, setForceUpdate] = useObjectUpdate(current);
-  const [define, setDefine] = useState<IFlowDefine>();
+  const [define, setDefine] = useState<IWorkDefine>();
   const [modalType, setModalType] = useState('');
   const items = [
     {
@@ -33,7 +33,7 @@ const FlowList: React.FC<IProps> = ({ current }: IProps) => {
       key: 'work',
     },
   ];
-  const renderOperation = (record: IFlowDefine): any[] => {
+  const renderOperation = (record: IWorkDefine): any[] => {
     if (record.workItem.isInherited) return [];
     let operations: any[] = [
       {
@@ -112,7 +112,7 @@ const FlowList: React.FC<IProps> = ({ current }: IProps) => {
               <div style={{ background: '#EFF4F8' }}>
                 <Card bordered={false} bodyStyle={{ paddingTop: 0 }}>
                   <div className={cls['app-wrap']} ref={parentRef}>
-                    <CardOrTable<IFlowDefine>
+                    <CardOrTable<IWorkDefine>
                       extra={[
                         <Button
                           key="edit"
@@ -127,7 +127,7 @@ const FlowList: React.FC<IProps> = ({ current }: IProps) => {
                       parentRef={parentRef}
                       dataSource={current.defines}
                       operation={renderOperation}
-                      rowKey={(record: IFlowDefine) => record.id}
+                      rowKey={(record: IWorkDefine) => record.id}
                       renderCardContent={(items) => {
                         return items.map((item) => (
                           <FlowCard

@@ -6,7 +6,7 @@ import ThingIndex from '@/pages/Store/content/Thing';
 import TaskListComp from '../components/TaskListComp';
 import { Badge, Typography } from 'antd';
 import { FaTasks } from 'react-icons/fa';
-import { IForm, IPropClass, ISpeciesItem, SpeciesType } from '@/ts/core';
+import { IForm } from '@/ts/core';
 
 interface IProps {
   selectMenu: MenuItemType;
@@ -18,24 +18,6 @@ const ContentIndex = (props: IProps) => {
   switch (props.selectMenu.itemType) {
     case MenuType.FileSystemItem:
       return <FileSystem current={props.selectMenu.item} />;
-    case MenuType.Species:
-      {
-        const species = props.selectMenu.item as ISpeciesItem;
-        switch (species.typeName) {
-          case SpeciesType.Store: {
-            const propClass = props.selectMenu.item as IPropClass;
-            return (
-              <ThingIndex
-                belongId={propClass.belongId}
-                labels={[`S${propClass.id}`]}
-                forms={[]}
-                propertys={propClass.propertys}
-              />
-            );
-          }
-        }
-      }
-      return <></>;
     case MenuType.Form: {
       const form = props.selectMenu.item as IForm;
       const propertys = [];

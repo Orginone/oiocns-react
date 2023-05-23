@@ -4,7 +4,7 @@ import React, { useState, Key } from 'react';
 import ShareShowComp from '@/bizcomponents/IndentityManage/ShareShowComp';
 import cls from './index.module.less';
 import CustomTree from '@/components/CustomTree';
-import { IWork, IWorkThing, SpeciesType } from '@/ts/core';
+import { IWork, IThingClass, SpeciesType } from '@/ts/core';
 import { XForm } from '@/ts/base/schema';
 
 interface IProps {
@@ -20,7 +20,7 @@ const SelectOperation: React.FC<IProps> = ({ current, selected, setSelected }) =
   );
 
   const onSelect: TreeProps['onSelect'] = async (_, info: any) => {
-    const species: IWorkThing = info.node.item;
+    const species: IThingClass = info.node.item;
     let forms = await species.loadForms();
     setCenterTreeData(
       forms.map((item) => {
@@ -48,7 +48,7 @@ const SelectOperation: React.FC<IProps> = ({ current, selected, setSelected }) =
     setSelected([...selected]);
   };
 
-  const buildWorkThingTree = (species: IWorkThing[]): any[] => {
+  const buildWorkThingTree = (species: IThingClass[]): any[] => {
     const result: any[] = [];
     for (const item of species) {
       result.push({
@@ -56,7 +56,7 @@ const SelectOperation: React.FC<IProps> = ({ current, selected, setSelected }) =
         title: item.name,
         value: item.id,
         item: item,
-        children: buildWorkThingTree(item.children.map((i) => i as IWorkThing)),
+        children: buildWorkThingTree(item.children.map((i) => i as IThingClass)),
       });
     }
     return result;
@@ -84,7 +84,7 @@ const SelectOperation: React.FC<IProps> = ({ current, selected, setSelected }) =
               treeData={buildWorkThingTree(
                 current.app.children
                   .filter((i) => i.typeName === SpeciesType.Thing)
-                  .map((i) => i as IWorkThing),
+                  .map((i) => i as IThingClass),
               )}
             />
           </div>

@@ -1,7 +1,6 @@
 import { schema } from '../../../base';
 import { ITarget } from '../../target/base/target';
 import { IWork, IWorkDefine, Work } from '../base/work';
-import { IForm } from '../base/form';
 import { IApplication } from './application';
 import { ISpeciesItem } from '../base/species';
 import { SpeciesType } from '../../public';
@@ -20,9 +19,6 @@ export class WorkItem extends Work implements IWorkItem {
         this.children.push(subItem);
       }
     }
-  }
-  async loadForms(): Promise<IForm[]> {
-    return await this.app.loadForms();
   }
   async loadAllWorkDefines(): Promise<IWorkDefine[]> {
     const result = [...(await this.loadWorkDefines())];
