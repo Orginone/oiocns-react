@@ -54,6 +54,7 @@ export enum TaskStatus {
 /** 变更操作 */
 export enum OperateType {
   'Add' = '新增',
+  'Create' = '创建',
   'Remove' = '移除',
   'Update' = '更新',
   'Delete' = '删除',

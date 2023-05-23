@@ -100,14 +100,9 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
               onOk: async () => {
                 const success = await indentity?.delete();
                 if (success) {
-                  current.identitys = current.identitys.filter(
-                    (a) => a.id != indentity?.id,
-                  );
                   message.success('删除成功');
                   setIndentity(undefined);
                   getDataList();
-                } else {
-                  message.error('删除失败');
                 }
               },
             });

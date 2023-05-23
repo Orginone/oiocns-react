@@ -1,8 +1,8 @@
 import { kernel, model, schema } from '../../../base';
 import { IMsgChat } from '../../chat/message/msgchat';
+import { OperateType } from '../../public';
 import { PageAll } from '../../public/consts';
 import { ITeam, Team } from '../base/team';
-import { IIdentity, Identity } from '../identity/identity';
 import { ICompany } from '../team/company';
 
 /** 岗位接口 */
@@ -10,13 +10,13 @@ export interface IStation extends ITeam {
   /** 设立岗位的单位 */
   company: ICompany;
   /** 岗位下的角色 */
-  identitys: IIdentity[];
+  identitys: schema.XIdentity[];
   /** 加载用户设立的身份(角色)对象 */
-  loadIdentitys(reload?: boolean): Promise<IIdentity[]>;
+  loadIdentitys(reload?: boolean): Promise<schema.XIdentity[]>;
   /** 用户拉入新身份(角色) */
-  pullIdentitys(identitys: IIdentity[]): Promise<boolean>;
+  pullIdentitys(identitys: schema.XIdentity[], notity?: boolean): Promise<boolean>;
   /** 用户移除身份(角色) */
-  removeIdentitys(identitys: IIdentity[]): Promise<boolean>;
+  removeIdentitys(identitys: schema.XIdentity[], notity?: boolean): Promise<boolean>;
 }
 
 export class Station extends Team implements IStation {
@@ -25,9 +25,9 @@ export class Station extends Team implements IStation {
     this.company = _space;
   }
   company: ICompany;
-  identitys: IIdentity[] = [];
+  identitys: schema.XIdentity[] = [];
   private _identityLoaded: boolean = false;
-  async loadIdentitys(reload?: boolean | undefined): Promise<IIdentity[]> {
+  async loadIdentitys(reload?: boolean | undefined): Promise<schema.XIdentity[]> {
     if (!this._identityLoaded || reload) {
       const res = await kernel.queryTeamIdentitys({
         id: this.id,
@@ -35,37 +35,49 @@ export class Station extends Team implements IStation {
       });
       if (res.success) {
         this._identityLoaded = true;
-        this.identitys = (res.data.result || []).map((item) => {
-          return new Identity(item, this.space);
-        });
+        this.identitys = res.data.result || [];
       }
     }
     return this.identitys;
   }
-  async pullIdentitys(identitys: IIdentity[]): Promise<boolean> {
-    identitys = identitys.filter((i) => {
-      return this.identitys.filter((m) => m.id === i.id).length < 1;
-    });
+  async pullIdentitys(
+    identitys: schema.XIdentity[],
+    notity: boolean = false,
+  ): Promise<boolean> {
+    identitys = identitys.filter((i) => this.identitys.every((a) => a.id !== i.id));
     if (identitys.length > 0) {
-      const res = await kernel.pullAnyToTeam({
-        id: this.id,
-        subIds: identitys.map((i) => i.id),
-      });
-      if (res.success) {
-        this.identitys.push(...identitys);
+      if (!notity) {
+        const res = await kernel.pullAnyToTeam({
+          id: this.id,
+          subIds: identitys.map((i) => i.id),
+        });
+        if (!res.success) return false;
+        identitys.forEach((a) => this.createIdentityMsg(OperateType.Add, a));
       }
-      return res.success;
+      this.identitys.push(...identitys);
     }
     return true;
   }
-  async removeIdentitys(identitys: IIdentity[]): Promise<boolean> {
-    for (const identity of identitys) {
-      const res = await kernel.removeOrExitOfTeam({
-        id: this.id,
-        subId: identity.id,
-      });
-      if (res.success) {
-        this.identitys = this.identitys.filter((i) => i.key != identity.key);
+  async removeIdentitys(
+    identitys: schema.XIdentity[],
+    notity: boolean = false,
+  ): Promise<boolean> {
+    identitys = identitys.filter((i) => this.identitys.some((a) => a.id === i.id));
+    if (identitys.length > 0) {
+      for (const identity of identitys) {
+        if (!notity) {
+          const res = await kernel.removeOrExitOfTeam({
+            id: this.id,
+            subId: identity.id,
+          });
+          if (!res.success) return false;
+          this.createIdentityMsg(OperateType.Remove, identity);
+        }
+        this.company.user.removeGivedIdentity(
+          identitys.map((a) => a.id),
+          this.id,
+        );
+        this.identitys = this.identitys.filter((i) => i.id != identity.id);
       }
     }
     return true;
@@ -75,12 +87,17 @@ export class Station extends Team implements IStation {
     if (notity) {
       this.company.stations = this.company.stations.filter((i) => i.key != this.key);
     }
+    this.company.user.removeGivedIdentity(
+      this.identitys.map((a) => a.id),
+      this.id,
+    );
     return notity;
   }
   get chats(): IMsgChat[] {
     return [this];
   }
   async deepLoad(reload: boolean = false): Promise<void> {
+    await this.loadIdentitys(reload);
     await this.loadMembers(reload);
   }
   createTarget(_data: model.TargetModel): Promise<ITeam | undefined> {
@@ -90,5 +107,22 @@ export class Station extends Team implements IStation {
   }
   async teamChangedNotity(target: schema.XTarget): Promise<boolean> {
     return await this.pullMembers([target], true);
+  }
+  async createIdentityMsg(
+    operate: OperateType,
+    identity: schema.XIdentity,
+  ): Promise<void> {
+    await kernel.createIdentityMsg({
+      group: false,
+      stationId: this.id,
+      identityId: identity.id,
+      excludeOperater: true,
+      data: JSON.stringify({
+        operate,
+        station: this.metadata,
+        identity: identity,
+        operater: this.space.user.metadata,
+      }),
+    });
   }
 }

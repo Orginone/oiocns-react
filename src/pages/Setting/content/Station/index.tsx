@@ -45,7 +45,7 @@ const Station: React.FC<IProps> = ({ current }: IProps) => {
   };
 
   // 角色表格操作内容渲染函数
-  const identityOperation = (item: IIdentity): any[] => {
+  const identityOperation = (item: schema.XIdentity): any[] => {
     return [
       current.hasRelationAuth() ? (
         {
@@ -175,7 +175,7 @@ const Station: React.FC<IProps> = ({ current }: IProps) => {
         destroyOnClose={true}
         onOk={async () => {
           if (selectIdentitys) {
-            if (await current.pullIdentitys(selectIdentitys)) {
+            if (await current.pullIdentitys(selectIdentitys.map((a) => a.metadata))) {
               forceUpdate();
             }
             setIsOpenIdentityModal(false);

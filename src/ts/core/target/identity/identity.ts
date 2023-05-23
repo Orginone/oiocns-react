@@ -1,5 +1,5 @@
 import { kernel, model, schema } from '../../../base';
-import { Entity, IEntity } from '../../public';
+import { Entity, IEntity, OperateType, TargetType } from '../../public';
 import { PageAll } from '../../public/consts';
 import { ITarget } from '../base/target';
 
@@ -12,23 +12,23 @@ export interface IIdentity extends IEntity<schema.XIdentity> {
   /** 加载成员用户实体 */
   loadMembers(reload?: boolean): Promise<schema.XTarget[]>;
   /** 身份（角色）拉入新成员 */
-  pullMembers(members: schema.XTarget[]): Promise<boolean>;
+  pullMembers(members: schema.XTarget[], notity?: boolean): Promise<boolean>;
   /** 身份（角色）移除成员 */
-  removeMembers(members: schema.XTarget[]): Promise<boolean>;
+  removeMembers(members: schema.XTarget[], notity?: boolean): Promise<boolean>;
   /** 更新身份（角色）信息 */
   update(data: model.IdentityModel): Promise<boolean>;
   /** 删除身份（角色） */
-  delete(): Promise<boolean>;
+  delete(notity?: boolean): Promise<boolean>;
 }
 
 /** 身份（角色）实现类 */
 export class Identity extends Entity<schema.XIdentity> implements IIdentity {
-  constructor(_metadata: schema.XIdentity, _current: ITarget) {
+  constructor(_metadata: schema.XIdentity, current: ITarget) {
     super({
       ..._metadata,
       typeName: '角色',
     });
-    this.current = _current;
+    this.current = current;
   }
   current: ITarget;
   members: schema.XTarget[] = [];
@@ -46,31 +46,42 @@ export class Identity extends Entity<schema.XIdentity> implements IIdentity {
     }
     return this.members;
   }
-  async pullMembers(members: schema.XTarget[]): Promise<boolean> {
-    members = members.filter((i) => {
-      return this.members.filter((m) => m.id === i.id).length < 1;
-    });
+  async pullMembers(
+    members: schema.XTarget[],
+    notity: boolean = false,
+  ): Promise<boolean> {
+    members = members.filter((i) => this.members.every((m) => m.id !== i.id));
     if (members.length > 0) {
-      const res = await kernel.giveIdentity({
-        id: this.id,
-        subIds: members.map((i) => i.id),
-      });
-      if (res.success) {
-        this.members.push(...members);
+      if (!notity) {
+        const res = await kernel.giveIdentity({
+          id: this.id,
+          subIds: members.map((i) => i.id),
+        });
+        if (!res.success) return false;
+        members.forEach((a) => this.createIdentityMsg(OperateType.Add, a));
       }
-      return res.success;
+      this.members.push(...members);
     }
     return true;
   }
-  async removeMembers(members: schema.XTarget[]): Promise<boolean> {
-    const res = await kernel.removeIdentity({
-      id: this.id,
-      subIds: members.map((i) => i.id),
-    });
-    if (res.success) {
-      for (const member of members) {
-        this.members = this.members.filter((i) => i.id != member.id);
+  async removeMembers(
+    members: schema.XTarget[],
+    notity: boolean = false,
+  ): Promise<boolean> {
+    members = members.filter((i) => this.members.some((m) => m.id === i.id));
+    if (members.length > 0) {
+      if (!notity) {
+        const res = await kernel.removeIdentity({
+          id: this.id,
+          subIds: members.map((i) => i.id),
+        });
+        if (!res.success) return false;
+        members.forEach((a) => this.createIdentityMsg(OperateType.Remove, a));
       }
+      if (members.some((a) => a.id === this.current.space.user.id)) {
+        this.current.space.user.removeGivedIdentity([this.metadata.id]);
+      }
+      this.members = this.members.filter((i) => members.every((s) => s.id !== i.id));
     }
     return true;
   }
@@ -85,17 +96,40 @@ export class Identity extends Entity<schema.XIdentity> implements IIdentity {
     if (res.success && res.data?.id) {
       res.data.typeName = '角色';
       this.setMetadata(res.data);
+      this.createIdentityMsg(OperateType.Update);
     }
     return res.success;
   }
-  async delete(): Promise<boolean> {
-    const res = await kernel.deleteIdentity({
-      id: this.id,
-      page: PageAll,
-    });
-    if (res.success) {
-      this.current.identitys = this.current.identitys.filter((i) => i.key != this.key);
+  async delete(notity: boolean = false): Promise<boolean> {
+    if (!notity) {
+      if (this.current.hasRelationAuth()) {
+        this.createIdentityMsg(OperateType.Delete);
+      }
+      const res = await kernel.deleteIdentity({
+        id: this.id,
+        page: PageAll,
+      });
+      if (!res.success) return false;
     }
-    return res.success;
+    this.current.space.user.removeGivedIdentity([this.metadata.id]);
+    this.current.identitys = this.current.identitys.filter((i) => i.key != this.key);
+    return true;
+  }
+  async createIdentityMsg(
+    operate: OperateType,
+    subTarget?: schema.XTarget,
+  ): Promise<void> {
+    await kernel.createIdentityMsg({
+      stationId: '0',
+      identityId: this.id,
+      excludeOperater: false,
+      group: this.current.typeName == TargetType.Group,
+      data: JSON.stringify({
+        operate,
+        subTarget,
+        identity: this.metadata,
+        operater: this.current.space.user.metadata,
+      }),
+    });
   }
 }

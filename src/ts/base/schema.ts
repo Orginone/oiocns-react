@@ -208,6 +208,8 @@ export type XIdProof = {
   identityId: string;
   // 对象ID
   targetId: string;
+  // 组织ID
+  teamId: string;
   // 身份证明证明的用户
   target: XTarget | undefined;
   // 身份证明证明的身份
