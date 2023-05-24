@@ -103,7 +103,7 @@ const ShareRecent = (props: Iprops) => {
       for (const item of data.identitys) {
         result.push({
           id: item.id,
-          name: item.name,
+          name: `[${item.current.name}]` + item.name,
           type: 'add',
         });
       }
