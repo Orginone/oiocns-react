@@ -24,6 +24,7 @@ import {
   IBelong,
 } from '@/ts/core';
 import { XProperty } from '@/ts/base/schema';
+import { generateXlsx } from '@/utils/excel';
 
 /** 加载分组菜单参数 */
 interface groupMenuParams {
@@ -220,6 +221,24 @@ const loadSpeciesMenus = (species: ISpeciesItem) => {
       },
     },
   );
+  if (species.speciesTypes.length > 0) {
+    items.push(
+      {
+        key: '导入类别',
+        icon: <im.ImPlus />,
+        label: '导入类别',
+      },
+      {
+        key: '导入模板下载',
+        icon: <im.ImDownload />,
+        label: '导入模板下载',
+        beforeLoad: async () => {
+          generateXlsx(['名称', '代码', '类型', '说明'], '类别导入模板', '类别数据');
+          return false;
+        },
+      },
+    );
+  }
   return items;
 };
 
