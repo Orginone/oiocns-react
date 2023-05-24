@@ -13,7 +13,7 @@ type IProps = {
   onValuesChange?: (changedValues: any, values: Record<string, any>) => void;
   onFinished?: Function;
   fieldsValue?: any;
-  formRef: any;
+  formRef?: any;
   disabled?: boolean;
 };
 

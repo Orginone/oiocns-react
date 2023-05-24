@@ -1,9 +1,8 @@
 import Thing from '@/pages/Store/content/Thing/Thing';
 import { IWorkDefine } from '@/ts/core';
-import { ProFormInstance } from '@ant-design/pro-form';
 import { Button, Card, Input, Modal, Tabs, message } from 'antd';
 import orgCtrl from '@/ts/controller';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import cls from './index.module.less';
 import OioForm from '@/bizcomponents/FormDesign/OioForm';
 import { GroupMenuType } from '../../config/menuType';
@@ -25,9 +24,8 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
   const [activeTab, setActiveTab] = useState<string>();
   const [propertys, setPropertys] = useState<XProperty[]>([]);
   const [thingForms, setThingForms] = useState<XForm[]>([]);
-  const [workForms, setWorkForms] = useState<XForm[]>([]);
+  const [workForm, setWorkForm] = useState<XForm>();
   const [content, setContent] = useState<string>('');
-  const formRef = useRef<ProFormInstance<any>>();
 
   const submit = async () => {
     if (
@@ -51,7 +49,7 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
     current.loadWorkNode().then((value) => {
       if (value && value.forms && value.forms?.length > 0) {
         setThingForms(value.forms.filter((i) => i.belongId === i.shareId));
-        setWorkForms(value.forms.filter((i) => i.belongId != i.shareId));
+        setWorkForm(value.forms.find((i) => i.belongId != i.shareId));
       }
     });
   }, []);
@@ -76,25 +74,23 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
 
   return (
     <div className={cls.content}>
-      {workForms.map((form) => {
-        return (
-          <OioForm
-            key={form.id}
-            form={form}
-            define={current}
-            formRef={formRef}
-            submitter={{
-              resetButtonProps: {
-                style: { display: 'none' },
-              },
-              render: (_: any, _dom: any) => <></>,
-            }}
-            onValuesChange={(_changedValues, values) => {
-              setData({ ...data, ...values });
-            }}
-          />
-        );
-      })}
+      {workForm && (
+        <OioForm
+          key={workForm.id}
+          form={workForm}
+          define={current}
+          submitter={{
+            resetButtonProps: {
+              style: { display: 'none' },
+            },
+            render: (_: any, _dom: any) => <></>,
+          }}
+          onValuesChange={(_, values) => {
+            console.log(values);
+            setData({ ...data, ...values });
+          }}
+        />
+      )}
       {activeTab && (
         <Tabs
           activeKey={activeTab}
@@ -180,7 +176,7 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
           destroyOnClose={true}
           cancelText={'关闭'}
           width={1000}>
-          <OioForm form={form} formRef={undefined} define={current} />
+          <OioForm form={form} define={current} />
         </Modal>
       )}
       {form && operateModel === 'select' && (

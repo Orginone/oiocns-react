@@ -303,7 +303,6 @@ const Thing: React.FC<IProps> = (props: IProps) => {
           <Item name="columnChooserButton" locateInMenu="auto" location="after" />
         </Toolbar>
         <SearchPanel visible={true} highlightCaseSensitive={true} width={230} />
-
         {menuItems && (
           <Column
             dataField="操作"
