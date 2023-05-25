@@ -3,7 +3,7 @@ import * as im from 'react-icons/im';
 import { ShareIcon } from '@/ts/base/model';
 import { Avatar, Image } from 'antd';
 import { TargetType } from '@/ts/core';
-
+import OrgIcons from '@/bizcomponents/GlobalComps/orgIcons';
 interface teamTypeInfo {
   preview?: boolean;
   size?: number;
@@ -11,17 +11,25 @@ interface teamTypeInfo {
   share: ShareIcon;
   notAvatar?: boolean;
   title?: string;
+  tabbar?: boolean;
+  selected?: boolean;
+  type?: string;
 }
 
 /** 组织图标 */
 const EntityIcon = (info: teamTypeInfo) => {
+  console.log(info);
   const [preview, setPreview] = useState(false);
   const size = info.size ?? 22;
   const fontSize = info.fontSize ?? 18;
+  let svgName = info.type
+  if (info.selected) {
+    svgName += '-select';
+  }
   if (info.share?.avatar && info.share?.avatar.thumbnail) {
     return (
       <div
-        style={{ cursor: 'pointer', display: 'inline-block' }}
+        style={{ cursor: 'pointer', display: 'inline-block', position: "relative" }}
         title={info.title ?? '点击预览'}>
         {info.preview && (
           <Image
@@ -42,6 +50,12 @@ const EntityIcon = (info: teamTypeInfo) => {
             setPreview(true);
           }}
         />
+        {svgName ? <div style={{ position: 'absolute', zIndex: 999, bottom: '20%', height: '24%', width: '40%', right: 0, background: "#FFF",borderRadius:'3px' }}>
+          <div style={{ position: 'relative', height: '100%', width: '100%' }}>
+            <img style={{ height: '100%', position: 'absolute' }} src={`/svg/${svgName}.svg`} alt="" />
+          </div>
+        </div> : ''}
+
       </div>
     );
   }
@@ -90,7 +104,15 @@ const EntityIcon = (info: teamTypeInfo) => {
       icon = <im.ImBubbles fontSize={fontSize} />;
       break;
     case TargetType.Person:
-      icon = <im.ImUserTie fontSize={fontSize} />;
+      if (info.tabbar) {
+        icon = <OrgIcons
+          size={26}
+          type={"setting"}
+          selected={location.hash.startsWith('#' + '/setting')}
+        />;
+      } else {
+        icon = <im.ImUserTie fontSize={fontSize} />;
+      }
       break;
     default:
       icon = <im.ImTree fontSize={fontSize} />;

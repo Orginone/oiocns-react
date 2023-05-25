@@ -15,9 +15,11 @@ interface IProps {
   size?: number;
   title?: string;
   type?: string;
+  setting?:string;
 }
 
 const OrgIcons = (props: IProps) => {
+  console.log(props);
   const size = props.size ?? 22;
   let svgName = 'home';
   if (props.chat) {
@@ -36,6 +38,8 @@ const OrgIcons = (props: IProps) => {
     svgName = 'myWork';
   } else if (props.workStart) {
     svgName = 'workStart';
+  } else if (props.setting) {
+    svgName = 'setting';
   } else if (props.type) {
     svgName = props.type;
   }

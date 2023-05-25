@@ -97,7 +97,7 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
       key: 'setting',
       path: '/setting',
       title: orgCtrl.user.name,
-      icon: <TeamIcon share={orgCtrl.user.share} size={28} title="设置" />,
+      icon: <TeamIcon type={"set"} tabbar={true} selected={location.hash.startsWith('#' + '/setting')}  share={orgCtrl.user.share} size={28} title="设置" />,
       count: 0,
       fath: '/setting',
       onClick: () => {
