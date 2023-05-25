@@ -397,6 +397,8 @@ export type AttributeModel = {
   authId: string;
   // 表单项Id
   formId: string;
+  // 字典项Id
+  dictId: string;
   // 备注
   remark: string;
 };
@@ -410,6 +412,8 @@ export type FormModel = {
   code: string;
   // 规则
   rule: string;
+  // 类型
+  typeName: string;
   // 备注
   remark: string;
   // 类别Id

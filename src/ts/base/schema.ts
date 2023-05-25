@@ -70,6 +70,8 @@ export type XAttribute = {
   propId: string;
   // 表单Id
   formId: string;
+  // 字典Id
+  DictId: string;
   // 附加过属性的物
   linkPropertys: XProperty[] | undefined;
   // 属性关系
