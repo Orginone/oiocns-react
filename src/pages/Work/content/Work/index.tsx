@@ -48,8 +48,10 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
   useEffect(() => {
     current.loadWorkNode().then((value) => {
       if (value && value.forms && value.forms?.length > 0) {
-        setThingForms(value.forms.filter((i) => i.belongId === i.shareId));
-        setWorkForm(value.forms.find((i) => i.belongId != i.shareId));
+        // setThingForms(value.forms.filter((i) => i.belongId === i.shareId));
+        console.log('valuevaluevalue', value);
+
+        setWorkForm(value.forms.find((i) => i.belongId == i.shareId));
       }
     });
   }, []);
