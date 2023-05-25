@@ -7,7 +7,7 @@ import cls from './index.module.less';
 import OioForm from '@/bizcomponents/FormDesign/OioForm';
 import { GroupMenuType } from '../../config/menuType';
 import { XForm, XProperty } from '@/ts/base/schema';
-
+import ThingTable from './ThingTable';
 // 卡片渲染
 interface IProps {
   current: IWorkDefine;
@@ -48,7 +48,7 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
   useEffect(() => {
     current.loadWorkNode().then((value) => {
       if (value && value.forms && value.forms?.length > 0) {
-        // setThingForms(value.forms.filter((i) => i.belongId === i.shareId));
+        setThingForms(value.forms.filter((i) => i.belongId === i.shareId));
         console.log('valuevaluevalue', value);
 
         setWorkForm(value.forms.find((i) => i.belongId == i.shareId));
@@ -96,21 +96,16 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
       {activeTab && (
         <Tabs
           activeKey={activeTab}
-          tabPosition="left"
+          tabPosition="top"
           onTabClick={(tabKey) => setActiveTab(tabKey)}
           items={thingForms.map((i) => {
             return {
               label: i.name,
               key: i.id,
               children: (
-                <Thing
-                  keyExpr="Id"
-                  height={500}
-                  selectable={false}
-                  dataSource={rows}
-                  labels={[`S${activeTab}`]}
-                  propertys={propertys}
-                  toolBarItems={[
+                <ThingTable
+                  headerTitle={activeTab}
+                  toolBarRender={() => [
                     <Button
                       key="1"
                       type="default"
@@ -130,17 +125,45 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
                       选择{i.name}
                     </Button>,
                   ]}
-                  belongId={current.workItem.belongId}
-                  menuItems={[
-                    {
-                      key: 'edit',
-                      label: '变更',
-                      click(data) {
-                        console.log(data);
-                      },
-                    },
-                  ]}
                 />
+                // <Thing
+                //   keyExpr="Id"
+                //   height={500}
+                //   selectable={false}
+                //   dataSource={rows}
+                //   labels={[`S${activeTab}`]}
+                //   propertys={propertys}
+                //   toolBarItems={[
+                //     <Button
+                //       key="1"
+                //       type="default"
+                //       onClick={() => {
+                //         setForm(i);
+                //         setOperateModel('add');
+                //       }}>
+                //       新增{i.name}
+                //     </Button>,
+                //     <Button
+                //       key="2"
+                //       type="default"
+                //       onClick={() => {
+                //         setForm(i);
+                //         setOperateModel('select');
+                //       }}>
+                //       选择{i.name}
+                //     </Button>,
+                //   ]}
+                //   belongId={current.workItem.belongId}
+                //   menuItems={[
+                //     {
+                //       key: 'edit',
+                //       label: '变更',
+                //       click(data) {
+                //         console.log(data);
+                //       },
+                //     },
+                //   ]}
+                // />
               ),
             };
           })}></Tabs>
