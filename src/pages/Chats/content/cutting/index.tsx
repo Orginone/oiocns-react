@@ -2,13 +2,15 @@ import React, { useState, useCallback, useRef, useEffect } from 'react';
 import Cropper from 'react-cropper'; // 引入Cropper
 import 'cropperjs/dist/cropper.css'; // 引入Cropper对应的css
 import html2canvas from 'html2canvas';
-import './index.less';
 import orgCtrl from '@/ts/controller';
 import dayjs from 'dayjs';
 import { message } from 'antd';
+import './index.less';
+
 const Cutting = ({ open, onClose }: { open?: boolean; onClose?: Function }) => {
   const cropperRef = useRef<any>(null);
   const [img, setimg] = useState<string>('');
+
   useEffect(() => {
     if (open) {
       init(50);
@@ -16,6 +18,7 @@ const Cutting = ({ open, onClose }: { open?: boolean; onClose?: Function }) => {
       setimg('');
     }
   }, [open]);
+
   const init = (times: number = 200) => {
     setTimeout(async () => {
       // 获取当前网页 可视区域
@@ -31,7 +34,13 @@ const Cutting = ({ open, onClose }: { open?: boolean; onClose?: Function }) => {
       setimg(imgUrl);
     }, times);
   };
-  // 按钮事件处理
+
+  /**
+   * @description: 按钮事件处理
+   * @param {string} targetKey
+   * @param {Function} onKeyDown
+   * @return {*}
+   */
   const useKeyPress = (targetKey: string, onKeyDown: Function) => {
     const handler = useCallback(
       (event: any) => {
@@ -55,7 +64,12 @@ const Cutting = ({ open, onClose }: { open?: boolean; onClose?: Function }) => {
       };
     }, [handler]);
   };
-  //提交截图信息
+
+  /**
+   * @description: 提交截图信息
+   * @param {*} useCallback
+   * @return {*}
+   */
   const handleSubmit = useCallback(() => {
     cropperRef.current.cropper.getCroppedCanvas().toBlob(async (blob: any) => {
       // 创造提交表单数据对象
@@ -85,6 +99,7 @@ const Cutting = ({ open, onClose }: { open?: boolean; onClose?: Function }) => {
       );
     });
   }, [cropperRef]);
+
   useKeyPress('a', (event: any) => {
     // 判断是否按下了 Control 和 Alt 键
     if (event.ctrlKey && event.altKey) {
@@ -94,9 +109,11 @@ const Cutting = ({ open, onClose }: { open?: boolean; onClose?: Function }) => {
       }
     }
   });
+
   if (!img) {
     return <></>;
   }
+
   return (
     <div className="hooks-cropper-modal">
       <div className="modal-panel">

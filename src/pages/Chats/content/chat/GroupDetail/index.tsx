@@ -192,6 +192,7 @@ const Groupdetail: React.FC<any> = ({ chat }: { chat: IMsgChat }) => {
           {operaButton}
         </div>
       </div>
+
       {/* 历史记录搜索弹窗 */}
       <ChatHistoryModal
         open={historyOpen}
@@ -199,6 +200,7 @@ const Groupdetail: React.FC<any> = ({ chat }: { chat: IMsgChat }) => {
         onCancel={onHistoryCancel}
         chat={chat}
       />
+
       <Modal
         title={'邀请成员'}
         destroyOnClose
@@ -208,6 +210,7 @@ const Groupdetail: React.FC<any> = ({ chat }: { chat: IMsgChat }) => {
         onCancel={onCancel}>
         <AssignPosts members={orgCtrl.user.members} searchFn={setSelectPerson} />
       </Modal>
+
       <Modal
         title={'移出成员'}
         destroyOnClose

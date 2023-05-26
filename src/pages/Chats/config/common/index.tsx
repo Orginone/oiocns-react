@@ -9,7 +9,7 @@ import { IconFont } from '@/components/IconFont';
 import { FileTypes } from '@/ts/core/public/consts';
 import { formatSize } from '@/ts/base/common';
 
-/** 处理返回的文字*/
+/** 处理返回的文字 */
 export const filetrText = (val: IMessage) => {
   //后端返回的值
   const spanText = val?.msgBody?.indexOf(
@@ -135,10 +135,7 @@ export const filterCite = (item: string, type: string, user: IMessage) => {
   }
 };
 
-/**
- * 显示引用消息
- * @param msg 引用消息
- */
+/** 显示引用消息 */
 export const showCiteText = (item: IMessage) => {
   switch (item.msgType) {
     case MessageType.Image: {
@@ -181,4 +178,22 @@ export const showCiteText = (item: IMessage) => {
       return <>{filterCite(item.msgBody, item.msgType, item)}</>;
     }
   }
+};
+
+/** 截屏后放入输入区发出消息 */
+export const handleCutImgSelect = async (result: any) => {
+  const img = document.createElement('img');
+  img.src = result.shareInfo().shareLink;
+  img.className = `cutImg`;
+  img.style.display = 'block';
+  img.style.marginBottom = '10px';
+  document.getElementById('insterHtml')?.append(img);
+};
+
+/** 创建img标签 */
+export const handleImgChoosed = (url: string) => {
+  const img = document.createElement('img');
+  img.src = url;
+  img.className = `emoji`;
+  document.getElementById('insterHtml')?.append(img);
 };

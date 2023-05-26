@@ -24,42 +24,13 @@ interface Iprops {
 const ChatHistoryModal: React.FC<Iprops> = ({ open, title, onCancel, chat }) => {
   const [messages, setMessages] = useState(chat.messages);
   const [loading, setLoading] = useState(false);
-  const [beforescrollHeight, setBeforescrollHeight] = useState(0);
-  const [searchStr, setSearchStr] = useState<string>('');
   const body = useRef<HTMLDivElement>(null);
-
-  /**
-   * @description: 处理第一次进入时的历史消息
-   * @return {*}
-   */
-  useEffect(() => {
-    setMessages([...chat.messages]);
-    chat.onMessage((ms) => {
-      setMessages([...ms]);
-    });
-    return () => {
-      chat.unMessage();
-    };
-  }, [chat]);
-
-  // 滚动时加载更多消息
-  useEffect(() => {
-    if (body && body.current && searchStr === '') {
-      if (loading) {
-        setLoading(false);
-        body.current.scrollTop = body.current.scrollHeight - beforescrollHeight;
-      } else {
-        setLoading(false);
-      }
-    }
-  }, [messages]);
 
   /**
    * @description: 搜索事件
    * @return {*}
    */
   const searchChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setSearchStr(e.target.value);
     filterOne(chat.messages, e.target.value, ['msgBody']);
   };
 
@@ -155,7 +126,6 @@ const ChatHistoryModal: React.FC<Iprops> = ({ open, title, onCancel, chat }) => 
           // 替换消息里 图片信息特殊字符
           const willReplaceStr = matches.map((match) => match[0]);
           willReplaceStr.forEach((strItem) => {
-            // str = str.replace(strItem, '图(' + (idx + 1) + ')');
             str = str.replace(strItem, ' ');
           });
           // 垂直展示截图信息。把文字消息统一放在底部
@@ -210,15 +180,8 @@ const ChatHistoryModal: React.FC<Iprops> = ({ open, title, onCancel, chat }) => 
 
   // 滚动事件
   const onScroll = async () => {
-    if (
-      !loading &&
-      body.current &&
-      chat &&
-      body.current.scrollTop === 0 &&
-      searchStr === ''
-    ) {
+    if (!loading && body.current && chat && body.current.scrollTop === 0) {
       setLoading(true);
-      setBeforescrollHeight(body.current.scrollHeight);
       if ((await chat.moreMessage()) < 1) {
         setLoading(false);
       }

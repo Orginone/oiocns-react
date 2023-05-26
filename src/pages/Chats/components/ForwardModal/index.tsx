@@ -39,10 +39,8 @@ type forwardType = {
 };
 
 const ForwardModal: React.FC<ModalPageProps> = (props) => {
-  const { visible, onCancel, formwardCode } = props; // 在这里将属性从props 中解构出来
-
+  const { visible, onCancel, formwardCode } = props;
   const allUser = orgCtrl.user.chats.filter((i) => i.isMyChat);
-  // 这里是页面状态
   const [sendData, setSendData] = useState<Array<forwardType>>([]); // 需要传输的卡片
   const [filterCode, setFilterCode] = useState('');
 
@@ -71,12 +69,10 @@ const ForwardModal: React.FC<ModalPageProps> = (props) => {
       message.success('消息转发成功');
       onCancel();
     });
-    // onOk();
   };
 
   // 取消按钮
   const cancelHandle = async () => {
-    // TODO 可以在这里做一些组件内部的事，再调用回调
     onCancel();
   };
 
@@ -198,17 +194,8 @@ const ForwardModal: React.FC<ModalPageProps> = (props) => {
     );
   };
 
-  useEffect(() => {
-    // useEffect在组件初始化或visible变化时执行
-  }, [visible]);
-
   return (
-    <Modal
-      // title="转发"
-      open={visible}
-      onOk={okHandle}
-      onCancel={cancelHandle}
-      width={800}>
+    <Modal open={visible} onOk={okHandle} onCancel={cancelHandle} width={800}>
       <Row gutter={10}>
         <Col span={10} className={style.leftBox}>
           <Input
