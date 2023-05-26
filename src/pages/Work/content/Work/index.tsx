@@ -11,6 +11,18 @@ import ThingTable from './ThingTable';
 interface IProps {
   current: IWorkDefine;
 }
+/* 发起办事数据 */
+interface SubmitDataType {
+  headerData: Map<string, any>;
+  formData: Map<
+    string,
+    {
+      isHeader: boolean;
+      resourceData: string;
+      changeData: Map<string, any>;
+    }
+  >;
+}
 /**
  * 办事-业务流程--发起
  * @returns
@@ -24,7 +36,19 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
   const [workForm, setWorkForm] = useState<XForm>();
   const [content, setContent] = useState<string>('');
 
+  const submitData: SubmitDataType = {
+    headerData: new Map(),
+    formData: new Map(),
+  };
+
   const submit = async () => {
+    for (const key in data) {
+      if (Object.prototype.hasOwnProperty.call(data, key)) {
+        submitData.headerData.set(key, data[key]);
+      }
+    }
+    console.log('打印提交数据', data, submitData);
+
     if (
       await current.createWorkInstance({
         hook: '',
@@ -32,7 +56,7 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
         contentType: 'Text',
         title: current.name,
         defineId: current.id,
-        data: JSON.stringify(data),
+        data: JSON.stringify(submitData),
         thingIds: rows.map((row: any) => row['Id']),
       })
     ) {
@@ -46,8 +70,6 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
     current.loadWorkNode().then((value) => {
       if (value && value.forms && value.forms?.length > 0) {
         setThingForms(value.forms.filter((i) => i.belongId === i.shareId));
-        console.log('valuevaluevalue', value);
-
         setWorkForm(value.forms.find((i) => i.belongId == i.shareId));
       }
     });
@@ -61,15 +83,44 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
         orgCtrl.work
           .loadAttributes(activeTab, current.workItem.belongId)
           .then((attributes) => {
+            // console.log(
+            //   'attributes',
+            //   attributes,
+            //   attributes
+            //     .filter((i) => i.linkPropertys && i.linkPropertys.length > 0)
+            //     .map((i) => i.linkPropertys![0]),
+            // );
+
             setPropertys(
               attributes
                 .filter((i) => i.linkPropertys && i.linkPropertys.length > 0)
-                .map((i) => i.linkPropertys![0]),
+                .map((i) => {
+                  return { attrId: i.id, ...i.linkPropertys![0] };
+                }),
             );
           });
       }
     }
   }, [thingForms, activeTab]);
+
+  const handleTableChange = (tableID: string, data: any[]) => {
+    console.log('handleTableChange', tableID, data);
+    const changeData: Map<string, Map<string, any>> = new Map();
+
+    data.forEach((item) => {
+      const childMap = new Map();
+      Object.keys(item).map((chidKey) => {
+        childMap.set(chidKey, item[chidKey]);
+      });
+
+      changeData.set(item.Id, childMap);
+    });
+    submitData.formData.set(tableID, {
+      isHeader: false,
+      resourceData: '',
+      changeData,
+    });
+  };
 
   return (
     <div className={cls.content}>
@@ -109,6 +160,7 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
                   propertys={propertys}
                   setRows={setRows}
                   belongId={current.workItem.belongId}
+                  onChange={handleTableChange}
                 />
                 // <Thing
                 //   keyExpr="Id"

@@ -2,17 +2,16 @@ import OioForm from '@/bizcomponents/FormDesign/OioForm';
 import { XForm, XProperty } from '@/ts/base/schema';
 import Thing from '@/pages/Store/content/Thing/Thing';
 
-import {
-  EditableFormInstance,
-  ProColumns,
-  ProFormInstance,
-  EditableProTable,
-  ProForm,
-} from '@ant-design/pro-components';
+import { ProColumns, ProTable } from '@ant-design/pro-components';
 import type { EditableProTableProps } from '@ant-design/pro-components/es/index';
 import type { ParamsType } from '@ant-design/pro-provider';
 import { Button, Modal } from 'antd';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { getUuid } from '@/utils/tools';
+import { deepClone } from '@/ts/base/common';
+import { columns } from '@/bizcomponents/Indentity/config';
+import { kernel } from '@/ts/base';
+import orgCtrl from '@/ts/controller';
 interface IProps {
   labels: string[];
   propertys: XProperty[];
@@ -35,22 +34,24 @@ interface IProps {
 
 const defaultData: any[] = [
   {
-    ID: '624748504',
+    Id: '624748504',
     name: '活动名称一',
     decs: '这个活动真好玩',
     Creater: 'open',
     Status: '正常',
     CreateTime: '1590486176000',
     ModifiedTime: '1590486176000',
+    '449928777586315264': 123,
   },
   {
-    ID: '624691229',
+    Id: '624691229',
     name: '活动名称二',
     decs: '这个活动真好玩',
     Creater: 'closed',
     Status: '已销毁',
     CreateTime: '1590481162000',
     ModifiedTime: '1590481162000',
+    '449928777586315264': '哈哈哈哈',
   },
 ];
 const ColTypes: Map<string, string> = new Map([
@@ -80,7 +81,6 @@ const ColTypes: Map<string, string> = new Map([
   ['图片', 'image'],
   ['颜色', 'color'],
 ]);
-let i = 0;
 
 const ThingTable = <
   DataType extends Record<string, any>,
@@ -89,18 +89,18 @@ const ThingTable = <
 >(
   props: EditableProTableProps<DataType, Params, ValueType> & IProps,
 ) => {
-  const [editableKeys, setEditableRowKeys] = useState<React.Key[]>(() => []);
-  const formRef = useRef<ProFormInstance<any>>();
-  const editorFormRef = useRef<EditableFormInstance<any>>();
+  // const [editableKeys, setEditableRowKeys] = useState<React.Key[]>(() => []);
+  const [dataSource, setDataSource] = useState<any[]>(deepClone(defaultData));
   const [form, setForm] = useState<XForm>();
   const [operateModel, setOperateModel] = useState<string>();
-
-  const { belongId, propertys, current, formInfo, labels, setRows } = props;
+  const [editData, setEditData] = useState<any>({});
+  const [newData, setNewData] = useState<any>({});
+  const { belongId, propertys, current, formInfo, labels, setRows, onChange } = props;
 
   const getColumns: () => ProColumns<any>[] = () => {
     let columns: ProColumns<any>[] = [];
     const defaultCol = [
-      { id: 'ID', name: '标识', valueType: '描述型' },
+      { id: 'Id', name: '标识', valueType: '描述型' },
       { id: 'Creater', name: '创建者', valueType: '用户型' },
       {
         id: 'Status',
@@ -141,12 +141,12 @@ const ThingTable = <
       // ),
       // );
 
-      const { id, name, valueType, valueEnum = undefined } = p;
+      const { id, attrId, name, valueType, valueEnum = undefined } = p;
       const width = name.length * 30 > 80 ? name.length * 30 : 80;
       columns.push({
         title: name,
         key: id,
-        dataIndex: id,
+        dataIndex: attrId,
         width: width,
         valueType: ColTypes.get(valueType) ?? 'text',
         valueEnum: valueEnum,
@@ -160,115 +160,154 @@ const ThingTable = <
         <a
           key="editable"
           onClick={() => {
-            action?.startEditable?.(record.id);
+            setEditData(record);
+            setForm(formInfo);
+            setOperateModel('edit');
           }}>
           编辑
         </a>,
         <a
           key="delete"
           onClick={() => {
-            const tableDataSource = formRef.current?.getFieldValue('table') as any[];
-            formRef.current?.setFieldsValue({
-              table: tableDataSource.filter((item) => item.id !== record.id),
-            });
+            setDataSource(dataSource.filter((item) => item.Id !== record.Id));
           }}>
           删除
         </a>,
       ],
     });
+
     return columns;
   };
 
+  const submitCurrentTableData = () => {
+    let colStr = columns;
+    colStr.pop();
+    onChange && onChange(formInfo.id, dataSource, JSON.stringify(colStr));
+  };
+
+  useEffect(() => {
+    // 当修改操作执行后
+    if (operateModel == '') {
+      setTimeout(() => {
+        submitCurrentTableData();
+      }, 100);
+    }
+  }, [operateModel]);
+
+  const handleModalDataChange = async (type: 'edit' | 'editMore' | 'add') => {
+    switch (type) {
+      case 'add':
+        {
+          let res = await kernel.anystore.createThing(orgCtrl.user.id, 1);
+          let newD = {};
+          const { success, data = [] }: any = res;
+          if (success && data.length > 0) {
+            newD = { ...data[0], ...newData };
+          }
+          console.log('42142', newD);
+          setDataSource([newD, ...dataSource]);
+        }
+        break;
+      case 'edit':
+        {
+          const newDataSource = dataSource.map((item) => {
+            ((item.Id && item.Id === editData.Id) || item.hid_id === editData.hid_id) &&
+              (item = {
+                ...item,
+                ...newData,
+              });
+
+            return item;
+          });
+          setDataSource(newDataSource);
+        }
+        break;
+      case 'editMore':
+        {
+          const newDataSource = dataSource.map((item) => {
+            return {
+              ...item,
+              ...newData,
+            };
+          });
+          setDataSource(newDataSource);
+        }
+        break;
+
+      default:
+        break;
+    }
+    setOperateModel('');
+    setForm(undefined);
+  };
   return (
     <>
-      <ProForm<{
-        table: any[];
-      }>
-        formRef={formRef}
-        initialValues={{
-          table: defaultData,
+      <ProTable<any>
+        rowKey="id"
+        size="small"
+        scroll={{
+          x: 1200,
         }}
-        validateTrigger="onBlur">
-        <EditableProTable<any>
-          rowKey="id"
-          size="small"
-          scroll={{
-            x: 1200,
-          }}
-          editableFormRef={editorFormRef}
-          headerTitle={'可编辑表格'}
-          maxLength={5}
-          name="table"
-          recordCreatorProps={false}
-          toolBarRender={() => [
-            <Button
-              key="1"
-              type="default"
-              onClick={() => {
-                setForm(formInfo);
-                setOperateModel('add');
-              }}>
-              批量修改
-            </Button>,
-            <Button
-              key="1"
-              type="default"
-              onClick={() => {
-                setForm(formInfo);
-                setOperateModel('add');
-              }}>
-              新增{formInfo.name}
-            </Button>,
-            <Button
-              key="2"
-              type="default"
-              onClick={() => {
-                setForm(formInfo);
-                setOperateModel('select');
-              }}>
-              选择{formInfo.name}
-            </Button>,
-          ]}
-          columns={getColumns()}
-          editable={{
-            type: 'multiple',
-            editableKeys,
-            onChange: setEditableRowKeys,
-            actionRender: (row, config, defaultDom) => {
-              return [
-                defaultDom.save,
-                defaultDom.delete || defaultDom.cancel,
-                <a
-                  key="set"
-                  onClick={() => {
-                    i++;
-                    editorFormRef.current?.setRowData?.(config.index!, {
-                      title: '动态设置的title' + i,
-                    });
-                  }}>
-                  动态设置此行
-                </a>,
-              ];
-            },
-          }}
-        />
-      </ProForm>
+        search={false}
+        dataSource={dataSource}
+        headerTitle={'实体类'}
+        toolBarRender={() => [
+          <Button
+            key="1"
+            type="default"
+            onClick={() => {
+              setForm(formInfo);
+              setOperateModel('editMore');
+            }}>
+            批量修改
+          </Button>,
+          <Button
+            key="1"
+            type="default"
+            onClick={() => {
+              setForm(formInfo);
+              setOperateModel('add');
+            }}>
+            新增{formInfo.name}
+          </Button>,
+          <Button
+            key="2"
+            type="default"
+            onClick={() => {
+              setForm(formInfo);
+              setOperateModel('select');
+            }}>
+            选择{formInfo.name}
+          </Button>,
+        ]}
+        columns={getColumns()}
+      />
       <>
-        {' '}
-        {form && operateModel === 'add' && (
-          <Modal
-            open={true}
-            onOk={() => {}}
-            onCancel={() => {
-              setOperateModel('');
-              setForm(undefined);
-            }}
-            destroyOnClose={true}
-            cancelText={'关闭'}
-            width={1000}>
-            <OioForm form={form} define={current} />
-          </Modal>
-        )}
+        {form &&
+          (operateModel === 'add' ||
+            operateModel === 'editMore' ||
+            operateModel === 'edit') && (
+            <Modal
+              open={true}
+              onOk={async () => {
+                await handleModalDataChange(operateModel);
+              }}
+              onCancel={() => {
+                setOperateModel('');
+                setForm(undefined);
+              }}
+              destroyOnClose={true}
+              cancelText={'关闭'}
+              width={1000}>
+              <OioForm
+                form={form}
+                define={current}
+                fieldsValue={operateModel === 'edit' ? editData : undefined}
+                onValuesChange={(_changeValue, values) => setNewData(values)}
+                noRule={true}
+              />
+            </Modal>
+          )}
         {form && operateModel === 'select' && (
           <Modal
             open={true}
@@ -281,9 +320,10 @@ const ThingTable = <
             cancelText={'关闭'}
             width={1000}>
             <Thing
+              keyExpr="Id"
               height={500}
               selectable
-              labels={[labels]}
+              labels={labels}
               propertys={propertys}
               onSelected={setRows}
               belongId={belongId}
