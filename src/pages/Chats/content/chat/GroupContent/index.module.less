@@ -43,7 +43,7 @@
   }
 
   .con_body {
-    max-width: 80%;
+    max-width: 40vw;
     display: -webkit-box;
     display: -ms-flexbox;
     display: flex;
@@ -90,6 +90,62 @@
           margin: 5px;
         }
       }
+
+      .con_content_file {
+        display: flex;
+        text-align: left;
+        width: 220px;
+        height: 80px;
+        background-color: #fffff7;
+        padding: 7px 10px;
+        margin: 0px 0px;
+        margin-top: -20px;
+        color: #3e5ed8;
+        border-radius: 6px;
+        z-index: 1;
+        font-size: small;
+        word-wrap: break-word;
+        word-break: normal;
+        position: relative;
+
+        &_info {
+          display: flex;
+          flex-direction: column;
+          flex-grow: 1;
+          height: 100%;
+
+          &_label {
+            width: 140px;
+            flex-grow: 1;
+            padding-right: 10px;
+            display: -webkit-box;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2;
+          }
+        }
+
+        &_Icon {
+          padding: 5px;
+          font-size: 50px;
+          background-color: aliceblue;
+        }
+
+        :global {
+          .ogo-btn-primary {
+            background-color: #89c6ff85;
+            border-color: #89c6ff85;
+            color: #3e5ed8;
+            box-shadow: none;
+            text-shadow: none;
+          }
+
+          .ogo-btn-primary:hover {
+            color: #f4f4ee;
+          }
+        }
+      }
     }
   }
 
@@ -122,6 +178,7 @@
     justify-content: flex-end;
     .con_content {
       max-width: 100%;
+      margin-top: 10px;
       display: flex;
       flex-direction: column;
       justify-content: flex-end;
@@ -185,4 +242,26 @@
   flex-wrap: nowrap;
   align-items: flex-start;
   align-content: flex-start;
+}
+
+.voiceStyle {
+  audio {
+    width: 200px;
+    height: 40px;
+    overflow-x: hidden;
+  }
+
+  audio::-webkit-media-controls-start-playback-button,
+  audio::-webkit-media-controls-end-playback-button,
+  audio::-webkit-media-controls-mute-button,
+  audio::-webkit-media-controls-timeline,
+  audio::-webkit-media-controls-volume-slider,
+  audio::-webkit-media-controls-overflow-button {
+    display: none !important;
+  }
+  /* 自定义时间显示样式 */
+  audio.time-display {
+    color: #666;
+    font-size: 10px;
+  }
 }
