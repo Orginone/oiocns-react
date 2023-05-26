@@ -1,6 +1,5 @@
-import Thing from '@/pages/Store/content/Thing/Thing';
 import { IWorkDefine } from '@/ts/core';
-import { Button, Card, Input, Modal, Tabs, message } from 'antd';
+import { Button, Card, Input, Tabs, message } from 'antd';
 import orgCtrl from '@/ts/controller';
 import React, { useEffect, useState } from 'react';
 import cls from './index.module.less';
@@ -19,8 +18,6 @@ interface IProps {
 const WorkStartDo: React.FC<IProps> = ({ current }) => {
   const [data, setData] = useState<any>({});
   const [rows, setRows] = useState<any[]>([]);
-  const [form, setForm] = useState<XForm>();
-  const [operateModel, setOperateModel] = useState<string>();
   const [activeTab, setActiveTab] = useState<string>();
   const [propertys, setPropertys] = useState<XProperty[]>([]);
   const [thingForms, setThingForms] = useState<XForm[]>([]);
@@ -105,26 +102,13 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
               children: (
                 <ThingTable
                   headerTitle={activeTab}
-                  toolBarRender={() => [
-                    <Button
-                      key="1"
-                      type="default"
-                      onClick={() => {
-                        setForm(i);
-                        setOperateModel('add');
-                      }}>
-                      新增{i.name}
-                    </Button>,
-                    <Button
-                      key="2"
-                      type="default"
-                      onClick={() => {
-                        setForm(i);
-                        setOperateModel('select');
-                      }}>
-                      选择{i.name}
-                    </Button>,
-                  ]}
+                  dataSource={rows}
+                  current={current}
+                  formInfo={i}
+                  labels={[`S${activeTab}`]}
+                  propertys={propertys}
+                  setRows={setRows}
+                  belongId={current.workItem.belongId}
                 />
                 // <Thing
                 //   keyExpr="Id"
@@ -190,41 +174,6 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
           </div>
         </div>
       </Card>
-      {form && operateModel === 'add' && (
-        <Modal
-          open={true}
-          onOk={() => {}}
-          onCancel={() => {
-            setOperateModel('');
-            setForm(undefined);
-          }}
-          destroyOnClose={true}
-          cancelText={'关闭'}
-          width={1000}>
-          <OioForm form={form} define={current} />
-        </Modal>
-      )}
-      {form && operateModel === 'select' && (
-        <Modal
-          open={true}
-          onOk={() => {}}
-          onCancel={() => {
-            setOperateModel('');
-            setForm(undefined);
-          }}
-          destroyOnClose={true}
-          cancelText={'关闭'}
-          width={1000}>
-          <Thing
-            height={500}
-            selectable
-            labels={[`S${activeTab}`]}
-            propertys={propertys}
-            onSelected={setRows}
-            belongId={current.workItem.belongId}
-          />
-        </Modal>
-      )}
     </div>
   );
 };
