@@ -97,8 +97,8 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
       key: 'setting',
       path: '/setting',
       title: orgCtrl.user.name,
-      icon: <TeamIcon share={orgCtrl.user.share} size={28} title="设置" />,
       count: 0,
+      icon: 'setting',
       fath: '/setting',
       onClick: () => {
         orgCtrl.currentKey = '';
@@ -116,8 +116,17 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
         onClick={() => {
           item.onClick();
         }}>
-        {typeof item.icon !== 'string' ? (
-          item.icon
+        {item.key === 'setting' ? (
+          <>
+            <TeamIcon share={orgCtrl.user.share} size={28} title="设置" />
+            <OrgIcons
+              className={cls.settingIcon}
+              size={13}
+              type={item.icon}
+              notAvatar
+              selected={location.hash.startsWith('#' + item.fath)}
+            />
+          </>
         ) : (
           <OrgIcons
             size={26}
