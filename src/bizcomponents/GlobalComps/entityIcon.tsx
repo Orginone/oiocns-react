@@ -50,7 +50,7 @@ const EntityIcon = (info: teamTypeInfo) => {
             setPreview(true);
           }}
         />
-        {svgName ? <div style={{ position: 'absolute', zIndex: 999, bottom: '20%', height: '24%', width: '40%', right: 0, background: "#FFF",borderRadius:'3px' }}>
+        {svgName ? <div style={{ position: 'absolute', zIndex: 999, bottom: '17%', height: '25%', width: '40%', right: '-9%', background: "#FFF",borderRadius:'3px' }}>
           <div style={{ position: 'relative', height: '100%', width: '100%' }}>
             <img style={{ height: '100%', position: 'absolute' }} src={`/svg/${svgName}.svg`} alt="" />
           </div>
