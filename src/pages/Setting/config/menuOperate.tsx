@@ -233,7 +233,7 @@ const loadSpeciesMenus = (species: ISpeciesItem) => {
         icon: <im.ImDownload />,
         label: '导入模板下载',
         beforeLoad: async () => {
-          generateXlsx(['名称', '代码', '类型', '说明'], '类别导入模板', '类别数据');
+          generateXlsx([], '类别导入模板');
           return false;
         },
       },
@@ -590,3 +590,4 @@ export const loadSettingMenu = () => {
     ),
   };
 };
+

@@ -4,25 +4,23 @@ import { ProFormColumnsType } from '@ant-design/pro-components';
 import SchemaForm from '@/components/SchemaForm';
 import { IPropClass } from '@/ts/core';
 import { AiOutlineBank, AiOutlineCheck } from 'react-icons/ai';
-import { readXlsx } from '@/utils/excel';
+import { ExcelConfig, readXlsx } from '@/utils/excel';
+import { SheetReadConfig } from '@/utils/excel';
 
-interface Iprops {
+interface IProps {
   title: string;
   species: IPropClass;
   open: boolean;
-  /** 需要读取的 Sheet 名称 */
-  sheetNumber: number;
-  /** 导入前需要初始化的内容 */
-  beforeImport?: () => Promise<void>;
-  /** 读取到每一行数据时处理的回调函数 */
-  operatingItem: (item: any) => Promise<void>;
   handleCancel: () => void;
   handleOk: () => void;
+  sheetReadConfigs: SheetReadConfig[];
+  completed?: () => void;
 }
+
 /*
   编辑
 */
-const ImportModal = (props: Iprops) => {
+const ImportModal = (props: IProps) => {
   const [progress, setProgress] = useState<number>(0);
   const uploadProps: UploadProps = {
     multiple: false,
@@ -37,17 +35,18 @@ const ImportModal = (props: Iprops) => {
       return isXlsx;
     },
     async customRequest(options) {
-      let onProgress = (progress: number | string) => {
-        if (typeof progress == 'number') {
+      let config: ExcelConfig = {
+        onProgress: function (progress: number): void {
           setProgress(progress);
-        } else {
-          message.error(progress);
-        }
+        },
+        onError: function (error: string): void {
+          message.error(error);
+        },
+        onCompleted: function (): void {
+          props.completed?.apply(props);
+        },
       };
-      if (props.beforeImport) {
-        await props.beforeImport();
-      }
-      readXlsx(options.file as File, props.sheetNumber, props.operatingItem, onProgress);
+      readXlsx(options.file as File, config, props.sheetReadConfigs);
     },
   };
   const columns: ProFormColumnsType[] = [

@@ -10,10 +10,9 @@ import { MenuItemType } from 'typings/globelType';
 import React, { useState } from 'react';
 import { Modal, message } from 'antd';
 import { XTarget } from '@/ts/base/schema';
-import { ISpeciesItem, TargetType } from '@/ts/core';
+import { TargetType } from '@/ts/core';
 import PropertyModal from '@/bizcomponents/GlobalComps/createProperty';
 import ImportModal from '@/bizcomponents/GlobalComps/import';
-import { model } from '@/ts/base';
 
 interface IProps {
   operateKey: string;
@@ -59,17 +58,7 @@ const OperateIndex = ({ selectMenu, operateKey, confrim }: IProps) => {
             handleCancel={confrim}
             handleOk={confrim}
             species={selectMenu.item}
-            sheetNumber={0}
-            operatingItem={async function (item: any): Promise<void> {
-              let species = selectMenu.item as ISpeciesItem;0
-              await species.create({
-                name: item['名称'],
-                code: item['代码'],
-                typeName: item['类型'],
-                authId: species.metadata.authId,
-                remark: item['说明'],
-              } as model.SpeciesModel);
-            }}
+            sheetReadConfigs={[]}
           />
         ) : (
           <SpeciesModal
