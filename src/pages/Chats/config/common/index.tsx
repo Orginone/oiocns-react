@@ -1,4 +1,4 @@
-import { parseAvatar } from '@/ts/base';
+import { model, parseAvatar } from '@/ts/base';
 import { FileItemShare } from '@/ts/base/model';
 import { MessageType, IMessage } from '@/ts/core';
 import { CaretUpOutlined } from '@ant-design/icons';
@@ -10,7 +10,7 @@ import { FileTypes } from '@/ts/core/public/consts';
 import { formatSize } from '@/ts/base/common';
 
 /** 处理返回的文字 */
-export const filetrText = (val: IMessage) => {
+export const filetrText = (val: model.MsgSaveModel) => {
   //后端返回的值
   const spanText = val?.msgBody?.indexOf(
     '<span style="white-space: pre; background-color: rgb(255, 255, 255);">',

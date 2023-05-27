@@ -215,6 +215,7 @@ const Book: React.FC<any> = ({
                       </div>
                     }
                     description={showMessage(item)}
+                    // description={item.information}
                   />
                 </List.Item>
               </div>

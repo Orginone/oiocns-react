@@ -1,8 +1,7 @@
-import React, { memo, useState, useEffect } from 'react';
+import React, { memo, useState } from 'react';
 import { Checkbox, Col, Divider, Input, Modal, Row, Tag, Image, message } from 'antd';
 import { common, kernel, model, parseAvatar } from '@/ts/base';
 import { ImSearch } from 'react-icons/im';
-import style from './index.module.less';
 import { MessageType } from '@/ts/core';
 import { FileItemShare, ResultType } from '@/ts/base/model';
 import { FileTypes } from '@/ts/core/public/consts';
@@ -10,6 +9,8 @@ import { IconFont } from '@/components/IconFont';
 import orgCtrl from '@/ts/controller';
 import { filetrText, isShowLink } from '@/pages/Chats/config/common';
 import { formatSize } from '@/ts/base/common';
+import { parseMsg } from '@/pages/Chats/components/pareMsg';
+import style from './index.module.less';
 
 interface ModalPageProps {
   // 采用如下属性标注方式,会在父组件传值时，有文案提示
@@ -160,7 +161,7 @@ const ForwardModal: React.FC<ModalPageProps> = (props) => {
     }
   };
 
-  /** 勾选哪一项 */
+  /** 勾选项 */
   const handleCheck = (item: any, val: any) => {
     if (val.target.checked === true) {
       setSendData([

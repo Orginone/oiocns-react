@@ -303,6 +303,10 @@ export abstract class MsgChat<T extends schema.XEntity>
     }
     this.chatdata.lastMsgTime = new Date().getTime();
     this.chatdata.lastMessage = msg;
+    console.log('vvvvvv1', common.StringPako.inflate(msg.msgBody));
+    console.log('vvvvvv2', msg);
+    console.log('vvvvvv3', findTextId(common.StringPako.inflate(msg.msgBody)));
+
     this.chatdata.isFindme = findTextId(common.StringPako.inflate(msg.msgBody)); // 用来往对象中添加艾特值
     this.cache();
     this.messageNotify?.apply(this, [this.messages]);
