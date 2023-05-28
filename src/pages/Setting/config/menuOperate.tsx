@@ -24,6 +24,7 @@ import {
   IWorkDefine,
 } from '@/ts/core';
 import { XProperty } from '@/ts/base/schema';
+import { orgAuth } from '@/ts/core/public/consts';
 import { generateXlsx, getConfigs } from '@/utils/excel';
 
 /** 加载分组菜单参数 */
