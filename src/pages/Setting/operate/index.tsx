@@ -13,6 +13,7 @@ import { XTarget } from '@/ts/base/schema';
 import { TargetType } from '@/ts/core';
 import PropertyModal from '@/bizcomponents/GlobalComps/createProperty';
 import ImportModal from '@/bizcomponents/GlobalComps/import';
+import { getReadConfigs } from '@/utils/excel/config';
 
 interface IProps {
   operateKey: string;
@@ -58,7 +59,7 @@ const OperateIndex = ({ selectMenu, operateKey, confrim }: IProps) => {
             handleCancel={confrim}
             handleOk={confrim}
             species={selectMenu.item}
-            sheetReadConfigs={[]}
+            sheetReadConfigs={getReadConfigs(selectMenu.item)}
           />
         ) : (
           <SpeciesModal

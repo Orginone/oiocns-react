@@ -92,4 +92,10 @@ export class DictClass extends SpeciesItem implements IDictClass {
       }
     }
   }
+  createChildren(
+    _metadata: schema.XSpecies,
+    _current: ITarget
+  ): ISpeciesItem | undefined {
+    return new DictClass(_metadata, _current, this);
+  }
 }

@@ -35,7 +35,8 @@ const ImportModal = (props: IProps) => {
       return isXlsx;
     },
     async customRequest(options) {
-      let config: ExcelConfig = {
+      let config: ExcelConfig<any> = {
+        context: {},
         onProgress: function (progress: number): void {
           setProgress(progress);
         },
