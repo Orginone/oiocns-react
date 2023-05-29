@@ -10,7 +10,7 @@ import { MenuItemType } from 'typings/globelType';
 import React, { useState } from 'react';
 import { Modal, message } from 'antd';
 import { XTarget } from '@/ts/base/schema';
-import { IWorkDefine, IWorkItem, TargetType } from '@/ts/core';
+import { IFlowClass, IWorkDefine, TargetType } from '@/ts/core';
 import PropertyModal from '@/bizcomponents/GlobalComps/createProperty';
 import ImportModal from '@/bizcomponents/GlobalComps/import';
 import { getReadConfigs } from '@/utils/excel/config';
@@ -96,7 +96,7 @@ const OperateIndex = ({ selectMenu, operateKey, confrim }: IProps) => {
       {/** 事项模态框 */}
       {operateKey.includes('事项') && (
         <WorkDefineModal
-          workItem={(selectMenu.item as IWorkDefine).workItem as IWorkItem}
+          workItem={(selectMenu.item as IWorkDefine).workItem as IFlowClass}
           current={selectMenu.item}
           open={operateKey.includes('事项')}
           handleCancel={confrim}
