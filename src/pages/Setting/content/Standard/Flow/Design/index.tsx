@@ -16,13 +16,20 @@ import { ImUndo2, ImWarning } from 'react-icons/im';
 import { IWorkDefine } from '@/ts/core';
 
 interface IProps {
+  Title?: string;
   IsEdit: boolean;
   current: IWorkDefine;
   instance?: XWorkInstance;
-  onBack: () => void;
+  onBack?: () => void;
 }
 
-const Design: React.FC<IProps> = ({ current, instance, onBack, IsEdit = true }) => {
+const Design: React.FC<IProps> = ({
+  Title,
+  current,
+  instance,
+  onBack,
+  IsEdit = true,
+}) => {
   const [scale, setScale] = useState<number>(100);
   const [showErrorsModal, setShowErrorsModal] = useState<ReactNode[]>([]);
   const [resource, setResource] = useState<WorkNodeModel>();
@@ -424,71 +431,65 @@ const Design: React.FC<IProps> = ({ current, instance, onBack, IsEdit = true }) 
   };
 
   const loadGroupBth = () => {
-    if (IsEdit) {
-      return (
-        <GroupBtn
-          showDivider={false}
-          list={[
-            {
-              size: 'small',
-              icon: <AiOutlineSend />,
-              text: '发布',
-              className: cls['publis-issue'],
-              type: 'primary',
-              onClick: async () => {
-                //数据结构转化
-                let resource_: WorkNodeModel = changeResource(
-                  resource,
-                  'flowNode',
-                ) as WorkNodeModel;
-                let errors = checkValid(resource_);
-                if (errors.length > 0) {
-                  setShowErrorsModal(errors);
-                  return;
-                }
-                if (
-                  await current.updateDefine({
-                    ...current.metadata,
-                    resource: resource_,
-                    speciesId: current.workItem.id,
-                  })
-                ) {
-                  message.success('保存成功');
-                  onBack();
-                }
-              },
+    let buttons: any = [
+      {
+        icon: <AiOutlineSend />,
+        text: '发布',
+        className: cls['publis-issue'],
+        type: 'primary',
+        onClick: async () => {
+          //数据结构转化
+          let resource_: WorkNodeModel = changeResource(
+            resource,
+            'flowNode',
+          ) as WorkNodeModel;
+          let errors = checkValid(resource_);
+          if (errors.length > 0) {
+            setShowErrorsModal(errors);
+            return;
+          }
+          if (
+            await current.updateDefine({
+              ...current.metadata,
+              resource: resource_,
+              speciesId: current.workItem.id,
+            })
+          ) {
+            message.success('保存成功');
+            onBack?.call(this);
+          }
+        },
+      },
+    ];
+    if (onBack) {
+      buttons.push({
+        danger: true,
+        text: '返回',
+        type: 'primary',
+        icon: <AiOutlineClockCircle />,
+        className: cls['publis-issue'],
+        onClick: async () => {
+          Modal.confirm({
+            title: '未发布的内容将不会被保存，是否直接退出?',
+            icon: <ImUndo2 />,
+            okText: '确认',
+            okType: 'danger',
+            cancelText: '取消',
+            onOk() {
+              onBack();
             },
-            {
-              size: 'small',
-              danger: true,
-              text: '返回',
-              type: 'primary',
-              icon: <AiOutlineClockCircle />,
-              className: cls['publis-issue'],
-              onClick: async () => {
-                Modal.confirm({
-                  title: '未发布的内容将不会被保存，是否直接退出?',
-                  icon: <ImUndo2 />,
-                  okText: '确认',
-                  okType: 'danger',
-                  cancelText: '取消',
-                  onOk() {
-                    onBack();
-                  },
-                });
-              },
-            },
-          ]}
-        />
-      );
+          });
+        },
+      });
     }
+    return <GroupBtn showDivider={false} list={buttons} />;
   };
 
   return (
     <div className={cls['company-info-content']}>
       <Card bordered={false}>
         <Layout>
-          {IsEdit && (
+          {Title && (
             <Layout.Header
               style={{
                 position: 'sticky',
@@ -501,7 +502,7 @@ const Design: React.FC<IProps> = ({ current, instance, onBack, IsEdit = true }) 
                 fontSize: '22px',
               }}>
               <Typography.Title level={3} style={{ margin: 0 }}>
-                办事设计
+                Title
               </Typography.Title>
             </Layout.Header>
           )}
@@ -524,7 +525,7 @@ const Design: React.FC<IProps> = ({ current, instance, onBack, IsEdit = true }) 
                     onClick={() => setScale(scale + 10)}>
                     <AiOutlinePlus />
                   </Button>
-                  {loadGroupBth()}
+                  {IsEdit && loadGroupBth()}
                 </Space>
               </div>
               {/* 基本信息组件 */}

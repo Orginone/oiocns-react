@@ -171,7 +171,7 @@ const buildDefineMenu = (form: IFlowClass) => {
       item: i,
       label: i.name,
       icon: <TeamIcon notAvatar={true} share={i.share} size={18} fontSize={16} />,
-      itemType: MenuType.Form,
+      itemType: MenuType.Work,
       menus: loadDefineMenus(i),
       children: [],
       beforeLoad: async () => {

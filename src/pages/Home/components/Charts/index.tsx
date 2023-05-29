@@ -122,7 +122,7 @@ let SeriesType3: any = [
     },
     itemStyle: {
       normal: {
-        barBorderRadius: [10, 10, 0, 0],
+        borderRadius: [10, 10, 0, 0],
         color: new echarts.graphic.LinearGradient(1, 0, 0, 0, [
           {
             offset: 0,
@@ -145,7 +145,7 @@ let SeriesType3: any = [
     },
     itemStyle: {
       normal: {
-        barBorderRadius: [10, 10, 0, 0],
+        borderRadius: [10, 10, 0, 0],
         color: new echarts.graphic.LinearGradient(1, 0, 0, 0, [
           {
             offset: 0,
@@ -169,7 +169,7 @@ let SeriesType3: any = [
     },
     itemStyle: {
       normal: {
-        barBorderRadius: [10, 10, 0, 0],
+        borderRadius: [10, 10, 0, 0],
         color: new echarts.graphic.LinearGradient(1, 0, 0, 0, [
           {
             offset: 0,

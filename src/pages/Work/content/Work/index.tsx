@@ -37,13 +37,8 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
   const [activeTab, setActiveTab] = useState<string>();
   const [propertys, setPropertys] = useState<XProperty[]>([]);
   const [thingForms, setThingForms] = useState<XForm[]>([]);
-  const [mainForm, setMainForm] = useState<XForm>();
+  const [workForm, setWorkForm] = useState<XForm>();
   const [content, setContent] = useState<string>('');
-
-  const submitData: SubmitDataType = {
-    headerData: new Map(),
-    formData: new Map(),
-  };
 
   const submit = async () => {
     for (const key in data) {
@@ -60,7 +55,6 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
         title: current.name,
         defineId: current.id,
         data: JSON.stringify(submitData),
-        thingIds: rows.map((row: any) => row['Id']),
       })
     ) {
       message.success('发起成功!');
@@ -142,10 +136,10 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
 
   return (
     <div className={cls.content}>
-      {mainForm && (
+      {workForm && (
         <OioForm
-          key={mainForm.id}
-          form={mainForm}
+          key={workForm.id}
+          form={workForm}
           define={current}
           submitter={{
             resetButtonProps: {
@@ -162,7 +156,6 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
         <Tabs
           tabPosition="top"
           activeKey={activeTab}
-          tabPosition="top"
           onTabClick={(tabKey) => setActiveTab(tabKey)}
           items={thingForms.map((i) => {
             return {
