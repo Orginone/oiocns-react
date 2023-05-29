@@ -284,6 +284,7 @@ export abstract class MsgChat<T extends schema.XEntity>
   }
   receiveMessage(msg: model.MsgSaveModel): void {
     const imsg = new Message(msg, this);
+    // 撤回走这里
     if (imsg.msgType === MessageType.Recall) {
       this.messages
         .find((m) => {
