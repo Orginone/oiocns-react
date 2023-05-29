@@ -23,10 +23,6 @@ interface SubmitDataType {
     }
   >;
 }
-const submitData: SubmitDataType = {
-  headerData: new Map(),
-  formData: new Map(),
-};
 /**
  * 办事-业务流程--发起
  * @returns
@@ -67,7 +63,7 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
     current.loadWorkNode().then((value) => {
       if (value && value.forms && value.forms.length > 0) {
         setThingForms(value.forms.filter((i) => i.belongId === i.shareId));
-        setWorkForm(value.forms.find((i) => i.belongId == i.shareId));
+        setMainForm(value.forms.find((i) => i.belongId == i.shareId));
       }
     });
   }, []);
