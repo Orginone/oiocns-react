@@ -139,14 +139,14 @@ const ThingTable = <
             setForm(formInfo);
             setOperateModel('edit');
           }}>
-          编辑
+          变更
         </a>,
         <a
           key="delete"
           onClick={() => {
             setThingList(thingList.filter((item) => item.Id !== record.Id));
           }}>
-          删除
+          移除
         </a>,
       ],
     });
