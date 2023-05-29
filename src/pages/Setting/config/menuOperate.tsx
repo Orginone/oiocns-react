@@ -24,7 +24,8 @@ import {
   IWorkDefine,
 } from '@/ts/core';
 import { XProperty } from '@/ts/base/schema';
-import { orgAuth } from '@/ts/core/public';
+import { orgAuth } from '@/ts/core/public/consts';
+import { generateXlsx, getConfigs } from '@/utils/excel';
 
 /** 加载分组菜单参数 */
 interface groupMenuParams {
@@ -250,6 +251,24 @@ const loadSpeciesMenus = (species: ISpeciesItem) => {
       },
     },
   );
+  if (species.speciesTypes.length > 0) {
+    items.push(
+      {
+        key: '导入类别',
+        icon: <im.ImPlus />,
+        label: '导入类别',
+      },
+      {
+        key: '导入模板下载',
+        icon: <im.ImDownload />,
+        label: '导入模板下载',
+        beforeLoad: async () => {
+          generateXlsx(await getConfigs(species), '类别导入模板');
+          return false;
+        },
+      },
+    );
+  }
   return items;
 };
 
