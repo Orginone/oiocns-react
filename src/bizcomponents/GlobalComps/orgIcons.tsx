@@ -1,5 +1,5 @@
 import React from 'react';
-import { Avatar } from 'antd';
+import { Avatar, Image } from 'antd';
 
 interface IProps {
   chat?: boolean;
@@ -15,6 +15,9 @@ interface IProps {
   size?: number;
   title?: string;
   type?: string;
+  css?: React.CSSProperties;
+  notAvatar?: boolean;
+  className?: string;
 }
 
 const OrgIcons = (props: IProps) => {
@@ -42,13 +45,27 @@ const OrgIcons = (props: IProps) => {
   if (props.selected) {
     svgName += '-select';
   }
-  return (
-    <Avatar
-      size={size}
-      src={`/svg/${svgName}.svg`}
-      style={{ background: 'transparent', color: '#606060' }}
-    />
-  );
+  if (props.notAvatar) {
+    return (
+      <Image
+        className={props.className}
+        preview={false}
+        height={size}
+        width={size}
+        src={`/svg/${svgName}.svg`}
+        style={props.css}
+      />
+    );
+  } else {
+    return (
+      <Avatar
+        size={size}
+        className={props.className}
+        src={`/svg/${svgName}.svg`}
+        style={{ background: 'transparent', color: '#606060', ...props.css }}
+      />
+    );
+  }
 };
 
 export default OrgIcons;
