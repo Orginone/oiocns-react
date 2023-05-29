@@ -47,7 +47,6 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
         submitData.headerData.set(key, data[key]);
       }
     }
-    console.log('打印提交数据', data, submitData);
 
     if (
       await current.createWorkInstance({
@@ -103,13 +102,15 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
     }
   }, [thingForms, activeTab]);
 
-  const handleTableChange = (tableID: string, data: any[]) => {
-    console.log('handleTableChange', tableID, data);
+  const handleTableChange = (tableID: string, data: any[], Json: string) => {
     const changeData: Map<string, Map<string, any>> = new Map();
 
     data.forEach((item) => {
       const childMap = new Map();
       Object.keys(item).map((chidKey) => {
+        if (['Id', 'Creater', 'Status', 'CreateTime', 'ModifiedTime'].includes(chidKey)) {
+          return;
+        }
         childMap.set(chidKey, item[chidKey]);
       });
 
@@ -117,7 +118,7 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
     });
     submitData.formData.set(tableID, {
       isHeader: false,
-      resourceData: '',
+      resourceData: Json,
       changeData,
     });
   };
@@ -160,7 +161,7 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
                   propertys={propertys}
                   setRows={setRows}
                   belongId={current.workItem.belongId}
-                  onChange={handleTableChange}
+                  onListChange={handleTableChange}
                 />
                 // <Thing
                 //   keyExpr="Id"
