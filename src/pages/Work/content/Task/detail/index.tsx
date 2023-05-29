@@ -10,7 +10,7 @@ import cls from './index.module.less';
 import OioForm from '@/bizcomponents/FormDesign/OioForm';
 import { WorkNodeModel } from '@/ts/base/model';
 import { schema } from '@/ts/base';
-import { IWorkDefine } from '@/ts/core/thing/base/work';
+import { IWorkDefine } from '@/ts/core';
 const { Panel } = Collapse;
 
 export interface TaskDetailType {

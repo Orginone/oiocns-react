@@ -13,7 +13,7 @@ import {
 import { getUuid } from '@/utils/tools';
 import { XWorkInstance } from '@/ts/base/schema';
 import { ImUndo2, ImWarning } from 'react-icons/im';
-import { IWorkDefine } from '@/ts/core/thing/base/work';
+import { IWorkDefine } from '@/ts/core';
 
 interface IProps {
   IsEdit: boolean;

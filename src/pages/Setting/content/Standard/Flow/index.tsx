@@ -10,10 +10,10 @@ import WorkDefineModal from '@/bizcomponents/GlobalComps/createFlow';
 import Design from './Design';
 import { orgAuth } from '@/ts/core/public/consts';
 import PageCard from '@/components/PageCard';
-import { IWorkDefine, IWorkItem } from '@/ts/core';
+import { IWorkDefine, IFlowClass } from '@/ts/core';
 
 interface IProps {
-  current: IWorkItem;
+  current: IFlowClass;
 }
 
 /**

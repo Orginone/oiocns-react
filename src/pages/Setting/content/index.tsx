@@ -29,8 +29,6 @@ const ContentIndex = ({ selectMenu }: IProps) => {
         return <AgencySetting current={selectMenu.item} />;
       case TargetType.Station:
         return <StationSetting current={selectMenu.item} />;
-      // case TargetType.Cohort:
-      //   return <CohortSetting current={selectMenu.item} />;
       case MenuType.Species:
         return <StandardSetting current={selectMenu.item} />;
       case MenuType.Dict:

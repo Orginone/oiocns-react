@@ -1,8 +1,7 @@
 import { schema } from '@/ts/base';
-import { IIdentity, ISpeciesItem } from '@/ts/core';
+import { ISpeciesItem, IWorkDefine } from '@/ts/core';
 import { ProColumns } from '@ant-design/pro-table';
 import orgCtrl from '@/ts/controller';
-import { IWorkDefine } from '@/ts/core/thing/base/work';
 
 const getSpeciesName = (
   id: string,
