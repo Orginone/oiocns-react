@@ -16,12 +16,13 @@ import {
   ITarget,
   ITeam,
   IThingClass,
-  IWorkItem,
+  IFlowClass,
   SpeciesType,
   TargetType,
   companyTypes,
   IBelong,
   IWorkDefine,
+  IWorkClass,
 } from '@/ts/core';
 import { XProperty } from '@/ts/base/schema';
 import { orgAuth } from '@/ts/core/public/consts';
@@ -78,7 +79,10 @@ const buildSpeciesTree = (species: ISpeciesItem): MenuItemType => {
   const children: MenuItemType[] = [];
   switch (species.typeName) {
     case SpeciesType.Thing:
-      children.push(...buildFormMenu(species as IThingClass));
+      children.push(...buildFormMenu((species as IThingClass).forms));
+      break;
+    case SpeciesType.Work:
+      children.push(...buildFormMenu((species as IWorkClass).forms));
       break;
     case SpeciesType.Store:
       children.push(...buildProperty(species as IPropClass));
@@ -86,8 +90,8 @@ const buildSpeciesTree = (species: ISpeciesItem): MenuItemType => {
     case SpeciesType.Dict:
       children.push(...buildDict(species as IDictClass));
       break;
-    case SpeciesType.Work:
-      children.push(...buildDefineMenu(species as IWorkItem));
+    case SpeciesType.Flow:
+      children.push(...buildDefineMenu(species as IFlowClass));
       break;
   }
   return {
@@ -102,14 +106,17 @@ const buildSpeciesTree = (species: ISpeciesItem): MenuItemType => {
     beforeLoad: async () => {
       switch (species.typeName) {
         case SpeciesType.Market:
-        case SpeciesType.Work:
-          await (species as IWorkItem).loadWorkDefines();
+        case SpeciesType.Flow:
+          await (species as IFlowClass).loadWorkDefines();
           break;
         case SpeciesType.Dict:
           await (species as IDictClass).loadDicts();
           break;
         case SpeciesType.Store:
           await (species as IPropClass).loadPropertys();
+          break;
+        case SpeciesType.Work:
+          await (species as IWorkClass).loadForms();
           break;
         case SpeciesType.Thing:
           await (species as IThingClass).loadForms();
@@ -157,7 +164,7 @@ const buildDict = (dictClass: IDictClass) => {
 };
 
 /** 编译表单项菜单 */
-const buildDefineMenu = (form: IWorkItem) => {
+const buildDefineMenu = (form: IFlowClass) => {
   return form.defines.map((i) => {
     return {
       key: i.key,
@@ -175,8 +182,8 @@ const buildDefineMenu = (form: IWorkItem) => {
 };
 
 /** 编译表单项菜单 */
-const buildFormMenu = (form: IThingClass) => {
-  return form.forms.map((i) => {
+const buildFormMenu = (forms: IForm[]) => {
+  return forms.map((i) => {
     return {
       key: i.key,
       item: i,

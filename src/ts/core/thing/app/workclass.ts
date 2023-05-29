@@ -4,7 +4,10 @@ import { Form, IForm } from '../base/form';
 import { ISpeciesItem, SpeciesItem } from '../base/species';
 import { PageAll } from '@/ts/core/public/consts';
 import { ITarget } from '../../target/base/target';
-export interface IThingClass extends ISpeciesItem {
+import { IApplication } from './application';
+export interface IWorkClass extends ISpeciesItem {
+  /** 对应的应用 */
+  app: IApplication;
   /** 分类下的表单 */
   forms: IForm[];
   /** 加载表单 */
@@ -13,17 +16,19 @@ export interface IThingClass extends ISpeciesItem {
   createForm(data: model.FormModel): Promise<IForm | undefined>;
 }
 
-export class ThingClass extends SpeciesItem implements IThingClass {
-  constructor(_metadata: schema.XSpecies, _current: ITarget, _parent?: IThingClass) {
-    super(_metadata, _current, _parent);
+export class WorkClass extends SpeciesItem implements IWorkClass {
+  constructor(_metadata: schema.XSpecies, _app: IApplication, _parent?: IWorkClass) {
+    super(_metadata, _app.current, _parent);
+    this.app = _app;
     this.speciesTypes = [_metadata.typeName];
     for (const item of _metadata.nodes || []) {
-      const subItem = this.createChildren(item, _current);
+      const subItem = this.createChildren(item, _app.current);
       if (subItem) {
         this.children.push(subItem);
       }
     }
   }
+  app: IApplication;
   forms: IForm[] = [];
   private _formLoaded: boolean = false;
   async loadForms(reload: boolean = false): Promise<IForm[]> {
@@ -45,7 +50,7 @@ export class ThingClass extends SpeciesItem implements IThingClass {
   async createForm(data: model.FormModel): Promise<IForm | undefined> {
     data.shareId = this.current.id;
     data.speciesId = this.id;
-    data.typeName = SpeciesType.Thing;
+    data.typeName = SpeciesType.Work;
     const res = await kernel.createForm(data);
     if (res.success && res.data.id) {
       const form = new Form(res.data, this);
@@ -58,8 +63,8 @@ export class ThingClass extends SpeciesItem implements IThingClass {
     _current: ITarget,
   ): ISpeciesItem | undefined {
     switch (_metadata.typeName) {
-      case SpeciesType.Thing:
-        return new ThingClass(_metadata, this.current, this);
+      case SpeciesType.Work:
+        return new WorkClass(_metadata, this.app, this);
     }
   }
 }

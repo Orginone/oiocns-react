@@ -44,6 +44,7 @@ export class Form extends Entity<schema.XForm> implements IForm {
   async update(data: model.FormModel): Promise<boolean> {
     data.shareId = this.metadata.shareId;
     data.speciesId = this.metadata.speciesId;
+    data.typeName = this.metadata.typeName;
     const res = await kernel.updateForm(data);
     if (res.success && res.data.id) {
       res.data.typeName = '表单';

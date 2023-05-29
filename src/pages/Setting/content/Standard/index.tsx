@@ -1,7 +1,7 @@
-import { ISpeciesItem, IWorkItem, SpeciesType } from '@/ts/core';
+import { ISpeciesItem, IFlowClass, SpeciesType } from '@/ts/core';
 import React from 'react';
 import Property from './Property';
-import WorkItem from './Flow';
+import FlowItem from './Flow';
 
 interface IProps {
   current: ISpeciesItem;
@@ -16,8 +16,8 @@ const SettingStandrad: React.FC<IProps> = ({ current }: IProps) => {
     case SpeciesType.Store:
       return <Property current={current} />;
     case SpeciesType.Market:
-    case SpeciesType.Work:
-      return <WorkItem current={current as IWorkItem} />;
+    case SpeciesType.Flow:
+      return <FlowItem current={current as IFlowClass} />;
     default:
       return <></>;
   }

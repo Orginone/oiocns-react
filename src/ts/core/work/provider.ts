@@ -3,7 +3,7 @@ import { PageAll } from '../public/consts';
 import { SpeciesType, TaskStatus } from '../public/enums';
 import { IPerson } from '../target/person';
 import { IApplication } from '../thing/app/application';
-import { IWorkDefine } from '../thing/base/work';
+import { IWorkDefine } from '../thing/base/flow';
 // 历史任务存储集合名称
 const hisWorkCollName = 'work-task';
 export interface IWorkProvider {

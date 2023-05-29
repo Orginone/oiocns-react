@@ -1,5 +1,5 @@
 import React from 'react';
-import { IBelong, IMarket, ISpeciesItem, IWorkItem, SpeciesType } from '@/ts/core';
+import { IBelong, IMarket, ISpeciesItem, IFlowClass, SpeciesType } from '@/ts/core';
 import { MenuItemType } from 'typings/globelType';
 import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
 import orgCtrl from '@/ts/controller';
@@ -38,7 +38,7 @@ const buildSpeciesTree = (species: ISpeciesItem[]) => {
         children.push(...buildSpeciesTree(item.children));
         break;
       case SpeciesType.Work:
-        defines.push(...(item as IWorkItem).defines);
+        defines.push(...(item as IFlowClass).defines);
         children.push(...buildWorkItem(defines), ...buildSpeciesTree(item.children));
         break;
       default:
