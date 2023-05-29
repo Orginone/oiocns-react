@@ -1,4 +1,4 @@
-import { model, parseAvatar } from '@/ts/base';
+import { common, model, parseAvatar } from '@/ts/base';
 import { FileItemShare } from '@/ts/base/model';
 import { MessageType, IMessage } from '@/ts/core';
 import { CaretUpOutlined } from '@ant-design/icons';
@@ -23,16 +23,32 @@ export const filetrText = (val: model.MsgSaveModel) => {
     return citeText;
   } else {
     const userText = val?.msgBody?.substring(spanText, val?.msgBody?.length);
-    const typeofText = userText?.indexOf('$CITE');
-    const typeofFInd = userText?.indexOf('$FINDME');
-    if (typeofText !== -1) {
-      const textGroup = userText?.substring(0, typeofText);
-      return textGroup;
-    } else if (typeofFInd !== -1) {
-      const findGroup = userText?.substring(0, typeofFInd);
-      return findGroup;
+    const typeofPas = userText?.includes('^!:');
+    if (typeofPas) {
+      const findText = common.StringPako.inflate(userText);
+      const typeofText = findText?.indexOf('$CITE');
+      const typeofFInd = findText?.indexOf('$FINDME');
+      if (typeofText !== -1) {
+        const textGroup = findText?.substring(0, typeofText);
+        return textGroup;
+      } else if (typeofFInd !== -1) {
+        const findGroup = findText?.substring(0, typeofFInd);
+        return findGroup;
+      } else {
+        return findText;
+      }
     } else {
-      return userText;
+      const typeofText = userText?.indexOf('$CITE');
+      const typeofFInd = userText?.indexOf('$FINDME');
+      if (typeofText !== -1) {
+        const textGroup = userText?.substring(0, typeofText);
+        return textGroup;
+      } else if (typeofFInd !== -1) {
+        const findGroup = userText?.substring(0, typeofFInd);
+        return findGroup;
+      } else {
+        return userText;
+      }
     }
   }
 };

@@ -3,7 +3,7 @@ import { IBelong } from '../../target/base/belong';
 import { IMessage, Message } from './message';
 import { IEntity, Entity, MessageType, TargetType, storeCollName } from '../../public';
 import { XTarget } from '@/ts/base/schema';
-import { filetrFindText, findTextId } from '@/utils/common';
+import { findTextId } from '@/utils/common';
 // 空时间
 const nullTime = new Date('2022-07-01').getTime();
 // 消息变更推送
@@ -293,7 +293,7 @@ export abstract class MsgChat<T extends schema.XEntity>
         ?.recall();
     } else {
       // 过滤掉@的消息内容
-      msg.msgBody = filetrFindText(common.StringPako.inflate(msg.msgBody));
+      msg.msgBody = common.StringPako.inflate(msg.msgBody);
       this.messages.push(imsg);
     }
     if (!this.messageNotify) {
@@ -304,10 +304,6 @@ export abstract class MsgChat<T extends schema.XEntity>
     }
     this.chatdata.lastMsgTime = new Date().getTime();
     this.chatdata.lastMessage = msg;
-    console.log('vvvvvv1', common.StringPako.inflate(msg.msgBody));
-    console.log('vvvvvv2', msg);
-    console.log('vvvvvv3', findTextId(common.StringPako.inflate(msg.msgBody)));
-
     this.chatdata.isFindme = findTextId(common.StringPako.inflate(msg.msgBody)); // 用来往对象中添加艾特值
     this.cache();
     this.messageNotify?.apply(this, [this.messages]);
