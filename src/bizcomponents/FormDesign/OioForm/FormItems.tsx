@@ -29,16 +29,17 @@ interface IProps {
   disabled?: boolean;
   item: XAttribute;
   belong: IBelong;
+  noRule?: boolean;
 }
 
 /**
  * 表单项渲染
  */
-const OioFormItem = ({ item, belong, disabled }: IProps) => {
+const OioFormItem = ({ item, belong, disabled, noRule }: IProps) => {
   const rule = JSON.parse(item.rule || '{}');
   // 规则校验
   let rules: Rule[] = [];
-  if (rule.rules) {
+  if (rule.rules && !noRule) {
     if (typeof rule.rules === 'string') {
       rules = [...rules, { message: '所填内容不符合要求', pattern: rule.rules }];
     } else if (rule.rules instanceof Array) {
@@ -49,6 +50,9 @@ const OioFormItem = ({ item, belong, disabled }: IProps) => {
   }
   if (rule.required === true) {
     rules = [...rules, { required: true, message: `${rule.title}为必填项` }];
+  }
+  if (noRule) {
+    rules = [];
   }
   switch (rule.widget) {
     case 'input':

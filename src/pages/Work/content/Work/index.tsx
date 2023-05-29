@@ -1,16 +1,27 @@
-import Thing from '@/pages/Store/content/Thing/Thing';
 import { IWorkDefine } from '@/ts/core';
-import { Button, Card, Input, Modal, Tabs, message } from 'antd';
-import orgCtrl from '@/ts/controller';
+import { Button, Card, Input, Tabs, message } from 'antd';
 import React, { useEffect, useState } from 'react';
 import cls from './index.module.less';
 import OioForm from '@/bizcomponents/FormDesign/OioForm';
 import { GroupMenuType } from '../../config/menuType';
 import { XForm, XProperty } from '@/ts/base/schema';
-
+import ThingTable from './ThingTable';
+import orgCtrl from '@/ts/controller';
 // 卡片渲染
 interface IProps {
   current: IWorkDefine;
+}
+/* 发起办事数据 */
+interface SubmitDataType {
+  headerData: Map<string, any>;
+  formData: Map<
+    string,
+    {
+      isHeader: boolean;
+      resourceData: string;
+      changeData: any;
+    }
+  >;
 }
 /**
  * 办事-业务流程--发起
@@ -19,15 +30,32 @@ interface IProps {
 const WorkStartDo: React.FC<IProps> = ({ current }) => {
   const [data, setData] = useState<any>({});
   const [rows, setRows] = useState<any[]>([]);
-  const [form, setForm] = useState<XForm>();
-  const [operateModel, setOperateModel] = useState<string>();
   const [activeTab, setActiveTab] = useState<string>();
   const [propertys, setPropertys] = useState<XProperty[]>([]);
   const [thingForms, setThingForms] = useState<XForm[]>([]);
-  const [workForm, setWorkForm] = useState<XForm>();
+  const [mainForm, setMainForm] = useState<XForm>();
   const [content, setContent] = useState<string>('');
 
+  const submitData: SubmitDataType = {
+    headerData: new Map(),
+    formData: new Map(),
+  };
+
   const submit = async () => {
+    if (mainForm) {
+      const mainChangeData = new Map();
+      for (const key in data) {
+        if (Object.prototype.hasOwnProperty.call(data, key)) {
+          submitData.headerData.set(key, data[key]);
+          mainChangeData.set(key, data[key]);
+        }
+      }
+      submitData.formData.set(mainForm.id, {
+        isHeader: true,
+        resourceData: JSON.stringify(mainForm),
+        changeData: Object.fromEntries(mainChangeData.entries()),
+      });
+    }
     if (
       await current.createWorkInstance({
         hook: '',
@@ -35,8 +63,7 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
         contentType: 'Text',
         title: current.name,
         defineId: current.id,
-        data: JSON.stringify(data),
-        thingIds: rows.map((row: any) => row['Id']),
+        data: JSON.stringify(submitData),
       })
     ) {
       message.success('发起成功!');
@@ -47,9 +74,9 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
 
   useEffect(() => {
     current.loadWorkNode().then((value) => {
-      if (value && value.forms && value.forms?.length > 0) {
+      if (value && value.forms && value.forms.length > 0) {
         setThingForms(value.forms.filter((i) => i.belongId === i.shareId));
-        setWorkForm(value.forms.find((i) => i.belongId != i.shareId));
+        setMainForm(value.forms.find((i) => i.belongId != i.shareId));
       }
     });
   }, []);
@@ -65,19 +92,41 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
             setPropertys(
               attributes
                 .filter((i) => i.linkPropertys && i.linkPropertys.length > 0)
-                .map((i) => i.linkPropertys![0]),
+                .map((i) => {
+                  return { attrId: i.id, ...i.linkPropertys![0] };
+                }),
             );
           });
       }
     }
   }, [thingForms, activeTab]);
 
+  const handleTableChange = (tableID: string, data: any[], Json: string) => {
+    const changeData: any = {};
+    data.forEach((item) => {
+      const childMap: any = {};
+      Object.keys(item).map((chidKey) => {
+        if (['Id', 'Creater', 'Status', 'CreateTime', 'ModifiedTime'].includes(chidKey)) {
+          return;
+        }
+        childMap[chidKey] = item[chidKey];
+      });
+
+      changeData[item.Id] = childMap;
+    });
+    submitData.formData.set(tableID, {
+      isHeader: false,
+      resourceData: Json,
+      changeData: changeData,
+    });
+  };
+
   return (
     <div className={cls.content}>
-      {workForm && (
+      {mainForm && (
         <OioForm
-          key={workForm.id}
-          form={workForm}
+          key={mainForm.id}
+          form={mainForm}
           define={current}
           submitter={{
             resetButtonProps: {
@@ -86,62 +135,35 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
             render: (_: any, _dom: any) => <></>,
           }}
           onValuesChange={(_, values) => {
-            console.log(values);
             setData({ ...data, ...values });
           }}
         />
       )}
-      {activeTab && (
+      {thingForms.length > 0 && (
         <Tabs
+          tabPosition="top"
           activeKey={activeTab}
-          tabPosition="left"
-          onTabClick={(tabKey) => setActiveTab(tabKey)}
+          onTabClick={setActiveTab}
           items={thingForms.map((i) => {
             return {
               label: i.name,
               key: i.id,
               children: (
-                <Thing
-                  keyExpr="Id"
-                  height={500}
-                  selectable={false}
+                <ThingTable
+                  headerTitle={activeTab}
                   dataSource={rows}
+                  current={current}
+                  formInfo={i}
                   labels={[`S${activeTab}`]}
                   propertys={propertys}
-                  toolBarItems={[
-                    <Button
-                      key="1"
-                      type="default"
-                      onClick={() => {
-                        setForm(i);
-                        setOperateModel('add');
-                      }}>
-                      新增{i.name}
-                    </Button>,
-                    <Button
-                      key="2"
-                      type="default"
-                      onClick={() => {
-                        setForm(i);
-                        setOperateModel('select');
-                      }}>
-                      选择{i.name}
-                    </Button>,
-                  ]}
+                  setRows={setRows}
                   belongId={current.workItem.belongId}
-                  menuItems={[
-                    {
-                      key: 'edit',
-                      label: '变更',
-                      click(data) {
-                        console.log(data);
-                      },
-                    },
-                  ]}
+                  onListChange={handleTableChange}
                 />
               ),
             };
-          })}></Tabs>
+          })}
+        />
       )}
       <Card className={cls['bootom_content']}>
         <div style={{ display: 'flex', width: '100%' }}>
@@ -165,41 +187,6 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
           </div>
         </div>
       </Card>
-      {form && operateModel === 'add' && (
-        <Modal
-          open={true}
-          onOk={() => {}}
-          onCancel={() => {
-            setOperateModel('');
-            setForm(undefined);
-          }}
-          destroyOnClose={true}
-          cancelText={'关闭'}
-          width={1000}>
-          <OioForm form={form} define={current} />
-        </Modal>
-      )}
-      {form && operateModel === 'select' && (
-        <Modal
-          open={true}
-          onOk={() => {}}
-          onCancel={() => {
-            setOperateModel('');
-            setForm(undefined);
-          }}
-          destroyOnClose={true}
-          cancelText={'关闭'}
-          width={1000}>
-          <Thing
-            height={500}
-            selectable
-            labels={[`S${activeTab}`]}
-            propertys={propertys}
-            onSelected={setRows}
-            belongId={current.workItem.belongId}
-          />
-        </Modal>
-      )}
     </div>
   );
 };
