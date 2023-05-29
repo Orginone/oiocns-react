@@ -23,6 +23,10 @@ interface SubmitDataType {
     }
   >;
 }
+const submitData: SubmitDataType = {
+  headerData: new Map(),
+  formData: new Map(),
+};
 /**
  * 办事-业务流程--发起
  * @returns
@@ -35,11 +39,6 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
   const [thingForms, setThingForms] = useState<XForm[]>([]);
   const [workForm, setWorkForm] = useState<XForm>();
   const [content, setContent] = useState<string>('');
-
-  const submitData: SubmitDataType = {
-    headerData: new Map(),
-    formData: new Map(),
-  };
 
   const submit = async () => {
     for (const key in data) {
@@ -106,12 +105,25 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
     const changeData: Map<string, Map<string, any>> = new Map();
 
     data.forEach((item) => {
+      let willsaveData = item;
+      // 判断是否包含 修改数据
+      if (willsaveData?.isNew || willsaveData?.EDIT_INFO) {
+        if (willsaveData?.isNew) {
+          delete willsaveData.isNew;
+        }
+        if (willsaveData?.EDIT_INFO) {
+          willsaveData = willsaveData?.EDIT_INFO;
+        }
+      } else {
+        willsaveData = {};
+      }
+
       const childMap = new Map();
-      Object.keys(item).map((chidKey) => {
+      Object.keys(willsaveData).map((chidKey) => {
         if (['Id', 'Creater', 'Status', 'CreateTime', 'ModifiedTime'].includes(chidKey)) {
           return;
         }
-        childMap.set(chidKey, item[chidKey]);
+        childMap.set(chidKey, willsaveData[chidKey]);
       });
 
       changeData.set(item.Id, childMap);
@@ -153,7 +165,7 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
               key: i.id,
               children: (
                 <ThingTable
-                  headerTitle={activeTab}
+                  headerTitle={'实体类'}
                   dataSource={rows}
                   current={current}
                   formInfo={i}
