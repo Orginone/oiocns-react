@@ -1,8 +1,7 @@
-import React, { memo, useState, useEffect } from 'react';
+import React, { memo, useState } from 'react';
 import { Checkbox, Col, Divider, Input, Modal, Row, Tag, Image, message } from 'antd';
 import { common, kernel, model, parseAvatar } from '@/ts/base';
 import { ImSearch } from 'react-icons/im';
-import style from './index.module.less';
 import { MessageType } from '@/ts/core';
 import { FileItemShare, ResultType } from '@/ts/base/model';
 import { FileTypes } from '@/ts/core/public/consts';
@@ -10,6 +9,8 @@ import { IconFont } from '@/components/IconFont';
 import orgCtrl from '@/ts/controller';
 import { filetrText, isShowLink } from '@/pages/Chats/config/common';
 import { formatSize } from '@/ts/base/common';
+import { parseMsg } from '@/pages/Chats/components/pareMsg';
+import style from './index.module.less';
 
 interface ModalPageProps {
   // 采用如下属性标注方式,会在父组件传值时，有文案提示
@@ -39,10 +40,8 @@ type forwardType = {
 };
 
 const ForwardModal: React.FC<ModalPageProps> = (props) => {
-  const { visible, onCancel, formwardCode } = props; // 在这里将属性从props 中解构出来
-
+  const { visible, onCancel, formwardCode } = props;
   const allUser = orgCtrl.user.chats.filter((i) => i.isMyChat);
-  // 这里是页面状态
   const [sendData, setSendData] = useState<Array<forwardType>>([]); // 需要传输的卡片
   const [filterCode, setFilterCode] = useState('');
 
@@ -71,12 +70,10 @@ const ForwardModal: React.FC<ModalPageProps> = (props) => {
       message.success('消息转发成功');
       onCancel();
     });
-    // onOk();
   };
 
   // 取消按钮
   const cancelHandle = async () => {
-    // TODO 可以在这里做一些组件内部的事，再调用回调
     onCancel();
   };
 
@@ -164,7 +161,7 @@ const ForwardModal: React.FC<ModalPageProps> = (props) => {
     }
   };
 
-  /** 勾选哪一项 */
+  /** 勾选项 */
   const handleCheck = (item: any, val: any) => {
     if (val.target.checked === true) {
       setSendData([
@@ -198,17 +195,8 @@ const ForwardModal: React.FC<ModalPageProps> = (props) => {
     );
   };
 
-  useEffect(() => {
-    // useEffect在组件初始化或visible变化时执行
-  }, [visible]);
-
   return (
-    <Modal
-      // title="转发"
-      open={visible}
-      onOk={okHandle}
-      onCancel={cancelHandle}
-      width={800}>
+    <Modal open={visible} onOk={okHandle} onCancel={cancelHandle} width={800}>
       <Row gutter={10}>
         <Col span={10} className={style.leftBox}>
           <Input

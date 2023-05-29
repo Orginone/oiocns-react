@@ -35,3 +35,23 @@ export const showCiteName = (val: Array<string>, id: any) => {
     return '';
   }
 };
+
+/**
+ * @description: 一维数组对象模糊搜索 模糊匹配
+ * @param {*} dataList 为一维数组数据结构
+ * @param {*} value 输入值
+ * @param {*} type type 为指定想要搜索的字段名，array格式 ['showTxt']
+ * @return {*}
+ */
+export const filterOne = (dataList: any[], value: string, type: string[]) => {
+  let str = dataList.filter(function (item) {
+    for (let j = 0; j < type.length; j++) {
+      if (item[type[j]] != undefined || item[type[j]] != null) {
+        if (item[type[j]].indexOf(value) >= 0) {
+          return item;
+        }
+      }
+    }
+  });
+  return str;
+};

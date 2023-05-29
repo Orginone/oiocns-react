@@ -4,21 +4,17 @@ import React, { memo, useEffect, useState } from 'react';
 const { Option } = Select;
 
 interface AppProps {
-  // 采用如下属性标注方式,会在父组件传值时，有文案提示
-  /** 引用人数据 */
-  people?: Array<any>;
-  /** 输入@展示人员 */
-  open?: boolean;
+  people?: Array<any>; //引用人数据
+  open?: boolean; // 输入@展示人员
   style?: React.CSSProperties;
   onSelect?: any;
   onChange?: any;
   pullDownRef?: any;
-  /** 关闭事件 */
-  onClose: any;
+  onClose: any; // 关闭事件
 }
 
 const PullDown: React.FC<AppProps> = (props) => {
-  const { people, open, style, onSelect, pullDownRef, onClose } = props; // 在这里将属性从props 中解构出来
+  const { people, open, style, onSelect, pullDownRef, onClose } = props;
   const [defaultValue, setDefaultValue] = useState<string | number | null>('00100');
 
   const onKeyDown = (e: { key: string }) => {
@@ -36,10 +32,9 @@ const PullDown: React.FC<AppProps> = (props) => {
       style={style}
       open={open}
       autoFocus={true}
-      // 这里用来聚焦select用
-      ref={pullDownRef}
+      ref={pullDownRef} // 这里用来聚焦select用
       defaultValue={defaultValue}
-      onSelect={(value, option) => onSelect(option)}
+      onSelect={(_value, option) => onSelect(option)}
       placement="topLeft"
       onKeyDown={onKeyDown}
       className="citeSelect">

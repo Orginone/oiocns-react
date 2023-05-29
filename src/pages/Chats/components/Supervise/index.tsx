@@ -9,7 +9,7 @@ import { showChatTime } from '@/utils/tools';
 import orgCtrl from '@/ts/controller';
 import { FileTypes } from '@/ts/core/public/consts';
 import SuperMsgs from '@/ts/core/chat/message/supermsg';
-import { filetrText, isShowLink } from '@/pages/Chats/config/common';
+import { filetrText, isShowLink, linkText } from '@/pages/Chats/config/common';
 import { formatSize } from '@/ts/base/common';
 import css from './index.module.less';
 
@@ -42,32 +42,10 @@ const Supervise: React.FC<IProps> = ({ belong }) => {
     setMessages(chatsa);
   };
 
-  /** 过滤非http链接字符 */
-  const linkText = (val: string) => {
-    const reg = /[\u4e00-\u9fa5]+/g;
-    const link = val.substring(val.indexOf('http'), val.length);
-    return (
-      <div className={`${css.con_content_a}`}>
-        <span className={`${css.con_content_span}`}>
-          {val?.substring(val.indexOf('http'), 0)}
-        </span>
-        <a
-          dangerouslySetInnerHTML={{ __html: link }}
-          href={val.replace(reg, '')}
-          target="_blank"
-          rel="noreferrer"></a>
-      </div>
-    );
-  };
-
   // 滚动事件
   const onScroll = async () => {
     if (!loading && body.current && body.current.scrollTop === 0) {
       setLoading(true);
-      // setBeforescrollHeight(body.current.scrollHeight);
-      // if ((await chat.moreMessage()) < 1) {
-      //   setLoading(false);
-      // }
     }
   };
 

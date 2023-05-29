@@ -10,7 +10,12 @@ import { FileTypes } from '@/ts/core/public/consts';
 import { formatSize } from '@/ts/base/common';
 import PullDown from '@/pages/Chats/components/pullDown';
 import { XTarget } from '@/ts/base/schema';
-import { filetrText, isShowLink } from '@/pages/Chats/config/common';
+import {
+  filetrText,
+  isShowLink,
+  handleCutImgSelect,
+  handleImgChoosed,
+} from '@/pages/Chats/config/common';
 import Cutting from '../../cutting';
 import './index.less';
 
@@ -137,16 +142,6 @@ const Groupinputbox = (props: Iprops) => {
     }
   };
 
-  // 截屏后放入输入区发出消息
-  const handleCutImgSelect = async (result: any) => {
-    const img = document.createElement('img');
-    img.src = result.shareInfo().shareLink;
-    img.className = `cutImg`;
-    img.style.display = 'block';
-    img.style.marginBottom = '10px';
-    document.getElementById('insterHtml')?.append(img);
-  };
-
   /**
    * @description: 提交聊天内容
    * @return {*}
@@ -209,8 +204,6 @@ const Groupinputbox = (props: Iprops) => {
           switch (n.className) {
             case 'cutImg':
               return `$IMG[${n.src}]`;
-            // case 'emoji':
-            //   return `$EMO[${n.src.match(/\/(\d+)\.png/)[1]}]`;
             default:
               break;
           }
@@ -219,18 +212,6 @@ const Groupinputbox = (props: Iprops) => {
       });
     }
     return [];
-  };
-
-  /**
-   * @description: 创建img标签
-   * @param {string} url
-   * @return {*}
-   */
-  const handleImgChoosed = (url: string) => {
-    const img = document.createElement('img');
-    img.src = url;
-    img.className = `emoji`;
-    document.getElementById('insterHtml')?.append(img);
   };
 
   /**
@@ -351,7 +332,6 @@ const Groupinputbox = (props: Iprops) => {
               <IconFont type={'icon-biaoqing'} className={'icons_oneself'} />
             </Popover>
           </div>
-
           <IconFont
             className={'icons_oneself'}
             type={'icon-maikefeng'}
