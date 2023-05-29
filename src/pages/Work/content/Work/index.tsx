@@ -23,10 +23,6 @@ interface SubmitDataType {
     }
   >;
 }
-const submitData: SubmitDataType = {
-  headerData: new Map(),
-  formData: new Map(),
-};
 /**
  * 办事-业务流程--发起
  * @returns
@@ -60,7 +56,6 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
         title: current.name,
         defineId: current.id,
         data: JSON.stringify(submitData),
-        thingIds: rows.map((row: any) => row['Id']),
       })
     ) {
       message.success('发起成功!');
@@ -73,7 +68,7 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
     current.loadWorkNode().then((value) => {
       if (value && value.forms && value.forms.length > 0) {
         setThingForms(value.forms.filter((i) => i.belongId === i.shareId));
-        setWorkForm(value.forms.find((i) => i.belongId == i.shareId));
+        setMainForm(value.forms.find((i) => i.belongId == i.shareId));
       }
     });
   }, []);
@@ -162,7 +157,6 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
         <Tabs
           tabPosition="top"
           activeKey={activeTab}
-          tabPosition="top"
           onTabClick={(tabKey) => setActiveTab(tabKey)}
           items={thingForms.map((i) => {
             return {
