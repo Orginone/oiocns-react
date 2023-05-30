@@ -5,6 +5,7 @@ import { defaultData } from '../config';
 import { XProperty } from '@/ts/base/schema';
 import cls from './index.module.less';
 import CustomTree from '@/components/CustomTree';
+import { SpeciesType } from '@/ts/core';
 interface PageProp {
   pageType?: 'tree' | 'table';
   selectable?: boolean;
@@ -67,7 +68,7 @@ const SelectThing = <
       <div className={cls.leftTree}>
         <CustomTree
           treeData={current.workItem.current.species.filter(
-            (ite: any) => ite.typeName === '实体类',
+            (ite: any) => ite.typeName === SpeciesType.Thing,
           )}
           fieldNames={{ title: 'name', key: 'id', children: 'children' }}
         />

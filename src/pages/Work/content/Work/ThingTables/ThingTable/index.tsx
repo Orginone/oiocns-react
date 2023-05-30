@@ -59,7 +59,7 @@ const ThingTable = <
   const [form, setForm] = useState<XForm>();
   const [selectedRows, setSelectedRows] = useState<any>([]);
   const [operateModel, setOperateModel] = useState<
-    'Edit' | 'EditMore' | 'add' | 'Select' | ''
+    'Edit' | 'EditMore' | 'Add' | 'Select' | ''
   >();
   const [EditData, setEditData] = useState<any>({});
   const [changeData, setChangeData] = useState<any>({});
@@ -110,9 +110,9 @@ const ThingTable = <
   }, [selectedRows]);
 
   // 触发弹窗 关闭事件
-  const handleModalDataChange = async (type: 'Edit' | 'EditMore' | 'add') => {
+  const handleModalDataChange = async (type: 'Edit' | 'EditMore' | 'Add') => {
     switch (type) {
-      case 'add':
+      case 'Add':
         {
           if (Object.keys(changeData).length == 0) {
             break;
@@ -196,7 +196,7 @@ const ThingTable = <
       <>
         {form &&
           current &&
-          (operateModel === 'add' ||
+          (operateModel === 'Add' ||
             operateModel === 'EditMore' ||
             operateModel === 'Edit') && (
             <Modal
