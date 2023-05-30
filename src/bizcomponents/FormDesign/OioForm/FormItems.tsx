@@ -39,7 +39,7 @@ const OioFormItem = ({ item, belong, disabled, noRule }: IProps) => {
   const rule = JSON.parse(item.rule || '{}');
   // 规则校验
   let rules: Rule[] = [];
-  if (rule.rules && !noRule) {
+  if (rule.rules) {
     if (typeof rule.rules === 'string') {
       rules = [...rules, { message: '所填内容不符合要求', pattern: rule.rules }];
     } else if (rule.rules instanceof Array) {
