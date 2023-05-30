@@ -97,7 +97,6 @@ const ThingTable = <
     belongId,
     propertys,
     dataSource,
-    defaultColums,
     current,
     formInfo,
     labels,

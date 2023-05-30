@@ -1,4 +1,4 @@
-import { IWorkDefine } from '@/ts/core';
+import { IWorkDefine, SpeciesType } from '@/ts/core';
 import { Button, Card, Input, Tabs, message } from 'antd';
 import orgCtrl from '@/ts/controller';
 import React, { useEffect, useState } from 'react';
@@ -13,15 +13,18 @@ interface IProps {
 }
 /* 发起办事数据 */
 interface SubmitDataType {
-  headerData: Map<string, any>;
-  formData: Map<
-    string,
-    {
+  headerData: {
+    [key: string]: any;
+  };
+  formData: {
+    [key: string]: {
       isHeader: boolean;
       resourceData: string;
-      changeData: Map<string, any>;
-    }
-  >;
+      changeData: {
+        [key: string]: any;
+      };
+    };
+  };
 }
 /**
  * 办事-业务流程--发起
@@ -35,14 +38,21 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
   const [thingForms, setThingForms] = useState<XForm[]>([]);
   const [workForm, setWorkForm] = useState<XForm>();
   const [content, setContent] = useState<string>('');
+  const [submitData, setSubmitData] = useState<SubmitDataType>({
+    headerData: data,
+    formData: {},
+  });
 
   const submit = async () => {
-    for (const key in data) {
-      if (Object.prototype.hasOwnProperty.call(data, key)) {
-        submitData.headerData.set(key, data[key]);
-      }
+    if (workForm) {
+      submitData.headerData = data;
+      submitData.formData[workForm.id] = {
+        isHeader: true,
+        resourceData: JSON.stringify(workForm),
+        changeData: {},
+      };
     }
-
+    console.log(submitData);
     if (
       await current.createWorkInstance({
         hook: '',
@@ -62,8 +72,8 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
   useEffect(() => {
     current.loadWorkNode().then((value) => {
       if (value && value.forms && value.forms.length > 0) {
-        setThingForms(value.forms.filter((i) => i.belongId === i.shareId));
-        setMainForm(value.forms.find((i) => i.belongId == i.shareId));
+        setThingForms(value.forms.filter((i) => i.typeName === SpeciesType.Thing));
+        setWorkForm(value.forms.find((i) => i.typeName === SpeciesType.Work));
       }
     });
   }, []);
@@ -76,14 +86,6 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
         orgCtrl.work
           .loadAttributes(activeTab, current.workItem.belongId)
           .then((attributes) => {
-            // console.log(
-            //   'attributes',
-            //   attributes,
-            //   attributes
-            //     .filter((i) => i.linkPropertys && i.linkPropertys.length > 0)
-            //     .map((i) => i.linkPropertys![0]),
-            // );
-
             setPropertys(
               attributes
                 .filter((i) => i.linkPropertys && i.linkPropertys.length > 0)
@@ -97,7 +99,7 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
   }, [thingForms, activeTab]);
 
   const handleTableChange = (tableID: string, data: any[], Json: string) => {
-    const changeData: Map<string, Map<string, any>> = new Map();
+    const changeData: { [key: string]: any } = {};
 
     data.forEach((item) => {
       let willsaveData = item;
@@ -113,21 +115,22 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
         willsaveData = {};
       }
 
-      const childMap = new Map();
+      const childMap: any = {};
       Object.keys(willsaveData).map((chidKey) => {
         if (['Id', 'Creater', 'Status', 'CreateTime', 'ModifiedTime'].includes(chidKey)) {
           return;
         }
-        childMap.set(chidKey, willsaveData[chidKey]);
+        childMap[chidKey] = willsaveData[chidKey];
       });
 
-      changeData.set(item.Id, childMap);
+      changeData[item.Id] = childMap;
     });
-    submitData.formData.set(tableID, {
+    submitData.formData[tableID] = {
       isHeader: false,
       resourceData: Json,
       changeData,
-    });
+    };
+    setSubmitData({ ...submitData });
   };
 
   return (
@@ -169,44 +172,6 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
                   belongId={current.workItem.belongId}
                   onListChange={handleTableChange}
                 />
-                // <Thing
-                //   keyExpr="Id"
-                //   height={500}
-                //   selectable={false}
-                //   dataSource={rows}
-                //   labels={[`S${activeTab}`]}
-                //   propertys={propertys}
-                //   toolBarItems={[
-                //     <Button
-                //       key="1"
-                //       type="default"
-                //       onClick={() => {
-                //         setForm(i);
-                //         setOperateModel('add');
-                //       }}>
-                //       新增{i.name}
-                //     </Button>,
-                //     <Button
-                //       key="2"
-                //       type="default"
-                //       onClick={() => {
-                //         setForm(i);
-                //         setOperateModel('select');
-                //       }}>
-                //       选择{i.name}
-                //     </Button>,
-                //   ]}
-                //   belongId={current.workItem.belongId}
-                //   menuItems={[
-                //     {
-                //       key: 'edit',
-                //       label: '变更',
-                //       click(data) {
-                //         console.log(data);
-                //       },
-                //     },
-                //   ]}
-                // />
               ),
             };
           })}

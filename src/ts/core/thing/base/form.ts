@@ -19,7 +19,7 @@ export interface IForm extends IEntity<schema.XForm> {
   /** 新建表单特性 */
   createAttribute(
     data: model.AttributeModel,
-    property: XProperty,
+    property?: XProperty,
   ): Promise<schema.XAttribute | undefined>;
   /** 更新表单特性 */
   updateAttribute(
@@ -32,10 +32,7 @@ export interface IForm extends IEntity<schema.XForm> {
 
 export class Form extends Entity<schema.XForm> implements IForm {
   constructor(_metadata: schema.XForm, _species: ISpeciesItem) {
-    super({
-      ..._metadata,
-      typeName: '表单',
-    });
+    super(_metadata);
     this.species = _species;
   }
   species: ISpeciesItem;
@@ -80,17 +77,21 @@ export class Form extends Entity<schema.XForm> implements IForm {
   }
   async createAttribute(
     data: model.AttributeModel,
-    property: XProperty,
+    property?: XProperty,
   ): Promise<schema.XAttribute | undefined> {
     data.formId = this.id;
-    data.propId = property.id;
+    if (property) {
+      data.propId = property.id;
+    }
     if (!data.authId || data.authId.length < 5) {
       data.authId = this.species.metadata.authId;
     }
     const res = await kernel.createAttribute(data);
     if (res.success && res.data.id) {
-      res.data.property = property;
-      res.data.linkPropertys = [property];
+      if (property) {
+        res.data.property = property;
+        res.data.linkPropertys = [property];
+      }
       this.attributes.push(res.data);
       return res.data;
     }

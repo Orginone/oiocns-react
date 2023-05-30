@@ -232,6 +232,7 @@ const loadSpeciesMenus = (species: ISpeciesItem) => {
     case SpeciesType.Dict:
       items.push(...loadDictMenus());
       break;
+    case SpeciesType.Work:
     case SpeciesType.Thing:
       items.push(...loadFormMenus());
       break;
