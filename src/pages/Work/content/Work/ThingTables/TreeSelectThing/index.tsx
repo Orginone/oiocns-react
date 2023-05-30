@@ -28,7 +28,7 @@ const SelectThing = <
 ) => {
   const {
     headerTitle = '实体类',
-    pageType = 'tree',
+    // pageType = 'tree',
     selectable = false,
     onRowSelectChange,
     current,

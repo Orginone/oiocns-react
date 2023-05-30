@@ -8,7 +8,6 @@ import { GroupMenuType } from '../../config/menuType';
 import { XForm, XProperty } from '@/ts/base/schema';
 // import BaseThing from './BaseThing';
 import ThingTable from './ThingTables/ThingTable';
-import Thing from '@/pages/Store/content/Thing';
 // 卡片渲染
 interface IProps {
   current: IWorkDefine;
@@ -35,7 +34,7 @@ const submitData: SubmitDataType = {
  */
 const WorkStartDo: React.FC<IProps> = ({ current }) => {
   const [data, setData] = useState<any>({});
-  const [rows, setRows] = useState<any[]>([]);
+  // const [rows, setRows] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState<string>();
   const [propertys, setPropertys] = useState<XProperty[]>([]);
   const [thingForms, setThingForms] = useState<XForm[]>([]);
@@ -57,7 +56,8 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
         title: current.name,
         defineId: current.id,
         data: JSON.stringify(submitData),
-        thingIds: rows.map((row: any) => row['Id']),
+        // thingIds: rows.map((row: any) => row['Id']),
+        thingIds: [],
       })
     ) {
       message.success('发起成功!');
@@ -169,7 +169,7 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
                 <ThingTable
                   headerTitle={'实体类'}
                   toolBtnItems={['Add', 'Edit', 'EditMore', 'Select']}
-                  dataSource={rows}
+                  dataSource={[]}
                   current={current}
                   formInfo={i}
                   labels={[`S${activeTab}`]}
