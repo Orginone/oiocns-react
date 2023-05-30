@@ -82,6 +82,7 @@ export class Form extends Entity<schema.XForm> implements IForm {
     data.formId = this.id;
     if (property) {
       data.propId = property.id;
+      data.valueType = property.valueType;
     }
     if (!data.authId || data.authId.length < 5) {
       data.authId = this.species.metadata.authId;
@@ -105,6 +106,7 @@ export class Form extends Entity<schema.XForm> implements IForm {
       data.formId = this.id;
       if (property) {
         data.propId = property.id;
+        data.valueType = property.valueType;
       }
       const res = await kernel.updateAttribute(data);
       if (res.success && res.data.id) {
