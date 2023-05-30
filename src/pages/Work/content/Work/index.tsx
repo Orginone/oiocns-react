@@ -6,7 +6,9 @@ import cls from './index.module.less';
 import OioForm from '@/bizcomponents/FormDesign/OioForm';
 import { GroupMenuType } from '../../config/menuType';
 import { XForm, XProperty } from '@/ts/base/schema';
-import ThingTable from './ThingTable';
+// import BaseThing from './BaseThing';
+import ThingTable from './ThingTables/ThingTable';
+import Thing from '@/pages/Store/content/Thing';
 // 卡片渲染
 interface IProps {
   current: IWorkDefine;
@@ -166,12 +168,13 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
               children: (
                 <ThingTable
                   headerTitle={'实体类'}
+                  toolBtnItems={['Add', 'Edit', 'EditMore', 'Select']}
                   dataSource={rows}
                   current={current}
                   formInfo={i}
                   labels={[`S${activeTab}`]}
                   propertys={propertys}
-                  setRows={setRows}
+                  // setSelectedRows={setRows}
                   belongId={current.workItem.belongId}
                   onListChange={handleTableChange}
                 />

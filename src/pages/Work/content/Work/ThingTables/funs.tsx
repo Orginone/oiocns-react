@@ -4,7 +4,7 @@ import React, { ReactNode } from 'react';
 import orgCtrl from '@/ts/controller';
 import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
 import { debounce } from '@/utils/tools';
-import { ColTypes } from './config';
+import { ColTypes, defaultCol } from './config';
 
 /*  // columns.push(
       // getColumn(
@@ -73,11 +73,11 @@ const getColItem = (
 };
 
 const submitCurrentTableData = debounce(
-  (formId: string, thingList: any[], columns: any[], callback: Function) => {
+  (formId: string, thingList: any[], propertys: any[], callback: Function) => {
     // 删除 操作一栏
     const JsonData = {
       data: thingList,
-      columns: columns.filter((v: ProColumns<any>) => v.valueType !== 'option'),
+      columns: [...defaultCol, ...propertys],
     };
 
     callback && callback(formId, thingList, JSON.stringify(JsonData));
