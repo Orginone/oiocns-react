@@ -59,6 +59,7 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
         content: content,
         contentType: 'Text',
         title: current.name,
+        applyId: orgCtrl.provider.user!.id,
         defineId: current.id,
         data: JSON.stringify(submitData),
       })
