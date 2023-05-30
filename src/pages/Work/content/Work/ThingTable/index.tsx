@@ -106,7 +106,6 @@ const ThingTable = <
   } = props;
 
   const [thingList, setThingList] = useState<any[]>(deepClone(dataSource));
-  // const [thingList, setThingList] = useState<any[]>(deepClone(defaultData));
   const [form, setForm] = useState<XForm>();
   const [operateModel, setOperateModel] = useState<string>();
   const [editData, setEditData] = useState<any>({});
