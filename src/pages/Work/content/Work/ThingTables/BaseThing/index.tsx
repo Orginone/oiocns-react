@@ -52,7 +52,6 @@ const BaseThing = <
     <>
       <ProTable
         rowKey={rowKey}
-        size="small"
         cardProps={{
           className: cls.thingTable,
         }}
