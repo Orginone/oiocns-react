@@ -62,6 +62,8 @@ export type XAttrLinkPropArray = {
 export type XAttribute = {
   // 规则
   rule: string;
+  // 值类型
+  valueType: string;
   // 共享用户ID
   shareId: string;
   // 工作职权Id

@@ -52,6 +52,7 @@ const ProFormAuth = (props: IProps) => {
       tooltip={props.tooltip}
       labelAlign={props.labelAlign}
       allowClear
+      width={150}
       fieldProps={{
         ...props.rules,
         ...{ treeData },
