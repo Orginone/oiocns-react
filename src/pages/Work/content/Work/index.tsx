@@ -122,13 +122,8 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
     data.forEach((item) => {
       let willsaveData = item;
       // 判断是否包含 修改数据
-      if (willsaveData?.isNew || willsaveData?.EDIT_INFO) {
-        if (willsaveData?.isNew) {
-          delete willsaveData.isNew;
-        }
-        if (willsaveData?.EDIT_INFO) {
-          willsaveData = willsaveData?.EDIT_INFO;
-        }
+      if (willsaveData?.EDIT_INFO) {
+        willsaveData = willsaveData?.EDIT_INFO;
       } else {
         willsaveData = {};
       }
