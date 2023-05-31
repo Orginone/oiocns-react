@@ -3,7 +3,7 @@ import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components'
 import SchemaForm from '@/components/SchemaForm';
 import { AttributeModel } from '@/ts/base/model';
 import { XAttribute } from '@/ts/base/schema';
-import { IDict, IForm, SpeciesType } from '@/ts/core';
+import { IDict, IForm, ValueType, valueTypes } from '@/ts/core';
 
 interface Iprops {
   open: boolean;
@@ -41,54 +41,16 @@ const AttributeModal = (props: Iprops) => {
       },
     },
     {
-      title: '选择属性',
-      dataIndex: 'propId',
-      hideInForm: form.typeName === SpeciesType.Work,
-      valueType: 'treeSelect',
-      request: async () => {
-        return [];
-      },
-    },
-    {
       title: '特性类型',
       dataIndex: 'valueType',
       valueType: 'select',
-      hideInForm: form.typeName !== SpeciesType.Work,
       fieldProps: {
-        options: [
-          {
-            value: '数值型',
-            label: '数值型',
-          },
-          {
-            value: '描述型',
-            label: '描述型',
-          },
-          {
-            value: '选择型',
-            label: '选择型',
-          },
-          {
-            value: '分类型',
-            label: '分类型',
-          },
-          {
-            value: '附件型',
-            label: '附件型',
-          },
-          {
-            value: '日期型',
-            label: '日期型',
-          },
-          {
-            value: '时间型',
-            label: '时间型',
-          },
-          {
-            value: '用户型',
-            label: '用户型',
-          },
-        ],
+        options: valueTypes.map((i) => {
+          return {
+            value: i,
+            label: i,
+          };
+        }),
         onSelect: (select: string) => {
           setSelectType(select);
         },
@@ -101,10 +63,9 @@ const AttributeModal = (props: Iprops) => {
       title: '选择枚举字典',
       dataIndex: 'dictId',
       valueType: 'select',
-      hideInForm: selectType !== '选择型',
+      hideInForm: selectType != ValueType.Select,
       formItemProps: { rules: [{ required: true, message: '枚举分类为必填项' }] },
       fieldProps: {
-        disabled: selectType !== '选择型',
         showSearch: true,
         options: dicts.map((i) => {
           return {

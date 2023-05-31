@@ -83,6 +83,7 @@ export class Form extends Entity<schema.XForm> implements IForm {
     if (property) {
       data.propId = property.id;
       data.valueType = property.valueType;
+      data.dictId = property.dictId;
     }
     if (!data.authId || data.authId.length < 5) {
       data.authId = this.species.metadata.authId;
