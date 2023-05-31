@@ -4,11 +4,10 @@ import { ProColumnType, ProTableProps } from '@ant-design/pro-components';
 import type { ParamsType } from '@ant-design/pro-provider';
 import { Button, Modal } from 'antd';
 import React, { ReactNode, useEffect, useState } from 'react';
-import { deepClone } from '@/ts/base/common';
 import { kernel } from '@/ts/base';
 import orgCtrl from '@/ts/controller';
 import { submitCurrentTableData } from '../funs';
-import { ModalNames, defaultData, toolBtnsType } from '../config';
+import { ModalNames, toolBtnsType } from '../config';
 import BaseThing from '../BaseThing';
 import SelectThing from '../TreeSelectThing';
 // {
@@ -44,7 +43,7 @@ const ThingTable = <
     headerTitle = '实体类',
     belongId,
     propertys,
-    // dataSource,
+    dataSource = [],
     // defaultColums,
     current,
     formInfo,
@@ -55,7 +54,7 @@ const ThingTable = <
     ...rest
   } = props;
 
-  const [thingList, setThingList] = useState<any[]>(deepClone(defaultData));
+  const [thingList, setThingList] = useState<any[]>(dataSource as []);
   const [form, setForm] = useState<XForm>();
   const [selectedRows, setSelectedRows] = useState<any>([]);
   const [operateModel, setOperateModel] = useState<
@@ -92,16 +91,14 @@ const ThingTable = <
         key="delete"
         onClick={() => {
           setThingList(thingList.filter((item) => item.Id !== record.Id));
+          setTimeout(() => {
+            submitCurrentTableData(formInfo.id, thingList, propertys, onListChange);
+          }, 100);
         }}>
         移除
       </a>,
     ],
   };
-
-  useEffect(() => {
-    // 当修改操作执行后 弹出数据
-    submitCurrentTableData(formInfo.id, thingList, propertys, onListChange);
-  }, [thingList]);
 
   useEffect(() => {
     if (selectedRows.length > 0) {
@@ -156,6 +153,9 @@ const ThingTable = <
     }
     setOperateModel('');
     setForm(undefined);
+    setTimeout(() => {
+      submitCurrentTableData(formInfo.id, thingList, propertys, onListChange);
+    }, 300);
   };
   // 获取自定义按钮组
   const HandleToolBarRender: () => ReactNode[] = () => {
@@ -165,12 +165,14 @@ const ThingTable = <
           <Button
             key={idx}
             type="default"
+            style={{ maxWidth: '100px', textOverflow: 'ellipsis', overflow: 'hidden' }}
             onClick={() => {
               setForm(formInfo);
               setChangeData({});
               setOperateModel(item as 'Edit');
             }}>
             {ModalNames.get(item) ?? '--'}
+            {formInfo.name}
           </Button>
         );
       }
@@ -184,9 +186,10 @@ const ThingTable = <
         Operation={Operation}
         propertys={propertys}
         rowKey={rowKey}
+        key={thingList.length}
         tooltip="蓝色字体为修改值，鼠标悬浮时展示修改前的值"
         size="small"
-        dataSource={thingList}
+        dataSource={[...thingList]}
         headerTitle={headerTitle}
         columnsState={{ ...defaultColumnStateMap }}
         options={readonly ? false : undefined}
@@ -228,9 +231,10 @@ const ThingTable = <
               setOperateModel('');
               setForm(undefined);
             }}
+            bodyStyle={{ minHeight: '600px' }}
             destroyOnClose={true}
             cancelText={'关闭'}
-            width={1000}>
+            width={'1200px'}>
             <SelectThing
               pageType="tree"
               selectable

@@ -28,6 +28,7 @@ const submitData: SubmitDataType = {
   headerData: new Map(),
   formData: new Map(),
 };
+// const dataMap = new Map();
 /**
  * 办事-业务流程--发起
  * @returns
@@ -40,7 +41,8 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
   const [thingForms, setThingForms] = useState<XForm[]>([]);
   const [workForm, setWorkForm] = useState<XForm>();
   const [content, setContent] = useState<string>('');
-
+  const [dataMap, setDataMap] = useState<any>({});
+  // const [newKey] = useObjectUpdate(dataMap);
   const submit = async () => {
     for (const key in data) {
       if (Object.prototype.hasOwnProperty.call(data, key)) {
@@ -104,6 +106,7 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
   }, [thingForms, activeTab]);
 
   const handleTableChange = (tableID: string, data: any[], Json: string) => {
+    setDataMap({ ...dataMap, tableID: data });
     const changeData: Map<string, Map<string, any>> = new Map();
 
     data.forEach((item) => {
@@ -168,7 +171,7 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
               children: (
                 <ThingTable
                   headerTitle={'实体类'}
-                  toolBtnItems={['Add', 'Edit', 'EditMore', 'Select']}
+                  toolBtnItems={['Add', 'EditMore', 'Select']}
                   dataSource={[]}
                   current={current}
                   formInfo={i}

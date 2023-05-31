@@ -30,14 +30,12 @@ const BaseThing = <
   const {
     rowKey = 'Id',
     propertys,
-    dataSource,
     // defaultColums,
     Operation = {},
     readonly,
     toolBarRender,
     ...rest
   } = props;
-
   const getColumns: any = useMemo(() => {
     let columns: any[] = defaultCol.map((item: any) => {
       return getColItem(item);
@@ -48,14 +46,14 @@ const BaseThing = <
     }
     !readonly && columns.push(Operation);
     return columns;
-  }, [dataSource, propertys, readonly]);
+  }, [props.dataSource, propertys, readonly]);
 
   return (
     <>
       <ProTable
         rowKey={rowKey}
         size="small"
-        dataSource={dataSource}
+        dataSource={props.dataSource}
         search={false}
         columns={getColumns}
         tableAlertRender={false}
