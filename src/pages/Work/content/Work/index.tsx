@@ -120,14 +120,8 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
     const changeData: Map<string, Map<string, any>> = new Map();
 
     data.forEach((item) => {
-      let willsaveData = item;
       // 判断是否包含 修改数据
-      if (willsaveData?.EDIT_INFO) {
-        willsaveData = willsaveData?.EDIT_INFO;
-      } else {
-        willsaveData = {};
-      }
-
+      const willsaveData = item?.EDIT_INFO ?? {};
       const childMap = new Map();
       Object.keys(willsaveData).map((chidKey) => {
         if (['Id', 'Creater', 'Status', 'CreateTime', 'ModifiedTime'].includes(chidKey)) {
