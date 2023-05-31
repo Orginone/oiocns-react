@@ -55,7 +55,7 @@ const ThingTable = <
   const [selectedRows, setSelectedRows] = useState<any>([]);
   const [operateModel, setOperateModel] = useState<
     'Edit' | 'EditMore' | 'Add' | 'Select' | ''
-  >();
+  >('');
   const [EditData, setEditData] = useState<any>({});
   const [changeData, setChangeData] = useState<any>({});
   const defaultColumnStateMap: any = {
@@ -96,7 +96,12 @@ const ThingTable = <
   useEffect(() => {
     // 监听实体选择
     if (selectedRows.length > 0) {
-      setThingList([...selectedRows, ...thingList]);
+      const thingListIds = thingList.map((v) => v.Id);
+      let newSelected = selectedRows.filter(
+        (s: { Id: string }) => !thingListIds.includes(s.Id),
+      );
+
+      setThingList([...newSelected, ...thingList]);
     }
   }, [selectedRows]);
   useEffect(() => {
@@ -178,6 +183,7 @@ const ThingTable = <
   };
   return (
     <>
+      {/* 实体表格区域 */}
       <BaseThing
         Operation={Operation}
         propertys={propertys}
@@ -191,6 +197,7 @@ const ThingTable = <
         toolBarRender={readonly ? undefined : (HandleToolBarRender as any)}
         {...rest}
       />
+      {/* 弹窗区域 */}
       <>
         {form &&
           current &&
@@ -221,7 +228,10 @@ const ThingTable = <
         {form && operateModel === 'Select' && (
           <Modal
             open={true}
-            onOk={() => {}}
+            onOk={() => {
+              setOperateModel('');
+              setForm(undefined);
+            }}
             onCancel={() => {
               setOperateModel('');
               setForm(undefined);
@@ -231,12 +241,12 @@ const ThingTable = <
             cancelText={'关闭'}
             width={'1200px'}>
             <SelectThing
-              pageType="tree"
               selectable
               labels={labels}
               current={current}
               propertys={propertys}
-              onRowSelectChange={setSelectedRows}
+              selectedKeys={thingList.map((v: { Id: string }) => v.Id)}
+              onRowSelectChange={(_keys, rows) => setSelectedRows(rows)}
               belongId={belongId}
             />
             {/* <Thing

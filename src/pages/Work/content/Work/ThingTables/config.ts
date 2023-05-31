@@ -61,7 +61,7 @@ export const ModalNames = new Map([
 ]);
 export const defaultData: any[] = [
   {
-    id: '624748504',
+    Id: '624748504',
     title: '活动名称一',
     decs: '这个活动真好玩',
     state: 'open',
@@ -69,7 +69,7 @@ export const defaultData: any[] = [
     update_at: '1590486176000',
   },
   {
-    id: '624691229',
+    Id: '624691229',
     title: '活动名称二',
     decs: '这个活动真好玩',
     state: 'closed',

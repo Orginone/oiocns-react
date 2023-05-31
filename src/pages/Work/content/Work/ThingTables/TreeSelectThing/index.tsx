@@ -7,8 +7,8 @@ import cls from './index.module.less';
 import CustomTree from '@/components/CustomTree';
 import { buildThingTree } from './treequest';
 interface PageProp {
-  pageType?: 'tree' | 'table';
   selectable?: boolean;
+  selectedKeys?: string[];
   onRowSelectChange?: (
     selectedRowKeys: React.Key[],
     selectedRows: { [key: string]: any }[],
@@ -31,6 +31,7 @@ const SelectThing = <
     // pageType = 'tree',
     selectable = false,
     onRowSelectChange,
+    selectedKeys = [],
     current,
     // belongId,
     propertys,
@@ -50,12 +51,25 @@ const SelectThing = <
       console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
       onRowSelectChange && onRowSelectChange(selectedRowKeys, selectedRows);
     },
+    selectedRowKeys: selectedKeys,
     // getCheckboxProps: (record: DataType) => ({
     //   disabled: record.name === 'Disabled User', // Column configuration not to be checked
     //   name: record.name,
     // }),
   };
 
+  const handleSelect: any = (
+    selectedKeys: string[],
+    _info: {
+      event: 'select';
+      selected: boolean;
+      node: any;
+      selectedNodes: any[];
+      nativeEvent: MouseEvent;
+    },
+  ) => {
+    console.log('选择实体', selectedKeys);
+  };
   return (
     <div style={{ display: 'flex', height: '100%' }}>
       <div className={cls.leftTree}>
@@ -64,6 +78,7 @@ const SelectThing = <
           showIcon
           treeData={treeData}
           fieldNames={{ title: 'label', key: 'key', children: 'children' }}
+          onSelect={handleSelect}
         />
       </div>
       <BaseThing
