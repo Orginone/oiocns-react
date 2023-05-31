@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import orgCtrl from '@/ts/controller';
 import { ProFormTreeSelect } from '@ant-design/pro-components';
 import { IBelong } from '@/ts/core';
 import { Rule } from 'antd/lib/form';
@@ -28,13 +27,21 @@ type OptionType = {
 const ProFormGroup = (props: IProps) => {
   const [treeData, setTreeData] = useState<OptionType[]>([]);
 
-  // useEffect(() => {
-  //   const initTreeData = async () => {
-  //     const res = await orgCtrl.getTeamTree(props.space);
-  //     setTreeData(targetsToTreeData(res));
-  //   };
-  //   initTreeData();
-  // }, []);
+  useEffect(() => {
+    const initTreeData = async () => {
+      setTreeData(
+        props.belong.parentTarget.map((i) => {
+          return {
+            key: i.key,
+            label: i.name,
+            value: i.id,
+            origin: 0,
+          };
+        }),
+      );
+    };
+    initTreeData();
+  }, []);
 
   return (
     <ProFormTreeSelect
@@ -46,6 +53,7 @@ const ProFormGroup = (props: IProps) => {
         ...props.rules,
         ...{ treeData },
       }}
+      width={200}
       rules={props.rules}
     />
   );

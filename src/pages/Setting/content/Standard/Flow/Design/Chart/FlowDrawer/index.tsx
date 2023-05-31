@@ -10,7 +10,7 @@ import ConditionNode from './components/ConditionNode';
 import { AddNodeType, NodeType } from './processType';
 import orgCtrl from '@/ts/controller';
 import { getUuid } from '@/utils/tools';
-import { IWorkDefine } from '@/ts/core/thing/base/work';
+import { IWorkDefine } from '@/ts/core';
 /**
  * @description: 流程设置抽屉
  * @return {*}

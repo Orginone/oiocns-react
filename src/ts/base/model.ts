@@ -391,6 +391,8 @@ export type AttributeModel = {
   code: string;
   // 规则
   rule: string;
+  // 值类型
+  valueType: string;
   // 属性Id
   propId: string;
   // 工作职权Id
@@ -530,8 +532,6 @@ export type WorkInstanceModel = {
   title: string;
   // 回调地址
   hook: string;
-  // 操作对象Id集合
-  thingIds: string[];
 };
 export type QueryWorkReq = {
   // 共享组织Id

@@ -9,7 +9,7 @@ import { Entity, IEntity } from '../../public';
 
 export interface IWorkDefine extends IEntity<schema.XWorkDefine> {
   /** 办事分类 */
-  workItem: IWork;
+  workItem: IFlow;
   /** 更新办事定义 */
   updateDefine(req: model.WorkDefineModel): Promise<boolean>;
   /** 加载事项定义节点 */
@@ -23,8 +23,8 @@ export interface IWorkDefine extends IEntity<schema.XWorkDefine> {
 }
 
 export class FlowDefine extends Entity<schema.XWorkDefine> implements IWorkDefine {
-  workItem: IWork;
-  constructor(_metadata: XWorkDefine, work: IWork) {
+  workItem: IFlow;
+  constructor(_metadata: XWorkDefine, work: IFlow) {
     super({
       ..._metadata,
       typeName: '事项',
@@ -68,7 +68,7 @@ export class FlowDefine extends Entity<schema.XWorkDefine> implements IWorkDefin
   }
 }
 
-export interface IWork extends ISpeciesItem {
+export interface IFlow extends ISpeciesItem {
   /** 对应的应用 */
   app: IApplication;
   /** 流程定义 */
@@ -79,7 +79,7 @@ export interface IWork extends ISpeciesItem {
   createWorkDefine(data: model.WorkDefineModel): Promise<IWorkDefine | undefined>;
 }
 
-export abstract class Work extends SpeciesItem implements IWork {
+export abstract class Flow extends SpeciesItem implements IFlow {
   constructor(
     _metadata: schema.XSpecies,
     _current: ITarget,

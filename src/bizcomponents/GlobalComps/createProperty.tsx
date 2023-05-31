@@ -3,7 +3,7 @@ import { ProFormColumnsType } from '@ant-design/pro-components';
 import SchemaForm from '@/components/SchemaForm';
 import { PropertyModel } from '@/ts/base/model';
 import { XProperty } from '@/ts/base/schema';
-import { IDict, IPropClass } from '@/ts/core';
+import { IDict, IPropClass, valueTypes } from '@/ts/core';
 
 interface Iprops {
   open: boolean;
@@ -21,7 +21,6 @@ const PropertyModal = ({ open, handleOk, species, data, handleCancel }: Iprops) 
   const [selectType, setSelectType] = useState<string>();
   useEffect(() => {
     species.current.space.loadDicts().then((value) => {
-      console.log(value);
       setDicts([...value]);
     });
   }, [selectType]);
@@ -44,40 +43,12 @@ const PropertyModal = ({ open, handleOk, species, data, handleCancel }: Iprops) 
         dataIndex: 'valueType',
         valueType: 'select',
         fieldProps: {
-          options: [
-            {
-              value: '数值型',
-              label: '数值型',
-            },
-            {
-              value: '描述型',
-              label: '描述型',
-            },
-            {
-              value: '选择型',
-              label: '选择型',
-            },
-            {
-              value: '分类型',
-              label: '分类型',
-            },
-            {
-              value: '附件型',
-              label: '附件型',
-            },
-            {
-              value: '日期型',
-              label: '日期型',
-            },
-            {
-              value: '时间型',
-              label: '时间型',
-            },
-            {
-              value: '用户型',
-              label: '用户型',
-            },
-          ],
+          options: valueTypes.map((i) => {
+            return {
+              value: i,
+              label: i,
+            };
+          }),
           onSelect: (select: string) => {
             setSelectType(select);
           },

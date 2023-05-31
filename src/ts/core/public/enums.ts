@@ -29,6 +29,7 @@ export enum SpeciesType {
   'Market' = '流通类',
   'Application' = '应用类',
   /** 类别类目 */
+  'Flow' = '流程类',
   'Work' = '事项类',
   'Thing' = '实体类',
   'Data' = '数据类',
@@ -58,4 +59,16 @@ export enum OperateType {
   'Remove' = '移除',
   'Update' = '更新',
   'Delete' = '删除',
+}
+
+/** 值类型 */
+export enum ValueType {
+  'Number' = '数值型',
+  'Remark' = '描述型',
+  'Select' = '选择型',
+  'Species' = '分类型',
+  'File' = '附件型',
+  'Time' = '时间型',
+  'Date' = '日期型',
+  'Target' = '用户型',
 }
