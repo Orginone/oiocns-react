@@ -14,20 +14,20 @@ interface IProps {
 }
 /* 发起办事数据 */
 interface SubmitDataType {
-  headerData: Map<string, any>;
-  formData: Map<
-    string,
-    {
+  headerData: {
+    [key: string]: any;
+  };
+  formData: {
+    [key: string]: {
       isHeader: boolean;
       resourceData: string;
-      changeData: Map<string, any>;
-    }
-  >;
+      changeData: {
+        [key: string]: any;
+      };
+    };
+  };
 }
-const submitData: SubmitDataType = {
-  headerData: new Map(),
-  formData: new Map(),
-};
+
 // const dataMap = new Map();
 /**
  * 办事-业务流程--发起
@@ -41,25 +41,21 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
   const [thingForms, setThingForms] = useState<XForm[]>([]);
   const [workForm, setWorkForm] = useState<XForm>();
   const [content, setContent] = useState<string>('');
-  const [dataMap, setDataMap] = useState<any>({});
-  // const [newKey] = useObjectUpdate(dataMap);
+  const [submitData, setSubmitData] = useState<SubmitDataType>({
+    headerData: data,
+    formData: {},
+  });
   const submit = async () => {
-    for (const key in data) {
-      if (Object.prototype.hasOwnProperty.call(data, key)) {
-        submitData.headerData.set(key, data[key]);
-      }
+    if (workForm) {
+      submitData.headerData = data;
+      submitData.formData[workForm.id] = {
+        isHeader: true,
+        resourceData: JSON.stringify(workForm),
+        changeData: {},
+      };
     }
 
-    console.log('提交数据', {
-      hook: '',
-      content: content,
-      contentType: 'Text',
-      title: current.name,
-      defineId: current.id,
-      data: JSON.stringify(submitData),
-      // thingIds: rows.map((row: any) => row['Id']),
-      thingIds: [],
-    });
+    console.log('打印提交数据', submitData);
     if (
       await current.createWorkInstance({
         hook: '',
@@ -116,27 +112,27 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
   }, [thingForms, activeTab]);
 
   const handleTableChange = (tableID: string, data: any[], Json: string) => {
-    setDataMap({ ...dataMap, tableID: data });
-    const changeData: Map<string, Map<string, any>> = new Map();
+    const changeData: { [key: string]: any } = {};
 
     data.forEach((item) => {
       // 判断是否包含 修改数据
       const willsaveData = item?.EDIT_INFO ?? {};
-      const childMap = new Map();
-      Object.keys(willsaveData).map((chidKey) => {
+      const childMap: { [key: string]: any } = {};
+      Object.keys(willsaveData).forEach((chidKey) => {
         if (['Id', 'Creater', 'Status', 'CreateTime', 'ModifiedTime'].includes(chidKey)) {
           return;
         }
-        childMap.set(chidKey, willsaveData[chidKey]);
+        childMap[chidKey] = willsaveData[chidKey];
       });
 
-      changeData.set(item.Id, childMap);
+      changeData[item.Id] = childMap;
     });
-    submitData.formData.set(tableID, {
+    submitData.formData[tableID] = {
       isHeader: false,
       resourceData: Json,
       changeData,
-    });
+    };
+    setSubmitData({ ...submitData });
   };
 
   return (
