@@ -10,11 +10,7 @@ import { submitCurrentTableData } from '../funs';
 import { ModalNames, toolBtnsType } from '../config';
 import BaseThing from '../BaseThing';
 import SelectThing from '../TreeSelectThing';
-// {
-//   Edit: '修改',
-//   EditMore: '批量修改',
-//   Select: '选择更多',
-// };
+
 interface IProps {
   labels: string[];
   propertys: XProperty[];
@@ -91,9 +87,6 @@ const ThingTable = <
         key="delete"
         onClick={() => {
           setThingList(thingList.filter((item) => item.Id !== record.Id));
-          setTimeout(() => {
-            submitCurrentTableData(formInfo.id, thingList, propertys, onListChange);
-          }, 100);
         }}>
         移除
       </a>,
@@ -101,11 +94,17 @@ const ThingTable = <
   };
 
   useEffect(() => {
+    // 监听实体选择
     if (selectedRows.length > 0) {
       setThingList([...selectedRows, ...thingList]);
     }
   }, [selectedRows]);
-
+  useEffect(() => {
+    // 监听展示数据变化。弹出数据给父级
+    setTimeout(() => {
+      submitCurrentTableData(formInfo.id, thingList, propertys, onListChange);
+    }, 100);
+  }, [thingList]);
   // 触发弹窗 关闭事件
   const handleModalDataChange = async (type: 'Edit' | 'EditMore' | 'Add') => {
     switch (type) {
@@ -153,9 +152,6 @@ const ThingTable = <
     }
     setOperateModel('');
     setForm(undefined);
-    setTimeout(() => {
-      submitCurrentTableData(formInfo.id, thingList, propertys, onListChange);
-    }, 300);
   };
   // 获取自定义按钮组
   const HandleToolBarRender: () => ReactNode[] = () => {
@@ -192,7 +188,6 @@ const ThingTable = <
         dataSource={[...thingList]}
         headerTitle={headerTitle}
         columnsState={{ ...defaultColumnStateMap }}
-        options={readonly ? false : undefined}
         toolBarRender={readonly ? undefined : (HandleToolBarRender as any)}
         {...rest}
       />

@@ -8,7 +8,7 @@ import {
   ProTable,
   ProTableProps,
 } from '@ant-design/pro-components';
-
+import cls from './index.module.less';
 interface IProps {
   propertys: XProperty[];
 
@@ -53,6 +53,9 @@ const BaseThing = <
       <ProTable
         rowKey={rowKey}
         size="small"
+        cardProps={{
+          className: cls.thingTable,
+        }}
         dataSource={props.dataSource}
         search={false}
         columns={getColumns}

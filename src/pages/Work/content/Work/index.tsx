@@ -50,6 +50,16 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
       }
     }
 
+    console.log('提交数据', {
+      hook: '',
+      content: content,
+      contentType: 'Text',
+      title: current.name,
+      defineId: current.id,
+      data: JSON.stringify(submitData),
+      // thingIds: rows.map((row: any) => row['Id']),
+      thingIds: [],
+    });
     if (
       await current.createWorkInstance({
         hook: '',
