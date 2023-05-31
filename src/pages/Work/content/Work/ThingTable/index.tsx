@@ -187,18 +187,18 @@ const ThingTable: React.FC<IProps> = ({
     return columns;
   };
 
-  const submitCurrentTableData = debounce((thingData: any) => {
+  const submitCurrentTableData = (thingData: any) => {
     // 删除 操作一栏
     onListChange?.call(
       this,
       form.id,
-      thingList,
+      thingData,
       JSON.stringify({
         data: thingData,
         columns: getColumns().filter((v: ProColumns<any>) => v.valueType !== 'option'),
       }),
     );
-  }, 100);
+  };
 
   const handleModalDataChange = async (operate: OperateType) => {
     if (Object.keys(newData).length == 0) return;
