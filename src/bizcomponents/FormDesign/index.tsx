@@ -136,7 +136,10 @@ const Design: React.FC<IProps> = ({ current }) => {
                   multiple: false,
                   treeExpandedKeys: [propId],
                   onSelect: async (_, x) => {
-                    await current.updateAttribute(item, x.item);
+                    await current.updateAttribute(
+                      { ...item, dictId: item.DictId },
+                      x.item,
+                    );
                     setSelectedItem(item);
                   },
                 }}

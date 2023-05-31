@@ -3,7 +3,7 @@ import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components'
 import SchemaForm from '@/components/SchemaForm';
 import { AttributeModel } from '@/ts/base/model';
 import { XAttribute } from '@/ts/base/schema';
-import { IForm } from '@/ts/core';
+import { IForm, SpeciesType } from '@/ts/core';
 
 interface Iprops {
   open: boolean;
@@ -36,12 +36,10 @@ const AttributeModal = (props: Iprops) => {
     {
       title: '选择属性',
       dataIndex: 'propId',
-      valueType: 'select',
-      formItemProps: { rules: [{ required: true, message: '属性为必填项' }] },
+      hideInForm: form.typeName === SpeciesType.Work,
+      valueType: 'treeSelect',
       request: async () => {
-        return (await props.form.loadPropertys()).map((item) => {
-          return { label: item.name, value: item.id };
-        });
+        return [];
       },
     },
     {
@@ -114,12 +112,7 @@ const AttributeModal = (props: Iprops) => {
           values = { ...current, ...values };
           handleOk(await form.updateAttribute(values));
         } else {
-          const property = (await props.form.loadPropertys()).find(
-            (i) => i.id === values.propId,
-          );
-          if (property) {
-            await form.createAttribute(values, property);
-          }
+          await form.createAttribute(values);
           handleOk(true);
         }
       }}

@@ -29,6 +29,7 @@ export enum SpeciesType {
   'Market' = '流通类',
   'Application' = '应用类',
   /** 类别类目 */
+  'Flow' = '流程类',
   'Work' = '事项类',
   'Thing' = '实体类',
   'Data' = '数据类',

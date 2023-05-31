@@ -1,5 +1,5 @@
-import * as XLSX from "xlsx";
-import { getConfigs, ReadError, } from "@/utils/excel/config";
+import * as XLSX from 'xlsx';
+import { getConfigs, ReadError } from '@/utils/excel/config';
 
 /**
  * 读取 Excel 配置
@@ -48,16 +48,19 @@ const generateXlsx = (sheetConfigs: SheetConfig[], filename: string) => {
   try {
     let workbook = XLSX.utils.book_new();
     for (let sheetConfig of sheetConfigs) {
-      let headers = sheetConfig.metaColumns.map(item => item.name);
-      let sheet = XLSX.utils.json_to_sheet(sheetConfig.data ?? [], { header: headers, skipHeader: false });
+      let headers = sheetConfig.metaColumns.map((item) => item.name);
+      let sheet = XLSX.utils.json_to_sheet(sheetConfig.data ?? [], {
+        header: headers,
+        skipHeader: false,
+      });
       XLSX.utils.book_append_sheet(workbook, sheet, sheetConfig.sheetName);
     }
-    XLSX.writeFileXLSX(workbook, filename + ".xlsx");
+    XLSX.writeFileXLSX(workbook, filename + '.xlsx');
     return true;
   } catch (err) {
     return false;
   }
-}
+};
 
 /**
  * 读取一份 Excel
@@ -65,11 +68,15 @@ const generateXlsx = (sheetConfigs: SheetConfig[], filename: string) => {
  * @param excelConfig 进度配置
  * @param sheetReadConfigs 读取配置
  */
-const readXlsx = <T>(file: File, excelConfig: ExcelConfig<T>, sheetReadConfigs: SheetReadConfig[]) => {
+const readXlsx = <T>(
+  file: File,
+  excelConfig: ExcelConfig<T>,
+  sheetReadConfigs: SheetReadConfig[],
+) => {
   let reader = new FileReader();
   reader.onprogress = (event: ProgressEvent<FileReader>) => {
     excelConfig.onProgress((event.loaded / event.total) * 30.0);
-  }
+  };
   reader.onload = async (e) => {
     /**
      * 数据收集
@@ -80,11 +87,11 @@ const readXlsx = <T>(file: File, excelConfig: ExcelConfig<T>, sheetReadConfigs: 
           config.data = XLSX.utils.sheet_to_json(sheets[key]);
         }
       }
-    }
+    };
     /**
      * 表处理回调
      * @param key 键值
-     * @param index 索引 
+     * @param index 索引
      * @param sheets 表格
      */
     let operating = async (key: string, index: number) => {
@@ -96,13 +103,16 @@ const readXlsx = <T>(file: File, excelConfig: ExcelConfig<T>, sheetReadConfigs: 
           await config.checkData?.apply(config, [data]);
           for (let item = 0; item < data.length; item++) {
             await config.operatingItem(data[item], excelConfig.context);
-            let progress = (30.0 + ((index + 1) / sheetSize) * ((item + 1) / data.length) * 70.0).toFixed(2);
+            let progress = (
+              30.0 +
+              ((index + 1) / sheetSize) * ((item + 1) / data.length) * 70.0
+            ).toFixed(2);
             excelConfig.onProgress(Number(progress));
           }
           await config.completed?.apply(config, [config, sheetReadConfigs]);
         }
       }
-    }
+    };
     /** 读取文件 */
     try {
       let workbook = XLSX.read(e.target?.result, { type: 'binary' });
@@ -120,21 +130,12 @@ const readXlsx = <T>(file: File, excelConfig: ExcelConfig<T>, sheetReadConfigs: 
         excelConfig.onError(error.message);
         return;
       }
-      excelConfig.onError("文件读取异常")
+      excelConfig.onError('文件读取异常');
     }
-  }
+  };
   reader.readAsArrayBuffer(file);
-}
+};
 
-export {
-  generateXlsx,
-  readXlsx,
-  getConfigs
-}
+export { generateXlsx, getConfigs, readXlsx };
 
-export type {
-  ExcelConfig,
-  MetaColumn,
-  SheetConfig,
-  SheetReadConfig
-}
+export type { ExcelConfig, MetaColumn, SheetConfig, SheetReadConfig };

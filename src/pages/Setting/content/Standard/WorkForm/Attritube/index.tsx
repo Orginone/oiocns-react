@@ -3,7 +3,7 @@ import CardOrTable from '@/components/CardOrTableComp';
 import { XAttribute } from '@/ts/base/schema';
 import { AttributeColumns } from '@/pages/Setting/config/columns';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
-import { IForm } from '@/ts/core';
+import { IForm, SpeciesType } from '@/ts/core';
 import PropertyConfig from './propConfig';
 import AttributeConfig from '@/bizcomponents/FormDesign/attributeConfig';
 import AttributeModal from '@/bizcomponents/GlobalComps/createAttribute';
@@ -56,7 +56,7 @@ const Attritube = ({ current, modalType, setModalType }: IProps) => {
           },
         },
       ];
-    } else {
+    } else if (current.typeName === SpeciesType.Thing) {
       return [
         {
           key: '关联属性',
@@ -76,6 +76,7 @@ const Attritube = ({ current, modalType, setModalType }: IProps) => {
         },
       ];
     }
+    return [];
   };
 
   return (

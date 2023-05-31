@@ -1,4 +1,4 @@
-import { IWorkDefine } from '@/ts/core';
+import { IWorkDefine, SpeciesType } from '@/ts/core';
 import { Button, Card, Input, Tabs, message } from 'antd';
 import orgCtrl from '@/ts/controller';
 import React, { useEffect, useState } from 'react';
@@ -64,8 +64,6 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
         title: current.name,
         defineId: current.id,
         data: JSON.stringify(submitData),
-        // thingIds: rows.map((row: any) => row['Id']),
-        thingIds: [],
       })
     ) {
       message.success('发起成功!');
@@ -76,9 +74,9 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
 
   useEffect(() => {
     current.loadWorkNode().then((value) => {
-      if (value && value.forms && value.forms?.length > 0) {
-        setThingForms(value.forms.filter((i) => i.belongId === i.shareId));
-        setWorkForm(value.forms.find((i) => i.belongId == i.shareId));
+      if (value && value.forms && value.forms.length > 0) {
+        setThingForms(value.forms.filter((i) => i.typeName === SpeciesType.Thing));
+        setWorkForm(value.forms.find((i) => i.typeName === SpeciesType.Work));
       }
     });
   }, []);
@@ -149,15 +147,14 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
             render: (_: any, _dom: any) => <></>,
           }}
           onValuesChange={(_, values) => {
-            console.log(values);
             setData({ ...data, ...values });
           }}
         />
       )}
-      {activeTab && (
+      {thingForms.length > 0 && (
         <Tabs
-          activeKey={activeTab}
           tabPosition="top"
+          activeKey={activeTab}
           onTabClick={(tabKey) => setActiveTab(tabKey)}
           items={thingForms.map((i) => {
             return {
@@ -216,7 +213,8 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
                 // />
               ),
             };
-          })}></Tabs>
+          })}
+        />
       )}
       <Card className={cls['bootom_content']}>
         <div style={{ display: 'flex', width: '100%' }}>
