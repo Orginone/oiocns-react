@@ -2,12 +2,12 @@ import { schema } from '@/ts/base';
 import { SpeciesType } from '@/ts/core/public/enums';
 import { ISpeciesItem } from '../base/species';
 import { ITarget } from '../../target/base/target';
-import { IWork, Work } from '../base/work';
+import { IFlow, Flow } from '../base/flow';
 import { ThingClass } from '../store/thingclass';
 import { IApplication } from '../app/application';
-export interface IMarket extends IWork {}
+export interface IMarket extends IFlow {}
 
-export class Market extends Work implements IMarket, IApplication {
+export class Market extends Flow implements IMarket, IApplication {
   constructor(_metadata: schema.XSpecies, _current: ITarget) {
     super(_metadata, _current);
     this.speciesTypes = [SpeciesType.Thing];

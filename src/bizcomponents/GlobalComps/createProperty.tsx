@@ -21,7 +21,6 @@ const PropertyModal = ({ open, handleOk, species, data, handleCancel }: Iprops) 
   const [selectType, setSelectType] = useState<string>();
   useEffect(() => {
     species.current.space.loadDicts().then((value) => {
-      console.log(value);
       setDicts([...value]);
     });
   }, [selectType]);

@@ -530,8 +530,6 @@ export type WorkInstanceModel = {
   title: string;
   // 回调地址
   hook: string;
-  // 操作对象Id集合
-  thingIds: string[];
 };
 export type QueryWorkReq = {
   // 共享组织Id

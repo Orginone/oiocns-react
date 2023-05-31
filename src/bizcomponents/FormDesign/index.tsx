@@ -50,7 +50,7 @@ const Design: React.FC<IProps> = ({ current }) => {
   const [selectKeys, setSelectKeys] = useState<string[]>([]);
   const [propertyTree, setPropertyTree] = useState<TreeNode[]>([]);
   const [selectedItem, setSelectedItem] = useState<XAttribute>();
-  const isInherited = current.species.isInherited;
+  const isInherited = current.species?.isInherited;
   // 表单项选中事件
   const itemClick = (item: any) => {
     setSelectedItem(item);
@@ -115,7 +115,7 @@ const Design: React.FC<IProps> = ({ current }) => {
 
   const loadItems = () => {
     return current.attributes
-      .sort((a, b) => {
+      ?.sort((a, b) => {
         return new Date(b.createTime).getTime() - new Date(a.createTime).getTime();
       })
       .map((item) => {
@@ -136,7 +136,10 @@ const Design: React.FC<IProps> = ({ current }) => {
                   multiple: false,
                   treeExpandedKeys: [propId],
                   onSelect: async (_, x) => {
-                    await current.updateAttribute(item, x.item);
+                    await current.updateAttribute(
+                      { ...item, dictId: item.DictId },
+                      x.item,
+                    );
                     setSelectedItem(item);
                   },
                 }}
@@ -157,7 +160,7 @@ const Design: React.FC<IProps> = ({ current }) => {
 
   const reloadPropertyTree = () => {
     const propClasses: IPropClass[] = [];
-    for (const item of current.species.current.space.species) {
+    for (const item of current.species?.current.space.species) {
       switch (item.typeName) {
         case SpeciesType.Store:
           propClasses.push(item as IPropClass);

@@ -4,11 +4,11 @@ import IndentityManage from '@/bizcomponents/IndentityManage';
 import cls from './index.module.less';
 import { NodeType } from '../../processType';
 import ShareShowComp from '@/bizcomponents/IndentityManage/ShareShowComp';
-import { IWork } from '@/ts/core';
+import { IFlow } from '@/ts/core';
 
 interface IProps {
   current: NodeType;
-  work: IWork;
+  work: IFlow;
 }
 /**
  * @description: 抄送对象
