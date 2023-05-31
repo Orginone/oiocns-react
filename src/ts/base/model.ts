@@ -391,6 +391,8 @@ export type AttributeModel = {
   code: string;
   // 规则
   rule: string;
+  // 值类型
+  valueType: string;
   // 属性Id
   propId: string;
   // 工作职权Id

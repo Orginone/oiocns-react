@@ -60,3 +60,15 @@ export enum OperateType {
   'Update' = '更新',
   'Delete' = '删除',
 }
+
+/** 值类型 */
+export enum ValueType {
+  'Number' = '数值型',
+  'Remark' = '描述型',
+  'Select' = '选择型',
+  'Species' = '分类型',
+  'File' = '附件型',
+  'Time' = '时间型',
+  'Date' = '日期型',
+  'Target' = '用户型',
+}
