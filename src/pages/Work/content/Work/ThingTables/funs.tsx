@@ -93,8 +93,6 @@ const submitCurrentTableData = debounce(
       propertys: propertys,
       form: form,
     };
-    console.log('cdsd', thingList, propertys);
-
     callback && callback(form.id, thingList, JSON.stringify(JsonData));
   },
   100,

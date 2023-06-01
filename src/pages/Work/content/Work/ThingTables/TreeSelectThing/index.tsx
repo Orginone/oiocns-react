@@ -48,7 +48,6 @@ const SelectThing = <
 
   const rowSelection = {
     onChange: (selectedRowKeys: React.Key[], selectedRows: DataType[]) => {
-      console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
       onRowSelectChange && onRowSelectChange(selectedRowKeys, selectedRows);
     },
     selectedRowKeys: selectedKeys,
@@ -59,7 +58,7 @@ const SelectThing = <
   };
 
   const handleSelect: any = async (
-    selectedKeys: string[],
+    _selectedKeys: string[],
     _info: {
       event: 'select';
       selected: boolean;

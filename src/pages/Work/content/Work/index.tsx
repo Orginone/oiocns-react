@@ -56,8 +56,6 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
       };
     }
 
-    console.log('打印提交数据', submitData);
-    return;
     if (
       await current.createWorkInstance({
         hook: '',
@@ -66,6 +64,7 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
         title: current.name,
         defineId: current.id,
         data: JSON.stringify(submitData),
+        applyId: '',
       })
     ) {
       message.success('发起成功!');
@@ -123,8 +122,6 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
           childMap[keyMap.get(chidKey)!] = willsaveData[chidKey];
         }
       });
-      console.log('old', OldchildMap, 'NEW', childMap);
-
       changeData[item.Id] = childMap;
     });
     submitData.formData[tableID] = {
