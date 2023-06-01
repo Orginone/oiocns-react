@@ -1,5 +1,5 @@
 import { XProperty } from '@/ts/base/schema';
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { getColItem } from '../funs';
 import { defaultCol } from '../config';
 import {
@@ -9,12 +9,13 @@ import {
   ProTableProps,
 } from '@ant-design/pro-components';
 import cls from './index.module.less';
+import { kernel } from '@/ts/base';
 interface IProps {
   propertys: XProperty[];
-
+  belongId?: string;
   onListChange?: Function;
   Operation?: ProColumnType<any>; //操作列渲染
-
+  labels?: string[];
   formInfo?: any; //传进来的 表单基本信息
   defaultColums?: any[]; //传进来的 表头设置
   readonly?: boolean; //只读表单，隐藏操作区，配置区
@@ -31,11 +32,14 @@ const BaseThing = <
     rowKey = 'Id',
     propertys,
     // defaultColums,
+    belongId,
+    labels = [],
     Operation = {},
     readonly,
     toolBarRender,
     ...rest
   } = props;
+  const [showData, setShowData] = useState<any[]>([]);
   const getColumns: any = useMemo(() => {
     let columns: any[] = defaultCol.map((item: any) => {
       return getColItem(item);
@@ -48,6 +52,45 @@ const BaseThing = <
     return columns;
   }, [props.dataSource, propertys, readonly]);
 
+  useEffect(() => {
+    console.log('666', labels, getColumns);
+    fetchData();
+  }, [props.labels]);
+  const fetchData = async (loadOptions: any = {}) => {
+    if (!belongId || labels.length == 0) {
+      return;
+    }
+    loadOptions.userData = labels;
+    let request: any = { ...loadOptions };
+    // if (props.byIds) {
+    //   request.options = {
+    //     match: {
+    //       _id: {
+    //         _in_: props.byIds,
+    //       },
+    //     },
+    //   };
+    // }
+    const result = await kernel.anystore.loadThing<any>(belongId, request);
+    console.log('请求数据', belongId, labels, result.data);
+    const { success, data } = result;
+    if (success) {
+      // return ;
+      setShowData(
+        data.data.map((properItem: any) => {
+          console.log('propertys', propertys, properItem.Propertys);
+          const { Propertys: ProperData, ...rest } = properItem;
+          let obj = { ...rest };
+          for (const key in ProperData) {
+            obj[key.slice(1)] = ProperData[key];
+          }
+          return obj;
+        }),
+      );
+    } else {
+      setShowData([]);
+    }
+  };
   return (
     <>
       <ProTable
@@ -55,7 +98,8 @@ const BaseThing = <
         cardProps={{
           className: cls.thingTable,
         }}
-        dataSource={props.dataSource}
+        key={labels.join('%')}
+        dataSource={labels.length > 0 ? showData : props.dataSource}
         search={false}
         columns={getColumns}
         tableAlertRender={false}

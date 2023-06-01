@@ -23,21 +23,21 @@ const getColItem = (
     valueEnum: Object | undefined;
   } & XProperty,
 ) => {
-  const { id, attrId, name, valueType = '描述型', valueEnum = undefined } = col;
+  const { id, attrId, code, name, valueType = '描述型', valueEnum = undefined } = col;
   const width = name.length * 30 > 80 ? name.length * 30 : 80;
 
   let ColItem: ProColumns<any> = {
     title: name,
     key: id,
-    dataIndex: attrId ?? id,
+    dataIndex: id,
     width: width,
     valueType: ColTypes.get(valueType) as 'text',
     valueEnum: valueEnum as ProSchemaValueEnumObj,
     render(text: any, _record: any) {
-      if (_record?.EDIT_INFO?.[attrId]) {
+      if (_record?.EDIT_INFO?.[code]) {
         return (
           <span style={{ color: '#154ad8' }} title={`修改前：${text}`}>
-            {_record?.EDIT_INFO?.[attrId]}
+            {_record?.EDIT_INFO?.[code]}
           </span>
         );
       }
@@ -71,6 +71,14 @@ const getColItem = (
   }
   return ColItem;
 };
+
+const MakePropertysToAttrMap = (propertys: any[]) => {
+  const PtyToAttrId: Map<string, string> = new Map([]);
+  propertys.forEach((proper) => {
+    PtyToAttrId.set(proper.id, proper.AttrId);
+  });
+  return PtyToAttrId;
+};
 /* 弹出编辑数据 */
 const submitCurrentTableData = debounce(
   (formId: string, thingList: any[], propertys: any[], callback: Function) => {
@@ -79,9 +87,10 @@ const submitCurrentTableData = debounce(
       data: thingList,
       columns: [...defaultCol, ...propertys],
     };
+    console.log('cdsd', thingList, propertys);
 
     callback && callback(formId, thingList, JSON.stringify(JsonData));
   },
   100,
 );
-export { getColItem, submitCurrentTableData };
+export { getColItem, MakePropertysToAttrMap, submitCurrentTableData };

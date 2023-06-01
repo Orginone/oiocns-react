@@ -1,13 +1,14 @@
 import { IWorkDefine, SpeciesType } from '@/ts/core';
 import { Button, Card, Input, Tabs, message } from 'antd';
 import orgCtrl from '@/ts/controller';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import cls from './index.module.less';
 import OioForm from '@/bizcomponents/FormDesign/OioForm';
 import { GroupMenuType } from '../../config/menuType';
 import { XForm, XProperty } from '@/ts/base/schema';
 // import BaseThing from './BaseThing';
 import ThingTable from './ThingTables/ThingTable';
+import { MakePropertysToAttrMap } from './ThingTables/funs';
 // 卡片渲染
 interface IProps {
   current: IWorkDefine;
@@ -56,6 +57,7 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
     }
 
     console.log('打印提交数据', submitData);
+    return;
     if (
       await current.createWorkInstance({
         hook: '',
@@ -89,14 +91,6 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
         orgCtrl.work
           .loadAttributes(activeTab, current.workItem.belongId)
           .then((attributes) => {
-            // console.log(
-            //   'attributes',
-            //   attributes,
-            //   attributes
-            //     .filter((i) => i.linkPropertys && i.linkPropertys.length > 0)
-            //     .map((i) => i.linkPropertys![0]),
-            // );
-
             setPropertys(
               attributes
                 .filter((i) => i.linkPropertys && i.linkPropertys.length > 0)
@@ -108,20 +102,28 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
       }
     }
   }, [thingForms, activeTab]);
+  // const keyMap: Map<string, string> = useMemo(() => {
+  //   return MakePropertysToAttrMap(propertys);
+  // }, [propertys]);
 
   const handleTableChange = (tableID: string, data: any[], Json: string) => {
     const changeData: { [key: string]: any } = {};
-
+    const keyMap: Map<string, string> = MakePropertysToAttrMap(propertys);
     data.forEach((item) => {
       // 判断是否包含 修改数据
       const willsaveData = item?.EDIT_INFO ?? {};
       const childMap: { [key: string]: any } = {};
+      const OldchildMap: { [key: string]: any } = {};
       Object.keys(willsaveData).forEach((chidKey) => {
         if (['Id', 'Creater', 'Status', 'CreateTime', 'ModifiedTime'].includes(chidKey)) {
           return;
         }
-        childMap[chidKey] = willsaveData[chidKey];
+        OldchildMap[chidKey] = willsaveData[chidKey];
+        if (keyMap.has(chidKey)) {
+          childMap[keyMap.get(chidKey)!] = willsaveData[chidKey];
+        }
       });
+      console.log('old', OldchildMap, 'NEW', childMap);
 
       changeData[item.Id] = childMap;
     });
@@ -173,44 +175,6 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
                   belongId={current.workItem.belongId}
                   onListChange={handleTableChange}
                 />
-                // <Thing
-                //   keyExpr="Id"
-                //   height={500}
-                //   selectable={false}
-                //   dataSource={rows}
-                //   labels={[`S${activeTab}`]}
-                //   propertys={propertys}
-                //   toolBarItems={[
-                //     <Button
-                //       key="1"
-                //       type="default"
-                //       onClick={() => {
-                //         setForm(i);
-                //         setOperateModel('add');
-                //       }}>
-                //       新增{i.name}
-                //     </Button>,
-                //     <Button
-                //       key="2"
-                //       type="default"
-                //       onClick={() => {
-                //         setForm(i);
-                //         setOperateModel('select');
-                //       }}>
-                //       选择{i.name}
-                //     </Button>,
-                //   ]}
-                //   belongId={current.workItem.belongId}
-                //   menuItems={[
-                //     {
-                //       key: 'edit',
-                //       label: '变更',
-                //       click(data) {
-                //         console.log(data);
-                //       },
-                //     },
-                //   ]}
-                // />
               ),
             };
           })}

@@ -18,6 +18,7 @@ interface IProps {
   selectable?: boolean;
   height?: any;
   width?: any;
+  keyMap?: Map<string, string>; //存放当前表单 属性id=>特性id
   readonly?: boolean; //只读表单，隐藏操作区，配置区
   setSelectedRows?: (data: any) => void;
   current?: any;
@@ -110,18 +111,34 @@ const ThingTable = <
       submitCurrentTableData(formInfo.id, thingList, propertys, onListChange);
     }, 100);
   }, [thingList]);
+
+  const ChangeAttrToPropObj = (
+    AttrObj: { [key: string]: any },
+    propertysArr: Array<XProperty & { attrId: string }> = propertys as any[],
+  ) => {
+    let Obj: { [key: string]: any } = {};
+    for (const key in AttrObj) {
+      const pKet = propertysArr.find((v) => v.attrId === key)!.id;
+      Obj[pKet] = AttrObj[key];
+    }
+    return Obj;
+  };
   // 触发弹窗 关闭事件
   const handleModalDataChange = async (type: 'Edit' | 'EditMore' | 'Add') => {
+    const _ChangeData = ChangeAttrToPropObj(changeData);
+
+    console.log('触发弹窗 ', changeData, _ChangeData);
+
     switch (type) {
       case 'Add':
         {
-          if (Object.keys(changeData).length == 0) {
+          if (Object.keys(_ChangeData).length == 0) {
             break;
           }
           let res = await kernel.anystore.createThing(orgCtrl.user.id, 1);
           const { success, data = [] }: any = res;
           if (success && data.length > 0) {
-            const _Data = { ...data[0], EDIT_INFO: changeData };
+            const _Data = { ...data[0], EDIT_INFO: _ChangeData };
             setThingList([_Data, ...thingList]);
           }
         }
@@ -132,7 +149,7 @@ const ThingTable = <
             item.Id === EditData.Id &&
               (item = {
                 ...item,
-                EDIT_INFO: { ...(item?.EDIT_INFO ?? {}), ...changeData },
+                EDIT_INFO: { ...(item?.EDIT_INFO ?? {}), ..._ChangeData },
               });
 
             return item;
@@ -145,7 +162,7 @@ const ThingTable = <
           const _DataSource = thingList.map((item) => {
             return {
               ...item,
-              EDIT_INFO: { ...(item?.EDIT_INFO ?? {}), ...changeData },
+              EDIT_INFO: { ...(item?.EDIT_INFO ?? {}), ..._ChangeData },
             };
           });
           setThingList(_DataSource);
@@ -249,16 +266,6 @@ const ThingTable = <
               onRowSelectChange={(_keys, rows) => setSelectedRows(rows)}
               belongId={belongId}
             />
-            {/* <Thing
-              keyExpr="Id"
-              height={500}
-              selectable
-              labels={labels}
-              propertys={propertys}
-              onSelected={setSelectedRows
-}
-              belongId={belongId}
-            /> */}
           </Modal>
         )}
       </>

@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ParamsType, ProTableProps } from '@ant-design/pro-components';
 import BaseThing from '../BaseThing';
-import { defaultData } from '../config';
 import { XProperty } from '@/ts/base/schema';
 import cls from './index.module.less';
 import CustomTree from '@/components/CustomTree';
@@ -27,7 +26,6 @@ const SelectThing = <
   props: ProTableProps<DataType, Params, ValueType> & PageProp,
 ) => {
   const {
-    headerTitle = '实体类',
     // pageType = 'tree',
     selectable = false,
     onRowSelectChange,
@@ -38,7 +36,7 @@ const SelectThing = <
     ...rest
   } = props;
   const [treeData, setTreeData] = useState<any[]>([]);
-
+  const [treeSelected, setTreeSelected] = useState<any>({});
   useEffect(() => {
     queryData();
   }, [current]);
@@ -68,7 +66,8 @@ const SelectThing = <
       nativeEvent: MouseEvent;
     },
   ) => {
-    console.log('选择实体', selectedKeys);
+    setTreeSelected(_info.node.item);
+    console.log('选择实体', selectedKeys, _info.node.item);
   };
   return (
     <div style={{ display: 'flex', height: '100%' }}>
@@ -82,12 +81,12 @@ const SelectThing = <
         />
       </div>
       <BaseThing
-        headerTitle={headerTitle}
         rowSelection={selectable ? rowSelection : undefined}
+        key={treeSelected?.id}
         propertys={propertys}
-        dataSource={defaultData}
         readonly
         {...rest}
+        labels={treeSelected?.id ? [`S${treeSelected.id}`] : undefined}
       />
     </div>
   );
