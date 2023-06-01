@@ -502,7 +502,7 @@ const Design: React.FC<IProps> = ({
                 fontSize: '22px',
               }}>
               <Typography.Title level={3} style={{ margin: 0 }}>
-                Title
+                {Title}
               </Typography.Title>
             </Layout.Header>
           )}

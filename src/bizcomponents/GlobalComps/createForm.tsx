@@ -2,14 +2,14 @@ import { XForm } from '@/ts/base/schema';
 import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components';
 import React, { useRef } from 'react';
 import SchemaForm from '@/components/SchemaForm';
-import { IForm, IWorkForm } from '@/ts/core';
+import { IForm, IWorkClass, IThingClass } from '@/ts/core';
 
 interface Iprops {
   open: boolean;
   handleCancel: () => void;
   handleOk: () => void;
   current?: IForm;
-  species?: IWorkForm;
+  species?: IWorkClass | IThingClass;
 }
 /**
  * 默认备注：表单默认布局

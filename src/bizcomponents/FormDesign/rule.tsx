@@ -7,11 +7,11 @@ export const loadWidgetsOpts = (valueType: string = '描述型') => {
           value: 'person',
         },
         {
-          label: '内部组织',
+          label: '部门',
           value: 'dept',
         },
         {
-          label: '外部组织',
+          label: '集群',
           value: 'group',
         },
       ];

@@ -1,39 +1,36 @@
 import OioForm from '@/bizcomponents/FormDesign/OioForm';
-import { XForm, XProperty } from '@/ts/base/schema';
-import Thing from '@/pages/Store/content/Thing/Thing';
-import {
-  ProColumns,
-  ProSchemaValueEnumObj,
-  ProTable,
-  ProTableProps,
-} from '@ant-design/pro-components';
-import type { ParamsType } from '@ant-design/pro-provider';
+import { kernel, schema } from '@/ts/base';
 import { Button, Modal } from 'antd';
-import React, { ReactNode, useCallback, useEffect, useState } from 'react';
-import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
-import { deepClone } from '@/ts/base/common';
-import { columns } from '@/bizcomponents/Indentity/config';
-import { kernel } from '@/ts/base';
 import orgCtrl from '@/ts/controller';
-import { GetRowKey } from 'antd/es/table/interface';
 import cls from './index.module.less';
 import { debounce } from '@/utils/tools';
+import { deepClone } from '@/ts/base/common';
+import { GetRowKey } from 'antd/es/table/interface';
+import Thing from '@/pages/Store/content/Thing/Thing';
+import { columns } from '@/bizcomponents/Indentity/config';
+import React, { ReactNode, useEffect, useState } from 'react';
+import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
+import { ProColumns, ProTable } from '@ant-design/pro-components';
+
+enum OperateType {
+  'Add' = '新增',
+  'Edit' = '编辑',
+  'Select' = '选择',
+  'EditMore' = '全部编辑',
+}
 
 interface IProps {
   rowKey?: string | GetRowKey<any>;
-  headerTitle?: string | ReactNode;
   labels: string[];
-  propertys: XProperty[];
   belongId: string;
   selectable?: boolean;
   height?: any;
   width?: any;
   dataSource?: any; //传进来的 展示数据
   readonly?: boolean; //只读表单，隐藏操作区，配置区
-  setRows?: (data: any) => void;
   current: any;
   onListChange?: Function;
-  formInfo: any; //传进来的 表单基本信息
+  form: schema.XForm; //传进来的 表单基本信息
   defaultColums?: any[]; //传进来的 表头设置
 }
 
@@ -64,6 +61,7 @@ const ColTypes: Map<string, string> = new Map([
   // ['图片', 'image'],
   // ['颜色', 'color'],
 ]);
+
 const defaultCol = [
   { id: 'Id', name: '标识', valueType: '描述型' },
   { id: 'Creater', name: '创建者', valueType: '用户型' },
@@ -83,33 +81,30 @@ const defaultCol = [
   { id: 'ModifiedTime', name: '修改时间', valueType: '时间型' },
 ];
 
-const ThingTable = <
-  DataType extends Record<string, any>,
-  Params extends ParamsType = ParamsType,
-  ValueType = 'text',
->(
-  props: ProTableProps<DataType, Params, ValueType> & IProps,
-) => {
-  // const [editableKeys, setEditableRowKeys] = useState<React.Key[]>(() => []);
-  const {
-    rowKey = 'Id',
-    headerTitle = '实体类',
-    belongId,
-    propertys,
-    dataSource,
-    current,
-    formInfo,
-    labels,
-    setRows,
-    onListChange,
-    readonly,
-  } = props;
-
-  const [thingList, setThingList] = useState<any[]>(deepClone(dataSource));
-  const [form, setForm] = useState<XForm>();
-  const [operateModel, setOperateModel] = useState<string>();
+const ThingTable: React.FC<IProps> = ({
+  rowKey = 'Id',
+  belongId,
+  dataSource,
+  current,
+  form,
+  labels,
+  onListChange,
+  readonly,
+}) => {
+  const [selectData, SetSelectData] = useState<any[]>([]);
+  const [attrs, setAttrs] = useState<schema.XAttribute[]>();
+  const [thingList, setThingList] = useState<any[]>([]);
+  const [operateModel, setOperateModel] = useState<OperateType>();
   const [editData, setEditData] = useState<any>({});
   const [newData, setNewData] = useState<any>({});
+
+  useEffect(() => {
+    setTimeout(async () => {
+      setAttrs(await orgCtrl.work.loadAttributes(form.id, current.workItem.belongId));
+    }, 10);
+  }, []);
+
+  if (attrs == undefined) return <></>;
   const defaultColumnStateMap: any = {
     ModifiedTime: {
       width: 100,
@@ -119,27 +114,19 @@ const ThingTable = <
       show: false,
     },
   };
-  const getColItem = (
-    col: {
-      attrId: string;
-      valueEnum: Object | undefined;
-    } & XProperty,
-  ) => {
-    const { id, attrId, name, valueType = '描述型', valueEnum = undefined } = col;
-    const width = name.length * 30 > 80 ? name.length * 30 : 80;
 
+  const getColItem = (id: string, name: string, valueType: string) => {
     let ColItem: ProColumns<any> = {
       title: name,
       key: id,
-      dataIndex: attrId ?? id,
-      width: width,
+      dataIndex: id,
+      width: name.length * 30 > 80 ? name.length * 30 : 80,
       valueType: ColTypes.get(valueType) as 'text',
-      valueEnum: valueEnum as ProSchemaValueEnumObj,
       render(text: any, _record: any) {
-        if (_record?.EDIT_INFO?.[attrId]) {
+        if (_record?.EDIT_INFO?.[id]) {
           return (
             <span style={{ color: '#154ad8' }} title={`修改前：${text}`}>
-              {_record?.EDIT_INFO?.[attrId]}
+              {_record?.EDIT_INFO?.[id]}
             </span>
           );
         }
@@ -149,50 +136,30 @@ const ThingTable = <
 
     switch (valueType) {
       case '用户型':
-        {
-          ColItem.render = (text: ReactNode, _record: any) => {
-            if (text) {
-              let share = orgCtrl.user.findShareById(text as string);
-
-              return (
-                <>
-                  <TeamIcon share={share} size={15} />
-                  <span style={{ marginLeft: 10 }}>{share.name}</span>
-                </>
-              );
-            }
-            return <span>-</span>;
-          };
-        }
+        ColItem.render = (text: any, _record: any) => {
+          let share = orgCtrl.user.findShareById(text.props.text as string);
+          return (
+            <>
+              <TeamIcon share={share} size={15} />
+              <span style={{ marginLeft: 10 }}>{share.name}</span>
+            </>
+          );
+        };
         break;
       case '选择型':
         break;
-
       default:
         break;
     }
     return ColItem;
   };
-  const getColumns: any = useCallback(() => {
-    let columns: ProColumns<any>[] = [];
 
-    columns = defaultCol.map((item) => {
-      return getColItem(item as any);
-    });
-    for (const p of propertys) {
-      // columns.push(
-      // getColumn(
-      //   p.id,
-      //   p.name,
-      //   p.valueType,
-      //   `Propertys.${p.code}`,
-      //   p.dict?.dictItems || [],
-      // ),
-      // );
-
-      columns.push(getColItem(p as any));
-    }
-    !readonly &&
+  const getColumns = () => {
+    let columns = [
+      ...defaultCol.map((a) => getColItem(a.id, a.name, a.valueType)),
+      ...attrs.map((a) => getColItem(a.id, a.name, a.property!.valueType)),
+    ];
+    if (!readonly) {
       columns.push({
         title: '操作',
         valueType: 'option',
@@ -203,8 +170,7 @@ const ThingTable = <
             onClick={() => {
               const { EDIT_INFO = {}, ...rest } = record;
               setEditData({ ...rest, ...EDIT_INFO });
-              setForm(formInfo);
-              setOperateModel('edit');
+              setOperateModel(OperateType.Edit);
             }}>
             变更
           </a>,
@@ -217,63 +183,39 @@ const ThingTable = <
           </a>,
         ],
       });
+    }
     return columns;
-  }, [thingList, readonly]);
-  const submitCurrentTableData = debounce(() => {
-    // const colStr = getColumns().map((v: any) => {
-    //   const { id, attrId, name, valueType, valueEnum } = v;
-    //   return {
-    //     id,
-    //     attrId,
-    //     name,
-    //     valueType,
-    //     valueEnum,
-    //   };
-    // });
+  };
+
+  const submitCurrentTableData = (thingData: any) => {
     // 删除 操作一栏
-    const JsonData = {
-      data: thingList,
-      columns: getColumns().filter((v: ProColumns<any>) => v.valueType !== 'option'),
-    };
+    onListChange?.call(
+      this,
+      form.id,
+      thingData,
+      JSON.stringify({
+        data: thingData,
+        columns: getColumns().filter((v: ProColumns<any>) => v.valueType !== 'option'),
+      }),
+    );
+  };
 
-    onListChange && onListChange(formInfo.id, thingList, JSON.stringify(JsonData));
-  }, 100);
-  useEffect(() => {
-    // 当修改操作执行后 弹出数据
-    submitCurrentTableData();
-  }, [thingList]);
-
-  // useEffect(() => {
-  //   // 当修改操作执行后 弹出数据
-  //   if (operateModel == '') {
-  //     setTimeout(() => {
-  //       submitCurrentTableData();
-  //     }, 100);
-  //   }
-  // }, [operateModel, thingList]);
-
-  const handleModalDataChange = async (type: 'edit' | 'editMore' | 'add') => {
-    switch (type) {
-      case 'add':
+  const handleModalDataChange = async (operate: OperateType) => {
+    if (Object.keys(newData).length == 0) return;
+    let thingDatas = thingList;
+    switch (operate) {
+      case OperateType.Add:
         {
-          if (Object.keys(newData).length == 0) {
-            break;
-          }
           let res = await kernel.anystore.createThing(orgCtrl.user.id, 1);
-          let newD = {
-            isNew: true,
-            EDIT_INFO: {},
-          };
           const { success, data = [] }: any = res;
           if (success && data.length > 0) {
-            newD = { ...data[0], EDIT_INFO: newData };
+            thingDatas.unshift({ isNew: true, ...data[0], EDIT_INFO: newData });
           }
-          setThingList([newD, ...thingList]);
         }
         break;
-      case 'edit':
+      case OperateType.Edit:
         {
-          const newDataSource = thingList.map((item) => {
+          thingDatas = thingList.map((item) => {
             item.Id === editData.Id &&
               (item = {
                 ...item,
@@ -282,29 +224,63 @@ const ThingTable = <
 
             return item;
           });
-          setThingList(newDataSource);
         }
         break;
-      case 'editMore':
+      case OperateType.EditMore:
         {
-          const newDataSource = thingList.map((item) => {
+          thingDatas = thingList.map((item) => {
             return {
               ...item,
               EDIT_INFO: { ...(item?.EDIT_INFO ?? {}), ...newData },
             };
           });
-          setThingList(newDataSource);
         }
         break;
       default:
         break;
     }
-    setOperateModel('');
-    setForm(undefined);
+    submitCurrentTableData(thingDatas);
+    setOperateModel(undefined);
+    setThingList([...thingDatas]);
   };
+
+  const loadToolBar = () => {
+    if (!readonly) {
+      return () => [
+        <Button
+          key="1"
+          type="default"
+          onClick={() => {
+            setNewData({});
+            setOperateModel(OperateType.EditMore);
+          }}>
+          批量修改
+        </Button>,
+        <Button
+          key="1"
+          type="default"
+          onClick={() => {
+            setNewData({});
+            setOperateModel(OperateType.Add);
+          }}>
+          新增
+        </Button>,
+        <Button
+          key="2"
+          type="default"
+          onClick={() => {
+            setOperateModel(OperateType.Select);
+          }}>
+          选择
+        </Button>,
+      ];
+    }
+  };
+
   return (
     <>
       <ProTable<any>
+        columns={getColumns()}
         rowKey={rowKey}
         tooltip="蓝色字体为修改值，鼠标悬浮时展示修改前的值"
         size="small"
@@ -318,103 +294,77 @@ const ThingTable = <
         options={readonly ? false : undefined}
         search={false}
         dataSource={thingList}
-        headerTitle={headerTitle}
+        headerTitle={form.name}
         //根据formInfo.id 设置默认表头设置--保存在localStorage下
         columnsState={
           readonly
             ? undefined
             : {
                 defaultValue: { ...defaultColumnStateMap },
-                persistenceKey: 'thingTable' + formInfo.id,
+                persistenceKey: 'thingTable' + form.id,
                 persistenceType: 'localStorage',
               }
         }
-        toolBarRender={
-          readonly
-            ? undefined
-            : () => [
-                <Button
-                  key="1"
-                  type="default"
-                  onClick={() => {
-                    setForm(formInfo);
-                    setNewData({});
-                    setOperateModel('editMore');
-                  }}>
-                  批量修改
-                </Button>,
-                <Button
-                  key="1"
-                  type="default"
-                  onClick={() => {
-                    setForm(formInfo);
-                    setNewData({});
-                    setOperateModel('add');
-                  }}>
-                  新增{formInfo.name}
-                </Button>,
-                <Button
-                  key="2"
-                  type="default"
-                  onClick={() => {
-                    setForm(formInfo);
-                    setOperateModel('select');
-                  }}>
-                  选择{formInfo.name}
-                </Button>,
-              ]
-        }
-        columns={getColumns()}
+        toolBarRender={loadToolBar()}
       />
-      <>
-        {form &&
-          (operateModel === 'add' ||
-            operateModel === 'editMore' ||
-            operateModel === 'edit') && (
-            <Modal
-              open={true}
-              onOk={async () => {
-                await handleModalDataChange(operateModel);
-              }}
-              onCancel={() => {
-                setOperateModel('');
-                setForm(undefined);
-              }}
-              destroyOnClose={true}
-              cancelText={'关闭'}
-              width={1000}>
-              <OioForm
-                form={form}
-                define={current}
-                fieldsValue={operateModel === 'edit' ? editData : undefined}
-                onValuesChange={(_changeValue, values) => setNewData(values)}
-                noRule={true}
-              />
-            </Modal>
-          )}
-        {form && operateModel === 'select' && (
-          <Modal
-            open={true}
-            onOk={() => {}}
-            onCancel={() => {
-              setOperateModel('');
-              setForm(undefined);
-            }}
-            destroyOnClose={true}
-            cancelText={'关闭'}
-            width={1000}>
-            <Thing
-              keyExpr="Id"
-              height={500}
-              selectable
-              labels={labels}
-              propertys={propertys}
-              onSelected={setRows}
-              belongId={belongId}
-            />
-          </Modal>
-        )}
-      </>
+      <Modal
+        open={
+          operateModel &&
+          [OperateType.Edit, OperateType.EditMore, OperateType.Add].includes(operateModel)
+        }
+        onOk={async () => {
+          await handleModalDataChange(operateModel!);
+        }}
+        onCancel={() => {
+          setOperateModel(undefined);
+        }}
+        destroyOnClose={true}
+        cancelText={'关闭'}
+        width={1000}>
+        <OioForm
+          form={form}
+          define={current}
+          fieldsValue={operateModel === OperateType.Edit ? editData : undefined}
+          onValuesChange={(_changeValue, values) => setNewData(values)}
+          noRule={true}
+        />
+      </Modal>
+      <Modal
+        width={1000}
+        cancelText={'关闭'}
+        destroyOnClose={true}
+        open={operateModel === OperateType.Select}
+        onOk={() => {
+          let allData = thingList;
+          selectData.forEach((a) => {
+            if (thingList.findIndex((s) => s.Id == a.Id) < 0) {
+              let propValue: any = {};
+              Object.keys(a.Propertys).forEach((key) => {
+                let attr = attrs.find((q) => q.property?.code == key);
+                if (attr) {
+                  propValue[attr.id] = a.Propertys[key];
+                }
+              });
+              allData.unshift({ ...a, ...propValue });
+            }
+          });
+          submitCurrentTableData(allData);
+          setThingList([...allData]);
+          setOperateModel(undefined);
+        }}
+        onCancel={() => {
+          setOperateModel(undefined);
+        }}>
+        <Thing
+          keyExpr="Id"
+          height={500}
+          selectable
+          labels={labels}
+          belongId={belongId}
+          propertys={attrs.map((a) => a.property!)}
+          onSelected={(data) => SetSelectData(data)}
+        />
+      </Modal>
     </>
   );
 };

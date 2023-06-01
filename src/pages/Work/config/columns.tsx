@@ -75,15 +75,12 @@ export const WorkColumns: ProColumns<schema.XWorkTask>[] = [
   },
   {
     title: '标题',
-    width: 100,
+    width: 300,
     dataIndex: 'title',
     render: (_: any, record: schema.XWorkTask) => {
-      let strs = record.title.split('&&');
-      if (strs.length > 1) {
-        let name = orgCtrl.provider.user!.findShareById(strs[0]).name;
-        return `[${name}]${strs[1]}`;
-      }
-      return record.title;
+      return `[${orgCtrl.provider.user!.findShareById(record.applyId).name}]${
+        record.title
+      }`;
     },
   },
   {

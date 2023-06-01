@@ -1,5 +1,5 @@
 import { PageModel } from '../../base/model';
-import { TargetType } from './enums';
+import { TargetType, ValueType } from './enums';
 
 /** 资产共享云模块权限Id */
 export const orgAuth = {
@@ -34,6 +34,17 @@ export const departmentTypes = [
   TargetType.Working,
   TargetType.Research,
   TargetType.Laboratory,
+];
+/** 支持的值类型 */
+export const valueTypes = [
+  ValueType.Number,
+  ValueType.Remark,
+  ValueType.Select,
+  ValueType.Species,
+  ValueType.Time,
+  ValueType.Target,
+  ValueType.Date,
+  ValueType.File,
 ];
 /** 用于获取全部的分页模型 */
 export const PageAll: PageModel = {
