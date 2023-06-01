@@ -1,10 +1,11 @@
+import EntityIcon from '@/bizcomponents/GlobalComps/entityIcon';
 import { Select } from 'antd';
 import React, { memo, useEffect, useState } from 'react';
 
 const { Option } = Select;
 
 interface AppProps {
-  people?: Array<any>; //引用人数据
+  people: Array<any>; //引用人数据
   open?: boolean; // 输入@展示人员
   style?: React.CSSProperties;
   onSelect?: any;
@@ -29,18 +30,21 @@ const PullDown: React.FC<AppProps> = (props) => {
 
   return (
     <Select
-      style={style}
+      style={{ ...style, width: 200 }}
       open={open}
       autoFocus={true}
       ref={pullDownRef} // 这里用来聚焦select用
       defaultValue={defaultValue}
-      onSelect={(_value, option) => onSelect(option)}
+      onSelect={(value) => {
+        onSelect(people.find((p) => p.id === value));
+      }}
       placement="topLeft"
       onKeyDown={onKeyDown}
       className="citeSelect">
-      {people?.map((res: any) => (
+      {people.map((res: any) => (
         <Option value={res.id} key={res.id}>
-          {res.name}
+          <EntityIcon share={res.share} fontSize={30} size={30} />
+          <strong style={{ marginLeft: 6 }}>{res.name}</strong>
         </Option>
       ))}
     </Select>

@@ -3,13 +3,12 @@ import { IconFont } from '@/components/IconFont';
 import { Button, message, Popover, Spin, Upload, UploadProps, Image } from 'antd';
 import { CloseCircleFilled } from '@ant-design/icons';
 import React, { useEffect, useState } from 'react';
-import { IMsgChat, MessageType, TaskModel } from '@/ts/core';
-import { model, parseAvatar } from '@/ts/base';
+import { IMessage, IMsgChat, MessageType, TaskModel } from '@/ts/core';
+import { parseAvatar } from '@/ts/base';
 import { FileItemShare } from '@/ts/base/model';
 import { FileTypes } from '@/ts/core/public/consts';
 import { formatSize } from '@/ts/base/common';
 import PullDown from '@/pages/Chats/components/pullDown';
-import { XTarget } from '@/ts/base/schema';
 import {
   filetrText,
   isShowLink,
@@ -27,7 +26,7 @@ import './index.less';
 interface Iprops {
   chat: IMsgChat;
   writeContent: any;
-  citeText: model.MsgSaveModel;
+  citeText: IMessage;
   closeCite: any;
   /** 回车传递引用消息 */
   enterCiteMsg: any;
@@ -39,11 +38,9 @@ const Groupinputbox = (props: Iprops) => {
   const [imgUrls, setImgUrls] = useState<Array<string>>([]); // 表情图片
   const [IsCut, setIsCut] = useState<boolean>(false); // 是否截屏
   const [citeShow, setCiteShow] = useState<boolean>(false); // @展示
-  const [citePeople, setCitePeople] = useState<XTarget[]>([]); // @人员
-  const [optionVal, setOptionVal] = useState<any>();
 
   /** 引用展示 */
-  const citeShowText = (val: model.MsgSaveModel) => {
+  const citeShowText = (val: IMessage) => {
     return (
       <div className={'showTxtContent'}>
         <div className={'showText'}>{parseMsg(val)}</div>
@@ -55,8 +52,14 @@ const Groupinputbox = (props: Iprops) => {
   /** 艾特触发人员选择 */
   const onSelect = (e: any) => {
     setCiteShow(false);
-    setOptionVal(e);
-    document.getElementById('insterHtml')?.append(`@${e.children}`);
+    const insterHtml = document.getElementById('insterHtml');
+    if (insterHtml) {
+      const node = document.createElement('at');
+      node.id = e.id;
+      node.innerText = `@${e.name}`;
+      insterHtml.append(node);
+      node.focus();
+    }
   };
 
   /** 点击空白处取消 @ 弹窗 */
@@ -65,7 +68,7 @@ const Groupinputbox = (props: Iprops) => {
   });
 
   /** 统一处理返回参数 */
-  const parseMsg = (item: model.MsgSaveModel) => {
+  const parseMsg = (item: IMessage) => {
     switch (item.msgType) {
       case MessageType.Image: {
         const img: FileItemShare = parseAvatar(item.msgBody);
@@ -173,42 +176,17 @@ const Groupinputbox = (props: Iprops) => {
     const arrElement = Array.from(elementChild);
     if (arrElement.length > 0) {
       return arrElement.map((n) => {
-        if (n.nodeName == '#text' || n.nodeName == 'DIV') {
-          // 如果是文本
-          if (n.textContent.length > 2048) {
-            const newContent = n.textContent.substring(0, 2048);
-            return newContent;
-          } else {
-            // 判断是否存在艾特字符
-            const matches = n.textContent.indexOf('@') !== -1;
-            if (citeText && matches) {
-              // 引用加@走这一块
-              const newContent = `${n.textContent}$CITE[${filetrText(citeText)}]$FINDME[${
-                optionVal.key
-              }]`;
-              return newContent;
-            } else if (matches) {
-              // 单纯@走这里
-              const newContent = `${n.textContent}$FINDME[${optionVal.key}]`;
-              return newContent;
-            } else if (citeText) {
-              // 为引用类型走这里
-              const newContent = `${n.textContent}$CITE[${filetrText(citeText)}]`;
-              return newContent;
-            } else {
-              const newContent = `${n.textContent}`;
-              return newContent;
-            }
-          }
-        } else if (n.nodeName == 'IMG') {
-          switch (n.className) {
-            case 'cutImg':
-              return `$IMG[${n.src}]`;
-            default:
-              break;
-          }
+        let content = '';
+        if (n.nodeName == 'AT') {
+          content += `$FINDME[${n.id}]`;
         }
-        return n?.outerHTML;
+        if (citeText) {
+          content += `$CITE[${filetrText(citeText)}]`;
+        }
+        if (n.nodeName == 'IMG') {
+          return `$IMG[${n.src}]${content}`;
+        }
+        return `${n.textContent}${content}`;
       });
     }
     return [];
@@ -260,10 +238,6 @@ const Groupinputbox = (props: Iprops) => {
         return message.warning('不能发送空值');
       }
     } else if (e.key === '@' && props.chat.members.length > 0) {
-      const filterPeople = props.chat.members.filter(
-        (val: any) => val.id !== props.chat.userId,
-      );
-      setCitePeople(filterPeople);
       setCiteShow(true);
     }
   };
@@ -360,11 +334,23 @@ const Groupinputbox = (props: Iprops) => {
         </div>
         {/* @功能 */}
         <div className={'input_content'}>
-          {citePeople.length > 0 && (
+          {citeShow && (
             <PullDown
               style={{ display: `${!citeShow ? 'none' : 'block'}` }}
               pullDownRef={(ref: any) => ref && ref.focus()}
-              people={citePeople}
+              people={props.chat.members
+                .filter((i) => i.id != props.chat.userId)
+                .map((i) => {
+                  return {
+                    id: i.id,
+                    name: i.name,
+                    share: {
+                      name: i.name,
+                      typeName: i.typeName,
+                      avatar: parseAvatar(i.icon),
+                    },
+                  };
+                })}
               open={citeShow}
               onSelect={onSelect}
               onClose={() => setCiteShow(false)}
