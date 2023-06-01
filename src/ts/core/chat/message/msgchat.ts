@@ -3,6 +3,7 @@ import { IBelong } from '../../target/base/belong';
 import { IMessage, Message } from './message';
 import { IEntity, Entity, MessageType, TargetType, storeCollName } from '../../public';
 import { XTarget } from '@/ts/base/schema';
+import { findTextId } from '@/utils/common';
 // 空时间
 const nullTime = new Date('2022-07-01').getTime();
 // 消息变更推送
@@ -19,6 +20,8 @@ export type MsgChatData = {
   chatRemark: string;
   /** 是否置顶 */
   isToping: boolean;
+  /** 是否艾特我 */
+  isFindme: any;
   /** 会话未读消息数量 */
   noReadCount: number;
   /** 最后一次消息时间 */
@@ -94,16 +97,19 @@ export abstract class MsgChat<T extends schema.XEntity>
   extends Entity<T>
   implements IMsgChatT<T>
 {
+  findMe: any;
   constructor(
     _metadata: T,
     _labels: string[],
     _space?: IBelong,
     _belong?: schema.XTarget,
+    _isFindMe?: any,
   ) {
     super(_metadata);
     this.chatId = _metadata.id;
     this.space = _space || (this as unknown as IBelong);
     this._belong = _belong || this.space.metadata;
+    this.findMe = _isFindMe;
     this.chatdata = {
       noReadCount: 0,
       isToping: false,
@@ -111,6 +117,7 @@ export abstract class MsgChat<T extends schema.XEntity>
       chatRemark: _metadata.remark,
       chatName: _metadata.name,
       lastMsgTime: nullTime,
+      isFindme: _isFindMe,
       fullId: `${this._belong.id}-${_metadata.id}`,
     };
     this.labels = new List(_labels);
@@ -277,6 +284,7 @@ export abstract class MsgChat<T extends schema.XEntity>
   }
   receiveMessage(msg: model.MsgSaveModel): void {
     const imsg = new Message(msg, this);
+    // 撤回走这里
     if (imsg.msgType === MessageType.Recall) {
       this.messages
         .find((m) => {
@@ -284,6 +292,8 @@ export abstract class MsgChat<T extends schema.XEntity>
         })
         ?.recall();
     } else {
+      // 过滤掉@的消息内容
+      msg.msgBody = common.StringPako.inflate(msg.msgBody);
       this.messages.push(imsg);
     }
     if (!this.messageNotify) {
@@ -294,6 +304,7 @@ export abstract class MsgChat<T extends schema.XEntity>
     }
     this.chatdata.lastMsgTime = new Date().getTime();
     this.chatdata.lastMessage = msg;
+    this.chatdata.isFindme = findTextId(common.StringPako.inflate(msg.msgBody)); // 用来往对象中添加艾特值
     this.cache();
     this.messageNotify?.apply(this, [this.messages]);
   }
@@ -330,8 +341,9 @@ export class PersonMsgChat
     _labels: string[],
     _space?: IBelong,
     _belong?: XTarget,
+    _findMe?: boolean,
   ) {
-    super(_metadata, _labels, _space, _belong);
+    super(_metadata, _labels, _space, _belong, _findMe);
   }
   async loadMembers(_reload: boolean = false): Promise<schema.XTarget[]> {
     return [];

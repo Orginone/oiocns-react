@@ -5,6 +5,7 @@ import cls from './index.module.less';
 import { schema } from '@/ts/base';
 import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
+import { formatZhDate } from '@/utils/tools';
 interface IProps {
   entity: IEntity<schema.XEntity>;
   other?: any;
@@ -34,11 +35,23 @@ const Description: React.FC<IProps> = ({ entity, other, extra }: IProps) => {
         key={tkey}
         contentStyle={{ textAlign: 'left', color: '#606266' }}>
         <Descriptions.Item label="名称">
-          <TeamIcon share={entity.share} fontSize={22} />
-          <strong>{entity.name}</strong>
+          <Typography.Paragraph
+            copyable={{
+              text: entity.id,
+              tooltips: [entity.id, '复制成功'],
+            }}>
+            <TeamIcon share={entity.share} fontSize={22} />
+            <strong>{entity.name}</strong>
+          </Typography.Paragraph>
         </Descriptions.Item>
         <Descriptions.Item label="代码">
-          <Typography.Paragraph copyable>{entity.code}</Typography.Paragraph>
+          <Typography.Paragraph
+            copyable={{
+              text: entity.id,
+              tooltips: [entity.code, '复制成功'],
+            }}>
+            {entity.code}
+          </Typography.Paragraph>
         </Descriptions.Item>
         {other}
         {entity.metadata.belongId != entity.id && (
@@ -54,7 +67,7 @@ const Description: React.FC<IProps> = ({ entity, other, extra }: IProps) => {
           </Descriptions.Item>
         )}
         <Descriptions.Item label="创建时间">
-          {entity.metadata.createTime}
+          {formatZhDate(entity.metadata.createTime)}
         </Descriptions.Item>
         {entity.metadata.createUser != entity.metadata.updateUser && (
           <>
@@ -63,7 +76,7 @@ const Description: React.FC<IProps> = ({ entity, other, extra }: IProps) => {
               <strong>{entity.updater.name}</strong>
             </Descriptions.Item>
             <Descriptions.Item label="更新时间">
-              {entity.metadata.updateTime}
+              {formatZhDate(entity.metadata.updateTime)}
             </Descriptions.Item>
           </>
         )}

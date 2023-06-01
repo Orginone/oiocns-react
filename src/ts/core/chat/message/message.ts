@@ -63,6 +63,10 @@ export interface IMessage {
   allowEdit: boolean;
   /** 已读信息 */
   readedinfo: string;
+  /** 已读人员 */
+  readedIds: string[];
+  /** 未读人员信息 */
+  unreadInfo: model.ShareIcon[];
   /** 评论数 */
   comments: number;
   /** 消息撤回 */
@@ -115,19 +119,28 @@ export class Message implements IMessage {
     );
   }
   get readedinfo(): string {
-    const ids = this.labels.map((v) => v.userId);
-    const readedCount = ids.filter((v, i) => ids.indexOf(v) === i).length;
+    const ids = this.readedIds;
     if (this._chat.metadata.typeName === TargetType.Person) {
-      return readedCount === 1 ? '已读' : '未读';
+      return ids.length === 1 ? '已读' : '未读';
     }
     const mCount = this._chat.members.filter((i) => i.id != this.user.id).length || 1;
-    if (readedCount === mCount) {
+    if (ids.length === mCount) {
       return '全部已读';
     }
-    if (readedCount === 0) {
+    if (ids.length === 0) {
       return '全部未读';
     }
-    return mCount - readedCount + '人未读';
+    return mCount - ids.length + '人未读';
+  }
+  get readedIds(): string[] {
+    const ids = this.labels.map((v) => v.userId);
+    return ids.filter((id, i) => ids.indexOf(id) === i);
+  }
+  get unreadInfo(): model.ShareIcon[] {
+    const ids = this.readedIds;
+    return this._chat.members
+      .filter((m) => !ids.includes(m.id) && m.id != this.user.id)
+      .map((m) => this.user.findShareById(m.id));
   }
   get comments(): number {
     return this.labels.filter((v) => v.label != '已读').length;

@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "ESNext",
     "module": "ESNext",
     "moduleResolution": "Node",
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
@@ -28,7 +28,7 @@
     "typings/*.d.ts",
     "config/**/*",
     "vite.config.ts",
-    "mock/_createProductionServer.ts",
-    ],
+    "mock/_createProductionServer.ts"
+  ],
   "exclude": ["node_modules", "build", "dist", "**/*.js"]
 }

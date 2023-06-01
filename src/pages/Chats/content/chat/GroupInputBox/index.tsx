@@ -1,9 +1,22 @@
 import orgCtrl from '@/ts/controller';
 import { IconFont } from '@/components/IconFont';
-import { Button, message, Popover, Spin, Upload, UploadProps } from 'antd';
+import { Button, message, Popover, Spin, Upload, UploadProps, Image } from 'antd';
+import { CloseCircleFilled } from '@ant-design/icons';
 import React, { useEffect, useState } from 'react';
-import inputboxStyle from './index.module.less';
-import { IMsgChat, MessageType, TaskModel } from '@/ts/core';
+import { IMessage, IMsgChat, MessageType, TaskModel } from '@/ts/core';
+import { parseAvatar } from '@/ts/base';
+import { FileItemShare } from '@/ts/base/model';
+import { FileTypes } from '@/ts/core/public/consts';
+import { formatSize } from '@/ts/base/common';
+import PullDown from '@/pages/Chats/components/pullDown';
+import {
+  filetrText,
+  isShowLink,
+  handleCutImgSelect,
+  handleImgChoosed,
+} from '@/pages/Chats/config/common';
+import Cutting from '../../cutting';
+import './index.less';
 
 /**
  * @description: 输入区域
@@ -13,12 +26,125 @@ import { IMsgChat, MessageType, TaskModel } from '@/ts/core';
 interface Iprops {
   chat: IMsgChat;
   writeContent: any;
+  citeText: IMessage;
+  closeCite: any;
+  /** 回车传递引用消息 */
+  enterCiteMsg: any;
 }
 
 const Groupinputbox = (props: Iprops) => {
-  const { writeContent } = props;
+  const { writeContent, citeText, enterCiteMsg, closeCite } = props;
   const [task, setTask] = useState<TaskModel>();
   const [imgUrls, setImgUrls] = useState<Array<string>>([]); // 表情图片
+  const [IsCut, setIsCut] = useState<boolean>(false); // 是否截屏
+  const [citeShow, setCiteShow] = useState<boolean>(false); // @展示
+
+  /** 引用展示 */
+  const citeShowText = (val: IMessage) => {
+    return (
+      <div className={'showTxtContent'}>
+        <div className={'showText'}>{parseMsg(val)}</div>
+        <CloseCircleFilled onClick={() => closeCite('')} className={'closeIcon'} />
+      </div>
+    );
+  };
+
+  /** 艾特触发人员选择 */
+  const onSelect = (e: any) => {
+    setCiteShow(false);
+    const insterHtml = document.getElementById('insterHtml');
+    if (insterHtml) {
+      const node = document.createElement('at');
+      node.id = e.id;
+      node.innerText = `@${e.name}`;
+      insterHtml.append(node);
+      node.focus();
+    }
+  };
+
+  /** 点击空白处取消 @ 弹窗 */
+  window.addEventListener('click', () => {
+    setCiteShow(false);
+  });
+
+  /** 统一处理返回参数 */
+  const parseMsg = (item: IMessage) => {
+    switch (item.msgType) {
+      case MessageType.Image: {
+        const img: FileItemShare = parseAvatar(item.msgBody);
+        return (
+          <>
+            <div style={{ width: '40%' }}>
+              <Image src={img.thumbnail} preview={{ src: img.shareLink }} />
+            </div>
+          </>
+        );
+      }
+      case MessageType.File: {
+        const file: FileItemShare = parseAvatar(item.msgBody);
+        const showFileIcon: (fileName: string) => string = (fileName) => {
+          const parts = fileName.split('.');
+          const fileTypeStr: string = parts[parts.length - 1];
+          const iconName = FileTypes[fileTypeStr] ?? 'icon-weizhi';
+          return iconName;
+        };
+        return (
+          <>
+            <div className={'con_content_link'}></div>
+            <div className={'con_content_file'}>
+              <div>
+                <span>{file.name}</span>
+                <span>{formatSize(file.size ?? 0)}</span>
+              </div>
+              <IconFont type={showFileIcon(file.name)} />
+            </div>
+          </>
+        );
+      }
+      default: {
+        // 优化截图展示问题
+        if (item.msgBody.includes('$IMG')) {
+          let str = item.msgBody;
+          const matches = [...str.matchAll(/\$IMG\[([^\]]*)\]/g)];
+          // 获取消息包含的图片地址
+          const imgUrls = matches.map((match) => match[1]);
+          // 替换消息里 图片信息特殊字符
+          const willReplaceStr = matches.map((match) => match[0]);
+          willReplaceStr.forEach((strItem) => {
+            // str = str.replace(strItem, '图(' + (idx + 1) + ')');
+            str = str.replace(strItem, ' ');
+          });
+          // 垂直展示截图信息。把文字消息统一放在底部
+          return (
+            <>
+              <div className={`${'con_content_link'}`}></div>
+              <div className={`${'con_content_txt'}`}>
+                {imgUrls.map((url, idx) => (
+                  <Image src={url} key={idx} preview={{ src: url }} />
+                ))}
+                {str.trim() && <p style={{ whiteSpace: 'pre-wrap', margin: 0 }}>{str}</p>}
+              </div>
+            </>
+          );
+        }
+
+        return (
+          <>
+            <div className={`${'con_content_link'}`}></div>
+            {/* 设置文本为超链接时打开新页面 */}
+            {isShowLink(item.msgBody) ? (
+              item.msgBody
+            ) : (
+              <div
+                className={`${'con_content_txt'}`}
+                dangerouslySetInnerHTML={{ __html: filetrText(item) }}></div>
+            )}
+          </>
+        );
+      }
+    }
+  };
+
   /**
    * @description: 提交聊天内容
    * @return {*}
@@ -36,6 +162,7 @@ const Groupinputbox = (props: Iprops) => {
         await props.chat.sendMessage(MessageType.Text, massage);
       }
       insterHtml.innerHTML = '';
+      closeCite('');
     }
   };
 
@@ -45,33 +172,24 @@ const Groupinputbox = (props: Iprops) => {
    * @return {*}
    */
   const reCreatChatContent = (elementChild: NodeList | any[]): Array<string> => {
+    // 判断聊天格式
     const arrElement = Array.from(elementChild);
     if (arrElement.length > 0) {
       return arrElement.map((n) => {
-        if (n.nodeName == '#text') {
-          // 如果是文本
-          const newContent =
-            n.textContent.length > 2048
-              ? n.textContent.substring(0, 2048)
-              : n.textContent;
-          return newContent;
+        let content = '';
+        if (n.nodeName == 'AT') {
+          content += `$FINDME[${n.id}]`;
         }
-        return n?.outerHTML;
+        if (citeText) {
+          content += `$CITE[${filetrText(citeText)}]`;
+        }
+        if (n.nodeName == 'IMG') {
+          return `$IMG[${n.src}]${content}`;
+        }
+        return `${n.textContent}${content}`;
       });
     }
     return [];
-  };
-
-  /**
-   * @description: 创建img标签
-   * @param {string} url
-   * @return {*}
-   */
-  const handleImgChoosed = (url: string) => {
-    const img = document.createElement('img');
-    img.src = url;
-    img.className = `emoji`;
-    document.getElementById('insterHtml')?.append(img);
   };
 
   /**
@@ -105,18 +223,22 @@ const Groupinputbox = (props: Iprops) => {
     if (e.ctrlKey && e.keyCode == 13) {
       //用户点击了ctrl+enter触发
       const value = doc.innerHTML;
+      enterCiteMsg(citeText);
       if (!value?.includes('<div><br></div>')) {
         doc.innerHTML += '<div><br></div>';
       }
     } else if (e.keyCode == 13) {
       //用户点击了enter触发
       e.preventDefault(); // 阻止浏览器默认换行操作
+      enterCiteMsg(citeText);
       const value = doc.innerHTML.replaceAll('<div><br></div>', '');
       if (value) {
         submit();
       } else {
         return message.warning('不能发送空值');
       }
+    } else if (e.key === '@' && props.chat.members.length > 0) {
+      setCiteShow(true);
     }
   };
   /** 文件上传参数 */
@@ -160,75 +282,108 @@ const Groupinputbox = (props: Iprops) => {
 
   return (
     <Spin tip={getMessage()} spinning={task != undefined}>
-      <div className={inputboxStyle.group_input_wrap}>
-        <div className={inputboxStyle.icons_box}>
+      <div className={'group_input_wrap'}>
+        <div className={'icons_box'}>
           <div style={{ marginTop: '4px' }}>
             <Popover
               trigger="click"
               content={
-                <div className={inputboxStyle.qqface_wrap}>
+                <div className={'qqface_wrap'}>
                   {imgUrls.map((index) => {
                     return (
                       <div
-                        className={inputboxStyle.emoji_box}
+                        className={'emoji_box'}
                         key={index}
                         onClick={() => {
                           handleImgChoosed(index);
                         }}>
-                        <img className={inputboxStyle.emoji} src={`${index}`} alt="" />
+                        <img className={'emoji'} src={`${index}`} alt="" />
                       </div>
                     );
                   })}
                 </div>
               }>
-              <IconFont type={'icon-biaoqing'} className={inputboxStyle.icons_oneself} />
+              <IconFont type={'icon-biaoqing'} className={'icons_oneself'} />
             </Popover>
           </div>
-          {/* <AudioOutlined  /> */}
-
           <IconFont
-            className={inputboxStyle.icons_oneself}
+            className={'icons_oneself'}
             type={'icon-maikefeng'}
             onClick={() => {
               message.warning('功能暂未开放');
             }}
           />
           <Upload {...uploadProps}>
-            <IconFont className={inputboxStyle.icons_oneself} type={'icon-wenjian'} />
+            <IconFont className={'icons_oneself'} type={'icon-wenjian'} />
           </Upload>
           <IconFont
-            className={inputboxStyle.icons_oneself}
+            title="Ctrl+Alt+A 可触发截屏；选择截图区域后双击即可完成截图；Esc退出截屏"
+            className={'icons_oneself'}
             type={'icon-jietu'}
             onClick={() => {
-              message.warning('功能暂未开放');
+              setIsCut(true);
             }}
           />
           <IconFont
-            className={inputboxStyle.icons_oneself}
+            className={'icons_oneself'}
             type={'icon-shipin'}
             onClick={() => {
               message.warning('功能暂未开放');
             }}
           />
         </div>
-        <div className={inputboxStyle.input_content}>
+        {/* @功能 */}
+        <div className={'input_content'}>
+          {citeShow && (
+            <PullDown
+              style={{ display: `${!citeShow ? 'none' : 'block'}` }}
+              pullDownRef={(ref: any) => ref && ref.focus()}
+              people={props.chat.members
+                .filter((i) => i.id != props.chat.userId)
+                .map((i) => {
+                  return {
+                    id: i.id,
+                    name: i.name,
+                    share: {
+                      name: i.name,
+                      typeName: i.typeName,
+                      avatar: parseAvatar(i.icon),
+                    },
+                  };
+                })}
+              open={citeShow}
+              onSelect={onSelect}
+              onClose={() => setCiteShow(false)}
+            />
+          )}
           <div
             id="insterHtml"
-            className={inputboxStyle.textarea}
+            autoFocus={true}
+            ref={(ref) => ref && !citeShow && ref.focus()}
+            className={'textarea'}
             contentEditable="true"
             spellCheck="false"
             placeholder="请输入内容"
             onKeyDown={keyDown}></div>
-          <div className={inputboxStyle.send_box}>
-            <Button
-              type="primary"
-              style={{ color: '#fff', border: 'none' }}
-              onClick={() => submit()}>
-              发送
-            </Button>
-          </div>
+          {citeText && citeShowText(citeText)}
+        </div>
+        <div className={'send_box'}>
+          <Button
+            type="primary"
+            style={{ color: '#fff', border: 'none' }}
+            onClick={() => submit()}>
+            发送
+          </Button>
         </div>
       </div>
+      {/* 截图功能 */}
+      <Cutting
+        open={IsCut}
+        onClose={(file: any) => {
+          file && handleCutImgSelect(file);
+          setIsCut(false);
+        }}
+      />
     </Spin>
   );
 };

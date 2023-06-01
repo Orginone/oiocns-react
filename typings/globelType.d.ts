@@ -1,4 +1,5 @@
 import React from 'react';
+import { ICompany } from '@/ts/core';
 import { RouteConfig } from 'react-router-config';
 
 interface DataType {
@@ -50,6 +51,7 @@ interface MenuItemType {
   menus?: OperateMenuType[];
   children: MenuItemType[];
   parentMenu?: MenuItemType;
+  company?: ICompany;
   beforeLoad?: () => Promise<void>;
 }
 

@@ -124,6 +124,19 @@ const handleFormatDate = (timeStr: string) => {
   return formatDate(timeStr, 'H:mm');
 };
 
+/**
+ * 格式化时间
+ * @param source 时间
+ * @param format 格式化字符串
+ * @returns 格式化后的时间信息
+ */
+const formatZhDate = (
+  source: string | Date,
+  format: string = 'YYYY年MM月DD日 HH:mm:ss.ms',
+): string => {
+  return moment(source).format(format);
+};
+
 let count = 1;
 // key: 当前填写字符,key0:记录初始字符, hasKeys:已存在的key数组
 const getNewKeyWithString: any = (key: string, key0: string, hasKeys: string[]) => {
@@ -266,11 +279,24 @@ const findMenuItemByKey = (item: MenuItemType, key: string): MenuItemType | unde
   return undefined;
 };
 
+/** url下载 */
+const downloadByUrl = (url: string) => {
+  if (!url) {
+    return message.error('资源路径不存在，请重试！');
+  }
+  const DownA = document.createElement('a'); // 创建a标签
+  DownA.setAttribute('download', url); // download属性(为下载的文件起个名)
+  DownA.setAttribute('href', url); // href链接（文件的url地址）（如果是下载图片需要使用代理，不然图片不会是下载而是打开）
+  DownA.click(); // 自执行点击事件
+};
+
 export {
   dateFormat,
   debounce,
+  downloadByUrl,
   findAimObj,
   findMenuItemByKey,
+  formatZhDate,
   getNewKeyWithString,
   getUuid,
   handleFormatDate,
