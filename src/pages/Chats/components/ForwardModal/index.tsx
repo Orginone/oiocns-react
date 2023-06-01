@@ -5,7 +5,6 @@ import { ImSearch } from 'react-icons/im';
 import { MessageType } from '@/ts/core';
 import { FileItemShare, ResultType } from '@/ts/base/model';
 import orgCtrl from '@/ts/controller';
-import { filetrText, isShowLink } from '@/pages/Chats/config/common';
 import { formatSize } from '@/ts/base/common';
 import style from './index.module.less';
 

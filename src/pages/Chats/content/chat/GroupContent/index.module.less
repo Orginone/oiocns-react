@@ -62,7 +62,7 @@
       width: 35px;
     }
     img {
-      max-width: 150%;
+      max-width: 100%;
       max-height: 400px;
     }
     .con_content {
@@ -91,59 +91,25 @@
         }
       }
 
-      .con_content_file {
-        display: flex;
+      .con_content_cite_txt {
+        cursor: pointer;
         text-align: left;
-        width: 220px;
-        height: 80px;
-        background-color: #fffff7;
+        min-height: 30px;
         padding: 7px 10px;
-        margin: 0px 0px;
-        margin-top: -20px;
-        color: #3e5ed8;
+        margin-top: 4px;
+        color: black;
         border-radius: 6px;
         z-index: 1;
-        font-size: small;
-        word-wrap: break-word;
+        max-width: 300px;
         word-break: normal;
-        position: relative;
-
-        &_info {
-          display: flex;
-          flex-direction: column;
-          flex-grow: 1;
-          height: 100%;
-
-          &_label {
-            width: 140px;
-            flex-grow: 1;
-            padding-right: 10px;
-            display: -webkit-box;
-            text-overflow: ellipsis;
-            overflow: hidden;
-            -webkit-box-orient: vertical;
-            -webkit-line-clamp: 2;
-          }
-        }
-
-        &_Icon {
-          padding: 5px;
-          font-size: 50px;
-          background-color: aliceblue;
-        }
-
-        :global {
-          .ogo-btn-primary {
-            background-color: #89c6ff85;
-            border-color: #89c6ff85;
-            color: #3e5ed8;
-            box-shadow: none;
-            text-shadow: none;
-          }
-
-          .ogo-btn-primary:hover {
-            color: #f4f4ee;
-          }
+        font-size: 12px;
+        color: #8a8a8a;
+        box-shadow: inset 0 0 2px #dddddd;
+        background-color: #ebebeb;
+        .emoji {
+          width: 20px;
+          height: 20px;
+          margin: 5px;
         }
       }
     }

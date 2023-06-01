@@ -7,7 +7,6 @@ import { model, parseAvatar } from '@/ts/base';
 import { showChatTime } from '@/utils/tools';
 import orgCtrl from '@/ts/controller';
 import SuperMsgs from '@/ts/core/chat/message/supermsg';
-// import { filetrText, isShowLink, linkText } from '@/pages/Chats/config/common';
 import { formatSize } from '@/ts/base/common';
 import css from './index.module.less';
 
@@ -136,7 +135,7 @@ const Supervise: React.FC<IProps> = ({ belong }) => {
             ) : (
               <div
                 className={`${css.con_content_txt}`}
-                dangerouslySetInnerHTML={{ __html: filetrText(item) }}></div>
+                dangerouslySetInnerHTML={{ __html: item.msgBody }}></div>
             )}
           </>
         );

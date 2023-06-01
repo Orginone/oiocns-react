@@ -1,15 +1,14 @@
 import orgCtrl from '@/ts/controller';
 import { IconFont } from '@/components/IconFont';
-import { Button, message, Popover, Spin, Upload, UploadProps, Image } from 'antd';
+import { Button, message, Popover, Spin, Upload, UploadProps } from 'antd';
 import { CloseCircleFilled } from '@ant-design/icons';
 import React, { useEffect, useState } from 'react';
 import { IMessage, IMsgChat, MessageType, TaskModel } from '@/ts/core';
 import { parseAvatar } from '@/ts/base';
-import { FileItemShare } from '@/ts/base/model';
-import { formatSize } from '@/ts/base/common';
 import PullDown from '@/pages/Chats/components/pullDown';
 import Cutting from '../../cutting';
 import './index.less';
+import { parseCiteMsg } from '@/pages/Chats/components/parseMsg';
 
 /**
  * @description: 输入区域
@@ -36,25 +35,10 @@ const Groupinputbox = (props: Iprops) => {
   const citeShowText = (val: IMessage) => {
     return (
       <div className={'showTxtContent'}>
-        <div className={'showText'}>{parseMsg(val)}</div>
+        <div className={'showText'}>{parseCiteMsg(val)}</div>
         <CloseCircleFilled onClick={() => closeCite('')} className={'closeIcon'} />
       </div>
     );
-  };
-
-  /** 判断是否为超链接的格式 */
-  const isShowLink = (val: string) => {
-    const str = val;
-    //判断URL地址的正则表达式为:http(s)?://([\w-]+\.)+[\w-]+(/[\w- ./?%&=]*)?
-    //下面的代码中应用了转义字符"\"输出一个字符"/"
-    // eslint-disable-next-line no-useless-escape
-    const Expression = /http(s)?:\/\/([\w-]+\.)+[\w-]+(\/[\w- .\/?%&=]*)?/;
-    const objExp = new RegExp(Expression);
-    if (objExp.test(str) === true) {
-      return val;
-    } else {
-      return false;
-    }
   };
 
   /** 艾特触发人员选择 */
@@ -74,91 +58,6 @@ const Groupinputbox = (props: Iprops) => {
   window.addEventListener('click', () => {
     setCiteShow(false);
   });
-
-  /** 统一处理返回参数 */
-  const parseMsg = (item: IMessage) => {
-    switch (item.msgType) {
-      case MessageType.Image: {
-        const img: FileItemShare = parseAvatar(item.msgBody);
-        return (
-          <>
-            <div style={{ width: '40%' }}>
-              <Image src={img.thumbnail} preview={{ src: img.shareLink }} />
-            </div>
-          </>
-        );
-      }
-      case MessageType.Voice: {
-        if (!item.msgBody) {
-          return <span>无法解析音频</span>;
-        }
-        const bytes = JSON.parse(item.msgBody).bytes;
-        const blob = new Blob([new Uint8Array(bytes)], { type: 'audio/mpeg' });
-        const url = URL.createObjectURL(blob);
-        return (
-          <div>
-            <audio src={url} controls />
-          </div>
-        );
-      }
-      case MessageType.File: {
-        const file: FileItemShare = parseAvatar(item.msgBody);
-        return (
-          <>
-            <div className={'con_content_link'}></div>
-            <div className={'con_content_file'}>
-              <div>
-                <span>{file.name}</span>
-                <span>{formatSize(file.size ?? 0)}</span>
-              </div>
-              <IconFont type="icon-weizhi" />
-            </div>
-          </>
-        );
-      }
-      default: {
-        // 优化截图展示问题
-        if (item.msgBody.includes('$IMG')) {
-          let str = item.msgBody;
-          const matches = [...str.matchAll(/\$IMG\[([^\]]*)\]/g)];
-          // 获取消息包含的图片地址
-          const imgUrls = matches.map((match) => match[1]);
-          // 替换消息里 图片信息特殊字符
-          const willReplaceStr = matches.map((match) => match[0]);
-          willReplaceStr.forEach((strItem) => {
-            // str = str.replace(strItem, '图(' + (idx + 1) + ')');
-            str = str.replace(strItem, ' ');
-          });
-          // 垂直展示截图信息。把文字消息统一放在底部
-          return (
-            <>
-              <div className={`${'con_content_link'}`}></div>
-              <div className={`${'con_content_txt'}`}>
-                {imgUrls.map((url, idx) => (
-                  <Image src={url} key={idx} preview={{ src: url }} />
-                ))}
-                {str.trim() && <p style={{ whiteSpace: 'pre-wrap', margin: 0 }}>{str}</p>}
-              </div>
-            </>
-          );
-        }
-
-        return (
-          <>
-            <div className={`${'con_content_link'}`}></div>
-            {/* 设置文本为超链接时打开新页面 */}
-            {isShowLink(item.msgBody) ? (
-              item.msgBody
-            ) : (
-              <div
-                className={`${'con_content_txt'}`}
-                dangerouslySetInnerHTML={{ __html: item.msgBody }}></div>
-            )}
-          </>
-        );
-      }
-    }
-  };
 
   /**
    * @description: 提交聊天内容

@@ -1,17 +1,16 @@
 /* eslint-disable no-unused-vars */
-import { Button, Popover, Image, Spin, Badge } from 'antd';
+import { Button, Popover, Spin, Badge } from 'antd';
 import moment from 'moment';
 import React, { useEffect, useRef, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
 import Information from './information';
 import { showChatTime, downloadByUrl } from '@/utils/tools';
-import { FileItemShare } from '@/ts/base/model';
 import { IMessage, IMsgChat, MessageType } from '@/ts/core';
 import { parseAvatar } from '@/ts/base';
 import ForwardModal from '@/pages/Chats/components/ForwardModal';
-import { formatSize } from '@/ts/base/common';
 import css from './index.module.less';
+import { parseCiteMsg, parseMsg } from '@/pages/Chats/components/parseMsg';
 
 /**
  * @description: 聊天区域
@@ -74,136 +73,10 @@ const GroupContent = (props: Iprops) => {
     }
   };
 
-  /** 判断是否为超链接的格式 */
-  const isShowLink = (val: string) => {
-    const str = val;
-    //判断URL地址的正则表达式为:http(s)?://([\w-]+\.)+[\w-]+(/[\w- ./?%&=]*)?
-    //下面的代码中应用了转义字符"\"输出一个字符"/"
-    // eslint-disable-next-line no-useless-escape
-    const Expression = /http(s)?:\/\/([\w-]+\.)+[\w-]+(\/[\w- .\/?%&=]*)?/;
-    const objExp = new RegExp(Expression);
-    if (objExp.test(str) === true) {
-      return val;
-    } else {
-      return false;
-    }
-  };
-  /** 过滤非http链接字符 */
-  const linkText = (val: string) => {
-    const reg = /[\u4e00-\u9fa5]+/g;
-    const link = val.substring(val.indexOf('http'), val.length);
-    return (
-      <div className={`${css.con_content_a}`}>
-        <span className={`${css.con_content_span}`}>
-          {val?.substring(val.indexOf('http'), 0)}
-        </span>
-        <a
-          dangerouslySetInnerHTML={{ __html: link }}
-          href={val.replace(reg, '')}
-          target="_blank"
-          rel="noreferrer"></a>
-      </div>
-    );
-  };
   /** 转发消息 */
   const forward = (item: IMessage) => {
     setForwardOpen(true);
     setFormwardCode(item);
-  };
-
-  /**
-   * 显示消息
-   * @param msg 消息
-   */
-  const parseMsg = (item: IMessage, cite: boolean = false): any => {
-    switch (item.msgType) {
-      case MessageType.Image: {
-        const img: FileItemShare = parseAvatar(item.msgBody);
-        if (img && img.thumbnail) {
-          return (
-            <>
-              <div className={`${css.con_content_link}`}></div>
-              <div className={`${css.con_content_txt}`}>
-                <Image src={img.thumbnail} preview={{ src: img.shareLink }} />
-              </div>
-            </>
-          );
-        }
-        return <div className={`${css.con_content_txt}`}>消息异常</div>;
-      }
-      case MessageType.File: {
-        const file: FileItemShare = parseAvatar(item.msgBody);
-        return (
-          <div className={`${css.con_content_txt}`}>
-            <a href={file.shareLink} title="点击下载">
-              <div>
-                <b>{file.name}</b>
-              </div>
-              <div>{formatSize(file.size)}</div>
-            </a>
-          </div>
-        );
-      }
-      case MessageType.Voice: {
-        if (!item.msgBody) {
-          return <span>无法解析音频</span>;
-        }
-        const bytes = JSON.parse(item.msgBody).bytes;
-        const blob = new Blob([new Uint8Array(bytes)], { type: 'audio/mpeg' });
-        const url = URL.createObjectURL(blob);
-        return (
-          <div className={css.voiceStyle}>
-            <audio src={url} controls />
-          </div>
-        );
-      }
-      default: {
-        // 优化截图展示问题
-        if (item.msgBody.includes('$IMG')) {
-          let str = item.msgBody;
-          const matches = [...str.matchAll(/\$IMG\[([^\]]*)\]/g)];
-          // 获取消息包含的图片地址
-          const imgUrls = matches.map((match) => match[1]);
-          // 替换消息里 图片信息特殊字符
-          const willReplaceStr = matches.map((match) => match[0]);
-          willReplaceStr.forEach((strItem) => {
-            str = str.replace(strItem, ' ');
-          });
-          // 垂直展示截图信息。把文字消息统一放在底部
-          return (
-            <>
-              <div className={`${css.con_content_link}`}></div>
-              <div className={`${css.con_content_txt}`}>
-                {imgUrls.map((url, idx) => (
-                  <Image
-                    className={css.cut_img}
-                    src={url}
-                    key={idx}
-                    preview={{ src: url }}
-                  />
-                ))}
-                {str.trim() && <p style={{ whiteSpace: 'pre-wrap', margin: 0 }}>{str}</p>}
-              </div>
-            </>
-          );
-        }
-        // 默认文本展示
-        return (
-          <>
-            <div className={`${css.con_content_link}`}></div>
-            {/* 设置文本为超链接时打开新页面 */}
-            {isShowLink(item.msgBody) ? (
-              linkText(item.msgBody)
-            ) : (
-              <div
-                className={`${css.con_content_txt}`}
-                dangerouslySetInnerHTML={{ __html: item.msgBody }}></div>
-            )}
-            {item.cite && parseMsg(item.cite, true)}
-          </>
-        );
-      }
-    }
   };
 
   const viewMsg = (item: IMessage) => {
@@ -212,7 +85,10 @@ const GroupContent = (props: Iprops) => {
         <>
           <div className={`${css.con_content}`}>
             {props.chat.isBelongPerson ? (
-              <React.Fragment>{parseMsg(item)}</React.Fragment>
+              <React.Fragment>
+                {parseMsg(item)}
+                {item.cite && parseCiteMsg(item.cite)}
+              </React.Fragment>
             ) : (
               <>
                 <Badge
@@ -222,6 +98,7 @@ const GroupContent = (props: Iprops) => {
                   style={{ zIndex: 2 }}
                   offset={[-15, -12]}>
                   {parseMsg(item)}
+                  {item.cite && parseCiteMsg(item.cite)}
                 </Badge>
                 <div
                   className={`${css.information} ${
@@ -247,6 +124,7 @@ const GroupContent = (props: Iprops) => {
           <div className={`${css.con_content}`}>
             <div className={`${css.name}`}>{item.from.name}</div>
             {parseMsg(item)}
+            {item.cite && parseCiteMsg(item.cite)}
           </div>
         </>
       );
