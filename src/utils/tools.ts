@@ -280,9 +280,21 @@ const findMenuItemByKey = (item: MenuItemType, key: string): MenuItemType | unde
   return undefined;
 };
 
+/** url下载 */
+const downloadByUrl = (url: string) => {
+  if (!url) {
+    return message.error('资源路径不存在，请重试！');
+  }
+  const DownA = document.createElement('a'); // 创建a标签
+  DownA.setAttribute('download', url); // download属性(为下载的文件起个名)
+  DownA.setAttribute('href', url); // href链接（文件的url地址）（如果是下载图片需要使用代理，不然图片不会是下载而是打开）
+  DownA.click(); // 自执行点击事件
+};
+
 export {
   dateFormat,
   debounce,
+  downloadByUrl,
   findAimObj,
   findMenuItemByKey,
   formatZhDate,

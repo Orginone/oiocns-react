@@ -1,11 +1,19 @@
-import { Badge, Card, Empty, List, Tag } from 'antd';
-import React from 'react';
+import { Badge, Card, Empty, List, Tag, Checkbox } from 'antd';
+import { CheckboxChangeEvent } from 'antd/lib/checkbox';
+import React, { useEffect, useState } from 'react';
 import orgCtrl from '@/ts/controller';
 import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
 import * as im from 'react-icons/im';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
-import { IMsgChat, msgChatNotify } from '@/ts/core';
+import { IMsgChat, msgChatNotify, ICompany } from '@/ts/core';
 import { XTarget } from '@/ts/base/schema';
+import { orgAuth } from '@/ts/core/public/consts';
+import SuperMsgs from '@/ts/core/chat/message/supermsg';
+import { showChatTime } from '@/utils/tools';
+import { findTextId, showCiteName } from '@/utils/common';
+import { MessageType } from '@/ts/core';
+import css from './index.module.less';
+import { filetrText } from '../../config/common';
 
 /**
  * @description: 通讯录
@@ -15,10 +23,13 @@ import { XTarget } from '@/ts/base/schema';
 const Book: React.FC<any> = ({
   chats,
   filter,
+  belong,
 }: {
   chats: IMsgChat[];
   filter: string;
+  belong: ICompany;
 }) => {
+  const [isSupervise, setIsSupervise] = useState<boolean>(false); // 是否有超管权限
   const [msgKey] = useCtrlUpdate(msgChatNotify);
   if (chats === undefined) {
     chats = orgCtrl.chat.chats.filter((i) => i.isMyChat);
@@ -37,6 +48,48 @@ const Book: React.FC<any> = ({
       }
       return num;
     });
+
+  /**
+   * @description: 页面加载判断是否有超管权限
+   * @return {*}
+   */
+  useEffect(() => {
+    if (belong !== undefined) {
+      setIsSupervise(belong.hasAuthoritys([orgAuth.SuperAuthId]));
+    }
+  }, [belong]);
+
+  let selectMenus: string[] = [];
+  const selectChange = (e: CheckboxChangeEvent, chaId: string, superChatid: string[]) => {
+    if (e.target.checked) {
+      selectMenus.push(chaId);
+      const SuperSet = new Set(superChatid);
+      selectMenus = [...selectMenus, ...SuperSet];
+    } else {
+      const newSet = new Set(selectMenus);
+      const SuperSet = new Set(superChatid);
+      newSet.delete(chaId);
+      SuperSet.delete(chaId);
+      const newIdArr = [...newSet, ...SuperSet];
+      selectMenus = newIdArr;
+    }
+    SuperMsgs.getSuperChatIds(selectMenus);
+  };
+
+  const showMessage = (chat: IMsgChat) => {
+    const userText = filetrText(chat.chatdata.lastMessage);
+    const citeID = findTextId(chat.chatdata.lastMessage?.msgBody);
+    const citeName = showCiteName(citeID, chat.userId);
+
+    if (chat.chatdata.lastMessage) {
+      let text = '最新消息[' + showChatTime(chat.chatdata.lastMessage.createTime) + ']:';
+      if (chat.chatdata.lastMessage.msgType === MessageType.Text) {
+        return text + userText + citeName;
+      }
+      return text + '[' + chat.chatdata.lastMessage.msgType + ']';
+    }
+    return '简介信息:' + chat.chatdata.chatRemark;
+  };
 
   const loadChatOperation = (item: IMsgChat) => {
     const operates: any[] = [
@@ -118,37 +171,54 @@ const Book: React.FC<any> = ({
           dataSource={chats}
           renderItem={(item: IMsgChat) => {
             return (
-              <List.Item
-                title="双击打开"
-                style={{ cursor: 'pointer' }}
-                actions={loadChatOperation(item)}
-                onDoubleClick={() => {
-                  orgCtrl.currentKey = item.chatdata.fullId;
-                  orgCtrl.changCallback();
-                }}>
-                <List.Item.Meta
-                  avatar={
-                    <Badge count={item.chatdata.noReadCount} size="small">
-                      <TeamIcon share={item.share} size={40} fontSize={40} />
-                    </Badge>
-                  }
-                  title={
-                    <div>
-                      <span style={{ marginRight: 10 }}>{item.chatdata.chatName}</span>
-                      {item.chatdata.labels
-                        .filter((i) => i.length > 0)
-                        .map((label) => {
-                          return (
-                            <Tag key={label} color={label === '置顶' ? 'red' : 'success'}>
-                              {label}
-                            </Tag>
-                          );
-                        })}
-                    </div>
-                  }
-                  description={item.information}
-                />
-              </List.Item>
+              <div className={css.book_ul}>
+                {isSupervise ? (
+                  <Checkbox
+                    className={css.check}
+                    defaultChecked={SuperMsgs.chatIds.includes(item.chatId)}
+                    key={item.key}
+                    onChange={(e) => {
+                      selectChange(e, item.chatId, SuperMsgs.chatIds);
+                    }}
+                  />
+                ) : (
+                  ''
+                )}
+                <List.Item
+                  title="双击打开"
+                  style={{ cursor: 'pointer' }}
+                  actions={loadChatOperation(item)}
+                  onDoubleClick={() => {
+                    orgCtrl.currentKey = item.chatdata.fullId;
+                    orgCtrl.changCallback();
+                  }}>
+                  <List.Item.Meta
+                    avatar={
+                      <Badge count={item.chatdata.noReadCount} size="small">
+                        <TeamIcon share={item.share} size={40} fontSize={40} />
+                      </Badge>
+                    }
+                    title={
+                      <div>
+                        <span style={{ marginRight: 10 }}>{item.chatdata.chatName}</span>
+                        {item.chatdata.labels
+                          .filter((i) => i.length > 0)
+                          .map((label) => {
+                            return (
+                              <Tag
+                                key={label}
+                                color={label === '置顶' ? 'red' : 'success'}>
+                                {label}
+                              </Tag>
+                            );
+                          })}
+                      </div>
+                    }
+                    description={showMessage(item)}
+                    // description={item.information}
+                  />
+                </List.Item>
+              </div>
             );
           }}
         />
