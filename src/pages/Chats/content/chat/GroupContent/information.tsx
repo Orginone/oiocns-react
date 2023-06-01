@@ -5,6 +5,7 @@ import { Drawer, Tabs } from 'antd';
 import React, { useState } from 'react';
 import { showChatTime } from '@/utils/tools';
 import type { TabsProps } from 'antd';
+import orgCtrl from '@/ts/controller'
 
 const Information = ({ msg, onClose }: { msg: IMessage; onClose: Function }) => {
   const [tabsKey, setTabsKey] = useState<string>();
@@ -30,9 +31,12 @@ const Information = ({ msg, onClose }: { msg: IMessage; onClose: Function }) => 
   // 展示未读
   const unRead = () => {
     const unreadList = msg._chat.members?.filter((v) => {
+      console.log('成员1', orgCtrl.provider.user?.findShareById(v.id));
       if (msg.labels.length > 0) {
         return msg?.labels?.find((prop) => prop.userId !== v.id);
       } else {
+        console.log('成员', v);
+
         return v;
       }
     });
