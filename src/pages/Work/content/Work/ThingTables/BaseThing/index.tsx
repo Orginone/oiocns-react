@@ -2,7 +2,7 @@ import { XProperty } from '@/ts/base/schema';
 import React, { useEffect, useMemo, useState } from 'react';
 import { getColItem } from '../funs';
 import { defaultCol } from '../const';
-import { getScrollX } from '@/utils/common';
+import { getScrollX } from '@/utils';
 
 import {
   ParamsType,
