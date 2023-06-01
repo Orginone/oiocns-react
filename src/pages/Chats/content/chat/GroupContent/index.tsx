@@ -5,11 +5,21 @@ import React, { useEffect, useRef, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
 import Information from './information';
-import css from './index.module.less';
-import { showChatTime } from '@/utils/tools';
+import { showChatTime, downloadByUrl } from '@/utils/tools';
 import { FileItemShare } from '@/ts/base/model';
 import { IMessage, IMsgChat, MessageType } from '@/ts/core';
 import { parseAvatar } from '@/ts/base';
+import ForwardModal from '@/pages/Chats/components/ForwardModal';
+import { FileTypes } from '@/ts/core/public/consts';
+import { formatSize } from '@/ts/base/common';
+import { IconFont } from '@/components/IconFont';
+import {
+  filetrText,
+  isShowLink,
+  showCiteText,
+  linkText,
+} from '@/pages/Chats/config/common';
+import css from './index.module.less';
 
 /**
  * @description: 聊天区域
@@ -20,6 +30,10 @@ interface Iprops {
   chat: IMsgChat;
   filter: string;
   handleReWrites: Function;
+  /** 返回值，引用 */
+  citeText: any;
+  /** 回车设置引用消息 */
+  enterCiteMsg: IMessage;
 }
 
 const GroupContent = (props: Iprops) => {
@@ -30,6 +44,8 @@ const GroupContent = (props: Iprops) => {
   const [selectId, setSelectId] = useState<string>('');
   const body = useRef<HTMLDivElement>(null);
   const [beforescrollHeight, setBeforescrollHeight] = useState(0);
+  const [forwardOpen, setForwardOpen] = useState(false); // 设置转发打开窗口
+  const [formwardCode, setFormwardCode] = useState<IMessage>(); // 转发时用户
 
   useEffect(() => {
     props.chat.onMessage((ms) => {
@@ -65,6 +81,18 @@ const GroupContent = (props: Iprops) => {
       }
     }
   };
+
+  /** 引用*/
+  const cite = (item: IMessage) => {
+    props.citeText(item);
+  };
+
+  /** 转发消息 */
+  const forward = (item: IMessage) => {
+    setForwardOpen(true);
+    setFormwardCode(item);
+  };
+
   /**
    * 显示消息
    * @param msg 消息
@@ -76,7 +104,8 @@ const GroupContent = (props: Iprops) => {
         if (img && img.thumbnail) {
           return (
             <>
-              <div className={`${css.con_content_txt} ${css.con_content_img}`}>
+              <div className={`${css.con_content_link}`}></div>
+              <div className={`${css.con_content_txt}`}>
                 <Image src={img.thumbnail} preview={{ src: img.shareLink }} />
               </div>
             </>
@@ -84,26 +113,105 @@ const GroupContent = (props: Iprops) => {
         }
         return <div className={`${css.con_content_txt}`}>消息异常</div>;
       }
-      case MessageType.File:
-        return <div className={`${css.con_content_txt}`}>{item.msgTitle}</div>;
-      default:
+      case MessageType.File: {
+        const file: FileItemShare = parseAvatar(item.msgBody);
+        const showFileIcon: (fileName: string) => string = (fileName) => {
+          const parts = fileName.split('.');
+          const fileTypeStr: string = parts[parts.length - 1];
+          const iconName = FileTypes[fileTypeStr] ?? 'icon-weizhi';
+          return iconName;
+        };
         return (
           <>
-            <div
-              className={`${css.con_content_txt}`}
-              dangerouslySetInnerHTML={{ __html: item.msgBody }}></div>
+            <div className={`${css.con_content_link}`}></div>
+            <div className={`${css.con_content_file}`}>
+              <div className={css.con_content_file_info}>
+                <span className={css.con_content_file_info_label}>{file.name}</span>
+                <span className={css.con_content_file_info_value}>
+                  {formatSize(file.size ?? 0)}
+                </span>
+              </div>
+              <IconFont
+                className={css.con_content_file_Icon}
+                type={showFileIcon(file.name)}
+              />
+            </div>
           </>
         );
+      }
+      case MessageType.Voice: {
+        if (!item.msgBody) {
+          return <span>无法解析音频</span>;
+        }
+        const bytes = JSON.parse(item.msgBody).bytes;
+        const blob = new Blob([new Uint8Array(bytes)], { type: 'audio/mpeg' });
+        const url = URL.createObjectURL(blob);
+        return (
+          <div className={css.voiceStyle}>
+            <audio src={url} controls />
+          </div>
+        );
+      }
+      default: {
+        // 优化截图展示问题
+        if (item.msgBody.includes('$IMG')) {
+          let str = item.msgBody;
+          const matches = [...str.matchAll(/\$IMG\[([^\]]*)\]/g)];
+          // 获取消息包含的图片地址
+          const imgUrls = matches.map((match) => match[1]);
+          // 替换消息里 图片信息特殊字符
+          const willReplaceStr = matches.map((match) => match[0]);
+          willReplaceStr.forEach((strItem) => {
+            str = str.replace(strItem, ' ');
+          });
+          // 垂直展示截图信息。把文字消息统一放在底部
+          return (
+            <>
+              <div className={`${css.con_content_link}`}></div>
+              <div className={`${css.con_content_txt}`}>
+                {imgUrls.map((url, idx) => (
+                  <Image
+                    className={css.cut_img}
+                    src={url}
+                    key={idx}
+                    preview={{ src: url }}
+                  />
+                ))}
+                {str.trim() && <p style={{ whiteSpace: 'pre-wrap', margin: 0 }}>{str}</p>}
+              </div>
+            </>
+          );
+        }
+        // 默认文本展示
+        return (
+          <>
+            <div className={`${css.con_content_link}`}></div>
+            {/* 设置文本为超链接时打开新页面 */}
+            {isShowLink(item.msgBody) ? (
+              linkText(item.msgBody)
+            ) : (
+              <div
+                className={`${css.con_content_txt}`}
+                dangerouslySetInnerHTML={{ __html: filetrText(item) }}></div>
+            )}
+          </>
+        );
+      }
     }
   };
 
   const viewMsg = (item: IMessage) => {
+    const isCite = item.msgBody.includes('$CITE[');
     if (item.isMySend) {
       return (
         <>
           <div className={`${css.con_content}`}>
             {props.chat.isBelongPerson ? (
-              parseMsg(item)
+              <React.Fragment>
+                {parseMsg(item)}
+                {/* 引用消息的展示 */}
+                {isCite && showCiteText(item)}
+              </React.Fragment>
             ) : (
               <>
                 <Badge
@@ -113,6 +221,8 @@ const GroupContent = (props: Iprops) => {
                   style={{ zIndex: 2 }}
                   offset={[-15, -12]}>
                   {parseMsg(item)}
+                  {/* 引用消息的展示 */}
+                  {isCite && showCiteText(item)}
                 </Badge>
                 <div
                   className={`${css.information} ${
@@ -138,6 +248,7 @@ const GroupContent = (props: Iprops) => {
           <div className={`${css.con_content}`}>
             <div className={`${css.name}`}>{item.from.name}</div>
             {parseMsg(item)}
+            {isCite && showCiteText(item)}
           </div>
         </>
       );
@@ -179,7 +290,7 @@ const GroupContent = (props: Iprops) => {
             复制
           </Button>
         </CopyToClipboard>
-        <Button type="text" style={{ color: '#3e5ed8' }}>
+        <Button type="text" style={{ color: '#3e5ed8' }} onClick={() => forward(item)}>
           转发
         </Button>
         {item.isMySend && (
@@ -191,6 +302,20 @@ const GroupContent = (props: Iprops) => {
               onClose();
             }}>
             撤回
+          </Button>
+        )}
+        <Button type="text" style={{ color: '#3e5ed8' }} onClick={() => cite(item)}>
+          引用
+        </Button>
+        {['文件', '视频', '图片'].includes(item.msgType) && (
+          <Button
+            type="text"
+            onClick={() => {
+              const url = parseAvatar(item.msgBody).shareLink;
+              downloadByUrl(url);
+            }}
+            style={{ color: '#3e5ed8' }}>
+            下载
           </Button>
         )}
         <Button
@@ -259,6 +384,13 @@ const GroupContent = (props: Iprops) => {
         </div>
         {infoMsg && <Information msg={infoMsg} onClose={() => setInfoMsg(undefined)} />}
       </Spin>
+      {forwardOpen && (
+        <ForwardModal
+          visible={forwardOpen}
+          onCancel={() => setForwardOpen(false)}
+          formwardCode={formwardCode}
+        />
+      )}
     </div>
   );
 };
