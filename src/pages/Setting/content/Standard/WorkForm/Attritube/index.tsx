@@ -39,11 +39,19 @@ const Attritube = ({ current, modalType, setModalType }: IProps) => {
     if (!current.species.isInherited) {
       return [
         {
-          key: '修改特性',
+          key: '编辑特性',
           label: '编辑特性',
           onClick: () => {
             setSelectedItem(item);
-            setModalType('修改特性');
+            setModalType('编辑特性');
+          },
+        },
+        {
+          key: '配置特性',
+          label: '配置特性',
+          onClick: () => {
+            setSelectedItem(item);
+            setModalType('配置特性');
           },
         },
         {
@@ -91,9 +99,10 @@ const Attritube = ({ current, modalType, setModalType }: IProps) => {
         dataSource={current.attributes}
       />
       {/** 新增特性模态框 */}
-      {modalType.includes('新增特性') && (
+      {['新增特性', '编辑特性'].indexOf(modalType) && (
         <AttributeModal
           form={current}
+          current={modalType.includes('新增') ? undefined : selectedItem}
           open={modalType.includes('特性')}
           handleCancel={function (): void {
             setModalType('');
@@ -107,7 +116,7 @@ const Attritube = ({ current, modalType, setModalType }: IProps) => {
         />
       )}
       {/** 编辑特性模态框 */}
-      {modalType.includes('修改特性') && selectedItem && (
+      {modalType.includes('配置特性') && selectedItem && (
         <AttributeConfig
           attr={selectedItem}
           onChanged={formValuesChange}
