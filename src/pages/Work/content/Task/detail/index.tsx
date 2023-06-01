@@ -4,14 +4,12 @@ import orgCtrl from '@/ts/controller';
 import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
 import { ProFormInstance } from '@ant-design/pro-form';
 import { Button, Card, Collapse, Input, Tabs, TabsProps, Timeline } from 'antd';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { ImUndo2 } from 'react-icons/im';
 import cls from './index.module.less';
 import OioForm from '@/bizcomponents/FormDesign/OioForm';
-import { WorkNodeModel } from '@/ts/base/model';
 import { schema } from '@/ts/base';
 import { IWorkDefine } from '@/ts/core';
-const { Panel } = Collapse;
 
 export interface TaskDetailType {
   task: schema.XWorkTask;
@@ -23,29 +21,38 @@ export interface TaskDetailType {
 const Detail: React.FC<TaskDetailType> = ({ task, define, instance, onBack }) => {
   const formRef = useRef<ProFormInstance<any>>();
   const [comment, setComment] = useState<string>('');
-  const [nodes, setNodes] = useState<WorkNodeModel>();
   const [loading, setLoading] = useState<boolean>(false);
-  useEffect(() => {
-    setTimeout(async () => {
-      setNodes(await define.loadWorkNode());
-    }, 100);
-  }, []);
+
+  /** 加载主表 */
+  const loadHeadForms = (forms: any) => {
+    const content: React.JSX.Element[] = [];
+    Object.keys(forms?.formData || {}).forEach((id) => {
+      if (forms.formData[id].isHeader) {
+        content.push(
+          ...loadForm(
+            [JSON.parse(forms.formData[id].resourceData)],
+            true,
+            forms.headerData,
+          ),
+        );
+      }
+    });
+    return content;
+  };
 
   /** 加载表单 */
   const loadForm = (forms: schema.XForm[], disabled: boolean, data?: any) => {
     let content = [];
     for (let item of forms) {
       content.push(
-        <Panel header={item.name} key={item.id}>
-          <OioForm
-            key={item.id}
-            form={item}
-            define={define}
-            formRef={undefined}
-            fieldsValue={data}
-            disabled={disabled}
-          />
-        </Panel>,
+        <OioForm
+          key={item.id}
+          form={item}
+          define={define}
+          formRef={undefined}
+          fieldsValue={data}
+          disabled={disabled}
+        />,
       );
     }
     return content;
@@ -54,6 +61,7 @@ const Detail: React.FC<TaskDetailType> = ({ task, define, instance, onBack }) =>
   /** 加载时间条 */
   const loadTimeline = () => {
     if (instance) {
+      const data = JSON.parse(instance.data);
       return (
         <Timeline>
           <Timeline.Item key={'begin'} color={'green'}>
@@ -68,10 +76,7 @@ const Detail: React.FC<TaskDetailType> = ({ task, define, instance, onBack }) =>
                   {orgCtrl.provider.user?.findShareById(instance.createUser).name}
                 </div>
               </div>
-              <Collapse ghost>
-                {nodes?.forms &&
-                  loadForm(nodes?.forms, true, JSON.parse(instance.data).formData)}
-              </Collapse>
+              <Collapse ghost>{loadHeadForms(data.forms)}</Collapse>
             </Card>
           </Timeline.Item>
           {instance.tasks?.map((task, _index) => {
