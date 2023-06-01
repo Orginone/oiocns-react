@@ -16,6 +16,7 @@ import { ColTypes } from './config';
       // ),
       // );
  */
+
 // 获取表头配置
 const getColItem = (
   col: {
@@ -31,12 +32,13 @@ const getColItem = (
   let ColItem: ProColumns<any> = {
     title: name,
     key: id,
-    dataIndex: (colKey === 'attrId' ? attrId : code) ?? id,
+    dataIndex: (colKey === 'attrId' ? attrId : id) ?? id,
     width: width,
     valueType: ColTypes.get(valueType) as 'text',
     valueEnum: valueEnum as ProSchemaValueEnumObj,
     render(text: any, _record: any) {
-      const _key = colKey === 'attrId' ? attrId : code?.slice(1);
+      const _key = colKey === 'attrId' ? attrId : id;
+
       if (_key && _record?.EDIT_INFO?.[_key]) {
         return (
           <span style={{ color: '#154ad8' }} title={`修改前：${text}`}>

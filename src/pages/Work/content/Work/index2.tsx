@@ -1,14 +1,14 @@
 import { IWorkDefine, SpeciesType } from '@/ts/core';
 import { Button, Card, Input, Tabs, message } from 'antd';
 import orgCtrl from '@/ts/controller';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import cls from './index.module.less';
 import OioForm from '@/bizcomponents/FormDesign/OioForm';
 import { GroupMenuType } from '../../config/menuType';
-import { XForm, XProperty } from '@/ts/base/schema';
+import { XForm } from '@/ts/base/schema';
 // import BaseThing from './BaseThing';
 import ThingTable from './ThingTables/ThingTable';
-import { MakePropertysToAttrMap } from './ThingTables/funs';
+// import { MakePropertysToAttrMap } from './ThingTables/funs';
 // 卡片渲染
 interface IProps {
   current: IWorkDefine;
@@ -38,7 +38,6 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
   const [data, setData] = useState<any>({});
   // const [rows, setRows] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState<string>();
-  const [propertys, setPropertys] = useState<XProperty[]>([]);
   const [thingForms, setThingForms] = useState<XForm[]>([]);
   const [workForm, setWorkForm] = useState<XForm>();
   const [content, setContent] = useState<string>('');
@@ -57,13 +56,14 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
     }
 
     console.log('打印提交数据', submitData);
-    return;
+    // return;
     if (
       await current.createWorkInstance({
         hook: '',
         content: content,
         contentType: 'Text',
         title: current.name,
+        applyId: orgCtrl.provider.user!.id,
         defineId: current.id,
         data: JSON.stringify(submitData),
       })
@@ -88,27 +88,12 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
       if (!activeTab) {
         setActiveTab(thingForms[0].id);
       } else {
-        orgCtrl.work
-          .loadAttributes(activeTab, current.workItem.belongId)
-          .then((attributes) => {
-            setPropertys(
-              attributes
-                .filter((i) => i.linkPropertys && i.linkPropertys.length > 0)
-                .map((i) => {
-                  return { attrId: i.id, ...i.linkPropertys![0] };
-                }),
-            );
-          });
       }
     }
   }, [thingForms, activeTab]);
-  // const keyMap: Map<string, string> = useMemo(() => {
-  //   return MakePropertysToAttrMap(propertys);
-  // }, [propertys]);
 
   const handleTableChange = (tableID: string, data: any[], Json: string) => {
     const changeData: { [key: string]: any } = {};
-    const keyMap: Map<string, string> = MakePropertysToAttrMap(propertys);
     data.forEach((item) => {
       // 判断是否包含 修改数据
       const willsaveData = item?.EDIT_INFO ?? {};
@@ -118,10 +103,7 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
         if (['Id', 'Creater', 'Status', 'CreateTime', 'ModifiedTime'].includes(chidKey)) {
           return;
         }
-        OldchildMap[chidKey] = willsaveData[chidKey];
-        if (keyMap.has(chidKey)) {
-          childMap[keyMap.get(chidKey)!] = willsaveData[chidKey];
-        }
+        childMap[chidKey] = willsaveData[chidKey];
       });
       console.log('old', OldchildMap, 'NEW', childMap);
 
@@ -164,13 +146,11 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
               key: i.id,
               children: (
                 <ThingTable
-                  headerTitle={'实体类'}
                   toolBtnItems={['Add', 'EditMore', 'Select']}
                   dataSource={[]}
                   current={current}
-                  formInfo={i}
                   labels={[`S${activeTab}`]}
-                  propertys={propertys}
+                  form={i}
                   // setSelectedRows={setRows}
                   belongId={current.workItem.belongId}
                   onListChange={handleTableChange}

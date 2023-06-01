@@ -55,7 +55,6 @@ const BaseThing = <
   }, [props.dataSource, propertys, readonly]);
 
   useEffect(() => {
-    console.log('666', labels, getColumns);
     fetchData();
   }, [props.labels]);
   const fetchData = async (loadOptions: any = {}) => {
@@ -74,13 +73,11 @@ const BaseThing = <
     //   };
     // }
     const result = await kernel.anystore.loadThing<any>(belongId, request);
-    console.log('请求数据', belongId, labels, result.data);
     const { success, data } = result;
     if (success) {
       // return ;
       setShowData(
         data.data.map((properItem: any) => {
-          console.log('propertys', propertys, properItem.Propertys);
           const { Propertys: ProperData, ...rest } = properItem;
           let obj = { ...rest };
           for (const key in ProperData) {

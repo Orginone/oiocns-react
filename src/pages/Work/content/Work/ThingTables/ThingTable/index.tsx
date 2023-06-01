@@ -279,10 +279,11 @@ const ThingTable = <
               selectable
               labels={labels}
               current={current}
-              propertys={propertys}
+              // propertys={propertys}
               selectedKeys={thingList.map((v: { Id: string }) => v.Id)}
               onRowSelectChange={(_keys, rows) => setSelectedRows(rows)}
               belongId={belongId}
+              formInfo={formInfo}
             />
           </Modal>
         )}

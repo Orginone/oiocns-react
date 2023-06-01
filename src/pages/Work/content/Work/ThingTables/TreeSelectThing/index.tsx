@@ -5,6 +5,7 @@ import { XProperty } from '@/ts/base/schema';
 import cls from './index.module.less';
 import CustomTree from '@/components/CustomTree';
 import { buildThingTree } from './treequest';
+import orgCtrl from '@/ts/controller';
 interface PageProp {
   selectable?: boolean;
   selectedKeys?: string[];
@@ -12,10 +13,10 @@ interface PageProp {
     selectedRowKeys: React.Key[],
     selectedRows: { [key: string]: any }[],
   ) => void;
-  propertys: XProperty[];
   labels: any;
   current: any;
   belongId: any;
+  formInfo: any;
 }
 
 const SelectThing = <
@@ -26,15 +27,16 @@ const SelectThing = <
   props: ProTableProps<DataType, Params, ValueType> & PageProp,
 ) => {
   const {
-    // pageType = 'tree',
     selectable = false,
     onRowSelectChange,
     selectedKeys = [],
     current,
-    // belongId,
-    propertys,
+    belongId,
+    // formInfo,
     ...rest
   } = props;
+
+  const [propertys, setPropertys] = useState<XProperty[]>([]);
   const [treeData, setTreeData] = useState<any[]>([]);
   const [treeSelected, setTreeSelected] = useState<any>({});
   useEffect(() => {
@@ -56,7 +58,7 @@ const SelectThing = <
     // }),
   };
 
-  const handleSelect: any = (
+  const handleSelect: any = async (
     selectedKeys: string[],
     _info: {
       event: 'select';
@@ -66,8 +68,15 @@ const SelectThing = <
       nativeEvent: MouseEvent;
     },
   ) => {
+    let attributes = await orgCtrl.work.loadAttributes(_info.node.item.id, belongId);
     setTreeSelected(_info.node.item);
-    console.log('选择实体', selectedKeys, _info.node.item);
+    setPropertys(
+      attributes
+        .filter((i) => i.linkPropertys && i.linkPropertys.length > 0)
+        .map((i) => {
+          return { attrId: i.id, ...i.linkPropertys![0] };
+        }),
+    );
   };
   return (
     <div style={{ display: 'flex', height: '100%' }}>
@@ -83,10 +92,11 @@ const SelectThing = <
       <BaseThing
         rowSelection={selectable ? rowSelection : undefined}
         key={treeSelected?.id}
-        propertys={propertys}
         colKey={'propertyId'}
         readonly
         {...rest}
+        belongId={belongId}
+        propertys={propertys}
         labels={treeSelected?.id ? [`S${treeSelected.id}`] : undefined}
       />
     </div>
