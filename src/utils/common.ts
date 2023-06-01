@@ -63,3 +63,38 @@ export const filterOne = (dataList: any[], value: string, type: string[]) => {
   });
   return str;
 };
+/**
+ *  处理表格组件，添加字段展示宽度，文本溢出省略显示
+ * @param propsColumns 传入的表头
+ * @returns
+ */
+export const getScrollX = (propsColumns: { [key: string]: any }[]) => {
+  let scrollx = 0 as number;
+  const columnsRes = propsColumns.map((item) => {
+    const { dataIndex, title, width, key, fixed } = item;
+    const type = Object.prototype.toString.call(title);
+    let _width = 0 as number;
+    if (!width) {
+      switch (type) {
+        case '[object Object]':
+          _width = title.props.title.length * 14 + 20;
+          break;
+        case '[object String]':
+          _width = title.length * 14 + 20;
+          break;
+        default:
+          _width = width;
+      }
+    } else {
+      _width = width;
+    }
+    scrollx += _width;
+    return {
+      ...item,
+      key: key || dataIndex,
+      width: _width,
+      ellipsis: !fixed,
+    };
+  });
+  return { columnsRes, scrollx };
+};

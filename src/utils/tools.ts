@@ -17,11 +17,10 @@ const showMessage = (response: any) => {
 const debounce = (fun: any, delay?: number) => {
   let timer: any = '';
   let that = this;
-  return (args?: any) => {
-    let _args = args;
+  return (...args: any) => {
     clearTimeout(timer);
     timer = setTimeout(function () {
-      fun.call(that, _args);
+      fun.call(that, ...args);
     }, delay ?? 300);
   };
 };

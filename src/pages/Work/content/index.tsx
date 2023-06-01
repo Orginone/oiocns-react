@@ -2,7 +2,7 @@ import { MenuItemType } from 'typings/globelType';
 import React from 'react';
 import { GroupMenuType } from '../config/menuType';
 import TaskContent from './Task';
-import WorkContent from './Work';
+import WorkContent from './Work/index';
 import ItemConetnt from './Item';
 import { IWorkDefine } from '@/ts/core';
 

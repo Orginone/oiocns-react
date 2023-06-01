@@ -6,7 +6,10 @@ import cls from './index.module.less';
 import OioForm from '@/bizcomponents/FormDesign/OioForm';
 import { GroupMenuType } from '../../config/menuType';
 import { XForm, XProperty } from '@/ts/base/schema';
-import ThingTable from './ThingTable';
+// import BaseThing from './BaseThing';
+import ThingTable from './ThingTables/ThingTable';
+import { MakePropertysToAttrMap } from './ThingTables/funs';
+import { OperateType } from './ThingTables/const';
 // 卡片渲染
 interface IProps {
   current: IWorkDefine;
@@ -26,13 +29,17 @@ interface SubmitDataType {
     };
   };
 }
+
+// const dataMap = new Map();
 /**
  * 办事-业务流程--发起
  * @returns
  */
 const WorkStartDo: React.FC<IProps> = ({ current }) => {
   const [data, setData] = useState<any>({});
+  // const [rows, setRows] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState<string>();
+  const [propertys, setPropertys] = useState<XProperty[]>([]);
   const [thingForms, setThingForms] = useState<XForm[]>([]);
   const [workForm, setWorkForm] = useState<XForm>();
   const [content, setContent] = useState<string>('');
@@ -40,7 +47,6 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
     headerData: data,
     formData: {},
   });
-
   const submit = async () => {
     if (workForm) {
       submitData.headerData = data;
@@ -50,16 +56,16 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
         changeData: {},
       };
     }
-    console.log(submitData);
+
     if (
       await current.createWorkInstance({
         hook: '',
         content: content,
         contentType: 'Text',
         title: current.name,
-        applyId: orgCtrl.provider.user!.id,
         defineId: current.id,
         data: JSON.stringify(submitData),
+        applyId: '',
       })
     ) {
       message.success('发起成功!');
@@ -82,14 +88,39 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
       if (!activeTab) {
         setActiveTab(thingForms[0].id);
       } else {
+        orgCtrl.work
+          .loadAttributes(activeTab, current.workItem.belongId)
+          .then((attributes) => {
+            setPropertys(
+              attributes
+                .filter((i) => i.linkPropertys && i.linkPropertys.length > 0)
+                .map((i) => {
+                  return { attrId: i.id, ...i.linkPropertys![0] };
+                }),
+            );
+          });
       }
     }
   }, [thingForms, activeTab]);
 
   const handleTableChange = (tableID: string, data: any[], Json: string) => {
     const changeData: { [key: string]: any } = {};
+    const keyMap: Map<string, string> = MakePropertysToAttrMap(propertys);
     data.forEach((item) => {
-      changeData[item.Id] = item.EDIT_INFO || {};
+      // 判断是否包含 修改数据
+      const willsaveData = item?.EDIT_INFO ?? {};
+      const childMap: { [key: string]: any } = {};
+      const OldchildMap: { [key: string]: any } = {};
+      Object.keys(willsaveData).forEach((chidKey) => {
+        if (['Id', 'Creater', 'Status', 'CreateTime', 'ModifiedTime'].includes(chidKey)) {
+          return;
+        }
+        OldchildMap[chidKey] = willsaveData[chidKey];
+        if (keyMap.has(chidKey)) {
+          childMap[keyMap.get(chidKey)!] = willsaveData[chidKey];
+        }
+      });
+      changeData[item.Id] = childMap;
     });
     submitData.formData[tableID] = {
       isHeader: false,
@@ -128,9 +159,17 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
               key: i.id,
               children: (
                 <ThingTable
-                  form={i}
+                  toolBtnItems={[
+                    OperateType.Add,
+                    OperateType.EditMore,
+                    OperateType.Select,
+                  ]}
+                  dataSource={[]}
                   current={current}
+                  form={i}
                   labels={[`S${activeTab}`]}
+                  propertys={propertys}
+                  // setSelectedRows={setRows}
                   belongId={current.workItem.belongId}
                   onListChange={handleTableChange}
                 />
