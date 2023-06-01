@@ -137,7 +137,7 @@ const Design: React.FC<IProps> = ({ current }) => {
                   treeExpandedKeys: [propId],
                   onSelect: async (_, x) => {
                     await current.updateAttribute(
-                      { ...item, dictId: item.DictId },
+                      { ...item, dictId: item.dictId },
                       x.item,
                     );
                     setSelectedItem(item);
@@ -160,7 +160,7 @@ const Design: React.FC<IProps> = ({ current }) => {
 
   const reloadPropertyTree = () => {
     const propClasses: IPropClass[] = [];
-    for (const item of current.species?.current.space.species) {
+    for (const item of current.species.current.space.species) {
       switch (item.typeName) {
         case SpeciesType.Store:
           propClasses.push(item as IPropClass);

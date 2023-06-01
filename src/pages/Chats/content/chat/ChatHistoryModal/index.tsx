@@ -1,12 +1,11 @@
-import React, { useEffect, ChangeEvent, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Modal, Spin, Empty } from 'antd';
 import { animateScroll } from 'react-scroll';
 import SearchInput from '@/components/SearchInput';
 import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
 import { IMsgChat } from '@/ts/core';
 import { showChatTime } from '@/utils/tools';
-import { filterOne } from '@/utils/common';
-import { parseMsg } from '@/pages/Chats/components/pareMsg';
+import { parseMsg } from '@/pages/Chats/components/parseMsg';
 import ChatHistoryStyle from './index.module.less';
 
 interface Iprops {
@@ -61,8 +60,8 @@ const ChatHistoryModal: React.FC<Iprops> = ({ open, title, onCancel, chat }) => 
    * @description: 搜索事件
    * @return {*}
    */
-  const searchChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setMessages(filterOne(chat.messages, e.target.value, ['msgBody']));
+  const searchChange = (filter: string) => {
+    setMessages(chat.messages.filter((i) => i.msgBody.includes(filter)));
   };
 
   /**
@@ -73,7 +72,7 @@ const ChatHistoryModal: React.FC<Iprops> = ({ open, title, onCancel, chat }) => 
     <div className={`${ChatHistoryStyle.search}`}>
       <SearchInput
         onChange={(e) => {
-          searchChange(e);
+          searchChange(e.target.value);
         }}
       />
     </div>

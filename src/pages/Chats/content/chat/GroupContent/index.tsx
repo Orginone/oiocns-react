@@ -10,15 +10,7 @@ import { FileItemShare } from '@/ts/base/model';
 import { IMessage, IMsgChat, MessageType } from '@/ts/core';
 import { parseAvatar } from '@/ts/base';
 import ForwardModal from '@/pages/Chats/components/ForwardModal';
-import { FileTypes } from '@/ts/core/public/consts';
 import { formatSize } from '@/ts/base/common';
-import { IconFont } from '@/components/IconFont';
-import {
-  filetrText,
-  isShowLink,
-  showCiteText,
-  linkText,
-} from '@/pages/Chats/config/common';
 import css from './index.module.less';
 
 /**
@@ -82,11 +74,37 @@ const GroupContent = (props: Iprops) => {
     }
   };
 
-  /** 引用*/
-  const cite = (item: IMessage) => {
-    props.citeText(item);
+  /** 判断是否为超链接的格式 */
+  const isShowLink = (val: string) => {
+    const str = val;
+    //判断URL地址的正则表达式为:http(s)?://([\w-]+\.)+[\w-]+(/[\w- ./?%&=]*)?
+    //下面的代码中应用了转义字符"\"输出一个字符"/"
+    // eslint-disable-next-line no-useless-escape
+    const Expression = /http(s)?:\/\/([\w-]+\.)+[\w-]+(\/[\w- .\/?%&=]*)?/;
+    const objExp = new RegExp(Expression);
+    if (objExp.test(str) === true) {
+      return val;
+    } else {
+      return false;
+    }
   };
-
+  /** 过滤非http链接字符 */
+  const linkText = (val: string) => {
+    const reg = /[\u4e00-\u9fa5]+/g;
+    const link = val.substring(val.indexOf('http'), val.length);
+    return (
+      <div className={`${css.con_content_a}`}>
+        <span className={`${css.con_content_span}`}>
+          {val?.substring(val.indexOf('http'), 0)}
+        </span>
+        <a
+          dangerouslySetInnerHTML={{ __html: link }}
+          href={val.replace(reg, '')}
+          target="_blank"
+          rel="noreferrer"></a>
+      </div>
+    );
+  };
   /** 转发消息 */
   const forward = (item: IMessage) => {
     setForwardOpen(true);
@@ -97,7 +115,7 @@ const GroupContent = (props: Iprops) => {
    * 显示消息
    * @param msg 消息
    */
-  const parseMsg = (item: IMessage) => {
+  const parseMsg = (item: IMessage, cite: boolean = false): any => {
     switch (item.msgType) {
       case MessageType.Image: {
         const img: FileItemShare = parseAvatar(item.msgBody);
@@ -115,28 +133,15 @@ const GroupContent = (props: Iprops) => {
       }
       case MessageType.File: {
         const file: FileItemShare = parseAvatar(item.msgBody);
-        const showFileIcon: (fileName: string) => string = (fileName) => {
-          const parts = fileName.split('.');
-          const fileTypeStr: string = parts[parts.length - 1];
-          const iconName = FileTypes[fileTypeStr] ?? 'icon-weizhi';
-          return iconName;
-        };
         return (
-          <>
-            <div className={`${css.con_content_link}`}></div>
-            <div className={`${css.con_content_file}`}>
-              <div className={css.con_content_file_info}>
-                <span className={css.con_content_file_info_label}>{file.name}</span>
-                <span className={css.con_content_file_info_value}>
-                  {formatSize(file.size ?? 0)}
-                </span>
+          <div className={`${css.con_content_txt}`}>
+            <a href={file.shareLink} title="点击下载">
+              <div>
+                <b>{file.name}</b>
               </div>
-              <IconFont
-                className={css.con_content_file_Icon}
-                type={showFileIcon(file.name)}
-              />
-            </div>
-          </>
+              <div>{formatSize(file.size)}</div>
+            </a>
+          </div>
         );
       }
       case MessageType.Voice: {
@@ -192,8 +197,9 @@ const GroupContent = (props: Iprops) => {
             ) : (
               <div
                 className={`${css.con_content_txt}`}
-                dangerouslySetInnerHTML={{ __html: filetrText(item) }}></div>
+                dangerouslySetInnerHTML={{ __html: item.msgBody }}></div>
             )}
+            {item.cite && parseMsg(item.cite, true)}
           </>
         );
       }
@@ -201,17 +207,12 @@ const GroupContent = (props: Iprops) => {
   };
 
   const viewMsg = (item: IMessage) => {
-    const isCite = item.msgBody.includes('$CITE[');
     if (item.isMySend) {
       return (
         <>
           <div className={`${css.con_content}`}>
             {props.chat.isBelongPerson ? (
-              <React.Fragment>
-                {parseMsg(item)}
-                {/* 引用消息的展示 */}
-                {isCite && showCiteText(item)}
-              </React.Fragment>
+              <React.Fragment>{parseMsg(item)}</React.Fragment>
             ) : (
               <>
                 <Badge
@@ -221,8 +222,6 @@ const GroupContent = (props: Iprops) => {
                   style={{ zIndex: 2 }}
                   offset={[-15, -12]}>
                   {parseMsg(item)}
-                  {/* 引用消息的展示 */}
-                  {isCite && showCiteText(item)}
                 </Badge>
                 <div
                   className={`${css.information} ${
@@ -248,7 +247,6 @@ const GroupContent = (props: Iprops) => {
           <div className={`${css.con_content}`}>
             <div className={`${css.name}`}>{item.from.name}</div>
             {parseMsg(item)}
-            {isCite && showCiteText(item)}
           </div>
         </>
       );
@@ -304,7 +302,10 @@ const GroupContent = (props: Iprops) => {
             撤回
           </Button>
         )}
-        <Button type="text" style={{ color: '#3e5ed8' }} onClick={() => cite(item)}>
+        <Button
+          type="text"
+          style={{ color: '#3e5ed8' }}
+          onClick={() => props.citeText(item)}>
           引用
         </Button>
         {['文件', '视频', '图片'].includes(item.msgType) && (

@@ -1,15 +1,13 @@
 import React, { useEffect, useState, useRef, useMemo } from 'react';
 import { Spin, Image, Empty } from 'antd';
-import { IconFont } from '@/components/IconFont';
 import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
 import { FileItemShare } from '@/ts/base/model';
 import { ICompany, MessageType, ChatMessage, IMessage } from '@/ts/core';
 import { model, parseAvatar } from '@/ts/base';
 import { showChatTime } from '@/utils/tools';
 import orgCtrl from '@/ts/controller';
-import { FileTypes } from '@/ts/core/public/consts';
 import SuperMsgs from '@/ts/core/chat/message/supermsg';
-import { filetrText, isShowLink, linkText } from '@/pages/Chats/config/common';
+// import { filetrText, isShowLink, linkText } from '@/pages/Chats/config/common';
 import { formatSize } from '@/ts/base/common';
 import css from './index.module.less';
 
@@ -71,26 +69,15 @@ const Supervise: React.FC<IProps> = ({ belong }) => {
       }
       case MessageType.File: {
         const file: FileItemShare = parseAvatar(item.msgBody);
-        const showFileIcon: (fileName: string) => string = (fileName) => {
-          const parts = fileName.split('.');
-          const fileTypeStr: string = parts[parts.length - 1];
-          const iconName = FileTypes[fileTypeStr] ?? 'icon-weizhi';
-          return iconName;
-        };
         return (
           <>
-            <div className={`${css.con_content_link}`}></div>
-            <div className={`${css.con_content_file}`}>
-              <div className={css.con_content_file_info}>
-                {/* <span className={css.con_content_file_info_label}>{file.name}</span> */}
-                <span className={css.con_content_file_info_value}>
-                  {/* {formatSize(file.size ?? 0)} */}
-                </span>
-              </div>
-              {/* <IconFont
-                className={css.con_content_file_Icon}
-                type={showFileIcon(file.name)}
-              /> */}
+            <div className={`${css.con_content_txt}`}>
+              <a href={file.shareLink} title="点击下载">
+                <div>
+                  <b>{file.name}</b>
+                </div>
+                <div>{formatSize(file.size)}</div>
+              </a>
             </div>
           </>
         );

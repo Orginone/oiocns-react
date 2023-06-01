@@ -9,11 +9,7 @@ import { IMsgChat, msgChatNotify, ICompany } from '@/ts/core';
 import { XTarget } from '@/ts/base/schema';
 import { orgAuth } from '@/ts/core/public/consts';
 import SuperMsgs from '@/ts/core/chat/message/supermsg';
-import { showChatTime } from '@/utils/tools';
-import { findTextId, showCiteName } from '@/utils/common';
-import { MessageType } from '@/ts/core';
 import css from './index.module.less';
-import { filetrText } from '../../config/common';
 
 /**
  * @description: 通讯录
@@ -74,21 +70,6 @@ const Book: React.FC<any> = ({
       selectMenus = newIdArr;
     }
     SuperMsgs.getSuperChatIds(selectMenus);
-  };
-
-  const showMessage = (chat: IMsgChat) => {
-    const userText = filetrText(chat.chatdata.lastMessage);
-    const citeID = findTextId(chat.chatdata.lastMessage?.msgBody);
-    const citeName = showCiteName(citeID, chat.userId);
-
-    if (chat.chatdata.lastMessage) {
-      let text = '最新消息[' + showChatTime(chat.chatdata.lastMessage.createTime) + ']:';
-      if (chat.chatdata.lastMessage.msgType === MessageType.Text) {
-        return text + userText + citeName;
-      }
-      return text + '[' + chat.chatdata.lastMessage.msgType + ']';
-    }
-    return '简介信息:' + chat.chatdata.chatRemark;
   };
 
   const loadChatOperation = (item: IMsgChat) => {
@@ -162,6 +143,7 @@ const Book: React.FC<any> = ({
     }
     return operates;
   };
+
   return (
     <Card key={msgKey}>
       {chats.length > 0 && (
@@ -214,8 +196,14 @@ const Book: React.FC<any> = ({
                           })}
                       </div>
                     }
-                    description={showMessage(item)}
-                    // description={item.information}
+                    description={
+                      <>
+                        {item.chatdata.mentionMe && (
+                          <span style={{ color: 'red' }}>[有人@我]</span>
+                        )}
+                        <span>{item.information}</span>
+                      </>
+                    }
                   />
                 </List.Item>
               </div>

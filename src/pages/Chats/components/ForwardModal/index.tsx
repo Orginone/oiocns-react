@@ -4,12 +4,9 @@ import { common, kernel, model, parseAvatar } from '@/ts/base';
 import { ImSearch } from 'react-icons/im';
 import { MessageType } from '@/ts/core';
 import { FileItemShare, ResultType } from '@/ts/base/model';
-import { FileTypes } from '@/ts/core/public/consts';
-import { IconFont } from '@/components/IconFont';
 import orgCtrl from '@/ts/controller';
 import { filetrText, isShowLink } from '@/pages/Chats/config/common';
 import { formatSize } from '@/ts/base/common';
-import { parseMsg } from '@/pages/Chats/components/pareMsg';
 import style from './index.module.less';
 
 interface ModalPageProps {
@@ -92,27 +89,15 @@ const ForwardModal: React.FC<ModalPageProps> = (props) => {
       }
       case MessageType.File: {
         const file: FileItemShare = parseAvatar(item.msgBody);
-        const showFileIcon: (fileName: string) => string = (fileName) => {
-          const parts = fileName.split('.');
-          const fileTypeStr: string = parts[parts.length - 1];
-          const iconName = FileTypes[fileTypeStr] ?? 'icon-weizhi';
-          return iconName;
-        };
         return (
           <>
-            <div className={style.fileContent} style={{ marginTop: '10px' }}>
-              <div className={style.fileContent_text}>
-                {/* 文件的名称 */}
-                <span className={style.fileContent_Text_name}>{file.name}</span>
-                <span>
-                  {/* 文件的大小 */}
-                  {formatSize(file.size ?? 0)}
-                </span>
-              </div>
-              <IconFont
-                type={showFileIcon(file.name)}
-                className={style.fileContent_Text_icon}
-              />
+            <div className={`${style.con_content_txt}`}>
+              <a href={file.shareLink} title="点击下载">
+                <div>
+                  <b>{file.name}</b>
+                </div>
+                <div>{formatSize(file.size)}</div>
+              </a>
             </div>
           </>
         );

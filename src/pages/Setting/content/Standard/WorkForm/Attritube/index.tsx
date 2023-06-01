@@ -99,7 +99,7 @@ const Attritube = ({ current, modalType, setModalType }: IProps) => {
         dataSource={current.attributes}
       />
       {/** 新增特性模态框 */}
-      {['新增特性', '编辑特性'].indexOf(modalType) && (
+      {['新增特性', '编辑特性'].includes(modalType) && (
         <AttributeModal
           form={current}
           current={modalType.includes('新增') ? undefined : selectedItem}

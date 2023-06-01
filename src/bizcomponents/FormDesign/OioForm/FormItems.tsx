@@ -215,7 +215,7 @@ const OioFormItem = ({ item, belong, disabled, noRule }: IProps) => {
     case 'dict':
       return (
         <ProFormDict
-          dictId={rule.dictId}
+          dictId={item.dictId}
           name={item.id}
           label={item.name}
           rules={rules}

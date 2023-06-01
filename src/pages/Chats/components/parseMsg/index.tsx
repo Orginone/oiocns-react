@@ -3,10 +3,8 @@ import { Image } from 'antd';
 import { MessageType, IMessage } from '@/ts/core';
 import { FileItemShare } from '@/ts/base/model';
 import { parseAvatar } from '@/ts/base';
-import { FileTypes } from '@/ts/core/public/consts';
 import { formatSize } from '@/ts/base/common';
 import { filetrText, isShowLink, linkText } from '@/pages/Chats/config/common';
-import { IconFont } from '@/components/IconFont';
 import styles from './index.module.less';
 
 export const parseMsg = (item: IMessage) => {
@@ -27,26 +25,15 @@ export const parseMsg = (item: IMessage) => {
     }
     case MessageType.File: {
       const file: FileItemShare = parseAvatar(item.msgBody);
-      const showFileIcon: (fileName: string) => string = (fileName) => {
-        const parts = fileName.split('.');
-        const fileTypeStr: string = parts[parts.length - 1];
-        const iconName = FileTypes[fileTypeStr] ?? 'icon-weizhi';
-        return iconName;
-      };
       return (
         <>
-          <div className={`${styles.con_content_link}`}></div>
-          <div className={`${styles.con_content_file}`}>
-            <div className={styles.con_content_file_info}>
-              <span className={styles.con_content_file_info_label}>{file.name}</span>
-              <span className={styles.con_content_file_info_value}>
-                {formatSize(file.size ?? 0)}
-              </span>
-            </div>
-            <IconFont
-              className={styles.con_content_file_Icon}
-              type={showFileIcon(file.name)}
-            />
+          <div className={`${styles.con_content_txt}`}>
+            <a href={file.shareLink} title="点击下载">
+              <div>
+                <b>{file.name}</b>
+              </div>
+              <div>{formatSize(file.size)}</div>
+            </a>
           </div>
         </>
       );

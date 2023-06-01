@@ -6,15 +6,8 @@ import React, { useEffect, useState } from 'react';
 import { IMessage, IMsgChat, MessageType, TaskModel } from '@/ts/core';
 import { parseAvatar } from '@/ts/base';
 import { FileItemShare } from '@/ts/base/model';
-import { FileTypes } from '@/ts/core/public/consts';
 import { formatSize } from '@/ts/base/common';
 import PullDown from '@/pages/Chats/components/pullDown';
-import {
-  filetrText,
-  isShowLink,
-  handleCutImgSelect,
-  handleImgChoosed,
-} from '@/pages/Chats/config/common';
 import Cutting from '../../cutting';
 import './index.less';
 
@@ -26,7 +19,7 @@ import './index.less';
 interface Iprops {
   chat: IMsgChat;
   writeContent: any;
-  citeText: IMessage;
+  citeText: IMessage | undefined;
   closeCite: any;
   /** 回车传递引用消息 */
   enterCiteMsg: any;
@@ -49,6 +42,21 @@ const Groupinputbox = (props: Iprops) => {
     );
   };
 
+  /** 判断是否为超链接的格式 */
+  const isShowLink = (val: string) => {
+    const str = val;
+    //判断URL地址的正则表达式为:http(s)?://([\w-]+\.)+[\w-]+(/[\w- ./?%&=]*)?
+    //下面的代码中应用了转义字符"\"输出一个字符"/"
+    // eslint-disable-next-line no-useless-escape
+    const Expression = /http(s)?:\/\/([\w-]+\.)+[\w-]+(\/[\w- .\/?%&=]*)?/;
+    const objExp = new RegExp(Expression);
+    if (objExp.test(str) === true) {
+      return val;
+    } else {
+      return false;
+    }
+  };
+
   /** 艾特触发人员选择 */
   const onSelect = (e: any) => {
     setCiteShow(false);
@@ -56,7 +64,7 @@ const Groupinputbox = (props: Iprops) => {
     if (insterHtml) {
       const node = document.createElement('at');
       node.id = e.id;
-      node.innerText = `@${e.name}`;
+      node.innerText = `${e.name}`;
       insterHtml.append(node);
       node.focus();
     }
@@ -80,14 +88,21 @@ const Groupinputbox = (props: Iprops) => {
           </>
         );
       }
+      case MessageType.Voice: {
+        if (!item.msgBody) {
+          return <span>无法解析音频</span>;
+        }
+        const bytes = JSON.parse(item.msgBody).bytes;
+        const blob = new Blob([new Uint8Array(bytes)], { type: 'audio/mpeg' });
+        const url = URL.createObjectURL(blob);
+        return (
+          <div>
+            <audio src={url} controls />
+          </div>
+        );
+      }
       case MessageType.File: {
         const file: FileItemShare = parseAvatar(item.msgBody);
-        const showFileIcon: (fileName: string) => string = (fileName) => {
-          const parts = fileName.split('.');
-          const fileTypeStr: string = parts[parts.length - 1];
-          const iconName = FileTypes[fileTypeStr] ?? 'icon-weizhi';
-          return iconName;
-        };
         return (
           <>
             <div className={'con_content_link'}></div>
@@ -96,7 +111,7 @@ const Groupinputbox = (props: Iprops) => {
                 <span>{file.name}</span>
                 <span>{formatSize(file.size ?? 0)}</span>
               </div>
-              <IconFont type={showFileIcon(file.name)} />
+              <IconFont type="icon-weizhi" />
             </div>
           </>
         );
@@ -137,7 +152,7 @@ const Groupinputbox = (props: Iprops) => {
             ) : (
               <div
                 className={`${'con_content_txt'}`}
-                dangerouslySetInnerHTML={{ __html: filetrText(item) }}></div>
+                dangerouslySetInnerHTML={{ __html: item.msgBody }}></div>
             )}
           </>
         );
@@ -152,14 +167,15 @@ const Groupinputbox = (props: Iprops) => {
   const submit = async () => {
     const insterHtml = document.getElementById('insterHtml');
     if (insterHtml != null) {
+      const mentions: string[] = [];
       const text: any =
         insterHtml.childNodes.length > 0
-          ? reCreatChatContent(insterHtml.childNodes ?? [])
+          ? reCreatChatContent(insterHtml.childNodes ?? [], mentions)
           : [insterHtml.innerHTML];
       let massage = text.join('').trim();
       if (massage.length > 0) {
         insterHtml.innerHTML = '发送中,请稍后...';
-        await props.chat.sendMessage(MessageType.Text, massage);
+        await props.chat.sendMessage(MessageType.Text, massage, mentions, citeText);
       }
       insterHtml.innerHTML = '';
       closeCite('');
@@ -171,22 +187,21 @@ const Groupinputbox = (props: Iprops) => {
    * @param {NodeList} elementChild
    * @return {*}
    */
-  const reCreatChatContent = (elementChild: NodeList | any[]): Array<string> => {
+  const reCreatChatContent = (
+    elementChild: NodeList | any[],
+    mentions: string[],
+  ): Array<string> => {
     // 判断聊天格式
     const arrElement = Array.from(elementChild);
     if (arrElement.length > 0) {
       return arrElement.map((n) => {
-        let content = '';
         if (n.nodeName == 'AT') {
-          content += `$FINDME[${n.id}]`;
-        }
-        if (citeText) {
-          content += `$CITE[${filetrText(citeText)}]`;
+          mentions.push(n.id);
         }
         if (n.nodeName == 'IMG') {
-          return `$IMG[${n.src}]${content}`;
+          return `$IMG[${n.src}]`;
         }
-        return `${n.textContent}${content}`;
+        return `${n.textContent}`;
       });
     }
     return [];
@@ -238,8 +253,26 @@ const Groupinputbox = (props: Iprops) => {
         return message.warning('不能发送空值');
       }
     } else if (e.key === '@' && props.chat.members.length > 0) {
+      doc.innerHTML += '@';
       setCiteShow(true);
     }
+  };
+  /** 截屏后放入输入区发出消息 */
+  const handleCutImgSelect = async (result: any) => {
+    const img = document.createElement('img');
+    img.src = result.shareInfo().shareLink;
+    img.className = `cutImg`;
+    img.style.display = 'block';
+    img.style.marginBottom = '10px';
+    document.getElementById('insterHtml')?.append(img);
+  };
+
+  /** 创建img标签 */
+  const handleImgChoosed = (url: string) => {
+    const img = document.createElement('img');
+    img.src = url;
+    img.className = `emoji`;
+    document.getElementById('insterHtml')?.append(img);
   };
   /** 文件上传参数 */
   const uploadProps: UploadProps = {
@@ -263,6 +296,7 @@ const Groupinputbox = (props: Iprops) => {
           await props.chat.sendMessage(
             result.metadata.thumbnail ? MessageType.Image : MessageType.File,
             JSON.stringify(result.shareInfo()),
+            [],
           );
         }
       }

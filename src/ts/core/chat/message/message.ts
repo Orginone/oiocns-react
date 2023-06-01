@@ -45,6 +45,10 @@ export interface IMessage {
   isMySend: boolean;
   /** 是否已读 */
   isReaded: boolean;
+  /** 提及 */
+  mentions: string[];
+  /** 引用 */
+  cite: IMessage | undefined;
   /** 标签信息 */
   labels: IMessageLabel[];
   /** 消息类型 */
@@ -82,12 +86,24 @@ export class Message implements IMessage {
     if (_metadata.msgType === 'recall') {
       _metadata.msgType = MessageType.Recall;
     }
-    this._msgBody = common.StringPako.inflate(_metadata.msgBody);
+    const txt = common.StringPako.inflate(_metadata.msgBody);
+    if (txt.startsWith('[obj]')) {
+      const content = JSON.parse(txt.substring(5));
+      this._msgBody = content.body;
+      this.mentions = content.mentions;
+      if (content.cite) {
+        this.cite = new Message(content.cite, _chat);
+      }
+    } else {
+      this._msgBody = txt;
+    }
     this.metadata = _metadata;
     _metadata.tags?.map((tag) => {
       this.labels.push(new MessageLabel(tag, this.user));
     });
   }
+  cite: IMessage | undefined;
+  mentions: string[] = [];
   user: IPerson;
   _chat: IMsgChat;
   _msgBody: string;
@@ -167,6 +183,8 @@ export class Message implements IMessage {
       case MessageType.Text:
       case MessageType.Recall:
         return `${header}[消息]:${this.msgBody.substring(0, 50)}`;
+      case MessageType.Voice:
+        return `${header}[${MessageType.Voice}]`;
     }
     const file: model.FileItemShare = parseAvatar(this.msgBody);
     if (file) {

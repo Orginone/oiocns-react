@@ -3,7 +3,6 @@ import { IBelong } from '../../target/base/belong';
 import { IMessage, Message } from './message';
 import { IEntity, Entity, MessageType, TargetType, storeCollName } from '../../public';
 import { XTarget } from '@/ts/base/schema';
-import { findTextId } from '@/utils/common';
 // 空时间
 const nullTime = new Date('2022-07-01').getTime();
 // 消息变更推送
@@ -20,14 +19,14 @@ export type MsgChatData = {
   chatRemark: string;
   /** 是否置顶 */
   isToping: boolean;
-  /** 是否艾特我 */
-  isFindme: any;
   /** 会话未读消息数量 */
   noReadCount: number;
   /** 最后一次消息时间 */
   lastMsgTime: number;
   /** 最新消息 */
   lastMessage?: model.MsgSaveModel;
+  /** 提及我 */
+  mentionMe: boolean;
 };
 
 // 消息类会话接口
@@ -73,7 +72,12 @@ interface IChat {
   /** 加载成员用户实体 */
   loadMembers(reload?: boolean): Promise<schema.XTarget[]>;
   /** 向会话发送消息 */
-  sendMessage(type: MessageType, text: string): Promise<boolean>;
+  sendMessage(
+    type: MessageType,
+    text: string,
+    mentions: string[],
+    cite?: IMessage,
+  ): Promise<boolean>;
   /** 撤回消息 */
   recallMessage(id: string): Promise<void>;
   /** 标记消息 */
@@ -117,7 +121,7 @@ export abstract class MsgChat<T extends schema.XEntity>
       chatRemark: _metadata.remark,
       chatName: _metadata.name,
       lastMsgTime: nullTime,
-      isFindme: _isFindMe,
+      mentionMe: false,
       fullId: `${this._belong.id}-${_metadata.id}`,
     };
     this.labels = new List(_labels);
@@ -173,6 +177,7 @@ export abstract class MsgChat<T extends schema.XEntity>
         if (ids.length > 0) {
           this.tagMessage(ids, ['已读']);
         }
+        this.chatdata.mentionMe = false;
         this.chatdata.noReadCount = 0;
         msgChatNotify.changCallback();
         this.cache();
@@ -225,12 +230,27 @@ export abstract class MsgChat<T extends schema.XEntity>
     return 0;
   }
   abstract loadMembers(reload?: boolean): Promise<schema.XTarget[]>;
-  async sendMessage(type: MessageType, text: string): Promise<boolean> {
+  async sendMessage(
+    type: MessageType,
+    text: string,
+    mentions: string[],
+    cite?: IMessage,
+  ): Promise<boolean> {
+    if (cite) {
+      cite.metadata.tags = [];
+    }
     let res = await kernel.createImMsg({
       msgType: type,
       toId: this.chatId,
       belongId: this.belongId,
-      msgBody: common.StringPako.deflate(text),
+      msgBody: common.StringPako.deflate(
+        '[obj]' +
+          JSON.stringify({
+            body: text,
+            mentions: mentions,
+            cite: cite?.metadata,
+          }),
+      ),
     });
     return res.success;
   }
@@ -292,19 +312,19 @@ export abstract class MsgChat<T extends schema.XEntity>
         })
         ?.recall();
     } else {
-      // 过滤掉@的消息内容
-      msg.msgBody = common.StringPako.inflate(msg.msgBody);
       this.messages.push(imsg);
     }
     if (!this.messageNotify) {
       this.chatdata.noReadCount += 1;
+      if (!this.chatdata.mentionMe) {
+        this.chatdata.mentionMe = imsg.mentions.includes(this.userId);
+      }
       msgChatNotify.changCallback();
     } else if (!imsg.isMySend) {
       this.tagMessage([imsg.id], ['已读']);
     }
     this.chatdata.lastMsgTime = new Date().getTime();
     this.chatdata.lastMessage = msg;
-    this.chatdata.isFindme = findTextId(common.StringPako.inflate(msg.msgBody)); // 用来往对象中添加艾特值
     this.cache();
     this.messageNotify?.apply(this, [this.messages]);
   }
