@@ -2,8 +2,8 @@ import { Badge, Card, List, Tag } from 'antd';
 import React from 'react';
 import orgCtrl from '@/ts/controller';
 import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
-import { IWorkDefine } from '@/ts/core/thing/base/work';
 import * as im from 'react-icons/im';
+import { IWorkDefine } from '@/ts/core';
 
 interface IProps {
   current: IWorkDefine[];

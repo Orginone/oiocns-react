@@ -62,6 +62,8 @@ export type XAttrLinkPropArray = {
 export type XAttribute = {
   // 规则
   rule: string;
+  // 值类型
+  valueType: string;
   // 共享用户ID
   shareId: string;
   // 工作职权Id
@@ -71,7 +73,7 @@ export type XAttribute = {
   // 表单Id
   formId: string;
   // 字典Id
-  DictId: string;
+  dictId: string;
   // 附加过属性的物
   linkPropertys: XProperty[] | undefined;
   // 属性关系

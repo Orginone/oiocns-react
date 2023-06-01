@@ -3,7 +3,7 @@ import FlowDrawer from './FlowDrawer';
 import ProcessTree from './ProcessTree';
 import React, { useEffect, useState } from 'react';
 import { AddNodeType, NodeType } from './FlowDrawer/processType';
-import { IWorkDefine } from '@/ts/core/thing/base/work';
+import { IWorkDefine } from '@/ts/core';
 
 interface IProps {
   current: IWorkDefine;

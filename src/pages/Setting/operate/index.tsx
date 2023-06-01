@@ -10,8 +10,11 @@ import { MenuItemType } from 'typings/globelType';
 import React, { useState } from 'react';
 import { Modal, message } from 'antd';
 import { XTarget } from '@/ts/base/schema';
-import { TargetType } from '@/ts/core';
+import { IFlowClass, IWorkDefine, TargetType } from '@/ts/core';
 import PropertyModal from '@/bizcomponents/GlobalComps/createProperty';
+import ImportModal from '@/bizcomponents/GlobalComps/import';
+import { getReadConfigs } from '@/utils/excel/config';
+import WorkDefineModal from '@/bizcomponents/GlobalComps/createFlow';
 
 interface IProps {
   operateKey: string;
@@ -46,16 +49,30 @@ const OperateIndex = ({ selectMenu, operateKey, confrim }: IProps) => {
         />
       )}
       {/** 分类模态框 */}
-      {operateKey.includes('类别') && (
-        <SpeciesModal
-          title={operateKey}
-          open={operateKey.includes('类别')}
-          handleCancel={confrim}
-          handleOk={confrim}
-          current={selectMenu.itemType != MenuType.Species ? selectMenu.item : undefined}
-          species={selectMenu.itemType === MenuType.Species ? selectMenu.item : undefined}
-        />
-      )}
+      {operateKey.includes('类别') &&
+        (operateKey.includes('导入') ? (
+          <ImportModal
+            title={operateKey}
+            open={operateKey.includes('导入')}
+            handleCancel={confrim}
+            handleOk={confrim}
+            species={selectMenu.item}
+            sheetReadConfigs={getReadConfigs(selectMenu.item)}
+          />
+        ) : (
+          <SpeciesModal
+            title={operateKey}
+            open={operateKey.includes('类别')}
+            handleCancel={confrim}
+            handleOk={confrim}
+            current={
+              selectMenu.itemType != MenuType.Species ? selectMenu.item : undefined
+            }
+            species={
+              selectMenu.itemType === MenuType.Species ? selectMenu.item : undefined
+            }
+          />
+        ))}
       {/** 权限模态框 */}
       {operateKey.includes('权限') && (
         <AuthorityModal
@@ -72,6 +89,16 @@ const OperateIndex = ({ selectMenu, operateKey, confrim }: IProps) => {
           open={operateKey.includes('表单')}
           current={operateKey.includes('编辑') ? selectMenu.item : undefined}
           species={operateKey.includes('新增') ? selectMenu.item : undefined}
+          handleCancel={confrim}
+          handleOk={confrim}
+        />
+      )}
+      {/** 事项模态框 */}
+      {operateKey.includes('事项') && (
+        <WorkDefineModal
+          workItem={(selectMenu.item as IWorkDefine).workItem as IFlowClass}
+          current={selectMenu.item}
+          open={operateKey.includes('事项')}
           handleCancel={confrim}
           handleOk={confrim}
         />

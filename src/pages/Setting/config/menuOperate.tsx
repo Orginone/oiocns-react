@@ -16,15 +16,17 @@ import {
   ITarget,
   ITeam,
   IThingClass,
-  IWorkItem,
+  IFlowClass,
   SpeciesType,
   TargetType,
   companyTypes,
   IBelong,
   IWorkDefine,
+  IWorkClass,
 } from '@/ts/core';
 import { XProperty } from '@/ts/base/schema';
-import { orgAuth } from '@/ts/core/public';
+import { orgAuth } from '@/ts/core/public/consts';
+import { generateXlsx, getConfigs } from '@/utils/excel';
 
 /** 加载分组菜单参数 */
 interface groupMenuParams {
@@ -77,7 +79,10 @@ const buildSpeciesTree = (species: ISpeciesItem): MenuItemType => {
   const children: MenuItemType[] = [];
   switch (species.typeName) {
     case SpeciesType.Thing:
-      children.push(...buildFormMenu(species as IThingClass));
+      children.push(...buildFormMenu((species as IThingClass).forms));
+      break;
+    case SpeciesType.Work:
+      children.push(...buildFormMenu((species as IWorkClass).forms));
       break;
     case SpeciesType.Store:
       children.push(...buildProperty(species as IPropClass));
@@ -85,8 +90,8 @@ const buildSpeciesTree = (species: ISpeciesItem): MenuItemType => {
     case SpeciesType.Dict:
       children.push(...buildDict(species as IDictClass));
       break;
-    case SpeciesType.Work:
-      children.push(...buildDefineMenu(species as IWorkItem));
+    case SpeciesType.Flow:
+      children.push(...buildDefineMenu(species as IFlowClass));
       break;
   }
   return {
@@ -101,14 +106,17 @@ const buildSpeciesTree = (species: ISpeciesItem): MenuItemType => {
     beforeLoad: async () => {
       switch (species.typeName) {
         case SpeciesType.Market:
-        case SpeciesType.Work:
-          await (species as IWorkItem).loadWorkDefines();
+        case SpeciesType.Flow:
+          await (species as IFlowClass).loadWorkDefines();
           break;
         case SpeciesType.Dict:
           await (species as IDictClass).loadDicts();
           break;
         case SpeciesType.Store:
           await (species as IPropClass).loadPropertys();
+          break;
+        case SpeciesType.Work:
+          await (species as IWorkClass).loadForms();
           break;
         case SpeciesType.Thing:
           await (species as IThingClass).loadForms();
@@ -156,14 +164,14 @@ const buildDict = (dictClass: IDictClass) => {
 };
 
 /** 编译表单项菜单 */
-const buildDefineMenu = (form: IWorkItem) => {
+const buildDefineMenu = (form: IFlowClass) => {
   return form.defines.map((i) => {
     return {
       key: i.key,
       item: i,
       label: i.name,
       icon: <TeamIcon notAvatar={true} share={i.share} size={18} fontSize={16} />,
-      itemType: MenuType.Form,
+      itemType: MenuType.Work,
       menus: loadDefineMenus(i),
       children: [],
       beforeLoad: async () => {
@@ -174,8 +182,8 @@ const buildDefineMenu = (form: IWorkItem) => {
 };
 
 /** 编译表单项菜单 */
-const buildFormMenu = (form: IThingClass) => {
-  return form.forms.map((i) => {
+const buildFormMenu = (forms: IForm[]) => {
+  return forms.map((i) => {
     return {
       key: i.key,
       item: i,
@@ -224,6 +232,7 @@ const loadSpeciesMenus = (species: ISpeciesItem) => {
     case SpeciesType.Dict:
       items.push(...loadDictMenus());
       break;
+    case SpeciesType.Work:
     case SpeciesType.Thing:
       items.push(...loadFormMenus());
       break;
@@ -250,6 +259,24 @@ const loadSpeciesMenus = (species: ISpeciesItem) => {
       },
     },
   );
+  if (species.speciesTypes.length > 0) {
+    items.push(
+      {
+        key: '导入类别',
+        icon: <im.ImPlus />,
+        label: '导入类别',
+      },
+      {
+        key: '导入模板下载',
+        icon: <im.ImDownload />,
+        label: '导入模板下载',
+        beforeLoad: async () => {
+          generateXlsx(await getConfigs(species), '类别导入模板');
+          return false;
+        },
+      },
+    );
+  }
   return items;
 };
 

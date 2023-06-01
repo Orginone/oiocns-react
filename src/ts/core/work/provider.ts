@@ -1,9 +1,9 @@
 import { common, kernel, model, schema } from '../../base';
-import { PageAll } from '../public/consts';
+import { PageAll, storeCollName } from '../public/consts';
 import { SpeciesType, TaskStatus } from '../public/enums';
 import { IPerson } from '../target/person';
 import { IApplication } from '../thing/app/application';
-import { IWorkDefine } from '../thing/base/work';
+import { IWorkDefine } from '../thing/base/flow';
 // 历史任务存储集合名称
 const hisWorkCollName = 'work-task';
 export interface IWorkProvider {
@@ -119,7 +119,10 @@ export class WorkProvider implements IWorkProvider {
       {
         match: {
           belongId: req.id,
-          createUser: req.id,
+          createUser: this.user.id,
+          nodeId: {
+            _exists_: false,
+          },
         },
         sort: {
           createTime: -1,
@@ -166,11 +169,25 @@ export class WorkProvider implements IWorkProvider {
   async loadTaskDetail(
     task: schema.XWorkTask,
   ): Promise<schema.XWorkInstance | undefined> {
-    const res = await kernel.queryWorkInstanceById({
-      id: task.instanceId,
-      page: PageAll,
-    });
-    return res.data;
+    const res = await kernel.anystore.aggregate(
+      task.belongId,
+      storeCollName.WorkInstance,
+      {
+        match: {
+          id: task.instanceId,
+        },
+        limit: 1,
+        lookup: {
+          from: storeCollName.WorkTask,
+          localField: 'id',
+          foreignField: 'instanceId',
+          as: 'tasks',
+        },
+      },
+    );
+    if (res.data && res.data.length > 0) {
+      return res.data[0];
+    }
   }
   async findFlowDefine(defineId: string): Promise<IWorkDefine | undefined> {
     for (const target of this.user.targets) {

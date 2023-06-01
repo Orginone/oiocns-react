@@ -47,6 +47,7 @@ const ProFormDept = (props: IProps) => {
         ...props.rules,
         ...{ treeData },
       }}
+      width={150}
       rules={props.rules}
     />
   );

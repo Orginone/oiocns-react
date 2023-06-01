@@ -1,11 +1,17 @@
 import React from 'react';
-import { IBelong, IMarket, ISpeciesItem, IWorkItem, SpeciesType } from '@/ts/core';
+import {
+  IBelong,
+  IMarket,
+  ISpeciesItem,
+  IFlowClass,
+  SpeciesType,
+  IWorkDefine,
+  IApplication,
+} from '@/ts/core';
 import { MenuItemType } from 'typings/globelType';
 import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
 import orgCtrl from '@/ts/controller';
 import { GroupMenuType } from './menuType';
-import { IWorkDefine } from '@/ts/core/thing/base/work';
-import { IApplication } from '@/ts/core/thing/app/application';
 import OrgIcons from '@/bizcomponents/GlobalComps/orgIcons';
 
 const buildWorkItem = (defines: IWorkDefine[]) => {
@@ -37,8 +43,8 @@ const buildSpeciesTree = (species: ISpeciesItem[]) => {
         defines.push(...(item as IApplication).defines);
         children.push(...buildSpeciesTree(item.children));
         break;
-      case SpeciesType.Work:
-        defines.push(...(item as IWorkItem).defines);
+      case SpeciesType.Flow:
+        defines.push(...(item as IFlowClass).defines);
         children.push(...buildWorkItem(defines), ...buildSpeciesTree(item.children));
         break;
       default:

@@ -15,6 +15,7 @@ type IProps = {
   fieldsValue?: any;
   formRef?: any;
   disabled?: boolean;
+  noRule?: boolean; //所有数据均可修改，且不验证规则
 };
 
 /**
@@ -29,9 +30,10 @@ const OioForm: React.FC<IProps> = ({
   fieldsValue,
   formRef,
   disabled,
+  noRule,
 }) => {
   const [attributes, setAttributes] = useState<XAttribute[]>([]);
-  let config: any = form.rule ? JSON.parse(form.rule) : { col: 12, layout: 'horizontal' };
+  let config: any = form.rule ? JSON.parse(form.rule) : { col: 8, layout: 'horizontal' };
   useEffect(() => {
     orgCtrl.work.loadAttributes(form.id, define.workItem.belongId).then((value) => {
       setAttributes(value);
@@ -84,7 +86,11 @@ const OioForm: React.FC<IProps> = ({
         <Row gutter={24}>
           {attributes.map((item) => (
             <Col span={config.col} key={item.id}>
-              <OioFormItem item={item} belong={define.workItem.current.space} />
+              <OioFormItem
+                item={item}
+                belong={define.workItem.current.space}
+                noRule={noRule}
+              />
             </Col>
           ))}
         </Row>

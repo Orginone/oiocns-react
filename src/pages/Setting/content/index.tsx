@@ -13,6 +13,7 @@ import DictSetting from './Dict';
 import AuthoritySetting from './Authority';
 import { MenuType } from '../config/menuType';
 import { TargetType, companyTypes, departmentTypes } from '@/ts/core';
+import Design from './Standard/Flow/Design';
 
 interface IProps {
   selectMenu: MenuItemType;
@@ -29,8 +30,6 @@ const ContentIndex = ({ selectMenu }: IProps) => {
         return <AgencySetting current={selectMenu.item} />;
       case TargetType.Station:
         return <StationSetting current={selectMenu.item} />;
-      // case TargetType.Cohort:
-      //   return <CohortSetting current={selectMenu.item} />;
       case MenuType.Species:
         return <StandardSetting current={selectMenu.item} />;
       case MenuType.Dict:
@@ -39,6 +38,8 @@ const ContentIndex = ({ selectMenu }: IProps) => {
         return <AuthoritySetting current={selectMenu.item} />;
       case MenuType.Form:
         return <WorkForm current={selectMenu.item} />;
+      case MenuType.Work:
+        return <Design IsEdit={true} current={selectMenu.item} />;
       case MenuType.Property:
         return (
           <Attribute

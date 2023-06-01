@@ -1,8 +1,7 @@
 import { schema } from '@/ts/base';
-import { IIdentity, ISpeciesItem } from '@/ts/core';
+import { ISpeciesItem, IWorkDefine } from '@/ts/core';
 import { ProColumns } from '@ant-design/pro-table';
 import orgCtrl from '@/ts/controller';
-import { IWorkDefine } from '@/ts/core/thing/base/work';
 
 const getSpeciesName = (
   id: string,
@@ -220,16 +219,16 @@ export const AttributeColumns = (): ProColumns<schema.XAttribute>[] => [
     width: 200,
   },
   {
-    title: '关联属性',
-    dataIndex: 'property',
-    key: 'propId',
+    title: '值类型',
+    dataIndex: 'valueType',
+    key: 'valueType',
     width: 150,
-    render: (_, record) => {
-      if (record.linkPropertys && record.linkPropertys.length > 0) {
-        return record.linkPropertys[0].name;
-      }
-      return '请关联属性';
-    },
+  },
+  {
+    title: '选择字典',
+    dataIndex: ['dict', 'name'],
+    key: 'dictId',
+    width: 150,
   },
   {
     title: '特性定义',

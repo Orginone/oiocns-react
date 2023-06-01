@@ -55,7 +55,6 @@ const EntityIcon = (info: teamTypeInfo) => {
             <img style={{ height: '100%', position: 'absolute' }} src={`/svg/${svgName}.svg`} alt="" />
           </div>
         </div> : ''}
-
       </div>
     );
   }
