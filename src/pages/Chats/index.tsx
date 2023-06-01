@@ -21,6 +21,7 @@ const Setting: React.FC<any> = () => {
         <Input
           style={{ height: 30, fontSize: 15 }}
           placeholder="搜索"
+          allowClear
           prefix={<ImSearch />}
           onChange={(e) => {
             setFilter(e.target.value);

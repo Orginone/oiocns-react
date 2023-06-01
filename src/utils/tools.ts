@@ -125,6 +125,19 @@ const handleFormatDate = (timeStr: string) => {
   return formatDate(timeStr, 'H:mm');
 };
 
+/**
+ * 格式化时间
+ * @param source 时间
+ * @param format 格式化字符串
+ * @returns 格式化后的时间信息
+ */
+const formatZhDate = (
+  source: string | Date,
+  format: string = 'YYYY年MM月DD日 HH:mm:ss.ms',
+): string => {
+  return moment(source).format(format);
+};
+
 let count = 1;
 // key: 当前填写字符,key0:记录初始字符, hasKeys:已存在的key数组
 const getNewKeyWithString: any = (key: string, key0: string, hasKeys: string[]) => {
@@ -272,6 +285,7 @@ export {
   debounce,
   findAimObj,
   findMenuItemByKey,
+  formatZhDate,
   getNewKeyWithString,
   getUuid,
   handleFormatDate,

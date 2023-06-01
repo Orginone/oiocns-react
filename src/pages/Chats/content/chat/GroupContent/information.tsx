@@ -11,8 +11,8 @@ const Information = ({ msg, onClose }: { msg: IMessage; onClose: Function }) => 
         {msg.labels.map((i) => {
           return (
             <li key={i.time}>
-              <EntityIcon share={i.labeler} fontSize={22} size={30} />
-              <strong>{i.labeler.name}</strong>
+              <EntityIcon share={i.labeler} fontSize={30} size={30} />
+              <strong style={{ marginLeft: 6 }}>{i.labeler.name}</strong>
               <div>
                 <span>{i.time}:</span>
                 <strong>{i.label}</strong>
