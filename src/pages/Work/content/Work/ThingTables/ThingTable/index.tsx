@@ -6,7 +6,7 @@ import { Button, Modal } from 'antd';
 import React, { ReactNode, useEffect, useState } from 'react';
 import { kernel } from '@/ts/base';
 import orgCtrl from '@/ts/controller';
-import { submitCurrentTableData } from '../funs';
+import { MakePropertysToAttrMap, submitCurrentTableData } from '../funs';
 import { ModalNames, toolBtnsType } from '../config';
 import BaseThing from '../BaseThing';
 import SelectThing from '../TreeSelectThing';
@@ -95,12 +95,33 @@ const ThingTable = <
   };
 
   useEffect(() => {
-    // 监听实体选择
+    const keyMap: Map<string, string> = MakePropertysToAttrMap(propertys);
+
+    // 监听实体选择 将实体属性转为表格展示特性
     if (selectedRows.length > 0) {
       const thingListIds = thingList.map((v) => v.Id);
-      let newSelected = selectedRows.filter(
-        (s: { Id: string }) => !thingListIds.includes(s.Id),
-      );
+      let newSelected = selectedRows
+        .filter((s: { Id: string }) => !thingListIds.includes(s.Id))
+        .map((item: any) => {
+          let obj: { [key: string]: any } = {};
+          Object.keys(item).forEach((key) => {
+            if (
+              [
+                'Id',
+                'Creater',
+                'Status',
+                'CreateTime',
+                'ModifiedTime',
+                'Species',
+              ].includes(key)
+            ) {
+              obj[key] = item[key];
+            } else {
+              keyMap.has(key) && (obj[keyMap.get(key)!] = item[key]);
+            }
+          });
+          return obj;
+        });
 
       setThingList([...newSelected, ...thingList]);
     }
@@ -108,37 +129,33 @@ const ThingTable = <
   useEffect(() => {
     // 监听展示数据变化。弹出数据给父级
     setTimeout(() => {
-      submitCurrentTableData(formInfo.id, thingList, propertys, onListChange);
+      submitCurrentTableData(formInfo, thingList, propertys, onListChange);
     }, 100);
   }, [thingList]);
 
-  const ChangeAttrToPropObj = (
-    AttrObj: { [key: string]: any },
-    propertysArr: Array<XProperty & { attrId: string }> = propertys as any[],
-  ) => {
-    let Obj: { [key: string]: any } = {};
-    for (const key in AttrObj) {
-      const pKet = propertysArr.find((v) => v.attrId === key)!.id;
-      Obj[pKet] = AttrObj[key];
-    }
-    return Obj;
-  };
+  // const ChangeAttrToPropObj = (
+  //   AttrObj: { [key: string]: any },
+  //   propertysArr: Array<XProperty & { attrId: string }> = propertys as any[],
+  // ) => {
+  //   let Obj: { [key: string]: any } = {};
+  //   for (const key in AttrObj) {
+  //     const pKet = propertysArr.find((v) => v.attrId === key)!.id;
+  //     Obj[pKet] = AttrObj[key];
+  //   }
+  //   return Obj;
+  // };
   // 触发弹窗 关闭事件
   const handleModalDataChange = async (type: 'Edit' | 'EditMore' | 'Add') => {
-    const _ChangeData = ChangeAttrToPropObj(changeData);
-
-    console.log('触发弹窗 ', changeData, _ChangeData);
-
     switch (type) {
       case 'Add':
         {
-          if (Object.keys(_ChangeData).length == 0) {
+          if (Object.keys(changeData).length == 0) {
             break;
           }
           let res = await kernel.anystore.createThing(orgCtrl.user.id, 1);
           const { success, data = [] }: any = res;
           if (success && data.length > 0) {
-            const _Data = { ...data[0], EDIT_INFO: _ChangeData };
+            const _Data = { ...data[0], EDIT_INFO: changeData };
             setThingList([_Data, ...thingList]);
           }
         }
@@ -149,7 +166,7 @@ const ThingTable = <
             item.Id === EditData.Id &&
               (item = {
                 ...item,
-                EDIT_INFO: { ...(item?.EDIT_INFO ?? {}), ..._ChangeData },
+                EDIT_INFO: { ...(item?.EDIT_INFO ?? {}), ...changeData },
               });
 
             return item;
@@ -162,7 +179,7 @@ const ThingTable = <
           const _DataSource = thingList.map((item) => {
             return {
               ...item,
-              EDIT_INFO: { ...(item?.EDIT_INFO ?? {}), ..._ChangeData },
+              EDIT_INFO: { ...(item?.EDIT_INFO ?? {}), ...changeData },
             };
           });
           setThingList(_DataSource);
@@ -208,6 +225,7 @@ const ThingTable = <
         key={thingList.length}
         tooltip="蓝色字体为修改值，鼠标悬浮时展示修改前的值"
         size="small"
+        colKey={'attrId'}
         dataSource={[...thingList]}
         headerTitle={headerTitle}
         columnsState={{ ...defaultColumnStateMap }}

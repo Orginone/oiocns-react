@@ -19,6 +19,7 @@ interface IProps {
   formInfo?: any; //传进来的 表单基本信息
   defaultColums?: any[]; //传进来的 表头设置
   readonly?: boolean; //只读表单，隐藏操作区，配置区
+  colKey?: 'propertyId' | 'attrId'; //cloumns表头取值设置 属性Id、特性id
 }
 
 const BaseThing = <
@@ -30,6 +31,7 @@ const BaseThing = <
 ) => {
   const {
     rowKey = 'Id',
+    colKey = 'propertyId',
     propertys,
     // defaultColums,
     belongId,
@@ -42,11 +44,11 @@ const BaseThing = <
   const [showData, setShowData] = useState<any[]>([]);
   const getColumns: any = useMemo(() => {
     let columns: any[] = defaultCol.map((item: any) => {
-      return getColItem(item);
+      return getColItem(item, colKey);
     });
 
     for (const p of propertys) {
-      columns.push(getColItem(p as any));
+      columns.push(getColItem(p as any, colKey));
     }
     !readonly && columns.push(Operation);
     return columns;

@@ -1,10 +1,10 @@
-import { XProperty } from '@/ts/base/schema';
+import { XForm, XProperty } from '@/ts/base/schema';
 import { ProColumns, ProSchemaValueEnumObj } from '@ant-design/pro-components';
 import React, { ReactNode } from 'react';
 import orgCtrl from '@/ts/controller';
 import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
 import { debounce } from '@/utils/tools';
-import { ColTypes, defaultCol } from './config';
+import { ColTypes } from './config';
 
 /*  // columns.push(
       // getColumn(
@@ -22,22 +22,25 @@ const getColItem = (
     attrId: string;
     valueEnum: Object | undefined;
   } & XProperty,
+  colKey: 'propertyId' | 'attrId' = 'propertyId',
 ) => {
+  // 使用属性Id 展示表格
   const { id, attrId, code, name, valueType = '描述型', valueEnum = undefined } = col;
   const width = name.length * 30 > 80 ? name.length * 30 : 80;
 
   let ColItem: ProColumns<any> = {
     title: name,
     key: id,
-    dataIndex: id,
+    dataIndex: (colKey === 'attrId' ? attrId : code) ?? id,
     width: width,
     valueType: ColTypes.get(valueType) as 'text',
     valueEnum: valueEnum as ProSchemaValueEnumObj,
     render(text: any, _record: any) {
-      if (_record?.EDIT_INFO?.[code]) {
+      const _key = colKey === 'attrId' ? attrId : code?.slice(1);
+      if (_key && _record?.EDIT_INFO?.[_key]) {
         return (
           <span style={{ color: '#154ad8' }} title={`修改前：${text}`}>
-            {_record?.EDIT_INFO?.[code]}
+            {_record?.EDIT_INFO?.[_key]}
           </span>
         );
       }
@@ -50,7 +53,7 @@ const getColItem = (
       {
         ColItem.render = (text: ReactNode, _record: any) => {
           if (text) {
-            let share = orgCtrl.user.findShareById(text as string);
+            let share = orgCtrl.user?.findShareById(text as string);
 
             return (
               <>
@@ -75,21 +78,22 @@ const getColItem = (
 const MakePropertysToAttrMap = (propertys: any[]) => {
   const PtyToAttrId: Map<string, string> = new Map([]);
   propertys.forEach((proper) => {
-    PtyToAttrId.set(proper.id, proper.AttrId);
+    PtyToAttrId.set(proper.id, proper.attrId);
   });
   return PtyToAttrId;
 };
 /* 弹出编辑数据 */
 const submitCurrentTableData = debounce(
-  (formId: string, thingList: any[], propertys: any[], callback: Function) => {
+  (form: XForm, thingList: any[], propertys: any[], callback: Function) => {
     // 删除 操作一栏
     const JsonData = {
       data: thingList,
-      columns: [...defaultCol, ...propertys],
+      propertys: propertys,
+      form: form,
     };
     console.log('cdsd', thingList, propertys);
 
-    callback && callback(formId, thingList, JSON.stringify(JsonData));
+    callback && callback(form.id, thingList, JSON.stringify(JsonData));
   },
   100,
 );

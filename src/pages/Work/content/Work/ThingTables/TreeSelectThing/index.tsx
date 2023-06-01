@@ -84,6 +84,7 @@ const SelectThing = <
         rowSelection={selectable ? rowSelection : undefined}
         key={treeSelected?.id}
         propertys={propertys}
+        colKey={'propertyId'}
         readonly
         {...rest}
         labels={treeSelected?.id ? [`S${treeSelected.id}`] : undefined}
