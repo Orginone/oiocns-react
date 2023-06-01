@@ -57,6 +57,7 @@ const Information = ({ msg, onClose }: { msg: IMessage; onClose: Function }) => 
   return (
     <Drawer title={'消息接收人列表'} onClose={() => onClose()} closable open>
       <Tabs
+        centered
         items={items}
         defaultActiveKey={'read'}
         activeKey={tabsKey}

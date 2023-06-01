@@ -67,9 +67,8 @@ const GroupContent = (props: Iprops) => {
     if (!loading && body.current && props.chat && body.current.scrollTop < 10) {
       setLoading(true);
       setBeforescrollHeight(body.current.scrollHeight);
-      if ((await props.chat.moreMessage()) < 1) {
-        setLoading(false);
-      }
+      await props.chat.moreMessage();
+      setMessages([...props.chat.messages]);
     }
   };
 

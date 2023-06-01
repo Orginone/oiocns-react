@@ -182,6 +182,7 @@ export abstract class MsgChat<T extends schema.XEntity>
         msgChatNotify.changCallback();
         this.cache();
       }
+      this.messageNotify?.apply(this, [this.messages]);
     });
   }
   cache(): void {
@@ -223,8 +224,13 @@ export abstract class MsgChat<T extends schema.XEntity>
       skip: this.messages.length,
       limit: 30,
     });
-    if (res && res.success && Array.isArray(res.data)) {
-      this.loadMessages(res.data);
+    if (res && res.success && Array.isArray(res.data) && res.data.length > 0) {
+      res.data.forEach((msg) => {
+        this.messages.unshift(new Message(msg, this));
+      });
+      if (this.chatdata.lastMsgTime === nullTime) {
+        this.chatdata.lastMsgTime = new Date(res.data[0].createTime).getTime();
+      }
       return res.data.length;
     }
     return 0;
@@ -340,15 +346,6 @@ export abstract class MsgChat<T extends schema.XEntity>
       this.cache();
       this.messageNotify?.apply(this, [this.messages]);
     }
-  }
-  private loadMessages(msgs: model.MsgSaveModel[]): void {
-    msgs.forEach((msg) => {
-      this.messages.unshift(new Message(msg, this));
-    });
-    if (this.chatdata.lastMsgTime === nullTime && msgs.length > 0) {
-      this.chatdata.lastMsgTime = new Date(msgs[0].createTime).getTime();
-    }
-    this.messageNotify?.apply(this, [this.messages]);
   }
 }
 
