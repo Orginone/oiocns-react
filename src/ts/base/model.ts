@@ -532,6 +532,8 @@ export type WorkInstanceModel = {
   title: string;
   // 回调地址
   hook: string;
+  // 申请组织Id
+  applyId: string;
 };
 export type QueryWorkReq = {
   // 共享组织Id

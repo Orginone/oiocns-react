@@ -32,9 +32,7 @@ interface SubmitDataType {
  */
 const WorkStartDo: React.FC<IProps> = ({ current }) => {
   const [data, setData] = useState<any>({});
-  const [rows, setRows] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState<string>();
-  const [propertys, setPropertys] = useState<XProperty[]>([]);
   const [thingForms, setThingForms] = useState<XForm[]>([]);
   const [workForm, setWorkForm] = useState<XForm>();
   const [content, setContent] = useState<string>('');
@@ -59,6 +57,7 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
         content: content,
         contentType: 'Text',
         title: current.name,
+        applyId: orgCtrl.provider.user!.id,
         defineId: current.id,
         data: JSON.stringify(submitData),
       })
@@ -83,47 +82,14 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
       if (!activeTab) {
         setActiveTab(thingForms[0].id);
       } else {
-        orgCtrl.work
-          .loadAttributes(activeTab, current.workItem.belongId)
-          .then((attributes) => {
-            setPropertys(
-              attributes
-                .filter((i) => i.linkPropertys && i.linkPropertys.length > 0)
-                .map((i) => {
-                  return { attrId: i.id, ...i.linkPropertys![0] };
-                }),
-            );
-          });
       }
     }
   }, [thingForms, activeTab]);
 
   const handleTableChange = (tableID: string, data: any[], Json: string) => {
     const changeData: { [key: string]: any } = {};
-
     data.forEach((item) => {
-      let willsaveData = item;
-      // 判断是否包含 修改数据
-      if (willsaveData?.isNew || willsaveData?.EDIT_INFO) {
-        if (willsaveData?.isNew) {
-          delete willsaveData.isNew;
-        }
-        if (willsaveData?.EDIT_INFO) {
-          willsaveData = willsaveData?.EDIT_INFO;
-        }
-      } else {
-        willsaveData = {};
-      }
-
-      const childMap: any = {};
-      Object.keys(willsaveData).map((chidKey) => {
-        if (['Id', 'Creater', 'Status', 'CreateTime', 'ModifiedTime'].includes(chidKey)) {
-          return;
-        }
-        childMap[chidKey] = willsaveData[chidKey];
-      });
-
-      changeData[item.Id] = childMap;
+      changeData[item.Id] = item.EDIT_INFO || {};
     });
     submitData.formData[tableID] = {
       isHeader: false,
@@ -162,13 +128,9 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
               key: i.id,
               children: (
                 <ThingTable
-                  headerTitle={'实体类'}
-                  dataSource={rows}
+                  form={i}
                   current={current}
-                  formInfo={i}
                   labels={[`S${activeTab}`]}
-                  propertys={propertys}
-                  setRows={setRows}
                   belongId={current.workItem.belongId}
                   onListChange={handleTableChange}
                 />
