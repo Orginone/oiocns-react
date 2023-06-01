@@ -1,7 +1,7 @@
 import { IWorkDefine, SpeciesType } from '@/ts/core';
 import { Button, Card, Input, Tabs, message } from 'antd';
 import orgCtrl from '@/ts/controller';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import cls from './index.module.less';
 import OioForm from '@/bizcomponents/FormDesign/OioForm';
 import { GroupMenuType } from '../../config/menuType';
@@ -9,6 +9,7 @@ import { XForm, XProperty } from '@/ts/base/schema';
 // import BaseThing from './BaseThing';
 import ThingTable from './ThingTables/ThingTable';
 import { MakePropertysToAttrMap } from './ThingTables/funs';
+import { OperateType } from './ThingTables/const';
 // 卡片渲染
 interface IProps {
   current: IWorkDefine;
@@ -101,9 +102,6 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
       }
     }
   }, [thingForms, activeTab]);
-  // const keyMap: Map<string, string> = useMemo(() => {
-  //   return MakePropertysToAttrMap(propertys);
-  // }, [propertys]);
 
   const handleTableChange = (tableID: string, data: any[], Json: string) => {
     const changeData: { [key: string]: any } = {};
@@ -161,11 +159,14 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
               key: i.id,
               children: (
                 <ThingTable
-                  headerTitle={'实体类'}
-                  toolBtnItems={['Add', 'EditMore', 'Select']}
+                  toolBtnItems={[
+                    OperateType.Add,
+                    OperateType.EditMore,
+                    OperateType.Select,
+                  ]}
                   dataSource={[]}
                   current={current}
-                  formInfo={i}
+                  form={i}
                   labels={[`S${activeTab}`]}
                   propertys={propertys}
                   // setSelectedRows={setRows}

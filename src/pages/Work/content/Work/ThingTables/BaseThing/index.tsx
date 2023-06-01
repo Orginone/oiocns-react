@@ -1,7 +1,9 @@
 import { XProperty } from '@/ts/base/schema';
 import React, { useEffect, useMemo, useState } from 'react';
 import { getColItem } from '../funs';
-import { defaultCol } from '../config';
+import { defaultCol } from '../const';
+import { getScrollX } from '@/utils/common';
+
 import {
   ParamsType,
   ProColumnType,
@@ -43,16 +45,16 @@ const BaseThing = <
   } = props;
   const [showData, setShowData] = useState<any[]>([]);
   const getColumns: any = useMemo(() => {
-    let columns: any[] = defaultCol.map((item: any) => {
+    let columns: any[] = [...defaultCol, ...propertys].map((item: any) => {
       return getColItem(item, colKey);
     });
-
-    for (const p of propertys) {
-      columns.push(getColItem(p as any, colKey));
+    if (!readonly) {
+      columns.push(Operation);
     }
-    !readonly && columns.push(Operation);
+
     return columns;
   }, [props.dataSource, propertys, readonly]);
+  const { columnsRes, scrollx } = getScrollX(getColumns);
 
   useEffect(() => {
     fetchData();
@@ -100,10 +102,11 @@ const BaseThing = <
         key={labels.join('%')}
         dataSource={labels.length > 0 ? showData : props.dataSource}
         search={false}
-        columns={getColumns}
+        columns={columnsRes}
         tableAlertRender={false}
         options={readonly ? false : undefined}
         toolBarRender={readonly ? undefined : toolBarRender}
+        scroll={{ x: scrollx }}
         {...rest}
       />
     </>

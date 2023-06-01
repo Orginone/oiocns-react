@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { ParamsType, ProTableProps } from '@ant-design/pro-components';
 import BaseThing from '../BaseThing';
-import { XProperty } from '@/ts/base/schema';
 import cls from './index.module.less';
 import CustomTree from '@/components/CustomTree';
 import { buildThingTree } from './treequest';
 import orgCtrl from '@/ts/controller';
+import { schema } from '@/ts/base';
 interface PageProp {
   selectable?: boolean;
   selectedKeys?: string[];
@@ -13,10 +13,10 @@ interface PageProp {
     selectedRowKeys: React.Key[],
     selectedRows: { [key: string]: any }[],
   ) => void;
-  labels: any;
+  labels: string[];
   current: any;
-  belongId: any;
-  formInfo: any;
+  belongId: string;
+  form: schema.XForm;
 }
 
 const SelectThing = <
@@ -32,13 +32,13 @@ const SelectThing = <
     selectedKeys = [],
     current,
     belongId,
-    // formInfo,
+    // form,
     ...rest
   } = props;
 
-  const [propertys, setPropertys] = useState<XProperty[]>([]);
-  const [treeData, setTreeData] = useState<any[]>([]);
-  const [treeSelected, setTreeSelected] = useState<any>({});
+  const [propertys, setPropertys] = useState<schema.XProperty[]>([]); //表格头部展示数据
+  const [treeData, setTreeData] = useState<any[]>([]); //实体树展示数据
+  const [treeSelected, setTreeSelected] = useState<any>({}); //实体树 选择的
   useEffect(() => {
     queryData();
   }, [current]);
@@ -51,6 +51,7 @@ const SelectThing = <
       onRowSelectChange && onRowSelectChange(selectedRowKeys, selectedRows);
     },
     selectedRowKeys: selectedKeys,
+    // 设置禁止选取，禁止操作
     // getCheckboxProps: (record: DataType) => ({
     //   disabled: record.name === 'Disabled User', // Column configuration not to be checked
     //   name: record.name,
@@ -81,7 +82,7 @@ const SelectThing = <
     <div style={{ display: 'flex', height: '100%' }}>
       <div className={cls.leftTree}>
         <CustomTree
-          title={'实体仓库'}
+          title={'实体分类'}
           showIcon
           treeData={treeData}
           fieldNames={{ title: 'label', key: 'key', children: 'children' }}
@@ -89,6 +90,7 @@ const SelectThing = <
         />
       </div>
       <BaseThing
+        style={{ width: 'calc(100% - 220px)', marginTop: '20px' }}
         rowSelection={selectable ? rowSelection : undefined}
         key={treeSelected?.id}
         colKey={'propertyId'}

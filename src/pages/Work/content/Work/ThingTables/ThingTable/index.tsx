@@ -1,19 +1,18 @@
 import OioForm from '@/bizcomponents/FormDesign/OioForm';
-import { XForm, XProperty } from '@/ts/base/schema';
 import { ProColumnType, ProTableProps } from '@ant-design/pro-components';
 import type { ParamsType } from '@ant-design/pro-provider';
 import { Button, Modal } from 'antd';
 import React, { ReactNode, useEffect, useState } from 'react';
-import { kernel } from '@/ts/base';
+import { kernel, schema } from '@/ts/base';
 import orgCtrl from '@/ts/controller';
 import { MakePropertysToAttrMap, submitCurrentTableData } from '../funs';
-import { ModalNames, toolBtnsType } from '../config';
+import { toolBtnsType, OperateType } from '../const';
 import BaseThing from '../BaseThing';
 import SelectThing from '../TreeSelectThing';
 
 interface IProps {
   labels: string[];
-  propertys: XProperty[];
+  propertys: schema.XProperty[];
   belongId: string;
   selectable?: boolean;
   height?: any;
@@ -23,7 +22,7 @@ interface IProps {
   setSelectedRows?: (data: any) => void;
   current?: any;
   onListChange?: Function;
-  formInfo?: any; //传进来的 表单基本信息
+  form: schema.XForm; //传进来的 表单基本信息
   defaultColums?: any[]; //传进来的 表头设置
   toolBtnItems?: toolBtnsType;
 }
@@ -37,13 +36,12 @@ const ThingTable = <
 ) => {
   const {
     rowKey = 'Id',
-    headerTitle = '实体类',
     belongId,
     propertys,
     dataSource = [],
     // defaultColums,
     current,
-    formInfo,
+    form,
     labels,
     onListChange,
     readonly,
@@ -52,11 +50,8 @@ const ThingTable = <
   } = props;
 
   const [thingList, setThingList] = useState<any[]>(dataSource as []);
-  const [form, setForm] = useState<XForm>();
   const [selectedRows, setSelectedRows] = useState<any>([]);
-  const [operateModel, setOperateModel] = useState<
-    'Edit' | 'EditMore' | 'Add' | 'Select' | ''
-  >('');
+  const [operateModel, setOperateModel] = useState<OperateType>('' as OperateType.Add);
   const [EditData, setEditData] = useState<any>({});
   const [changeData, setChangeData] = useState<any>({});
   const defaultColumnStateMap: any = {
@@ -79,8 +74,7 @@ const ThingTable = <
         onClick={() => {
           const { EDIT_INFO = {}, ...rest } = record;
           setEditData({ ...rest, ...EDIT_INFO });
-          setForm(formInfo);
-          setOperateModel('Edit');
+          setOperateModel(OperateType.Edit);
         }}>
         变更
       </a>,
@@ -129,25 +123,14 @@ const ThingTable = <
   useEffect(() => {
     // 监听展示数据变化。弹出数据给父级
     setTimeout(() => {
-      submitCurrentTableData(formInfo, thingList, propertys, onListChange);
+      submitCurrentTableData(form, thingList, propertys, onListChange);
     }, 100);
   }, [thingList]);
 
-  // const ChangeAttrToPropObj = (
-  //   AttrObj: { [key: string]: any },
-  //   propertysArr: Array<XProperty & { attrId: string }> = propertys as any[],
-  // ) => {
-  //   let Obj: { [key: string]: any } = {};
-  //   for (const key in AttrObj) {
-  //     const pKet = propertysArr.find((v) => v.attrId === key)!.id;
-  //     Obj[pKet] = AttrObj[key];
-  //   }
-  //   return Obj;
-  // };
   // 触发弹窗 关闭事件
-  const handleModalDataChange = async (type: 'Edit' | 'EditMore' | 'Add') => {
+  const handleModalDataChange = async (type: OperateType) => {
     switch (type) {
-      case 'Add':
+      case OperateType.Add:
         {
           if (Object.keys(changeData).length == 0) {
             break;
@@ -160,7 +143,7 @@ const ThingTable = <
           }
         }
         break;
-      case 'Edit':
+      case OperateType.Edit:
         {
           const _DataSource = thingList.map((item) => {
             item.Id === EditData.Id &&
@@ -174,7 +157,7 @@ const ThingTable = <
           setThingList(_DataSource);
         }
         break;
-      case 'EditMore':
+      case OperateType.EditMore:
         {
           const _DataSource = thingList.map((item) => {
             return {
@@ -189,8 +172,7 @@ const ThingTable = <
       default:
         break;
     }
-    setOperateModel('');
-    setForm(undefined);
+    setOperateModel('' as OperateType.Add);
   };
   // 获取自定义按钮组
   const HandleToolBarRender: () => ReactNode[] = () => {
@@ -200,14 +182,15 @@ const ThingTable = <
           <Button
             key={idx}
             type="default"
-            style={{ maxWidth: '100px', textOverflow: 'ellipsis', overflow: 'hidden' }}
+            style={{ maxWidth: '150px', textOverflow: 'ellipsis', overflow: 'hidden' }}
             onClick={() => {
-              setForm(formInfo);
               setChangeData({});
-              setOperateModel(item as 'Edit');
+              console.log('dianji', item);
+
+              setOperateModel(item as OperateType.Add);
             }}>
-            {ModalNames.get(item) ?? '--'}
-            {formInfo.name}
+            {item ?? '--'}
+            {form?.name}
           </Button>
         );
       }
@@ -223,53 +206,46 @@ const ThingTable = <
         propertys={propertys}
         rowKey={rowKey}
         key={thingList.length}
-        tooltip="蓝色字体为修改值，鼠标悬浮时展示修改前的值"
         size="small"
         colKey={'attrId'}
         dataSource={[...thingList]}
-        headerTitle={headerTitle}
         columnsState={{ ...defaultColumnStateMap }}
         toolBarRender={readonly ? undefined : (HandleToolBarRender as any)}
         {...rest}
       />
       {/* 弹窗区域 */}
       <>
-        {form &&
-          current &&
-          (operateModel === 'Add' ||
-            operateModel === 'EditMore' ||
-            operateModel === 'Edit') && (
-            <Modal
-              open={true}
-              onOk={async () => {
-                await handleModalDataChange(operateModel);
-              }}
-              onCancel={() => {
-                setOperateModel('');
-                setForm(undefined);
-              }}
-              destroyOnClose={true}
-              cancelText={'关闭'}
-              width={1000}>
-              <OioForm
-                form={form}
-                define={current}
-                fieldsValue={operateModel === 'Edit' ? EditData : undefined}
-                onValuesChange={(_changeValue, values) => setChangeData(values)}
-                noRule={operateModel.includes('Edit')}
-              />
-            </Modal>
-          )}
-        {form && operateModel === 'Select' && (
+        {current && (
           <Modal
-            open={true}
-            onOk={() => {
-              setOperateModel('');
-              setForm(undefined);
+            open={[OperateType.Add, OperateType.Edit, OperateType.EditMore].includes(
+              operateModel,
+            )}
+            onOk={async () => {
+              await handleModalDataChange(operateModel);
             }}
             onCancel={() => {
-              setOperateModel('');
-              setForm(undefined);
+              setOperateModel('' as OperateType.Add);
+            }}
+            destroyOnClose={true}
+            cancelText={'关闭'}
+            width={1000}>
+            <OioForm
+              form={form}
+              define={current}
+              fieldsValue={operateModel === OperateType.Edit ? EditData : undefined}
+              onValuesChange={(_changeValue, values) => setChangeData(values)}
+              noRule={operateModel.includes('Edit')}
+            />
+          </Modal>
+        )}
+        {
+          <Modal
+            open={operateModel === OperateType.Select}
+            onOk={() => {
+              setOperateModel('' as OperateType.Add);
+            }}
+            onCancel={() => {
+              setOperateModel('' as OperateType.Add);
             }}
             bodyStyle={{ minHeight: '600px' }}
             destroyOnClose={true}
@@ -279,14 +255,13 @@ const ThingTable = <
               selectable
               labels={labels}
               current={current}
-              // propertys={propertys}
               selectedKeys={thingList.map((v: { Id: string }) => v.Id)}
               onRowSelectChange={(_keys, rows) => setSelectedRows(rows)}
               belongId={belongId}
-              formInfo={formInfo}
+              form={form}
             />
           </Modal>
-        )}
+        }
       </>
     </>
   );

@@ -52,12 +52,17 @@ export type toolBtnsType = (
   | 'Select'
   | Omit<ReactNode, 'string'>
 )[];
-
+export enum OperateType {
+  'Add' = '新增',
+  'Edit' = '编辑',
+  'Select' = '选择',
+  'EditMore' = '全部编辑',
+}
 export const ModalNames = new Map([
-  ['Add', '新建'],
-  ['Edit', '修改'],
-  ['EditMore', '批量修改'],
-  ['Select', '选择更多'],
+  ['Add', '新增'],
+  ['Edit', '编辑'],
+  ['EditMore', '全部编辑'],
+  ['Select', '选择'],
 ]);
 export const defaultData: any[] = [
   {

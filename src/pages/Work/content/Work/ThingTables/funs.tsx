@@ -4,18 +4,7 @@ import React, { ReactNode } from 'react';
 import orgCtrl from '@/ts/controller';
 import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
 import { debounce } from '@/utils/tools';
-import { ColTypes } from './config';
-
-/*  // columns.push(
-      // getColumn(
-      //   p.id,
-      //   p.name,
-      //   p.valueType,
-      //   `Propertys.${p.code}`,
-      //   p.dict?.dictItems || [],
-      // ),
-      // );
- */
+import { ColTypes } from './const';
 
 // 获取表头配置
 const getColItem = (
@@ -26,8 +15,8 @@ const getColItem = (
   colKey: 'propertyId' | 'attrId' = 'propertyId',
 ) => {
   // 使用属性Id 展示表格
-  const { id, attrId, code, name, valueType = '描述型', valueEnum = undefined } = col;
-  const width = name.length * 30 > 80 ? name.length * 30 : 80;
+  const { id, attrId, name, valueType = '描述型', valueEnum = undefined } = col;
+  const width = name.length * 40 > 100 ? name.length * 40 : 100;
 
   let ColItem: ProColumns<any> = {
     title: name,
