@@ -5,9 +5,20 @@ import { Drawer, Tabs } from 'antd';
 import React, { useState } from 'react';
 import { showChatTime } from '@/utils/tools';
 import type { TabsProps } from 'antd';
-import orgCtrl from '@/ts/controller'
+import orgCtrl from '@/ts/controller';
+import { ShareIcon } from '@/ts/base/model';
+interface IMessageType extends IMessage {
+  _chat: any;
+}
 
-const Information = ({ msg, onClose }: { msg: IMessage; onClose: Function }) => {
+interface TypeUnread {
+  time: string;
+  id: string;
+  name: string;
+  label: string;
+}
+
+const Information = ({ msg, onClose }: { msg: IMessageType; onClose: Function }) => {
   const [tabsKey, setTabsKey] = useState<string>();
   // 展示已读的
   const readList = () => {
@@ -28,31 +39,35 @@ const Information = ({ msg, onClose }: { msg: IMessage; onClose: Function }) => 
       </ul>
     );
   };
+
   // 展示未读
   const unRead = () => {
-    const unreadList = msg._chat.members?.filter((v) => {
-      console.log('成员1', orgCtrl.provider.user?.findShareById(v.id));
-      if (msg.labels.length > 0) {
-        return msg?.labels?.find((prop) => prop.userId !== v.id);
-      } else {
-        console.log('成员', v);
-
+    const unreadList = msg._chat.members?.filter((v: { id: string }) => {
+      if (msg.labels.length === 0) {
         return v;
+      } else {
+        return msg?.labels?.find((prop) => prop.userId !== v.id);
       }
     });
     return (
       <ul className={css.moreInfo}>
         {unreadList
-          ?.filter((code) => code.id !== msg._chat.userId)
-          .map((i) => {
+          ?.filter((code: { id: string }) => code.id !== msg._chat.userId)
+          .map((i: TypeUnread) => {
             return (
-              <li key={i.time}>
-                <EntityIcon share={i.icon} fontSize={22} size={30} />
-                <strong>{i.name}</strong>
-                <div>
-                  <strong>{i.label}</strong>
-                </div>
-              </li>
+              msg.labels.length !== msg._chat.members.length - 1 && (
+                <li key={i.time}>
+                  <EntityIcon
+                    share={orgCtrl.provider.user?.findShareById(i.id) as ShareIcon}
+                    fontSize={22}
+                    size={30}
+                  />
+                  <strong>{i.name}</strong>
+                  <div>
+                    <strong>{i.label}</strong>
+                  </div>
+                </li>
+              )
             );
           })}
       </ul>
@@ -60,8 +75,12 @@ const Information = ({ msg, onClose }: { msg: IMessage; onClose: Function }) => 
   };
 
   const items: TabsProps['items'] = [
-    { key: 'read', label: '已读', children: readList() },
-    { key: 'Unread', label: '未读', children: unRead() },
+    { key: 'read', label: `${msg.labels.length}人已读`, children: readList() },
+    {
+      key: 'Unread',
+      label: `${msg._chat.members.length - msg.labels.length - 1}人未读`,
+      children: unRead(),
+    },
   ];
 
   return (
