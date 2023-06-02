@@ -82,3 +82,12 @@ export const defaultData: any[] = [
     update_at: '1590481162000',
   },
 ];
+export const defaultColumnStateMap: any = {
+  ModifiedTime: {
+    width: 100,
+    show: false,
+  },
+  CreateTime: {
+    show: false,
+  },
+};

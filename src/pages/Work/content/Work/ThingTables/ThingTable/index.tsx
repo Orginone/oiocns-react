@@ -5,19 +5,17 @@ import { Button, Modal } from 'antd';
 import React, { ReactNode, useEffect, useState } from 'react';
 import { kernel, schema } from '@/ts/base';
 import orgCtrl from '@/ts/controller';
-import { MakePropertysToAttrMap, submitCurrentTableData } from '../funs';
+import { handlePropToAttrObj, submitCurrentTableData } from '../Function';
 import { toolBtnsType, OperateType } from '../const';
 import BaseThing from '../BaseThing';
 import SelectThing from '../TreeSelectThing';
 
 interface IProps {
-  labels: string[];
   propertys: schema.XProperty[];
   belongId: string;
   selectable?: boolean;
   height?: any;
   width?: any;
-  keyMap?: Map<string, string>; //存放当前表单 属性id=>特性id
   readonly?: boolean; //只读表单，隐藏操作区，配置区
   setSelectedRows?: (data: any) => void;
   current?: any;
@@ -42,7 +40,6 @@ const ThingTable = <
     // defaultColums,
     current,
     form,
-    labels,
     onListChange,
     readonly,
     toolBtnItems = [],
@@ -52,17 +49,8 @@ const ThingTable = <
   const [thingList, setThingList] = useState<any[]>(dataSource as []);
   const [selectedRows, setSelectedRows] = useState<any>([]);
   const [operateModel, setOperateModel] = useState<OperateType>('' as OperateType.Add);
-  const [EditData, setEditData] = useState<any>({});
+  const [selectedData, setSelectedData] = useState<any>({});
   const [changeData, setChangeData] = useState<any>({});
-  const defaultColumnStateMap: any = {
-    ModifiedTime: {
-      width: 100,
-      show: false,
-    },
-    CreateTime: {
-      show: false,
-    },
-  };
 
   const Operation: ProColumnType<any> = {
     title: '操作',
@@ -73,7 +61,7 @@ const ThingTable = <
         key="Editable"
         onClick={() => {
           const { EDIT_INFO = {}, ...rest } = record;
-          setEditData({ ...rest, ...EDIT_INFO });
+          setSelectedData({ ...rest, ...EDIT_INFO });
           setOperateModel(OperateType.Edit);
         }}>
         变更
@@ -88,40 +76,18 @@ const ThingTable = <
     ],
   };
 
+  // 处理实体表选择事件
   useEffect(() => {
-    const keyMap: Map<string, string> = MakePropertysToAttrMap(propertys);
-
     // 监听实体选择 将实体属性转为表格展示特性
     if (selectedRows.length > 0) {
       const thingListIds = thingList.map((v) => v.Id);
-      let newSelected = selectedRows
-        .filter((s: { Id: string }) => !thingListIds.includes(s.Id))
-        .map((item: any) => {
-          let obj: { [key: string]: any } = {};
-          Object.keys(item).forEach((key) => {
-            if (
-              [
-                'Id',
-                'Creater',
-                'Status',
-                'CreateTime',
-                'ModifiedTime',
-                'Species',
-              ].includes(key)
-            ) {
-              obj[key] = item[key];
-            } else {
-              keyMap.has(key) && (obj[keyMap.get(key)!] = item[key]);
-            }
-          });
-          return obj;
-        });
-
-      setThingList([...newSelected, ...thingList]);
+      const newThings = handlePropToAttrObj(selectedRows, thingListIds, propertys);
+      setThingList([...newThings, ...thingList]);
     }
   }, [selectedRows]);
+
+  // 监听展示数据变化。弹出数据给父级
   useEffect(() => {
-    // 监听展示数据变化。弹出数据给父级
     setTimeout(() => {
       submitCurrentTableData(form, thingList, propertys, onListChange);
     }, 100);
@@ -146,7 +112,7 @@ const ThingTable = <
       case OperateType.Edit:
         {
           const _DataSource = thingList.map((item) => {
-            item.Id === EditData.Id &&
+            item.Id === selectedData.Id &&
               (item = {
                 ...item,
                 EDIT_INFO: { ...(item?.EDIT_INFO ?? {}), ...changeData },
@@ -174,7 +140,7 @@ const ThingTable = <
     }
     setOperateModel('' as OperateType.Add);
   };
-  // 获取自定义按钮组
+  // 获取自定义按钮组 默认三项 +可以定义Dom
   const HandleToolBarRender: () => ReactNode[] = () => {
     const dom: ReactNode[] = toolBtnItems.map((item, idx) => {
       if (typeof item == 'string') {
@@ -185,8 +151,6 @@ const ThingTable = <
             style={{ maxWidth: '150px', textOverflow: 'ellipsis', overflow: 'hidden' }}
             onClick={() => {
               setChangeData({});
-              console.log('dianji', item);
-
               setOperateModel(item as OperateType.Add);
             }}>
             {item ?? '--'}
@@ -198,6 +162,7 @@ const ThingTable = <
     });
     return dom;
   };
+
   return (
     <>
       {/* 实体表格区域 */}
@@ -207,9 +172,7 @@ const ThingTable = <
         rowKey={rowKey}
         key={thingList.length}
         size="small"
-        colKey={'attrId'}
         dataSource={[...thingList]}
-        columnsState={{ ...defaultColumnStateMap }}
         toolBarRender={readonly ? undefined : (HandleToolBarRender as any)}
         {...rest}
       />
@@ -232,13 +195,13 @@ const ThingTable = <
             <OioForm
               form={form}
               define={current}
-              fieldsValue={operateModel === OperateType.Edit ? EditData : undefined}
+              fieldsValue={operateModel === OperateType.Edit ? selectedData : undefined}
               onValuesChange={(_changeValue, values) => setChangeData(values)}
               noRule={operateModel.includes('Edit')}
             />
           </Modal>
         )}
-        {
+        {current && (
           <Modal
             open={operateModel === OperateType.Select}
             onOk={() => {
@@ -252,18 +215,16 @@ const ThingTable = <
             cancelText={'关闭'}
             width={'1200px'}>
             <SelectThing
-              selectable
-              labels={labels}
               current={current}
-              selectedKeys={thingList.map((v: { Id: string }) => v.Id)}
-              onRowSelectChange={(_keys, rows) => setSelectedRows(rows)}
+              labels={[`S${form.id}`]}
+              onRowSelectChange={(rows) => setSelectedRows(rows)}
               belongId={belongId}
               form={form}
             />
           </Modal>
-        }
+        )}
       </>
     </>
   );
 };
-export default ThingTable;
+export default React.memo(ThingTable);

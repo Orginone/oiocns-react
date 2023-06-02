@@ -8,7 +8,6 @@ import { GroupMenuType } from '../../config/menuType';
 import { XForm, XProperty } from '@/ts/base/schema';
 // import BaseThing from './BaseThing';
 import ThingTable from './ThingTables/ThingTable';
-import { MakePropertysToAttrMap } from './ThingTables/funs';
 import { OperateType } from './ThingTables/const';
 // 卡片渲染
 interface IProps {
@@ -65,7 +64,7 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
         title: current.name,
         defineId: current.id,
         data: JSON.stringify(submitData),
-        applyId: '',
+        applyId: orgCtrl.provider.user!.id,
       })
     ) {
       message.success('发起成功!');
@@ -105,20 +104,15 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
 
   const handleTableChange = (tableID: string, data: any[], Json: string) => {
     const changeData: { [key: string]: any } = {};
-    const keyMap: Map<string, string> = MakePropertysToAttrMap(propertys);
     data.forEach((item) => {
       // 判断是否包含 修改数据
       const willsaveData = item?.EDIT_INFO ?? {};
       const childMap: { [key: string]: any } = {};
-      const OldchildMap: { [key: string]: any } = {};
       Object.keys(willsaveData).forEach((chidKey) => {
         if (['Id', 'Creater', 'Status', 'CreateTime', 'ModifiedTime'].includes(chidKey)) {
           return;
         }
-        OldchildMap[chidKey] = willsaveData[chidKey];
-        if (keyMap.has(chidKey)) {
-          childMap[keyMap.get(chidKey)!] = willsaveData[chidKey];
-        }
+        childMap[chidKey] = willsaveData[chidKey];
       });
       changeData[item.Id] = childMap;
     });
@@ -167,7 +161,6 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
                   dataSource={[]}
                   current={current}
                   form={i}
-                  labels={[`S${activeTab}`]}
                   propertys={propertys}
                   // setSelectedRows={setRows}
                   belongId={current.workItem.belongId}

@@ -1,5 +1,27 @@
-.leftTree {
-  width: 220px;
-  min-width: 220px;
-  overflow-y: auto;
+.treeThingWrap {
+  display: flex;
+  height: 600px;
+
+  .leftTree {
+    width: 220px;
+    min-width: 220px;
+    height: 600px;
+
+    .leftMenu {
+      height: 100%;
+      overflow-y: auto;
+
+      .ogo-menu-inline {
+        height: 100%;
+      }
+
+      .ogo-menu {
+        height: 500px;
+      }
+    }
+  }
+
+  .ThingTable {
+    width: calc(100% - 220px);
+  }
 }
