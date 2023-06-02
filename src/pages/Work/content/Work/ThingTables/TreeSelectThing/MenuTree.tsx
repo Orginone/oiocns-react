@@ -1,13 +1,41 @@
 import { MenuType } from '@/pages/Setting/config/menuType';
-import { ISpeciesItem, SpeciesType, IThingClass } from '@/ts/core';
+import { ISpeciesItem, SpeciesType, IThingClass, IBelong } from '@/ts/core';
 import React from 'react';
 import { MenuItemType } from 'typings/globelType';
 import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
+import { GroupMenuType } from '@/pages/Store/config/menuType';
+import { Company } from '@/ts/core/target/team/company';
+
+const loadChildren = async (team: IBelong) => {
+  const things: ISpeciesItem[] = [];
+  for (const s of team.species) {
+    switch (s.typeName) {
+      case SpeciesType.Thing:
+        things.push(s);
+        break;
+    }
+  }
+  return [...(await buildThingTree(things))];
+};
+/** 获取存储模块菜单 */
+export const loadStoreMenu = async (company: Company) => {
+  let menu = {
+    key: company.id,
+    item: company,
+    label: company.name,
+    itemType: GroupMenuType.Company,
+    menus: [],
+    icon: <TeamIcon share={company.share} size={18} fontSize={16} />,
+    children: await loadChildren(company),
+  };
+
+  return menu as MenuItemType;
+};
 /** 编译组织分类树 */
 export const buildThingTree = async (
   species: ISpeciesItem[],
 ): Promise<MenuItemType[]> => {
-  const result: MenuItemType[] = [];
+  const result: any[] = [];
   for (const item of species) {
     switch (item.typeName) {
       case SpeciesType.Thing:
@@ -21,12 +49,22 @@ export const buildThingTree = async (
             ),
             itemType: MenuType.Species,
             menus: [],
+            forms: await (item as IThingClass).loadForms(),
             tag: [item.typeName],
             children: [
-              // ...(await (item as IThingClass).loadForms()),
               ...buildThingMenus(item as IThingClass),
               ...(await buildThingTree(item.children)),
             ],
+            beforeLoad: async () => {
+              switch (item.typeName) {
+                case SpeciesType.Thing:
+                  {
+                    (await (item as IThingClass).loadForms()) as any;
+                  }
+
+                  break;
+              }
+            },
           });
         }
         break;
