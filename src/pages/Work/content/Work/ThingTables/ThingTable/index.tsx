@@ -78,25 +78,11 @@ const ThingTable = <
 
   // 处理实体表选择事件
   useEffect(() => {
-    // const keyMap: Map<string, string> = MakePropertysToAttrMap(propertys);
     // 监听实体选择 将实体属性转为表格展示特性
     if (selectedRows.length > 0) {
       const thingListIds = thingList.map((v) => v.Id);
-      const New = handlePropToAttrObj(selectedRows, thingListIds, propertys);
-      // 判断是否 已选择存在
-      // let newSelected = selectedRows
-      //   .filter((s: { Id: string }) => !thingListIds.includes(s.Id))
-      //   .map((item: any) => {
-      //     let obj: { [key: string]: any } = {};
-      //     const { Propertys, ...rest } = item;
-      //     Object.keys(Propertys).forEach((key) => {
-      //       const _key = key.slice(1);
-      //       keyMap.has(_key) && (obj[keyMap.get(_key)!] = item.Propertys[key]);
-      //     });
-      //     return { ...rest, ...obj };
-      //   });
-
-      setThingList([...New, ...thingList]);
+      const newThings = handlePropToAttrObj(selectedRows, thingListIds, propertys);
+      setThingList([...newThings, ...thingList]);
     }
   }, [selectedRows]);
 
@@ -154,7 +140,7 @@ const ThingTable = <
     }
     setOperateModel('' as OperateType.Add);
   };
-  // 获取自定义按钮组
+  // 获取自定义按钮组 默认三项 +可以定义Dom
   const HandleToolBarRender: () => ReactNode[] = () => {
     const dom: ReactNode[] = toolBtnItems.map((item, idx) => {
       if (typeof item == 'string') {
@@ -176,6 +162,7 @@ const ThingTable = <
     });
     return dom;
   };
+
   return (
     <>
       {/* 实体表格区域 */}
