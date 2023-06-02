@@ -64,7 +64,7 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
         title: current.name,
         defineId: current.id,
         data: JSON.stringify(submitData),
-        applyId: '',
+        applyId: orgCtrl.provider.user!.id,
       })
     ) {
       message.success('发起成功!');
