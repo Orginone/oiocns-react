@@ -1,0 +1,43 @@
+.formTitle {
+  display: flex;
+  justify-content: center;
+  font-size: 16px;
+  height: 36px;
+  line-height: 36px;
+  padding-bottom: 10px;
+  border-bottom: 0;
+}
+
+.formWrap {
+  .formRow {
+    :global {
+      .ogo-form-item {
+        margin: 0;
+
+        div,
+        span,
+        input {
+          background-color: transparent;
+          border: none;
+        }
+      }
+    }
+
+    .formCol {
+      padding: 0 !important;
+
+      :global {
+        .ogo-form-item {
+          margin: 0;
+        }
+
+        .ogo-form-item-label {
+          // background-color: #f5f6fc;
+        }
+
+        .ogo-form-item-control {
+        }
+      }
+    }
+  }
+}
