@@ -210,7 +210,7 @@ const ThingTable = <
             onCancel={() => {
               setOperateModel('' as OperateType.Add);
             }}
-            bodyStyle={{ minHeight: '600px' }}
+            bodyStyle={{ minHeight: '400px' }}
             destroyOnClose={true}
             cancelText={'关闭'}
             width={'1200px'}>

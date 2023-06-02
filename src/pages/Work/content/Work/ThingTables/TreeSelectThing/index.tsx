@@ -51,7 +51,7 @@ const SelectThing = <
       <div className={cls.ThingTable}>
         <Thing
           keyExpr={'Id'}
-          height={600}
+          height={'100%'}
           selectable
           belongId={belongId}
           propertys={propertys.map((a) => a.property!)}
