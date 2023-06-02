@@ -1,12 +1,9 @@
-import { MenuType } from '@/pages/Setting/config/menuType';
 import { ISpeciesItem, SpeciesType, IThingClass, IBelong } from '@/ts/core';
 import React from 'react';
 import { MenuItemType } from 'typings/globelType';
 import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
-import { GroupMenuType } from '@/pages/Store/config/menuType';
-import { Company } from '@/ts/core/target/team/company';
 
-const loadChildren = async (team: IBelong) => {
+const loadChildren = (team: IBelong) => {
   const things: ISpeciesItem[] = [];
   for (const s of team.species) {
     switch (s.typeName) {
@@ -15,26 +12,22 @@ const loadChildren = async (team: IBelong) => {
         break;
     }
   }
-  return [...(await buildThingTree(things))];
+  return buildThingTree(things);
 };
 /** 获取存储模块菜单 */
-export const loadStoreMenu = async (company: Company) => {
-  let menu = {
-    key: company.id,
-    item: company,
-    label: company.name,
-    itemType: GroupMenuType.Company,
+export const loadStoreMenu = (space: IBelong) => {
+  return {
+    key: space.id,
+    item: space,
+    label: space.name,
+    itemType: space.typeName,
     menus: [],
-    icon: <TeamIcon share={company.share} size={18} fontSize={16} />,
-    children: await loadChildren(company),
-  };
-
-  return menu as MenuItemType;
+    icon: <TeamIcon share={space.share} size={18} fontSize={16} />,
+    children: loadChildren(space),
+  } as MenuItemType;
 };
 /** 编译组织分类树 */
-export const buildThingTree = async (
-  species: ISpeciesItem[],
-): Promise<MenuItemType[]> => {
+export const buildThingTree = (species: ISpeciesItem[]): MenuItemType[] => {
   const result: any[] = [];
   for (const item of species) {
     switch (item.typeName) {
@@ -44,24 +37,17 @@ export const buildThingTree = async (
             key: item.key,
             item: item,
             label: item.name,
-            icon: (
-              <TeamIcon notAvatar={true} share={item.share} size={18} fontSize={16} />
-            ),
-            itemType: MenuType.Species,
+            icon: <TeamIcon share={item.share} size={18} fontSize={16} />,
+            itemType: item.typeName,
             menus: [],
-            forms: await (item as IThingClass).loadForms(),
-            tag: [item.typeName],
             children: [
               ...buildThingMenus(item as IThingClass),
-              ...(await buildThingTree(item.children)),
+              ...buildThingTree(item.children),
             ],
             beforeLoad: async () => {
               switch (item.typeName) {
                 case SpeciesType.Thing:
-                  {
-                    (await (item as IThingClass).loadForms()) as any;
-                  }
-
+                  await (item as IThingClass).loadForms();
                   break;
               }
             },
@@ -83,7 +69,7 @@ export const buildThingMenus = (thing: IThingClass) => {
         item: form,
         label: form.name,
         icon: <TeamIcon share={form.share} size={18} fontSize={16} />,
-        itemType: MenuType.Form,
+        itemType: '表单',
         beforeLoad: async () => {
           await form.loadAttributes();
         },

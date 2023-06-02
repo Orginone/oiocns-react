@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { ParamsType, ProTableProps } from '@ant-design/pro-components';
 import cls from './index.module.less';
 import { loadStoreMenu } from './MenuTree';
@@ -23,22 +23,10 @@ const SelectThing = <
   props: ProTableProps<DataType, Params, ValueType> & PageProp,
 ) => {
   const { onRowSelectChange, current, belongId, ...rest } = props;
-  const [menu, setMenu] = useState<any>(); //展示左侧菜单
+  const [menu, setMenu] = useState(loadStoreMenu(current.workItem.current)); //展示左侧菜单
   const [propertys, setPropertys] = useState<schema.XAttribute[]>([]); //表格头部展示数据
-  const [menuSelected, setMenuSelected] = useState<any>({}); //实体树 选择的
-  useEffect(() => {
-    // 初始化菜单
-    loadStoreMenu(current.workItem.current).then((res) => {
-      setMenu(res);
-    });
-  }, [current != undefined]);
+  const [menuSelected, setMenuSelected] = useState(menu); //实体树 选择的
   if (!current || !menu) return <></>;
-  // 选择菜单请求实体及表头数据
-  const onSelectClick: any = async (menuItem: any) => {
-    let attributes = await orgCtrl.work.loadAttributes(menuItem.item.id, belongId);
-    setMenuSelected(menuItem.item);
-    setPropertys(attributes);
-  };
 
   return (
     <div className={cls.treeThingWrap}>
@@ -47,8 +35,15 @@ const SelectThing = <
           className={cls.leftMenu}
           item={menu}
           selectMenu={menuSelected}
-          onSelect={(item) => {
-            onSelectClick(item);
+          onSelect={async (item) => {
+            if (item.beforeLoad) {
+              await item.beforeLoad();
+            }
+            if (item.itemType === '表单') {
+              setPropertys(await orgCtrl.work.loadAttributes(item.item.id, belongId));
+            }
+            setMenu(loadStoreMenu(current.workItem.current));
+            setMenuSelected(item);
           }}
           collapsed={false}
         />
@@ -56,13 +51,13 @@ const SelectThing = <
       <div className={cls.ThingTable}>
         <Thing
           keyExpr={'Id'}
-          height={400}
+          height={600}
           selectable
           belongId={belongId}
           propertys={propertys.map((a) => a.property!)}
           onSelected={(data: any) => onRowSelectChange && onRowSelectChange(data)}
           {...rest}
-          labels={menuSelected.id ? [`S${menuSelected.id}`] : []}
+          labels={[`S${menuSelected.item.id}`]}
         />
       </div>
     </div>
