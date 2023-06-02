@@ -38,12 +38,12 @@ const loadBookMenu = () => {
       company,
       menus: company.hasAuthoritys([orgAuth.SuperAuthId])
         ? [
-            // {
-            //   key: '查看会话',
-            //   label: `查看${company.metadata.typeName}所有消息`,
-            //   icon: <im.ImFilter />,
-            //   model: 'outside',
-            // },
+            {
+              key: '查看会话',
+              label: `查看${company.metadata.typeName}所有消息`,
+              icon: <im.ImFilter />,
+              model: 'outside',
+            },
           ]
         : [],
       children: [
