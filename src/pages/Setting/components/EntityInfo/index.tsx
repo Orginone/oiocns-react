@@ -47,7 +47,7 @@ const Description: React.FC<IProps> = ({ entity, other, extra }: IProps) => {
         <Descriptions.Item label="代码">
           <Typography.Paragraph
             copyable={{
-              text: entity.id,
+              text: entity.code,
               tooltips: [entity.code, '复制成功'],
             }}>
             {entity.code}
