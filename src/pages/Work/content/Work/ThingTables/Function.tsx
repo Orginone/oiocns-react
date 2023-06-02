@@ -38,9 +38,8 @@ const getColItem = (
     case '用户型':
       {
         ColItem.render = (text: ReactNode, _record: any) => {
-          if (text) {
-            let share = orgCtrl.user?.findShareById(text as string);
-
+          if (_record) {
+            let share = orgCtrl.user?.findShareById(_record[attrId ?? id]);
             return (
               <>
                 <TeamIcon share={share} size={15} />
