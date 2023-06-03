@@ -116,6 +116,7 @@ const Detail: React.FC<TaskDetailType> = ({ task, define, instance, onBack }) =>
                                   .name
                               }
                             </div>
+                            <div>审批结果：{record.status < 200 ? '通过' : '拒绝'}</div>
                             <div>
                               {record.comment && <div>审批意见：{record.comment}</div>}
                             </div>
