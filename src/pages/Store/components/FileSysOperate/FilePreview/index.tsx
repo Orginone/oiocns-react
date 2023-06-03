@@ -27,7 +27,11 @@ const FilePreview = ({ share, previewDone }: IProps) => {
     if (share.thumbnail && share.thumbnail.length > 0) {
       return <Image src={share.shareLink} title={share.name} preview={false} />;
     }
-
+    // 自定义文件类型处理
+    switch (share.extension) {
+      case '.mat':
+        break;
+    }
     return (
       <FileViewer
         key={view}
