@@ -2,11 +2,8 @@ import React, { useEffect, useState } from 'react';
 import InsertButton from '../InsertButton';
 import { AiOutlineCopy, AiOutlineClose } from 'react-icons/ai';
 import cls from './index.module.less';
-import { Tooltip } from 'antd';
 import orgCtrl from '@/ts/controller';
 type ConcurrentNodeProps = {
-  //默认操作组织id
-  operateOrgId?: string;
   onInsertNode: Function;
   onDelNode: Function;
   onCopy: Function;
@@ -86,21 +83,13 @@ const ConcurrentNode: React.FC<ConcurrentNodeProps> = (props: ConcurrentNodeProp
   );
   return (
     <div className={editable ? cls['node'] : cls['node-unEdit']}>
-      <Tooltip
-        title={
-          <span>
-            创建组织: {orgCtrl.provider.user?.findShareById(props.config.belongId).name}
-          </span>
-        }
-        placement="right">
-        <div className={cls['node-body']}>
-          <div className={cls['node-body-main']}>
-            {nodeHeader}
-            {nodeContent}
-          </div>
+      <div className={cls['node-body']}>
+        <div className={cls['node-body-main']}>
+          {nodeHeader}
+          {nodeContent}
         </div>
-        <div className={cls['node-footer']}>{footer}</div>
-      </Tooltip>
+      </div>
+      <div className={cls['node-footer']}>{footer}</div>
     </div>
   );
 };

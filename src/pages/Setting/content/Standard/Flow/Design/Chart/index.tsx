@@ -14,17 +14,17 @@ interface IProps {
 
 const ChartDesign: React.FC<IProps> = (props) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const [scale, setScale] = useState<number>(100);
   const [currentNode, setCurrentNode] = useState<NodeType>();
-  useEffect(() => {
-    setScale(props.scale ?? 100);
-  }, [props]);
+
+  useEffect(() => {}, [props.resource]);
 
   return (
     <div className={cls['container']}>
       <div className={cls['layout-body']}>
         <div style={{ height: 'calc(100vh - 250px )', overflowY: 'auto' }}>
-          <div className={cls['design']} style={{ transform: `scale(${scale / 100})` }}>
+          <div
+            className={cls['design']}
+            style={{ transform: `scale(${(props.scale ?? 100) / 100})` }}>
             {/* 树结构展示 */}
             <ProcessTree
               defaultEditable={props.defaultEditable}

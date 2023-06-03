@@ -3,12 +3,9 @@ import InsertButton from '../InsertButton';
 import cls from './index.module.less';
 import { AiOutlineCopy, AiOutlineClose } from 'react-icons/ai';
 import { FieldCondition } from '../../FlowDrawer/processType';
-import { Tooltip } from 'antd';
-import orgCtrl from '@/ts/controller';
 
 type IProps = {
   //默认操作组织id
-  operateOrgId?: string;
   conditions?: FieldCondition[];
   onInsertNode: Function;
   onDelNode: Function;
@@ -161,22 +158,14 @@ const ConditionNode: React.FC<IProps> = (props) => {
       className={`${editable ? cls['node'] : cls['node-unEdit']} ${
         showError && editable ? cls['node-error-state'] : ''
       }`}>
-      <Tooltip
-        title={
-          <span>
-            创建组织: {orgCtrl.provider.user?.findShareById(props.config.belongId).name}
-          </span>
-        }
-        placement="right">
-        <div className={`${cls['node-body']} ${showError ? cls['error'] : ''}`}>
-          <div className={cls['node-body-main']}>
-            {nodeHeader}
-            {nodeContent}
-          </div>
+      <div className={`${cls['node-body']} ${showError ? cls['error'] : ''}`}>
+        <div className={cls['node-body-main']}>
+          {nodeHeader}
+          {nodeContent}
         </div>
+      </div>
 
-        <div className={cls['node-footer']}>{footer}</div>
-      </Tooltip>
+      <div className={cls['node-footer']}>{footer}</div>
     </div>
   );
 };

@@ -23,7 +23,6 @@ import { WorkNodeModel } from '@/ts/base/model';
 import { getUuid } from '@/utils/tools';
 
 type IProps = {
-  operateOrgId?: string;
   conditions?: FieldCondition[]; //内置条件选择器
   resource: WorkNodeModel;
   onSelectedNode: (params: any) => void;
@@ -40,7 +39,6 @@ const ProcessTree: React.FC<IProps> = ({
   onSelectedNode,
   resource,
   conditions,
-  operateOrgId,
   defaultEditable,
 }) => {
   const [key, setKey] = useState(0);
@@ -196,7 +194,6 @@ const ProcessTree: React.FC<IProps> = ({
         key: getRandomId(),
         ...props,
         conditions,
-        operateOrgId,
         defaultEditable,
         //定义事件，插入节点，删除节点，选中节点，复制/移动
         onInsertNode: (type: any) => insertNode(type, node),
@@ -541,9 +538,7 @@ const ProcessTree: React.FC<IProps> = ({
     return getBranchEndNode(conditionNode.children);
   };
   const addBranchNode = (node: any) => {
-    if (node.belongId && node.belongId != operateOrgId) {
-      message.warning(`该节点由其他人或单位创建，无法在此添加新节点`);
-    } else if (node.branches.length < 8) {
+    if (node.branches.length < 8) {
       node.branches.push({
         nodeId: getRandomId(),
         parentId: node.nodeId,
