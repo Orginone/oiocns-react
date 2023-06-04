@@ -29,7 +29,7 @@ import { loadWidgetsOpts } from '../rule';
 interface IProps {
   disabled?: boolean;
   item: XAttribute;
-  belong: IBelong;
+  belong?: IBelong;
   noRule?: boolean;
 }
 

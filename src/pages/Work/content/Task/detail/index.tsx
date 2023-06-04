@@ -6,7 +6,7 @@ import { Button, Card, Collapse, Input, Tabs, TabsProps, Timeline } from 'antd';
 import React, { useRef, useState } from 'react';
 import { ImUndo2 } from 'react-icons/im';
 import cls from './index.module.less';
-import OioForm from '@/bizcomponents/FormDesign/OioForm';
+import OioForm from '@/bizcomponents/FormDesign/OioFormNext';
 import { schema } from '@/ts/base';
 import { IWorkDefine } from '@/ts/core';
 import BashThing from '@/pages/Work/content/Work/ThingTables/BaseThing';
@@ -25,7 +25,7 @@ const Detail: React.FC<TaskDetailType> = ({ task, define, instance, onBack }) =>
 
   /** 加载主表 */
   const loadForms = (forms: any) => {
-    const content: React.JSX.Element[] = [];
+    const content: React.ReactNode[] = [];
     let items: any[] = [];
     Object.keys(forms?.formData || {}).forEach((id) => {
       if (forms.formData[id].isHeader) {
@@ -63,7 +63,7 @@ const Detail: React.FC<TaskDetailType> = ({ task, define, instance, onBack }) =>
         <OioForm
           key={item.id}
           form={item}
-          define={define}
+          belong={define.workItem.current.space}
           formRef={undefined}
           fieldsValue={data}
           disabled={disabled}

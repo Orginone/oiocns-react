@@ -2,13 +2,13 @@ import { ProForm } from '@ant-design/pro-components';
 import { Col, Descriptions, Row } from 'antd';
 import React, { useEffect, useMemo, useState } from 'react';
 import OioFormItem from './FormItems';
-import { IWorkDefine } from '@/ts/core';
+import { IBelong, IWorkDefine } from '@/ts/core';
 import { XAttribute, XForm } from '@/ts/base/schema';
 import orgCtrl from '@/ts/controller';
 import cls from './index.module.less';
 type IProps = {
   form: XForm;
-  define: IWorkDefine;
+  belong?: IBelong;
   submitter?: any;
   onValuesChange?: (changedValues: any, values: Record<string, any>) => void;
   onFinished?: Function;
@@ -23,7 +23,7 @@ type IProps = {
  */
 const OioForm: React.FC<IProps> = ({
   form,
-  define,
+  belong,
   submitter,
   onValuesChange,
   onFinished,
@@ -32,15 +32,17 @@ const OioForm: React.FC<IProps> = ({
   disabled,
   noRule,
 }) => {
-  const [attributes, setAttributes] = useState<XAttribute[]>([]);
+  const [attributes, setAttributes] = useState<XAttribute[]>(form.attributes || []);
   let config: any = form.rule ? JSON.parse(form.rule) : { col: 8, layout: 'horizontal' };
   useEffect(() => {
-    orgCtrl.work.loadAttributes(form.id, define.workItem.belongId).then((value) => {
-      setAttributes(value);
-      if (fieldsValue) {
-        formRef?.current?.setFieldsValue(fieldsValue);
-      }
-    });
+    if (attributes.length == 0 && belong) {
+      orgCtrl.work.loadAttributes(form.id, belong.id).then((value) => {
+        setAttributes(value);
+        if (fieldsValue) {
+          formRef?.current?.setFieldsValue(fieldsValue);
+        }
+      });
+    }
   }, []);
   const fillArr = useMemo(() => {
     let leg = attributes.length % 3;
@@ -96,11 +98,7 @@ const OioForm: React.FC<IProps> = ({
               key={item.id}
               span={1}
               contentStyle={{ width: '33%' }}>
-              <OioFormItem
-                item={item}
-                belong={define.workItem.current.space}
-                noRule={noRule}
-              />
+              <OioFormItem item={item} belong={belong} noRule={noRule} />
             </Descriptions.Item>
           ))}
           {fillArr.map((_, index) => (

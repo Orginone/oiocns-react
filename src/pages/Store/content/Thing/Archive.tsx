@@ -2,9 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { Card, Collapse, Tabs, Timeline } from 'antd';
 import orgCtrl from '@/ts/controller';
 import { kernel, schema } from '@/ts/base';
-import OioForm from '@/bizcomponents/FormDesign/OioForm';
+import OioForm from '@/bizcomponents/FormDesign/OioFormNext';
 import { XWorkInstance, XWorkTask } from '@/ts/base/schema';
 import BashThing from '@/pages/Work/content/Work/ThingTables/BaseThing';
+import { IBelong } from '@/ts/core';
 
 const { Panel } = Collapse;
 
@@ -61,7 +62,7 @@ const ThingArchive: React.FC<IThingCardProps> = ({ thingId, belongId }) => {
 
   /** 加载主表 */
   const loadForms = (forms: any) => {
-    const content: React.JSX.Element[] = [];
+    const content: React.ReactNode[] = [];
     let items: any[] = [];
     Object.keys(forms?.formData || {}).forEach((id) => {
       if (forms.formData[id].isHeader) {
@@ -94,19 +95,20 @@ const ThingArchive: React.FC<IThingCardProps> = ({ thingId, belongId }) => {
   /** 加载表单 */
   const loadFormItem = (forms: schema.XForm[], disabled: boolean, data?: any) => {
     let content = [];
-    for (let item of forms) {
-      // TODO 主表待优化
-      content.push(
-        // <OioForm
-        //   key={item.id}
-        //   form={item}
-        //   define={define}
-        //   formRef={undefined}
-        //   fieldsValue={data}
-        //   disabled={disabled}
-        // />,
-        <></>,
-      );
+    let belong = orgCtrl.user.targets.find((a) => a.id == belongId);
+    if (belong) {
+      for (let item of forms) {
+        content.push(
+          <OioForm
+            key={item.id}
+            form={item}
+            formRef={undefined}
+            belong={belong as IBelong}
+            fieldsValue={data}
+            disabled={disabled}
+          />,
+        );
+      }
     }
     return content;
   };

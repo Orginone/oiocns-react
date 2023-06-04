@@ -8,7 +8,7 @@ import { LabelTooltipType } from 'antd/lib/form/FormItemLabel';
 interface IProps {
   rules: Rule[];
   name: string;
-  belong: IBelong;
+  belong?: IBelong;
   label: React.ReactNode;
   labelAlign: FormLabelAlign;
   tooltip: LabelTooltipType;
@@ -28,19 +28,21 @@ const ProFormGroup = (props: IProps) => {
   const [treeData, setTreeData] = useState<OptionType[]>([]);
 
   useEffect(() => {
-    const initTreeData = async () => {
-      setTreeData(
-        props.belong.parentTarget.map((i) => {
-          return {
-            key: i.key,
-            label: i.name,
-            value: i.id,
-            origin: 0,
-          };
-        }),
-      );
-    };
-    initTreeData();
+    if (props.belong) {
+      const initTreeData = async () => {
+        setTreeData(
+          props.belong!.parentTarget.map((i) => {
+            return {
+              key: i.key,
+              label: i.name,
+              value: i.id,
+              origin: 0,
+            };
+          }),
+        );
+      };
+      initTreeData();
+    }
   }, []);
 
   return (

@@ -127,6 +127,7 @@ const Design: React.FC<IProps> = ({
         );
       }
     }
+    // TODO 判断条件节点是否合格
     return errors;
   };
 

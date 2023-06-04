@@ -16,8 +16,6 @@ const ChartDesign: React.FC<IProps> = (props) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [currentNode, setCurrentNode] = useState<NodeType>();
 
-  useEffect(() => {}, [props.resource]);
-
   return (
     <div className={cls['container']}>
       <div className={cls['layout-body']}>
@@ -49,6 +47,7 @@ const ChartDesign: React.FC<IProps> = (props) => {
       {/* 侧边数据填充 */}
       {currentNode && (
         <FlowDrawer
+          forms={props.resource.props.operations}
           define={props.current}
           defaultEditable={props.defaultEditable}
           isOpen={
