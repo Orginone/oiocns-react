@@ -106,7 +106,7 @@ const SelectForms: React.FC<IProps> = (props) => {
               checkedKeys={centerCheckedKeys}
               autoExpandParent={true}
               onCheck={onCheck}
-              treeData={centerTreeData.filter((i) => i.title.includes(filter))}
+              treeData={centerTreeData.filter((i: any) => i.title.includes(filter))}
             />
           </div>
         </div>
