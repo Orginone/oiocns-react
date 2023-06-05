@@ -14,11 +14,6 @@ type DeptWayNodeProps = {
   level: any;
   defaultEditable: boolean;
   [key: string]: any;
-  // config?: any,
-  //  _disabled?: boolean,
-  // level?: number,
-  // //条件数
-  // size?:number
 };
 
 /**
@@ -26,7 +21,6 @@ type DeptWayNodeProps = {
  * @returns
  */
 const DeptWayNode: React.FC<DeptWayNodeProps> = (props: DeptWayNodeProps) => {
-  const [editable, setEditable] = useState<boolean>(true);
   const [key, setKey] = useState<number>(0);
   const [orgId, setOrgId] = useState<string>();
   const delNode = () => {
@@ -38,20 +32,8 @@ const DeptWayNode: React.FC<DeptWayNodeProps> = (props: DeptWayNodeProps) => {
   const select = () => {
     props.onSelected();
   };
-  // TODO 这里有问题
-  const isEditable = (): boolean => {
-    let editable = props.defaultEditable;
-    if (
-      props.config.belongId &&
-      props.config.belongId != '' &&
-      props.config.belongId != orgCtrl.user.id
-    ) {
-      editable = false;
-    }
-    return editable;
-  };
+
   useEffect(() => {
-    setEditable(isEditable());
     if (props.config.conditions.length == 0) {
       props.config.conditions = [
         {
@@ -66,7 +48,7 @@ const DeptWayNode: React.FC<DeptWayNodeProps> = (props: DeptWayNodeProps) => {
       ];
       setKey(key + 1);
     }
-    if (!isEditable()) {
+    if (!props.defaultEditable) {
       setOrgId(props.config.conditions[0]?.val);
     } else {
       setOrgId(orgCtrl.user.id);
@@ -76,7 +58,9 @@ const DeptWayNode: React.FC<DeptWayNodeProps> = (props: DeptWayNodeProps) => {
   const footer = (
     <>
       <div className={cls['btn']}>
-        {editable && <InsertButton onInsertNode={props.onInsertNode}></InsertButton>}
+        {props.defaultEditable && (
+          <InsertButton onInsertNode={props.onInsertNode}></InsertButton>
+        )}
       </div>
     </>
   );
@@ -88,7 +72,7 @@ const DeptWayNode: React.FC<DeptWayNodeProps> = (props: DeptWayNodeProps) => {
           {props.config.name ? props.config.name : '组织分支' + props.level}
         </span>
       </span>
-      {editable && props.config.readonly && (
+      {props.defaultEditable && !props.config.readonly && (
         <span className={cls['option']}>
           <AiOutlineCopy
             style={{ fontSize: '12px', paddingRight: '5px' }}
@@ -101,6 +85,7 @@ const DeptWayNode: React.FC<DeptWayNodeProps> = (props: DeptWayNodeProps) => {
   );
 
   const onChange = (newValue: string) => {
+    props.config.conditions[0].display = newValue;
     props.config.conditions[0].val = newValue;
     setKey(key + 1);
   };
@@ -109,24 +94,17 @@ const DeptWayNode: React.FC<DeptWayNodeProps> = (props: DeptWayNodeProps) => {
     <div className={cls['node-body-main-content']} onClick={select}>
       {/* <span>组织分支</span> */}
       <span>
-        {' '}
-        {editable && (
-          <SelectOrg
-            key={key}
-            onChange={onChange}
-            orgId={orgId}
-            value={props.config.conditions[0]?.val}
-            readonly={props.config.readonly}
-            rootDisable={false}></SelectOrg>
+        {props.defaultEditable ? (
+          <SelectOrg key={key} onChange={onChange} orgId={orgId} />
+        ) : (
+          props.config.conditions[0].display
         )}
-        {!editable &&
-          orgCtrl.provider.user?.findShareById(props.config.conditions[0]?.val).name}
       </span>
     </div>
   );
 
   return (
-    <div className={editable ? cls['node'] : cls['node-unEdit']}>
+    <div className={props.defaultEditable ? cls['node'] : cls['node-unEdit']}>
       <div className={cls['node-body']}>
         <div className={cls['node-body-main']}>
           {nodeHeader}

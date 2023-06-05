@@ -93,7 +93,7 @@ const Modal = ({ open, handleOk, species, current, handleCancel }: Iprops) => {
       onFinish={async (values: XForm) => {
         let success = false;
         if (current) {
-          success = await current.update(values);
+          success = await current.update({ ...current.metadata, ...values });
         } else if (species) {
           success = (await species.createForm(values)) != undefined;
         }

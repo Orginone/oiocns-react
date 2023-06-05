@@ -16,14 +16,12 @@ import {
   CC_PROPS,
   dataType,
   DELAY_PROPS,
-  FieldCondition,
   TRIGGER_PROPS,
 } from '../FlowDrawer/processType';
 import { WorkNodeModel } from '@/ts/base/model';
 import { getUuid } from '@/utils/tools';
 
 type IProps = {
-  conditions?: FieldCondition[]; //内置条件选择器
   resource: WorkNodeModel;
   onSelectedNode: (params: any) => void;
   defaultEditable: boolean;
@@ -35,12 +33,7 @@ type IProps = {
  * @returns
  */
 
-const ProcessTree: React.FC<IProps> = ({
-  onSelectedNode,
-  resource,
-  conditions,
-  defaultEditable,
-}) => {
+const ProcessTree: React.FC<IProps> = ({ onSelectedNode, resource, defaultEditable }) => {
   const [key, setKey] = useState(0);
 
   const addNodeMap = useAppwfConfig((state: any) => state.addNodeMap);
@@ -193,7 +186,6 @@ const ProcessTree: React.FC<IProps> = ({
         config: node,
         key: getRandomId(),
         ...props,
-        conditions,
         defaultEditable,
         //定义事件，插入节点，删除节点，选中节点，复制/移动
         onInsertNode: (type: any) => insertNode(type, node),

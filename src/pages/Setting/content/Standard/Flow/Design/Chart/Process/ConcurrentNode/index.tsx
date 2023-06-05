@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import InsertButton from '../InsertButton';
 import { AiOutlineCopy, AiOutlineClose } from 'react-icons/ai';
 import cls from './index.module.less';
-import orgCtrl from '@/ts/controller';
 type ConcurrentNodeProps = {
   onInsertNode: Function;
   onDelNode: Function;
@@ -12,11 +11,6 @@ type ConcurrentNodeProps = {
   level: any;
   defaultEditable: boolean;
   [key: string]: any;
-  // config?: any,
-  //  _disabled?: boolean,
-  // level?: number,
-  // //条件数
-  // size?:number
 };
 
 /**
@@ -24,7 +18,6 @@ type ConcurrentNodeProps = {
  * @returns
  */
 const ConcurrentNode: React.FC<ConcurrentNodeProps> = (props: ConcurrentNodeProps) => {
-  const [editable, setEditable] = useState<boolean>(true);
   const delNode = () => {
     props.onDelNode();
   };
@@ -34,26 +27,12 @@ const ConcurrentNode: React.FC<ConcurrentNodeProps> = (props: ConcurrentNodeProp
   const select = () => {
     props.onSelected();
   };
-  // TODO 这里有问题
-  const isEditable = (): boolean => {
-    let editable = props.defaultEditable;
-    if (
-      props.config.belongId &&
-      props.config.belongId != '' &&
-      props.config.belongId != orgCtrl.user.id
-    ) {
-      editable = false;
-    }
-    return editable;
-  };
-  useEffect(() => {
-    setEditable(isEditable());
-  }, []);
-
   const footer = (
     <>
       <div className={cls['btn']}>
-        {editable && <InsertButton onInsertNode={props.onInsertNode}></InsertButton>}
+        {props.defaultEditable && (
+          <InsertButton onInsertNode={props.onInsertNode}></InsertButton>
+        )}
       </div>
     </>
   );
@@ -65,7 +44,7 @@ const ConcurrentNode: React.FC<ConcurrentNodeProps> = (props: ConcurrentNodeProp
           {props.config.name ? props.config.name : '并行任务' + props.level}
         </span>
       </span>
-      {editable && (
+      {props.defaultEditable && (
         <span className={cls['option']}>
           <AiOutlineCopy
             style={{ fontSize: '12px', paddingRight: '5px' }}
@@ -82,7 +61,7 @@ const ConcurrentNode: React.FC<ConcurrentNodeProps> = (props: ConcurrentNodeProp
     </div>
   );
   return (
-    <div className={editable ? cls['node'] : cls['node-unEdit']}>
+    <div className={props.defaultEditable ? cls['node'] : cls['node-unEdit']}>
       <div className={cls['node-body']}>
         <div className={cls['node-body-main']}>
           {nodeHeader}

@@ -1,7 +1,7 @@
 import cls from './index.module.less';
 import FlowDrawer from './FlowDrawer';
 import ProcessTree from './ProcessTree';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { AddNodeType, NodeType } from './FlowDrawer/processType';
 import { IWorkDefine } from '@/ts/core';
 
