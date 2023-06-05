@@ -70,7 +70,7 @@ export interface IMessage {
   /** 已读人员 */
   readedIds: string[];
   /** 未读人员信息 */
-  unreadInfo: model.ShareIcon[];
+  unreadInfo: IMessageLabel[];
   /** 评论数 */
   comments: number;
   /** 消息撤回 */
@@ -152,11 +152,21 @@ export class Message implements IMessage {
     const ids = this.labels.map((v) => v.userId);
     return ids.filter((id, i) => ids.indexOf(id) === i);
   }
-  get unreadInfo(): model.ShareIcon[] {
+  get unreadInfo(): IMessageLabel[] {
     const ids = this.readedIds;
     return this._chat.members
       .filter((m) => !ids.includes(m.id) && m.id != this.user.id)
-      .map((m) => this.user.findShareById(m.id));
+      .map(
+        (m) =>
+          new MessageLabel(
+            {
+              label: m.remark,
+              userId: m.id,
+              time: '',
+            },
+            this.user,
+          ),
+      );
   }
   get comments(): number {
     return this.labels.filter((v) => v.label != '已读').length;

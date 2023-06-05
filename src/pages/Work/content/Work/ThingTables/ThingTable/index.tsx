@@ -154,7 +154,6 @@ const ThingTable = <
               setOperateModel(item as OperateType.Add);
             }}>
             {item ?? '--'}
-            {form?.name}
           </Button>
         );
       }

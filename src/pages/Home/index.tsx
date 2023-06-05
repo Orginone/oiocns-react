@@ -11,7 +11,6 @@ import Charts from './components/Charts';
 //TODO: 临时获取本地banner
 let imgList: any[] = [];
 
-
 /**
  * @desc: 获取图片列表资源
  * @return  {url:string} 图片信息
@@ -36,10 +35,14 @@ const Home: React.FC = () => {
       <BannerCom imgList={imgList} />
       {/* 快捷入口及应用 */}
       <div className=" flex">
-        <Shortcuts props={[]} /> <SelfAppCom props={[]} />
+        <Shortcuts props={[]} />
+      </div>
+      {/* 快捷入口及应用 */}
+      <div className=" flex">
+        <SelfAppCom props={[]} />
       </div>
       {/* 底部区域 //TODO:临时*/}
-      <Charts/>
+      <Charts />
     </div>
   );
 };

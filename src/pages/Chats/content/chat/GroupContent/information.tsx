@@ -1,9 +1,8 @@
-import EntityIcon from '@/bizcomponents/GlobalComps/entityIcon';
-import { IMessage } from '@/ts/core';
-import css from './index.module.less';
-import { Drawer, Tabs } from 'antd';
+import { IMessage, IMessageLabel } from '@/ts/core';
+import { Drawer, List, Tabs } from 'antd';
 import React, { useState } from 'react';
-import { formatZhDate } from '@/utils/tools';
+import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
+import { showChatTime } from '@/utils/tools';
 import type { TabsProps } from 'antd';
 
 const Information = ({ msg, onClose }: { msg: IMessage; onClose: Function }) => {
@@ -12,36 +11,42 @@ const Information = ({ msg, onClose }: { msg: IMessage; onClose: Function }) => 
   // 展示已读的
   const readList = () => {
     return (
-      <ul className={css.moreInfo}>
-        {msg.labels.map((i) => {
-          return (
-            <li key={i.time}>
-              <EntityIcon share={i.labeler} fontSize={30} size={30} />
-              <strong style={{ marginLeft: 6 }}>{i.labeler.name}</strong>
-              <div>
-                <span>{formatZhDate(i.time)}:</span>
-                <strong>{i.label}</strong>
-              </div>
-            </li>
-          );
-        })}
-      </ul>
+      <List
+        className="demo-loadmore-list"
+        itemLayout="horizontal"
+        dataSource={msg.labels}
+        renderItem={loadLabelItem}
+      />
     );
   };
 
   // 展示未读
   const unRead = () => {
     return (
-      <ul className={css.moreInfo}>
-        {unreadInfo.map((i) => {
-          return (
-            <li key={i.name}>
-              <EntityIcon share={i} fontSize={30} size={30} />
-              <strong style={{ marginLeft: 6 }}>{i.name}</strong>
-            </li>
-          );
-        })}
-      </ul>
+      <List
+        className="demo-loadmore-list"
+        itemLayout="horizontal"
+        dataSource={msg.unreadInfo}
+        renderItem={loadLabelItem}
+      />
+    );
+  };
+
+  const loadLabelItem = (item: IMessageLabel) => {
+    return (
+      <List.Item
+        style={{ cursor: 'pointer', padding: 6 }}
+        actions={
+          item.time.length > 0
+            ? [<div key={item.time}>{showChatTime(item.time)}</div>]
+            : []
+        }>
+        <List.Item.Meta
+          avatar={<TeamIcon share={item.labeler} size={42} fontSize={42} />}
+          title={<strong>{item.labeler.name}</strong>}
+          description={item.label}
+        />
+      </List.Item>
     );
   };
 

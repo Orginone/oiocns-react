@@ -89,8 +89,8 @@ const BannerCom: React.FC<ShortcutsComType> = () => {
   );
 
   return (
-    <CardWidthTitle className="shortcuts-wrap" title={'快捷入口'}>
-      {Btns}
+    <CardWidthTitle className="shortcuts-wrap" title={'常用'}>
+      <div className="groupbuttons">{Btns}</div>
       {/* 添加用户 */}
       {selectTargetType && (
         <Modal
