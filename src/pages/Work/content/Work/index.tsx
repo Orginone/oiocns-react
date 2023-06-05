@@ -8,7 +8,7 @@ import { GroupMenuType } from '../../config/menuType';
 import { XForm, XProperty } from '@/ts/base/schema';
 // import BaseThing from './BaseThing';
 import ThingTable from './ThingTables/ThingTable';
-import { OperateType } from './ThingTables/const';
+import { OperateType, defaultCol } from './ThingTables/const';
 // 卡片渲染
 interface IProps {
   current: IWorkDefine;
@@ -105,15 +105,13 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
   const handleTableChange = (tableID: string, data: any[], Json: string) => {
     const changeData: { [key: string]: any } = {};
     data.forEach((item) => {
-      // 判断是否包含 修改数据
-      const willsaveData = item?.EDIT_INFO ?? {};
+      const DMData = item?.EDIT_INFO ?? {}; //待修改数据
       const childMap: { [key: string]: any } = {};
-      Object.keys(willsaveData).forEach((chidKey) => {
-        if (['Id', 'Creater', 'Status', 'CreateTime', 'ModifiedTime'].includes(chidKey)) {
-          return;
-        }
-        childMap[chidKey] = willsaveData[chidKey];
-      });
+      Object.keys(DMData)
+        .filter((s) => !defaultCol.map((v: { id: string }) => v.id).includes(s))
+        .forEach((chidKey) => {
+          childMap[chidKey] = DMData[chidKey];
+        });
       changeData[item.Id] = childMap;
     });
     submitData.formData[tableID] = {
@@ -123,7 +121,9 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
     };
     setSubmitData({ ...submitData });
   };
-
+  if (!activeTab) {
+    return <></>;
+  }
   return (
     <div className={cls.content}>
       {workForm && (
@@ -143,32 +143,27 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
         />
       )}
       {thingForms.length > 0 && (
-        <Tabs
-          tabPosition="top"
-          activeKey={activeTab}
-          onTabClick={(tabKey) => setActiveTab(tabKey)}
-          items={thingForms.map((i) => {
-            return {
-              label: i.name,
-              key: i.id,
-              children: (
-                <ThingTable
-                  toolBtnItems={[
-                    OperateType.Add,
-                    OperateType.EditMore,
-                    OperateType.Select,
-                  ]}
-                  dataSource={[]}
-                  current={current}
-                  form={i}
-                  propertys={propertys}
-                  // setSelectedRows={setRows}
-                  belongId={current.workItem.belongId}
-                  onListChange={handleTableChange}
-                />
-              ),
-            };
-          })}
+        <ThingTable
+          headerTitle={
+            <Tabs
+              activeKey={activeTab}
+              tabPosition="bottom"
+              className={cls.tabBar}
+              onTabClick={(tabKey) => setActiveTab(tabKey)}
+              items={thingForms.map((i) => {
+                return {
+                  label: i.name,
+                  key: i.id,
+                };
+              })}></Tabs>
+          }
+          toolBtnItems={[OperateType.Add, OperateType.EditMore, OperateType.Select]}
+          dataSource={[]}
+          current={current}
+          form={thingForms.find((v) => v.id === activeTab)}
+          propertys={propertys}
+          belongId={current.workItem.belongId}
+          onListChange={handleTableChange}
         />
       )}
       <Card className={cls['bootom_content']}>

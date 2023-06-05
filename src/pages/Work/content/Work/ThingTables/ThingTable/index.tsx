@@ -20,7 +20,7 @@ interface IProps {
   setSelectedRows?: (data: any) => void;
   current?: any;
   onListChange?: Function;
-  form: schema.XForm; //传进来的 表单基本信息
+  form?: schema.XForm; //传进来的 表单基本信息
   defaultColums?: any[]; //传进来的 表头设置
   toolBtnItems?: toolBtnsType;
 }
@@ -51,6 +51,9 @@ const ThingTable = <
   const [operateModel, setOperateModel] = useState<OperateType>('' as OperateType.Add);
   const [selectedData, setSelectedData] = useState<any>({});
   const [changeData, setChangeData] = useState<any>({});
+  if (!form) {
+    return <></>;
+  }
 
   const Operation: ProColumnType<any> = {
     title: '操作',
@@ -154,7 +157,6 @@ const ThingTable = <
               setOperateModel(item as OperateType.Add);
             }}>
             {item ?? '--'}
-            {form?.name}
           </Button>
         );
       }
