@@ -35,6 +35,7 @@ const BaseThing = <
     Operation = {},
     readonly,
     toolBarRender,
+    scroll = {},
     ...rest
   } = props;
   const getColumns: any = useMemo(() => {
@@ -63,7 +64,7 @@ const BaseThing = <
         options={readonly ? false : undefined}
         columnsState={{ ...defaultColumnStateMap }}
         toolBarRender={readonly ? undefined : toolBarRender}
-        scroll={{ x: scrollx }}
+        scroll={{ ...scroll, x: scrollx }}
         {...rest}
       />
     </>

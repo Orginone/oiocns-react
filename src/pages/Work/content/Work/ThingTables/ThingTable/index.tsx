@@ -41,7 +41,6 @@ const ThingTable = <
     current,
     form,
     onListChange,
-    readonly,
     toolBtnItems = [],
     ...rest
   } = props;
@@ -186,7 +185,7 @@ const ThingTable = <
         key={thingList.length}
         size="small"
         dataSource={[...thingList]}
-        toolBarRender={readonly ? undefined : (HandleToolBarRender as any)}
+        toolBarRender={HandleToolBarRender}
         {...rest}
       />
       {/* 弹窗区域 */}
@@ -226,7 +225,7 @@ const ThingTable = <
             bodyStyle={{ minHeight: '400px' }}
             destroyOnClose={true}
             cancelText={'关闭'}
-            width={'1200px'}>
+            width={1200}>
             <SelectThing
               current={current}
               labels={[`S${form.id}`]}

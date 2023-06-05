@@ -1,15 +1,16 @@
 import Design from '@/pages/Setting/content/Standard/Flow/Design';
-import Thing from '@/pages/Store/content/Thing/Thing';
+// import Thing from '@/pages/Store/content/Thing/Thing';
 import orgCtrl from '@/ts/controller';
 import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
 import { ProFormInstance } from '@ant-design/pro-form';
 import { Button, Card, Collapse, Input, Tabs, TabsProps, Timeline } from 'antd';
-import React, { useRef, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { ImUndo2 } from 'react-icons/im';
 import cls from './index.module.less';
-import OioForm from '@/bizcomponents/FormDesign/OioForm';
+import OioForm from '@/bizcomponents/FormDesign/OioFormNext';
 import { schema } from '@/ts/base';
 import { IWorkDefine } from '@/ts/core';
+import ThingTable from '../../Work/ThingTables/ThingTable';
 
 export interface TaskDetailType {
   task: schema.XWorkTask;
@@ -22,6 +23,7 @@ const Detail: React.FC<TaskDetailType> = ({ task, define, instance, onBack }) =>
   const formRef = useRef<ProFormInstance<any>>();
   const [comment, setComment] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
+  const [activeTab, setActiveTab] = useState<string>('');
 
   /** 加载主表 */
   const loadHeadForms = (forms: any) => {
@@ -35,6 +37,10 @@ const Detail: React.FC<TaskDetailType> = ({ task, define, instance, onBack }) =>
             forms.headerData,
           ),
         );
+      } else {
+        if (!activeTab) {
+          setActiveTab(JSON.parse(forms.formData[id].resourceData)?.form?.id);
+        }
       }
     });
     return content;
@@ -140,7 +146,55 @@ const Detail: React.FC<TaskDetailType> = ({ task, define, instance, onBack }) =>
     }
     return <></>;
   };
+  /* 加载操作实体 */
+  const loadThingTable = useMemo(() => {
+    if (instance) {
+      const formData = JSON.parse(instance.data).forms.formData ?? {};
+      let thingList: any[] = [];
+      Object.keys(formData).forEach((keyStr) => {
+        const _data = formData[keyStr];
+        if (!_data.isHeader) {
+          const { data, form, propertys } = JSON.parse(_data.resourceData);
+          data.length > 0 && thingList.push({ ...form, data, propertys });
+        }
+      });
+      if (thingList[0]?.id && !activeTab) {
+        setActiveTab(thingList[0].id);
+      }
 
+      if (thingList.length == 0 || !activeTab) {
+        return <></>;
+      }
+      const TableData = thingList.find((v) => v.id === activeTab);
+      return (
+        <>
+          {
+            <ThingTable
+              headerTitle={
+                <Tabs
+                  activeKey={activeTab}
+                  tabPosition="bottom"
+                  // className={cls.tabBar}
+                  onTabClick={(tabKey) => setActiveTab(tabKey)}
+                  items={thingList.map((i) => {
+                    return {
+                      label: i.name,
+                      key: i.id,
+                    };
+                  })}></Tabs>
+              }
+              readonly
+              dataSource={TableData.data}
+              form={TableData}
+              propertys={TableData.propertys}
+              belongId={''}
+            />
+          }
+        </>
+      );
+    }
+  }, [activeTab]);
+  const reanderTable = useMemo(() => {}, []);
   // 审批
   const approvalTask = async (status: number) => {
     await formRef.current?.validateFields();
@@ -166,16 +220,7 @@ const Detail: React.FC<TaskDetailType> = ({ task, define, instance, onBack }) =>
             {/** 时间轴 */}
             {loadTimeline()}
             {/** 选中的操作对象 */}
-            {instance.thingIds?.length > 0 && (
-              <Thing
-                height={'400px'}
-                byIds={instance.thingIds.split(',').filter((id: any) => id != '')}
-                selectable={false}
-                labels={[]}
-                propertys={[]}
-                belongId={instance.belongId}
-              />
-            )}
+            {loadThingTable}
           </div>
           <Card className={cls['bootom_right']}>
             <div style={{ display: 'flex', width: '100%' }}>
