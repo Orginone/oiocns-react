@@ -61,7 +61,7 @@ const Design: React.FC<IProps> = ({
   useEffect(() => {
     const load = async () => {
       let nodes = await current.loadWorkNode();
-      if (nodes) {
+      if (nodes && nodes.code) {
         // content字段可能取消
         let resourceData = loadResource(nodes, 'flowNode', '', '', undefined);
         if (instance) {
@@ -114,20 +114,55 @@ const Design: React.FC<IProps> = ({
     resource.destId = resource.destId ? resource.destId : '0';
     //每个节点的 belongId  审核和抄送和子流程的destId
     for (let node of allNodes) {
-      if (
-        (node.type == 'APPROVAL' || node.type == 'CC' || node.type == 'CHILDWORK') &&
-        (!node.destId || node.destId == '0' || node.destId == '')
-      ) {
-        errors.push(
-          getErrorItem(
-            <>
-              节点： <span style={{ color: 'blue' }}>{node.name} </span>缺少操作对象
-            </>,
-          ),
-        );
+      switch (node.type) {
+        case 'CC':
+        case 'CHILDWORK':
+        case 'APPROVAL':
+          if (!node.destId || node.destId == '0' || node.destId == '') {
+            errors.push(
+              getErrorItem(
+                <>
+                  节点： <span style={{ color: 'blue' }}>{node.name} </span>缺少操作对象
+                </>,
+              ),
+            );
+          }
+          break;
+        case 'CONDITIONS':
+        case 'CONCURRENTS':
+        case 'ORGANIZATIONAL':
+          if (
+            node.branches == undefined ||
+            node.branches.length == 0 ||
+            node.branches.some((a) => a.children == undefined)
+          ) {
+            errors.push(
+              getErrorItem(
+                <>
+                  节点： <span style={{ color: 'blue' }}>{node.name} </span>缺少分支信息
+                </>,
+              ),
+            );
+          } else if (node.type == 'CONDITIONS') {
+            if (
+              node.branches.some(
+                (a) =>
+                  a.conditions == undefined ||
+                  a.conditions.length == 0 ||
+                  a.conditions.find((a) => a.val == undefined || a.val == ''),
+              )
+            ) {
+              errors.push(
+                getErrorItem(
+                  <span style={{ color: 'blue' }}>
+                    条件节点：{node.name}条件不可为空{' '}
+                  </span>,
+                ),
+              );
+            }
+          }
       }
     }
-    // TODO 判断条件节点是否合格
     return errors;
   };
 
@@ -359,6 +394,7 @@ const Design: React.FC<IProps> = ({
                 key: item.key,
                 type: item.type,
                 val: item.val != undefined ? String(item.val) : undefined,
+                display: `${item.paramLabel} ${item.label} ${item.val} `,
               };
             })
           : [],
