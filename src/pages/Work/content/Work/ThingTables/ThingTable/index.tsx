@@ -58,7 +58,7 @@ const ThingTable = <
   const Operation: ProColumnType<any> = {
     title: '操作',
     valueType: 'option',
-    width: 200,
+    width: 100,
     render: (_text, record, _, _action) => [
       <a
         key="Editable"
@@ -114,12 +114,19 @@ const ThingTable = <
         break;
       case OperateType.Edit:
         {
+          const _DMData: { [key: string]: any } = {};
           const _DataSource = thingList.map((item) => {
-            item.Id === selectedData.Id &&
-              (item = {
-                ...item,
-                EDIT_INFO: { ...(item?.EDIT_INFO ?? {}), ...changeData },
+            if (item.Id === selectedData.Id) {
+              Object.keys(changeData).forEach((keyStr: string) => {
+                if (changeData[keyStr] !== item[keyStr]) {
+                  _DMData[keyStr] = changeData[keyStr];
+                }
               });
+              item = {
+                ...item,
+                EDIT_INFO: { ...(item?.EDIT_INFO ?? {}), ..._DMData },
+              };
+            }
 
             return item;
           });
