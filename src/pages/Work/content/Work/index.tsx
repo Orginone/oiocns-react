@@ -42,6 +42,7 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
   const [thingForms, setThingForms] = useState<XForm[]>([]);
   const [workForm, setWorkForm] = useState<XForm>();
   const [content, setContent] = useState<string>('');
+  const [defaultData, setDefaultData] = useState<any[]>([]);
   const [submitData, setSubmitData] = useState<SubmitDataType>({
     headerData: data,
     formData: {},
@@ -98,6 +99,11 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
                 }),
             );
           });
+        if (submitData.formData[activeTab]?.resourceData) {
+          setDefaultData(
+            JSON.parse(submitData.formData[activeTab]?.resourceData)?.data ?? [],
+          );
+        }
       }
     }
   }, [thingForms, activeTab]);
@@ -148,6 +154,7 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
             <Tabs
               activeKey={activeTab}
               tabPosition="bottom"
+              key={activeTab}
               className={cls.tabBar}
               onTabClick={(tabKey) => setActiveTab(tabKey)}
               items={thingForms.map((i) => {
@@ -158,7 +165,7 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
               })}></Tabs>
           }
           toolBtnItems={[OperateType.Add, OperateType.EditMore, OperateType.Select]}
-          dataSource={[]}
+          dataSource={defaultData}
           current={current}
           form={thingForms.find((v) => v.id === activeTab)}
           propertys={propertys}

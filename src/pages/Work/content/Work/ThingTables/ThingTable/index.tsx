@@ -5,7 +5,7 @@ import { Button, Modal } from 'antd';
 import React, { ReactNode, useEffect, useState } from 'react';
 import { kernel, schema } from '@/ts/base';
 import orgCtrl from '@/ts/controller';
-import { handlePropToAttrObj, submitCurrentTableData } from '../Function';
+import { MakePropertysToAttrMap, submitCurrentTableData } from '../Function';
 import { toolBtnsType, OperateType } from '../const';
 import BaseThing from '../BaseThing';
 import SelectThing from '../TreeSelectThing';
@@ -46,11 +46,15 @@ const ThingTable = <
     ...rest
   } = props;
 
-  const [thingList, setThingList] = useState<any[]>(dataSource as []);
+  const [thingList, setThingList] = useState<any[]>([]);
   const [selectedRows, setSelectedRows] = useState<any>([]);
   const [operateModel, setOperateModel] = useState<OperateType>('' as OperateType.Add);
   const [selectedData, setSelectedData] = useState<any>({});
   const [changeData, setChangeData] = useState<any>({});
+  const keyMap: Map<string, string> = MakePropertysToAttrMap(propertys);
+  useEffect(() => {
+    setThingList(dataSource as any[]);
+  }, [dataSource]);
   if (!form) {
     return <></>;
   }
@@ -84,16 +88,16 @@ const ThingTable = <
     // 监听实体选择 将实体属性转为表格展示特性
     if (selectedRows.length > 0) {
       const thingListIds = thingList.map((v) => v.Id);
-      const newThings = handlePropToAttrObj(selectedRows, thingListIds, propertys);
+      const newThings = selectedRows.filter(
+        (v: { id: string }) => !thingListIds.includes(v.id),
+      );
       setThingList([...newThings, ...thingList]);
     }
   }, [selectedRows]);
 
   // 监听展示数据变化。弹出数据给父级
   useEffect(() => {
-    setTimeout(() => {
-      submitCurrentTableData(form, thingList, propertys, onListChange);
-    }, 100);
+    submitCurrentTableData(form, thingList, propertys, onListChange);
   }, [thingList]);
 
   // 触发弹窗 关闭事件
@@ -226,6 +230,7 @@ const ThingTable = <
             <SelectThing
               current={current}
               labels={[`S${form.id}`]}
+              propertyIdToAttrIdMap={keyMap}
               onRowSelectChange={(rows) => setSelectedRows(rows)}
               belongId={belongId}
               form={form}
