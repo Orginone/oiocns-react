@@ -3,6 +3,7 @@ import Node from '../Process/Node';
 import { useAppwfConfig } from './flow';
 import { message } from 'antd';
 import Root from '../Process/RootNode';
+import orgCtrl from '@/ts/controller';
 import Approval from '../Process/ApprovalNode';
 import WorkFlow from '../Process/WorkFlowNode';
 import Cc from '../Process/CcNode';
@@ -22,6 +23,7 @@ import { WorkNodeModel } from '@/ts/base/model';
 import { getUuid } from '@/utils/tools';
 
 type IProps = {
+  belongId: string;
   resource: WorkNodeModel;
   onSelectedNode: (params: any) => void;
   defaultEditable: boolean;
@@ -33,9 +35,15 @@ type IProps = {
  * @returns
  */
 
-const ProcessTree: React.FC<IProps> = ({ onSelectedNode, resource, defaultEditable }) => {
+const ProcessTree: React.FC<IProps> = ({
+  belongId,
+  onSelectedNode,
+  resource,
+  defaultEditable,
+}) => {
   const [key, setKey] = useState(0);
-
+  const belong = orgCtrl.user.targets.find((i) => i.id === belongId);
+  if (!belong) return <></>;
   const addNodeMap = useAppwfConfig((state: any) => state.addNodeMap);
   /**组件渲染中变更nodeMap  共享状态*/
   var nodeMap = useAppwfConfig((state: any) => state.nodeMap);
@@ -187,6 +195,7 @@ const ProcessTree: React.FC<IProps> = ({ onSelectedNode, resource, defaultEditab
         key: getRandomId(),
         ...props,
         defaultEditable,
+        belong: belong,
         //定义事件，插入节点，删除节点，选中节点，复制/移动
         onInsertNode: (type: any) => insertNode(type, node),
         onDelNode: () => delNode(node),

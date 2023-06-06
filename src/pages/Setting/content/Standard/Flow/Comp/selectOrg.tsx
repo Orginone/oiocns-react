@@ -1,22 +1,19 @@
 import { TreeSelect } from 'antd';
 import React, { useEffect, useState } from 'react';
-import orgCtrl from '@/ts/controller';
-import { ITarget } from '@/ts/core';
+import { IBelong, ITarget } from '@/ts/core';
 interface IProps {
   rootDisable?: boolean;
   orgId?: string;
   onChange: any;
   value?: string;
   readonly?: boolean;
+  belong: IBelong;
 }
 const SelectOrg: React.FC<IProps> = (props: IProps) => {
   const [treeData, setTreeData] = useState<any[]>([]);
-
+  if (!props.value || props.value.length < 2) return <div>其它组织</div>;
   const loadTreeData = async () => {
-    let tree = [orgCtrl.user, ...orgCtrl.user.companys].find((a) => a.id == props.orgId);
-    if (tree) {
-      setTreeData(buildTargetTree([tree], false, 0));
-    }
+    setTreeData(buildTargetTree([props.belong], false, 0));
   };
   /** 加载组织树 */
   const buildTargetTree = (targets: ITarget[], isChild: boolean, level: number) => {
@@ -29,10 +26,7 @@ const SelectOrg: React.FC<IProps> = (props: IProps) => {
               label: item.name,
               value: item.id,
               disabled: props.rootDisable && level == 0,
-              children: [
-                ...[{ label: '其他', value: '0' }],
-                ...buildTargetTree(item.subTarget, true, level + 1),
-              ],
+              children: buildTargetTree(item.subTarget, true, level + 1),
             });
           } else {
             let children = buildTargetTree(item.subTarget, false, level + 1);
@@ -54,7 +48,7 @@ const SelectOrg: React.FC<IProps> = (props: IProps) => {
   };
   useEffect(() => {
     loadTreeData();
-  }, [orgCtrl.user, props]);
+  }, [props]);
   return (
     <TreeSelect
       showSearch

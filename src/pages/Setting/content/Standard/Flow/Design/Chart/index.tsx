@@ -25,6 +25,7 @@ const ChartDesign: React.FC<IProps> = (props) => {
             style={{ transform: `scale(${(props.scale ?? 100) / 100})` }}>
             {/* 树结构展示 */}
             <ProcessTree
+              belongId={props.current.workItem.belongId}
               defaultEditable={props.defaultEditable}
               resource={props.resource}
               onSelectedNode={(params) => {

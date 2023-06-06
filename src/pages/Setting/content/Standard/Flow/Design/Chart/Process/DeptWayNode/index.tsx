@@ -2,9 +2,9 @@ import React, { useEffect, useState } from 'react';
 import InsertButton from '../InsertButton';
 import { AiOutlineCopy, AiOutlineClose } from 'react-icons/ai';
 import cls from './index.module.less';
-import orgCtrl from '@/ts/controller';
 import SelectOrg from '@/pages/Setting/content/Standard/Flow/Comp/selectOrg';
 import { dataType } from '../../FlowDrawer/processType';
+import { IBelong } from '@/ts/core';
 type DeptWayNodeProps = {
   onInsertNode: Function;
   onDelNode: Function;
@@ -12,6 +12,7 @@ type DeptWayNodeProps = {
   onSelected: Function;
   config: any;
   level: any;
+  belong: IBelong;
   defaultEditable: boolean;
   [key: string]: any;
 };
@@ -43,7 +44,7 @@ const DeptWayNode: React.FC<DeptWayNodeProps> = (props: DeptWayNodeProps) => {
           key: 'EQ',
           label: '=',
           type: dataType.BELONG,
-          val: orgCtrl.user.id,
+          val: props.belong.id,
         },
       ];
       setKey(key + 1);
@@ -51,7 +52,7 @@ const DeptWayNode: React.FC<DeptWayNodeProps> = (props: DeptWayNodeProps) => {
     if (!props.defaultEditable) {
       setOrgId(props.config.conditions[0]?.val);
     } else {
-      setOrgId(orgCtrl.user.id);
+      setOrgId(props.belong.id);
     }
   }, []);
 
@@ -99,6 +100,7 @@ const DeptWayNode: React.FC<DeptWayNodeProps> = (props: DeptWayNodeProps) => {
             key={key}
             onChange={onChange}
             orgId={orgId}
+            belong={props.belong}
             value={props.config.conditions[0]?.val}
             readonly={props.config.readonly}
             rootDisable={false}
