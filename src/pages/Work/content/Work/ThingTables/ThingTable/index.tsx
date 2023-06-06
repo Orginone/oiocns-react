@@ -164,6 +164,7 @@ const ThingTable = <
             style={{ maxWidth: '150px', textOverflow: 'ellipsis', overflow: 'hidden' }}
             onClick={() => {
               setChangeData({});
+              setSelectedData({});
               setOperateModel(item as OperateType.Add);
             }}>
             {item ?? '--'}
@@ -183,7 +184,6 @@ const ThingTable = <
         propertys={propertys}
         rowKey={rowKey}
         key={thingList.length}
-        size="small"
         dataSource={[...thingList]}
         toolBarRender={HandleToolBarRender}
         {...rest}

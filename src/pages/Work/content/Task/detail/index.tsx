@@ -83,6 +83,7 @@ const Detail: React.FC<TaskDetailType> = ({ task, define, instance, onBack }) =>
                 </div>
               </div>
               <Collapse ghost>{loadHeadForms(data.forms)}</Collapse>
+              {data.forms?.formData && loadThingTable}
             </Card>
           </Timeline.Item>
           {instance.tasks?.map((task, _index) => {
@@ -170,12 +171,15 @@ const Detail: React.FC<TaskDetailType> = ({ task, define, instance, onBack }) =>
         <>
           {
             <ThingTable
+              size="small"
               headerTitle={
                 <Tabs
                   activeKey={activeTab}
                   tabPosition="bottom"
-                  // className={cls.tabBar}
+                  size="small"
+                  className={cls.tabBar}
                   onTabClick={(tabKey) => setActiveTab(tabKey)}
+                  style={{ padding: 0 }}
                   items={thingList.map((i) => {
                     return {
                       label: i.name,
@@ -187,6 +191,7 @@ const Detail: React.FC<TaskDetailType> = ({ task, define, instance, onBack }) =>
               dataSource={TableData.data}
               form={TableData}
               propertys={TableData.propertys}
+              scroll={{ y: 400 }}
               belongId={''}
             />
           }
@@ -194,7 +199,6 @@ const Detail: React.FC<TaskDetailType> = ({ task, define, instance, onBack }) =>
       );
     }
   }, [activeTab]);
-  const reanderTable = useMemo(() => {}, []);
   // 审批
   const approvalTask = async (status: number) => {
     await formRef.current?.validateFields();
@@ -216,11 +220,11 @@ const Detail: React.FC<TaskDetailType> = ({ task, define, instance, onBack }) =>
       label: `办事详情`,
       children: (
         <>
-          <div className={cls['content']}>
+          <div className={cls['content1']}>
             {/** 时间轴 */}
             {loadTimeline()}
             {/** 选中的操作对象 */}
-            {loadThingTable}
+            {/* {loadThingTable} */}
           </div>
           <Card className={cls['bootom_right']}>
             <div style={{ display: 'flex', width: '100%' }}>
