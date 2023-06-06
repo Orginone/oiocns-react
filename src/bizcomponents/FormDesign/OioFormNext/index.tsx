@@ -1,5 +1,5 @@
 import { ProForm } from '@ant-design/pro-components';
-import { Col, Descriptions, Row } from 'antd';
+import { Descriptions } from 'antd';
 import React, { useEffect, useMemo, useState } from 'react';
 import OioFormItem from './FormItems';
 import { IBelong, IWorkDefine } from '@/ts/core';
@@ -110,17 +110,6 @@ const OioForm: React.FC<IProps> = ({
             </Descriptions.Item>
           ))}
         </Descriptions>
-        {/* <Row gutter={24} className={cls.formRow}>
-          {attributes.map((item) => (
-            <Col span={config.col} key={item.id} className={cls.formCol}>
-              <OioFormItem
-                item={item}
-                belong={define.workItem.current.space}
-                noRule={noRule}
-              />
-            </Col>
-          ))}
-        </Row> */}
       </ProForm>
     </>
   );

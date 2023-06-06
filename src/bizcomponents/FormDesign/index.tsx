@@ -1,13 +1,11 @@
 import { Col, Row, Select } from 'antd';
 import cls from './index.module.less';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useState } from 'react';
-import { ProForm, ProFormTreeSelect } from '@ant-design/pro-components';
+import { ProForm } from '@ant-design/pro-components';
 import OperateItem from './OperateItem';
-import CustomTree from '@/components/CustomTree';
-import { IForm, IPropClass, SpeciesType } from '@/ts/core';
-import { XAttribute, XProperty } from '@/ts/base/schema';
-import { model } from '@/ts/base';
+import { IForm } from '@/ts/core';
+import { XAttribute } from '@/ts/base/schema';
 import AttributeConfig from './attributeConfig';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 
@@ -18,15 +16,6 @@ type IProps = {
 type FormLayout = {
   layout: 'horizontal' | 'vertical';
   col: 8 | 12 | 24;
-};
-
-type TreeNode = {
-  key: string;
-  title: string;
-  value: string;
-  item: IPropClass | XProperty;
-  children: TreeNode[];
-  checkable: boolean;
 };
 
 /**
@@ -47,8 +36,6 @@ const Design: React.FC<IProps> = ({ current }) => {
           col: 12,
         },
   );
-  const [selectKeys, setSelectKeys] = useState<string[]>([]);
-  const [propertyTree, setPropertyTree] = useState<TreeNode[]>([]);
   const [selectedItem, setSelectedItem] = useState<XAttribute>();
   const isInherited = current.species?.isInherited;
   // 表单项选中事件
@@ -81,37 +68,9 @@ const Design: React.FC<IProps> = ({ current }) => {
         rule: JSON.stringify(rule),
       });
       current.updateAttribute({ ...selectedItem, ...rule, rule: JSON.stringify(rule) });
+      tforceUpdate();
     }
   };
-
-  // 属性树
-  function buildPropertyTree(props: IPropClass[]) {
-    const treeNode: TreeNode[] = [];
-    for (const prop of props) {
-      const children: TreeNode[] = buildPropertyTree(
-        prop.children.map((i) => i as IPropClass),
-      );
-      prop.propertys.forEach((item) => {
-        children.push({
-          key: item.id,
-          title: item.name,
-          value: item.id,
-          item: item,
-          children: [],
-          checkable: true,
-        });
-      });
-      treeNode.push({
-        key: prop.id,
-        title: prop.name,
-        value: prop.id,
-        item: prop,
-        checkable: false,
-        children: children,
-      });
-    }
-    return treeNode;
-  }
 
   const loadItems = () => {
     return current.attributes
@@ -119,104 +78,22 @@ const Design: React.FC<IProps> = ({ current }) => {
         return new Date(b.createTime).getTime() - new Date(a.createTime).getTime();
       })
       .map((item) => {
-        let propId = '0';
-        if (item.linkPropertys && item.linkPropertys.length > 0) {
-          propId = item.linkPropertys[0].id;
-        }
         return (
           <Col span={formLayout.col} key={item.id}>
-            {isInherited ? (
-              <ProFormTreeSelect
-                name={item.name}
-                label={item.name}
-                labelAlign="right"
-                fieldProps={{
-                  defaultValue: propId,
-                  treeData: propertyTree,
-                  multiple: false,
-                  treeExpandedKeys: [propId],
-                  onSelect: async (_, x) => {
-                    await current.updateAttribute(
-                      { ...item, dictId: item.dictId },
-                      x.item,
-                    );
-                    setSelectedItem(item);
-                  },
-                }}
-              />
-            ) : (
-              <OperateItem
-                item={item}
-                belong={current.species.current.space}
-                onClick={() => {
-                  itemClick(item);
-                }}
-              />
-            )}
+            <OperateItem
+              item={item}
+              belong={current.species.current.space}
+              onClick={() => {
+                itemClick(item);
+              }}
+            />
           </Col>
         );
       });
   };
 
-  const reloadPropertyTree = () => {
-    const propClasses: IPropClass[] = [];
-    for (const item of current.species.current.space.species) {
-      switch (item.typeName) {
-        case SpeciesType.Store:
-          propClasses.push(item as IPropClass);
-          break;
-      }
-    }
-    setPropertyTree(buildPropertyTree(propClasses));
-    setSelectKeys(
-      current.attributes
-        .filter((i) => i.propId && i.propId.length > 0)
-        .map((i) => i.propId),
-    );
-  };
-
-  useEffect(() => {
-    reloadPropertyTree();
-  }, []);
   return (
     <div style={{ display: 'flex' }}>
-      {!isInherited && (
-        <div className={cls.sider}>
-          <CustomTree
-            checkable={true}
-            defaultExpandAll={true}
-            checkedKeys={selectKeys}
-            onSelect={async (_, info: any) => {
-              if (!info.node.checkable) {
-                await (info.node.item as IPropClass).loadPropertys();
-                reloadPropertyTree();
-              }
-            }}
-            onCheck={async (keys, info) => {
-              setSelectKeys(keys as string[]);
-              const prop = (info.node as any).item;
-              if (info.checked) {
-                await current.createAttribute(
-                  {
-                    name: prop.name,
-                    code: prop.code,
-                    rule: '{}',
-                    remark: prop.remark,
-                  } as model.AttributeModel,
-                  prop,
-                );
-              } else {
-                const attr = current.attributes.find((i) => i.propId === prop.id);
-                if (attr) {
-                  await current.deleteAttribute(attr);
-                }
-              }
-              tforceUpdate();
-            }}
-            treeData={propertyTree}
-          />
-        </div>
-      )}
       <div className={cls.content}>
         <div className={cls.head}>
           <label style={{ padding: '6px' }}>整体布局：</label>
