@@ -143,11 +143,9 @@ const WorkDefineModal = ({ open, handleOk, handleCancel, workItem, current }: Ip
       }}
       onFinish={async (model: any) => {
         model.rule = JSON.stringify({
-          thing: {
-            allowAdd: model.allowAdd,
-            allowEdit: model.allowEdit,
-            allowSelect: model.allowSelect,
-          },
+          allowAdd: model.allowAdd,
+          allowEdit: model.allowEdit,
+          allowSelect: model.allowSelect,
         });
         if (current) {
           model.icon = JSON.stringify(avatar);

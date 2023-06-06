@@ -644,6 +644,14 @@ export type XWorkDefine = {
   speciesId: string;
   // 共享用户ID
   shareId: string;
+  // 规则
+  rule: string;
+  // 允许变更
+  allowEdit: boolean;
+  // 允许新增
+  allowAdd: boolean;
+  // 允许选择
+  allowSelect: boolean;
   // 办事定义节点
   nodes: XWorkNode[] | undefined;
   // 办事的实例

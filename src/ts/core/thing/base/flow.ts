@@ -22,13 +22,23 @@ export interface IWorkDefine extends IEntity<schema.XWorkDefine> {
   ): Promise<schema.XWorkInstance | undefined>;
 }
 
+export const fullDefineRule = (data: XWorkDefine) => {
+  data.typeName = '事项';
+  data.allowAdd = true;
+  data.allowEdit = true;
+  data.allowSelect = true;
+  if (data.rule && data.rule.includes('{') && data.rule.includes('}')) {
+    const rule = JSON.parse(data.rule);
+    data.allowAdd = rule.allowAdd;
+    data.allowEdit = rule.allowEdit;
+    data.allowSelect = rule.allowSelect;
+  }
+  return data;
+};
 export class FlowDefine extends Entity<schema.XWorkDefine> implements IWorkDefine {
   workItem: IFlow;
   constructor(_metadata: XWorkDefine, work: IFlow) {
-    super({
-      ..._metadata,
-      typeName: '事项',
-    });
+    super(fullDefineRule(_metadata));
     this.workItem = work;
   }
   async deleteDefine(): Promise<boolean> {
