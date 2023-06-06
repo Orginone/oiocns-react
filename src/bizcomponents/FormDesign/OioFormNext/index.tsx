@@ -123,7 +123,10 @@ const OioForm: React.FC<IProps> = ({
                     item={item}
                     belong={belong}
                     onFilesValueChange={(key, files: any) => {
-                      formRef?.current?.setFieldValue(key, files);
+                      formRef?.current?.setFieldValue(
+                        key,
+                        files.map((v: { data: any }) => v.data),
+                      );
                       onValuesChange &&
                         onValuesChange(
                           { key: files },
