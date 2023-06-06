@@ -13,7 +13,7 @@ const { Search } = Input;
 interface IProps {
   rules: Rule[];
   name: string;
-  belong: IBelong;
+  belong?: IBelong;
   label: React.ReactNode;
   labelAlign: FormLabelAlign;
   tooltip: LabelTooltipType;
@@ -51,7 +51,7 @@ const ProFormIdentity = (props: IProps) => {
       <Modal
         width="650px"
         title="选择角色"
-        open={isOpen}
+        open={isOpen && props.belong != undefined}
         destroyOnClose={true}
         onOk={() => {
           console.log('identity', identity);
@@ -59,7 +59,7 @@ const ProFormIdentity = (props: IProps) => {
         }}
         onCancel={() => setIsOpen(false)}>
         <IndentitySelect
-          space={props.belong}
+          space={props.belong!}
           multiple={false}
           onChecked={(params: any) => {
             console.log('params', params);

@@ -1,7 +1,7 @@
 import cls from './index.module.less';
 import FlowDrawer from './FlowDrawer';
 import ProcessTree from './ProcessTree';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { AddNodeType, NodeType } from './FlowDrawer/processType';
 import { IWorkDefine } from '@/ts/core';
 
@@ -14,19 +14,18 @@ interface IProps {
 
 const ChartDesign: React.FC<IProps> = (props) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const [scale, setScale] = useState<number>(100);
   const [currentNode, setCurrentNode] = useState<NodeType>();
-  useEffect(() => {
-    setScale(props.scale ?? 100);
-  }, [props]);
 
   return (
     <div className={cls['container']}>
       <div className={cls['layout-body']}>
         <div style={{ height: 'calc(100vh - 250px )', overflowY: 'auto' }}>
-          <div className={cls['design']} style={{ transform: `scale(${scale / 100})` }}>
+          <div
+            className={cls['design']}
+            style={{ transform: `scale(${(props.scale ?? 100) / 100})` }}>
             {/* 树结构展示 */}
             <ProcessTree
+              belongId={props.current.workItem.belongId}
               defaultEditable={props.defaultEditable}
               resource={props.resource}
               onSelectedNode={(params) => {
@@ -49,6 +48,7 @@ const ChartDesign: React.FC<IProps> = (props) => {
       {/* 侧边数据填充 */}
       {currentNode && (
         <FlowDrawer
+          forms={props.resource.props.operations}
           define={props.current}
           defaultEditable={props.defaultEditable}
           isOpen={

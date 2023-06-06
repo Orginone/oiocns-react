@@ -582,6 +582,7 @@ export type Condition = {
   paramKey: string;
   val: string;
   type: string;
+  display: string;
 };
 
 export type QueryTaskReq = {

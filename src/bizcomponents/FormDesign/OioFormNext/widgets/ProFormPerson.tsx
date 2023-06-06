@@ -8,7 +8,7 @@ import { LabelTooltipType } from 'antd/lib/form/FormItemLabel';
 interface IProps {
   rules: Rule[];
   name: string;
-  belong: IBelong;
+  belong?: IBelong;
   label: React.ReactNode;
   labelAlign: FormLabelAlign;
   tooltip: LabelTooltipType;
@@ -20,14 +20,16 @@ interface IProps {
 const ProFormPerson = (props: IProps) => {
   const [options, setOptions] = useState<{ label: string; value: string }[]>([]);
   useEffect(() => {
-    const initOptions = async () => {
-      setOptions(
-        props.belong.members?.map((xtarget) => {
-          return { label: xtarget.name, value: xtarget.id };
-        }) || [],
-      );
-    };
-    initOptions();
+    if (props.belong) {
+      const initOptions = async () => {
+        setOptions(
+          props.belong!.members?.map((xtarget) => {
+            return { label: xtarget.name, value: xtarget.id };
+          }) || [],
+        );
+      };
+      initOptions();
+    }
   }, []);
 
   const filterOption = (input: any, option: any) =>

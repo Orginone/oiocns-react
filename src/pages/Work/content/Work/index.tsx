@@ -143,7 +143,7 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
         <OioForm
           key={workForm.id}
           form={workForm}
-          define={current}
+          belong={current.workItem.current.space}
           submitter={{
             resetButtonProps: {
               style: { display: 'none' },

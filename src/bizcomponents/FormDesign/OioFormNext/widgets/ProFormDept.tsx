@@ -9,7 +9,7 @@ import { LabelTooltipType } from 'antd/lib/form/FormItemLabel';
 interface IProps {
   rules: Rule[];
   name: string;
-  belong: IBelong;
+  belong?: IBelong;
   label: React.ReactNode;
   labelAlign: FormLabelAlign;
   tooltip: LabelTooltipType;

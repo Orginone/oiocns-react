@@ -70,6 +70,9 @@ const RootNode: React.FC<IProps> = (props) => {
               }}
               deleteFuc={(id: string) => {
                 setWorkForms([...workforms.filter((i) => i.id != id)]);
+                props.current.props.operations = props.current.props.operations.filter(
+                  (a) => a.id != id,
+                );
               }}></ShareShowComp>
           </span>
         )}
@@ -93,6 +96,9 @@ const RootNode: React.FC<IProps> = (props) => {
               }}
               deleteFuc={(id: string) => {
                 setThingForms([...thingforms.filter((i) => i.id != id)]);
+                props.current.props.operations = props.current.props.operations.filter(
+                  (a) => a.id != id,
+                );
               }}></ShareShowComp>
           </span>
         )}

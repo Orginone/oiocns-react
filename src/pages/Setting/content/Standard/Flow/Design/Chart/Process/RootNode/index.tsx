@@ -2,7 +2,6 @@ import React, { useMemo } from 'react';
 import Node, { AddNodeType } from '../Node';
 
 type RootNodeProps = {
-  operateOrgId?: string;
   onInsertNode: Function;
   onDelNode: Function;
   onSelected: Function;
@@ -42,8 +41,6 @@ const RootNode: React.FC<RootNodeProps> = (props: RootNodeProps) => {
       onInsertNode={props.onInsertNode}
       onDelNode={props.onDelNode}
       onSelected={props.onSelected}
-      operateOrgId={props.operateOrgId}
-      belongId={props.config.belongId}
       config={props.config}
       errorInfo="错误信息"
       placeholder="全员"

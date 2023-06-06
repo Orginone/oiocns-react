@@ -125,7 +125,7 @@ const OperateIndex = ({ selectMenu, operateKey, confrim }: IProps) => {
           bodyStyle={{ padding: 0 }}
           okText="确定"
           onOk={async () => {
-            if (await orgCtrl.user.applyJoin(searchCallback || [])) {
+            if (searchCallback && (await orgCtrl.user.applyJoin(searchCallback))) {
               message.success('已申请加入成功.');
             }
             confrim();
