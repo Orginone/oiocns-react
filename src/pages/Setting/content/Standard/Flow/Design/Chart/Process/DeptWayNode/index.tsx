@@ -95,7 +95,14 @@ const DeptWayNode: React.FC<DeptWayNodeProps> = (props: DeptWayNodeProps) => {
       {/* <span>组织分支</span> */}
       <span>
         {props.defaultEditable ? (
-          <SelectOrg key={key} onChange={onChange} orgId={orgId} />
+          <SelectOrg
+            key={key}
+            onChange={onChange}
+            orgId={orgId}
+            value={props.config.conditions[0]?.val}
+            readonly={props.config.readonly}
+            rootDisable={false}
+          />
         ) : (
           props.config.conditions[0].display
         )}

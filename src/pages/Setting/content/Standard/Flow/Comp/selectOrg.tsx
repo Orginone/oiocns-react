@@ -3,8 +3,11 @@ import React, { useEffect, useState } from 'react';
 import orgCtrl from '@/ts/controller';
 import { ITarget } from '@/ts/core';
 interface IProps {
+  rootDisable?: boolean;
   orgId?: string;
   onChange: any;
+  value?: string;
+  readonly?: boolean;
 }
 const SelectOrg: React.FC<IProps> = (props: IProps) => {
   const [treeData, setTreeData] = useState<any[]>([]);
@@ -25,8 +28,11 @@ const SelectOrg: React.FC<IProps> = (props: IProps) => {
             result.push({
               label: item.name,
               value: item.id,
-              disabled: false,
-              children: [...buildTargetTree(item.subTarget, true, level + 1)],
+              disabled: props.rootDisable && level == 0,
+              children: [
+                ...[{ label: '其他', value: '0' }],
+                ...buildTargetTree(item.subTarget, true, level + 1),
+              ],
             });
           } else {
             let children = buildTargetTree(item.subTarget, false, level + 1);
@@ -38,6 +44,7 @@ const SelectOrg: React.FC<IProps> = (props: IProps) => {
           result.push({
             label: item.name,
             value: item.id,
+            disabled: props.rootDisable && level == 0,
             children: buildTargetTree(item.subTarget, isChild, level + 1),
           });
         }
@@ -51,12 +58,14 @@ const SelectOrg: React.FC<IProps> = (props: IProps) => {
   return (
     <TreeSelect
       showSearch
+      value={props.value}
       style={{ width: '100%' }}
       dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
       placeholder="请选择操作组织"
       treeDefaultExpandAll
       onChange={props.onChange}
       treeData={treeData}
+      disabled={props.readonly}
     />
   );
 };
