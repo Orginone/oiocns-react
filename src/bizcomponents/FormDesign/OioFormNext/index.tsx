@@ -1,6 +1,6 @@
 import { ProForm } from '@ant-design/pro-components';
 import { Descriptions } from 'antd';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import OioFormItem from './FormItems';
 import { IBelong } from '@/ts/core';
 import { XAttribute, XForm } from '@/ts/base/schema';
@@ -28,7 +28,7 @@ const OioForm: React.FC<IProps> = ({
   onValuesChange,
   onFinished,
   fieldsValue,
-  formRef,
+  formRef = useRef(),
   disabled,
   noRule,
 }) => {
@@ -119,7 +119,19 @@ const OioForm: React.FC<IProps> = ({
                   key={item.id}
                   span={3}
                   contentStyle={{ width: '33%' }}>
-                  <OioFormItem item={item} belong={belong} noRule={noRule} />
+                  <OioFormItem
+                    item={item}
+                    belong={belong}
+                    onFilesValueChange={(key, files: any) => {
+                      formRef?.current?.setFieldValue(key, files);
+                      onValuesChange &&
+                        onValuesChange(
+                          { key: files },
+                          formRef?.current.getFieldsValue(true),
+                        );
+                    }}
+                    noRule={noRule}
+                  />
                 </Descriptions.Item>
               );
             }

@@ -15,7 +15,7 @@ import {
   ProFormUploadButton,
 } from '@ant-design/pro-form';
 import { Rule } from 'antd/es/form';
-import React from 'react';
+import React, { useState } from 'react';
 import ProFormAuth from './widgets/ProFormAuth';
 import ProFormDept from './widgets/ProFormDept';
 import ProFormDict from './widgets/ProFormDict';
@@ -25,18 +25,20 @@ import ProFormIdentity from './widgets/ProFormIdentity';
 import { XAttribute } from '@/ts/base/schema';
 import { IBelong } from '@/ts/core';
 import { loadWidgetsOpts } from '../rule';
-
+import { UploadProps } from 'antd';
+import orgCtrl from '@/ts/controller';
 interface IProps {
   disabled?: boolean;
   item: XAttribute;
   belong?: IBelong;
   noRule?: boolean;
+  onFilesValueChange?: (key: string, files: any[]) => void;
 }
 
 /**
  * 表单项渲染
  */
-const OioFormItem = ({ item, belong, disabled, noRule }: IProps) => {
+const OioFormItem = ({ item, belong, disabled, noRule, onFilesValueChange }: IProps) => {
   const rule = JSON.parse(item.rule || '{}');
   // 规则校验
   let rules: Rule[] = [];
@@ -58,6 +60,37 @@ const OioFormItem = ({ item, belong, disabled, noRule }: IProps) => {
   if (!rule.widget) {
     rule.widget = loadWidgetsOpts(item.valueType)[0].value;
   }
+
+  const [fileList, setFileList] = useState<any[]>([]);
+  const uploadProps: UploadProps = {
+    multiple: false,
+    showUploadList: true,
+    maxCount: 10,
+    onRemove(file: { key: string } & any) {
+      const data = fileList.filter((v) => v.uid !== file.uid);
+      setFileList(data);
+      onFilesValueChange && onFilesValueChange(item.id, data);
+    },
+    async customRequest(options: { file: any }) {
+      const file = options.file as File;
+      const docDir = await orgCtrl.user.filesys?.home?.create('附件');
+      if (docDir && file) {
+        const result = await docDir.upload(file.name, file);
+        if (result) {
+          const _data = result.shareInfo();
+          const _file = {
+            uid: result.key,
+            name: _data.name,
+            status: 'done',
+            url: _data.shareLink,
+            data: _data,
+          };
+          setFileList([...fileList, _file]);
+          onFilesValueChange && onFilesValueChange(item.id, [...fileList, _file]);
+        }
+      }
+    },
+  };
   switch (rule.widget) {
     case 'input':
     case 'string':
@@ -111,18 +144,25 @@ const OioFormItem = ({ item, belong, disabled, noRule }: IProps) => {
         />
       );
     case 'file':
-    case 'upload':
+    case 'upload': {
       return (
         <ProFormUploadButton
           disabled={disabled}
           name={item.id}
-          fieldProps={rule}
+          key={fileList.length}
+          listType="picture-card"
+          fileList={fileList}
+          fieldProps={{
+            ...rule,
+            ...uploadProps,
+          }}
           rules={rules}
-          // width={200}
           tooltip={rule.description}
           labelAlign="right"
         />
       );
+    }
+
     case 'date':
       return (
         <ProFormDatePicker
