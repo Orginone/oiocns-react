@@ -31,9 +31,7 @@ const ConditionNode: React.FC<IProps> = (props) => {
   };
   const content = useMemo(() => {
     if (props.config.conditions.length > 0) {
-      return props.config.conditions
-        .map((a) => `${a.paramLabel} ${a.label} ${a.val} `)
-        .join('且');
+      return props.config.conditions.map((a) => a.display).join('且');
     }
     return '请设置条件';
   }, [props.config]);
