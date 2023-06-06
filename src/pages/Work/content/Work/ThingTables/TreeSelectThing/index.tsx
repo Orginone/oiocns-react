@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { ParamsType, ProTableProps } from '@ant-design/pro-components';
 import cls from './index.module.less';
-import { loadStoreMenu } from './MenuTree';
+import { loadThingMenu } from './MenuTree';
 import orgCtrl from '@/ts/controller';
 import { schema } from '@/ts/base';
 import Thing from '@/pages/Store/content/Thing/Thing';
@@ -25,7 +25,7 @@ const SelectThing = <
   props: ProTableProps<DataType, Params, ValueType> & PageProp,
 ) => {
   const { onRowSelectChange, current, belongId, propertyIdToAttrIdMap, ...rest } = props;
-  const [menu, setMenu] = useState(loadStoreMenu(current.workItem.current)); //展示左侧菜单
+  const [menu, setMenu] = useState(loadThingMenu(current.workItem.current)); //展示左侧菜单
   const [propertys, setPropertys] = useState<schema.XAttribute[]>([]); //表格头部展示数据
   const [menuSelected, setMenuSelected] = useState(menu); //实体树 选择的
   if (!current || !menu) return <></>;
@@ -44,7 +44,7 @@ const SelectThing = <
             if (item.itemType === '表单') {
               setPropertys(await orgCtrl.work.loadAttributes(item.item.id, belongId));
             }
-            setMenu(loadStoreMenu(current.workItem.current));
+            setMenu(loadThingMenu(current.workItem.current));
             setMenuSelected(item);
           }}
           collapsed={false}
