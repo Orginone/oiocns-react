@@ -9,7 +9,7 @@ import React, { useEffect, useState } from 'react';
 interface IProps {
   rules: Rule[];
   name: string;
-  belong: IBelong;
+  belong?: IBelong;
   label: React.ReactNode;
   labelAlign: FormLabelAlign;
   tooltip: LabelTooltipType;
@@ -21,12 +21,14 @@ interface IProps {
 const ProFormAuth = (props: IProps) => {
   const [treeData, setTreeData] = useState<any[]>([]);
   const loadTreeData = async () => {
-    let tree = await props.belong.loadSuperAuth(false);
-    if (tree) {
-      setTreeData([
-        ...[{ label: '全员', value: '0', key: '0', children: [] }],
-        ...getTreeData([tree]),
-      ]);
+    if (props.belong) {
+      let tree = await props.belong.loadSuperAuth(false);
+      if (tree) {
+        setTreeData([
+          ...[{ label: '全员', value: '0', key: '0', children: [] }],
+          ...getTreeData([tree]),
+        ]);
+      }
     }
   };
   const getTreeData = (targets: IAuthority[]): DefaultOptionType[] => {

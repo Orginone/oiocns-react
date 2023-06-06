@@ -27,7 +27,7 @@ const OperateItem = (props: IProps) => {
       onClick={() => {
         props.onClick();
       }}>
-      {<OioFormItem item={props.item} belong={props.belong} disabled={true} />}
+      {<OioFormItem item={props.item} belong={props.belong} />}
     </div>
   );
 };

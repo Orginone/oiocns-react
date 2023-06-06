@@ -509,6 +509,8 @@ export type WorkDefineModel = {
   code: string;
   // 图标
   icon: string;
+  // 规则
+  rule: string;
   // 流程节点
   resource: WorkNodeModel | undefined;
   // 备注
@@ -580,6 +582,7 @@ export type Condition = {
   paramKey: string;
   val: string;
   type: string;
+  display: string;
 };
 
 export type QueryTaskReq = {

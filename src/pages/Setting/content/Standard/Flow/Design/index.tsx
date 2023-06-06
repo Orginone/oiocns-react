@@ -32,44 +32,43 @@ const Design: React.FC<IProps> = ({
 }) => {
   const [scale, setScale] = useState<number>(100);
   const [showErrorsModal, setShowErrorsModal] = useState<ReactNode[]>([]);
-  const [resource, setResource] = useState<WorkNodeModel>();
+  const [resource, setResource] = useState<any>({
+    nodeId: `node_${getUuid()}`,
+    parentId: '',
+    type: 'ROOT',
+    name: '发起角色',
+    props: {
+      assignedType: 'JOB',
+      mode: 'AND',
+      assignedUser: [
+        {
+          id: '0',
+          name: undefined,
+          type: undefined,
+          orgIds: undefined,
+        },
+      ],
+      refuse: {
+        type: 'TO_END', //驳回规则 TO_END  TO_NODE  TO_BEFORE
+        target: '', //驳回到指定ID的节点
+      },
+      friendDialogmode: false,
+      num: 0,
+    },
+    children: {},
+  });
 
   useEffect(() => {
     const load = async () => {
       let nodes = await current.loadWorkNode();
-      // content字段可能取消
-      let resourceData = nodes?.id
-        ? loadResource(nodes, 'flowNode', '', '', undefined, '')
-        : {
-            nodeId: `node_${getUuid()}`,
-            parentId: '',
-            type: 'ROOT',
-            name: '发起角色',
-            props: {
-              assignedType: 'JOB',
-              mode: 'AND',
-              assignedUser: [
-                {
-                  id: '0',
-                  name: undefined,
-                  type: undefined,
-                  orgIds: undefined,
-                },
-              ],
-              refuse: {
-                type: 'TO_END', //驳回规则 TO_END  TO_NODE  TO_BEFORE
-                target: '', //驳回到指定ID的节点
-              },
-              friendDialogmode: false,
-              num: 0,
-            },
-            children: {},
-          };
-
-      if (instance) {
-        showTask(instance, resourceData);
-      } else {
-        setResource(resourceData);
+      if (nodes && nodes.code) {
+        // content字段可能取消
+        let resourceData = loadResource(nodes, 'flowNode', '', '', undefined);
+        if (instance) {
+          showTask(instance, resourceData);
+        } else {
+          setResource(resourceData);
+        }
       }
     };
     load();
@@ -115,17 +114,53 @@ const Design: React.FC<IProps> = ({
     resource.destId = resource.destId ? resource.destId : '0';
     //每个节点的 belongId  审核和抄送和子流程的destId
     for (let node of allNodes) {
-      if (
-        (node.type == 'APPROVAL' || node.type == 'CC' || node.type == 'CHILDWORK') &&
-        (!node.destId || node.destId == '0' || node.destId == '')
-      ) {
-        errors.push(
-          getErrorItem(
-            <>
-              节点： <span style={{ color: 'blue' }}>{node.name} </span>缺少操作对象
-            </>,
-          ),
-        );
+      switch (node.type) {
+        case 'CC':
+        case 'CHILDWORK':
+        case 'APPROVAL':
+          if (!node.destId || node.destId == '0' || node.destId == '') {
+            errors.push(
+              getErrorItem(
+                <>
+                  节点： <span style={{ color: 'blue' }}>{node.name} </span>缺少操作对象
+                </>,
+              ),
+            );
+          }
+          break;
+        case 'CONDITIONS':
+        case 'CONCURRENTS':
+        case 'ORGANIZATIONAL':
+          if (
+            node.branches == undefined ||
+            node.branches.length == 0 ||
+            node.branches.some((a) => a.children == undefined)
+          ) {
+            errors.push(
+              getErrorItem(
+                <>
+                  节点： <span style={{ color: 'blue' }}>{node.name} </span>缺少分支信息
+                </>,
+              ),
+            );
+          } else if (node.type == 'CONDITIONS') {
+            if (
+              node.branches.some(
+                (a) =>
+                  a.conditions == undefined ||
+                  a.conditions.length == 0 ||
+                  a.conditions.find((a) => a.val == undefined || a.val == ''),
+              )
+            ) {
+              errors.push(
+                getErrorItem(
+                  <span style={{ color: 'blue' }}>
+                    条件节点：{node.name}条件不可为空{' '}
+                  </span>,
+                ),
+              );
+            }
+          }
       }
     }
     return errors;
@@ -137,7 +172,6 @@ const Design: React.FC<IProps> = ({
     parentId: string,
     parentType: string,
     emptyChild: any,
-    parentBelongId: string,
   ): any => {
     let obj: any;
     if (resource) {
@@ -185,7 +219,6 @@ const Design: React.FC<IProps> = ({
                 resource.code,
                 resource.type,
                 undefined,
-                resource.belongId || '',
               );
             })
           : undefined;
@@ -208,7 +241,6 @@ const Design: React.FC<IProps> = ({
                   nodeId,
                   resource.type,
                   undefined,
-                  resource.belongId,
                 )
               : undefined,
         };
@@ -248,7 +280,6 @@ const Design: React.FC<IProps> = ({
                 resource.code,
                 resource.type,
                 resource.children,
-                resource.belongId,
               )
             : resource.children && resource.children.name != undefined
             ? loadResource(
@@ -257,7 +288,6 @@ const Design: React.FC<IProps> = ({
                 resource.code,
                 resource.type,
                 undefined,
-                resource.belongId,
               )
             : undefined,
         };
@@ -270,7 +300,6 @@ const Design: React.FC<IProps> = ({
         nodeId: nodeId,
         parentId: parentId,
         name: resource.name,
-        belongId: parentBelongId,
         type: parentType.substring(0, parentType.length - 1),
         conditions: resource.conditions
           ? resource.conditions.map((item: any, index: number) => {
@@ -294,7 +323,6 @@ const Design: React.FC<IProps> = ({
                 nodeId,
                 resource.type,
                 undefined,
-                resource.belongId || '',
               )
             : undefined,
       };
@@ -304,18 +332,10 @@ const Design: React.FC<IProps> = ({
       let empty: any = {
         nodeId: nodeId,
         parentId: parentId,
-        belongId: parentBelongId,
         type: 'EMPTY',
         children:
           emptyChild != undefined
-            ? loadResource(
-                resource,
-                'flowNode',
-                nodeId,
-                resource.type,
-                emptyChild,
-                resource.belongId || '',
-              )
+            ? loadResource(resource, 'flowNode', nodeId, resource.type, emptyChild)
             : undefined,
       };
       obj = empty;
@@ -374,6 +394,7 @@ const Design: React.FC<IProps> = ({
                 key: item.key,
                 type: item.type,
                 val: item.val != undefined ? String(item.val) : undefined,
+                display: `${item.paramLabel} ${item.label} ${item.val} `,
               };
             })
           : [],
@@ -410,11 +431,11 @@ const Design: React.FC<IProps> = ({
     return resource;
   };
 
-  const showTask = (instance: any, resource: any) => {
+  const showTask = (instance: XWorkInstance, resource: any) => {
     let map = new Map<string, number>();
     let taskmap = new Map<string, any>();
-    if (instance.historyTasks) {
-      for (let task of instance.historyTasks) {
+    if (instance.tasks) {
+      for (let task of instance.tasks) {
         let _passed = 1;
         if (task.status >= 200) {
           _passed = 0;
@@ -439,10 +460,7 @@ const Design: React.FC<IProps> = ({
         type: 'primary',
         onClick: async () => {
           //数据结构转化
-          let resource_: WorkNodeModel = changeResource(
-            resource,
-            'flowNode',
-          ) as WorkNodeModel;
+          let resource_ = changeResource(resource, 'flowNode') as WorkNodeModel;
           let errors = checkValid(resource_);
           if (errors.length > 0) {
             setShowErrorsModal(errors);

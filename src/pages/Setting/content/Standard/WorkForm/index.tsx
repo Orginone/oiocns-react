@@ -4,29 +4,17 @@ import FormDesign from '@/bizcomponents/FormDesign';
 import cls from '../index.module.less';
 import PageCard from '@/components/PageCard';
 import Attribute from './Attritube';
-import { IForm, SpeciesType } from '@/ts/core';
+import { IForm } from '@/ts/core';
 
 interface IProps {
   current: IForm;
 }
 const WorkForm: React.FC<IProps> = ({ current }: IProps) => {
   const [modalType, setModalType] = useState<string>('');
-  const [tabItem] = useState<any>(
-    current.typeName === SpeciesType.Work
-      ? {
-          label: `表单特性`,
-          tab: '表单特性',
-          key: 'attr',
-        }
-      : {
-          label: `表单设计`,
-          tab: '表单设计',
-          key: 'form',
-        },
-  );
+  const [tabKey, setTabKey] = useState<string>('attr');
   /** 操作按钮 */
   const renderButton = () => {
-    if (current.typeName === SpeciesType.Work) {
+    if (!current.species.isInherited && tabKey === 'attr') {
       return (
         <Button
           key="edit"
@@ -42,7 +30,7 @@ const WorkForm: React.FC<IProps> = ({ current }: IProps) => {
   };
 
   const content = () => {
-    if (current.typeName === SpeciesType.Work) {
+    if (tabKey === 'attr') {
       return (
         <Attribute
           current={current!}
@@ -60,7 +48,18 @@ const WorkForm: React.FC<IProps> = ({ current }: IProps) => {
       <div className={cls['pages-wrap']}>
         <PageCard
           bordered={false}
-          tabList={[tabItem]}
+          tabList={[
+            {
+              tab: '表单特性',
+              key: 'attr',
+            },
+            {
+              tab: '表单设计',
+              key: 'form',
+            },
+          ]}
+          activeTabKey={tabKey}
+          onTabChange={(key) => setTabKey(key)}
           tabBarExtraContent={renderButton()}
           bodyStyle={{ paddingTop: 16 }}>
           <div className={cls['page-content-table']}>{content()}</div>

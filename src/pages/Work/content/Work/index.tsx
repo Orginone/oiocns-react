@@ -36,7 +36,6 @@ interface SubmitDataType {
  */
 const WorkStartDo: React.FC<IProps> = ({ current }) => {
   const [data, setData] = useState<any>({});
-  // const [rows, setRows] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState<string>();
   const [propertys, setPropertys] = useState<XProperty[]>([]);
   const [thingForms, setThingForms] = useState<XForm[]>([]);
@@ -72,6 +71,20 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
       orgCtrl.currentKey = current.workItem.current.key + GroupMenuType.Apply;
       orgCtrl.changCallback();
     }
+  };
+
+  const loadActions = () => {
+    const actions: string[] = [];
+    if (current.metadata.allowAdd) {
+      actions.push(OperateType.Add);
+    }
+    if (current.metadata.allowEdit) {
+      actions.push(OperateType.EditMore);
+    }
+    if (current.metadata.allowSelect) {
+      actions.push(OperateType.Select);
+    }
+    return actions;
   };
 
   useEffect(() => {
@@ -136,7 +149,7 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
         <OioForm
           key={workForm.id}
           form={workForm}
-          define={current}
+          belong={current.workItem.current.space}
           submitter={{
             resetButtonProps: {
               style: { display: 'none' },
@@ -164,7 +177,7 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
                 };
               })}></Tabs>
           }
-          toolBtnItems={[OperateType.Add, OperateType.EditMore, OperateType.Select]}
+          toolBtnItems={loadActions()}
           dataSource={defaultData}
           current={current}
           form={thingForms.find((v) => v.id === activeTab)}

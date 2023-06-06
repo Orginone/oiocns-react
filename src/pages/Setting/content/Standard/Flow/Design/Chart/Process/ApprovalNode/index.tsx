@@ -1,9 +1,6 @@
 import React, { useMemo } from 'react';
 import Node from '../Node';
 type ApprovalNodeProps = {
-  operateOrgId?: string;
-  nodeOperateOrgId?: string;
-  setNodeOperateOrgId: Function;
   onInsertNode: Function;
   onDelNode: Function;
   onSelected: Function;
@@ -41,12 +38,10 @@ const ApprovalNode: React.FC<ApprovalNodeProps> = (props: ApprovalNodeProps) => 
       onInsertNode={props.onInsertNode}
       onDelNode={props.onDelNode}
       onSelected={props.onSelected}
-      operateOrgId={props.operateOrgId}
       defaultEditable={props.defaultEditable}
       type={props?.config.type}
       showError={false}
       content={content}
-      belongId={props.config.belongId}
       config={props?.config}
       errorInfo="错误信息"
       placeholder="请设置审批对象"

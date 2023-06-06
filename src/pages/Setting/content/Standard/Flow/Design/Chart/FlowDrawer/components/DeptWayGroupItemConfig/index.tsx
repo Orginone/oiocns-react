@@ -54,12 +54,7 @@ const DeptWayGroupItemConfig: React.FC<IProps> = (props) => {
                 {condition.type == 'BELONG' && (
                   <Form.Item name={['allContent', index, 'val']}>
                     <div style={{ width: 200 }}>
-                      <SelectOrg
-                        key={key}
-                        onChange={onChange}
-                        orgId={orgCtrl.user.id}
-                        value={condition.val}
-                        rootDisable={false}></SelectOrg>
+                      <SelectOrg key={key} onChange={onChange} orgId={orgCtrl.user.id} />
                     </div>
                   </Form.Item>
                 )}

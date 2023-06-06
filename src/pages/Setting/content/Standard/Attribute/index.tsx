@@ -6,6 +6,7 @@ import { IPropClass } from '@/ts/core';
 import { Card, Descriptions, Space, Typography } from 'antd';
 import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
 import orgCtrl from '@/ts/controller';
+import PageCard from '@/components/PageCard';
 
 interface IProps {
   current: IPropClass;
@@ -65,45 +66,69 @@ const Attribute: React.FC<IProps> = ({ current, property }) => {
           </Descriptions.Item>
         </Descriptions>
       </Card>
-      <CardOrTable<XAttribute>
-        rowKey={'id'}
-        params={tkey}
-        columns={[
+
+      <PageCard
+        bordered={false}
+        activeTabKey={'attribute'}
+        tabList={[
           {
-            title: '序号',
-            valueType: 'index',
-            width: 50,
-          },
-          {
-            title: '表单名称',
-            dataIndex: 'formName',
-            width: 250,
-            render: (_, record) => {
-              return record.form.name;
-            },
-          },
-          {
-            title: '特性编号',
-            dataIndex: 'code',
-            key: 'code',
-            width: 150,
-          },
-          {
-            title: '特性名称',
-            dataIndex: 'name',
-            key: 'name',
-            width: 250,
-          },
-          {
-            title: '特性定义',
-            dataIndex: 'remark',
-            ellipsis: true,
-            key: 'remark',
+            tab: '关联特性',
+            key: 'attribute',
           },
         ]}
-        showChangeBtn={false}
-        dataSource={attributes}
-      />
+        bodyStyle={{ paddingTop: 16 }}>
+        <CardOrTable<XAttribute>
+          rowKey={'id'}
+          params={tkey}
+          columns={[
+            {
+              title: '序号',
+              valueType: 'index',
+              width: 50,
+            },
+            {
+              title: '表单名称',
+              dataIndex: 'formName',
+              width: 200,
+              render: (_, record) => {
+                return record.form.name;
+              },
+            },
+            {
+              title: '特性编号',
+              dataIndex: 'code',
+              key: 'code',
+              width: 200,
+            },
+            {
+              title: '特性名称',
+              dataIndex: 'name',
+              key: 'name',
+              width: 250,
+            },
+            {
+              title: '值类型',
+              dataIndex: 'valueType',
+              key: 'valueType',
+              width: 150,
+            },
+            {
+              title: '选择字典',
+              dataIndex: ['dict', 'name'],
+              key: 'dictId',
+              width: 150,
+            },
+            {
+              title: '特性定义',
+              dataIndex: 'remark',
+              ellipsis: true,
+              key: 'remark',
+            },
+          ]}
+          showChangeBtn={false}
+          dataSource={attributes}
+        />
+      </PageCard>
     </>
   );
 };
