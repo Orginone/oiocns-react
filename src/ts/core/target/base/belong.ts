@@ -115,6 +115,7 @@ export abstract class Belong extends Target implements IBelong {
   }
   override loadMemberChats(_newMembers: schema.XTarget[], _isAdd: boolean): void {
     _newMembers = _newMembers.filter((i) => i.id != this.userId);
+    this.memberChats.splice(0, this.memberChats.length);
     if (_isAdd) {
       const labels = this.id === this.user.id ? ['好友'] : [this.name, '同事'];
       _newMembers.forEach((i) => {
