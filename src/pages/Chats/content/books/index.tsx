@@ -167,10 +167,9 @@ const Book: React.FC<any> = ({
                   ''
                 )}
                 <List.Item
-                  title="双击打开"
                   style={{ cursor: 'pointer' }}
                   actions={loadChatOperation(item)}
-                  onDoubleClick={() => {
+                  onClick={() => {
                     orgCtrl.currentKey = item.chatdata.fullId;
                     orgCtrl.changCallback();
                   }}>
