@@ -5,7 +5,7 @@ import { Button, Modal } from 'antd';
 import React, { ReactNode, useEffect, useState } from 'react';
 import { kernel, schema } from '@/ts/base';
 import orgCtrl from '@/ts/controller';
-import { handlePropToAttrObj, submitCurrentTableData } from '../Function';
+import { MakePropertysToAttrMap, submitCurrentTableData } from '../Function';
 import { toolBtnsType, OperateType } from '../const';
 import BaseThing from '../BaseThing';
 import SelectThing from '../TreeSelectThing';
@@ -20,7 +20,7 @@ interface IProps {
   setSelectedRows?: (data: any) => void;
   current?: any;
   onListChange?: Function;
-  form: schema.XForm; //传进来的 表单基本信息
+  form?: schema.XForm; //传进来的 表单基本信息
   defaultColums?: any[]; //传进来的 表头设置
   toolBtnItems?: toolBtnsType;
 }
@@ -41,21 +41,27 @@ const ThingTable = <
     current,
     form,
     onListChange,
-    readonly,
     toolBtnItems = [],
     ...rest
   } = props;
 
-  const [thingList, setThingList] = useState<any[]>(dataSource as []);
+  const [thingList, setThingList] = useState<any[]>([]);
   const [selectedRows, setSelectedRows] = useState<any>([]);
   const [operateModel, setOperateModel] = useState<OperateType>('' as OperateType.Add);
   const [selectedData, setSelectedData] = useState<any>({});
   const [changeData, setChangeData] = useState<any>({});
+  const keyMap: Map<string, string> = MakePropertysToAttrMap(propertys);
+  useEffect(() => {
+    setThingList(dataSource as any[]);
+  }, [dataSource]);
+  if (!form) {
+    return <></>;
+  }
 
   const Operation: ProColumnType<any> = {
     title: '操作',
     valueType: 'option',
-    width: 200,
+    width: 100,
     render: (_text, record, _, _action) => [
       <a
         key="Editable"
@@ -81,16 +87,16 @@ const ThingTable = <
     // 监听实体选择 将实体属性转为表格展示特性
     if (selectedRows.length > 0) {
       const thingListIds = thingList.map((v) => v.Id);
-      const newThings = handlePropToAttrObj(selectedRows, thingListIds, propertys);
+      const newThings = selectedRows.filter(
+        (v: { id: string }) => !thingListIds.includes(v.id),
+      );
       setThingList([...newThings, ...thingList]);
     }
   }, [selectedRows]);
 
   // 监听展示数据变化。弹出数据给父级
   useEffect(() => {
-    setTimeout(() => {
-      submitCurrentTableData(form, thingList, propertys, onListChange);
-    }, 100);
+    submitCurrentTableData(form, thingList, propertys, onListChange);
   }, [thingList]);
 
   // 触发弹窗 关闭事件
@@ -111,12 +117,19 @@ const ThingTable = <
         break;
       case OperateType.Edit:
         {
+          const _DMData: { [key: string]: any } = {};
           const _DataSource = thingList.map((item) => {
-            item.Id === selectedData.Id &&
-              (item = {
-                ...item,
-                EDIT_INFO: { ...(item?.EDIT_INFO ?? {}), ...changeData },
+            if (item.Id === selectedData.Id) {
+              Object.keys(changeData).forEach((keyStr: string) => {
+                if (changeData[keyStr] !== item[keyStr]) {
+                  _DMData[keyStr] = changeData[keyStr];
+                }
               });
+              item = {
+                ...item,
+                EDIT_INFO: { ...(item?.EDIT_INFO ?? {}), ..._DMData },
+              };
+            }
 
             return item;
           });
@@ -151,6 +164,7 @@ const ThingTable = <
             style={{ maxWidth: '150px', textOverflow: 'ellipsis', overflow: 'hidden' }}
             onClick={() => {
               setChangeData({});
+              setSelectedData({});
               setOperateModel(item as OperateType.Add);
             }}>
             {item ?? '--'}
@@ -170,9 +184,8 @@ const ThingTable = <
         propertys={propertys}
         rowKey={rowKey}
         key={thingList.length}
-        size="small"
         dataSource={[...thingList]}
-        toolBarRender={readonly ? undefined : (HandleToolBarRender as any)}
+        toolBarRender={HandleToolBarRender}
         {...rest}
       />
       {/* 弹窗区域 */}
@@ -212,10 +225,11 @@ const ThingTable = <
             bodyStyle={{ minHeight: '400px' }}
             destroyOnClose={true}
             cancelText={'关闭'}
-            width={'1200px'}>
+            width={1200}>
             <SelectThing
               current={current}
               labels={[`S${form.id}`]}
+              propertyIdToAttrIdMap={keyMap}
               onRowSelectChange={(rows) => setSelectedRows(rows)}
               belongId={belongId}
               form={form}

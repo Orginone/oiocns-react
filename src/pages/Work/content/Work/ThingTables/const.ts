@@ -56,12 +56,12 @@ export enum OperateType {
   'Add' = '新增',
   'Edit' = '变更',
   'Select' = '选择',
-  'EditMore' = '批量变更',
+  'EditMore' = '变更',
 }
 export const ModalNames = new Map([
   ['Add', '新增'],
   ['Edit', '变更'],
-  ['EditMore', '批量变更'],
+  ['EditMore', '变更'],
   ['Select', '选择'],
 ]);
 export const defaultData: any[] = [

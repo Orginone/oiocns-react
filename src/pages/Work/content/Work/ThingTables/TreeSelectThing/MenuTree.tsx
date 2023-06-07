@@ -15,7 +15,7 @@ const loadChildren = (team: IBelong) => {
   return buildThingTree(things);
 };
 /** 获取存储模块菜单 */
-export const loadStoreMenu = (space: IBelong) => {
+export const loadThingMenu = (space: IBelong) => {
   return {
     key: space.id,
     item: space,

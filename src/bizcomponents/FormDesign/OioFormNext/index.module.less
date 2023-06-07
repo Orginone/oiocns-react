@@ -2,16 +2,18 @@
   display: flex;
   justify-content: center;
   font-size: 16px;
-  height: 36px;
-  line-height: 36px;
-  padding-bottom: 10px;
-  border-bottom: 0;
+  height: 40px;
+  line-height: 40px;
 }
 
 .formWrap {
   .formRow {
     :global {
-      .ogo-form-item {
+      .ogo-form-item,
+      .ogo-descriptions-row,
+      .ogo-form-item-row,
+      .ogo-form-item-control {
+        // height: 32px;
         margin: 0;
 
         div,
@@ -19,24 +21,19 @@
         input {
           background-color: transparent;
           border: none;
+          outline: none;
+          list-style: none;
+          // min-height: 30px;
         }
       }
-    }
 
-    .formCol {
-      padding: 0 !important;
+      .ogo-descriptions-item-label,
+      .ogo-descriptions-item-content {
+        padding: 0px 10px;
+      }
 
-      :global {
-        .ogo-form-item {
-          margin: 0;
-        }
-
-        .ogo-form-item-label {
-          // background-color: #f5f6fc;
-        }
-
-        .ogo-form-item-control {
-        }
+      .ogo-input-affix-wrapper {
+        padding: 0 10px;
       }
     }
   }

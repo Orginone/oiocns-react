@@ -12,12 +12,11 @@ import {
 } from '@ant-design/pro-components';
 import cls from './index.module.less';
 interface IProps {
-  propertys: XProperty[]; //表单头部展示数据源
+  propertys: XProperty[]; // 表单头部展示数据源
   belongId?: string;
-  Operation?: ProColumnType<any>; //操作列渲染
-  labels?: string[]; //表单标签
-  form?: XForm; //传进来的 表单基本信息
-  defaultColums?: ProColumnType[]; //传进来的 表头设置用于复现数据
+  Operation?: ProColumnType<any>; // 操作列渲染
+  labels?: string[]; //搜索信息 表单标签
+  form?: XForm; // 表单基本信息
   readonly?: boolean; //只读表单，隐藏操作区，配置区
 }
 
@@ -30,11 +29,11 @@ const BaseThing = <
 ) => {
   const {
     propertys,
-    // defaultColums,
     labels = [],
     Operation = {},
     readonly,
     toolBarRender,
+    scroll = {},
     ...rest
   } = props;
   const getColumns: any = useMemo(() => {
@@ -63,7 +62,7 @@ const BaseThing = <
         options={readonly ? false : undefined}
         columnsState={{ ...defaultColumnStateMap }}
         toolBarRender={readonly ? undefined : toolBarRender}
-        scroll={{ x: scrollx }}
+        scroll={{ ...scroll, x: scrollx }}
         {...rest}
       />
     </>
