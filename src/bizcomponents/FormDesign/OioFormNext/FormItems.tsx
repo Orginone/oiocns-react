@@ -15,7 +15,7 @@ import {
   ProFormUploadButton,
 } from '@ant-design/pro-form';
 import { Rule } from 'antd/es/form';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import ProFormAuth from './widgets/ProFormAuth';
 import ProFormDept from './widgets/ProFormDept';
 import ProFormDict from './widgets/ProFormDict';
@@ -27,18 +27,27 @@ import { IBelong } from '@/ts/core';
 import { loadWidgetsOpts } from '../rule';
 import { UploadProps } from 'antd';
 import orgCtrl from '@/ts/controller';
+import { fileArr } from './common';
 interface IProps {
   disabled?: boolean;
   item: XAttribute;
   belong?: IBelong;
   noRule?: boolean;
   onFilesValueChange?: (key: string, files: any[]) => void;
+  fileCode?: Array<any>;
 }
 
 /**
  * 表单项渲染
  */
-const OioFormItem = ({ item, belong, disabled, noRule, onFilesValueChange }: IProps) => {
+const OioFormItem = ({
+  item,
+  belong,
+  disabled,
+  noRule,
+  onFilesValueChange,
+  fileCode,
+}: IProps) => {
   const rule = JSON.parse(item.rule || '{}');
   // 规则校验
   let rules: Rule[] = [];
@@ -62,6 +71,7 @@ const OioFormItem = ({ item, belong, disabled, noRule, onFilesValueChange }: IPr
   }
 
   const [fileList, setFileList] = useState<any[]>([]);
+  // 上传文件区域
   const uploadProps: UploadProps = {
     multiple: false,
     showUploadList: true,
@@ -76,6 +86,8 @@ const OioFormItem = ({ item, belong, disabled, noRule, onFilesValueChange }: IPr
       const docDir = await orgCtrl.user.filesys?.home?.create('附件');
       if (docDir && file) {
         const result = await docDir.upload(file.name, file);
+        console.log(result, 'result');
+
         if (result) {
           const _data = result.shareInfo();
           const _file = {
@@ -91,6 +103,20 @@ const OioFormItem = ({ item, belong, disabled, noRule, onFilesValueChange }: IPr
       }
     },
   };
+
+  // 这里用于复现审批办事界面的上传
+  useEffect(() => {
+    if (fileCode) {
+      // 格式化参数，让其参数符合upload预览的参数
+      Object.keys(fileCode || {}).forEach((id: any) => {
+        if (id == item.id) {
+          // 格式化参数
+          setFileList(fileArr(fileCode[id]));
+        }
+      });
+    }
+  }, [fileCode]);
+
   switch (rule.widget) {
     case 'input':
     case 'string':
