@@ -15,7 +15,7 @@ import {
   ProFormUploadButton,
 } from '@ant-design/pro-form';
 import { Rule } from 'antd/es/form';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import ProFormAuth from './widgets/ProFormAuth';
 import ProFormDept from './widgets/ProFormDept';
 import ProFormDict from './widgets/ProFormDict';
@@ -27,18 +27,27 @@ import { IBelong } from '@/ts/core';
 import { loadWidgetsOpts } from '../rule';
 import { UploadProps } from 'antd';
 import orgCtrl from '@/ts/controller';
+import { FileItemShare } from '@/ts/base/model';
 interface IProps {
   disabled?: boolean;
   item: XAttribute;
   belong?: IBelong;
   noRule?: boolean;
+  value?: any;
   onFilesValueChange?: (key: string, files: any[]) => void;
 }
 
 /**
  * 表单项渲染
  */
-const OioFormItem = ({ item, belong, disabled, noRule, onFilesValueChange }: IProps) => {
+const OioFormItem = ({
+  item,
+  belong,
+  disabled,
+  noRule,
+  onFilesValueChange,
+  value,
+}: IProps) => {
   const rule = JSON.parse(item.rule || '{}');
   // 规则校验
   let rules: Rule[] = [];
@@ -61,7 +70,17 @@ const OioFormItem = ({ item, belong, disabled, noRule, onFilesValueChange }: IPr
     rule.widget = loadWidgetsOpts(item.valueType)[0].value;
   }
 
-  const [fileList, setFileList] = useState<any[]>([]);
+  console.log(value);
+
+  const [fileList, setFileList] = useState<any[]>(
+    JSON.parse(value || '[]').map((a: FileItemShare) => {
+      uid: a.name;
+      name: a.name;
+      status: 'done';
+      url: a.shareLink;
+      data: a;
+    }),
+  );
   const uploadProps: UploadProps = {
     multiple: false,
     showUploadList: true,

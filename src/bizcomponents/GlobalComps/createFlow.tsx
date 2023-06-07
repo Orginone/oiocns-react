@@ -93,7 +93,7 @@ const WorkDefineModal = ({ open, handleOk, handleCancel, workItem, current }: Ip
     },
     {
       title: '允许新增实体',
-      dataIndex: 'allAdd',
+      dataIndex: 'allowAdd',
       valueType: 'switch',
       initialValue: true,
     },

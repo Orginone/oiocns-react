@@ -51,7 +51,7 @@ const OioForm: React.FC<IProps> = ({
 
     const legArr: any[] = [];
     if (leg === 0) {
-      return [];
+      return fileTypeItems;
     }
     for (let i = 0; i < colNum - leg; i++) {
       legArr.push({ id: 0 });
@@ -121,11 +121,12 @@ const OioForm: React.FC<IProps> = ({
                   contentStyle={{ width: '33%' }}>
                   <OioFormItem
                     item={item}
+                    value={formRef?.current?.getFieldsValue(true)[item.name]}
                     belong={belong}
                     onFilesValueChange={(key, files: any) => {
                       formRef?.current?.setFieldValue(
                         key,
-                        files.map((v: { data: any }) => v.data),
+                        JSON.stringify(files.map((v: { data: any }) => v.data)),
                       );
                       onValuesChange &&
                         onValuesChange(

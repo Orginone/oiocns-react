@@ -74,14 +74,15 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
   };
 
   const loadActions = () => {
+    let { allowAdd, allowEdit, allowSelect } = JSON.parse(current.metadata.rule);
     const actions: string[] = [];
-    if (current.metadata.allowAdd) {
+    if (allowAdd) {
       actions.push(OperateType.Add);
     }
-    if (current.metadata.allowEdit) {
+    if (allowEdit) {
       actions.push(OperateType.EditMore);
     }
-    if (current.metadata.allowSelect) {
+    if (allowSelect) {
       actions.push(OperateType.Select);
     }
     return actions;

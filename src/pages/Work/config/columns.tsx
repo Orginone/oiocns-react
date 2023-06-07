@@ -236,4 +236,11 @@ const statusMap = new Map([
       text: '已退货',
     },
   ],
+  [
+    240,
+    {
+      color: 'red',
+      text: '已取消',
+    },
+  ],
 ]);

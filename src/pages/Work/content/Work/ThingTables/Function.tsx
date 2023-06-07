@@ -1,10 +1,12 @@
 import { XForm, XProperty } from '@/ts/base/schema';
+import { Image } from 'antd';
 import { ProColumns, ProSchemaValueEnumObj } from '@ant-design/pro-components';
 import React, { ReactNode } from 'react';
 import orgCtrl from '@/ts/controller';
 import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
 import { debounce } from '@/utils/tools';
 import { ColTypes } from './const';
+import { FileItemShare } from '@/ts/base/model';
 
 // 获取表头配置
 const getColItem = (
@@ -52,6 +54,21 @@ const getColItem = (
       }
       break;
     case '选择型':
+      break;
+    case '附件型':
+      {
+        ColItem.render = (_text: ReactNode, _record: any) => {
+          if (_record) {
+            let shares: FileItemShare[] = JSON.parse(
+              _record.EDIT_INFO[attrId ?? id] || _record[attrId ?? id] || '[]',
+            );
+            return shares.map((a) => (
+              <Image src={a.thumbnail} preview={{ src: a.shareLink }} />
+            ));
+          }
+          return <span>-</span>;
+        };
+      }
       break;
 
     default:
