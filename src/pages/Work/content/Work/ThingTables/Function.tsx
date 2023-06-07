@@ -25,7 +25,7 @@ const getColItem = (
     render(text: any, _record: any) {
       if (_record?.EDIT_INFO?.[attrId]) {
         return (
-          <span style={{ color: '#154ad8' }} title={`修改前：${text}`}>
+          <span style={{ color: '#154ad8' }} title={`修改前：${_record[attrId] ?? '-'}`}>
             {_record?.EDIT_INFO?.[attrId]}
           </span>
         );
@@ -37,7 +37,7 @@ const getColItem = (
   switch (valueType) {
     case '用户型':
       {
-        ColItem.render = (text: ReactNode, _record: any) => {
+        ColItem.render = (_text: ReactNode, _record: any) => {
           if (_record) {
             let share = orgCtrl.user?.findShareById(_record[attrId ?? id]);
             return (
@@ -78,23 +78,21 @@ const submitCurrentTableData = debounce(
     };
     callback && callback(form.id, thingList, JSON.stringify(JsonData));
   },
-  100,
+  300,
 );
 /* 属性对象转 特性对象 */
-const handlePropToAttrObj = (Ptyrows: any[], hasIds: string[], propertys: any[]) => {
-  const keyMap: Map<string, string> = MakePropertysToAttrMap(propertys);
+const handlePropToAttrObj = (PropertysDatas: any[], keyMap: Map<string, string>) => {
+  // const keyMap: Map<string, string> = MakePropertysToAttrMap(propertys);
   // 判断是否 已选择存在
-  return Ptyrows.filter((s: { Id: string }) => !hasIds.includes(s.Id)).map(
-    (item: any) => {
-      let obj: { [key: string]: any } = {};
-      const { Propertys = {}, ...rest } = item;
-      Object.keys(Propertys).forEach((key) => {
-        const _key = key.slice(1);
-        keyMap.has(_key) && (obj[keyMap.get(_key)!] = item.Propertys[key]);
-      });
-      return { ...rest, ...obj };
-    },
-  );
+  return PropertysDatas.map((item: any) => {
+    let obj: { [key: string]: any } = {};
+    const { Propertys = {}, ...rest } = item;
+    Object.keys(Propertys).forEach((key) => {
+      const _key = key.slice(1);
+      obj[keyMap.has(_key) ? keyMap.get(_key)! : `S${key}`] = Propertys[key];
+    });
+    return { ...rest, ...obj };
+  });
 };
 export {
   getColItem,

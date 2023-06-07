@@ -52,7 +52,7 @@ const Detail: React.FC<TaskDetailType> = ({ task, define, instance, onBack }) =>
         });
       }
     });
-    return [content, <Tabs tabPosition="top" items={items} />];
+    return [content, <Tabs tabPosition="top" key={2} items={items} />];
   };
 
   /** 加载表单 */
