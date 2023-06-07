@@ -81,6 +81,7 @@ const ConditionGroupItemConfig: React.FC<IProps> = (props) => {
                 item.valLabel = findConLabel?.label || '';
               }
             }
+            item.display = `${item.paramLabel} ${item.label} ${item.val} `;
           });
           // setCurretEditorValue([...(currentOpNode?.conditions || [])]);
         }}>

@@ -27,6 +27,7 @@ const ConditionNode: React.FC<Iprops> = (props) => {
       label: '',
       type: dataType.NUMERIC,
       val: undefined,
+      display: '',
     });
     setKey(key + 1);
   };
