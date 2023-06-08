@@ -58,7 +58,13 @@ const getColItem = (
             return (
               <>
                 {shares.map((share: FileItemShare, i: number) => {
-                  return <div key={i}>{`${share.name}(${formatSize(share.size)})`}</div>;
+                  return (
+                    <div key={i}>
+                      <a href={share.shareLink}>{`${share.name}(${formatSize(
+                        share.size,
+                      )})`}</a>
+                    </div>
+                  );
                 })}
               </>
             );
