@@ -21,7 +21,7 @@ const EntityIcon = (info: teamTypeInfo) => {
   const [share, setShare] = useState<ShareIcon>();
   const size = info.size ?? 22;
   useEffect(() => {
-    if (info.entityId.length > 10) {
+    if (info.entityId && info.entityId.length > 10) {
       orgCtrl.user.findShareAsync(info.entityId).then((value) => {
         setShare(value);
       });
