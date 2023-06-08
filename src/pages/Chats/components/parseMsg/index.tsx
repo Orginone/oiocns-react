@@ -8,13 +8,13 @@ import css from './index.module.less';
 
 /** 将链接转化为超链接 */
 const linkText = (val: string) => {
-  var reg = /(https?:\/\/[^\s]+)/g;
+  let reg = /(https?:\/\/[^\s]+)/g;
   return val.replace(reg, '<a target=_blank href="$1"> $1 </a>');
 };
 
 /**
  * 显示消息
- * @param msg 消息
+ * @param item
  */
 export const parseMsg = (item: IMessage): any => {
   switch (item.msgType) {

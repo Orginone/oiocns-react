@@ -19,7 +19,7 @@ const Setting: React.FC<any> = () => {
    * @return {*}
    */
   useEffect(() => {
-    if (selectMenu?.company === undefined && isSupervise === true) {
+    if (selectMenu?.company === undefined && isSupervise) {
       setIsSupervise(false);
     }
   }, [selectMenu?.company]);
