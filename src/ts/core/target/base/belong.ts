@@ -117,7 +117,6 @@ export abstract class Belong extends Target implements IBelong {
     const isEqual = (msgChat: PersonMsgChat, member: schema.XTarget) =>
       msgChat.chatId === member.id;
     _newMembers = _newMembers.filter((i) => i.id != this.userId);
-    this.memberChats.splice(0, this.memberChats.length);
     if (_isAdd) {
       const missingMembers = _newMembers.filter(
         (el1) => !this.memberChats.some((el2) => isEqual(el2, el1)),
