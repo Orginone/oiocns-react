@@ -1,4 +1,4 @@
-import { IMessage, IMessageLabel } from '@/ts/core';
+import { IMessage, IMessageLabel, TargetType } from '@/ts/core';
 import { Drawer, List, Tabs } from 'antd';
 import React, { useState } from 'react';
 import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
@@ -42,7 +42,9 @@ const Information = ({ msg, onClose }: { msg: IMessage; onClose: Function }) => 
             : []
         }>
         <List.Item.Meta
-          avatar={<TeamIcon share={item.labeler} size={42} fontSize={42} />}
+          avatar={
+            <TeamIcon typeName={TargetType.Person} entityId={item.userId} size={42} />
+          }
           title={<strong>{item.labeler.name}</strong>}
           description={item.label}
         />

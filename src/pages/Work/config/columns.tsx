@@ -75,12 +75,12 @@ export const WorkColumns: ProColumns<schema.XWorkTask>[] = [
   },
   {
     title: '标题',
-    width: 300,
+    width: 150,
     dataIndex: 'title',
   },
   {
     key: 'shareId',
-    width: 200,
+    width: 150,
     title: '共享组织',
     dataIndex: 'shareId',
     render: (_: any, record: schema.XWorkTask) => {
@@ -98,7 +98,7 @@ export const WorkColumns: ProColumns<schema.XWorkTask>[] = [
   },
   {
     title: '发起组织',
-    width: 300,
+    width: 100,
     dataIndex: 'applyId',
     render: (_, record: schema.XWorkTask) => {
       return orgCtrl.provider.user?.findShareById(record.applyId).name;

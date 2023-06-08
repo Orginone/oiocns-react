@@ -177,7 +177,7 @@ const Book: React.FC<any> = ({
                   <List.Item.Meta
                     avatar={
                       <Badge count={item.chatdata.noReadCount} size="small">
-                        <TeamIcon share={item.share} size={40} fontSize={40} />
+                        <TeamIcon typeName={item.typeName} entityId={item.id} size={40} />
                       </Badge>
                     }
                     title={

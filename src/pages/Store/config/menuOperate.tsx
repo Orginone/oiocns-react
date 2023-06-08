@@ -99,7 +99,12 @@ const buildThingTree = (species: ISpeciesItem[]): MenuItemType[] => {
             item: item,
             label: item.name,
             icon: (
-              <TeamIcon notAvatar={true} share={item.share} size={18} fontSize={16} />
+              <TeamIcon
+                notAvatar={true}
+                entityId={item.id}
+                typeName={item.typeName}
+                size={18}
+              />
             ),
             itemType: MenuType.Species,
             menus: [],
@@ -132,7 +137,7 @@ const buildThingMenus = (thing: IThingClass) => {
         key: form.key,
         item: form,
         label: form.name,
-        icon: <TeamIcon share={form.share} size={18} fontSize={16} />,
+        icon: <TeamIcon entityId={form.id} typeName={form.typeName} size={18} />,
         itemType: MenuType.Form,
         beforeLoad: async () => {
           await form.loadAttributes();
@@ -180,7 +185,9 @@ const getUserMenu = () => {
     item: orgCtrl.user,
     label: orgCtrl.user.name,
     itemType: GroupMenuType.User,
-    icon: <TeamIcon share={orgCtrl.user.share} size={18} fontSize={16} />,
+    icon: (
+      <TeamIcon entityId={orgCtrl.user.id} typeName={orgCtrl.user.typeName} size={18} />
+    ),
     menus: [],
     children: loadChildren(orgCtrl.user),
   };
@@ -196,7 +203,7 @@ const getTeamMenu = () => {
       label: company.name,
       itemType: GroupMenuType.Company,
       menus: [],
-      icon: <TeamIcon share={company.share} size={18} fontSize={16} />,
+      icon: <TeamIcon entityId={company.id} typeName={company.typeName} size={18} />,
       children: loadChildren(company),
     });
   }

@@ -2,7 +2,6 @@ import { XForm, XProperty } from '@/ts/base/schema';
 import { Image } from 'antd';
 import { ProColumns, ProSchemaValueEnumObj } from '@ant-design/pro-components';
 import React, { ReactNode } from 'react';
-import orgCtrl from '@/ts/controller';
 import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
 import { debounce } from '@/utils/tools';
 import { ColTypes } from './const';
@@ -41,13 +40,7 @@ const getColItem = (
       {
         ColItem.render = (_text: ReactNode, _record: any) => {
           if (_record) {
-            let share = orgCtrl.user?.findShareById(_record[attrId ?? id]);
-            return (
-              <>
-                <TeamIcon share={share} size={15} />
-                <span style={{ marginLeft: 10 }}>{share.name}</span>
-              </>
-            );
+            return <TeamIcon entityId={_record[attrId ?? id]} size={15} showName />;
           }
           return <span>-</span>;
         };
@@ -63,7 +56,7 @@ const getColItem = (
               _record.EDIT_INFO[attrId ?? id] || _record[attrId ?? id] || '[]',
             );
             return shares.map((a) => (
-              <Image src={a.thumbnail} preview={{ src: a.shareLink }} />
+              <Image key={a.name} src={a.thumbnail} preview={{ src: a.shareLink }} />
             ));
           }
           return <span>-</span>;

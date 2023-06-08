@@ -1,6 +1,5 @@
 import React from 'react';
 import { Card, Dropdown } from 'antd';
-import orgCtrl from '@/ts/controller';
 import { XProperty } from '@/ts/base/schema';
 import DataGrid, {
   Column,
@@ -170,16 +169,11 @@ const Thing: React.FC<IProps> = (props: IProps) => {
             width={150}
             allowFiltering={false}
             cellRender={(data: any) => {
-              var share = orgCtrl.user.findShareById(data.value);
-              if (data) {
-                return (
-                  <>
-                    <TeamIcon share={share} size={15} />
-                    <span style={{ marginLeft: 10 }}>{share.name}</span>
-                  </>
-                );
-              }
-              return <span>{share.name}</span>;
+              return (
+                <>
+                  <TeamIcon entityId={data.value} size={15} showName />
+                </>
+              );
             }}
           />
         );

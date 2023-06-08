@@ -17,7 +17,9 @@ const createChatMenu = (chat: IMsgChat, children: MenuItemType[]) => {
     tag: chat.chatdata.labels,
     itemType: MenuType.Chat,
     menus: loadChatMoreMenus(false, true),
-    icon: <TeamIcon notAvatar={true} share={chat.share} size={18} fontSize={16} />,
+    icon: (
+      <TeamIcon notAvatar={true} typeName={chat.typeName} entityId={chat.id} size={18} />
+    ),
     children: children,
   };
 };
@@ -34,7 +36,7 @@ const loadBookMenu = () => {
       label: company.name,
       item: company.chats.filter((i) => i.isMyChat),
       itemType: MenuType.Books,
-      icon: <TeamIcon share={company.share} size={18} fontSize={16} />,
+      icon: <TeamIcon typeName={company.typeName} entityId={company.id} size={18} />,
       company,
       menus: company.hasAuthoritys([orgAuth.SuperAuthId])
         ? [
@@ -72,7 +74,9 @@ const loadBookMenu = () => {
           .filter((i) => i.isMyChat)
           .map((item) => createChatMenu(item, [])),
       ],
-      icon: <TeamIcon share={orgCtrl.user.share} size={18} fontSize={16} />,
+      icon: (
+        <TeamIcon typeName={orgCtrl.user.typeName} entityId={orgCtrl.user.id} size={18} />
+      ),
     },
     ...companyItems,
   ];
