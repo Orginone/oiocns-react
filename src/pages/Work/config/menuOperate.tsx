@@ -153,9 +153,7 @@ const createMenu = (team: IBelong) => {
     label: team.name,
     itemType: team.typeName,
     menus: [],
-    icon: (
-      <TeamIcon notAvatar={true} entityId={team.id} typeName={team.typeName} size={18} />
-    ),
+    icon: <TeamIcon notAvatar={true} entityId={team.id} size={18} />,
     children: loadChildren(team),
   };
 };

@@ -9,7 +9,7 @@ import TreeLeftDeptPage from './components/TreeLeftPosPage';
 import AssignPosts from './components/AssignPosts';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import cls from './index.module.less';
-import { IIdentity, ITarget, TargetType } from '@/ts/core';
+import { IIdentity, ITarget } from '@/ts/core';
 import TeamIcon from '../GlobalComps/entityIcon';
 
 const { Sider, Content } = Layout;
@@ -128,11 +128,7 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
             <Descriptions.Item label="名称">{indentity.name}</Descriptions.Item>
             <Descriptions.Item label="编码">{indentity.code}</Descriptions.Item>
             <Descriptions.Item label="创建人">
-              <TeamIcon
-                typeName={TargetType.Person}
-                entityId={indentity.metadata.createUser}
-                size={22}
-              />
+              <TeamIcon entityId={indentity.metadata.createUser} size={22} />
               <strong>{indentity.creater.name}</strong>
             </Descriptions.Item>
             <Descriptions.Item label="创建时间">

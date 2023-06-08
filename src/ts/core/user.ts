@@ -2,7 +2,7 @@ import { IPerson, Person } from './target/person';
 import { common, kernel, model, schema } from '../base';
 import { IChatProvider, ChatProvider } from './chat/provider';
 import { IWorkProvider, WorkProvider } from './work/provider';
-import { OperateType, TargetType } from './public/enums';
+import { OperateType } from './public/enums';
 import { logger } from '../base/common';
 import { msgChatNotify } from './chat/message/msgchat';
 import { IIdentity, Identity } from './target/identity/identity';

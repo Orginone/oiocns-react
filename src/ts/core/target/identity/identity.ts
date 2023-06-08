@@ -107,7 +107,6 @@ export class Identity extends Entity<schema.XIdentity> implements IIdentity {
       }
       const res = await kernel.deleteIdentity({
         id: this.id,
-        page: PageAll,
       });
       if (!res.success) return false;
     }

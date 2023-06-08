@@ -118,12 +118,7 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
         }}>
         {item.key === 'setting' ? (
           <>
-            <TeamIcon
-              typeName={orgCtrl.user.typeName}
-              entityId={orgCtrl.user.id}
-              size={28}
-              title="设置"
-            />
+            <TeamIcon entityId={orgCtrl.user.id} size={28} title="设置" />
             <OrgIcons
               className={cls.settingIcon}
               size={13}

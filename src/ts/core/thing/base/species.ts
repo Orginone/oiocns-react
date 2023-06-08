@@ -1,5 +1,5 @@
 import { kernel, model, schema } from '../../../base';
-import { Entity, IEntity, PageAll } from '../../public';
+import { Entity, IEntity } from '../../public';
 import { ITarget } from '../../target/base/target';
 
 /** 分类的抽象接口 */
@@ -46,7 +46,6 @@ export abstract class SpeciesItem
   async delete(): Promise<boolean> {
     const res = await kernel.deleteSpecies({
       id: this.id,
-      page: PageAll,
     });
     if (res.success) {
       if (this.parent) {

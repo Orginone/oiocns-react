@@ -36,7 +36,7 @@ const loadBookMenu = () => {
       label: company.name,
       item: company.chats.filter((i) => i.isMyChat),
       itemType: MenuType.Books,
-      icon: <TeamIcon typeName={company.typeName} entityId={company.id} size={18} />,
+      icon: <TeamIcon entityId={company.id} size={18} />,
       company,
       menus: company.hasAuthoritys([orgAuth.SuperAuthId])
         ? [
@@ -74,9 +74,7 @@ const loadBookMenu = () => {
           .filter((i) => i.isMyChat)
           .map((item) => createChatMenu(item, [])),
       ],
-      icon: (
-        <TeamIcon typeName={orgCtrl.user.typeName} entityId={orgCtrl.user.id} size={18} />
-      ),
+      icon: <TeamIcon entityId={orgCtrl.user.id} size={18} />,
     },
     ...companyItems,
   ];

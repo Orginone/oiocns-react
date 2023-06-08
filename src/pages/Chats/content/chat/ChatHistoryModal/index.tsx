@@ -3,7 +3,7 @@ import { Modal, Spin, Empty } from 'antd';
 import { animateScroll } from 'react-scroll';
 import SearchInput from '@/components/SearchInput';
 import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
-import { IMsgChat, TargetType } from '@/ts/core';
+import { IMsgChat } from '@/ts/core';
 import { showChatTime } from '@/utils/tools';
 import { parseMsg } from '@/pages/Chats/components/parseMsg';
 import ChatHistoryStyle from './index.module.less';
@@ -92,12 +92,7 @@ const ChatHistoryModal: React.FC<Iprops> = ({ open, title, onCancel, chat }) => 
         return (
           <div key={item.metadata.fromId + index}>
             <div className={`${ChatHistoryStyle.own_all}`}>
-              <TeamIcon
-                typeName={TargetType.Person}
-                entityId={item.metadata.fromId}
-                preview
-                size={36}
-              />
+              <TeamIcon entityId={item.metadata.fromId} preview size={36} />
               <div className={`${ChatHistoryStyle.own_item}`}>
                 <div className={`${ChatHistoryStyle.own_name}`}>
                   <div>{item.from.name}</div>

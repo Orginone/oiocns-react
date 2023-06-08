@@ -43,7 +43,7 @@ const PullDown: React.FC<AppProps> = (props) => {
       className="citeSelect">
       {people.map((res: any) => (
         <Option value={res.id} key={res.id}>
-          <EntityIcon typeName={res.typeName} entityId={res.id} size={30} />
+          <EntityIcon entityId={res.id} size={30} />
           <strong style={{ marginLeft: 6 }}>{res.name}</strong>
         </Option>
       ))}
