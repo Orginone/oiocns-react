@@ -27,7 +27,7 @@ import { IBelong } from '@/ts/core';
 import { loadWidgetsOpts } from '../rule';
 import { UploadProps } from 'antd';
 import orgCtrl from '@/ts/controller';
-import { FileItemShare } from '@/ts/base/model';
+import { fileArr } from './common';
 interface IProps {
   disabled?: boolean;
   item: XAttribute;
@@ -35,6 +35,7 @@ interface IProps {
   noRule?: boolean;
   value?: any;
   onFilesValueChange?: (key: string, files: any[]) => void;
+  fileCode?: Array<any>;
 }
 
 /**
@@ -46,7 +47,7 @@ const OioFormItem = ({
   disabled,
   noRule,
   onFilesValueChange,
-  value,
+  fileCode,
 }: IProps) => {
   const rule = JSON.parse(item.rule || '{}');
   // 规则校验
@@ -70,17 +71,8 @@ const OioFormItem = ({
     rule.widget = loadWidgetsOpts(item.valueType)[0].value;
   }
 
-  console.log(value);
-
-  const [fileList, setFileList] = useState<any[]>(
-    JSON.parse(value || '[]').map((a: FileItemShare) => {
-      uid: a.name;
-      name: a.name;
-      status: 'done';
-      url: a.shareLink;
-      data: a;
-    }),
-  );
+  const [fileList, setFileList] = useState<any[]>([]);
+  // 上传文件区域
   const uploadProps: UploadProps = {
     multiple: false,
     showUploadList: true,
@@ -95,6 +87,8 @@ const OioFormItem = ({
       const docDir = await orgCtrl.user.filesys?.home?.create('附件');
       if (docDir && file) {
         const result = await docDir.upload(file.name, file);
+        console.log(result, 'result');
+
         if (result) {
           const _data = result.shareInfo();
           const _file = {
@@ -110,6 +104,20 @@ const OioFormItem = ({
       }
     },
   };
+
+  // 这里用于复现审批办事界面的上传
+  useEffect(() => {
+    if (fileCode) {
+      // 格式化参数，让其参数符合upload预览的参数
+      Object.keys(fileCode || {}).forEach((id: any) => {
+        if (id == item.id) {
+          // 格式化参数
+          setFileList(fileArr(fileCode[id]));
+        }
+      });
+    }
+  }, [fileCode]);
+
   switch (rule.widget) {
     case 'input':
     case 'string':

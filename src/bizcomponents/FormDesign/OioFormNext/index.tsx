@@ -45,6 +45,7 @@ const OioForm: React.FC<IProps> = ({
       });
     }
   }, []);
+
   const fillArr = useMemo(() => {
     const fileTypeItems = attributes.filter((v) => v.valueType == '附件型') ?? [];
     const leg = (attributes.length - fileTypeItems.length) % colNum;
@@ -123,6 +124,7 @@ const OioForm: React.FC<IProps> = ({
                     item={item}
                     value={formRef?.current?.getFieldsValue(true)[item.name]}
                     belong={belong}
+                    fileCode={fieldsValue}
                     onFilesValueChange={(key, files: any) => {
                       formRef?.current?.setFieldValue(
                         key,
