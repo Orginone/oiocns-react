@@ -153,7 +153,7 @@ export abstract class MsgChat<T extends schema.XEntity>
   get information(): string {
     if (this.chatdata.lastMessage) {
       const msg = new Message(this.chatdata.lastMessage, this);
-      return `${msg.createTime}>${msg.msgTitle}`;
+      return msg.msgTitle;
     }
     return this.remark.substring(0, 60);
   }

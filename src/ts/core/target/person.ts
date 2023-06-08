@@ -246,27 +246,24 @@ export class Person extends Belong implements IPerson {
   }
   async findShareAsync(id: string): Promise<model.ShareIcon | undefined> {
     const metadata = this.findMetadata<schema.XEntity>(id);
-    if (!metadata) {
-      const res = await kernel.queryTargetById({
-        ids: [id],
-        page: PageAll,
-      });
-      if (res.success && res.data.result) {
-        res.data.result.forEach((item) => {
-          this.updateMetadata(item);
-          return {
-            name: item.name,
-            typeName: item.typeName,
-            avatar: parseAvatar(item.icon),
-          };
-        });
-      }
-    }
     if (metadata) {
       return {
         name: metadata.name,
         typeName: metadata.typeName,
         avatar: parseAvatar(metadata.icon),
+      };
+    }
+    const res = await kernel.queryTargetById({
+      ids: [id],
+      page: PageAll,
+    });
+    if (res.success && res.data.result && res.data.result.length > 0) {
+      const item = res.data.result[0];
+      this.updateMetadata(item);
+      return {
+        name: item.name,
+        typeName: item.typeName,
+        avatar: parseAvatar(item.icon),
       };
     }
   }

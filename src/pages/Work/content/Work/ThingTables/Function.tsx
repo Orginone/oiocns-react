@@ -5,6 +5,7 @@ import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
 import { debounce } from '@/utils/tools';
 import { ColTypes } from './const';
 import { FileItemShare } from '@/ts/base/model';
+import { formatSize } from '@/ts/base/common';
 
 // 获取表头配置
 const getColItem = (
@@ -56,13 +57,8 @@ const getColItem = (
             );
             return (
               <>
-                {shares.map((a) => {
-                  return (
-                    <>
-                      <a href={a.shareLink}>{a.name}</a>
-                      <br />
-                    </>
-                  );
+                {shares.map((share: FileItemShare, i: number) => {
+                  return <div key={i}>{`${share.name}(${formatSize(share.size)})`}</div>;
                 })}
               </>
             );

@@ -8,13 +8,13 @@ import css from './index.module.less';
 
 /** 将链接转化为超链接 */
 const linkText = (val: string) => {
-  var reg = /(https?:\/\/[^\s]+)/g;
+  let reg = /(https?:\/\/[^\s]+)/g;
   return val.replace(reg, '<a target=_blank href="$1"> $1 </a>');
 };
 
 /**
  * 显示消息
- * @param msg 消息
+ * @param item
  */
 export const parseMsg = (item: IMessage): any => {
   switch (item.msgType) {
@@ -33,6 +33,13 @@ export const parseMsg = (item: IMessage): any => {
     }
     case MessageType.File: {
       const file: FileItemShare = parseAvatar(item.msgBody);
+      if (!file) {
+        return (
+          <div className={`${css.con_content_txt}`} style={{ color: '#af1212' }}>
+            文件消息异常
+          </div>
+        );
+      }
       return (
         <>
           <div className={`${css.con_content_txt}`}>

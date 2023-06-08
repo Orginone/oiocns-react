@@ -1,7 +1,8 @@
 import { schema } from '@/ts/base';
 import { ISpeciesItem, IWorkDefine } from '@/ts/core';
 import { ProColumns } from '@ant-design/pro-table';
-import orgCtrl from '@/ts/controller';
+import EntityIcon from '@/bizcomponents/GlobalComps/entityIcon';
+import React from 'react';
 
 const getSpeciesName = (
   id: string,
@@ -123,7 +124,7 @@ export const IdentityColumn: ProColumns<schema.XIdentity>[] = [
     title: '组织',
     dataIndex: 'shareId',
     render: (_, record) => {
-      return orgCtrl.user.findShareById(record.shareId).name;
+      return <EntityIcon entityId={record.shareId} showName />;
     },
   },
   {
@@ -176,7 +177,7 @@ export const PropertyColumns = (
     key: 'belongId',
     width: 200,
     render: (_, record) => {
-      return orgCtrl.user.findShareById(record.belongId).name;
+      return <EntityIcon entityId={record.belongId} showName />;
     },
   },
   {
@@ -274,7 +275,7 @@ export const FormColumns = (species: ISpeciesItem): ProColumns<schema.XForm>[] =
     key: 'shareId',
     width: 200,
     render: (_, record) => {
-      return orgCtrl.user.findShareById(record.shareId).name;
+      return <EntityIcon entityId={record.shareId} showName />;
     },
   },
   {
@@ -283,7 +284,7 @@ export const FormColumns = (species: ISpeciesItem): ProColumns<schema.XForm>[] =
     key: 'belongId',
     width: 200,
     render: (_, record) => {
-      return orgCtrl.user.findShareById(record.belongId).name;
+      return <EntityIcon entityId={record.belongId} showName />;
     },
   },
 ];

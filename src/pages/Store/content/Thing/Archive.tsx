@@ -6,6 +6,7 @@ import OioForm from '@/bizcomponents/FormDesign/OioFormNext';
 import { XWorkInstance, XWorkTask } from '@/ts/base/schema';
 import BashThing from '@/pages/Work/content/Work/ThingTables/BaseThing';
 import { IBelong } from '@/ts/core';
+import EntityIcon from '@/bizcomponents/GlobalComps/entityIcon';
 
 const { Panel } = Collapse;
 
@@ -89,7 +90,7 @@ const ThingArchive: React.FC<IThingCardProps> = ({ thingId, belongId }) => {
         });
       }
     });
-    return [content, <Tabs tabPosition="top" items={items} />];
+    return [content, <Tabs key={1} tabPosition="top" items={items} />];
   };
 
   /** 加载表单 */
@@ -126,7 +127,7 @@ const ThingArchive: React.FC<IThingCardProps> = ({ thingId, belongId }) => {
               </div>
               <div style={{ paddingRight: '24px' }}>
                 发起人：
-                {orgCtrl.provider.user?.findShareById(instance.createUser).name}
+                <EntityIcon entityId={instance.createUser} showName />
               </div>
             </div>
             {loadForms(data.forms)}
@@ -146,7 +147,7 @@ const ThingArchive: React.FC<IThingCardProps> = ({ thingId, belongId }) => {
                         </div>
                         <div style={{ paddingRight: '24px' }}>
                           审批人：
-                          {orgCtrl.provider.user?.findShareById(record.createUser).name}
+                          <EntityIcon entityId={record.createUser} showName />
                         </div>
                         <div>审批结果：{record.status < 200 ? '通过' : '拒绝'}</div>
                         <div>
@@ -188,10 +189,12 @@ const ThingArchive: React.FC<IThingCardProps> = ({ thingId, belongId }) => {
                         {a.createTime.substring(0, a.createTime.length - 4)}
                       </div>
                       <div style={{ paddingRight: '24px' }}>
-                        归属用户：{orgCtrl.provider.user?.findShareById(a.belongId!).name}
+                        归属用户：
+                        <EntityIcon entityId={a.belongId} showName />
                       </div>
                       <div style={{ paddingRight: '24px' }}>
-                        操作人：{orgCtrl.provider.user?.findShareById(a.createUser).name}
+                        操作人：
+                        <EntityIcon entityId={a.createUser} showName />
                       </div>
                     </div>
                   }>

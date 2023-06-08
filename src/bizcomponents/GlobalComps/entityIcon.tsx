@@ -21,11 +21,8 @@ const EntityIcon = (info: teamTypeInfo) => {
   const [share, setShare] = useState<ShareIcon>();
   const size = info.size ?? 22;
   useEffect(() => {
-    if (info.entityId) {
+    if (info.entityId && info.entityId.length > 10) {
       orgCtrl.user.findShareAsync(info.entityId).then((value) => {
-        if (info.showName) {
-          console.log(value);
-        }
         setShare(value);
       });
     }
@@ -33,7 +30,7 @@ const EntityIcon = (info: teamTypeInfo) => {
   if (share?.avatar && share?.avatar.thumbnail) {
     return (
       <div
-        style={{ cursor: 'pointer', display: 'inline-block' }}
+        style={{ cursor: 'pointer', display: 'contents' }}
         title={info.title ?? '点击预览'}>
         {info.preview && (
           <Image
@@ -54,7 +51,7 @@ const EntityIcon = (info: teamTypeInfo) => {
             setPreview(true);
           }}
         />
-        {info.showName && <strong>{share.name}</strong>}
+        {info.showName && <strong style={{ marginLeft: 6 }}>{share.name}</strong>}
       </div>
     );
   }
@@ -113,14 +110,14 @@ const EntityIcon = (info: teamTypeInfo) => {
     return icon;
   }
   return (
-    <>
+    <div style={{ display: 'contents' }}>
       <Avatar
         size={size}
         icon={icon}
         style={{ background: 'transparent', color: '#606060' }}
       />
-      {info.showName && <strong>{share?.name}</strong>}
-    </>
+      {info.showName && <strong style={{ marginLeft: 6 }}>{share?.name}</strong>}
+    </div>
   );
 };
 
