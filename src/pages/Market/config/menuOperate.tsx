@@ -18,7 +18,12 @@ const buildSpeciesTree = (species: ISpeciesItem[]): MenuItemType[] => {
             item: item,
             label: item.name,
             icon: (
-              <TeamIcon notAvatar={true} share={item.share} size={18} fontSize={16} />
+              <TeamIcon
+                notAvatar={true}
+                typeName={item.typeName}
+                entityId={item.id}
+                size={18}
+              />
             ),
             itemType: item.typeName,
             menus: [],
@@ -30,7 +35,9 @@ const buildSpeciesTree = (species: ISpeciesItem[]): MenuItemType[] => {
                   key: i.key,
                   item: i,
                   label: i.name,
-                  icon: <TeamIcon share={item.share} size={18} fontSize={16} />,
+                  icon: (
+                    <TeamIcon typeName={item.typeName} entityId={item.id} size={18} />
+                  ),
                   itemType: i.typeName,
                   beforeLoad: async () => {
                     await i.loadAttributes();
@@ -60,7 +67,14 @@ const buildMarketTree = (markets: IMarket[]) => {
       itemType: market.typeName,
       menus: [],
       tag: [market.current.space.name],
-      icon: <TeamIcon notAvatar={true} share={market.share} size={18} fontSize={16} />,
+      icon: (
+        <TeamIcon
+          notAvatar={true}
+          typeName={market.typeName}
+          entityId={market.id}
+          size={18}
+        />
+      ),
       children: buildSpeciesTree(market.children),
     };
   });

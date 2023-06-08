@@ -23,7 +23,14 @@ const buildWorkItem = (defines: IWorkDefine[]) => {
       label: item.name,
       itemType: GroupMenuType.WorkItem,
       menus: [],
-      icon: <TeamIcon notAvatar={true} share={item.share} size={18} fontSize={16} />,
+      icon: (
+        <TeamIcon
+          notAvatar={true}
+          entityId={item.id}
+          typeName={item.typeName}
+          size={18}
+        />
+      ),
       children: [],
     });
   }
@@ -56,7 +63,14 @@ const buildSpeciesTree = (species: ISpeciesItem[]) => {
       label: item.name,
       itemType: GroupMenuType.Species,
       menus: [],
-      icon: <TeamIcon notAvatar={true} share={item.share} size={18} fontSize={16} />,
+      icon: (
+        <TeamIcon
+          notAvatar={true}
+          entityId={item.id}
+          typeName={item.typeName}
+          size={18}
+        />
+      ),
       children: children,
     });
   }
@@ -65,15 +79,18 @@ const buildSpeciesTree = (species: ISpeciesItem[]) => {
 
 const loadChildren = (team: IBelong) => {
   const defines: IWorkDefine[] = [];
-  const species: ISpeciesItem[] = [];
+  const apps: IApplication[] = [];
   for (const t of team.targets) {
     if (t.space === team.space) {
       for (const s of t.species) {
         switch (s.typeName) {
           case SpeciesType.Market:
           case SpeciesType.Application:
-            species.push(s);
-            defines.push(...(s as IApplication).defines);
+            {
+              const app = s as IApplication;
+              apps.push(app);
+              defines.push(...app.defines);
+            }
             break;
         }
       }
@@ -88,10 +105,10 @@ const loadChildren = (team: IBelong) => {
       icon: <OrgIcons size={22} workStart />,
       expIcon: <OrgIcons size={22} workStart selected />,
       menus: [],
-      children: buildSpeciesTree(species),
+      children: buildSpeciesTree(apps.filter((app) => app.defines.length > 0)),
       beforeLoad: async () => {
-        for (const s of species) {
-          await (s as IApplication).loadWorkDefines();
+        for (const app of apps) {
+          await app.loadWorkDefines();
         }
       },
     },
@@ -136,7 +153,9 @@ const createMenu = (team: IBelong) => {
     label: team.name,
     itemType: team.typeName,
     menus: [],
-    icon: <TeamIcon notAvatar={true} share={team.share} size={18} fontSize={16} />,
+    icon: (
+      <TeamIcon notAvatar={true} entityId={team.id} typeName={team.typeName} size={18} />
+    ),
     children: loadChildren(team),
   };
 };

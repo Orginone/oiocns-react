@@ -220,60 +220,59 @@ export class FileSystemItem implements IFileSystemItem {
     file: Blob,
     p?: OnProgressType,
   ): Promise<IFileSystemItem | undefined> {
-    const exist = await this._findByName(name);
-    if (!exist) {
-      p?.apply(this, [0]);
-      const task: TaskModel = {
-        name: name,
-        finished: 0,
+    const idx = name.lastIndexOf('.');
+    if (idx > -1) {
+      name = await this._confrimName(name.substring(0, idx), name.substring(idx));
+    } else {
+      name = await this._confrimName(name, '');
+    }
+    p?.apply(this, [0]);
+    const task: TaskModel = {
+      name: name,
+      finished: 0,
+      size: file.size,
+      createTime: new Date(),
+      group: this.metadata.name,
+    };
+    let data: BucketOpreateModel = {
+      key: this._formatKey(name),
+      operate: BucketOpreates.Upload,
+    };
+    const id = generateUuid();
+    this.filesys.taskChanged(id, task);
+    let index = 0;
+    while (index * chunkSize < file.size) {
+      var start = index * chunkSize;
+      var end = start + chunkSize;
+      if (end > file.size) {
+        end = file.size;
+      }
+      data.fileItem = {
+        index: index,
+        uploadId: id,
         size: file.size,
-        createTime: new Date(),
-        group: this.metadata.name,
+        data: [],
+        dataUrl: await blobToDataUrl(file.slice(start, end)),
       };
-      let data: BucketOpreateModel = {
-        key: this._formatKey(name),
-        operate: BucketOpreates.Upload,
-      };
-      const id = generateUuid();
-      this.filesys.taskChanged(id, task);
-      let index = 0;
-      while (index * chunkSize < file.size) {
-        var start = index * chunkSize;
-        var end = start + chunkSize;
-        if (end > file.size) {
-          end = file.size;
-        }
-        data.fileItem = {
-          index: index,
-          uploadId: id,
-          size: file.size,
-          data: [],
-          dataUrl: await blobToDataUrl(file.slice(start, end)),
-        };
-        const res = await kernel.anystore.bucketOpreate<FileItemModel>(
-          this.belongId,
-          data,
-        );
-        if (!res.success) {
-          data.operate = BucketOpreates.AbortUpload;
-          await kernel.anystore.bucketOpreate<boolean>(this.belongId, data);
-          task.finished = -1;
-          this.filesys.taskChanged(id, task);
-          p?.apply(this, [-1]);
-          return;
-        }
-        index++;
-        task.finished = end;
+      const res = await kernel.anystore.bucketOpreate<FileItemModel>(this.belongId, data);
+      if (!res.success) {
+        data.operate = BucketOpreates.AbortUpload;
+        await kernel.anystore.bucketOpreate<boolean>(this.belongId, data);
+        task.finished = -1;
         this.filesys.taskChanged(id, task);
-        p?.apply(this, [end]);
-        if (end === file.size && res.data) {
-          const node = new FileSystemItem(this.filesys, res.data, this);
-          this.children.push(node);
-          return node;
-        }
+        p?.apply(this, [-1]);
+        return;
+      }
+      index++;
+      task.finished = end;
+      this.filesys.taskChanged(id, task);
+      p?.apply(this, [end]);
+      if (end === file.size && res.data) {
+        const node = new FileSystemItem(this.filesys, res.data, this);
+        this.children.push(node);
+        return node;
       }
     }
-    return exist;
   }
   download(path: string, onProgress: OnProgressType): Promise<void> {
     throw new Error('Method not implemented.');
@@ -318,6 +317,21 @@ export class FileSystemItem implements IFileSystemItem {
       }
     }
     return;
+  }
+  /** 根据名称确认新文件名称 */
+  private async _confrimName(
+    name: string,
+    ext: string,
+    index: number = 0,
+  ): Promise<string> {
+    await this.loadChildren();
+    const newName = index > 0 ? `${name}_${index}${ext}` : `${name}${ext}`;
+    for (const item of this.children) {
+      if (item.metadata.name === newName) {
+        return this._confrimName(name, ext, index + 1);
+      }
+    }
+    return newName;
   }
   /**
    * 根据新目录生成文件系统项

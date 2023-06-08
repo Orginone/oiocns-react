@@ -34,7 +34,7 @@ const ShareRecent = (props: Iprops) => {
           title: item.name,
           item: item,
           isLeaf: item.subTarget.length === 0,
-          icon: <EntityIcon share={item.share} size={18} />,
+          icon: <EntityIcon typeName={item.typeName} entityId={item.id} size={18} />,
           children: buildTargetTree(item.subTarget),
         });
       }

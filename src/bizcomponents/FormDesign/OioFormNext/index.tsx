@@ -122,12 +122,13 @@ const OioForm: React.FC<IProps> = ({
                   contentStyle={{ width: '33%' }}>
                   <OioFormItem
                     item={item}
+                    value={formRef?.current?.getFieldsValue(true)[item.name]}
                     belong={belong}
                     fileCode={fieldsValue}
                     onFilesValueChange={(key, files: any) => {
                       formRef?.current?.setFieldValue(
                         key,
-                        files.map((v: { data: any }) => v.data),
+                        JSON.stringify(files.map((v: { data: any }) => v.data)),
                       );
                       onValuesChange &&
                         onValuesChange(

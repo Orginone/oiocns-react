@@ -1,10 +1,11 @@
 import { XForm, XProperty } from '@/ts/base/schema';
+import { Image } from 'antd';
 import { ProColumns, ProSchemaValueEnumObj } from '@ant-design/pro-components';
 import React, { ReactNode } from 'react';
-import orgCtrl from '@/ts/controller';
 import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
 import { debounce } from '@/utils/tools';
 import { ColTypes } from './const';
+import { FileItemShare } from '@/ts/base/model';
 
 // 获取表头配置
 const getColItem = (
@@ -39,19 +40,33 @@ const getColItem = (
       {
         ColItem.render = (_text: ReactNode, _record: any) => {
           if (_record) {
-            let share = orgCtrl.user?.findShareById(_record[attrId ?? id]);
-            return (
-              <>
-                <TeamIcon share={share} size={15} />
-                <span style={{ marginLeft: 10 }}>{share.name}</span>
-              </>
-            );
+            return <TeamIcon entityId={_record[attrId ?? id]} size={15} showName />;
           }
           return <span>-</span>;
         };
       }
       break;
     case '选择型':
+      break;
+    case '附件型':
+      {
+        ColItem.render = (_text: ReactNode, _record: any) => {
+          if (_record) {
+            try {
+              _record.EDIT_INFO = _record.EDIT_INFO || {};
+              const value =
+                _record.EDIT_INFO[attrId ?? id] || _record[attrId ?? id] || '[]';
+              let shares: FileItemShare[] = JSON.parse(value);
+              return shares.map((a) => (
+                <Image key={a.name} src={a.thumbnail} preview={{ src: a.shareLink }} />
+              ));
+            } catch {
+              return <span>-</span>;
+            }
+          }
+          return <span>-</span>;
+        };
+      }
       break;
 
     default:

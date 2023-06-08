@@ -10,6 +10,7 @@ import OioForm from '@/bizcomponents/FormDesign/OioFormNext';
 import { schema } from '@/ts/base';
 import { IWorkDefine } from '@/ts/core';
 import BashThing from '@/pages/Work/content/Work/ThingTables/BaseThing';
+import EntityIcon from '@/bizcomponents/GlobalComps/entityIcon';
 
 export interface TaskDetailType {
   task: schema.XWorkTask;
@@ -88,7 +89,7 @@ const Detail: React.FC<TaskDetailType> = ({ task, define, instance, onBack }) =>
                 </div>
                 <div style={{ paddingRight: '24px' }}>
                   发起人：
-                  {orgCtrl.provider.user?.findShareById(instance.createUser).name}
+                  <EntityIcon entityId={instance.createUser} showName />
                 </div>
               </div>
               {loadForms(data.forms)}
@@ -111,10 +112,7 @@ const Detail: React.FC<TaskDetailType> = ({ task, define, instance, onBack }) =>
                             </div>
                             <div style={{ paddingRight: '24px' }}>
                               审批人：
-                              {
-                                orgCtrl.provider.user?.findShareById(record.createUser)
-                                  .name
-                              }
+                              <EntityIcon entityId={record.createUser} showName />
                             </div>
                             <div>审批结果：{record.status < 200 ? '通过' : '拒绝'}</div>
                             <div>

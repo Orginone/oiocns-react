@@ -5,7 +5,6 @@ import useObjectUpdate from '@/hooks/useObjectUpdate';
 import { IPropClass } from '@/ts/core';
 import { Card, Descriptions, Space, Typography } from 'antd';
 import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
-import orgCtrl from '@/ts/controller';
 import PageCard from '@/components/PageCard';
 
 interface IProps {
@@ -25,9 +24,6 @@ const Attribute: React.FC<IProps> = ({ current, property }) => {
       tforceUpdate();
     });
   }, []);
-  const belong = orgCtrl.provider.user!.findShareById(property.belongId);
-  const create = orgCtrl.provider.user!.findShareById(property.createUser);
-
   return (
     <>
       <Card bordered={false}>
@@ -42,14 +38,12 @@ const Attribute: React.FC<IProps> = ({ current, property }) => {
           contentStyle={{ textAlign: 'center', color: '#606266' }}>
           <Descriptions.Item label="归属用户">
             <Space>
-              <TeamIcon share={belong} />
-              <strong>{belong.name}</strong>
+              <TeamIcon entityId={property.belongId} showName />
             </Space>
           </Descriptions.Item>
           <Descriptions.Item label="创建人">
             <Space>
-              <TeamIcon share={create} />
-              <strong>{create.name}</strong>
+              <TeamIcon entityId={property.createUser} showName />
             </Space>
           </Descriptions.Item>
           <Descriptions.Item label="属性类型">{property.valueType}</Descriptions.Item>

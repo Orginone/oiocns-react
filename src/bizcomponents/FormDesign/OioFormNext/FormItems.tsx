@@ -33,6 +33,7 @@ interface IProps {
   item: XAttribute;
   belong?: IBelong;
   noRule?: boolean;
+  value?: any;
   onFilesValueChange?: (key: string, files: any[]) => void;
   fileCode?: Array<any>;
 }
