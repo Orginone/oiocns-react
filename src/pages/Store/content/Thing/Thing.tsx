@@ -22,6 +22,7 @@ import { kernel } from '@/ts/base';
 import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
 import { AiOutlineEllipsis } from 'react-icons/ai';
 import { ItemType } from 'antd/lib/menu/hooks/useItems';
+import { FileItemShare } from '@/ts/base/model';
 
 type ThingItemType = ItemType & { click: (data: any) => void };
 
@@ -172,6 +173,32 @@ const Thing: React.FC<IProps> = (props: IProps) => {
               return (
                 <>
                   <TeamIcon entityId={data.value} size={15} showName />
+                </>
+              );
+            }}
+          />
+        );
+      case '附件型':
+        return (
+          <Column
+            key={id}
+            dataField={dataField}
+            caption={caption}
+            dataType="string"
+            width={150}
+            allowFiltering={false}
+            cellRender={(data: any) => {
+              const files: FileItemShare[] = JSON.parse(data.value || '[]');
+              return (
+                <>
+                  {files.map((a) => {
+                    return (
+                      <>
+                        <a href={a.shareLink}>{a.name}</a>
+                        <br />
+                      </>
+                    );
+                  })}
                 </>
               );
             }}
