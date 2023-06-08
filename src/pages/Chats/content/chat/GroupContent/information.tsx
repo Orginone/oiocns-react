@@ -42,7 +42,7 @@ const Information = ({ msg, onClose }: { msg: IMessage; onClose: Function }) => 
             : []
         }>
         <List.Item.Meta
-          avatar={<TeamIcon share={item.labeler} size={42} fontSize={42} />}
+          avatar={<TeamIcon entityId={item.userId} size={42} />}
           title={<strong>{item.labeler.name}</strong>}
           description={item.label}
         />

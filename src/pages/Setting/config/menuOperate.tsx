@@ -51,7 +51,9 @@ const createMenu = (team: ITeam, menus: OperateMenuType[], children: MenuItemTyp
     itemType: team.typeName,
     menus: menus,
     tag: [team.typeName],
-    icon: <TeamIcon notAvatar={true} share={team.share} size={18} fontSize={16} />,
+    icon: (
+      <TeamIcon notAvatar={true} entityId={team.id} typeName={team.typeName} size={18} />
+    ),
     children: children,
   };
 };
@@ -99,7 +101,7 @@ const buildSpeciesTree = (species: ISpeciesItem): MenuItemType => {
     item: species,
     label: species.name,
     tag: [species.typeName],
-    icon: <TeamIcon share={species.share} size={18} fontSize={16} />,
+    icon: <TeamIcon entityId={species.id} typeName={species.typeName} size={18} />,
     itemType: MenuType.Species,
     menus: loadSpeciesMenus(species),
     children: [...children, ...species.children.map((i) => buildSpeciesTree(i))],
@@ -153,7 +155,14 @@ const buildDict = (dictClass: IDictClass) => {
       label: dict.name,
       itemType: MenuType.Dict,
       tag: ['字典'],
-      icon: <TeamIcon notAvatar={true} share={dict.share} size={18} fontSize={16} />,
+      icon: (
+        <TeamIcon
+          notAvatar={true}
+          entityId={dict.id}
+          typeName={dict.typeName}
+          size={18}
+        />
+      ),
       menus: loadDictMenus(dict),
       children: [],
       beforeLoad: async () => {
@@ -170,7 +179,7 @@ const buildDefineMenu = (form: IFlowClass) => {
       key: i.key,
       item: i,
       label: i.name,
-      icon: <TeamIcon notAvatar={true} share={i.share} size={18} fontSize={16} />,
+      icon: <TeamIcon notAvatar={true} entityId={i.id} typeName={i.typeName} size={18} />,
       itemType: MenuType.Work,
       menus: loadDefineMenus(i),
       children: [],
@@ -188,7 +197,7 @@ const buildFormMenu = (forms: IForm[]) => {
       key: i.key,
       item: i,
       label: i.name,
-      icon: <TeamIcon notAvatar={true} share={i.share} size={18} fontSize={16} />,
+      icon: <TeamIcon notAvatar={true} entityId={i.id} typeName={i.typeName} size={18} />,
       itemType: MenuType.Form,
       menus: loadFormMenus(i),
       children: [],
@@ -205,7 +214,14 @@ const buildAuthorityTree = (authority: IAuthority, name?: string) => {
     key: authority.key,
     item: authority,
     label: name || authority.name,
-    icon: <TeamIcon notAvatar={true} share={authority.share} size={18} fontSize={16} />,
+    icon: (
+      <TeamIcon
+        notAvatar={true}
+        entityId={authority.id}
+        typeName={authority.typeName}
+        size={18}
+      />
+    ),
     itemType: MenuType.Authority,
     tag: [MenuType.Authority],
     menus: loadAuthorityMenus(authority),
@@ -554,17 +570,7 @@ const loadGroupMenus = (param: groupMenuParams, teamTypes: string[]) => {
     key: param.key,
     label: param.label,
     itemType: param.key,
-    icon: (
-      <TeamIcon
-        share={{
-          name: param.key,
-          typeName: param.typeName,
-        }}
-        size={18}
-        fontSize={16}
-        notAvatar={true}
-      />
-    ),
+    icon: <TeamIcon entityId="0" typeName={param.typeName} size={18} notAvatar={true} />,
     menus: menus,
     item: param.item,
     children: param.children,
@@ -653,7 +659,12 @@ export const loadSettingMenu = () => {
     itemType: 'Tab',
     children: [getUserMenu(), ...getTeamMenu()],
     icon: (
-      <TeamIcon notAvatar={true} share={orgCtrl.user.share} size={18} fontSize={16} />
+      <TeamIcon
+        notAvatar={true}
+        entityId={orgCtrl.user.id}
+        typeName={orgCtrl.user.typeName}
+        size={18}
+      />
     ),
   };
 };

@@ -5,7 +5,6 @@ import { FileItemShare } from '@/ts/base/model';
 import { ICompany, MessageType, ChatMessage, IMessage } from '@/ts/core';
 import { model, parseAvatar } from '@/ts/base';
 import { showChatTime } from '@/utils/tools';
-import orgCtrl from '@/ts/controller';
 import SuperMsgs from '@/ts/core/chat/message/supermsg';
 import { formatSize } from '@/ts/base/common';
 import css from './index.module.less';
@@ -159,18 +158,16 @@ const Supervise: React.FC<IProps> = ({ belong }) => {
             <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
           ) : (
             messages.map((item, index) => {
-              const share = orgCtrl.user.findShareById(item.fromId);
-              const own_name = orgCtrl.user.findShareById(item.toId);
               return (
                 <div key={item.fromId + index}>
                   <div className={`${css.other_all}`}>
-                    <TeamIcon preview share={share} size={36} fontSize={32} />
+                    <TeamIcon preview entityId={item.fromId} size={36} />
                     <div className={`${css.other_item}`}>
                       <div className={`${css.other_name}`}>
                         <div>
-                          {share.name}
+                          <TeamIcon preview entityId={item.fromId} showName />
                           &emsp;发送给&emsp;
-                          {own_name.name}
+                          <TeamIcon preview entityId={item.toId} showName />
                         </div>
                         <div>{showChatTime(item.createTime)}</div>
                       </div>

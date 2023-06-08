@@ -22,7 +22,7 @@ const SelectDefine = (props: Iprops) => {
           key: s.id,
           title: s.name,
           item: s,
-          icon: <EntityIcon share={s.share} size={18} />,
+          icon: <EntityIcon entityId={s.id} typeName={s.typeName} size={18} />,
           children: [],
         });
       }
@@ -41,7 +41,7 @@ const SelectDefine = (props: Iprops) => {
               key: s.id,
               title: s.name,
               item: s.metadata,
-              icon: <EntityIcon share={s.share} size={18} />,
+              icon: <EntityIcon entityId={s.id} typeName={s.typeName} size={18} />,
               children: [],
             };
           }),

@@ -1,9 +1,9 @@
 import React from 'react';
 import { Tag } from 'antd';
-import orgCtrl from '@/ts/controller';
 import { ProColumns } from '@ant-design/pro-table';
 import { schema } from '@/ts/base';
 import { IWorkDefine } from '@/ts/core';
+import EntityIcon from '@/bizcomponents/GlobalComps/entityIcon';
 
 export const DefineColumns: ProColumns<IWorkDefine>[] = [
   {
@@ -27,8 +27,8 @@ export const DefineColumns: ProColumns<IWorkDefine>[] = [
     width: 100,
     title: '归属用户',
     dataIndex: ['metadata', 'belongId'],
-    render: (_: any, record: IWorkDefine) => {
-      return orgCtrl.provider.user?.findShareById(record.metadata.belongId).name;
+    render: (_, record) => {
+      return <EntityIcon entityId={record.metadata.belongId} showName />;
     },
   },
   {
@@ -36,8 +36,8 @@ export const DefineColumns: ProColumns<IWorkDefine>[] = [
     width: 100,
     title: '共享用户',
     dataIndex: ['metadata', 'shareId'],
-    render: (_: any, record: IWorkDefine) => {
-      return orgCtrl.provider.user?.findShareById(record.metadata.shareId).name;
+    render: (_, record) => {
+      return <EntityIcon entityId={record.metadata.shareId} showName />;
     },
   },
   {
@@ -45,8 +45,8 @@ export const DefineColumns: ProColumns<IWorkDefine>[] = [
     width: 100,
     title: '创建人员',
     dataIndex: 'createUser',
-    render: (_: any, record: IWorkDefine) => {
-      return orgCtrl.provider.user?.findShareById(record.metadata.createUser).name;
+    render: (_, record) => {
+      return <EntityIcon entityId={record.metadata.createUser} showName />;
     },
   },
   {
@@ -75,16 +75,16 @@ export const WorkColumns: ProColumns<schema.XWorkTask>[] = [
   },
   {
     title: '标题',
-    width: 300,
+    width: 150,
     dataIndex: 'title',
   },
   {
     key: 'shareId',
-    width: 200,
+    width: 150,
     title: '共享组织',
     dataIndex: 'shareId',
-    render: (_: any, record: schema.XWorkTask) => {
-      return orgCtrl.provider.user?.findShareById(record.shareId).name;
+    render: (_, record) => {
+      return <EntityIcon entityId={record.shareId} showName />;
     },
   },
   {
@@ -92,23 +92,23 @@ export const WorkColumns: ProColumns<schema.XWorkTask>[] = [
     width: 100,
     title: '申请人',
     dataIndex: 'createUser',
-    render: (_: any, record: schema.XWorkTask) => {
-      return orgCtrl.provider.user?.findShareById(record.createUser).name;
+    render: (_, record) => {
+      return <EntityIcon entityId={record.createUser} showName />;
     },
   },
   {
     title: '发起组织',
-    width: 300,
+    width: 100,
     dataIndex: 'applyId',
-    render: (_, record: schema.XWorkTask) => {
-      return orgCtrl.provider.user?.findShareById(record.applyId).name;
+    render: (_, record) => {
+      return <EntityIcon entityId={record.applyId} showName />;
     },
   },
   {
     title: '状态',
     width: 80,
     dataIndex: 'status',
-    render: (_: any, record: schema.XWorkTask) => {
+    render: (_, record) => {
       const status = statusMap.get(record.status as number);
       return <Tag color={status!.color}>{status!.text}</Tag>;
     },
@@ -116,7 +116,7 @@ export const WorkColumns: ProColumns<schema.XWorkTask>[] = [
   {
     title: '内容',
     dataIndex: 'content',
-    render: (_: any, record: schema.XWorkTask) => {
+    render: (_, record) => {
       if (record.taskType === '加用户') {
         const targets: schema.XTarget[] = JSON.parse(record.content);
         if (targets.length === 2) {
@@ -154,8 +154,8 @@ export const DoneColumns: ProColumns<schema.XWorkRecord>[] = [
     width: 200,
     title: '共享组织',
     dataIndex: 'shareId',
-    render: (_: any, record: schema.XWorkRecord) => {
-      return orgCtrl.provider.user?.findShareById(record.task!.shareId).name;
+    render: (_, record) => {
+      return <EntityIcon entityId={record.task!.shareId} showName />;
     },
   },
   {
@@ -163,14 +163,14 @@ export const DoneColumns: ProColumns<schema.XWorkRecord>[] = [
     width: 200,
     title: '申请人',
     dataIndex: 'createUser',
-    render: (_: any, record: schema.XWorkRecord) => {
-      return orgCtrl.provider.user?.findShareById(record.task!.createUser).name;
+    render: (_, record) => {
+      return <EntityIcon entityId={record.task!.createUser} showName />;
     },
   },
   {
     title: '状态',
     dataIndex: 'status',
-    render: (_: any, record: schema.XWorkRecord) => {
+    render: (_, record) => {
       const status = statusMap.get(record.status as number);
       return <Tag color={status!.color}>{status!.text}</Tag>;
     },
@@ -234,6 +234,13 @@ const statusMap = new Map([
     {
       color: 'default',
       text: '已退货',
+    },
+  ],
+  [
+    240,
+    {
+      color: 'red',
+      text: '已取消',
     },
   ],
 ]);

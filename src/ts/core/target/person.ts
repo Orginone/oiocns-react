@@ -17,6 +17,8 @@ export interface IPerson extends IBelong {
   givedIdentitys: schema.XIdProof[];
   /** 根据ID查询共享信息 */
   findShareById(id: string): model.ShareIcon;
+  /** 根据Id查询共享信息 */
+  findShareAsync(id: string): Promise<model.ShareIcon | undefined>;
   /** 判断是否拥有某些用户的权限 */
   authenticate(orgIds: string[], authIds: string[]): boolean;
   /** 加载赋予人的身份(角色)实体 */
@@ -242,7 +244,29 @@ export class Person extends Belong implements IPerson {
     }
     return false;
   }
-
+  async findShareAsync(id: string): Promise<model.ShareIcon | undefined> {
+    const metadata = this.findMetadata<schema.XEntity>(id);
+    if (metadata) {
+      return {
+        name: metadata.name,
+        typeName: metadata.typeName,
+        avatar: parseAvatar(metadata.icon),
+      };
+    }
+    const res = await kernel.queryTargetById({
+      ids: [id],
+      page: PageAll,
+    });
+    if (res.success && res.data.result && res.data.result.length > 0) {
+      const item = res.data.result[0];
+      this.updateMetadata(item);
+      return {
+        name: item.name,
+        typeName: item.typeName,
+        avatar: parseAvatar(item.icon),
+      };
+    }
+  }
   findShareById(id: string): model.ShareIcon {
     const metadata = this.findMetadata<schema.XEntity>(id);
     if (!metadata) {
