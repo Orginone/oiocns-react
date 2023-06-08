@@ -52,12 +52,17 @@ const getColItem = (
       {
         ColItem.render = (_text: ReactNode, _record: any) => {
           if (_record) {
-            let shares: FileItemShare[] = JSON.parse(
-              _record.EDIT_INFO[attrId ?? id] || _record[attrId ?? id] || '[]',
-            );
-            return shares.map((a) => (
-              <Image key={a.name} src={a.thumbnail} preview={{ src: a.shareLink }} />
-            ));
+            try {
+              _record.EDIT_INFO = _record.EDIT_INFO || {};
+              const value =
+                _record.EDIT_INFO[attrId ?? id] || _record[attrId ?? id] || '[]';
+              let shares: FileItemShare[] = JSON.parse(value);
+              return shares.map((a) => (
+                <Image key={a.name} src={a.thumbnail} preview={{ src: a.shareLink }} />
+              ));
+            } catch {
+              return <span>-</span>;
+            }
           }
           return <span>-</span>;
         };
