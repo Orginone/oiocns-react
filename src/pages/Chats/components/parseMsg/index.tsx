@@ -33,6 +33,13 @@ export const parseMsg = (item: IMessage): any => {
     }
     case MessageType.File: {
       const file: FileItemShare = parseAvatar(item.msgBody);
+      if (!file) {
+        return (
+          <div className={`${css.con_content_txt}`} style={{ color: '#af1212' }}>
+            文件消息异常
+          </div>
+        );
+      }
       return (
         <>
           <div className={`${css.con_content_txt}`}>
