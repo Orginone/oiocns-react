@@ -1,5 +1,4 @@
 import { XForm, XProperty } from '@/ts/base/schema';
-import { Image } from 'antd';
 import { ProColumns, ProSchemaValueEnumObj } from '@ant-design/pro-components';
 import React, { ReactNode } from 'react';
 import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
@@ -55,9 +54,18 @@ const getColItem = (
             let shares: FileItemShare[] = JSON.parse(
               _record.EDIT_INFO[attrId ?? id] || _record[attrId ?? id] || '[]',
             );
-            return shares.map((a) => (
-              <Image key={a.name} src={a.thumbnail} preview={{ src: a.shareLink }} />
-            ));
+            return (
+              <>
+                {shares.map((a) => {
+                  return (
+                    <>
+                      <a href={a.shareLink}>{a.name}</a>
+                      <br />
+                    </>
+                  );
+                })}
+              </>
+            );
           }
           return <span>-</span>;
         };

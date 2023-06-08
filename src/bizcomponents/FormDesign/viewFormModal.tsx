@@ -1,6 +1,6 @@
 import React from 'react';
 import { Modal } from 'antd';
-import OioForm from './OioForm';
+import OioForm from './OioFormNext';
 import { XForm } from '@/ts/base/schema';
 import { IWorkDefine } from '@/ts/core';
 
@@ -25,7 +25,7 @@ const ViewFormModal = ({ open, form, define, handleCancel, handleOk }: IProps) =
       destroyOnClose={true}
       cancelText={'关闭'}
       width={1000}>
-      <OioForm form={form} formRef={undefined} define={define} />
+      <OioForm form={form} formRef={undefined} belong={define.workItem.current.space} />
     </Modal>
   );
 };

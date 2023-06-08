@@ -70,17 +70,23 @@ const OioFormItem = ({
     rule.widget = loadWidgetsOpts(item.valueType)[0].value;
   }
 
-  console.log(value);
-
-  const [fileList, setFileList] = useState<any[]>(
-    JSON.parse(value || '[]').map((a: FileItemShare) => {
-      uid: a.name;
-      name: a.name;
-      status: 'done';
-      url: a.shareLink;
-      data: a;
-    }),
-  );
+  const [fileList, setFileList] = useState<any[]>([]);
+  useEffect(() => {
+    if (value && ['file', 'upload'].includes(rule.widget)) {
+      setFileList(
+        JSON.parse(value).map((a: FileItemShare) => {
+          return {
+            uid: a.name,
+            name: a.name,
+            status: 'done',
+            url: a.shareLink,
+            data: a,
+          };
+        }),
+      );
+    }
+  });
+  // 上传文件区域
   const uploadProps: UploadProps = {
     multiple: false,
     showUploadList: true,
@@ -95,6 +101,8 @@ const OioFormItem = ({
       const docDir = await orgCtrl.user.filesys?.home?.create('附件');
       if (docDir && file) {
         const result = await docDir.upload(file.name, file);
+        console.log(result, 'result');
+
         if (result) {
           const _data = result.shareInfo();
           const _file = {
@@ -110,6 +118,7 @@ const OioFormItem = ({
       }
     },
   };
+
   switch (rule.widget) {
     case 'input':
     case 'string':
@@ -166,7 +175,6 @@ const OioFormItem = ({
     case 'upload': {
       return (
         <ProFormUploadButton
-          disabled={disabled}
           name={item.id}
           key={fileList.length}
           listType="picture-card"
