@@ -88,6 +88,13 @@ const ForwardModal: React.FC<ModalPageProps> = (props) => {
       }
       case MessageType.File: {
         const file: FileItemShare = parseAvatar(item.msgBody);
+        if (!file) {
+          return (
+            <div className={`${style.con_content_txt}`} style={{ color: '#af1212' }}>
+              文件消息异常
+            </div>
+          );
+        }
         return (
           <>
             <div className={`${style.con_content_txt}`}>
