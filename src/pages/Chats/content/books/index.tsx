@@ -1,15 +1,16 @@
-import { Badge, Card, Empty, List, Tag, Checkbox } from 'antd';
+import { Badge, Card, Empty, List, Tag, Checkbox, Typography, Dropdown } from 'antd';
 import { CheckboxChangeEvent } from 'antd/lib/checkbox';
 import React, { useEffect, useState } from 'react';
 import orgCtrl from '@/ts/controller';
 import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
-import * as im from 'react-icons/im';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import { IMsgChat, msgChatNotify, ICompany } from '@/ts/core';
 import { XTarget } from '@/ts/base/schema';
 import { orgAuth } from '@/ts/core/public/consts';
 import SuperMsgs from '@/ts/core/chat/message/supermsg';
 import css from './index.module.less';
+import { showChatTime } from '@/utils/tools';
+const { Text } = Typography;
 
 /**
  * @description: 通讯录
@@ -73,17 +74,7 @@ const Book: React.FC<any> = ({
   };
 
   const loadChatOperation = (item: IMsgChat) => {
-    const operates: any[] = [
-      <a
-        key="聊天"
-        title="聊天"
-        onClick={async () => {
-          orgCtrl.currentKey = item.chatdata.fullId;
-          orgCtrl.changCallback();
-        }}>
-        <im.ImBubbles3 style={{ fontSize: 18 }}></im.ImBubbles3>
-      </a>,
-    ];
+    const operates: any[] = [];
     if (item.chatdata.noReadCount < 1) {
       operates.push(
         <a
@@ -94,7 +85,7 @@ const Book: React.FC<any> = ({
             item.cache();
             msgChatNotify.changCallback();
           }}>
-          <im.ImBell style={{ fontSize: 18 }}></im.ImBell>
+          标记为未读
         </a>,
       );
     }
@@ -109,7 +100,7 @@ const Book: React.FC<any> = ({
             item.cache();
             msgChatNotify.changCallback();
           }}>
-          <im.ImDownload style={{ fontSize: 18 }}></im.ImDownload>
+          取消置顶
         </a>,
       );
     } else {
@@ -123,7 +114,7 @@ const Book: React.FC<any> = ({
             item.cache();
             msgChatNotify.changCallback();
           }}>
-          <im.ImUpload style={{ fontSize: 18 }}></im.ImUpload>
+          置顶会话
         </a>,
       );
     }
@@ -137,11 +128,16 @@ const Book: React.FC<any> = ({
               msgChatNotify.changCallback();
             }
           }}>
-          <im.ImUserPlus style={{ fontSize: 18 }}></im.ImUserPlus>
+          加好友
         </a>,
       );
     }
-    return operates;
+    return operates.map((item, index) => {
+      return {
+        key: `${index}`,
+        label: item,
+      };
+    });
   };
 
   return (
@@ -166,46 +162,60 @@ const Book: React.FC<any> = ({
                 ) : (
                   ''
                 )}
-                <List.Item
-                  title="双击打开"
-                  style={{ cursor: 'pointer' }}
-                  actions={loadChatOperation(item)}
-                  onDoubleClick={() => {
-                    orgCtrl.currentKey = item.chatdata.fullId;
-                    orgCtrl.changCallback();
-                  }}>
-                  <List.Item.Meta
-                    avatar={
-                      <Badge count={item.chatdata.noReadCount} size="small">
-                        <TeamIcon share={item.share} size={40} fontSize={40} />
-                      </Badge>
+                <Dropdown
+                  menu={{ items: loadChatOperation(item) }}
+                  trigger={['contextMenu']}>
+                  <List.Item
+                    style={{ cursor: 'pointer' }}
+                    extra={
+                      <Text type="secondary">
+                        {item.chatdata.lastMessage
+                          ? showChatTime(item.chatdata.lastMessage?.createTime)
+                          : ''}
+                      </Text>
                     }
-                    title={
-                      <div>
-                        <span style={{ marginRight: 10 }}>{item.chatdata.chatName}</span>
-                        {item.chatdata.labels
-                          .filter((i) => i.length > 0)
-                          .map((label) => {
-                            return (
-                              <Tag
-                                key={label}
-                                color={label === '置顶' ? 'red' : 'success'}>
-                                {label}
-                              </Tag>
-                            );
-                          })}
-                      </div>
-                    }
-                    description={
-                      <>
-                        {item.chatdata.mentionMe && (
-                          <span style={{ color: 'red' }}>[有人@我]</span>
-                        )}
-                        <span>{item.information}</span>
-                      </>
-                    }
-                  />
-                </List.Item>
+                    onClick={() => {
+                      orgCtrl.currentKey = item.chatdata.fullId;
+                      orgCtrl.changCallback();
+                    }}>
+                    <List.Item.Meta
+                      avatar={
+                        <Badge count={item.chatdata.noReadCount} size="small">
+                          <TeamIcon
+                            typeName={item.typeName}
+                            entityId={item.id}
+                            size={40}
+                          />
+                        </Badge>
+                      }
+                      title={
+                        <div>
+                          <span style={{ marginRight: 10 }}>
+                            {item.chatdata.chatName}
+                          </span>
+                          {item.chatdata.labels
+                            .filter((i) => i.length > 0)
+                            .map((label) => {
+                              return (
+                                <Tag
+                                  key={label}
+                                  color={label === '置顶' ? 'red' : 'success'}>
+                                  {label}
+                                </Tag>
+                              );
+                            })}
+                        </div>
+                      }
+                      description={
+                        <>
+                          {item.chatdata.mentionMe && (
+                            <span style={{ color: 'red' }}>[有人@我]</span>
+                          )}
+                          <span>{item.information}</span>
+                        </>
+                      }></List.Item.Meta>
+                  </List.Item>
+                </Dropdown>
               </div>
             );
           }}

@@ -27,14 +27,14 @@ import { IBelong } from '@/ts/core';
 import { loadWidgetsOpts } from '../rule';
 import { UploadProps } from 'antd';
 import orgCtrl from '@/ts/controller';
-import { fileArr } from './common';
+import { FileItemShare } from '@/ts/base/model';
 interface IProps {
   disabled?: boolean;
   item: XAttribute;
   belong?: IBelong;
   noRule?: boolean;
+  value?: any;
   onFilesValueChange?: (key: string, files: any[]) => void;
-  fileCode?: Array<any>;
 }
 
 /**
@@ -46,7 +46,7 @@ const OioFormItem = ({
   disabled,
   noRule,
   onFilesValueChange,
-  fileCode,
+  value,
 }: IProps) => {
   const rule = JSON.parse(item.rule || '{}');
   // 规则校验
@@ -71,6 +71,21 @@ const OioFormItem = ({
   }
 
   const [fileList, setFileList] = useState<any[]>([]);
+  useEffect(() => {
+    if (value && ['file', 'upload'].includes(rule.widget)) {
+      setFileList(
+        JSON.parse(value).map((a: FileItemShare) => {
+          return {
+            uid: a.name,
+            name: a.name,
+            status: 'done',
+            url: a.shareLink,
+            data: a,
+          };
+        }),
+      );
+    }
+  });
   // 上传文件区域
   const uploadProps: UploadProps = {
     multiple: false,
@@ -103,19 +118,6 @@ const OioFormItem = ({
       }
     },
   };
-
-  // 这里用于复现审批办事界面的上传
-  useEffect(() => {
-    if (fileCode) {
-      // 格式化参数，让其参数符合upload预览的参数
-      Object.keys(fileCode || {}).forEach((id: any) => {
-        if (id == item.id) {
-          // 格式化参数
-          setFileList(fileArr(fileCode[id]));
-        }
-      });
-    }
-  }, [fileCode]);
 
   switch (rule.widget) {
     case 'input':
@@ -173,7 +175,6 @@ const OioFormItem = ({
     case 'upload': {
       return (
         <ProFormUploadButton
-          disabled={disabled}
           name={item.id}
           key={fileList.length}
           listType="picture-card"

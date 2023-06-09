@@ -52,7 +52,7 @@ const AppCard: any = ({ className, app }: { className: string; app: IApplication
         orgCtrl.currentKey = app.key;
         history.push('/work');
       }}>
-      <TeamIcon share={app.share} fontSize={50} size={50} />
+      <TeamIcon typeName={app.typeName} entityId={app.id} size={50} />
       <div className="app-info">
         <span className="app-info-name">{app.name}</span>
       </div>

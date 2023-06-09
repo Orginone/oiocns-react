@@ -92,7 +92,7 @@ const ChatHistoryModal: React.FC<Iprops> = ({ open, title, onCancel, chat }) => 
         return (
           <div key={item.metadata.fromId + index}>
             <div className={`${ChatHistoryStyle.own_all}`}>
-              <TeamIcon share={item.from} preview size={36} fontSize={32} />
+              <TeamIcon entityId={item.metadata.fromId} preview size={36} />
               <div className={`${ChatHistoryStyle.own_item}`}>
                 <div className={`${ChatHistoryStyle.own_name}`}>
                   <div>{item.from.name}</div>

@@ -2,7 +2,7 @@ import { Button, Col, Modal, Row, Typography } from 'antd';
 import React, { useState } from 'react';
 import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
 import detailStyle from './index.module.less';
-import { parseAvatar, schema } from '@/ts/base';
+import { schema } from '@/ts/base';
 import AssignPosts from '@/bizcomponents/Indentity/components/AssignPosts';
 import { getUuid } from '@/utils/tools';
 import { ICohort, IMsgChat, TargetType } from '@/ts/core';
@@ -63,7 +63,7 @@ const Groupdetail: React.FC<any> = ({ chat }: { chat: IMsgChat }) => {
     <Row style={{ paddingBottom: '12px' }}>
       <Col span={4}>
         <div style={{ color: '#888', width: 42 }}>
-          <TeamIcon share={chat.share} size={32} fontSize={28} />
+          <TeamIcon typeName={chat.typeName} entityId={chat.id} size={32} />
         </div>
       </Col>
       <Col span={20}>
@@ -88,7 +88,7 @@ const Groupdetail: React.FC<any> = ({ chat }: { chat: IMsgChat }) => {
     <Row style={{ paddingBottom: '12px' }}>
       <Col>
         <div style={{ color: '#888', width: 42 }}>
-          <TeamIcon share={chat.share} size={32} fontSize={28} />
+          <TeamIcon typeName={chat.typeName} entityId={chat.id} size={32} />
         </div>
       </Col>
       <Col>
@@ -113,16 +113,7 @@ const Groupdetail: React.FC<any> = ({ chat }: { chat: IMsgChat }) => {
       {chat.members.map((item) => {
         return (
           <div key={getUuid()} title={item.name} className={detailStyle.show_persons}>
-            <TeamIcon
-              size={36}
-              preview
-              share={{
-                name: item.name,
-                typeName: item.typeName,
-                avatar: parseAvatar(item.icon),
-              }}
-              fontSize={32}
-            />
+            <TeamIcon size={36} preview typeName={item.typeName} entityId={item.id} />
             <Typography className={detailStyle.img_list_con_name}>{item.name}</Typography>
           </div>
         );

@@ -183,16 +183,13 @@ export class Message implements IMessage {
   }
   get msgTitle(): string {
     let header = ``;
-    if (
-      this._chat.metadata.typeName != TargetType.Person &&
-      this.metadata.fromId != this.user.id
-    ) {
-      header += `${this.from.name}`;
+    if (this._chat.metadata.typeName != TargetType.Person) {
+      header += `${this.from.name}: `;
     }
     switch (this.msgType) {
       case MessageType.Text:
       case MessageType.Recall:
-        return `${header}[消息]:${this.msgBody.substring(0, 50)}`;
+        return `${header}${this.msgBody.substring(0, 50)}`;
       case MessageType.Voice:
         return `${header}[${MessageType.Voice}]`;
     }

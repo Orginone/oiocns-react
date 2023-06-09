@@ -123,11 +123,12 @@ const OioForm: React.FC<IProps> = ({
                   <OioFormItem
                     item={item}
                     belong={belong}
-                    fileCode={fieldsValue}
+                    disabled={disabled}
+                    value={fieldsValue ? fieldsValue[item.id] : undefined}
                     onFilesValueChange={(key, files: any) => {
                       formRef?.current?.setFieldValue(
                         key,
-                        files.map((v: { data: any }) => v.data),
+                        JSON.stringify(files.map((v: { data: any }) => v.data)),
                       );
                       onValuesChange &&
                         onValuesChange(

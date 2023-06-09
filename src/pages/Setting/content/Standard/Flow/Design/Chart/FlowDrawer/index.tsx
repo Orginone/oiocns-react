@@ -12,6 +12,7 @@ import orgCtrl from '@/ts/controller';
 import { getUuid } from '@/utils/tools';
 import { IWorkDefine, SpeciesType } from '@/ts/core';
 import { schema } from '@/ts/base';
+import EntityIcon from '@/bizcomponents/GlobalComps/entityIcon';
 /**
  * @description: 流程设置抽屉
  * @return {*}
@@ -87,7 +88,8 @@ const FlowDrawer: React.FC<IProps> = (props) => {
         return (
           <>
             <div>
-              审核人：{orgCtrl.provider.user?.findShareById(record.createUser).name}
+              审核人：
+              <EntityIcon entityId={record.createUser} showName />
             </div>
             <div>审核结果：{handleResult}</div>
             <div>审核意见：{record.comment}</div>

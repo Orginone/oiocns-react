@@ -22,7 +22,7 @@ export const loadThingMenu = (space: IBelong) => {
     label: space.name,
     itemType: space.typeName,
     menus: [],
-    icon: <TeamIcon share={space.share} size={18} fontSize={16} />,
+    icon: <TeamIcon entityId={space.id} typeName={space.typeName} size={18} />,
     children: loadChildren(space),
   } as MenuItemType;
 };
@@ -37,7 +37,7 @@ export const buildThingTree = (species: ISpeciesItem[]): MenuItemType[] => {
             key: item.key,
             item: item,
             label: item.name,
-            icon: <TeamIcon share={item.share} size={18} fontSize={16} />,
+            icon: <TeamIcon entityId={item.id} typeName={item.typeName} size={18} />,
             itemType: item.typeName,
             menus: [],
             children: [
@@ -68,7 +68,7 @@ export const buildThingMenus = (thing: IThingClass) => {
         key: form.key,
         item: form,
         label: form.name,
-        icon: <TeamIcon share={form.share} size={18} fontSize={16} />,
+        icon: <TeamIcon entityId={form.id} typeName={form.typeName} size={18} />,
         itemType: '表单',
         beforeLoad: async () => {
           await form.loadAttributes();

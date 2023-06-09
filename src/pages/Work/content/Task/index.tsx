@@ -20,10 +20,6 @@ const TaskContent = (props: IProps) => {
   const [task, setTask] = useState<TaskDetailType>();
   const [selectedRows, setSelectRows] = useState<schema.XWorkTask[]>([]);
 
-  // useEffect(() => {
-  //   tforceUpdate();
-  // }, [props]);
-
   /** 查询任务项 */
   const getTaskList = async (page: model.PageModel) => {
     let taskList: model.PageResult<XWorkTask> = {

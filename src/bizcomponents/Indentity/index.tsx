@@ -128,7 +128,7 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
             <Descriptions.Item label="名称">{indentity.name}</Descriptions.Item>
             <Descriptions.Item label="编码">{indentity.code}</Descriptions.Item>
             <Descriptions.Item label="创建人">
-              <TeamIcon share={indentity.creater} fontSize={22} />
+              <TeamIcon entityId={indentity.metadata.createUser} size={22} />
               <strong>{indentity.creater.name}</strong>
             </Descriptions.Item>
             <Descriptions.Item label="创建时间">

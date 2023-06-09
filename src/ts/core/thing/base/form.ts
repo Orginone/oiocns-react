@@ -1,4 +1,3 @@
-import { PageAll } from '@/ts/core/public/consts';
 import { SpeciesType } from '@/ts/core/public/enums';
 import { ISpeciesItem } from './species';
 import { kernel, model, schema } from '@/ts/base';
@@ -52,7 +51,6 @@ export class Form extends Entity<schema.XForm> implements IForm {
   async delete(): Promise<boolean> {
     const res = await kernel.deleteForm({
       id: this.id,
-      page: PageAll,
     });
     if (res.success) {
       if (this.species.typeName === SpeciesType.Thing) {
@@ -127,7 +125,6 @@ export class Form extends Entity<schema.XForm> implements IForm {
     if (index > -1) {
       const res = await kernel.deleteAttribute({
         id: data.id,
-        page: PageAll,
       });
       if (res.success) {
         this.attributes.splice(index, 1);

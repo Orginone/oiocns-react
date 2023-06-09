@@ -118,7 +118,9 @@ export abstract class Belong extends Target implements IBelong {
     if (_isAdd) {
       const labels = this.id === this.user.id ? ['好友'] : [this.name, '同事'];
       _newMembers.forEach((i) => {
-        this.memberChats.push(new PersonMsgChat(i, labels, this));
+        if (!this.memberChats.some((a) => a.id === i.id)) {
+          this.memberChats.push(new PersonMsgChat(i, labels, this));
+        }
       });
     } else {
       this.memberChats = this.memberChats.filter((i) =>

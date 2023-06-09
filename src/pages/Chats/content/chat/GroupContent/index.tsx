@@ -110,7 +110,7 @@ const GroupContent = (props: Iprops) => {
             )}
           </div>
           <div style={{ color: '#888' }}>
-            <TeamIcon share={item.from} preview size={36} fontSize={32} />
+            <TeamIcon entityId={item.metadata.fromId} preview size={36} />
           </div>
         </>
       );
@@ -118,7 +118,7 @@ const GroupContent = (props: Iprops) => {
       return (
         <>
           <div style={{ color: '#888', paddingRight: 10 }}>
-            <TeamIcon preview share={item.from} size={36} fontSize={32} />
+            <TeamIcon entityId={item.metadata.fromId} preview size={36} />
           </div>
           <div className={`${css.con_content}`}>
             <div className={`${css.name}`}>{item.from.name}</div>

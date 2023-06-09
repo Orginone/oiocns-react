@@ -40,8 +40,7 @@ const Description: React.FC<IProps> = ({ entity, other, extra }: IProps) => {
               text: entity.id,
               tooltips: [entity.id, '复制成功'],
             }}>
-            <TeamIcon share={entity.share} fontSize={22} />
-            <strong>{entity.name}</strong>
+            <TeamIcon entityId={entity.id} showName />
           </Typography.Paragraph>
         </Descriptions.Item>
         <Descriptions.Item label="代码">
@@ -56,14 +55,12 @@ const Description: React.FC<IProps> = ({ entity, other, extra }: IProps) => {
         {other}
         {entity.metadata.belongId != entity.id && (
           <Descriptions.Item label="归属">
-            <TeamIcon share={entity.belong} fontSize={22} />
-            <strong>{entity.belong.name}</strong>
+            <TeamIcon entityId={entity.metadata.belongId} showName />
           </Descriptions.Item>
         )}
         {entity.metadata.createUser != entity.id && (
           <Descriptions.Item label="创建人">
-            <TeamIcon share={entity.creater} fontSize={22} />
-            <strong>{entity.creater.name}</strong>
+            <TeamIcon entityId={entity.metadata.createUser} showName />
           </Descriptions.Item>
         )}
         <Descriptions.Item label="创建时间">
@@ -72,8 +69,7 @@ const Description: React.FC<IProps> = ({ entity, other, extra }: IProps) => {
         {entity.metadata.createUser != entity.metadata.updateUser && (
           <>
             <Descriptions.Item label="更新人">
-              <TeamIcon share={entity.updater} fontSize={22} />
-              <strong>{entity.updater.name}</strong>
+              <TeamIcon entityId={entity.metadata.updateUser} showName />
             </Descriptions.Item>
             <Descriptions.Item label="更新时间">
               {formatZhDate(entity.metadata.updateTime)}

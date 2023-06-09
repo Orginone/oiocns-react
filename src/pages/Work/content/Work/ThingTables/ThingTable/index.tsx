@@ -1,4 +1,4 @@
-import OioForm from '@/bizcomponents/FormDesign/OioForm';
+import OioForm from '@/bizcomponents/FormDesign/OioFormNext';
 import { ProColumnType, ProTableProps } from '@ant-design/pro-components';
 import type { ParamsType } from '@ant-design/pro-provider';
 import { Button, Modal } from 'antd';
@@ -212,7 +212,7 @@ const ThingTable = <
             width={1000}>
             <OioForm
               form={form}
-              define={current}
+              belong={current.workItem.belong}
               fieldsValue={operateModel === OperateType.Edit ? selectedData : undefined}
               onValuesChange={(_changeValue, values) => setChangeData(values)}
               noRule={operateModel.includes('Edit')}

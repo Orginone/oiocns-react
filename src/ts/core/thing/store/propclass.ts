@@ -58,7 +58,6 @@ export class PropClass extends SpeciesItem implements IPropClass {
     if (index > -1) {
       const res = await kernel.queryPropAttributes({
         id: data.id,
-        page: PageAll,
       });
       if (res.success) {
         return res.data.result || [];
@@ -114,7 +113,6 @@ export class PropClass extends SpeciesItem implements IPropClass {
     if (index > -1) {
       const res = await kernel.deleteProperty({
         id: data.id,
-        page: PageAll,
       });
       if (res.success) {
         this._propertyChanged('deleted', [data]);
