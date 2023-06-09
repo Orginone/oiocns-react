@@ -51,9 +51,11 @@ const getColItem = (
     case '附件型':
       {
         ColItem.render = (_text: ReactNode, _record: any) => {
+          console.log('4444', _record);
+
           if (_record) {
             let shares: FileItemShare[] = JSON.parse(
-              _record.EDIT_INFO[attrId ?? id] || _record[attrId ?? id] || '[]',
+              _record?.EDIT_INFO[attrId ?? id] || _record[attrId ?? id] || '[]',
             );
             return (
               <>
