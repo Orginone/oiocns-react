@@ -105,6 +105,7 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
 
   const nodeHeader = (
     <div
+      onClick={select}
       className={
         props.type === AddNodeType.APPROVAL
           ? cls['node-body-people']

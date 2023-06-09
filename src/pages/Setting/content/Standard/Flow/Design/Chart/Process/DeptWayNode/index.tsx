@@ -39,7 +39,7 @@ const DeptWayNode: React.FC<DeptWayNodeProps> = (props: DeptWayNodeProps) => {
       props.config.conditions = [
         {
           pos: 1,
-          paramKey: 'belongId',
+          paramKey: '0',
           paramLabel: '组织',
           key: 'EQ',
           label: '=',

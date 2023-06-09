@@ -11,7 +11,7 @@ interface IProps {
 }
 const SelectOrg: React.FC<IProps> = (props: IProps) => {
   const [treeData, setTreeData] = useState<any[]>([]);
-  if (!props.value || props.value.length < 2) return <div>其它组织</div>;
+  if (!props.value || props.value.length < 2) return <div>其他组织</div>;
   const loadTreeData = async () => {
     setTreeData(buildTargetTree([props.belong], false, 0));
   };
