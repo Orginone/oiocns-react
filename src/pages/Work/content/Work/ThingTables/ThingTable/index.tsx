@@ -194,8 +194,10 @@ const ThingTable = <
         toolBarRender={HandleToolBarRender}
         {...rest}
       />
+
       {/* 弹窗区域 */}
       <>
+        {/* 弹窗操作，新增-编辑-批量编辑 */}
         {current && (
           <Modal
             open={[OperateType.Add, OperateType.Edit, OperateType.EditMore].includes(
@@ -219,6 +221,7 @@ const ThingTable = <
             />
           </Modal>
         )}
+        {/* 实体选择区域 */}
         {current && (
           <Modal
             open={operateModel === OperateType.Select}
