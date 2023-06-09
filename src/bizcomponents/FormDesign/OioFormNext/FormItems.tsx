@@ -25,9 +25,10 @@ import ProFormIdentity from './widgets/ProFormIdentity';
 import { XAttribute } from '@/ts/base/schema';
 import { IBelong } from '@/ts/core';
 import { loadWidgetsOpts } from '../rule';
-import { UploadProps } from 'antd';
+import { Modal, UploadProps } from 'antd';
 import orgCtrl from '@/ts/controller';
 import { FileItemShare } from '@/ts/base/model';
+import { downloadByUrl } from '@/utils/tools';
 interface IProps {
   disabled?: boolean;
   item: XAttribute;
@@ -37,6 +38,11 @@ interface IProps {
   onFilesValueChange?: (key: string, files: any[]) => void;
 }
 
+const defaultFilsUrl = [
+  '/public/img/pdf.png',
+  '/public/img/word.png',
+  '/public/img/file.png',
+];
 /**
  * 表单项渲染
  */
@@ -91,6 +97,15 @@ const OioFormItem = ({
     multiple: false,
     showUploadList: true,
     maxCount: 10,
+    onPreview(file: any) {
+      Modal.confirm({
+        title: '下载文件',
+        content: '是否下载文件？',
+        cancelText: '取消',
+        okText: '下载',
+        onOk: () => downloadByUrl(file.url),
+      });
+    },
     onRemove(file: { key: string } & any) {
       const data = fileList.filter((v) => v.uid !== file.uid);
       setFileList(data);
@@ -105,12 +120,21 @@ const OioFormItem = ({
 
         if (result) {
           const _data = result.shareInfo();
+          console.log('da', _data);
+          const showImg =
+            _data.extension && ['.png', '.jpg', '.jpeg'].includes(_data.extension)
+              ? _data.shareLink
+              : getImgSrc(_data.extension ?? '.file');
+
           const _file = {
             uid: result.key,
             name: _data.name,
             status: 'done',
             url: _data.shareLink,
             data: _data,
+            isImage:
+              _data.extension && ['.png', '.jpg', '.jpeg'].includes(_data.extension),
+            thumbUrl: showImg,
           };
           setFileList([...fileList, _file]);
           onFilesValueChange && onFilesValueChange(item.id, [...fileList, _file]);
@@ -118,7 +142,18 @@ const OioFormItem = ({
       }
     },
   };
+  const getImgSrc = (fileType: string) => {
+    switch (fileType) {
+      case '.pdf':
+        return defaultFilsUrl[0];
 
+      case '.doc':
+      case '.docx':
+        return defaultFilsUrl[1];
+      default:
+        return defaultFilsUrl[2];
+    }
+  };
   switch (rule.widget) {
     case 'input':
     case 'string':
@@ -177,7 +212,7 @@ const OioFormItem = ({
         <ProFormUploadButton
           name={item.id}
           key={fileList.length}
-          listType="picture-card"
+          listType="picture"
           fileList={fileList}
           fieldProps={{
             ...rule,
