@@ -85,7 +85,7 @@ const OioFormItem = ({
         }),
       );
     }
-  });
+  }, [value]);
   // 上传文件区域
   const uploadProps: UploadProps = {
     multiple: false,
