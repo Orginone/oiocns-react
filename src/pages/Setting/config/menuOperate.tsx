@@ -51,9 +51,7 @@ const createMenu = (team: ITeam, menus: OperateMenuType[], children: MenuItemTyp
     itemType: team.typeName,
     menus: menus,
     tag: [team.typeName],
-    icon: (
-      <TeamIcon notAvatar={true} entityId={team.id} typeName={team.typeName} size={18} />
-    ),
+    icon: <TeamIcon notAvatar={true} entityId={team.id} size={18} />,
     children: children,
   };
 };
@@ -658,13 +656,6 @@ export const loadSettingMenu = () => {
     label: '设置',
     itemType: 'Tab',
     children: [getUserMenu(), ...getTeamMenu()],
-    icon: (
-      <TeamIcon
-        notAvatar={true}
-        entityId={orgCtrl.user.id}
-        typeName={orgCtrl.user.typeName}
-        size={18}
-      />
-    ),
+    icon: <TeamIcon notAvatar={true} entityId={orgCtrl.user.id} size={18} />,
   };
 };

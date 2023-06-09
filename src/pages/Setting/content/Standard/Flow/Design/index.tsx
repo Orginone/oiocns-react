@@ -392,7 +392,7 @@ const Design: React.FC<IProps> = ({
                 key: item.key,
                 type: item.type,
                 val: item.val != undefined ? String(item.val) : undefined,
-                display: `${item.paramLabel} ${item.label} ${item.val} `,
+                display: item.display,
               };
             })
           : [],

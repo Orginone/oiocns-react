@@ -115,6 +115,7 @@ export const WorkColumns: ProColumns<schema.XWorkTask>[] = [
   },
   {
     title: '内容',
+    width: 400,
     dataIndex: 'content',
     render: (_, record) => {
       if (record.taskType === '加用户') {

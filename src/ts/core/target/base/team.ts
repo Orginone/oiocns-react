@@ -148,7 +148,6 @@ export abstract class Team extends MsgChat<schema.XTarget> implements ITeam {
       }
       const res = await kernel.deleteTarget({
         id: this.id,
-        page: PageAll,
       });
       notity = res.success;
     }
