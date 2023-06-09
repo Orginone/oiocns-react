@@ -15,7 +15,7 @@ import { parseCiteMsg } from '@/pages/Chats/components/parseMsg';
  * @return {*}
  */
 
-interface Iprops {
+interface IProps {
   chat: IMsgChat;
   writeContent: any;
   citeText: IMessage | undefined;
@@ -24,7 +24,7 @@ interface Iprops {
   enterCiteMsg: any;
 }
 
-const Groupinputbox = (props: Iprops) => {
+const GroupInputBox = (props: IProps) => {
   const { writeContent, citeText, enterCiteMsg, closeCite } = props;
   const [task, setTask] = useState<TaskModel>();
   const [imgUrls, setImgUrls] = useState<Array<string>>([]); // 表情图片
@@ -34,9 +34,12 @@ const Groupinputbox = (props: Iprops) => {
   /** 引用展示 */
   const citeShowText = (val: IMessage) => {
     return (
-      <div className={'showTxtContent'}>
-        <div className={'showText'}>{parseCiteMsg(val)}</div>
-        <CloseCircleFilled onClick={() => closeCite('')} className={'closeIcon'} />
+      <div className="cite-text">
+        <div className="cite-text__content">{parseCiteMsg(val)}</div>
+        <CloseCircleFilled
+          onClick={() => closeCite('')}
+          className="cite-text__close-icon"
+        />
       </div>
     );
   };
@@ -321,4 +324,4 @@ const Groupinputbox = (props: Iprops) => {
   );
 };
 
-export default Groupinputbox;
+export default GroupInputBox;

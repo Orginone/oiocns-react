@@ -5,6 +5,7 @@ import { FileItemShare } from '@/ts/base/model';
 import { parseAvatar } from '@/ts/base';
 import { formatSize } from '@/ts/base/common';
 import css from './index.module.less';
+import {truncateString} from "@/utils/tools";
 
 /** 将链接转化为超链接 */
 const linkText = (val: string) => {
@@ -186,7 +187,10 @@ export const parseCiteMsg = (item: IMessage): any => {
       return (
         <div className={`${css.con_content_cite_txt}`}>
           <span>{item.from.name}:</span>
-          <div dangerouslySetInnerHTML={{ __html: linkText(item.msgBody) }}></div>
+          <div
+            dangerouslySetInnerHTML={{
+              __html: truncateString(linkText(item.msgBody), 80),
+            }}></div>
         </div>
       );
     }

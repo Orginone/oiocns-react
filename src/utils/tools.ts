@@ -290,6 +290,13 @@ const downloadByUrl = (url: string) => {
   DownA.click(); // 自执行点击事件
 };
 
+const truncateString = (str: string, maxLength: number) => {
+  if (str.length > maxLength) {
+    return str.slice(0, maxLength - 3) + '...';
+  }
+  return str;
+};
+
 export {
   dateFormat,
   debounce,
@@ -307,4 +314,5 @@ export {
   showChatTime,
   showMessage,
   validIsSocialCreditCode,
+  truncateString,
 };

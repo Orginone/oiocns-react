@@ -1,13 +1,4 @@
-import {
-  Badge,
-  Card,
-  Empty,
-  List,
-  Tag,
-  Checkbox,
-  Typography,
-  Dropdown,
-} from 'antd';
+import { Badge, Card, Empty, List, Tag, Checkbox, Typography, Dropdown } from 'antd';
 import { CheckboxChangeEvent } from 'antd/lib/checkbox';
 import React, { useEffect, useState } from 'react';
 import orgCtrl from '@/ts/controller';

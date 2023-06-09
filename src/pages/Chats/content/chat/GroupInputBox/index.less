@@ -76,11 +76,11 @@
       background-color: transparent;
     }
 
-    .showTxtContent {
+
+    .cite-text {
       display: flex;
-      width: 160px;
-      .showText {
-        background-color: #c6d6f0;
+      &__content {
+        background-color: #e5e5e5;
         max-width: 500px;
         word-wrap: break-word;
         word-break: break-all;
@@ -89,7 +89,7 @@
         border-radius: 5px;
         padding: 5px;
         font-size: 12px;
-        color: #535050;
+        color: #8b8b8b;
         .con_content_txt {
           img {
             width: 100%;
@@ -152,10 +152,12 @@
         }
       }
 
-      .closeIcon {
+      &__close-icon {
         cursor: pointer;
+        color: #d0d0d0;
         height: 14px;
         max-width: 16px;
+        margin-left: 4px;
       }
     }
   }
