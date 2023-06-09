@@ -76,7 +76,18 @@ const submitCurrentTableData = debounce(
       propertys: propertys,
       form: form,
     };
-    callback && callback(form.id, thingList, JSON.stringify(JsonData));
+    callback &&
+      callback(
+        form.id,
+        thingList.map((item) => {
+          /* 去除额外字段 */
+          if (item?.isCreate) {
+            delete item.isCreate;
+          }
+          return item;
+        }),
+        JSON.stringify(JsonData),
+      );
   },
   300,
 );

@@ -40,18 +40,31 @@ interface IProps {
   byIds?: string[];
   deferred?: boolean;
   setGridInstance?: Function;
+  defaultSelectedRowKeys?: string[];
   onBack?: () => void;
   setThingId?: (thingId: string) => void;
   scrolling?: boolean;
   keyExpr?: string;
   onSelected?: (data: any[]) => void;
+  onCancleSelected?: (data: string[]) => void; //取消选中
+  onSelectedChanged?: (e: {
+    currentDeselectedRowKeys: any[];
+    currentSelectedRowKeys: any[];
+    selectedRowsData: any[];
+    selectedRowKeys: any[];
+  }) => void;
 }
 
 /**
  * 存储-物
  */
 const Thing: React.FC<IProps> = (props: IProps) => {
-  const { menuItems, selectable = true, deferred = false } = props;
+  const {
+    menuItems,
+    selectable = true,
+    deferred = false,
+    defaultSelectedRowKeys = [],
+  } = props;
   const allMenuItems: ThingItemType[] = [...(menuItems || [])];
   const menuClick = (key: string, data: any) => {
     const menu = allMenuItems.find((i) => i.key == key);
@@ -59,7 +72,6 @@ const Thing: React.FC<IProps> = (props: IProps) => {
       menu.click(data);
     }
   };
-
   const getColumns = () => {
     const columns = [];
     columns.push(getColumn('1', '标识', '描述型', 'Id'));
@@ -252,8 +264,10 @@ const Thing: React.FC<IProps> = (props: IProps) => {
             props.onBack();
           }
         }}
+        defaultSelectedRowKeys={defaultSelectedRowKeys}
         onSelectionChanged={(e) => {
-          props.onSelected?.apply(this, [e.selectedRowsData]);
+          props?.onSelected?.apply(this, [e.selectedRowsData]);
+          props?.onSelectedChanged?.apply(this, [e]);
         }}
         columnResizingMode={'widget'}
         height={props.height || 'calc(100vh - 175px)'}
