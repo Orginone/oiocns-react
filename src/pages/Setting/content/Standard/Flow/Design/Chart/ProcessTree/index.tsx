@@ -483,6 +483,7 @@ const ProcessTree: React.FC<IProps> = ({
             pos: 1,
             paramKey: '0',
             paramLabel: '组织',
+            dispaly: '其他',
             key: 'EQ',
             label: '=',
             type: dataType.BELONG,

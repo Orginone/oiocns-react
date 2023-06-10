@@ -85,8 +85,8 @@ const DeptWayNode: React.FC<DeptWayNodeProps> = (props: DeptWayNodeProps) => {
     </div>
   );
 
-  const onChange = (newValue: string) => {
-    props.config.conditions[0].display = newValue;
+  const onChange = (newValue: string, labels: string[]) => {
+    props.config.conditions[0].display = labels[0];
     props.config.conditions[0].val = newValue;
     setKey(key + 1);
   };
