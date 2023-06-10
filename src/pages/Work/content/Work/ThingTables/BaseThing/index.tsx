@@ -27,7 +27,7 @@ const BaseThing = <
   props: ProTableProps<DataType, Params, ValueType> & IProps,
 ) => {
   const {
-    propertys,
+    propertys = [],
     labels = [],
     Operation = {},
     readonly,

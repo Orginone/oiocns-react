@@ -26,11 +26,6 @@ const FilePreview = ({ files, previewDone }: IProps) => {
   }, []);
 
   const getBody = useMemo(() => {
-    console.log('files', files, current);
-
-    if (!files) {
-      return <></>;
-    }
     const _file = files[current];
     if (_file?.thumbnail && _file.thumbnail.length > 0) {
       return <Image src={_file.shareLink} title={_file.name} preview={false} />;
@@ -51,10 +46,6 @@ const FilePreview = ({ files, previewDone }: IProps) => {
       />
     );
   }, [current]);
-  const handleCurrentChange = (type: 'left' | 'right') => {
-    const num = type === 'left' ? current - 1 : current + 1;
-    setCurrent(num);
-  };
 
   return (
     <Modal
@@ -82,14 +73,14 @@ const FilePreview = ({ files, previewDone }: IProps) => {
           shape="circle"
           icon={<LeftCircleOutlined />}
           disabled={current === 0}
-          onClick={() => handleCurrentChange('left')}></Button>
+          onClick={() => setCurrent(current - 1)}></Button>
         <Button
           className="btnR"
           type="primary"
           shape="circle"
           icon={<RightCircleOutlined />}
           disabled={current === files.length - 1}
-          onClick={() => handleCurrentChange('right')}></Button>
+          onClick={() => setCurrent(current + 1)}></Button>
         {getBody}
       </div>
     </Modal>
