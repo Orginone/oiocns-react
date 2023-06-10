@@ -496,7 +496,7 @@ const ProcessTree: React.FC<IProps> = ({
     ];
   };
   const insertWorkFlowNode = (parentNode: any) => {
-    parentNode.children.name = '外部办事';
+    parentNode.children.name = '其他办事';
     parentNode.children.props = deepCopy(APPROVAL_PROPS);
   };
   const insertConcurrentsNode = (parentNode: any) => {

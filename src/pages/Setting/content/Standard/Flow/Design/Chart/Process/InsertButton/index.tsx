@@ -140,7 +140,7 @@ const InsertButton: React.FC<InsertButtonProps> = (props: any) => {
             left: '25px',
           }}
         />
-        <span>外部办事</span>
+        <span>其他办事</span>
       </div>
     </div>
   );
