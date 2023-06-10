@@ -346,6 +346,8 @@ export type XProperty = {
   valueType: string;
   // 计量单位
   unit: string;
+  // 附加信息
+  info: string;
   // 类别ID
   speciesId: string;
   // 字典的类型ID

@@ -58,7 +58,7 @@ const EntityIcon = (info: teamTypeInfo) => {
             setPreview(true);
           }}
         />
-        {info.showName && <strong style={{ marginLeft: 6 }}>{share.name}</strong>}
+        {info.showName && <b style={{ marginLeft: 6 }}>{share.name}</b>}
       </div>
     );
   }
@@ -123,7 +123,7 @@ const EntityIcon = (info: teamTypeInfo) => {
         icon={icon}
         style={{ background: 'transparent', color: '#606060' }}
       />
-      {info.showName && <strong style={{ marginLeft: 6 }}>{share?.name}</strong>}
+      {info.showName && <b style={{ marginLeft: 6 }}>{share?.name}</b>}
     </div>
   );
 };

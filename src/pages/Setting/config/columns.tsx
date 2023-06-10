@@ -160,7 +160,7 @@ export const PropertyColumns = (
     width: 150,
   },
   {
-    title: '单位',
+    title: '计量单位',
     dataIndex: 'unit',
     key: 'unit',
     width: 150,
@@ -198,6 +198,25 @@ export const PropertyColumns = (
     dataIndex: 'remark',
     ellipsis: true,
     key: 'remark',
+    width: 300,
+  },
+  {
+    title: '附加信息',
+    dataIndex: 'info',
+    key: 'info',
+    width: 300,
+    ellipsis: true,
+    render: (_, record) => {
+      if (record.info && record.info.includes('-')) {
+        const infos = record.info.split('-');
+        return (
+          <div>
+            库表要素：编号<b>{infos[0]}</b>代码<b>{infos[1]}</b>
+          </div>
+        );
+      }
+      return record.info;
+    },
   },
 ];
 
