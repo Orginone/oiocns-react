@@ -1,7 +1,8 @@
 import { schema } from '@/ts/base';
 import { ISpeciesItem, IWorkDefine } from '@/ts/core';
 import { ProColumns } from '@ant-design/pro-table';
-import orgCtrl from '@/ts/controller';
+import EntityIcon from '@/bizcomponents/GlobalComps/entityIcon';
+import React from 'react';
 
 const getSpeciesName = (
   id: string,
@@ -123,7 +124,7 @@ export const IdentityColumn: ProColumns<schema.XIdentity>[] = [
     title: '组织',
     dataIndex: 'shareId',
     render: (_, record) => {
-      return orgCtrl.user.findShareById(record.shareId).name;
+      return <EntityIcon entityId={record.shareId} showName />;
     },
   },
   {
@@ -159,7 +160,7 @@ export const PropertyColumns = (
     width: 150,
   },
   {
-    title: '单位',
+    title: '计量单位',
     dataIndex: 'unit',
     key: 'unit',
     width: 150,
@@ -176,7 +177,7 @@ export const PropertyColumns = (
     key: 'belongId',
     width: 200,
     render: (_, record) => {
-      return orgCtrl.user.findShareById(record.belongId).name;
+      return <EntityIcon entityId={record.belongId} showName />;
     },
   },
   {
@@ -197,6 +198,25 @@ export const PropertyColumns = (
     dataIndex: 'remark',
     ellipsis: true,
     key: 'remark',
+    width: 300,
+  },
+  {
+    title: '附加信息',
+    dataIndex: 'info',
+    key: 'info',
+    width: 300,
+    ellipsis: true,
+    render: (_, record) => {
+      if (record.info && record.info.includes('-')) {
+        const infos = record.info.split('-');
+        return (
+          <div>
+            库表要素：编号<b>{infos[0]}</b>代码<b>{infos[1]}</b>
+          </div>
+        );
+      }
+      return record.info;
+    },
   },
 ];
 
@@ -274,7 +294,7 @@ export const FormColumns = (species: ISpeciesItem): ProColumns<schema.XForm>[] =
     key: 'shareId',
     width: 200,
     render: (_, record) => {
-      return orgCtrl.user.findShareById(record.shareId).name;
+      return <EntityIcon entityId={record.shareId} showName />;
     },
   },
   {
@@ -283,7 +303,7 @@ export const FormColumns = (species: ISpeciesItem): ProColumns<schema.XForm>[] =
     key: 'belongId',
     width: 200,
     render: (_, record) => {
-      return orgCtrl.user.findShareById(record.belongId).name;
+      return <EntityIcon entityId={record.belongId} showName />;
     },
   },
 ];

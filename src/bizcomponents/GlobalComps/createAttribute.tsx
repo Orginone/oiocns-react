@@ -142,8 +142,7 @@ const AttributeModal = (props: Iprops) => {
       }}
       onFinish={async (values) => {
         if (current) {
-          values = { ...current, ...values };
-          handleOk(await form.updateAttribute(values));
+          handleOk(await form.updateAttribute({ ...current, ...values }));
         } else {
           await form.createAttribute(values);
           handleOk(true);

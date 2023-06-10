@@ -9,6 +9,7 @@ interface CustomMenuType {
   collapsed: boolean;
   selectMenu: MenuItemType;
   item: MenuItemType;
+  className?: string;
   onSelect?: (item: MenuItemType) => void;
   onMenuClick?: (item: MenuItemType, menuKey: string) => void;
 }
@@ -19,7 +20,7 @@ const CustomMenu = (props: CustomMenuType) => {
   const [visibleMenu, setVisibleMenu] = useState<boolean>();
   const [data, setData] = useState<MenuProps['items']>([]);
   useEffect(() => {
-    reloadData(loadOpenKeys(props.item.children, props.selectMenu.key));
+    reloadData(loadOpenKeys(props.item?.children, props.selectMenu.key));
   }, [props]);
 
   useEffect(() => {
@@ -155,7 +156,7 @@ const CustomMenu = (props: CustomMenuType) => {
       </span>
 
       <Menu
-        className={style.customMenu}
+        className={`${style.customMenu} ${props.className ?? ''}`}
         mode="inline"
         inlineIndent={10}
         items={data}

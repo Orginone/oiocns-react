@@ -1,6 +1,5 @@
 import { kernel, model, schema } from '../../../base';
 import { IMsgChat, IMsgChatT, MsgChat } from '../../chat/message/msgchat';
-import { PageAll } from '../../public/consts';
 import { IBelong } from '../base/belong';
 
 /** 权限接口 */
@@ -92,7 +91,6 @@ export class Authority extends MsgChat<schema.XAuthority> implements IAuthority 
   async delete(): Promise<boolean> {
     const res = await kernel.deleteAuthority({
       id: this.id,
-      page: PageAll,
     });
     if (res.success && this.parent) {
       this.parent.children = this.parent.children.filter((i) => i.key != this.key);

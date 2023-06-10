@@ -1,15 +1,16 @@
 /* eslint-disable no-unused-vars */
-import { Button, Popover, Image, Spin, Badge } from 'antd';
+import { Button, Popover, Spin, Badge } from 'antd';
 import moment from 'moment';
 import React, { useEffect, useRef, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
 import Information from './information';
-import css from './index.module.less';
-import { showChatTime } from '@/utils/tools';
-import { FileItemShare } from '@/ts/base/model';
+import { showChatTime, downloadByUrl } from '@/utils/tools';
 import { IMessage, IMsgChat, MessageType } from '@/ts/core';
 import { parseAvatar } from '@/ts/base';
+import ForwardModal from '@/pages/Chats/components/ForwardModal';
+import css from './index.module.less';
+import { parseCiteMsg, parseMsg } from '@/pages/Chats/components/parseMsg';
 
 /**
  * @description: 聊天区域
@@ -20,6 +21,10 @@ interface Iprops {
   chat: IMsgChat;
   filter: string;
   handleReWrites: Function;
+  /** 返回值，引用 */
+  citeText: any;
+  /** 回车设置引用消息 */
+  enterCiteMsg: IMessage;
 }
 
 const GroupContent = (props: Iprops) => {
@@ -30,6 +35,8 @@ const GroupContent = (props: Iprops) => {
   const [selectId, setSelectId] = useState<string>('');
   const body = useRef<HTMLDivElement>(null);
   const [beforescrollHeight, setBeforescrollHeight] = useState(0);
+  const [forwardOpen, setForwardOpen] = useState(false); // 设置转发打开窗口
+  const [formwardCode, setFormwardCode] = useState<IMessage>(); // 转发时用户
 
   useEffect(() => {
     props.chat.onMessage((ms) => {
@@ -60,41 +67,15 @@ const GroupContent = (props: Iprops) => {
     if (!loading && body.current && props.chat && body.current.scrollTop < 10) {
       setLoading(true);
       setBeforescrollHeight(body.current.scrollHeight);
-      if ((await props.chat.moreMessage()) < 1) {
-        setLoading(false);
-      }
+      await props.chat.moreMessage();
+      setMessages([...props.chat.messages]);
     }
   };
-  /**
-   * 显示消息
-   * @param msg 消息
-   */
-  const parseMsg = (item: IMessage) => {
-    switch (item.msgType) {
-      case MessageType.Image: {
-        const img: FileItemShare = parseAvatar(item.msgBody);
-        if (img && img.thumbnail) {
-          return (
-            <>
-              <div className={`${css.con_content_txt} ${css.con_content_img}`}>
-                <Image src={img.thumbnail} preview={{ src: img.shareLink }} />
-              </div>
-            </>
-          );
-        }
-        return <div className={`${css.con_content_txt}`}>消息异常</div>;
-      }
-      case MessageType.File:
-        return <div className={`${css.con_content_txt}`}>{item.msgTitle}</div>;
-      default:
-        return (
-          <>
-            <div
-              className={`${css.con_content_txt}`}
-              dangerouslySetInnerHTML={{ __html: item.msgBody }}></div>
-          </>
-        );
-    }
+
+  /** 转发消息 */
+  const forward = (item: IMessage) => {
+    setForwardOpen(true);
+    setFormwardCode(item);
   };
 
   const viewMsg = (item: IMessage) => {
@@ -103,7 +84,10 @@ const GroupContent = (props: Iprops) => {
         <>
           <div className={`${css.con_content}`}>
             {props.chat.isBelongPerson ? (
-              parseMsg(item)
+              <React.Fragment>
+                {parseMsg(item)}
+                {item.cite && parseCiteMsg(item.cite)}
+              </React.Fragment>
             ) : (
               <>
                 <Badge
@@ -113,6 +97,7 @@ const GroupContent = (props: Iprops) => {
                   style={{ zIndex: 2 }}
                   offset={[-15, -12]}>
                   {parseMsg(item)}
+                  {item.cite && parseCiteMsg(item.cite)}
                 </Badge>
                 <div
                   className={`${css.information} ${
@@ -125,7 +110,7 @@ const GroupContent = (props: Iprops) => {
             )}
           </div>
           <div style={{ color: '#888' }}>
-            <TeamIcon share={item.from} preview size={36} fontSize={32} />
+            <TeamIcon entityId={item.metadata.fromId} preview size={36} />
           </div>
         </>
       );
@@ -133,11 +118,12 @@ const GroupContent = (props: Iprops) => {
       return (
         <>
           <div style={{ color: '#888', paddingRight: 10 }}>
-            <TeamIcon preview share={item.from} size={36} fontSize={32} />
+            <TeamIcon entityId={item.metadata.fromId} preview size={36} />
           </div>
           <div className={`${css.con_content}`}>
             <div className={`${css.name}`}>{item.from.name}</div>
             {parseMsg(item)}
+            {item.cite && parseCiteMsg(item.cite)}
           </div>
         </>
       );
@@ -179,7 +165,7 @@ const GroupContent = (props: Iprops) => {
             复制
           </Button>
         </CopyToClipboard>
-        <Button type="text" style={{ color: '#3e5ed8' }}>
+        <Button type="text" style={{ color: '#3e5ed8' }} onClick={() => forward(item)}>
           转发
         </Button>
         {item.isMySend && (
@@ -191,6 +177,23 @@ const GroupContent = (props: Iprops) => {
               onClose();
             }}>
             撤回
+          </Button>
+        )}
+        <Button
+          type="text"
+          style={{ color: '#3e5ed8' }}
+          onClick={() => props.citeText(item)}>
+          引用
+        </Button>
+        {['文件', '视频', '图片'].includes(item.msgType) && (
+          <Button
+            type="text"
+            onClick={() => {
+              const url = parseAvatar(item.msgBody).shareLink;
+              downloadByUrl(url);
+            }}
+            style={{ color: '#3e5ed8' }}>
+            下载
           </Button>
         )}
         <Button
@@ -259,6 +262,13 @@ const GroupContent = (props: Iprops) => {
         </div>
         {infoMsg && <Information msg={infoMsg} onClose={() => setInfoMsg(undefined)} />}
       </Spin>
+      {forwardOpen && (
+        <ForwardModal
+          visible={forwardOpen}
+          onCancel={() => setForwardOpen(false)}
+          formwardCode={formwardCode}
+        />
+      )}
     </div>
   );
 };

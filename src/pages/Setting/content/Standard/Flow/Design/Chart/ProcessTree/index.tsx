@@ -3,6 +3,7 @@ import Node from '../Process/Node';
 import { useAppwfConfig } from './flow';
 import { message } from 'antd';
 import Root from '../Process/RootNode';
+import orgCtrl from '@/ts/controller';
 import Approval from '../Process/ApprovalNode';
 import WorkFlow from '../Process/WorkFlowNode';
 import Cc from '../Process/CcNode';
@@ -16,15 +17,13 @@ import {
   CC_PROPS,
   dataType,
   DELAY_PROPS,
-  FieldCondition,
   TRIGGER_PROPS,
 } from '../FlowDrawer/processType';
 import { WorkNodeModel } from '@/ts/base/model';
 import { getUuid } from '@/utils/tools';
 
 type IProps = {
-  operateOrgId?: string;
-  conditions?: FieldCondition[]; //内置条件选择器
+  belongId: string;
   resource: WorkNodeModel;
   onSelectedNode: (params: any) => void;
   defaultEditable: boolean;
@@ -37,14 +36,14 @@ type IProps = {
  */
 
 const ProcessTree: React.FC<IProps> = ({
+  belongId,
   onSelectedNode,
   resource,
-  conditions,
-  operateOrgId,
   defaultEditable,
 }) => {
   const [key, setKey] = useState(0);
-
+  const belong = orgCtrl.user.targets.find((i) => i.id === belongId);
+  if (!belong) return <></>;
   const addNodeMap = useAppwfConfig((state: any) => state.addNodeMap);
   /**组件渲染中变更nodeMap  共享状态*/
   var nodeMap = useAppwfConfig((state: any) => state.nodeMap);
@@ -195,9 +194,8 @@ const ProcessTree: React.FC<IProps> = ({
         config: node,
         key: getRandomId(),
         ...props,
-        conditions,
-        operateOrgId,
         defaultEditable,
+        belong: belong,
         //定义事件，插入节点，删除节点，选中节点，复制/移动
         onInsertNode: (type: any) => insertNode(type, node),
         onDelNode: () => delNode(node),
@@ -541,9 +539,7 @@ const ProcessTree: React.FC<IProps> = ({
     return getBranchEndNode(conditionNode.children);
   };
   const addBranchNode = (node: any) => {
-    if (node.belongId && node.belongId != operateOrgId) {
-      message.warning(`该节点由其他人或单位创建，无法在此添加新节点`);
-    } else if (node.branches.length < 8) {
+    if (node.branches.length < 8) {
       node.branches.push({
         nodeId: getRandomId(),
         parentId: node.nodeId,

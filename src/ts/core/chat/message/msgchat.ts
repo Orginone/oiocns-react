@@ -25,6 +25,8 @@ export type MsgChatData = {
   lastMsgTime: number;
   /** 最新消息 */
   lastMessage?: model.MsgSaveModel;
+  /** 提及我 */
+  mentionMe: boolean;
 };
 
 // 消息类会话接口
@@ -70,7 +72,12 @@ interface IChat {
   /** 加载成员用户实体 */
   loadMembers(reload?: boolean): Promise<schema.XTarget[]>;
   /** 向会话发送消息 */
-  sendMessage(type: MessageType, text: string): Promise<boolean>;
+  sendMessage(
+    type: MessageType,
+    text: string,
+    mentions: string[],
+    cite?: IMessage,
+  ): Promise<boolean>;
   /** 撤回消息 */
   recallMessage(id: string): Promise<void>;
   /** 标记消息 */
@@ -94,16 +101,19 @@ export abstract class MsgChat<T extends schema.XEntity>
   extends Entity<T>
   implements IMsgChatT<T>
 {
+  findMe: any;
   constructor(
     _metadata: T,
     _labels: string[],
     _space?: IBelong,
     _belong?: schema.XTarget,
+    _isFindMe?: any,
   ) {
     super(_metadata);
     this.chatId = _metadata.id;
     this.space = _space || (this as unknown as IBelong);
     this._belong = _belong || this.space.metadata;
+    this.findMe = _isFindMe;
     this.chatdata = {
       noReadCount: 0,
       isToping: false,
@@ -111,6 +121,7 @@ export abstract class MsgChat<T extends schema.XEntity>
       chatRemark: _metadata.remark,
       chatName: _metadata.name,
       lastMsgTime: nullTime,
+      mentionMe: false,
       fullId: `${this._belong.id}-${_metadata.id}`,
     };
     this.labels = new List(_labels);
@@ -142,7 +153,7 @@ export abstract class MsgChat<T extends schema.XEntity>
   get information(): string {
     if (this.chatdata.lastMessage) {
       const msg = new Message(this.chatdata.lastMessage, this);
-      return `${msg.createTime}>${msg.msgTitle}`;
+      return msg.msgTitle;
     }
     return this.remark.substring(0, 60);
   }
@@ -166,10 +177,12 @@ export abstract class MsgChat<T extends schema.XEntity>
         if (ids.length > 0) {
           this.tagMessage(ids, ['已读']);
         }
+        this.chatdata.mentionMe = false;
         this.chatdata.noReadCount = 0;
         msgChatNotify.changCallback();
         this.cache();
       }
+      this.messageNotify?.apply(this, [this.messages]);
     });
   }
   cache(): void {
@@ -211,19 +224,39 @@ export abstract class MsgChat<T extends schema.XEntity>
       skip: this.messages.length,
       limit: 30,
     });
-    if (res && res.success && Array.isArray(res.data)) {
-      this.loadMessages(res.data);
+    if (res && res.success && Array.isArray(res.data) && res.data.length > 0) {
+      res.data.forEach((msg) => {
+        this.messages.unshift(new Message(msg, this));
+      });
+      if (this.chatdata.lastMsgTime === nullTime) {
+        this.chatdata.lastMsgTime = new Date(res.data[0].createTime).getTime();
+      }
       return res.data.length;
     }
     return 0;
   }
   abstract loadMembers(reload?: boolean): Promise<schema.XTarget[]>;
-  async sendMessage(type: MessageType, text: string): Promise<boolean> {
+  async sendMessage(
+    type: MessageType,
+    text: string,
+    mentions: string[],
+    cite?: IMessage,
+  ): Promise<boolean> {
+    if (cite) {
+      cite.metadata.tags = [];
+    }
     let res = await kernel.createImMsg({
       msgType: type,
       toId: this.chatId,
       belongId: this.belongId,
-      msgBody: common.StringPako.deflate(text),
+      msgBody: common.StringPako.deflate(
+        '[obj]' +
+          JSON.stringify({
+            body: text,
+            mentions: mentions,
+            cite: cite?.metadata,
+          }),
+      ),
     });
     return res.success;
   }
@@ -277,6 +310,7 @@ export abstract class MsgChat<T extends schema.XEntity>
   }
   receiveMessage(msg: model.MsgSaveModel): void {
     const imsg = new Message(msg, this);
+    // 撤回走这里
     if (imsg.msgType === MessageType.Recall) {
       this.messages
         .find((m) => {
@@ -288,6 +322,9 @@ export abstract class MsgChat<T extends schema.XEntity>
     }
     if (!this.messageNotify) {
       this.chatdata.noReadCount += 1;
+      if (!this.chatdata.mentionMe) {
+        this.chatdata.mentionMe = imsg.mentions.includes(this.userId);
+      }
       msgChatNotify.changCallback();
     } else if (!imsg.isMySend) {
       this.tagMessage([imsg.id], ['已读']);
@@ -310,15 +347,6 @@ export abstract class MsgChat<T extends schema.XEntity>
       this.messageNotify?.apply(this, [this.messages]);
     }
   }
-  private loadMessages(msgs: model.MsgSaveModel[]): void {
-    msgs.forEach((msg) => {
-      this.messages.unshift(new Message(msg, this));
-    });
-    if (this.chatdata.lastMsgTime === nullTime && msgs.length > 0) {
-      this.chatdata.lastMsgTime = new Date(msgs[0].createTime).getTime();
-    }
-    this.messageNotify?.apply(this, [this.messages]);
-  }
 }
 
 export class PersonMsgChat
@@ -330,8 +358,9 @@ export class PersonMsgChat
     _labels: string[],
     _space?: IBelong,
     _belong?: XTarget,
+    _findMe?: boolean,
   ) {
-    super(_metadata, _labels, _space, _belong);
+    super(_metadata, _labels, _space, _belong, _findMe);
   }
   async loadMembers(_reload: boolean = false): Promise<schema.XTarget[]> {
     return [];

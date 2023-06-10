@@ -4,7 +4,7 @@ import * as im from 'react-icons/im';
 import * as fa from 'react-icons/fa';
 import { MenuItemType, OperateMenuType } from 'typings/globelType';
 import { GroupMenuType, MenuType } from './menuType';
-import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
+import EntityIcon from '@/bizcomponents/GlobalComps/entityIcon';
 import {
   IBelong,
   IFileSystem,
@@ -99,7 +99,12 @@ const buildThingTree = (species: ISpeciesItem[]): MenuItemType[] => {
             item: item,
             label: item.name,
             icon: (
-              <TeamIcon notAvatar={true} share={item.share} size={18} fontSize={16} />
+              <EntityIcon
+                notAvatar={true}
+                entityId={item.id}
+                typeName={item.typeName}
+                size={18}
+              />
             ),
             itemType: MenuType.Species,
             menus: [],
@@ -132,7 +137,7 @@ const buildThingMenus = (thing: IThingClass) => {
         key: form.key,
         item: form,
         label: form.name,
-        icon: <TeamIcon share={form.share} size={18} fontSize={16} />,
+        icon: <EntityIcon entityId={form.id} typeName={form.typeName} size={18} />,
         itemType: MenuType.Form,
         beforeLoad: async () => {
           await form.loadAttributes();
@@ -180,7 +185,7 @@ const getUserMenu = () => {
     item: orgCtrl.user,
     label: orgCtrl.user.name,
     itemType: GroupMenuType.User,
-    icon: <TeamIcon share={orgCtrl.user.share} size={18} fontSize={16} />,
+    icon: <EntityIcon entityId={orgCtrl.user.id} size={18} />,
     menus: [],
     children: loadChildren(orgCtrl.user),
   };
@@ -196,7 +201,7 @@ const getTeamMenu = () => {
       label: company.name,
       itemType: GroupMenuType.Company,
       menus: [],
-      icon: <TeamIcon share={company.share} size={18} fontSize={16} />,
+      icon: <EntityIcon entityId={company.id} size={18} />,
       children: loadChildren(company),
     });
   }

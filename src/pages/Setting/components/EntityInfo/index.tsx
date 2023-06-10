@@ -5,6 +5,7 @@ import cls from './index.module.less';
 import { schema } from '@/ts/base';
 import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
+import { formatZhDate } from '@/utils/tools';
 interface IProps {
   entity: IEntity<schema.XEntity>;
   other?: any;
@@ -34,36 +35,44 @@ const Description: React.FC<IProps> = ({ entity, other, extra }: IProps) => {
         key={tkey}
         contentStyle={{ textAlign: 'left', color: '#606266' }}>
         <Descriptions.Item label="名称">
-          <TeamIcon share={entity.share} fontSize={22} />
-          <strong>{entity.name}</strong>
+          <Typography.Paragraph
+            copyable={{
+              text: entity.id,
+              tooltips: [entity.id, '复制成功'],
+            }}>
+            <TeamIcon entityId={entity.id} showName />
+          </Typography.Paragraph>
         </Descriptions.Item>
         <Descriptions.Item label="代码">
-          <Typography.Paragraph copyable>{entity.code}</Typography.Paragraph>
+          <Typography.Paragraph
+            copyable={{
+              text: entity.code,
+              tooltips: [entity.code, '复制成功'],
+            }}>
+            {entity.code}
+          </Typography.Paragraph>
         </Descriptions.Item>
         {other}
         {entity.metadata.belongId != entity.id && (
           <Descriptions.Item label="归属">
-            <TeamIcon share={entity.belong} fontSize={22} />
-            <strong>{entity.belong.name}</strong>
+            <TeamIcon entityId={entity.metadata.belongId} showName />
           </Descriptions.Item>
         )}
         {entity.metadata.createUser != entity.id && (
           <Descriptions.Item label="创建人">
-            <TeamIcon share={entity.creater} fontSize={22} />
-            <strong>{entity.creater.name}</strong>
+            <TeamIcon entityId={entity.metadata.createUser} showName />
           </Descriptions.Item>
         )}
         <Descriptions.Item label="创建时间">
-          {entity.metadata.createTime}
+          {formatZhDate(entity.metadata.createTime)}
         </Descriptions.Item>
         {entity.metadata.createUser != entity.metadata.updateUser && (
           <>
             <Descriptions.Item label="更新人">
-              <TeamIcon share={entity.updater} fontSize={22} />
-              <strong>{entity.updater.name}</strong>
+              <TeamIcon entityId={entity.metadata.updateUser} showName />
             </Descriptions.Item>
             <Descriptions.Item label="更新时间">
-              {entity.metadata.updateTime}
+              {formatZhDate(entity.metadata.updateTime)}
             </Descriptions.Item>
           </>
         )}

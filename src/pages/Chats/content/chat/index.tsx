@@ -19,6 +19,8 @@ const Chat: React.FC<any> = ({
   filter: string;
 }) => {
   const [writeContent, setWriteContent] = useState<any>(null); // 重新编辑
+  const [citeText, setCiteText] = useState<string>(''); // 引用值
+  const [enterCiteMsg, setEnterCiteMsg] = useState<string | any>(); // 回车赋值
 
   /**
    * @description: 重新编辑
@@ -34,10 +36,22 @@ const Chat: React.FC<any> = ({
       {/* 主体 */}
       <div className={charsStyle.chart_page}>
         {/* 聊天区域 */}
-        <GroupContent chat={chat} handleReWrites={handleReWrites} filter={filter} />
+        <GroupContent
+          chat={chat}
+          handleReWrites={handleReWrites}
+          filter={filter}
+          citeText={(text: any) => setCiteText(text)}
+          enterCiteMsg={enterCiteMsg}
+        />
         {/* 输入区域 */}
         <div className={charsStyle.chart_input}>
-          <GroupInputBox chat={chat} writeContent={writeContent} />
+          <GroupInputBox
+            chat={chat}
+            writeContent={writeContent}
+            citeText={citeText as any} // 传递引用的值给聊天框组件
+            closeCite={(e: string) => setCiteText(e)} // 设置关闭引用下的值
+            enterCiteMsg={(e: any) => setEnterCiteMsg(e)} // 设置回车时把所引用的值赋值
+          />
         </div>
       </div>
       {/**回话详情 */}

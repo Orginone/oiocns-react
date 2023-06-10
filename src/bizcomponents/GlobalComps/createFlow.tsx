@@ -92,25 +92,22 @@ const WorkDefineModal = ({ open, handleOk, handleCancel, workItem, current }: Ip
       },
     },
     {
-      title: '是否创建实体',
-      dataIndex: 'isCreate',
-      valueType: 'select',
-      colProps: { span: 24 },
-      fieldProps: {
-        options: [
-          {
-            value: true,
-            label: '是',
-          },
-          {
-            value: false,
-            label: '否',
-          },
-        ],
-      },
-      formItemProps: {
-        rules: [{ required: true, message: '是否创建实体为必填项' }],
-      },
+      title: '允许新增实体',
+      dataIndex: 'allowAdd',
+      valueType: 'switch',
+      initialValue: true,
+    },
+    {
+      title: '允许变更实体',
+      dataIndex: 'allowEdit',
+      valueType: 'switch',
+      initialValue: true,
+    },
+    {
+      title: '允许选择实体',
+      dataIndex: 'allowSelect',
+      valueType: 'switch',
+      initialValue: true,
     },
     {
       title: '备注',
@@ -144,7 +141,12 @@ const WorkDefineModal = ({ open, handleOk, handleCancel, workItem, current }: Ip
       rowProps={{
         gutter: [24, 0],
       }}
-      onFinish={async (model) => {
+      onFinish={async (model: any) => {
+        model.rule = JSON.stringify({
+          allowAdd: model.allowAdd,
+          allowEdit: model.allowEdit,
+          allowSelect: model.allowSelect,
+        });
         if (current) {
           model.icon = JSON.stringify(avatar);
           handleOk(await current.updateDefine(model));

@@ -90,6 +90,11 @@ export type PageModel = {
 export type IdModel = {
   // 唯一ID
   id: string;
+};
+
+export type IdPageModel = {
+  // 唯一ID
+  id: string;
   // 分页
   page: PageModel;
 };
@@ -412,6 +417,8 @@ export type FormModel = {
   name: string;
   // 编号
   code: string;
+  // 图标
+  icon: string;
   // 规则
   rule: string;
   // 类型
@@ -509,6 +516,8 @@ export type WorkDefineModel = {
   code: string;
   // 图标
   icon: string;
+  // 规则
+  rule: string;
   // 流程节点
   resource: WorkNodeModel | undefined;
   // 备注
@@ -532,6 +541,8 @@ export type WorkInstanceModel = {
   title: string;
   // 回调地址
   hook: string;
+  // 申请组织Id
+  applyId: string;
 };
 export type QueryWorkReq = {
   // 共享组织Id
@@ -578,6 +589,7 @@ export type Condition = {
   paramKey: string;
   val: string;
   type: string;
+  display: string;
 };
 
 export type QueryTaskReq = {

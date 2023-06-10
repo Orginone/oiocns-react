@@ -1,34 +1,50 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import * as im from 'react-icons/im';
-import { ShareIcon } from '@/ts/base/model';
 import { Avatar, Image } from 'antd';
 import { TargetType } from '@/ts/core';
+import orgCtrl from '@/ts/controller';
+import { ShareIcon } from '@/ts/base/model';
+import { parseAvatar } from '@/ts/base';
 
 interface teamTypeInfo {
   preview?: boolean;
   size?: number;
-  fontSize?: number;
-  share: ShareIcon;
+  entityId: string;
+  typeName?: string;
   notAvatar?: boolean;
   title?: string;
+  showName?: boolean;
 }
 
 /** 组织图标 */
 const EntityIcon = (info: teamTypeInfo) => {
   const [preview, setPreview] = useState(false);
+  const [share, setShare] = useState<ShareIcon>();
   const size = info.size ?? 22;
-  const fontSize = info.fontSize ?? 18;
-  if (info.share?.avatar && info.share?.avatar.thumbnail) {
+  useEffect(() => {
+    if (info.entityId && info.entityId.length > 10) {
+      orgCtrl.user.findEntityAsync(info.entityId).then((value) => {
+        if (value) {
+          setShare({
+            name: value.name,
+            typeName: value.typeName,
+            avatar: parseAvatar(value.icon),
+          });
+        }
+      });
+    }
+  }, []);
+  if (share?.avatar && share?.avatar.thumbnail) {
     return (
       <div
-        style={{ cursor: 'pointer', display: 'inline-block' }}
+        style={{ cursor: 'pointer', display: 'contents' }}
         title={info.title ?? '点击预览'}>
         {info.preview && (
           <Image
             style={{ display: 'none' }}
             preview={{
               visible: preview,
-              src: info.share.avatar.shareLink,
+              src: share.avatar.shareLink,
               onVisibleChange: (value) => {
                 setPreview(value);
               },
@@ -37,74 +53,78 @@ const EntityIcon = (info: teamTypeInfo) => {
         )}
         <Avatar
           size={size}
-          src={info.share.avatar.thumbnail}
+          src={share.avatar.thumbnail}
           onClick={() => {
             setPreview(true);
           }}
         />
+        {info.showName && <b style={{ marginLeft: 6 }}>{share.name}</b>}
       </div>
     );
   }
   let icon;
-  switch (info.share?.typeName) {
+  switch (info.typeName || share?.typeName) {
     case '平台':
     case TargetType.Group:
-      icon = <im.ImTree fontSize={fontSize} />;
+      icon = <im.ImTree fontSize={size} />;
       break;
     case '权限':
-      icon = <im.ImAddressBook fontSize={fontSize} />;
+      icon = <im.ImAddressBook fontSize={size} />;
       break;
     case '字典':
-      icon = <im.ImBook fontSize={fontSize} />;
+      icon = <im.ImBook fontSize={size} />;
       break;
     case '属性':
-      icon = <im.ImJoomla fontSize={fontSize} />;
+      icon = <im.ImJoomla fontSize={size} />;
       break;
     case '表单':
-      icon = <im.ImInsertTemplate fontSize={fontSize} />;
+      icon = <im.ImInsertTemplate fontSize={size} />;
       break;
     case TargetType.Company:
-      icon = <im.ImOffice fontSize={fontSize} />;
+      icon = <im.ImOffice fontSize={size} />;
       break;
     case TargetType.Section:
     case TargetType.Department:
-      return <im.ImLibrary fontSize={fontSize} />;
+      return <im.ImLibrary fontSize={size} />;
     case TargetType.College:
-      return <im.ImTrophy fontSize={fontSize} />;
+      return <im.ImTrophy fontSize={size} />;
     case TargetType.Laboratory:
-      icon = <im.ImJoomla fontSize={fontSize} />;
+      icon = <im.ImJoomla fontSize={size} />;
       break;
     case TargetType.Office:
-      icon = <im.ImBriefcase fontSize={fontSize} />;
+      icon = <im.ImBriefcase fontSize={size} />;
       break;
     case TargetType.Research:
-      icon = <im.ImFlickr4 fontSize={fontSize} />;
+      icon = <im.ImFlickr4 fontSize={size} />;
       break;
     case TargetType.Working:
-      icon = <im.ImUsers fontSize={fontSize} />;
+      icon = <im.ImUsers fontSize={size} />;
       break;
     case TargetType.Station:
-      icon = <im.ImAddressBook fontSize={fontSize} />;
+      icon = <im.ImAddressBook fontSize={size} />;
       break;
     case TargetType.Cohort:
-      icon = <im.ImBubbles fontSize={fontSize} />;
+      icon = <im.ImBubbles fontSize={size} />;
       break;
     case TargetType.Person:
-      icon = <im.ImUserTie fontSize={fontSize} />;
+      icon = <im.ImUserTie fontSize={size} />;
       break;
     default:
-      icon = <im.ImTree fontSize={fontSize} />;
+      icon = <im.ImTree fontSize={size} />;
       break;
   }
   if (info.notAvatar) {
     return icon;
   }
   return (
-    <Avatar
-      size={size}
-      icon={icon}
-      style={{ background: 'transparent', color: '#606060' }}
-    />
+    <div style={{ display: 'contents' }}>
+      <Avatar
+        size={size}
+        icon={icon}
+        style={{ background: 'transparent', color: '#606060' }}
+      />
+      {info.showName && <b style={{ marginLeft: 6 }}>{share?.name}</b>}
+    </div>
   );
 };
 

@@ -1,6 +1,6 @@
 .cohort_wrap {
   width: 100%;
-  height: calc(100vh - 115px);
+  height: 100%;
   display: flex;
   justify-content: space-between;
   overflow: hidden;
@@ -29,6 +29,14 @@
       border-top: 1px solid #dde4f3;
       .el-textarea__inner {
         // color: #fff;
+      }
+      :global {
+        .ogo-spin-nested-loading {
+          height: 100%;
+          .ogo-spin-container {
+            height: 100%;
+          }
+        }
       }
     }
 
