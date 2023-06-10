@@ -14,6 +14,7 @@ interface IProps {
   tooltip: LabelTooltipType;
   props: any;
 }
+
 /**
  * 字典组件
  */
@@ -38,7 +39,6 @@ const ProFormDict = (props: IProps) => {
   }, []);
   return (
     <ProFormSelect
-      width={200}
       name={props.name}
       label={props.label}
       tooltip={props.tooltip}

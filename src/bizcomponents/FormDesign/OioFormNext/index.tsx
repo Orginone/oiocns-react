@@ -8,7 +8,7 @@ import orgCtrl from '@/ts/controller';
 import cls from './index.module.less';
 type IProps = {
   form: XForm;
-  belong?: IBelong;
+  belong: IBelong;
   submitter?: any;
   onValuesChange?: (changedValues: any, values: Record<string, any>) => void;
   onFinished?: Function;

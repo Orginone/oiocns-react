@@ -32,7 +32,7 @@ import { downloadByUrl } from '@/utils/tools';
 interface IProps {
   disabled?: boolean;
   item: XAttribute;
-  belong?: IBelong;
+  belong: IBelong;
   noRule?: boolean;
   value?: any;
   onFilesValueChange?: (key: string, files: any[]) => void;
@@ -165,7 +165,6 @@ const OioFormItem = ({
           required={rule.required}
           fieldProps={rule}
           rules={rules}
-          // width={200}
           tooltip={rule.description}
           labelAlign="right"
         />
