@@ -15,7 +15,7 @@ import { parseCiteMsg } from '@/pages/Chats/components/parseMsg';
  * @return {*}
  */
 
-interface Iprops {
+interface IProps {
   chat: IMsgChat;
   writeContent: any;
   citeText: IMessage | undefined;
@@ -24,7 +24,7 @@ interface Iprops {
   enterCiteMsg: any;
 }
 
-const Groupinputbox = (props: Iprops) => {
+const GroupInputBox = (props: IProps) => {
   const { writeContent, citeText, enterCiteMsg, closeCite } = props;
   const [task, setTask] = useState<TaskModel>();
   const [imgUrls, setImgUrls] = useState<Array<string>>([]); // 表情图片
@@ -34,9 +34,12 @@ const Groupinputbox = (props: Iprops) => {
   /** 引用展示 */
   const citeShowText = (val: IMessage) => {
     return (
-      <div className={'showTxtContent'}>
-        <div className={'showText'}>{parseCiteMsg(val)}</div>
-        <CloseCircleFilled onClick={() => closeCite('')} className={'closeIcon'} />
+      <div className="cite-text">
+        <div className="cite-text__content">{parseCiteMsg(val)}</div>
+        <CloseCircleFilled
+          onClick={() => closeCite('')}
+          className="cite-text__close-icon"
+        />
       </div>
     );
   };
@@ -44,12 +47,12 @@ const Groupinputbox = (props: Iprops) => {
   /** 艾特触发人员选择 */
   const onSelect = (e: any) => {
     setCiteShow(false);
-    const insterHtml = document.getElementById('insterHtml');
-    if (insterHtml) {
+    const innerHtml = document.getElementById('innerHtml');
+    if (innerHtml) {
       const node = document.createElement('at');
       node.id = e.id;
       node.innerText = `${e.name}`;
-      insterHtml.append(node);
+      innerHtml.append(node);
       node.focus();
     }
   };
@@ -64,19 +67,19 @@ const Groupinputbox = (props: Iprops) => {
    * @return {*}
    */
   const submit = async () => {
-    const insterHtml = document.getElementById('insterHtml');
-    if (insterHtml != null) {
+    const innerHtml = document.getElementById('innerHtml');
+    if (innerHtml != null) {
       const mentions: string[] = [];
       const text: any =
-        insterHtml.childNodes.length > 0
-          ? reCreatChatContent(insterHtml.childNodes ?? [], mentions)
-          : [insterHtml.innerHTML];
+        innerHtml.childNodes.length > 0
+          ? reCreatChatContent(innerHtml.childNodes ?? [], mentions)
+          : [innerHtml.innerHTML];
       let massage = text.join('').trim();
       if (massage.length > 0) {
-        insterHtml.innerHTML = '发送中,请稍后...';
+        innerHtml.innerHTML = '发送中,请稍后...';
         await props.chat.sendMessage(MessageType.Text, massage, mentions, citeText);
       }
-      insterHtml.innerHTML = '';
+      innerHtml.innerHTML = '';
       closeCite('');
     }
   };
@@ -84,6 +87,7 @@ const Groupinputbox = (props: Iprops) => {
   /**
    * @description: 解析聊天内容
    * @param {NodeList} elementChild
+   * @param mentions
    * @return {*}
    */
   const reCreatChatContent = (
@@ -120,7 +124,7 @@ const Groupinputbox = (props: Iprops) => {
     setImgUrls(imgUrlss);
   }, []);
   useEffect(() => {
-    let doc = document.getElementById('insterHtml');
+    let doc = document.getElementById('innerHtml');
     if (writeContent !== null && doc) {
       doc.innerHTML = writeContent;
     }
@@ -132,7 +136,7 @@ const Groupinputbox = (props: Iprops) => {
    * @return {*}
    */
   const keyDown = (e: any) => {
-    let doc = document.getElementById('insterHtml');
+    let doc = document.getElementById('innerHtml');
     if (!doc) return;
     if (e.ctrlKey && e.keyCode == 13) {
       //用户点击了ctrl+enter触发
@@ -163,7 +167,7 @@ const Groupinputbox = (props: Iprops) => {
     img.className = `cutImg`;
     img.style.display = 'block';
     img.style.marginBottom = '10px';
-    document.getElementById('insterHtml')?.append(img);
+    document.getElementById('innerHtml')?.append(img);
   };
 
   /** 创建img标签 */
@@ -171,7 +175,7 @@ const Groupinputbox = (props: Iprops) => {
     const img = document.createElement('img');
     img.src = url;
     img.className = `emoji`;
-    document.getElementById('insterHtml')?.append(img);
+    document.getElementById('innerHtml')?.append(img);
   };
   /** 文件上传参数 */
   const uploadProps: UploadProps = {
@@ -215,58 +219,50 @@ const Groupinputbox = (props: Iprops) => {
 
   return (
     <Spin tip={getMessage()} spinning={task != undefined}>
-      <div className={'group_input_wrap'}>
-        <div className={'icons_box'}>
-          <div style={{ marginTop: '4px' }}>
-            <Popover
-              trigger="click"
-              content={
-                <div className={'qqface_wrap'}>
-                  {imgUrls.map((index) => {
-                    return (
-                      <div
-                        className={'emoji_box'}
-                        key={index}
-                        onClick={() => {
-                          handleImgChoosed(index);
-                        }}>
-                        <img className={'emoji'} src={`${index}`} alt="" />
-                      </div>
-                    );
-                  })}
-                </div>
-              }>
-              <IconFont type={'icon-biaoqing'} className={'icons_oneself'} />
-            </Popover>
-          </div>
-          <IconFont
-            className={'icons_oneself'}
-            type={'icon-maikefeng'}
+      <div className="group-input-box">
+        <div className="group-input-box__toolbar">
+          <Popover
+            placement="top"
+            trigger="click"
+            content={
+              <div className="emoticons-picker">
+                {imgUrls.map((index) => {
+                  return (
+                    <div
+                      className="emoticons-picker__item"
+                      key={index}
+                      onClick={() => {
+                        handleImgChoosed(index);
+                      }}>
+                      <img className="emoticon" src={`${index}`} alt="" />
+                    </div>
+                  );
+                })}
+              </div>
+            }>
+            <Button type="text" icon={<IconFont type="icon-biaoqing" />} />
+          </Popover>
+
+          <Button
+            type="text"
             onClick={() => {
               message.warning('功能暂未开放');
             }}
+            icon={<IconFont type="icon-maikefeng" />}
           />
           <Upload {...uploadProps}>
-            <IconFont className={'icons_oneself'} type={'icon-wenjian'} />
+            <Button type="text" icon={<IconFont type="icon-wenjian" />} />
           </Upload>
-          <IconFont
-            title="Ctrl+Alt+A 可触发截屏；选择截图区域后双击即可完成截图；Esc退出截屏"
-            className={'icons_oneself'}
-            type={'icon-jietu'}
-            onClick={() => {
-              setIsCut(true);
-            }}
-          />
-          <IconFont
-            className={'icons_oneself'}
-            type={'icon-shipin'}
+          <Button
+            type="text"
             onClick={() => {
               message.warning('功能暂未开放');
             }}
+            icon={<IconFont type="icon-shipin" />}
           />
         </div>
         {/* @功能 */}
-        <div className={'input_content'}>
+        <div className="group-input-box__input-area">
           {citeShow && (
             <PullDown
               style={{ display: `${!citeShow ? 'none' : 'block'}` }}
@@ -290,7 +286,7 @@ const Groupinputbox = (props: Iprops) => {
             />
           )}
           <div
-            id="insterHtml"
+            id="innerHtml"
             autoFocus={true}
             ref={(ref) => ref && !citeShow && ref.focus()}
             className={'textarea'}
@@ -300,7 +296,7 @@ const Groupinputbox = (props: Iprops) => {
             onKeyDown={keyDown}></div>
           {citeText && citeShowText(citeText)}
         </div>
-        <div className={'send_box'}>
+        <div className="group-input-box__action-bar">
           <Button
             type="primary"
             style={{ color: '#fff', border: 'none' }}
@@ -321,4 +317,4 @@ const Groupinputbox = (props: Iprops) => {
   );
 };
 
-export default Groupinputbox;
+export default GroupInputBox;
