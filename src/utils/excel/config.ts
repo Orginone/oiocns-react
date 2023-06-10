@@ -86,6 +86,12 @@ export const getReadConfigs = (species: ISpeciesItem) => {
     switch (config.sheetName) {
       case SpeciesType.Store:
       case SpeciesType.Dict:
+      case SpeciesType.Market:
+      case SpeciesType.Application:
+      case SpeciesType.Flow:
+      case SpeciesType.Work:
+      case SpeciesType.Thing:
+      case SpeciesType.Data:
         readConfigs.push({
           ...config,
           initContext: (context: Context) => {

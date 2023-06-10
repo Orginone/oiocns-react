@@ -285,7 +285,7 @@ const loadSpeciesMenus = (species: ISpeciesItem) => {
         icon: <im.ImDownload />,
         label: '导入模板下载',
         beforeLoad: async () => {
-          generateXlsx(await getConfigs(species), '类别导入模板');
+          generateXlsx(await getConfigs(species), species.typeName + '导入模板');
           return false;
         },
       },
