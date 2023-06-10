@@ -171,18 +171,20 @@ const buildDict = (dictClass: IDictClass) => {
 };
 
 /** 编译表单项菜单 */
-const buildDefineMenu = (form: IFlowClass) => {
-  return form.defines.map((i) => {
+const buildDefineMenu = (flow: IFlowClass) => {
+  return flow.defines.map((i) => {
     return {
       key: i.key,
       item: i,
       label: i.name,
       icon: <TeamIcon notAvatar={true} entityId={i.id} typeName={i.typeName} size={18} />,
-      itemType: MenuType.Work,
+      itemType: flow.isInherited ? MenuType.Species : MenuType.Work,
       menus: loadDefineMenus(i),
-      children: [],
+      children: buildFormMenu(i.forms),
       beforeLoad: async () => {
-        await i.loadWorkNode();
+        if (flow.isInherited) {
+          await i.loadWorkForms();
+        }
       },
     } as MenuItemType;
   });

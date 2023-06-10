@@ -56,6 +56,7 @@ const WorkForm: React.FC<IProps> = ({ current }: IProps) => {
             {
               tab: '表单设计',
               key: 'form',
+              disabled: current.species.isInherited,
             },
           ]}
           activeTabKey={tabKey}

@@ -88,6 +88,7 @@ const OioForm: React.FC<IProps> = ({
             <Col span={config.col} key={item.id}>
               <OioFormItem
                 item={item}
+                disabled
                 belong={define.workItem.current.space}
                 noRule={noRule}
               />

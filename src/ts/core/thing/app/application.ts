@@ -43,7 +43,10 @@ export class Application extends SpeciesItem implements IApplication {
   ): ISpeciesItem | undefined {
     switch (_metadata.typeName) {
       case SpeciesType.Work:
-        return new WorkClass(_metadata, this);
+        if (!this.isInherited) {
+          return new WorkClass(_metadata, this);
+        }
+        break;
       case SpeciesType.Flow:
         return new FlowClass(_metadata, this);
       case SpeciesType.Data:

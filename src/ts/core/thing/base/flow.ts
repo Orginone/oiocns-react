@@ -6,14 +6,19 @@ import { ISpeciesItem, SpeciesItem } from './species';
 import { IApplication } from '../app/application';
 import { ITarget } from '../../target/base/target';
 import { Entity, IEntity } from '../../public';
+import { IForm, Form } from './form';
 
 export interface IWorkDefine extends IEntity<schema.XWorkDefine> {
   /** 办事分类 */
   workItem: IFlow;
+  /** 流程关联的表单 */
+  forms: IForm[];
   /** 更新办事定义 */
   updateDefine(req: model.WorkDefineModel): Promise<boolean>;
   /** 加载事项定义节点 */
   loadWorkNode(): Promise<model.WorkNodeModel | undefined>;
+  /** 加载事项定义节点关联的表单 */
+  loadWorkForms(): Promise<IForm[]>;
   /** 删除办事定义 */
   deleteDefine(): Promise<boolean>;
   /** 新建办事实例 */
@@ -37,6 +42,7 @@ export const fullDefineRule = (data: XWorkDefine) => {
 };
 export class FlowDefine extends Entity<schema.XWorkDefine> implements IWorkDefine {
   workItem: IFlow;
+  forms: IForm[] = [];
   constructor(_metadata: XWorkDefine, work: IFlow) {
     super(fullDefineRule(_metadata));
     this.workItem = work;
@@ -66,6 +72,30 @@ export class FlowDefine extends Entity<schema.XWorkDefine> implements IWorkDefin
     if (res.success) {
       return res.data;
     }
+  }
+  async loadWorkForms(): Promise<IForm[]> {
+    const forms: IForm[] = [];
+    const res = await kernel.queryWorkNodes({ id: this.id });
+    if (res.success && res.data) {
+      const recursionForms = (node: model.WorkNodeModel) => {
+        if (node.forms && node.forms.length > 0) {
+          forms.push(...node.forms.map((i) => new Form(i, this.workItem)));
+        }
+        if (node.children) {
+          recursionForms(node.children);
+        }
+        if (node.branches) {
+          for (const branch of node.branches) {
+            if (branch.children) {
+              recursionForms(branch.children);
+            }
+          }
+        }
+      };
+      recursionForms(res.data);
+    }
+    this.forms = forms;
+    return forms;
   }
   async createWorkInstance(
     data: model.WorkInstanceModel,

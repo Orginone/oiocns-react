@@ -1,19 +1,13 @@
 import { SpeciesType, TargetType } from '@/ts/core/public/enums';
 import { kernel, model, schema } from '../../../base';
-import { Form, IForm } from '../base/form';
+import { Form, IForm, IFormClass } from '../base/form';
 import { ISpeciesItem, SpeciesItem } from '../base/species';
 import { PageAll } from '@/ts/core/public/consts';
 import { ITarget } from '../../target/base/target';
 import { IApplication } from './application';
-export interface IWorkClass extends ISpeciesItem {
+export interface IWorkClass extends IFormClass {
   /** 对应的应用 */
   app: IApplication;
-  /** 分类下的表单 */
-  forms: IForm[];
-  /** 加载表单 */
-  loadForms(reload?: boolean): Promise<IForm[]>;
-  /** 新建表单 */
-  createForm(data: model.FormModel): Promise<IForm | undefined>;
 }
 
 export class WorkClass extends SpeciesItem implements IWorkClass {

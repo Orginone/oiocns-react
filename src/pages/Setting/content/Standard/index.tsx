@@ -17,10 +17,11 @@ const SettingStandrad: React.FC<IProps> = ({ current }: IProps) => {
       return <Property current={current} />;
     case SpeciesType.Market:
     case SpeciesType.Flow:
-      return <FlowItem current={current as IFlowClass} />;
-    default:
-      return <></>;
+      if (!current.isInherited) {
+        return <FlowItem current={current as IFlowClass} />;
+      }
   }
+  return <></>;
 };
 
 export default SettingStandrad;

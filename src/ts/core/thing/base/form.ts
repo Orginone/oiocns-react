@@ -1,9 +1,17 @@
-import { SpeciesType } from '@/ts/core/public/enums';
 import { ISpeciesItem } from './species';
 import { kernel, model, schema } from '@/ts/base';
-import { IThingClass } from '../store/thingclass';
 import { XProperty } from '@/ts/base/schema';
-import { Entity, IEntity } from '../../public';
+import { Entity, IEntity, orgAuth } from '../../public';
+
+export interface IFormClass extends ISpeciesItem {
+  /** 分类下的表单 */
+  forms: IForm[];
+  /** 加载表单 */
+  loadForms(reload?: boolean): Promise<IForm[]>;
+  /** 新建表单 */
+  createForm(data: model.FormModel): Promise<IForm | undefined>;
+}
+
 export interface IForm extends IEntity<schema.XForm> {
   /** 表单分类 */
   species: ISpeciesItem;
@@ -49,22 +57,25 @@ export class Form extends Entity<schema.XForm> implements IForm {
     return res.success;
   }
   async delete(): Promise<boolean> {
-    const res = await kernel.deleteForm({
-      id: this.id,
-    });
-    if (res.success) {
-      if (this.species.typeName === SpeciesType.Thing) {
-        const species = this.species as IThingClass;
-        species.forms = species.forms.filter((i) => i.key != this.key);
+    if (this.species) {
+      const res = await kernel.deleteForm({
+        id: this.id,
+      });
+      if (res.success) {
+        if ('forms' in this.species) {
+          const formClass = this.species as IFormClass;
+          formClass.forms = formClass.forms.filter((i) => i.key != this.key);
+        }
       }
+      return res.success;
     }
-    return res.success;
+    return false;
   }
   async loadAttributes(reload: boolean = false): Promise<schema.XAttribute[]> {
     if (!this._attributeLoaded || reload) {
       const res = await kernel.queryFormAttributes({
         id: this.id,
-        subId: this.species.belongId,
+        subId: this.metadata.belongId,
       });
       if (res.success) {
         this._attributeLoaded = true;
@@ -84,7 +95,7 @@ export class Form extends Entity<schema.XForm> implements IForm {
       data.dictId = property.dictId;
     }
     if (!data.authId || data.authId.length < 5) {
-      data.authId = this.species.metadata.authId;
+      data.authId = this.species?.metadata.authId ?? orgAuth.SuperAuthId;
     }
     const res = await kernel.createAttribute(data);
     if (res.success && res.data.id) {

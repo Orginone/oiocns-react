@@ -39,7 +39,7 @@ const Attritube = ({ current, modalType, setModalType }: IProps) => {
     }
   };
   useEffect(() => {
-    if (current.species.typeName === SpeciesType.Thing) {
+    if (current.typeName === SpeciesType.Thing) {
       setPropertys(
         current.attributes
           .filter((i) => i.linkPropertys && i.linkPropertys.length > 0)
@@ -113,7 +113,7 @@ const Attritube = ({ current, modalType, setModalType }: IProps) => {
       />
       {/** 新增特性模态框 */}
       {['新增特性', '编辑特性'].includes(modalType) &&
-        (current.species.typeName === SpeciesType.Work ? (
+        (current.typeName === SpeciesType.Work ? (
           <AttributeModal
             form={current}
             current={modalType.includes('新增') ? undefined : selectedItem}
