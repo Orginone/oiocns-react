@@ -1,9 +1,9 @@
 import { XForm, XProperty } from '@/ts/base/schema';
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { getColItem } from '../Function';
 import { defaultCol, defaultColumnStateMap } from '../const';
 import { getScrollX } from '@/utils';
-
+import FilesPreview from '@/components/FilesPreview';
 import {
   ParamsType,
   ProColumnType,
@@ -19,7 +19,6 @@ interface IProps {
   form?: XForm; // 表单基本信息
   readonly?: boolean; //只读表单，隐藏操作区，配置区
 }
-
 const BaseThing = <
   DataType extends Record<string, any>,
   Params extends ParamsType = ParamsType,
@@ -36,9 +35,10 @@ const BaseThing = <
     scroll = {},
     ...rest
   } = props;
+  const [visibleImgs, setVisibleImgs] = useState([]);
   const getColumns: any = useMemo(() => {
     let columns: any[] = [...defaultCol, ...propertys].map((item: any) => {
-      return getColItem(item);
+      return getColItem(item, { 附件型: setVisibleImgs });
     });
     if (!readonly) {
       columns.push(Operation);
@@ -47,9 +47,8 @@ const BaseThing = <
     return columns;
   }, [props.dataSource, propertys, readonly]);
   const { columnsRes, scrollx } = getScrollX(getColumns);
-
   return (
-    <>
+    <div>
       <ProTable
         cardProps={{
           className: cls.thingTable,
@@ -65,7 +64,9 @@ const BaseThing = <
         scroll={{ ...scroll, x: scrollx }}
         {...rest}
       />
-    </>
+      {/* 文件预览处理 */}
+      <FilesPreview files={visibleImgs} previewDone={() => setVisibleImgs([])} />
+    </div>
   );
 };
 export default BaseThing;
