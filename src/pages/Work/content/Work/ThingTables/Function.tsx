@@ -6,6 +6,7 @@ import { debounce } from '@/utils/tools';
 import { ColTypes } from './const';
 import { FileItemShare } from '@/ts/base/model';
 import { formatSize } from '@/ts/base/common';
+import { Button } from 'antd';
 
 // 获取表头配置
 const getColItem = (
@@ -13,6 +14,7 @@ const getColItem = (
     attrId: string;
     valueEnum: Object | undefined;
   } & XProperty,
+  funObj?: { [key: string]: Function },
 ) => {
   // 使用属性Id 展示表格
   const { id, attrId, name, valueType = '描述型', valueEnum = undefined } = col;
@@ -50,11 +52,24 @@ const getColItem = (
       break;
     case '附件型':
       {
+        const fun = funObj?.['附件型'];
         ColItem.render = (_text: ReactNode, _record: any) => {
           if (_record) {
-            let shares: FileItemShare[] = JSON.parse(
-              _record.EDIT_INFO[attrId ?? id] || _record[attrId ?? id] || '[]',
-            );
+            const fileInfo =
+              (_record?.EDIT_INFO?.[attrId ?? id] || _record?.[attrId ?? id]) ?? '[]';
+            console.log('fileInfo', fileInfo);
+
+            let shares: FileItemShare[] = JSON.parse(fileInfo);
+            if (shares.length == 0) {
+              return <span>-</span>;
+            }
+            if (fun && fileInfo.length) {
+              return (
+                <Button onClick={() => fun(shares)}>
+                  附件（<span>{shares.length}</span>）
+                </Button>
+              );
+            }
             return (
               <>
                 {shares.map((share: FileItemShare, i: number) => {
@@ -96,7 +111,18 @@ const submitCurrentTableData = debounce(
       propertys: propertys,
       form: form,
     };
-    callback && callback(form.id, thingList, JSON.stringify(JsonData));
+    callback &&
+      callback(
+        form.id,
+        thingList.map((item) => {
+          /* 去除额外字段 */
+          if (item?.isCreate) {
+            delete item.isCreate;
+          }
+          return item;
+        }),
+        JSON.stringify(JsonData),
+      );
   },
   300,
 );

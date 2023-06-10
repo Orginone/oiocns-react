@@ -55,7 +55,6 @@ const ProFormGroup = (props: IProps) => {
         ...props.rules,
         ...{ treeData },
       }}
-      width={200}
       rules={props.rules}
     />
   );

@@ -84,13 +84,18 @@ const ThingTable = <
 
   // 处理实体表选择事件
   useEffect(() => {
-    // 监听实体选择 将实体属性转为表格展示特性
+    /* 处理选择变化后的数据 */
     if (selectedRows.length > 0) {
       const thingListIds = thingList.map((v) => v.Id);
-      const newThings = selectedRows.filter(
-        (v: { id: string }) => !thingListIds.includes(v.id),
+      const selectedRowsIds = selectedRows.map((v: { Id: string }) => v.Id);
+      let restData = thingList.filter((v) => selectedRowsIds.includes(v.Id));
+      let newThings = selectedRows.filter(
+        (row: { Id: string }) => !thingListIds.includes(row.Id),
       );
-      setThingList([...newThings, ...thingList]);
+      setThingList([...newThings, ...restData]);
+    } else {
+      /* 仅保留新增实体 */
+      setThingList(thingList.filter((v) => v.isCreate));
     }
   }, [selectedRows]);
 
@@ -104,13 +109,14 @@ const ThingTable = <
     switch (type) {
       case OperateType.Add:
         {
+          /* 增加字段isCreate 判断是否新建实体；用于处理实体选择取消所有选中时，数据判断剩余数据 */
           if (Object.keys(changeData).length == 0) {
             break;
           }
           let res = await kernel.anystore.createThing(orgCtrl.user.id, 1);
           const { success, data = [] }: any = res;
           if (success && data.length > 0) {
-            const _Data = { ...data[0], EDIT_INFO: changeData };
+            const _Data = { ...data[0], isCreate: true, EDIT_INFO: changeData };
             setThingList([_Data, ...thingList]);
           }
         }
@@ -188,8 +194,10 @@ const ThingTable = <
         toolBarRender={HandleToolBarRender}
         {...rest}
       />
+
       {/* 弹窗区域 */}
       <>
+        {/* 弹窗操作，新增-编辑-批量编辑 */}
         {current && (
           <Modal
             open={[OperateType.Add, OperateType.Edit, OperateType.EditMore].includes(
@@ -213,15 +221,11 @@ const ThingTable = <
             />
           </Modal>
         )}
+        {/* 实体选择区域 */}
         {current && (
           <Modal
             open={operateModel === OperateType.Select}
-            onOk={() => {
-              setOperateModel('' as OperateType.Add);
-            }}
-            onCancel={() => {
-              setOperateModel('' as OperateType.Add);
-            }}
+            footer={false}
             bodyStyle={{ minHeight: '400px' }}
             destroyOnClose={true}
             cancelText={'关闭'}
@@ -232,7 +236,14 @@ const ThingTable = <
               propertyIdToAttrIdMap={keyMap}
               onRowSelectChange={(rows) => setSelectedRows(rows)}
               belongId={belongId}
+              selectedRowKeys={thingList.map((v) => v.Id)}
               form={form}
+              onOk={() => {
+                setOperateModel('' as OperateType.Add);
+              }}
+              onCancel={() => {
+                setOperateModel('' as OperateType.Add);
+              }}
             />
           </Modal>
         )}

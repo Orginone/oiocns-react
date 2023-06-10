@@ -16,9 +16,9 @@ export interface IWorkProvider {
   /** 加载待办任务 */
   loadTodos(reload?: boolean): Promise<schema.XWorkTask[]>;
   /** 加载已办任务 */
-  loadDones(req: model.IdModel): Promise<schema.XWorkRecordArray>;
+  loadDones(req: model.IdPageModel): Promise<schema.XWorkRecordArray>;
   /** 加载我发起的办事任务 */
-  loadApply(req: model.IdModel): Promise<model.PageResult<schema.XWorkTask>>;
+  loadApply(req: model.IdPageModel): Promise<model.PageResult<schema.XWorkTask>>;
   /** 任务更新 */
   updateTask(task: schema.XWorkTask): void;
   /** 任务审批 */
@@ -69,7 +69,7 @@ export class WorkProvider implements IWorkProvider {
   }
   async loadTodos(reload?: boolean): Promise<schema.XWorkTask[]> {
     if (!this._todoLoaded || reload) {
-      let res = await kernel.queryApproveTask({ id: '0', page: PageAll });
+      let res = await kernel.queryApproveTask({ id: '0' });
       if (res.success) {
         this._todoLoaded = true;
         this.todos = res.data.result || [];
@@ -78,7 +78,7 @@ export class WorkProvider implements IWorkProvider {
     }
     return this.todos;
   }
-  async loadDones(req: model.IdModel): Promise<schema.XWorkRecordArray> {
+  async loadDones(req: model.IdPageModel): Promise<schema.XWorkRecordArray> {
     const res = await kernel.anystore.pageRequest<schema.XWorkTask>(
       this.user.id,
       hisWorkCollName,
@@ -112,7 +112,7 @@ export class WorkProvider implements IWorkProvider {
         .map((i) => i!),
     };
   }
-  async loadApply(req: model.IdModel): Promise<model.PageResult<schema.XWorkTask>> {
+  async loadApply(req: model.IdPageModel): Promise<model.PageResult<schema.XWorkTask>> {
     const res = await kernel.anystore.pageRequest<schema.XWorkTask>(
       this.user.id,
       hisWorkCollName,
@@ -143,7 +143,6 @@ export class WorkProvider implements IWorkProvider {
         if (status === -1) {
           await kernel.recallWorkInstance({
             id: task.id,
-            page: PageAll,
           });
         } else {
           const res = await kernel.approvalTask({
@@ -208,7 +207,7 @@ export class WorkProvider implements IWorkProvider {
     }
   }
   async deleteInstance(id: string): Promise<boolean> {
-    const res = await kernel.recallWorkInstance({ id, page: PageAll });
+    const res = await kernel.recallWorkInstance({ id });
     return res.success;
   }
   async loadAttributes(id: string, belongId: string): Promise<schema.XAttribute[]> {

@@ -44,7 +44,6 @@ const ProFormPerson = (props: IProps) => {
       name={props.name}
       label={props.label}
       tooltip={props.tooltip}
-      width={200}
       labelAlign={props.labelAlign}
       fieldProps={{
         ...props.rules,

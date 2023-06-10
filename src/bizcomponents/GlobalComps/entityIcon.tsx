@@ -4,6 +4,7 @@ import { Avatar, Image } from 'antd';
 import { TargetType } from '@/ts/core';
 import orgCtrl from '@/ts/controller';
 import { ShareIcon } from '@/ts/base/model';
+import { parseAvatar } from '@/ts/base';
 
 interface teamTypeInfo {
   preview?: boolean;
@@ -22,8 +23,14 @@ const EntityIcon = (info: teamTypeInfo) => {
   const size = info.size ?? 22;
   useEffect(() => {
     if (info.entityId && info.entityId.length > 10) {
-      orgCtrl.user.findShareAsync(info.entityId).then((value) => {
-        setShare(value);
+      orgCtrl.user.findEntityAsync(info.entityId).then((value) => {
+        if (value) {
+          setShare({
+            name: value.name,
+            typeName: value.typeName,
+            avatar: parseAvatar(value.icon),
+          });
+        }
       });
     }
   }, []);

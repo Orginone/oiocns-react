@@ -90,6 +90,11 @@ export type PageModel = {
 export type IdModel = {
   // 唯一ID
   id: string;
+};
+
+export type IdPageModel = {
+  // 唯一ID
+  id: string;
   // 分页
   page: PageModel;
 };
@@ -412,6 +417,8 @@ export type FormModel = {
   name: string;
   // 编号
   code: string;
+  // 图标
+  icon: string;
   // 规则
   rule: string;
   // 类型

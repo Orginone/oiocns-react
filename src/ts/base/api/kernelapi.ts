@@ -159,15 +159,29 @@ export default class KernelApi {
   }
   /**
    * 查询日志记录
-   * @param {model.IdModel} params 请求参数
+   * @param {model.IdPageModel} params 请求参数
    * @returns {model.ResultType<schema.XLogArray>} 请求结果
    */
   public async queryLogs(
-    params: model.IdModel,
+    params: model.IdPageModel,
   ): Promise<model.ResultType<schema.XLogArray>> {
     return await this.request({
       module: 'core',
       action: 'QueryLogs',
+      params: params,
+    });
+  }
+  /**
+   * 根据ID查询实体信息
+   * @param {model.IdModel} params 请求参数
+   * @returns {model.ResultType<schema.XEntity>} 请求结果
+   */
+  public async queryEntityById(
+    params: model.IdModel,
+  ): Promise<model.ResultType<schema.XEntity>> {
+    return await this.request({
+      module: 'core',
+      action: 'QueryEntityById',
       params: params,
     });
   }
@@ -390,20 +404,6 @@ export default class KernelApi {
     });
   }
   /**
-   * 根据ID查询关系
-   * @param {model.IdModel} params 请求参数
-   * @returns {model.ResultType<schema.XRelation>} 请求结果
-   */
-  public async queryRelationById(
-    params: model.IdModel,
-  ): Promise<model.ResultType<schema.XRelation>> {
-    return await this.request({
-      module: 'target',
-      action: 'QueryRelationById',
-      params: params,
-    });
-  }
-  /**
    * 模糊查找用户
    * @param {model.SearchModel} params 请求参数
    * @returns {model.ResultType<schema.XTargetArray>} 请求结果
@@ -447,11 +447,11 @@ export default class KernelApi {
   }
   /**
    * 查询组织权限树
-   * @param {model.IdModel} params 请求参数
+   * @param {model.IdPageModel} params 请求参数
    * @returns {model.ResultType<schema.XAuthority>} 请求结果
    */
   public async queryAuthorityTree(
-    params: model.IdModel,
+    params: model.IdPageModel,
   ): Promise<model.ResultType<schema.XAuthority>> {
     return await this.request({
       module: 'target',
@@ -475,11 +475,11 @@ export default class KernelApi {
   }
   /**
    * 查询组织身份
-   * @param {model.IdModel} params 请求参数
+   * @param {model.IdPageModel} params 请求参数
    * @returns {model.ResultType<schema.XIdentityArray>} 请求结果
    */
   public async queryTargetIdentitys(
-    params: model.IdModel,
+    params: model.IdPageModel,
   ): Promise<model.ResultType<schema.XIdentityArray>> {
     return await this.request({
       module: 'target',
@@ -489,11 +489,11 @@ export default class KernelApi {
   }
   /**
    * 查询赋予身份的用户
-   * @param {model.IdModel} params 请求参数
+   * @param {model.IdPageModel} params 请求参数
    * @returns {model.ResultType<schema.XTargetArray>} 请求结果
    */
   public async queryIdentityTargets(
-    params: model.IdModel,
+    params: model.IdPageModel,
   ): Promise<model.ResultType<schema.XTargetArray>> {
     return await this.request({
       module: 'target',
@@ -503,11 +503,11 @@ export default class KernelApi {
   }
   /**
    * 查询在当前空间拥有权限的组织
-   * @param {model.IdModel} params 请求参数
+   * @param {model.IdPageModel} params 请求参数
    * @returns {model.ResultType<schema.XTargetArray>} 请求结果
    */
   public async queryTargetsByAuthority(
-    params: model.IdModel,
+    params: model.IdPageModel,
   ): Promise<model.ResultType<schema.XTargetArray>> {
     return await this.request({
       module: 'target',
@@ -528,11 +528,11 @@ export default class KernelApi {
   }
   /**
    * 查询组织身份集
-   * @param {model.IdModel} params 请求参数
+   * @param {model.IdPageModel} params 请求参数
    * @returns {model.ResultType<schema.XIdentityArray>} 请求结果
    */
   public async queryTeamIdentitys(
-    params: model.IdModel,
+    params: model.IdPageModel,
   ): Promise<model.ResultType<schema.XIdentityArray>> {
     return await this.request({
       module: 'target',
@@ -906,11 +906,11 @@ export default class KernelApi {
   }
   /**
    * 查询用户属性集
-   * @param {model.IdModel} params 请求参数
+   * @param {model.IdPageModel} params 请求参数
    * @returns {model.ResultType<schema.XPropertyArray>} 请求结果
    */
   public async queryPropertys(
-    params: model.IdModel,
+    params: model.IdPageModel,
   ): Promise<model.ResultType<schema.XPropertyArray>> {
     return await this.request({
       module: 'thing',
@@ -934,11 +934,11 @@ export default class KernelApi {
   }
   /**
    * 查询用户字典集
-   * @param {model.IdModel} params 请求参数
+   * @param {model.IdPageModel} params 请求参数
    * @returns {model.ResultType<schema.XDictArray>} 请求结果
    */
   public async queryDicts(
-    params: model.IdModel,
+    params: model.IdPageModel,
   ): Promise<model.ResultType<schema.XDictArray>> {
     return await this.request({
       module: 'thing',
@@ -948,11 +948,11 @@ export default class KernelApi {
   }
   /**
    * 查询字典项集
-   * @param {model.IdModel} params 请求参数
+   * @param {model.IdPageModel} params 请求参数
    * @returns {model.ResultType<schema.XDictItemArray>} 请求结果
    */
   public async queryDictItems(
-    params: model.IdModel,
+    params: model.IdPageModel,
   ): Promise<model.ResultType<schema.XDictItemArray>> {
     return await this.request({
       module: 'thing',
@@ -1018,11 +1018,11 @@ export default class KernelApi {
   }
   /**
    * 物的属性历史值查询
-   * @param {model.IdModel} params 请求参数
+   * @param {model.IdPageModel} params 请求参数
    * @returns {model.ResultType<schema.XThingPropHistroyArray>} 请求结果
    */
   public async queryPropertyHistroy(
-    params: model.IdModel,
+    params: model.IdPageModel,
   ): Promise<model.ResultType<schema.XThingPropHistroyArray>> {
     return await this.request({
       module: 'thing',
@@ -1060,11 +1060,11 @@ export default class KernelApi {
   }
   /**
    * 查询订单集合
-   * @param {model.IdModel} params 请求参数
+   * @param {model.IdPageModel} params 请求参数
    * @returns {model.ResultType<schema.XOrderArray>} 请求结果
    */
   public async queryOrders(
-    params: model.IdModel,
+    params: model.IdPageModel,
   ): Promise<model.ResultType<schema.XOrderArray>> {
     return await this.request({
       module: 'order',
@@ -1186,11 +1186,11 @@ export default class KernelApi {
   }
   /**
    * 查询审批记录
-   * @param {model.IdModel} params 请求参数
+   * @param {model.IdPageModel} params 请求参数
    * @returns {model.ResultType<schema.XWorkRecordArray>} 请求结果
    */
   public async queryWorkRecord(
-    params: model.IdModel,
+    params: model.IdPageModel,
   ): Promise<model.ResultType<schema.XWorkRecordArray>> {
     return await this.request({
       module: 'work',
@@ -1232,7 +1232,7 @@ export default class KernelApi {
    * @returns {model.ResultType<model.PageResult<schema.XWorkTask>>} 请求结果
    */
   public async queryMyApply(
-    params: model.IdModel,
+    params: model.IdPageModel,
   ): Promise<model.ResultType<model.PageResult<schema.XWorkTask>>> {
     return await this.request({
       module: 'work',

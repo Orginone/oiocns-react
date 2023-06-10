@@ -75,7 +75,7 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
 
   const loadActions = () => {
     const actions: string[] = [];
-    if (current.metadata.allowAdd) {
+    if (current.metadata.allowAdd !== false) {
       actions.push(OperateType.Add);
     }
     if (current.metadata.allowEdit) {
@@ -112,10 +112,13 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
                 }),
             );
           });
+
         if (submitData.formData[activeTab]?.resourceData) {
           setDefaultData(
             JSON.parse(submitData.formData[activeTab]?.resourceData)?.data ?? [],
           );
+        } else {
+          setDefaultData([]);
         }
       }
     }
@@ -177,6 +180,7 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
                 };
               })}></Tabs>
           }
+          // key={activeTab}
           toolBtnItems={loadActions()}
           dataSource={defaultData}
           current={current}

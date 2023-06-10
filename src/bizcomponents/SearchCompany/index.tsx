@@ -75,14 +75,7 @@ const CompanySearchList: React.FC<CompanySearchTableProps> = (props) => {
                 bordered
                 style={{ width: '100%' }}
                 className={`${styles.card}`}
-                avatar={
-                  <TeamIcon
-                    typeName={target.typeName}
-                    entityId={target.id}
-                    size={60}
-                    preview={true}
-                  />
-                }
+                avatar={<TeamIcon entityId={target.id} size={60} preview={true} />}
                 title={
                   <Space>
                     {target.name}
