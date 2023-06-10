@@ -38,7 +38,7 @@ const TaskContent = (props: IProps) => {
           taskList.total = res.total;
           for (const item of res.result || []) {
             if (item.task) {
-              item.task.records = [item];
+              delete item.task.records;
               taskList.result!.push(item.task);
             }
           }

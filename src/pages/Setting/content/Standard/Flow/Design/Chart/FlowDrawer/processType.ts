@@ -26,7 +26,7 @@ export const AddNodeTypeAndNameMaps: Record<AddNodeType, string> = {
   [AddNodeType.CONDITION]: '条件节点',
   [AddNodeType.CONCURRENTS]: '同时审核节点',
   [AddNodeType.ORGANIZATIONA]: '组织节点',
-  [AddNodeType.CHILDWORK]: '外部办事',
+  [AddNodeType.CHILDWORK]: '其他办事',
 };
 
 export type conditionDataType = {

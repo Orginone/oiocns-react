@@ -45,7 +45,7 @@ const WorkFlowNode: React.FC<WorkFlowNodeProps> = (props: WorkFlowNodeProps) => 
       content={content}
       config={props?.config}
       errorInfo="错误信息"
-      placeholder="请选择外部办事"
+      placeholder="请选择其他办事"
       headerBgc="#ffffff"
       headerIcon="el-icon-s-check"
     />

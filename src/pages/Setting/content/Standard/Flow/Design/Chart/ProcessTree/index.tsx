@@ -481,8 +481,9 @@ const ProcessTree: React.FC<IProps> = ({
         conditions: [
           {
             pos: 1,
-            paramKey: 'belongId',
+            paramKey: '0',
             paramLabel: '组织',
+            dispaly: '其他',
             key: 'EQ',
             label: '=',
             type: dataType.BELONG,
@@ -495,7 +496,7 @@ const ProcessTree: React.FC<IProps> = ({
     ];
   };
   const insertWorkFlowNode = (parentNode: any) => {
-    parentNode.children.name = '外部办事';
+    parentNode.children.name = '其他办事';
     parentNode.children.props = deepCopy(APPROVAL_PROPS);
   };
   const insertConcurrentsNode = (parentNode: any) => {

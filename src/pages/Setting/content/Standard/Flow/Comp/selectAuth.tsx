@@ -37,7 +37,7 @@ const SelectAuth: React.FC<IProps> = (props: IProps) => {
     <TreeSelect
       showSearch
       style={{ width: '100%' }}
-      value={props.value}
+      value={props.value || '0'}
       dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
       placeholder="请选择角色"
       treeDefaultExpandAll
