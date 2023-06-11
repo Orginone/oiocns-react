@@ -54,8 +54,8 @@ export class DictReadConfig extends ReadConfigImpl<
   async checkData?(data: DictModel[]): Promise<void> {
     for (let index = 0; index < data.length; index++) {
       let item = data[index];
-      if (!item.speciesId || !item.name || !item.code || !item.remark) {
-        this.pushError(index, '存在未填写的类型、属性名称、属性类型以及属性定义！');
+      if (!item.speciesId || !item.name || !item.code) {
+        this.pushError(index, '存在未填写的类型、字典名称、字典代码！');
       }
     }
   }
@@ -111,10 +111,11 @@ export class DictReadConfig extends ReadConfigImpl<
             if (item.dictId && context.dictIndex[item.dictId]) {
               item.dictId = context.dictIndex[item.dictId].id;
             } else {
-              readConfig.pushError(index, '未找到字典' + item.dictId);
+              readConfig.pushError(index, '未找到字典：' + item.dictId);
             }
           }
           if (readConfig.errors.length > 0) {
+            this.excelConfig.onReadError(readConfig.errors);
             throw new Error();
           }
         }

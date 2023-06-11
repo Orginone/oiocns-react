@@ -68,15 +68,18 @@ export class SpeciesReadConfig extends ReadConfigImpl<
   async operatingItem(index: number, row: SpeciesModel): Promise<void> {
     let species = this.sheetConfig.species;
     let child = species.children.find((child) => child.metadata.code == row.code);
-    let success: boolean = false;
     if (child) {
-      success = await child.update({
+      let success = await child.update({
         ...child.metadata,
         name: row.name,
         code: row.code,
         typeName: row.typeName,
         remark: row.remark,
       });
+      if (!success) {
+        this.pushError(index, '生成失败，请根据提示修改错误！');
+        return;
+      }
     } else {
       child = await species.create({
         ...row,
@@ -84,12 +87,12 @@ export class SpeciesReadConfig extends ReadConfigImpl<
         shareId: species.metadata.shareId,
         authId: species.metadata.authId,
       });
+      if (!child) {
+        this.pushError(index, '生成失败，请根据提示修改错误！');
+        return;
+      }
+      this.excelConfig.context.speciesIndex[child.id] = child;
     }
-    if (!success || !child) {
-      this.pushError(index, '生成失败，请根据提示修改错误！');
-      return;
-    }
-    this.excelConfig.context.speciesIndex[child.id] = child;
   }
 
   /**

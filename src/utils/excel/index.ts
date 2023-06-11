@@ -80,6 +80,7 @@ const readXlsx = <T>(
           readConfig.errors = [];
           await readConfig.checkData?.apply(readConfig, [data]);
           if (readConfig.errors.length > 0) {
+            excelConfig.onReadError(readConfig.errors);
             throw new Error();
           }
 
@@ -92,6 +93,7 @@ const readXlsx = <T>(
             excelConfig.addProgress(itemPro);
           }
           if (readConfig.errors.length > 0) {
+            excelConfig.onReadError(readConfig.errors);
             throw new Error();
           }
 
@@ -104,6 +106,9 @@ const readXlsx = <T>(
     try {
       let workbook = XLSX.read(e.target?.result, { type: 'binary' });
       let keys = Object.keys(workbook.Sheets);
+
+      // 初始化
+      excelConfig.initialize();
 
       // 收集数据并处理
       for (let index = 0; index < keys.length; index++)

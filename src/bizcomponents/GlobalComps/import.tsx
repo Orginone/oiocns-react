@@ -77,8 +77,8 @@ const ImportModal = (props: IProps) => {
           this.progress += partProgress;
           setProgress(Number(this.progress.toFixed(2)));
         },
-        onReadError: function (errorMessage: ErrorMessage[]): void {
-          setErrors(errorMessage);
+        onReadError: function (errorMessages: ErrorMessage[]): void {
+          setErrors(errorMessages);
         },
         onError: function (error: string): void {
           message.error(error);

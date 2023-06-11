@@ -118,7 +118,6 @@ export abstract class ReadConfigImpl<
       row: this.sheetConfig.headerRows + 1 + index,
       message: error,
     });
-    this.excelConfig.onReadError(this.errors);
   }
 
   initContext?(): Promise<void>;
