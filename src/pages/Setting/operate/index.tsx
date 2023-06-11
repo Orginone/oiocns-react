@@ -13,7 +13,7 @@ import { XTarget } from '@/ts/base/schema';
 import { IFlowClass, IWorkDefine, TargetType } from '@/ts/core';
 import PropertyModal from '@/bizcomponents/GlobalComps/createProperty';
 import ImportModal from '@/bizcomponents/GlobalComps/import';
-import { getReadConfigs } from '@/utils/excel/config';
+import { getReadConfigs } from '@/utils/excel/configs/index';
 import WorkDefineModal from '@/bizcomponents/GlobalComps/createFlow';
 
 interface IProps {
@@ -57,7 +57,7 @@ const OperateIndex = ({ selectMenu, operateKey, confrim }: IProps) => {
             handleCancel={confrim}
             handleOk={confrim}
             species={selectMenu.item}
-            sheetReadConfigs={getReadConfigs(selectMenu.item)}
+            readConfigs={(excelConfig) => getReadConfigs(selectMenu.item, excelConfig)}
           />
         ) : (
           <SpeciesModal
