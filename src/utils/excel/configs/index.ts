@@ -4,6 +4,8 @@ import { SpeciesSheetConfig, SpeciesReadConfig } from './species';
 import { PropSheetConfig, PropReadConfig } from './property';
 import { DictSheetConfig, DictReadConfig } from './dict';
 import { DictItemSheetConfig, DictItemReadConfig } from './dictitem';
+import { FormSheetConfig, FormReadConfig } from './form';
+import { AttrSheetConfig, AttrReadConfig } from './attribute';
 
 export const getConfigs = (species: ISpeciesItem) => {
   let configs: SheetConfig<any>[] = [new SpeciesSheetConfig(species)];
@@ -13,6 +15,9 @@ export const getConfigs = (species: ISpeciesItem) => {
       break;
     case SpeciesType.Dict:
       configs.push(new DictSheetConfig(species), new DictItemSheetConfig(species));
+      break;
+    case SpeciesType.Thing:
+      configs.push(new FormSheetConfig(species), new AttrSheetConfig(species));
       break;
   }
   return configs;
@@ -40,6 +45,12 @@ export const getReadConfigs = (species: ISpeciesItem, excel: ExcelConfig<any>) =
         break;
       case SheetName.DictItem:
         readConfigs.push(new DictItemReadConfig(config as DictItemSheetConfig, excel));
+        break;
+      case SheetName.Form:
+        readConfigs.push(new FormReadConfig(config as FormSheetConfig, excel));
+        break;
+      case SheetName.Attr:
+        readConfigs.push(new AttrReadConfig(config as AttrSheetConfig, excel));
         break;
     }
   }

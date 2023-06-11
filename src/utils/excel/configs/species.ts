@@ -91,8 +91,8 @@ export class SpeciesReadConfig extends ReadConfigImpl<
         this.pushError(index, '生成失败，请根据提示修改错误！');
         return;
       }
-      this.excelConfig.context.speciesIndex[child.id] = child;
     }
+    this.excelConfig.context.speciesIndex[child.id] = child;
   }
 
   /**

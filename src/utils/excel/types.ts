@@ -1,10 +1,12 @@
-import { XDictItem, XProperty } from '@/ts/base/schema';
-import { ISpeciesItem, IDict } from '@/ts/core';
+import { XAttribute, XDictItem, XProperty } from '@/ts/base/schema';
+import { ISpeciesItem, IDict, IForm } from '@/ts/core';
 
 export enum SheetName {
   Property = '属性定义',
   Dict = '字典定义',
   DictItem = '字典项定义',
+  Form = '表单定义',
+  Attr = '特性定义',
 }
 
 /**
@@ -15,6 +17,9 @@ export interface Context {
   propIndex: { [key: string]: { [key: string]: XProperty } };
   dictIndex: { [key: string]: IDict };
   dictItemIndex: { [key: string]: { [key: string]: XDictItem } };
+  formIndex: { [key: string]: IForm };
+  unfoldPropIndex: { [key: string]: XProperty };
+  attrIndex: { [key: string]: { [key: string]: XAttribute } };
 }
 
 /**

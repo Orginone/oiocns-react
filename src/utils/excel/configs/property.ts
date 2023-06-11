@@ -33,6 +33,7 @@ export class PropSheetConfig extends SheetConfigImpl<PropertyModel> {
       { name: '单位', code: 'unit', type: '描述型' },
       { name: '枚举字典', code: 'dictId', type: '选择型' },
       { name: '属性定义', code: 'remark', type: '描述型' },
+      { name: '附加信息', code: 'info', type: '描述型' }
     ]);
     this.species = spceies;
   }
@@ -110,6 +111,7 @@ export class PropReadConfig extends ReadConfigImpl<
         speciesId: row.speciesId,
         dictId: row.valueType == '选择型' ? row.dictId : undefined!,
         remark: row.remark,
+        info: row.info,
       });
     } else {
       success = !!(await (species as IPropClass).createProperty({
