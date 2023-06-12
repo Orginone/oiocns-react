@@ -2,7 +2,7 @@ import cls from './index.module.less';
 import FlowDrawer from './FlowDrawer';
 import ProcessTree from './ProcessTree';
 import React, { useState } from 'react';
-import { AddNodeType, NodeType } from './FlowDrawer/processType';
+import { AddNodeType, NodeModel } from './processType';
 import { IWorkDefine } from '@/ts/core';
 
 interface IProps {
@@ -14,7 +14,7 @@ interface IProps {
 
 const ChartDesign: React.FC<IProps> = (props) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const [currentNode, setCurrentNode] = useState<NodeType>();
+  const [currentNode, setCurrentNode] = useState<NodeModel>();
 
   return (
     <div className={cls['container']}>

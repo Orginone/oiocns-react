@@ -7,7 +7,7 @@ import RootNode from './components/RootNode';
 import ConcurrentNode from './components/ConcurrentNode';
 import DeptWayNode from './components/DeptWayNode';
 import ConditionNode from './components/ConditionNode';
-import { AddNodeType, FieldCondition, NodeType, dataType } from './processType';
+import { AddNodeType, FieldCondition, NodeModel, dataType } from '../processType';
 import orgCtrl from '@/ts/controller';
 import { getUuid } from '@/utils/tools';
 import { IWorkDefine, SpeciesType } from '@/ts/core';
@@ -20,7 +20,7 @@ import EntityIcon from '@/bizcomponents/GlobalComps/entityIcon';
 
 interface IProps {
   isOpen: boolean;
-  current: NodeType;
+  current: NodeModel;
   onClose: () => void;
   define: IWorkDefine;
   defaultEditable: boolean;

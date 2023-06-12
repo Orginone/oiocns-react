@@ -9,6 +9,7 @@ import {
 import InsertButton from '../InsertButton';
 import React, { useEffect, useState } from 'react';
 import cls from './index.module.less';
+import { AddNodeType } from '../../processType';
 
 type NodeProps = {
   //是否为根节点
@@ -39,31 +40,6 @@ type NodeProps = {
   //默认操作组织id
   config?: any;
   defaultEditable: boolean;
-};
-
-/**
- * 添加的节点枚举
- * */
-export enum AddNodeType {
-  'APPROVAL' = 'APPROVAL',
-  'CC' = 'CC',
-  'CONDITIONS' = 'CONDITIONS',
-  'CONCURRENTS' = 'CONCURRENTS',
-  'EMPTY' = 'EMPTY',
-  'START' = 'START',
-  'ORGANIZATIONAL' = 'ORGANIZATIONAL',
-  'CHILDWORK' = 'CHILDWORK',
-}
-
-export const AddNodeTypeAndNameMaps: Record<AddNodeType, string> = {
-  [AddNodeType.APPROVAL]: '审批节点',
-  [AddNodeType.CC]: '抄送节点',
-  [AddNodeType.CONDITIONS]: '条件节点',
-  [AddNodeType.CONCURRENTS]: '同时审核节点',
-  [AddNodeType.EMPTY]: '空节点',
-  [AddNodeType.START]: '开始节点',
-  [AddNodeType.ORGANIZATIONAL]: '组织网关',
-  [AddNodeType.CHILDWORK]: '子流程',
 };
 
 /**
@@ -126,7 +102,7 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
           style={{ fontSize: '24px', paddingRight: '5px', color: '#ff9e3a' }}
         />
       )}
-      {props.type === AddNodeType.START && (
+      {props.type === AddNodeType.ROOT && (
         <span className={cls['process-content']}>START</span>
       )}
     </div>

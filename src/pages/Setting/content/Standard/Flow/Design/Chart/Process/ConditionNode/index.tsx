@@ -1,15 +1,15 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import InsertButton from '../InsertButton';
 import cls from './index.module.less';
 import { AiOutlineCopy, AiOutlineClose } from 'react-icons/ai';
-import { NodeType } from '../../FlowDrawer/processType';
+import { NodeModel } from '../../processType';
 
 type IProps = {
   onInsertNode: Function;
   onDelNode: Function;
   onCopy: Function;
   onSelected: Function;
-  config: NodeType;
+  config: NodeModel;
   level: any;
   defaultEditable: boolean;
   [key: string]: any;
@@ -29,12 +29,6 @@ const ConditionNode: React.FC<IProps> = (props) => {
   const select = () => {
     props.onSelected();
   };
-  const content = useMemo(() => {
-    if (props.config.conditions.length > 0) {
-      return props.config.conditions.map((a) => a.display).join('且');
-    }
-    return '请设置条件';
-  }, [props.config]);
   const footer = (
     <>
       <div className={cls['btn']}>
@@ -62,7 +56,7 @@ const ConditionNode: React.FC<IProps> = (props) => {
   );
   const nodeContent = (
     <div className={cls['node-body-main-content']} onClick={select}>
-      <span className={cls['name']}>{content}</span>
+      <span className={cls['name']}>{props.config.conditions?.map((a) => a.display).join('且')||'请设置条件'}</span>
     </div>
   );
   return (
@@ -80,7 +74,7 @@ const ConditionNode: React.FC<IProps> = (props) => {
 };
 
 ConditionNode.defaultProps = {
-  config: {} as NodeType,
+  config: {} as NodeModel,
   level: 1,
   size: 0,
 };

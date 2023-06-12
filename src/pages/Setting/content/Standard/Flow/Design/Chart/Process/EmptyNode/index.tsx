@@ -1,5 +1,6 @@
 import React from 'react';
-import Node, { AddNodeType } from '../Node';
+import Node from '../Node';
+import { AddNodeType } from '../../processType';
 
 type EmptyNodeProps = {
   onInsertNode: Function;

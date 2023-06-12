@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
-import Node, { AddNodeType } from '../Node';
+import Node from '../Node';
+import { AddNodeType } from '../../processType';
 
 type RootNodeProps = {
   onInsertNode: Function;
@@ -46,7 +47,7 @@ const RootNode: React.FC<RootNodeProps> = (props: RootNodeProps) => {
       placeholder="全员"
       headerBgc="#576a95"
       headerIcon="el-icon-user-solid"
-      type={AddNodeType.START}
+      type={AddNodeType.ROOT}
     />
   );
 };

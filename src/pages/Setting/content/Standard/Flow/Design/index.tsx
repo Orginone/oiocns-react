@@ -507,16 +507,7 @@ const Design: React.FC<IProps> = ({
         <Layout>
           {Title && (
             <Layout.Header
-              style={{
-                position: 'sticky',
-                top: 0,
-                zIndex: 100,
-                width: '100%',
-                textAlign: 'center',
-                justifyContent: 'center',
-                alignItems: 'center',
-                fontSize: '22px',
-              }}>
+            className={cls['layout-title']}  >
               <Typography.Title level={3} style={{ margin: 0 }}>
                 {Title}
               </Typography.Title>

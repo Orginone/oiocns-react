@@ -16,9 +16,7 @@ import {
   APPROVAL_PROPS,
   CC_PROPS,
   dataType,
-  DELAY_PROPS,
-  TRIGGER_PROPS,
-} from '../FlowDrawer/processType';
+} from '../processType';
 import { WorkNodeModel } from '@/ts/base/model';
 import { getUuid } from '@/utils/tools';
 
@@ -376,12 +374,6 @@ const ProcessTree: React.FC<IProps> = ({
       case 'CC':
         insertCcNode(parentNode);
         break;
-      case 'DELAY':
-        insertDelayNode(parentNode);
-        break;
-      case 'TRIGGER':
-        insertTriggerNode(parentNode);
-        break;
       case 'CONDITIONS':
         insertConditionsNode(parentNode);
         break;
@@ -524,14 +516,6 @@ const ProcessTree: React.FC<IProps> = ({
         children: {},
       },
     ];
-  };
-  const insertDelayNode = (parentNode: any) => {
-    parentNode.children.name = '延时处理';
-    parentNode.children.props = deepCopy(DELAY_PROPS);
-  };
-  const insertTriggerNode = (parentNode: any) => {
-    parentNode.children.name = '触发器';
-    parentNode.children.props = deepCopy(TRIGGER_PROPS);
   };
   const getBranchEndNode: any = (conditionNode: any) => {
     if (!conditionNode.children || !conditionNode.children.nodeId) {

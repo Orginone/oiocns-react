@@ -1,4 +1,5 @@
-import Node, { AddNodeType } from '../Node';
+import { AddNodeType } from '../../processType';
+import Node from '../Node';
 import React, { useMemo } from 'react';
 
 type CcNodeProps = {
