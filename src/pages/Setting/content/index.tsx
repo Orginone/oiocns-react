@@ -39,7 +39,7 @@ const ContentIndex = ({ selectMenu }: IProps) => {
       case MenuType.Form:
         return <WorkForm current={selectMenu.item} />;
       case MenuType.Work:
-        return <Design IsEdit={true} current={selectMenu.item} />;
+        return <Design current={selectMenu.item} />;
       case MenuType.Property:
         return (
           <Attribute

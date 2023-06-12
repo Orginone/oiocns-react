@@ -59,7 +59,6 @@ export type conditiondType = {
 };
 
 export type NodeType = {
-  designId?: string;
   type: AddNodeType;
   parentId: string;
   nodeId: string;

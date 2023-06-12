@@ -17,7 +17,7 @@ import { IWorkDefine } from '@/ts/core';
 
 interface IProps {
   Title?: string;
-  IsEdit: boolean;
+  IsEdit?: boolean;
   current: IWorkDefine;
   instance?: XWorkInstance;
   onBack?: () => void;
