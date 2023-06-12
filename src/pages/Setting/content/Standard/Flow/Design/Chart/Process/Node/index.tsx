@@ -9,7 +9,7 @@ import {
 import InsertButton from '../InsertButton';
 import React, { useEffect, useState } from 'react';
 import cls from './index.module.less';
-import orgCtrl from '@/ts/controller';
+
 type NodeProps = {
   //是否为根节点
   isRoot?: boolean;
@@ -23,8 +23,6 @@ type NodeProps = {
   content?: string;
   title?: string;
   placeholder?: string;
-  //创建组织
-  belongId?: string;
   //节点体左侧图标
   leftIcon?: string;
   //头部图标
@@ -39,7 +37,6 @@ type NodeProps = {
   onSelected: Function;
   type?: AddNodeType;
   //默认操作组织id
-  operateOrgId?: string;
   config?: any;
   defaultEditable: boolean;
 };
@@ -78,9 +75,6 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
   const [key, setKey] = useState<number>(0);
   const isEditable = (): boolean => {
     let editable = props.defaultEditable;
-    if (props.belongId && props.belongId != '' && props.belongId != orgCtrl.user.id) {
-      editable = false;
-    }
     return editable;
   };
   useEffect(() => {
@@ -212,28 +206,19 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
         }
         ${props.config?._passed === 1 ? cls['node-ongoing-state'] : ''}
         ${props.config?._passed === 2 ? cls['node-completed-state'] : ''}`}>
-        <Tooltip
-          title={
-            <span>
-              创建组织:
-              {orgCtrl.provider.user?.findShareById(props.belongId || '0').name}
-            </span>
-          }
-          placement="right">
-          <div className={`${cls['node-body']} ${props.showError ? cls['error'] : ''}`}>
-            <div
-              key={key}
-              className={
-                props.type === AddNodeType.APPROVAL
-                  ? cls['nodeAproStyle']
-                  : cls['nodeNewStyle']
-              }>
-              {nodeHeader}
-              {nodeContent}
-              {nodeError}
-            </div>
+        <div className={`${cls['node-body']} ${props.showError ? cls['error'] : ''}`}>
+          <div
+            key={key}
+            className={
+              props.type === AddNodeType.APPROVAL
+                ? cls['nodeAproStyle']
+                : cls['nodeNewStyle']
+            }>
+            {nodeHeader}
+            {nodeContent}
+            {nodeError}
           </div>
-        </Tooltip>
+        </div>
         {footer}
       </div>
     );

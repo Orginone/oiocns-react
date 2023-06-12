@@ -1,50 +1,59 @@
-import { IWorkDefine } from '@/ts/core';
+import { IWorkDefine, SpeciesType } from '@/ts/core';
 import { Button, Card, Input, Tabs, message } from 'antd';
 import orgCtrl from '@/ts/controller';
 import React, { useEffect, useState } from 'react';
 import cls from './index.module.less';
-import OioForm from '@/bizcomponents/FormDesign/OioForm';
+import OioForm from '@/bizcomponents/FormDesign/OioFormNext';
 import { GroupMenuType } from '../../config/menuType';
 import { XForm, XProperty } from '@/ts/base/schema';
-import ThingTable from './ThingTable';
+// import BaseThing from './BaseThing';
+import ThingTable from './ThingTables/ThingTable';
+import { OperateType, defaultCol } from './ThingTables/const';
 // 卡片渲染
 interface IProps {
   current: IWorkDefine;
 }
 /* 发起办事数据 */
 interface SubmitDataType {
-  headerData: Map<string, any>;
-  formData: Map<
-    string,
-    {
+  headerData: {
+    [key: string]: any;
+  };
+  formData: {
+    [key: string]: {
       isHeader: boolean;
       resourceData: string;
-      changeData: Map<string, any>;
-    }
-  >;
+      changeData: {
+        [key: string]: any;
+      };
+    };
+  };
 }
-const submitData: SubmitDataType = {
-  headerData: new Map(),
-  formData: new Map(),
-};
+
+// const dataMap = new Map();
 /**
  * 办事-业务流程--发起
  * @returns
  */
 const WorkStartDo: React.FC<IProps> = ({ current }) => {
   const [data, setData] = useState<any>({});
-  const [rows, setRows] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState<string>();
   const [propertys, setPropertys] = useState<XProperty[]>([]);
   const [thingForms, setThingForms] = useState<XForm[]>([]);
   const [workForm, setWorkForm] = useState<XForm>();
   const [content, setContent] = useState<string>('');
-
+  const [defaultData, setDefaultData] = useState<any[]>([]);
+  const [submitData, setSubmitData] = useState<SubmitDataType>({
+    headerData: data,
+    formData: {},
+  });
   const submit = async () => {
-    for (const key in data) {
-      if (Object.prototype.hasOwnProperty.call(data, key)) {
-        submitData.headerData.set(key, data[key]);
-      }
+    if (workForm) {
+      submitData.headerData = data;
+      submitData.formData[workForm.id] = {
+        isHeader: true,
+        resourceData: JSON.stringify(workForm),
+        changeData: {},
+      };
     }
 
     if (
@@ -55,7 +64,7 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
         title: current.name,
         defineId: current.id,
         data: JSON.stringify(submitData),
-        thingIds: rows.map((row: any) => row['Id']),
+        applyId: orgCtrl.provider.user!.id,
       })
     ) {
       message.success('发起成功!');
@@ -64,11 +73,25 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
     }
   };
 
+  const loadActions = () => {
+    const actions: string[] = [];
+    if (current.metadata.allowAdd !== false) {
+      actions.push(OperateType.Add);
+    }
+    if (current.metadata.allowEdit) {
+      actions.push(OperateType.EditMore);
+    }
+    if (current.metadata.allowSelect) {
+      actions.push(OperateType.Select);
+    }
+    return actions;
+  };
+
   useEffect(() => {
     current.loadWorkNode().then((value) => {
-      if (value && value.forms && value.forms?.length > 0) {
-        setThingForms(value.forms.filter((i) => i.belongId === i.shareId));
-        setWorkForm(value.forms.find((i) => i.belongId == i.shareId));
+      if (value && value.forms && value.forms.length > 0) {
+        setThingForms(value.forms.filter((i) => i.typeName === SpeciesType.Thing));
+        setWorkForm(value.forms.find((i) => i.typeName === SpeciesType.Work));
       }
     });
   }, []);
@@ -81,14 +104,6 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
         orgCtrl.work
           .loadAttributes(activeTab, current.workItem.belongId)
           .then((attributes) => {
-            // console.log(
-            //   'attributes',
-            //   attributes,
-            //   attributes
-            //     .filter((i) => i.linkPropertys && i.linkPropertys.length > 0)
-            //     .map((i) => i.linkPropertys![0]),
-            // );
-
             setPropertys(
               attributes
                 .filter((i) => i.linkPropertys && i.linkPropertys.length > 0)
@@ -97,51 +112,47 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
                 }),
             );
           });
+
+        if (submitData.formData[activeTab]?.resourceData) {
+          setDefaultData(
+            JSON.parse(submitData.formData[activeTab]?.resourceData)?.data ?? [],
+          );
+        } else {
+          setDefaultData([]);
+        }
       }
     }
   }, [thingForms, activeTab]);
 
   const handleTableChange = (tableID: string, data: any[], Json: string) => {
-    const changeData: Map<string, Map<string, any>> = new Map();
-
+    const changeData: { [key: string]: any } = {};
     data.forEach((item) => {
-      let willsaveData = item;
-      // 判断是否包含 修改数据
-      if (willsaveData?.isNew || willsaveData?.EDIT_INFO) {
-        if (willsaveData?.isNew) {
-          delete willsaveData.isNew;
-        }
-        if (willsaveData?.EDIT_INFO) {
-          willsaveData = willsaveData?.EDIT_INFO;
-        }
-      } else {
-        willsaveData = {};
-      }
-
-      const childMap = new Map();
-      Object.keys(willsaveData).map((chidKey) => {
-        if (['Id', 'Creater', 'Status', 'CreateTime', 'ModifiedTime'].includes(chidKey)) {
-          return;
-        }
-        childMap.set(chidKey, willsaveData[chidKey]);
-      });
-
-      changeData.set(item.Id, childMap);
+      const DMData = item?.EDIT_INFO ?? {}; //待修改数据
+      const childMap: { [key: string]: any } = {};
+      Object.keys(DMData)
+        .filter((s) => !defaultCol.map((v: { id: string }) => v.id).includes(s))
+        .forEach((chidKey) => {
+          childMap[chidKey] = DMData[chidKey];
+        });
+      changeData[item.Id] = childMap;
     });
-    submitData.formData.set(tableID, {
+    submitData.formData[tableID] = {
       isHeader: false,
       resourceData: Json,
       changeData,
-    });
+    };
+    setSubmitData({ ...submitData });
   };
-
+  if (!activeTab) {
+    return <></>;
+  }
   return (
     <div className={cls.content}>
       {workForm && (
         <OioForm
           key={workForm.id}
           form={workForm}
-          define={current}
+          belong={current.workItem.current.space}
           submitter={{
             resetButtonProps: {
               style: { display: 'none' },
@@ -149,73 +160,35 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
             render: (_: any, _dom: any) => <></>,
           }}
           onValuesChange={(_, values) => {
-            console.log(values);
             setData({ ...data, ...values });
           }}
         />
       )}
-      {activeTab && (
-        <Tabs
-          activeKey={activeTab}
-          tabPosition="top"
-          onTabClick={(tabKey) => setActiveTab(tabKey)}
-          items={thingForms.map((i) => {
-            return {
-              label: i.name,
-              key: i.id,
-              children: (
-                <ThingTable
-                  headerTitle={'实体类'}
-                  dataSource={rows}
-                  current={current}
-                  formInfo={i}
-                  labels={[`S${activeTab}`]}
-                  propertys={propertys}
-                  setRows={setRows}
-                  belongId={current.workItem.belongId}
-                  onListChange={handleTableChange}
-                />
-                // <Thing
-                //   keyExpr="Id"
-                //   height={500}
-                //   selectable={false}
-                //   dataSource={rows}
-                //   labels={[`S${activeTab}`]}
-                //   propertys={propertys}
-                //   toolBarItems={[
-                //     <Button
-                //       key="1"
-                //       type="default"
-                //       onClick={() => {
-                //         setForm(i);
-                //         setOperateModel('add');
-                //       }}>
-                //       新增{i.name}
-                //     </Button>,
-                //     <Button
-                //       key="2"
-                //       type="default"
-                //       onClick={() => {
-                //         setForm(i);
-                //         setOperateModel('select');
-                //       }}>
-                //       选择{i.name}
-                //     </Button>,
-                //   ]}
-                //   belongId={current.workItem.belongId}
-                //   menuItems={[
-                //     {
-                //       key: 'edit',
-                //       label: '变更',
-                //       click(data) {
-                //         console.log(data);
-                //       },
-                //     },
-                //   ]}
-                // />
-              ),
-            };
-          })}></Tabs>
+      {thingForms.length > 0 && (
+        <ThingTable
+          headerTitle={
+            <Tabs
+              activeKey={activeTab}
+              tabPosition="bottom"
+              key={activeTab}
+              className={cls.tabBar}
+              onTabClick={(tabKey) => setActiveTab(tabKey)}
+              items={thingForms.map((i) => {
+                return {
+                  label: i.name,
+                  key: i.id,
+                };
+              })}></Tabs>
+          }
+          // key={activeTab}
+          toolBtnItems={loadActions()}
+          dataSource={defaultData}
+          current={current}
+          form={thingForms.find((v) => v.id === activeTab)}
+          propertys={propertys}
+          belongId={current.workItem.belongId}
+          onListChange={handleTableChange}
+        />
       )}
       <Card className={cls['bootom_content']}>
         <div style={{ display: 'flex', width: '100%' }}>

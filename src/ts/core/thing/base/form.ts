@@ -1,4 +1,3 @@
-import { PageAll } from '@/ts/core/public/consts';
 import { SpeciesType } from '@/ts/core/public/enums';
 import { ISpeciesItem } from './species';
 import { kernel, model, schema } from '@/ts/base';
@@ -19,7 +18,7 @@ export interface IForm extends IEntity<schema.XForm> {
   /** 新建表单特性 */
   createAttribute(
     data: model.AttributeModel,
-    property: XProperty,
+    property?: XProperty,
   ): Promise<schema.XAttribute | undefined>;
   /** 更新表单特性 */
   updateAttribute(
@@ -32,10 +31,7 @@ export interface IForm extends IEntity<schema.XForm> {
 
 export class Form extends Entity<schema.XForm> implements IForm {
   constructor(_metadata: schema.XForm, _species: ISpeciesItem) {
-    super({
-      ..._metadata,
-      typeName: '表单',
-    });
+    super(_metadata);
     this.species = _species;
   }
   species: ISpeciesItem;
@@ -55,7 +51,6 @@ export class Form extends Entity<schema.XForm> implements IForm {
   async delete(): Promise<boolean> {
     const res = await kernel.deleteForm({
       id: this.id,
-      page: PageAll,
     });
     if (res.success) {
       if (this.species.typeName === SpeciesType.Thing) {
@@ -80,17 +75,23 @@ export class Form extends Entity<schema.XForm> implements IForm {
   }
   async createAttribute(
     data: model.AttributeModel,
-    property: XProperty,
+    property?: XProperty,
   ): Promise<schema.XAttribute | undefined> {
     data.formId = this.id;
-    data.propId = property.id;
+    if (property) {
+      data.propId = property.id;
+      data.valueType = property.valueType;
+      data.dictId = property.dictId;
+    }
     if (!data.authId || data.authId.length < 5) {
       data.authId = this.species.metadata.authId;
     }
     const res = await kernel.createAttribute(data);
     if (res.success && res.data.id) {
-      res.data.property = property;
-      res.data.linkPropertys = [property];
+      if (property) {
+        res.data.property = property;
+        res.data.linkPropertys = [property];
+      }
       this.attributes.push(res.data);
       return res.data;
     }
@@ -104,6 +105,7 @@ export class Form extends Entity<schema.XForm> implements IForm {
       data.formId = this.id;
       if (property) {
         data.propId = property.id;
+        data.valueType = property.valueType;
       }
       const res = await kernel.updateAttribute(data);
       if (res.success && res.data.id) {
@@ -123,7 +125,6 @@ export class Form extends Entity<schema.XForm> implements IForm {
     if (index > -1) {
       const res = await kernel.deleteAttribute({
         id: data.id,
-        page: PageAll,
       });
       if (res.success) {
         this.attributes.splice(index, 1);

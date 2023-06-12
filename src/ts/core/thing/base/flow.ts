@@ -22,19 +22,28 @@ export interface IWorkDefine extends IEntity<schema.XWorkDefine> {
   ): Promise<schema.XWorkInstance | undefined>;
 }
 
+export const fullDefineRule = (data: XWorkDefine) => {
+  data.typeName = '事项';
+  data.allowAdd = true;
+  data.allowEdit = true;
+  data.allowSelect = true;
+  if (data.rule && data.rule.includes('{') && data.rule.includes('}')) {
+    const rule = JSON.parse(data.rule);
+    data.allowAdd = rule.allowAdd;
+    data.allowEdit = rule.allowEdit;
+    data.allowSelect = rule.allowSelect;
+  }
+  return data;
+};
 export class FlowDefine extends Entity<schema.XWorkDefine> implements IWorkDefine {
   workItem: IFlow;
   constructor(_metadata: XWorkDefine, work: IFlow) {
-    super({
-      ..._metadata,
-      typeName: '事项',
-    });
+    super(fullDefineRule(_metadata));
     this.workItem = work;
   }
   async deleteDefine(): Promise<boolean> {
     const res = await kernel.deleteWorkDefine({
       id: this.id,
-      page: PageAll,
     });
     if (res.success) {
       this.workItem.defines = this.workItem.defines.filter((a) => a.id != this.id);
@@ -48,12 +57,12 @@ export class FlowDefine extends Entity<schema.XWorkDefine> implements IWorkDefin
     const res = await kernel.createWorkDefine(data);
     if (res.success && res.data.id) {
       res.data.typeName = '事项';
-      this.setMetadata(res.data);
+      this.setMetadata(fullDefineRule(res.data));
     }
     return res.success;
   }
   async loadWorkNode(): Promise<model.WorkNodeModel | undefined> {
-    const res = await kernel.queryWorkNodes({ id: this.id, page: PageAll });
+    const res = await kernel.queryWorkNodes({ id: this.id });
     if (res.success) {
       return res.data;
     }

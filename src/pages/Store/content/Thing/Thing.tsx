@@ -1,6 +1,5 @@
 import React from 'react';
 import { Card, Dropdown } from 'antd';
-import orgCtrl from '@/ts/controller';
 import { XProperty } from '@/ts/base/schema';
 import DataGrid, {
   Column,
@@ -19,10 +18,12 @@ import DataGrid, {
   Scrolling,
 } from 'devextreme-react/data-grid';
 import CustomStore from 'devextreme/data/custom_store';
-import { kernel } from '@/ts/base';
+import { kernel, parseAvatar } from '@/ts/base';
 import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
 import { AiOutlineEllipsis } from 'react-icons/ai';
 import { ItemType } from 'antd/lib/menu/hooks/useItems';
+import { formatSize } from '@/ts/base/common';
+import { FileItemShare } from '@/ts/base/model';
 
 type ThingItemType = ItemType & { click: (data: any) => void };
 
@@ -40,18 +41,31 @@ interface IProps {
   byIds?: string[];
   deferred?: boolean;
   setGridInstance?: Function;
+  defaultSelectedRowKeys?: string[];
   onBack?: () => void;
   setThingId?: (thingId: string) => void;
   scrolling?: boolean;
   keyExpr?: string;
   onSelected?: (data: any[]) => void;
+  onCancleSelected?: (data: string[]) => void; //取消选中
+  onSelectedChanged?: (e: {
+    currentDeselectedRowKeys: any[];
+    currentSelectedRowKeys: any[];
+    selectedRowsData: any[];
+    selectedRowKeys: any[];
+  }) => void;
 }
 
 /**
  * 存储-物
  */
 const Thing: React.FC<IProps> = (props: IProps) => {
-  const { menuItems, selectable = true, deferred = false } = props;
+  const {
+    menuItems,
+    selectable = true,
+    deferred = false,
+    defaultSelectedRowKeys = [],
+  } = props;
   const allMenuItems: ThingItemType[] = [...(menuItems || [])];
   const menuClick = (key: string, data: any) => {
     const menu = allMenuItems.find((i) => i.key == key);
@@ -59,7 +73,6 @@ const Thing: React.FC<IProps> = (props: IProps) => {
       menu.click(data);
     }
   };
-
   const getColumns = () => {
     const columns = [];
     columns.push(getColumn('1', '标识', '描述型', 'Id'));
@@ -170,16 +183,27 @@ const Thing: React.FC<IProps> = (props: IProps) => {
             width={150}
             allowFiltering={false}
             cellRender={(data: any) => {
-              var share = orgCtrl.user.findShareById(data.value);
-              if (data) {
-                return (
-                  <>
-                    <TeamIcon share={share} size={15} />
-                    <span style={{ marginLeft: 10 }}>{share.name}</span>
-                  </>
-                );
+              return <TeamIcon entityId={data.value} size={15} showName />;
+            }}
+          />
+        );
+      case '附件型':
+        return (
+          <Column
+            key={id}
+            dataField={dataField}
+            caption={caption}
+            dataType="string"
+            width={150}
+            allowFiltering={false}
+            cellRender={(data: any) => {
+              const shares = parseAvatar(data.value);
+              if (shares) {
+                return shares.map((share: FileItemShare, i: number) => {
+                  return <div key={i}>{`${share.name}(${formatSize(share.size)})`}</div>;
+                });
               }
-              return <span>{share.name}</span>;
+              return '';
             }}
           />
         );
@@ -252,8 +276,10 @@ const Thing: React.FC<IProps> = (props: IProps) => {
             props.onBack();
           }
         }}
+        defaultSelectedRowKeys={defaultSelectedRowKeys}
         onSelectionChanged={(e) => {
-          props.onSelected?.apply(this, [e.selectedRowsData]);
+          props?.onSelected?.apply(this, [e.selectedRowsData]);
+          props?.onSelectedChanged?.apply(this, [e]);
         }}
         columnResizingMode={'widget'}
         height={props.height || 'calc(100vh - 175px)'}

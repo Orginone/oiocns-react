@@ -1,9 +1,9 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components';
 import SchemaForm from '@/components/SchemaForm';
 import { AttributeModel } from '@/ts/base/model';
 import { XAttribute } from '@/ts/base/schema';
-import { IForm } from '@/ts/core';
+import { IDict, IForm, ValueType, valueTypes } from '@/ts/core';
 
 interface Iprops {
   open: boolean;
@@ -17,6 +17,13 @@ interface Iprops {
 */
 const AttributeModal = (props: Iprops) => {
   const formRef = useRef<ProFormInstance>();
+  const [dicts, setDicts] = useState<IDict[]>([]);
+  const [selectType, setSelectType] = useState<string>();
+  useEffect(() => {
+    form.species.current.space.loadDicts().then((value) => {
+      setDicts([...value]);
+    });
+  }, [selectType]);
   const { open, handleOk, current, form, handleCancel } = props;
   const columns: ProFormColumnsType<AttributeModel>[] = [
     {
@@ -34,14 +41,38 @@ const AttributeModal = (props: Iprops) => {
       },
     },
     {
-      title: '选择属性',
-      dataIndex: 'propId',
+      title: '特性类型',
+      dataIndex: 'valueType',
       valueType: 'select',
-      formItemProps: { rules: [{ required: true, message: '属性为必填项' }] },
-      request: async () => {
-        return (await props.form.loadPropertys()).map((item) => {
-          return { label: item.name, value: item.id };
-        });
+      fieldProps: {
+        options: valueTypes.map((i) => {
+          return {
+            value: i,
+            label: i,
+          };
+        }),
+        onSelect: (select: string) => {
+          setSelectType(select);
+        },
+      },
+      formItemProps: {
+        rules: [{ required: true, message: '特性类型为必填项' }],
+      },
+    },
+    {
+      title: '选择枚举字典',
+      dataIndex: 'dictId',
+      valueType: 'select',
+      hideInForm: selectType != ValueType.Select,
+      formItemProps: { rules: [{ required: true, message: '枚举分类为必填项' }] },
+      fieldProps: {
+        showSearch: true,
+        options: dicts.map((i) => {
+          return {
+            value: i.id,
+            label: i.name,
+          };
+        }),
       },
     },
     {
@@ -111,15 +142,9 @@ const AttributeModal = (props: Iprops) => {
       }}
       onFinish={async (values) => {
         if (current) {
-          values = { ...current, ...values };
-          handleOk(await form.updateAttribute(values));
+          handleOk(await form.updateAttribute({ ...current, ...values }));
         } else {
-          const property = (await props.form.loadPropertys()).find(
-            (i) => i.id === values.propId,
-          );
-          if (property) {
-            await form.createAttribute(values, property);
-          }
+          await form.createAttribute(values);
           handleOk(true);
         }
       }}

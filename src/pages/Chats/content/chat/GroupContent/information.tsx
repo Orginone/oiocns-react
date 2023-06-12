@@ -1,26 +1,73 @@
-import EntityIcon from '@/bizcomponents/GlobalComps/entityIcon';
-import { IMessage } from '@/ts/core';
-import css from './index.module.less';
-import { Drawer } from 'antd';
-import React from 'react';
+import { IMessage, IMessageLabel } from '@/ts/core';
+import { Drawer, List, Tabs } from 'antd';
+import React, { useState } from 'react';
+import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
+import { showChatTime } from '@/utils/tools';
+import type { TabsProps } from 'antd';
 
 const Information = ({ msg, onClose }: { msg: IMessage; onClose: Function }) => {
+  const [tabsKey, setTabsKey] = useState<string>();
+  const unreadInfo = msg.unreadInfo;
+  // 展示已读的
+  const readList = () => {
+    return (
+      <List
+        className="demo-loadmore-list"
+        itemLayout="horizontal"
+        dataSource={msg.labels}
+        renderItem={loadLabelItem}
+      />
+    );
+  };
+
+  // 展示未读
+  const unRead = () => {
+    return (
+      <List
+        className="demo-loadmore-list"
+        itemLayout="horizontal"
+        dataSource={msg.unreadInfo}
+        renderItem={loadLabelItem}
+      />
+    );
+  };
+
+  const loadLabelItem = (item: IMessageLabel) => {
+    return (
+      <List.Item
+        style={{ cursor: 'pointer', padding: 6 }}
+        actions={
+          item.time.length > 0
+            ? [<div key={item.time}>{showChatTime(item.time)}</div>]
+            : []
+        }>
+        <List.Item.Meta
+          avatar={<TeamIcon entityId={item.userId} size={42} />}
+          title={<strong>{item.labeler.name}</strong>}
+          description={item.label}
+        />
+      </List.Item>
+    );
+  };
+
+  const items: TabsProps['items'] = [
+    { key: 'read', label: `已读(${msg.readedIds.length})`, children: readList() },
+    {
+      key: 'unRead',
+      label: `未读(${unreadInfo.length})`,
+      children: unRead(),
+    },
+  ];
+
   return (
-    <Drawer title={'消息标记信息'} onClose={() => onClose()} closable open>
-      <ul className={css.moreInfo}>
-        {msg.labels.map((i) => {
-          return (
-            <li key={i.time}>
-              <EntityIcon share={i.labeler} fontSize={22} size={30} />
-              <strong>{i.labeler.name}</strong>
-              <div>
-                <span>{i.time}:</span>
-                <strong>{i.label}</strong>
-              </div>
-            </li>
-          );
-        })}
-      </ul>
+    <Drawer title={'消息接收人列表'} onClose={() => onClose()} closable open>
+      <Tabs
+        centered
+        items={items}
+        defaultActiveKey={'read'}
+        activeKey={tabsKey}
+        onChange={(e) => setTabsKey(e)}
+      />
     </Drawer>
   );
 };

@@ -6,6 +6,7 @@ import orgCtrl from '@/ts/controller';
 import { MenuItemType } from 'typings/globelType';
 import { IMsgChat } from '@/ts/core';
 import OrgIcons from '@/bizcomponents/GlobalComps/orgIcons';
+import { orgAuth } from '@/ts/core/public/consts';
 
 /** 创建会话菜单 */
 const createChatMenu = (chat: IMsgChat, children: MenuItemType[]) => {
@@ -16,7 +17,9 @@ const createChatMenu = (chat: IMsgChat, children: MenuItemType[]) => {
     tag: chat.chatdata.labels,
     itemType: MenuType.Chat,
     menus: loadChatMoreMenus(false, true),
-    icon: <TeamIcon notAvatar={true} share={chat.share} size={18} fontSize={16} />,
+    icon: (
+      <TeamIcon notAvatar={true} typeName={chat.typeName} entityId={chat.id} size={18} />
+    ),
     children: children,
   };
 };
@@ -33,7 +36,18 @@ const loadBookMenu = () => {
       label: company.name,
       item: company.chats.filter((i) => i.isMyChat),
       itemType: MenuType.Books,
-      icon: <TeamIcon share={company.share} size={18} fontSize={16} />,
+      icon: <TeamIcon entityId={company.id} size={18} />,
+      company,
+      menus: company.hasAuthoritys([orgAuth.SuperAuthId])
+        ? [
+            {
+              key: '查看会话',
+              label: `查看${company.metadata.typeName}所有消息`,
+              icon: <im.ImFilter />,
+              model: 'outside',
+            },
+          ]
+        : [],
       children: [
         createChatMenu(
           company,
@@ -60,7 +74,7 @@ const loadBookMenu = () => {
           .filter((i) => i.isMyChat)
           .map((item) => createChatMenu(item, [])),
       ],
-      icon: <TeamIcon share={orgCtrl.user.share} size={18} fontSize={16} />,
+      icon: <TeamIcon entityId={orgCtrl.user.id} size={18} />,
     },
     ...companyItems,
   ];

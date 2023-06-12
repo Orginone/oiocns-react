@@ -16,6 +16,7 @@ interface Iprops {
 
 const ConditionNode: React.FC<Iprops> = (props) => {
   const [key, setKey] = useState(0);
+
   /**点击添加的时候默认增加一行 */
   const addConditionGroup = () => {
     props.current?.conditions?.push({
@@ -26,6 +27,7 @@ const ConditionNode: React.FC<Iprops> = (props) => {
       label: '',
       type: dataType.NUMERIC,
       val: undefined,
+      display: '',
     });
     setKey(key + 1);
   };

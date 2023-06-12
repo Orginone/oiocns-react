@@ -24,6 +24,7 @@ import ProFormPerson from './widgets/ProFormPerson';
 import ProFormIdentity from './widgets/ProFormIdentity';
 import { XAttribute } from '@/ts/base/schema';
 import { IBelong } from '@/ts/core';
+import { loadWidgetsOpts } from '../rule';
 
 interface IProps {
   disabled?: boolean;
@@ -54,6 +55,9 @@ const OioFormItem = ({ item, belong, disabled, noRule }: IProps) => {
   if (noRule) {
     rules = [];
   }
+  if (!rule.widget) {
+    rule.widget = loadWidgetsOpts(item.valueType)[0].value;
+  }
   switch (rule.widget) {
     case 'input':
     case 'string':
@@ -66,7 +70,8 @@ const OioFormItem = ({ item, belong, disabled, noRule }: IProps) => {
           required={rule.required}
           fieldProps={rule}
           rules={rules}
-          tooltip={rule.description}
+          width={200}
+          tooltip={item.remark}
           labelAlign="right"
         />
       );
@@ -79,7 +84,8 @@ const OioFormItem = ({ item, belong, disabled, noRule }: IProps) => {
           label={item.name}
           fieldProps={rule}
           rules={rules}
-          tooltip={rule.description}
+          width={200}
+          tooltip={item.remark}
           labelAlign="right"
         />
       );
@@ -91,7 +97,8 @@ const OioFormItem = ({ item, belong, disabled, noRule }: IProps) => {
           label={item.name}
           fieldProps={rule}
           rules={rules}
-          tooltip={rule.description}
+          width={200}
+          tooltip={item.remark}
           labelAlign="right"
         />
       );
@@ -102,7 +109,8 @@ const OioFormItem = ({ item, belong, disabled, noRule }: IProps) => {
           name={item.id}
           label={item.name}
           rules={rules}
-          tooltip={rule.description}
+          width={200}
+          tooltip={item.remark}
           labelAlign="right"
         />
       );
@@ -115,7 +123,8 @@ const OioFormItem = ({ item, belong, disabled, noRule }: IProps) => {
           label={item.name}
           fieldProps={rule}
           rules={rules}
-          tooltip={rule.description}
+          width={200}
+          tooltip={item.remark}
           labelAlign="right"
         />
       );
@@ -126,7 +135,8 @@ const OioFormItem = ({ item, belong, disabled, noRule }: IProps) => {
           name={item.id}
           label={item.name}
           rules={rules}
-          tooltip={rule.description}
+          width={200}
+          tooltip={item.remark}
           labelAlign="right"
         />
       );
@@ -137,7 +147,8 @@ const OioFormItem = ({ item, belong, disabled, noRule }: IProps) => {
           name={item.id}
           label={item.name}
           rules={rules}
-          tooltip={rule.description}
+          width={200}
+          tooltip={item.remark}
           labelAlign="right"
         />
       );
@@ -148,7 +159,8 @@ const OioFormItem = ({ item, belong, disabled, noRule }: IProps) => {
           name={item.id}
           label={item.name}
           rules={rules}
-          tooltip={rule.description}
+          width={200}
+          tooltip={item.remark}
           labelAlign="right"
         />
       );
@@ -159,7 +171,8 @@ const OioFormItem = ({ item, belong, disabled, noRule }: IProps) => {
           name={item.id}
           label={item.name}
           rules={rules}
-          tooltip={rule.description}
+          width={200}
+          tooltip={item.remark}
           labelAlign="right"
         />
       );
@@ -170,7 +183,8 @@ const OioFormItem = ({ item, belong, disabled, noRule }: IProps) => {
           name={item.id}
           label={item.name}
           rules={rules}
-          tooltip={rule.description}
+          width={200}
+          tooltip={item.remark}
           labelAlign="right"
         />
       );
@@ -181,7 +195,8 @@ const OioFormItem = ({ item, belong, disabled, noRule }: IProps) => {
           name={item.id}
           label={item.name}
           rules={rules}
-          tooltip={rule.description}
+          width={200}
+          tooltip={item.remark}
           labelAlign="right"
         />
       );
@@ -192,18 +207,19 @@ const OioFormItem = ({ item, belong, disabled, noRule }: IProps) => {
           name={item.id}
           label={item.name}
           rules={rules}
-          tooltip={rule.description}
+          width={200}
+          tooltip={item.remark}
           labelAlign="right"
         />
       );
     case 'dict':
       return (
         <ProFormDict
-          dictId={rule.dictId}
+          dictId={item.dictId}
           name={item.id}
           label={item.name}
           rules={rules}
-          tooltip={rule.description}
+          tooltip={item.remark}
           labelAlign="right"
           props={rule}
         />
@@ -216,7 +232,7 @@ const OioFormItem = ({ item, belong, disabled, noRule }: IProps) => {
           name={item.id}
           label={item.name}
           rules={rules}
-          tooltip={rule.description}
+          tooltip={item.remark}
           labelAlign="right"
         />
       );
@@ -227,7 +243,7 @@ const OioFormItem = ({ item, belong, disabled, noRule }: IProps) => {
           name={item.id}
           label={item.name}
           rules={rules}
-          tooltip={rule.description}
+          tooltip={item.remark}
           labelAlign="right"
         />
       );
@@ -238,7 +254,7 @@ const OioFormItem = ({ item, belong, disabled, noRule }: IProps) => {
           name={item.id}
           label={item.name}
           rules={rules}
-          tooltip={rule.description}
+          tooltip={item.remark}
           labelAlign="right"
         />
       );
@@ -249,7 +265,7 @@ const OioFormItem = ({ item, belong, disabled, noRule }: IProps) => {
           name={item.id}
           label={item.name}
           rules={rules}
-          tooltip={rule.description}
+          tooltip={item.remark}
           labelAlign="right"
         />
       );
@@ -260,7 +276,7 @@ const OioFormItem = ({ item, belong, disabled, noRule }: IProps) => {
           name={item.id}
           label={item.name}
           rules={rules}
-          tooltip={rule.description}
+          tooltip={item.remark}
           labelAlign="right"
         />
       );
@@ -271,7 +287,7 @@ const OioFormItem = ({ item, belong, disabled, noRule }: IProps) => {
           label={item.name}
           fieldProps={rule}
           rules={rules}
-          tooltip={rule.description}
+          tooltip={item.remark}
           labelAlign="right"
         />
       );

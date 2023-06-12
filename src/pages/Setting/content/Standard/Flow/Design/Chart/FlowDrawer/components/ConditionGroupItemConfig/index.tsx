@@ -41,7 +41,9 @@ const ConditionGroupItemConfig: React.FC<IProps> = (props) => {
           currentNode?.conditions.map((item: conditiondType, index: number) => {
             /** 怎么知道paramKey有没有变化 */
             item.val = currentValue.allContent[index].val;
+            item.label = currentValue.allContent[index].label;
             item.paramKey = currentValue.allContent[index].paramKey;
+            item.paramLabel = currentValue.allContent[index].paramLabel;
             /**这里临时存一个数组,用来判断新旧值是否发生变化，然后清空值 */
             // if (paramKeyArr[index] !== currentValue.allContent[index].paramKey) {
             //   currentValue.allContent[index].val = '';
@@ -79,6 +81,7 @@ const ConditionGroupItemConfig: React.FC<IProps> = (props) => {
                 item.valLabel = findConLabel?.label || '';
               }
             }
+            item.display = `${item.paramLabel} ${item.label} ${item.val} `;
           });
           // setCurretEditorValue([...(currentOpNode?.conditions || [])]);
         }}>

@@ -54,6 +54,7 @@ export type conditiondType = {
   type: dataType;
   val: string | undefined;
   valLabel?: string;
+  display: string;
   dict?: any[];
 };
 

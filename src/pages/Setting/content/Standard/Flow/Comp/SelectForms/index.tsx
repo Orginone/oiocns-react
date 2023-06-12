@@ -14,6 +14,7 @@ interface IProps {
 }
 
 const SelectForms: React.FC<IProps> = ({ species, selected, setSelected }) => {
+  const [filter, setFilter] = useState<string>('');
   const [centerTreeData, setCenterTreeData] = useState<any>([]);
   const [centerCheckedKeys, setCenterCheckedKeys] = useState<Key[]>(
     (selected || []).map((i) => i.id),
@@ -85,11 +86,15 @@ const SelectForms: React.FC<IProps> = ({ species, selected, setSelected }) => {
             />
           </div>
         </div>
+
         <div className={cls.center}>
           <Input
             className={cls.centerInput}
             prefix={<AiOutlineSearch />}
             placeholder="搜索"
+            onChange={(e) => {
+              setFilter(e.target.value);
+            }}
           />
           <div className={cls.centerContent}>
             <CustomTree
@@ -97,11 +102,10 @@ const SelectForms: React.FC<IProps> = ({ species, selected, setSelected }) => {
               checkedKeys={centerCheckedKeys}
               autoExpandParent={true}
               onCheck={onCheck}
-              treeData={centerTreeData}
+              treeData={centerTreeData.filter((i: any) => i.title.includes(filter))}
             />
           </div>
         </div>
-
         <div style={{ width: '33%' }} className={cls.right}>
           <ShareShowComp departData={selected} deleteFuc={handelDel}></ShareShowComp>
         </div>

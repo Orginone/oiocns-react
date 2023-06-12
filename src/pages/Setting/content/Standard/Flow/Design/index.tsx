@@ -16,53 +16,59 @@ import { ImUndo2, ImWarning } from 'react-icons/im';
 import { IWorkDefine } from '@/ts/core';
 
 interface IProps {
+  Title?: string;
   IsEdit: boolean;
   current: IWorkDefine;
   instance?: XWorkInstance;
-  onBack: () => void;
+  onBack?: () => void;
 }
 
-const Design: React.FC<IProps> = ({ current, instance, onBack, IsEdit = true }) => {
+const Design: React.FC<IProps> = ({
+  Title,
+  current,
+  instance,
+  onBack,
+  IsEdit = true,
+}) => {
   const [scale, setScale] = useState<number>(100);
   const [showErrorsModal, setShowErrorsModal] = useState<ReactNode[]>([]);
-  const [resource, setResource] = useState<WorkNodeModel>();
+  const [resource, setResource] = useState<any>({
+    nodeId: `node_${getUuid()}`,
+    parentId: '',
+    type: 'ROOT',
+    name: '发起角色',
+    props: {
+      assignedType: 'JOB',
+      mode: 'AND',
+      assignedUser: [
+        {
+          id: '0',
+          name: undefined,
+          type: undefined,
+          orgIds: undefined,
+        },
+      ],
+      refuse: {
+        type: 'TO_END', //驳回规则 TO_END  TO_NODE  TO_BEFORE
+        target: '', //驳回到指定ID的节点
+      },
+      friendDialogmode: false,
+      num: 0,
+    },
+    children: {},
+  });
 
   useEffect(() => {
     const load = async () => {
       let nodes = await current.loadWorkNode();
-      // content字段可能取消
-      let resourceData = nodes?.id
-        ? loadResource(nodes, 'flowNode', '', '', undefined, '')
-        : {
-            nodeId: `node_${getUuid()}`,
-            parentId: '',
-            type: 'ROOT',
-            name: '发起角色',
-            props: {
-              assignedType: 'JOB',
-              mode: 'AND',
-              assignedUser: [
-                {
-                  id: '0',
-                  name: undefined,
-                  type: undefined,
-                  orgIds: undefined,
-                },
-              ],
-              refuse: {
-                type: 'TO_END', //驳回规则 TO_END  TO_NODE  TO_BEFORE
-                target: '', //驳回到指定ID的节点
-              },
-              friendDialogmode: false,
-              num: 0,
-            },
-            children: {},
-          };
-
-      if (instance) {
-        showTask(instance, resourceData);
-      } else {
-        setResource(resourceData);
+      if (nodes && nodes.code) {
+        // content字段可能取消
+        let resourceData = loadResource(nodes, 'flowNode', '', '', undefined);
+        if (instance) {
+          showTask(instance, resourceData);
+        } else {
+          setResource(resourceData);
+        }
       }
     };
     load();
@@ -108,17 +114,53 @@ const Design: React.FC<IProps> = ({ current, instance, onBack, IsEdit = true }) 
     resource.destId = resource.destId ? resource.destId : '0';
     //每个节点的 belongId  审核和抄送和子流程的destId
     for (let node of allNodes) {
-      if (
-        (node.type == 'APPROVAL' || node.type == 'CC' || node.type == 'CHILDWORK') &&
-        (!node.destId || node.destId == '0' || node.destId == '')
-      ) {
-        errors.push(
-          getErrorItem(
-            <>
-              节点： <span style={{ color: 'blue' }}>{node.name} </span>缺少操作对象
-            </>,
-          ),
-        );
+      switch (node.type) {
+        case 'CC':
+        case 'CHILDWORK':
+        case 'APPROVAL':
+          if (!node.destId || node.destId == '0' || node.destId == '') {
+            errors.push(
+              getErrorItem(
+                <>
+                  节点： <span style={{ color: 'blue' }}>{node.name} </span>缺少操作对象
+                </>,
+              ),
+            );
+          }
+          break;
+        case 'CONDITIONS':
+        case 'CONCURRENTS':
+        case 'ORGANIZATIONAL':
+          if (
+            node.branches == undefined ||
+            node.branches.length == 0 ||
+            node.branches.some((a) => a.children == undefined)
+          ) {
+            errors.push(
+              getErrorItem(
+                <>
+                  节点： <span style={{ color: 'blue' }}>{node.name} </span>缺少分支信息
+                </>,
+              ),
+            );
+          } else if (node.type == 'CONDITIONS') {
+            if (
+              node.branches.some(
+                (a) =>
+                  a.conditions == undefined ||
+                  a.conditions.length == 0 ||
+                  a.conditions.find((a) => a.val == undefined || a.val == ''),
+              )
+            ) {
+              errors.push(
+                getErrorItem(
+                  <span style={{ color: 'blue' }}>
+                    条件节点：{node.name}条件不可为空{' '}
+                  </span>,
+                ),
+              );
+            }
+          }
       }
     }
     return errors;
@@ -130,7 +172,6 @@ const Design: React.FC<IProps> = ({ current, instance, onBack, IsEdit = true }) 
     parentId: string,
     parentType: string,
     emptyChild: any,
-    parentBelongId: string,
   ): any => {
     let obj: any;
     if (resource) {
@@ -178,7 +219,6 @@ const Design: React.FC<IProps> = ({ current, instance, onBack, IsEdit = true }) 
                 resource.code,
                 resource.type,
                 undefined,
-                resource.belongId || '',
               );
             })
           : undefined;
@@ -201,7 +241,6 @@ const Design: React.FC<IProps> = ({ current, instance, onBack, IsEdit = true }) 
                   nodeId,
                   resource.type,
                   undefined,
-                  resource.belongId,
                 )
               : undefined,
         };
@@ -241,7 +280,6 @@ const Design: React.FC<IProps> = ({ current, instance, onBack, IsEdit = true }) 
                 resource.code,
                 resource.type,
                 resource.children,
-                resource.belongId,
               )
             : resource.children && resource.children.name != undefined
             ? loadResource(
@@ -250,7 +288,6 @@ const Design: React.FC<IProps> = ({ current, instance, onBack, IsEdit = true }) 
                 resource.code,
                 resource.type,
                 undefined,
-                resource.belongId,
               )
             : undefined,
         };
@@ -263,7 +300,6 @@ const Design: React.FC<IProps> = ({ current, instance, onBack, IsEdit = true }) 
         nodeId: nodeId,
         parentId: parentId,
         name: resource.name,
-        belongId: parentBelongId,
         type: parentType.substring(0, parentType.length - 1),
         conditions: resource.conditions
           ? resource.conditions.map((item: any, index: number) => {
@@ -273,9 +309,7 @@ const Design: React.FC<IProps> = ({ current, instance, onBack, IsEdit = true }) 
                 type: item.type,
                 val: item.val != undefined ? String(item.val) : undefined,
                 pos: index,
-                paramLabel: 'paramLabel',
-                label: 'label',
-                valLabel: 'valLabel',
+                display: item.display,
               };
             })
           : [],
@@ -287,7 +321,6 @@ const Design: React.FC<IProps> = ({ current, instance, onBack, IsEdit = true }) 
                 nodeId,
                 resource.type,
                 undefined,
-                resource.belongId || '',
               )
             : undefined,
       };
@@ -297,18 +330,10 @@ const Design: React.FC<IProps> = ({ current, instance, onBack, IsEdit = true }) 
       let empty: any = {
         nodeId: nodeId,
         parentId: parentId,
-        belongId: parentBelongId,
         type: 'EMPTY',
         children:
           emptyChild != undefined
-            ? loadResource(
-                resource,
-                'flowNode',
-                nodeId,
-                resource.type,
-                emptyChild,
-                resource.belongId || '',
-              )
+            ? loadResource(resource, 'flowNode', nodeId, resource.type, emptyChild)
             : undefined,
       };
       obj = empty;
@@ -367,6 +392,7 @@ const Design: React.FC<IProps> = ({ current, instance, onBack, IsEdit = true }) 
                 key: item.key,
                 type: item.type,
                 val: item.val != undefined ? String(item.val) : undefined,
+                display: item.display,
               };
             })
           : [],
@@ -403,11 +429,11 @@ const Design: React.FC<IProps> = ({ current, instance, onBack, IsEdit = true }) 
     return resource;
   };
 
-  const showTask = (instance: any, resource: any) => {
+  const showTask = (instance: XWorkInstance, resource: any) => {
     let map = new Map<string, number>();
     let taskmap = new Map<string, any>();
-    if (instance.historyTasks) {
-      for (let task of instance.historyTasks) {
+    if (instance.tasks) {
+      for (let task of instance.tasks) {
         let _passed = 1;
         if (task.status >= 200) {
           _passed = 0;
@@ -424,71 +450,62 @@ const Design: React.FC<IProps> = ({ current, instance, onBack, IsEdit = true }) 
   };
 
   const loadGroupBth = () => {
-    if (IsEdit) {
-      return (
-        <GroupBtn
-          showDivider={false}
-          list={[
-            {
-              size: 'small',
-              icon: <AiOutlineSend />,
-              text: '发布',
-              className: cls['publis-issue'],
-              type: 'primary',
-              onClick: async () => {
-                //数据结构转化
-                let resource_: WorkNodeModel = changeResource(
-                  resource,
-                  'flowNode',
-                ) as WorkNodeModel;
-                let errors = checkValid(resource_);
-                if (errors.length > 0) {
-                  setShowErrorsModal(errors);
-                  return;
-                }
-                if (
-                  await current.updateDefine({
-                    ...current.metadata,
-                    resource: resource_,
-                    speciesId: current.workItem.id,
-                  })
-                ) {
-                  message.success('保存成功');
-                  onBack();
-                }
-              },
+    let buttons: any = [
+      {
+        icon: <AiOutlineSend />,
+        text: '发布',
+        className: cls['publis-issue'],
+        type: 'primary',
+        onClick: async () => {
+          //数据结构转化
+          let resource_ = changeResource(resource, 'flowNode') as WorkNodeModel;
+          let errors = checkValid(resource_);
+          if (errors.length > 0) {
+            setShowErrorsModal(errors);
+            return;
+          }
+          if (
+            await current.updateDefine({
+              ...current.metadata,
+              resource: resource_,
+              speciesId: current.workItem.id,
+            })
+          ) {
+            message.success('保存成功');
+            onBack?.call(this);
+          }
+        },
+      },
+    ];
+    if (onBack) {
+      buttons.push({
+        danger: true,
+        text: '返回',
+        type: 'primary',
+        icon: <AiOutlineClockCircle />,
+        className: cls['publis-issue'],
+        onClick: async () => {
+          Modal.confirm({
+            title: '未发布的内容将不会被保存，是否直接退出?',
+            icon: <ImUndo2 />,
+            okText: '确认',
+            okType: 'danger',
+            cancelText: '取消',
+            onOk() {
+              onBack();
             },
-            {
-              size: 'small',
-              danger: true,
-              text: '返回',
-              type: 'primary',
-              icon: <AiOutlineClockCircle />,
-              className: cls['publis-issue'],
-              onClick: async () => {
-                Modal.confirm({
-                  title: '未发布的内容将不会被保存，是否直接退出?',
-                  icon: <ImUndo2 />,
-                  okText: '确认',
-                  okType: 'danger',
-                  cancelText: '取消',
-                  onOk() {
-                    onBack();
-                  },
-                });
-              },
-            },
-          ]}
-        />
-      );
+          });
+        },
+      });
     }
+    return <GroupBtn showDivider={false} list={buttons} />;
   };
 
   return (
     <div className={cls['company-info-content']}>
       <Card bordered={false}>
         <Layout>
-          {IsEdit && (
+          {Title && (
             <Layout.Header
               style={{
                 position: 'sticky',
@@ -501,7 +518,7 @@ const Design: React.FC<IProps> = ({ current, instance, onBack, IsEdit = true }) 
                 fontSize: '22px',
               }}>
               <Typography.Title level={3} style={{ margin: 0 }}>
-                办事设计
+                {Title}
               </Typography.Title>
             </Layout.Header>
           )}
@@ -524,7 +541,7 @@ const Design: React.FC<IProps> = ({ current, instance, onBack, IsEdit = true }) 
                     onClick={() => setScale(scale + 10)}>
                     <AiOutlinePlus />
                   </Button>
-                  {loadGroupBth()}
+                  {IsEdit && loadGroupBth()}
                 </Space>
               </div>
               {/* 基本信息组件 */}

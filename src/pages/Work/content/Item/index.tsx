@@ -46,7 +46,7 @@ const WorkItem: React.FC<any> = ({ current, filter }: IProps) => {
                 <List.Item.Meta
                   avatar={
                     <Badge size="small">
-                      <TeamIcon share={item.share} size={40} fontSize={40} />
+                      <TeamIcon entityId={item.id} typeName={item.typeName} size={40} />
                     </Badge>
                   }
                   title={

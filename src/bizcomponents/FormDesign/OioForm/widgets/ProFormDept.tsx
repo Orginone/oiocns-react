@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import orgCtrl from '@/ts/controller';
 import { ProFormTreeSelect } from '@ant-design/pro-components';
-import { IBelong } from '@/ts/core';
+import { IBelong, ICompany, IDepartment, TargetType } from '@/ts/core';
 import { Rule } from 'antd/lib/form';
 import { FormLabelAlign } from 'antd/lib/form/interface';
 import { LabelTooltipType } from 'antd/lib/form/FormItemLabel';
@@ -15,27 +14,37 @@ interface IProps {
   tooltip: LabelTooltipType;
 }
 
+interface treeModel {
+  key: string;
+  label: string;
+  value: string;
+  children: treeModel[];
+}
+
 /**
  * 部门组件
  */
 const ProFormDept = (props: IProps) => {
-  const [treeData, setTreeData] = useState<
-    {
-      key: string;
-      label: string;
-      value: string;
-      origin: any;
-    }[]
-  >([]);
+  const [treeData, setTreeData] = useState<treeModel[]>([]);
 
-  // useEffect(() => {
-  //   const initTreeData = async () => {
-  //     const res = await orgCtrl.getTeamTree(props.belong);
-  //     const data = targetsToTreeData(res);
-  //     setTreeData(data);
-  //   };
-  //   initTreeData();
-  // }, []);
+  const buildDepartments = (departments: IDepartment[]) => {
+    const data: treeModel[] = [];
+    for (const item of departments) {
+      data.push({
+        key: item.id,
+        label: item.name,
+        value: item.id,
+        children: buildDepartments(item.children),
+      });
+    }
+    return data;
+  };
+  useEffect(() => {
+    if (props.belong.typeName != TargetType.Person) {
+      const company = props.belong as ICompany;
+      setTreeData(buildDepartments(company.departments));
+    }
+  }, []);
 
   return (
     <ProFormTreeSelect
@@ -47,6 +56,7 @@ const ProFormDept = (props: IProps) => {
         ...props.rules,
         ...{ treeData },
       }}
+      width={150}
       rules={props.rules}
     />
   );

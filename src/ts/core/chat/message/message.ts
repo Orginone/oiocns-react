@@ -45,6 +45,10 @@ export interface IMessage {
   isMySend: boolean;
   /** 是否已读 */
   isReaded: boolean;
+  /** 提及 */
+  mentions: string[];
+  /** 引用 */
+  cite: IMessage | undefined;
   /** 标签信息 */
   labels: IMessageLabel[];
   /** 消息类型 */
@@ -63,6 +67,10 @@ export interface IMessage {
   allowEdit: boolean;
   /** 已读信息 */
   readedinfo: string;
+  /** 已读人员 */
+  readedIds: string[];
+  /** 未读人员信息 */
+  unreadInfo: IMessageLabel[];
   /** 评论数 */
   comments: number;
   /** 消息撤回 */
@@ -78,12 +86,24 @@ export class Message implements IMessage {
     if (_metadata.msgType === 'recall') {
       _metadata.msgType = MessageType.Recall;
     }
-    this._msgBody = common.StringPako.inflate(_metadata.msgBody);
+    const txt = common.StringPako.inflate(_metadata.msgBody);
+    if (txt.startsWith('[obj]')) {
+      const content = JSON.parse(txt.substring(5));
+      this._msgBody = content.body;
+      this.mentions = content.mentions;
+      if (content.cite) {
+        this.cite = new Message(content.cite, _chat);
+      }
+    } else {
+      this._msgBody = txt;
+    }
     this.metadata = _metadata;
     _metadata.tags?.map((tag) => {
       this.labels.push(new MessageLabel(tag, this.user));
     });
   }
+  cite: IMessage | undefined;
+  mentions: string[] = [];
   user: IPerson;
   _chat: IMsgChat;
   _msgBody: string;
@@ -115,19 +135,38 @@ export class Message implements IMessage {
     );
   }
   get readedinfo(): string {
-    const ids = this.labels.map((v) => v.userId);
-    const readedCount = ids.filter((v, i) => ids.indexOf(v) === i).length;
+    const ids = this.readedIds;
     if (this._chat.metadata.typeName === TargetType.Person) {
-      return readedCount === 1 ? '已读' : '未读';
+      return ids.length === 1 ? '已读' : '未读';
     }
     const mCount = this._chat.members.filter((i) => i.id != this.user.id).length || 1;
-    if (readedCount === mCount) {
+    if (ids.length === mCount) {
       return '全部已读';
     }
-    if (readedCount === 0) {
+    if (ids.length === 0) {
       return '全部未读';
     }
-    return mCount - readedCount + '人未读';
+    return mCount - ids.length + '人未读';
+  }
+  get readedIds(): string[] {
+    const ids = this.labels.map((v) => v.userId);
+    return ids.filter((id, i) => ids.indexOf(id) === i);
+  }
+  get unreadInfo(): IMessageLabel[] {
+    const ids = this.readedIds;
+    return this._chat.members
+      .filter((m) => !ids.includes(m.id) && m.id != this.user.id)
+      .map(
+        (m) =>
+          new MessageLabel(
+            {
+              label: m.remark,
+              userId: m.id,
+              time: '',
+            },
+            this.user,
+          ),
+      );
   }
   get comments(): number {
     return this.labels.filter((v) => v.label != '已读').length;
@@ -144,16 +183,15 @@ export class Message implements IMessage {
   }
   get msgTitle(): string {
     let header = ``;
-    if (
-      this._chat.metadata.typeName != TargetType.Person &&
-      this.metadata.fromId != this.user.id
-    ) {
-      header += `${this.from.name}`;
+    if (this._chat.metadata.typeName != TargetType.Person) {
+      header += `${this.from.name}: `;
     }
     switch (this.msgType) {
       case MessageType.Text:
       case MessageType.Recall:
-        return `${header}[消息]:${this.msgBody.substring(0, 50)}`;
+        return `${header}${this.msgBody.substring(0, 50)}`;
+      case MessageType.Voice:
+        return `${header}[${MessageType.Voice}]`;
     }
     const file: model.FileItemShare = parseAvatar(this.msgBody);
     if (file) {

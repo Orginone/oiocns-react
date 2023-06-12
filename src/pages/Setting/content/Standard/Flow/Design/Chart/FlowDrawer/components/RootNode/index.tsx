@@ -21,10 +21,12 @@ interface IProps {
 const RootNode: React.FC<IProps> = (props) => {
   const [viewForm, setViewForm] = useState<XForm>();
   const [workforms, setWorkForms] = useState<XForm[]>(
-    (props.current.props.operations || []).filter((i) => i.belongId != i.shareId),
+    (props.current.props.operations || []).filter((i) => i.typeName === SpeciesType.Work),
   );
   const [thingforms, setThingForms] = useState<XForm[]>(
-    (props.current.props.operations || []).filter((i) => i.belongId == i.shareId),
+    (props.current.props.operations || []).filter(
+      (i) => i.typeName === SpeciesType.Thing,
+    ),
   );
   const [formModel, setFormModel] = useState<string>('');
   const [selectAuthValue, setSelectAuthValue] = useState<any>(
@@ -68,6 +70,9 @@ const RootNode: React.FC<IProps> = (props) => {
               }}
               deleteFuc={(id: string) => {
                 setWorkForms([...workforms.filter((i) => i.id != id)]);
+                props.current.props.operations = props.current.props.operations.filter(
+                  (a) => a.id != id,
+                );
               }}></ShareShowComp>
           </span>
         )}
@@ -91,6 +96,9 @@ const RootNode: React.FC<IProps> = (props) => {
               }}
               deleteFuc={(id: string) => {
                 setThingForms([...thingforms.filter((i) => i.id != id)]);
+                props.current.props.operations = props.current.props.operations.filter(
+                  (a) => a.id != id,
+                );
               }}></ShareShowComp>
           </span>
         )}
@@ -114,7 +122,7 @@ const RootNode: React.FC<IProps> = (props) => {
                       .filter((i) => i.typeName === SpeciesType.Thing)
                       .map((i) => i as IThingClass)
                   : props.define.workItem.app.children
-                      .filter((i) => i.typeName === SpeciesType.Thing)
+                      .filter((i) => i.typeName === SpeciesType.Work)
                       .map((i) => i as IThingClass)
               }
               selected={formModel === 'thingForm' ? thingforms : workforms}

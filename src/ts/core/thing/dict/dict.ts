@@ -48,7 +48,6 @@ export class Dict extends Entity<schema.XDict> implements IDict {
   async delete(): Promise<boolean> {
     const res = await kernel.deleteDict({
       id: this.id,
-      page: PageAll,
     });
     if (res.success) {
       this.species._propertyChanged('deleted', [this]);
@@ -78,7 +77,6 @@ export class Dict extends Entity<schema.XDict> implements IDict {
   async deleteItem(item: schema.XDictItem): Promise<boolean> {
     const res = await kernel.deleteDictItem({
       id: item.id,
-      page: PageAll,
     });
     if (res.success) {
       this.items = this.items.filter((i) => i.id != item.id);
