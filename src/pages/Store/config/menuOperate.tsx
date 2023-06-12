@@ -83,6 +83,11 @@ export const loadFileSysItemMenus = (
       label: '彻底删除',
       icon: <fa.FaTrashAlt color="red" />,
     },
+    {
+      key: '生成NFT',
+      label: '生成NFT',
+      icon: <im.ImRedo color="blue" />,
+    },
   );
   return menus;
 };

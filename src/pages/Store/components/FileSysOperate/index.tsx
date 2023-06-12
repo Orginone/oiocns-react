@@ -5,6 +5,7 @@ import CopyOrMoveModal from './CopyOrMove';
 import FilePreview from './FilePreview';
 import { FileItemShare } from '@/ts/base/model';
 import { IFileSystemItem } from '@/ts/core';
+import { Blockchain } from '@/ts/core/thing/filesys/Blockchain';
 
 interface IProps {
   operateKey?: string;
@@ -78,6 +79,22 @@ const FileSysOperate: React.FC<IProps> = (props: IProps) => {
           setPreview(target.shareInfo());
         }
         return;
+        case '生成NFT':
+          Modal.confirm({
+            content: '请确认生成NFT',
+            onOk: async () => {
+              console.log(target);
+              // MainNFT()
+              // await target.createAccounts(); //成功的
+              new Blockchain().createNFT();
+  
+              // if (true) {
+              //   message.success('生成NFT成功!');
+              //   // orgCtrl.changCallback();
+              // }
+            },
+          });
+          return;
     }
     orgCtrl.changCallback();
   };
