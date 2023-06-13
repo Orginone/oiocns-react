@@ -208,7 +208,10 @@ export class Directory extends Entity<schema.XDirectory> implements IDirectory {
         page: PageAll,
       });
       if (res.success) {
-        this.applications = (res.data.result || []).map((i) => new Application(i, this));
+        const data = res.data.result || [];
+        this.applications = data
+          .filter((i) => !i.parentId || i.parentId.length < 1)
+          .map((i) => new Application(i, this, undefined, data));
       }
     }
     return this.applications;

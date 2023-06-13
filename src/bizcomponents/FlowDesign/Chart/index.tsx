@@ -35,6 +35,10 @@ const ChartDesign: React.FC<IProps> = (props) => {
                   params.type !== AddNodeType.CONCURRENTS &&
                   params.type !== AddNodeType.ORGANIZATIONA
                 ) {
+<<<<<<< HEAD
+=======
+                  //设置当前操作的节点，后续都是对当前节点的操作
+>>>>>>> 1142324d7dfdff4d8b3e29159263411557da16b8
                   setCurrentNode(params);
                   setIsOpen(
                     props.instance == undefined ||
