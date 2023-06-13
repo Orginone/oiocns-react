@@ -12,6 +12,25 @@ export function formatSize(size: number, unit: string = ''): string {
   }
   return size + unit;
 }
+/** 编码路径 */
+export function encodeKey(key: string): string {
+  return btoa(unescape(encodeURIComponent(`${key}`)));
+}
+
+/** 将文件切片 */
+export function sliceFile(file: Blob, chunkSize: number): Blob[] {
+  const slices: Blob[] = [];
+  let index = 0;
+  while (index * chunkSize < file.size) {
+    var start = index * chunkSize;
+    var end = start + chunkSize;
+    if (end > file.size) {
+      end = file.size;
+    }
+    slices.push(file.slice(start, end));
+  }
+  return slices;
+}
 /** 将文件读成url */
 export function blobToDataUrl(file: Blob): Promise<string> {
   return new Promise((resolve) => {

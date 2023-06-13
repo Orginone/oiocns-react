@@ -10,6 +10,7 @@ import { IStation } from './target/innerTeam/station';
 import { ITeam } from './target/base/team';
 const sessionUserName = 'sessionUser';
 
+/** 当前用户提供层 */
 export class UserProvider {
   private _user: IPerson | undefined;
   private _work: IWorkProvider | undefined;
