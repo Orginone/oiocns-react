@@ -1,14 +1,13 @@
-import { AddNodeType } from '../../processType';
+import { AddNodeType, NodeModel } from '../../../processType';
 import Node from '../Node';
-import React, { useMemo } from 'react';
+import React from 'react';
 
 type CcNodeProps = {
   onInsertNode: Function;
   onDelNode: Function;
   onSelected: Function;
-  config: any;
-  defaultEditable: boolean;
-  [key: string]: any;
+  config: NodeModel;
+  isEdit: boolean;
 };
 
 /**
@@ -16,27 +15,13 @@ type CcNodeProps = {
  * @returns
  */
 const CcNode: React.FC<CcNodeProps> = (props: CcNodeProps) => {
-  const content: any = useMemo(() => {
-    if (
-      props.config &&
-      !!props.config.props &&
-      !!props.config.props.assignedUser &&
-      props.config.props.assignedUser.length > 0
-    ) {
-      let texts: any[] = [];
-      props.config.props.assignedUser.forEach((org: any) => texts.push(org.name));
-      return String(texts).replaceAll(',', '、');
-    } else {
-      return null;
-    }
-  }, [props.config]);
   return (
     <Node
-      title={props.config.name}
       showError={false}
-      content={content}
-      config={props?.config}
-      defaultEditable={props.defaultEditable}
+      config={props.config}
+      title={props.config.name}
+      content={props.config.destName}
+      isEdit={props.isEdit}
       errorInfo="错误信息"
       placeholder="请设置抄送对象"
       headerBgc="#3296fa"

@@ -1,8 +1,8 @@
 import React from 'react';
 import cls from './index.module.less';
-import { NodeType } from '../../processType';
+import { NodeModel } from '../../../../processType';
 interface IProps {
-  current: NodeType;
+  current: NodeModel;
   orgId?: string;
 }
 /**

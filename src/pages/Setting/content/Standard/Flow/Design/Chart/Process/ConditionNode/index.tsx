@@ -2,7 +2,7 @@ import React from 'react';
 import InsertButton from '../InsertButton';
 import cls from './index.module.less';
 import { AiOutlineCopy, AiOutlineClose } from 'react-icons/ai';
-import { NodeModel } from '../../processType';
+import { NodeModel } from '../../../processType';
 
 type IProps = {
   onInsertNode: Function;
@@ -11,8 +11,7 @@ type IProps = {
   onSelected: Function;
   config: NodeModel;
   level: any;
-  defaultEditable: boolean;
-  [key: string]: any;
+  isEdit: boolean;
 };
 
 /**
@@ -29,21 +28,12 @@ const ConditionNode: React.FC<IProps> = (props) => {
   const select = () => {
     props.onSelected();
   };
-  const footer = (
-    <>
-      <div className={cls['btn']}>
-        {props.defaultEditable && (
-          <InsertButton onInsertNode={props.onInsertNode}></InsertButton>
-        )}
-      </div>
-    </>
-  );
   const nodeHeader = (
     <div className={cls['node-body-main-header']}>
       <span className={cls['title']}>
         {props.config.name ? props.config.name : '条件' + props.level}
       </span>
-      {props.defaultEditable && (
+      {props.isEdit && (
         <span className={cls['option']}>
           <AiOutlineCopy
             style={{ fontSize: '12px', paddingRight: '5px' }}
@@ -56,11 +46,13 @@ const ConditionNode: React.FC<IProps> = (props) => {
   );
   const nodeContent = (
     <div className={cls['node-body-main-content']} onClick={select}>
-      <span className={cls['name']}>{props.config.conditions?.map((a) => a.display).join('且')||'请设置条件'}</span>
+      <span className={cls['name']}>
+        {props.config.conditions?.map((a) => a.display).join('且') || '请设置条件'}
+      </span>
     </div>
   );
   return (
-    <div className={`${props.defaultEditable ? cls['node'] : cls['node-unEdit']} `}>
+    <div className={`${props.isEdit ? cls['node'] : cls['node-unEdit']} `}>
       <div className={`${cls['node-body']}`}>
         <div className={cls['node-body-main']}>
           {nodeHeader}
@@ -68,7 +60,11 @@ const ConditionNode: React.FC<IProps> = (props) => {
         </div>
       </div>
 
-      <div className={cls['node-footer']}>{footer}</div>
+      <div className={cls['node-footer']}>
+        <div className={cls['btn']}>
+          {props.isEdit && <InsertButton onInsertNode={props.onInsertNode} />}
+        </div>
+      </div>
     </div>
   );
 };
@@ -76,7 +72,6 @@ const ConditionNode: React.FC<IProps> = (props) => {
 ConditionNode.defaultProps = {
   config: {} as NodeModel,
   level: 1,
-  size: 0,
 };
 
 export default ConditionNode;

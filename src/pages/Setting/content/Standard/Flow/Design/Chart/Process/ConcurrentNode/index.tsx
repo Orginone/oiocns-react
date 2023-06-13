@@ -9,8 +9,7 @@ type ConcurrentNodeProps = {
   onSelected: Function;
   config: any;
   level: any;
-  defaultEditable: boolean;
-  [key: string]: any;
+  isEdit: boolean;
 };
 
 /**
@@ -27,15 +26,6 @@ const ConcurrentNode: React.FC<ConcurrentNodeProps> = (props: ConcurrentNodeProp
   const select = () => {
     props.onSelected();
   };
-  const footer = (
-    <>
-      <div className={cls['btn']}>
-        {props.defaultEditable && (
-          <InsertButton onInsertNode={props.onInsertNode}></InsertButton>
-        )}
-      </div>
-    </>
-  );
   const nodeHeader = (
     <div className={cls['node-body-main-header']}>
       <span className={cls['title']}>
@@ -44,7 +34,7 @@ const ConcurrentNode: React.FC<ConcurrentNodeProps> = (props: ConcurrentNodeProp
           {props.config.name ? props.config.name : '并行任务' + props.level}
         </span>
       </span>
-      {props.defaultEditable && (
+      {props.isEdit && (
         <span className={cls['option']}>
           <AiOutlineCopy
             style={{ fontSize: '12px', paddingRight: '5px' }}
@@ -61,14 +51,18 @@ const ConcurrentNode: React.FC<ConcurrentNodeProps> = (props: ConcurrentNodeProp
     </div>
   );
   return (
-    <div className={props.defaultEditable ? cls['node'] : cls['node-unEdit']}>
+    <div className={props.isEdit ? cls['node'] : cls['node-unEdit']}>
       <div className={cls['node-body']}>
         <div className={cls['node-body-main']}>
           {nodeHeader}
           {nodeContent}
         </div>
       </div>
-      <div className={cls['node-footer']}>{footer}</div>
+      <div className={cls['node-footer']}>
+        <div className={cls['btn']}>
+          {props.isEdit && <InsertButton onInsertNode={props.onInsertNode} />}
+        </div>
+      </div>
     </div>
   );
 };
@@ -76,7 +70,6 @@ const ConcurrentNode: React.FC<ConcurrentNodeProps> = (props: ConcurrentNodeProp
 ConcurrentNode.defaultProps = {
   config: {},
   level: 1,
-  size: 0,
 };
 
 export default ConcurrentNode;

@@ -12,7 +12,7 @@ import CardOrTableComp from '@/components/CardOrTableComp';
 interface IProps {
   filter: string;
   taskType: string;
-  space: IBelong | undefined;
+  space: IBelong;
 }
 
 const TaskContent = (props: IProps) => {
@@ -81,11 +81,15 @@ const TaskContent = (props: IProps) => {
         onClick: async () => {
           const define = await orgCtrl.work.findFlowDefine(items[0].defineId);
           const instance = await orgCtrl.work.loadTaskDetail(items[0]);
-          if (define && instance) {
+          if (instance) {
             setTask({
               define,
               instance,
               task: items[0],
+              belong: props.space,
+              onBack: () => {
+                setTask(undefined);
+              },
             });
           }
         },
@@ -128,16 +132,7 @@ const TaskContent = (props: IProps) => {
   };
 
   if (task) {
-    return (
-      <TaskDetail
-        task={task.task}
-        define={task.define}
-        instance={task.instance}
-        onBack={() => {
-          setTask(undefined);
-        }}
-      />
-    );
+    return <TaskDetail {...task} />;
   }
   return (
     <CardOrTableComp<schema.XWorkTask>

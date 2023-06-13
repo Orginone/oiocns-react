@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button, Divider, Modal, Row } from 'antd';
 import cls from './index.module.less';
-import { NodeType } from '../../processType';
+import { NodeModel } from '../../../../processType';
 import ShareShowComp from '@/bizcomponents/IndentityManage/ShareShowComp';
 import { AiOutlineSetting } from 'react-icons/ai';
 import SelectAuth from '../../../../../Comp/selectAuth';
@@ -10,7 +10,7 @@ import { IThingClass, IWorkDefine, SpeciesType } from '@/ts/core';
 import ViewFormModal from '@/bizcomponents/FormDesign/viewFormModal';
 import { XForm } from '@/ts/base/schema';
 interface IProps {
-  current: NodeType;
+  current: NodeModel;
   define: IWorkDefine;
 }
 /**
@@ -21,17 +21,13 @@ interface IProps {
 const RootNode: React.FC<IProps> = (props) => {
   const [viewForm, setViewForm] = useState<XForm>();
   const [workforms, setWorkForms] = useState<XForm[]>(
-    (props.current.props.operations || []).filter((i) => i.typeName === SpeciesType.Work),
+    (props.current.forms || []).filter((i) => i.typeName === SpeciesType.Work),
   );
   const [thingforms, setThingForms] = useState<XForm[]>(
-    (props.current.props.operations || []).filter(
-      (i) => i.typeName === SpeciesType.Thing,
-    ),
+    (props.current.forms || []).filter((i) => i.typeName === SpeciesType.Thing),
   );
   const [formModel, setFormModel] = useState<string>('');
-  const [selectAuthValue, setSelectAuthValue] = useState<any>(
-    props.current.props.assignedUser[0]?.id,
-  );
+  const [selectAuthValue, setSelectAuthValue] = useState<any>(props.current.destId);
   return (
     <div className={cls[`app-roval-node`]}>
       <div className={cls[`roval-node`]}>
@@ -42,11 +38,9 @@ const RootNode: React.FC<IProps> = (props) => {
         <SelectAuth
           space={props.define.workItem.current.space}
           onChange={(newValue: string, label: string) => {
-            if (props.current.props.assignedUser[0]) {
-              props.current.props.assignedUser[0].id = newValue;
-              props.current.props.assignedUser[0].name = label[0];
-              setSelectAuthValue(newValue);
-            }
+            props.current.destId = newValue;
+            props.current.destName = label;
+            setSelectAuthValue(newValue);
           }}
           value={selectAuthValue}></SelectAuth>
         <Divider />
@@ -70,9 +64,7 @@ const RootNode: React.FC<IProps> = (props) => {
               }}
               deleteFuc={(id: string) => {
                 setWorkForms([...workforms.filter((i) => i.id != id)]);
-                props.current.props.operations = props.current.props.operations.filter(
-                  (a) => a.id != id,
-                );
+                props.current.forms = props.current.forms?.filter((a) => a.id != id);
               }}></ShareShowComp>
           </span>
         )}
@@ -96,9 +88,7 @@ const RootNode: React.FC<IProps> = (props) => {
               }}
               deleteFuc={(id: string) => {
                 setThingForms([...thingforms.filter((i) => i.id != id)]);
-                props.current.props.operations = props.current.props.operations.filter(
-                  (a) => a.id != id,
-                );
+                props.current.forms = props.current.forms?.filter((a) => a.id != id);
               }}></ShareShowComp>
           </span>
         )}
@@ -111,7 +101,7 @@ const RootNode: React.FC<IProps> = (props) => {
             open={formModel != ''}
             okText="确定"
             onOk={() => {
-              props.current.props.operations = [...workforms, ...thingforms];
+              props.current.forms = [...workforms, ...thingforms];
               setFormModel('');
             }}
             onCancel={() => setFormModel('')}>

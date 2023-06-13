@@ -7,7 +7,7 @@ import RootNode from './components/RootNode';
 import ConcurrentNode from './components/ConcurrentNode';
 import DeptWayNode from './components/DeptWayNode';
 import ConditionNode from './components/ConditionNode';
-import { AddNodeType, FieldCondition, NodeModel, dataType } from '../processType';
+import { AddNodeType, FieldCondition, NodeModel, dataType } from '../../processType';
 import orgCtrl from '@/ts/controller';
 import { getUuid } from '@/utils/tools';
 import { IWorkDefine, SpeciesType } from '@/ts/core';
@@ -19,10 +19,11 @@ import EntityIcon from '@/bizcomponents/GlobalComps/entityIcon';
  */
 
 interface IProps {
+  instance?: schema.XWorkInstance;
   isOpen: boolean;
   current: NodeModel;
   onClose: () => void;
-  define: IWorkDefine;
+  define?: IWorkDefine;
   defaultEditable: boolean;
   forms: schema.XForm[];
 }
@@ -38,7 +39,7 @@ const FlowDrawer: React.FC<IProps> = (props) => {
         for (const form of props.forms.filter((a) => a.typeName == SpeciesType.Work)) {
           const attrs = await orgCtrl.work.loadAttributes(
             form.id,
-            props.define.workItem.belongId,
+            props.define!.workItem.belongId,
           );
           for (let attr of attrs) {
             switch (attr!.valueType) {
@@ -79,25 +80,7 @@ const FlowDrawer: React.FC<IProps> = (props) => {
   });
 
   const Component = () => {
-    if (props.current.task?.records?.length > 0) {
-      return props.current.task?.records.map((record: any) => {
-        let handleResult = '通过';
-        if (record.status >= 200) {
-          handleResult = '不通过';
-        }
-        return (
-          <>
-            <div>
-              审核人：
-              <EntityIcon entityId={record.createUser} showName />
-            </div>
-            <div>审核结果：{handleResult}</div>
-            <div>审核意见：{record.comment}</div>
-            <div>审核时间：{record.createTime}</div>
-          </>
-        );
-      });
-    } else {
+    if (props.defaultEditable && props.define) {
       switch (props.current.type) {
         case AddNodeType.ROOT:
           return <RootNode current={props.current} define={props.define} />;
@@ -116,6 +99,26 @@ const FlowDrawer: React.FC<IProps> = (props) => {
         default:
           return <div>暂无需要处理的数据</div>;
       }
+    } else if (props.instance) {
+      return props.instance.tasks
+        ?.find((a) => a.nodeId == props.current.id)
+        ?.records?.map((record: any) => {
+          let handleResult = '通过';
+          if (record.status >= 200) {
+            handleResult = '不通过';
+          }
+          return (
+            <>
+              <div>
+                审核人：
+                <EntityIcon entityId={record.createUser} showName />
+              </div>
+              <div>审核结果：{handleResult}</div>
+              <div>审核意见：{record.comment}</div>
+              <div>审核时间：{record.createTime}</div>
+            </>
+          );
+        });
     }
   };
 
@@ -124,21 +127,25 @@ const FlowDrawer: React.FC<IProps> = (props) => {
       title={
         <div key={key}>
           <Typography.Title
-            editable={{
-              onChange: (e: any) => {
-                props.current.name = e;
-                setKey(getUuid());
-              },
-            }}
+            editable={
+              props.defaultEditable
+                ? {
+                    onChange: (e: any) => {
+                      props.current.name = e;
+                      setKey(getUuid());
+                    },
+                  }
+                : false
+            }
             level={5}
             style={{ margin: 0 }}>
             {props.current.name}
           </Typography.Title>
         </div>
       }
+      open={props.isOpen}
       destroyOnClose
       placement="right"
-      open={props.isOpen}
       onClose={() => props.onClose()}
       width={500}>
       {Component()}

@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { Button } from 'antd';
-import { dataType, FieldCondition, NodeType } from '../../processType';
+import { dataType, FieldCondition, NodeModel } from '../../../../processType';
 import ConditionGroupItemConfig from '../ConditionGroupItemConfig';
 
 interface Iprops {
-  current: NodeType;
+  current: NodeModel;
   conditions?: FieldCondition[];
   orgId?: string;
 }

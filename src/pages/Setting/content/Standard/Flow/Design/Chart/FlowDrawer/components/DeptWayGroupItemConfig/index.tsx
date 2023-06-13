@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Select, Form } from 'antd';
-import { NodeType, FieldCondition, conditiondType } from '../../processType';
-import SelectOrg from '@/pages/Setting/content/Standard/Flow/Comp/selectOrg';
+import { NodeModel, FieldCondition, conditiondType } from '../../../../processType';
 import cls from './index.module.less';
-import orgCtrl from '@/ts/controller';
 
 interface IProps {
-  currnet: NodeType;
+  currnet: NodeModel;
   conditions?: FieldCondition[];
 }
 
@@ -16,7 +14,7 @@ interface IProps {
  */
 const DeptWayGroupItemConfig: React.FC<IProps> = (props) => {
   const [form] = Form.useForm();
-  const [currentNode, setCurrentNode] = useState<NodeType>();
+  const [currentNode, setCurrentNode] = useState<NodeModel>();
   // const [conditions, setConditions] = useState<FieldCondition[]>([]);
   const [key, setKey] = useState(0);
 
@@ -54,7 +52,7 @@ const DeptWayGroupItemConfig: React.FC<IProps> = (props) => {
                 {condition.type == 'BELONG' && (
                   <Form.Item name={['allContent', index, 'val']}>
                     <div style={{ width: 200 }}>
-                      <SelectOrg key={key} onChange={onChange} orgId={orgCtrl.user.id} />
+                      {/* <SelectOrg key={key} onChange={onChange} orgId={orgCtrl.user.id} /> */}
                     </div>
                   </Form.Item>
                 )}

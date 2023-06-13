@@ -1,14 +1,13 @@
 import React from 'react';
 import Node from '../Node';
-import { AddNodeType } from '../../processType';
+import { AddNodeType } from '../../../processType';
 
 type EmptyNodeProps = {
   onInsertNode: Function;
   onDelNode: Function;
   onSelected: Function;
   config: any;
-  defaultEditable: boolean;
-  [key: string]: any;
+  isEdit: boolean;
 };
 
 /**
@@ -29,7 +28,7 @@ const EmptyNode: React.FC<EmptyNodeProps> = (props: EmptyNodeProps) => {
       onInsertNode={props.onInsertNode}
       onDelNode={props.onDelNode}
       onSelected={props.onSelected}
-      defaultEditable={props.defaultEditable}
+      isEdit={props.isEdit}
       type={AddNodeType.EMPTY}
     />
   );

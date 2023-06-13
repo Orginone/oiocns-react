@@ -3,28 +3,23 @@ import Node from '../Process/Node';
 import { useAppwfConfig } from './flow';
 import { message } from 'antd';
 import Root from '../Process/RootNode';
-import orgCtrl from '@/ts/controller';
 import Approval from '../Process/ApprovalNode';
+import Empty from '../Process/EmptyNode';
 import WorkFlow from '../Process/WorkFlowNode';
 import Cc from '../Process/CcNode';
 import Concurrent from '../Process/ConcurrentNode';
 import DeptWay from '../Process/DeptWayNode';
 import Condition from '../Process/ConditionNode';
-import Empty from '../Process/EmptyNode';
 import cls from './index.module.less';
-import {
-  APPROVAL_PROPS,
-  CC_PROPS,
-  dataType,
-} from '../processType';
-import { WorkNodeModel } from '@/ts/base/model';
+import { AddNodeType, NodeModel, dataType } from '../../processType';
 import { getUuid } from '@/utils/tools';
+import { IWorkDefine } from '@/ts/core';
 
 type IProps = {
-  belongId: string;
-  resource: WorkNodeModel;
-  onSelectedNode: (params: any) => void;
-  defaultEditable: boolean;
+  define?: IWorkDefine;
+  resource: NodeModel;
+  isEdit: boolean;
+  onSelectedNode: (params: NodeModel) => void;
   [key: string]: any;
 };
 
@@ -33,21 +28,14 @@ type IProps = {
  * @returns
  */
 
-const ProcessTree: React.FC<IProps> = ({
-  belongId,
-  onSelectedNode,
-  resource,
-  defaultEditable,
-}) => {
+const ProcessTree: React.FC<IProps> = ({ define, resource, onSelectedNode, isEdit }) => {
   const [key, setKey] = useState(0);
-  const belong = orgCtrl.user.targets.find((i) => i.id === belongId);
-  if (!belong) return <></>;
   const addNodeMap = useAppwfConfig((state: any) => state.addNodeMap);
   /**组件渲染中变更nodeMap  共享状态*/
   var nodeMap = useAppwfConfig((state: any) => state.nodeMap);
   // const nodeMap = processCtrl.nodeMap;
 
-  const getDomTree = (h: any, node: WorkNodeModel) => {
+  const getDomTree = (h: any, node: NodeModel) => {
     toMapping(node);
     if (isPrimaryNode(node)) {
       //普通业务节点
@@ -157,43 +145,42 @@ const ProcessTree: React.FC<IProps> = ({
     }
   };
 
-  const compTrans = (comp: String) => {
-    if (comp == 'root') {
-      return Root;
-    } else if (comp == 'node') {
-      return Node;
-    } else if (comp == 'approval') {
-      return Approval;
-    } else if (comp == 'childwork') {
-      return WorkFlow;
-    } else if (comp == 'cc') {
-      return Cc;
-    } else if (comp == 'concurrent') {
-      return Concurrent;
-    } else if (comp == 'organizationa') {
-      return DeptWay;
-    } else if (comp == 'condition') {
-      return Condition;
-    } else if (comp == 'empty') {
-      return Empty;
-    } else {
-      return comp;
+  const compTrans = (comp: string) => {
+    switch (comp) {
+      case AddNodeType.ROOT:
+        return Root;
+      case AddNodeType.APPROVAL:
+        return Approval;
+      case AddNodeType.CC:
+        return Cc;
+      case AddNodeType.CONDITION:
+        return Condition;
+      case AddNodeType.CONCURRENTS:
+        return Concurrent;
+      case AddNodeType.ORGANIZATIONA:
+        return DeptWay;
+      case AddNodeType.CHILDWORK:
+        return WorkFlow;
+      case AddNodeType.EMPTY:
+        return Empty;
+      default:
+        return Node;
     }
   };
 
   //解码渲染的时候插入dom到同级
-  const decodeAppendDom = (h: any, node: any, dom: any, props = {}) => {
+  const decodeAppendDom = (h: any, node: NodeModel, dom: any, props = {}) => {
     if (!node || !node.nodeId) {
       return;
     }
     const Dom = h(
-      compTrans(node.type.toLowerCase()),
+      compTrans(node.type),
       {
         config: node,
         key: getRandomId(),
         ...props,
-        defaultEditable,
-        belong: belong,
+        isEdit,
+        define: define,
         //定义事件，插入节点，删除节点，选中节点，复制/移动
         onInsertNode: (type: any) => insertNode(type, node),
         onDelNode: () => delNode(node),
@@ -284,56 +271,33 @@ const ProcessTree: React.FC<IProps> = ({
   };
   //判断是否为主要业务节点
   const isPrimaryNode = (node: any) => {
-    return (
-      node &&
-      (node.type === 'ROOT' ||
-        node.type === 'APPROVAL' ||
-        node.type === 'CHILDWORK' ||
-        node.type === 'CC' ||
-        node.type === 'DELAY' ||
-        node.type === 'TRIGGER')
-    );
+    return [
+      AddNodeType.ROOT,
+      AddNodeType.APPROVAL,
+      AddNodeType.CHILDWORK,
+      AddNodeType.CC,
+    ].includes(node.type);
   };
   const isBranchNode = (node: any) => {
-    return (
-      node &&
-      (node.type === 'CONDITIONS' ||
-        node.type === 'CONCURRENTS' ||
-        node.type === 'ORGANIZATIONAL')
-    );
+    return [
+      AddNodeType.CONCURRENTS,
+      AddNodeType.CONDITION,
+      AddNodeType.ORGANIZATIONA,
+    ].includes(node.type);
   };
   const isEmptyNode = (node: any) => {
-    return node && node.type === 'EMPTY';
-  };
-  //是分支节点
-  // const isConditionNode = (node: any) => {
-  //   return node.type === 'CONDITIONS';
-  // };
-  const getConditionNodeType = (node: any) => {
-    let type = '';
-    switch (node.type) {
-      case 'CONDITIONS':
-        type = 'CONDITION';
-        break;
-      case 'CONCURRENTS':
-        type = 'CONCURRENT';
-        break;
-      case 'ORGANIZATIONAL':
-        type = 'ORGANIZATIONA';
-        break;
-    }
-    return type;
+    return node && node.type === AddNodeType.EMPTY;
   };
   const getConditionNodeName = (node: any) => {
     let name = '';
     switch (node.type) {
-      case 'CONDITIONS':
-        name = '条件';
+      case AddNodeType.CONDITION:
+        name = '条件分支';
         break;
-      case 'CONCURRENTS':
-        name = '分支';
+      case AddNodeType.CONCURRENTS:
+        name = '并行分支';
         break;
-      case 'ORGANIZATIONAL':
+      case AddNodeType.ORGANIZATIONA:
         name = '组织分支';
         break;
     }
@@ -341,22 +305,17 @@ const ProcessTree: React.FC<IProps> = ({
   };
   //是分支节点
   const isBranchSubNode = (node: any) => {
-    return (
-      node &&
-      (node.type === 'CONDITION' ||
-        node.type === 'CONCURRENT' ||
-        node.type === 'ORGANIZATIONA')
-    );
+    return [
+      AddNodeType.CONDITION,
+      AddNodeType.CONCURRENTS,
+      AddNodeType.ORGANIZATIONA,
+    ].includes(node.type);
   };
-  // const isConcurrentNode = (node: any) => {
-  //   return node.type === 'CONCURRENTS';
-  // };
-
   const getRandomId = () => {
     return `node_${getUuid()}`;
   };
   //处理节点插入逻辑
-  const insertNode = (type: any, parentNode: any) => {
+  const insertNode = (type: AddNodeType, parentNode: any) => {
     // ctx.refs['_root'].click()
     //缓存一下后面的节点
     let afterNode = parentNode.children;
@@ -367,23 +326,23 @@ const ProcessTree: React.FC<IProps> = ({
       props: {},
       type: type,
     };
-    switch (type) {
-      case 'APPROVAL':
+    switch (type as AddNodeType) {
+      case AddNodeType.APPROVAL:
         insertApprovalNode(parentNode);
         break;
-      case 'CC':
+      case AddNodeType.CC:
         insertCcNode(parentNode);
         break;
-      case 'CONDITIONS':
+      case AddNodeType.CONDITION:
         insertConditionsNode(parentNode);
         break;
-      case 'CONCURRENTS':
+      case AddNodeType.CONCURRENTS:
         insertConcurrentsNode(parentNode);
         break;
-      case 'ORGANIZATIONAL':
+      case AddNodeType.ORGANIZATIONA:
         insertDeptGateWayNode(parentNode);
         break;
-      case 'CHILDWORK':
+      case AddNodeType.CHILDWORK:
         insertWorkFlowNode(parentNode);
         break;
       default:
@@ -398,11 +357,6 @@ const ProcessTree: React.FC<IProps> = ({
     ) {
       if (afterNode && afterNode.nodeId) {
         afterNode.parentId = parentNode.children.children.nodeId;
-        // afterNode.children = {
-        //   nodeId: getRandomId(),
-        //   parentId: afterNode.nodeId,
-        //   type: 'EMPTY',
-        // };
       }
       parentNode.children.children.children = afterNode;
     } else {
@@ -416,26 +370,23 @@ const ProcessTree: React.FC<IProps> = ({
   };
   const insertApprovalNode = (parentNode: any) => {
     parentNode.children.name = '审批对象';
-    parentNode.children.props = deepCopy(APPROVAL_PROPS);
   };
   const insertCcNode = (parentNode: any) => {
     parentNode.children.name = '抄送对象';
-    parentNode.children.props = deepCopy(CC_PROPS);
   };
   const insertConditionsNode = (parentNode: any) => {
     parentNode.children.name = '条件分支';
     parentNode.children.children = {
       nodeId: getRandomId(),
       parentId: parentNode.children.nodeId,
-      type: 'EMPTY',
+      type: AddNodeType.EMPTY,
     };
 
     parentNode.children.branches = [
       {
         nodeId: getRandomId(),
         parentId: parentNode.children.nodeId,
-        type: 'CONDITION',
-        // props: deepCopy(DefaultProps.CONDITION_PROPS),
+        type: AddNodeType.CONDITION,
         conditions: [],
         name: '条件1',
         // children: {},
@@ -443,8 +394,7 @@ const ProcessTree: React.FC<IProps> = ({
       {
         nodeId: getRandomId(),
         parentId: parentNode.children.nodeId,
-        type: 'CONDITION',
-        // props: deepCopy(DefaultProps.CONDITION_PROPS),
+        type: AddNodeType.CONDITION,
         conditions: [],
         name: '条件2',
         // children: {},
@@ -456,20 +406,20 @@ const ProcessTree: React.FC<IProps> = ({
     parentNode.children.children = {
       nodeId: getRandomId(),
       parentId: parentNode.children.nodeId,
-      type: 'EMPTY',
+      type: AddNodeType.EMPTY,
     };
     parentNode.children.branches = [
       {
         nodeId: getRandomId(),
         parentId: parentNode.children.nodeId,
-        type: 'ORGANIZATIONA',
+        type: AddNodeType.ORGANIZATIONA,
         conditions: [],
         name: '组织分支1',
       },
       {
         nodeId: getRandomId(),
         parentId: parentNode.children.nodeId,
-        type: 'ORGANIZATIONA',
+        type: AddNodeType.ORGANIZATIONA,
         conditions: [
           {
             pos: 1,
@@ -489,21 +439,20 @@ const ProcessTree: React.FC<IProps> = ({
   };
   const insertWorkFlowNode = (parentNode: any) => {
     parentNode.children.name = '其他办事';
-    parentNode.children.props = deepCopy(APPROVAL_PROPS);
   };
   const insertConcurrentsNode = (parentNode: any) => {
     parentNode.children.name = '并行分支';
     parentNode.children.children = {
       nodeId: getRandomId(),
       parentId: parentNode.children.nodeId,
-      type: 'EMPTY',
+      type: AddNodeType.EMPTY,
     };
     parentNode.children.branches = [
       {
         nodeId: getRandomId(),
         name: '分支1',
         parentId: parentNode.children.nodeId,
-        type: 'CONCURRENT',
+        type: AddNodeType.CONCURRENTS,
         props: {},
         children: {},
       },
@@ -511,7 +460,7 @@ const ProcessTree: React.FC<IProps> = ({
         nodeId: getRandomId(),
         name: '分支2',
         parentId: parentNode.children.nodeId,
-        type: 'CONCURRENT',
+        type: AddNodeType.CONCURRENTS,
         props: {},
         children: {},
       },
@@ -529,11 +478,8 @@ const ProcessTree: React.FC<IProps> = ({
         nodeId: getRandomId(),
         parentId: node.nodeId,
         name: getConditionNodeName(node) + (node.branches.length + 1),
-        // name: (isConditionNode(node) ? '条件' : '分支') + (node.branches.length + 1),
-        // props: isConditionNode(node) ? deepCopy(DefaultProps.CONDITION_PROPS) : {},
         conditions: [],
-        type: getConditionNodeType(node),
-        // type: isConditionNode(node) ? 'CONDITION' : 'CONCURRENT',
+        type: node.type,
         children: {},
       });
       setKey(key + 1);

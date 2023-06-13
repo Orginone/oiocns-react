@@ -2,12 +2,12 @@ import React, { useState } from 'react';
 import { Button, Modal } from 'antd';
 import IndentityManage from '@/bizcomponents/IndentityManage';
 import cls from './index.module.less';
-import { NodeType } from '../../processType';
+import { NodeModel } from '../../../../processType';
 import ShareShowComp from '@/bizcomponents/IndentityManage/ShareShowComp';
 import { IFlow } from '@/ts/core';
 
 interface IProps {
-  current: NodeType;
+  current: NodeModel;
   work: IFlow;
 }
 /**
@@ -17,17 +17,9 @@ interface IProps {
 
 const CcNode: React.FC<IProps> = (props) => {
   const [isApprovalOpen, setIsApprovalOpen] = useState<boolean>(false); // 打开弹窗
-  const [currentData, setCurrentData] = useState<{
-    data: { id: string; name: string };
-    title: string;
-    key: string;
-  }>({
-    title: props.current.props.assignedUser[0]?.name,
-    key: props.current.props.assignedUser[0]?.id,
-    data: {
-      id: props.current.props.assignedUser[0]?.id,
-      name: props.current.props.assignedUser[0]?.name,
-    },
+  const [currentData, setCurrentData] = useState<{ id: string; name: string }>({
+    id: props.current.destId,
+    name: props.current.destName,
   });
   return (
     <div className={cls[`app-roval-node`]}>
@@ -44,19 +36,13 @@ const CcNode: React.FC<IProps> = (props) => {
           </Button>
         </div>
         <div>
-          {currentData?.title ? (
-            // <span>
-            //   当前选择：<a>{currentData?.title}</a>
-            // </span>
+          {currentData.id != '' ? (
             <ShareShowComp
-              departData={[currentData.data]}
+              departData={[currentData]}
               deleteFuc={(_id: string) => {
-                props.current.props.assignedUser = { id: '', name: '' };
-                setCurrentData({
-                  title: '',
-                  key: '',
-                  data: { id: '', name: '' },
-                });
+                props.current.destId = '';
+                props.current.destName = '';
+                setCurrentData({ id: '', name: '' });
               }}></ShareShowComp>
           ) : null}
         </div>
@@ -68,9 +54,9 @@ const CcNode: React.FC<IProps> = (props) => {
         open={isApprovalOpen}
         destroyOnClose={true}
         onOk={() => {
-          props.current.props.assignedUser = [
-            { name: currentData.title, id: currentData.key },
-          ];
+          props.current.destType = '身份';
+          props.current.destId = currentData.id;
+          props.current.destName = currentData.name;
           setIsApprovalOpen(false);
         }}
         onCancel={() => setIsApprovalOpen(false)}>
@@ -78,8 +64,10 @@ const CcNode: React.FC<IProps> = (props) => {
           space={props.work.current.space}
           multiple={false}
           onChecked={(params: any) => {
-            props.current.props.assignedUser = [{ name: params.title, id: params.key }];
-            setCurrentData(params);
+            setCurrentData({
+              id: params.key,
+              name: params.title,
+            });
           }}
         />
       </Modal>

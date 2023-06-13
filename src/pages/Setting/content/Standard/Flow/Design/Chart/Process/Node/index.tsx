@@ -9,7 +9,7 @@ import {
 import InsertButton from '../InsertButton';
 import React, { useEffect, useState } from 'react';
 import cls from './index.module.less';
-import { AddNodeType } from '../../processType';
+import { AddNodeType } from '../../../processType';
 
 type NodeProps = {
   //是否为根节点
@@ -39,7 +39,7 @@ type NodeProps = {
   type?: AddNodeType;
   //默认操作组织id
   config?: any;
-  defaultEditable: boolean;
+  isEdit: boolean;
 };
 
 /**
@@ -50,7 +50,7 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
   const [editable, setEditable] = useState<boolean>(true);
   const [key, setKey] = useState<number>(0);
   const isEditable = (): boolean => {
-    let editable = props.defaultEditable;
+    let editable = props.isEdit;
     return editable;
   };
   useEffect(() => {
@@ -70,13 +70,11 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
     setKey(key + 1);
   }, [props.config]);
   const footer = (
-    <>
-      <div className={cls['node-footer']}>
-        <div className={cls['btn']}>
-          {editable && <InsertButton onInsertNode={props.onInsertNode}></InsertButton>}
-        </div>
+    <div className={cls['node-footer']}>
+      <div className={cls['btn']}>
+        {editable && <InsertButton onInsertNode={props.onInsertNode} />}
       </div>
-    </>
+    </div>
   );
 
   const nodeHeader = (
@@ -110,21 +108,6 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
 
   const nodeContent = (
     <>
-      {/* {props.isRoot && (
-        <div
-          className={cls['node-root-body-right']}
-          onClick={(e) => {
-            select();
-          }}>
-          <div style={{ width: '86%', height: '100%', paddingLeft: '7%' }}>
-            <SelectAuth
-              onChange={onChange}
-              readonly={!editable}
-              value={props.config.props.assignedUser[0]?.id}></SelectAuth>
-          </div>
-        </div>
-      )} */}
-      {/* {!props.isRoot && ( */}
       <div className={cls['node-body-right']}>
         <div
           onClick={(e) => {
@@ -151,7 +134,6 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
               {props.content}
             </span>
           )}
-          {/* <RightOutlined className={cls['node-body-rightOutlined']} /> */}
           {editable && !props.isRoot && (
             <AiOutlineClose
               className={cls['iconPosition']}

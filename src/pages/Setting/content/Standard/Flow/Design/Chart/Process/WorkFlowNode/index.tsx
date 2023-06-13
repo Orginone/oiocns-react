@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import Node from '../Node';
 
 type WorkFlowNodeProps = {
@@ -7,8 +7,7 @@ type WorkFlowNodeProps = {
   onSelected: Function;
   type: {};
   config: any;
-  defaultEditable: boolean;
-  [key: string]: any;
+  isEdit: boolean;
 };
 
 /**
@@ -16,33 +15,16 @@ type WorkFlowNodeProps = {
  * @returns
  */
 const WorkFlowNode: React.FC<WorkFlowNodeProps> = (props: WorkFlowNodeProps) => {
-  const content: any = useMemo(() => {
-    if (
-      props.config &&
-      !!props.config.props &&
-      !!props.config.props.assignedUser &&
-      props.config.props.assignedUser.length > 0
-    ) {
-      let texts: any[] = [];
-      props.config.props.assignedUser.forEach((org: any) => {
-        texts.push(org.name);
-      });
-      return String(texts).replaceAll(',', '、');
-    } else {
-      return null;
-    }
-  }, [props.config]);
-
   return (
     <Node
       title={props.config.name}
       onInsertNode={props.onInsertNode}
       onDelNode={props.onDelNode}
       onSelected={props.onSelected}
-      defaultEditable={props.defaultEditable}
+      isEdit={props.isEdit}
       type={props?.config.type}
       showError={false}
-      content={content}
+      content={props.config.destName}
       config={props?.config}
       errorInfo="错误信息"
       placeholder="请选择其他办事"

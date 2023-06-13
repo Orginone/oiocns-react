@@ -3,8 +3,9 @@ import InsertButton from '../InsertButton';
 import { AiOutlineCopy, AiOutlineClose } from 'react-icons/ai';
 import cls from './index.module.less';
 import SelectOrg from '@/pages/Setting/content/Standard/Flow/Comp/selectOrg';
-import { dataType } from '../../FlowDrawer/processType';
-import { IBelong } from '@/ts/core';
+import { dataType } from '../../../processType';
+import { IWorkDefine } from '@/ts/core';
+
 type DeptWayNodeProps = {
   onInsertNode: Function;
   onDelNode: Function;
@@ -12,9 +13,8 @@ type DeptWayNodeProps = {
   onSelected: Function;
   config: any;
   level: any;
-  belong: IBelong;
-  defaultEditable: boolean;
-  [key: string]: any;
+  define?: IWorkDefine;
+  isEdit: boolean;
 };
 
 /**
@@ -35,36 +35,25 @@ const DeptWayNode: React.FC<DeptWayNodeProps> = (props: DeptWayNodeProps) => {
   };
 
   useEffect(() => {
-    if (props.config.conditions.length == 0) {
-      props.config.conditions = [
-        {
-          pos: 1,
-          paramKey: '0',
-          paramLabel: '组织',
-          key: 'EQ',
-          label: '=',
-          type: dataType.BELONG,
-          val: props.belong.id,
-        },
-      ];
-      setKey(key + 1);
-    }
-    if (!props.defaultEditable) {
-      setOrgId(props.config.conditions[0]?.val);
-    } else {
-      setOrgId(props.belong.id);
+    if (props.isEdit && props.define) {
+      if (props.config.conditions.length == 0) {
+        props.config.conditions = [
+          {
+            pos: 1,
+            paramKey: '0',
+            paramLabel: '组织',
+            key: 'EQ',
+            label: '=',
+            type: dataType.BELONG,
+            val: props.define.workItem.current.space.id,
+          },
+        ];
+        setKey(key + 1);
+      }
+      setOrgId(props.define.workItem.current.space.id);
     }
   }, []);
 
-  const footer = (
-    <>
-      <div className={cls['btn']}>
-        {props.defaultEditable && (
-          <InsertButton onInsertNode={props.onInsertNode}></InsertButton>
-        )}
-      </div>
-    </>
-  );
   const nodeHeader = (
     <div className={cls['node-body-main-header']}>
       <span className={cls['title']}>
@@ -73,7 +62,7 @@ const DeptWayNode: React.FC<DeptWayNodeProps> = (props: DeptWayNodeProps) => {
           {props.config.name ? props.config.name : '组织分支' + props.level}
         </span>
       </span>
-      {props.defaultEditable && !props.config.readonly && (
+      {props.isEdit && !props.config.readonly && (
         <span className={cls['option']}>
           <AiOutlineCopy
             style={{ fontSize: '12px', paddingRight: '5px' }}
@@ -95,12 +84,12 @@ const DeptWayNode: React.FC<DeptWayNodeProps> = (props: DeptWayNodeProps) => {
     <div className={cls['node-body-main-content']} onClick={select}>
       {/* <span>组织分支</span> */}
       <span>
-        {props.defaultEditable ? (
+        {props.isEdit && props.define ? (
           <SelectOrg
             key={key}
             onChange={onChange}
             orgId={orgId}
-            belong={props.belong}
+            belong={props.define.workItem.current.space}
             value={props.config.conditions[0]?.val}
             readonly={props.config.readonly}
             rootDisable={false}
@@ -113,14 +102,20 @@ const DeptWayNode: React.FC<DeptWayNodeProps> = (props: DeptWayNodeProps) => {
   );
 
   return (
-    <div className={props.defaultEditable ? cls['node'] : cls['node-unEdit']}>
+    <div className={props.isEdit ? cls['node'] : cls['node-unEdit']}>
       <div className={cls['node-body']}>
         <div className={cls['node-body-main']}>
           {nodeHeader}
           {nodeContent}
         </div>
       </div>
-      <div className={cls['node-footer']}>{footer}</div>
+      <div className={cls['node-footer']}>
+        {props.isEdit && (
+          <div className={cls['btn']}>
+            <InsertButton onInsertNode={props.onInsertNode} />
+          </div>
+        )}
+      </div>
     </div>
   );
 };
@@ -128,7 +123,6 @@ const DeptWayNode: React.FC<DeptWayNodeProps> = (props: DeptWayNodeProps) => {
 DeptWayNode.defaultProps = {
   config: {},
   level: 1,
-  size: 0,
 };
 
 export default DeptWayNode;

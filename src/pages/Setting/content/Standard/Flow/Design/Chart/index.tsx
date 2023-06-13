@@ -2,14 +2,16 @@ import cls from './index.module.less';
 import FlowDrawer from './FlowDrawer';
 import ProcessTree from './ProcessTree';
 import React, { useState } from 'react';
-import { AddNodeType, NodeModel } from './processType';
+import { AddNodeType, NodeModel } from '../processType';
 import { IWorkDefine } from '@/ts/core';
+import { schema } from '@/ts/base';
 
 interface IProps {
-  current: IWorkDefine;
   scale?: number;
-  resource: any;
-  defaultEditable: boolean;
+  isEdit: boolean;
+  resource: NodeModel;
+  current?: IWorkDefine;
+  instance?: schema.XWorkInstance;
 }
 
 const ChartDesign: React.FC<IProps> = (props) => {
@@ -25,18 +27,20 @@ const ChartDesign: React.FC<IProps> = (props) => {
             style={{ transform: `scale(${(props.scale ?? 100) / 100})` }}>
             {/* 树结构展示 */}
             <ProcessTree
-              belongId={props.current.workItem.belongId}
-              defaultEditable={props.defaultEditable}
+              define={props.current}
+              isEdit={props.isEdit}
               resource={props.resource}
               onSelectedNode={(params) => {
                 if (
                   params.type !== AddNodeType.CONCURRENTS &&
                   params.type !== AddNodeType.ORGANIZATIONA
                 ) {
-                  //设置当前操作的节点，后续都是对当前节点的操作
-                  params.designId = props.current.id;
                   setCurrentNode(params);
-                  setIsOpen(true);
+                  setIsOpen(
+                    props.instance == undefined ||
+                      props.instance.tasks?.find((a) => a.nodeId == params.id) !=
+                        undefined,
+                  );
                 } else {
                   return false;
                 }
@@ -48,15 +52,14 @@ const ChartDesign: React.FC<IProps> = (props) => {
       {/* 侧边数据填充 */}
       {currentNode && (
         <FlowDrawer
-          forms={props.resource.props.operations}
+          instance={props.instance}
+          forms={currentNode.forms || []}
           define={props.current}
-          defaultEditable={props.defaultEditable}
-          isOpen={
-            isOpen && (props.defaultEditable || currentNode?.task?.records?.length > 0)
-          }
-          current={currentNode!}
+          defaultEditable={props.isEdit}
+          isOpen={isOpen}
+          current={currentNode}
           onClose={() => {
-            setIsOpen(false);
+            setCurrentNode(undefined);
           }}
         />
       )}

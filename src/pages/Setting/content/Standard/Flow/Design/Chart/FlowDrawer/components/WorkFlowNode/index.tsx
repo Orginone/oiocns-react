@@ -2,14 +2,14 @@ import React, { useState } from 'react';
 import { AiOutlineSetting } from 'react-icons/ai';
 import { Row, Button, Space, Modal, message } from 'antd';
 import cls from './index.module.less';
-import { NodeType } from '../../processType';
+import { NodeModel } from '../../../../processType';
 import { IWorkDefine } from '@/ts/core';
 import SelectDefine from '../../../../../Comp/SelectDefine';
 import ShareShowComp from '@/bizcomponents/IndentityManage/ShareShowComp';
 import { schema } from '@/ts/base';
 
 interface IProps {
-  current: NodeType;
+  current: NodeModel;
   define: IWorkDefine;
 }
 
@@ -22,12 +22,8 @@ const WorkFlowNode: React.FC<IProps> = (props) => {
   const [isOpen, setIsOpen] = useState<boolean>(false); // 打开弹窗
   const [selectChildWork, setSelectChildWork] = useState<schema.XWorkDefine>();
   const [currentData, setCurrentData] = useState({
-    title: props.current.props.assignedUser[0]?.name,
-    key: props.current.props.assignedUser[0]?.id,
-    data: {
-      id: props.current.props.assignedUser[0]?.id,
-      name: props.current.props.assignedUser[0]?.name,
-    },
+    id: props.current.destId,
+    name: props.current.destName,
   });
 
   return (
@@ -43,23 +39,19 @@ const WorkFlowNode: React.FC<IProps> = (props) => {
             shape="round"
             size="small"
             onClick={() => {
-              props.current.props.assignedType = 'JOB';
               setIsOpen(true);
             }}>
             选择其他办事
           </Button>
         </Space>
         <div>
-          {currentData?.title ? (
+          {currentData.id != '' ? (
             <ShareShowComp
-              departData={[currentData.data]}
+              departData={[currentData]}
               deleteFuc={(_id: string) => {
-                props.current.props.assignedUser = { id: '', name: '' };
-                setCurrentData({
-                  title: '',
-                  key: '',
-                  data: { id: '', name: '' },
-                });
+                props.current.destId = '';
+                props.current.destName = '';
+                setCurrentData({ id: '', name: '' });
               }}></ShareShowComp>
           ) : null}
         </div>
@@ -79,20 +71,9 @@ const WorkFlowNode: React.FC<IProps> = (props) => {
             selectChildWork.belongId,
           );
           let name = `${selectChildWork.name} [${b.name}]`;
-          props.current.props.assignedUser = [
-            {
-              name: name,
-              id: selectChildWork.id,
-            },
-          ];
-          setCurrentData({
-            title: name,
-            key: selectChildWork.id,
-            data: {
-              id: selectChildWork.id,
-              name: name,
-            },
-          });
+          props.current.destId = selectChildWork.id;
+          props.current.destName = name;
+          setCurrentData({ id: selectChildWork.id, name: name });
           setIsOpen(false);
         }}
         onCancel={() => setIsOpen(false)}>

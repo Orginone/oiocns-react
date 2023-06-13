@@ -8,18 +8,19 @@ import { ImUndo2 } from 'react-icons/im';
 import cls from './index.module.less';
 import OioForm from '@/bizcomponents/FormDesign/OioFormNext';
 import { schema } from '@/ts/base';
-import { IWorkDefine } from '@/ts/core';
+import { IBelong, IWorkDefine } from '@/ts/core';
 import BashThing from '@/pages/Work/content/Work/ThingTables/BaseThing';
 import EntityIcon from '@/bizcomponents/GlobalComps/entityIcon';
 
 export interface TaskDetailType {
+  belong: IBelong;
   task: schema.XWorkTask;
-  define: IWorkDefine;
+  define?: IWorkDefine;
   instance: schema.XWorkInstance;
   onBack?: () => void;
 }
 
-const Detail: React.FC<TaskDetailType> = ({ task, define, instance, onBack }) => {
+const Detail: React.FC<TaskDetailType> = ({ task, define, belong, instance, onBack }) => {
   const formRef = useRef<ProFormInstance<any>>();
   const [comment, setComment] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
@@ -64,7 +65,7 @@ const Detail: React.FC<TaskDetailType> = ({ task, define, instance, onBack }) =>
         <OioForm
           key={item.id}
           form={item}
-          belong={define.workItem.current.space}
+          belong={belong}
           formRef={undefined}
           fieldsValue={data}
           disabled={disabled}
@@ -215,7 +216,7 @@ const Detail: React.FC<TaskDetailType> = ({ task, define, instance, onBack }) =>
     {
       key: '2',
       label: `流程图`,
-      children: <Design current={define} instance={instance} IsEdit={false} />,
+      children: <Design IsEdit={false} current={define} instance={instance} />,
     },
   ];
 

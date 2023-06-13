@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import cls from './index.module.less';
-import { NodeModel, dataType, FieldCondition } from '../../../processType';
+import { NodeModel, dataType, FieldCondition } from '../../../../processType';
 import orgCtrl from '@/ts/controller';
 import DeptWayGroupItemConfig from '../DeptWayGroupItemConfig';
 interface IProps {
@@ -37,7 +37,7 @@ const DeptWayNode: React.FC<IProps> = (props) => {
         label: '=',
         type: dataType.BELONG,
         val: orgCtrl.user.id,
-        display:orgCtrl.user.id,
+        display: orgCtrl.user.id,
       });
     }
   }, []);

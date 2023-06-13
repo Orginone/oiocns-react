@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { AiOutlineDelete } from 'react-icons/ai';
 import { Select, InputNumber, Input, Form } from 'antd';
+import cls from './index.module.less';
 import {
-  NodeType,
+  NodeModel,
   conditiondType,
   getConditionKeys,
   dataType,
   FieldCondition,
-} from '../../processType';
-import cls from './index.module.less';
+} from '../../../../processType';
 
 interface IProps {
-  currnet: NodeType;
+  currnet: NodeModel;
   conditions: FieldCondition[];
 }
 
@@ -22,7 +22,7 @@ interface IProps {
 const ConditionGroupItemConfig: React.FC<IProps> = (props) => {
   const [key, setKey] = useState(0);
   const [form] = Form.useForm();
-  const [currentNode, setCurrentNode] = useState<NodeType>();
+  const [currentNode, setCurrentNode] = useState<NodeModel>();
   const [conditions, setConditions] = useState<FieldCondition[]>([]);
 
   useEffect(() => {
@@ -44,13 +44,6 @@ const ConditionGroupItemConfig: React.FC<IProps> = (props) => {
             item.label = currentValue.allContent[index].label;
             item.paramKey = currentValue.allContent[index].paramKey;
             item.paramLabel = currentValue.allContent[index].paramLabel;
-            /**这里临时存一个数组,用来判断新旧值是否发生变化，然后清空值 */
-            // if (paramKeyArr[index] !== currentValue.allContent[index].paramKey) {
-            //   currentValue.allContent[index].val = '';
-            //   form.setFieldsValue({
-            //     allContent: [...currentValue.allContent],
-            //   });
-            // }
             /**当前数组得替换一下 */
             newArr.push(currentValue.allContent[index].paramKey);
             // setParamKeyArr(newArr);

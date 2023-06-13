@@ -1,4 +1,4 @@
-import { Popover, Tooltip, Button } from 'antd';
+import { Popover, Button } from 'antd';
 import {
   AiOutlinePlus,
   AiOutlineShareAlt,
@@ -10,6 +10,7 @@ import {
 } from 'react-icons/ai';
 import React from 'react';
 import cls from './index.module.less';
+import { AddNodeType } from '../../../processType';
 
 type InsertButtonProps = {
   onInsertNode: Function;
@@ -21,51 +22,41 @@ type InsertButtonProps = {
  * @returns
  */
 const InsertButton: React.FC<InsertButtonProps> = (props: any) => {
-  // const { FlowSub } = useContext(EventContext);
-  // const FlowSub: any = useContext(EventContext);
-
-  // const FlowSub = useEventEmitter();
-  const text = <span>添加流程节点</span>;
-
   /**
    * 添加审批节点
    * */
   const addApprovalNode = () => {
-    props.onInsertNode('APPROVAL');
-    // FlowSub.emit('insertNode', 'APPROVAL');
+    props.onInsertNode(AddNodeType.APPROVAL);
   };
   /**
    * 添加抄送节点
    * */
   const addCcNode = () => {
-    props.onInsertNode('CC');
-    // FlowSub.emit('insertNode', 'CC');
+    props.onInsertNode(AddNodeType.CC);
   };
   /**
    * 添加条件审核
    * */
   const addConditionsNode = () => {
-    props.onInsertNode('CONDITIONS');
-    // FlowSub.emit('insertNode', 'CONDITIONS');
+    props.onInsertNode(AddNodeType.CONDITION);
   };
   /**
    * 同时审核
    * */
   const addConcurrentsNode = () => {
-    props.onInsertNode('CONCURRENTS');
-    // FlowSub.emit('insertNode', 'CONCURRENTS');
+    props.onInsertNode(AddNodeType.CONCURRENTS);
   };
   /**
    * 组织网关
    */
   const addDeptGateWayNode = () => {
-    props.onInsertNode('ORGANIZATIONAL');
+    props.onInsertNode(AddNodeType.ORGANIZATIONA);
   };
   /**
    * 子流程
    */
   const addWorkFlowNode = () => {
-    props.onInsertNode('CHILDWORK');
+    props.onInsertNode(AddNodeType.CHILDWORK);
   };
 
   const content = (
@@ -145,10 +136,12 @@ const InsertButton: React.FC<InsertButtonProps> = (props: any) => {
     </div>
   );
   return (
-    <Popover placement="bottomLeft" title={text} content={content} trigger="click">
-      <Tooltip title="添加节点" placement="right">
-        <Button type="primary" shape="circle" icon={<AiOutlinePlus />} />
-      </Tooltip>
+    <Popover
+      placement="bottomLeft"
+      title={<span>添加流程节点</span>}
+      content={content}
+      trigger="click">
+      <Button type="primary" shape="circle" icon={<AiOutlinePlus />} />
     </Popover>
   );
 };
