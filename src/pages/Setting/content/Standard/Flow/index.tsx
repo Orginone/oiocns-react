@@ -7,7 +7,7 @@ import FlowCard from './Comp/FlowCard';
 import { FlowColumn } from '@/pages/Setting/config/columns';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import WorkDefineModal from '@/bizcomponents/GlobalComps/createFlow';
-import Design from './Design';
+import Design from '@/bizcomponents/FlowDesign';
 import { orgAuth } from '@/ts/core/public/consts';
 import PageCard from '@/components/PageCard';
 import { IWorkDefine, IFlowClass } from '@/ts/core';

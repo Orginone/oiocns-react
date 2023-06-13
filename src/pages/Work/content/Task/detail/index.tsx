@@ -1,4 +1,4 @@
-import Design from '@/pages/Setting/content/Standard/Flow/Design';
+import Design from '@/bizcomponents/FlowDesign';
 import orgCtrl from '@/ts/controller';
 import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
 import { ProFormInstance } from '@ant-design/pro-form';
