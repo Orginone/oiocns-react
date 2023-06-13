@@ -24,7 +24,7 @@ export interface ISpecies extends IFileInfo<schema.XSpecies> {
 /** 元数据分类实现 */
 export class Species extends Entity<schema.XSpecies> implements ISpecies {
   constructor(_metadata: schema.XSpecies, _directory: IDirectory) {
-    super(_metadata);
+    super({ ..._metadata, typeName: '类别' });
     this.directory = _directory;
   }
   directory: IDirectory;
@@ -55,6 +55,7 @@ export class Species extends Entity<schema.XSpecies> implements ISpecies {
         this.directory.specieses = this.directory.specieses.filter(
           (i) => i.key != this.key,
         );
+        this.directory = destination;
         destination.specieses.push(this);
       } else {
         this.setMetadata({ ...this.metadata, directoryId: this.directory.id });
@@ -93,6 +94,7 @@ export class Species extends Entity<schema.XSpecies> implements ISpecies {
         page: PageAll,
       });
       if (res.success) {
+        this._itemLoaded = true;
         this.items = res.data.result || [];
       }
     }

@@ -58,6 +58,7 @@ export class Application extends Entity<schema.XApplication> implements IApplica
         this.directory.applications = this.directory.applications.filter(
           (i) => i.key != this.key,
         );
+        this.directory = destination;
         destination.applications.push(this);
       } else {
         this.setMetadata({ ...this.metadata, directoryId: this.directory.id });

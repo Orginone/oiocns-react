@@ -15,7 +15,7 @@ export interface IProperty extends IFileInfo<schema.XProperty> {
 
 export class Property extends Entity<schema.XProperty> implements IProperty {
   constructor(_metadata: schema.XProperty, _directory: IDirectory) {
-    super(_metadata);
+    super({ ..._metadata, typeName: '属性' });
     this.directory = _directory;
   }
   directory: IDirectory;
@@ -46,6 +46,7 @@ export class Property extends Entity<schema.XProperty> implements IProperty {
         this.directory.propertys = this.directory.propertys.filter(
           (i) => i.key != this.key,
         );
+        this.directory = destination;
         destination.propertys.push(this);
       } else {
         this.setMetadata({ ...this.metadata, directoryId: this.directory.id });
@@ -69,7 +70,9 @@ export class Property extends Entity<schema.XProperty> implements IProperty {
         id: this.id,
       });
       if (res.success) {
-        this.directory.forms = this.directory.forms.filter((i) => i.key != this.key);
+        this.directory.propertys = this.directory.propertys.filter(
+          (i) => i.key != this.key,
+        );
       }
       return res.success;
     }

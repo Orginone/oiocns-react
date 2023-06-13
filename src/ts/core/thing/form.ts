@@ -39,7 +39,7 @@ export interface IForm extends IFileInfo<schema.XForm> {
 
 export class FormView extends Entity<schema.XForm> implements IFormView {
   constructor(_metadata: schema.XForm, _directory?: IDirectory) {
-    super(_metadata);
+    super({ ..._metadata, typeName: '表单' });
     this.directory = _directory;
   }
   directory: IDirectory | undefined;
@@ -88,6 +88,7 @@ export class Form extends FormView implements IForm {
       const success = await this.update(this.metadata);
       if (success) {
         this.directory.forms = this.directory.forms.filter((i) => i.key != this.key);
+        this.directory = destination;
         destination.forms.push(this);
       } else {
         this.setMetadata({ ...this.metadata, directoryId: this.directory.id });

@@ -122,6 +122,7 @@ export class SysFileInfo extends Entity<schema.XEntity> implements ISysFileInfo 
       });
       if (res.success) {
         this.directory.files = this.directory.files.filter((i) => i.key != this.key);
+        this.directory = destination;
         destination.files.push(this);
       }
       return res.success;

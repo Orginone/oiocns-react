@@ -126,8 +126,9 @@ export class Directory extends Entity<schema.XDirectory> implements IDirectory {
       this.metadata.belongId,
       file,
       `${this.id}/${file.name}`,
-      (p) => {
-        task.finished = p;
+      (pn) => {
+        task.finished = pn;
+        p?.apply(this, [pn]);
         this.taskEmitter.changCallback();
       },
     );

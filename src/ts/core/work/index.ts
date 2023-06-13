@@ -33,6 +33,7 @@ export const fullDefineRule = (data: XWorkDefine) => {
     data.allowEdit = rule.allowEdit;
     data.allowSelect = rule.allowSelect;
   }
+  data.typeName = '事项';
   return data;
 };
 
