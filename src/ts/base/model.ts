@@ -334,6 +334,8 @@ export type PropertyModel = {
   sourceId: string;
   // 备注
   remark: string;
+  // 附加信息
+  info: string;
 };
 
 export type DictModel = {

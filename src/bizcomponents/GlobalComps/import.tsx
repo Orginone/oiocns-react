@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { message, Upload, UploadProps, Button, Space, Avatar, Progress } from 'antd';
-import { ProFormColumnsType } from '@ant-design/pro-components';
+import { ProColumns, ProFormColumnsType, ProTable } from '@ant-design/pro-components';
 import SchemaForm from '@/components/SchemaForm';
 import { IPropClass } from '@/ts/core';
 import { AiOutlineBank, AiOutlineCheck } from 'react-icons/ai';
-import { ExcelConfig, readXlsx } from '@/utils/excel';
-import { SheetReadConfig } from '@/utils/excel';
+import { readXlsx } from '@/utils/excel/index';
+import { ExcelConfig, SheetConfig, ReadConfig, ErrorMessage } from '@/utils/excel/types';
 
 interface IProps {
   title: string;
@@ -13,15 +13,42 @@ interface IProps {
   open: boolean;
   handleCancel: () => void;
   handleOk: () => void;
-  sheetReadConfigs: SheetReadConfig[];
+  readConfigs: (
+    excelConfig: ExcelConfig<any>,
+  ) => ReadConfig<any, any, SheetConfig<any>, ExcelConfig<any>>[];
   completed?: () => void;
 }
+
+const errorHeaders: ProColumns<ErrorMessage>[] = [
+  {
+    title: '序号',
+    valueType: 'index',
+    width: 50,
+  },
+  {
+    title: '表名',
+    dataIndex: 'sheetName',
+    key: 'sheetName',
+  },
+  {
+    title: '行数',
+    dataIndex: 'row',
+    key: 'row',
+  },
+  {
+    title: '错误信息',
+    dataIndex: 'message',
+    key: 'message',
+    width: 460,
+  },
+];
 
 /*
   编辑
 */
 const ImportModal = (props: IProps) => {
   const [progress, setProgress] = useState<number>(0);
+  const [errors, setErrors] = useState<ErrorMessage[]>([]);
   const uploadProps: UploadProps = {
     multiple: false,
     showUploadList: false,
@@ -36,9 +63,22 @@ const ImportModal = (props: IProps) => {
     },
     async customRequest(options) {
       let config: ExcelConfig<any> = {
+        progress: 0,
         context: {},
+        initialize: () => {
+          setProgress(0);
+          setErrors([]);
+        },
         onProgress: function (progress: number): void {
+          this.progress = progress;
           setProgress(progress);
+        },
+        addProgress: function (partProgress: number): void {
+          this.progress += partProgress;
+          setProgress(Number(this.progress.toFixed(2)));
+        },
+        onReadError: function (errorMessages: ErrorMessage[]): void {
+          setErrors(errorMessages);
         },
         onError: function (error: string): void {
           message.error(error);
@@ -47,7 +87,7 @@ const ImportModal = (props: IProps) => {
           props.completed?.apply(props);
         },
       };
-      readXlsx(options.file as File, config, props.sheetReadConfigs);
+      readXlsx(options.file as File, config, props.readConfigs(config));
     },
   };
   const columns: ProFormColumnsType[] = [
@@ -86,11 +126,30 @@ const ImportModal = (props: IProps) => {
       },
     },
   ];
+  if (errors.length > 0) {
+    columns.push({
+      title: '错误信息',
+      dataIndex: 'table',
+      colProps: { span: 24 },
+      renderFormItem: () => {
+        return (
+          <ProTable
+            dataSource={errors}
+            cardProps={{ bodyStyle: { padding: 0 } }}
+            scroll={{ y: 300 }}
+            options={false}
+            search={false}
+            columns={errorHeaders}
+          />
+        );
+      },
+    });
+  }
   return (
     <SchemaForm
       title={props.title}
       open={props.open}
-      width={640}
+      width={860}
       rowProps={{
         gutter: [24, 0],
       }}
@@ -101,7 +160,8 @@ const ImportModal = (props: IProps) => {
           props.handleCancel();
         }
       }}
-      columns={columns}></SchemaForm>
+      columns={columns}
+    />
   );
 };
 
