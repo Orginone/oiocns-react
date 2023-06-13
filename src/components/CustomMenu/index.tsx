@@ -129,7 +129,9 @@ const CustomMenu = (props: CustomMenuType) => {
                   setVisibleMenu(open);
                 }}
                 trigger={['click', 'contextMenu']}>
-                <RiMore2Fill style={{ fontSize: 22, marginTop: 10 }} />
+                {!props.collapsed && (
+                  <RiMore2Fill style={{ fontSize: 22, marginTop: 10 }} />
+                )}
               </Dropdown>
             )}
           </span>

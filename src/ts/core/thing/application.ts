@@ -24,10 +24,12 @@ export class Application extends Entity<schema.XApplication> implements IApplica
     _metadata: schema.XApplication,
     _directory: IDirectory,
     _parent?: IApplication,
+    _application?: schema.XApplication[],
   ) {
     super(_metadata);
     this.parent = _parent;
     this.directory = _directory;
+    this.loadChildren(_application);
   }
   works: IWork[] = [];
   directory: IDirectory;
@@ -106,6 +108,15 @@ export class Application extends Entity<schema.XApplication> implements IApplica
       let work = new Work(res.data, this);
       this.works.push(work);
       return work;
+    }
+  }
+  private loadChildren(applications?: schema.XApplication[]) {
+    if (applications && applications.length > 0) {
+      applications
+        .filter((i) => i.parentId === this.metadata.id)
+        .forEach((i) => {
+          this.children.push(new Application(i, this.directory, this, applications));
+        });
     }
   }
 }
