@@ -104,7 +104,6 @@ const FlowList: React.FC<IProps> = ({ current }: IProps) => {
             if (define) {
               return (
                 <Design
-                  IsEdit={true}
                   Title={'办事设计'}
                   current={define}
                   onBack={() => setModalType('')}

@@ -1,8 +1,8 @@
 import { schema, model, kernel } from '../../../base';
 import { IIdentity, Identity } from '../identity/identity';
-import { OperateType, SpeciesType, TargetType } from '../../public/enums';
+import { OperateType, TargetType } from '../../public/enums';
+import { Directory, IDirectory } from '../../thing/directory';
 import { PageAll } from '../../public/consts';
-import { ISpeciesItem, createSpecies } from '../../thing/';
 import { ITeam, Team } from './team';
 import { IBelong } from './belong';
 
@@ -10,24 +10,18 @@ import { IBelong } from './belong';
 export interface ITarget extends ITeam {
   /** 用户设立的身份(角色) */
   identitys: IIdentity[];
-  /** 用户设立的管理类别 */
-  species: ISpeciesItem[];
-  /** 支持的类别类型 */
-  speciesTypes: string[];
   /** 子用户 */
   subTarget: ITarget[];
   /** 所有相关用户 */
   targets: ITarget[];
+  /** 用户的目录 */
+  directory: IDirectory;
   /** 退出用户群 */
   exit(): Promise<boolean>;
   /** 加载用户设立的身份(角色)对象 */
   loadIdentitys(reload?: boolean): Promise<IIdentity[]>;
-  /** 加载用户设立的管理类别 */
-  loadSpecies(reload?: boolean): Promise<ISpeciesItem[]>;
   /** 为用户设立身份 */
   createIdentity(data: model.IdentityModel): Promise<IIdentity | undefined>;
-  /** 为用户设立管理类别 */
-  createSpecies(data: model.SpeciesModel): Promise<ISpeciesItem | undefined>;
 }
 
 /** 用户基类实现 */
@@ -39,13 +33,11 @@ export abstract class Target extends Team implements ITarget {
     _memberTypes: TargetType[] = [TargetType.Person],
   ) {
     super(_metadata, _labels, _space, _memberTypes);
-    this.speciesTypes = [SpeciesType.Application];
+    this.directory = new Directory(_metadata, this);
   }
-  speciesTypes: string[] = [];
   identitys: IIdentity[] = [];
-  species: ISpeciesItem[] = [];
+  directory: IDirectory;
   private _identityLoaded: boolean = false;
-  private _speciesLoaded: boolean = false;
   async loadIdentitys(reload?: boolean | undefined): Promise<IIdentity[]> {
     if (!this._identityLoaded || reload) {
       const res = await kernel.queryTargetIdentitys({
@@ -61,24 +53,6 @@ export abstract class Target extends Team implements ITarget {
     }
     return this.identitys;
   }
-  async loadSpecies(reload?: boolean | undefined): Promise<ISpeciesItem[]> {
-    if (!this._speciesLoaded || reload) {
-      const res = await kernel.querySpeciesTree({
-        id: this.id,
-        upTeam: this.typeName === TargetType.Group,
-        belongId: this.space.id,
-        filter: '',
-      });
-      if (res.success) {
-        this._speciesLoaded = true;
-        this.species = (res.data.result || [])
-          .map((i) => createSpecies(i, this))
-          .filter((i) => i != undefined)
-          .map((i) => i!);
-      }
-    }
-    return this.species;
-  }
   async createIdentity(data: model.IdentityModel): Promise<IIdentity | undefined> {
     data.shareId = this.id;
     const res = await kernel.createIdentity(data);
@@ -87,18 +61,6 @@ export abstract class Target extends Team implements ITarget {
       this.identitys.push(identity);
       identity.createIdentityMsg(OperateType.Create, this.metadata);
       return identity;
-    }
-  }
-  async createSpecies(data: model.SpeciesModel): Promise<ISpeciesItem | undefined> {
-    data.shareId = this.id;
-    data.parentId = '0';
-    const res = await kernel.createSpecies(data);
-    if (res.success && res.data?.id) {
-      const species = createSpecies(res.data, this);
-      if (species) {
-        this.species.push(species);
-      }
-      return species;
     }
   }
   protected async pullSubTarget(team: ITeam): Promise<boolean> {

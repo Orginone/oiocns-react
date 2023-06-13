@@ -236,7 +236,6 @@ export class Company extends Belong implements ICompany {
     await this.loadCohorts(reload);
     await this.loadMembers(reload);
     await this.loadSuperAuth(reload);
-    await this.loadSpecies(reload);
     for (const group of this.groups) {
       await group.deepLoad(reload);
     }

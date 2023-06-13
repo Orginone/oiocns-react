@@ -135,7 +135,6 @@ export class Department extends Target implements IDepartment {
   async deepLoad(reload: boolean = false): Promise<void> {
     await this.loadChildren(reload);
     await this.loadMembers(reload);
-    await this.loadSpecies(reload);
     for (const department of this.children) {
       await department.deepLoad(reload);
     }

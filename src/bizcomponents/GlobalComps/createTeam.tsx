@@ -28,6 +28,11 @@ const CreateTeamModal = (props: Iprops) => {
   } else if (props.typeNames.includes(props.title)) {
     props.typeNames.splice(0, 1);
   }
+  const metainfo = {
+    ...props.current.metadata,
+    teamCode: props.current.metadata.team?.code,
+    teamName: props.current.metadata.team?.name,
+  };
   if (!props.open || props.typeNames.length === 0) return <></>;
   const uploadProps: UploadProps = {
     multiple: false,
@@ -140,7 +145,7 @@ const CreateTeamModal = (props: Iprops) => {
       }
       open={props.open}
       width={640}
-      initialValues={props.isEdit ? props.current.metadata : {}}
+      initialValues={props.isEdit ? metainfo : {}}
       onOpenChange={(open: boolean) => {
         if (open) {
           if (props.isEdit) {

@@ -1,12 +1,14 @@
 import {
   badRequest,
   BucketOpreateModel,
+  BucketOpreates,
+  FileItemModel,
   PageModel,
   PageResult,
   ResultType,
 } from '../model';
 import StoreHub from './storehub';
-import { logger } from '../common';
+import { blobToDataUrl, encodeKey, logger, sliceFile } from '../common';
 import axios from 'axios';
 
 /**
@@ -342,6 +344,48 @@ export default class AnyStore {
       },
       data,
     );
+  }
+  /**
+   * 文件上传
+   * @param file 文件
+   * @param name 名称
+   * @param key 路径
+   */
+  public async fileUpdate(
+    belongId: string,
+    file: Blob,
+    key: string,
+    progress: (p: number) => void,
+  ): Promise<FileItemModel | undefined> {
+    key = encodeKey(key);
+    const data: BucketOpreateModel = {
+      key: key,
+      operate: BucketOpreates.Upload,
+    };
+    progress.apply(this, [0]);
+    const slices = sliceFile(file, 1024 * 1024);
+    for (let i = 0; i < slices.length; i++) {
+      const s = slices[i];
+      data.fileItem = {
+        index: i,
+        uploadId: key,
+        size: file.size,
+        data: [],
+        dataUrl: await blobToDataUrl(s),
+      };
+      const res = await this.bucketOpreate<FileItemModel>(belongId, data);
+      if (!res.success) {
+        data.operate = BucketOpreates.AbortUpload;
+        await this.bucketOpreate<boolean>(belongId, data);
+        progress.apply(this, [-1]);
+        return;
+      }
+      const finished = (i - 1) * 1024 * 1024 + s.size;
+      progress.apply(this, [finished]);
+      if (finished === file.size && res.data) {
+        return res.data;
+      }
+    }
   }
   /**
    * 加载物
