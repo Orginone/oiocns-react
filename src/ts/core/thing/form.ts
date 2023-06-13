@@ -39,7 +39,7 @@ export interface IForm extends IFileInfo<schema.XForm> {
 
 export class FormView extends Entity<schema.XForm> implements IFormView {
   constructor(_metadata: schema.XForm, _directory?: IDirectory) {
-    super({ ..._metadata, typeName: '表单' });
+    super(_metadata);
     this.directory = _directory;
   }
   directory: IDirectory | undefined;

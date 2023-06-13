@@ -24,7 +24,7 @@ export interface ISpecies extends IFileInfo<schema.XSpecies> {
 /** 元数据分类实现 */
 export class Species extends Entity<schema.XSpecies> implements ISpecies {
   constructor(_metadata: schema.XSpecies, _directory: IDirectory) {
-    super({ ..._metadata, typeName: '类别' });
+    super(_metadata);
     this.directory = _directory;
   }
   directory: IDirectory;
