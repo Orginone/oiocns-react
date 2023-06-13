@@ -1,20 +1,20 @@
-import { ISpeciesItem } from './species';
-import { kernel, model, schema } from '@/ts/base';
-import { XProperty } from '@/ts/base/schema';
-import { Entity, IEntity, orgAuth } from '../../public';
+import { schema, model, kernel } from '../../base';
+import { Entity, IEntity, orgAuth } from '../../core/public';
+import { IDirectory } from './directory';
+import { IFileInfo } from './fileinfo';
 
-export interface IFormClass extends ISpeciesItem {
-  /** 分类下的表单 */
-  forms: IForm[];
-  /** 加载表单 */
-  loadForms(reload?: boolean): Promise<IForm[]>;
-  /** 新建表单 */
-  createForm(data: model.FormModel): Promise<IForm | undefined>;
+/** 表单类只读接口 */
+export interface IFormView extends IEntity<schema.XForm> {
+  /** 目录 */
+  directory: IDirectory | undefined;
+  /** 表单特性 */
+  attributes: schema.XAttribute[];
+  /** 加载表单特性 */
+  loadAttributes(reload?: boolean): Promise<schema.XAttribute[]>;
 }
 
-export interface IForm extends IEntity<schema.XForm> {
-  /** 表单分类 */
-  species: ISpeciesItem;
+/** 表单类接口 */
+export interface IForm extends IFileInfo<schema.XForm> {
   /** 表单特性 */
   attributes: schema.XAttribute[];
   /** 更新表单 */
@@ -26,7 +26,7 @@ export interface IForm extends IEntity<schema.XForm> {
   /** 新建表单特性 */
   createAttribute(
     data: model.AttributeModel,
-    property?: XProperty,
+    property?: schema.XProperty,
   ): Promise<schema.XAttribute | undefined>;
   /** 更新表单特性 */
   updateAttribute(
@@ -37,40 +37,14 @@ export interface IForm extends IEntity<schema.XForm> {
   deleteAttribute(data: schema.XAttribute): Promise<boolean>;
 }
 
-export class Form extends Entity<schema.XForm> implements IForm {
-  constructor(_metadata: schema.XForm, _species: ISpeciesItem) {
+export class FormView extends Entity<schema.XForm> implements IFormView {
+  constructor(_metadata: schema.XForm, _directory?: IDirectory) {
     super(_metadata);
-    this.species = _species;
+    this.directory = _directory;
   }
-  species: ISpeciesItem;
+  directory: IDirectory | undefined;
   attributes: schema.XAttribute[] = [];
   private _attributeLoaded: boolean = false;
-  async update(data: model.FormModel): Promise<boolean> {
-    data.shareId = this.metadata.shareId;
-    data.speciesId = this.metadata.speciesId;
-    data.typeName = this.metadata.typeName;
-    const res = await kernel.updateForm(data);
-    if (res.success && res.data.id) {
-      res.data.typeName = '表单';
-      this.setMetadata(res.data);
-    }
-    return res.success;
-  }
-  async delete(): Promise<boolean> {
-    if (this.species) {
-      const res = await kernel.deleteForm({
-        id: this.id,
-      });
-      if (res.success) {
-        if ('forms' in this.species) {
-          const formClass = this.species as IFormClass;
-          formClass.forms = formClass.forms.filter((i) => i.key != this.key);
-        }
-      }
-      return res.success;
-    }
-    return false;
-  }
   async loadAttributes(reload: boolean = false): Promise<schema.XAttribute[]> {
     if (!this._attributeLoaded || reload) {
       const res = await kernel.queryFormAttributes({
@@ -84,18 +58,73 @@ export class Form extends Entity<schema.XForm> implements IForm {
     }
     return this.attributes;
   }
+}
+
+export class Form extends FormView implements IForm {
+  constructor(_metadata: schema.XForm, _directory: IDirectory) {
+    super(_metadata, _directory);
+    this.directory = _directory;
+  }
+  directory: IDirectory;
+  async rename(name: string): Promise<boolean> {
+    return await this.update({ ...this.metadata, name: name });
+  }
+  async copy(destination: IDirectory): Promise<boolean> {
+    if (destination.id != this.directory.id) {
+      const res = await destination.createForm({
+        ...this.metadata,
+        directoryId: destination.id,
+      });
+      return res != undefined;
+    }
+    return false;
+  }
+  async move(destination: IDirectory): Promise<boolean> {
+    if (
+      destination.id != this.directory.id &&
+      destination.metadata.belongId === this.directory.metadata.belongId
+    ) {
+      this.setMetadata({ ...this.metadata, directoryId: destination.id });
+      const success = await this.update(this.metadata);
+      if (success) {
+        this.directory.forms = this.directory.forms.filter((i) => i.key != this.key);
+        destination.forms.push(this);
+      } else {
+        this.setMetadata({ ...this.metadata, directoryId: this.directory.id });
+      }
+      return success;
+    }
+    return false;
+  }
+  async update(data: model.FormModel): Promise<boolean> {
+    data.directoryId = this.metadata.directoryId;
+    data.typeName = this.metadata.typeName;
+    const res = await kernel.updateForm(data);
+    if (res.success && res.data.id) {
+      res.data.typeName = '表单';
+      this.setMetadata(res.data);
+    }
+    return res.success;
+  }
+  async delete(): Promise<boolean> {
+    const res = await kernel.deleteForm({
+      id: this.id,
+    });
+    if (res.success) {
+      this.directory.forms = this.directory.forms.filter((i) => i.key != this.key);
+    }
+    return res.success;
+  }
   async createAttribute(
     data: model.AttributeModel,
-    property?: XProperty,
+    property?: schema.XProperty,
   ): Promise<schema.XAttribute | undefined> {
     data.formId = this.id;
     if (property) {
       data.propId = property.id;
-      data.valueType = property.valueType;
-      data.dictId = property.dictId;
     }
     if (!data.authId || data.authId.length < 5) {
-      data.authId = this.species?.metadata.authId ?? orgAuth.SuperAuthId;
+      data.authId = orgAuth.SuperAuthId;
     }
     const res = await kernel.createAttribute(data);
     if (res.success && res.data.id) {
@@ -116,7 +145,6 @@ export class Form extends Entity<schema.XForm> implements IForm {
       data.formId = this.id;
       if (property) {
         data.propId = property.id;
-        data.valueType = property.valueType;
       }
       const res = await kernel.updateAttribute(data);
       if (res.success && res.data.id) {

@@ -1,6 +1,13 @@
 export { CharCode } from './charCode';
 export { Emitter } from './emitter';
-export { blobToDataUrl, blobToNumberArray, formatSize, StringPako } from './format';
+export {
+  blobToDataUrl,
+  blobToNumberArray,
+  encodeKey,
+  formatSize,
+  sliceFile,
+  StringPako,
+} from './format';
 export type { IDisposable } from './lifecycle';
 export { sleep } from './lifecycle';
 export { logger, LoggerLevel } from './logger';
