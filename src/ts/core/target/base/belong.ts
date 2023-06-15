@@ -7,6 +7,7 @@ import { IPerson } from '../person';
 import { ITarget, Target } from './target';
 import { IChatMessage, ChatMessage } from '../../chat/message/chatmsg';
 import { IMsgChat, PersonMsgChat } from '../../chat/message/msgchat';
+import { targetOperates } from '../../public';
 
 /** 自归属用户接口类 */
 export interface IBelong extends ITarget {
@@ -92,6 +93,9 @@ export abstract class Belong extends Target implements IBelong {
         _newMembers.every((a) => a.id != i.chatId),
       );
     }
+  }
+  override operates(): model.OperateModel[] {
+    return [targetOperates.NewCohort, targetOperates.SettingAuth, ...super.operates()];
   }
   abstract get shareTarget(): ITarget[];
   abstract cohortChats: IMsgChat[];

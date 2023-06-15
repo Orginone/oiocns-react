@@ -1,7 +1,7 @@
 import { kernel, model, schema } from '../../base';
-import { Entity, PageAll } from '../public';
+import { PageAll } from '../public';
 import { IDirectory } from './directory';
-import { IFileInfo } from './fileinfo';
+import { FileInfo, IFileInfo } from './fileinfo';
 
 /** 元数据分类接口 */
 export interface ISpecies extends IFileInfo<schema.XSpecies> {
@@ -22,12 +22,10 @@ export interface ISpecies extends IFileInfo<schema.XSpecies> {
 }
 
 /** 元数据分类实现 */
-export class Species extends Entity<schema.XSpecies> implements ISpecies {
+export class Species extends FileInfo<schema.XSpecies> implements ISpecies {
   constructor(_metadata: schema.XSpecies, _directory: IDirectory) {
-    super(_metadata);
-    this.directory = _directory;
+    super(_metadata, _directory);
   }
-  directory: IDirectory;
   items: schema.XSpeciesItem[] = [];
   private _itemLoaded: boolean = false;
   async rename(name: string): Promise<boolean> {

@@ -3,6 +3,7 @@ import { OperateType, TargetType } from '../../public/enums';
 import { PageAll, orgAuth } from '../../public/consts';
 import { IBelong } from './belong';
 import { IMsgChatT, IMsgChat, MsgChat } from '../../chat/message/msgchat';
+import { entityOperates, fileOperates, teamOperates } from '../../public';
 
 /** 团队抽象接口类 */
 export interface ITeam extends IMsgChatT<schema.XTarget> {
@@ -28,6 +29,8 @@ export interface ITeam extends IMsgChatT<schema.XTarget> {
   hasAuthoritys(authIds: string[]): boolean;
   /** 接收相关用户增加变更 */
   teamChangedNotity(target: schema.XTarget): Promise<boolean>;
+  /** 用户的操作 */
+  operates(): model.OperateModel[];
 }
 
 /** 团队基类实现 */
@@ -152,6 +155,9 @@ export abstract class Team extends MsgChat<schema.XTarget> implements ITeam {
       notity = res.success;
     }
     return notity;
+  }
+  operates(): model.OperateModel[] {
+    return [entityOperates.Update, teamOperates.Pull, fileOperates.Remark];
   }
   abstract get chats(): IMsgChat[];
   abstract deepLoad(reload?: boolean): Promise<void>;

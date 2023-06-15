@@ -47,9 +47,8 @@ const CreateTeamModal = (props: Iprops) => {
     },
     async customRequest(options) {
       const file = options.file as File;
-      const docDir = await orgCtrl.user.filesys?.home?.create('头像');
-      if (docDir && file) {
-        const result = await docDir.upload(file.name, file);
+      if (file) {
+        const result = await orgCtrl.user.directory.createFile(file);
         if (result) {
           setAvatar(result.shareInfo());
         }

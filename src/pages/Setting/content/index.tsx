@@ -14,12 +14,16 @@ import AuthoritySetting from './Authority';
 import { MenuType } from '../config/menuType';
 import { TargetType, companyTypes, departmentTypes } from '@/ts/core';
 import Design from './Standard/Flow/Design';
+import FileSystem from './FileSystem';
 
 interface IProps {
   selectMenu: MenuItemType;
 }
 
 const ContentIndex = ({ selectMenu }: IProps) => {
+  if (selectMenu.itemType === '目录') {
+    return <FileSystem current={selectMenu.item} />;
+  }
   const loadConent = () => {
     /** 加载内容区 */
     switch (selectMenu.itemType) {

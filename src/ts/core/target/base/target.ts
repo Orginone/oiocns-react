@@ -5,6 +5,7 @@ import { Directory, IDirectory } from '../../thing/directory';
 import { PageAll } from '../../public/consts';
 import { ITeam, Team } from './team';
 import { IBelong } from './belong';
+import { targetOperates } from '../../public';
 
 /** 用户抽象接口类 */
 export interface ITarget extends ITeam {
@@ -33,7 +34,14 @@ export abstract class Target extends Team implements ITarget {
     _memberTypes: TargetType[] = [TargetType.Person],
   ) {
     super(_metadata, _labels, _space, _memberTypes);
-    this.directory = new Directory(_metadata, this);
+    this.directory = new Directory(
+      {
+        ..._metadata,
+        shareId: _metadata.id,
+        id: _metadata.id + '_',
+      } as unknown as schema.XDirectory,
+      this,
+    );
   }
   identitys: IIdentity[] = [];
   directory: IDirectory;
@@ -62,6 +70,9 @@ export abstract class Target extends Team implements ITarget {
       identity.createIdentityMsg(OperateType.Create, this.metadata);
       return identity;
     }
+  }
+  override operates(): model.OperateModel[] {
+    return [targetOperates.NewIdentity, ...super.operates()];
   }
   protected async pullSubTarget(team: ITeam): Promise<boolean> {
     const res = await kernel.pullAnyToTeam({

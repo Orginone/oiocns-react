@@ -1,4 +1,3 @@
-import { type } from 'os';
 import { XForm, XIdentity, XTarget } from './schema';
 // 请求类型定义
 export type ReqestType = {
@@ -632,9 +631,9 @@ export type FileItemModel = {
   /** 完整路径 */
   key: string;
   /** 创建时间 */
-  dateCreated: Date;
+  dateCreated: string;
   /** 修改时间 */
-  dateModified: Date;
+  dateModified: string;
   /** 文件类型 */
   contentType?: string;
   /** 是否是目录 */
@@ -690,6 +689,14 @@ export type TaskModel = {
   finished: number;
   createTime: Date;
 };
+
+/** 操作命令模型 */
+export type OperateModel = {
+  cmd: string;
+  label: string;
+  iconType: string;
+  menus?: OperateModel[];
+}
 
 /** 请求失败 */
 export const badRequest = (

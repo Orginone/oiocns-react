@@ -44,7 +44,7 @@ export abstract class Entity<T extends schema.XEntity>
     super();
     this.key = generateUuid();
     this._metadata = _metadata;
-    ShareIdSet.set(this.id, _metadata);
+    ShareIdSet.set(_metadata.id, _metadata);
   }
   _metadata: T;
   key: string;
@@ -64,8 +64,8 @@ export abstract class Entity<T extends schema.XEntity>
     return this.metadata.remark;
   }
   get metadata(): T {
-    if (ShareIdSet.has(this.id)) {
-      return ShareIdSet.get(this.id);
+    if (ShareIdSet.has(this._metadata.id)) {
+      return ShareIdSet.get(this._metadata.id);
     }
     return this._metadata;
   }

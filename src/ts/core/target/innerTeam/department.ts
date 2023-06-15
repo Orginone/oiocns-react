@@ -5,6 +5,7 @@ import { TargetType } from '../../public/enums';
 import { PageAll } from '../../public/consts';
 import { IMsgChat } from '../../chat/message/msgchat';
 import { ITeam } from '../base/team';
+import { targetOperates } from '../../public';
 
 /** 单位内部机构（部门）接口 */
 export interface IDepartment extends ITarget {
@@ -138,6 +139,9 @@ export class Department extends Target implements IDepartment {
     for (const department of this.children) {
       await department.deepLoad(reload);
     }
+  }
+  override operates(): model.OperateModel[] {
+    return [targetOperates.NewDepartment, ...super.operates()];
   }
   async teamChangedNotity(target: schema.XTarget): Promise<boolean> {
     if (this.childrenTypes.includes(target.typeName as TargetType)) {

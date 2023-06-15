@@ -1,31 +1,39 @@
 import { common, kernel, model, schema } from '../../base';
-import { Entity, IEntity, PageAll, TargetType } from '../public';
+import { PageAll, TargetType, directoryNew, directoryOperates } from '../public';
 import { ITarget } from '../target/base/target';
 import { Form, IForm } from './form';
-import { SysFileInfo, ISysFileInfo } from './fileinfo';
+import { SysFileInfo, ISysFileInfo, IFileInfo, FileInfo } from './fileinfo';
 import { Species, ISpecies } from './species';
+import { Member } from './member';
 import { Property, IProperty } from './property';
 import { Application, IApplication } from './application';
-import { BucketOpreates } from '@/ts/base/model';
+import { BucketOpreates, DirectoryModel } from '@/ts/base/model';
+import { encodeKey } from '@/ts/base/common';
 /** 可为空的进度回调 */
 export type OnProgress = (p: number) => void;
 
 /** 目录接口类 */
-export interface IDirectory extends IEntity<schema.XDirectory> {
+export interface IDirectory extends IFileInfo<schema.XDirectory> {
   /** 当前加载目录的用户 */
   target: ITarget;
   /** 上级目录 */
   parent: IDirectory | undefined;
   /** 下级文件系统项数组 */
   children: IDirectory[];
-  /** 是否为继承的类别 */
-  isInherited: boolean;
   /** 上传任务列表 */
   taskList: model.TaskModel[];
   /** 任务发射器 */
   taskEmitter: common.Emitter;
+  /** 目录下的内容 */
+  content(mode?: number): IFileInfo<schema.XEntity>[];
   /** 加载目录里的内容 */
   loadContent(reload?: boolean): Promise<boolean>;
+  /** 创建子目录 */
+  create(data: DirectoryModel): Promise<IDirectory | undefined>;
+  /** 更新目录 */
+  update(data: DirectoryModel): Promise<boolean>;
+  /** 删除目录 */
+  delete(): Promise<boolean>;
   /** 目录下的文件 */
   files: ISysFileInfo[];
   /** 加载文件 */
@@ -59,14 +67,20 @@ export interface IDirectory extends IEntity<schema.XDirectory> {
 }
 
 /** 目录实现类 */
-export class Directory extends Entity<schema.XDirectory> implements IDirectory {
+export class Directory extends FileInfo<schema.XDirectory> implements IDirectory {
   constructor(
-    _metadata: schema.XTarget | schema.XDirectory,
+    _metadata: schema.XDirectory,
     _target: ITarget,
     _parent?: IDirectory,
     _directorys?: schema.XDirectory[],
   ) {
-    super({ ..._metadata, typeName: '目录' } as schema.XDirectory);
+    super(
+      {
+        ..._metadata,
+        typeName: '目录',
+      },
+      _parent ?? (_target as unknown as IDirectory),
+    );
     this.target = _target;
     this.parent = _parent;
     this.taskEmitter = new common.Emitter();
@@ -83,16 +97,90 @@ export class Directory extends Entity<schema.XDirectory> implements IDirectory {
   propertys: IProperty[] = [];
   applications: IApplication[] = [];
   private _contentLoaded: boolean = false;
-  get isInherited(): boolean {
-    return this.metadata.belongId != this.target.belongId;
+  get id(): string {
+    return super.id.replace('_', '');
+  }
+  content(mode: number = 0): IFileInfo<schema.XEntity>[] {
+    const cnt: IFileInfo<schema.XEntity>[] = [
+      ...this.children,
+      ...this.forms,
+      ...this.specieses,
+      ...this.applications,
+    ];
+    if (mode === 1) {
+      cnt.push(...this.files);
+    } else if (!this.parent) {
+      cnt.push(...this.target.members.map((i) => new Member(i, this)));
+    }
+    return cnt.sort((a, b) => (a.metadata.updateTime < b.metadata.updateTime ? 1 : -1));
   }
   async loadContent(reload: boolean = false): Promise<boolean> {
     if (!this._contentLoaded || reload) {
       await this.loadSubDirectory();
+      await this.loadFiles();
       await this.loadForms();
       await this.loadPropertys();
       await this.loadSpecieses();
       await this.loadApplications();
+      this._contentLoaded = true;
+    }
+    return false;
+  }
+  async rename(name: string): Promise<boolean> {
+    return await this.update({ ...this.metadata, name: name });
+  }
+  copy(destination: IDirectory): Promise<boolean> {
+    throw new Error('暂不支持.');
+  }
+  async move(destination: IDirectory): Promise<boolean> {
+    if (
+      this.parent &&
+      destination.id != this.parent.id &&
+      destination.metadata.belongId === this.directory.metadata.belongId
+    ) {
+      this.setMetadata({ ...this.metadata, parentId: destination.id });
+      const success = await this.update(this.metadata);
+      if (success) {
+        this.directory.children = this.directory.children.filter(
+          (i) => i.key != this.key,
+        );
+        this.parent = destination;
+        this.directory = destination;
+        destination.children.push(this);
+      } else {
+        this.setMetadata({ ...this.metadata, parentId: this.directory.id });
+      }
+      return success;
+    }
+    return false;
+  }
+  async create(data: DirectoryModel): Promise<IDirectory | undefined> {
+    data.parentId = this.id;
+    data.shareId = this.metadata.shareId;
+    const res = await kernel.createDirectory(data);
+    if (res.success && res.data.id) {
+      const directory = new Directory(res.data, this.target, this);
+      this.children.push(directory);
+      return directory;
+    }
+  }
+  async update(data: model.DirectoryModel): Promise<boolean> {
+    data.id = this.id;
+    data.parentId = this.metadata.parentId;
+    data.shareId = this.metadata.shareId;
+    const res = await kernel.updateDirectory(data);
+    if (res.success && res.data.id) {
+      this.setMetadata({ ...res.data, typeName: '目录' });
+    }
+    return res.success;
+  }
+  async delete(): Promise<boolean> {
+    if (this.parent) {
+      const res = await kernel.deleteDirectory({ id: this.id });
+      if (res.success) {
+        this.parent.children = this.parent.children.filter((i) => i.key != this.key);
+      }
+      return res.success;
     }
     return false;
   }
@@ -101,14 +189,16 @@ export class Directory extends Entity<schema.XDirectory> implements IDirectory {
       const res = await kernel.anystore.bucketOpreate<model.FileItemModel[]>(
         this.metadata.belongId,
         {
-          key: this.id,
+          key: encodeKey(this.id),
           operate: BucketOpreates.List,
         },
       );
       if (res.success && res.data.length > 0) {
-        this.files = res.data.map((item) => {
-          return new SysFileInfo(item, this);
-        });
+        this.files = res.data
+          .filter((i) => !i.isDirectory)
+          .map((item) => {
+            return new SysFileInfo(item, this);
+          });
       }
     }
     return this.files;
@@ -224,6 +314,20 @@ export class Directory extends Entity<schema.XDirectory> implements IDirectory {
       return application;
     }
   }
+  override operates(mode: number = 0): model.OperateModel[] {
+    const operates: model.OperateModel[] = [];
+    if (mode === 2) {
+      operates.push(directoryNew);
+      operates.push(directoryOperates.NewDir);
+      operates.push(directoryOperates.Refesh);
+    }
+    if (this.parent) {
+      operates.push(...super.operates(mode));
+    } else {
+      operates.push(...this.target.operates());
+    }
+    return operates;
+  }
   private async loadSubDirectory() {
     if (!this.parent) {
       const res = await kernel.queryDirectorys({
@@ -240,7 +344,7 @@ export class Directory extends Entity<schema.XDirectory> implements IDirectory {
   private loadChildren(directorys?: schema.XDirectory[]) {
     if (directorys && directorys.length > 0) {
       directorys
-        .filter((i) => i.parentId === this.metadata.id)
+        .filter((i) => i.parentId === this.id)
         .forEach((i) => {
           this.children.push(new Directory(i, this.target, this, directorys));
         });

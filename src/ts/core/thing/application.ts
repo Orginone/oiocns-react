@@ -1,7 +1,7 @@
 import { kernel, model, schema } from '../../base';
-import { Entity, PageAll } from '../public';
+import { PageAll } from '../public';
 import { IDirectory } from './directory';
-import { IFileInfo } from './fileinfo';
+import { FileInfo, IFileInfo } from './fileinfo';
 import { IWork, Work } from '../work';
 
 /** 应用/模块接口类 */
@@ -19,18 +19,16 @@ export interface IApplication extends IFileInfo<schema.XApplication> {
 }
 
 /** 应用实现类 */
-export class Application extends Entity<schema.XApplication> implements IApplication {
+export class Application extends FileInfo<schema.XApplication> implements IApplication {
   constructor(
     _metadata: schema.XApplication,
     _directory: IDirectory,
     _parent?: IApplication,
   ) {
-    super(_metadata);
+    super(_metadata, _directory);
     this.parent = _parent;
-    this.directory = _directory;
   }
   works: IWork[] = [];
-  directory: IDirectory;
   children: IApplication[] = [];
   parent: IApplication | undefined;
   private _worksLoaded: boolean = false;
@@ -68,6 +66,7 @@ export class Application extends Entity<schema.XApplication> implements IApplica
     return false;
   }
   async update(data: model.ApplicationModel): Promise<boolean> {
+    data.id = this.id;
     data.directoryId = this.metadata.directoryId;
     data.typeName = this.metadata.typeName;
     const res = await kernel.updateApplication(data);
