@@ -10,7 +10,8 @@ import { MenuItemType } from 'typings/globelType';
 import React, { useState } from 'react';
 import { Modal, message } from 'antd';
 import { XTarget } from '@/ts/base/schema';
-import { IFlowClass, IWork, TargetType } from '@/ts/core';
+import { TargetType } from '@/ts/core';
+import DirectoryModal from '@/bizcomponents/GlobalComps/createDirectory';
 import PropertyModal from '@/bizcomponents/GlobalComps/createProperty';
 import ImportModal from '@/bizcomponents/GlobalComps/import';
 import { getReadConfigs } from '@/utils/excel/config';
@@ -79,6 +80,18 @@ const OperateIndex = ({ selectMenu, operateKey, confrim }: IProps) => {
           title={operateKey}
           open={operateKey.includes('权限')}
           current={selectMenu.item}
+          handleCancel={confrim}
+          handleOk={confrim}
+        />
+      )}
+      {/** 目录模态框 */}
+      {operateKey.includes('目录') && (
+        <DirectoryModal
+          title={operateKey}
+          open={operateKey.includes('目录')}
+          current={
+            operateKey.includes('编辑') ? selectMenu.item : selectMenu.item.directory
+          }
           handleCancel={confrim}
           handleOk={confrim}
         />

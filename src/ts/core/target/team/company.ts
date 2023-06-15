@@ -10,6 +10,7 @@ import { TargetType } from '../../public/enums';
 import { IMsgChat } from '../../chat/message/msgchat';
 import { ITarget } from '../base/target';
 import { ITeam } from '../base/team';
+import { targetOperates } from '../../public';
 
 /** 单位类型接口 */
 export interface ICompany extends IBelong {
@@ -249,6 +250,15 @@ export class Company extends Belong implements ICompany {
       await cohort.deepLoad(reload);
     }
     this.superAuth?.deepLoad(reload);
+  }
+
+  override operates(): model.OperateModel[] {
+    return [
+      targetOperates.NewGroup,
+      targetOperates.NewDepartment,
+      targetOperates.NewStation,
+      ...super.operates(),
+    ];
   }
 
   override async removeMembers(

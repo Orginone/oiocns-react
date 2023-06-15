@@ -46,6 +46,12 @@ export const valueTypes = [
   ValueType.Date,
   ValueType.File,
 ];
+/** 表单弹框支持的类型 */
+export const formModalType = {
+  New: 'New',
+  Edit: 'Edit',
+  View: 'View',
+};
 /** 用于获取全部的分页模型 */
 export const PageAll: PageModel = {
   offset: 0,

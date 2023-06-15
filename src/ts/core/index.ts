@@ -22,6 +22,6 @@ export type { ICohort } from './target/outTeam/cohort';
 export type { IGroup } from './target/outTeam/group';
 export type { IPerson } from './target/person';
 export type { ICompany } from './target/team/company';
-export type { IWork } from './work';
-export type { IApplication } from './thing/application';
+export type { IDirectory } from './thing/directory';
+export type { IFileInfo, ISysFileInfo } from './thing/fileinfo';
 export { UserProvider } from './user';

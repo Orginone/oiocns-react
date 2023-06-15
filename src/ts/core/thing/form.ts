@@ -1,7 +1,7 @@
 import { schema, model, kernel } from '../../base';
 import { Entity, IEntity, orgAuth } from '../../core/public';
 import { IDirectory } from './directory';
-import { IFileInfo } from './fileinfo';
+import { FileInfo, IFileInfo } from './fileinfo';
 
 /** 表单类只读接口 */
 export interface IFormView extends IEntity<schema.XForm> {
@@ -39,7 +39,7 @@ export interface IForm extends IFileInfo<schema.XForm> {
 
 export class FormView extends Entity<schema.XForm> implements IFormView {
   constructor(_metadata: schema.XForm, _directory?: IDirectory) {
-    super({ ..._metadata, typeName: '表单' });
+    super(_metadata);
     this.directory = _directory;
   }
   directory: IDirectory | undefined;
@@ -60,12 +60,12 @@ export class FormView extends Entity<schema.XForm> implements IFormView {
   }
 }
 
-export class Form extends FormView implements IForm {
+export class Form extends FileInfo<schema.XForm> implements IForm {
   constructor(_metadata: schema.XForm, _directory: IDirectory) {
     super(_metadata, _directory);
-    this.directory = _directory;
   }
-  directory: IDirectory;
+  attributes: schema.XAttribute[] = [];
+  private _attributeLoaded: boolean = false;
   async rename(name: string): Promise<boolean> {
     return await this.update({ ...this.metadata, name: name });
   }
@@ -98,6 +98,7 @@ export class Form extends FormView implements IForm {
     return false;
   }
   async update(data: model.FormModel): Promise<boolean> {
+    data.id = this.id;
     data.directoryId = this.metadata.directoryId;
     data.typeName = this.metadata.typeName;
     const res = await kernel.updateForm(data);
@@ -115,6 +116,19 @@ export class Form extends FormView implements IForm {
       this.directory.forms = this.directory.forms.filter((i) => i.key != this.key);
     }
     return res.success;
+  }
+  async loadAttributes(reload: boolean = false): Promise<schema.XAttribute[]> {
+    if (!this._attributeLoaded || reload) {
+      const res = await kernel.queryFormAttributes({
+        id: this.id,
+        subId: this.metadata.belongId,
+      });
+      if (res.success) {
+        this._attributeLoaded = true;
+        this.attributes = res.data.result || [];
+      }
+    }
+    return this.attributes;
   }
   async createAttribute(
     data: model.AttributeModel,

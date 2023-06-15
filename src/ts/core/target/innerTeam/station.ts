@@ -1,6 +1,6 @@
 import { kernel, model, schema } from '../../../base';
 import { IMsgChat } from '../../chat/message/msgchat';
-import { OperateType } from '../../public';
+import { OperateType, teamOperates } from '../../public';
 import { PageAll } from '../../public/consts';
 import { ITeam, Team } from '../base/team';
 import { ICompany } from '../team/company';
@@ -107,6 +107,9 @@ export class Station extends Team implements IStation {
   }
   async teamChangedNotity(target: schema.XTarget): Promise<boolean> {
     return await this.pullMembers([target], true);
+  }
+  override operates(): model.OperateModel[] {
+    return [teamOperates.pullIdentity, ...super.operates()];
   }
   async createIdentityMsg(
     operate: OperateType,

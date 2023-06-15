@@ -8,7 +8,7 @@ import {
   ResultType,
 } from '../model';
 import StoreHub from './storehub';
-import { blobToDataUrl, encodeKey, logger, sliceFile } from '../common';
+import { blobToDataUrl, encodeKey, generateUuid, logger, sliceFile } from '../common';
 import axios from 'axios';
 
 /**
@@ -357,9 +357,9 @@ export default class AnyStore {
     key: string,
     progress: (p: number) => void,
   ): Promise<FileItemModel | undefined> {
-    key = encodeKey(key);
+    const id = generateUuid();
     const data: BucketOpreateModel = {
-      key: key,
+      key: encodeKey(key),
       operate: BucketOpreates.Upload,
     };
     progress.apply(this, [0]);
@@ -368,7 +368,7 @@ export default class AnyStore {
       const s = slices[i];
       data.fileItem = {
         index: i,
-        uploadId: key,
+        uploadId: id,
         size: file.size,
         data: [],
         dataUrl: await blobToDataUrl(s),
@@ -380,7 +380,7 @@ export default class AnyStore {
         progress.apply(this, [-1]);
         return;
       }
-      const finished = (i - 1) * 1024 * 1024 + s.size;
+      const finished = i * 1024 * 1024 + s.size;
       progress.apply(this, [finished]);
       if (finished === file.size && res.data) {
         return res.data;

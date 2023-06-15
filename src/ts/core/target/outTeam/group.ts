@@ -5,6 +5,7 @@ import { TargetType } from '../../public/enums';
 import { ICompany } from '../team/company';
 import { IMsgChat } from '../../chat/message/msgchat';
 import { ITeam } from '../base/team';
+import { targetOperates } from '../../public';
 
 /** 组织集群接口 */
 export interface IGroup extends ITarget {
@@ -101,6 +102,9 @@ export class Group extends Target implements IGroup {
     for (const group of this.children) {
       await group.deepLoad(reload);
     }
+  }
+  override operates(): model.OperateModel[] {
+    return [targetOperates.NewGroup, ...super.operates()];
   }
   async teamChangedNotity(target: schema.XTarget): Promise<boolean> {
     switch (target.typeName) {

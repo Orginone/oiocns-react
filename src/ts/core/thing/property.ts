@@ -1,7 +1,6 @@
 import { schema, model, kernel } from '../../base';
-import { Entity } from '../../core/public';
 import { IDirectory } from './directory';
-import { IFileInfo } from './fileinfo';
+import { FileInfo, IFileInfo } from './fileinfo';
 export interface IProperty extends IFileInfo<schema.XProperty> {
   /** 表单特性 */
   attributes: schema.XAttribute[];
@@ -13,12 +12,10 @@ export interface IProperty extends IFileInfo<schema.XProperty> {
   loadAttributes(reload?: boolean): Promise<schema.XAttribute[]>;
 }
 
-export class Property extends Entity<schema.XProperty> implements IProperty {
+export class Property extends FileInfo<schema.XProperty> implements IProperty {
   constructor(_metadata: schema.XProperty, _directory: IDirectory) {
-    super({ ..._metadata, typeName: '属性' });
-    this.directory = _directory;
+    super({ ..._metadata, typeName: '属性' }, _directory);
   }
-  directory: IDirectory;
   attributes: schema.XAttribute[] = [];
   private _attributeLoaded: boolean = false;
   async rename(name: string): Promise<boolean> {
@@ -56,6 +53,7 @@ export class Property extends Entity<schema.XProperty> implements IProperty {
     return false;
   }
   async update(data: model.PropertyModel): Promise<boolean> {
+    data.id = this.id;
     data.directoryId = this.metadata.directoryId;
     const res = await kernel.updateProperty(data);
     if (res.success && res.data.id) {
