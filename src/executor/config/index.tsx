@@ -28,12 +28,10 @@ const ConfigExecutor: React.FC<IProps> = ({ cmd, args, finished }) => {
           );
         case '分类':
           return (
-            <EntityForm cmd={cmd + 'Property'} entity={args[0]} finished={finished} />
+            <EntityForm cmd={cmd + 'Species'} entity={args[0]} finished={finished} />
           );
         case '字典':
-          return (
-            <EntityForm cmd={cmd + 'Property'} entity={args[0]} finished={finished} />
-          );
+          return <EntityForm cmd={cmd + 'Dict'} entity={args[0]} finished={finished} />;
       }
       break;
     case 'refresh':
@@ -43,15 +41,6 @@ const ConfigExecutor: React.FC<IProps> = ({ cmd, args, finished }) => {
       break;
     case 'delete':
       if ('delete' in args[0]) {
-        args[0].delete().then((success: boolean) => {
-          if (success) {
-            orgCtrl.changCallback();
-          }
-        });
-      }
-      break;
-    case 'rename':
-      if ('rename' in args[0]) {
         args[0].delete().then((success: boolean) => {
           if (success) {
             orgCtrl.changCallback();
