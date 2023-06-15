@@ -3,34 +3,24 @@ import { message, Upload, UploadProps, Image, Button, Space, Avatar } from 'antd
 import { ProFormColumnsType } from '@ant-design/pro-components';
 import SchemaForm from '@/components/SchemaForm';
 import orgCtrl from '@/ts/controller';
-import { FileItemShare } from '@/ts/base/model';
-import { ITarget, ISpeciesItem } from '@/ts/core';
+import { DirectoryModel, FileItemShare } from '@/ts/base/model';
+import { IDirectory } from '@/ts/core';
 import { AiOutlineBank } from 'react-icons/ai';
-import { SpeciesModel } from '@/ts/base/model';
 import { parseAvatar } from '@/ts/base';
-import { orgAuth } from '@/ts/core/public/consts';
 
 interface Iprops {
   title: string;
   open: boolean;
   handleCancel: () => void;
-  handleOk: (newItem: ISpeciesItem | undefined) => void;
-  current?: ITarget;
-  species?: ISpeciesItem;
+  handleOk: (newItem: IDirectory | undefined) => void;
+  current: IDirectory;
 }
 /*
   编辑
 */
-const CreateSpeciesModal = (props: Iprops) => {
+const CreateDirectoryModal = (props: Iprops) => {
   const [avatar, setAvatar] = useState<FileItemShare>();
   if (!props.open) return <></>;
-  const speciesTypes: string[] = [];
-  if (props.species) {
-    speciesTypes.push(...props.species.speciesTypes);
-  }
-  if (props.current) {
-    speciesTypes.push(...props.current.speciesTypes);
-  }
   const uploadProps: UploadProps = {
     multiple: false,
     showUploadList: false,
@@ -52,7 +42,7 @@ const CreateSpeciesModal = (props: Iprops) => {
       }
     },
   };
-  const columns: ProFormColumnsType<SpeciesModel>[] = [
+  const columns: ProFormColumnsType<DirectoryModel>[] = [
     {
       title: '图标',
       dataIndex: 'icon',
@@ -100,77 +90,18 @@ const CreateSpeciesModal = (props: Iprops) => {
       },
     },
     {
-      title: '类型',
-      dataIndex: 'typeName',
-      valueType: 'select',
-      formItemProps: {
-        rules: [{ required: true, message: '分类代码为必填项' }],
-      },
-      fieldProps: {
-        options: speciesTypes.map((item) => {
-          return { value: item, label: item };
-        }),
-      },
-    },
-    {
       title: '制定组织',
       dataIndex: 'shareId',
       valueType: 'select',
+      hideInForm: true,
       formItemProps: { rules: [{ required: true, message: '组织为必填项' }] },
       fieldProps: {
         options: [
           {
-            value: props.current?.id || props.species?.current.id,
-            label: props.current?.name || props.species?.current.name,
+            value: props.current.target.id,
+            label: props.current.target.name,
           },
         ],
-      },
-    },
-    {
-      title: '管理权限',
-      dataIndex: 'authId',
-      valueType: 'treeSelect',
-      formItemProps: { rules: [{ required: true, message: '管理权限为必填项' }] },
-      request: async () => {
-        if (props.current && props.current.space.superAuth) {
-          return [props.current.space.superAuth.metadata];
-        }
-        if (
-          props.species &&
-          props.species.current &&
-          props.species.current.space.superAuth
-        ) {
-          return [props.species.current.space.superAuth.metadata];
-        }
-        return [];
-      },
-      fieldProps: {
-        fieldNames: { label: 'name', value: 'id', children: 'nodes' },
-        showSearch: true,
-        filterTreeNode: true,
-        treeNodeFilterProp: 'name',
-        treeDefaultExpandAll: true,
-      },
-    },
-    {
-      title: '向下级组织公开',
-      dataIndex: 'public',
-      valueType: 'select',
-      initialValue: true,
-      fieldProps: {
-        options: [
-          {
-            value: true,
-            label: '公开',
-          },
-          {
-            value: false,
-            label: '不公开',
-          },
-        ],
-      },
-      formItemProps: {
-        rules: [{ required: true, message: '是否公开为必填项' }],
       },
     },
     {
@@ -179,30 +110,29 @@ const CreateSpeciesModal = (props: Iprops) => {
       valueType: 'textarea',
       colProps: { span: 24 },
       formItemProps: {
-        rules: [{ required: true, message: '分类定义为必填项' }],
+        rules: [{ required: true, message: '目录定义为必填项' }],
       },
     },
   ];
   return (
-    <SchemaForm<SpeciesModel>
+    <SchemaForm<DirectoryModel>
       title={
-        props.title.includes('编辑') ? `编辑[${props.species?.name}]类别` : props.title
+        props.title.includes('编辑') ? `编辑[${props.current.name}]类别` : props.title
       }
       columns={columns}
       open={props.open}
       width={640}
       initialValues={
-        props.species && props.title.includes('编辑')
-          ? props.species.metadata
+        props.title.includes('编辑')
+          ? props.current.metadata
           : {
-              shareId: props.current?.id || props.species?.current.id,
-              authId: orgAuth.SuperAuthId,
+              shareId: props.current.target.id,
             }
       }
       onOpenChange={(open: boolean) => {
         if (open) {
           if (props.title.includes('编辑')) {
-            setAvatar(parseAvatar(props.species?.metadata.icon));
+            setAvatar(parseAvatar(props.current.metadata.icon));
           }
         } else {
           setAvatar(undefined);
@@ -215,18 +145,14 @@ const CreateSpeciesModal = (props: Iprops) => {
       layoutType="ModalForm"
       onFinish={async (values) => {
         values.icon = JSON.stringify(avatar);
-        if (props.species) {
-          if (props.title.includes('编辑')) {
-            await props.species.update(values);
-            props.handleOk(props.species);
-          } else {
-            props.handleOk(await props.species.create(values));
-          }
-        } else if (props.current) {
-          props.handleOk(await props.current.createSpecies(values));
+        if (props.title.includes('编辑')) {
+          await props.current.update(values);
+          props.handleOk(props.current);
+        } else {
+          props.handleOk(await props.current.create(values));
         }
       }}></SchemaForm>
   );
 };
 
-export default CreateSpeciesModal;
+export default CreateDirectoryModal;

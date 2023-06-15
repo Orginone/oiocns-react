@@ -8,6 +8,7 @@ import { ICompany } from './team/company';
 import { IMsgChat } from '../chat/message/msgchat';
 import { ITarget } from './base/target';
 import { ITeam } from './base/team';
+import { targetOperates } from '../public';
 
 /** 人员类型接口 */
 export interface IPerson extends IBelong {
@@ -241,6 +242,9 @@ export class Person extends Belong implements IPerson {
         }
     }
     return false;
+  }
+  override operates(): model.OperateModel[] {
+    return [targetOperates.NewCompany, ...super.operates()];
   }
   async findEntityAsync(id: string): Promise<schema.XEntity | undefined> {
     const metadata = this.findMetadata<schema.XEntity>(id);

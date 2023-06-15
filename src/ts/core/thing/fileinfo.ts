@@ -3,9 +3,14 @@ import { BucketOpreates, FileItemModel } from '../../base/model';
 import { model, kernel, schema } from '../../base';
 import { FileItemShare } from '../../base/model';
 import { IDirectory } from './directory';
-import { Entity, IEntity } from '../public';
+import { Entity, IEntity, entityOperates } from '../public';
+import { fileOperates } from '../public';
 /** 文件类接口 */
 export interface IFileInfo<T extends schema.XEntity> extends IEntity<T> {
+  /** 归属ID */
+  belongId: string;
+  /** 是否为继承的类别 */
+  isInherited: boolean;
   /** 目录 */
   directory: IDirectory;
   /** 删除文件系统项 */
@@ -25,6 +30,51 @@ export interface IFileInfo<T extends schema.XEntity> extends IEntity<T> {
    * @param {IDirectory} destination 目标文件系统
    */
   move(destination: IDirectory): Promise<boolean>;
+  /**
+   * 文件可进行的操作
+   * @param mode 模式,默认为配置模式
+   */
+  operates(mode?: number): model.OperateModel[];
+}
+
+/** 文件类抽象实现 */
+export abstract class FileInfo<T extends schema.XEntity>
+  extends Entity<T>
+  implements IFileInfo<T>
+{
+  constructor(_metadata: T, _directory: IDirectory) {
+    super(_metadata);
+    if ('target' in _directory) {
+      this.directory = _directory;
+    } else {
+      this.directory = this as unknown as IDirectory;
+    }
+  }
+  directory: IDirectory;
+  get isInherited(): boolean {
+    return this.metadata.belongId != this.directory.belongId;
+  }
+  get belongId(): string {
+    return this.directory.metadata.belongId;
+  }
+  abstract delete(): Promise<boolean>;
+  abstract rename(name: string): Promise<boolean>;
+  abstract copy(destination: IDirectory): Promise<boolean>;
+  abstract move(destination: IDirectory): Promise<boolean>;
+  operates(mode: number = 0): model.OperateModel[] {
+    if (mode == 0 && this.directory.target.hasRelationAuth()) {
+      return [
+        fileOperates.Open,
+        entityOperates.Update,
+        fileOperates.Copy,
+        fileOperates.Move,
+        fileOperates.Rename,
+        fileOperates.Delete,
+        fileOperates.Remark,
+      ];
+    }
+    return [fileOperates.Remark];
+  }
 }
 
 /** 系统文件接口 */
@@ -44,27 +94,26 @@ export const fileToEntity = (
   return {
     id: data.key,
     name: data.name,
-    code: data.name,
+    code: data.extension,
     icon: JSON.stringify(data),
     belongId: belongId,
-    typeName: '文件',
+    typeName: data.contentType,
+    createTime: data.dateCreated,
+    updateTime: data.dateModified,
     belong: belong,
   } as schema.XEntity;
 };
 
 /** 文件类实现 */
-export class SysFileInfo extends Entity<schema.XEntity> implements ISysFileInfo {
+export class SysFileInfo extends FileInfo<schema.XEntity> implements ISysFileInfo {
   constructor(_metadata: model.FileItemModel, _directory: IDirectory) {
     super(
       fileToEntity(_metadata, _directory.metadata.belongId, _directory.metadata.belong),
+      _directory,
     );
     this.filedata = _metadata;
-    this.directory = _directory;
-    this.belongId = this.directory.metadata.belongId;
   }
-  belongId: string;
   filedata: FileItemModel;
-  directory: IDirectory;
   shareInfo(): model.FileItemShare {
     return {
       size: this.filedata.size,

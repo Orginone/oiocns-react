@@ -80,6 +80,9 @@ const EntityIcon = (info: teamTypeInfo) => {
     case '表单':
       icon = <im.ImInsertTemplate fontSize={size} />;
       break;
+    case '目录':
+      icon = <im.ImFolder fontSize={size} />;
+      break;
     case TargetType.Company:
       icon = <im.ImOffice fontSize={size} />;
       break;

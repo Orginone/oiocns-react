@@ -28,6 +28,7 @@ export function sliceFile(file: Blob, chunkSize: number): Blob[] {
       end = file.size;
     }
     slices.push(file.slice(start, end));
+    index++;
   }
   return slices;
 }

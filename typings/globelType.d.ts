@@ -59,6 +59,7 @@ interface OperateMenuType {
   key: string;
   label: string;
   model?: string;
+  children?: OperateMenuType[];
   icon: React.ReactNode;
   beforeLoad?: () => Promise<boolean>;
 }

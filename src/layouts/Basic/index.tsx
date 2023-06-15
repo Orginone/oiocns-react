@@ -5,6 +5,7 @@ import { IRouteConfig } from 'typings/globelType';
 import BasicHeader from './Header';
 import styles from './index.module.less';
 import orgCtrl from '@/ts/controller';
+import Executor from '@/executor';
 
 type BasicLayoutProps = {
   route: IRouteConfig;
@@ -26,6 +27,8 @@ const BasicLayout: React.FC<BasicLayoutProps> = (props) => {
     <Layout className={styles['page-layout']}>
       {inited ? (
         <>
+          {/** 命令执行器 */}
+          <Executor />
           {/* 公共头部 */}
           <BasicHeader />
           {/* 内容区域 */}
