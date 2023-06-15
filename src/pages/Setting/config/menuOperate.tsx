@@ -21,7 +21,7 @@ import {
   TargetType,
   companyTypes,
   IBelong,
-  IWorkDefine,
+  IWork,
   IWorkClass,
 } from '@/ts/core';
 import { XProperty } from '@/ts/base/schema';
@@ -297,7 +297,7 @@ const loadSpeciesMenus = (species: ISpeciesItem) => {
 };
 
 /** 加载右侧菜单 */
-const loadDefineMenus = (define?: IWorkDefine) => {
+const loadDefineMenus = (define?: IWork) => {
   const items: OperateMenuType[] = [];
   if (define) {
     items.push(

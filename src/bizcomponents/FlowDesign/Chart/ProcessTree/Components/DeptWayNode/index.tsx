@@ -3,9 +3,9 @@ import InsertButton from '../InsertButton';
 import { AiOutlineCopy, AiOutlineClose } from 'react-icons/ai';
 import cls from './index.module.less';
 import SelectOrg from '../selectOrg';
-import { IWorkDefine } from '@/ts/core';
-
-import { dataType } from '../../../../processType';
+import orgCtrl from '@/ts/controller';
+import { ITarget, IWork } from '@/ts/core';
+import { dataType } from '@/bizcomponents/FlowDesign/processType';
 
 type DeptWayNodeProps = {
   onInsertNode: Function;
@@ -14,17 +14,18 @@ type DeptWayNodeProps = {
   onSelected: Function;
   config: any;
   level: any;
-  define?: IWorkDefine;
+  define?: IWork;
   isEdit: boolean;
 };
 
 /**
- * 并行节点
+ * 部门网关节点
  * @returns
  */
 const DeptWayNode: React.FC<DeptWayNodeProps> = (props: DeptWayNodeProps) => {
   const [key, setKey] = useState<number>(0);
   const [orgId, setOrgId] = useState<string>();
+  const [target, settarget] = useState<ITarget>();
   const delNode = () => {
     props.onDelNode();
   };
@@ -37,6 +38,7 @@ const DeptWayNode: React.FC<DeptWayNodeProps> = (props: DeptWayNodeProps) => {
 
   useEffect(() => {
     if (props.isEdit && props.define) {
+      settarget(orgCtrl.user.targets.find((a) => a.id == props.define!.metadata.shareId));
       if (props.config.conditions.length == 0) {
         props.config.conditions = [
           {
@@ -46,12 +48,12 @@ const DeptWayNode: React.FC<DeptWayNodeProps> = (props: DeptWayNodeProps) => {
             key: 'EQ',
             label: '=',
             type: dataType.BELONG,
-            val: props.define.workItem.current.space.id,
+            val: props.define.metadata.shareId,
           },
         ];
         setKey(key + 1);
       }
-      setOrgId(props.define.workItem.current.space.id);
+      setOrgId(props.define.metadata.shareId);
     }
   }, []);
 
@@ -85,14 +87,13 @@ const DeptWayNode: React.FC<DeptWayNodeProps> = (props: DeptWayNodeProps) => {
     <div className={cls['node-body-main-content']} onClick={select}>
       {/* <span>组织分支</span> */}
       <span>
-        {props.isEdit && props.define ? (
+        {props.isEdit && target && props.define ? (
           <SelectOrg
             key={key}
             onChange={onChange}
             orgId={orgId}
-            belong={props.define.workItem.current.space}
+            target={target}
             value={props.config.conditions[0]?.val}
-            readonly={props.config.readonly}
             rootDisable={false}
           />
         ) : (

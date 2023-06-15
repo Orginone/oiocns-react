@@ -10,7 +10,7 @@ import {
 } from 'react-icons/ai';
 import React from 'react';
 import cls from './index.module.less';
-import { AddNodeType } from '../../../../processType';
+import { AddNodeType } from '@/bizcomponents/FlowDesign/processType';
 
 type InsertButtonProps = {
   onInsertNode: Function;

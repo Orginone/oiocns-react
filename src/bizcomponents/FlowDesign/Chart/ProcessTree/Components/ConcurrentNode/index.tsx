@@ -30,9 +30,7 @@ const ConcurrentNode: React.FC<ConcurrentNodeProps> = (props: ConcurrentNodeProp
     <div className={cls['node-body-main-header']}>
       <span className={cls['title']}>
         <i className={cls['el-icon-s-operation']}></i>
-        <span className={cls['name']}>
-          {props.config.name ? props.config.name : '并行任务' + props.level}
-        </span>
+        <span className={cls['name']}>{'并行任务' + props.level}</span>
       </span>
       {props.isEdit && (
         <span className={cls['option']}>

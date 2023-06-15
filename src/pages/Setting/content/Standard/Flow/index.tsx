@@ -10,10 +10,10 @@ import WorkDefineModal from '@/bizcomponents/GlobalComps/createFlow';
 import Design from '@/bizcomponents/FlowDesign';
 import { orgAuth } from '@/ts/core/public/consts';
 import PageCard from '@/components/PageCard';
-import { IWorkDefine, IFlowClass } from '@/ts/core';
+import { IWork, IApplication } from '@/ts/core';
 
 interface IProps {
-  current: IFlowClass;
+  current: IApplication;
 }
 
 /**
@@ -24,7 +24,7 @@ const FlowList: React.FC<IProps> = ({ current }: IProps) => {
   const parentRef = useRef<any>(null);
   const [activeTab, setActiveTab] = useState<string>('work');
   const [key, setForceUpdate] = useObjectUpdate(current);
-  const [define, setDefine] = useState<IWorkDefine>();
+  const [define, setDefine] = useState<IWork>();
   const [modalType, setModalType] = useState('');
   const items = [
     {
@@ -33,8 +33,8 @@ const FlowList: React.FC<IProps> = ({ current }: IProps) => {
       key: 'work',
     },
   ];
-  const renderOperation = (record: IWorkDefine): any[] => {
-    if (record.workItem.isInherited) return [];
+  const renderOperation = (record: IWork): any[] => {
+    if (current.directory.isInherited) return [];
     let operations: any[] = [
       {
         key: 'editor',
@@ -53,7 +53,7 @@ const FlowList: React.FC<IProps> = ({ current }: IProps) => {
         },
       },
     ];
-    if (current.current.hasAuthoritys([orgAuth.ThingAuthId])) {
+    if (current.directory.target.hasAuthoritys([orgAuth.ThingAuthId])) {
       operations.push({
         key: 'delete',
         label: '删除',
@@ -104,6 +104,7 @@ const FlowList: React.FC<IProps> = ({ current }: IProps) => {
             if (define) {
               return (
                 <Design
+                  belong={Belong}
                   Title={'办事设计'}
                   current={define}
                   onBack={() => setModalType('')}
@@ -116,7 +117,7 @@ const FlowList: React.FC<IProps> = ({ current }: IProps) => {
               <div style={{ background: '#EFF4F8' }}>
                 <Card bordered={false} bodyStyle={{ paddingTop: 0 }}>
                   <div className={cls['app-wrap']} ref={parentRef}>
-                    <CardOrTable<IWorkDefine>
+                    <CardOrTable<IWork>
                       extra={[
                         <Button
                           key="edit"
@@ -129,9 +130,9 @@ const FlowList: React.FC<IProps> = ({ current }: IProps) => {
                       ]}
                       columns={FlowColumn}
                       parentRef={parentRef}
-                      dataSource={current.defines}
+                      dataSource={current.works}
                       operation={renderOperation}
-                      rowKey={(record: IWorkDefine) => record.id}
+                      rowKey={(record: IWork) => record.id}
                       renderCardContent={(items) => {
                         return items.map((item) => (
                           <FlowCard

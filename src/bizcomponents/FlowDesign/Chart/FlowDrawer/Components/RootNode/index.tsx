@@ -6,12 +6,12 @@ import ShareShowComp from '@/bizcomponents/IndentityManage/ShareShowComp';
 import { AiOutlineSetting } from 'react-icons/ai';
 import SelectAuth from '@/bizcomponents/SelectAuth';
 import SelectForms from '@/bizcomponents/SelectForms';
-import { IThingClass, IWorkDefine, SpeciesType } from '@/ts/core';
+import { IBelong, SpeciesType } from '@/ts/core';
 import ViewFormModal from '@/bizcomponents/FormDesign/viewFormModal';
 import { XForm } from '@/ts/base/schema';
 interface IProps {
+  belong: IBelong;
   current: NodeModel;
-  define: IWorkDefine;
 }
 /**
  * @description: 角色
@@ -36,7 +36,7 @@ const RootNode: React.FC<IProps> = (props) => {
           <span className={cls[`roval-node-title`]}>选择角色</span>
         </Row>
         <SelectAuth
-          space={props.define.workItem.current.space}
+          space={props.belong}
           onChange={(newValue: string, label: string) => {
             props.current.destId = newValue;
             props.current.destName = label;
@@ -106,15 +106,7 @@ const RootNode: React.FC<IProps> = (props) => {
             }}
             onCancel={() => setFormModel('')}>
             <SelectForms
-              species={
-                formModel === 'thingForm'
-                  ? props.define.workItem.current.space.species
-                      .filter((i) => i.typeName === SpeciesType.Thing)
-                      .map((i) => i as IThingClass)
-                  : props.define.workItem.app.children
-                      .filter((i) => i.typeName === SpeciesType.Work)
-                      .map((i) => i as IThingClass)
-              }
+              belong={props.belong}
               selected={formModel === 'thingForm' ? thingforms : workforms}
               setSelected={
                 formModel === 'thingForm' ? setThingForms : setWorkForms
@@ -124,7 +116,7 @@ const RootNode: React.FC<IProps> = (props) => {
             <ViewFormModal
               form={viewForm}
               open={true}
-              define={props.define}
+              belong={props.belong}
               handleCancel={() => {
                 setViewForm(undefined);
               }}

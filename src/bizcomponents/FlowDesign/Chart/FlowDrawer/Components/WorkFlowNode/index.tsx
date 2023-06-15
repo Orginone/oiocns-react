@@ -3,14 +3,15 @@ import { AiOutlineSetting } from 'react-icons/ai';
 import { Row, Button, Space, Modal, message } from 'antd';
 import cls from './index.module.less';
 import { NodeModel } from '../../../../processType';
-import { IWorkDefine } from '@/ts/core';
+import { IBelong } from '@/ts/core';
 import SelectDefine from '@/bizcomponents/SelectDefine';
 import ShareShowComp from '@/bizcomponents/IndentityManage/ShareShowComp';
 import { schema } from '@/ts/base';
 
 interface IProps {
   current: NodeModel;
-  define: IWorkDefine;
+  excludeIds: string[];
+  belong: IBelong;
 }
 
 /**
@@ -67,10 +68,7 @@ const WorkFlowNode: React.FC<IProps> = (props) => {
             message.warn('请选择办事');
             return;
           }
-          const b = props.define.workItem.current.space.user.findShareById(
-            selectChildWork.belongId,
-          );
-          let name = `${selectChildWork.name} [${b.name}]`;
+          let name = `${selectChildWork.name} [${props.belong.name}]`;
           props.current.destId = selectChildWork.id;
           props.current.destName = name;
           setCurrentData({ id: selectChildWork.id, name: name });
@@ -78,8 +76,8 @@ const WorkFlowNode: React.FC<IProps> = (props) => {
         }}
         onCancel={() => setIsOpen(false)}>
         <SelectDefine
-          exclude={props.define.metadata}
-          belong={props.define.workItem.current.space}
+          excludeIds={props.excludeIds}
+          belong={props.belong}
           onChecked={setSelectChildWork}
         />
       </Modal>

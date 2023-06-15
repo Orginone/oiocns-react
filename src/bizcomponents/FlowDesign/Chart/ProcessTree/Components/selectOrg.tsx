@@ -1,20 +1,21 @@
 import { TreeSelect } from 'antd';
 import React, { useEffect, useState } from 'react';
-import { IBelong, ITarget } from '@/ts/core';
+import { ITarget } from '@/ts/core';
 interface IProps {
   rootDisable?: boolean;
   orgId?: string;
   onChange: any;
   value?: string;
-  readonly?: boolean;
-  belong: IBelong;
+  target: ITarget;
 }
 const SelectOrg: React.FC<IProps> = (props: IProps) => {
   const [treeData, setTreeData] = useState<any[]>([]);
   if (!props.value || props.value.length < 2) return <div>其他组织</div>;
-  const loadTreeData = async () => {
-    setTreeData(buildTargetTree([props.belong], false, 0));
-  };
+
+  useEffect(() => {
+    setTreeData(buildTargetTree([props.target], false, 0));
+  }, [props]);
+
   /** 加载组织树 */
   const buildTargetTree = (targets: ITarget[], isChild: boolean, level: number) => {
     const result: any[] = [];
@@ -46,9 +47,6 @@ const SelectOrg: React.FC<IProps> = (props: IProps) => {
     }
     return result;
   };
-  useEffect(() => {
-    loadTreeData();
-  }, [props]);
   return (
     <TreeSelect
       showSearch
@@ -59,7 +57,6 @@ const SelectOrg: React.FC<IProps> = (props: IProps) => {
       treeDefaultExpandAll
       onChange={props.onChange}
       treeData={treeData}
-      disabled={props.readonly}
     />
   );
 };

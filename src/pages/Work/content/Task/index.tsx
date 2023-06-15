@@ -79,11 +79,9 @@ const TaskContent = (props: IProps) => {
         key: 'detail',
         label: '详情',
         onClick: async () => {
-          const define = await orgCtrl.work.findFlowDefine(items[0].defineId);
           const instance = await orgCtrl.work.loadTaskDetail(items[0]);
           if (instance) {
             setTask({
-              define,
               instance,
               task: items[0],
               belong: props.space,

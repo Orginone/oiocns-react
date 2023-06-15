@@ -2,13 +2,13 @@ import { ProForm } from '@ant-design/pro-components';
 import { Col, Row } from 'antd';
 import React, { useEffect, useState } from 'react';
 import OioFormItem from './FormItems';
-import { IWorkDefine } from '@/ts/core';
+import { IBelong } from '@/ts/core';
 import { XAttribute, XForm } from '@/ts/base/schema';
 import orgCtrl from '@/ts/controller';
 
 type IProps = {
   form: XForm;
-  define: IWorkDefine;
+  belong: IBelong;
   submitter?: any;
   onValuesChange?: (changedValues: any, values: Record<string, any>) => void;
   onFinished?: Function;
@@ -23,7 +23,7 @@ type IProps = {
  */
 const OioForm: React.FC<IProps> = ({
   form,
-  define,
+  belong,
   submitter,
   onValuesChange,
   onFinished,
@@ -35,7 +35,7 @@ const OioForm: React.FC<IProps> = ({
   const [attributes, setAttributes] = useState<XAttribute[]>([]);
   let config: any = form.rule ? JSON.parse(form.rule) : { col: 8, layout: 'horizontal' };
   useEffect(() => {
-    orgCtrl.work.loadAttributes(form.id, define.workItem.belongId).then((value) => {
+    orgCtrl.work.loadAttributes(form.id, belong.id).then((value) => {
       setAttributes(value);
       if (fieldsValue) {
         formRef?.current?.setFieldsValue(fieldsValue);
@@ -86,12 +86,7 @@ const OioForm: React.FC<IProps> = ({
         <Row gutter={24}>
           {attributes.map((item) => (
             <Col span={config.col} key={item.id}>
-              <OioFormItem
-                item={item}
-                disabled
-                belong={define.workItem.current.space}
-                noRule={noRule}
-              />
+              <OioFormItem item={item} disabled belong={belong} noRule={noRule} />
             </Col>
           ))}
         </Row>

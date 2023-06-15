@@ -1,14 +1,14 @@
-import React, {  useState } from 'react';
+import React, { useState } from 'react';
 import { AiOutlineSetting, AiOutlineUser } from 'react-icons/ai';
 import { Row, Button, Divider, Col, Radio, Space, Form, InputNumber, Modal } from 'antd';
 import IndentitySelect from '@/bizcomponents/IndentityManage';
 import cls from './index.module.less';
-import { NodeModel } from '../../../../processType';
+import { NodeModel } from '@/bizcomponents/FlowDesign/processType';
 import ShareShowComp from '@/bizcomponents/IndentityManage/ShareShowComp';
-import { IWorkDefine } from '@/ts/core';
+import { IBelong } from '@/ts/core';
 interface IProps {
   current: NodeModel;
-  define: IWorkDefine;
+  belong: IBelong;
 }
 
 /**
@@ -110,7 +110,7 @@ const ApprovalNode: React.FC<IProps> = (props) => {
               name: params.title,
             });
           }}
-          space={props.define.workItem.current.space}
+          space={props.belong}
         />
       </Modal>
     </div>

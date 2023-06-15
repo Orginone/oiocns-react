@@ -1,9 +1,7 @@
 import { common, kernel, model, schema } from '../../base';
 import { PageAll, storeCollName } from '../public/consts';
-import { SpeciesType, TaskStatus } from '../public/enums';
+import { TaskStatus } from '../public/enums';
 import { IPerson } from '../target/person';
-import { IApplication } from '../thing/app/application';
-import { IWorkDefine } from '../thing/base/flow';
 // 历史任务存储集合名称
 const hisWorkCollName = 'work-task';
 export interface IWorkProvider {
@@ -16,7 +14,7 @@ export interface IWorkProvider {
   /** 加载待办任务 */
   loadTodos(reload?: boolean): Promise<schema.XWorkTask[]>;
   /** 加载已办任务 */
-  loadDones(req: model.IdPageModel): Promise<schema.XWorkRecordArray>;
+  loadDones(req: model.IdPageModel): Promise<model.PageResult<schema.XWorkRecord>>;
   /** 加载我发起的办事任务 */
   loadApply(req: model.IdPageModel): Promise<model.PageResult<schema.XWorkTask>>;
   /** 任务更新 */
@@ -30,14 +28,12 @@ export interface IWorkProvider {
   ): Promise<void>;
   /** 查询任务明细 */
   loadTaskDetail(task: schema.XWorkTask): Promise<schema.XWorkInstance | undefined>;
-  /** 查询流程定义 */
-  findFlowDefine(defineId: string): Promise<IWorkDefine | undefined>;
   /** 删除办事实例 */
   deleteInstance(id: string): Promise<boolean>;
   /** 根据表单id查询表单特性 */
   loadAttributes(id: string, belongId: string): Promise<schema.XAttribute[]>;
-  /** 根据字典id查询字典项 */
-  loadItems(id: string): Promise<schema.XDictItem[]>;
+  /** 根据分类id查询分类项 */
+  loadItems(id: string): Promise<schema.XSpeciesItem[]>;
 }
 
 export class WorkProvider implements IWorkProvider {
@@ -78,7 +74,7 @@ export class WorkProvider implements IWorkProvider {
     }
     return this.todos;
   }
-  async loadDones(req: model.IdPageModel): Promise<schema.XWorkRecordArray> {
+  async loadDones(req: model.IdPageModel): Promise<model.PageResult<schema.XWorkRecord>> {
     const res = await kernel.anystore.pageRequest<schema.XWorkTask>(
       this.user.id,
       hisWorkCollName,
@@ -96,7 +92,7 @@ export class WorkProvider implements IWorkProvider {
           createTime: -1,
         },
       },
-      req.page,
+      req.page || PageAll,
     );
     return {
       ...res.data,
@@ -128,7 +124,7 @@ export class WorkProvider implements IWorkProvider {
           createTime: -1,
         },
       },
-      req.page,
+      req.page || PageAll,
     );
     return res.data;
   }
@@ -188,24 +184,7 @@ export class WorkProvider implements IWorkProvider {
       return res.data[0];
     }
   }
-  async findFlowDefine(defineId: string): Promise<IWorkDefine | undefined> {
-    for (const target of this.user.targets) {
-      for (const species of target.species) {
-        const defines: IWorkDefine[] = [];
-        switch (species.typeName) {
-          case SpeciesType.Market:
-          case SpeciesType.Application:
-            defines.push(...(await (species as IApplication).loadWorkDefines()));
-            break;
-        }
-        for (const define of defines) {
-          if (define.id === defineId) {
-            return define;
-          }
-        }
-      }
-    }
-  }
+
   async deleteInstance(id: string): Promise<boolean> {
     const res = await kernel.recallWorkInstance({ id });
     return res.success;
@@ -220,8 +199,8 @@ export class WorkProvider implements IWorkProvider {
     }
     return [];
   }
-  async loadItems(id: string): Promise<schema.XDictItem[]> {
-    const res = await kernel.queryDictItems({
+  async loadItems(id: string): Promise<schema.XSpeciesItem[]> {
+    const res = await kernel.querySpeciesItems({
       id: id,
       page: PageAll,
     });

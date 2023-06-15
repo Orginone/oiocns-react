@@ -10,16 +10,15 @@ import {
   AiOutlinePlus,
   AiOutlineClockCircle,
 } from 'react-icons/ai';
-import { getUuid } from '@/utils/tools';
 import { XWorkInstance } from '@/ts/base/schema';
 import { ImUndo2, ImWarning } from 'react-icons/im';
-import { IWorkDefine } from '@/ts/core';
-import { AddNodeType, NodeModel } from './processType';
+import { IWork } from '@/ts/core';
+import { AddNodeType, NodeModel, getNodeCode, isBranchNode } from './processType';
 
 interface IProps {
   Title?: string;
-  IsEdit: boolean;
-  current?: IWorkDefine;
+  IsEdit?: boolean;
+  current?: IWork;
   instance?: XWorkInstance;
   onBack?: () => void;
 }
@@ -34,8 +33,8 @@ const Design: React.FC<IProps> = ({
   const [scale, setScale] = useState<number>(100);
   const [showErrors, setShowErrors] = useState<any[]>([]);
   const [resource, setResource] = useState<any>({
-    nodeId: `node_${getUuid()}`,
-    parentId: '',
+    code: getNodeCode(),
+    parentCode: '',
     type: AddNodeType.ROOT,
     name: '发起角色',
     destId: '0',
@@ -65,14 +64,14 @@ const Design: React.FC<IProps> = ({
     load();
   }, [current]);
 
-  const loadResource = (resource: any, parentId: string): any => {
+  const loadResource = (resource: any, parentCode: string): any => {
     let obj: any;
     if (resource) {
-      let nodeId = getUuid();
+      let code = getNodeCode();
       obj = {
         id: resource.id,
-        nodeId: resource.code,
-        parentId: parentId,
+        code: resource.code,
+        parentCode: parentCode,
         type: resource.type as AddNodeType,
         name: resource.name,
         destId: resource.destId,
@@ -84,16 +83,12 @@ const Design: React.FC<IProps> = ({
           resource.branches?.map((item: any) => {
             return loadBranch(item, resource.code, resource.type);
           }) || [],
-        children: [
-          AddNodeType.CONCURRENTS,
-          AddNodeType.CONDITION,
-          AddNodeType.ORGANIZATIONA,
-        ].includes(resource.type)
+        children: isBranchNode(resource.type)
           ? {
-              nodeId: nodeId,
-              parentId: parentId,
+              code: code,
+              parentCode: parentCode,
               type: AddNodeType.EMPTY,
-              children: loadResource(resource.children, nodeId),
+              children: loadResource(resource.children, code),
             }
           : loadResource(resource.children, resource.code),
       };
@@ -101,13 +96,13 @@ const Design: React.FC<IProps> = ({
     }
   };
 
-  const loadBranch = (resource: any, parentId: string, parentType: string) => {
+  const loadBranch = (resource: any, parentCode: string, parentType: string) => {
     if (resource) {
-      let nodeId = getUuid();
+      let code = getNodeCode();
       return {
-        id: getUuid(),
-        nodeId: nodeId,
-        parentId: parentId,
+        id: getNodeCode(),
+        code: code,
+        parentCode: parentCode,
         name: resource.name,
         type: parentType as AddNodeType,
         conditions: resource.conditions
@@ -122,7 +117,7 @@ const Design: React.FC<IProps> = ({
               };
             })
           : [],
-        children: loadResource(resource.children, nodeId),
+        children: loadResource(resource.children, code),
       };
     }
   };
@@ -157,7 +152,7 @@ const Design: React.FC<IProps> = ({
             resource.branches == undefined ||
             resource.branches.length == 0 ||
             resource.branches.some(
-              (a) => a.children == undefined || a.children.nodeId == undefined,
+              (a) => a.children == undefined || a.children.code == undefined,
             )
           ) {
             errors.push(
@@ -184,7 +179,7 @@ const Design: React.FC<IProps> = ({
       }
       return {
         id: resource.id,
-        code: resource.nodeId,
+        code: resource.code,
         type: resource.type,
         name: resource.name,
         num: resource.num || 1,
@@ -279,7 +274,6 @@ const Design: React.FC<IProps> = ({
             (await current.updateDefine({
               ...current.metadata,
               resource: resource_,
-              speciesId: current.workItem.id,
             }))
           ) {
             message.success('保存成功');

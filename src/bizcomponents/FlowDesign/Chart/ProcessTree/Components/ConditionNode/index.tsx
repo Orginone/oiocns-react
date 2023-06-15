@@ -2,7 +2,7 @@ import React from 'react';
 import InsertButton from '../InsertButton';
 import cls from './index.module.less';
 import { AiOutlineCopy, AiOutlineClose } from 'react-icons/ai';
-import { NodeModel } from '../../../../processType';
+import { NodeModel } from '@/bizcomponents/FlowDesign/processType';
 
 type IProps = {
   onInsertNode: Function;
@@ -22,12 +22,15 @@ const ConditionNode: React.FC<IProps> = (props) => {
   const delNode = () => {
     props.onDelNode();
   };
+
   const copy = () => {
     props.onCopy();
   };
+
   const select = () => {
     props.onSelected();
   };
+
   const nodeHeader = (
     <div className={cls['node-body-main-header']}>
       <span className={cls['title']}>
@@ -44,6 +47,7 @@ const ConditionNode: React.FC<IProps> = (props) => {
       )}
     </div>
   );
+
   const nodeContent = (
     <div className={cls['node-body-main-content']} onClick={select}>
       <span className={cls['name']}>
@@ -51,6 +55,7 @@ const ConditionNode: React.FC<IProps> = (props) => {
       </span>
     </div>
   );
+
   return (
     <div className={`${props.isEdit ? cls['node'] : cls['node-unEdit']} `}>
       <div className={`${cls['node-body']}`}>

@@ -2,10 +2,10 @@ import React from 'react';
 import { Tag } from 'antd';
 import { ProColumns } from '@ant-design/pro-table';
 import { schema } from '@/ts/base';
-import { IWorkDefine } from '@/ts/core';
+import { IWork } from '@/ts/core';
 import EntityIcon from '@/bizcomponents/GlobalComps/entityIcon';
 
-export const DefineColumns: ProColumns<IWorkDefine>[] = [
+export const DefineColumns: ProColumns<IWork>[] = [
   {
     title: '序号',
     dataIndex: 'index',

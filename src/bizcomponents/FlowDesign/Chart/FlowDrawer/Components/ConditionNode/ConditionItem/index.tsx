@@ -8,7 +8,7 @@ import {
   getConditionKeys,
   dataType,
   FieldCondition,
-} from '../../../../processType';
+} from '../../../../../processType';
 
 interface IProps {
   currnet: NodeModel;
@@ -19,7 +19,7 @@ interface IProps {
  * @description: 条件
  * @return {*}
  */
-const ConditionGroupItemConfig: React.FC<IProps> = (props) => {
+const ConditionItem: React.FC<IProps> = (props) => {
   const [key, setKey] = useState(0);
   const [form] = Form.useForm();
   const [currentNode, setCurrentNode] = useState<NodeModel>();
@@ -180,4 +180,4 @@ const ConditionGroupItemConfig: React.FC<IProps> = (props) => {
     </div>
   );
 };
-export default ConditionGroupItemConfig;
+export default ConditionItem;

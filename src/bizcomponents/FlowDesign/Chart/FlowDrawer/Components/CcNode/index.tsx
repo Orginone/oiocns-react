@@ -4,11 +4,11 @@ import IndentityManage from '@/bizcomponents/IndentityManage';
 import cls from './index.module.less';
 import { NodeModel } from '../../../../processType';
 import ShareShowComp from '@/bizcomponents/IndentityManage/ShareShowComp';
-import { IFlow } from '@/ts/core';
+import { IBelong } from '@/ts/core';
 
 interface IProps {
   current: NodeModel;
-  work: IFlow;
+  belong: IBelong;
 }
 /**
  * @description: 抄送对象
@@ -61,7 +61,7 @@ const CcNode: React.FC<IProps> = (props) => {
         }}
         onCancel={() => setIsApprovalOpen(false)}>
         <IndentityManage
-          space={props.work.current.space}
+          space={props.belong}
           multiple={false}
           onChecked={(params: any) => {
             setCurrentData({

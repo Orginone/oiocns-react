@@ -3,14 +3,14 @@ import FlowDrawer from './FlowDrawer';
 import ProcessTree from './ProcessTree';
 import React, { useState } from 'react';
 import { AddNodeType, NodeModel } from '../processType';
-import { IWorkDefine } from '@/ts/core';
+import { IWork } from '@/ts/core';
 import { schema } from '@/ts/base';
 
 interface IProps {
   scale?: number;
   isEdit: boolean;
   resource: NodeModel;
-  current?: IWorkDefine;
+  current?: IWork;
   instance?: schema.XWorkInstance;
 }
 
@@ -35,10 +35,6 @@ const ChartDesign: React.FC<IProps> = (props) => {
                   params.type !== AddNodeType.CONCURRENTS &&
                   params.type !== AddNodeType.ORGANIZATIONA
                 ) {
-<<<<<<< HEAD
-=======
-                  //设置当前操作的节点，后续都是对当前节点的操作
->>>>>>> 1142324d7dfdff4d8b3e29159263411557da16b8
                   setCurrentNode(params);
                   setIsOpen(
                     props.instance == undefined ||

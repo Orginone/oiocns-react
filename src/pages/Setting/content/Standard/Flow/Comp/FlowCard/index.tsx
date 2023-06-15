@@ -3,12 +3,12 @@ import { Dropdown } from 'antd';
 import React from 'react';
 import './index.module.less';
 import { ImStackoverflow } from 'react-icons/im';
-import { IWorkDefine } from '@/ts/core';
+import { IWork } from '@/ts/core';
 interface FlowCardType {
-  data: IWorkDefine;
+  data: IWork;
   className?: string;
   onClick?: (event?: any) => void;
-  operation?: (_item: IWorkDefine) => any[];
+  operation?: (_item: IWork) => any[];
 }
 
 const FlowCard: React.FC<FlowCardType> = ({ className, data, onClick, operation }) => {

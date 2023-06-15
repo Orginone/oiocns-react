@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import { Button } from 'antd';
 import { dataType, FieldCondition, NodeModel } from '../../../../processType';
-import ConditionGroupItemConfig from '../ConditionGroupItemConfig';
+import ConditionItem from './ConditionItem';
 
 interface Iprops {
   current: NodeModel;
   conditions?: FieldCondition[];
-  orgId?: string;
 }
 
 /**
@@ -39,7 +38,7 @@ const ConditionNode: React.FC<Iprops> = (props) => {
           添加条件
         </Button>
       </div>
-      <ConditionGroupItemConfig currnet={props.current} conditions={props.conditions} />
+      <ConditionItem currnet={props.current} conditions={props.conditions} />
     </div>
   ) : (
     <></>

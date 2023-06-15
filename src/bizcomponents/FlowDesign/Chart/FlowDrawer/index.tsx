@@ -5,12 +5,10 @@ import WorkFlowNode from './Components/WorkFlowNode';
 import CcNode from './Components/CcNode';
 import RootNode from './Components/RootNode';
 import ConcurrentNode from './Components/ConcurrentNode';
-import DeptWayNode from './Components/DeptWayNode';
 import ConditionNode from './Components/ConditionNode';
 import { AddNodeType, FieldCondition, NodeModel, dataType } from '../../processType';
 import orgCtrl from '@/ts/controller';
-import { getUuid } from '@/utils/tools';
-import { IWorkDefine, SpeciesType } from '@/ts/core';
+import { IBelong, IWork, SpeciesType } from '@/ts/core';
 import { schema } from '@/ts/base';
 import EntityIcon from '@/bizcomponents/GlobalComps/entityIcon';
 /**
@@ -23,13 +21,12 @@ interface IProps {
   isOpen: boolean;
   current: NodeModel;
   onClose: () => void;
-  define?: IWorkDefine;
+  define?: IWork;
   defaultEditable: boolean;
   forms: schema.XForm[];
 }
 
 const FlowDrawer: React.FC<IProps> = (props) => {
-  const [key, setKey] = useState<string>();
   const [conditions, setConditions] = useState<FieldCondition[]>([]);
 
   useEffect(() => {
@@ -39,38 +36,40 @@ const FlowDrawer: React.FC<IProps> = (props) => {
         for (const form of props.forms.filter((a) => a.typeName == SpeciesType.Work)) {
           const attrs = await orgCtrl.work.loadAttributes(
             form.id,
-            props.define!.workItem.belongId,
+            props.define!.metadata.belongId,
           );
-          for (let attr of attrs) {
-            switch (attr!.valueType) {
-              case '数值型':
-                fields.push({
-                  label: attr.name,
-                  value: attr.id,
-                  type: dataType.NUMERIC,
-                });
-                break;
-              case '选择型':
-                {
-                  if (attr.dictId) {
-                    fields.push({
-                      label: attr.name,
-                      value: attr.id,
-                      type: dataType.DICT,
-                      dict: (await orgCtrl.work.loadItems(attr.dictId)).map((a) => {
-                        return { label: a.name, value: a.id };
-                      }),
-                    });
-                  }
-                }
-                break;
-              default:
-                fields.push({
-                  label: attr.name,
-                  value: attr.id,
-                  type: dataType.STRING,
-                });
-                break;
+          for (let attr of attrs.filter((a) => a.property)) {
+            if (attr.property) {
+              switch (attr.property.valueType) {
+                case '数值型':
+                  fields.push({
+                    label: attr.name,
+                    value: attr.id,
+                    type: dataType.NUMERIC,
+                  });
+                  break;
+                case '选择型':
+                  {
+                      fields.push({
+                        label: attr.name,
+                        value: attr.id,
+                        type: dataType.DICT,
+                        dict: (await orgCtrl.work.loadItems(attr.property.speciesId)).map(
+                          (a) => {
+                            return { label: a.name, value: a.id };
+                          },
+                        ),
+                      });
+                    }
+                  break;
+                default:
+                  fields.push({
+                    label: attr.name,
+                    value: attr.id,
+                    type: dataType.STRING,
+                  });
+                  break;
+              }
             }
           }
         }
@@ -81,21 +80,29 @@ const FlowDrawer: React.FC<IProps> = (props) => {
 
   const Component = () => {
     if (props.defaultEditable && props.define) {
+      const belong = orgCtrl.user.targets.find(
+        (a) => a.id == props.define!.metadata.belongId,
+      ) as IBelong;
+      if (belong == undefined) return <></>;
       switch (props.current.type) {
         case AddNodeType.ROOT:
-          return <RootNode current={props.current} define={props.define} />;
+          return <RootNode current={props.current} belong={belong} />;
         case AddNodeType.APPROVAL:
-          return <ApprovalNode current={props.current} define={props.define} />;
+          return <ApprovalNode current={props.current} belong={belong} />;
         case AddNodeType.CHILDWORK:
-          return <WorkFlowNode current={props.current} define={props.define} />;
+          return (
+            <WorkFlowNode
+              current={props.current}
+              belong={belong}
+              excludeIds={[props.define.id]}
+            />
+          );
         case AddNodeType.CC:
-          return <CcNode current={props.current} work={props.define.workItem} />;
+          return <CcNode current={props.current} belong={belong} />;
         case AddNodeType.CONDITION:
           return <ConditionNode current={props.current} conditions={conditions} />;
         case AddNodeType.CONCURRENTS:
           return <ConcurrentNode current={props.current} />;
-        case AddNodeType.ORGANIZATIONA:
-          return <DeptWayNode current={props.current} />;
         default:
           return <div>暂无需要处理的数据</div>;
       }
@@ -125,14 +132,13 @@ const FlowDrawer: React.FC<IProps> = (props) => {
   return (
     <Drawer
       title={
-        <div key={key}>
+        <div>
           <Typography.Title
             editable={
               props.defaultEditable
                 ? {
                     onChange: (e: any) => {
                       props.current.name = e;
-                      setKey(getUuid());
                     },
                   }
                 : false

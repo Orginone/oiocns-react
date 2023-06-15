@@ -3,10 +3,10 @@ import React from 'react';
 import orgCtrl from '@/ts/controller';
 import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
 import * as im from 'react-icons/im';
-import { IWorkDefine } from '@/ts/core';
+import { IWork } from '@/ts/core';
 
 interface IProps {
-  current: IWorkDefine[];
+  current: IWork[];
   filter: string;
 }
 
@@ -24,7 +24,7 @@ const WorkItem: React.FC<any> = ({ current, filter }: IProps) => {
           className="demo-loadmore-list"
           itemLayout="horizontal"
           dataSource={current}
-          renderItem={(item: IWorkDefine) => {
+          renderItem={(item: IWork) => {
             return (
               <List.Item
                 style={{ cursor: 'pointer' }}

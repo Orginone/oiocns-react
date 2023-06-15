@@ -5,7 +5,7 @@ import {
   ISpeciesItem,
   IFlowClass,
   SpeciesType,
-  IWorkDefine,
+  IWork,
   IApplication,
 } from '@/ts/core';
 import { MenuItemType } from 'typings/globelType';
@@ -14,7 +14,7 @@ import orgCtrl from '@/ts/controller';
 import { GroupMenuType } from './menuType';
 import OrgIcons from '@/bizcomponents/GlobalComps/orgIcons';
 
-const buildWorkItem = (defines: IWorkDefine[]) => {
+const buildWorkItem = (defines: IWork[]) => {
   const items: MenuItemType[] = [];
   for (const item of defines) {
     items.push({
@@ -41,7 +41,7 @@ const buildSpeciesTree = (species: ISpeciesItem[]) => {
   const items: MenuItemType[] = [];
   for (const item of species) {
     const children: MenuItemType[] = [];
-    const defines: IWorkDefine[] = [];
+    const defines: IWork[] = [];
     switch (item.typeName) {
       case SpeciesType.Market:
         defines.push(...(item as IMarket).defines);
@@ -78,7 +78,7 @@ const buildSpeciesTree = (species: ISpeciesItem[]) => {
 };
 
 const loadChildren = (team: IBelong) => {
-  const defines: IWorkDefine[] = [];
+  const defines: IWork[] = [];
   const apps: IApplication[] = [];
   for (const t of team.targets) {
     if (t.space === team.space) {

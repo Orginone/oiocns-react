@@ -4,7 +4,7 @@ import { GroupMenuType } from '../config/menuType';
 import TaskContent from './Task';
 import WorkContent from './Work/index';
 import ItemConetnt from './Item';
-import { IWorkDefine } from '@/ts/core';
+import { IWork } from '@/ts/core';
 
 interface IProps {
   filter: string;
@@ -18,9 +18,7 @@ const ContentIndex = ({ selectMenu, filter }: IProps) => {
       return <WorkContent current={selectMenu.item} />;
     case GroupMenuType.Species:
       return (
-        <ItemConetnt
-          current={selectMenu.item as IWorkDefine[]}
-          filter={filter}></ItemConetnt>
+        <ItemConetnt current={selectMenu.item as IWork[]} filter={filter}></ItemConetnt>
       );
     default:
       return (

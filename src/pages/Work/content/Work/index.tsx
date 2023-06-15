@@ -1,4 +1,4 @@
-import { IWorkDefine, SpeciesType } from '@/ts/core';
+import { IWork, SpeciesType } from '@/ts/core';
 import { Button, Card, Input, Tabs, message } from 'antd';
 import orgCtrl from '@/ts/controller';
 import React, { useEffect, useState } from 'react';
@@ -11,7 +11,7 @@ import ThingTable from './ThingTables/ThingTable';
 import { OperateType, defaultCol } from './ThingTables/const';
 // 卡片渲染
 interface IProps {
-  current: IWorkDefine;
+  current: IWork;
 }
 /* 发起办事数据 */
 interface SubmitDataType {

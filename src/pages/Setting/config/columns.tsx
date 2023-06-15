@@ -1,5 +1,5 @@
 import { schema } from '@/ts/base';
-import { ISpeciesItem, IWorkDefine } from '@/ts/core';
+import { ISpeciesItem, IWork } from '@/ts/core';
 import { ProColumns } from '@ant-design/pro-table';
 import EntityIcon from '@/bizcomponents/GlobalComps/entityIcon';
 import React from 'react';
@@ -308,7 +308,7 @@ export const FormColumns = (species: ISpeciesItem): ProColumns<schema.XForm>[] =
   },
 ];
 
-export const FlowColumn: ProColumns<IWorkDefine>[] = [
+export const FlowColumn: ProColumns<IWork>[] = [
   {
     title: '序号',
     valueType: 'index',
