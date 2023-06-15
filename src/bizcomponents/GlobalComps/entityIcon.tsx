@@ -83,6 +83,9 @@ const EntityIcon = (info: teamTypeInfo) => {
     case '目录':
       icon = <im.ImFolder fontSize={size} />;
       break;
+    case '应用':
+      icon = <im.ImDropbox fontSize={size} />;
+      break;
     case TargetType.Company:
       icon = <im.ImOffice fontSize={size} />;
       break;

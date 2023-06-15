@@ -14,7 +14,7 @@ export const loadMenus = (file: IFileInfo<schema.XEntity>, mode: number = 0) => 
       label: o.label,
       icon: o.menus ? <></> : <TypeIcon iconType={o.iconType} size={16} />,
       beforeLoad: () => {
-        command.emitter('config', o.cmd, o);
+        command.emitter('config', o.cmd, file);
       },
       children: o.menus?.map((s) => {
         return {
@@ -22,7 +22,7 @@ export const loadMenus = (file: IFileInfo<schema.XEntity>, mode: number = 0) => 
           label: s.label,
           icon: <TypeIcon iconType={s.iconType} size={16} />,
           beforeLoad: () => {
-            command.emitter('config', s.cmd, o);
+            command.emitter('config', s.cmd, file);
           },
         };
       }),

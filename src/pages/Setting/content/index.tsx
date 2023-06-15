@@ -13,7 +13,7 @@ import DictSetting from './Dict';
 import AuthoritySetting from './Authority';
 import { MenuType } from '../config/menuType';
 import { TargetType, companyTypes, departmentTypes } from '@/ts/core';
-import Design from './Standard/Flow/Design';
+import Design from '@/bizcomponents/FlowDesign';
 import FileSystem from './FileSystem';
 
 interface IProps {

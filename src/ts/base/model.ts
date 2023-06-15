@@ -696,7 +696,7 @@ export type OperateModel = {
   label: string;
   iconType: string;
   menus?: OperateModel[];
-}
+};
 
 /** 请求失败 */
 export const badRequest = (

@@ -1,0 +1,166 @@
+import React from 'react';
+import { ProFormColumnsType } from '@ant-design/pro-components';
+import SchemaForm from '@/components/SchemaForm';
+import { TargetModel } from '@/ts/base/model';
+import { ITarget, TargetType, companyTypes } from '@/ts/core';
+import UploadItem from '../tools/upload';
+
+interface Iprops {
+  formType: string;
+  target: ITarget;
+  finished: () => void;
+}
+/*
+  编辑
+*/
+const DirectoryForm = (props: Iprops) => {
+  let title = '';
+  let types: string[] = [props.target.typeName];
+  const readonly = props.formType === 'remark';
+  let initialValue: any = props.target.metadata;
+  switch (props.formType) {
+    case 'newCohort':
+      title = '设立群组';
+      types = [TargetType.Cohort];
+      initialValue = {};
+      break;
+    case 'newStation':
+      title = '设立岗位';
+      types = [TargetType.Station];
+      initialValue = {};
+      break;
+    case 'newGroup':
+      title = '设立集群';
+      types = [TargetType.Group];
+      initialValue = {};
+      break;
+    case 'newCompany':
+      title = '设立单位';
+      types = companyTypes;
+      initialValue = {};
+      break;
+    case 'newDepartment':
+      title = '设立部门';
+      if ('departmentTypes' in props.target) {
+        types = props.target.departmentTypes as string[];
+      }
+      if ('childrenTypes' in props.target) {
+        types = props.target.childrenTypes as string[];
+      }
+      initialValue = {};
+      break;
+    case 'update':
+      title = '更新' + props.target.name;
+      break;
+    case 'remark':
+      title = '查看' + props.target.name;
+      break;
+    default:
+      return <></>;
+  }
+  const columns: ProFormColumnsType<TargetModel>[] = [
+    {
+      title: '图标',
+      dataIndex: 'icon',
+      colProps: { span: 24 },
+      renderFormItem: (_, __, form) => {
+        return (
+          <UploadItem
+            readonly={readonly}
+            typeName={'directory'}
+            icon={initialValue.icon}
+            onChanged={(icon) => {
+              form.setFieldValue('icon', icon);
+            }}
+            directory={props.target.directory}
+          />
+        );
+      },
+    },
+    {
+      title: '名称',
+      dataIndex: 'name',
+      readonly: readonly,
+      formItemProps: {
+        rules: [{ required: true, message: '分类名称为必填项' }],
+      },
+    },
+    {
+      title: '类型',
+      dataIndex: 'typeName',
+      valueType: 'select',
+      initialValue: types[0],
+      fieldProps: {
+        options: types.map((i) => {
+          return {
+            value: i,
+            label: i,
+          };
+        }),
+      },
+      formItemProps: {
+        rules: [{ required: true, message: '类型为必填项' }],
+      },
+    },
+    {
+      title: '代码',
+      dataIndex: 'code',
+      readonly: readonly,
+      formItemProps: {
+        rules: [{ required: true, message: '分类代码为必填项' }],
+      },
+    },
+    {
+      title: '简称',
+      dataIndex: 'TeamName',
+      readonly: readonly,
+    },
+    {
+      title: '标识',
+      dataIndex: 'teamCode',
+      readonly: readonly,
+    },
+    {
+      title: '简介',
+      dataIndex: 'remark',
+      valueType: 'textarea',
+      colProps: { span: 24 },
+      readonly: readonly,
+      formItemProps: {
+        rules: [{ required: true, message: '简介为必填项' }],
+      },
+    },
+  ];
+  return (
+    <SchemaForm<TargetModel>
+      open
+      title={title}
+      width={640}
+      columns={columns}
+      initialValues={initialValue}
+      rowProps={{
+        gutter: [24, 0],
+      }}
+      layoutType="ModalForm"
+      onOpenChange={(open: boolean) => {
+        if (!open) {
+          props.finished();
+        }
+      }}
+      onFinish={async (values) => {
+        switch (props.formType) {
+          case 'update':
+            await props.target.update(values);
+            break;
+          default:
+            if (props.formType.startsWith('new')) {
+              await props.target.createTarget(values);
+            }
+            break;
+        }
+        props.finished();
+      }}></SchemaForm>
+  );
+};
+
+export default DirectoryForm;

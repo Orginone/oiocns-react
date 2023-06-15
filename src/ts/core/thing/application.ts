@@ -12,6 +12,8 @@ export interface IApplication extends IFileInfo<schema.XApplication> {
   children: IApplication[];
   /** 流程定义 */
   works: IWork[];
+  /** 更新应用 */
+  update(data: model.ApplicationModel): Promise<boolean>;
   /** 加载办事 */
   loadWorks(reload?: boolean): Promise<IWork[]>;
   /** 新建办事 */
