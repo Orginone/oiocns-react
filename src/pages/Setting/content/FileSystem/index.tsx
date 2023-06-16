@@ -6,8 +6,9 @@ import TableContent from './components/TableContent';
 import CardListContent from './components/CardContent';
 import { IconFont } from '@/components/IconFont';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
-import { IDirectory } from '@/ts/core';
-import { command } from '@/ts/base';
+import { IDirectory, IFileInfo } from '@/ts/core';
+import { schema } from '@/ts/base';
+import TypeIcon from '@/bizcomponents/GlobalComps/typeIcon';
 
 interface IProps {
   current: IDirectory;
@@ -20,6 +21,24 @@ const FileSystem: React.FC<IProps> = ({ current }: IProps) => {
   const [segmented, setSegmented] = useSessionStorage('segmented', 'Kanban');
   const parentRef = useRef<any>();
 
+  /** 操作到Menus */
+  const loadMenus = (file: IFileInfo<schema.XEntity>, mode: number = 0) => {
+    return file.operates(mode).map((o) => {
+      return {
+        key: o.cmd,
+        label: o.label,
+        icon: o.menus ? <></> : <TypeIcon iconType={o.iconType} size={16} />,
+        children: o.menus?.map((s) => {
+          return {
+            key: s.cmd,
+            label: s.label,
+            icon: <TypeIcon iconType={s.iconType} size={16} />,
+          };
+        }),
+      };
+    });
+  };
+
   return (
     <Card id={key} className={style.pageCard} bordered={false}>
       <div className={style.mainContent} ref={parentRef}>
@@ -28,17 +47,10 @@ const FileSystem: React.FC<IProps> = ({ current }: IProps) => {
             key={key}
             parentRef={parentRef}
             pageData={current.content()}
-            handleMenuClick={(key, target) => {
-              command.emitter('config', key, target);
-            }}
+            loadMenus={loadMenus}
           />
         ) : (
-          <CardListContent
-            current={current}
-            handleMenuClick={(key, target) => {
-              command.emitter('config', key, target);
-            }}
-          />
+          <CardListContent current={current} loadMenus={loadMenus} />
         )}
       </div>
       <Segmented

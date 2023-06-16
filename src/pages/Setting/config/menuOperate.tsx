@@ -7,8 +7,8 @@ import { IDepartment, IGroup, ITarget, IDirectory, IFileInfo } from '@/ts/core';
 import { command, schema } from '@/ts/base';
 
 /** 操作到Menus */
-export const loadMenus = (file: IFileInfo<schema.XEntity>, mode: number = 0) => {
-  return file.operates(mode).map((o) => {
+export const loadMenus = (file: IFileInfo<schema.XEntity>) => {
+  return file.operates(2).map((o) => {
     return {
       key: o.cmd,
       label: o.label,
@@ -79,7 +79,7 @@ const buildDirectoryTree = (directorys: IDirectory[]): MenuItemType[] => {
         <EntityIcon entityId={directory.id} typeName={directory.typeName} size={18} />
       ),
       itemType: directory.typeName,
-      menus: loadMenus(directory, 2),
+      menus: loadMenus(directory),
       children: buildDirectoryTree(directory.children),
       beforeLoad: async () => {
         await directory.loadContent();

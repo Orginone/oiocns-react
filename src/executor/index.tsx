@@ -3,37 +3,41 @@ import DataExecutor from './data';
 import ConfigExecutor from './config';
 import React, { useEffect, useState } from 'react';
 
-const Executor: React.FC = () => {
-  const [type, setType] = useState<string>('');
-  const [cmd, setCmd] = useState<string>('');
-  const [args, setArgs] = useState<any[]>([]);
+const Executor = () => {
+  const [content, setContent] = useState(<></>);
   useEffect(() => {
     const id = command.subscribe((type, cmd, ...args) => {
       console.log(type, cmd, args);
       if (cmd === 'qrcode') {
         type = 'config';
       }
-      setType(type);
-      setCmd(cmd);
-      setArgs(args);
+      switch (type) {
+        case 'data':
+          setContent(
+            <DataExecutor
+              cmd={cmd}
+              args={args}
+              finished={() => {
+                setContent(<></>);
+              }}
+            />,
+          );
+          break;
+        case 'config':
+          setContent(
+            <ConfigExecutor cmd={cmd} args={args} finished={() => setContent(<></>)} />,
+          );
+          break;
+        default:
+          setContent(<></>);
+          break;
+      }
     });
     return () => {
       command.unsubscribe(id);
     };
   }, []);
-  const finished = () => {
-    setType('');
-    setCmd('');
-    setArgs([]);
-  };
-  switch (type) {
-    case 'data':
-      return <DataExecutor cmd={cmd} args={args} finished={finished} />;
-    case 'config':
-      return <ConfigExecutor cmd={cmd} args={args} finished={finished} />;
-    default:
-      return <></>;
-  }
+  return content;
 };
 
 export default Executor;

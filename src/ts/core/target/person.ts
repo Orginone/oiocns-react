@@ -242,9 +242,24 @@ export class Person extends Belong implements IPerson {
   }
   override operates(): model.OperateModel[] {
     const operates = super.operates();
-    if (this.hasRelationAuth()) {
-      operates.unshift(targetOperates.NewCompany);
-    }
+    operates.unshift(
+      {
+        cmd: 'joinFriend',
+        label: '添加好友',
+        iconType: 'joinFriend',
+      },
+      {
+        cmd: 'joinCohort',
+        label: '加入群组',
+        iconType: 'joinCohort',
+      },
+      {
+        cmd: 'joinCompany',
+        label: '加入单位',
+        iconType: 'joinCompany',
+      },
+      targetOperates.NewCompany,
+    );
     return operates;
   }
   async findEntityAsync(id: string): Promise<schema.XEntity | undefined> {

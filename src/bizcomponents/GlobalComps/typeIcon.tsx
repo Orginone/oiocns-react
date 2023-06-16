@@ -15,49 +15,34 @@ const TypeIcon = ({ avatar, iconType, size }: TypeIconInfo) => {
     switch (iconType) {
       case '目录':
         return <im.ImFolder size={iconSize} />;
-      case 'newDir':
-        return <im.ImFolderPlus size={iconSize} />;
       case '字典':
-      case 'newDict':
         return <im.ImBook size={iconSize} />;
       case '分类':
-      case 'newSpecies':
         return <im.ImTree size={iconSize} />;
       case '属性':
-      case 'newProperty':
         return <im.ImJoomla size={iconSize} />;
       case '应用':
-      case 'newApp':
         return <im.ImDropbox size={iconSize} />;
       case '事项配置':
-      case 'newWorkConfig':
         return <im.ImInsertTemplate size={iconSize} />;
       case '实体配置':
-      case 'newThingConfig':
         return <im.ImPaste size={iconSize} />;
       case '角色':
-      case 'newIdentity':
         return <im.ImKey size={iconSize} />;
       case '权限':
-      case 'settingAuth':
         return <im.ImShield size={iconSize} />;
       case TargetType.Company:
       case TargetType.University:
       case TargetType.Hospital:
-      case 'newCompany':
         return <im.ImOffice size={iconSize} />;
       case TargetType.Station:
-      case 'newStation':
         return <im.ImAddressBook size={iconSize} />;
       case TargetType.Group:
-      case 'newGroup':
         return <im.ImTree size={iconSize} />;
       case TargetType.Cohort:
-      case 'newCohort':
         return <im.ImBubbles2 size={iconSize} />;
       case TargetType.Section:
       case TargetType.Department:
-      case 'newDepartment':
         return <im.ImLibrary size={iconSize} />;
       case TargetType.Person:
         return <im.ImUserTie size={iconSize} />;
@@ -71,6 +56,8 @@ const TypeIcon = ({ avatar, iconType, size }: TypeIconInfo) => {
         return <im.ImFlickr4 size={iconSize} />;
       case TargetType.Working:
         return <im.ImUsers size={iconSize} />;
+      case 'newDir':
+        return <im.ImFolderPlus size={iconSize} />;
       case 'refresh':
         return <im.ImSpinner9 size={iconSize} />;
       case 'remark':
@@ -93,6 +80,14 @@ const TypeIcon = ({ avatar, iconType, size }: TypeIconInfo) => {
         return <im.ImUserPlus size={iconSize} />;
       case 'qrcode':
         return <im.ImQrcode size={iconSize} />;
+      case 'joinFriend':
+        return <im.ImUserPlus size={iconSize} />;
+      case 'joinCohort':
+        return <im.ImUsers size={iconSize} />;
+      case 'joinCompany':
+        return <im.ImPlus size={iconSize} />;
+      case 'joinGroup':
+        return <im.ImEnter size={iconSize} />;
       default:
         return <im.ImFilesEmpty size={iconSize} />;
     }

@@ -73,12 +73,12 @@ const ConfigExecutor: React.FC<IProps> = ({ cmd, args, finished }) => {
           });
       }
       break;
-    case 'pull':
-      return <OperateModal cmd={cmd} entity={args[0]} finished={finished} />;
     default:
+      if (cmd === 'pull' || cmd.startsWith('join')) {
+        return <OperateModal cmd={cmd} entity={args[0]} finished={finished} />;
+      }
       return <EntityForm cmd={cmd} entity={args[0]} finished={finished} />;
   }
-  finished();
   return <></>;
 };
 

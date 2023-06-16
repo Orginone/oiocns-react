@@ -3,23 +3,22 @@ import { Dropdown, Row, Col, Card, Typography } from 'antd';
 import React from 'react';
 import cls from '../../index.module.less';
 import { IDirectory, IFileInfo } from '@/ts/core';
-import { schema } from '@/ts/base';
+import { command, schema } from '@/ts/base';
 import EntityIcon from '@/bizcomponents/GlobalComps/entityIcon';
-import { loadMenus } from '@/pages/Setting/config/menuOperate';
 
 const CardListContent = ({
   current,
-  handleMenuClick,
+  loadMenus,
 }: {
   current: IDirectory;
-  handleMenuClick: (key: string, node: IFileInfo<schema.XEntity>) => void;
+  loadMenus: (file: IFileInfo<schema.XEntity>) => any[];
 }) => {
   const FileCard = (el: IFileInfo<schema.XEntity>) => (
     <Dropdown
       menu={{
-        items: loadMenus(el, 1),
+        items: loadMenus(el),
         onClick: ({ key }) => {
-          handleMenuClick(key, el);
+          command.emitter('data', key, el);
         },
       }}
       trigger={['contextMenu']}>
@@ -29,7 +28,7 @@ const CardListContent = ({
         bordered={false}
         key={el.key}
         onDoubleClick={async () => {
-          handleMenuClick('open', el);
+          command.emitter('data', 'open', el);
         }}
         onContextMenu={(e) => {
           e.stopPropagation();
@@ -53,9 +52,9 @@ const CardListContent = ({
   return (
     <Dropdown
       menu={{
-        items: loadMenus(current, 1),
+        items: loadMenus(current),
         onClick: ({ key }) => {
-          handleMenuClick(key, current);
+          command.emitter('data', key, current);
         },
       }}
       trigger={['contextMenu']}>

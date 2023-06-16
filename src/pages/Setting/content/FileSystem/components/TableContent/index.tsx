@@ -4,20 +4,19 @@ import { Dropdown, Button, Typography } from 'antd';
 import { AiOutlineEllipsis } from 'react-icons/ai';
 import style from '../../index.module.less';
 import { IFileInfo, ISysFileInfo } from '@/ts/core';
-import { schema } from '@/ts/base';
+import { command, schema } from '@/ts/base';
 import EntityIcon from '@/bizcomponents/GlobalComps/entityIcon';
 import { showChatTime } from '@/utils/tools';
 import { formatSize } from '@/ts/base/common';
-import { loadMenus } from '@/pages/Setting/config/menuOperate';
 
 const TableContent = ({
   pageData,
-  handleMenuClick,
   parentRef,
+  loadMenus,
 }: {
   parentRef: any;
   pageData: IFileInfo<schema.XEntity>[];
-  handleMenuClick: (key: string, node: IFileInfo<schema.XEntity>) => void;
+  loadMenus: (file: IFileInfo<schema.XEntity>) => any[];
 }) => {
   const [tableHeight, setTableHeight] = useState<number | 'auto'>('auto'); //计算高度
   // 监听父级高度
@@ -100,7 +99,7 @@ const TableContent = ({
                   menu={{
                     items: loadMenus(record),
                     onClick: ({ key }) => {
-                      handleMenuClick(key, record);
+                      command.emitter('config', key, record);
                     },
                   }}
                   key={record.key}
@@ -119,7 +118,7 @@ const TableContent = ({
         onRow={(record) => {
           return {
             onDoubleClick: async () => {
-              handleMenuClick('open', record);
+              command.emitter('config', 'open', record);
             },
           };
         }}

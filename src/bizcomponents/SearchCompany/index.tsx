@@ -26,14 +26,6 @@ const CompanySearchList: React.FC<CompanySearchTableProps> = (props) => {
   const [searchKey, setSearchKey] = useState<string>();
   const [dataSource, setDataSource] = useState<XTarget[]>([]);
   const [searchPlace, setSearchPlace] = useState<string>();
-  /** 生产用户共享信息 */
-  const generateShare = (target: XTarget) => {
-    return {
-      name: target.name,
-      typeName: target.typeName,
-      avatar: parseAvatar(target.icon),
-    };
-  };
 
   useEffect(() => {
     switch (tableProps.searchType) {

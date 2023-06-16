@@ -29,7 +29,7 @@ export class Member extends FileInfo<schema.XTarget> implements IMemeber {
   override operates(): OperateModel[] {
     const operates = super.operates(1);
     if (
-      this.metadata.id != this.directory.target.userId &&
+      this.metadata.id != this.directory.belongId &&
       this.directory.target.hasRelationAuth()
     ) {
       operates.unshift({

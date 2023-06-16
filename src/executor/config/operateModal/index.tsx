@@ -1,6 +1,7 @@
 import { schema } from '@/ts/base';
-import { IDirectory, IEntity } from '@/ts/core';
+import { IBelong, IDirectory, IEntity } from '@/ts/core';
 import SearchTarget from './searchTarget';
+import JoinTarget from './joinTarget';
 import React from 'react';
 import orgCtrl from '@/ts/controller';
 interface IProps {
@@ -18,11 +19,18 @@ const OperateModal: React.FC<IProps> = ({ cmd, entity, finished }) => {
   switch (cmd) {
     case 'pull':
       return (
-        <SearchTarget
-          current={(entity as IDirectory).target}
-          finished={reloadFinish}></SearchTarget>
+        <SearchTarget current={(entity as IDirectory).target} finished={reloadFinish} />
       );
     default:
+      if (cmd.startsWith('join')) {
+        return (
+          <JoinTarget
+            cmd={cmd}
+            current={(entity as IDirectory).target as IBelong}
+            finished={finished}
+          />
+        );
+      }
       return <></>;
   }
 };

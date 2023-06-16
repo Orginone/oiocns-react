@@ -30,7 +30,6 @@ const DataExecutor: React.FC<IProps> = ({ cmd, args, finished }) => {
       }
       break;
   }
-  finished();
   return <></>;
 };
 

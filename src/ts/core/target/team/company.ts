@@ -259,6 +259,11 @@ export class Company extends Belong implements ICompany {
     const operates = super.operates();
     if (this.hasRelationAuth()) {
       operates.unshift(
+        {
+          cmd: 'joinGroup',
+          label: '加入集群',
+          iconType: 'joinGroup',
+        },
         targetOperates.NewGroup,
         targetOperates.NewDepartment,
         targetOperates.NewStation,

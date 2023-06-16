@@ -173,7 +173,7 @@ export class SysFileInfo extends FileInfo<schema.XEntity> implements ISysFileInf
     return false;
   }
   override operates(mode?: number): model.OperateModel[] {
-    const operates = super.operates(mode);
+    const operates = super.operates();
     return operates.filter((i) => i.cmd != 'update');
   }
 }

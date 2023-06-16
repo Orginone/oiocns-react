@@ -60,32 +60,32 @@ export const directoryOperates = {
   NewApp: {
     cmd: 'newApp',
     label: '新建应用',
-    iconType: 'newApp',
+    iconType: '应用',
   },
   NewSpecies: {
     cmd: 'newSpecies',
     label: '新建分类',
-    iconType: 'newSpecies',
+    iconType: '分类',
   },
   NewDict: {
     cmd: 'newDict',
     label: '新建字典',
-    iconType: 'newDict',
+    iconType: '字典',
   },
   NewProperty: {
     cmd: 'newProperty',
     label: '新建属性',
-    iconType: 'newProperty',
+    iconType: '属性',
   },
   NewThingConfig: {
     cmd: 'newThingConfig',
     label: '新建实体配置',
-    iconType: 'newThingConfig',
+    iconType: '实体配置',
   },
   NewWorkConfig: {
     cmd: 'newWorkConfig',
     label: '新建事项配置',
-    iconType: 'newWorkConfig',
+    iconType: '事项配置',
   },
 };
 
@@ -123,36 +123,36 @@ export const targetOperates = {
   NewIdentity: {
     cmd: 'newIdentity',
     label: '设立角色',
-    iconType: 'newIdentity',
+    iconType: '角色',
   },
   NewCohort: {
     cmd: 'newCohort',
     label: '设立群组',
-    iconType: 'newCohort',
+    iconType: '群组',
   },
   NewCompany: {
     cmd: 'newCompany',
     label: '设立单位',
-    iconType: 'newCompany',
+    iconType: '单位',
   },
   NewGroup: {
     cmd: 'newGroup',
     label: '设立集群',
-    iconType: 'newGroup',
+    iconType: '组织群',
   },
   NewDepartment: {
     cmd: 'newDepartment',
     label: '设立部门',
-    iconType: 'newDepartment',
+    iconType: '部门',
   },
   NewStation: {
     cmd: 'newStation',
     label: '设立岗位',
-    iconType: 'newStation',
+    iconType: '岗位',
   },
   SettingAuth: {
     cmd: 'settingAuth',
     label: '权限设置',
-    iconType: 'settingAuth',
+    iconType: '权限',
   },
 };

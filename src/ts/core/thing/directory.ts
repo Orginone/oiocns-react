@@ -104,12 +104,12 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
     const cnt: IFileInfo<schema.XEntity>[] = [
       ...this.children,
       ...this.forms,
-      ...this.specieses,
       ...this.applications,
     ];
     if (mode === 1) {
       cnt.push(...this.files);
     } else if (!this.parent) {
+      cnt.push(...this.specieses);
       cnt.push(...this.target.targets.filter((i) => i.id != this.target.id));
       cnt.push(...this.target.members.map((i) => new Member(i, this)));
     }
