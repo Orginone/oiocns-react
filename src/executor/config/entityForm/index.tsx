@@ -8,6 +8,7 @@ import TargetForm from './TargetForm';
 import LabelsForm from './LabelsForm';
 import React from 'react';
 import orgCtrl from '@/ts/controller';
+import RenameForm from './RenameForm';
 interface IProps {
   cmd: string;
   entity: IEntity<schema.XEntity>;
@@ -20,6 +21,8 @@ const EntityForm: React.FC<IProps> = ({ cmd, entity, finished }) => {
     orgCtrl.changCallback();
   };
   switch (cmd) {
+    case 'rename':
+      return <RenameForm file={entity as any} finished={reloadFinish} />;
     case 'newDir':
     case 'updateDir':
     case 'remarkDir':
