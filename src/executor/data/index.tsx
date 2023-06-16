@@ -10,8 +10,9 @@ interface IProps {
 const DataExecutor: React.FC<IProps> = ({ cmd, args, finished }) => {
   switch (cmd) {
     case 'open':
+    case 'remark':
       if (args && args.length > 0) {
-        return <ExecutorOpen file={args[0]} finished={finished} />;
+        return <ExecutorOpen cmd={cmd} file={args[0]} finished={finished} />;
       }
       break;
     case 'refresh':
