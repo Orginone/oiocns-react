@@ -28,3 +28,4 @@ export type { IFileInfo, ISysFileInfo } from './thing/fileinfo';
 export type { IMemeber } from './thing/member';
 export type { ISpecies } from './thing/species';
 export { UserProvider } from './user';
+export type { IWork } from './work';

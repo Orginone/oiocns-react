@@ -3,7 +3,7 @@ import './index.less';
 import CardWidthTitle from '@/components/CardWidthTitle';
 import orgCtrl from '@/ts/controller';
 import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
-import { IApplication, SpeciesType } from '@/ts/core';
+import { IApplication } from '@/ts/core';
 import { useHistory } from 'react-router-dom';
 interface SelfAppComType {
   props: []; //入口列表
@@ -21,15 +21,8 @@ const BannerCom: React.FC<SelfAppComType> = () => {
 
   const loadApps = async () => {
     const apps: IApplication[] = [];
-    for (const u of orgCtrl.user.targets) {
-      for (const s of u.species) {
-        if (s.typeName === SpeciesType.Application) {
-          const app = s as IApplication;
-          if ((await app.loadWorkDefines()).length > 0) {
-            apps.push(app);
-          }
-        }
-      }
+    for (const target of orgCtrl.targets) {
+      apps.push(...target.directory.applications);
     }
     return apps.filter((a, i) => apps.findIndex((x) => x.id === a.id) === i);
   };

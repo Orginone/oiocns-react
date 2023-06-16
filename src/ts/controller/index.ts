@@ -1,4 +1,4 @@
-import { IPerson, UserProvider } from '@/ts/core';
+import { IPerson, ITarget, UserProvider } from '@/ts/core';
 import { common } from '@/ts/base';
 import { IWorkProvider } from '../core/work/provider';
 import { IChatProvider } from '../core/chat/provider';
@@ -23,6 +23,10 @@ class IndexController extends common.Emitter {
   /** 当前用户 */
   get user(): IPerson {
     return this._provider.user!;
+  }
+  /** 所有相关的用户 */
+  get targets(): ITarget[] {
+    return this._provider.targets;
   }
   /** 办事提供者 */
   get work(): IWorkProvider {

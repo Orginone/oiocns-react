@@ -1,18 +1,11 @@
 import React from 'react';
-import {
-  IBelong,
-  IMarket,
-  ISpeciesItem,
-  IFlowClass,
-  SpeciesType,
-  IWork,
-  IApplication,
-} from '@/ts/core';
+import { IApplication, IBelong } from '@/ts/core';
 import { MenuItemType } from 'typings/globelType';
 import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
 import orgCtrl from '@/ts/controller';
 import { GroupMenuType } from './menuType';
 import OrgIcons from '@/bizcomponents/GlobalComps/orgIcons';
+import { IWork } from '@/ts/core';
 
 const buildWorkItem = (defines: IWork[]) => {
   const items: MenuItemType[] = [];
@@ -37,41 +30,19 @@ const buildWorkItem = (defines: IWork[]) => {
   return items;
 };
 
-const buildSpeciesTree = (species: ISpeciesItem[]) => {
+const buildAppTree = (apps: IApplication[]) => {
   const items: MenuItemType[] = [];
-  for (const item of species) {
-    const children: MenuItemType[] = [];
-    const defines: IWork[] = [];
-    switch (item.typeName) {
-      case SpeciesType.Market:
-        defines.push(...(item as IMarket).defines);
-        break;
-      case SpeciesType.Application:
-        defines.push(...(item as IApplication).defines);
-        children.push(...buildSpeciesTree(item.children));
-        break;
-      case SpeciesType.Flow:
-        defines.push(...(item as IFlowClass).defines);
-        children.push(...buildWorkItem(defines), ...buildSpeciesTree(item.children));
-        break;
-      default:
-        continue;
-    }
+  for (const app of apps) {
     items.push({
-      key: item.key,
-      item: defines,
-      label: item.name,
+      key: app.key,
+      item: app.works,
+      label: app.name,
       itemType: GroupMenuType.Species,
       menus: [],
       icon: (
-        <TeamIcon
-          notAvatar={true}
-          entityId={item.id}
-          typeName={item.typeName}
-          size={18}
-        />
+        <TeamIcon notAvatar={true} entityId={app.id} typeName={app.typeName} size={18} />
       ),
-      children: children,
+      children: [...buildAppTree(app.children), ...buildWorkItem(app.works)],
     });
   }
   return items;
@@ -81,19 +52,10 @@ const loadChildren = (team: IBelong) => {
   const defines: IWork[] = [];
   const apps: IApplication[] = [];
   for (const t of team.targets) {
-    if (t.space === team.space) {
-      for (const s of t.species) {
-        switch (s.typeName) {
-          case SpeciesType.Market:
-          case SpeciesType.Application:
-            {
-              const app = s as IApplication;
-              apps.push(app);
-              defines.push(...app.defines);
-            }
-            break;
-        }
-      }
+    for (const s of t.directory.applications) {
+      const app = s as IApplication;
+      apps.push(app);
+      defines.push(...app.works);
     }
   }
   return [
@@ -105,10 +67,10 @@ const loadChildren = (team: IBelong) => {
       icon: <OrgIcons size={22} workStart />,
       expIcon: <OrgIcons size={22} workStart selected />,
       menus: [],
-      children: buildSpeciesTree(apps.filter((app) => app.defines.length > 0)),
+      children: buildAppTree(apps.filter((app) => app.works.length > 0)),
       beforeLoad: async () => {
         for (const app of apps) {
-          await app.loadWorkDefines();
+          await app.loadWorks();
         }
       },
     },
