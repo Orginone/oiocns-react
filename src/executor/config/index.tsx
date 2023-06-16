@@ -3,6 +3,7 @@ import React from 'react';
 import orgCtrl from '@/ts/controller';
 import EntityForm from './entityForm';
 import OperateModal from './operateModal';
+import { IMemeber } from '@/ts/core';
 
 interface IProps {
   cmd: string;
@@ -58,6 +59,18 @@ const ConfigExecutor: React.FC<IProps> = ({ cmd, args, finished }) => {
             orgCtrl.changCallback();
           }
         });
+      }
+      break;
+    case 'remove':
+      if ('isMember' in args[0]) {
+        const member = args[0] as IMemeber;
+        member.directory.target
+          .removeMembers([member.metadata])
+          .then((success: boolean) => {
+            if (success) {
+              orgCtrl.changCallback();
+            }
+          });
       }
       break;
     case 'pull':

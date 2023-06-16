@@ -25,5 +25,6 @@ export type { ICompany } from './target/team/company';
 export type { IApplication } from './thing/application';
 export type { IDirectory } from './thing/directory';
 export type { IFileInfo, ISysFileInfo } from './thing/fileinfo';
+export type { IMemeber } from './thing/member';
 export type { ISpecies } from './thing/species';
 export { UserProvider } from './user';
