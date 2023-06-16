@@ -320,7 +320,7 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
   }
   override operates(mode: number = 0): model.OperateModel[] {
     const operates: model.OperateModel[] = [];
-    if (mode === 2) {
+    if (mode === 2 && this.target.hasRelationAuth()) {
       operates.push(directoryNew);
       operates.push(directoryOperates.NewDir);
       operates.push(directoryOperates.Refesh);

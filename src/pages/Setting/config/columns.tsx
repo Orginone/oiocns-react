@@ -1,5 +1,4 @@
 import { schema } from '@/ts/base';
-import { ISpeciesItem, IWork } from '@/ts/core';
 import { ProColumns } from '@ant-design/pro-table';
 import EntityIcon from '@/bizcomponents/GlobalComps/entityIcon';
 import React from 'react';

@@ -6,7 +6,6 @@ import useObjectUpdate from '@/hooks/useObjectUpdate';
 import { IForm, IPropClass, SpeciesType } from '@/ts/core';
 import PropertyConfig from './propConfig';
 import AttributeConfig from '@/bizcomponents/FormDesign/attributeConfig';
-import AttributeModal from '@/bizcomponents/GlobalComps/createAttribute';
 import SelectPropertys from './SelectPropertys';
 import { Modal } from 'antd';
 import { AttributeModel } from '@/ts/base/model';

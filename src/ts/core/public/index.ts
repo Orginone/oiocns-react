@@ -14,6 +14,7 @@ export {
   directoryOperates,
   entityOperates,
   fileOperates,
+  personJoins,
   targetOperates,
   teamOperates,
 } from './operates';

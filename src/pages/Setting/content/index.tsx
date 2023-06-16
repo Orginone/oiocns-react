@@ -1,84 +1,84 @@
-import CompanySetting from './Company';
-import StationSetting from './Station';
-import AgencySetting from './Agency';
-import PersonSetting from './Person';
-import StandardSetting from './Standard';
-import AgencyInfo from '../components/AgencyInfo';
-import EntityInfo from '../components/EntityInfo';
-import WorkForm from './Standard/WorkForm';
-import Attribute from './Standard/Attribute';
-import { MenuItemType } from 'typings/globelType';
-import React from 'react';
-import DictSetting from './Dict';
-import AuthoritySetting from './Authority';
-import { MenuType } from '../config/menuType';
-import { TargetType, companyTypes, departmentTypes } from '@/ts/core';
-import Design from '@/bizcomponents/FlowDesign';
-import FileSystem from './FileSystem';
+import React, { useRef } from 'react';
+import style from './index.module.less';
+import { Segmented, Card } from 'antd';
+import useSessionStorage from '@/hooks/useSessionStorage';
+import TableContent from './components/TableContent';
+import CardListContent from './components/CardContent';
+import { IconFont } from '@/components/IconFont';
+import useCtrlUpdate from '@/hooks/useCtrlUpdate';
+import { IDirectory, IFileInfo } from '@/ts/core';
+import { schema } from '@/ts/base';
+import TypeIcon from '@/bizcomponents/GlobalComps/typeIcon';
 
 interface IProps {
-  selectMenu: MenuItemType;
+  current: IDirectory | undefined;
 }
+/**
+ * 存储-文件系统
+ */
+const SettingContent: React.FC<IProps> = ({ current }: IProps) => {
+  if (!current) return <></>;
+  const [key] = useCtrlUpdate(current);
+  const [segmented, setSegmented] = useSessionStorage('segmented', 'Kanban');
+  const parentRef = useRef<any>();
 
-const ContentIndex = ({ selectMenu }: IProps) => {
-  if (selectMenu.itemType === '目录') {
-    return <FileSystem current={selectMenu.item} />;
-  }
-  const loadConent = () => {
-    /** 加载内容区 */
-    switch (selectMenu.itemType) {
-      case TargetType.Person:
-        return <PersonSetting />;
-      case TargetType.Group:
-      case TargetType.Cohort:
-        return <AgencySetting current={selectMenu.item} />;
-      case TargetType.Station:
-        return <StationSetting current={selectMenu.item} />;
-      case MenuType.Species:
-        return <StandardSetting current={selectMenu.item} />;
-      case MenuType.Dict:
-        return <DictSetting current={selectMenu.item} />;
-      case MenuType.Authority:
-        return <AuthoritySetting current={selectMenu.item} />;
-      case MenuType.Form:
-        return <WorkForm current={selectMenu.item} />;
-      case MenuType.Work:
-        return <Design current={selectMenu.item} />;
-      case MenuType.Property:
-        return (
-          <Attribute
-            current={selectMenu.item.species}
-            property={selectMenu.item.property}
-          />
-        );
-      default:
-        if (companyTypes.includes(selectMenu.itemType as TargetType)) {
-          return <CompanySetting current={selectMenu.item} />;
-        }
-        if (departmentTypes.includes(selectMenu.itemType as TargetType)) {
-          return <AgencySetting current={selectMenu.item} />;
-        }
-        return <></>;
-    }
+  /** 操作到Menus */
+  const loadMenus = (file: IFileInfo<schema.XEntity>, mode: number = 0) => {
+    return file.operates(mode).map((o) => {
+      return {
+        key: o.cmd,
+        label: o.label,
+        icon: o.menus ? <></> : <TypeIcon iconType={o.iconType} size={16} />,
+        children: o.menus?.map((s) => {
+          return {
+            key: s.cmd,
+            label: s.label,
+            icon: <TypeIcon iconType={s.iconType} size={16} />,
+          };
+        }),
+      };
+    });
   };
-  const loadInfo = () => {
-    /** 加载信息区 */
-    const entity = selectMenu.item;
-    if (entity) {
-      if ('memberTypes' in entity) {
-        return <AgencyInfo entity={entity} />;
-      } else if ('share' in entity) {
-        return <EntityInfo entity={entity} />;
-      }
-    }
-    return <></>;
-  };
+
   return (
-    <>
-      {loadInfo()}
-      {loadConent()}
-    </>
+    <Card id={key} className={style.pageCard} bordered={false}>
+      <div className={style.mainContent} ref={parentRef}>
+        {segmented === 'List' ? (
+          <TableContent
+            key={key}
+            parentRef={parentRef}
+            pageData={current.content()}
+            loadMenus={loadMenus}
+          />
+        ) : (
+          <CardListContent current={current} loadMenus={loadMenus} />
+        )}
+      </div>
+      <Segmented
+        value={segmented}
+        onChange={(value) => setSegmented(value as 'Kanban' | 'List')}
+        options={[
+          {
+            value: 'List',
+            icon: (
+              <IconFont
+                type={'icon-chuangdanwei'}
+                className={segmented === 'List' ? style.active : ''}
+              />
+            ),
+          },
+          {
+            value: 'Kanban',
+            icon: (
+              <IconFont
+                type={'icon-jianyingyong'}
+                className={segmented === 'Kanban' ? style.active : ''}
+              />
+            ),
+          },
+        ]}
+      />
+    </Card>
   );
 };
-
-export default ContentIndex;
+export default SettingContent;

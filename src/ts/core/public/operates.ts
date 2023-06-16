@@ -91,7 +91,7 @@ export const directoryOperates = {
 
 /** 目录下新增 */
 export const directoryNew = {
-  cmd: '-',
+  cmd: '',
   label: '新建配置',
   iconType: 'new',
   menus: [
@@ -155,4 +155,28 @@ export const targetOperates = {
     label: '权限设置',
     iconType: '权限',
   },
+};
+
+/** 人员的申请 */
+export const personJoins = {
+  cmd: '',
+  label: '申请加入',
+  iconType: 'join',
+  menus: [
+    {
+      cmd: 'joinFriend',
+      label: '添加好友',
+      iconType: 'joinFriend',
+    },
+    {
+      cmd: 'joinCohort',
+      label: '加入群组',
+      iconType: 'joinCohort',
+    },
+    {
+      cmd: 'joinCompany',
+      label: '加入单位',
+      iconType: 'joinCompany',
+    },
+  ],
 };

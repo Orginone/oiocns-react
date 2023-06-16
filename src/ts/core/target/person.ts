@@ -8,7 +8,7 @@ import { ICompany } from './team/company';
 import { IMsgChat } from '../chat/message/msgchat';
 import { ITarget } from './base/target';
 import { ITeam } from './base/team';
-import { targetOperates } from '../public';
+import { personJoins, targetOperates } from '../public';
 
 /** 人员类型接口 */
 export interface IPerson extends IBelong {
@@ -242,24 +242,7 @@ export class Person extends Belong implements IPerson {
   }
   override operates(): model.OperateModel[] {
     const operates = super.operates();
-    operates.unshift(
-      {
-        cmd: 'joinFriend',
-        label: '添加好友',
-        iconType: 'joinFriend',
-      },
-      {
-        cmd: 'joinCohort',
-        label: '加入群组',
-        iconType: 'joinCohort',
-      },
-      {
-        cmd: 'joinCompany',
-        label: '加入单位',
-        iconType: 'joinCompany',
-      },
-      targetOperates.NewCompany,
-    );
+    operates.unshift(personJoins, targetOperates.NewCompany);
     return operates;
   }
   async findEntityAsync(id: string): Promise<schema.XEntity | undefined> {
