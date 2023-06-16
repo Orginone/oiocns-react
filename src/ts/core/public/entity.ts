@@ -1,6 +1,7 @@
 import { Emitter } from '@/ts/base/common';
 import { schema, model, parseAvatar } from '../../base';
 import { generateUuid } from '../../base/common/uuid';
+import { entityOperates } from './operates';
 
 /** 共享信息数据集 */
 export const ShareIdSet = new Map<string, any>();
@@ -33,6 +34,11 @@ export interface IEntity<T> extends Emitter {
   findMetadata<U>(id: string): U | undefined;
   /** 更新元数据 */
   updateMetadata<U extends schema.XEntity>(data: U): void;
+  /**
+   * 对实体可进行的操作
+   * @param mode 模式,默认为配置模式
+   */
+  operates(mode?: number): model.OperateModel[];
 }
 
 /** 实体类实现 */
@@ -104,5 +110,8 @@ export abstract class Entity<T extends schema.XEntity>
       typeName: metadata?.typeName ?? '未知',
       avatar: parseAvatar(metadata?.icon),
     };
+  }
+  operates(mode?: number | undefined): model.OperateModel[] {
+    return [entityOperates.Remark, entityOperates.QrCode];
   }
 }

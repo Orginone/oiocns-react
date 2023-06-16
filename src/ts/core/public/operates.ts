@@ -1,10 +1,28 @@
-/** 文件支持的操作 */
-export const fileOperates = {
+/** 实体的操作 */
+export const entityOperates = {
   Open: {
     cmd: 'open',
     label: '打开',
     iconType: 'open',
   },
+  Update: {
+    cmd: 'update',
+    label: '更新信息',
+    iconType: 'update',
+  },
+  Remark: {
+    cmd: 'remark',
+    label: '详细信息',
+    iconType: 'remark',
+  },
+  QrCode: {
+    cmd: 'qrcode',
+    label: '分享二维码',
+    iconType: 'qrcode',
+  },
+};
+/** 文件支持的操作 */
+export const fileOperates = {
   Copy: {
     cmd: 'copy',
     label: '复制到',
@@ -24,11 +42,6 @@ export const fileOperates = {
     cmd: 'delete',
     label: '彻底删除',
     iconType: 'delete',
-  },
-  Remark: {
-    cmd: 'remark',
-    label: '详细信息',
-    iconType: 'remark',
   },
 };
 
@@ -89,15 +102,6 @@ export const directoryNew = {
     directoryOperates.NewThingConfig,
     directoryOperates.NewWorkConfig,
   ],
-};
-
-/** 实体的操作 */
-export const entityOperates = {
-  Update: {
-    cmd: 'update',
-    label: '更新信息',
-    iconType: 'update',
-  },
 };
 
 /** 团队的操作 */

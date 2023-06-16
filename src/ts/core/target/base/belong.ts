@@ -95,7 +95,11 @@ export abstract class Belong extends Target implements IBelong {
     }
   }
   override operates(): model.OperateModel[] {
-    return [targetOperates.NewCohort, targetOperates.SettingAuth, ...super.operates()];
+    const operates = super.operates();
+    if (this.hasRelationAuth()) {
+      operates.unshift(targetOperates.NewCohort, targetOperates.SettingAuth);
+    }
+    return operates;
   }
   abstract get shareTarget(): ITarget[];
   abstract cohortChats: IMsgChat[];

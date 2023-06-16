@@ -5,7 +5,7 @@ import { IBelong } from './belong';
 import { IMsgChatT, IMsgChat, MsgChat } from '../../chat/message/msgchat';
 import { IFileInfo } from '../../thing/fileinfo';
 import { IDirectory } from '../../thing/directory';
-import { entityOperates, fileOperates, teamOperates } from '../../public';
+import { entityOperates, teamOperates } from '../../public';
 
 /** 团队抽象接口类 */
 export interface ITeam extends IMsgChatT<schema.XTarget>, IFileInfo<schema.XTarget> {
@@ -177,7 +177,11 @@ export abstract class Team extends MsgChat<schema.XTarget> implements ITeam {
     return notity;
   }
   operates(): model.OperateModel[] {
-    return [entityOperates.Update, teamOperates.Pull, fileOperates.Remark];
+    const operates = super.operates();
+    if (this.hasRelationAuth()) {
+      operates.unshift(entityOperates.Update, teamOperates.Pull);
+    }
+    return operates;
   }
   abstract get chats(): IMsgChat[];
   abstract deepLoad(reload?: boolean): Promise<void>;

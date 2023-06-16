@@ -91,6 +91,8 @@ const TypeIcon = ({ avatar, iconType, size }: TypeIconInfo) => {
         return <im.ImPriceTags size={iconSize} />;
       case 'pull':
         return <im.ImUserPlus size={iconSize} />;
+      case 'qrcode':
+        return <im.ImQrcode size={iconSize} />;
       default:
         return <im.ImFilesEmpty size={iconSize} />;
     }

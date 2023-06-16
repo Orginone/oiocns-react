@@ -256,12 +256,15 @@ export class Company extends Belong implements ICompany {
   }
 
   override operates(): model.OperateModel[] {
-    return [
-      targetOperates.NewGroup,
-      targetOperates.NewDepartment,
-      targetOperates.NewStation,
-      ...super.operates(),
-    ];
+    const operates = super.operates();
+    if (this.hasRelationAuth()) {
+      operates.unshift(
+        targetOperates.NewGroup,
+        targetOperates.NewDepartment,
+        targetOperates.NewStation,
+      );
+    }
+    return operates;
   }
 
   override async removeMembers(

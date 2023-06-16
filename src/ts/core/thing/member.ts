@@ -2,7 +2,6 @@ import { OperateModel } from '@/ts/base/model';
 import { schema } from '../../base';
 import { IDirectory } from './directory';
 import { FileInfo, IFileInfo } from './fileinfo';
-import { fileOperates } from '../public';
 
 /** 应用/模块接口类 */
 export interface IMemeber extends IFileInfo<schema.XTarget> {
@@ -28,16 +27,17 @@ export class Member extends FileInfo<schema.XTarget> implements IMemeber {
     throw new Error('暂不支持.');
   }
   override operates(): OperateModel[] {
-    if (this.metadata.id != this.directory.target.userId) {
-      return [
-        {
-          cmd: 'remove',
-          label: '移除成员',
-          iconType: 'remove',
-        },
-        fileOperates.Remark,
-      ];
+    const operates = super.operates();
+    if (
+      this.metadata.id != this.directory.target.userId &&
+      this.directory.target.hasRelationAuth()
+    ) {
+      operates.unshift({
+        cmd: 'remove',
+        label: '移除成员',
+        iconType: 'remove',
+      });
     }
-    return [fileOperates.Remark];
+    return operates;
   }
 }
