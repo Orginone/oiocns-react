@@ -87,7 +87,7 @@ const EntityForm: React.FC<IProps> = ({ cmd, entity, finished }) => {
       );
     case 'newIdentity':
     case 'updateIdentity':
-    case 'remarkIdentity':
+    case 'remarkIdentity': {
       const target = cmd.startsWith('new')
         ? (entity as ITarget)
         : (entity as IIdentity).current;
@@ -99,6 +99,7 @@ const EntityForm: React.FC<IProps> = ({ cmd, entity, finished }) => {
           identity={identity}
           finished={reloadFinish}></IdentityForm>
       );
+    }
     case 'newAuthority':
     case 'updateAuthority':
     case 'remarkAuthority':
