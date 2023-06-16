@@ -11,7 +11,6 @@ interface IProps {
 }
 
 const OperateModal: React.FC<IProps> = ({ cmd, entity, finished }) => {
-  console.log(cmd, entity);
   const reloadFinish = () => {
     finished();
     orgCtrl.changCallback();

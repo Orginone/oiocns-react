@@ -9,6 +9,7 @@ import { Property, IProperty } from './property';
 import { Application, IApplication } from './application';
 import { BucketOpreates, DirectoryModel } from '@/ts/base/model';
 import { encodeKey } from '@/ts/base/common';
+import { ICompany } from '../target/team/company';
 /** 可为空的进度回调 */
 export type OnProgress = (p: number) => void;
 
@@ -108,10 +109,16 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
     ];
     if (mode === 1) {
       cnt.push(...this.files);
-    } else if (!this.parent) {
+    } else {
+      cnt.push(...this.propertys);
       cnt.push(...this.specieses);
-      cnt.push(...this.target.targets.filter((i) => i.id != this.target.id));
-      cnt.push(...this.target.members.map((i) => new Member(i, this)));
+      if (!this.parent) {
+        cnt.push(...this.target.targets.filter((i) => i.id != this.target.id));
+        if ('stations' in this.target) {
+          cnt.push(...(this.target as ICompany).stations);
+        }
+        cnt.push(...this.target.members.map((i) => new Member(i, this)));
+      }
     }
     return cnt.sort((a, b) => (a.metadata.updateTime < b.metadata.updateTime ? 1 : -1));
   }
@@ -322,8 +329,6 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
     const operates: model.OperateModel[] = [];
     if (mode === 2 && this.target.hasRelationAuth()) {
       operates.push(directoryNew);
-      operates.push(directoryOperates.NewDir);
-      operates.push(directoryOperates.Refesh);
     }
     if (this.parent) {
       operates.push(...super.operates(mode));
@@ -332,6 +337,7 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
     } else {
       operates.push(...super.operates(1));
     }
+    operates.push(directoryOperates.Refesh);
     return operates;
   }
   private async loadSubDirectory() {

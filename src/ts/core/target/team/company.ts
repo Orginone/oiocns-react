@@ -43,11 +43,11 @@ export class Company extends Belong implements ICompany {
   constructor(_metadata: schema.XTarget, _user: IPerson) {
     super(_metadata, ['全员群'], _user);
     this.departmentTypes = [
+      TargetType.Department,
       TargetType.Office,
       TargetType.Working,
       TargetType.Research,
       TargetType.Laboratory,
-      TargetType.Department,
     ];
   }
   groups: IGroup[] = [];
@@ -260,13 +260,20 @@ export class Company extends Belong implements ICompany {
     if (this.hasRelationAuth()) {
       operates.unshift(
         {
+          cmd: 'setNew',
+          label: '设立更多',
+          iconType: 'setNew',
+          menus: [
+            targetOperates.NewGroup,
+            targetOperates.NewDepartment,
+            targetOperates.NewStation,
+          ],
+        },
+        {
           cmd: 'joinGroup',
           label: '加入集群',
           iconType: 'joinGroup',
         },
-        targetOperates.NewGroup,
-        targetOperates.NewDepartment,
-        targetOperates.NewStation,
       );
     }
     return operates;

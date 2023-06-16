@@ -31,19 +31,19 @@ export const loadMenus = (file: IFileInfo<schema.XEntity>) => {
 };
 
 /** 创建团队菜单 */
-const createMenu = (team: ITarget, children: MenuItemType[]) => {
+const createMenu = (target: ITarget, children: MenuItemType[]) => {
   return {
-    key: team.key,
-    item: team.directory,
-    label: team.name,
-    itemType: team.directory.typeName,
-    menus: loadMenus(team.directory),
-    tag: [team.typeName],
-    icon: <EntityIcon notAvatar={true} entityId={team.id} size={18} />,
+    key: target.directory.key,
+    item: target.directory,
+    label: target.name,
+    itemType: target.directory.typeName,
+    menus: loadMenus(target.directory),
+    tag: [target.typeName],
+    icon: <EntityIcon notAvatar={true} entityId={target.id} size={18} />,
     children: children,
     beforeLoad: async () => {
-      if ('directory' in team) {
-        await (team as ITarget).directory.loadContent();
+      if ('directory' in target) {
+        await (target as ITarget).directory.loadContent();
       }
     },
   };

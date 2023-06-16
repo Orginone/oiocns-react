@@ -1,6 +1,5 @@
 import React from 'react';
 import ExecutorOpen from './open';
-import { IDirectory } from '@/ts/core';
 import orgCtrl from '@/ts/controller';
 interface IProps {
   cmd: string;
@@ -14,11 +13,6 @@ const DataExecutor: React.FC<IProps> = ({ cmd, args, finished }) => {
       if (args && args.length > 0) {
         return <ExecutorOpen cmd={cmd} file={args[0]} finished={finished} />;
       }
-      break;
-    case 'refresh':
-      (args[0] as IDirectory).loadContent(true).then(() => {
-        orgCtrl.changCallback();
-      });
       break;
     case 'delete':
       if ('delete' in args[0]) {

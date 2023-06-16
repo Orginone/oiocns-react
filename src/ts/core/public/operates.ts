@@ -91,10 +91,11 @@ export const directoryOperates = {
 
 /** 目录下新增 */
 export const directoryNew = {
-  cmd: '',
-  label: '新建配置',
+  cmd: 'new',
+  label: '新建更多',
   iconType: 'new',
   menus: [
+    directoryOperates.NewDir,
     directoryOperates.NewDict,
     directoryOperates.NewSpecies,
     directoryOperates.NewProperty,
@@ -155,11 +156,16 @@ export const targetOperates = {
     label: '权限设置',
     iconType: '权限',
   },
+  Chat: {
+    cmd: 'openChat',
+    label: '打开会话',
+    iconType: '群组',
+  },
 };
 
 /** 人员的申请 */
 export const personJoins = {
-  cmd: '',
+  cmd: 'join',
   label: '申请加入',
   iconType: 'join',
   menus: [

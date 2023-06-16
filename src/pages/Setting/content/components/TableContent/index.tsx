@@ -54,7 +54,7 @@ const TableContent = ({
           {
             dataIndex: 'code',
             title: '代码',
-            width: 100,
+            width: 200,
             render: (_, record) => <Typography>{record.code}</Typography>,
           },
           {

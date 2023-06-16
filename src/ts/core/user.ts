@@ -8,6 +8,7 @@ import { msgChatNotify } from './chat/message/msgchat';
 import { IIdentity, Identity } from './target/identity/identity';
 import { IStation } from './target/innerTeam/station';
 import { ITeam } from './target/base/team';
+import { ITarget } from './target/base/target';
 const sessionUserName = 'sessionUser';
 
 /** 当前用户提供层 */
@@ -49,6 +50,17 @@ export class UserProvider {
   /** 是否完成初始化 */
   get inited(): boolean {
     return this._inited;
+  }
+  /** 所有相关的用户 */
+  get targets(): ITarget[] {
+    const targets: ITarget[] = [];
+    if (this._user) {
+      targets.push(...this._user.targets);
+      for (const company of this._user.companys) {
+        targets.push(...company.targets);
+      }
+    }
+    return targets;
   }
   /**
    * 登录
@@ -113,9 +125,8 @@ export class UserProvider {
   async _updateTarget(recvData: string) {
     const data: model.TargetOperateModel = JSON.parse(recvData);
     if (!this.user || !data) return;
-    let allTarget: ITeam[] = this.user.targets;
+    const allTarget: ITeam[] = this.targets;
     this.user.companys.forEach((a) => {
-      allTarget.push(...a.cohorts);
       allTarget.push(...a.stations);
     });
     let message = '';

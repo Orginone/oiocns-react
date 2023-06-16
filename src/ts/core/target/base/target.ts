@@ -71,6 +71,9 @@ export abstract class Target extends Team implements ITarget {
   }
   override operates(): model.OperateModel[] {
     const operates = super.operates();
+    if (this.isMyChat) {
+      operates.unshift(targetOperates.Chat);
+    }
     if (this.hasRelationAuth()) {
       operates.unshift(targetOperates.NewIdentity);
     }
