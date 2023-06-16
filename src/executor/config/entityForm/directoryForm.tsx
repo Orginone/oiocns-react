@@ -40,7 +40,7 @@ const DirectoryForm = (props: Iprops) => {
         return (
           <UploadItem
             readonly={readonly}
-            typeName={'directory'}
+            typeName={props.current.typeName}
             icon={initialValue.icon}
             onChanged={(icon) => {
               form.setFieldValue('icon', icon);

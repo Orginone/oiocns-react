@@ -1,11 +1,11 @@
 import { schema, model, kernel } from '../../../base';
 import { IIdentity, Identity } from '../identity/identity';
 import { OperateType, TargetType } from '../../public/enums';
-import { Directory, IDirectory } from '../../thing/directory';
 import { PageAll } from '../../public/consts';
 import { ITeam, Team } from './team';
 import { IBelong } from './belong';
 import { targetOperates } from '../../public';
+import { Directory, IDirectory } from '../../thing/directory';
 
 /** 用户抽象接口类 */
 export interface ITarget extends ITeam {
@@ -15,8 +15,6 @@ export interface ITarget extends ITeam {
   subTarget: ITarget[];
   /** 所有相关用户 */
   targets: ITarget[];
-  /** 用户的目录 */
-  directory: IDirectory;
   /** 退出用户群 */
   exit(): Promise<boolean>;
   /** 加载用户设立的身份(角色)对象 */
@@ -43,8 +41,8 @@ export abstract class Target extends Team implements ITarget {
       this,
     );
   }
-  identitys: IIdentity[] = [];
   directory: IDirectory;
+  identitys: IIdentity[] = [];
   private _identityLoaded: boolean = false;
   async loadIdentitys(reload?: boolean | undefined): Promise<IIdentity[]> {
     if (!this._identityLoaded || reload) {

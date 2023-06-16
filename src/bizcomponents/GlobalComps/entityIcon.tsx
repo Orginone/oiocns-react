@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import * as im from 'react-icons/im';
 import { Avatar, Image } from 'antd';
-import { TargetType } from '@/ts/core';
 import orgCtrl from '@/ts/controller';
 import { ShareIcon } from '@/ts/base/model';
 import { parseAvatar } from '@/ts/base';
+import TypeIcon from './typeIcon';
 
 interface teamTypeInfo {
   preview?: boolean;
@@ -62,63 +61,9 @@ const EntityIcon = (info: teamTypeInfo) => {
       </div>
     );
   }
-  let icon;
-  switch (info.typeName || share?.typeName) {
-    case '平台':
-    case TargetType.Group:
-      icon = <im.ImTree fontSize={size} />;
-      break;
-    case '权限':
-      icon = <im.ImAddressBook fontSize={size} />;
-      break;
-    case '字典':
-      icon = <im.ImBook fontSize={size} />;
-      break;
-    case '属性':
-      icon = <im.ImJoomla fontSize={size} />;
-      break;
-    case '表单':
-      icon = <im.ImInsertTemplate fontSize={size} />;
-      break;
-    case '目录':
-      icon = <im.ImFolder fontSize={size} />;
-      break;
-    case '应用':
-      icon = <im.ImDropbox fontSize={size} />;
-      break;
-    case TargetType.Company:
-      icon = <im.ImOffice fontSize={size} />;
-      break;
-    case TargetType.Section:
-    case TargetType.Department:
-      return <im.ImLibrary fontSize={size} />;
-    case TargetType.College:
-      return <im.ImTrophy fontSize={size} />;
-    case TargetType.Laboratory:
-      icon = <im.ImJoomla fontSize={size} />;
-      break;
-    case TargetType.Office:
-      icon = <im.ImBriefcase fontSize={size} />;
-      break;
-    case TargetType.Research:
-      icon = <im.ImFlickr4 fontSize={size} />;
-      break;
-    case TargetType.Working:
-      icon = <im.ImUsers fontSize={size} />;
-      break;
-    case TargetType.Station:
-      icon = <im.ImAddressBook fontSize={size} />;
-      break;
-    case TargetType.Cohort:
-      icon = <im.ImBubbles fontSize={size} />;
-      break;
-    case TargetType.Person:
-      icon = <im.ImUserTie fontSize={size} />;
-      break;
-    default:
-      icon = <im.ImTree fontSize={size} />;
-      break;
-  }
+  const icon = (
+    <TypeIcon avatar iconType={info.typeName || share?.typeName || '其它'} size={size} />
+  );
   if (info.notAvatar) {
     return icon;
   }

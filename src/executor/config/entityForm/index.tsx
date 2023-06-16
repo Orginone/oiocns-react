@@ -1,5 +1,5 @@
 import { schema } from '@/ts/base';
-import { IDirectory, IEntity, ITarget, TargetType } from '@/ts/core';
+import { IDirectory, IEntity, ITarget } from '@/ts/core';
 import DirectoryForm from './directoryForm';
 import ApplicationForm from './ApplicationForm';
 import SpeciesForm from './SpeciesForm';
@@ -15,6 +15,7 @@ interface IProps {
 }
 
 const EntityForm: React.FC<IProps> = ({ cmd, entity, finished }) => {
+  console.log(cmd, entity);
   const reloadFinish = () => {
     finished();
     orgCtrl.changCallback();
@@ -22,10 +23,19 @@ const EntityForm: React.FC<IProps> = ({ cmd, entity, finished }) => {
   switch (cmd) {
     case 'newDir':
     case 'updateDir':
-    case 'remarkDir':
-      return (
-        <DirectoryForm formType={cmd} current={entity as any} finished={reloadFinish} />
-      );
+    case 'remarkDir': {
+      const directory = entity as IDirectory;
+      if (!directory.parent && cmd !== 'newDir') {
+        return (
+          <TargetForm
+            formType={cmd.replace('Dir', '')}
+            target={directory.target}
+            finished={reloadFinish}
+          />
+        );
+      }
+      return <DirectoryForm formType={cmd} current={directory} finished={reloadFinish} />;
+    }
     case 'newApp':
     case 'updateApp':
     case 'remarkApp':
@@ -66,16 +76,13 @@ const EntityForm: React.FC<IProps> = ({ cmd, entity, finished }) => {
       return (
         <PropertyForm formType={cmd} current={entity as any} finished={reloadFinish} />
       );
-    default:
-      const target = cmd.startsWith('new') ? (entity as IDirectory).target : entity;
-      if (Object.values(TargetType).includes(target.typeName as TargetType)) {
-        return (
-          <TargetForm formType={cmd} target={target as ITarget} finished={reloadFinish} />
-        );
-      }
+    default: {
+      const target = cmd.startsWith('new')
+        ? (entity as IDirectory).target
+        : (entity as ITarget);
+      return <TargetForm formType={cmd} target={target} finished={reloadFinish} />;
+    }
   }
-  finished();
-  return <></>;
 };
 
 export default EntityForm;

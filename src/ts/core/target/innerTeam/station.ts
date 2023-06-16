@@ -2,6 +2,7 @@ import { kernel, model, schema } from '../../../base';
 import { IMsgChat } from '../../chat/message/msgchat';
 import { OperateType, teamOperates } from '../../public';
 import { PageAll } from '../../public/consts';
+import { IDirectory } from '../../thing/directory';
 import { ITeam, Team } from '../base/team';
 import { ICompany } from '../team/company';
 
@@ -23,8 +24,10 @@ export class Station extends Team implements IStation {
   constructor(_metadata: schema.XTarget, _space: ICompany) {
     super(_metadata, [_metadata.belong?.name ?? '', _metadata.typeName + '群'], _space);
     this.company = _space;
+    this.directory = _space.directory;
   }
   company: ICompany;
+  directory: IDirectory;
   identitys: schema.XIdentity[] = [];
   private _identityLoaded: boolean = false;
   async loadIdentitys(reload?: boolean | undefined): Promise<schema.XIdentity[]> {

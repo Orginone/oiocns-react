@@ -48,7 +48,7 @@ const ApplicationForm = (props: Iprops) => {
         return (
           <UploadItem
             readonly={readonly}
-            typeName={'directory'}
+            typeName={'应用'}
             icon={initialValue.icon}
             onChanged={(icon) => {
               form.setFieldValue('icon', icon);

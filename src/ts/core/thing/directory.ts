@@ -110,6 +110,7 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
     if (mode === 1) {
       cnt.push(...this.files);
     } else if (!this.parent) {
+      cnt.push(...this.target.targets.filter((i) => i.id != this.target.id));
       cnt.push(...this.target.members.map((i) => new Member(i, this)));
     }
     return cnt.sort((a, b) => (a.metadata.updateTime < b.metadata.updateTime ? 1 : -1));
@@ -326,8 +327,10 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
     }
     if (this.parent) {
       operates.push(...super.operates(mode));
-    } else {
+    } else if (mode % 2 === 0) {
       operates.push(...this.target.operates());
+    } else {
+      operates.push(...super.operates(1));
     }
     return operates;
   }

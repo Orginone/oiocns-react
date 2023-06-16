@@ -1,23 +1,23 @@
 import React, { useEffect, useState } from 'react';
 import { ProTable } from '@ant-design/pro-components';
-import { Dropdown, Button, Typography } from 'antd';
+import { Space, Image, Dropdown, Button, Typography } from 'antd';
 import { AiOutlineEllipsis } from 'react-icons/ai';
 import style from '../../index.module.less';
-import { IFileInfo, ISysFileInfo } from '@/ts/core';
-import { schema } from '@/ts/base';
-import EntityIcon from '@/bizcomponents/GlobalComps/entityIcon';
-import { showChatTime } from '@/utils/tools';
 import { formatSize } from '@/ts/base/common';
-import { loadMenus } from '@/pages/Setting/config/menuOperate';
+import { IFileSystemItem } from '@/ts/core';
+import { FileItemModel } from '@/ts/base/model';
+import { loadFileSysItemMenus } from '@/pages/Store/config/menuOperate';
 
 const TableContent = ({
   pageData,
+  getThumbnail,
   handleMenuClick,
   parentRef,
 }: {
   parentRef: any;
-  pageData: IFileInfo<schema.XEntity>[];
-  handleMenuClick: (key: string, node: IFileInfo<schema.XEntity>) => void;
+  pageData: IFileSystemItem[];
+  getThumbnail: (item: FileItemModel) => string;
+  handleMenuClick: (key: string, node: IFileSystemItem) => void;
 }) => {
   const [tableHeight, setTableHeight] = useState<number | 'auto'>('auto'); //计算高度
   // 监听父级高度
@@ -43,51 +43,51 @@ const TableContent = ({
         options={false}
         columns={[
           {
-            dataIndex: 'name',
+            dataIndex: ['metadata', 'name'],
             title: '名称',
             ellipsis: {
               showTitle: false,
             },
             render: (_, record) => {
-              return <EntityIcon entityId={record.id} showName />;
+              return (
+                <Space>
+                  <Image
+                    width={32}
+                    height={32}
+                    preview={false}
+                    src={getThumbnail(record.metadata)}
+                    fallback="/icons/default_file.svg"
+                  />
+                  <Typography.Text
+                    style={{ width: 300 }}
+                    ellipsis={true}
+                    title={_?.toString()}>
+                    {_}
+                  </Typography.Text>
+                </Space>
+              );
             },
           },
           {
-            dataIndex: 'code',
-            title: '代码',
-            width: 100,
-            render: (_, record) => <Typography>{record.code}</Typography>,
-          },
-          {
-            dataIndex: 'typeName',
-            title: '类型',
-            width: 100,
-            render: (_, record) => <Typography>{record.typeName}</Typography>,
-          },
-          {
-            dataIndex: 'size',
+            dataIndex: ['metadata', 'size'],
             title: '大小',
+            valueType: 'number',
             width: 100,
-            render: (_, record) => {
-              if ('filedata' in record) {
-                return formatSize((record as ISysFileInfo).filedata.size);
-              }
-              return '';
-            },
+            render: (_, record) => (
+              <Typography>{formatSize(record.metadata.size)}</Typography>
+            ),
           },
           {
-            dataIndex: ['metadata', 'createTime'],
+            dataIndex: ['metadata', 'dateCreated'],
             title: '创建时间',
             valueType: 'dateTime',
             width: 200,
-            render: (_, record) => showChatTime(record.metadata.createTime),
           },
           {
-            dataIndex: ['metadata', 'updateTime'],
+            dataIndex: ['metadata', 'dateModified'],
             title: '更新时间',
             valueType: 'dateTime',
             width: 200,
-            render: (_, record) => showChatTime(record.metadata.updateTime),
           },
           {
             dataIndex: 'opration',
@@ -98,7 +98,7 @@ const TableContent = ({
                 <Dropdown
                   className={style['operation-btn']}
                   menu={{
-                    items: loadMenus(record),
+                    items: loadFileSysItemMenus(record),
                     onClick: ({ key }) => {
                       handleMenuClick(key, record);
                     },
@@ -119,7 +119,7 @@ const TableContent = ({
         onRow={(record) => {
           return {
             onDoubleClick: async () => {
-              handleMenuClick('open', record);
+              handleMenuClick('双击', record);
             },
           };
         }}

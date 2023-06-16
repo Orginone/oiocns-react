@@ -5,13 +5,16 @@ import { FileInfo, IFileInfo } from './fileinfo';
 import { fileOperates } from '../public';
 
 /** 应用/模块接口类 */
-export interface IMemeber extends IFileInfo<schema.XTarget> {}
+export interface IMemeber extends IFileInfo<schema.XTarget> {
+  isMember: boolean;
+}
 
 /** 应用实现类 */
 export class Member extends FileInfo<schema.XTarget> implements IMemeber {
   constructor(_metadata: schema.XTarget, _directory: IDirectory) {
     super(_metadata, _directory);
   }
+  isMember: boolean = true;
   async rename(name: string): Promise<boolean> {
     throw new Error('暂不支持.');
   }
@@ -25,13 +28,16 @@ export class Member extends FileInfo<schema.XTarget> implements IMemeber {
     throw new Error('暂不支持.');
   }
   override operates(): OperateModel[] {
-    return [
-      {
-        cmd: 'remove',
-        label: '移除成员',
-        iconType: 'remove',
-      },
-      fileOperates.Remark,
-    ];
+    if (this.metadata.id != this.directory.target.userId) {
+      return [
+        {
+          cmd: 'remove',
+          label: '移除成员',
+          iconType: 'remove',
+        },
+        fileOperates.Remark,
+      ];
+    }
+    return [fileOperates.Remark];
   }
 }
