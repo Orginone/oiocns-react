@@ -141,7 +141,11 @@ export class Department extends Target implements IDepartment {
     }
   }
   override operates(): model.OperateModel[] {
-    return [targetOperates.NewDepartment, ...super.operates()];
+    const operates = super.operates();
+    if (this.hasRelationAuth()) {
+      operates.unshift(targetOperates.NewDepartment);
+    }
+    return operates;
   }
   async teamChangedNotity(target: schema.XTarget): Promise<boolean> {
     if (this.childrenTypes.includes(target.typeName as TargetType)) {

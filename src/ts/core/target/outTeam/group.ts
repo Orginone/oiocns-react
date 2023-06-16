@@ -104,7 +104,11 @@ export class Group extends Target implements IGroup {
     }
   }
   override operates(): model.OperateModel[] {
-    return [targetOperates.NewGroup, ...super.operates()];
+    const operates = super.operates();
+    if (this.hasRelationAuth()) {
+      operates.unshift(targetOperates.NewGroup);
+    }
+    return operates;
   }
   async teamChangedNotity(target: schema.XTarget): Promise<boolean> {
     switch (target.typeName) {

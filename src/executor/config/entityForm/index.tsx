@@ -1,4 +1,6 @@
+import React from 'react';
 import { schema } from '@/ts/base';
+import orgCtrl from '@/ts/controller';
 import { IDirectory, IEntity, ITarget } from '@/ts/core';
 import DirectoryForm from './directoryForm';
 import ApplicationForm from './applicationForm';
@@ -6,12 +8,11 @@ import SpeciesForm from './speciesForm';
 import PropertyForm from './propertyForm';
 import TargetForm from './targetForm';
 import LabelsForm from './labelsForm';
-import React from 'react';
-import orgCtrl from '@/ts/controller';
 import RenameForm from './renameForm';
 import IdentityForm from './IdentityForm';
 import AuthorityForm from './authorityForm';
 import { IIdentity } from '@/ts/core/target/identity/identity';
+import EntityQrCode from './entityQrCode';
 interface IProps {
   cmd: string;
   entity: IEntity<schema.XEntity>;
@@ -22,7 +23,9 @@ const EntityForm: React.FC<IProps> = ({ cmd, entity, finished }) => {
   console.log(cmd, entity);
   const reloadFinish = () => {
     finished();
-    orgCtrl.changCallback();
+    if (!cmd.startsWith('remark')) {
+      orgCtrl.changCallback();
+    }
   };
   switch (cmd) {
     case 'rename':
@@ -102,6 +105,8 @@ const EntityForm: React.FC<IProps> = ({ cmd, entity, finished }) => {
       return (
         <AuthorityForm formType={cmd} current={entity as any} finished={reloadFinish} />
       );
+    case 'qrcode':
+      return <EntityQrCode entity={entity} finished={finished} />;
     default: {
       const target = cmd.startsWith('new')
         ? (entity as IDirectory).target

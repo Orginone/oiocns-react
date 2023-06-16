@@ -112,7 +112,11 @@ export class Station extends Team implements IStation {
     return await this.pullMembers([target], true);
   }
   override operates(): model.OperateModel[] {
-    return [teamOperates.pullIdentity, ...super.operates()];
+    const operates = super.operates();
+    if (this.hasRelationAuth()) {
+      operates.unshift(teamOperates.pullIdentity);
+    }
+    return operates;
   }
   async createIdentityMsg(
     operate: OperateType,

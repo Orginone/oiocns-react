@@ -30,11 +30,6 @@ export interface IFileInfo<T extends schema.XEntity> extends IEntity<T> {
    * @param {IDirectory} destination 目标文件系统
    */
   move(destination: IDirectory): Promise<boolean>;
-  /**
-   * 文件可进行的操作
-   * @param mode 模式,默认为配置模式
-   */
-  operates(mode?: number): model.OperateModel[];
 }
 
 /** 文件类抽象实现 */
@@ -62,18 +57,17 @@ export abstract class FileInfo<T extends schema.XEntity>
   abstract copy(destination: IDirectory): Promise<boolean>;
   abstract move(destination: IDirectory): Promise<boolean>;
   operates(mode: number = 0): model.OperateModel[] {
+    const operates = super.operates(mode);
     if (mode === 0 && this.directory.target.hasRelationAuth()) {
-      return [
-        fileOperates.Open,
+      operates.unshift(
         entityOperates.Update,
         fileOperates.Copy,
         fileOperates.Move,
         fileOperates.Rename,
         fileOperates.Delete,
-        fileOperates.Remark,
-      ];
+      );
     }
-    return [fileOperates.Open, fileOperates.Remark];
+    return operates;
   }
 }
 
@@ -92,9 +86,9 @@ export const fileToEntity = (
   belong: schema.XTarget | undefined,
 ): schema.XEntity => {
   return {
-    id: data.key,
+    id: 'orginone/anydata/bucket/load/' + data.shareLink,
     name: data.name,
-    code: data.extension,
+    code: data.key,
     icon: JSON.stringify(data),
     belongId: belongId,
     typeName: data.contentType,
@@ -179,16 +173,7 @@ export class SysFileInfo extends FileInfo<schema.XEntity> implements ISysFileInf
     return false;
   }
   override operates(mode?: number): model.OperateModel[] {
-    if (this.directory.target.hasRelationAuth()) {
-      return [
-        fileOperates.Open,
-        fileOperates.Copy,
-        fileOperates.Move,
-        fileOperates.Rename,
-        fileOperates.Delete,
-        fileOperates.Remark,
-      ];
-    }
-    return [fileOperates.Open, fileOperates.Remark];
+    const operates = super.operates(mode);
+    return operates.filter((i) => i.cmd != 'update');
   }
 }

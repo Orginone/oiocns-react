@@ -241,7 +241,11 @@ export class Person extends Belong implements IPerson {
     return false;
   }
   override operates(): model.OperateModel[] {
-    return [targetOperates.NewCompany, ...super.operates()];
+    const operates = super.operates();
+    if (this.hasRelationAuth()) {
+      operates.unshift(targetOperates.NewCompany);
+    }
+    return operates;
   }
   async findEntityAsync(id: string): Promise<schema.XEntity | undefined> {
     const metadata = this.findMetadata<schema.XEntity>(id);
