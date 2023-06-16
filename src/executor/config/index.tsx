@@ -10,9 +10,14 @@ interface IProps {
 const ConfigExecutor: React.FC<IProps> = ({ cmd, args, finished }) => {
   switch (cmd) {
     case 'open':
-      if (['目录', Object.values(TargetType)].includes(args[0].typeName)) {
-        orgCtrl.currentKey = args[0].key;
-        orgCtrl.changCallback();
+      if ('isMember' in args[0]) {
+        return <EntityForm cmd={'remark'} entity={args[0]} finished={finished} />;
+      } else {
+        const dirTyps = ['目录', ...Object.values(TargetType)];
+        if (dirTyps.includes(args[0].typeName)) {
+          orgCtrl.currentKey = args[0].key;
+          orgCtrl.changCallback();
+        }
       }
       break;
     case 'update':
@@ -32,6 +37,11 @@ const ConfigExecutor: React.FC<IProps> = ({ cmd, args, finished }) => {
           );
         case '字典':
           return <EntityForm cmd={cmd + 'Dict'} entity={args[0]} finished={finished} />;
+        default: {
+          if (Object.values(TargetType).includes(args[0].typeName as TargetType)) {
+            return <EntityForm cmd={cmd} entity={args[0]} finished={finished} />;
+          }
+        }
       }
       break;
     case 'refresh':

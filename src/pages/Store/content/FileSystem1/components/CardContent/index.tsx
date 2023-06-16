@@ -1,23 +1,24 @@
-import { Dropdown, Row, Col, Card, Typography } from 'antd';
+import { Dropdown, Image, Row, Col, Card, Typography } from 'antd';
 
 import React from 'react';
 import cls from '../../index.module.less';
-import { IDirectory, IFileInfo } from '@/ts/core';
-import { schema } from '@/ts/base';
-import EntityIcon from '@/bizcomponents/GlobalComps/entityIcon';
-import { loadMenus } from '@/pages/Setting/config/menuOperate';
+import { IFileSystemItem } from '@/ts/core';
+import { FileItemModel } from '@/ts/base/model';
+import { loadFileSysItemMenus } from '@/pages/Store/config/menuOperate';
 
 const CardListContent = ({
   current,
   handleMenuClick,
+  getThumbnail,
 }: {
-  current: IDirectory;
-  handleMenuClick: (key: string, node: IFileInfo<schema.XEntity>) => void;
+  current: IFileSystemItem;
+  getThumbnail: (item: FileItemModel) => string;
+  handleMenuClick: (key: string, node: IFileSystemItem) => void;
 }) => {
-  const FileCard = (el: IFileInfo<schema.XEntity>) => (
+  const FileCard = (el: IFileSystemItem) => (
     <Dropdown
       menu={{
-        items: loadMenus(el, 1),
+        items: loadFileSysItemMenus(el),
         onClick: ({ key }) => {
           handleMenuClick(key, el);
         },
@@ -29,22 +30,22 @@ const CardListContent = ({
         bordered={false}
         key={el.key}
         onDoubleClick={async () => {
-          handleMenuClick('open', el);
+          handleMenuClick('双击', el);
         }}
         onContextMenu={(e) => {
           e.stopPropagation();
         }}>
         <div className={cls.fileImage}>
-          <EntityIcon entityId={el.id} size={50} />
+          <Image
+            preview={false}
+            height={el.metadata.thumbnail ? 'auto' : 60}
+            src={getThumbnail(el.metadata)}
+            fallback="/icons/default_file.svg"
+          />
         </div>
-        <div className={cls.fileName} title={el.typeName}>
-          <Typography.Text title={el.typeName} ellipsis>
-            {el.typeName}
-          </Typography.Text>
-        </div>
-        <div className={cls.fileName} title={el.name}>
-          <Typography.Text title={el.name} ellipsis>
-            {el.name}
+        <div className={cls.fileName} title={el.metadata.name}>
+          <Typography.Text title={el.metadata.name} ellipsis>
+            {el.metadata.name}
           </Typography.Text>
         </div>
       </Card>
@@ -53,7 +54,7 @@ const CardListContent = ({
   return (
     <Dropdown
       menu={{
-        items: loadMenus(current, 1),
+        items: loadFileSysItemMenus(current),
         onClick: ({ key }) => {
           handleMenuClick(key, current);
         },
@@ -65,7 +66,7 @@ const CardListContent = ({
           e.stopPropagation();
         }}>
         <Row gutter={[16, 16]}>
-          {current.content(1).map((el) => {
+          {current.children.map((el) => {
             return (
               <Col xs={8} sm={8} md={6} lg={4} xl={3} xxl={2} key={el.key}>
                 {FileCard(el)}

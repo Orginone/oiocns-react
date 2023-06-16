@@ -228,6 +228,9 @@ export class Company extends Belong implements ICompany {
     for (const item of this.departments) {
       targets.push(...item.targets);
     }
+    for (const item of this.cohorts) {
+      targets.push(...item.targets);
+    }
     return targets;
   }
   async deepLoad(reload: boolean = false): Promise<void> {

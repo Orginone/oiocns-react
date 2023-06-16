@@ -15,31 +15,37 @@ interface Iprops {
 */
 const DirectoryForm = (props: Iprops) => {
   let title = '';
+  let typeName = '';
   let types: string[] = [props.target.typeName];
   const readonly = props.formType === 'remark';
   let initialValue: any = props.target.metadata;
   switch (props.formType) {
     case 'newCohort':
+      typeName = '群组';
       title = '设立群组';
       types = [TargetType.Cohort];
       initialValue = {};
       break;
     case 'newStation':
+      typeName = '岗位';
       title = '设立岗位';
       types = [TargetType.Station];
       initialValue = {};
       break;
     case 'newGroup':
+      typeName = '组织群';
       title = '设立集群';
       types = [TargetType.Group];
       initialValue = {};
       break;
     case 'newCompany':
+      typeName = '单位';
       title = '设立单位';
       types = companyTypes;
       initialValue = {};
       break;
     case 'newDepartment':
+      typeName = '部门';
       title = '设立部门';
       if ('departmentTypes' in props.target) {
         types = props.target.departmentTypes as string[];
@@ -50,9 +56,15 @@ const DirectoryForm = (props: Iprops) => {
       initialValue = {};
       break;
     case 'update':
+      initialValue.teamCode = props.target.metadata.team?.code;
+      initialValue.teamName = props.target.metadata.team?.name;
+      typeName = props.target.typeName;
       title = '更新' + props.target.name;
       break;
     case 'remark':
+      initialValue.teamCode = props.target.metadata.team?.code;
+      initialValue.teamName = props.target.metadata.team?.name;
+      typeName = props.target.typeName;
       title = '查看' + props.target.name;
       break;
     default:
@@ -67,7 +79,7 @@ const DirectoryForm = (props: Iprops) => {
         return (
           <UploadItem
             readonly={readonly}
-            typeName={'directory'}
+            typeName={typeName}
             icon={initialValue.icon}
             onChanged={(icon) => {
               form.setFieldValue('icon', icon);

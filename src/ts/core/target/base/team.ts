@@ -3,10 +3,14 @@ import { OperateType, TargetType } from '../../public/enums';
 import { PageAll, orgAuth } from '../../public/consts';
 import { IBelong } from './belong';
 import { IMsgChatT, IMsgChat, MsgChat } from '../../chat/message/msgchat';
+import { IFileInfo } from '../../thing/fileinfo';
+import { IDirectory } from '../../thing/directory';
 import { entityOperates, fileOperates, teamOperates } from '../../public';
 
 /** 团队抽象接口类 */
-export interface ITeam extends IMsgChatT<schema.XTarget> {
+export interface ITeam extends IMsgChatT<schema.XTarget>, IFileInfo<schema.XTarget> {
+  /** 用户的目录 */
+  directory: IDirectory;
   /** 限定成员类型 */
   memberTypes: TargetType[];
   /** 用户相关的所有会话 */
@@ -29,8 +33,6 @@ export interface ITeam extends IMsgChatT<schema.XTarget> {
   hasAuthoritys(authIds: string[]): boolean;
   /** 接收相关用户增加变更 */
   teamChangedNotity(target: schema.XTarget): Promise<boolean>;
-  /** 用户的操作 */
-  operates(): model.OperateModel[];
 }
 
 /** 团队基类实现 */
@@ -44,8 +46,26 @@ export abstract class Team extends MsgChat<schema.XTarget> implements ITeam {
     super(_metadata, _labels, _space, _metadata.belong);
     this.memberTypes = _memberTypes;
   }
+  abstract directory: IDirectory;
   memberTypes: TargetType[];
   private _memberLoaded: boolean = false;
+  get isInherited(): boolean {
+    return this.metadata.belongId != this.space.id;
+  }
+  async rename(name: string): Promise<boolean> {
+    return this.update({
+      ...this.metadata,
+      name: name,
+      teamCode: this.metadata.team?.code ?? this.code,
+      teamName: this.metadata.team?.name ?? this.name,
+    });
+  }
+  copy(destination: IDirectory): Promise<boolean> {
+    throw new Error('暂不支持.');
+  }
+  move(destination: IDirectory): Promise<boolean> {
+    throw new Error('暂不支持.');
+  }
   async loadMembers(reload: boolean = false): Promise<schema.XTarget[]> {
     if (!this._memberLoaded || reload) {
       const res = await kernel.querySubTargetById({

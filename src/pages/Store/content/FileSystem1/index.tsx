@@ -1,24 +1,38 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import style from './index.module.less';
 import { Segmented, Card } from 'antd';
 import useSessionStorage from '@/hooks/useSessionStorage';
+import orgCtrl from '@/ts/controller';
 import TableContent from './components/TableContent';
 import CardListContent from './components/CardContent';
 import { IconFont } from '@/components/IconFont';
+import { FileItemModel } from '@/ts/base/model';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
-import { IDirectory } from '@/ts/core';
-import { command } from '@/ts/base';
+import FileSysOperate from '../../components/FileSysOperate';
+import { IFileSystemItem } from '@/ts/core';
 
 interface IProps {
-  current: IDirectory;
+  current: IFileSystemItem;
 }
 /**
  * 存储-文件系统
  */
 const FileSystem: React.FC<IProps> = ({ current }: IProps) => {
-  const [key] = useCtrlUpdate(current);
+  const [key] = useCtrlUpdate(orgCtrl);
+  const [operateKey, setOperateKey] = useState<string>();
+  const [operateTarget, setOperateTarget] = useState<IFileSystemItem>();
   const [segmented, setSegmented] = useSessionStorage('segmented', 'Kanban');
   const parentRef = useRef<any>();
+
+  const getThumbnail = (item: FileItemModel) => {
+    if (item.thumbnail && item.thumbnail.length > 0) {
+      return item.thumbnail;
+    }
+    if (item.extension && item.extension.length > 0) {
+      return `/icons/file_type_${item.extension.replace('.', '')}.svg`;
+    }
+    return '/icons/default_folder.svg';
+  };
 
   return (
     <Card id={key} className={style.pageCard} bordered={false}>
@@ -27,16 +41,20 @@ const FileSystem: React.FC<IProps> = ({ current }: IProps) => {
           <TableContent
             key={key}
             parentRef={parentRef}
-            pageData={current.content(1)}
+            pageData={current.children}
+            getThumbnail={getThumbnail}
             handleMenuClick={(key, target) => {
-              command.emitter('data', key, target);
+              setOperateKey(key);
+              setOperateTarget(target);
             }}
           />
         ) : (
           <CardListContent
             current={current}
+            getThumbnail={getThumbnail}
             handleMenuClick={(key, target) => {
-              command.emitter('data', key, target);
+              setOperateKey(key);
+              setOperateTarget(target);
             }}
           />
         )}
@@ -64,6 +82,14 @@ const FileSystem: React.FC<IProps> = ({ current }: IProps) => {
             ),
           },
         ]}
+      />
+      <FileSysOperate
+        operateKey={operateKey}
+        operateTarget={operateTarget}
+        operateDone={() => {
+          setOperateKey(undefined);
+          setOperateTarget(undefined);
+        }}
       />
     </Card>
   );

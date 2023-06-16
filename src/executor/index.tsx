@@ -9,6 +9,7 @@ const Executor: React.FC = () => {
   const [args, setArgs] = useState<any[]>([]);
   useEffect(() => {
     const id = command.subscribe((type, cmd, ...args) => {
+      console.log(type, cmd, args);
       setType(type);
       setCmd(cmd);
       setArgs(args);

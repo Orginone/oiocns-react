@@ -62,7 +62,7 @@ export abstract class FileInfo<T extends schema.XEntity>
   abstract copy(destination: IDirectory): Promise<boolean>;
   abstract move(destination: IDirectory): Promise<boolean>;
   operates(mode: number = 0): model.OperateModel[] {
-    if (mode == 0 && this.directory.target.hasRelationAuth()) {
+    if (mode === 0 && this.directory.target.hasRelationAuth()) {
       return [
         fileOperates.Open,
         entityOperates.Update,
@@ -73,7 +73,7 @@ export abstract class FileInfo<T extends schema.XEntity>
         fileOperates.Remark,
       ];
     }
-    return [fileOperates.Remark];
+    return [fileOperates.Open, fileOperates.Remark];
   }
 }
 
@@ -177,5 +177,18 @@ export class SysFileInfo extends FileInfo<schema.XEntity> implements ISysFileInf
       return res.success;
     }
     return false;
+  }
+  override operates(mode?: number): model.OperateModel[] {
+    if (this.directory.target.hasRelationAuth()) {
+      return [
+        fileOperates.Open,
+        fileOperates.Copy,
+        fileOperates.Move,
+        fileOperates.Rename,
+        fileOperates.Delete,
+        fileOperates.Remark,
+      ];
+    }
+    return [fileOperates.Open, fileOperates.Remark];
   }
 }

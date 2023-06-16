@@ -10,14 +10,24 @@ interface IProps {
 const DataExecutor: React.FC<IProps> = ({ cmd, args, finished }) => {
   switch (cmd) {
     case 'open':
-      if (args && args.length > 1) {
-        return <ExecutorOpen typeName={args[0]} file={args[1]} finished={finished} />;
+    case 'remark':
+      if (args && args.length > 0) {
+        return <ExecutorOpen cmd={cmd} file={args[0]} finished={finished} />;
       }
       break;
     case 'refresh':
       (args[0] as IDirectory).loadContent(true).then(() => {
         orgCtrl.changCallback();
       });
+      break;
+    case 'delete':
+      if ('delete' in args[0]) {
+        args[0].delete().then((success: boolean) => {
+          if (success) {
+            orgCtrl.changCallback();
+          }
+        });
+      }
       break;
   }
   finished();

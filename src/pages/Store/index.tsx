@@ -1,15 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react';
 import MainLayout from '@/components/MainLayout';
-import { MenuType } from './config/menuType';
 import Content, { TopBarExtra } from './content';
-import { MenuItemType } from 'typings/globelType';
-import FileSysOperate from './components/FileSysOperate';
 import * as config from './config/menuOperate';
 import useMenuUpdate from '@/hooks/useMenuUpdate';
 /** 存储模块 */
 const Package: React.FC = () => {
-  const [operateTarget, setOperateTarget] = useState<MenuItemType>();
-  const [operateKey, setOperateKey] = useState<string>();
+  // const [operateTarget, setOperateTarget] = useState<MenuItemType>();
+  // const [operateKey, setOperateKey] = useState<string>();
   const [key, rootMenu, selectMenu, setSelectMenu] = useMenuUpdate(config.loadStoreMenu);
   if (!selectMenu || !rootMenu) return <></>;
   return (
@@ -20,11 +17,11 @@ const Package: React.FC = () => {
       }}
       rightBar={<TopBarExtra key={key} selectMenu={selectMenu} />}
       onMenuClick={async (data, key) => {
-        setOperateKey(key);
-        setOperateTarget(data);
+        // setOperateKey(key);
+        // setOperateTarget(data);
       }}
       siderMenuData={rootMenu}>
-      <FileSysOperate
+      {/* <FileSysOperate
         operateKey={operateKey}
         operateTarget={
           operateTarget?.itemType === MenuType.FileSystemItem
@@ -35,7 +32,7 @@ const Package: React.FC = () => {
           setOperateKey(undefined);
           setOperateTarget(undefined);
         }}
-      />
+      /> */}
       <Content key={key} selectMenu={selectMenu} />
     </MainLayout>
   );

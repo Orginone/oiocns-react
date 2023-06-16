@@ -1,9 +1,9 @@
-import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
+import EntityIcon from '@/bizcomponents/GlobalComps/entityIcon';
 import orgCtrl from '@/ts/controller';
 import React from 'react';
 import TypeIcon from '@/bizcomponents/GlobalComps/typeIcon';
 import { MenuItemType, OperateMenuType } from 'typings/globelType';
-import { IDepartment, IGroup, ITarget, ITeam, IDirectory, IFileInfo } from '@/ts/core';
+import { IDepartment, IGroup, ITarget, IDirectory, IFileInfo } from '@/ts/core';
 import { command, schema } from '@/ts/base';
 
 /** 操作到Menus */
@@ -31,21 +31,15 @@ export const loadMenus = (file: IFileInfo<schema.XEntity>, mode: number = 0) => 
 };
 
 /** 创建团队菜单 */
-const createMenu = (team: ITeam, children: MenuItemType[]) => {
-  const menus: OperateMenuType[] = [];
-  let item: any = team;
-  if ('directory' in team) {
-    item = (team as ITarget).directory;
-    menus.push(...loadMenus((team as ITarget).directory, 2));
-  }
+const createMenu = (team: ITarget, children: MenuItemType[]) => {
   return {
-    key: item.key,
-    item: item,
-    label: item.name,
-    itemType: item.typeName,
-    menus: menus,
-    tag: [item.typeName],
-    icon: <TeamIcon notAvatar={true} entityId={team.id} size={18} />,
+    key: team.key,
+    item: team.directory,
+    label: team.name,
+    itemType: team.directory.typeName,
+    menus: loadMenus(team.directory),
+    tag: [team.typeName],
+    icon: <EntityIcon notAvatar={true} entityId={team.id} size={18} />,
     children: children,
     beforeLoad: async () => {
       if ('directory' in team) {
@@ -81,7 +75,9 @@ const buildDirectoryTree = (directorys: IDirectory[]): MenuItemType[] => {
       item: directory,
       label: directory.name,
       tag: [directory.typeName],
-      icon: <TeamIcon entityId={directory.id} typeName={directory.typeName} size={18} />,
+      icon: (
+        <EntityIcon entityId={directory.id} typeName={directory.typeName} size={18} />
+      ),
       itemType: directory.typeName,
       menus: loadMenus(directory, 2),
       children: buildDirectoryTree(directory.children),
@@ -111,7 +107,6 @@ const getTeamMenu = () => {
         ...buildDirectoryTree(company.directory.children),
         ...buildDepartmentTree(company.departments),
         ...buildGroupTree(company.groups),
-        ...company.stations.map((i) => createMenu(i, [])),
         ...company.cohorts.map((i) =>
           createMenu(i, buildDirectoryTree(i.directory.children)),
         ),
@@ -128,6 +123,6 @@ export const loadSettingMenu = () => {
     label: '设置',
     itemType: 'Tab',
     children: [getUserMenu(), ...getTeamMenu()],
-    icon: <TeamIcon notAvatar={true} entityId={orgCtrl.user.id} size={18} />,
+    icon: <EntityIcon notAvatar={true} entityId={orgCtrl.user.id} size={18} />,
   };
 };

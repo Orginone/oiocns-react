@@ -199,9 +199,6 @@ export class Person extends Belong implements IPerson {
   }
   get targets(): ITarget[] {
     const targets: ITarget[] = [this];
-    for (const item of this.companys) {
-      targets.push(...item.targets);
-    }
     for (const item of this.cohorts) {
       targets.push(...item.targets);
     }

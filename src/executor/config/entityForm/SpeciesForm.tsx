@@ -49,7 +49,7 @@ const SpeciesForm = (props: Iprops) => {
         return (
           <UploadItem
             readonly={readonly}
-            typeName={'directory'}
+            typeName={props.typeName}
             icon={initialValue.icon}
             onChanged={(icon) => {
               form.setFieldValue('icon', icon);
