@@ -10,6 +10,9 @@ const Executor: React.FC = () => {
   useEffect(() => {
     const id = command.subscribe((type, cmd, ...args) => {
       console.log(type, cmd, args);
+      if (cmd === 'qrcode') {
+        type = 'config';
+      }
       setType(type);
       setCmd(cmd);
       setArgs(args);

@@ -5,6 +5,7 @@ import { FormModel } from '@/ts/base/model';
 import { IDirectory } from '@/ts/core';
 import UploadItem from '../tools/upload';
 import { IForm } from '@/ts/core/thing/form';
+import { EntityColumns } from './entityColumns';
 
 interface Iprops {
   formType: string;
@@ -75,17 +76,20 @@ const LabelsForm = (props: Iprops) => {
         rules: [{ required: true, message: '分类代码为必填项' }],
       },
     },
-    {
-      title: '备注信息',
-      dataIndex: 'remark',
-      valueType: 'textarea',
-      colProps: { span: 24 },
-      readonly: readonly,
-      formItemProps: {
-        rules: [{ required: true, message: '备注信息为必填项' }],
-      },
-    },
   ];
+  if (readonly) {
+    columns.push(...EntityColumns(props.current!.metadata));
+  }
+  columns.push({
+    title: '备注信息',
+    dataIndex: 'remark',
+    valueType: 'textarea',
+    colProps: { span: 24 },
+    readonly: readonly,
+    formItemProps: {
+      rules: [{ required: true, message: '备注信息为必填项' }],
+    },
+  });
   return (
     <SchemaForm<FormModel>
       open

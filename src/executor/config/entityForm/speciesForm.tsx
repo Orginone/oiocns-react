@@ -4,7 +4,8 @@ import SchemaForm from '@/components/SchemaForm';
 import { SpeciesModel } from '@/ts/base/model';
 import { IDirectory } from '@/ts/core';
 import UploadItem from '../tools/upload';
-import { ISpecies } from '@/ts/core/thing/species';
+import { ISpecies } from '@/ts/core';
+import { EntityColumns } from './entityColumns';
 
 interface Iprops {
   formType: string;
@@ -75,17 +76,20 @@ const SpeciesForm = (props: Iprops) => {
         rules: [{ required: true, message: '分类代码为必填项' }],
       },
     },
-    {
-      title: '备注信息',
-      dataIndex: 'remark',
-      valueType: 'textarea',
-      colProps: { span: 24 },
-      readonly: readonly,
-      formItemProps: {
-        rules: [{ required: true, message: '备注信息为必填项' }],
-      },
-    },
   ];
+  if (readonly) {
+    columns.push(...EntityColumns(props.current!.metadata));
+  }
+  columns.push({
+    title: '备注信息',
+    dataIndex: 'remark',
+    valueType: 'textarea',
+    colProps: { span: 24 },
+    readonly: readonly,
+    formItemProps: {
+      rules: [{ required: true, message: '备注信息为必填项' }],
+    },
+  });
   return (
     <SchemaForm<SpeciesModel>
       open

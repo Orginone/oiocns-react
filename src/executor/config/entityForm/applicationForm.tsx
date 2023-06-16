@@ -4,6 +4,7 @@ import SchemaForm from '@/components/SchemaForm';
 import { ApplicationModel } from '@/ts/base/model';
 import { IApplication, IDirectory } from '@/ts/core';
 import UploadItem from '../tools/upload';
+import { EntityColumns } from './entityColumns';
 
 interface Iprops {
   formType: string;
@@ -97,17 +98,20 @@ const ApplicationForm = (props: Iprops) => {
       colProps: { span: 24 },
       readonly: readonly,
     },
-    {
-      title: '备注信息',
-      dataIndex: 'remark',
-      valueType: 'textarea',
-      colProps: { span: 24 },
-      readonly: readonly,
-      formItemProps: {
-        rules: [{ required: true, message: '备注信息为必填项' }],
-      },
-    },
   ];
+  if (readonly) {
+    columns.push(...EntityColumns(props.current.metadata));
+  }
+  columns.push({
+    title: '备注信息',
+    dataIndex: 'remark',
+    valueType: 'textarea',
+    colProps: { span: 24 },
+    readonly: readonly,
+    formItemProps: {
+      rules: [{ required: true, message: '备注信息为必填项' }],
+    },
+  });
   return (
     <SchemaForm<ApplicationModel>
       open

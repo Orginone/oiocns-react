@@ -3,6 +3,7 @@ import { ProFormColumnsType } from '@ant-design/pro-components';
 import SchemaForm from '@/components/SchemaForm';
 import { IdentityModel } from '@/ts/base/model';
 import { IIdentity, ITarget } from '@/ts/core';
+import { EntityColumns } from './entityColumns';
 
 interface Iprops {
   target: ITarget;
@@ -68,17 +69,20 @@ const IdentityForm = (props: Iprops) => {
         treeDefaultExpandAll: true,
       },
     },
-    {
-      title: '角色简介',
-      dataIndex: 'remark',
-      valueType: 'textarea',
-      colProps: { span: 24 },
-      readonly: readonly,
-      formItemProps: {
-        rules: [{ required: true, message: '备注信息为必填项' }],
-      },
-    },
   ];
+  if (readonly) {
+    columns.push(...EntityColumns(props.identity!.metadata));
+  }
+  columns.push({
+    title: '角色简介',
+    dataIndex: 'remark',
+    valueType: 'textarea',
+    colProps: { span: 24 },
+    readonly: readonly,
+    formItemProps: {
+      rules: [{ required: true, message: '角色简介为必填项' }],
+    },
+  });
   return (
     <SchemaForm<IdentityModel>
       open

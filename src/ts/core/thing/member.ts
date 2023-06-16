@@ -27,7 +27,7 @@ export class Member extends FileInfo<schema.XTarget> implements IMemeber {
     throw new Error('暂不支持.');
   }
   override operates(): OperateModel[] {
-    const operates = super.operates();
+    const operates = super.operates(1);
     if (
       this.metadata.id != this.directory.target.userId &&
       this.directory.target.hasRelationAuth()

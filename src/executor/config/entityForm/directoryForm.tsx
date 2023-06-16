@@ -4,6 +4,7 @@ import SchemaForm from '@/components/SchemaForm';
 import { DirectoryModel } from '@/ts/base/model';
 import { IDirectory } from '@/ts/core';
 import UploadItem from '../tools/upload';
+import { EntityColumns } from './entityColumns';
 
 interface Iprops {
   formType: string;
@@ -82,17 +83,20 @@ const DirectoryForm = (props: Iprops) => {
         ],
       },
     },
-    {
-      title: '备注信息',
-      dataIndex: 'remark',
-      valueType: 'textarea',
-      colProps: { span: 24 },
-      readonly: readonly,
-      formItemProps: {
-        rules: [{ required: true, message: '备注信息为必填项' }],
-      },
-    },
   ];
+  if (readonly) {
+    columns.push(...EntityColumns(props.current.metadata));
+  }
+  columns.push({
+    title: '备注信息',
+    dataIndex: 'remark',
+    valueType: 'textarea',
+    colProps: { span: 24 },
+    readonly: readonly,
+    formItemProps: {
+      rules: [{ required: true, message: '备注信息为必填项' }],
+    },
+  });
   return (
     <SchemaForm<DirectoryModel>
       open
