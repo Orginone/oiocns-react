@@ -2,6 +2,8 @@ import { IDirectory, TargetType } from '@/ts/core';
 import React from 'react';
 import orgCtrl from '@/ts/controller';
 import EntityForm from './entityForm';
+import OperateModal from './operateModal';
+
 interface IProps {
   cmd: string;
   args: any[];
@@ -58,6 +60,8 @@ const ConfigExecutor: React.FC<IProps> = ({ cmd, args, finished }) => {
         });
       }
       break;
+    case 'pull':
+      return <OperateModal cmd={cmd} entity={args[0]} finished={finished} />;
     default:
       return <EntityForm cmd={cmd} entity={args[0]} finished={finished} />;
   }

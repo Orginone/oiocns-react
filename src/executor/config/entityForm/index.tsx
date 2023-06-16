@@ -1,14 +1,17 @@
 import { schema } from '@/ts/base';
 import { IDirectory, IEntity, ITarget } from '@/ts/core';
 import DirectoryForm from './directoryForm';
-import ApplicationForm from './ApplicationForm';
-import SpeciesForm from './SpeciesForm';
-import PropertyForm from './PropertyForm';
-import TargetForm from './TargetForm';
-import LabelsForm from './LabelsForm';
+import ApplicationForm from './applicationForm';
+import SpeciesForm from './speciesForm';
+import PropertyForm from './propertyForm';
+import TargetForm from './targetForm';
+import LabelsForm from './labelsForm';
 import React from 'react';
 import orgCtrl from '@/ts/controller';
-import RenameForm from './RenameForm';
+import RenameForm from './renameForm';
+import IdentityForm from './IdentityForm';
+import AuthorityForm from './authorityForm';
+import { IIdentity } from '@/ts/core/target/identity/identity';
 interface IProps {
   cmd: string;
   entity: IEntity<schema.XEntity>;
@@ -78,6 +81,26 @@ const EntityForm: React.FC<IProps> = ({ cmd, entity, finished }) => {
     case 'remarkProperty':
       return (
         <PropertyForm formType={cmd} current={entity as any} finished={reloadFinish} />
+      );
+    case 'newIdentity':
+    case 'updateIdentity':
+    case 'remarkIdentity':
+      const target = cmd.startsWith('new')
+        ? (entity as ITarget)
+        : (entity as IIdentity).current;
+      const identity = cmd.startsWith('new') ? undefined : (entity as IIdentity);
+      return (
+        <IdentityForm
+          formType={cmd}
+          target={target}
+          identity={identity}
+          finished={reloadFinish}></IdentityForm>
+      );
+    case 'newAuthority':
+    case 'updateAuthority':
+    case 'remarkAuthority':
+      return (
+        <AuthorityForm formType={cmd} current={entity as any} finished={reloadFinish} />
       );
     default: {
       const target = cmd.startsWith('new')

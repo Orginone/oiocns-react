@@ -102,6 +102,7 @@ const DirectoryForm = (props: Iprops) => {
       dataIndex: 'typeName',
       valueType: 'select',
       initialValue: types[0],
+      readonly: readonly,
       fieldProps: {
         options: types.map((i) => {
           return {
@@ -124,7 +125,7 @@ const DirectoryForm = (props: Iprops) => {
     },
     {
       title: '简称',
-      dataIndex: 'TeamName',
+      dataIndex: 'teamName',
       readonly: readonly,
     },
     {
