@@ -46,7 +46,7 @@ const ApprovalNode: React.FC<IProps> = (props) => {
         <div>
           {currentData.id ? (
             <ShareShowComp
-              departData={[currentData]}
+              departData={[{ id: props.current.destId, name: props.current.destName }]}
               deleteFuc={(_id: string) => {
                 props.current.destId = '';
                 props.current.destName = '';

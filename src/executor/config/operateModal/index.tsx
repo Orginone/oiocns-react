@@ -5,6 +5,7 @@ import SearchTarget from './searchTarget';
 import JoinTarget from './joinTarget';
 import SpeciesModal from './speciesModal';
 import ApplicationModal from './applicationModal';
+import LabelsModal from './labelsModal';
 import orgCtrl from '@/ts/controller';
 interface IProps {
   cmd: string;
@@ -24,6 +25,9 @@ const OperateModal: React.FC<IProps> = ({ cmd, entity, finished }) => {
       );
     case 'open':
       switch (entity.typeName) {
+        case '事项配置':
+        case '实体配置':
+          return <LabelsModal finished={finished} current={entity as any} />;
         case '应用':
           return <ApplicationModal finished={finished} current={entity as any} />;
         case '字典':

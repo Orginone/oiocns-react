@@ -1,9 +1,9 @@
 import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components';
-import React, { useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import { IApplication, IWork } from '@/ts/core';
 import { model } from '@/ts/base';
 import SchemaForm from '@/components/SchemaForm';
-import { FileItemShare, WorkDefineModel } from '@/ts/base/model';
+import { WorkDefineModel } from '@/ts/base/model';
 import UploadItem from '../../tools/uploadItem';
 
 interface Iprops {
@@ -19,7 +19,6 @@ interface Iprops {
 */
 const WorkModal = ({ open, handleOk, handleCancel, application, current }: Iprops) => {
   const formRef = useRef<ProFormInstance>();
-  const [avatar, setAvatar] = useState<FileItemShare>();
   const columns: ProFormColumnsType<WorkDefineModel>[] = [
     {
       title: '图标',
@@ -101,12 +100,11 @@ const WorkModal = ({ open, handleOk, handleCancel, application, current }: Iprop
       open={open}
       width={640}
       layoutType="ModalForm"
-      initialValues={current?.metadata || {}}
       title={current ? `编辑[${current.name}]办事` : '新建办事'}
       onOpenChange={(open: boolean) => {
         if (open) {
           if (current) {
-            setAvatar(current.share.avatar);
+            formRef.current?.setFieldsValue(current.metadata);
           }
         } else {
           formRef.current?.resetFields();
@@ -123,7 +121,6 @@ const WorkModal = ({ open, handleOk, handleCancel, application, current }: Iprop
           allowSelect: model.allowSelect,
         });
         if (current) {
-          model.icon = JSON.stringify(avatar);
           handleOk(await current.updateDefine(model));
         } else {
           handleOk((await application.createWork(model)) != undefined);

@@ -103,7 +103,6 @@ export class Form extends FileInfo<schema.XForm> implements IForm {
     data.typeName = this.metadata.typeName;
     const res = await kernel.updateForm(data);
     if (res.success && res.data.id) {
-      res.data.typeName = '表单';
       this.setMetadata(res.data);
     }
     return res.success;

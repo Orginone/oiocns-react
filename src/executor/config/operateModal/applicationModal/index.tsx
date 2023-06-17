@@ -42,27 +42,29 @@ const SpeciesModal: React.FC<IProps> = ({ current, finished }) => {
   const renderOperate = (item: IWork) => {
     return [
       {
-        key: `编辑办事定义`,
-        label: `编辑办事定义`,
+        key: `编辑`,
+        label: `编辑`,
         onClick: () => {
           setWork(item);
           setActiveModel('编辑');
         },
       },
       {
-        key: `设计办事定义`,
-        label: `设计办事定义`,
+        key: `设计`,
+        label: `设计`,
         onClick: () => {
           setWork(item);
           setActiveModel('设计');
         },
       },
       {
-        key: `删除办事定义`,
-        label: `删除办事定义`,
+        key: `删除`,
+        label: `删除`,
         onClick: async () => {
-          await item.deleteDefine();
-          tforceUpdate();
+          if (await item.deleteDefine()) {
+            setDataSource(current.works);
+            tforceUpdate();
+          }
         },
       },
     ];
