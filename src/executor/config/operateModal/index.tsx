@@ -2,6 +2,7 @@ import { schema } from '@/ts/base';
 import { IBelong, IDirectory, IEntity } from '@/ts/core';
 import SearchTarget from './searchTarget';
 import JoinTarget from './joinTarget';
+import SpeciesModal from './speciesModal';
 import React from 'react';
 import orgCtrl from '@/ts/controller';
 interface IProps {
@@ -20,6 +21,12 @@ const OperateModal: React.FC<IProps> = ({ cmd, entity, finished }) => {
       return (
         <SearchTarget current={(entity as IDirectory).target} finished={reloadFinish} />
       );
+    case 'open':
+      switch (entity.typeName) {
+        case '字典':
+        case '分类':
+          return <SpeciesModal finished={finished} current={entity as any} />;
+      }
     default:
       if (cmd.startsWith('join')) {
         return (
