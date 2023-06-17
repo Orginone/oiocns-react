@@ -49,8 +49,14 @@ const openChat = (chat: IDirectory | IMemeber | IMsgChat) => {
 /** 删除实体 */
 const deleteEntity = (entity: IFileInfo<schema.XEntity>) => {
   Modal.confirm({
-    icon: <></>,
-    title: `确认要删除${entity.typeName}[${entity.name}]吗?`,
+    okText: '确认',
+    cancelText: '取消',
+    title: '删除询问框',
+    content: (
+      <div style={{ fontSize: 16 }}>
+        确认要删除{entity.typeName}[{entity.name}]吗?
+      </div>
+    ),
     onOk: () => {
       entity.delete().then((success: boolean) => {
         if (success) {

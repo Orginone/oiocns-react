@@ -13,6 +13,9 @@ const Executor = () => {
       console.log(type, cmd, args);
       if (cmd === 'link') return history.push(args[0]);
       if (executeCmd(cmd, args[0], args.slice(1)) === false) {
+        if (cmd === 'open' && type === 'config' && 'filedata' in args[0]) {
+          type = 'data';
+        }
         switch (type) {
           case 'data':
             setContent(
