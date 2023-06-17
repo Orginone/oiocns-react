@@ -110,7 +110,7 @@ const Design: React.FC<IProps> = ({ current, instance, IsEdit = true }) => {
   };
 
   const convertNode = (resource: NodeModel | undefined, errors: any[]): any => {
-    if (resource) {
+    if (resource && resource.code) {
       if (resource.type == AddNodeType.EMPTY) {
         return convertNode(resource.children, errors);
       }
@@ -259,7 +259,6 @@ const Design: React.FC<IProps> = ({ current, instance, IsEdit = true }) => {
           if (
             errors.length == 0 &&
             (await current.updateDefine({
-              applicationId: current.metadata.applicationId,
               ...current.metadata,
               resource: resource_,
             }))

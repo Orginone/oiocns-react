@@ -6,7 +6,7 @@ import ShareShowComp from '@/bizcomponents/IndentityManage/ShareShowComp';
 import { AiOutlineSetting } from 'react-icons/ai';
 import SelectAuth from '@/bizcomponents/SelectAuth';
 import SelectForms from '@/bizcomponents/SelectForms';
-import { IBelong, SpeciesType } from '@/ts/core';
+import { IBelong } from '@/ts/core';
 import ViewFormModal from '@/bizcomponents/FormDesign/viewFormModal';
 import { XForm } from '@/ts/base/schema';
 interface IProps {
@@ -21,10 +21,10 @@ interface IProps {
 const RootNode: React.FC<IProps> = (props) => {
   const [viewForm, setViewForm] = useState<XForm>();
   const [workforms, setWorkForms] = useState<XForm[]>(
-    (props.current.forms || []).filter((i) => i.typeName === SpeciesType.Work),
+    (props.current.forms || []).filter((i) => i.typeName === '事项配置'),
   );
   const [thingforms, setThingForms] = useState<XForm[]>(
-    (props.current.forms || []).filter((i) => i.typeName === SpeciesType.Thing),
+    (props.current.forms || []).filter((i) => i.typeName === '实体配置'),
   );
   const [formModel, setFormModel] = useState<string>('');
   const [selectAuthValue, setSelectAuthValue] = useState<any>(props.current.destId);
@@ -50,7 +50,7 @@ const RootNode: React.FC<IProps> = (props) => {
             shape="round"
             size="small"
             onClick={() => {
-              setFormModel('workForm');
+              setFormModel('事项配置');
             }}>
             选择业务表单
           </Button>
@@ -65,7 +65,8 @@ const RootNode: React.FC<IProps> = (props) => {
               deleteFuc={(id: string) => {
                 setWorkForms([...workforms.filter((i) => i.id != id)]);
                 props.current.forms = props.current.forms?.filter((a) => a.id != id);
-              }}></ShareShowComp>
+              }}
+            />
           </span>
         )}
         <Row style={{ marginBottom: '10px' }}>
@@ -74,7 +75,7 @@ const RootNode: React.FC<IProps> = (props) => {
             shape="round"
             size="small"
             onClick={() => {
-              setFormModel('thingForm');
+              setFormModel('实体配置');
             }}>
             选择实体表单
           </Button>
@@ -89,7 +90,8 @@ const RootNode: React.FC<IProps> = (props) => {
               deleteFuc={(id: string) => {
                 setThingForms([...thingforms.filter((i) => i.id != id)]);
                 props.current.forms = props.current.forms?.filter((a) => a.id != id);
-              }}></ShareShowComp>
+              }}
+            />
           </span>
         )}
         {/* </div> */}
@@ -107,10 +109,10 @@ const RootNode: React.FC<IProps> = (props) => {
             onCancel={() => setFormModel('')}>
             <SelectForms
               belong={props.belong}
-              selected={formModel === 'thingForm' ? thingforms : workforms}
-              setSelected={
-                formModel === 'thingForm' ? setThingForms : setWorkForms
-              }></SelectForms>
+              typeName={formModel}
+              selected={formModel === '实体配置' ? thingforms : workforms}
+              setSelected={formModel === '实体配置' ? setThingForms : setWorkForms}
+            />
           </Modal>
           {viewForm && (
             <ViewFormModal

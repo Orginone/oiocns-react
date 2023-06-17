@@ -7,6 +7,8 @@ import SpeciesModal from './speciesModal';
 import ApplicationModal from './applicationModal';
 import orgCtrl from '@/ts/controller';
 import LabelsModal from './labelsModal';
+import IdentityModal from './identityModal';
+import AuthorityModal from './authorityModal';
 interface IProps {
   cmd: string;
   entity: IEntity<schema.XEntity>;
@@ -23,6 +25,12 @@ const OperateModal: React.FC<IProps> = ({ cmd, entity, finished }) => {
       return (
         <SearchTarget current={(entity as IDirectory).target} finished={reloadFinish} />
       );
+    case 'settingAuth':
+      return (
+        <AuthorityModal
+          current={((entity as IDirectory).target as IBelong).superAuth!}
+          finished={reloadFinish}></AuthorityModal>
+      );
     case 'open':
       switch (entity.typeName) {
         case '事项配置':
@@ -33,6 +41,8 @@ const OperateModal: React.FC<IProps> = ({ cmd, entity, finished }) => {
         case '字典':
         case '分类':
           return <SpeciesModal finished={finished} current={entity as any} />;
+        case '角色':
+          return <IdentityModal finished={finished} identity={entity as any} />;
         default:
           return <></>;
       }

@@ -10,11 +10,12 @@ import { IDirectory } from '@/ts/core/thing/directory';
 
 interface IProps {
   belong: IBelong;
+  typeName: string;
   selected: XForm[];
   setSelected: (forms: XForm[]) => void;
 }
 
-const SelectForms: React.FC<IProps> = ({ belong, selected, setSelected }) => {
+const SelectForms: React.FC<IProps> = ({ belong, typeName, selected, setSelected }) => {
   const [filter, setFilter] = useState<string>('');
   const [centerTreeData, setCenterTreeData] = useState<any>([]);
   const [centerCheckedKeys, setCenterCheckedKeys] = useState<Key[]>(
@@ -25,15 +26,17 @@ const SelectForms: React.FC<IProps> = ({ belong, selected, setSelected }) => {
     const directory: IDirectory = info.node.item;
     let forms = await directory.loadForms();
     setCenterTreeData(
-      forms.map((item) => {
-        return {
-          key: item.id,
-          title: item.name,
-          value: item.id,
-          item: item.metadata,
-          children: [],
-        };
-      }),
+      forms
+        .filter((a) => a.typeName == typeName)
+        .map((item) => {
+          return {
+            key: item.id,
+            title: item.name,
+            value: item.id,
+            item: item.metadata,
+            children: [],
+          };
+        }),
     );
   };
 

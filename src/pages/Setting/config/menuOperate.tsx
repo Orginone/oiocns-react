@@ -42,7 +42,11 @@ const createMenu = (target: ITarget, children: MenuItemType[]) => {
     icon: <EntityIcon notAvatar={true} entityId={target.id} size={18} />,
     children: children,
     beforeLoad: async () => {
+      if ('loadSuperAuth' in target) {
+        await target.space.loadSuperAuth();
+      }
       if ('directory' in target) {
+        await target.loadIdentitys();
         await (target as ITarget).directory.loadContent();
       }
     },

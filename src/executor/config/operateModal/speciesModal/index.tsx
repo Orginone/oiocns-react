@@ -11,7 +11,7 @@ import cls from './index.module.less';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import SpeciesItemModal from './itemModal';
 import EntityInfo from '@/bizcomponents/EntityInfo';
-import FullScreenModal from '../../../tools/fullScreen';
+import FullScreenModal from '../../tools/fullScreen';
 
 type IProps = {
   current: ISpecies;
