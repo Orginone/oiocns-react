@@ -3,7 +3,7 @@ import { ProFormColumnsType } from '@ant-design/pro-components';
 import SchemaForm from '@/components/SchemaForm';
 import { FormModel } from '@/ts/base/model';
 import { IDirectory } from '@/ts/core';
-import UploadItem from '../../tools/uploadItem';
+import UploadItem from '../tools/uploadItem';
 import { IForm } from '@/ts/core/thing/form';
 import { EntityColumns } from './entityColumns';
 

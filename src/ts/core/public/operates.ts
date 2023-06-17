@@ -52,6 +52,11 @@ export const directoryOperates = {
     label: '刷新目录',
     iconType: 'refresh',
   },
+  TaskList: {
+    cmd: 'taskList',
+    label: '上传列表',
+    iconType: 'taskList',
+  },
   NewFile: {
     cmd: 'newFile',
     label: '上传文件',

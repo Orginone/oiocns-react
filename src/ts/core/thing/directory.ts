@@ -327,6 +327,7 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
   override operates(mode: number = 0): model.OperateModel[] {
     const operates: model.OperateModel[] = [
       directoryOperates.NewFile,
+      directoryOperates.TaskList,
       directoryOperates.Refesh,
     ];
     if (mode === 2 && this.target.hasRelationAuth()) {
