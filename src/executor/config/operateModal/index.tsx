@@ -26,6 +26,8 @@ const OperateModal: React.FC<IProps> = ({ cmd, entity, finished }) => {
         case '字典':
         case '分类':
           return <SpeciesModal finished={finished} current={entity as any} />;
+        default:
+          return <></>;
       }
     default:
       if (cmd.startsWith('join')) {
