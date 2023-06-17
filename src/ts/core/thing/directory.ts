@@ -1,5 +1,11 @@
 import { common, kernel, model, schema } from '../../base';
-import { PageAll, TargetType, directoryNew, directoryOperates } from '../public';
+import {
+  PageAll,
+  TargetType,
+  directoryNew,
+  directoryOperates,
+  fileOperates,
+} from '../public';
 import { ITarget } from '../target/base/target';
 import { Form, IForm } from './form';
 import { SysFileInfo, ISysFileInfo, IFileInfo, FileInfo } from './fileinfo';
@@ -333,6 +339,9 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
     if (mode === 2 && this.target.hasRelationAuth()) {
       operates.push(directoryNew);
     }
+    if (this.target.space.user.copyFiles.size > 0) {
+      operates.push(fileOperates.Parse);
+    }
     if (this.parent) {
       operates.push(...super.operates(mode));
     } else if (mode % 2 === 0) {
@@ -340,7 +349,7 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
     } else {
       operates.push(...super.operates(1));
     }
-    return operates.sort((a, b) => (a.menus ? -10 : b.menus ? 10 : 0));
+    return operates;
   }
   private async loadSubDirectory() {
     if (!this.parent) {

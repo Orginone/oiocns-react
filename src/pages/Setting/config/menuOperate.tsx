@@ -8,26 +8,31 @@ import { command, schema } from '@/ts/base';
 
 /** 操作到Menus */
 export const loadMenus = (file: IFileInfo<schema.XEntity>) => {
-  return file.operates(2).map((o) => {
-    return {
-      key: o.cmd,
-      label: o.label,
-      icon: o.menus ? <></> : <TypeIcon iconType={o.iconType} size={16} />,
-      beforeLoad: () => {
-        command.emitter('config', o.cmd, file);
-      },
-      children: o.menus?.map((s) => {
-        return {
-          key: s.cmd,
-          label: s.label,
-          icon: <TypeIcon iconType={s.iconType} size={16} />,
-          beforeLoad: () => {
-            command.emitter('config', s.cmd, file);
-          },
-        };
-      }),
-    } as OperateMenuType;
-  });
+  return file
+    .operates(2)
+    .sort((a, b) => a.sort - b.sort)
+    .map((o) => {
+      return {
+        key: o.cmd,
+        label: o.label,
+        icon: o.menus ? <></> : <TypeIcon iconType={o.iconType} size={16} />,
+        beforeLoad: () => {
+          command.emitter('config', o.cmd, file);
+        },
+        children: o.menus
+          ?.sort((a, b) => a.sort - b.sort)
+          .map((s) => {
+            return {
+              key: s.cmd,
+              label: s.label,
+              icon: <TypeIcon iconType={s.iconType} size={16} />,
+              beforeLoad: () => {
+                command.emitter('config', s.cmd, file);
+              },
+            };
+          }),
+      } as OperateMenuType;
+    });
 };
 
 /** 创建团队菜单 */

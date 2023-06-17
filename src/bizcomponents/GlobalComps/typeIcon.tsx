@@ -2,6 +2,7 @@ import { TargetType } from '@/ts/core';
 import React from 'react';
 import * as im from 'react-icons/im';
 import * as fa from 'react-icons/fa';
+import { IconBaseProps } from 'react-icons';
 
 interface TypeIconInfo {
   avatar?: boolean;
@@ -12,89 +13,112 @@ interface TypeIconInfo {
 /** 类型图标 */
 const TypeIcon = ({ avatar, iconType, size }: TypeIconInfo) => {
   const iconSize = size || 12;
+  const config: IconBaseProps = { size: iconSize, color: '#9498df' };
+  const loadFileIcon = () => {
+    switch (iconType) {
+      case 'application/pdf':
+        return <fa.FaFilePdf {...config} />;
+      case 'application/x-zip-compressed':
+        return <fa.FaFileArchive {...config} />;
+    }
+    if (iconType?.startsWith('application')) {
+      return <fa.FaAppStoreIos {...config} />;
+    } else if (iconType?.startsWith('video')) {
+      return <fa.FaFileVideo {...config} />;
+    } else if (iconType?.startsWith('image')) {
+      return <fa.FaFileImage {...config} />;
+    } else if (iconType?.startsWith('text')) {
+      return <fa.FaFileCode {...config} />;
+    } else if (iconType?.startsWith('audio')) {
+      return <fa.FaFileAudio {...config} />;
+    }
+    return <im.ImFilesEmpty {...config} />;
+  };
   const loadIcon = () => {
     switch (iconType) {
       case '目录':
-        return <im.ImFolder size={iconSize} />;
+        return <im.ImFolder {...config} />;
       case '字典':
-        return <im.ImBook size={iconSize} />;
+        return <im.ImBook {...config} />;
       case '分类':
-        return <im.ImTree size={iconSize} />;
+        return <im.ImTree {...config} />;
       case '属性':
-        return <im.ImJoomla size={iconSize} />;
+        return <im.ImJoomla {...config} />;
       case '应用':
-        return <im.ImDropbox size={iconSize} />;
+        return <im.ImDropbox {...config} />;
       case '事项配置':
-        return <im.ImInsertTemplate size={iconSize} />;
+        return <im.ImInsertTemplate {...config} />;
       case '实体配置':
-        return <im.ImPaste size={iconSize} />;
+        return <im.ImPaste {...config} />;
       case '角色':
-        return <im.ImKey size={iconSize} />;
+        return <im.ImKey {...config} />;
       case '权限':
-        return <im.ImShield size={iconSize} />;
+        return <im.ImShield {...config} />;
       case TargetType.Company:
       case TargetType.University:
       case TargetType.Hospital:
-        return <im.ImOffice size={iconSize} />;
+        return <im.ImOffice {...config} />;
       case TargetType.Station:
-        return <im.ImAddressBook size={iconSize} />;
+        return <im.ImAddressBook {...config} />;
       case TargetType.Group:
-        return <im.ImTree size={iconSize} />;
+        return <im.ImTree {...config} />;
       case TargetType.Cohort:
-        return <im.ImBubbles2 size={iconSize} />;
+        return <im.ImBubbles2 {...config} />;
       case TargetType.Section:
       case TargetType.Department:
-        return <im.ImLibrary size={iconSize} />;
+        return <im.ImLibrary {...config} />;
       case TargetType.Person:
-        return <im.ImUserTie size={iconSize} />;
+        return <im.ImUserTie {...config} />;
       case TargetType.College:
-        return <im.ImTrophy size={iconSize} />;
+        return <im.ImTrophy {...config} />;
       case TargetType.Laboratory:
-        return <im.ImJoomla size={iconSize} />;
+        return <im.ImJoomla {...config} />;
       case TargetType.Office:
-        return <im.ImBriefcase size={iconSize} />;
+        return <im.ImBriefcase {...config} />;
       case TargetType.Research:
-        return <im.ImFlickr4 size={iconSize} />;
+        return <im.ImFlickr4 {...config} />;
       case TargetType.Working:
-        return <im.ImUsers size={iconSize} />;
+        return <im.ImUsers {...config} />;
       case 'newDir':
-        return <im.ImFolderPlus size={iconSize} />;
+        return <im.ImFolderPlus {...config} />;
       case 'refresh':
-        return <im.ImSpinner9 size={iconSize} />;
+        return <im.ImSpinner9 {...config} />;
       case 'remark':
-        return <im.ImWrench size={iconSize} />;
+        return <im.ImWrench {...config} />;
       case 'open':
-        return <im.ImDelicious size={iconSize} />;
+        return <im.ImDelicious {...config} />;
       case 'copy':
-        return <im.ImCopy size={iconSize} />;
+        return <im.ImCopy {...config} />;
       case 'move':
-        return <im.ImShuffle size={iconSize} />;
+        return <im.ImShuffle {...config} />;
+      case 'parse':
+        return <im.ImCoinPound {...config} />;
       case 'rename':
-        return <im.ImPencil size={iconSize} />;
+        return <im.ImPencil {...config} />;
       case 'delete':
-        return <im.ImBin size={iconSize} />;
+        return <im.ImBin {...config} />;
       case 'remove':
-        return <im.ImUserMinus size={iconSize} />;
+        return <im.ImUserMinus {...config} />;
       case 'update':
-        return <im.ImPriceTags size={iconSize} />;
+        return <im.ImPriceTags {...config} />;
       case 'pull':
-        return <im.ImUserPlus size={iconSize} />;
+        return <im.ImUserPlus {...config} />;
       case 'qrcode':
-        return <im.ImQrcode size={iconSize} />;
+        return <im.ImQrcode {...config} />;
       case 'joinFriend':
-        return <im.ImUserPlus size={iconSize} />;
+        return <im.ImUserPlus {...config} />;
       case 'joinCohort':
-        return <im.ImUsers size={iconSize} />;
+        return <im.ImUsers {...config} />;
       case 'joinCompany':
-        return <im.ImPlus size={iconSize} />;
+        return <im.ImPlus {...config} />;
       case 'joinGroup':
-        return <im.ImEnter size={iconSize} />;
+        return <im.ImEnter {...config} />;
       case 'newFile':
-        return <im.ImUpload size={iconSize} />;
+        return <im.ImUpload {...config} />;
       case 'taskList':
-        return <fa.FaTasks size={iconSize} />;
+        return <im.ImList {...config} />;
       default:
-        return <im.ImFilesEmpty size={iconSize} />;
+        return loadFileIcon();
     }
   };
   if (avatar) {

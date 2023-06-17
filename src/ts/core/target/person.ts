@@ -9,6 +9,7 @@ import { IMsgChat } from '../chat/message/msgchat';
 import { ITarget } from './base/target';
 import { ITeam } from './base/team';
 import { personJoins, targetOperates } from '../public';
+import { IFileInfo } from '../thing/fileinfo';
 
 /** 人员类型接口 */
 export interface IPerson extends IBelong {
@@ -16,6 +17,8 @@ export interface IPerson extends IBelong {
   companys: ICompany[];
   /** 赋予人的身份(角色)实体 */
   givedIdentitys: schema.XIdProof[];
+  /** 拷贝的文件 */
+  copyFiles: Map<string, IFileInfo<schema.XEntity>>;
   /** 根据ID查询共享信息 */
   findShareById(id: string): model.ShareIcon;
   /** 根据Id查询共享信息 */
@@ -38,11 +41,13 @@ export interface IPerson extends IBelong {
 export class Person extends Belong implements IPerson {
   constructor(_metadata: schema.XTarget) {
     super(_metadata, ['本人']);
+    this.copyFiles = new Map();
   }
   companys: ICompany[] = [];
+  givedIdentitys: schema.XIdProof[] = [];
+  copyFiles: Map<string, IFileInfo<schema.XEntity>>;
   private _cohortLoaded: boolean = false;
   private _companyLoaded: boolean = false;
-  givedIdentitys: schema.XIdProof[] = [];
   private _givedIdentityLoaded: boolean = false;
   async loadGivedIdentitys(reload: boolean = false): Promise<schema.XIdProof[]> {
     if (!this._givedIdentityLoaded || reload) {

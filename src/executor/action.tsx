@@ -1,10 +1,11 @@
 import { IDirectory, IEntity, IFileInfo, IMemeber, IMsgChat } from '@/ts/core';
 import orgCtrl from '@/ts/controller';
 import { command, schema } from '@/ts/base';
-import { Drawer, List, Modal, Progress, Upload } from 'antd';
+import { Drawer, List, Modal, Progress, Upload, message } from 'antd';
 import QrCode from 'qrcode.react';
 import React, { useEffect, useState } from 'react';
 import TypeIcon from '@/bizcomponents/GlobalComps/typeIcon';
+import EntityIcon from '@/bizcomponents/GlobalComps/entityIcon';
 /** 执行非页面命令 */
 export const executeCmd = (cmd: string, entity: any, args: any[]) => {
   switch (cmd) {
@@ -14,6 +15,11 @@ export const executeCmd = (cmd: string, entity: any, args: any[]) => {
       return directoryRefresh(entity);
     case 'openChat':
       return openChat(entity);
+    case 'copy':
+    case 'move':
+      return setCopyFiles(cmd, entity);
+    case 'parse':
+      return copyBoard(entity);
     case 'delete':
       return deleteEntity(entity);
     case 'remove':
@@ -32,6 +38,67 @@ export const executeCmd = (cmd: string, entity: any, args: any[]) => {
 const directoryRefresh = (dir: IDirectory) => {
   dir.loadContent(true).then(() => {
     orgCtrl.changCallback();
+  });
+};
+
+/** 拷贝/剪切文件 */
+const setCopyFiles = (cmd: string, file: IFileInfo<schema.XEntity>) => {
+  const key = cmd + '_' + file.id;
+  for (const k of orgCtrl.user.copyFiles.keys()) {
+    if (k.endsWith(file.id)) {
+      orgCtrl.user.copyFiles.delete(k);
+    }
+  }
+  orgCtrl.user.copyFiles.set(key, file);
+  message.info(`${file.name}已放入剪切板`);
+};
+
+/** 剪贴板操作 */
+const copyBoard = (dir: IDirectory) => {
+  const datasource = [];
+  for (const item of orgCtrl.user.copyFiles.entries()) {
+    datasource.push({
+      key: item[0],
+      cmd: item[0].split('_')[0],
+      file: item[1],
+    });
+  }
+  const modal = Modal.info({
+    icon: <></>,
+    width: 500,
+    content: (
+      <List
+        itemLayout="horizontal"
+        dataSource={datasource}
+        renderItem={({ key, cmd, file }) => {
+          return (
+            <List.Item
+              style={{ cursor: 'pointer', padding: 6 }}
+              actions={[
+                <div key={file.name} style={{ width: 60 }}>
+                  {cmd === 'copy' ? '复制' : '移动'}
+                </div>,
+              ]}
+              onClick={async () => {
+                modal.destroy();
+                if (cmd === 'copy') {
+                  await file.copy(dir);
+                } else {
+                  await file.move(dir);
+                }
+                orgCtrl.user.copyFiles.delete(key);
+                orgCtrl.changCallback();
+              }}>
+              <List.Item.Meta
+                avatar={<TypeIcon iconType={file.typeName} size={50} />}
+                title={<strong>{file.name}</strong>}
+                description={<EntityIcon entityId={file.directory.belongId} showName />}
+              />
+            </List.Item>
+          );
+        }}
+      />
+    ),
   });
 };
 

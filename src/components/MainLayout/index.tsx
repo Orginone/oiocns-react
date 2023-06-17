@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import cls from './index.module.less';
 import CustomMenu from '@/components/CustomMenu';
 import CustomBreadcrumb from '@/components/CustomBreadcrumb';
-import { MenuItemType } from 'typings/globelType';
+import { MenuItemType, OperateMenuType } from 'typings/globelType';
 import { ImArrowLeft2 } from 'react-icons/im';
 import { RiMenuFoldFill, RiMenuUnfoldFill, RiMore2Fill } from 'react-icons/ri';
 import OrgIcons from '@/bizcomponents/GlobalComps/orgIcons';
@@ -34,18 +34,31 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
   const outside =
     props.selectMenu.menus?.filter((item) => item.model === 'outside') ?? [];
   const inside = props.selectMenu.menus?.filter((item) => item.model != 'outside') ?? [];
-  const onOperateMenuClick = async (item: MenuItemType, key: string) => {
-    if (item.menus) {
-      const menu = item.menus.find((i) => i.key == key);
-      if (menu && menu.beforeLoad) {
-        if (await menu.beforeLoad()) {
-          onSelectClick(parentMenu);
-        } else {
-          onSelectClick(props.selectMenu);
-        }
+  const findMenus = (
+    key: string,
+    menus?: OperateMenuType[],
+  ): OperateMenuType | undefined => {
+    for (const menu of menus ?? []) {
+      if (menu.key === key) {
+        return menu;
       } else {
-        props.onMenuClick?.apply(this, [item, key]);
+        const find = findMenus(key, menu.children);
+        if (find) {
+          return find;
+        }
       }
+    }
+  };
+  const onOperateMenuClick = async (item: MenuItemType, key: string) => {
+    const menu = findMenus(key, item.menus);
+    if (menu && menu.beforeLoad) {
+      if (await menu.beforeLoad()) {
+        onSelectClick(parentMenu);
+      } else {
+        onSelectClick(props.selectMenu);
+      }
+    } else {
+      props.onMenuClick?.apply(this, [item, key]);
     }
   };
   const onSelectClick = async (item: MenuItemType) => {

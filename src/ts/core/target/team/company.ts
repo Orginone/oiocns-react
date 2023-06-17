@@ -260,6 +260,7 @@ export class Company extends Belong implements ICompany {
     if (this.hasRelationAuth()) {
       operates.unshift(
         {
+          sort: 3,
           cmd: 'setNew',
           label: '设立更多',
           iconType: 'setNew',
@@ -270,6 +271,7 @@ export class Company extends Belong implements ICompany {
           ],
         },
         {
+          sort: 13,
           cmd: 'joinGroup',
           label: '加入集群',
           iconType: 'joinGroup',

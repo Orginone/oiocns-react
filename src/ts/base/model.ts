@@ -693,6 +693,7 @@ export type TaskModel = {
 /** 操作命令模型 */
 export type OperateModel = {
   cmd: string;
+  sort: number;
   label: string;
   iconType: string;
   menus?: OperateModel[];

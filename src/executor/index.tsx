@@ -14,7 +14,7 @@ const Executor = () => {
       if (cmd === 'link') return history.push(args[0]);
       if (cmd === 'taskList') return setContent(<FileTaskList directory={args[0]} />);
       if (executeCmd(cmd, args[0], args.slice(1)) === false) {
-        if (cmd === 'open' && type === 'config' && 'filedata' in args[0]) {
+        if (['open', 'remark'].includes(cmd) && 'filedata' in args[0]) {
           type = 'data';
         }
         switch (type) {

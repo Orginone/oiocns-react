@@ -24,20 +24,25 @@ const SettingContent: React.FC<IProps> = ({ current }: IProps) => {
 
   /** 操作到Menus */
   const loadMenus = (file: IFileInfo<schema.XEntity>) => {
-    return file.operates(1).map((o) => {
-      return {
-        key: o.cmd,
-        label: o.label,
-        icon: o.menus ? <></> : <TypeIcon iconType={o.iconType} size={16} />,
-        children: o.menus?.map((s) => {
-          return {
-            key: s.cmd,
-            label: s.label,
-            icon: <TypeIcon iconType={s.iconType} size={16} />,
-          };
-        }),
-      };
-    });
+    return file
+      .operates(1)
+      .sort((a, b) => a.sort - b.sort)
+      .map((o) => {
+        return {
+          key: o.cmd,
+          label: o.label,
+          icon: o.menus ? <></> : <TypeIcon iconType={o.iconType} size={16} />,
+          children: o.menus
+            ?.sort((a, b) => a.sort - b.sort)
+            .map((s) => {
+              return {
+                key: s.cmd,
+                label: s.label,
+                icon: <TypeIcon iconType={s.iconType} size={16} />,
+              };
+            }),
+        };
+      });
   };
 
   return (
