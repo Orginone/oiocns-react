@@ -9,7 +9,8 @@ import EntityIcon from '@/bizcomponents/GlobalComps/entityIcon';
 import CardOrTable from '@/components/CardOrTableComp';
 import cls from './index.module.less';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
-import SpeciesItemModal from './speciesItem';
+import SpeciesItemModal from './itemModal';
+import EntityInfo from '@/bizcomponents/EntityInfo';
 
 type IProps = {
   current: ISpecies;
@@ -21,7 +22,7 @@ type IProps = {
 */
 const SpeciesModal: React.FC<IProps> = ({ current, finished }) => {
   const [activeModel, setActiveModel] = useState<string>('');
-  const [item, setDictItem] = useState<schema.XSpeciesItem>();
+  const [item, setItem] = useState<schema.XSpeciesItem>();
   const [tkey, tforceUpdate] = useObjectUpdate(current);
   const renderBtns = () => {
     return (
@@ -32,12 +33,12 @@ const SpeciesModal: React.FC<IProps> = ({ current, finished }) => {
   };
   // 操作内容渲染函数
   const renderOperate = (item: schema.XSpeciesItem) => {
-    return [
+    const operates = [
       {
         key: `编辑${current.typeName}项`,
         label: `编辑${current.typeName}项`,
         onClick: () => {
-          setDictItem(item);
+          setItem(item);
           setActiveModel('编辑');
         },
       },
@@ -50,6 +51,17 @@ const SpeciesModal: React.FC<IProps> = ({ current, finished }) => {
         },
       },
     ];
+    if (current.typeName != '字典') {
+      operates.unshift({
+        key: `新增${current.typeName}子项`,
+        label: `新增${current.typeName}子项`,
+        onClick: () => {
+          setItem(item);
+          setActiveModel('新增');
+        },
+      });
+    }
+    return operates;
   };
   const TitleItems = [
     {
@@ -59,6 +71,11 @@ const SpeciesModal: React.FC<IProps> = ({ current, finished }) => {
   ];
 
   const columns: ProColumns<schema.XSpeciesItem>[] = [
+    {
+      title: '序号',
+      valueType: 'index',
+      width: 50,
+    },
     {
       title: '名称',
       dataIndex: 'name',
@@ -122,6 +139,7 @@ const SpeciesModal: React.FC<IProps> = ({ current, finished }) => {
       footer={[]}
       onCancel={finished}
       destroyOnClose>
+      <EntityInfo entity={current}></EntityInfo>
       <PageCard
         className={cls[`card-wrap`]}
         bordered={false}
@@ -139,17 +157,18 @@ const SpeciesModal: React.FC<IProps> = ({ current, finished }) => {
       </PageCard>
       <SpeciesItemModal
         typeName={current.typeName}
+        operateType={activeModel}
         open={activeModel == '新增' || (activeModel == '编辑' && item != undefined)}
         data={item}
         current={current}
         handleCancel={() => {
           setActiveModel('');
-          setDictItem(undefined);
+          setItem(undefined);
         }}
         handleOk={(success: boolean) => {
           if (success) {
             message.success('操作成功');
-            setDictItem(undefined);
+            setItem(undefined);
             setActiveModel('');
             tforceUpdate();
           }

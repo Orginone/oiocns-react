@@ -58,7 +58,7 @@ export class Work extends Entity<schema.XWorkDefine> implements IWork {
   }
   async updateDefine(data: model.WorkDefineModel): Promise<boolean> {
     data.id = this.id;
-    data.applicationId = this.metadata.applicationId;
+    data.appicationId = this.metadata.applicationId;
     const res = await kernel.createWorkDefine(data);
     if (res.success && res.data.id) {
       res.data.typeName = '事项';

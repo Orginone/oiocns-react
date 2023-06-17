@@ -24,15 +24,30 @@ const ConfigExecutor: React.FC<IProps> = ({ cmd, args, finished }) => {
   };
   switch (cmd) {
     case 'open':
+      switch (args[0].typeName) {
+        case '目录':
+          return openDir();
+        case '应用':
+        case '分类':
+        case '字典':
+          return <OperateModal cmd={cmd} entity={args[0]} finished={finished} />;
+        default: {
+          if (Object.values(TargetType).includes(args[0].typeName as TargetType)) {
+            if ('isMember' in args[0]) {
+              cmd = 'remark';
+              return <EntityForm cmd={cmd} entity={args[0]} finished={finished} />;
+            } else {
+              return openDir();
+            }
+          }
+        }
+      }
+      break;
     case 'update':
     case 'remark':
       switch (args[0].typeName) {
         case '目录':
-          if (cmd === 'open') {
-            return openDir();
-          } else {
-            return <EntityForm cmd={cmd + 'Dir'} entity={args[0]} finished={finished} />;
-          }
+          return <EntityForm cmd={cmd + 'Dir'} entity={args[0]} finished={finished} />;
         case '应用':
           return <EntityForm cmd={cmd + 'App'} entity={args[0]} finished={finished} />;
         case '属性':
@@ -44,19 +59,9 @@ const ConfigExecutor: React.FC<IProps> = ({ cmd, args, finished }) => {
             <EntityForm cmd={cmd + 'Species'} entity={args[0]} finished={finished} />
           );
         case '字典':
-          if (cmd === 'open') {
-            return <OperateModal cmd={cmd} entity={args[0]} finished={finished} />;
-          }
           return <EntityForm cmd={cmd + 'Dict'} entity={args[0]} finished={finished} />;
         default: {
           if (Object.values(TargetType).includes(args[0].typeName as TargetType)) {
-            if (cmd === 'open') {
-              if ('isMember' in args[0]) {
-                cmd = 'remark';
-              } else {
-                return openDir();
-              }
-            }
             return <EntityForm cmd={cmd} entity={args[0]} finished={finished} />;
           }
         }

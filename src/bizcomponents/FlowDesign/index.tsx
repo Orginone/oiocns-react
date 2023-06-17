@@ -16,20 +16,13 @@ import { IWork } from '@/ts/core';
 import { AddNodeType, NodeModel, getNodeCode, isBranchNode } from './processType';
 
 interface IProps {
-  Title?: string;
   IsEdit?: boolean;
   current?: IWork;
   instance?: XWorkInstance;
   onBack?: () => void;
 }
 
-const Design: React.FC<IProps> = ({
-  Title,
-  current,
-  instance,
-  onBack,
-  IsEdit = true,
-}) => {
+const Design: React.FC<IProps> = ({ current, instance, onBack, IsEdit = true }) => {
   const [scale, setScale] = useState<number>(100);
   const [showErrors, setShowErrors] = useState<any[]>([]);
   const [resource, setResource] = useState<any>({
@@ -272,6 +265,7 @@ const Design: React.FC<IProps> = ({
           if (
             errors.length == 0 &&
             (await current.updateDefine({
+              appicationId: current.metadata.applicationId,
               ...current.metadata,
               resource: resource_,
             }))
@@ -310,13 +304,6 @@ const Design: React.FC<IProps> = ({
     <div className={cls['company-info-content']}>
       <Card bordered={false}>
         <Layout>
-          {Title && (
-            <Layout.Header className={cls['layout-title']}>
-              <Typography.Title level={3} style={{ margin: 0 }}>
-                {Title}
-              </Typography.Title>
-            </Layout.Header>
-          )}
           <Layout.Content>
             <Card bordered={false}>
               <div className={cls['publish']} style={{ width: '200px' }}>

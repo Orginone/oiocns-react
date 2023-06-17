@@ -3,8 +3,7 @@ import InsertButton from '../InsertButton';
 import { AiOutlineCopy, AiOutlineClose } from 'react-icons/ai';
 import cls from './index.module.less';
 import SelectOrg from '../selectOrg';
-import orgCtrl from '@/ts/controller';
-import { ITarget, IWork } from '@/ts/core';
+import { IWork } from '@/ts/core';
 import { dataType } from '@/bizcomponents/FlowDesign/processType';
 
 type DeptWayNodeProps = {
@@ -25,7 +24,6 @@ type DeptWayNodeProps = {
 const DeptWayNode: React.FC<DeptWayNodeProps> = (props: DeptWayNodeProps) => {
   const [key, setKey] = useState<number>(0);
   const [orgId, setOrgId] = useState<string>();
-  const [target, settarget] = useState<ITarget>();
   const delNode = () => {
     props.onDelNode();
   };
@@ -38,7 +36,6 @@ const DeptWayNode: React.FC<DeptWayNodeProps> = (props: DeptWayNodeProps) => {
 
   useEffect(() => {
     if (props.isEdit && props.define) {
-      settarget(orgCtrl.user.targets.find((a) => a.id == props.define!.metadata.shareId));
       if (props.config.conditions.length == 0) {
         props.config.conditions = [
           {
@@ -48,7 +45,8 @@ const DeptWayNode: React.FC<DeptWayNodeProps> = (props: DeptWayNodeProps) => {
             key: 'EQ',
             label: '=',
             type: dataType.BELONG,
-            val: props.define.metadata.shareId,
+            val: props.define.application?.directory.target.id,
+            display: props.define.application?.directory.target.name,
           },
         ];
         setKey(key + 1);
@@ -68,10 +66,13 @@ const DeptWayNode: React.FC<DeptWayNodeProps> = (props: DeptWayNodeProps) => {
       {props.isEdit && !props.config.readonly && (
         <span className={cls['option']}>
           <AiOutlineCopy
-            style={{ fontSize: '12px', paddingRight: '5px' }}
+            style={{ fontSize: '15px', marginRight: '50px' }}
             onClick={copy}
           />
-          <AiOutlineClose style={{ fontSize: '12px' }} onClick={delNode} />
+          <AiOutlineClose
+            style={{ fontSize: '15px', marginRight: '10px' }}
+            onClick={delNode}
+          />
         </span>
       )}
     </div>
@@ -87,12 +88,12 @@ const DeptWayNode: React.FC<DeptWayNodeProps> = (props: DeptWayNodeProps) => {
     <div className={cls['node-body-main-content']} onClick={select}>
       {/* <span>组织分支</span> */}
       <span>
-        {props.isEdit && target && props.define ? (
+        {props.isEdit && props.define ? (
           <SelectOrg
             key={key}
             onChange={onChange}
             orgId={orgId}
-            target={target}
+            target={props.define.application!.directory.target}
             value={props.config.conditions[0]?.val}
             rootDisable={false}
           />

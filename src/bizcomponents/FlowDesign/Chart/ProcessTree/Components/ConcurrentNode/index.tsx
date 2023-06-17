@@ -35,10 +35,13 @@ const ConcurrentNode: React.FC<ConcurrentNodeProps> = (props: ConcurrentNodeProp
       {props.isEdit && (
         <span className={cls['option']}>
           <AiOutlineCopy
-            style={{ fontSize: '12px', paddingRight: '5px' }}
+            style={{ fontSize: '15px', marginRight: '5px' }}
             onClick={copy}
           />
-          <AiOutlineClose style={{ fontSize: '12px' }} onClick={delNode} />
+          <AiOutlineClose
+            style={{ fontSize: '15px', marginRight: '10px' }}
+            onClick={delNode}
+          />
         </span>
       )}
     </div>

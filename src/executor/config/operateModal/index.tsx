@@ -1,9 +1,10 @@
+import React from 'react';
 import { schema } from '@/ts/base';
 import { IBelong, IDirectory, IEntity } from '@/ts/core';
 import SearchTarget from './searchTarget';
 import JoinTarget from './joinTarget';
 import SpeciesModal from './speciesModal';
-import React from 'react';
+import ApplicationModal from './applicationModal';
 import orgCtrl from '@/ts/controller';
 interface IProps {
   cmd: string;
@@ -23,6 +24,8 @@ const OperateModal: React.FC<IProps> = ({ cmd, entity, finished }) => {
       );
     case 'open':
       switch (entity.typeName) {
+        case '应用':
+          return <ApplicationModal finished={finished} current={entity as any} />;
         case '字典':
         case '分类':
           return <SpeciesModal finished={finished} current={entity as any} />;

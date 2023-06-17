@@ -475,7 +475,7 @@ export type WorkDefineModel = {
   // 共享组织ID
   shareId: string;
   // 应用ID
-  applicationId: string;
+  appicationId: string;
   // 是否创建实体
   rule: string;
   // 流程节点
