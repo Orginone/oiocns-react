@@ -4,11 +4,11 @@ import React, { useState, Key } from 'react';
 import ShareShowComp from '@/bizcomponents/IndentityManage/ShareShowComp';
 import cls from './index.module.less';
 import CustomTree from '@/components/CustomTree';
-import { IPropClass } from '@/ts/core';
 import { XProperty } from '@/ts/base/schema';
+import { IDirectory } from '@/ts/core';
 
 interface IProps {
-  species: IPropClass[];
+  directory: IDirectory[];
   selected: XProperty[];
   onAdded: (prop: XProperty) => void;
   onDeleted: (id: string) => void;
@@ -23,8 +23,8 @@ const SelectForms: React.FC<IProps> = (props) => {
   );
 
   const onSelect: TreeProps['onSelect'] = async (_, info: any) => {
-    const species: IPropClass = info.node.item;
-    let propertys = await species.loadPropertys();
+    const directory: IDirectory = info.node.item;
+    let propertys = await directory.loadPropertys();
     setCenterTreeData(
       propertys.map((item) => {
         return {
@@ -53,15 +53,15 @@ const SelectForms: React.FC<IProps> = (props) => {
     props.setSelected([...props.selected]);
   };
 
-  const buildPropClassTree = (species: IPropClass[]): any[] => {
+  const buildDirectoryTree = (directorys: IDirectory[]): any[] => {
     const result: any[] = [];
-    for (const item of species) {
+    for (const item of directorys) {
       result.push({
         key: item.id,
         title: item.name,
         value: item.id,
         item: item,
-        children: buildPropClassTree(item.children.map((i) => i as IPropClass)),
+        children: buildDirectoryTree(item.children.map((i) => i as IDirectory)),
       });
     }
     return result;
@@ -87,7 +87,7 @@ const SelectForms: React.FC<IProps> = (props) => {
               checkable={false}
               autoExpandParent={true}
               onSelect={onSelect}
-              treeData={buildPropClassTree(props.species)}
+              treeData={buildDirectoryTree(props.directory)}
             />
           </div>
         </div>

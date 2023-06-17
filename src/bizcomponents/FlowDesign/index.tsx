@@ -3,15 +3,10 @@ import cls from './index.module.less';
 import ChartDesign from './Chart';
 import GroupBtn from '@/components/GroupBtn';
 import { WorkNodeModel } from '@/ts/base/model';
-import { Button, Card, Layout, message, Modal, Space, Typography } from 'antd';
-import {
-  AiOutlineSend,
-  AiOutlineMinus,
-  AiOutlinePlus,
-  AiOutlineClockCircle,
-} from 'react-icons/ai';
+import { Button, Card, Layout, message, Modal, Space } from 'antd';
+import { AiOutlineSend, AiOutlineMinus, AiOutlinePlus } from 'react-icons/ai';
 import { XWorkInstance } from '@/ts/base/schema';
-import { ImUndo2, ImWarning } from 'react-icons/im';
+import { ImWarning } from 'react-icons/im';
 import { IWork } from '@/ts/core';
 import { AddNodeType, NodeModel, getNodeCode, isBranchNode } from './processType';
 
@@ -19,10 +14,9 @@ interface IProps {
   IsEdit?: boolean;
   current?: IWork;
   instance?: XWorkInstance;
-  onBack?: () => void;
 }
 
-const Design: React.FC<IProps> = ({ current, instance, onBack, IsEdit = true }) => {
+const Design: React.FC<IProps> = ({ current, instance, IsEdit = true }) => {
   const [scale, setScale] = useState<number>(100);
   const [showErrors, setShowErrors] = useState<any[]>([]);
   const [resource, setResource] = useState<any>({
@@ -265,35 +259,13 @@ const Design: React.FC<IProps> = ({ current, instance, onBack, IsEdit = true }) 
           if (
             errors.length == 0 &&
             (await current.updateDefine({
-              appicationId: current.metadata.applicationId,
+              applicationId: current.metadata.applicationId,
               ...current.metadata,
               resource: resource_,
             }))
           ) {
             message.success('保存成功');
-            onBack?.call(this);
           }
-        },
-      });
-    }
-    if (onBack) {
-      buttons.push({
-        danger: true,
-        text: '返回',
-        type: 'primary',
-        icon: <AiOutlineClockCircle />,
-        className: cls['publis-issue'],
-        onClick: async () => {
-          Modal.confirm({
-            title: '未发布的内容将不会被保存，是否直接退出?',
-            icon: <ImUndo2 />,
-            okText: '确认',
-            okType: 'danger',
-            cancelText: '取消',
-            onOk() {
-              onBack();
-            },
-          });
         },
       });
     }

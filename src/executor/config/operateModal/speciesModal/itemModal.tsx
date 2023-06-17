@@ -77,9 +77,10 @@ const SpeciesItemModal = ({
       title={title}
       open={open}
       width={640}
-      initialValues={data || {}}
       onOpenChange={(open: boolean) => {
-        if (!open) {
+        if (open) {
+          formRef.current?.setFieldsValue(operateType == '新增' ? {} : data);
+        } else {
           formRef.current?.resetFields();
           handleCancel();
         }

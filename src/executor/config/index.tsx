@@ -30,6 +30,8 @@ const ConfigExecutor: React.FC<IProps> = ({ cmd, args, finished }) => {
         case '应用':
         case '分类':
         case '字典':
+        case '事项配置':
+        case '实体配置':
           return <OperateModal cmd={cmd} entity={args[0]} finished={finished} />;
         default: {
           if (Object.values(TargetType).includes(args[0].typeName as TargetType)) {

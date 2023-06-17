@@ -5,8 +5,8 @@ import SearchTarget from './searchTarget';
 import JoinTarget from './joinTarget';
 import SpeciesModal from './speciesModal';
 import ApplicationModal from './applicationModal';
-import LabelsModal from './labelsModal';
 import orgCtrl from '@/ts/controller';
+import LabelsModal from './labelsModal';
 interface IProps {
   cmd: string;
   entity: IEntity<schema.XEntity>;

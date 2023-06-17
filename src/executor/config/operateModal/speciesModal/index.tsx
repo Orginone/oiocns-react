@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ISpecies } from '@/ts/core';
-import { Button, Modal, message } from 'antd';
+import { Button, message } from 'antd';
 import { schema } from '@/ts/base';
 import { ProColumns } from '@ant-design/pro-table';
 import PageCard from '@/components/PageCard';
@@ -11,6 +11,7 @@ import cls from './index.module.less';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import SpeciesItemModal from './itemModal';
 import EntityInfo from '@/bizcomponents/EntityInfo';
+import FullScreenModal from '../../../tools/fullScreen';
 
 type IProps = {
   current: ISpecies;
@@ -24,6 +25,14 @@ const SpeciesModal: React.FC<IProps> = ({ current, finished }) => {
   const [activeModel, setActiveModel] = useState<string>('');
   const [item, setItem] = useState<schema.XSpeciesItem>();
   const [tkey, tforceUpdate] = useObjectUpdate(current);
+  const [dataSource, setDataSource] = useState<schema.XSpeciesItem[]>([]);
+
+  useEffect(() => {
+    setTimeout(async () => {
+      setDataSource(await current.loadItems());
+    }, 10);
+  }, [current]);
+
   const renderBtns = () => {
     return (
       <Button type="link" onClick={() => setActiveModel('新增')}>
@@ -130,15 +139,15 @@ const SpeciesModal: React.FC<IProps> = ({ current, finished }) => {
   ];
 
   return (
-    <Modal
+    <FullScreenModal
       open
-      width="100vw"
-      style={{ maxWidth: '100vw', top: 0, paddingBottom: 0 }}
-      bodyStyle={{ height: 'calc(100vh - 50px - 53px)', maxHeight: '100vh' }}
+      centered
+      fullScreen
+      width={'80vw'}
+      destroyOnClose
       title={current.typeName + '项管理'}
-      footer={[]}
-      onCancel={finished}
-      destroyOnClose>
+      onCancel={() => finished()}
+      footer={[]}>
       <EntityInfo entity={current}></EntityInfo>
       <PageCard
         className={cls[`card-wrap`]}
@@ -147,9 +156,9 @@ const SpeciesModal: React.FC<IProps> = ({ current, finished }) => {
         onTabChange={(_: any) => {}}
         tabBarExtraContent={renderBtns()}>
         <CardOrTable<schema.XSpeciesItem>
-          dataSource={current.items}
+          key={tkey}
+          dataSource={dataSource}
           rowKey={'id'}
-          params={tkey}
           operation={renderOperate}
           columns={columns}
           showChangeBtn={false}
@@ -174,7 +183,7 @@ const SpeciesModal: React.FC<IProps> = ({ current, finished }) => {
           }
         }}
       />
-    </Modal>
+    </FullScreenModal>
   );
 };
 

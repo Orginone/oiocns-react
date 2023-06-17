@@ -4,7 +4,7 @@ import { IApplication, IWork } from '@/ts/core';
 import { model } from '@/ts/base';
 import SchemaForm from '@/components/SchemaForm';
 import { WorkDefineModel } from '@/ts/base/model';
-import UploadItem from '../../tools/uploadItem';
+import UploadItem from '../../../tools/uploadItem';
 
 interface Iprops {
   open: boolean;
@@ -103,9 +103,7 @@ const WorkModal = ({ open, handleOk, handleCancel, application, current }: Iprop
       title={current ? `编辑[${current.name}]办事` : '新建办事'}
       onOpenChange={(open: boolean) => {
         if (open) {
-          if (current) {
-            formRef.current?.setFieldsValue(current.metadata);
-          }
+          formRef.current?.setFieldsValue(current?.metadata || {});
         } else {
           formRef.current?.resetFields();
           handleCancel();

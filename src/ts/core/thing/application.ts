@@ -103,7 +103,7 @@ export class Application extends FileInfo<schema.XApplication> implements IAppli
     return this.works;
   }
   async createWork(data: model.WorkDefineModel): Promise<IWork | undefined> {
-    data.appicationId = this.id;
+    data.applicationId = this.id;
     const res = await kernel.createWorkDefine(data);
     if (res.success && res.data.id) {
       let work = new Work(res.data, this);

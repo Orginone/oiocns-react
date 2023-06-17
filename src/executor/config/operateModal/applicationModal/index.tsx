@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from 'react';
 import { IApplication, IWork } from '@/ts/core';
-import { Button, Modal, message } from 'antd';
+import { Button, message } from 'antd';
 import WorkModal from './workModal';
 import { ProColumns } from '@ant-design/pro-table';
 import PageCard from '@/components/PageCard';
@@ -11,6 +11,7 @@ import cls from './index.module.less';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import EntityInfo from '@/bizcomponents/EntityInfo';
 import FlowDesign from '@/bizcomponents/FlowDesign';
+import FullScreenModal from '@/executor/tools/fullScreen';
 
 type IProps = {
   current: IApplication;
@@ -147,15 +148,15 @@ const SpeciesModal: React.FC<IProps> = ({ current, finished }) => {
   ];
 
   return (
-    <Modal
+    <FullScreenModal
       open
-      width="100vw"
-      style={{ maxWidth: '100vw', top: 0, paddingBottom: 0 }}
-      bodyStyle={{ height: 'calc(100vh - 50px - 53px)', maxHeight: '100vh' }}
+      centered
+      fullScreen
+      width={'80vw'}
+      destroyOnClose
       title={current.typeName + '项管理'}
       footer={[]}
-      onCancel={finished}
-      destroyOnClose>
+      onCancel={finished}>
       <EntityInfo entity={current}></EntityInfo>
       <PageCard
         className={cls[`card-wrap`]}
@@ -190,19 +191,21 @@ const SpeciesModal: React.FC<IProps> = ({ current, finished }) => {
         }}
       />
       {work && (
-        <Modal
-          open={activeModel == '设计'}
-          width="100vw"
-          style={{ maxWidth: '100vw', top: 0, paddingBottom: 0 }}
-          bodyStyle={{ height: 'calc(100vh - 50px - 53px)', maxHeight: '100vh' }}
-          title={`事项[${work.name}]设计`}
+        <FullScreenModal
+          centered
+          fullScreen
+          destroyOnClose
           footer={[]}
-          onCancel={() => setWork(undefined)}
-          destroyOnClose>
-          <FlowDesign current={work} onBack={() => setWork(undefined)} />
-        </Modal>
+          open={activeModel == '设计'}
+          width="80vw"
+          okText="发布"
+          cancelText="取消"
+          title={`事项[${work.name}]设计`}
+          onCancel={() => setWork(undefined)}>
+          <FlowDesign current={work} />
+        </FullScreenModal>
       )}
-    </Modal>
+    </FullScreenModal>
   );
 };
 
