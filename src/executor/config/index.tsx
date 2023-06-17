@@ -44,6 +44,9 @@ const ConfigExecutor: React.FC<IProps> = ({ cmd, args, finished }) => {
             <EntityForm cmd={cmd + 'Species'} entity={args[0]} finished={finished} />
           );
         case '字典':
+          if (cmd === 'open') {
+            return <OperateModal cmd={cmd} entity={args[0]} finished={finished} />;
+          }
           return <EntityForm cmd={cmd + 'Dict'} entity={args[0]} finished={finished} />;
         default: {
           if (Object.values(TargetType).includes(args[0].typeName as TargetType)) {

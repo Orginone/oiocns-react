@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 import React, { useState } from 'react';
 import { XTarget } from '@/ts/base/schema';
-import { IBelong, ITarget, TargetType } from '@/ts/core';
+import { IBelong, TargetType } from '@/ts/core';
 import SearchCompany from '@/bizcomponents/SearchCompany';
 import { Modal } from 'antd';
 import { schema } from '@/ts/base';
