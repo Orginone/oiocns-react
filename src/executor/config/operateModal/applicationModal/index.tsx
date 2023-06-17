@@ -11,7 +11,7 @@ import cls from './index.module.less';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import EntityInfo from '@/bizcomponents/EntityInfo';
 import FlowDesign from '@/bizcomponents/FlowDesign';
-import FullScreenModal from '@/executor/tools/fullScreen';
+import FullScreenModal from '@/executor/config/tools/fullScreen';
 
 type IProps = {
   current: IApplication;

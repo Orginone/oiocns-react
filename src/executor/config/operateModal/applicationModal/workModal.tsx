@@ -4,7 +4,7 @@ import { IApplication, IWork } from '@/ts/core';
 import { model } from '@/ts/base';
 import SchemaForm from '@/components/SchemaForm';
 import { WorkDefineModel } from '@/ts/base/model';
-import UploadItem from '../../../tools/uploadItem';
+import UploadItem from '../../tools/uploadItem';
 
 interface Iprops {
   open: boolean;
