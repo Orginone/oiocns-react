@@ -1,6 +1,6 @@
 import ImageView from './image';
 import { IFileInfo } from '@/ts/core';
-import { command, schema } from '@/ts/base';
+import { schema } from '@/ts/base';
 import React from 'react';
 
 interface IOpenProps {
@@ -12,8 +12,6 @@ const ExecutorOpen: React.FC<IOpenProps> = (props: IOpenProps) => {
   if (props.file.typeName.startsWith('image') && props.file.share.avatar) {
     return <ImageView share={props.file.share.avatar} finished={props.finished} />;
   }
-  props.finished();
-  command.emitter('config', props.cmd, props.file);
   return <></>;
 };
 
