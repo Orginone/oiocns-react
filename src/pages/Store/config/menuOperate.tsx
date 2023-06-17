@@ -2,7 +2,7 @@ import TypeIcon from '@/bizcomponents/GlobalComps/typeIcon';
 import EntityIcon from '@/bizcomponents/GlobalComps/entityIcon';
 import { command, schema } from '@/ts/base';
 import orgCtrl from '@/ts/controller';
-import { IDepartment, IDirectory, IFileInfo, IGroup, ITarget } from '@/ts/core';
+import { IDirectory, IFileInfo, IGroup, ITarget } from '@/ts/core';
 import React from 'react';
 import { MenuItemType, OperateMenuType } from 'typings/globelType';
 
@@ -47,15 +47,6 @@ const createMenu = (team: ITarget, children: MenuItemType[]) => {
       }
     },
   };
-};
-/** 编译部门树 */
-const buildDepartmentTree = (departments: IDepartment[]): MenuItemType[] => {
-  return departments.map((item) =>
-    createMenu(item, [
-      ...buildDirectoryTree(item.directory.children),
-      ...buildDepartmentTree(item.children),
-    ]),
-  );
 };
 /** 编译组织集群树 */
 const buildGroupTree = (groups: IGroup[]): MenuItemType[] => {
@@ -105,11 +96,10 @@ const getTeamMenu = () => {
     children.push(
       createMenu(company, [
         ...buildDirectoryTree(company.directory.children),
-        ...buildDepartmentTree(company.departments),
+        ...company.targets
+          .filter((i) => i.isMyChat && i.id != company.id)
+          .map((i) => createMenu(i, buildDirectoryTree(i.directory.children))),
         ...buildGroupTree(company.groups),
-        ...company.cohorts.map((i) =>
-          createMenu(i, buildDirectoryTree(i.directory.children)),
-        ),
       ]),
     );
   }

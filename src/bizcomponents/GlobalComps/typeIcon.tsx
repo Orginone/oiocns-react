@@ -1,6 +1,7 @@
 import { TargetType } from '@/ts/core';
 import React from 'react';
 import * as im from 'react-icons/im';
+import * as fa from 'react-icons/fa';
 
 interface TypeIconInfo {
   avatar?: boolean;
@@ -90,6 +91,8 @@ const TypeIcon = ({ avatar, iconType, size }: TypeIconInfo) => {
         return <im.ImEnter size={iconSize} />;
       case 'newFile':
         return <im.ImUpload size={iconSize} />;
+      case 'taskList':
+        return <fa.FaTasks size={iconSize} />;
       default:
         return <im.ImFilesEmpty size={iconSize} />;
     }

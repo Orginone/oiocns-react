@@ -1,9 +1,10 @@
 import { IDirectory, IEntity, IFileInfo, IMemeber, IMsgChat } from '@/ts/core';
 import orgCtrl from '@/ts/controller';
 import { command, schema } from '@/ts/base';
-import { Modal, Upload } from 'antd';
+import { Drawer, List, Modal, Progress, Upload } from 'antd';
 import QrCode from 'qrcode.react';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import TypeIcon from '@/bizcomponents/GlobalComps/typeIcon';
 /** 执行非页面命令 */
 export const executeCmd = (cmd: string, entity: any, args: any[]) => {
   switch (cmd) {
@@ -134,6 +135,7 @@ export const uploadFile = (
         style={{ width: 550, height: 300 }}
         customRequest={async (options) => {
           modal.destroy();
+          command.emitter('-', 'taskList', dir);
           const file = options.file as File;
           if (file) {
             uploaded?.apply(this, [await dir.createFile(file)]);
@@ -143,4 +145,56 @@ export const uploadFile = (
       </Upload>
     ),
   });
+};
+
+/** 文件上传列表 */
+export const FileTaskList = ({ directory }: { directory: IDirectory }) => {
+  const [taskList, setTaskList] = useState(directory.taskList);
+  useEffect(() => {
+    const id = directory.taskEmitter.subscribe(() => {
+      setTaskList([...directory.taskList]);
+    });
+    return () => {
+      directory.unsubscribe(id);
+    };
+  }, []);
+  const getProcess = (f: number, s: number) => {
+    s = s == 0 ? 1 : s;
+    return parseInt(((f * 10000.0) / s).toFixed(0)) / 100;
+  };
+  return (
+    <Drawer
+      title="操作记录"
+      open
+      width={500}
+      placement="right"
+      onClose={() => command.emitter('-', '-')}>
+      <List
+        itemLayout="horizontal"
+        dataSource={taskList}
+        renderItem={(item) => {
+          return (
+            <List.Item
+              style={{ cursor: 'pointer', padding: 6 }}
+              actions={[
+                <div key={item.name} style={{ width: 60 }}>
+                  {getProcess(item.finished, item.size)}%
+                </div>,
+              ]}>
+              <List.Item.Meta
+                avatar={<TypeIcon iconType={'文件'} size={50} />}
+                title={<strong>{item.name}</strong>}
+                description={
+                  <Progress
+                    status={item.finished === -1 ? 'exception' : 'success'}
+                    percent={getProcess(item.finished, item.size)}
+                  />
+                }
+              />
+            </List.Item>
+          );
+        }}
+      />
+    </Drawer>
+  );
 };
