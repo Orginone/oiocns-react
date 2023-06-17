@@ -12,7 +12,6 @@ import RenameForm from './renameForm';
 import IdentityForm from './IdentityForm';
 import AuthorityForm from './authorityForm';
 import { IIdentity } from '@/ts/core/target/identity/identity';
-import EntityQrCode from './entityQrCode';
 interface IProps {
   cmd: string;
   entity: IEntity<schema.XEntity>;
@@ -106,8 +105,6 @@ const EntityForm: React.FC<IProps> = ({ cmd, entity, finished }) => {
       return (
         <AuthorityForm formType={cmd} current={entity as any} finished={reloadFinish} />
       );
-    case 'qrcode':
-      return <EntityQrCode entity={entity} finished={finished} />;
     default: {
       const target = cmd.startsWith('new')
         ? (entity as IDirectory).target

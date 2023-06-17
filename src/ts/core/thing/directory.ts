@@ -106,10 +106,9 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
       ...this.children,
       ...this.forms,
       ...this.applications,
+      ...this.files,
     ];
-    if (mode === 1) {
-      cnt.push(...this.files);
-    } else {
+    if (mode != 1) {
       cnt.push(...this.propertys);
       cnt.push(...this.specieses);
       if (!this.parent) {
@@ -326,7 +325,10 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
     }
   }
   override operates(mode: number = 0): model.OperateModel[] {
-    const operates: model.OperateModel[] = [];
+    const operates: model.OperateModel[] = [
+      directoryOperates.NewFile,
+      directoryOperates.Refesh,
+    ];
     if (mode === 2 && this.target.hasRelationAuth()) {
       operates.push(directoryNew);
     }
@@ -337,8 +339,7 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
     } else {
       operates.push(...super.operates(1));
     }
-    operates.push(directoryOperates.Refesh);
-    return operates;
+    return operates.sort((a, b) => (a.menus ? -10 : b.menus ? 10 : 0));
   }
   private async loadSubDirectory() {
     if (!this.parent) {

@@ -3,7 +3,7 @@ import { ProFormColumnsType } from '@ant-design/pro-components';
 import SchemaForm from '@/components/SchemaForm';
 import { TargetModel } from '@/ts/base/model';
 import { ITarget, TargetType, companyTypes } from '@/ts/core';
-import UploadItem from '../tools/upload';
+import UploadItem from '../tools/uploadItem';
 import { EntityColumns } from './entityColumns';
 
 interface Iprops {

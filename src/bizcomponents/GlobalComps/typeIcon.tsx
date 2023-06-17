@@ -88,6 +88,8 @@ const TypeIcon = ({ avatar, iconType, size }: TypeIconInfo) => {
         return <im.ImPlus size={iconSize} />;
       case 'joinGroup':
         return <im.ImEnter size={iconSize} />;
+      case 'newFile':
+        return <im.ImUpload size={iconSize} />;
       default:
         return <im.ImFilesEmpty size={iconSize} />;
     }

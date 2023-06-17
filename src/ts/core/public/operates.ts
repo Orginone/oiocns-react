@@ -52,6 +52,11 @@ export const directoryOperates = {
     label: '刷新目录',
     iconType: 'refresh',
   },
+  NewFile: {
+    cmd: 'newFile',
+    label: '上传文件',
+    iconType: 'newFile',
+  },
   NewDir: {
     cmd: 'newDir',
     label: '新建目录',
