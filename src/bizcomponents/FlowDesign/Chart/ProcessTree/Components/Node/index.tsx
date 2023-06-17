@@ -90,23 +90,19 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
   const nodeContent = (
     <>
       <div className={cls['node-body-right']}>
-        <div onClick={() => select()}>
+        <div>
           <span className={cls['name-title']}>{props.config.name}</span>
         </div>
         <div>
-          {props.config.destName == '' ? (
-            <span onClick={() => select()} className={cls['placeholder']}>
-              {placeholder}
-            </span>
+          {props.config.destName == undefined || props.config.destName == '' ? (
+            <span className={cls['placeholder']}>{placeholder}</span>
           ) : (
-            <span onClick={() => select()} className={cls['name-select-title']}>
-              {props.config.destName}
-            </span>
+            <span className={cls['name-select-title']}>{props.config.destName}</span>
           )}
           {props.isEdit && !isRoot && (
             <AiOutlineClose
               className={cls['iconPosition']}
-              style={{ fontSize: '12px', display: 'block' }}
+              style={{ fontSize: '15px', marginRight: '10px' }}
               onClick={delNode}
             />
           )}
@@ -114,6 +110,21 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
       </div>
     </>
   );
+  if (props.config.type == AddNodeType.EMPTY) {
+    return (
+      <div
+        className={`${cls['node']} ${cls['root']}  ${
+          props._passed === 0 && !props._executable ? cls['node-error-state'] : ''
+        }  ${
+          props._passed === 0 && props._executable ? cls['node-unCompleted-state'] : ''
+        }
+         ${props._passed === 1 && !props._executable ? cls['node-ongoing-state'] : ''}  ${
+          props._passed === 2 ? cls['node-completed-state'] : ''
+        }`}>
+        {footer}
+      </div>
+    );
+  }
 
   return (
     <div
@@ -122,7 +133,7 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
       }  ${props.config?._passed === 0 ? cls['node-error-state'] : ''}
         ${props.config?._passed === 1 ? cls['node-ongoing-state'] : ''}
         ${props.config?._passed === 2 ? cls['node-completed-state'] : ''}`}>
-      <div className={cls['node-body']}>
+      <div className={cls['node-body']} onClick={() => props.onSelected()}>
         <div
           className={
             props.config.type === AddNodeType.APPROVAL

@@ -122,6 +122,9 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
         if ('stations' in this.target) {
           cnt.push(...(this.target as ICompany).stations);
         }
+        if ('identitys' in this.target) {
+          cnt.push(...(this.target as ICompany).identitys);
+        }
         cnt.push(...this.target.members.map((i) => new Member(i, this)));
       }
     }
@@ -142,7 +145,7 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
   async rename(name: string): Promise<boolean> {
     return await this.update({ ...this.metadata, name: name });
   }
-  copy(destination: IDirectory): Promise<boolean> {
+  copy(_destination: IDirectory): Promise<boolean> {
     throw new Error('暂不支持.');
   }
   async move(destination: IDirectory): Promise<boolean> {

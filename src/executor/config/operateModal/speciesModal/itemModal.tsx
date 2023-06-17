@@ -9,6 +9,7 @@ import UploadItem from '../../tools/uploadItem';
 interface Iprops {
   open: boolean;
   typeName: string;
+  operateType: string;
   data?: schema.XSpeciesItem;
   handleCancel: () => void;
   handleOk: (success: boolean) => void;
@@ -20,11 +21,14 @@ interface Iprops {
 const SpeciesItemModal = ({
   open,
   typeName,
+  operateType,
   handleOk,
   current,
   data,
   handleCancel,
 }: Iprops) => {
+  const title =
+    operateType == '新增' ? `新增${typeName}项` : `编辑[${data?.name}]${typeName}项`;
   const formRef = useRef<ProFormInstance>();
 
   const columns: ProFormColumnsType<SpeciesItemModel>[] = [
@@ -70,12 +74,13 @@ const SpeciesItemModal = ({
   return (
     <SchemaForm<SpeciesItemModel>
       formRef={formRef}
-      title={data ? `修改[${data.name}]${typeName}项` : '新增' + typeName + '项'}
+      title={title}
       open={open}
       width={640}
-      initialValues={data || {}}
       onOpenChange={(open: boolean) => {
-        if (!open) {
+        if (open) {
+          formRef.current?.setFieldsValue(operateType == '新增' ? {} : data);
+        } else {
           formRef.current?.resetFields();
           handleCancel();
         }
@@ -85,10 +90,13 @@ const SpeciesItemModal = ({
       }}
       layoutType="ModalForm"
       onFinish={async (values) => {
-        if (data) {
-          values.id = data.id;
+        if (operateType == '编辑') {
+          values.id = data!.id;
           handleOk(await current.updateItem(values));
         } else {
+          if (data) {
+            values.parentId = data.id;
+          }
           handleOk((await current.createItem(values)) != undefined);
         }
       }}

@@ -73,7 +73,7 @@ export class Species extends FileInfo<schema.XSpecies> implements ISpecies {
   }
   async delete(): Promise<boolean> {
     if (this.directory) {
-      const res = await kernel.deleteForm({
+      const res = await kernel.deleteSpecies({
         id: this.id,
       });
       if (res.success) {

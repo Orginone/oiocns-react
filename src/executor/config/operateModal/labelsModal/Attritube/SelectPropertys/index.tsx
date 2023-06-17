@@ -4,65 +4,64 @@ import React, { useState, Key } from 'react';
 import ShareShowComp from '@/bizcomponents/IndentityManage/ShareShowComp';
 import cls from './index.module.less';
 import CustomTree from '@/components/CustomTree';
-import { IBelong } from '@/ts/core';
-import { XForm } from '@/ts/base/schema';
-import { IDirectory } from '@/ts/core/thing/directory';
+import { XProperty } from '@/ts/base/schema';
+import { IDirectory } from '@/ts/core';
 
 interface IProps {
-  belong: IBelong;
-  typeName: string;
-  selected: XForm[];
-  setSelected: (forms: XForm[]) => void;
+  directory: IDirectory[];
+  selected: XProperty[];
+  onAdded: (prop: XProperty) => void;
+  onDeleted: (id: string) => void;
+  setSelected: (props: XProperty[]) => void;
 }
 
-const SelectForms: React.FC<IProps> = ({ belong, typeName, selected, setSelected }) => {
+const SelectForms: React.FC<IProps> = (props) => {
   const [filter, setFilter] = useState<string>('');
-  const [centerTreeData, setCenterTreeData] = useState<any>([]);
+  const [centerTreeData, setCenterTreeData] = useState<any[]>([]);
   const [centerCheckedKeys, setCenterCheckedKeys] = useState<Key[]>(
-    (selected || []).map((i) => i.id),
+    (props.selected || []).map((i) => i.id),
   );
 
   const onSelect: TreeProps['onSelect'] = async (_, info: any) => {
     const directory: IDirectory = info.node.item;
-    let forms = await directory.loadForms();
+    let propertys = await directory.loadPropertys();
     setCenterTreeData(
-      forms
-        .filter((a) => a.typeName == typeName)
-        .map((item) => {
-          return {
-            key: item.id,
-            title: item.name,
-            value: item.id,
-            item: item.metadata,
-            children: [],
-          };
-        }),
+      propertys.map((item) => {
+        return {
+          key: item.id,
+          title: item.name,
+          value: item.id,
+          item: item,
+          children: [],
+        };
+      }),
     );
   };
-
   // 中间树形点击事件
   const onCheck: TreeProps['onCheck'] = (checkedKeys, info) => {
     if (Array.isArray(checkedKeys)) {
       setCenterCheckedKeys(checkedKeys);
     }
-    const form: XForm = (info.node as any).item;
+    const property: XProperty = (info.node as any).item;
     if (info.checked) {
-      selected.push(form);
+      props.selected.push(property);
+      props.onAdded(property);
     } else {
-      selected = selected.filter((i) => i.id != form.id);
+      props.selected = props.selected.filter((i) => i.id != property.id);
+      props.onDeleted(property.id);
     }
-    setSelected([...selected]);
+    props.setSelected([...props.selected]);
   };
 
-  const buildWorkThingTree = (directory: IDirectory[]): any[] => {
+  const buildDirectoryTree = (directorys: IDirectory[]): any[] => {
     const result: any[] = [];
-    for (const item of directory) {
+    for (const item of directorys) {
       result.push({
         key: item.id,
         title: item.name,
         value: item.id,
         item: item,
-        children: buildWorkThingTree(item.children),
+        children: buildDirectoryTree(item.children.map((i) => i as IDirectory)),
       });
     }
     return result;
@@ -70,7 +69,8 @@ const SelectForms: React.FC<IProps> = ({ belong, typeName, selected, setSelected
 
   const handelDel = (id: string) => {
     setCenterCheckedKeys(centerCheckedKeys.filter((data) => data != id));
-    setSelected(selected.filter((i) => i.id != id));
+    props.setSelected(props.selected.filter((i) => i.id != id));
+    props.onDeleted(id);
   };
 
   return (
@@ -87,11 +87,10 @@ const SelectForms: React.FC<IProps> = ({ belong, typeName, selected, setSelected
               checkable={false}
               autoExpandParent={true}
               onSelect={onSelect}
-              treeData={buildWorkThingTree([belong.directory])}
+              treeData={buildDirectoryTree(props.directory)}
             />
           </div>
         </div>
-
         <div className={cls.center}>
           <Input
             className={cls.centerInput}
@@ -111,8 +110,11 @@ const SelectForms: React.FC<IProps> = ({ belong, typeName, selected, setSelected
             />
           </div>
         </div>
+
         <div style={{ width: '33%' }} className={cls.right}>
-          <ShareShowComp departData={selected} deleteFuc={handelDel}></ShareShowComp>
+          <ShareShowComp
+            departData={props.selected}
+            deleteFuc={handelDel}></ShareShowComp>
         </div>
       </div>
     </div>

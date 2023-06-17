@@ -1,10 +1,12 @@
 import { kernel, model, schema } from '../../../base';
-import { Entity, IEntity, OperateType, TargetType } from '../../public';
+import { Entity, OperateType, entityOperates, fileOperates } from '../../public';
 import { PageAll } from '../../public/consts';
+import { IDirectory } from '../../thing/directory';
+import { IFileInfo } from '../../thing/fileinfo';
 import { ITarget } from '../base/target';
 
 /** 身份（角色）接口 */
-export interface IIdentity extends IEntity<schema.XIdentity> {
+export interface IIdentity extends IFileInfo<schema.XIdentity> {
   /** 设置身份（角色）的用户 */
   current: ITarget;
   /** 赋予身份（角色）的成员用户 */
@@ -29,6 +31,21 @@ export class Identity extends Entity<schema.XIdentity> implements IIdentity {
       typeName: '角色',
     });
     this.current = current;
+    this.belongId = _metadata.belongId;
+    this.isInherited = false;
+    this.directory = current.directory;
+  }
+  belongId: string;
+  isInherited: boolean;
+  directory: IDirectory;
+  async rename(name: string): Promise<boolean> {
+    return await this.update({ ...this.metadata, name: name });
+  }
+  copy(_destination: IDirectory): Promise<boolean> {
+    throw new Error('Method not implemented.');
+  }
+  move(_destination: IDirectory): Promise<boolean> {
+    throw new Error('Method not implemented.');
   }
   current: ITarget;
   members: schema.XTarget[] = [];
@@ -114,21 +131,29 @@ export class Identity extends Entity<schema.XIdentity> implements IIdentity {
     this.current.identitys = this.current.identitys.filter((i) => i.key != this.key);
     return true;
   }
+  override operates(mode: number = 0): model.OperateModel[] {
+    const operates: model.OperateModel[] = [];
+    if (mode == 0 && this.current.hasRelationAuth()) {
+      operates.push(entityOperates.Update, fileOperates.Rename, fileOperates.Delete);
+    }
+    operates.push(...super.operates(1));
+    return operates.sort((a, b) => (a.menus ? -10 : b.menus ? 10 : 0));
+  }
   async createIdentityMsg(
     operate: OperateType,
     subTarget?: schema.XTarget,
   ): Promise<void> {
-    await kernel.createIdentityMsg({
-      stationId: '0',
-      identityId: this.id,
-      excludeOperater: false,
-      group: this.current.typeName == TargetType.Group,
-      data: JSON.stringify({
-        operate,
-        subTarget,
-        identity: this.metadata,
-        operater: this.current.space.user.metadata,
-      }),
-    });
+    // await kernel.createIdentityMsg({
+    //   stationId: '0',
+    //   identityId: this.id,
+    //   excludeOperater: false,
+    //   group: this.current.typeName == TargetType.Group,
+    //   data: JSON.stringify({
+    //     operate,
+    //     subTarget,
+    //     identity: this.metadata,
+    //     operater: this.current.space.user.metadata,
+    //   }),
+    // });
   }
 }

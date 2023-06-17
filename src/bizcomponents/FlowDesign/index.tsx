@@ -3,33 +3,20 @@ import cls from './index.module.less';
 import ChartDesign from './Chart';
 import GroupBtn from '@/components/GroupBtn';
 import { WorkNodeModel } from '@/ts/base/model';
-import { Button, Card, Layout, message, Modal, Space, Typography } from 'antd';
-import {
-  AiOutlineSend,
-  AiOutlineMinus,
-  AiOutlinePlus,
-  AiOutlineClockCircle,
-} from 'react-icons/ai';
+import { Button, Card, Layout, message, Modal, Space } from 'antd';
+import { AiOutlineSend, AiOutlineMinus, AiOutlinePlus } from 'react-icons/ai';
 import { XWorkInstance } from '@/ts/base/schema';
-import { ImUndo2, ImWarning } from 'react-icons/im';
+import { ImWarning } from 'react-icons/im';
 import { IWork } from '@/ts/core';
 import { AddNodeType, NodeModel, getNodeCode, isBranchNode } from './processType';
 
 interface IProps {
-  Title?: string;
   IsEdit?: boolean;
   current?: IWork;
   instance?: XWorkInstance;
-  onBack?: () => void;
 }
 
-const Design: React.FC<IProps> = ({
-  Title,
-  current,
-  instance,
-  onBack,
-  IsEdit = true,
-}) => {
+const Design: React.FC<IProps> = ({ current, instance, IsEdit = true }) => {
   const [scale, setScale] = useState<number>(100);
   const [showErrors, setShowErrors] = useState<any[]>([]);
   const [resource, setResource] = useState<any>({
@@ -123,7 +110,7 @@ const Design: React.FC<IProps> = ({
   };
 
   const convertNode = (resource: NodeModel | undefined, errors: any[]): any => {
-    if (resource) {
+    if (resource && resource.code) {
       if (resource.type == AddNodeType.EMPTY) {
         return convertNode(resource.children, errors);
       }
@@ -277,29 +264,7 @@ const Design: React.FC<IProps> = ({
             }))
           ) {
             message.success('保存成功');
-            onBack?.call(this);
           }
-        },
-      });
-    }
-    if (onBack) {
-      buttons.push({
-        danger: true,
-        text: '返回',
-        type: 'primary',
-        icon: <AiOutlineClockCircle />,
-        className: cls['publis-issue'],
-        onClick: async () => {
-          Modal.confirm({
-            title: '未发布的内容将不会被保存，是否直接退出?',
-            icon: <ImUndo2 />,
-            okText: '确认',
-            okType: 'danger',
-            cancelText: '取消',
-            onOk() {
-              onBack();
-            },
-          });
         },
       });
     }
@@ -310,13 +275,6 @@ const Design: React.FC<IProps> = ({
     <div className={cls['company-info-content']}>
       <Card bordered={false}>
         <Layout>
-          {Title && (
-            <Layout.Header className={cls['layout-title']}>
-              <Typography.Title level={3} style={{ margin: 0 }}>
-                {Title}
-              </Typography.Title>
-            </Layout.Header>
-          )}
           <Layout.Content>
             <Card bordered={false}>
               <div className={cls['publish']} style={{ width: '200px' }}>

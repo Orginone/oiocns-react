@@ -88,7 +88,7 @@ const EntityForm: React.FC<IProps> = ({ cmd, entity, finished }) => {
     case 'updateIdentity':
     case 'remarkIdentity': {
       const target = cmd.startsWith('new')
-        ? (entity as ITarget)
+        ? (entity as IDirectory).target
         : (entity as IIdentity).current;
       const identity = cmd.startsWith('new') ? undefined : (entity as IIdentity);
       return (

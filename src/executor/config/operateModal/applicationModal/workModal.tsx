@@ -1,17 +1,15 @@
 import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components';
-import { Avatar, Button, Space, Upload, UploadProps, Image, message } from 'antd';
-import React, { useRef, useState } from 'react';
-import { IWork, IFlowClass } from '@/ts/core';
+import React, { useRef } from 'react';
+import { IApplication, IWork } from '@/ts/core';
 import { model } from '@/ts/base';
 import SchemaForm from '@/components/SchemaForm';
-import { FileItemShare, WorkDefineModel } from '@/ts/base/model';
-import { AiOutlineBank } from 'react-icons/ai';
-import orgCtrl from '@/ts/controller';
+import { WorkDefineModel } from '@/ts/base/model';
+import UploadItem from '../../tools/uploadItem';
 
 interface Iprops {
   open: boolean;
+  application: IApplication;
   current?: IWork;
-  workItem: IFlowClass;
   handleOk: (success: boolean) => void;
   handleCancel: () => void;
 }
@@ -19,61 +17,23 @@ interface Iprops {
 /*
   业务标准编辑模态框
 */
-const WorkDefineModal = ({ open, handleOk, handleCancel, workItem, current }: Iprops) => {
+const WorkModal = ({ open, handleOk, handleCancel, application, current }: Iprops) => {
   const formRef = useRef<ProFormInstance>();
-  const [avatar, setAvatar] = useState<FileItemShare>();
-  const uploadProps: UploadProps = {
-    multiple: false,
-    showUploadList: false,
-    maxCount: 1,
-    beforeUpload: (file) => {
-      const isImage = file.type.startsWith('image');
-      if (!isImage) {
-        message.error(`${file.name} 不是一个图片文件`);
-      }
-      return isImage;
-    },
-    async customRequest(options) {
-      const file = options.file as File;
-      const docDir = await orgCtrl.user.filesys?.home?.create('头像');
-      if (docDir && file) {
-        const result = await docDir.upload(file.name, file);
-        if (result) {
-          setAvatar(result.shareInfo());
-        }
-      }
-    },
-  };
   const columns: ProFormColumnsType<WorkDefineModel>[] = [
     {
       title: '图标',
       dataIndex: 'icon',
       colProps: { span: 24 },
-      renderFormItem: () => {
+      renderFormItem: (_, __, form) => {
         return (
-          <Space>
-            <Avatar
-              size={64}
-              style={{ background: '#f9f9f9', color: '#606060', fontSize: 10 }}
-              src={
-                avatar ? (
-                  <Image src={avatar.thumbnail} preview={{ src: avatar.shareLink }} />
-                ) : (
-                  <AiOutlineBank style={{ fontSize: 16 }} />
-                )
-              }
-            />
-            <Upload {...uploadProps}>
-              <Button type="link">上传图标</Button>
-            </Upload>
-            {avatar ? (
-              <Button type="link" onClick={() => setAvatar(undefined)}>
-                清除图标
-              </Button>
-            ) : (
-              ''
-            )}
-          </Space>
+          <UploadItem
+            typeName={'应用'}
+            icon={current?.metadata?.icon || ''}
+            onChanged={(icon) => {
+              form.setFieldValue('icon', icon);
+            }}
+            directory={application.directory}
+          />
         );
       },
     },
@@ -89,6 +49,20 @@ const WorkDefineModal = ({ open, handleOk, handleCancel, workItem, current }: Ip
       dataIndex: 'code',
       formItemProps: {
         rules: [{ required: true, message: '事项编号为必填项' }],
+      },
+    },
+    {
+      title: '选择共享组织',
+      dataIndex: 'shareId',
+      valueType: 'select',
+      formItemProps: { rules: [{ required: true, message: '请选择共享组织' }] },
+      fieldProps: {
+        options: application.directory.target.space.shareTarget.map((i) => {
+          return {
+            label: i.name,
+            value: i.id,
+          };
+        }),
       },
     },
     {
@@ -126,13 +100,10 @@ const WorkDefineModal = ({ open, handleOk, handleCancel, workItem, current }: Ip
       open={open}
       width={640}
       layoutType="ModalForm"
-      initialValues={current?.metadata || {}}
       title={current ? `编辑[${current.name}]办事` : '新建办事'}
       onOpenChange={(open: boolean) => {
         if (open) {
-          if (current) {
-            setAvatar(current.share.avatar);
-          }
+          formRef.current?.setFieldsValue(current?.metadata || {});
         } else {
           formRef.current?.resetFields();
           handleCancel();
@@ -148,10 +119,9 @@ const WorkDefineModal = ({ open, handleOk, handleCancel, workItem, current }: Ip
           allowSelect: model.allowSelect,
         });
         if (current) {
-          model.icon = JSON.stringify(avatar);
           handleOk(await current.updateDefine(model));
         } else {
-          handleOk((await workItem.createWorkDefine(model)) != undefined);
+          handleOk((await application.createWork(model)) != undefined);
         }
       }}
       columns={columns}
@@ -159,4 +129,4 @@ const WorkDefineModal = ({ open, handleOk, handleCancel, workItem, current }: Ip
   );
 };
 
-export default WorkDefineModal;
+export default WorkModal;
