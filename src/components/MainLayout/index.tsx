@@ -53,14 +53,9 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
   const onOperateMenuClick = async (item: MenuItemType, key: string) => {
     const menu = findMenus(key, item.menus);
     if (menu && menu.beforeLoad) {
-      if (await menu.beforeLoad()) {
-        onSelectClick(parentMenu);
-      } else {
-        onSelectClick(props.selectMenu);
-      }
-    } else {
-      props.onMenuClick?.apply(this, [item, key]);
+      await menu.beforeLoad();
     }
+    props.onMenuClick?.apply(this, [item, key]);
   };
   const onSelectClick = async (item: MenuItemType) => {
     if (item.beforeLoad) {

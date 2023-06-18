@@ -40,6 +40,7 @@ export class Member extends FileInfo<schema.XTarget> implements IMemeber {
       this.directory.target.hasRelationAuth()
     ) {
       operates.unshift({
+        sort: 60,
         cmd: 'remove',
         label: '移除成员',
         iconType: 'remove',

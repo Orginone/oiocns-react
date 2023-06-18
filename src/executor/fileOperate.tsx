@@ -32,7 +32,7 @@ export const loadFileMenus = (file: IFileInfo<schema.XEntity>, mode: number = 0)
                 if (o.cmd === 'open') {
                   await file.loadContent();
                 }
-                command.emitter('config', o.cmd, file);
+                command.emitter('config', s.cmd, file);
                 return true;
               },
             };
