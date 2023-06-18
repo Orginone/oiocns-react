@@ -1,4 +1,4 @@
-import { encodeKey } from '../../base/common';
+import { encodeKey, sleep } from '../../base/common';
 import { BucketOpreates, FileItemModel } from '../../base/model';
 import { model, kernel, schema } from '../../base';
 import { FileItemShare } from '../../base/model';
@@ -30,6 +30,8 @@ export interface IFileInfo<T extends schema.XEntity> extends IEntity<T> {
    * @param {IDirectory} destination 目标文件系统
    */
   move(destination: IDirectory): Promise<boolean>;
+  /** 加载文件内容 */
+  loadContent(reload?: boolean): Promise<boolean>;
 }
 
 /** 文件类抽象实现 */
@@ -56,6 +58,9 @@ export abstract class FileInfo<T extends schema.XEntity>
   abstract rename(name: string): Promise<boolean>;
   abstract copy(destination: IDirectory): Promise<boolean>;
   abstract move(destination: IDirectory): Promise<boolean>;
+  async loadContent(reload: boolean = false): Promise<boolean> {
+    return await sleep(reload ? 10 : 0);
+  }
   operates(mode: number = 0): model.OperateModel[] {
     const operates = super.operates(mode);
     if (mode === 0 && this.directory.target.hasRelationAuth()) {

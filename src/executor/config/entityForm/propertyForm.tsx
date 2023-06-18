@@ -78,21 +78,23 @@ const PropertyForm = (props: Iprops) => {
         },
       },
     ];
-    if (selectType === '选择型') {
+    if (['选择型', '分类型'].includes(selectType || '')) {
+      const typeName = selectType === '选择型' ? '字典' : '分类';
       columns.push({
-        title: '选择枚举字典',
+        title: `选择${typeName}`,
         dataIndex: 'speciesId',
         valueType: 'select',
-        formItemProps: { rules: [{ required: true, message: '枚举分类为必填项' }] },
+        formItemProps: { rules: [{ required: true, message: `${typeName}为必填项` }] },
         fieldProps: {
-          disabled: selectType !== '选择型',
           showSearch: true,
-          options: directory.specieses.map((i) => {
-            return {
-              value: i.id,
-              label: i.name,
-            };
-          }),
+          options: directory.specieses
+            .filter((i) => i.typeName === typeName)
+            .map((i) => {
+              return {
+                value: i.id,
+                label: i.name,
+              };
+            }),
         },
       });
     }

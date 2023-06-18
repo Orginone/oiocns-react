@@ -65,16 +65,6 @@ const TodoRouter: IRouteConfig[] = [
   },
 ];
 
-/* 市场 */
-const MarketRouter: IRouteConfig[] = [
-  {
-    path: '/market',
-    component: React.lazy(() => import('@/pages/Market')),
-    title: '市场',
-    icon: 'icon-guangshangcheng',
-  },
-];
-
 const StoreRouter: IRouteConfig[] = [
   {
     path: '/store',
@@ -118,7 +108,6 @@ const Routers: IRouteConfig[] = [
       ...ChatRouter,
       ...TodoRouter,
       ...StoreRouter,
-      ...MarketRouter,
       ...SettingRouter,
       {
         path: '/online',
@@ -139,27 +128,5 @@ const Routers: IRouteConfig[] = [
     component: React.lazy(() => import('@/pages/NoFond')),
   },
 ];
-
-// interface rType {
-//   path: string;
-//   title: string;
-//   icon?: string | React.ReactNode;
-//   routes?: rType[];
-// }
-// function handleInfo(routeArr: IRouteConfig[]): rType[] {
-//   return routeArr.map((r: IRouteConfig) => {
-//     let obj: rType = {
-//       path: r.path,
-//       title: r.title,
-//       icon: r?.icon || '',
-//     };
-//     if (r.routes && r.routes?.length > 0) {
-//       obj.routes = handleInfo(r.routes);
-//     }
-//     return obj;
-//   });
-// }
-// 处理 向外导出的 路由目录树 不携带组件信息
-// console.log(handleInfo(Routers));
 
 export default Routers;

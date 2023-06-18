@@ -1,5 +1,5 @@
 import { Card, Button, Descriptions, Modal, Layout, ModalProps } from 'antd';
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import CardOrTable from '@/components/CardOrTableComp';
 import { schema } from '@/ts/base';
 import { XTarget } from '@/ts/base/schema';
@@ -9,7 +9,7 @@ import useObjectUpdate from '@/hooks/useObjectUpdate';
 import cls from './index.module.less';
 import { IIdentity } from '@/ts/core';
 import EntityIcon from '@/bizcomponents/GlobalComps/entityIcon';
-import FullScreenModal from '../../tools/fullScreen';
+import FullScreenModal from '../../../tools/fullScreen';
 import { ProColumns } from '@ant-design/pro-table';
 
 const { Content } = Layout;
@@ -28,14 +28,6 @@ const IdentityModal: React.FC<IdentityManageType & ModalProps> = (props) => {
   const [isOpenAssign, setIsOpenAssign] = useState<boolean>(false);
   const [currentPerson, setPerson] = useState<schema.XTarget[]>();
   const [key, forceUpdate] = useObjectUpdate(identity);
-  const [members, setMembers] = useState<schema.XTarget[]>([]);
-
-  useEffect(() => {
-    setTimeout(async () => {
-      setMembers(await identity.loadMembers());
-      forceUpdate();
-    }, 10);
-  }, [identity]);
 
   // 操作内容渲染函数
   const renderOperation = (item: XTarget) => {
@@ -152,7 +144,7 @@ const IdentityModal: React.FC<IdentityManageType & ModalProps> = (props) => {
               <CardOrTable<XTarget>
                 rowKey={'id'}
                 params={key}
-                dataSource={identity.members || members}
+                dataSource={identity.members}
                 operation={renderOperation}
                 columns={columns}
                 parentRef={parentRef}

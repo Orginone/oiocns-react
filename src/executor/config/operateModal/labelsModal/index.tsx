@@ -5,7 +5,7 @@ import cls from './index.module.less';
 import PageCard from '@/components/PageCard';
 import Attribute from './Attritube';
 import { IForm } from '@/ts/core';
-import FullScreenModal from '@/executor/config/tools/fullScreen';
+import FullScreenModal from '../../../tools/fullScreen';
 import EntityInfo from '@/bizcomponents/EntityInfo';
 
 interface IProps {

@@ -1,10 +1,10 @@
-import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components';
-import React, { useRef } from 'react';
+import { ProFormColumnsType } from '@ant-design/pro-components';
+import React from 'react';
 import { IApplication, IWork } from '@/ts/core';
 import { model } from '@/ts/base';
 import SchemaForm from '@/components/SchemaForm';
 import { WorkDefineModel } from '@/ts/base/model';
-import UploadItem from '../../tools/uploadItem';
+import UploadItem from '../../../tools/uploadItem';
 
 interface Iprops {
   open: boolean;
@@ -18,7 +18,6 @@ interface Iprops {
   业务标准编辑模态框
 */
 const WorkModal = ({ open, handleOk, handleCancel, application, current }: Iprops) => {
-  const formRef = useRef<ProFormInstance>();
   const columns: ProFormColumnsType<WorkDefineModel>[] = [
     {
       title: '图标',
@@ -96,16 +95,13 @@ const WorkModal = ({ open, handleOk, handleCancel, application, current }: Iprop
   return (
     <SchemaForm<model.WorkDefineModel>
       key={'workDefineModal'}
-      formRef={formRef}
       open={open}
       width={640}
       layoutType="ModalForm"
+      initialValues={current ? current.metadata : {}}
       title={current ? `编辑[${current.name}]办事` : '新建办事'}
       onOpenChange={(open: boolean) => {
-        if (open) {
-          formRef.current?.setFieldsValue(current?.metadata || {});
-        } else {
-          formRef.current?.resetFields();
+        if (!open) {
           handleCancel();
         }
       }}

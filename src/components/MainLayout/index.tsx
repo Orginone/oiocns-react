@@ -18,6 +18,7 @@ type MainLayoutType = {
   siderMenuData: MenuItemType;
   rightBar?: React.ReactNode;
   selectMenu: MenuItemType;
+  notExitIcon?: boolean;
   onSelect?: (item: MenuItemType) => void;
   onMenuClick?: (item: MenuItemType, menuKey: string) => void;
 };
@@ -97,15 +98,17 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
             onMenuClick={onOperateMenuClick}
           />
         </div>
-        <div
-          className={cls.exit}
-          onClick={() => {
-            sessionStorage.clear();
-            location.reload();
-          }}>
-          <OrgIcons size={26} exit title="注销" selected />
-          {!collapsed && <span>注销</span>}
-        </div>
+        {!props.notExitIcon && (
+          <div
+            className={cls.exit}
+            onClick={() => {
+              sessionStorage.clear();
+              location.reload();
+            }}>
+            <OrgIcons size={26} exit title="注销" selected />
+            {!collapsed && <span>注销</span>}
+          </div>
+        )}
       </Sider>
       <Layout className={cls.container}>
         <Row className={cls[`content-top`]} justify="space-between">

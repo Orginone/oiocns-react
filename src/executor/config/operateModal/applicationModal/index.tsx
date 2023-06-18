@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { IApplication, IWork } from '@/ts/core';
 import { Button, message } from 'antd';
 import WorkModal from './workModal';
@@ -11,7 +11,7 @@ import cls from './index.module.less';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import EntityInfo from '@/bizcomponents/EntityInfo';
 import FlowDesign from '@/bizcomponents/FlowDesign';
-import FullScreenModal from '@/executor/config/tools/fullScreen';
+import FullScreenModal from '../../../tools/fullScreen';
 
 type IProps = {
   current: IApplication;
@@ -23,7 +23,6 @@ type IProps = {
 */
 const SpeciesModal: React.FC<IProps> = ({ current, finished }) => {
   const [work, setWork] = useState<IWork>();
-  const [dataSource, setDataSource] = useState<IWork[]>([]);
   const [activeModel, setActiveModel] = useState<string>('');
   const [tkey, tforceUpdate] = useObjectUpdate(current);
   const renderBtns = () => {
@@ -33,12 +32,6 @@ const SpeciesModal: React.FC<IProps> = ({ current, finished }) => {
       </Button>
     );
   };
-  useEffect(() => {
-    setTimeout(async () => {
-      setDataSource(await current.loadWorks());
-      tforceUpdate();
-    }, 10);
-  }, [current]);
   // 操作内容渲染函数
   const renderOperate = (item: IWork) => {
     return [
@@ -63,7 +56,6 @@ const SpeciesModal: React.FC<IProps> = ({ current, finished }) => {
         label: `删除`,
         onClick: async () => {
           if (await item.deleteDefine()) {
-            setDataSource(current.works);
             tforceUpdate();
           }
         },
@@ -167,7 +159,7 @@ const SpeciesModal: React.FC<IProps> = ({ current, finished }) => {
         <CardOrTable<IWork>
           rowKey={'id'}
           params={tkey}
-          dataSource={dataSource}
+          dataSource={current.works}
           operation={renderOperate}
           columns={columns}
           showChangeBtn={false}

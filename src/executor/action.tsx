@@ -1,4 +1,4 @@
-import { IDirectory, IEntity, IFileInfo, IMemeber, IMsgChat } from '@/ts/core';
+import { IDirectory, IEntity, IFileInfo, IMemeber, IMsgChat, ITarget } from '@/ts/core';
 import orgCtrl from '@/ts/controller';
 import { command, schema } from '@/ts/base';
 import { Drawer, List, Modal, Progress, Upload, message } from 'antd';
@@ -30,6 +30,8 @@ export const executeCmd = (cmd: string, entity: any, args: any[]) => {
           orgCtrl.changCallback();
         }
       });
+    case 'open':
+      return openDirectory(entity);
   }
   return false;
 };
@@ -39,6 +41,20 @@ const directoryRefresh = (dir: IDirectory) => {
   dir.loadContent(true).then(() => {
     orgCtrl.changCallback();
   });
+};
+
+/** 进入目录 */
+const openDirectory = (entity: IDirectory | ITarget | IEntity<schema.XEntity>) => {
+  if ('identitys' in entity) {
+    entity = entity.directory;
+  }
+  if ('files' in entity) {
+    entity.loadContent().then(() => {
+      orgCtrl.currentKey = entity.key;
+      orgCtrl.changCallback();
+    });
+  }
+  return false;
 };
 
 /** 拷贝/剪切文件 */
