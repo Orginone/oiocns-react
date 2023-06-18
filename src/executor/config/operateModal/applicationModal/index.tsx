@@ -21,7 +21,7 @@ type IProps = {
 /*
   弹出框表格查询
 */
-const SpeciesModal: React.FC<IProps> = ({ current, finished }) => {
+const ApplicationModal: React.FC<IProps> = ({ current, finished }) => {
   const [work, setWork] = useState<IWork>();
   const [isSave, setIsSave] = useState<boolean>(false);
   const [activeModel, setActiveModel] = useState<string>('');
@@ -38,7 +38,7 @@ const SpeciesModal: React.FC<IProps> = ({ current, finished }) => {
     return [
       {
         key: `编辑`,
-        label: `编辑`,
+        label: `编辑办事定义`,
         onClick: () => {
           setWork(item);
           setActiveModel('编辑');
@@ -46,7 +46,7 @@ const SpeciesModal: React.FC<IProps> = ({ current, finished }) => {
       },
       {
         key: `设计`,
-        label: `设计`,
+        label: `设计办事定义`,
         onClick: () => {
           setWork(item);
           setActiveModel('设计');
@@ -54,7 +54,7 @@ const SpeciesModal: React.FC<IProps> = ({ current, finished }) => {
       },
       {
         key: `删除`,
-        label: `删除`,
+        label: <span style={{ color: 'red' }}>删除办事定义</span>,
         onClick: async () => {
           if (await item.deleteDefine()) {
             tforceUpdate();
@@ -221,4 +221,4 @@ const SpeciesModal: React.FC<IProps> = ({ current, finished }) => {
   );
 };
 
-export default SpeciesModal;
+export default ApplicationModal;

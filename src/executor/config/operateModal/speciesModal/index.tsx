@@ -46,7 +46,7 @@ const SpeciesModal: React.FC<IProps> = ({ current, finished }) => {
       },
       {
         key: `删除${current.typeName}项`,
-        label: `删除${current.typeName}项`,
+        label: <span style={{ color: 'red' }}>`删除${current.typeName}项`</span>,
         onClick: async () => {
           await current.deleteItem(item);
           tforceUpdate();
