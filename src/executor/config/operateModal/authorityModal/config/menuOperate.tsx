@@ -12,7 +12,7 @@ const loadAuthorityMenus = (item: IAuthority) => {
       label: '新增权限',
     },
   ];
-  if (item.space.hasRelationAuth()) {
+  if (item.metadata.belongId == item.space.id && item.space.hasRelationAuth()) {
     items.push(
       {
         key: '编辑权限',
@@ -52,10 +52,12 @@ const createMenu = (authoritys: IAuthority[]): MenuItemType[] => {
 /** 加载设置模块菜单 */
 export const loadSettingMenu = (authority: IAuthority): MenuItemType => {
   return {
-    key: '权限设置',
-    label: '权限设置',
+    key: '超级管理权',
+    label: '超级管理权',
     itemType: 'Tab',
-    children: createMenu([authority]),
+    item: authority,
+    menus: loadAuthorityMenus(authority),
+    children: createMenu(authority.children),
     icon: <EntityIcon notAvatar={true} entityId={authority.metadata.id} size={18} />,
   };
 };

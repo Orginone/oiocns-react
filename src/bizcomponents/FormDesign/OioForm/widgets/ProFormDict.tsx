@@ -31,7 +31,7 @@ const ProFormDict = (props: IProps) => {
     orgCtrl.work.loadItems(props.dictId).then((value) => {
       setOptions(
         value.map((item) => {
-          return { label: item.name, value: item.value };
+          return { label: item.name, value: item.id };
         }),
       );
     });

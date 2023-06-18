@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import cls from './index.module.less';
 import ChartDesign from './Chart';
-import GroupBtn from '@/components/GroupBtn';
 import { WorkNodeModel } from '@/ts/base/model';
-import { Button, Card, Layout, message, Modal, Space } from 'antd';
-import { AiOutlineSend, AiOutlineMinus, AiOutlinePlus } from 'react-icons/ai';
+import { Button, Card, Layout, Modal, Space } from 'antd';
+import { AiOutlineMinus, AiOutlinePlus } from 'react-icons/ai';
 import { XWorkInstance } from '@/ts/base/schema';
 import { ImWarning } from 'react-icons/im';
 import { IWork } from '@/ts/core';
@@ -14,9 +13,17 @@ interface IProps {
   IsEdit?: boolean;
   current?: IWork;
   instance?: XWorkInstance;
+  onSave?: boolean;
+  onSaveFinished?: (success: boolean) => void;
 }
 
-const Design: React.FC<IProps> = ({ current, instance, IsEdit = true }) => {
+const Design: React.FC<IProps> = ({
+  current,
+  instance,
+  IsEdit = true,
+  onSave,
+  onSaveFinished,
+}) => {
   const [scale, setScale] = useState<number>(100);
   const [showErrors, setShowErrors] = useState<any[]>([]);
   const [resource, setResource] = useState<any>({
@@ -30,6 +37,27 @@ const Design: React.FC<IProps> = ({ current, instance, IsEdit = true }) => {
     num: 1,
     children: {},
   });
+
+  useEffect(() => {
+    if (onSave && current) {
+      let errors: any[] = [];
+      //数据结构转化
+      let resource_ = convertNode(resource, errors) as WorkNodeModel;
+      setShowErrors(errors);
+      if (errors.length > 0) {
+        onSaveFinished?.apply(this, [false]);
+      } else {
+        current
+          .updateDefine({
+            ...current.metadata,
+            resource: resource_,
+          })
+          .then((success) => {
+            onSaveFinished?.apply(this, [success]);
+          });
+      }
+    }
+  }, [onSave]);
 
   useEffect(() => {
     const load = async () => {
@@ -244,41 +272,13 @@ const Design: React.FC<IProps> = ({ current, instance, IsEdit = true }) => {
     setResource(resource_showState);
   };
 
-  const loadGroupBth = () => {
-    let buttons: any[] = [];
-    if (current) {
-      buttons.push({
-        icon: <AiOutlineSend />,
-        text: '发布',
-        className: cls['publis-issue'],
-        type: 'primary',
-        onClick: async () => {
-          let errors: any[] = [];
-          //数据结构转化
-          let resource_ = convertNode(resource, errors) as WorkNodeModel;
-          setShowErrors(errors);
-          if (
-            errors.length == 0 &&
-            (await current.updateDefine({
-              ...current.metadata,
-              resource: resource_,
-            }))
-          ) {
-            message.success('保存成功');
-          }
-        },
-      });
-    }
-    return <GroupBtn showDivider={false} list={buttons} />;
-  };
-
   return (
     <div className={cls['company-info-content']}>
       <Card bordered={false}>
         <Layout>
           <Layout.Content>
             <Card bordered={false}>
-              <div className={cls['publish']} style={{ width: '200px' }}>
+              <div className={cls['publish']}>
                 <Space>
                   <Button
                     className={cls['scale']}
@@ -295,7 +295,6 @@ const Design: React.FC<IProps> = ({ current, instance, IsEdit = true }) => {
                     onClick={() => setScale(scale + 10)}>
                     <AiOutlinePlus />
                   </Button>
-                  {IsEdit && current && loadGroupBth()}
                 </Space>
               </div>
               {/* 基本信息组件 */}

@@ -23,6 +23,7 @@ type IProps = {
 */
 const SpeciesModal: React.FC<IProps> = ({ current, finished }) => {
   const [work, setWork] = useState<IWork>();
+  const [isSave, setIsSave] = useState<boolean>(false);
   const [dataSource, setDataSource] = useState<IWork[]>([]);
   const [activeModel, setActiveModel] = useState<string>('');
   const [tkey, tforceUpdate] = useObjectUpdate(current);
@@ -201,8 +202,19 @@ const SpeciesModal: React.FC<IProps> = ({ current, finished }) => {
           okText="发布"
           cancelText="取消"
           title={`事项[${work.name}]设计`}
+          onSave={() => setIsSave(true)}
           onCancel={() => setWork(undefined)}>
-          <FlowDesign current={work} />
+          <FlowDesign
+            current={work}
+            onSave={isSave}
+            onSaveFinished={(success) => {
+              if (success) {
+                message.info('保存成功');
+                setWork(undefined);
+              }
+              setIsSave(false);
+            }}
+          />
         </FullScreenModal>
       )}
     </FullScreenModal>

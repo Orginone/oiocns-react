@@ -21,7 +21,7 @@ const ChartDesign: React.FC<IProps> = (props) => {
   return (
     <div className={cls['container']}>
       <div className={cls['layout-body']}>
-        <div style={{ height: 'calc(100vh - 250px )', overflowY: 'auto' }}>
+        <div style={{ height: 'calc(100vh - 220px )', overflowY: 'auto' }}>
           <div
             className={cls['design']}
             style={{ transform: `scale(${(props.scale ?? 100) / 100})` }}>
