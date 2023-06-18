@@ -89,6 +89,11 @@ export abstract class Target extends Team implements ITarget {
     }
     return res.success;
   }
+  async loadContent(reload: boolean = false): Promise<boolean> {
+    await super.loadContent(reload);
+    await this.loadIdentitys(reload);
+    return true;
+  }
   abstract exit(): Promise<boolean>;
   abstract get targets(): ITarget[];
   abstract get subTarget(): ITarget[];

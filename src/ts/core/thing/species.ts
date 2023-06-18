@@ -85,6 +85,10 @@ export class Species extends FileInfo<schema.XSpecies> implements ISpecies {
     }
     return false;
   }
+  async loadContent(reload: boolean = false): Promise<boolean> {
+    await this.loadItems(reload);
+    return true;
+  }
   async loadItems(reload: boolean = false): Promise<schema.XSpeciesItem[]> {
     if (!this._itemLoaded || reload) {
       const res = await kernel.querySpeciesItems({

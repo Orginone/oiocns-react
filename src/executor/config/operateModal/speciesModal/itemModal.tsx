@@ -1,10 +1,10 @@
-import React, { useRef } from 'react';
-import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components';
+import React from 'react';
+import { ProFormColumnsType } from '@ant-design/pro-components';
 import SchemaForm from '@/components/SchemaForm';
 import { schema } from '@/ts/base';
 import { ISpecies } from '@/ts/core';
 import { SpeciesItemModel } from '@/ts/base/model';
-import UploadItem from '../../tools/uploadItem';
+import UploadItem from '../../../tools/uploadItem';
 
 interface Iprops {
   open: boolean;
@@ -28,9 +28,12 @@ const SpeciesItemModal = ({
   handleCancel,
 }: Iprops) => {
   const title =
-    operateType == '新增' ? `新增${typeName}项` : `编辑[${data?.name}]${typeName}项`;
-  const formRef = useRef<ProFormInstance>();
-
+    operateType == '新增'
+      ? data
+        ? `新增[${data.name}]的子${typeName}项`
+        : `新增${typeName}项`
+      : `编辑[${data?.name}]${typeName}项`;
+  const initialValue = operateType === '新增' || data ? {} : current.metadata;
   const columns: ProFormColumnsType<SpeciesItemModel>[] = [
     {
       title: '图标',
@@ -73,15 +76,12 @@ const SpeciesItemModal = ({
 
   return (
     <SchemaForm<SpeciesItemModel>
-      formRef={formRef}
       title={title}
       open={open}
       width={640}
+      initialValues={initialValue}
       onOpenChange={(open: boolean) => {
-        if (open) {
-          formRef.current?.setFieldsValue(operateType == '新增' ? {} : data);
-        } else {
-          formRef.current?.resetFields();
+        if (!open) {
           handleCancel();
         }
       }}

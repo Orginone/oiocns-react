@@ -16,20 +16,27 @@ interface IFullModalProps extends ModalProps {
 const FullScreenModal: React.FC<IFullModalProps> = (props) => {
   const [modalState, setModalState] = useState(!props.fullScreen);
   const loadModalProps = () => {
-    if (modalState) return { ...props };
+    if (modalState)
+      return {
+        ...props,
+        bodyStyle: {
+          ...props.bodyStyle,
+          maxHeight: 'calc(100vh - 80px)',
+        },
+      };
     return {
       ...props,
       width: '100vw',
       style: {
         ...props.style,
-        maxWidth: '100vw',
-        top: 0,
-        paddingBottom: 0,
+        height: 'calc(100vh - 2px)',
+        maxWidth: 'calc(100vw - 2px)',
+        top: 1,
       },
       bodyStyle: {
         ...props.bodyStyle,
-        height: 'calc(100vh - 112px)',
-        maxHeight: '100vh',
+        height: 'calc(100vh - 80px)',
+        maxHeight: 'calc(100vh - 80px)',
       },
     };
   };

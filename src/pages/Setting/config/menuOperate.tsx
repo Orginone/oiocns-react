@@ -1,39 +1,9 @@
 import EntityIcon from '@/bizcomponents/GlobalComps/entityIcon';
 import orgCtrl from '@/ts/controller';
 import React from 'react';
-import TypeIcon from '@/bizcomponents/GlobalComps/typeIcon';
-import { MenuItemType, OperateMenuType } from 'typings/globelType';
-import { IDepartment, IGroup, ITarget, IDirectory, IFileInfo } from '@/ts/core';
-import { command, schema } from '@/ts/base';
-
-/** 操作到Menus */
-export const loadMenus = (file: IFileInfo<schema.XEntity>) => {
-  return file
-    .operates(2)
-    .sort((a, b) => a.sort - b.sort)
-    .map((o) => {
-      return {
-        key: o.cmd,
-        label: o.label,
-        icon: o.menus ? <></> : <TypeIcon iconType={o.iconType} size={16} />,
-        beforeLoad: () => {
-          command.emitter('config', o.cmd, file);
-        },
-        children: o.menus
-          ?.sort((a, b) => a.sort - b.sort)
-          .map((s) => {
-            return {
-              key: s.cmd,
-              label: s.label,
-              icon: <TypeIcon iconType={s.iconType} size={16} />,
-              beforeLoad: () => {
-                command.emitter('config', s.cmd, file);
-              },
-            };
-          }),
-      } as OperateMenuType;
-    });
-};
+import { loadFileMenus } from '@/executor/fileOperate';
+import { MenuItemType } from 'typings/globelType';
+import { IDepartment, IGroup, ITarget, IDirectory } from '@/ts/core';
 
 /** 创建团队菜单 */
 const createMenu = (target: ITarget, children: MenuItemType[]) => {
@@ -42,18 +12,12 @@ const createMenu = (target: ITarget, children: MenuItemType[]) => {
     item: target.directory,
     label: target.name,
     itemType: target.directory.typeName,
-    menus: loadMenus(target.directory),
+    menus: loadFileMenus(target.directory, 2),
     tag: [target.typeName],
     icon: <EntityIcon notAvatar={true} entityId={target.id} size={18} />,
     children: children,
     beforeLoad: async () => {
-      if ('loadSuperAuth' in target) {
-        await target.space.loadSuperAuth();
-      }
-      if ('directory' in target) {
-        await target.loadIdentitys();
-        await (target as ITarget).directory.loadContent();
-      }
+      await target.loadContent();
     },
   };
 };
@@ -88,7 +52,7 @@ const buildDirectoryTree = (directorys: IDirectory[]): MenuItemType[] => {
         <EntityIcon entityId={directory.id} typeName={directory.typeName} size={18} />
       ),
       itemType: directory.typeName,
-      menus: loadMenus(directory),
+      menus: loadFileMenus(directory),
       children: buildDirectoryTree(directory.children),
       beforeLoad: async () => {
         await directory.loadContent();

@@ -5,18 +5,13 @@ import cls from '../../index.module.less';
 import { IDirectory, IFileInfo } from '@/ts/core';
 import { command, schema } from '@/ts/base';
 import EntityIcon from '@/bizcomponents/GlobalComps/entityIcon';
+import { loadFileMenus } from '@/executor/fileOperate';
 
-const CardListContent = ({
-  current,
-  loadMenus,
-}: {
-  current: IDirectory;
-  loadMenus: (file: IFileInfo<schema.XEntity>) => any[];
-}) => {
+const CardListContent = ({ current }: { current: IDirectory }) => {
   const FileCard = (el: IFileInfo<schema.XEntity>) => (
     <Dropdown
       menu={{
-        items: loadMenus(el),
+        items: loadFileMenus(el, 1),
         onClick: ({ key }) => {
           command.emitter('data', key, el);
         },
@@ -28,6 +23,7 @@ const CardListContent = ({
         bordered={false}
         key={el.key}
         onDoubleClick={async () => {
+          await el.loadContent();
           command.emitter('data', 'open', el);
         }}
         onContextMenu={(e) => {
@@ -52,7 +48,7 @@ const CardListContent = ({
   return (
     <Dropdown
       menu={{
-        items: loadMenus(current),
+        items: loadFileMenus(current, 1),
         onClick: ({ key }) => {
           command.emitter('data', key, current);
         },

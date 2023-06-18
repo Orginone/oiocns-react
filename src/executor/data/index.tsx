@@ -10,7 +10,7 @@ const DataExecutor: React.FC<IProps> = ({ cmd, args, finished }) => {
     case 'open':
     case 'remark':
       if (args && args.length > 0) {
-        return <ExecutorOpen cmd={cmd} file={args[0]} finished={finished} />;
+        return <ExecutorOpen cmd={cmd} entity={args[0]} finished={finished} />;
       }
       break;
   }

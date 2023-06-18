@@ -50,6 +50,10 @@ export class Identity extends Entity<schema.XIdentity> implements IIdentity {
   current: ITarget;
   members: schema.XTarget[] = [];
   private _memberLoaded: boolean = false;
+  async loadContent(reload: boolean = false): Promise<boolean> {
+    await this.loadMembers(reload);
+    return true;
+  }
   async loadMembers(reload?: boolean | undefined): Promise<schema.XTarget[]> {
     if (!this._memberLoaded || reload) {
       const res = await kernel.queryIdentityTargets({

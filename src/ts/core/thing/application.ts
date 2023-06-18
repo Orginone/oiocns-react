@@ -26,10 +26,11 @@ export class Application extends FileInfo<schema.XApplication> implements IAppli
     _metadata: schema.XApplication,
     _directory: IDirectory,
     _parent?: IApplication,
-    _application?: schema.XApplication[],
+    _applications?: schema.XApplication[],
   ) {
     super(_metadata, _directory);
     this.parent = _parent;
+    this.loadChildren(_applications);
   }
   works: IWork[] = [];
   children: IApplication[] = [];
@@ -110,6 +111,10 @@ export class Application extends FileInfo<schema.XApplication> implements IAppli
       this.works.push(work);
       return work;
     }
+  }
+  async loadContent(reload: boolean = false): Promise<boolean> {
+    await this.loadWorks(reload);
+    return true;
   }
   private loadChildren(applications?: schema.XApplication[]) {
     if (applications && applications.length > 0) {

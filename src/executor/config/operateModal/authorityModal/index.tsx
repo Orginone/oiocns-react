@@ -4,7 +4,7 @@ import Content from './content';
 import useMenuUpdate from '@/hooks/useMenuUpdate';
 import * as config from './config/menuOperate';
 import { IAuthority } from '@/ts/core';
-import FullScreenModal from '../../tools/fullScreen';
+import FullScreenModal from '@/executor/tools/fullScreen';
 import CreateAuthority from './createAuthority';
 
 interface IProps {

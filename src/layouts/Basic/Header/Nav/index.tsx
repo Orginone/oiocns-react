@@ -82,18 +82,6 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
       },
     },
     {
-      key: 'market',
-      path: '/market',
-      title: '流通',
-      icon: 'market',
-      count: 0,
-      fath: '/market',
-      onClick: () => {
-        orgCtrl.currentKey = '';
-        orgCtrl.changCallback();
-      },
-    },
-    {
       key: 'setting',
       path: '/setting',
       title: orgCtrl.user.name,
