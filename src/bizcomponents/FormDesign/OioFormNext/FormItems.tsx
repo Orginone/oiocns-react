@@ -26,9 +26,9 @@ import { XAttribute } from '@/ts/base/schema';
 import { IBelong } from '@/ts/core';
 import { loadWidgetsOpts } from '../rule';
 import { Modal, UploadProps } from 'antd';
-import orgCtrl from '@/ts/controller';
 import { FileItemShare } from '@/ts/base/model';
 import { downloadByUrl } from '@/utils/tools';
+
 interface IProps {
   disabled?: boolean;
   item: XAttribute;
@@ -73,7 +73,7 @@ const OioFormItem = ({
     rules = [];
   }
   if (!rule.widget) {
-    rule.widget = loadWidgetsOpts(item.valueType)[0].value;
+    rule.widget = loadWidgetsOpts(item.property!.valueType)[0].value;
   }
 
   const [fileList, setFileList] = useState<any[]>([]);
@@ -113,10 +113,8 @@ const OioFormItem = ({
     },
     async customRequest(options: { file: any }) {
       const file = options.file as File;
-      const docDir = await orgCtrl.user.filesys?.home?.create('附件');
-      if (docDir && file) {
-        const result = await docDir.upload(file.name, file);
-        console.log(result, 'result');
+      if (file) {
+        const result = await belong.directory.createFile(file);
 
         if (result) {
           const _data = result.shareInfo();
@@ -305,7 +303,7 @@ const OioFormItem = ({
       return (
         <ProFormDict
           label=""
-          dictId={item.dictId}
+          dictId={item.property!.speciesId}
           name={item.id}
           rules={rules}
           tooltip={rule.description}

@@ -56,7 +56,7 @@ const OioFormItem = ({ item, belong, disabled, noRule }: IProps) => {
     rules = [];
   }
   if (!rule.widget) {
-    rule.widget = loadWidgetsOpts(item.valueType)[0].value;
+    rule.widget = loadWidgetsOpts(item.property!.valueType)[0].value;
   }
   switch (rule.widget) {
     case 'input':
@@ -215,7 +215,7 @@ const OioFormItem = ({ item, belong, disabled, noRule }: IProps) => {
     case 'dict':
       return (
         <ProFormDict
-          dictId={item.dictId}
+          dictId={item.property!.speciesId}
           name={item.id}
           label={item.name}
           rules={rules}

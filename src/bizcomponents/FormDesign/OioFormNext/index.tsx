@@ -47,7 +47,8 @@ const OioForm: React.FC<IProps> = ({
   }, []);
 
   const fillArr = useMemo(() => {
-    const fileTypeItems = attributes.filter((v) => v.valueType == '附件型') ?? [];
+    const fileTypeItems =
+      attributes.filter((v) => v.property!.valueType == '附件型') ?? [];
     const leg = (attributes.length - fileTypeItems.length) % colNum;
 
     const legArr: any[] = [];
@@ -97,7 +98,7 @@ const OioForm: React.FC<IProps> = ({
           column={3}
           labelStyle={{ minWidth: '120px', textAlign: 'right' }}>
           {attributes.map((item) => {
-            if (item.valueType === '附件型') {
+            if (item.property!.valueType === '附件型') {
               return <></>;
             }
             return (

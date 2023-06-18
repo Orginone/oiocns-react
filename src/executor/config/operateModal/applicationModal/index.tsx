@@ -142,7 +142,7 @@ const SpeciesModal: React.FC<IProps> = ({ current, finished }) => {
       title: '创建时间',
       dataIndex: ['metadata', 'createTime'],
       key: 'createTime',
-      width: 150,
+      width: 200,
       editable: false,
     },
   ];

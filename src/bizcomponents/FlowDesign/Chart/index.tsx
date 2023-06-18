@@ -53,7 +53,7 @@ const ChartDesign: React.FC<IProps> = (props) => {
       {currentNode && (
         <FlowDrawer
           instance={props.instance}
-          forms={currentNode.forms || []}
+          forms={props.resource.forms || []}
           define={props.current}
           defaultEditable={props.isEdit}
           isOpen={isOpen}

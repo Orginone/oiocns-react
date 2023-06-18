@@ -37,7 +37,6 @@ const Design: React.FC<IProps> = ({ current }) => {
         },
   );
   const [selectedItem, setSelectedItem] = useState<XAttribute>();
-  const isInherited = current.species?.isInherited;
   // 表单项选中事件
   const itemClick = (item: any) => {
     setSelectedItem(item);
@@ -82,7 +81,7 @@ const Design: React.FC<IProps> = ({ current }) => {
           <Col span={formLayout.col} key={item.id}>
             <OperateItem
               item={item}
-              belong={current.species.current.space}
+              belong={current.directory.target.space}
               onClick={() => {
                 itemClick(item);
               }}
@@ -145,14 +144,14 @@ const Design: React.FC<IProps> = ({ current }) => {
           <Row gutter={24}>{loadItems()}</Row>
         </ProForm>
       </div>
-      {showConfig && !isInherited && selectedItem && (
+      {showConfig && !current.isInherited && selectedItem && (
         <AttributeConfig
           attr={selectedItem}
           onChanged={formValuesChange}
           onClose={() => {
             setShowConfig(false);
           }}
-          superAuth={current.species.current.space.superAuth!.metadata}
+          superAuth={current.directory.target.space.superAuth!.metadata}
         />
       )}
     </div>

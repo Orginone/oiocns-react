@@ -33,7 +33,7 @@ const FlowDrawer: React.FC<IProps> = (props) => {
     if (props.define && props.current.type == AddNodeType.CONDITION) {
       setTimeout(async () => {
         let fields: FieldCondition[] = [];
-        for (const form of props.forms.filter((a) => a.typeName == SpeciesType.Work)) {
+        for (const form of props.forms.filter((a) => a.typeName == '事项配置')) {
           const attrs = await orgCtrl.work.loadAttributes(
             form.id,
             props.define!.metadata.belongId,
@@ -50,17 +50,17 @@ const FlowDrawer: React.FC<IProps> = (props) => {
                   break;
                 case '选择型':
                   {
-                      fields.push({
-                        label: attr.name,
-                        value: attr.id,
-                        type: dataType.DICT,
-                        dict: (await orgCtrl.work.loadItems(attr.property.speciesId)).map(
-                          (a) => {
-                            return { label: a.name, value: a.id };
-                          },
-                        ),
-                      });
-                    }
+                    fields.push({
+                      label: attr.name,
+                      value: attr.id,
+                      type: dataType.DICT,
+                      dict: (await orgCtrl.work.loadItems(attr.property.speciesId)).map(
+                        (a) => {
+                          return { label: a.name, value: a.id };
+                        },
+                      ),
+                    });
+                  }
                   break;
                 default:
                   fields.push({

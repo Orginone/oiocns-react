@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import CardOrTable from '@/components/CardOrTableComp';
-import { XAttribute, XProperty } from '@/ts/base/schema';
-import { AttributeColumns } from '@/pages/Setting/config/columns';
+import { XAttribute } from '@/ts/base/schema';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import { IForm } from '@/ts/core';
 import PropertyConfig from './propConfig';
@@ -9,6 +8,7 @@ import AttributeConfig from '@/bizcomponents/FormDesign/attributeConfig';
 import SelectPropertys from './SelectPropertys';
 import { Modal } from 'antd';
 import { AttributeModel } from '@/ts/base/model';
+import { ProColumns } from '@ant-design/pro-components';
 
 interface IProps {
   current: IForm;
@@ -23,7 +23,6 @@ interface IProps {
  */
 const Attritube = ({ current, modalType, setModalType }: IProps) => {
   const [tkey, tforceUpdate] = useObjectUpdate('');
-  const [propertys, setPropertys] = useState<XProperty[]>([]);
   const [selectedItem, setSelectedItem] = useState<XAttribute>();
   // 项配置改变
   const formValuesChange = (changedValues: any) => {
@@ -37,13 +36,6 @@ const Attritube = ({ current, modalType, setModalType }: IProps) => {
       current.updateAttribute({ ...selectedItem, ...rule, rule: JSON.stringify(rule) });
     }
   };
-  useEffect(() => {
-    setPropertys(
-      current.attributes
-        .filter((i) => i.linkPropertys && i.linkPropertys.length > 0)
-        .map((i) => i.linkPropertys![0]),
-    );
-  }, []);
   // 操作内容渲染函数
   const renderOperate = (item: XAttribute) => {
     if (!current.directory.isInherited) {
@@ -95,6 +87,43 @@ const Attritube = ({ current, modalType, setModalType }: IProps) => {
       ];
     }
   };
+  const AttributeColumns = (): ProColumns<XAttribute>[] => [
+    {
+      title: '序号',
+      valueType: 'index',
+      width: 50,
+    },
+    {
+      title: '特性编号',
+      dataIndex: 'code',
+      key: 'code',
+      width: 200,
+    },
+    {
+      title: '特性名称',
+      dataIndex: 'name',
+      key: 'name',
+      width: 200,
+    },
+    {
+      title: '值类型',
+      dataIndex: ['property', 'valueType'],
+      key: 'valueType',
+      width: 150,
+    },
+    {
+      title: '选择字典',
+      dataIndex: ['species', 'name'],
+      key: 'dictId',
+      width: 150,
+    },
+    {
+      title: '特性定义',
+      dataIndex: 'remark',
+      ellipsis: true,
+      key: 'remark',
+    },
+  ];
 
   return (
     <>
@@ -110,19 +139,16 @@ const Attritube = ({ current, modalType, setModalType }: IProps) => {
       {/** 新增特性模态框 */}
       {['新增特性', '编辑特性'].includes(modalType) && (
         <Modal
-          title={`选择表单`}
+          open
           width={800}
-          destroyOnClose={true}
-          open={true}
+          title="选择属性"
+          destroyOnClose
           okText="确定"
-          onOk={() => {
-            setModalType('');
-          }}
+          onOk={() => setModalType('')}
           onCancel={() => setModalType('')}>
           <SelectPropertys
-            directory={[current.directory.target.space.directory]}
-            selected={propertys}
-            setSelected={setPropertys}
+            target={current.directory.target}
+            selected={current.attributes.map((a) => a.property!)}
             onAdded={async (prop) => {
               await current.createAttribute(
                 {
@@ -136,12 +162,7 @@ const Attritube = ({ current, modalType, setModalType }: IProps) => {
               tforceUpdate();
             }}
             onDeleted={async (id) => {
-              const attr = current.attributes.find(
-                (i) =>
-                  i.linkPropertys &&
-                  i.linkPropertys.length > 0 &&
-                  i.linkPropertys[0].id === id,
-              );
+              const attr = current.attributes.find((i) => i.propId === id);
               if (attr) {
                 await current.deleteAttribute(attr);
                 tforceUpdate();

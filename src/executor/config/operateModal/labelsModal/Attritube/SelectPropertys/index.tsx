@@ -5,24 +5,23 @@ import ShareShowComp from '@/bizcomponents/IndentityManage/ShareShowComp';
 import cls from './index.module.less';
 import CustomTree from '@/components/CustomTree';
 import { XProperty } from '@/ts/base/schema';
-import { IDirectory } from '@/ts/core';
+import { IDirectory, ITarget } from '@/ts/core';
 
 interface IProps {
-  directory: IDirectory[];
+  target: ITarget;
   selected: XProperty[];
   onAdded: (prop: XProperty) => void;
   onDeleted: (id: string) => void;
-  setSelected: (props: XProperty[]) => void;
 }
 
 const SelectForms: React.FC<IProps> = (props) => {
   const [filter, setFilter] = useState<string>('');
   const [centerTreeData, setCenterTreeData] = useState<any[]>([]);
   const [centerCheckedKeys, setCenterCheckedKeys] = useState<Key[]>(
-    (props.selected || []).map((i) => i.id),
+    props.selected.map((i) => i.id),
   );
 
-  const onSelect: TreeProps['onSelect'] = async (_, info: any) => {
+  const onSelectDirectory: TreeProps['onSelect'] = async (_, info: any) => {
     const directory: IDirectory = info.node.item;
     let propertys = await directory.loadPropertys();
     setCenterTreeData(
@@ -50,7 +49,6 @@ const SelectForms: React.FC<IProps> = (props) => {
       props.selected = props.selected.filter((i) => i.id != property.id);
       props.onDeleted(property.id);
     }
-    props.setSelected([...props.selected]);
   };
 
   const buildDirectoryTree = (directorys: IDirectory[]): any[] => {
@@ -61,7 +59,7 @@ const SelectForms: React.FC<IProps> = (props) => {
         title: item.name,
         value: item.id,
         item: item,
-        children: buildDirectoryTree(item.children.map((i) => i as IDirectory)),
+        children: buildDirectoryTree(item.children),
       });
     }
     return result;
@@ -69,7 +67,6 @@ const SelectForms: React.FC<IProps> = (props) => {
 
   const handelDel = (id: string) => {
     setCenterCheckedKeys(centerCheckedKeys.filter((data) => data != id));
-    props.setSelected(props.selected.filter((i) => i.id != id));
     props.onDeleted(id);
   };
 
@@ -86,8 +83,8 @@ const SelectForms: React.FC<IProps> = (props) => {
             <CustomTree
               checkable={false}
               autoExpandParent={true}
-              onSelect={onSelect}
-              treeData={buildDirectoryTree(props.directory)}
+              onSelect={onSelectDirectory}
+              treeData={buildDirectoryTree([props.target.directory])}
             />
           </div>
         </div>

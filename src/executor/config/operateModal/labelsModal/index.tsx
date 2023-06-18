@@ -17,7 +17,7 @@ const LabelModl: React.FC<IProps> = ({ current, finished }: IProps) => {
   const [tabKey, setTabKey] = useState<string>('attr');
   /** 操作按钮 */
   const renderButton = () => {
-    if (!current.directory.isInherited && tabKey === 'attr') {
+    if (!current.isInherited && tabKey === 'attr') {
       return (
         <Button
           key="edit"
@@ -36,7 +36,7 @@ const LabelModl: React.FC<IProps> = ({ current, finished }: IProps) => {
     if (tabKey === 'attr') {
       return (
         <Attribute
-          current={current!}
+          current={current}
           modalType={modalType}
           recursionOrg={true}
           setModalType={setModalType}

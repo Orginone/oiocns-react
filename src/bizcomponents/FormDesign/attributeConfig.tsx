@@ -15,8 +15,7 @@ const AttributeConfig = ({ attr, onChanged, superAuth, onClose }: IProps) => {
   useEffect(() => {
     const rule = JSON.parse(attr.rule || '{}');
     if (!rule.widget) {
-      const valueType = attr.valueType;
-      rule.widget = loadWidgetsOpts(valueType)[0];
+      rule.widget = loadWidgetsOpts(attr.property!.valueType)[0];
     }
     form.setFieldsValue({ ...attr, ...rule });
   }, [attr]);
@@ -27,7 +26,7 @@ const AttributeConfig = ({ attr, onChanged, superAuth, onClose }: IProps) => {
           <Input />
         </Form.Item>
         <Form.Item label="组件" name="widget">
-          <Select options={loadWidgetsOpts(attr.valueType)} />
+          <Select options={loadWidgetsOpts(attr.property!.valueType)} />
         </Form.Item>
         <Form.Item label="必填" name="required">
           <Radio.Group buttonStyle="solid">
