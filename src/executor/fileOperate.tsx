@@ -29,7 +29,7 @@ export const loadFileMenus = (file: IFileInfo<schema.XEntity>, mode: number = 0)
               label: s.label,
               icon: <TypeIcon iconType={s.iconType} size={16} />,
               beforeLoad: async () => {
-                if (o.cmd === 'open') {
+                if (s.cmd === 'open') {
                   await file.loadContent();
                 }
                 command.emitter('config', s.cmd, file);
