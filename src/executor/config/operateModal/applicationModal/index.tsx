@@ -140,6 +140,30 @@ const SpeciesModal: React.FC<IProps> = ({ current, finished }) => {
     },
   ];
 
+  const loadWorkNodal = () => {
+    return activeModel == '新增' || (activeModel == '编辑' && work != undefined) ? (
+      <WorkModal
+        open
+        application={current}
+        current={work}
+        handleCancel={() => {
+          setActiveModel('');
+          setWork(undefined);
+        }}
+        handleOk={(success: boolean) => {
+          if (success) {
+            message.success('操作成功');
+            setWork(undefined);
+            setActiveModel('');
+            tforceUpdate();
+          }
+        }}
+      />
+    ) : (
+      <></>
+    );
+  };
+
   return (
     <FullScreenModal
       open
@@ -166,23 +190,7 @@ const SpeciesModal: React.FC<IProps> = ({ current, finished }) => {
           showChangeBtn={false}
         />
       </PageCard>
-      <WorkModal
-        open={activeModel == '新增' || (activeModel == '编辑' && work != undefined)}
-        application={current}
-        current={work}
-        handleCancel={() => {
-          setActiveModel('');
-          setWork(undefined);
-        }}
-        handleOk={(success: boolean) => {
-          if (success) {
-            message.success('操作成功');
-            setWork(undefined);
-            setActiveModel('');
-            tforceUpdate();
-          }
-        }}
-      />
+      {loadWorkNodal()}
       {work && (
         <FullScreenModal
           centered

@@ -9,7 +9,7 @@ import EntityIcon from '@/bizcomponents/GlobalComps/entityIcon';
 import CardOrTable from '@/components/CardOrTableComp';
 import cls from './index.module.less';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
-import SpeciesItemForm from './itemModal';
+import SpeciesItemModal from './itemModal';
 import EntityInfo from '@/bizcomponents/EntityInfo';
 import FullScreenModal from '@/executor/tools/fullScreen';
 
@@ -131,6 +131,32 @@ const SpeciesModal: React.FC<IProps> = ({ current, finished }) => {
     },
   ];
 
+  const loadSpeciesItemModal = () => {
+    return activeModel == '新增' || (activeModel == '编辑' && item != undefined) ? (
+      <SpeciesItemModal
+        open
+        data={item}
+        current={current}
+        typeName={current.typeName}
+        operateType={activeModel}
+        handleCancel={() => {
+          setActiveModel('');
+          setItem(undefined);
+        }}
+        handleOk={(success: boolean) => {
+          if (success) {
+            message.success('操作成功');
+            setItem(undefined);
+            setActiveModel('');
+            tforceUpdate();
+          }
+        }}
+      />
+    ) : (
+      <></>
+    );
+  };
+
   return (
     <FullScreenModal
       open
@@ -157,25 +183,7 @@ const SpeciesModal: React.FC<IProps> = ({ current, finished }) => {
           showChangeBtn={false}
         />
       </PageCard>
-      <SpeciesItemForm
-        typeName={current.typeName}
-        operateType={activeModel}
-        open={activeModel == '新增' || (activeModel == '编辑' && item != undefined)}
-        data={item}
-        current={current}
-        handleCancel={() => {
-          setActiveModel('');
-          setItem(undefined);
-        }}
-        handleOk={(success: boolean) => {
-          if (success) {
-            message.success('操作成功');
-            setItem(undefined);
-            setActiveModel('');
-            tforceUpdate();
-          }
-        }}
-      />
+      {loadSpeciesItemModal()}
     </FullScreenModal>
   );
 };

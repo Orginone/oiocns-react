@@ -33,7 +33,7 @@ const SpeciesItemModal = ({
         ? `新增[${data.name}]的子${typeName}项`
         : `新增${typeName}项`
       : `编辑[${data?.name}]${typeName}项`;
-  const initialValue = operateType === '新增' || data ? {} : current.metadata;
+  const initialValue = operateType === '编辑' ? data : {};
   const columns: ProFormColumnsType<SpeciesItemModel>[] = [
     {
       title: '图标',
@@ -79,6 +79,8 @@ const SpeciesItemModal = ({
       title={title}
       open={open}
       width={640}
+      columns={columns}
+      layoutType="ModalForm"
       initialValues={initialValue}
       onOpenChange={(open: boolean) => {
         if (!open) {
@@ -88,7 +90,6 @@ const SpeciesItemModal = ({
       rowProps={{
         gutter: [24, 0],
       }}
-      layoutType="ModalForm"
       onFinish={async (values) => {
         if (operateType == '编辑') {
           values.id = data!.id;
@@ -100,7 +101,6 @@ const SpeciesItemModal = ({
           handleOk((await current.createItem(values)) != undefined);
         }
       }}
-      columns={columns}
     />
   );
 };
