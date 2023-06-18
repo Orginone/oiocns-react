@@ -58,7 +58,7 @@ const Attritube = ({ current, modalType, setModalType }: IProps) => {
         },
         {
           key: '删除特性',
-          label: '删除特性',
+          label: <span style={{ color: 'red' }}>删除特性</span>,
           onClick: async () => {
             if (await current.deleteAttribute(item)) {
               tforceUpdate();

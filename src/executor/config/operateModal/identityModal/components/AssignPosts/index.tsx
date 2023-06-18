@@ -28,7 +28,7 @@ const MemberList: React.FC<indexType> = (props) => {
       setSearchValue(e.target.value);
     }, 500);
   };
-  const cohortColumn: ProColumns<schema.XTarget>[] = [
+  const personColumn: ProColumns<schema.XTarget>[] = [
     { title: '序号', valueType: 'index', width: 50 },
     { title: '账号', dataIndex: 'code' },
     {
@@ -72,7 +72,7 @@ const MemberList: React.FC<indexType> = (props) => {
           params={{ filter: searchValue }}
           hideOperation={true}
           scroll={{ y: 300 }}
-          columns={cohortColumn}
+          columns={personColumn}
           rowKey={'id'}
         />
       </div>

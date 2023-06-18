@@ -18,6 +18,24 @@ const AuthorityModal: React.FC<IProps> = (props) => {
   );
   const [operateKey, setOperateKey] = useState<string>('');
   if (!selectMenu || !rootMenu) return <></>;
+  const loadAuthorityModal = () => {
+    return operateKey.includes('权限') ? (
+      <CreateAuthority
+        open
+        title={operateKey}
+        current={selectMenu.item}
+        handleCancel={() => {
+          setOperateKey('');
+        }}
+        handleOk={() => {
+          setOperateKey('');
+          setSelectMenu(selectMenu);
+        }}
+      />
+    ) : (
+      <></>
+    );
+  };
   return (
     <FullScreenModal
       open
@@ -36,20 +54,9 @@ const AuthorityModal: React.FC<IProps> = (props) => {
           setOperateKey(key);
         }}
         siderMenuData={rootMenu}>
-        <CreateAuthority
-          title={operateKey}
-          open={operateKey.includes('权限')}
-          current={selectMenu.item}
-          handleCancel={() => {
-            setOperateKey('');
-          }}
-          handleOk={() => {
-            setOperateKey('');
-            setSelectMenu(selectMenu);
-          }}
-        />
         <Content key={key} current={selectMenu.item} />
       </MainLayout>
+      {loadAuthorityModal()}
     </FullScreenModal>
   );
 };

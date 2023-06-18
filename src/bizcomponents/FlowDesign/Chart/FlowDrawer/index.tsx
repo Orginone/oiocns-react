@@ -8,7 +8,7 @@ import ConcurrentNode from './Components/ConcurrentNode';
 import ConditionNode from './Components/ConditionNode';
 import { AddNodeType, FieldCondition, NodeModel, dataType } from '../../processType';
 import orgCtrl from '@/ts/controller';
-import { IBelong, IWork, SpeciesType } from '@/ts/core';
+import { IBelong, IWork } from '@/ts/core';
 import { schema } from '@/ts/base';
 import EntityIcon from '@/bizcomponents/GlobalComps/entityIcon';
 /**
@@ -80,7 +80,7 @@ const FlowDrawer: React.FC<IProps> = (props) => {
 
   const Component = () => {
     if (props.defaultEditable && props.define) {
-      const belong = orgCtrl.user.targets.find(
+      const belong = orgCtrl.targets.find(
         (a) => a.id == props.define!.metadata.belongId,
       ) as IBelong;
       if (belong == undefined) return <></>;

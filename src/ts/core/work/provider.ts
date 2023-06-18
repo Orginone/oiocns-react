@@ -1,6 +1,7 @@
 import { common, kernel, model, schema } from '../../base';
 import { PageAll, storeCollName } from '../public/consts';
 import { TaskStatus } from '../public/enums';
+import { ITarget } from '../target/base/target';
 import { IPerson } from '../target/person';
 // 历史任务存储集合名称
 const hisWorkCollName = 'work-task';
@@ -50,6 +51,17 @@ export class WorkProvider implements IWorkProvider {
   notity: common.Emitter;
   todos: schema.XWorkTask[] = [];
   private _todoLoaded: boolean = false;
+  /** 所有相关的用户 */
+  get targets(): ITarget[] {
+    const targets: ITarget[] = [];
+    if (this.user) {
+      targets.push(...this.user.targets);
+      for (const company of this.user.companys) {
+        targets.push(...company.targets);
+      }
+    }
+    return targets;
+  }
   updateTask(task: schema.XWorkTask): void {
     const index = this.todos.findIndex((i) => i.id === task.id);
     if (task.status < TaskStatus.ApprovalStart) {
@@ -150,7 +162,7 @@ export class WorkProvider implements IWorkProvider {
           if (res.data && status < TaskStatus.RefuseStart && task.taskType == '加用户') {
             let targets = <Array<schema.XTarget>>JSON.parse(task.content);
             if (targets.length == 2) {
-              for (const item of this.user.targets) {
+              for (const item of this.targets) {
                 if (item.id === targets[1].id) {
                   item.pullMembers([targets[0]]);
                 }

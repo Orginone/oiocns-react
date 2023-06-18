@@ -68,19 +68,16 @@ const WorkModal = ({ open, handleOk, handleCancel, application, current }: Iprop
       title: '允许新增实体',
       dataIndex: 'allowAdd',
       valueType: 'switch',
-      initialValue: true,
     },
     {
       title: '允许变更实体',
       dataIndex: 'allowEdit',
       valueType: 'switch',
-      initialValue: true,
     },
     {
       title: '允许选择实体',
       dataIndex: 'allowSelect',
       valueType: 'switch',
-      initialValue: true,
     },
     {
       title: '备注',
@@ -98,7 +95,11 @@ const WorkModal = ({ open, handleOk, handleCancel, application, current }: Iprop
       open={open}
       width={640}
       layoutType="ModalForm"
-      initialValues={current ? current.metadata : {}}
+      initialValues={
+        current
+          ? current.metadata
+          : { allowEdit: true, allowAdd: true, allowSelect: true }
+      }
       title={current ? `编辑[${current.name}]办事` : '新建办事'}
       onOpenChange={(open: boolean) => {
         if (!open) {

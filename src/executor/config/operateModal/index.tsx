@@ -9,6 +9,7 @@ import orgCtrl from '@/ts/controller';
 import LabelsModal from './labelsModal';
 import IdentityModal from './identityModal';
 import AuthorityModal from './authorityModal';
+import StationModal from './stationModal';
 interface IProps {
   cmd: string;
   entity: IEntity<schema.XEntity>;
@@ -43,6 +44,8 @@ const OperateModal: React.FC<IProps> = ({ cmd, entity, finished }) => {
           return <SpeciesModal finished={finished} current={entity as any} />;
         case '角色':
           return <IdentityModal finished={finished} identity={entity as any} />;
+        case '岗位':
+          return <StationModal finished={finished} current={entity as any} />;
         default:
           return <></>;
       }
