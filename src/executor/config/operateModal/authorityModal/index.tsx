@@ -27,6 +27,7 @@ const AuthorityModal: React.FC<IProps> = (props) => {
       destroyOnClose
       footer={[]}>
       <MainLayout
+        notExitIcon
         selectMenu={selectMenu}
         onSelect={(data) => {
           setSelectMenu(data);

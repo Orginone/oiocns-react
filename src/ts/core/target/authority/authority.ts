@@ -1,5 +1,6 @@
 import { kernel, model, schema } from '../../../base';
 import { IMsgChat, IMsgChatT, MsgChat } from '../../chat/message/msgchat';
+import { IDirectory } from '../../thing/directory';
 import { IBelong } from '../base/belong';
 
 /** 权限接口 */
@@ -46,10 +47,12 @@ export class Authority extends MsgChat<schema.XAuthority> implements IAuthority 
     for (const node of _metadata.nodes || []) {
       this.children.push(new Authority(node, _space, this));
     }
+    this.directory = _space.directory;
   }
   members: schema.XTarget[] = [];
   parent: IAuthority | undefined;
   children: IAuthority[] = [];
+  directory: IDirectory;
   private _memberLoaded: boolean = false;
   async loadMembers(reload: boolean = false): Promise<schema.XTarget[]> {
     if (!this._memberLoaded || reload) {

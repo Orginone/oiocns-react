@@ -9,8 +9,6 @@ import { entityOperates, teamOperates } from '../../public';
 
 /** 团队抽象接口类 */
 export interface ITeam extends IMsgChatT<schema.XTarget>, IFileInfo<schema.XTarget> {
-  /** 用户的目录 */
-  directory: IDirectory;
   /** 限定成员类型 */
   memberTypes: TargetType[];
   /** 用户相关的所有会话 */
@@ -46,7 +44,6 @@ export abstract class Team extends MsgChat<schema.XTarget> implements ITeam {
     super(_metadata, _labels, _space, _metadata.belong);
     this.memberTypes = _memberTypes;
   }
-  abstract directory: IDirectory;
   memberTypes: TargetType[];
   private _memberLoaded: boolean = false;
   get isInherited(): boolean {

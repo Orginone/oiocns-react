@@ -3,6 +3,7 @@ import { IBelong } from '../../target/base/belong';
 import { IMessage, Message } from './message';
 import { IEntity, Entity, MessageType, TargetType, storeCollName } from '../../public';
 import { XTarget } from '@/ts/base/schema';
+import { IDirectory } from '../../thing/directory';
 // 空时间
 const nullTime = new Date('2022-07-01').getTime();
 // 消息变更推送
@@ -59,6 +60,8 @@ interface IChat {
   isBelongPerson: boolean;
   /** 是否为我的好友 */
   isFriend: boolean;
+  /** 会话的目录 */
+  directory: IDirectory;
   /** 禁用通知 */
   unMessage(): void;
   /** 消息变更通知 */
@@ -134,6 +137,7 @@ export abstract class MsgChat<T extends schema.XEntity>
   chatdata: MsgChatData;
   _belong: schema.XTarget;
   memberChats: PersonMsgChat[] = [];
+  abstract directory: IDirectory;
   private messageNotify?: (messages: IMessage[]) => void;
   get userId(): string {
     return this.space.user.id;
@@ -356,12 +360,14 @@ export class PersonMsgChat
   constructor(
     _metadata: schema.XTarget,
     _labels: string[],
-    _space?: IBelong,
+    _space: IBelong,
     _belong?: XTarget,
     _findMe?: boolean,
   ) {
     super(_metadata, _labels, _space, _belong, _findMe);
+    this.directory = _space?.directory;
   }
+  directory: IDirectory;
   async loadMembers(_reload: boolean = false): Promise<schema.XTarget[]> {
     return [];
   }

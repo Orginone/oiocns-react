@@ -1,10 +1,9 @@
-import orgCtrl from '@/ts/controller';
 import { IconFont } from '@/components/IconFont';
 import { Button, message, Popover, Spin, Upload, UploadProps } from 'antd';
 import { CloseCircleFilled } from '@ant-design/icons';
 import React, { useEffect, useState } from 'react';
-import { IMessage, IMsgChat, MessageType, TaskModel } from '@/ts/core';
-import { parseAvatar } from '@/ts/base';
+import { IMessage, IMsgChat, MessageType } from '@/ts/core';
+import { model, parseAvatar } from '@/ts/base';
 import PullDown from '@/pages/Chats/components/pullDown';
 import Cutting from '../../cutting';
 import './index.less';
@@ -26,7 +25,7 @@ interface IProps {
 
 const GroupInputBox = (props: IProps) => {
   const { writeContent, citeText, enterCiteMsg, closeCite } = props;
-  const [task, setTask] = useState<TaskModel>();
+  const [task, setTask] = useState<model.TaskModel>();
   const [imgUrls, setImgUrls] = useState<Array<string>>([]); // 表情图片
   const [IsCut, setIsCut] = useState<boolean>(false); // 是否截屏
   const [citeShow, setCiteShow] = useState<boolean>(false); // @展示
@@ -183,21 +182,19 @@ const GroupInputBox = (props: IProps) => {
     showUploadList: false,
     async customRequest(options) {
       const file = options.file as File;
-      const docDir = await orgCtrl.user.filesys?.home?.create('沟通');
-      if (docDir && file) {
-        const result = await docDir.upload(file.name, file, (p: number) => {
+      if (file) {
+        const result = await props.chat.directory.createFile(file, (p: number) => {
           return setTask({
             finished: p,
             size: file.size,
             name: file.name,
-            group: docDir.metadata.name,
             createTime: new Date(),
           });
         });
         setTask(undefined);
         if (result) {
           await props.chat.sendMessage(
-            result.metadata.thumbnail ? MessageType.Image : MessageType.File,
+            result.filedata.thumbnail ? MessageType.Image : MessageType.File,
             JSON.stringify(result.shareInfo()),
             [],
           );
