@@ -102,11 +102,7 @@ export abstract class Belong extends Target implements IBelong {
   override operates(): model.OperateModel[] {
     const operates = super.operates();
     if (this.hasRelationAuth()) {
-      operates.unshift(
-        targetOperates.NewCohort,
-        targetOperates.NewStation,
-        targetOperates.SettingAuth,
-      );
+      operates.unshift(targetOperates.NewCohort, targetOperates.SettingAuth);
     }
     return operates;
   }
