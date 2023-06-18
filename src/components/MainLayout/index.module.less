@@ -5,7 +5,7 @@
   height: 100%;
   .container {
     padding: 0 @padding-xs;
-    height: calc(100vh - 170px);
+    height: calc(100% - 130px);
     overflow-y: scroll;
   }
   .title {
@@ -40,7 +40,10 @@
     font-size: 15px;
     font-weight: bold;
     cursor: pointer;
-    border-top: #EFEFEF 1px solid;
+    position: absolute;
+    bottom: 0;
+    width: 250px;
+    border-top: #efefef 1px solid;
     padding: 10px;
     background-color: #f9fbfe;
     display: flex;
@@ -99,7 +102,7 @@
   width: auto;
   height: 100%;
   margin-bottom: 0;
-  padding: 16px;
+  padding: 12px;
   background-color: @component-background;
   border-radius: @border-radius-base;
   overflow-y: auto;

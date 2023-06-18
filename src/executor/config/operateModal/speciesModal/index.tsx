@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { ISpecies } from '@/ts/core';
 import { Button, message } from 'antd';
 import { schema } from '@/ts/base';
@@ -9,9 +9,9 @@ import EntityIcon from '@/bizcomponents/GlobalComps/entityIcon';
 import CardOrTable from '@/components/CardOrTableComp';
 import cls from './index.module.less';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
-import SpeciesItemModal from './itemModal';
+import SpeciesItemForm from './itemModal';
 import EntityInfo from '@/bizcomponents/EntityInfo';
-import FullScreenModal from '../../tools/fullScreen';
+import FullScreenModal from '@/executor/tools/fullScreen';
 
 type IProps = {
   current: ISpecies;
@@ -25,13 +25,6 @@ const SpeciesModal: React.FC<IProps> = ({ current, finished }) => {
   const [activeModel, setActiveModel] = useState<string>('');
   const [item, setItem] = useState<schema.XSpeciesItem>();
   const [tkey, tforceUpdate] = useObjectUpdate(current);
-  const [dataSource, setDataSource] = useState<schema.XSpeciesItem[]>([]);
-
-  useEffect(() => {
-    setTimeout(async () => {
-      setDataSource(await current.loadItems());
-    }, 10);
-  }, [current]);
 
   const renderBtns = () => {
     return (
@@ -157,14 +150,14 @@ const SpeciesModal: React.FC<IProps> = ({ current, finished }) => {
         tabBarExtraContent={renderBtns()}>
         <CardOrTable<schema.XSpeciesItem>
           key={tkey}
-          dataSource={dataSource}
+          dataSource={current.items}
           rowKey={'id'}
           operation={renderOperate}
           columns={columns}
           showChangeBtn={false}
         />
       </PageCard>
-      <SpeciesItemModal
+      <SpeciesItemForm
         typeName={current.typeName}
         operateType={activeModel}
         open={activeModel == '新增' || (activeModel == '编辑' && item != undefined)}

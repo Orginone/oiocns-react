@@ -176,6 +176,10 @@ export abstract class Team extends MsgChat<schema.XTarget> implements ITeam {
     }
     return notity;
   }
+  async loadContent(reload: boolean = false): Promise<boolean> {
+    await this.directory.loadContent(reload);
+    return true;
+  }
   operates(): model.OperateModel[] {
     const operates = super.operates();
     if (this.hasRelationAuth()) {

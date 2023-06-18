@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Dropdown } from 'antd';
+import { Dropdown } from 'antd';
 import { XProperty } from '@/ts/base/schema';
 import DataGrid, {
   Column,
@@ -32,13 +32,9 @@ interface IProps {
   propertys: XProperty[];
   belongId: string;
   selectable?: boolean;
-  height?: any;
-  width?: any;
   editingTool?: any;
   menuItems?: ThingItemType[];
   toolBarItems?: any[];
-  dataSource?: any;
-  byIds?: string[];
   deferred?: boolean;
   setGridInstance?: Function;
   defaultSelectedRowKeys?: string[];
@@ -221,138 +217,118 @@ const Thing: React.FC<IProps> = (props: IProps) => {
     }
   };
 
-  const getComponent = () => {
-    return (
-      <DataGrid
-        keyExpr={props.keyExpr}
-        dataSource={
-          props.dataSource ||
-          new CustomStore({
-            key: 'Id',
-            async load(loadOptions) {
-              loadOptions.userData = props.labels;
-              let request: any = { ...loadOptions };
-              if (props.byIds) {
-                request.options = {
-                  match: {
-                    _id: {
-                      _in_: props.byIds,
-                    },
-                  },
-                };
-              }
-              const result = await kernel.anystore.loadThing<any>(
-                props.belongId,
-                request,
-              );
-              if (result.success) {
-                return result.data;
-              }
-              return [];
-            },
-            async insert(values) {
-              console.log(values);
-            },
-          })
+  return (
+    <DataGrid<any, string>
+      keyExpr={props.keyExpr}
+      dataSource={
+        new CustomStore({
+          key: 'Id',
+          async load(loadOptions) {
+            loadOptions.userData = props.labels;
+            let request: any = { ...loadOptions };
+            const result = await kernel.anystore.loadThing<any>(props.belongId, request);
+            if (result.success) {
+              return result.data;
+            }
+            return [];
+          },
+        })
+      }
+      onInitialized={(e) => {
+        props.setGridInstance?.call(this, e.component);
+      }}
+      remoteOperations={true}
+      columnMinWidth={80}
+      focusedRowEnabled={true}
+      allowColumnReordering={true}
+      allowColumnResizing={true}
+      columnAutoWidth={true}
+      showColumnLines={true}
+      showRowLines={true}
+      rowAlternationEnabled={true}
+      hoverStateEnabled={true}
+      onRowDblClick={(e) => {
+        if (props.setThingId) {
+          props.setThingId(e.key);
         }
-        onInitialized={(e) => {
-          props.setGridInstance?.call(this, e.component);
-        }}
-        remoteOperations={true}
-        columnMinWidth={80}
-        focusedRowEnabled={true}
-        allowColumnReordering={true}
-        allowColumnResizing={true}
-        columnAutoWidth={true}
-        showColumnLines={true}
-        showRowLines={true}
-        rowAlternationEnabled={true}
-        hoverStateEnabled={true}
-        onRowDblClick={(e) => {
-          if (props.setThingId) {
-            props.setThingId(e.key);
-          }
-          if (props.onBack) {
-            props.onBack();
-          }
-        }}
-        defaultSelectedRowKeys={defaultSelectedRowKeys}
-        onSelectionChanged={(e) => {
-          props?.onSelected?.apply(this, [e.selectedRowsData]);
-          props?.onSelectedChanged?.apply(this, [e]);
-        }}
-        columnResizingMode={'widget'}
-        height={props.height || 'calc(100vh - 175px)'}
-        width="100%"
-        showBorders={true}>
-        {getColumns()}
-        <ColumnChooser
-          enabled={true}
-          title={'列选择器'}
-          height={'500px'}
-          allowSearch={true}
-          sortOrder={'asc'}
+        if (props.onBack) {
+          props.onBack();
+        }
+      }}
+      defaultSelectedRowKeys={defaultSelectedRowKeys}
+      onSelectionChanged={(e) => {
+        props?.onSelected?.apply(this, [e.selectedRowsData]);
+        props?.onSelectedChanged?.apply(this, [e]);
+      }}
+      columnResizingMode={'widget'}
+      height="100%"
+      width="100%"
+      showBorders={true}>
+      {getColumns()}
+      <ColumnChooser
+        enabled={true}
+        title={'列选择器'}
+        height={'500px'}
+        allowSearch={true}
+        sortOrder={'asc'}
+      />
+      <ColumnFixing enabled={true} />
+      {props.scrolling || <Scrolling showScrollbar="always" useNative="false" />}
+      {selectable && (
+        <Selection
+          mode="multiple"
+          selectAllMode="allPages"
+          showCheckBoxesMode="always"
+          deferred={deferred}
         />
-        <ColumnFixing enabled={true} />
-        {props.scrolling || <Scrolling showScrollbar="always" useNative="false" />}
-        {selectable && (
-          <Selection
-            mode="multiple"
-            selectAllMode="allPages"
-            showCheckBoxesMode="always"
-            deferred={deferred}
-          />
-        )}
-        <Pager
-          visible={true}
-          allowedPageSizes={[10, 20, 50]}
-          showPageSizeSelector={true}
-          showNavigationButtons={true}
-          showInfo={true}
-          infoText={'共{2}项'}
-          displayMode={'full'}
-        />
-        <Sorting mode="multiple" />
-        <Paging defaultPageSize={10} />
-        <FilterRow visible={true} />
-        <HeaderFilter visible={true} />
-        <Toolbar>
-          {props.toolBarItems &&
-            props.toolBarItems.map((item) => {
-              return (
-                <Item key={item.key} location="after">
-                  {item}
-                </Item>
-              );
-            })}
-          <Item name="searchPanel" />
-          <Item name="columnChooserButton" locateInMenu="auto" location="after" />
-        </Toolbar>
-        <SearchPanel visible={true} highlightCaseSensitive={true} width={230} />
-        {menuItems && (
-          <Column
-            dataField="操作"
-            type={'buttons'}
-            width={30}
-            cellRender={(params) => {
-              return (
-                <Dropdown
-                  menu={{
-                    items: allMenuItems,
-                    onClick: (info) => menuClick(info.key, params.data),
-                  }}
-                  placement="bottom">
-                  <div style={{ cursor: 'pointer', width: '40px' }}>
-                    <AiOutlineEllipsis />
-                  </div>
-                </Dropdown>
-              );
-            }}></Column>
-        )}
-      </DataGrid>
-    );
-  };
-
-  return <Card bordered={false}>{getComponent()}</Card>;
+      )}
+      <Pager
+        visible={true}
+        allowedPageSizes={[10, 20, 50]}
+        showPageSizeSelector={true}
+        showNavigationButtons={true}
+        showInfo={true}
+        infoText={'共{2}项'}
+        displayMode={'full'}
+      />
+      <Sorting mode="multiple" />
+      <Paging defaultPageSize={10} />
+      <FilterRow visible={true} />
+      <HeaderFilter visible={true} />
+      <Toolbar>
+        {props.toolBarItems &&
+          props.toolBarItems.map((item) => {
+            return (
+              <Item key={item.key} location="after">
+                {item}
+              </Item>
+            );
+          })}
+        <Item name="searchPanel" />
+        <Item name="columnChooserButton" locateInMenu="auto" location="after" />
+      </Toolbar>
+      <SearchPanel visible={true} highlightCaseSensitive={true} width={230} />
+      {menuItems && (
+        <Column
+          dataField="操作"
+          type={'buttons'}
+          width={30}
+          cellRender={(params) => {
+            return (
+              <Dropdown
+                menu={{
+                  items: allMenuItems,
+                  onClick: (info) => menuClick(info.key, params.data),
+                }}
+                placement="bottom">
+                <div style={{ cursor: 'pointer', width: '40px' }}>
+                  <AiOutlineEllipsis />
+                </div>
+              </Dropdown>
+            );
+          }}></Column>
+      )}
+    </DataGrid>
+  );
 };
 export default Thing;

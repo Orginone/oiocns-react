@@ -245,8 +245,8 @@ export const AttributeColumns = (): ProColumns<schema.XAttribute>[] => [
   },
   {
     title: '选择字典',
-    dataIndex: ['dict', 'name'],
-    key: 'dictId',
+    dataIndex: ['property', 'species', 'name'],
+    key: 'speciesId',
     width: 150,
   },
   {

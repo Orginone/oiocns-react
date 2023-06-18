@@ -1,7 +1,7 @@
 import React from 'react';
 import { Image } from 'antd';
 import { FileItemShare } from '@/ts/base/model';
-import FullScreenModal from '../../../config/tools/fullScreen';
+import FullScreenModal from '@/executor/tools/fullScreen';
 
 interface IProps {
   share: FileItemShare;

@@ -4,7 +4,7 @@ import cls from './index.module.less';
 import { loadThingMenu } from './MenuTree';
 import orgCtrl from '@/ts/controller';
 import { schema } from '@/ts/base';
-import Thing from '@/pages/Store/content/Thing/Thing';
+import Thing from '@/executor/data/open/form/Thing/Thing';
 import CustomMenu from '@/components/CustomMenu';
 import { handlePropToAttrObj } from '../Function';
 import { Button, Space } from 'antd';

@@ -2,7 +2,7 @@ import React from 'react';
 import { ProFormColumnsType } from '@ant-design/pro-components';
 import SchemaForm from '@/components/SchemaForm';
 import { IAuthority } from '@/ts/core';
-import UploadItem from '../../tools/uploadItem';
+import UploadItem from '../../../tools/uploadItem';
 
 interface Iprops {
   title: string;
@@ -24,7 +24,7 @@ const createAuthority = (props: Iprops) => {
       renderFormItem: (_, __, form) => {
         return (
           <UploadItem
-            typeName={'应用'}
+            typeName={'权限'}
             icon={props.current.metadata.icon}
             onChanged={(icon) => {
               form.setFieldValue('icon', icon);

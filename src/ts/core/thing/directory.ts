@@ -33,8 +33,6 @@ export interface IDirectory extends IFileInfo<schema.XDirectory> {
   taskEmitter: common.Emitter;
   /** 目录下的内容 */
   content(mode?: number): IFileInfo<schema.XEntity>[];
-  /** 加载目录里的内容 */
-  loadContent(reload?: boolean): Promise<boolean>;
   /** 创建子目录 */
   create(data: DirectoryModel): Promise<IDirectory | undefined>;
   /** 更新目录 */

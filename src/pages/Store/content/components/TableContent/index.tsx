@@ -8,15 +8,14 @@ import { command, schema } from '@/ts/base';
 import EntityIcon from '@/bizcomponents/GlobalComps/entityIcon';
 import { showChatTime } from '@/utils/tools';
 import { formatSize } from '@/ts/base/common';
+import { loadFileMenus } from '@/executor/fileOperate';
 
 const TableContent = ({
   pageData,
   parentRef,
-  loadMenus,
 }: {
   parentRef: any;
   pageData: IFileInfo<schema.XEntity>[];
-  loadMenus: (file: IFileInfo<schema.XEntity>) => any[];
 }) => {
   const [tableHeight, setTableHeight] = useState<number | 'auto'>('auto'); //计算高度
   // 监听父级高度
@@ -97,7 +96,7 @@ const TableContent = ({
                 <Dropdown
                   className={style['operation-btn']}
                   menu={{
-                    items: loadMenus(record),
+                    items: loadFileMenus(record, 1),
                     onClick: ({ key }) => {
                       command.emitter('data', key, record);
                     },
@@ -118,6 +117,7 @@ const TableContent = ({
         onRow={(record) => {
           return {
             onDoubleClick: async () => {
+              await record.loadContent();
               command.emitter('data', 'open', record);
             },
           };

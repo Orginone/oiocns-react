@@ -76,6 +76,10 @@ export class Property extends FileInfo<schema.XProperty> implements IProperty {
     }
     return false;
   }
+  async loadContent(reload: boolean = false): Promise<boolean> {
+    await this.loadAttributes(reload);
+    return true;
+  }
   async loadAttributes(reload: boolean = false): Promise<schema.XAttribute[]> {
     if (!this._attributeLoaded || reload) {
       const res = await kernel.queryPropAttributes({

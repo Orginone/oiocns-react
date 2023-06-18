@@ -1,20 +1,29 @@
 import { schema, model, kernel } from '../../base';
-import { Entity, IEntity, orgAuth } from '../../core/public';
+import { Entity, IEntity, PageAll, orgAuth } from '../../core/public';
 import { IDirectory } from './directory';
 import { FileInfo, IFileInfo } from './fileinfo';
 
+/** 分类项实体接口 */
+export class SpeciesItem extends Entity<schema.XSpeciesItem> {
+  constructor(_metadata: schema.XSpeciesItem) {
+    super({ ..._metadata, typeName: '分类项' });
+  }
+}
+
 /** 表单类只读接口 */
 export interface IFormView extends IEntity<schema.XForm> {
-  /** 目录 */
-  directory: IDirectory | undefined;
+  /** 类目项 */
+  items: IEntity<schema.XSpeciesItem>[];
   /** 表单特性 */
   attributes: schema.XAttribute[];
+  /** 加载类目项 */
+  loadItems(reload?: boolean): Promise<IEntity<schema.XSpeciesItem>[]>;
   /** 加载表单特性 */
   loadAttributes(reload?: boolean): Promise<schema.XAttribute[]>;
 }
 
 /** 表单类接口 */
-export interface IForm extends IFileInfo<schema.XForm> {
+export interface IForm extends IFileInfo<schema.XForm>, IFormView {
   /** 表单特性 */
   attributes: schema.XAttribute[];
   /** 更新表单 */
@@ -38,12 +47,12 @@ export interface IForm extends IFileInfo<schema.XForm> {
 }
 
 export class FormView extends Entity<schema.XForm> implements IFormView {
-  constructor(_metadata: schema.XForm, _directory?: IDirectory) {
+  constructor(_metadata: schema.XForm) {
     super(_metadata);
-    this.directory = _directory;
   }
-  directory: IDirectory | undefined;
+  items: IEntity<schema.XSpeciesItem>[] = [];
   attributes: schema.XAttribute[] = [];
+  private _itemLoaded: boolean = false;
   private _attributeLoaded: boolean = false;
   async loadAttributes(reload: boolean = false): Promise<schema.XAttribute[]> {
     if (!this._attributeLoaded || reload) {
@@ -58,12 +67,35 @@ export class FormView extends Entity<schema.XForm> implements IFormView {
     }
     return this.attributes;
   }
+
+  async loadItems(reload: boolean = false): Promise<IEntity<schema.XSpeciesItem>[]> {
+    if (!this._itemLoaded || reload) {
+      this.items = [];
+      for (const attr of this.attributes) {
+        if (attr.property?.valueType === '分类型') {
+          const res = await kernel.querySpeciesItems({
+            id: attr.property.speciesId,
+            page: PageAll,
+          });
+          if (res.success) {
+            (res.data.result || []).forEach((item) => {
+              this.items.push(new SpeciesItem(item));
+            });
+          }
+        }
+      }
+      this._itemLoaded = true;
+    }
+    return this.items;
+  }
 }
 
 export class Form extends FileInfo<schema.XForm> implements IForm {
   constructor(_metadata: schema.XForm, _directory: IDirectory) {
     super(_metadata, _directory);
   }
+  items: IEntity<schema.XSpeciesItem>[] = [];
+  private _itemLoaded: boolean = false;
   attributes: schema.XAttribute[] = [];
   private _attributeLoaded: boolean = false;
   async rename(name: string): Promise<boolean> {
@@ -115,6 +147,31 @@ export class Form extends FileInfo<schema.XForm> implements IForm {
       this.directory.forms = this.directory.forms.filter((i) => i.key != this.key);
     }
     return res.success;
+  }
+  async loadContent(reload: boolean = false): Promise<boolean> {
+    await this.loadAttributes(reload);
+    await this.loadItems(reload);
+    return true;
+  }
+  async loadItems(reload: boolean = false): Promise<IEntity<schema.XSpeciesItem>[]> {
+    if (!this._itemLoaded || reload) {
+      this.items = [];
+      for (const attr of this.attributes) {
+        if (attr.property?.valueType === '分类型') {
+          const res = await kernel.querySpeciesItems({
+            id: attr.property.speciesId,
+            page: PageAll,
+          });
+          if (res.success) {
+            (res.data.result || []).forEach((item) => {
+              this.items.push(new SpeciesItem(item));
+            });
+          }
+        }
+      }
+      this._itemLoaded = true;
+    }
+    return this.items;
   }
   async loadAttributes(reload: boolean = false): Promise<schema.XAttribute[]> {
     if (!this._attributeLoaded || reload) {

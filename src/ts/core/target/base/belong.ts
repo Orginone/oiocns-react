@@ -94,6 +94,11 @@ export abstract class Belong extends Target implements IBelong {
       );
     }
   }
+  async loadContent(reload: boolean = false): Promise<boolean> {
+    await super.loadContent(reload);
+    await this.loadSuperAuth(reload);
+    return true;
+  }
   override operates(): model.OperateModel[] {
     const operates = super.operates();
     if (this.hasRelationAuth()) {
