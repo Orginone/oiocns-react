@@ -34,6 +34,7 @@ const AuthorityModal: React.FC<IProps> = (props) => {
         onMenuClick={async (_data, key) => {
           setOperateKey(key);
         }}
+        notExitIcon
         siderMenuData={rootMenu}>
         <CreateAuthority
           title={operateKey}
