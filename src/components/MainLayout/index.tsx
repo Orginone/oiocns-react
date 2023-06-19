@@ -1,5 +1,5 @@
 import { Col, Divider, Dropdown, Layout, Row, Space, Typography, Button } from 'antd';
-import React, { useState } from 'react';
+import React, { CSSProperties, useState } from 'react';
 import cls from './index.module.less';
 import CustomMenu from '@/components/CustomMenu';
 import CustomBreadcrumb from '@/components/CustomBreadcrumb';
@@ -13,7 +13,8 @@ const { Content, Sider } = Layout;
  * 内容区模板类
  */
 type MainLayoutType = {
-  className?: string; //wrap calss
+  style?: CSSProperties;
+  menusHeight?: number | string;
   children?: React.ReactNode; // 子组件
   siderMenuData: MenuItemType;
   rightBar?: React.ReactNode;
@@ -64,9 +65,7 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
     props.onSelect?.apply(this, [item]);
   };
   return (
-    <Layout
-      className={`${props.className}`}
-      style={{ height: '100%', position: 'relative' }}>
+    <Layout className={cls.layout} style={props.style}>
       <Sider className={cls.sider} width={250} collapsed={collapsed}>
         <div
           className={cls.title}
@@ -82,7 +81,10 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
           <span style={{ fontSize: 20, margin: '0 6px' }}>{parentMenu.icon}</span>
           {!collapsed && <strong>{parentMenu.label}</strong>}
         </div>
-        <div className={cls.container} id="templateMenu">
+        <div
+          className={cls.container}
+          id="templateMenu"
+          style={{ height: props.menusHeight }}>
           <CustomMenu
             item={parentMenu}
             collapsed={collapsed}

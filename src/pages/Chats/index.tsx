@@ -27,6 +27,7 @@ const Setting: React.FC<any> = () => {
   if (!selectMenu || !rootMenu) return <></>;
   return (
     <MainLayout
+      menusHeight={'calc(100vh - 168px)'}
       selectMenu={selectMenu}
       onSelect={async (data) => {
         setSelectMenu(data);

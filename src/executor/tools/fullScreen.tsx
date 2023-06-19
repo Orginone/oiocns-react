@@ -11,6 +11,7 @@ interface IFullModalProps extends ModalProps {
   fullScreen?: boolean;
   onSave?: () => void;
   icon?: React.ReactNode;
+  bodyHeight?: number | string;
 }
 
 const FullScreenModal: React.FC<IFullModalProps> = (props) => {
@@ -21,6 +22,9 @@ const FullScreenModal: React.FC<IFullModalProps> = (props) => {
         ...props,
         bodyStyle: {
           ...props.bodyStyle,
+          height: props.bodyHeight,
+          padding: 6,
+          margin: 2,
           maxHeight: 'calc(100vh - 80px)',
         },
       };
@@ -35,6 +39,8 @@ const FullScreenModal: React.FC<IFullModalProps> = (props) => {
       },
       bodyStyle: {
         ...props.bodyStyle,
+        padding: 6,
+        margin: 2,
         height: 'calc(100vh - 80px)',
         maxHeight: 'calc(100vh - 80px)',
       },

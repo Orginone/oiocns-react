@@ -53,6 +53,7 @@ const openDirectory = (entity: IDirectory | ITarget | IEntity<schema.XEntity>) =
       orgCtrl.currentKey = entity.key;
       orgCtrl.changCallback();
     });
+    return;
   }
   return false;
 };

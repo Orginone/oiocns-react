@@ -25,8 +25,8 @@ const FormView: React.FC<IProps> = ({ form, finished }) => {
       fullScreen
       width={'80vw'}
       title={form.name}
+      bodyHeight={'80vh'}
       icon={<EntityIcon entityId={form.id} />}
-      bodyStyle={{ height: '80vh', padding: 6, margin: 2 }}
       destroyOnClose
       onCancel={() => finished()}>
       <MainLayout

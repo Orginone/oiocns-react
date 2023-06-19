@@ -14,6 +14,7 @@ const Todo: React.FC<any> = () => {
 
   return (
     <MainLayout
+      menusHeight={'calc(100vh - 168px)'}
       selectMenu={selectMenu}
       onSelect={async (data) => {
         setSelectMenu(data);

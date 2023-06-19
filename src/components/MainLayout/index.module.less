@@ -1,11 +1,15 @@
 @import '~antd/es/style/themes/variable';
-
+.layout {
+  height: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: row;
+}
 .sider {
   background-color: @component-background;
   height: 100%;
   .container {
     padding: 0 @padding-xs;
-    height: calc(100% - 130px);
     overflow-y: scroll;
   }
   .title {
@@ -40,7 +44,7 @@
     font-size: 15px;
     font-weight: bold;
     cursor: pointer;
-    position: absolute;
+    position: fixed;
     bottom: 0;
     width: 250px;
     border-top: #efefef 1px solid;

@@ -1,9 +1,8 @@
 import { XForm, XProperty } from '@/ts/base/schema';
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { getColItem } from '../Function';
 import { defaultCol, defaultColumnStateMap } from '../const';
 import { getScrollX } from '@/utils';
-import FilesPreview from '@/components/FilesPreview';
 import {
   ParamsType,
   ProColumnType,
@@ -35,10 +34,9 @@ const BaseThing = <
     scroll = {},
     ...rest
   } = props;
-  const [visibleImgs, setVisibleImgs] = useState([]);
   const getColumns: any = useMemo(() => {
     let columns: any[] = [...defaultCol, ...propertys].map((item: any) => {
-      return getColItem(item, { 附件型: setVisibleImgs });
+      return getColItem(item, {});
     });
     if (!readonly) {
       columns.push(Operation);
@@ -64,8 +62,6 @@ const BaseThing = <
         scroll={{ ...scroll, x: scrollx }}
         {...rest}
       />
-      {/* 文件预览处理 */}
-      <FilesPreview files={visibleImgs} previewDone={() => setVisibleImgs([])} />
     </div>
   );
 };

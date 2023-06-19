@@ -41,6 +41,7 @@ const AuthorityModal: React.FC<IProps> = (props) => {
       open
       onCancel={props.finished}
       width="80vw"
+      bodyStyle={{ height: '60vh' }}
       title="权限设置"
       destroyOnClose
       footer={[]}>

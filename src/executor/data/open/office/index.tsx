@@ -1,14 +1,14 @@
 import React from 'react';
-import { Image } from 'antd';
 import { FileItemModel } from '@/ts/base/model';
 import FullScreenModal from '@/executor/tools/fullScreen';
+import FileViewer from 'react-file-viewer';
 
 interface IProps {
   share: FileItemModel;
   finished: () => void;
 }
 
-const ImageView: React.FC<IProps> = ({ share, finished }) => {
+const OfficeView: React.FC<IProps> = ({ share, finished }) => {
   if (share.shareLink) {
     if (!share.shareLink.includes('/orginone/anydata/bucket/load')) {
       share.shareLink = `/orginone/anydata/bucket/load/${share.shareLink}`;
@@ -17,12 +17,20 @@ const ImageView: React.FC<IProps> = ({ share, finished }) => {
       <FullScreenModal
         centered
         open={true}
-        width={'50vw'}
+        fullScreen
+        width={'80vw'}
         destroyOnClose
         title={share.name}
-        bodyHeight={'50vh'}
+        bodyHeight={'80vh'}
         onCancel={() => finished()}>
-        <Image src={share.shareLink} preview={false} />
+        <FileViewer
+          key={share.key}
+          fileType={share.extension?.substring(1)}
+          filePath={share.shareLink}
+          errorComponent={(val: any) => {
+            console.log('err=', val);
+          }}
+        />
       </FullScreenModal>
     );
   }
@@ -30,4 +38,4 @@ const ImageView: React.FC<IProps> = ({ share, finished }) => {
   return <></>;
 };
 
-export default ImageView;
+export default OfficeView;
