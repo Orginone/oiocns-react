@@ -44,6 +44,9 @@ export abstract class Team extends MsgChat<schema.XTarget> implements ITeam {
     super(_metadata, _labels, _space, _metadata.belong);
     this.memberTypes = _memberTypes;
   }
+  content(_mode?: number | undefined): IFileInfo<schema.XEntity>[] {
+    return [];
+  }
   memberTypes: TargetType[];
   private _memberLoaded: boolean = false;
   get isInherited(): boolean {
@@ -57,10 +60,10 @@ export abstract class Team extends MsgChat<schema.XTarget> implements ITeam {
       teamName: this.metadata.team?.name ?? this.name,
     });
   }
-  copy(destination: IDirectory): Promise<boolean> {
+  copy(_destination: IDirectory): Promise<boolean> {
     throw new Error('暂不支持.');
   }
-  move(destination: IDirectory): Promise<boolean> {
+  move(_destination: IDirectory): Promise<boolean> {
     throw new Error('暂不支持.');
   }
   async loadMembers(reload: boolean = false): Promise<schema.XTarget[]> {

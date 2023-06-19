@@ -2,12 +2,18 @@ import { Dropdown, Row, Col, Card, Typography } from 'antd';
 
 import React from 'react';
 import cls from './less/icon.module.less';
-import { IDirectory, IFileInfo } from '@/ts/core';
+import { IFileInfo } from '@/ts/core';
 import { command, schema } from '@/ts/base';
 import { loadFileMenus } from '@/executor/fileOperate';
 import EntityIcon from '@/bizcomponents/GlobalComps/entityIcon';
 
-const IconMode = ({ current, mode }: { current: IDirectory; mode: number }) => {
+const IconMode = ({
+  current,
+  mode,
+}: {
+  current: IFileInfo<schema.XEntity>;
+  mode: number;
+}) => {
   const FileCard = (el: IFileInfo<schema.XEntity>) => (
     <Dropdown
       menu={{

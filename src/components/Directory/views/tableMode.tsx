@@ -1,5 +1,5 @@
 import React from 'react';
-import { IDirectory, IFileInfo, ISysFileInfo } from '@/ts/core';
+import { IFileInfo, ISysFileInfo } from '@/ts/core';
 import { command, schema } from '@/ts/base';
 import EntityIcon from '@/bizcomponents/GlobalComps/entityIcon';
 import { showChatTime } from '@/utils/tools';
@@ -8,7 +8,13 @@ import DataGrid, { Column, Scrolling } from 'devextreme-react/data-grid';
 import { Dropdown, Modal } from 'antd';
 import { loadFileMenus } from '@/executor/fileOperate';
 
-const TableMode = ({ current, mode }: { current: IDirectory; mode: number }) => {
+const TableMode = ({
+  current,
+  mode,
+}: {
+  current: IFileInfo<schema.XEntity>;
+  mode: number;
+}) => {
   const cmdType = mode === 1 ? 'data' : 'config';
   return (
     <DataGrid<IFileInfo<schema.XEntity>, string>

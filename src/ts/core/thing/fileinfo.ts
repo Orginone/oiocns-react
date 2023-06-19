@@ -32,6 +32,8 @@ export interface IFileInfo<T extends schema.XEntity> extends IEntity<T> {
   move(destination: IDirectory): Promise<boolean>;
   /** 加载文件内容 */
   loadContent(reload?: boolean): Promise<boolean>;
+  /** 目录下的内容 */
+  content(mode?: number): IFileInfo<schema.XEntity>[];
 }
 
 /** 文件类抽象实现 */
@@ -61,6 +63,7 @@ export abstract class FileInfo<T extends schema.XEntity>
   async loadContent(reload: boolean = false): Promise<boolean> {
     return await sleep(reload ? 10 : 0);
   }
+  abstract content(_mode?: number | undefined): IFileInfo<schema.XEntity>[];
   operates(mode: number = 0): model.OperateModel[] {
     const operates = super.operates(mode);
     if (mode % 2 === 0 && this.directory.target.hasRelationAuth()) {
@@ -177,8 +180,11 @@ export class SysFileInfo extends FileInfo<schema.XEntity> implements ISysFileInf
     }
     return false;
   }
-  override operates(mode?: number): model.OperateModel[] {
+  override operates(_mode?: number): model.OperateModel[] {
     const operates = super.operates();
     return operates.filter((i) => i.cmd != 'update');
+  }
+  content(_mode?: number | undefined): IFileInfo<schema.XEntity>[] {
+    return [];
   }
 }

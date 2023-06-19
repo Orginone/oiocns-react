@@ -1,10 +1,12 @@
 import { XWorkDefine } from '../../base/schema';
 import { kernel, model, schema } from '../../base';
 import { IApplication } from '../thing/application';
-import { Entity, IEntity } from '../public';
+import { Entity, entityOperates } from '../public';
 import { IFormView, FormView } from '../thing/form';
+import { IFileInfo } from '../thing/fileinfo';
+import { IDirectory } from '../thing/directory';
 
-export interface IWork extends IEntity<schema.XWorkDefine> {
+export interface IWork extends IFileInfo<schema.XEntity> {
   /** 应用 */
   application: IApplication | undefined;
   /** 流程关联的表单 */
@@ -41,6 +43,39 @@ export class Work extends Entity<schema.XWorkDefine> implements IWork {
   constructor(_metadata: XWorkDefine, _application?: IApplication) {
     super(fullDefineRule(_metadata));
     this.application = _application;
+
+    this.belongId = _application?.belongId || '';
+    this.isInherited = _application?.isInherited || false;
+    this.directory = _application?.directory || ({} as IDirectory);
+  }
+  belongId: string;
+  isInherited: boolean;
+  directory: IDirectory;
+
+  delete(): Promise<boolean> {
+    throw new Error('Method not implemented.');
+  }
+  rename(_name: string): Promise<boolean> {
+    throw new Error('Method not implemented.');
+  }
+  copy(_destination: IDirectory): Promise<boolean> {
+    throw new Error('Method not implemented.');
+  }
+  move(_destination: IDirectory): Promise<boolean> {
+    throw new Error('Method not implemented.');
+  }
+  async loadContent(_reload?: boolean | undefined): Promise<boolean> {
+    return true;
+  }
+  content(_mode?: number | undefined): IFileInfo<schema.XEntity>[] {
+    return [];
+  }
+  override operates(mode?: number | undefined): model.OperateModel[] {
+    const operates = super.operates();
+    if (mode == 1) {
+      operates.unshift(entityOperates.Open);
+    }
+    return operates;
   }
   forms: IFormView[] = [];
   application: IApplication | undefined;

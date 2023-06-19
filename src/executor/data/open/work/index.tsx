@@ -9,6 +9,7 @@ import { XForm, XProperty } from '@/ts/base/schema';
 import ThingTable from './ThingTables/ThingTable';
 import { OperateType, defaultCol } from './ThingTables/const';
 import FullScreenModal from '@/executor/tools/fullScreen';
+import { schema } from '@/ts/base';
 // 卡片渲染
 interface IProps {
   current: IWork;
@@ -76,13 +77,13 @@ const WorkStartDo: React.FC<IProps> = ({ current, finished }) => {
 
   const loadActions = () => {
     const actions: string[] = [];
-    if (current.metadata.allowAdd !== false) {
+    if ((current.metadata as schema.XWorkDefine).allowAdd !== false) {
       actions.push(OperateType.Add);
     }
-    if (current.metadata.allowEdit) {
+    if ((current.metadata as schema.XWorkDefine).allowEdit) {
       actions.push(OperateType.EditMore);
     }
-    if (current.metadata.allowSelect) {
+    if ((current.metadata as schema.XWorkDefine).allowSelect) {
       actions.push(OperateType.Select);
     }
     return actions;

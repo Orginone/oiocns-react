@@ -4,6 +4,7 @@ import { schema } from '@/ts/base';
 import React from 'react';
 import FormView from './form';
 import ApplicationView from './application';
+import WorkStart from './work';
 import OfficeView from './office';
 import { message } from 'antd';
 
@@ -17,6 +18,8 @@ const ExecutorOpen: React.FC<IOpenProps> = (props: IOpenProps) => {
     case '事项配置':
     case '实体配置':
       return <FormView form={props.entity as any} finished={props.finished} />;
+    case '事项':
+      return <WorkStart current={props.entity as any} finished={props.finished} />;
     case '应用':
       return <ApplicationView current={props.entity as any} finished={props.finished} />;
   }
