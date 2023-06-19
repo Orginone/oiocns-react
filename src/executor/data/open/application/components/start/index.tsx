@@ -4,7 +4,6 @@ import orgCtrl from '@/ts/controller';
 import React, { useEffect, useState } from 'react';
 import cls from './index.module.less';
 import OioForm from '@/bizcomponents/FormDesign/OioFormNext';
-import { GroupMenuType } from '../../config/menuType';
 import { XForm, XProperty } from '@/ts/base/schema';
 // import BaseThing from './BaseThing';
 import ThingTable from './ThingTables/ThingTable';
@@ -71,9 +70,7 @@ const WorkStartDo: React.FC<IProps> = ({ current, finished }) => {
       })
     ) {
       message.success('发起成功!');
-      orgCtrl.currentKey =
-        current.application?.directory.target.space.key + GroupMenuType.Apply;
-      orgCtrl.changCallback();
+      finished();
     }
   };
 
@@ -147,9 +144,6 @@ const WorkStartDo: React.FC<IProps> = ({ current, finished }) => {
     };
     setSubmitData({ ...submitData });
   };
-  if (!activeTab) {
-    return <></>;
-  }
   return (
     <>
       <FullScreenModal

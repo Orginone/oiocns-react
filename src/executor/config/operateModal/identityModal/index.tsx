@@ -74,7 +74,7 @@ const IdentityModal: React.FC<IdentityManageType & ModalProps> = (props) => {
       {identity && (
         <div className={cls['company-dept-content']}>
           <Descriptions
-            title="角色信息"
+            title={`角色[${identity.name}]信息`}
             bordered
             column={2}
             size="small"
@@ -135,7 +135,7 @@ const IdentityModal: React.FC<IdentityManageType & ModalProps> = (props) => {
     <div className={`${cls['dept-wrap-pages']}`}>
       <div className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
         <Card
-          title={identity?.name}
+          title="成员管理"
           className={cls['app-tabs']}
           extra={renderBtns}
           bordered={false}>

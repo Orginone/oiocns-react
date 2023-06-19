@@ -46,7 +46,7 @@ const SpeciesModal: React.FC<IProps> = ({ current, finished }) => {
       },
       {
         key: `删除${current.typeName}项`,
-        label: <span style={{ color: 'red' }}>`删除${current.typeName}项`</span>,
+        label: <span style={{ color: 'red' }}>{`删除${current.typeName}项`}</span>,
         onClick: async () => {
           await current.deleteItem(item);
           tforceUpdate();
@@ -107,7 +107,7 @@ const SpeciesModal: React.FC<IProps> = ({ current, finished }) => {
       dataIndex: 'belongId',
       editable: false,
       key: 'belongId',
-      width: 150,
+      width: 200,
       render: (_, record) => {
         return <EntityIcon entityId={record.belongId} showName />;
       },
@@ -126,7 +126,7 @@ const SpeciesModal: React.FC<IProps> = ({ current, finished }) => {
       title: '创建时间',
       dataIndex: 'createTime',
       key: 'createTime',
-      width: 150,
+      width: 200,
       editable: false,
     },
   ];
