@@ -321,7 +321,7 @@ const Design: React.FC<IProps> = ({
         }}>
         <Card bordered={false}>
           {showErrors.map((a) => (
-            <div style={{ padding: 10 }}>
+            <div key={a} style={{ padding: 10 }}>
               <ImWarning color="orange" />
               {a}
             </div>

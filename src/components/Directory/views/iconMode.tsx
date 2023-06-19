@@ -1,19 +1,19 @@
 import { Dropdown, Row, Col, Card, Typography } from 'antd';
 
 import React from 'react';
-import cls from '../../index.module.less';
+import cls from './less/icon.module.less';
 import { IDirectory, IFileInfo } from '@/ts/core';
 import { command, schema } from '@/ts/base';
-import EntityIcon from '@/bizcomponents/GlobalComps/entityIcon';
 import { loadFileMenus } from '@/executor/fileOperate';
+import EntityIcon from '@/bizcomponents/GlobalComps/entityIcon';
 
-const CardListContent = ({ current }: { current: IDirectory }) => {
+const IconMode = ({ current, mode }: { current: IDirectory; mode: number }) => {
   const FileCard = (el: IFileInfo<schema.XEntity>) => (
     <Dropdown
       menu={{
-        items: loadFileMenus(el, 1),
+        items: loadFileMenus(el, mode),
         onClick: ({ key }) => {
-          command.emitter('data', key, el);
+          command.emitter(mode === 1 ? 'data' : 'config', key, el);
         },
       }}
       trigger={['contextMenu']}>
@@ -24,7 +24,7 @@ const CardListContent = ({ current }: { current: IDirectory }) => {
         key={el.key}
         onDoubleClick={async () => {
           await el.loadContent();
-          command.emitter('data', 'open', el);
+          command.emitter(mode === 1 ? 'data' : 'config', 'open', el);
         }}
         onContextMenu={(e) => {
           e.stopPropagation();
@@ -48,9 +48,9 @@ const CardListContent = ({ current }: { current: IDirectory }) => {
   return (
     <Dropdown
       menu={{
-        items: loadFileMenus(current, 1),
+        items: loadFileMenus(current, mode),
         onClick: ({ key }) => {
-          command.emitter('data', key, current);
+          command.emitter(mode === 1 ? 'data' : 'config', key, current);
         },
       }}
       trigger={['contextMenu']}>
@@ -60,7 +60,7 @@ const CardListContent = ({ current }: { current: IDirectory }) => {
           e.stopPropagation();
         }}>
         <Row gutter={[16, 16]}>
-          {current.content(1).map((el) => {
+          {current.content(mode).map((el) => {
             return (
               <Col xs={8} sm={8} md={6} lg={4} xl={3} xxl={2} key={el.key}>
                 {FileCard(el)}
@@ -72,4 +72,4 @@ const CardListContent = ({ current }: { current: IDirectory }) => {
     </Dropdown>
   );
 };
-export default CardListContent;
+export default IconMode;
