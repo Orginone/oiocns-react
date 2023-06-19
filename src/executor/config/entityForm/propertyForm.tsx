@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { ProFormColumnsType } from '@ant-design/pro-components';
+import React, { useRef, useState } from 'react';
+import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components';
 import SchemaForm from '@/components/SchemaForm';
 import { PropertyModel } from '@/ts/base/model';
 import { IDirectory, valueTypes } from '@/ts/core';
@@ -15,7 +15,10 @@ interface Iprops {
   编辑
 */
 const PropertyForm = (props: Iprops) => {
-  const [selectType, setSelectType] = useState<string>();
+  const formRef = useRef<ProFormInstance>();
+  const [selectType, setSelectType] = useState<string>(
+    (props.current as IProperty).metadata.valueType,
+  );
   let title = '';
   let directory: IDirectory;
   let property: IProperty | undefined;
@@ -62,6 +65,7 @@ const PropertyForm = (props: Iprops) => {
         title: '类型',
         dataIndex: 'valueType',
         valueType: 'select',
+        readonly: readonly,
         fieldProps: {
           options: valueTypes.map((i) => {
             return {
@@ -71,6 +75,7 @@ const PropertyForm = (props: Iprops) => {
           }),
           onSelect: (select: string) => {
             setSelectType(select);
+            formRef.current?.setFieldValue('speciesId', '');
           },
         },
         formItemProps: {
@@ -109,6 +114,7 @@ const PropertyForm = (props: Iprops) => {
       title: '附加信息',
       dataIndex: 'info',
       valueType: 'textarea',
+      readonly: readonly,
       colProps: { span: 24 },
       formItemProps: {
         rules: [{ required: true, message: '属性定义为必填项' }],
@@ -134,6 +140,7 @@ const PropertyForm = (props: Iprops) => {
       open
       title={title}
       width={640}
+      formRef={formRef}
       columns={getFromColumns()}
       initialValues={initialValue}
       rowProps={{
@@ -155,7 +162,8 @@ const PropertyForm = (props: Iprops) => {
             break;
         }
         props.finished();
-      }}></SchemaForm>
+      }}
+    />
   );
 };
 
