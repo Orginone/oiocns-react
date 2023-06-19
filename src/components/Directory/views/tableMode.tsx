@@ -43,6 +43,7 @@ const TableMode = ({ current, mode }: { current: IDirectory; mode: number }) => 
           },
           bodyStyle: {
             padding: 0,
+            height: 1,
           },
           maskClosable: true,
           okButtonProps: {
