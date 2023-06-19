@@ -63,7 +63,7 @@ export abstract class FileInfo<T extends schema.XEntity>
   }
   operates(mode: number = 0): model.OperateModel[] {
     const operates = super.operates(mode);
-    if (mode === 0 && this.directory.target.hasRelationAuth()) {
+    if (mode % 2 === 0 && this.directory.target.hasRelationAuth()) {
       operates.unshift(
         entityOperates.Update,
         fileOperates.Copy,

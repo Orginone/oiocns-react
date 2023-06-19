@@ -32,14 +32,17 @@ const IconMode = ({ current, mode }: { current: IDirectory; mode: number }) => {
         <div className={cls.fileImage}>
           <EntityIcon entityId={el.id} size={50} />
         </div>
-        <div className={cls.fileName} title={el.typeName}>
-          <Typography.Text title={el.typeName} ellipsis>
-            {el.typeName}
-          </Typography.Text>
-        </div>
         <div className={cls.fileName} title={el.name}>
           <Typography.Text title={el.name} ellipsis>
             {el.name}
+          </Typography.Text>
+        </div>
+        <div className={cls.fileName} title={el.typeName}>
+          <Typography.Text
+            style={{ fontSize: 12, color: '#888' }}
+            title={el.typeName}
+            ellipsis>
+            {el.typeName}
           </Typography.Text>
         </div>
       </Card>
