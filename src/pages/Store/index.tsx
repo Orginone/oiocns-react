@@ -1,8 +1,8 @@
 import React from 'react';
 import MainLayout from '@/components/MainLayout';
-import Content from './content';
 import * as config from './config/menuOperate';
 import useMenuUpdate from '@/hooks/useMenuUpdate';
+import Directory from '@/components/Directory';
 /** 存储模块 */
 const Package: React.FC = () => {
   const [key, rootMenu, selectMenu, setSelectMenu] = useMenuUpdate(config.loadStoreMenu);
@@ -15,7 +15,7 @@ const Package: React.FC = () => {
         setSelectMenu(data);
       }}
       siderMenuData={rootMenu}>
-      <Content key={key} current={selectMenu.item} />
+      <Directory key={key} current={selectMenu.item} mode={1} />
     </MainLayout>
   );
 };

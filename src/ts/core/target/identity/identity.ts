@@ -137,7 +137,7 @@ export class Identity extends Entity<schema.XIdentity> implements IIdentity {
   }
   override operates(mode: number = 0): model.OperateModel[] {
     const operates: model.OperateModel[] = [];
-    if (mode == 0 && this.current.hasRelationAuth()) {
+    if (mode % 2 === 0 && this.current.hasRelationAuth()) {
       operates.push(entityOperates.Update, fileOperates.Rename, fileOperates.Delete);
     }
     operates.push(...super.operates(1));

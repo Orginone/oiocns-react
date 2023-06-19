@@ -2,19 +2,20 @@ import React, { useRef } from 'react';
 import style from './index.module.less';
 import { Segmented, Card } from 'antd';
 import useSessionStorage from '@/hooks/useSessionStorage';
-import TableContent from './components/TableContent';
-import CardListContent from './components/CardContent';
+import IconMode from './views/iconMode';
+import TableMode from './views/tableMode';
 import { IconFont } from '@/components/IconFont';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import { IDirectory } from '@/ts/core';
 
 interface IProps {
+  mode: number;
   current: IDirectory | undefined;
 }
 /**
  * 存储-文件系统
  */
-const SettingContent: React.FC<IProps> = ({ current }: IProps) => {
+const Directory: React.FC<IProps> = ({ mode, current }: IProps) => {
   if (!current) return <></>;
   const [key] = useCtrlUpdate(current);
   const [segmented, setSegmented] = useSessionStorage('segmented', 'Kanban');
@@ -24,9 +25,9 @@ const SettingContent: React.FC<IProps> = ({ current }: IProps) => {
     <Card id={key} className={style.pageCard} bordered={false}>
       <div className={style.mainContent} ref={parentRef}>
         {segmented === 'List' ? (
-          <TableContent key={key} parentRef={parentRef} pageData={current.content()} />
+          <TableMode current={current} mode={mode} />
         ) : (
-          <CardListContent current={current} />
+          <IconMode current={current} mode={mode} />
         )}
       </div>
       <Segmented
@@ -56,4 +57,4 @@ const SettingContent: React.FC<IProps> = ({ current }: IProps) => {
     </Card>
   );
 };
-export default SettingContent;
+export default Directory;

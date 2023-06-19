@@ -35,9 +35,7 @@ const EntityIcon = (info: teamTypeInfo) => {
   }, []);
   if (share?.avatar && share?.avatar.thumbnail) {
     return (
-      <div
-        style={{ cursor: 'pointer', display: 'contents' }}
-        title={info.title ?? '点击预览'}>
+      <div style={{ cursor: 'pointer', display: 'contents' }} title={info.title ?? ''}>
         {info.preview && (
           <Image
             style={{ display: 'none' }}

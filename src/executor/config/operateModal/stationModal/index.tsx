@@ -2,7 +2,7 @@ import { Card, Modal, Button } from 'antd';
 import React, { useState, useRef } from 'react';
 import cls from './index.module.less';
 import CardOrTable from '@/components/CardOrTableComp';
-import AssignPosts from '@/bizcomponents/Indentity/components/AssignPosts';
+import AssignPosts from '@/components/AssignPosts';
 import { schema } from '@/ts/base';
 import IndentityManage from '@/bizcomponents/IndentityManage';
 import { IIdentity, IStation } from '@/ts/core';
