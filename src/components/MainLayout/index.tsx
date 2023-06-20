@@ -67,17 +67,36 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
   return (
     <Layout className={cls.layout} style={props.style}>
       <Sider className={cls.sider} width={250} collapsed={collapsed}>
+        <div className={cls.menuBar}>
+          <Typography.Link
+            style={{ fontSize: 16 }}
+            onClick={() => {
+              onSelectClick(parentMenu);
+            }}>
+            {!collapsed && parentMenu.key != props.siderMenuData.key && (
+              <div className={cls.backup}>
+                <ImArrowLeft2 fontSize={20} />
+              </div>
+            )}
+          </Typography.Link>
+          <Typography.Link
+            style={{ fontSize: 16 }}
+            onClick={() => {
+              setCollapsed(!collapsed);
+            }}>
+            {collapsed ? (
+              <RiMenuUnfoldFill fontSize={22} />
+            ) : (
+              <RiMenuFoldFill fontSize={22} />
+            )}
+          </Typography.Link>
+        </div>
         <div
           className={cls.title}
           title={parentMenu.label}
           onClick={() => {
             onSelectClick(parentMenu);
           }}>
-          {!collapsed && parentMenu.key != props.siderMenuData.key && (
-            <div className={cls.backup}>
-              <ImArrowLeft2 fontSize={20} />
-            </div>
-          )}
           <span style={{ fontSize: 20, margin: '0 6px' }}>{parentMenu.icon}</span>
           {!collapsed && <strong>{parentMenu.label}</strong>}
         </div>
@@ -111,19 +130,6 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
         <Row className={cls[`content-top`]} justify="space-between">
           <Col>
             <CustomBreadcrumb
-              leftBar={
-                <Typography.Link
-                  style={{ fontSize: 16 }}
-                  onClick={() => {
-                    setCollapsed(!collapsed);
-                  }}>
-                  {collapsed ? (
-                    <RiMenuUnfoldFill fontSize={22} />
-                  ) : (
-                    <RiMenuFoldFill fontSize={22} />
-                  )}
-                </Typography.Link>
-              }
               selectKey={props.selectMenu.key}
               item={props.siderMenuData}
               onSelect={(item) => {
