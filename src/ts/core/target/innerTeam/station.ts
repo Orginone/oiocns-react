@@ -127,17 +127,17 @@ export class Station extends Team implements IStation {
     operate: OperateType,
     identity: schema.XIdentity,
   ): Promise<void> {
-    // await kernel.createIdentityMsg({
-    //   group: false,
-    //   stationId: this.id,
-    //   identityId: identity.id,
-    //   excludeOperater: true,
-    //   data: JSON.stringify({
-    //     operate,
-    //     station: this.metadata,
-    //     identity: identity,
-    //     operater: this.space.user.metadata,
-    //   }),
-    // });
+    await kernel.createIdentityMsg({
+      group: false,
+      stationId: this.id,
+      identityId: identity.id,
+      excludeOperater: true,
+      data: JSON.stringify({
+        operate,
+        station: this.metadata,
+        identity: identity,
+        operater: this.space.user.metadata,
+      }),
+    });
   }
 }
