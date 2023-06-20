@@ -19,7 +19,7 @@ type CompanySearchTableProps = {
 /*
   弹出框表格查询
 */
-const CompanySearchList: React.FC<CompanySearchTableProps> = (props) => {
+const SearchTarget: React.FC<CompanySearchTableProps> = (props) => {
   const tableProps: CompanySearchTableProps = props;
 
   const [searchKey, setSearchKey] = useState<string>();
@@ -142,4 +142,4 @@ const CompanySearchList: React.FC<CompanySearchTableProps> = (props) => {
   );
 };
 
-export default CompanySearchList;
+export default SearchTarget;

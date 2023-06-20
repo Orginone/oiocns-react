@@ -1,13 +1,14 @@
 import { common, kernel, model, schema } from '../../base';
 import { PageAll, storeCollName } from '../public/consts';
 import { TaskStatus } from '../public/enums';
-import { ITarget } from '../target/base/target';
-import { IPerson } from '../target/person';
+import { UserProvider } from '../user';
 // 历史任务存储集合名称
 const hisWorkCollName = 'work-task';
 export interface IWorkProvider {
+  /** 用户ID */
+  userId: string;
   /** 当前用户 */
-  user: IPerson;
+  user: UserProvider;
   /** 待办 */
   todos: schema.XWorkTask[];
   /** 变更通知 */
@@ -38,8 +39,9 @@ export interface IWorkProvider {
 }
 
 export class WorkProvider implements IWorkProvider {
-  constructor(_user: IPerson) {
+  constructor(_user: UserProvider) {
     this.user = _user;
+    this.userId = _user.user!.id;
     this.notity = new common.Emitter();
     kernel.on('RecvTask', (data: schema.XWorkTask) => {
       if (this._todoLoaded) {
@@ -47,21 +49,11 @@ export class WorkProvider implements IWorkProvider {
       }
     });
   }
-  user: IPerson;
+  userId: string;
+  user: UserProvider;
   notity: common.Emitter;
   todos: schema.XWorkTask[] = [];
   private _todoLoaded: boolean = false;
-  /** 所有相关的用户 */
-  get targets(): ITarget[] {
-    const targets: ITarget[] = [];
-    if (this.user) {
-      targets.push(...this.user.targets);
-      for (const company of this.user.companys) {
-        targets.push(...company.targets);
-      }
-    }
-    return targets;
-  }
   updateTask(task: schema.XWorkTask): void {
     const index = this.todos.findIndex((i) => i.id === task.id);
     if (task.status < TaskStatus.ApprovalStart) {
@@ -88,7 +80,7 @@ export class WorkProvider implements IWorkProvider {
   }
   async loadDones(req: model.IdPageModel): Promise<model.PageResult<schema.XWorkRecord>> {
     const res = await kernel.anystore.pageRequest<schema.XWorkTask>(
-      this.user.id,
+      this.userId,
       hisWorkCollName,
       {
         match: {
@@ -122,12 +114,12 @@ export class WorkProvider implements IWorkProvider {
   }
   async loadApply(req: model.IdPageModel): Promise<model.PageResult<schema.XWorkTask>> {
     const res = await kernel.anystore.pageRequest<schema.XWorkTask>(
-      this.user.id,
+      this.userId,
       hisWorkCollName,
       {
         match: {
           belongId: req.id,
-          createUser: this.user.id,
+          createUser: this.userId,
           nodeId: {
             _exists_: false,
           },
@@ -162,7 +154,7 @@ export class WorkProvider implements IWorkProvider {
           if (res.data && status < TaskStatus.RefuseStart && task.taskType == '加用户') {
             let targets = <Array<schema.XTarget>>JSON.parse(task.content);
             if (targets.length == 2) {
-              for (const item of this.targets) {
+              for (const item of this.user.targets) {
                 if (item.id === targets[1].id) {
                   item.pullMembers([targets[0]]);
                 }

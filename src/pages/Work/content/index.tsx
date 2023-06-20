@@ -10,15 +10,7 @@ interface IProps {
 const ContentIndex = ({ selectMenu, filter }: IProps) => {
   /** 加载内容区 */
   return (
-    <>
-      {selectMenu.item && (
-        <TaskContent
-          taskType={selectMenu.itemType}
-          space={selectMenu.item}
-          filter={filter}
-        />
-      )}
-    </>
+    <TaskContent taskType={selectMenu.itemType} space={selectMenu.item} filter={filter} />
   );
 };
 

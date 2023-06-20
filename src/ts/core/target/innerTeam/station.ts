@@ -85,11 +85,6 @@ export class Station extends Team implements IStation {
     }
     return true;
   }
-  override async loadContent(reload: boolean = false): Promise<boolean> {
-    await this.loadMembers(reload);
-    await this.loadIdentitys(reload);
-    return true;
-  }
   override async delete(notity: boolean = false): Promise<boolean> {
     notity = await super.delete(notity);
     if (notity) {
@@ -127,17 +122,17 @@ export class Station extends Team implements IStation {
     operate: OperateType,
     identity: schema.XIdentity,
   ): Promise<void> {
-    // await kernel.createIdentityMsg({
-    //   group: false,
-    //   stationId: this.id,
-    //   identityId: identity.id,
-    //   excludeOperater: true,
-    //   data: JSON.stringify({
-    //     operate,
-    //     station: this.metadata,
-    //     identity: identity,
-    //     operater: this.space.user.metadata,
-    //   }),
-    // });
+    await kernel.createIdentityMsg({
+      group: false,
+      stationId: this.id,
+      identityId: identity.id,
+      excludeOperater: true,
+      data: JSON.stringify({
+        operate,
+        station: this.metadata,
+        identity: identity,
+        operater: this.space.user.metadata,
+      }),
+    });
   }
 }

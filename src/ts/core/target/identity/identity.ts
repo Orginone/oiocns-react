@@ -57,10 +57,6 @@ export class Identity extends Entity<schema.XIdentity> implements IIdentity {
   current: ITarget;
   members: schema.XTarget[] = [];
   private _memberLoaded: boolean = false;
-  async loadContent(reload: boolean = false): Promise<boolean> {
-    await this.loadMembers(reload);
-    return true;
-  }
   async loadMembers(reload?: boolean | undefined): Promise<schema.XTarget[]> {
     if (!this._memberLoaded || reload) {
       const res = await kernel.queryIdentityTargets({
@@ -145,7 +141,7 @@ export class Identity extends Entity<schema.XIdentity> implements IIdentity {
   override operates(mode: number = 0): model.OperateModel[] {
     const operates: model.OperateModel[] = [];
     if (mode % 2 === 0 && this.current.hasRelationAuth()) {
-      operates.push(entityOperates.Update, fileOperates.Rename, fileOperates.Delete);
+      operates.push(entityOperates.Update, fileOperates.Rename);
     }
     operates.push(...super.operates(1));
     return operates.sort((a, b) => (a.menus ? -10 : b.menus ? 10 : 0));
