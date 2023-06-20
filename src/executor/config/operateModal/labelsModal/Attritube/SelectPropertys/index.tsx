@@ -30,7 +30,7 @@ const SelectForms: React.FC<IProps> = (props) => {
           key: item.id,
           title: item.name,
           value: item.id,
-          item: item,
+          item: item.metadata,
           children: [],
         };
       }),
