@@ -30,7 +30,7 @@ const OperateModal: React.FC<IProps> = ({ cmd, entity, finished }) => {
       return (
         <AuthorityModal
           current={((entity as IDirectory).target as IBelong).superAuth!}
-          finished={reloadFinish}></AuthorityModal>
+          finished={finished}></AuthorityModal>
       );
     case 'open':
       switch (entity.typeName) {

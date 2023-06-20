@@ -531,6 +531,20 @@ export default class KernelApi {
     });
   }
   /**
+   * 创建组织变更消息
+   * @param {model.IdentityMessageModel} params 请求参数
+   * @returns {model.ResultType<boolean>} 请求结果
+   */
+  public async createIdentityMsg(
+    params: model.IdentityMessageModel,
+  ): Promise<model.ResultType<boolean>> {
+    return await this.request({
+      module: 'chat',
+      action: 'CreateTargetMsg',
+      params: params,
+    });
+  }
+  /**
    * 消息撤回
    * @param {model.MsgSaveModel} params 请求参数
    * @returns {model.ResultType<boolean>} 请求结果

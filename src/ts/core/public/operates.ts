@@ -12,6 +12,12 @@ export const entityOperates = {
     label: '更新信息',
     iconType: 'update',
   },
+  Delete: {
+    sort: 24,
+    cmd: 'delete',
+    label: '彻底删除',
+    iconType: 'delete',
+  },
   Remark: {
     sort: 100,
     cmd: 'remark',
@@ -50,12 +56,6 @@ export const fileOperates = {
     cmd: 'rename',
     label: '重名名',
     iconType: 'rename',
-  },
-  Delete: {
-    sort: 24,
-    cmd: 'delete',
-    label: '彻底删除',
-    iconType: 'delete',
   },
 };
 
@@ -158,12 +158,6 @@ export const teamOperates = {
 
 /** 用户的操作 */
 export const targetOperates = {
-  NewIdentity: {
-    sort: 32,
-    cmd: 'newIdentity',
-    label: '设立角色',
-    iconType: '角色',
-  },
   NewCohort: {
     sort: 33,
     cmd: 'newCohort',
@@ -187,18 +181,6 @@ export const targetOperates = {
     cmd: 'newDepartment',
     label: '设立部门',
     iconType: '部门',
-  },
-  NewStation: {
-    sort: 37,
-    cmd: 'newStation',
-    label: '设立岗位',
-    iconType: '岗位',
-  },
-  SettingAuth: {
-    sort: 38,
-    cmd: 'settingAuth',
-    label: '权限设置',
-    iconType: '权限',
   },
   Chat: {
     sort: 15,
@@ -234,4 +216,38 @@ export const personJoins = {
       iconType: 'joinCompany',
     },
   ],
+};
+
+/** 成员操作 */
+export const memberOperates = {
+  SettingAuth: {
+    sort: 56,
+    cmd: 'settingAuth',
+    label: '权限设置',
+    iconType: '权限',
+  },
+  SettingIdentity: {
+    sort: 57,
+    cmd: 'settingIdentity',
+    label: '角色设置',
+    iconType: '角色',
+  },
+  SettingStation: {
+    sort: 58,
+    cmd: 'settingStation',
+    label: '岗位设置',
+    iconType: '岗位',
+  },
+  Copy: {
+    sort: 59,
+    cmd: 'copy',
+    label: '分配成员',
+    iconType: 'copy',
+  },
+  Remove: {
+    sort: 60,
+    cmd: 'remove',
+    label: '移除成员',
+    iconType: 'remove',
+  },
 };

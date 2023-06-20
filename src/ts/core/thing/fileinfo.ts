@@ -14,7 +14,7 @@ export interface IFileInfo<T extends schema.XEntity> extends IEntity<T> {
   /** 目录 */
   directory: IDirectory;
   /** 删除文件系统项 */
-  delete(): Promise<boolean>;
+  delete(notity?: boolean): Promise<boolean>;
   /**
    * 重命名
    * @param {string} name 新名称
@@ -63,16 +63,18 @@ export abstract class FileInfo<T extends schema.XEntity>
   async loadContent(reload: boolean = false): Promise<boolean> {
     return await sleep(reload ? 10 : 0);
   }
-  abstract content(_mode?: number | undefined): IFileInfo<schema.XEntity>[];
+  content(_mode: number = 0): IFileInfo<schema.XEntity>[] {
+    return [];
+  }
   operates(mode: number = 0): model.OperateModel[] {
     const operates = super.operates(mode);
     if (mode % 2 === 0 && this.directory.target.hasRelationAuth()) {
       operates.unshift(
-        entityOperates.Update,
         fileOperates.Copy,
         fileOperates.Move,
         fileOperates.Rename,
-        fileOperates.Delete,
+        entityOperates.Update,
+        entityOperates.Delete,
       );
     }
     return operates;

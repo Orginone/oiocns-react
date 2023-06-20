@@ -5,6 +5,8 @@ import {
   directoryNew,
   directoryOperates,
   fileOperates,
+  memberOperates,
+  teamOperates,
 } from '../public';
 import { ITarget } from '../target/base/target';
 import { Form, IForm } from './form';
@@ -15,7 +17,6 @@ import { Property, IProperty } from './property';
 import { Application, IApplication } from './application';
 import { BucketOpreates, DirectoryModel } from '@/ts/base/model';
 import { encodeKey } from '@/ts/base/common';
-import { ICompany } from '../target/team/company';
 /** 可为空的进度回调 */
 export type OnProgress = (p: number) => void;
 
@@ -82,7 +83,7 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
     super(
       {
         ..._metadata,
-        typeName: '目录',
+        typeName: _metadata.typeName || '目录',
       },
       _parent ?? (_target as unknown as IDirectory),
     );
@@ -103,39 +104,40 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
   applications: IApplication[] = [];
   private _contentLoaded: boolean = false;
   get id(): string {
-    return super.id.replace('_', '');
+    if (!this.parent) {
+      return this.target.id;
+    }
+    return super.id;
   }
   content(mode: number = 0): IFileInfo<schema.XEntity>[] {
-    const cnt: IFileInfo<schema.XEntity>[] = [
-      ...this.children,
-      ...this.forms,
-      ...this.applications,
-      ...this.files,
-    ];
-    if (mode != 1) {
-      cnt.push(...this.propertys);
-      cnt.push(...this.specieses);
-      if (!this.parent) {
-        cnt.push(...this.target.targets.filter((i) => i.id != this.target.id));
-        if ('stations' in this.target) {
-          cnt.push(...(this.target as ICompany).stations);
+    const cnt: IFileInfo<schema.XEntity>[] = [...this.children];
+    if (this.typeName === '成员目录') {
+      cnt.push(...this.target.members.map((i) => new Member(i, this)));
+    } else {
+      cnt.push(...this.forms, ...this.applications, ...this.files);
+      if (mode != 1) {
+        cnt.push(...this.propertys);
+        cnt.push(...this.specieses);
+        if (!this.parent) {
+          cnt.unshift(this.target.memberDirectory);
+          cnt.push(...this.target.targets.filter((i) => i.id != this.target.id));
         }
-        if ('identitys' in this.target) {
-          cnt.push(...(this.target as ICompany).identitys);
-        }
-        cnt.push(...this.target.members.map((i) => new Member(i, this)));
       }
     }
     return cnt.sort((a, b) => (a.metadata.updateTime < b.metadata.updateTime ? 1 : -1));
   }
   async loadContent(reload: boolean = false): Promise<boolean> {
     if (!this._contentLoaded || reload) {
-      await this.loadSubDirectory();
-      await this.loadFiles();
-      await this.loadForms();
-      await this.loadPropertys();
-      await this.loadSpecieses();
-      await this.loadApplications();
+      if (this.typeName === '成员目录') {
+        await this.target.loadContent(reload);
+      } else {
+        await this.loadSubDirectory();
+        await this.loadFiles();
+        await this.loadForms();
+        await this.loadPropertys();
+        await this.loadSpecieses();
+        await this.loadApplications();
+      }
       this._contentLoaded = true;
     }
     return false;
@@ -332,23 +334,39 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
     }
   }
   override operates(mode: number = 0): model.OperateModel[] {
-    const operates: model.OperateModel[] = [
-      directoryOperates.NewFile,
-      directoryOperates.TaskList,
-      directoryOperates.Refesh,
-    ];
-    if (mode === 2 && this.target.hasRelationAuth()) {
-      operates.push(directoryNew);
-    }
-    if (this.target.space.user.copyFiles.size > 0) {
-      operates.push(fileOperates.Parse);
-    }
-    if (this.parent) {
-      operates.push(...super.operates(mode));
-    } else if (mode % 2 === 0) {
-      operates.push(...this.target.operates());
+    const operates: model.OperateModel[] = [];
+    if (this.typeName === '成员目录') {
+      if (this.target.hasRelationAuth()) {
+        if (this.target.space.user.copyFiles.size > 0) {
+          operates.push(fileOperates.Parse);
+        }
+        operates.push(teamOperates.Pull, memberOperates.SettingIdentity);
+        if ('superAuth' in this.target) {
+          operates.unshift(memberOperates.SettingAuth);
+          if ('stations' in this.target) {
+            operates.unshift(memberOperates.SettingStation);
+          }
+        }
+      }
     } else {
-      operates.push(...super.operates(1));
+      operates.push(
+        directoryOperates.NewFile,
+        directoryOperates.TaskList,
+        directoryOperates.Refesh,
+      );
+      if (mode === 2 && this.target.hasRelationAuth()) {
+        operates.push(directoryNew);
+        if (this.target.space.user.copyFiles.size > 0) {
+          operates.push(fileOperates.Parse);
+        }
+      }
+      if (this.parent) {
+        operates.push(...super.operates(mode));
+      } else if (mode % 2 === 0) {
+        operates.push(...this.target.operates());
+      } else {
+        operates.push(...super.operates(1));
+      }
     }
     return operates;
   }

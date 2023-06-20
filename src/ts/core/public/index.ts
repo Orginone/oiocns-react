@@ -14,6 +14,7 @@ export {
   directoryOperates,
   entityOperates,
   fileOperates,
+  memberOperates,
   personJoins,
   targetOperates,
   teamOperates,
