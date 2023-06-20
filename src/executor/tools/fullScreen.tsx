@@ -56,7 +56,6 @@ const FullScreenModal: React.FC<IFullModalProps> = (props) => {
         <Space wrap split={<Divider type="vertical" />} size={2}>
           {props.onSave && (
             <Typography.Link
-              key={'max'}
               title={'保存'}
               style={{ fontSize: 18 }}
               onClick={() => {
@@ -66,7 +65,6 @@ const FullScreenModal: React.FC<IFullModalProps> = (props) => {
             </Typography.Link>
           )}
           <Typography.Link
-            key={'max'}
             title={modalState ? '最大化' : '恢复'}
             style={{ fontSize: 18 }}
             onClick={() => {
@@ -75,7 +73,6 @@ const FullScreenModal: React.FC<IFullModalProps> = (props) => {
             {modalState ? <FullscreenOutlined /> : <FullscreenExitOutlined />}
           </Typography.Link>
           <Typography.Link
-            key={'close'}
             title={'关闭'}
             style={{ fontSize: 18 }}
             onClick={(e) => {

@@ -1,12 +1,13 @@
-import IndentitySelect from '@/bizcomponents/IndentityManage';
 import { AiOutlineSelect } from 'react-icons/ai';
 import { ProForm } from '@ant-design/pro-components';
-import { Button, Input, Modal } from 'antd';
+import { Button, Input } from 'antd';
 import React, { useState } from 'react';
 import { IBelong } from '@/ts/core';
 import { Rule } from 'antd/lib/form';
 import { FormLabelAlign } from 'antd/lib/form/interface';
 import { LabelTooltipType } from 'antd/lib/form/FormItemLabel';
+import SelectIdentity from '@/bizcomponents/SelectIdentity';
+import { schema } from '@/ts/base';
 
 const { Search } = Input;
 
@@ -23,12 +24,8 @@ interface IProps {
  * 角色组件(Todo 待完善)
  */
 const ProFormIdentity = (props: IProps) => {
-  const [id, setId] = useState();
-  const [name, setName] = useState();
-  const [identity, setIdentity] = useState<any>({});
-
+  const [identity, setIdentity] = useState<schema.XIdentity>();
   const [isOpen, setIsOpen] = useState<boolean>(false); // 打开弹窗
-
   const onSearch = (value: string) => console.log(value);
 
   return (
@@ -37,7 +34,7 @@ const ProFormIdentity = (props: IProps) => {
         <Search
           placeholder={'请选择角色'}
           allowClear
-          value={name || id}
+          value={identity?.id}
           readOnly={true}
           enterButton={
             <Button
@@ -48,27 +45,18 @@ const ProFormIdentity = (props: IProps) => {
           onSearch={onSearch}
         />
       </ProForm.Item>
-      <Modal
-        width="650px"
-        title="选择角色"
+      <SelectIdentity
+        multiple={false}
+        space={props.belong}
         open={isOpen}
-        destroyOnClose={true}
-        onOk={() => {
-          console.log('identity', identity);
+        exclude={[]}
+        finished={(selected) => {
+          if (selected.length > 0) {
+            setIdentity(selected[0]);
+          }
           setIsOpen(false);
         }}
-        onCancel={() => setIsOpen(false)}>
-        <IndentitySelect
-          space={props.belong}
-          multiple={false}
-          onChecked={(params: any) => {
-            console.log('params', params);
-            setIdentity(params.data);
-            setId(params.key);
-            setName(params.title);
-          }}
-        />
-      </Modal>
+      />
     </>
   );
 };

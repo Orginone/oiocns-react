@@ -1,6 +1,7 @@
 import EntityIcon from '@/bizcomponents/GlobalComps/entityIcon';
 import { IApplication } from '@/ts/core';
 import React from 'react';
+
 import { MenuItemType } from 'typings/globelType';
 
 /** 获取个人菜单 */

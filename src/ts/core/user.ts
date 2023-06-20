@@ -107,10 +107,6 @@ export class UserProvider {
     this._work = new WorkProvider(this);
     this.refresh();
   }
-  /** 更新用户 */
-  public update(person: schema.XTarget) {
-    sessionStorage.setItem(sessionUserName, JSON.stringify(person));
-  }
   /** 重载数据 */
   public async refresh(): Promise<void> {
     this._inited = false;

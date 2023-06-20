@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { AiOutlineSetting, AiOutlineUser } from 'react-icons/ai';
-import { Row, Button, Divider, Col, Radio, Space, Form, InputNumber, Modal } from 'antd';
-import IndentitySelect from '@/bizcomponents/IndentityManage';
+import { Row, Button, Divider, Col, Radio, Space, Form, InputNumber } from 'antd';
 import cls from './index.module.less';
 import { NodeModel } from '@/bizcomponents/FlowDesign/processType';
 import ShareShowComp from '@/bizcomponents/IndentityManage/ShareShowComp';
 import { IBelong } from '@/ts/core';
+import SelectIdentity from '@/bizcomponents/SelectIdentity';
 interface IProps {
   current: NodeModel;
   belong: IBelong;
@@ -90,29 +90,22 @@ const ApprovalNode: React.FC<IProps> = (props) => {
         </div>
       </div>
       <Divider />
-      <Modal
-        width="650px"
-        title="选择角色"
+      <SelectIdentity
+        multiple={false}
+        space={props.belong}
         open={isOpen}
-        destroyOnClose={true}
-        onOk={() => {
-          props.current.destType = '身份';
-          props.current.destId = currentData.id;
-          props.current.destName = currentData.name;
+        exclude={[]}
+        finished={(selected) => {
+          if (selected.length > 0) {
+            const item = selected[0];
+            props.current.destType = '身份';
+            props.current.destId = item.id;
+            props.current.destName = item.name;
+            setCurrentData(item);
+          }
           setIsOpen(false);
         }}
-        onCancel={() => setIsOpen(false)}>
-        <IndentitySelect
-          multiple={false}
-          onChecked={(params: any) => {
-            setCurrentData({
-              id: params.key,
-              name: params.title,
-            });
-          }}
-          space={props.belong}
-        />
-      </Modal>
+      />
     </div>
   );
 };

@@ -44,7 +44,7 @@ const SelectIdentity: React.FC<IProps> = ({
   return (
     <Modal
       open={open}
-      title={'选择成员'}
+      title={'选择角色'}
       maskClosable
       width={800}
       bodyStyle={{
@@ -60,16 +60,17 @@ const SelectIdentity: React.FC<IProps> = ({
       }}>
       <div className={cls.layout}>
         <div className={cls.content}>
-          <div className={`${multiple ? cls.leftContent : cls.newLeftContent}`}>
+          <div className={cls.leftContent}>
             <CustomTree
               className={cls.docTree}
               isDirectoryTree
               searchable
               showIcon
               treeData={buildTargetTree(space.shareTarget)}
-              onSelect={(_, info: any) => {
+              onSelect={async (_, info: any) => {
                 const target: ITarget = info.node.item;
                 if (target) {
+                  await target.loadIdentitys();
                   setIdentitys(
                     target.identitys.map((item) => {
                       return {
@@ -83,7 +84,7 @@ const SelectIdentity: React.FC<IProps> = ({
               }}
             />
           </div>
-          <div className={`${multiple ? cls.center : cls.newCenter}`}>
+          <div className={cls.center}>
             <CustomTree
               className={cls.docTree}
               searchable

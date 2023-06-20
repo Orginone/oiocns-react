@@ -88,15 +88,7 @@ const Thing: React.FC<IProps> = (props: IProps) => {
     columns.push(getColumn('4', '创建时间', '时间型', 'CreateTime'));
     columns.push(getColumn('5', '修改时间', '时间型', 'ModifiedTime'));
     for (const p of props.propertys) {
-      columns.push(
-        getColumn(
-          p.id,
-          p.name,
-          p.valueType,
-          `Propertys.${p.code}`,
-          p.dict?.dictItems || [],
-        ),
-      );
+      columns.push(getColumn(p.id, p.name, p.valueType, `Propertys.${p.code}`, []));
     }
     return columns;
   };
