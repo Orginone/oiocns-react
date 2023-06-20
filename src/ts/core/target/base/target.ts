@@ -15,6 +15,8 @@ export interface ITarget extends ITeam {
   subTarget: ITarget[];
   /** 所有相关用户 */
   targets: ITarget[];
+  /** 成员目录 */
+  memberDirectory: IDirectory;
   /** 退出用户群 */
   exit(): Promise<boolean>;
   /** 加载用户设立的身份(角色)对象 */
@@ -41,9 +43,23 @@ export abstract class Target extends Team implements ITarget {
       } as unknown as schema.XDirectory,
       this,
     );
+    this.memberDirectory = new Directory(
+      {
+        ...this.directory.metadata,
+        typeName: '成员目录',
+        id: _metadata.id + '__',
+        name:
+          _metadata.typeName === TargetType.Person
+            ? '我的好友'
+            : `${_metadata.typeName}成员`,
+      },
+      this,
+      this.directory,
+    );
   }
   directory: IDirectory;
   identitys: IIdentity[] = [];
+  memberDirectory: IDirectory;
   private _identityLoaded: boolean = false;
   async loadIdentitys(reload?: boolean | undefined): Promise<IIdentity[]> {
     if (!this._identityLoaded || reload) {

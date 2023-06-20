@@ -105,10 +105,13 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
   applications: IApplication[] = [];
   private _contentLoaded: boolean = false;
   get id(): string {
-    return this.target.id;
+    if (!this.parent) {
+      return this.target.id;
+    }
+    return super.id;
   }
   content(mode: number = 0): IFileInfo<schema.XEntity>[] {
-    const cnt: IFileInfo<schema.XEntity>[] = [];
+    const cnt: IFileInfo<schema.XEntity>[] = [...this.children];
     if (this.typeName === '成员目录') {
       if ('stations' in this.target) {
         cnt.push(...(this.target as ICompany).stations);
@@ -118,11 +121,12 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
       }
       cnt.push(...this.target.members.map((i) => new Member(i, this)));
     } else {
-      cnt.push(...this.children, ...this.forms, ...this.applications, ...this.files);
+      cnt.push(...this.forms, ...this.applications, ...this.files);
       if (mode != 1) {
         cnt.push(...this.propertys);
         cnt.push(...this.specieses);
         if (!this.parent) {
+          cnt.unshift(this.target.memberDirectory);
           cnt.push(...this.target.targets.filter((i) => i.id != this.target.id));
         }
       }
@@ -376,21 +380,7 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
         upTeam: this.target.typeName === TargetType.Group,
       });
       if (res.success && res.data) {
-        this.children = [
-          new Directory(
-            {
-              ...this._metadata,
-              typeName: '成员目录',
-              id: this._metadata.id + '_',
-              name:
-                this.target.id === this.target.userId
-                  ? '我的好友'
-                  : `${this.target.typeName}成员`,
-            },
-            this.target,
-            this,
-          ),
-        ];
+        this.children = [];
         this.loadChildren(res.data.result);
       }
     }
@@ -398,7 +388,7 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
   private loadChildren(directorys?: schema.XDirectory[]) {
     if (directorys && directorys.length > 0) {
       directorys
-        .filter((i) => i.parentId === this._metadata.id)
+        .filter((i) => i.parentId === this.id)
         .forEach((i) => {
           this.children.push(new Directory(i, this.target, this, directorys));
         });
