@@ -22,6 +22,11 @@ export interface IApplication extends IFileInfo<schema.XApplication> {
 
 /** 应用实现类 */
 export class Application extends FileInfo<schema.XApplication> implements IApplication {
+  content(_mode: number = 0): IFileInfo<schema.XEntity>[] {
+    return [...this.children, ...this.works].sort((a, b) =>
+      a.metadata.updateTime < b.metadata.updateTime ? 1 : -1,
+    );
+  }
   constructor(
     _metadata: schema.XApplication,
     _directory: IDirectory,

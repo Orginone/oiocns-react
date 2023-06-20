@@ -88,7 +88,7 @@ const Station: React.FC<IProps> = ({ current, finished }: IProps) => {
               <CardOrTable
                 rowKey={'id'}
                 params={key}
-                headerTitle={'角色设置'}
+                headerTitle={'角色管理'}
                 operation={identityOperation}
                 dataSource={current.identitys}
                 columns={IdentityColumn}
@@ -127,7 +127,7 @@ const Station: React.FC<IProps> = ({ current, finished }: IProps) => {
               <CardOrTable
                 rowKey={'id'}
                 params={key}
-                headerTitle={'成员设置'}
+                headerTitle={'成员管理'}
                 dataSource={current.members}
                 toolBarRender={() => [
                   current.hasRelationAuth() ? (

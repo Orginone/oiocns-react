@@ -53,6 +53,14 @@ const ConfigExecutor: React.FC<IProps> = ({ cmd, args, finished }) => {
           return (
             <EntityForm cmd={cmd + 'Identity'} entity={args[0]} finished={finished} />
           );
+        case '事项配置':
+          return (
+            <EntityForm cmd={cmd + 'WorkConfig'} entity={args[0]} finished={finished} />
+          );
+        case '实体配置':
+          return (
+            <EntityForm cmd={cmd + 'ThingConfig'} entity={args[0]} finished={finished} />
+          );
         default: {
           if (Object.values(TargetType).includes(args[0].typeName as TargetType)) {
             return <EntityForm cmd={cmd} entity={args[0]} finished={finished} />;

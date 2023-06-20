@@ -1,25 +1,24 @@
 import { Dropdown, Row, Col, Card, Typography } from 'antd';
 
 import React from 'react';
-import cls from './less/icon.module.less';
-import { IFileInfo } from '@/ts/core';
-import { command, schema } from '@/ts/base';
-import { loadFileMenus } from '@/executor/fileOperate';
+import cls from '../../index.module.less';
+import { IApplication, IWork } from '@/ts/core';
+import { command } from '@/ts/base';
 import EntityIcon from '@/bizcomponents/GlobalComps/entityIcon';
 
-const IconMode = ({
+const CardListContent = ({
   current,
-  mode,
+  setApplyWork,
 }: {
-  current: IFileInfo<schema.XEntity>;
-  mode: number;
+  current: IApplication;
+  setApplyWork: Function;
 }) => {
-  const FileCard = (el: IFileInfo<schema.XEntity>) => (
+  const FileCard = (el: IWork) => (
     <Dropdown
       menu={{
-        items: loadFileMenus(el, mode),
+        items: [],
         onClick: ({ key }) => {
-          command.emitter(mode === 1 ? 'data' : 'config', key, el);
+          command.emitter('data', key, el);
         },
       }}
       trigger={['contextMenu']}>
@@ -29,8 +28,7 @@ const IconMode = ({
         bordered={false}
         key={el.key}
         onDoubleClick={async () => {
-          await el.loadContent();
-          command.emitter(mode === 1 ? 'data' : 'config', 'open', el);
+          setApplyWork(el);
         }}
         onContextMenu={(e) => {
           e.stopPropagation();
@@ -38,28 +36,26 @@ const IconMode = ({
         <div className={cls.fileImage}>
           <EntityIcon entityId={el.id} size={50} />
         </div>
+        <div className={cls.fileName} title={el.typeName}>
+          <Typography.Text title={el.typeName} ellipsis>
+            {el.typeName}
+          </Typography.Text>
+        </div>
         <div className={cls.fileName} title={el.name}>
           <Typography.Text title={el.name} ellipsis>
             {el.name}
           </Typography.Text>
         </div>
-        <div className={cls.fileName} title={el.typeName}>
-          <Typography.Text
-            style={{ fontSize: 12, color: '#888' }}
-            title={el.typeName}
-            ellipsis>
-            {el.typeName}
-          </Typography.Text>
-        </div>
       </Card>
     </Dropdown>
   );
+
   return (
     <Dropdown
       menu={{
-        items: loadFileMenus(current, mode),
+        items: [],
         onClick: ({ key }) => {
-          command.emitter(mode === 1 ? 'data' : 'config', key, current);
+          command.emitter('data', key, current);
         },
       }}
       trigger={['contextMenu']}>
@@ -69,7 +65,7 @@ const IconMode = ({
           e.stopPropagation();
         }}>
         <Row gutter={[16, 16]}>
-          {current.content(mode).map((el) => {
+          {current.works.map((el) => {
             return (
               <Col xs={8} sm={8} md={6} lg={4} xl={3} xxl={2} key={el.key}>
                 {FileCard(el)}
@@ -81,4 +77,4 @@ const IconMode = ({
     </Dropdown>
   );
 };
-export default IconMode;
+export default CardListContent;

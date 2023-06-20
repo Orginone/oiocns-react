@@ -4,12 +4,12 @@ import orgCtrl from '@/ts/controller';
 import React, { useEffect, useState } from 'react';
 import cls from './index.module.less';
 import OioForm from '@/bizcomponents/FormDesign/OioFormNext';
-import { GroupMenuType } from '../../config/menuType';
 import { XForm, XProperty } from '@/ts/base/schema';
 // import BaseThing from './BaseThing';
 import ThingTable from './ThingTables/ThingTable';
 import { OperateType, defaultCol } from './ThingTables/const';
 import FullScreenModal from '@/executor/tools/fullScreen';
+import { schema } from '@/ts/base';
 // 卡片渲染
 interface IProps {
   current: IWork;
@@ -71,21 +71,19 @@ const WorkStartDo: React.FC<IProps> = ({ current, finished }) => {
       })
     ) {
       message.success('发起成功!');
-      orgCtrl.currentKey =
-        current.application?.directory.target.space.key + GroupMenuType.Apply;
-      orgCtrl.changCallback();
+      finished();
     }
   };
 
   const loadActions = () => {
     const actions: string[] = [];
-    if (current.metadata.allowAdd !== false) {
+    if ((current.metadata as schema.XWorkDefine).allowAdd !== false) {
       actions.push(OperateType.Add);
     }
-    if (current.metadata.allowEdit) {
+    if ((current.metadata as schema.XWorkDefine).allowEdit) {
       actions.push(OperateType.EditMore);
     }
-    if (current.metadata.allowSelect) {
+    if ((current.metadata as schema.XWorkDefine).allowSelect) {
       actions.push(OperateType.Select);
     }
     return actions;
@@ -147,9 +145,6 @@ const WorkStartDo: React.FC<IProps> = ({ current, finished }) => {
     };
     setSubmitData({ ...submitData });
   };
-  if (!activeTab) {
-    return <></>;
-  }
   return (
     <>
       <FullScreenModal

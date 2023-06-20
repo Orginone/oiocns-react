@@ -143,6 +143,9 @@ export class Identity extends Entity<schema.XIdentity> implements IIdentity {
     operates.push(...super.operates(1));
     return operates.sort((a, b) => (a.menus ? -10 : b.menus ? 10 : 0));
   }
+  content(_mode?: number | undefined): IFileInfo<schema.XEntity>[] {
+    return [];
+  }
   async createIdentityMsg(
     operate: OperateType,
     subTarget?: schema.XTarget,
