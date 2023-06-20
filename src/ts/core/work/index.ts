@@ -6,7 +6,7 @@ import { IFormView, FormView } from '../thing/form';
 import { IFileInfo } from '../thing/fileinfo';
 import { IDirectory } from '../thing/directory';
 
-export interface IWork extends IFileInfo<schema.XEntity> {
+export interface IWork extends IFileInfo<schema.XWorkDefine> {
   /** 应用 */
   application: IApplication | undefined;
   /** 流程关联的表单 */
