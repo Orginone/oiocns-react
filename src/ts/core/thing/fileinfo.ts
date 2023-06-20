@@ -51,7 +51,7 @@ export abstract class FileInfo<T extends schema.XEntity>
   }
   directory: IDirectory;
   get isInherited(): boolean {
-    return this.metadata.belongId != this.directory.belongId;
+    return this.directory.isInherited;
   }
   get belongId(): string {
     return this.directory.metadata.belongId;
