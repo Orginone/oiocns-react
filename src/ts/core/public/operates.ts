@@ -12,6 +12,12 @@ export const entityOperates = {
     label: '更新信息',
     iconType: 'update',
   },
+  Delete: {
+    sort: 24,
+    cmd: 'delete',
+    label: '彻底删除',
+    iconType: 'delete',
+  },
   Remark: {
     sort: 100,
     cmd: 'remark',
@@ -50,12 +56,6 @@ export const fileOperates = {
     cmd: 'rename',
     label: '重名名',
     iconType: 'rename',
-  },
-  Delete: {
-    sort: 24,
-    cmd: 'delete',
-    label: '彻底删除',
-    iconType: 'delete',
   },
 };
 

@@ -169,7 +169,7 @@ export abstract class Team extends MsgChat<schema.XTarget> implements ITeam {
   operates(): model.OperateModel[] {
     const operates = super.operates();
     if (this.hasRelationAuth()) {
-      operates.unshift(entityOperates.Update);
+      operates.unshift(entityOperates.Update, entityOperates.Delete);
     }
     return operates;
   }

@@ -70,11 +70,11 @@ export abstract class FileInfo<T extends schema.XEntity>
     const operates = super.operates(mode);
     if (mode % 2 === 0 && this.directory.target.hasRelationAuth()) {
       operates.unshift(
-        entityOperates.Update,
         fileOperates.Copy,
         fileOperates.Move,
         fileOperates.Rename,
-        fileOperates.Delete,
+        entityOperates.Update,
+        entityOperates.Delete,
       );
     }
     return operates;
