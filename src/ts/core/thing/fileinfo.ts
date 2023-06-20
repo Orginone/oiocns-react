@@ -63,7 +63,9 @@ export abstract class FileInfo<T extends schema.XEntity>
   async loadContent(reload: boolean = false): Promise<boolean> {
     return await sleep(reload ? 10 : 0);
   }
-  abstract content(_mode?: number | undefined): IFileInfo<schema.XEntity>[];
+  content(_mode: number = 0): IFileInfo<schema.XEntity>[] {
+    return [];
+  }
   operates(mode: number = 0): model.OperateModel[] {
     const operates = super.operates(mode);
     if (mode % 2 === 0 && this.directory.target.hasRelationAuth()) {

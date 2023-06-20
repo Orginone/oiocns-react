@@ -5,7 +5,7 @@ import { IBelong } from './belong';
 import { IMsgChatT, IMsgChat, MsgChat } from '../../chat/message/msgchat';
 import { IFileInfo } from '../../thing/fileinfo';
 import { IDirectory } from '../../thing/directory';
-import { entityOperates, teamOperates } from '../../public';
+import { entityOperates } from '../../public';
 
 /** 团队抽象接口类 */
 export interface ITeam extends IMsgChatT<schema.XTarget>, IFileInfo<schema.XTarget> {
@@ -178,12 +178,13 @@ export abstract class Team extends MsgChat<schema.XTarget> implements ITeam {
   }
   async loadContent(reload: boolean = false): Promise<boolean> {
     await this.directory.loadContent(reload);
+    await this.loadMembers(reload);
     return true;
   }
   operates(): model.OperateModel[] {
     const operates = super.operates();
     if (this.hasRelationAuth()) {
-      operates.unshift(entityOperates.Update, teamOperates.Pull);
+      operates.unshift(entityOperates.Update);
     }
     return operates;
   }

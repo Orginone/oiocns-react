@@ -37,7 +37,6 @@ const TypeIcon = ({ avatar, iconType, size }: TypeIconInfo) => {
   const loadIcon = () => {
     switch (iconType) {
       case '目录':
-      case '用户目录':
         return <im.ImFolder {...config} />;
       case '成员目录':
         return <im.ImBooks {...config} />;

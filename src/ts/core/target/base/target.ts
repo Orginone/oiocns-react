@@ -37,6 +37,7 @@ export abstract class Target extends Team implements ITarget {
         ..._metadata,
         shareId: _metadata.id,
         id: _metadata.id + '_',
+        typeName: '目录',
       } as unknown as schema.XDirectory,
       this,
     );
@@ -73,9 +74,6 @@ export abstract class Target extends Team implements ITarget {
     const operates = super.operates();
     if (this.isMyChat) {
       operates.unshift(targetOperates.Chat);
-    }
-    if (this.hasRelationAuth()) {
-      operates.unshift(targetOperates.NewIdentity);
     }
     return operates;
   }

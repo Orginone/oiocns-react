@@ -5,6 +5,8 @@ import {
   directoryNew,
   directoryOperates,
   fileOperates,
+  targetOperates,
+  teamOperates,
 } from '../public';
 import { ITarget } from '../target/base/target';
 import { Form, IForm } from './form';
@@ -82,7 +84,7 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
     super(
       {
         ..._metadata,
-        typeName: '目录',
+        typeName: _metadata.typeName || '目录',
       },
       _parent ?? (_target as unknown as IDirectory),
     );
@@ -103,39 +105,42 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
   applications: IApplication[] = [];
   private _contentLoaded: boolean = false;
   get id(): string {
-    return super.id.replace('_', '');
+    return this.target.id;
   }
   content(mode: number = 0): IFileInfo<schema.XEntity>[] {
-    const cnt: IFileInfo<schema.XEntity>[] = [
-      ...this.children,
-      ...this.forms,
-      ...this.applications,
-      ...this.files,
-    ];
-    if (mode != 1) {
-      cnt.push(...this.propertys);
-      cnt.push(...this.specieses);
-      if (!this.parent) {
-        cnt.push(...this.target.targets.filter((i) => i.id != this.target.id));
-        if ('stations' in this.target) {
-          cnt.push(...(this.target as ICompany).stations);
+    const cnt: IFileInfo<schema.XEntity>[] = [];
+    if (this.typeName === '成员目录') {
+      if ('stations' in this.target) {
+        cnt.push(...(this.target as ICompany).stations);
+      }
+      if ('identitys' in this.target) {
+        cnt.push(...(this.target as ICompany).identitys);
+      }
+      cnt.push(...this.target.members.map((i) => new Member(i, this)));
+    } else {
+      cnt.push(...this.children, ...this.forms, ...this.applications, ...this.files);
+      if (mode != 1) {
+        cnt.push(...this.propertys);
+        cnt.push(...this.specieses);
+        if (!this.parent) {
+          cnt.push(...this.target.targets.filter((i) => i.id != this.target.id));
         }
-        if ('identitys' in this.target) {
-          cnt.push(...(this.target as ICompany).identitys);
-        }
-        cnt.push(...this.target.members.map((i) => new Member(i, this)));
       }
     }
     return cnt.sort((a, b) => (a.metadata.updateTime < b.metadata.updateTime ? 1 : -1));
   }
   async loadContent(reload: boolean = false): Promise<boolean> {
     if (!this._contentLoaded || reload) {
-      await this.loadSubDirectory();
-      await this.loadFiles();
-      await this.loadForms();
-      await this.loadPropertys();
-      await this.loadSpecieses();
-      await this.loadApplications();
+      if (this.typeName === '成员目录') {
+        await this.target.loadContent(reload);
+      } else {
+        await this.loadSubDirectory();
+        await this.loadFiles();
+        await this.loadForms();
+        await this.loadPropertys();
+        await this.loadSpecieses();
+        await this.loadApplications();
+      }
       this._contentLoaded = true;
     }
     return false;
@@ -332,23 +337,34 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
     }
   }
   override operates(mode: number = 0): model.OperateModel[] {
-    const operates: model.OperateModel[] = [
-      directoryOperates.NewFile,
-      directoryOperates.TaskList,
-      directoryOperates.Refesh,
-    ];
-    if (mode === 2 && this.target.hasRelationAuth()) {
-      operates.push(directoryNew);
-    }
-    if (this.target.space.user.copyFiles.size > 0) {
-      operates.push(fileOperates.Parse);
-    }
-    if (this.parent) {
-      operates.push(...super.operates(mode));
-    } else if (mode % 2 === 0) {
-      operates.push(...this.target.operates());
+    const operates: model.OperateModel[] = [];
+    if (this.typeName === '成员目录') {
+      if (this.target.hasRelationAuth()) {
+        if (this.target.space.user.copyFiles.size > 0) {
+          operates.push(fileOperates.Parse);
+        }
+        operates.push(teamOperates.Pull);
+        operates.push(targetOperates.NewIdentity);
+      }
     } else {
-      operates.push(...super.operates(1));
+      operates.push(
+        directoryOperates.NewFile,
+        directoryOperates.TaskList,
+        directoryOperates.Refesh,
+      );
+      if (mode === 2 && this.target.hasRelationAuth()) {
+        operates.push(directoryNew);
+        if (this.target.space.user.copyFiles.size > 0) {
+          operates.push(fileOperates.Parse);
+        }
+      }
+      if (this.parent) {
+        operates.push(...super.operates(mode));
+      } else if (mode % 2 === 0) {
+        operates.push(...this.target.operates());
+      } else {
+        operates.push(...super.operates(1));
+      }
     }
     return operates;
   }
@@ -360,7 +376,21 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
         upTeam: this.target.typeName === TargetType.Group,
       });
       if (res.success && res.data) {
-        this.children = [];
+        this.children = [
+          new Directory(
+            {
+              ...this._metadata,
+              typeName: '成员目录',
+              id: this._metadata.id + '_',
+              name:
+                this.target.id === this.target.userId
+                  ? '我的好友'
+                  : `${this.target.typeName}成员`,
+            },
+            this.target,
+            this,
+          ),
+        ];
         this.loadChildren(res.data.result);
       }
     }
@@ -368,7 +398,7 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
   private loadChildren(directorys?: schema.XDirectory[]) {
     if (directorys && directorys.length > 0) {
       directorys
-        .filter((i) => i.parentId === this.id)
+        .filter((i) => i.parentId === this._metadata.id)
         .forEach((i) => {
           this.children.push(new Directory(i, this.target, this, directorys));
         });

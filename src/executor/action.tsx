@@ -82,11 +82,16 @@ const setCopyFiles = (cmd: string, file: IFileInfo<schema.XEntity>) => {
 const copyBoard = (dir: IDirectory) => {
   const datasource = [];
   for (const item of orgCtrl.user.copyFiles.entries()) {
-    datasource.push({
-      key: item[0],
-      cmd: item[0].split('_')[0],
-      file: item[1],
-    });
+    if (
+      (item[1].typeName === '人员' && dir.typeName === '成员目录') ||
+      (item[1].typeName !== '人员' && dir.typeName === '目录')
+    ) {
+      datasource.push({
+        key: item[0],
+        cmd: item[0].split('_')[0],
+        file: item[1],
+      });
+    }
   }
   const modal = Modal.info({
     icon: <></>,
