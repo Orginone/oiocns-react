@@ -5,7 +5,7 @@ import {
   directoryNew,
   directoryOperates,
   fileOperates,
-  targetOperates,
+  memberOperates,
   teamOperates,
 } from '../public';
 import { ITarget } from '../target/base/target';
@@ -17,7 +17,6 @@ import { Property, IProperty } from './property';
 import { Application, IApplication } from './application';
 import { BucketOpreates, DirectoryModel } from '@/ts/base/model';
 import { encodeKey } from '@/ts/base/common';
-import { ICompany } from '../target/team/company';
 /** 可为空的进度回调 */
 export type OnProgress = (p: number) => void;
 
@@ -113,12 +112,6 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
   content(mode: number = 0): IFileInfo<schema.XEntity>[] {
     const cnt: IFileInfo<schema.XEntity>[] = [...this.children];
     if (this.typeName === '成员目录') {
-      if ('stations' in this.target) {
-        cnt.push(...(this.target as ICompany).stations);
-      }
-      if ('identitys' in this.target) {
-        cnt.push(...(this.target as ICompany).identitys);
-      }
       cnt.push(...this.target.members.map((i) => new Member(i, this)));
     } else {
       cnt.push(...this.forms, ...this.applications, ...this.files);
@@ -347,8 +340,13 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
         if (this.target.space.user.copyFiles.size > 0) {
           operates.push(fileOperates.Parse);
         }
-        operates.push(teamOperates.Pull);
-        operates.push(targetOperates.NewIdentity);
+        operates.push(teamOperates.Pull, memberOperates.SettingIdentity);
+        if ('superAuth' in this.target) {
+          operates.unshift(memberOperates.SettingAuth);
+          if ('stations' in this.target) {
+            operates.unshift(memberOperates.SettingStation);
+          }
+        }
       }
     } else {
       operates.push(

@@ -264,11 +264,7 @@ export class Company extends Belong implements ICompany {
           cmd: 'setNew',
           label: '设立更多',
           iconType: 'setNew',
-          menus: [
-            targetOperates.NewGroup,
-            targetOperates.NewDepartment,
-            targetOperates.NewStation,
-          ],
+          menus: [targetOperates.NewGroup, targetOperates.NewDepartment],
         },
         {
           sort: 13,

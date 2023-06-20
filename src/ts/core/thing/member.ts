@@ -2,7 +2,7 @@ import { OperateModel } from '@/ts/base/model';
 import { schema } from '../../base';
 import { IDirectory } from './directory';
 import { FileInfo, IFileInfo } from './fileinfo';
-import { targetOperates } from '../public';
+import { memberOperates, targetOperates } from '../public';
 
 /** 成员接口类 */
 export interface IMemeber extends IFileInfo<schema.XTarget> {
@@ -40,18 +40,7 @@ export class Member extends FileInfo<schema.XTarget> implements IMemeber {
       this.metadata.id != this.directory.belongId &&
       this.directory.target.hasRelationAuth()
     ) {
-      operates.unshift({
-        sort: 59,
-        cmd: 'copy',
-        label: '分配成员',
-        iconType: 'copy',
-      });
-      operates.unshift({
-        sort: 60,
-        cmd: 'remove',
-        label: '移除成员',
-        iconType: 'remove',
-      });
+      operates.unshift(memberOperates.Copy, memberOperates.Remove);
     }
     if (this.metadata.id != this.directory.target.userId) {
       operates.unshift(targetOperates.Chat);

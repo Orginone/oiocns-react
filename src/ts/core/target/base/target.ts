@@ -6,9 +6,10 @@ import { ITeam, Team } from './team';
 import { IBelong } from './belong';
 import { targetOperates } from '../../public';
 import { Directory, IDirectory } from '../../thing/directory';
+import { IFileInfo } from '../../thing/fileinfo';
 
 /** 用户抽象接口类 */
-export interface ITarget extends ITeam {
+export interface ITarget extends ITeam, IFileInfo<schema.XTarget> {
   /** 用户设立的身份(角色) */
   identitys: IIdentity[];
   /** 子用户 */
@@ -107,6 +108,20 @@ export abstract class Target extends Team implements ITarget {
     await super.loadContent(reload);
     await this.loadIdentitys(reload);
     return true;
+  }
+  async rename(name: string): Promise<boolean> {
+    return this.update({
+      ...this.metadata,
+      name: name,
+      teamCode: this.metadata.team?.code ?? this.code,
+      teamName: this.metadata.team?.name ?? this.name,
+    });
+  }
+  copy(_destination: IDirectory): Promise<boolean> {
+    throw new Error('暂不支持.');
+  }
+  move(_destination: IDirectory): Promise<boolean> {
+    throw new Error('暂不支持.');
   }
   abstract exit(): Promise<boolean>;
   abstract get targets(): ITarget[];

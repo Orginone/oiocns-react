@@ -14,7 +14,7 @@ export interface IFileInfo<T extends schema.XEntity> extends IEntity<T> {
   /** 目录 */
   directory: IDirectory;
   /** 删除文件系统项 */
-  delete(): Promise<boolean>;
+  delete(notity?: boolean): Promise<boolean>;
   /**
    * 重命名
    * @param {string} name 新名称
