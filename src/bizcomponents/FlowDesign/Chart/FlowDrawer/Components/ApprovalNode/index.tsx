@@ -3,7 +3,7 @@ import { AiOutlineSetting, AiOutlineUser } from 'react-icons/ai';
 import { Row, Button, Divider, Col, Radio, Space, Form, InputNumber } from 'antd';
 import cls from './index.module.less';
 import { NodeModel } from '@/bizcomponents/FlowDesign/processType';
-import ShareShowComp from '@/bizcomponents/IndentityManage/ShareShowComp';
+import ShareShowComp from '@/bizcomponents/ShareShowComp';
 import { IBelong } from '@/ts/core';
 import SelectIdentity from '@/bizcomponents/SelectIdentity';
 interface IProps {

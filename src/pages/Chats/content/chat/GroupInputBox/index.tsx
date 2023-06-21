@@ -1,4 +1,4 @@
-import { IconFont } from '@/components/IconFont';
+import * as im from 'react-icons/im';
 import { Button, message, Popover, Spin, Upload, UploadProps } from 'antd';
 import { CloseCircleFilled } from '@ant-design/icons';
 import React, { useEffect, useState } from 'react';
@@ -237,25 +237,24 @@ const GroupInputBox = (props: IProps) => {
                 })}
               </div>
             }>
-            <Button type="text" icon={<IconFont type="icon-biaoqing" />} />
+            <im.ImSmile size={18} color={'#9498df'} />
           </Popover>
-
-          <Button
-            type="text"
+          <im.ImMic
+            size={18}
+            color={'#9498df'}
             onClick={() => {
               message.warning('功能暂未开放');
             }}
-            icon={<IconFont type="icon-maikefeng" />}
           />
           <Upload {...uploadProps}>
-            <Button type="text" icon={<IconFont type="icon-wenjian" />} />
+            <im.ImFolder size={18} color={'#9498df'} />
           </Upload>
-          <Button
-            type="text"
+          <im.ImVideoCamera
+            size={18}
+            color={'#9498df'}
             onClick={() => {
               message.warning('功能暂未开放');
             }}
-            icon={<IconFont type="icon-shipin" />}
           />
         </div>
         {/* @功能 */}

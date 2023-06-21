@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button } from 'antd';
 import cls from './index.module.less';
 import { NodeModel } from '../../../../processType';
-import ShareShowComp from '@/bizcomponents/IndentityManage/ShareShowComp';
+import ShareShowComp from '@/bizcomponents/ShareShowComp';
 import { IBelong } from '@/ts/core';
 import SelectIdentity from '@/bizcomponents/SelectIdentity';
 

@@ -4,7 +4,7 @@ import { Segmented, Card } from 'antd';
 import useSessionStorage from '@/hooks/useSessionStorage';
 import IconMode from './views/iconMode';
 import TableMode from './views/tableMode';
-import { IconFont } from '@/components/IconFont';
+import * as fa from 'react-icons/fa';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import { IDirectory } from '@/ts/core';
 
@@ -37,18 +37,18 @@ const Directory: React.FC<IProps> = ({ mode, current }: IProps) => {
           {
             value: 'List',
             icon: (
-              <IconFont
-                type={'icon-chuangdanwei'}
-                className={segmented === 'List' ? style.active : ''}
+              <fa.FaTable
+                fontSize={20}
+                color={segmented === 'List' ? 'blue' : '#9498df'}
               />
             ),
           },
           {
             value: 'Kanban',
             icon: (
-              <IconFont
-                type={'icon-jianyingyong'}
-                className={segmented === 'Kanban' ? style.active : ''}
+              <fa.FaTh
+                fontSize={20}
+                color={segmented === 'Kanban' ? 'blue' : '#9498df'}
               />
             ),
           },

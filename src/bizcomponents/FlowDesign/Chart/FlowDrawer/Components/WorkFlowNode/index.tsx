@@ -5,7 +5,7 @@ import cls from './index.module.less';
 import { NodeModel } from '../../../../processType';
 import { IBelong } from '@/ts/core';
 import SelectDefine from '@/bizcomponents/SelectDefine';
-import ShareShowComp from '@/bizcomponents/IndentityManage/ShareShowComp';
+import ShareShowComp from '@/bizcomponents/ShareShowComp';
 import { schema } from '@/ts/base';
 
 interface IProps {
