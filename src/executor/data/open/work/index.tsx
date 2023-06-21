@@ -1,5 +1,5 @@
 import { IWork, SpeciesType } from '@/ts/core';
-import { Button, Card, Input, Tabs, message } from 'antd';
+import { Button, Input, Tabs, message } from 'antd';
 import orgCtrl from '@/ts/controller';
 import React, { useEffect, useState } from 'react';
 import cls from './index.module.less';
@@ -91,6 +91,7 @@ const WorkStartDo: React.FC<IProps> = ({ current, finished }) => {
 
   useEffect(() => {
     current.loadWorkNode().then((value) => {
+      console.log(value);
       if (value && value.forms && value.forms.length > 0) {
         setThingForms(value.forms.filter((i) => i.typeName === SpeciesType.Thing));
         setWorkForm(value.forms.find((i) => i.typeName === SpeciesType.Work));
@@ -153,7 +154,7 @@ const WorkStartDo: React.FC<IProps> = ({ current, finished }) => {
         fullScreen
         width={'80vw'}
         destroyOnClose
-        title={current.typeName + '项管理'}
+        title={current.name}
         footer={[]}
         onCancel={finished}>
         <div className={cls.content}>
@@ -173,7 +174,7 @@ const WorkStartDo: React.FC<IProps> = ({ current, finished }) => {
               }}
             />
           )}
-          {thingForms.length > 0 && (
+          {/* {thingForms.length > 0 && (
             <ThingTable
               headerTitle={
                 <Tabs
@@ -189,7 +190,7 @@ const WorkStartDo: React.FC<IProps> = ({ current, finished }) => {
                     };
                   })}></Tabs>
               }
-              // key={activeTab}
+              key={activeTab}
               toolBtnItems={loadActions()}
               dataSource={defaultData}
               current={current}
@@ -198,29 +199,19 @@ const WorkStartDo: React.FC<IProps> = ({ current, finished }) => {
               belongId={current.application!.belongId}
               onListChange={handleTableChange}
             />
-          )}
-          <Card className={cls['bootom_content']}>
-            <div style={{ display: 'flex', width: '100%' }}>
-              <Input.TextArea
-                style={{ width: '92%' }}
-                placeholder="请填写备注信息"
-                onChange={(e) => {
-                  setContent(e.target.value);
-                }}
-              />
-              <div
-                style={{
-                  width: '8%',
-                  display: 'flex',
-                  marginTop: '18px',
-                  marginLeft: '18px',
-                }}>
-                <Button type="primary" onClick={submit}>
-                  提交
-                </Button>
-              </div>
-            </div>
-          </Card>
+          )} */}
+          <div className={cls.approvalArea}>
+            <Input.TextArea
+              style={{ height: 150, width: 'calc(100% - 120px)' }}
+              placeholder="请填写备注信息"
+              onChange={(e) => {
+                setContent(e.target.value);
+              }}
+            />
+            <Button type="primary" onClick={submit}>
+              提交
+            </Button>
+          </div>
         </div>
       </FullScreenModal>
     </>

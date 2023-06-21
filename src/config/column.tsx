@@ -4,6 +4,7 @@ import { Typography } from 'antd';
 import { schema } from '@/ts/base';
 import EntityIcon from '@/bizcomponents/GlobalComps/entityIcon';
 
+/** 人员信息列 */
 export const PersonColumns: ProColumns<schema.XTarget>[] = [
   { title: '序号', valueType: 'index', width: 50 },
   {
@@ -28,6 +29,7 @@ export const PersonColumns: ProColumns<schema.XTarget>[] = [
   },
 ];
 
+/** 身份信息列 */
 export const IdentityColumn: ProColumns<schema.XIdentity>[] = [
   {
     title: '序号',

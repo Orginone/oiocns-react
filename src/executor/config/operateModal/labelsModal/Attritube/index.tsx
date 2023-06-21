@@ -133,7 +133,6 @@ const Attritube = ({ current, modalType, setModalType }: IProps) => {
         params={tkey}
         operation={renderOperate}
         columns={AttributeColumns()}
-        showChangeBtn={false}
         dataSource={current.attributes}
       />
       {/** 新增特性模态框 */}

@@ -20,7 +20,11 @@ const Executor = () => {
         }
         const resetContent = () => {
           if (Array.isArray(args) && args.length > 0 && 'key' in args[0]) {
-            orgCtrl.currentKey = args[0].key;
+            if ('directory' in args[0]) {
+              orgCtrl.currentKey = args[0].directory.key;
+            } else if ('files' in args[0]) {
+              orgCtrl.currentKey = args[0].key;
+            }
           }
           setContent(<></>);
         };

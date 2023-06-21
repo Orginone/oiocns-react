@@ -187,7 +187,6 @@ const ApplicationModal: React.FC<IProps> = ({ current, finished }) => {
           dataSource={current.works}
           operation={renderOperate}
           columns={columns}
-          showChangeBtn={false}
         />
       </PageCard>
       {loadWorkNodal()}

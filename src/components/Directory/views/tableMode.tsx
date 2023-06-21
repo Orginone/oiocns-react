@@ -33,6 +33,10 @@ const TableMode = ({
         await e.data.loadContent();
         command.emitter(cmdType, 'open', e.data);
       }}
+      headerFilter={{
+        visible: true,
+        allowSearch: true,
+      }}
       dataSource={current.content(mode)}
       onContextMenuPreparing={(e: any) => {
         e.component.selectRowsByIndexes([e.rowIndex]);
@@ -87,6 +91,8 @@ const TableMode = ({
         dataField="metadata.createTime"
         caption="创建时间"
         width={200}
+        dataType={'datetime'}
+        allowFiltering={false}
         calculateDisplayValue={(e: IFileInfo<schema.XEntity>) => {
           return showChatTime(e.metadata.createTime);
         }}
@@ -95,6 +101,7 @@ const TableMode = ({
         dataField="metadata.updateTime"
         caption="更新时间"
         width={200}
+        allowFiltering={false}
         calculateDisplayValue={(e: IFileInfo<schema.XEntity>) => {
           return showChatTime(e.metadata.updateTime);
         }}
@@ -103,6 +110,7 @@ const TableMode = ({
         width={100}
         dataField="size"
         caption="大小"
+        allowFiltering={false}
         calculateCellValue={(e: IFileInfo<schema.XEntity>) => {
           if ('filedata' in e) {
             return formatSize((e as ISysFileInfo).filedata.size);
@@ -110,7 +118,7 @@ const TableMode = ({
           return '';
         }}
       />
-      <Column width={250} dataField="remark" caption="描述" />
+      <Column width={250} dataField="remark" caption="描述" allowFiltering={false} />
     </DataGrid>
   );
 };

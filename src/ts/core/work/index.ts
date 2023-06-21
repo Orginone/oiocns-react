@@ -1,4 +1,3 @@
-import { XWorkDefine } from '../../base/schema';
 import { kernel, model, schema } from '../../base';
 import { IApplication } from '../thing/application';
 import { Entity, entityOperates } from '../public';
@@ -6,7 +5,7 @@ import { IFormView, FormView } from '../thing/form';
 import { IFileInfo } from '../thing/fileinfo';
 import { IDirectory } from '../thing/directory';
 
-export interface IWork extends IFileInfo<schema.XEntity> {
+export interface IWork extends IFileInfo<schema.XWorkDefine> {
   /** 应用 */
   application: IApplication | undefined;
   /** 流程关联的表单 */
@@ -25,7 +24,7 @@ export interface IWork extends IFileInfo<schema.XEntity> {
   ): Promise<schema.XWorkInstance | undefined>;
 }
 
-export const fullDefineRule = (data: XWorkDefine) => {
+export const fullDefineRule = (data: schema.XWorkDefine) => {
   data.allowAdd = true;
   data.allowEdit = true;
   data.allowSelect = true;
@@ -40,7 +39,7 @@ export const fullDefineRule = (data: XWorkDefine) => {
 };
 
 export class Work extends Entity<schema.XWorkDefine> implements IWork {
-  constructor(_metadata: XWorkDefine, _application?: IApplication) {
+  constructor(_metadata: schema.XWorkDefine, _application?: IApplication) {
     super(fullDefineRule(_metadata));
     this.application = _application;
 

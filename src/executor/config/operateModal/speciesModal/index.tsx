@@ -180,7 +180,6 @@ const SpeciesModal: React.FC<IProps> = ({ current, finished }) => {
           rowKey={'id'}
           operation={renderOperate}
           columns={columns}
-          showChangeBtn={false}
         />
       </PageCard>
       {loadSpeciesItemModal()}
