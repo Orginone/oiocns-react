@@ -76,7 +76,7 @@ const TableMode = ({
         });
         e.items = [];
       }}>
-      <Scrolling mode="virtual" showScrollbar={false} />
+      <Scrolling mode="virtual" />
       <Column
         width={250}
         dataField="name"
