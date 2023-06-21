@@ -81,12 +81,8 @@ const Cutting = ({ open, onClose }: { open?: boolean; onClose?: Function }) => {
           type: 'image/jpeg',
         },
       );
-      // 沟通文件夹 下 创建 当前日期文件夹。用于存放当天截图
-      const docDir = await orgCtrl.user?.filesys?.home?.create(
-        '沟通/截图/' + dayjs(new Date()).format('YYYY-MM-DD'),
-      );
-      if (docDir && file) {
-        const result = await docDir.upload(file.name, file);
+      if (file) {
+        const result = await orgCtrl.user.directory.createFile(file.name, file);
         // 把选中裁切好的的图片传出去
         if (result) {
           onClose && onClose(result);

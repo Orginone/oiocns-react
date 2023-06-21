@@ -1,7 +1,7 @@
 import { ISpeciesItem, SpeciesType, IThingClass, IBelong } from '@/ts/core';
 import React from 'react';
 import { MenuItemType } from 'typings/globelType';
-import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
+import TeamIcon from '@/components/Common/GlobalComps/entityIcon';
 
 const loadChildren = (team: IBelong) => {
   const things: ISpeciesItem[] = [];

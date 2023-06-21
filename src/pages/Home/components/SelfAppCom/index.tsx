@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import './index.less';
 import CardWidthTitle from '@/components/CardWidthTitle';
 import orgCtrl from '@/ts/controller';
-import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
+import TeamIcon from '@/components/Common/GlobalComps/entityIcon';
 import { IApplication } from '@/ts/core';
 import { useHistory } from 'react-router-dom';
 interface SelfAppComType {

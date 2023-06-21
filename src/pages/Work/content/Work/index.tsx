@@ -3,7 +3,7 @@ import { Button, Card, Input, Tabs, message } from 'antd';
 import orgCtrl from '@/ts/controller';
 import React, { useEffect, useState } from 'react';
 import cls from './index.module.less';
-import OioForm from '@/bizcomponents/FormDesign/OioFormNext';
+import OioForm from '@/components/Common/FormDesign/OioFormNext';
 import { GroupMenuType } from '../../config/menuType';
 import { XForm, XProperty } from '@/ts/base/schema';
 // import BaseThing from './BaseThing';

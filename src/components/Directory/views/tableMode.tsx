@@ -1,7 +1,7 @@
 import React from 'react';
 import { IFileInfo, ISysFileInfo } from '@/ts/core';
 import { command, schema } from '@/ts/base';
-import EntityIcon from '@/bizcomponents/GlobalComps/entityIcon';
+import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import { showChatTime } from '@/utils/tools';
 import { formatSize } from '@/ts/base/common';
 import DataGrid, { Column, Scrolling } from 'devextreme-react/data-grid';

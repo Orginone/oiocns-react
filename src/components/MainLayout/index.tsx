@@ -6,7 +6,7 @@ import CustomBreadcrumb from '@/components/CustomBreadcrumb';
 import { MenuItemType, OperateMenuType } from 'typings/globelType';
 import { ImArrowLeft2 } from 'react-icons/im';
 import { RiMenuFoldFill, RiMenuUnfoldFill, RiMore2Fill } from 'react-icons/ri';
-import OrgIcons from '@/bizcomponents/GlobalComps/orgIcons';
+import OrgIcons from '@/components/Common/GlobalComps/orgIcons';
 const { Content, Sider } = Layout;
 
 /**

@@ -3,7 +3,7 @@ import { Tag } from 'antd';
 import { ProColumns } from '@ant-design/pro-table';
 import { schema } from '@/ts/base';
 import { IWork } from '@/ts/core';
-import EntityIcon from '@/bizcomponents/GlobalComps/entityIcon';
+import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 
 export const DefineColumns: ProColumns<IWork>[] = [
   {
@@ -27,7 +27,7 @@ export const DefineColumns: ProColumns<IWork>[] = [
     width: 100,
     title: '归属用户',
     dataIndex: ['metadata', 'belongId'],
-    render: (_, record) => {
+    render: (_: any, record: IWork) => {
       return <EntityIcon entityId={record.metadata.belongId} showName />;
     },
   },
@@ -36,7 +36,7 @@ export const DefineColumns: ProColumns<IWork>[] = [
     width: 100,
     title: '共享用户',
     dataIndex: ['metadata', 'shareId'],
-    render: (_, record) => {
+    render: (_: any, record: IWork) => {
       return <EntityIcon entityId={record.metadata.shareId} showName />;
     },
   },
@@ -45,7 +45,7 @@ export const DefineColumns: ProColumns<IWork>[] = [
     width: 100,
     title: '创建人员',
     dataIndex: 'createUser',
-    render: (_, record) => {
+    render: (_: any, record: IWork) => {
       return <EntityIcon entityId={record.metadata.createUser} showName />;
     },
   },
@@ -83,7 +83,7 @@ export const WorkColumns: ProColumns<schema.XWorkTask>[] = [
     width: 150,
     title: '共享组织',
     dataIndex: 'shareId',
-    render: (_, record) => {
+    render: (_: any, record: schema.XWorkTask) => {
       return <EntityIcon entityId={record.shareId} showName />;
     },
   },
@@ -92,7 +92,7 @@ export const WorkColumns: ProColumns<schema.XWorkTask>[] = [
     width: 100,
     title: '申请人',
     dataIndex: 'createUser',
-    render: (_, record) => {
+    render: (_: any, record: schema.XWorkTask) => {
       return <EntityIcon entityId={record.createUser} showName />;
     },
   },
@@ -100,7 +100,7 @@ export const WorkColumns: ProColumns<schema.XWorkTask>[] = [
     title: '发起组织',
     width: 100,
     dataIndex: 'applyId',
-    render: (_, record) => {
+    render: (_: any, record: schema.XWorkTask) => {
       return <EntityIcon entityId={record.applyId} showName />;
     },
   },
@@ -108,7 +108,7 @@ export const WorkColumns: ProColumns<schema.XWorkTask>[] = [
     title: '状态',
     width: 80,
     dataIndex: 'status',
-    render: (_, record) => {
+    render: (_: any, record: schema.XWorkTask) => {
       const status = statusMap.get(record.status as number);
       return <Tag color={status!.color}>{status!.text}</Tag>;
     },
@@ -117,7 +117,7 @@ export const WorkColumns: ProColumns<schema.XWorkTask>[] = [
     title: '内容',
     width: 400,
     dataIndex: 'content',
-    render: (_, record) => {
+    render: (_: any, record: schema.XWorkTask) => {
       if (record.taskType === '加用户') {
         const targets: schema.XTarget[] = JSON.parse(record.content);
         if (targets.length === 2) {
@@ -155,7 +155,7 @@ export const DoneColumns: ProColumns<schema.XWorkRecord>[] = [
     width: 200,
     title: '共享组织',
     dataIndex: 'shareId',
-    render: (_, record) => {
+    render: (_: any, record: schema.XWorkRecord) => {
       return <EntityIcon entityId={record.task!.shareId} showName />;
     },
   },
@@ -164,14 +164,14 @@ export const DoneColumns: ProColumns<schema.XWorkRecord>[] = [
     width: 200,
     title: '申请人',
     dataIndex: 'createUser',
-    render: (_, record) => {
+    render: (_: any, record: schema.XWorkRecord) => {
       return <EntityIcon entityId={record.task!.createUser} showName />;
     },
   },
   {
     title: '状态',
     dataIndex: 'status',
-    render: (_, record) => {
+    render: (_: any, record: schema.XWorkRecord) => {
       const status = statusMap.get(record.status as number);
       return <Tag color={status!.color}>{status!.text}</Tag>;
     },

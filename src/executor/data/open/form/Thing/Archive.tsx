@@ -2,11 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { Card, Collapse, Tabs, Timeline } from 'antd';
 import orgCtrl from '@/ts/controller';
 import { kernel, schema } from '@/ts/base';
-import OioForm from '@/bizcomponents/FormDesign/OioFormNext';
+import OioForm from '@/components/Common/FormDesign/OioFormNext';
 import { XWorkInstance, XWorkTask } from '@/ts/base/schema';
 import BashThing from '@/pages/Work/content/Work/ThingTables/BaseThing';
 import { IBelong } from '@/ts/core';
-import EntityIcon from '@/bizcomponents/GlobalComps/entityIcon';
+import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 
 const { Panel } = Collapse;
 

@@ -1,4 +1,4 @@
-import OioForm from '@/bizcomponents/FormDesign/OioFormNext';
+import OioForm from '@/components/Common/FormDesign/OioFormNext';
 import { ProColumnType, ProTableProps } from '@ant-design/pro-components';
 import type { ParamsType } from '@ant-design/pro-provider';
 import { Button, Modal } from 'antd';

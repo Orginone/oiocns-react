@@ -1,6 +1,6 @@
 import { schema } from '@/ts/base';
 import { ProColumns } from '@ant-design/pro-table';
-import EntityIcon from '@/bizcomponents/GlobalComps/entityIcon';
+import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import React from 'react';
 
 const getSpeciesName = (

@@ -5,12 +5,12 @@ import { Button, message } from 'antd';
 import WorkModal from './workModal';
 import { ProColumns } from '@ant-design/pro-table';
 import PageCard from '@/components/PageCard';
-import EntityIcon from '@/bizcomponents/GlobalComps/entityIcon';
+import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import CardOrTable from '@/components/CardOrTableComp';
 import cls from './index.module.less';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
-import EntityInfo from '@/bizcomponents/EntityInfo';
-import FlowDesign from '@/bizcomponents/FlowDesign';
+import EntityInfo from '@/components/Common/EntityInfo';
+import FlowDesign from '@/components/Common/FlowDesign';
 import FullScreenModal from '@/executor/tools/fullScreen';
 
 type IProps = {
@@ -93,7 +93,7 @@ const ApplicationModal: React.FC<IProps> = ({ current, finished }) => {
       dataIndex: ['metadata', 'allowAdd'],
       key: 'allowAdd',
       width: 200,
-      render: (_, record) => {
+      render: (_: any, record: IWork) => {
         return record.metadata.allowAdd ? '是' : '否';
       },
     },
@@ -102,7 +102,7 @@ const ApplicationModal: React.FC<IProps> = ({ current, finished }) => {
       dataIndex: ['metadata', 'allowEdit'],
       key: 'allowEdit',
       width: 200,
-      render: (_, record) => {
+      render: (_: any, record: IWork) => {
         return record.metadata.allowEdit ? '是' : '否';
       },
     },
@@ -111,7 +111,7 @@ const ApplicationModal: React.FC<IProps> = ({ current, finished }) => {
       dataIndex: ['metadata', 'allowSelect'],
       key: 'allowSelect',
       width: 200,
-      render: (_, record) => {
+      render: (_: any, record: IWork) => {
         return record.metadata.allowSelect ? '是' : '否';
       },
     },
@@ -127,7 +127,7 @@ const ApplicationModal: React.FC<IProps> = ({ current, finished }) => {
       editable: false,
       key: 'createUser',
       width: 150,
-      render: (_, record) => {
+      render: (_: any, record: IWork) => {
         return <EntityIcon entityId={record.metadata.createUser} showName />;
       },
     },

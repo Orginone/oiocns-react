@@ -1,7 +1,7 @@
 import { Badge, Card, List, Tag } from 'antd';
 import React from 'react';
 import orgCtrl from '@/ts/controller';
-import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
+import TeamIcon from '@/components/Common/GlobalComps/entityIcon';
 import * as im from 'react-icons/im';
 import { IWork } from '@/ts/core';
 

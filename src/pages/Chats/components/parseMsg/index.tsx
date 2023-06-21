@@ -5,7 +5,7 @@ import { FileItemShare } from '@/ts/base/model';
 import { parseAvatar } from '@/ts/base';
 import { formatSize } from '@/ts/base/common';
 import css from './index.module.less';
-import {truncateString} from "@/utils/tools";
+import { truncateString } from '@/utils/tools';
 
 /** 将链接转化为超链接 */
 const linkText = (val: string) => {

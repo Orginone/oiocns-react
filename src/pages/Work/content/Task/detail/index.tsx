@@ -1,4 +1,4 @@
-import Design from '@/bizcomponents/FlowDesign';
+import Design from '@/components/Common/FlowDesign';
 import orgCtrl from '@/ts/controller';
 import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
 import { ProFormInstance } from '@ant-design/pro-form';
@@ -6,11 +6,11 @@ import { Button, Card, Collapse, Input, Tabs, TabsProps, Timeline } from 'antd';
 import React, { useRef, useState } from 'react';
 import { ImUndo2 } from 'react-icons/im';
 import cls from './index.module.less';
-import OioForm from '@/bizcomponents/FormDesign/OioFormNext';
+import OioForm from '@/components/Common/FormDesign/OioFormNext';
 import { schema } from '@/ts/base';
 import { IBelong } from '@/ts/core';
 import BashThing from '@/pages/Work/content/Work/ThingTables/BaseThing';
-import EntityIcon from '@/bizcomponents/GlobalComps/entityIcon';
+import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 
 export interface TaskDetailType {
   belong: IBelong;

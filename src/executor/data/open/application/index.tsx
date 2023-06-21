@@ -1,7 +1,7 @@
 import React from 'react';
 import FullScreenModal from '@/executor/tools/fullScreen';
 import { IApplication } from '@/ts/core';
-import EntityIcon from '@/bizcomponents/GlobalComps/entityIcon';
+import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import MainLayout from '@/components/MainLayout';
 import useMenuUpdate from '@/hooks/useMenuUpdate';
 import Directory from '@/components/Directory';

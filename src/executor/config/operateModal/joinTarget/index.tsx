@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { XTarget } from '@/ts/base/schema';
 import { IBelong, TargetType } from '@/ts/core';
-import SearchTarget from '@/bizcomponents/SearchTarget';
+import SearchTarget from '@/components/Common/SearchTarget';
 import { Modal } from 'antd';
 import { schema } from '@/ts/base';
 

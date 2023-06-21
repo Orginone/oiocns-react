@@ -2,9 +2,9 @@
 import React, { useState } from 'react';
 import { XTarget } from '@/ts/base/schema';
 import { ITarget, TargetType } from '@/ts/core';
-import SearchTarget from '@/bizcomponents/SearchTarget';
+import SearchTarget from '@/components/Common/SearchTarget';
 import { Modal } from 'antd';
-import SelectMember from '@/bizcomponents/SelectMember';
+import SelectMember from '@/components/Common/SelectMember';
 
 type IProps = {
   current: ITarget;

@@ -1,7 +1,7 @@
 import { XForm, XProperty } from '@/ts/base/schema';
 import { ProColumns, ProSchemaValueEnumObj } from '@ant-design/pro-components';
 import React, { ReactNode } from 'react';
-import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
+import TeamIcon from '@/components/Common/GlobalComps/entityIcon';
 import { debounce } from '@/utils/tools';
 import { ColTypes } from './const';
 import { FileItemShare } from '@/ts/base/model';

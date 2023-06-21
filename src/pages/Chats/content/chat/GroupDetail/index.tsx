@@ -1,6 +1,6 @@
 import { Button, Col, Modal, Row, Typography } from 'antd';
 import React, { useState } from 'react';
-import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
+import TeamIcon from '@/components/Common/GlobalComps/entityIcon';
 import detailStyle from './index.module.less';
 import { getUuid } from '@/utils/tools';
 import { IMsgChat, TargetType } from '@/ts/core';

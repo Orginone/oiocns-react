@@ -1,4 +1,4 @@
-import EntityIcon from '@/bizcomponents/GlobalComps/entityIcon';
+import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import { schema } from '@/ts/base';
 import { formatZhDate } from '@/utils/tools';
 import { ProFormColumnsType } from '@ant-design/pro-components';

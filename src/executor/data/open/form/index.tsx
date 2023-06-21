@@ -3,7 +3,7 @@ import FullScreenModal from '@/executor/tools/fullScreen';
 import { IFormView } from '@/ts/core';
 import Thing from './Thing/Thing';
 import * as config from './config';
-import EntityIcon from '@/bizcomponents/GlobalComps/entityIcon';
+import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import MainLayout from '@/components/MainLayout';
 import useMenuUpdate from '@/hooks/useMenuUpdate';
 
