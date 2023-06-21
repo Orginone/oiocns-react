@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { XTarget } from '@/ts/base/schema';
 import { IBelong, TargetType } from '@/ts/core';
-import SearchCompany from '@/bizcomponents/SearchCompany';
+import SearchTarget from '@/bizcomponents/SearchTarget';
 import { Modal } from 'antd';
 import { schema } from '@/ts/base';
 
@@ -51,7 +51,7 @@ const JoinTarget: React.FC<IProps> = ({ cmd, current, finished }) => {
       }}
       onCancel={finished}
       width={670}>
-      <SearchCompany
+      <SearchTarget
         searchCallback={(persons: schema.XTarget[]) => {
           setSelectMembers(persons);
         }}

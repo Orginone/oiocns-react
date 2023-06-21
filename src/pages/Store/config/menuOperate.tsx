@@ -45,7 +45,7 @@ const buildDirectoryTree = (directorys: IDirectory[]): MenuItemType[] => {
         <EntityIcon entityId={directory.id} typeName={directory.typeName} size={18} />
       ),
       itemType: directory.typeName,
-      menus: loadFileMenus(directory, 2),
+      menus: loadFileMenus(directory, 1),
       children: buildDirectoryTree(directory.children),
       beforeLoad: async () => {
         await directory.loadContent();

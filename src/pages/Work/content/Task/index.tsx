@@ -54,8 +54,9 @@ const TaskContent = (props: IProps) => {
         {
           let todos = orgCtrl.work.todos;
           if (props.space) {
+            const ids = props.space.targets.map((i) => i.id);
             todos = todos.filter(
-              (a) => a.belongId == props.space!.id || a.shareId == props.space!.id,
+              (t) => ids.includes(t.belongId) || ids.includes(t.shareId),
             );
           }
           if (props.filter != '') {

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button, Divider, Modal, Row } from 'antd';
 import cls from './index.module.less';
 import { NodeModel } from '../../../../processType';
-import ShareShowComp from '@/bizcomponents/IndentityManage/ShareShowComp';
+import ShareShowComp from '@/bizcomponents/ShareShowComp';
 import { AiOutlineSetting } from 'react-icons/ai';
 import SelectAuth from '@/bizcomponents/SelectAuth';
 import SelectForms from '@/bizcomponents/SelectForms';

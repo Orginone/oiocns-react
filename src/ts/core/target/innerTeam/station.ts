@@ -85,11 +85,6 @@ export class Station extends Team implements IStation {
     }
     return true;
   }
-  override async loadContent(reload: boolean = false): Promise<boolean> {
-    await this.loadMembers(reload);
-    await this.loadIdentitys(reload);
-    return true;
-  }
   override async delete(notity: boolean = false): Promise<boolean> {
     notity = await super.delete(notity);
     if (notity) {

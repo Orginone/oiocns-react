@@ -540,7 +540,7 @@ export default class KernelApi {
   ): Promise<model.ResultType<boolean>> {
     return await this.request({
       module: 'chat',
-      action: 'CreateTargetMsg',
+      action: 'CreateIdentityMsg',
       params: params,
     });
   }

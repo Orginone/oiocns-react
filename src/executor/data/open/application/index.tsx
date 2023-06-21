@@ -5,7 +5,7 @@ import EntityIcon from '@/bizcomponents/GlobalComps/entityIcon';
 import MainLayout from '@/components/MainLayout';
 import useMenuUpdate from '@/hooks/useMenuUpdate';
 import Directory from '@/components/Directory';
-import * as config from './config/menuOperate';
+import { loadAppMenu } from './config';
 
 interface IProps {
   current: IApplication;
@@ -15,7 +15,7 @@ interface IProps {
 /** 应用查看 */
 const FormView: React.FC<IProps> = ({ current, finished }) => {
   const [key, rootMenu, selectMenu, setSelectMenu] = useMenuUpdate(() =>
-    config.loadAppMenu(current),
+    loadAppMenu(current),
   );
   if (!selectMenu || !rootMenu) return <></>;
   return (

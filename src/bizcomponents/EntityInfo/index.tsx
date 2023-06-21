@@ -3,7 +3,7 @@ import { Card, Descriptions, Typography } from 'antd';
 import { IEntity } from '@/ts/core';
 import cls from './index.module.less';
 import { schema } from '@/ts/base';
-import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
+import EntityIcon from '@/bizcomponents/GlobalComps/entityIcon';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import { formatZhDate } from '@/utils/tools';
 interface IProps {
@@ -15,7 +15,7 @@ interface IProps {
  * @description: 机构信息内容
  * @return {*}
  */
-const Description: React.FC<IProps> = ({ entity, other, extra }: IProps) => {
+const EntityInfo: React.FC<IProps> = ({ entity, other, extra }: IProps) => {
   const [tkey] = useCtrlUpdate(entity);
   const [ellipsis] = useState(true);
   return (
@@ -40,7 +40,7 @@ const Description: React.FC<IProps> = ({ entity, other, extra }: IProps) => {
               text: entity.id,
               tooltips: [entity.id, '复制成功'],
             }}>
-            <TeamIcon entityId={entity.id} showName />
+            <EntityIcon entityId={entity.id} showName />
           </Typography.Paragraph>
         </Descriptions.Item>
         <Descriptions.Item label="代码">
@@ -55,12 +55,12 @@ const Description: React.FC<IProps> = ({ entity, other, extra }: IProps) => {
         {other}
         {entity.metadata.belongId != entity.id && (
           <Descriptions.Item label="归属">
-            <TeamIcon entityId={entity.metadata.belongId} showName />
+            <EntityIcon entityId={entity.metadata.belongId} showName />
           </Descriptions.Item>
         )}
         {entity.metadata.createUser != entity.id && (
           <Descriptions.Item label="创建人">
-            <TeamIcon entityId={entity.metadata.createUser} showName />
+            <EntityIcon entityId={entity.metadata.createUser} showName />
           </Descriptions.Item>
         )}
         <Descriptions.Item label="创建时间">
@@ -69,7 +69,7 @@ const Description: React.FC<IProps> = ({ entity, other, extra }: IProps) => {
         {entity.metadata.createUser != entity.metadata.updateUser && (
           <>
             <Descriptions.Item label="更新人">
-              <TeamIcon entityId={entity.metadata.updateUser} showName />
+              <EntityIcon entityId={entity.metadata.updateUser} showName />
             </Descriptions.Item>
             <Descriptions.Item label="更新时间">
               {formatZhDate(entity.metadata.updateTime)}
@@ -99,4 +99,4 @@ const Description: React.FC<IProps> = ({ entity, other, extra }: IProps) => {
     </Card>
   );
 };
-export default Description;
+export default EntityInfo;

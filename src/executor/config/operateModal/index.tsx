@@ -1,15 +1,12 @@
 import React from 'react';
 import { schema } from '@/ts/base';
 import { IBelong, IDirectory, IEntity } from '@/ts/core';
-import SearchTarget from './searchTarget';
+import PullMember from './pullMember';
 import JoinTarget from './joinTarget';
 import SpeciesModal from './speciesModal';
 import ApplicationModal from './applicationModal';
 import orgCtrl from '@/ts/controller';
 import LabelsModal from './labelsModal';
-import IdentityModal from './identityModal';
-import AuthorityModal from './authorityModal';
-import StationModal from './stationModal';
 interface IProps {
   cmd: string;
   entity: IEntity<schema.XEntity>;
@@ -24,13 +21,7 @@ const OperateModal: React.FC<IProps> = ({ cmd, entity, finished }) => {
   switch (cmd) {
     case 'pull':
       return (
-        <SearchTarget current={(entity as IDirectory).target} finished={reloadFinish} />
-      );
-    case 'settingAuth':
-      return (
-        <AuthorityModal
-          current={((entity as IDirectory).target as IBelong).superAuth!}
-          finished={finished}></AuthorityModal>
+        <PullMember current={(entity as IDirectory).target} finished={reloadFinish} />
       );
     case 'open':
       switch (entity.typeName) {
@@ -42,10 +33,6 @@ const OperateModal: React.FC<IProps> = ({ cmd, entity, finished }) => {
         case '字典':
         case '分类':
           return <SpeciesModal finished={finished} current={entity as any} />;
-        case '角色':
-          return <IdentityModal finished={finished} identity={entity as any} />;
-        case '岗位':
-          return <StationModal finished={finished} current={entity as any} />;
         default:
           return <></>;
       }

@@ -35,7 +35,6 @@ const TableMode = ({
       }}
       dataSource={current.content(mode)}
       onContextMenuPreparing={(e: any) => {
-        console.log(e);
         e.component.selectRowsByIndexes([e.rowIndex]);
         const modal = Modal.info({
           mask: false,

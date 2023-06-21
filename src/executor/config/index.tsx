@@ -2,6 +2,9 @@ import { TargetType } from '@/ts/core';
 import React from 'react';
 import EntityForm from './entityForm';
 import OperateModal from './operateModal';
+import SettingAuth from './settingModal/settingAuth';
+import SettingStation from './settingModal/settingStation';
+import SettingIdentity from './settingModal/settingIdentity';
 
 interface IProps {
   cmd: string;
@@ -31,7 +34,11 @@ const ConfigExecutor: React.FC<IProps> = ({ cmd, args, finished }) => {
       }
       break;
     case 'settingAuth':
-      return <OperateModal cmd={cmd} entity={args[0]} finished={finished} />;
+      return <SettingAuth space={args[0].target} finished={finished} />;
+    case 'settingIdentity':
+      return <SettingIdentity target={args[0].target} finished={finished} />;
+    case 'settingStation':
+      return <SettingStation company={args[0].target} finished={finished} />;
     case 'update':
     case 'remark':
       switch (args[0].typeName) {

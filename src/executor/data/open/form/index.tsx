@@ -38,8 +38,8 @@ const FormView: React.FC<IProps> = ({ form, finished }) => {
         siderMenuData={rootMenu}>
         <Thing
           key={key}
-          labels={[selectMenu.item?.id]}
-          propertys={[]}
+          labels={selectMenu.item ? [`S${selectMenu.item.id}`] : []}
+          propertys={form.attributes.map((i) => i.property!)}
           belongId={form.metadata.belongId}
           menuItems={[
             {

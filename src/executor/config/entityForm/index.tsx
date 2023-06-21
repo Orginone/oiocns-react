@@ -9,9 +9,6 @@ import PropertyForm from './propertyForm';
 import TargetForm from './targetForm';
 import LabelsForm from './labelsForm';
 import RenameForm from './renameForm';
-import IdentityForm from './IdentityForm';
-import AuthorityForm from './authorityForm';
-import { IIdentity } from '@/ts/core/target/identity/identity';
 interface IProps {
   cmd: string;
   entity: IEntity<schema.XEntity>;
@@ -83,27 +80,6 @@ const EntityForm: React.FC<IProps> = ({ cmd, entity, finished }) => {
     case 'remarkProperty':
       return (
         <PropertyForm formType={cmd} current={entity as any} finished={reloadFinish} />
-      );
-    case 'newIdentity':
-    case 'updateIdentity':
-    case 'remarkIdentity': {
-      const target = cmd.startsWith('new')
-        ? (entity as IDirectory).target
-        : (entity as IIdentity).current;
-      const identity = cmd.startsWith('new') ? undefined : (entity as IIdentity);
-      return (
-        <IdentityForm
-          formType={cmd}
-          target={target}
-          identity={identity}
-          finished={reloadFinish}></IdentityForm>
-      );
-    }
-    case 'newAuthority':
-    case 'updateAuthority':
-    case 'remarkAuthority':
-      return (
-        <AuthorityForm formType={cmd} current={entity as any} finished={reloadFinish} />
       );
     default: {
       const target = cmd.startsWith('new')

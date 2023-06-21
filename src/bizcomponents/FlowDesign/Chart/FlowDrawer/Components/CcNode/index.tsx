@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { Button, Modal } from 'antd';
-import IndentityManage from '@/bizcomponents/IndentityManage';
+import { Button } from 'antd';
 import cls from './index.module.less';
 import { NodeModel } from '../../../../processType';
-import ShareShowComp from '@/bizcomponents/IndentityManage/ShareShowComp';
+import ShareShowComp from '@/bizcomponents/ShareShowComp';
 import { IBelong } from '@/ts/core';
+import SelectIdentity from '@/bizcomponents/SelectIdentity';
 
 interface IProps {
   current: NodeModel;
@@ -47,30 +47,22 @@ const CcNode: React.FC<IProps> = (props) => {
           ) : null}
         </div>
       </div>
-      <Modal
-        title="添加角色"
-        width="650px"
-        key="addApproval"
+      <SelectIdentity
+        multiple={false}
+        space={props.belong}
         open={isApprovalOpen}
-        destroyOnClose={true}
-        onOk={() => {
-          props.current.destType = '身份';
-          props.current.destId = currentData.id;
-          props.current.destName = currentData.name;
+        exclude={[]}
+        finished={(selected) => {
+          if (selected.length > 0) {
+            const item = selected[0];
+            props.current.destType = '身份';
+            props.current.destId = item.id;
+            props.current.destName = item.name;
+            setCurrentData(item);
+          }
           setIsApprovalOpen(false);
         }}
-        onCancel={() => setIsApprovalOpen(false)}>
-        <IndentityManage
-          space={props.belong}
-          multiple={false}
-          onChecked={(params: any) => {
-            setCurrentData({
-              id: params.key,
-              name: params.title,
-            });
-          }}
-        />
-      </Modal>
+      />
     </div>
   );
 };

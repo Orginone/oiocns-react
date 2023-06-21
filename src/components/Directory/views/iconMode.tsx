@@ -14,12 +14,13 @@ const IconMode = ({
   current: IFileInfo<schema.XEntity>;
   mode: number;
 }) => {
+  const cmdType = mode === 1 ? 'data' : 'config';
   const FileCard = (el: IFileInfo<schema.XEntity>) => (
     <Dropdown
       menu={{
         items: loadFileMenus(el, mode),
         onClick: ({ key }) => {
-          command.emitter(mode === 1 ? 'data' : 'config', key, el);
+          command.emitter(cmdType, key, el);
         },
       }}
       trigger={['contextMenu']}>
@@ -30,7 +31,7 @@ const IconMode = ({
         key={el.key}
         onDoubleClick={async () => {
           await el.loadContent();
-          command.emitter(mode === 1 ? 'data' : 'config', 'open', el);
+          command.emitter(cmdType, 'open', el);
         }}
         onContextMenu={(e) => {
           e.stopPropagation();
@@ -59,7 +60,7 @@ const IconMode = ({
       menu={{
         items: loadFileMenus(current, mode),
         onClick: ({ key }) => {
-          command.emitter(mode === 1 ? 'data' : 'config', key, current);
+          command.emitter(cmdType, key, current);
         },
       }}
       trigger={['contextMenu']}>
