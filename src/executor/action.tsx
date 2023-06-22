@@ -1,11 +1,16 @@
 import { IDirectory, IEntity, IFileInfo, IMemeber, IMsgChat, ITarget } from '@/ts/core';
 import orgCtrl from '@/ts/controller';
 import { command, schema } from '@/ts/base';
-import { Drawer, List, Modal, Progress, Upload, message } from 'antd';
+import { Button, Drawer, List, Modal, Progress, Upload, message } from 'antd';
 import QrCode from 'qrcode.react';
 import React, { useEffect, useState } from 'react';
 import TypeIcon from '@/bizcomponents/GlobalComps/typeIcon';
 import EntityIcon from '@/bizcomponents/GlobalComps/entityIcon';
+import { getConfigs } from '@/utils/excel/configs/index';
+import { generateXlsx } from '@/utils/excel/index';
+import { ErrorMessage } from '@/utils/excel/types';
+import { ProTable } from '@ant-design/pro-components';
+
 /** 执行非页面命令 */
 export const executeCmd = (cmd: string, entity: any, args: any[]) => {
   switch (cmd) {
@@ -32,6 +37,8 @@ export const executeCmd = (cmd: string, entity: any, args: any[]) => {
       });
     case 'open':
       return openDirectory(entity);
+    case 'standard':
+      return uploadTemplate(entity);
   }
   return false;
 };
@@ -280,4 +287,87 @@ export const FileTaskList = ({ directory }: { directory: IDirectory }) => {
       />
     </Drawer>
   );
+};
+
+/** 导入模板 */
+export const uploadTemplate = (dir: IDirectory) => {
+  const showErrors = (errors: ErrorMessage[]) =>
+    Modal.info({
+      icon: <></>,
+      okText: '关闭',
+      width: 860,
+      title: '错误信息',
+      maskClosable: true,
+      content: (
+        <ProTable
+          dataSource={errors}
+          cardProps={{ bodyStyle: { padding: 0 } }}
+          scroll={{ y: 300 }}
+          options={false}
+          search={false}
+          columns={[
+            {
+              title: '序号',
+              valueType: 'index',
+              width: 50,
+            },
+            {
+              title: '表名',
+              dataIndex: 'sheetName',
+              key: 'sheetName',
+            },
+            {
+              title: '行数',
+              dataIndex: 'row',
+              key: 'row',
+            },
+            {
+              title: '错误信息',
+              dataIndex: 'message',
+              key: 'message',
+              width: 460,
+            },
+          ]}
+        />
+      ),
+    });
+  const modal = Modal.info({
+    icon: <></>,
+    okText: '关闭',
+    width: 610,
+    title: '导入模板',
+    maskClosable: true,
+    content: (
+      <>
+        <Button onClick={async () => generateXlsx(getConfigs(dir), '导入模板')}>
+          导入模板下载
+        </Button>
+        <Upload
+          type={'drag'}
+          showUploadList={false}
+          style={{ width: 550, height: 300, marginTop: 10 }}
+          beforeUpload={(file) => {
+            const isXlsx =
+              file.type ==
+              'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+            if (!isXlsx) {
+              message.error(`${file.name} 不是一个 xlsx 文件`);
+            }
+            return isXlsx;
+          }}
+          customRequest={async (options) => {
+            modal.destroy();
+            command.emitter('-', 'taskList', dir);
+            const file = options.file as File;
+            dir.createBatch(
+              file,
+              (errors) => showErrors(errors),
+              (error) => message.error(error),
+            );
+          }}>
+          <div style={{ color: 'limegreen', fontSize: 22 }}>点击或拖拽至此处上传</div>
+        </Upload>
+      </>
+    ),
+  });
 };
