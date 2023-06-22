@@ -21,10 +21,10 @@ interface IProps {
 const RootNode: React.FC<IProps> = (props) => {
   const [viewForm, setViewForm] = useState<XForm>();
   const [workforms, setWorkForms] = useState<XForm[]>(
-    (props.current.forms || []).filter((i) => i.typeName === '事项配置'),
+    (props.current.forms || []).filter((i) => i.typeName === '主表'),
   );
   const [thingforms, setThingForms] = useState<XForm[]>(
-    (props.current.forms || []).filter((i) => i.typeName === '实体配置'),
+    (props.current.forms || []).filter((i) => i.typeName === '子表'),
   );
   const [formModel, setFormModel] = useState<string>('');
   const [selectAuthValue, setSelectAuthValue] = useState<any>(props.current.destId);
@@ -50,9 +50,9 @@ const RootNode: React.FC<IProps> = (props) => {
             shape="round"
             size="small"
             onClick={() => {
-              setFormModel('事项配置');
+              setFormModel('主表');
             }}>
-            选择业务表单
+            选择主表
           </Button>
         </Row>
         {workforms && workforms.length > 0 && (
@@ -75,9 +75,9 @@ const RootNode: React.FC<IProps> = (props) => {
             shape="round"
             size="small"
             onClick={() => {
-              setFormModel('实体配置');
+              setFormModel('子表');
             }}>
-            选择实体表单
+            选择子表
           </Button>
         </Row>
         {thingforms && thingforms.length > 0 && (
@@ -110,8 +110,8 @@ const RootNode: React.FC<IProps> = (props) => {
             <SelectForms
               belong={props.belong}
               typeName={formModel}
-              selected={formModel === '实体配置' ? thingforms : workforms}
-              setSelected={formModel === '实体配置' ? setThingForms : setWorkForms}
+              selected={formModel === '子表' ? thingforms : workforms}
+              setSelected={formModel === '子表' ? setThingForms : setWorkForms}
             />
           </Modal>
           {viewForm && (

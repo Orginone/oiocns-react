@@ -1,5 +1,6 @@
 import { schema, model, kernel } from '../../base';
 import { Entity, IEntity, PageAll, orgAuth } from '../../core/public';
+import { ITarget } from '../target/base/target';
 import { IDirectory } from './directory';
 import { FileInfo, IFileInfo } from './fileinfo';
 
@@ -12,6 +13,8 @@ export class SpeciesItem extends Entity<schema.XSpeciesItem> {
 
 /** 表单类只读接口 */
 export interface IFormView extends IEntity<schema.XForm> {
+  /** 用户 */
+  target: ITarget;
   /** 类目项 */
   items: IEntity<schema.XSpeciesItem>[];
   /** 表单特性 */
@@ -47,9 +50,11 @@ export interface IForm extends IFileInfo<schema.XForm>, IFormView {
 }
 
 export class FormView extends Entity<schema.XForm> implements IFormView {
-  constructor(_metadata: schema.XForm) {
+  constructor(_metadata: schema.XForm, _target: ITarget) {
     super(_metadata);
+    this.target = _target;
   }
+  target: ITarget;
   items: IEntity<schema.XSpeciesItem>[] = [];
   attributes: schema.XAttribute[] = [];
   private _itemLoaded: boolean = false;
@@ -93,7 +98,9 @@ export class FormView extends Entity<schema.XForm> implements IFormView {
 export class Form extends FileInfo<schema.XForm> implements IForm {
   constructor(_metadata: schema.XForm, _directory: IDirectory) {
     super(_metadata, _directory);
+    this.target = _directory.target;
   }
+  target: ITarget;
   items: IEntity<schema.XSpeciesItem>[] = [];
   private _itemLoaded: boolean = false;
   attributes: schema.XAttribute[] = [];

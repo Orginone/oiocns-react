@@ -6,7 +6,7 @@ import { FormLabelAlign } from 'antd/lib/form/interface';
 import { LabelTooltipType } from 'antd/es/form/FormItemLabel';
 
 interface IProps {
-  dictId: string;
+  speciesId: string;
   rules: Rule[];
   name: string;
   label: React.ReactNode;
@@ -29,7 +29,7 @@ const ProFormDict = (props: IProps) => {
       .localeCompare(((optionB?.label ?? '') as string).toLowerCase());
 
   useEffect(() => {
-    orgCtrl.work.loadItems(props.dictId).then((value) => {
+    orgCtrl.work.loadItems(props.speciesId).then((value) => {
       setOptions(
         value.map((item) => {
           return { label: item.name, value: item.id };

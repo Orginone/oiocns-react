@@ -9,10 +9,10 @@ import { MakePropertysToAttrMap, submitCurrentTableData } from '../Function';
 import { toolBtnsType, OperateType } from '../const';
 import BaseThing from '../BaseThing';
 import SelectThing from '../TreeSelectThing';
+import { IFormView } from '@/ts/core';
 
-interface IProps {
+interface IProps extends ProTableProps<Record<string, any>, ParamsType, 'text'> {
   propertys: schema.XProperty[];
-  belongId: string;
   selectable?: boolean;
   height?: any;
   width?: any;
@@ -20,26 +20,19 @@ interface IProps {
   setSelectedRows?: (data: any) => void;
   current?: any;
   onListChange?: Function;
-  form?: schema.XForm; //传进来的 表单基本信息
+  formView: IFormView; //传进来的 表单基本信息
   defaultColums?: any[]; //传进来的 表头设置
   toolBtnItems?: toolBtnsType;
 }
 
-const ThingTable = <
-  DataType extends Record<string, any>,
-  Params extends ParamsType = ParamsType,
-  ValueType = 'text',
->(
-  props: ProTableProps<DataType, Params, ValueType> & IProps,
-) => {
+const ThingTable: React.FC<IProps> = (props) => {
   const {
     rowKey = 'Id',
-    belongId,
     propertys,
     dataSource = [],
     // defaultColums,
     current,
-    form,
+    formView,
     onListChange,
     toolBtnItems = [],
     ...rest
@@ -54,7 +47,7 @@ const ThingTable = <
   useEffect(() => {
     setThingList(dataSource as any[]);
   }, [dataSource]);
-  if (!form) {
+  if (!formView) {
     return <></>;
   }
 
@@ -101,7 +94,7 @@ const ThingTable = <
 
   // 监听展示数据变化。弹出数据给父级
   useEffect(() => {
-    submitCurrentTableData(form, thingList, propertys, onListChange);
+    submitCurrentTableData(formView, thingList, propertys, onListChange);
   }, [thingList]);
 
   // 触发弹窗 关闭事件
@@ -191,6 +184,7 @@ const ThingTable = <
         rowKey={rowKey}
         key={thingList.length}
         dataSource={[...thingList]}
+        formView={formView}
         toolBarRender={HandleToolBarRender}
         {...rest}
       />
@@ -213,8 +207,7 @@ const ThingTable = <
             cancelText={'关闭'}
             width={1000}>
             <OioForm
-              form={form}
-              belong={current.workItem.belong}
+              form={formView}
               fieldsValue={operateModel === OperateType.Edit ? selectedData : undefined}
               onValuesChange={(_changeValue, values) => setChangeData(values)}
               noRule={operateModel.includes('Edit')}
@@ -222,7 +215,7 @@ const ThingTable = <
           </Modal>
         )}
         {/* 实体选择区域 */}
-        {current && (
+        {/* {current && (
           <Modal
             open={operateModel === OperateType.Select}
             footer={false}
@@ -246,7 +239,7 @@ const ThingTable = <
               }}
             />
           </Modal>
-        )}
+        )} */}
       </>
     </>
   );

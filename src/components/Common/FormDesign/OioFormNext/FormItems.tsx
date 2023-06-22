@@ -303,7 +303,7 @@ const OioFormItem = ({
       return (
         <ProFormDict
           label=""
-          dictId={item.property!.speciesId}
+          speciesId={item.property!.speciesId}
           name={item.id}
           rules={rules}
           tooltip={rule.description}

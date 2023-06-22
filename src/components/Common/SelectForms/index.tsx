@@ -26,17 +26,15 @@ const SelectForms: React.FC<IProps> = ({ belong, typeName, selected, setSelected
     const directory: IDirectory = info.node.item;
     let forms = await directory.loadForms();
     setCenterTreeData(
-      forms
-        .filter((a) => a.typeName == typeName)
-        .map((item) => {
-          return {
-            key: item.id,
-            title: item.name,
-            value: item.id,
-            item: item.metadata,
-            children: [],
-          };
-        }),
+      forms.map((item) => {
+        return {
+          key: item.id,
+          title: item.name,
+          value: item.id,
+          item: item.metadata,
+          children: [],
+        };
+      }),
     );
   };
 
@@ -47,6 +45,7 @@ const SelectForms: React.FC<IProps> = ({ belong, typeName, selected, setSelected
     }
     const form: XForm = (info.node as any).item;
     if (info.checked) {
+      form.typeName = typeName;
       selected.push(form);
     } else {
       selected = selected.filter((i) => i.id != form.id);

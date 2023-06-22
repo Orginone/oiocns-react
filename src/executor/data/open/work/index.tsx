@@ -1,4 +1,4 @@
-import { IWork, SpeciesType } from '@/ts/core';
+import { IFormView, IWork, SpeciesType } from '@/ts/core';
 import { Button, Input, Tabs, message } from 'antd';
 import orgCtrl from '@/ts/controller';
 import React, { useEffect, useState } from 'react';
@@ -37,11 +37,12 @@ interface SubmitDataType {
  * @returns
  */
 const WorkStartDo: React.FC<IProps> = ({ current, finished }) => {
+  const thingForms = current.forms.filter((i) => i.typeName === '子表');
   const [data, setData] = useState<any>({});
-  const [activeTab, setActiveTab] = useState<string>();
+  const [activeTab, setActiveTab] = useState<string>(
+    thingForms.length > 0 ? thingForms[0].id : '',
+  );
   const [propertys, setPropertys] = useState<XProperty[]>([]);
-  const [thingForms, setThingForms] = useState<XForm[]>([]);
-  const [workForm, setWorkForm] = useState<XForm>();
   const [content, setContent] = useState<string>('');
   const [defaultData, setDefaultData] = useState<any[]>([]);
   const [submitData, setSubmitData] = useState<SubmitDataType>({
@@ -89,44 +90,6 @@ const WorkStartDo: React.FC<IProps> = ({ current, finished }) => {
     return actions;
   };
 
-  useEffect(() => {
-    current.loadWorkNode().then((value) => {
-      console.log(value);
-      if (value && value.forms && value.forms.length > 0) {
-        setThingForms(value.forms.filter((i) => i.typeName === SpeciesType.Thing));
-        setWorkForm(value.forms.find((i) => i.typeName === SpeciesType.Work));
-      }
-    });
-  }, []);
-
-  useEffect(() => {
-    if (thingForms.length > 0) {
-      if (!activeTab) {
-        setActiveTab(thingForms[0].id);
-      } else {
-        orgCtrl.work
-          .loadAttributes(activeTab, current.application!.belongId)
-          .then((attributes) => {
-            setPropertys(
-              attributes
-                .filter((i) => i.linkPropertys && i.linkPropertys.length > 0)
-                .map((i) => {
-                  return { attrId: i.id, ...i.linkPropertys![0] };
-                }),
-            );
-          });
-
-        if (submitData.formData[activeTab]?.resourceData) {
-          setDefaultData(
-            JSON.parse(submitData.formData[activeTab]?.resourceData)?.data ?? [],
-          );
-        } else {
-          setDefaultData([]);
-        }
-      }
-    }
-  }, [thingForms, activeTab]);
-
   const handleTableChange = (tableID: string, data: any[], Json: string) => {
     const changeData: { [key: string]: any } = {};
     data.forEach((item) => {
@@ -158,23 +121,26 @@ const WorkStartDo: React.FC<IProps> = ({ current, finished }) => {
         footer={[]}
         onCancel={finished}>
         <div className={cls.content}>
-          {workForm && (
-            <OioForm
-              key={workForm.id}
-              form={workForm}
-              belong={current.application!.directory.target.space}
-              submitter={{
-                resetButtonProps: {
-                  style: { display: 'none' },
-                },
-                render: (_: any, _dom: any) => <></>,
-              }}
-              onValuesChange={(_, values) => {
-                setData({ ...data, ...values });
-              }}
-            />
-          )}
-          {/* {thingForms.length > 0 && (
+          {current.forms
+            .filter((form) => form.typeName === '主表')
+            .map((form) => {
+              return (
+                <OioForm
+                  key={form.id}
+                  form={form}
+                  submitter={{
+                    resetButtonProps: {
+                      style: { display: 'none' },
+                    },
+                    render: (_: any, _dom: any) => <></>,
+                  }}
+                  onValuesChange={(_, values) => {
+                    setData({ ...data, ...values });
+                  }}
+                />
+              );
+            })}
+          {thingForms.length > 0 && (
             <ThingTable
               headerTitle={
                 <Tabs
@@ -194,12 +160,11 @@ const WorkStartDo: React.FC<IProps> = ({ current, finished }) => {
               toolBtnItems={loadActions()}
               dataSource={defaultData}
               current={current}
-              form={thingForms.find((v) => v.id === activeTab)}
+              formView={thingForms.find((v) => v.id === activeTab)!}
               propertys={propertys}
-              belongId={current.application!.belongId}
               onListChange={handleTableChange}
             />
-          )} */}
+          )}
           <div className={cls.approvalArea}>
             <Input.TextArea
               style={{ height: 150, width: 'calc(100% - 120px)' }}

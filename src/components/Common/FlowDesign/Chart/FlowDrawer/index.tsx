@@ -49,6 +49,7 @@ const FlowDrawer: React.FC<IProps> = (props) => {
                   });
                   break;
                 case '选择型':
+                case '分类型':
                   {
                     fields.push({
                       label: attr.name,

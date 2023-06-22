@@ -9,7 +9,7 @@ import cls from './index.module.less';
 import OioForm from '@/components/Common/FormDesign/OioFormNext';
 import { schema } from '@/ts/base';
 import { IBelong } from '@/ts/core';
-import BashThing from '@/pages/Work/content/Work/ThingTables/BaseThing';
+import BashThing from '@/executor/data/open/work/ThingTables/BaseThing';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 
 export interface TaskDetailType {
@@ -47,7 +47,7 @@ const Detail: React.FC<TaskDetailType> = ({ task, belong, instance, onBack }) =>
               readonly
               propertys={json.propertys}
               dataSource={json.data}
-              form={json.form}
+              formView={json.form}
             />
           ),
         });
