@@ -3,12 +3,11 @@ import { Button, Popover, Spin, Badge } from 'antd';
 import moment from 'moment';
 import React, { useEffect, useRef, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
-import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
+import TeamIcon from '@/components/Common/GlobalComps/entityIcon';
 import Information from './information';
 import { showChatTime, downloadByUrl } from '@/utils/tools';
 import { IMessage, IMsgChat, MessageType } from '@/ts/core';
 import { parseAvatar } from '@/ts/base';
-import ForwardModal from '@/pages/Chats/components/ForwardModal';
 import css from './index.module.less';
 import { parseCiteMsg, parseMsg } from '@/pages/Chats/components/parseMsg';
 
@@ -262,13 +261,6 @@ const GroupContent = (props: Iprops) => {
         </div>
         {infoMsg && <Information msg={infoMsg} onClose={() => setInfoMsg(undefined)} />}
       </Spin>
-      {forwardOpen && (
-        <ForwardModal
-          visible={forwardOpen}
-          onCancel={() => setForwardOpen(false)}
-          formwardCode={formwardCode}
-        />
-      )}
     </div>
   );
 };

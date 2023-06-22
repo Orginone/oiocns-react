@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { Modal, Spin, Empty } from 'antd';
 import { animateScroll } from 'react-scroll';
 import SearchInput from '@/components/SearchInput';
-import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
+import TeamIcon from '@/components/Common/GlobalComps/entityIcon';
 import { IMsgChat } from '@/ts/core';
 import { showChatTime } from '@/utils/tools';
 import { parseMsg } from '@/pages/Chats/components/parseMsg';

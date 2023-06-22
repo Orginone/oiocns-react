@@ -1,12 +1,14 @@
-import { XWorkDefine } from '../../base/schema';
 import { kernel, model, schema } from '../../base';
 import { IApplication } from '../thing/application';
 import { Entity, entityOperates } from '../public';
 import { IFormView, FormView } from '../thing/form';
 import { IFileInfo } from '../thing/fileinfo';
 import { IDirectory } from '../thing/directory';
+import { ITarget } from '../target/base/target';
 
 export interface IWork extends IFileInfo<schema.XWorkDefine> {
+  /** 用户 */
+  target: ITarget;
   /** 应用 */
   application: IApplication | undefined;
   /** 流程关联的表单 */
@@ -25,7 +27,7 @@ export interface IWork extends IFileInfo<schema.XWorkDefine> {
   ): Promise<schema.XWorkInstance | undefined>;
 }
 
-export const fullDefineRule = (data: XWorkDefine) => {
+export const fullDefineRule = (data: schema.XWorkDefine) => {
   data.allowAdd = true;
   data.allowEdit = true;
   data.allowSelect = true;
@@ -40,14 +42,19 @@ export const fullDefineRule = (data: XWorkDefine) => {
 };
 
 export class Work extends Entity<schema.XWorkDefine> implements IWork {
-  constructor(_metadata: XWorkDefine, _application?: IApplication) {
+  constructor(
+    _metadata: schema.XWorkDefine,
+    _target: ITarget,
+    _application?: IApplication,
+  ) {
     super(fullDefineRule(_metadata));
     this.application = _application;
-
+    this.target = _target;
     this.belongId = _application?.belongId || '';
     this.isInherited = _application?.isInherited || false;
     this.directory = _application?.directory || ({} as IDirectory);
   }
+  target: ITarget;
   belongId: string;
   isInherited: boolean;
   directory: IDirectory;
@@ -64,8 +71,9 @@ export class Work extends Entity<schema.XWorkDefine> implements IWork {
   move(_destination: IDirectory): Promise<boolean> {
     throw new Error('Method not implemented.');
   }
-  async loadContent(_reload?: boolean | undefined): Promise<boolean> {
-    return true;
+  async loadContent(_reload: boolean = false): Promise<boolean> {
+    await this.loadWorkForms();
+    return this.forms.length > 0;
   }
   content(_mode?: number | undefined): IFileInfo<schema.XEntity>[] {
     return [];
@@ -111,22 +119,24 @@ export class Work extends Entity<schema.XWorkDefine> implements IWork {
     const forms: IFormView[] = [];
     const res = await kernel.queryWorkNodes({ id: this.id });
     if (res.success && res.data) {
-      const recursionForms = (node: model.WorkNodeModel) => {
-        if (node.forms && node.forms.length > 0) {
-          forms.push(...node.forms.map((i) => new FormView(i)));
+      const recursionForms = async (node: model.WorkNodeModel) => {
+        for (const item of node.forms ?? []) {
+          const form = new FormView(item, this.target);
+          await form.loadAttributes();
+          forms.push(form);
         }
         if (node.children) {
-          recursionForms(node.children);
+          await recursionForms(node.children);
         }
         if (node.branches) {
           for (const branch of node.branches) {
             if (branch.children) {
-              recursionForms(branch.children);
+              await recursionForms(branch.children);
             }
           }
         }
       };
-      recursionForms(res.data);
+      await recursionForms(res.data);
     }
     this.forms = forms;
     return forms;

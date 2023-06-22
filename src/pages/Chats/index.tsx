@@ -6,7 +6,6 @@ import useMenuUpdate from '@/hooks/useMenuUpdate';
 import { Input } from 'antd';
 import { ImSearch } from 'react-icons/im';
 import { IMsgChat, msgChatNotify } from '@/ts/core';
-import Supervise from './components/Supervise';
 
 const Setting: React.FC<any> = () => {
   const [filter, setFilter] = useState('');
@@ -63,19 +62,13 @@ const Setting: React.FC<any> = () => {
         }
       }}
       siderMenuData={rootMenu}>
-      {isSupervise ? (
-        <>
-          {selectMenu.company !== undefined && <Supervise belong={selectMenu.company!} />}
-        </>
-      ) : (
-        <Content
-          key={key}
-          belong={selectMenu.company!}
-          selectMenu={selectMenu}
-          openDetail={openDetail}
-          filter={filter}
-        />
-      )}
+      <Content
+        key={key}
+        belong={selectMenu.company!}
+        selectMenu={selectMenu}
+        openDetail={openDetail}
+        filter={filter}
+      />
     </MainLayout>
   );
 };

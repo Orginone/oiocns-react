@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import FullScreenModal from '@/executor/tools/fullScreen';
 import { IAuthority, IBelong } from '@/ts/core';
-import EntityIcon from '@/bizcomponents/GlobalComps/entityIcon';
+import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import MainLayout from '@/components/MainLayout';
 import useMenuUpdate from '@/hooks/useMenuUpdate';
-import EntityInfo from '@/bizcomponents/EntityInfo';
+import EntityInfo from '@/components/Common/EntityInfo';
 import * as im from 'react-icons/im';
 import { MenuItemType, OperateMenuType } from 'typings/globelType';
 import AuthForm from './subModal/authForm';

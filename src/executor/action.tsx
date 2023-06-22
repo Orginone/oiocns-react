@@ -12,8 +12,8 @@ import { command, schema } from '@/ts/base';
 import { Drawer, List, Modal, Progress, Upload, message } from 'antd';
 import QrCode from 'qrcode.react';
 import React, { useEffect, useState } from 'react';
-import TypeIcon from '@/bizcomponents/GlobalComps/typeIcon';
-import EntityIcon from '@/bizcomponents/GlobalComps/entityIcon';
+import TypeIcon from '@/components/Common/GlobalComps/typeIcon';
+import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 /** 执行非页面命令 */
 export const executeCmd = (cmd: string, entity: any, args: any[]) => {
   switch (cmd) {

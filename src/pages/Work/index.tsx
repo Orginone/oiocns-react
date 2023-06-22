@@ -29,7 +29,12 @@ const Todo: React.FC<any> = () => {
           }}></Input>
       }
       siderMenuData={rootMenu}>
-      <Content key={key} selectMenu={selectMenu} filter={filter} />
+      <Content
+        key={key}
+        taskType={selectMenu.itemType}
+        space={selectMenu.item}
+        filter={filter}
+      />
     </MainLayout>
   );
 };

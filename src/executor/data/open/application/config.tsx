@@ -1,4 +1,4 @@
-import EntityIcon from '@/bizcomponents/GlobalComps/entityIcon';
+import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import { IApplication } from '@/ts/core';
 import React from 'react';
 

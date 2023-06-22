@@ -1,4 +1,4 @@
-import EntityIcon from '@/bizcomponents/GlobalComps/entityIcon';
+import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import { Select } from 'antd';
 import React, { memo, useEffect, useState } from 'react';
 

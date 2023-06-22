@@ -1,9 +1,9 @@
-import { IWork, SpeciesType } from '@/ts/core';
-import { Button, Card, Input, Tabs, message } from 'antd';
+import { IFormView, IWork, SpeciesType } from '@/ts/core';
+import { Button, Input, Tabs, message } from 'antd';
 import orgCtrl from '@/ts/controller';
 import React, { useEffect, useState } from 'react';
 import cls from './index.module.less';
-import OioForm from '@/bizcomponents/FormDesign/OioFormNext';
+import OioForm from '@/components/Common/FormDesign/OioFormNext';
 import { XForm, XProperty } from '@/ts/base/schema';
 // import BaseThing from './BaseThing';
 import ThingTable from './ThingTables/ThingTable';
@@ -37,11 +37,12 @@ interface SubmitDataType {
  * @returns
  */
 const WorkStartDo: React.FC<IProps> = ({ current, finished }) => {
+  const thingForms = current.forms.filter((i) => i.typeName === '子表');
   const [data, setData] = useState<any>({});
-  const [activeTab, setActiveTab] = useState<string>();
+  const [activeTab, setActiveTab] = useState<string>(
+    thingForms.length > 0 ? thingForms[0].id : '',
+  );
   const [propertys, setPropertys] = useState<XProperty[]>([]);
-  const [thingForms, setThingForms] = useState<XForm[]>([]);
-  const [workForm, setWorkForm] = useState<XForm>();
   const [content, setContent] = useState<string>('');
   const [defaultData, setDefaultData] = useState<any[]>([]);
   const [submitData, setSubmitData] = useState<SubmitDataType>({
@@ -89,43 +90,6 @@ const WorkStartDo: React.FC<IProps> = ({ current, finished }) => {
     return actions;
   };
 
-  useEffect(() => {
-    current.loadWorkNode().then((value) => {
-      if (value && value.forms && value.forms.length > 0) {
-        setThingForms(value.forms.filter((i) => i.typeName === SpeciesType.Thing));
-        setWorkForm(value.forms.find((i) => i.typeName === SpeciesType.Work));
-      }
-    });
-  }, []);
-
-  useEffect(() => {
-    if (thingForms.length > 0) {
-      if (!activeTab) {
-        setActiveTab(thingForms[0].id);
-      } else {
-        orgCtrl.work
-          .loadAttributes(activeTab, current.application!.belongId)
-          .then((attributes) => {
-            setPropertys(
-              attributes
-                .filter((i) => i.linkPropertys && i.linkPropertys.length > 0)
-                .map((i) => {
-                  return { attrId: i.id, ...i.linkPropertys![0] };
-                }),
-            );
-          });
-
-        if (submitData.formData[activeTab]?.resourceData) {
-          setDefaultData(
-            JSON.parse(submitData.formData[activeTab]?.resourceData)?.data ?? [],
-          );
-        } else {
-          setDefaultData([]);
-        }
-      }
-    }
-  }, [thingForms, activeTab]);
-
   const handleTableChange = (tableID: string, data: any[], Json: string) => {
     const changeData: { [key: string]: any } = {};
     data.forEach((item) => {
@@ -153,26 +117,29 @@ const WorkStartDo: React.FC<IProps> = ({ current, finished }) => {
         fullScreen
         width={'80vw'}
         destroyOnClose
-        title={current.typeName + '项管理'}
+        title={current.name}
         footer={[]}
         onCancel={finished}>
         <div className={cls.content}>
-          {workForm && (
-            <OioForm
-              key={workForm.id}
-              form={workForm}
-              belong={current.application!.directory.target.space}
-              submitter={{
-                resetButtonProps: {
-                  style: { display: 'none' },
-                },
-                render: (_: any, _dom: any) => <></>,
-              }}
-              onValuesChange={(_, values) => {
-                setData({ ...data, ...values });
-              }}
-            />
-          )}
+          {current.forms
+            .filter((form) => form.typeName === '主表')
+            .map((form) => {
+              return (
+                <OioForm
+                  key={form.id}
+                  form={form}
+                  submitter={{
+                    resetButtonProps: {
+                      style: { display: 'none' },
+                    },
+                    render: (_: any, _dom: any) => <></>,
+                  }}
+                  onValuesChange={(_, values) => {
+                    setData({ ...data, ...values });
+                  }}
+                />
+              );
+            })}
           {thingForms.length > 0 && (
             <ThingTable
               headerTitle={
@@ -189,38 +156,27 @@ const WorkStartDo: React.FC<IProps> = ({ current, finished }) => {
                     };
                   })}></Tabs>
               }
-              // key={activeTab}
+              key={activeTab}
               toolBtnItems={loadActions()}
               dataSource={defaultData}
               current={current}
-              form={thingForms.find((v) => v.id === activeTab)}
+              formView={thingForms.find((v) => v.id === activeTab)!}
               propertys={propertys}
-              belongId={current.application!.belongId}
               onListChange={handleTableChange}
             />
           )}
-          <Card className={cls['bootom_content']}>
-            <div style={{ display: 'flex', width: '100%' }}>
-              <Input.TextArea
-                style={{ width: '92%' }}
-                placeholder="请填写备注信息"
-                onChange={(e) => {
-                  setContent(e.target.value);
-                }}
-              />
-              <div
-                style={{
-                  width: '8%',
-                  display: 'flex',
-                  marginTop: '18px',
-                  marginLeft: '18px',
-                }}>
-                <Button type="primary" onClick={submit}>
-                  提交
-                </Button>
-              </div>
-            </div>
-          </Card>
+          <div className={cls.approvalArea}>
+            <Input.TextArea
+              style={{ height: 150, width: 'calc(100% - 120px)' }}
+              placeholder="请填写备注信息"
+              onChange={(e) => {
+                setContent(e.target.value);
+              }}
+            />
+            <Button type="primary" onClick={submit}>
+              提交
+            </Button>
+          </div>
         </div>
       </FullScreenModal>
     </>

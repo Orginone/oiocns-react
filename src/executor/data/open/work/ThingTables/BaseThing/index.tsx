@@ -1,4 +1,4 @@
-import { XForm, XProperty } from '@/ts/base/schema';
+import { XProperty } from '@/ts/base/schema';
 import React, { useMemo } from 'react';
 import { getColItem } from '../Function';
 import { defaultCol, defaultColumnStateMap } from '../const';
@@ -10,21 +10,16 @@ import {
   ProTableProps,
 } from '@ant-design/pro-components';
 import cls from './index.module.less';
-interface IProps {
+import { IFormView } from '@/ts/core';
+interface IProps extends ProTableProps<Record<string, any>, ParamsType, 'text'> {
   propertys: XProperty[]; // 表单头部展示数据源
   belongId?: string;
   Operation?: ProColumnType<any>; // 操作列渲染
   labels?: string[]; //搜索信息 表单标签
-  form?: XForm; // 表单基本信息
+  formView: IFormView; // 表单基本信息
   readonly?: boolean; //只读表单，隐藏操作区，配置区
 }
-const BaseThing = <
-  DataType extends Record<string, any>,
-  Params extends ParamsType = ParamsType,
-  ValueType = 'text',
->(
-  props: ProTableProps<DataType, Params, ValueType> & IProps,
-) => {
+const BaseThing: React.FC<IProps> = (props) => {
   const {
     propertys = [],
     labels = [],

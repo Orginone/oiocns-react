@@ -19,7 +19,7 @@ import DataGrid, {
 } from 'devextreme-react/data-grid';
 import CustomStore from 'devextreme/data/custom_store';
 import { kernel, parseAvatar } from '@/ts/base';
-import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
+import TeamIcon from '@/components/Common/GlobalComps/entityIcon';
 import { AiOutlineEllipsis } from 'react-icons/ai';
 import { ItemType } from 'antd/lib/menu/hooks/useItems';
 import { formatSize } from '@/ts/base/common';

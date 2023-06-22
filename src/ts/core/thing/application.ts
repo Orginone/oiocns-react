@@ -103,7 +103,9 @@ export class Application extends FileInfo<schema.XApplication> implements IAppli
       });
       if (res.success) {
         this._worksLoaded = true;
-        this.works = (res.data.result || []).map((a) => new Work(a, this));
+        this.works = (res.data.result || []).map(
+          (a) => new Work(a, this.directory.target, this),
+        );
       }
     }
     return this.works;
@@ -112,7 +114,7 @@ export class Application extends FileInfo<schema.XApplication> implements IAppli
     data.applicationId = this.id;
     const res = await kernel.createWorkDefine(data);
     if (res.success && res.data.id) {
-      let work = new Work(res.data, this);
+      let work = new Work(res.data, this.directory.target, this);
       this.works.push(work);
       return work;
     }

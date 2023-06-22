@@ -1,20 +1,20 @@
 import React, { useState } from 'react';
 import FullScreenModal from '@/executor/tools/fullScreen';
 import { ICompany, IStation } from '@/ts/core';
-import EntityIcon from '@/bizcomponents/GlobalComps/entityIcon';
+import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import MainLayout from '@/components/MainLayout';
 import useMenuUpdate from '@/hooks/useMenuUpdate';
 import * as im from 'react-icons/im';
 import { MenuItemType, OperateMenuType } from 'typings/globelType';
 import StationForm from './subModal/stationForm';
-import SelectMember from '@/bizcomponents/SelectMember';
-import SelectIdentity from '@/bizcomponents/SelectIdentity';
+import SelectMember from '@/components/Common/SelectMember';
+import SelectIdentity from '@/components/Common/SelectIdentity';
 import { Modal, message } from 'antd';
 import CardOrTableComp from '@/components/CardOrTableComp';
 import { schema } from '@/ts/base';
 import { IdentityColumn, PersonColumns } from '@/config/column';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
-import EntityInfo from '@/bizcomponents/EntityInfo';
+import EntityInfo from '@/components/Common/EntityInfo';
 
 interface IProps {
   company: ICompany;

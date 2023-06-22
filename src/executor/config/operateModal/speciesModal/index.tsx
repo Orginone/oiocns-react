@@ -5,12 +5,12 @@ import { Button, message } from 'antd';
 import { schema } from '@/ts/base';
 import { ProColumns } from '@ant-design/pro-table';
 import PageCard from '@/components/PageCard';
-import EntityIcon from '@/bizcomponents/GlobalComps/entityIcon';
+import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import CardOrTable from '@/components/CardOrTableComp';
 import cls from './index.module.less';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import SpeciesItemModal from './itemModal';
-import EntityInfo from '@/bizcomponents/EntityInfo';
+import EntityInfo from '@/components/Common/EntityInfo';
 import FullScreenModal from '@/executor/tools/fullScreen';
 
 type IProps = {
@@ -108,7 +108,7 @@ const SpeciesModal: React.FC<IProps> = ({ current, finished }) => {
       editable: false,
       key: 'belongId',
       width: 200,
-      render: (_, record) => {
+      render: (_: any, record: schema.XSpeciesItem) => {
         return <EntityIcon entityId={record.belongId} showName />;
       },
     },
@@ -118,7 +118,7 @@ const SpeciesModal: React.FC<IProps> = ({ current, finished }) => {
       editable: false,
       key: 'createUser',
       width: 150,
-      render: (_, record) => {
+      render: (_: any, record: schema.XSpeciesItem) => {
         return <EntityIcon entityId={record.createUser} showName />;
       },
     },
@@ -180,7 +180,6 @@ const SpeciesModal: React.FC<IProps> = ({ current, finished }) => {
           rowKey={'id'}
           operation={renderOperate}
           columns={columns}
-          showChangeBtn={false}
         />
       </PageCard>
       {loadSpeciesItemModal()}

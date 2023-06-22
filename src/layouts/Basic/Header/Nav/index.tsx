@@ -2,8 +2,8 @@ import { Badge, Space } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { Link, RouteComponentProps, withRouter } from 'react-router-dom';
 import cls from './index.module.less';
-import OrgIcons from '@/bizcomponents/GlobalComps/orgIcons';
-import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
+import OrgIcons from '@/components/Common/GlobalComps/orgIcons';
+import TeamIcon from '@/components/Common/GlobalComps/entityIcon';
 import orgCtrl from '@/ts/controller';
 import { msgChatNotify } from '@/ts/core';
 

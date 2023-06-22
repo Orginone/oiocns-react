@@ -1,4 +1,4 @@
-import EntityIcon from '@/bizcomponents/GlobalComps/entityIcon';
+import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import orgCtrl from '@/ts/controller';
 import { IDirectory, IGroup, ITarget } from '@/ts/core';
 import React from 'react';

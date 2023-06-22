@@ -1,10 +1,10 @@
 import React from 'react';
 import { IBelong } from '@/ts/core';
 import { MenuItemType } from 'typings/globelType';
-import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
+import TeamIcon from '@/components/Common/GlobalComps/entityIcon';
 import orgCtrl from '@/ts/controller';
 import { GroupMenuType } from './menuType';
-import OrgIcons from '@/bizcomponents/GlobalComps/orgIcons';
+import OrgIcons from '@/components/Common/GlobalComps/orgIcons';
 
 const createSpaceMenu = (team: IBelong) => {
   return {

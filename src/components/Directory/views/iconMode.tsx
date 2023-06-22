@@ -5,7 +5,7 @@ import cls from './less/icon.module.less';
 import { IFileInfo } from '@/ts/core';
 import { command, schema } from '@/ts/base';
 import { loadFileMenus } from '@/executor/fileOperate';
-import EntityIcon from '@/bizcomponents/GlobalComps/entityIcon';
+import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 
 const IconMode = ({
   current,

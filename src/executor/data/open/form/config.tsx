@@ -1,7 +1,7 @@
 import { MenuItemType } from 'typings/globelType';
 import { IEntity, IFormView } from '@/ts/core';
 import React from 'react';
-import EntityIcon from '@/bizcomponents/GlobalComps/entityIcon';
+import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import { schema } from '@/ts/base';
 /** 创建团队菜单 */
 const buildSpeciesItemTree = (

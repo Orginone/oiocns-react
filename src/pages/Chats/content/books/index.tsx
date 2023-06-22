@@ -2,7 +2,7 @@ import { Badge, Card, Empty, List, Tag, Checkbox, Typography, Dropdown } from 'a
 import { CheckboxChangeEvent } from 'antd/lib/checkbox';
 import React, { useEffect, useState } from 'react';
 import orgCtrl from '@/ts/controller';
-import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
+import TeamIcon from '@/components/Common/GlobalComps/entityIcon';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import { IMsgChat, msgChatNotify, ICompany } from '@/ts/core';
 import { XTarget } from '@/ts/base/schema';
