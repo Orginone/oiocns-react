@@ -2,10 +2,10 @@ import { ProForm } from '@ant-design/pro-components';
 import { Descriptions } from 'antd';
 import React, { useMemo, useRef } from 'react';
 import OioFormItem from './FormItems';
-import { IFormView } from '@/ts/core';
+import { IForm } from '@/ts/core';
 import cls from './index.module.less';
 type IProps = {
-  form: IFormView;
+  form: IForm;
   submitter?: any;
   onValuesChange?: (changedValues: any, values: Record<string, any>) => void;
   onFinished?: Function;
@@ -97,7 +97,11 @@ const OioForm: React.FC<IProps> = ({
                 key={item.id}
                 span={1}
                 contentStyle={{ width: '33%' }}>
-                <OioFormItem item={item} belong={form.target.space} noRule={noRule} />
+                <OioFormItem
+                  item={item}
+                  belong={form.directory.target.space}
+                  noRule={noRule}
+                />
               </Descriptions.Item>
             );
           })}
@@ -113,7 +117,7 @@ const OioForm: React.FC<IProps> = ({
                   contentStyle={{ width: '33%' }}>
                   <OioFormItem
                     item={item}
-                    belong={form.target.space}
+                    belong={form.directory.target.space}
                     disabled={disabled}
                     value={fieldsValue ? fieldsValue[item.id] : undefined}
                     onFilesValueChange={(key, files: any) => {

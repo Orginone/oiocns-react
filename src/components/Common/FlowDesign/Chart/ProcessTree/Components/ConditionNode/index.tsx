@@ -1,16 +1,15 @@
 import React from 'react';
 import InsertButton from '../InsertButton';
 import cls from './index.module.less';
-import { AiOutlineCopy, AiOutlineClose } from 'react-icons/ai';
+import { AiOutlineClose } from 'react-icons/ai';
 import { NodeModel } from '@/components/Common/FlowDesign/processType';
 
 type IProps = {
   onInsertNode: Function;
   onDelNode: Function;
-  onCopy: Function;
   onSelected: Function;
   config: NodeModel;
-  level: any;
+  level: number;
   isEdit: boolean;
 };
 
@@ -21,10 +20,6 @@ type IProps = {
 const ConditionNode: React.FC<IProps> = (props) => {
   const delNode = () => {
     props.onDelNode();
-  };
-
-  const copy = () => {
-    props.onCopy();
   };
 
   const select = () => {
@@ -38,10 +33,6 @@ const ConditionNode: React.FC<IProps> = (props) => {
       </span>
       {props.isEdit && (
         <span className={cls['option']}>
-          <AiOutlineCopy
-            style={{ fontSize: '15px', marginRight: '5px' }}
-            onClick={copy}
-          />
           <AiOutlineClose
             style={{ fontSize: '15px', marginRight: '10px' }}
             onClick={delNode}

@@ -1,10 +1,10 @@
-import create from 'zustand';
+import { create } from 'zustand';
 import { WorkNodeModel } from '@/ts/base/model';
 import { getUuid } from '@/utils/tools';
 
 export const useAppwfConfig = create((setItem) => ({
   nodeMap: new Map(),
-  addNodeMap: async (data: any) => {
+  addNodeMap: (data: any) => {
     return setItem((prev: any) => {
       return { nodeMap: prev.nodeMap.set(data.code, data.node) };
     });

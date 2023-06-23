@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import InsertButton from '../InsertButton';
-import { AiOutlineCopy, AiOutlineClose } from 'react-icons/ai';
+import { AiOutlineClose } from 'react-icons/ai';
 import cls from './index.module.less';
 import SelectOrg from '../selectOrg';
 import { IWork } from '@/ts/core';
@@ -9,7 +9,6 @@ import { dataType } from '@/components/Common/FlowDesign/processType';
 type DeptWayNodeProps = {
   onInsertNode: Function;
   onDelNode: Function;
-  onCopy: Function;
   onSelected: Function;
   config: any;
   level: any;
@@ -26,9 +25,6 @@ const DeptWayNode: React.FC<DeptWayNodeProps> = (props: DeptWayNodeProps) => {
   const [orgId, setOrgId] = useState<string>();
   const delNode = () => {
     props.onDelNode();
-  };
-  const copy = () => {
-    props.onCopy();
   };
   const select = () => {
     props.onSelected();
@@ -65,10 +61,6 @@ const DeptWayNode: React.FC<DeptWayNodeProps> = (props: DeptWayNodeProps) => {
       </span>
       {props.isEdit && !props.config.readonly && (
         <span className={cls['option']}>
-          <AiOutlineCopy
-            style={{ fontSize: '15px', marginRight: '50px' }}
-            onClick={copy}
-          />
           <AiOutlineClose
             style={{ fontSize: '15px', marginRight: '10px' }}
             onClick={delNode}
@@ -115,7 +107,7 @@ const DeptWayNode: React.FC<DeptWayNodeProps> = (props: DeptWayNodeProps) => {
       <div className={cls['node-footer']}>
         {props.isEdit && (
           <div className={cls['btn']}>
-            <InsertButton onInsertNode={props.onInsertNode} />
+            <InsertButton allowBranche onInsertNode={props.onInsertNode} />
           </div>
         )}
       </div>

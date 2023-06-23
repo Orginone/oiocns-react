@@ -1,11 +1,10 @@
 import React from 'react';
 import InsertButton from '../InsertButton';
-import { AiOutlineCopy, AiOutlineClose } from 'react-icons/ai';
+import { AiOutlineClose } from 'react-icons/ai';
 import cls from './index.module.less';
 type ConcurrentNodeProps = {
   onInsertNode: Function;
   onDelNode: Function;
-  onCopy: Function;
   onSelected: Function;
   config: any;
   level: any;
@@ -20,9 +19,6 @@ const ConcurrentNode: React.FC<ConcurrentNodeProps> = (props: ConcurrentNodeProp
   const delNode = () => {
     props.onDelNode();
   };
-  const copy = () => {
-    props.onCopy();
-  };
   const select = () => {
     props.onSelected();
   };
@@ -34,10 +30,6 @@ const ConcurrentNode: React.FC<ConcurrentNodeProps> = (props: ConcurrentNodeProp
       </span>
       {props.isEdit && (
         <span className={cls['option']}>
-          <AiOutlineCopy
-            style={{ fontSize: '15px', marginRight: '5px' }}
-            onClick={copy}
-          />
           <AiOutlineClose
             style={{ fontSize: '15px', marginRight: '10px' }}
             onClick={delNode}

@@ -4,7 +4,6 @@ import { IWork } from '@/ts/core';
 import React, { useState } from 'react';
 import cls from './index.module.less';
 import {
-  useAppwfConfig,
   isPrimaryNode,
   isBranchNode,
   getConditionNodeName,
@@ -25,15 +24,12 @@ type IProps = {
  */
 const ProcessTree: React.FC<IProps> = ({ define, resource, onSelectedNode, isEdit }) => {
   const [key, setKey] = useState(0);
-  /**组件渲染中变更nodeMap  共享状态*/
-  const nodeMap = useAppwfConfig((state: any) => state.nodeMap);
-  const addNodeMap = useAppwfConfig((state: any) => state.addNodeMap);
-  nodeMap.clear();
+  const [nodeMap] = useState(new Map<string, NodeModel>());
 
   // 获取节点数
   const getDomTree = (node?: NodeModel): any[] => {
     if (node && node.code != '') {
-      addNodeMap({ code: node.code, node: node });
+      nodeMap.set(node.code, node);
       if (isPrimaryNode(node)) {
         return [
           React.createElement(
@@ -42,17 +38,14 @@ const ProcessTree: React.FC<IProps> = ({ define, resource, onSelectedNode, isEdi
               className: cls['primary-node'],
               key: getNodeCode(),
             },
-            [
-              decodeAppendDom(React.createElement, node, {}),
-              ...getDomTree(node.children),
-            ],
+            [decodeAppendDom(node, {}), ...getDomTree(node.children)],
           ),
         ];
       } else if (isBranchNode(node.type)) {
         let index = 0;
         //遍历分支节点，包含并行及条件节点
         let branchItems = (node.branches || []).map((branchNode: any) => {
-          addNodeMap({ code: node.code, node: node });
+          nodeMap.set(node.code, node);
           let childDoms = getDomTree(branchNode.children);
           //插入4条横线，遮挡掉条件节点左右半边线条
           insertCoverLine(index, childDoms, node.branches);
@@ -65,8 +58,8 @@ const ProcessTree: React.FC<IProps> = ({ define, resource, onSelectedNode, isEdi
               key: getNodeCode(),
             },
             [
-              decodeAppendDom(React.createElement, branchNode, {
-                level: index + 1,
+              decodeAppendDom(branchNode, {
+                level: index,
                 size: node.branches?.length ?? 0,
                 _disabled: branchNode?._disabled,
                 _executable: branchNode?._executable,
@@ -129,10 +122,7 @@ const ProcessTree: React.FC<IProps> = ({ define, resource, onSelectedNode, isEdi
               className: cls['empty-node'],
               key: getNodeCode(),
             },
-            [
-              decodeAppendDom(React.createElement, node, {}),
-              ...getDomTree(node.children),
-            ],
+            [decodeAppendDom(node, {}), ...getDomTree(node.children)],
           ),
         ];
       }
@@ -141,47 +131,36 @@ const ProcessTree: React.FC<IProps> = ({ define, resource, onSelectedNode, isEdi
   };
 
   //解码渲染的时候插入dom到同级
-  const decodeAppendDom = (h: any, node: NodeModel, props = {}) => {
+  const decodeAppendDom = (node: NodeModel, props = {}) => {
+    const config = {
+      isEdit,
+      level: 1,
+      ...props,
+      config: node,
+      define: define,
+      key: getNodeCode(),
+      //定义事件，插入节点，删除节点，选中节点，复制/移动
+      onInsertNode: (type: any) => insertNode(type, node),
+      onDelNode: () => delNode(node),
+      onSelected: () => onSelectedNode(node),
+    };
     if (node && node.code != '') {
-      let comp;
       switch (node.type) {
         case AddNodeType.CONDITION:
-          comp = Condition;
-          break;
+          return <Condition {...config} />;
         case AddNodeType.CONCURRENTS:
-          comp = Concurrent;
-          break;
+          return <Concurrent {...config} />;
         case AddNodeType.ORGANIZATIONA:
-          comp = DeptWay;
-          break;
+          return <DeptWay {...config} />;
         default:
-          comp = Node;
-          break;
+          return <Node {...config} />;
       }
-      return h(
-        comp,
-        {
-          isEdit,
-          ...props,
-          config: node,
-          define: define,
-          key: getNodeCode(),
-          //定义事件，插入节点，删除节点，选中节点，复制/移动
-          onInsertNode: (type: any) => insertNode(type, node),
-          onDelNode: () => delNode(node),
-          onSelected: () => onSelectedNode(node),
-          onCopy: () => copyBranch(node),
-          onLeftMove: () => branchMove(node, -1),
-          onRightMove: () => branchMove(node, 1),
-        },
-        [],
-      );
     }
     return <></>;
   };
 
   // 新增连线
-  const insertCoverLine = (index: any, doms: any, branches: any) => {
+  const insertCoverLine = (index: any, doms: any, branches: NodeModel[]) => {
     if (index === 0) {
       //最左侧分支
       doms.unshift(
@@ -231,10 +210,12 @@ const ProcessTree: React.FC<IProps> = ({ define, resource, onSelectedNode, isEdi
 
   //处理节点插入逻辑
   const insertNode = (type: AddNodeType, parentNode: any) => {
+    console.log(parentNode);
     //缓存一下后面的节点
     let nextNode = parentNode.children;
     //插入新节点
     parentNode.children = {
+      name: AddNodeType.APPROVAL,
       code: getNodeCode(),
       parentCode: parentNode.code,
       type: type,
@@ -351,14 +332,13 @@ const ProcessTree: React.FC<IProps> = ({ define, resource, onSelectedNode, isEdi
         parentNode.children.children = nextNode;
       }
     }
-    // ctx.$forceUpdate()
     setKey(key + 1);
   };
 
   //删除当前节点
-  const delNode = (node: any) => {
+  const delNode = (node: NodeModel) => {
     //获取该节点的父节点
-    let parentNode: NodeModel = nodeMap.get(node.parentCode);
+    let parentNode = nodeMap.get(node.parentCode);
     if (parentNode) {
       //判断该节点的父节点是不是分支节点
       if (isBranchNode(parentNode.type)) {
@@ -367,7 +347,7 @@ const ProcessTree: React.FC<IProps> = ({ define, resource, onSelectedNode, isEdi
         //处理只剩1个分支的情况
         if (parentNode.branches.length < 2) {
           //获取条件组的父节点
-          let ppNode = nodeMap.get(parentNode.parentCode);
+          let ppNode = nodeMap.get(parentNode.parentCode)!;
           //判断唯一分支是否存在业务节点
           if (parentNode.branches[0].children && parentNode.branches[0].children.code) {
             //将剩下的唯一分支头部合并到主干
@@ -401,30 +381,6 @@ const ProcessTree: React.FC<IProps> = ({ define, resource, onSelectedNode, isEdi
     }
   };
 
-  // 复制分支
-  const copyBranch = (node: any) => {
-    let parentNode = nodeMap.get(node.parentCode);
-    let branchNode: any = deepCopy(node);
-    branchNode.name = branchNode.name + '-copy';
-    forEachNode(parentNode, branchNode, (parent: any, node: any) => {
-      let id = getNodeCode();
-      node.code = id;
-      node.parentCode = parent.code;
-    });
-    parentNode.branches.splice(parentNode.branches.indexOf(node), 0, branchNode);
-    setKey(key + 1);
-    // ctx.$forceUpdate()
-  };
-
-  // 移动分支
-  const branchMove = (node: any, offset: any) => {
-    let parentNode = nodeMap.get(node.parentCode);
-    let index = parentNode.branches.indexOf(node);
-    let branch = parentNode.branches[index + offset];
-    parentNode.branches[index + offset] = parentNode.branches[index];
-    parentNode.branches[index] = branch;
-  };
-
   // 获取分支结束节点
   const getBranchEndNode: any = (conditionNode: any) => {
     if (!conditionNode.children || !conditionNode.children.code) {
@@ -445,90 +401,6 @@ const ProcessTree: React.FC<IProps> = ({ define, resource, onSelectedNode, isEdi
     });
     setKey(key + 1);
   };
-
-  // 给定一个起始节点，遍历内部所有节点
-  const forEachNode = (parent: any, node: any, callback: any) => {
-    if (isBranchNode(node.type)) {
-      callback(parent, node);
-      forEachNode(node, node.children, callback);
-      node.branches.map((branchNode: any) => {
-        callback(node, branchNode);
-        forEachNode(branchNode, branchNode.children, callback);
-      });
-    } else if (
-      isPrimaryNode(node) ||
-      isBranchNode(node) ||
-      node.type === AddNodeType.EMPTY
-    ) {
-      callback(parent, node);
-      forEachNode(node, node.children, callback);
-    }
-  };
-
-  const deepCopy = (obj: any) => {
-    //判断 传入对象 为 数组 或者 对象
-    var result: any = Array.isArray(obj) ? [] : {};
-    // for in 遍历
-    for (var key in obj) {
-      // 判断 是否 为自身 的属性值（排除原型链干扰）
-      if (Object.prototype.hasOwnProperty.call(obj, key)) {
-        // 判断 对象的属性值 中 存储的 数据类型 是否为对象
-        if (typeof obj[key] === 'object') {
-          // 递归调用
-          result[key] = deepCopy(obj[key]); //递归复制
-        }
-        // 不是的话 直接 赋值 copy
-        else {
-          result[key] = obj[key];
-        }
-      }
-    }
-    // 返回 新的对象
-    return result;
-  };
-
-  // const getTree = () => {
-  // let processTrees = getDomTree(resource);
-  // //插入末端节点
-  // processTrees.push(
-  //   React.createElement(
-  //     'div',
-  //     { className: cls['all-process-end'], key: getNodeCode() },
-  //     [
-  //       React.createElement(
-  //         'div',
-  //         { className: cls['process-content'], key: getNodeCode() },
-  //         [
-  //           React.createElement(
-  //             'div',
-  //             {
-  //               className: cls['process-left'],
-  //               key: getNodeCode(),
-  //             },
-  //             ['END'],
-  //           ),
-  //           React.createElement(
-  //             'div',
-  //             {
-  //               className: cls['process-right'],
-  //               key: getNodeCode(),
-  //             },
-  //             ['结束'],
-  //           ),
-  //         ],
-  //       ),
-  //     ],
-  //   ),
-  // );
-  // return React.createElement(
-  //   'div',
-  //   {
-  //     className: cls['_root'],
-  //     key: getNodeCode(),
-  //   },
-  //   processTrees,
-  // );
-  // };
 
   return (
     <div className={cls['_root']}>

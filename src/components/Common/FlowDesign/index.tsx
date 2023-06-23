@@ -48,7 +48,7 @@ const Design: React.FC<IProps> = ({
         onSaveFinished?.apply(this, [false]);
       } else {
         current
-          .updateDefine({
+          .update({
             ...current.metadata,
             resource: resource_,
           })

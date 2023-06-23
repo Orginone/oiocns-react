@@ -2,7 +2,7 @@ import { kernel, model, schema } from '../../base';
 import { PageAll } from '../public';
 import { IDirectory } from './directory';
 import { FileInfo, IFileInfo } from './fileinfo';
-import { IWork, Work } from '../work';
+import { IWork, Work } from './work';
 
 /** 应用/模块接口类 */
 export interface IApplication extends IFileInfo<schema.XApplication> {
@@ -22,11 +22,6 @@ export interface IApplication extends IFileInfo<schema.XApplication> {
 
 /** 应用实现类 */
 export class Application extends FileInfo<schema.XApplication> implements IApplication {
-  content(_mode: number = 0): IFileInfo<schema.XEntity>[] {
-    return [...this.children, ...this.works].sort((a, b) =>
-      a.metadata.updateTime < b.metadata.updateTime ? 1 : -1,
-    );
-  }
   constructor(
     _metadata: schema.XApplication,
     _directory: IDirectory,
@@ -41,6 +36,11 @@ export class Application extends FileInfo<schema.XApplication> implements IAppli
   children: IApplication[] = [];
   parent: IApplication | undefined;
   private _worksLoaded: boolean = false;
+  content(_mode: number = 0): IFileInfo<schema.XEntity>[] {
+    return [...this.children, ...this.works].sort((a, b) =>
+      a.metadata.updateTime < b.metadata.updateTime ? 1 : -1,
+    );
+  }
   async rename(name: string): Promise<boolean> {
     return await this.update({ ...this.metadata, name: name });
   }
@@ -103,9 +103,7 @@ export class Application extends FileInfo<schema.XApplication> implements IAppli
       });
       if (res.success) {
         this._worksLoaded = true;
-        this.works = (res.data.result || []).map(
-          (a) => new Work(a, this.directory.target, this),
-        );
+        this.works = (res.data.result || []).map((a) => new Work(a, this));
       }
     }
     return this.works;
@@ -114,7 +112,7 @@ export class Application extends FileInfo<schema.XApplication> implements IAppli
     data.applicationId = this.id;
     const res = await kernel.createWorkDefine(data);
     if (res.success && res.data.id) {
-      let work = new Work(res.data, this.directory.target, this);
+      let work = new Work(res.data, this);
       this.works.push(work);
       return work;
     }

@@ -1,9 +1,4 @@
-import {
-  AiOutlineFork,
-  AiOutlineClose,
-  AiOutlineUsergroupAdd,
-  AiOutlineMail,
-} from 'react-icons/ai';
+import * as ai from 'react-icons/ai';
 import InsertButton from '../InsertButton';
 import React from 'react';
 import cls from './index.module.less';
@@ -34,59 +29,44 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
   let isRoot = false;
   let placeholder = '';
   let header = <></>;
-  let headerIcon = '';
   let headerCls = cls['node-body-left'];
   switch (props.config.type) {
     case AddNodeType.ROOT:
       isRoot = true;
       placeholder = '全员';
-      headerIcon = 'el-icon-user-solid';
       header = <span className={cls['process-content']}>START</span>;
       break;
     case AddNodeType.APPROVAL:
       placeholder = '请设置审批对象';
-      headerIcon = 'el-icon-s-check';
       headerCls = cls['node-body-people'];
       header = (
-        <AiOutlineUsergroupAdd
+        <ai.AiOutlineTeam
           style={{ fontSize: '24px', paddingRight: '5px', color: '#FFFFFF' }}
         />
       );
       break;
     case AddNodeType.CC:
       placeholder = '请设置抄送对象';
-      headerIcon = 'el-icon-s-promotion';
       header = (
-        <AiOutlineMail
+        <ai.AiOutlineMail
           style={{ fontSize: '24px', paddingRight: '5px', color: '#ff9e3a' }}
         />
       );
       break;
     case AddNodeType.CHILDWORK:
       placeholder = '请选择其他办事';
-      headerIcon = 'el-icon-s-check';
       header = (
-        <AiOutlineFork
+        <ai.AiOutlineFork
           style={{ fontSize: '24px', paddingRight: '5px', color: 'rgb(21, 188, 131)' }}
         />
       );
       break;
     case AddNodeType.EMPTY:
       placeholder = '空节点';
-      headerIcon = 'el-icon-s-check';
       break;
     default:
       break;
   }
-
-  const footer = (
-    <div className={cls['node-footer']}>
-      <div className={cls['btn']}>
-        {props.isEdit && <InsertButton onInsertNode={props.onInsertNode} />}
-      </div>
-    </div>
-  );
-
   const nodeContent = (
     <>
       <div className={cls['node-body-right']}>
@@ -98,13 +78,6 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
             <span className={cls['placeholder']}>{placeholder}</span>
           ) : (
             <span className={cls['name-select-title']}>{props.config.destName}</span>
-          )}
-          {props.isEdit && !isRoot && (
-            <AiOutlineClose
-              className={cls['iconPosition']}
-              style={{ fontSize: '15px', marginRight: '10px' }}
-              onClick={delNode}
-            />
           )}
         </div>
       </div>
@@ -121,7 +94,13 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
          ${props._passed === 1 && !props._executable ? cls['node-ongoing-state'] : ''}  ${
           props._passed === 2 ? cls['node-completed-state'] : ''
         }`}>
-        {footer}
+        <div className={cls['node-footer']}>
+          <div className={cls['btn']}>
+            {props.isEdit && (
+              <InsertButton allowBranche onInsertNode={props.onInsertNode} />
+            )}
+          </div>
+        </div>
       </div>
     );
   }
@@ -133,20 +112,36 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
       }  ${props.config?._passed === 0 ? cls['node-error-state'] : ''}
         ${props.config?._passed === 1 ? cls['node-ongoing-state'] : ''}
         ${props.config?._passed === 2 ? cls['node-completed-state'] : ''}`}>
-      <div className={cls['node-body']} onClick={() => props.onSelected()}>
+      <div className={cls['node-body']}>
         <div
           className={
             props.config.type === AddNodeType.APPROVAL
-              ? cls['nodeAproStyle']
-              : cls['nodeNewStyle']
+              ? cls.nodeAproStyle
+              : cls.nodeNewStyle
           }>
-          <div onClick={select} className={headerCls}>
-            {header}
+          <div
+            style={{ display: 'flex' }}
+            onClick={() => props.onSelected()}
+            title="点击配置">
+            <div onClick={select} className={headerCls}>
+              {header}
+            </div>
+            {nodeContent}
           </div>
-          {nodeContent}
+          {props.isEdit && !isRoot && (
+            <div className={cls.closeBtn}>
+              <ai.AiOutlineClose onClick={delNode} title="点击删除" />
+            </div>
+          )}
         </div>
       </div>
-      {footer}
+      <div className={cls['node-footer']}>
+        <div className={cls['btn']}>
+          {props.isEdit && (
+            <InsertButton allowBranche onInsertNode={props.onInsertNode} />
+          )}
+        </div>
+      </div>
     </div>
   );
 };

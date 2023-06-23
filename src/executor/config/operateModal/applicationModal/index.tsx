@@ -56,7 +56,7 @@ const ApplicationModal: React.FC<IProps> = ({ current, finished }) => {
         key: `删除`,
         label: <span style={{ color: 'red' }}>删除办事定义</span>,
         onClick: async () => {
-          if (await item.deleteDefine()) {
+          if (await item.delete()) {
             tforceUpdate();
           }
         },

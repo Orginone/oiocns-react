@@ -116,7 +116,7 @@ const WorkModal = ({ open, handleOk, handleCancel, application, current }: Iprop
           allowSelect: model.allowSelect,
         });
         if (current) {
-          handleOk(await current.updateDefine(model));
+          handleOk(await current.update(model));
         } else {
           handleOk((await application.createWork(model)) != undefined);
         }
