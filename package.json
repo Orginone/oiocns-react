@@ -75,8 +75,7 @@
     "react-router-dom": "^5.2.0",
     "react-scroll": "^1.8.9",
     "terser": "^5.15.1",
-    "xlsx": "^0.18.5",
-    "zustand": "^4.1.2"
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@commitlint/cli": "^13.1.0",

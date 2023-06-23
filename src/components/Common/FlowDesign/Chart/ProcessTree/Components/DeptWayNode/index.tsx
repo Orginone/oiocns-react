@@ -23,12 +23,6 @@ type DeptWayNodeProps = {
 const DeptWayNode: React.FC<DeptWayNodeProps> = (props: DeptWayNodeProps) => {
   const [key, setKey] = useState<number>(0);
   const [orgId, setOrgId] = useState<string>();
-  const delNode = () => {
-    props.onDelNode();
-  };
-  const select = () => {
-    props.onSelected();
-  };
 
   useEffect(() => {
     if (props.isEdit && props.define) {
@@ -51,57 +45,51 @@ const DeptWayNode: React.FC<DeptWayNodeProps> = (props: DeptWayNodeProps) => {
     }
   }, []);
 
-  const nodeHeader = (
-    <div className={cls['node-body-main-header']}>
-      <span className={cls['title']}>
-        <i className={cls['el-icon-s-operation']}></i>
-        <span className={cls['name']}>
-          {props.config.name ? props.config.name : '组织分支' + props.level}
-        </span>
-      </span>
-      {props.isEdit && !props.config.readonly && (
-        <span className={cls['option']}>
-          <AiOutlineClose
-            style={{ fontSize: '15px', marginRight: '10px' }}
-            onClick={delNode}
-          />
-        </span>
-      )}
-    </div>
-  );
-
   const onChange = (newValue: string, labels: string[]) => {
     props.config.conditions[0].display = labels[0];
     props.config.conditions[0].val = newValue;
     setKey(key + 1);
   };
 
-  const nodeContent = (
-    <div className={cls['node-body-main-content']} onClick={select}>
-      {/* <span>组织分支</span> */}
-      <span>
-        {props.isEdit && props.define ? (
-          <SelectOrg
-            key={key}
-            onChange={onChange}
-            orgId={orgId}
-            target={props.define.application!.directory.target}
-            value={props.config.conditions[0]?.val}
-            rootDisable={false}
-          />
-        ) : (
-          props.config.conditions[0].display
-        )}
-      </span>
-    </div>
-  );
-
   return (
     <div className={props.isEdit ? cls['node'] : cls['node-unEdit']}>
       <div className={cls['node-body']}>
         <div className={cls['node-body-main']}>
-          {nodeHeader}
-          {nodeContent}
+          <div className={cls['node-body-main-header']}>
+            <span className={cls['title']}>
+              <i className={cls['el-icon-s-operation']}></i>
+              <span className={cls['name']}>
+                {props.config.name ? props.config.name : '组织分支' + props.level}
+              </span>
+            </span>
+            {props.isEdit && !props.config.readonly && (
+              <span className={cls['option']}>
+                <AiOutlineClose
+                  style={{ fontSize: '15px', marginRight: '10px' }}
+                  onClick={() => props.onDelNode()}
+                />
+              </span>
+            )}
+          </div>
+
+          <div
+            className={cls['node-body-main-content']}
+            onClick={() => props.onSelected()}>
+            <span>
+              {props.isEdit && props.define ? (
+                <SelectOrg
+                  key={key}
+                  onChange={onChange}
+                  orgId={orgId}
+                  target={props.define.application!.directory.target}
+                  value={props.config.conditions[0]?.val}
+                  rootDisable={false}
+                />
+              ) : (
+                props.config.conditions[0].display
+              )}
+            </span>
+          </div>
         </div>
       </div>
       <div className={cls['node-footer']}>

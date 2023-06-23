@@ -61,7 +61,7 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
   request,
   ...rest
 }) => {
-  const [segmented, setSegmented] = useSessionStorage('segmented', 'Kanban');
+  const [segment, setSegment] = useSessionStorage('segment', 'Kanban');
   const [defaultHeight, setDefaultHeight] = useState<number | 'auto'>('auto'); //计算高度
 
   // 监听父级高度
@@ -114,15 +114,15 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
       {/* 切换展示形式 */}
       {showChangeBtn && (
         <Segmented
-          value={segmented}
-          onChange={(value) => setSegmented(value as 'Kanban' | 'List')}
+          value={segment}
+          onChange={(value) => setSegment(value as 'Kanban' | 'List')}
           options={[
             {
               value: 'List',
               icon: (
                 <fa.FaTable
                   fontSize={20}
-                  color={segmented === 'List' ? 'blue' : '#9498df'}
+                  color={segment === 'List' ? 'blue' : '#9498df'}
                 />
               ),
             },
@@ -131,7 +131,7 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
               icon: (
                 <fa.FaTh
                   fontSize={20}
-                  color={segmented === 'Kanban' ? 'blue' : '#9498df'}
+                  color={segment === 'Kanban' ? 'blue' : '#9498df'}
                 />
               ),
             },
@@ -197,7 +197,7 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
           }
         }}
         tableRender={(props: any, defaultDom, { toolbar }) => {
-          return segmented === 'List' ? (
+          return segment === 'List' ? (
             !showChangeBtn ||
             !props.action.dataSource ||
             props.action.dataSource.length === 0 ? (
@@ -243,7 +243,7 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
         {...rest}
       />
     );
-  }, [segmented, dataSource, resetColumns, defaultHeight]);
+  }, [segment, dataSource, resetColumns, defaultHeight]);
 
   return (
     <div className={cls['common-table-wrap']} style={style}>

@@ -1,16 +1,5 @@
-import { create } from 'zustand';
 import { WorkNodeModel } from '@/ts/base/model';
 import { getUuid } from '@/utils/tools';
-
-export const useAppwfConfig = create((setItem) => ({
-  nodeMap: new Map(),
-  addNodeMap: (data: any) => {
-    return setItem((prev: any) => {
-      return { nodeMap: prev.nodeMap.set(data.code, data.node) };
-    });
-  },
-}));
-
 export const getNodeCode = () => {
   return `node_${getUuid()}`;
 };
@@ -64,6 +53,7 @@ export enum AddNodeType {
   'CONCURRENTS' = '全部',
   'ORGANIZATIONA' = '组织',
   'CHILDWORK' = '子流程',
+  'END' = '结束',
 }
 
 export type FieldCondition = {

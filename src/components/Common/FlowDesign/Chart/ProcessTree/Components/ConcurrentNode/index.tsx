@@ -16,39 +16,29 @@ type ConcurrentNodeProps = {
  * @returns
  */
 const ConcurrentNode: React.FC<ConcurrentNodeProps> = (props: ConcurrentNodeProps) => {
-  const delNode = () => {
-    props.onDelNode();
-  };
-  const select = () => {
-    props.onSelected();
-  };
-  const nodeHeader = (
-    <div className={cls['node-body-main-header']}>
-      <span className={cls['title']}>
-        <i className={cls['el-icon-s-operation']}></i>
-        <span className={cls['name']}>{'并行任务' + props.level}</span>
-      </span>
-      {props.isEdit && (
-        <span className={cls['option']}>
-          <AiOutlineClose
-            style={{ fontSize: '15px', marginRight: '10px' }}
-            onClick={delNode}
-          />
-        </span>
-      )}
-    </div>
-  );
-  const nodeContent = (
-    <div className={cls['node-body-main-content']} onClick={select}>
-      <span>并行任务（同时进行）</span>
-    </div>
-  );
   return (
     <div className={props.isEdit ? cls['node'] : cls['node-unEdit']}>
       <div className={cls['node-body']}>
         <div className={cls['node-body-main']}>
-          {nodeHeader}
-          {nodeContent}
+          <div className={cls['node-body-main-header']}>
+            <span className={cls['title']}>
+              <i className={cls['el-icon-s-operation']}></i>
+              <span className={cls['name']}>{'并行任务' + props.level}</span>
+            </span>
+            {props.isEdit && (
+              <span className={cls['option']}>
+                <AiOutlineClose
+                  style={{ fontSize: '15px', marginRight: '10px' }}
+                  onClick={() => props.onDelNode()}
+                />
+              </span>
+            )}
+          </div>
+          <div
+            className={cls['node-body-main-content']}
+            onClick={() => props.onSelected()}>
+            <span>并行任务（同时进行）</span>
+          </div>
         </div>
       </div>
       <div className={cls['node-footer']}>

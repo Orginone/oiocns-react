@@ -18,44 +18,30 @@ type IProps = {
  * @returns
  */
 const ConditionNode: React.FC<IProps> = (props) => {
-  const delNode = () => {
-    props.onDelNode();
-  };
-
-  const select = () => {
-    props.onSelected();
-  };
-
-  const nodeHeader = (
-    <div className={cls['node-body-main-header']}>
-      <span className={cls['title']}>
-        {props.config.name ? props.config.name : '条件' + props.level}
-      </span>
-      {props.isEdit && (
-        <span className={cls['option']}>
-          <AiOutlineClose
-            style={{ fontSize: '15px', marginRight: '10px' }}
-            onClick={delNode}
-          />
-        </span>
-      )}
-    </div>
-  );
-
-  const nodeContent = (
-    <div className={cls['node-body-main-content']} onClick={select}>
-      <span className={cls['name']}>
-        {props.config.conditions?.map((a) => a.display).join('且') || '请设置条件'}
-      </span>
-    </div>
-  );
-
   return (
     <div className={`${props.isEdit ? cls['node'] : cls['node-unEdit']} `}>
       <div className={`${cls['node-body']}`}>
         <div className={cls['node-body-main']}>
-          {nodeHeader}
-          {nodeContent}
+          <div className={cls['node-body-main-header']}>
+            <span className={cls['title']}>
+              {props.config.name ? props.config.name : '条件' + props.level}
+            </span>
+            {props.isEdit && (
+              <span className={cls['option']}>
+                <AiOutlineClose
+                  style={{ fontSize: '15px', marginRight: '10px' }}
+                  onClick={() => props.onDelNode()}
+                />
+              </span>
+            )}
+          </div>
+          <div
+            className={cls['node-body-main-content']}
+            onClick={() => props.onSelected()}>
+            <span className={cls['name']}>
+              {props.config.conditions?.map((a) => a.display).join('且') || '请设置条件'}
+            </span>
+          </div>
         </div>
       </div>
 

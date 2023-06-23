@@ -407,8 +407,8 @@ const ProcessTree: React.FC<IProps> = ({ define, resource, onSelectedNode, isEdi
       {getDomTree(resource)}
       <div className={cls['all-process-end']}>
         <div className={cls['process-content']}>
-          <div className={cls['process-left']}>END</div>
-          <div className={cls['process-right']}>结束</div>
+          <div className={cls['process-left']}>结束</div>
+          <div className={cls['process-right']}>数据归档</div>
         </div>
       </div>
     </div>
