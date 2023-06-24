@@ -1,5 +1,6 @@
+import { kernel, model } from '@/ts/base';
 import * as XLSX from 'xlsx';
-import { ExcelConfig, ReadConfig, SheetConfig } from './types';
+import { DataHandler, ReadConfig, RequestIndex, SheetConfig } from './types';
 
 /**
  * 生成一份 Excel 文件
@@ -10,8 +11,20 @@ const generateXlsx = (sheetConfigs: SheetConfig<any>[], filename: string) => {
   try {
     let workbook = XLSX.utils.book_new();
     for (let sheetConfig of sheetConfigs) {
-      let headers = sheetConfig.metaColumns.map((item) => item.name);
-      let sheet = XLSX.utils.json_to_sheet(sheetConfig.data, {
+      let headers = sheetConfig.metaColumns
+        .filter((item) => !item.hide)
+        .map((item) => item.title);
+
+      let converted = [];
+      for (let item of sheetConfig.data) {
+        let newItem: { [key: string]: any } = {};
+        sheetConfig.metaColumns.forEach((column) => {
+          newItem[column.title] = item[column.dataIndex];
+        });
+        converted.push(newItem);
+      }
+
+      let sheet = XLSX.utils.json_to_sheet(converted, {
         header: headers,
         skipHeader: false,
       });
@@ -25,43 +38,64 @@ const generateXlsx = (sheetConfigs: SheetConfig<any>[], filename: string) => {
 };
 
 /**
- * 读取一份 Excel
- * @param file 文件
- * @param excelConfig 进度配置
- * @param readConfigs 读取配置
+ * 收集 Excel 数据
  */
-const readXlsx = <T>(
+const readXlsx = (
   file: Blob,
-  excelConfig: ExcelConfig<T>,
-  readConfigs: ReadConfig<any, any, SheetConfig<any>, ExcelConfig<any>>[],
+  readConfigs: ReadConfig<any, any, SheetConfig<any>>[],
+  completed: () => void,
 ) => {
   let reader = new FileReader();
   reader.onload = async (e) => {
-    try {
-      let workbook = XLSX.read(e.target?.result, { type: 'binary' });
-      let keys = Object.keys(workbook.Sheets);
+    let workbook = XLSX.read(e.target?.result, { type: 'binary' });
+    let keys = Object.keys(workbook.Sheets);
 
-      // 收集数据
-      let totalRows = 0;
-      for (let index = 0; index < keys.length; index++)
-        totalRows += collecting(keys[index], workbook.Sheets, readConfigs);
+    for (let index = 0; index < keys.length; index++)
+      collecting(keys[index], workbook.Sheets, readConfigs);
 
-      // 初始化
-      excelConfig.initialize?.apply(excelConfig, [totalRows, workbook]);
-
-      // 处理数据
-      for (let index = 0; index < keys.length; index++)
-        await operating(keys[index], excelConfig, readConfigs);
-
-      // 完成回调
-      excelConfig.onCompleted?.apply(excelConfig);
-    } catch (error: any) {
-      // 错误处理
-      console.log(error);
-      excelConfig.onError?.apply(excelConfig, ['文件读取异常']);
-    }
+    completed();
   };
   reader.readAsArrayBuffer(file);
+};
+
+/**
+ * 处理一份 Excel
+ * @param file 文件
+ * @param dataHandler 数据处理句柄
+ * @param readConfigs 读取配置
+ */
+const dataHandling = async <T>(
+  context: T,
+  dataHandler: DataHandler,
+  readConfigs: ReadConfig<any, any, SheetConfig<any>>[],
+) => {
+  try {
+    // 总行数
+    let totalRows = readConfigs
+      .map((item) => item.sheetConfig)
+      .map((item) => item.data.length)
+      .reduce((f, s) => f + s);
+
+    // 初始化
+    dataHandler.initialize?.apply(dataHandler, [totalRows]);
+
+    // 处理数据
+    for (let index = 0; index < readConfigs.length; index++) {
+      let sheetConfig = readConfigs[index].sheetConfig;
+      await operating(sheetConfig.sheetName, context, dataHandler, readConfigs);
+      if (readConfigs[index].errors.length > 0) {
+        dataHandler.onReadError?.apply(dataHandler, [readConfigs[index].errors]);
+        throw new Error();
+      }
+    }
+
+    // 完成回调
+    dataHandler.onCompleted?.apply(dataHandler);
+  } catch (error: any) {
+    // 错误处理
+    console.log(error);
+    dataHandler.onError?.apply(dataHandler, ['数据处理异常']);
+  }
 };
 
 /**
@@ -70,8 +104,8 @@ const readXlsx = <T>(
 const collecting = (
   key: string,
   sheets: { [sheet: string]: XLSX.WorkSheet },
-  readConfigs: ReadConfig<any, any, SheetConfig<any>, ExcelConfig<any>>[],
-): number => {
+  readConfigs: ReadConfig<any, any, SheetConfig<any>>[],
+): void => {
   for (let readConfig of readConfigs) {
     let sheetConfig = readConfig.sheetConfig;
     if (sheetConfig.sheetName == key) {
@@ -80,19 +114,16 @@ const collecting = (
       data.forEach((item: any) => {
         let ansItem: any = {};
         sheetConfig.metaColumns.forEach((column) => {
-          if (item[column.name] === 0) {
-            ansItem[column.code] = '0';
-          } else {
-            ansItem[column.code] = String(item[column.name] ?? '');
+          let value = item[column.title];
+          if (value || value === 0) {
+            ansItem[column.dataIndex] = String(value);
           }
         });
         ansData.push(ansItem);
       });
       sheetConfig.data = ansData;
-      return ansData.length;
     }
   }
-  return 0;
 };
 
 /**
@@ -101,36 +132,65 @@ const collecting = (
  */
 let operating = async (
   key: string,
-  excelConfig: ExcelConfig<any>,
-  readConfigs: ReadConfig<any, any, SheetConfig<any>, ExcelConfig<any>>[],
+  context: any,
+  dataHandler: DataHandler,
+  readConfigs: ReadConfig<any, any, SheetConfig<any>>[],
 ) => {
   for (let readConfig of readConfigs) {
     if (readConfig.sheetConfig.sheetName == key) {
-      // 数据
-      let data = readConfig.sheetConfig.data;
-
-      // 校验数据
-      readConfig.errors = [];
-      await readConfig.checkData?.apply(readConfig, [data]);
-      if (readConfig.errors.length > 0) {
-        excelConfig.onReadError?.apply(excelConfig, [readConfig.errors]);
-        throw new Error();
-      }
-
-      // 处理数据并显示进度
-      for (let index = 0; index < data.length; index++) {
-        await readConfig.operatingItem(data[index], index);
-        excelConfig.onItemCompleted?.apply(excelConfig);
-      }
-      if (readConfig.errors.length > 0) {
-        excelConfig.onReadError?.apply(excelConfig, [readConfig.errors]);
-        throw new Error();
-      }
-
-      // 完成后回调
-      await readConfig.completed?.apply(readConfig, [readConfigs]);
+      await readConfig.operating(context, () => {
+        dataHandler.onItemCompleted?.apply(dataHandler);
+      });
+      await readConfig.completed?.apply(readConfig, [readConfigs, context]);
     }
   }
 };
 
-export { generateXlsx, readXlsx };
+/**
+ * 赋给新对象中没有的老对象的值
+ * @param old
+ */
+function assignment(oldObj: { [key: string]: any }, newObj: { [key: string]: any }) {
+  Object.keys(oldObj).forEach((key) => {
+    if (!(key in newObj)) {
+      newObj[key] = oldObj[key];
+    }
+  });
+}
+
+/**
+ * 数组分组
+ * @param arr
+ * @param length
+ * @returns
+ */
+function partition<T>(arr: T[], count: number): T[][] {
+  var result: T[][] = [];
+  for (var index = 0, total = arr.length; index < total; index++) {
+    if (index % count === 0) {
+      result.push([]);
+    }
+    result[result.length - 1].push(arr[index]);
+  }
+  return result;
+}
+
+/**
+ * 批量请求
+ */
+async function batchRequests(
+  requests: RequestIndex[],
+  onItemCompleted: (request: RequestIndex, result: model.ResultType<any>) => void,
+) {
+  let res = await kernel.requests(requests.map((item) => item.request));
+  if (res.success) {
+    let results: model.ResultType<any>[] = res.data;
+    for (let index = 0; index < results.length; index++) {
+      let request = requests[index];
+      let result = results[index];
+      onItemCompleted(request, result);
+    }
+  }
+}
+
+export { assignment, batchRequests, dataHandling, generateXlsx, partition, readXlsx };

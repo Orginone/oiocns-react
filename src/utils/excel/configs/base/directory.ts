@@ -1,167 +1,171 @@
+import { kernel, model } from '@/ts/base';
 import { DirectoryModel } from '@/ts/base/model';
-import { IDirectory, IForm, IProperty, ISpecies } from '@/ts/core';
-import {
-  Context,
-  ExcelConfig,
-  ReadConfig,
-  ReadConfigImpl,
-  SheetConfig,
-  SheetConfigImpl,
-  SheetName,
-} from '../../types';
+import { IDirectory } from '@/ts/core';
+import { Context, ReadConfigImpl, SheetConfigImpl, SheetName } from '../../types';
+import { XProperty, XSpecies, XSpeciesItem } from '@/ts/base/schema';
+import { assignment } from '../..';
 
-interface DirectoryImportModel {
-  first: string;
-  second: string;
-  third: string;
-  code: string;
-  remark: string;
+export interface Directory extends DirectoryModel {
+  parentCode?: string;
 }
 
-export class DirectorySheetConfig extends SheetConfigImpl<DirectoryImportModel> {
-  root: IDirectory;
+export class DirectorySheetConfig extends SheetConfigImpl<Directory> {
+  directory: IDirectory;
 
-  constructor(root: IDirectory) {
+  constructor(directory: IDirectory) {
     super(SheetName.Directory, 1, [
-      { name: '一级目录', code: 'first', type: '描述型' },
-      { name: '二级目录', code: 'second', type: '描述型' },
-      { name: '三级目录', code: 'third', type: '描述型' },
-      { name: '代码', code: 'code', type: '描述型' },
-      { name: '定义', code: 'remark', type: '描述型' },
+      { title: '上级目录代码', dataIndex: 'parentCode', valueType: '描述型' },
+      { title: '目录名称', dataIndex: 'name', valueType: '描述型' },
+      { title: '目录代码', dataIndex: 'code', valueType: '描述型' },
+      { title: '备注信息', dataIndex: 'remark', valueType: '描述型' },
+      { title: '主键', dataIndex: 'id', valueType: '描述性', hide: true },
+      { title: '上级目录主键', dataIndex: 'parentId', valueType: '描述性', hide: true },
     ]);
-    this.root = root;
+    this.directory = directory;
   }
 }
 
 export class DirectoryReadConfig extends ReadConfigImpl<
-  DirectoryImportModel,
+  Directory,
   Context,
-  DirectorySheetConfig,
-  ExcelConfig<Context>
+  DirectorySheetConfig
 > {
-  constructor(sheetConfig: DirectorySheetConfig, config: ExcelConfig<Context>) {
-    super(sheetConfig, config);
+  constructor(sheetConfig: DirectorySheetConfig) {
+    super(sheetConfig);
   }
+  /**
+   * 输出读取完成后进行一些初始化
+   * @param c
+   */
+  async initContext(c: Context): Promise<void> {
+    await this.deepLoad(this.sheetConfig.directory, c);
+    for (let item of this.sheetConfig.data) {
+      if (c.directoryCodeMap.has(item.code)) {
+        let old = c.directoryCodeMap.get(item.code)!;
+        assignment(old, item);
+      }
+      c.directoryCodeMap.set(item.code, item);
+    }
+  }
+  async deepLoad(root: IDirectory, c: Context): Promise<void> {
+    let queue = [root];
+    let allDirs = [root];
+    // 加载目录
+    while (true) {
+      let first = queue.shift();
+      if (!first) continue;
+      await first.loadContent();
+      c.directoryCodeMap.set(first.code, {
+        ...first.metadata,
+        parentCode: first.parent?.metadata.code,
+      });
+      if (first?.children) {
+        queue.push(...first.children);
+        allDirs.push(...first.children);
+      }
+      if (queue.length == 0) {
+        break;
+      }
+    }
+    // 加载分类
+    let speciesMap: { [key: string]: XSpecies } = {};
+    for (let dir of allDirs) {
+      for (let species of dir.specieses) {
+        speciesMap[species.id] = species.metadata;
+        c.speciesCodeMap.set(species.code, {
+          ...species.metadata,
+          directoryCode: dir.code,
+        });
+        await species.loadItems();
+        c.speciesItemCodeMap.set(species.code, new Map());
+        let parentMap: { [id: string]: XSpeciesItem } = {};
+        species.items.forEach((item) => (parentMap[item.id] = item));
+        for (let speciesItem of species.items) {
+          c.speciesItemCodeMap.get(species.code)?.set(speciesItem.info, {
+            ...speciesItem,
+            parentInfo: parentMap[speciesItem.parentId]?.info,
+            speciesCode: species.code,
+          });
+        }
+      }
+    }
+    // 加载属性
+    let propMap: { [id: string]: XProperty } = {};
+    for (let dir of allDirs) {
+      for (let property of dir.propertys) {
+        propMap[property.id] = property.metadata;
+        c.propertyMap.set(property.metadata.info, {
+          ...property.metadata,
+          directoryCode: dir.code,
+          speciesCode: speciesMap[property.metadata.speciesId]?.code,
+        });
+      }
+    }
+    // 加载表单
+    for (let dir of allDirs) {
+      for (let form of dir.forms) {
+        c.formCodeMap.set(form.code, {
+          ...form.metadata,
+          directoryCode: dir.code,
+        });
+        await form.loadAttributes();
+        c.formAttrCodeMap.set(form.code, new Map());
+        for (let attribute of form.attributes) {
+          c.formAttrCodeMap.get(form.code)?.set(attribute.code, {
+            ...attribute,
+            directoryId: dir.id,
+            formCode: form.code,
+            propInfo: propMap[attribute.propId]?.info,
+          });
+        }
+      }
+    }
+  }
+
   /**
    * 数据校验
    * @param data 数据
    */
-  async checkData(data: DirectoryImportModel[]): Promise<void> {
-    for (let index = 0; index < data.length; index++) {
-      let item = data[index];
-      if (!item.code || !item.second || !item.third || !item.code) {
-        this.pushError(index, '一级目录、二级目录、三级目录、代码不能为空！');
+  checkData(context: Context) {
+    for (let index = 0; index < this.sheetConfig.data.length; index++) {
+      let item = this.sheetConfig.data[index];
+      if (!item.name || !item.code) {
+        this.pushError(index, '目录名称、目录代码不能为空！');
+      }
+      if (item.parentCode && !context.directoryCodeMap.has(item.parentCode)) {
+        let error = `表格中未获取到上级目录代码：${item.parentCode}，上级目录代码需定义在子目录前！`;
+        this.pushError(index, error);
       }
     }
+    return this.errors;
   }
-  /**
-   * 创建一个目录
-   */
-  async create(
-    name: string,
-    code: string,
-    remark: string,
-    root?: IDirectory,
-  ): Promise<IDirectory | undefined> {
-    let next = root?.children
-      .filter((item) => item.typeName == '目录')
-      .find((item) => item.name == name);
-    if (!next) {
-      next = await root?.create({
-        name: name,
-        code: code,
-        remark: remark,
-      } as DirectoryModel);
-    }
-    if (next) {
-      await this.cacheData(next);
-    }
-    return next;
-  }
-  /**
-   * 建立上下文的一些索引
-   */
-  async cacheData(directory: IDirectory): Promise<void> {
-    await directory.loadContent();
-    this.context.directoryIndex[directory.name] = directory;
-    let dictIndex: { [dictName: string]: ISpecies } = {};
-    this.context.dictIndex[directory.id] = dictIndex;
-    let speciesIndex: { [speciesName: string]: ISpecies } = {};
-    this.context.speciesIndex[directory.id] = speciesIndex;
-    directory.specieses.forEach((item) => {
-      if (item.typeName == '字典') {
-        dictIndex[item.name] = item;
-        this.context.dictNameIndex[item.name] = item;
-        this.context.dictCodeIndex[item.code] = item;
-      } else if (item.typeName == '分类') {
-        speciesIndex[item.name] = item;
-        this.context.speciesNameIndex[item.name] = item;
-        this.context.speciesCodeIndex[item.code] = item;
-      }
-    });
-    let propertyIndex: { [propName: string]: IProperty } = {};
-    this.context.propIndex[directory.id] = propertyIndex;
-    directory.propertys.forEach((item) => {
-      propertyIndex[item.name] = item;
-      this.context.propCodeIndex[item.metadata.info] = item;
-    });
-    let entityFormIndex: { [formName: string]: IForm } = {};
-    this.context.entityFormIndex[directory.id] = entityFormIndex;
-    let workFormIndex: { [formName: string]: IForm } = {};
-    this.context.workFormIndex[directory.id] = workFormIndex;
-    directory.forms.forEach((item) => {
-      if (item.typeName == '实体配置') {
-        entityFormIndex[item.name] = item;
-        this.context.entityFormNameIndex[item.name] = item;
-      } else if (item.typeName == '事项配置') {
-        workFormIndex[item.name] = item;
-        this.context.workFormNameIndex[item.name] = item;
-      }
-    });
-  }
-
   /**
    * 更新/创建属性
    * @param _index 行索引
    * @param row 行数据
    * @param context 上下文
    */
-  async operatingItem(row: DirectoryImportModel): Promise<void> {
-    let root = this.sheetConfig.root;
-    await this.cacheData(root);
-    let first = await this.create(row.first, row.first, row.first, root);
-    let second = await this.create(row.second, row.second, row.second, first);
-    await this.create(row.third, row.code, row.remark, second);
-  }
-
-  /**
-   * 完成后回写后面有目录的表
-   * @param sheets
-   */
-  completed(
-    sheets: ReadConfig<any, any, SheetConfig<any>, ExcelConfig<Context>>[],
-  ): void {
-    let directoryIndex = this.excelConfig.context.directoryIndex;
-    for (let readConfig of sheets) {
-      let sheetConfig = readConfig.sheetConfig;
-      if (sheetConfig.sheetName != this.sheetConfig.sheetName) {
-        let hasDirectory = sheetConfig.metaColumns.findIndex(
-          (item) => item.name == '目录',
-        );
-        if (hasDirectory != -1) {
-          for (let index = 0; index < sheetConfig.data.length; index++) {
-            let item = sheetConfig.data[index];
-            if (item.directoryName && directoryIndex[item.directoryName]) {
-              item.directoryId = directoryIndex[item.directoryName].id;
-            } else {
-              readConfig.pushError(index, '未找到目录：' + item.directoryName);
-            }
-          }
-          if (readConfig.errors.length > 0) {
-            this.excelConfig.onReadError?.apply(this.excelConfig, [readConfig.errors]);
-            throw new Error();
-          }
-        }
+  async operating(context: Context): Promise<void> {
+    let data = this.sheetConfig.data;
+    for (let index = 0; index < data.length; index++) {
+      let item = data[index];
+      item.shareId = this.sheetConfig.directory.metadata.shareId;
+      if (item.parentCode) {
+        let parent = context.directoryCodeMap.get(item.parentCode)!;
+        item.parentId = parent.id.replace('_', '');
+      } else {
+        item.parentId = this.sheetConfig.directory.id;
+      }
+      let res: model.ResultType<Directory> = await kernel.request({
+        module: 'thing',
+        action: item.id ? 'UpdateDirectory' : 'CreateDirectory',
+        params: item,
+      });
+      if (res.success) {
+        assignment(res.data, item);
+        context.directoryCodeMap.set(item.code, res.data);
+      } else {
+        this.pushError(index, res.msg);
       }
     }
   }
