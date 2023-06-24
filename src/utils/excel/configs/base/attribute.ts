@@ -1,78 +1,73 @@
 import { AttributeModel } from '@/ts/base/model';
-import { XAttribute } from '@/ts/base/schema';
-import { IDirectory, IForm } from '@/ts/core';
+import { IDirectory } from '@/ts/core';
+import { assignment, batchRequests, partition } from '../..';
 import {
   Context,
-  ExcelConfig,
   ReadConfigImpl,
+  RequestIndex,
   SheetConfigImpl,
   SheetName,
 } from '../../types';
 
-interface Attribute extends AttributeModel {
+export interface Attribute extends AttributeModel {
   directoryId: string;
-  formName: string;
-  propCode: string;
+  formCode: string;
+  propInfo: string;
 }
 
-export class FormAttrSheetConfig extends SheetConfigImpl<Attribute> {
+export class AttrSheetConfig extends SheetConfigImpl<Attribute> {
   directory: IDirectory;
 
   constructor(directory: IDirectory) {
     super(SheetName.FormAttr, 1, [
-      { name: '表单名称', code: 'formName', type: '描述型' },
-      { name: '特性名称', code: 'name', type: '描述型' },
-      { name: '特性代码', code: 'code', type: '描述型' },
-      { name: '库表要素', code: 'propCode', type: '描述型' },
+      { title: '表单代码', dataIndex: 'formCode', valueType: '描述型' },
+      { title: '特性名称', dataIndex: 'name', valueType: '描述型' },
+      { title: '特性代码', dataIndex: 'code', valueType: '描述型' },
+      { title: '关联属性代码/id', dataIndex: 'propInfo', valueType: '描述型' },
+      { title: '附加信息', dataIndex: 'info', valueType: '描述型' },
+      { title: '主键', dataIndex: 'id', valueType: '描述型', hide: true },
+      { title: '表单主键', dataIndex: 'formId', valueType: '描述型', hide: true },
+      { title: '关联属性主键', dataIndex: 'propId', valueType: '描述型', hide: true },
     ]);
     this.directory = directory;
   }
 }
 
-export class WorkAttrSheetConfig extends SheetConfigImpl<Attribute> {
-  directory: IDirectory;
-
-  constructor(directory: IDirectory) {
-    super(SheetName.WorkAttr, 1, [
-      { name: '事项名称', code: 'formName', type: '描述型' },
-      { name: '特性名称', code: 'name', type: '描述型' },
-      { name: '特性代码', code: 'code', type: '描述型' },
-      { name: '库表要素', code: 'propCode', type: '描述型' },
-    ]);
-    this.directory = directory;
+export class AttrReadConfig extends ReadConfigImpl<Attribute, Context, AttrSheetConfig> {
+  /**
+   * 初始化
+   * @param context 上下文
+   */
+  async initContext(c: Context): Promise<void> {
+    for (let item of this.sheetConfig.data) {
+      if (c.formAttrCodeMap.has(item.formCode)) {
+        let attrCodeMap = c.formAttrCodeMap.get(item.formCode)!;
+        if (attrCodeMap.has(item.code)) {
+          let old = attrCodeMap.get(item.code)!;
+          assignment(old, item);
+        }
+        attrCodeMap.set(item.code, item);
+      }
+    }
   }
-}
-
-class CommAttrReadConfig<
-  C extends WorkAttrSheetConfig | FormAttrSheetConfig,
-> extends ReadConfigImpl<AttributeModel, Context, C, ExcelConfig<Context>> {
-  readonly formNameIndex: { [formName: string]: IForm };
-
-  constructor(
-    sheetConfig: C,
-    config: ExcelConfig<Context>,
-    formNameIndex: { [formName: string]: IForm },
-  ) {
-    super(sheetConfig, config);
-    this.formNameIndex = formNameIndex;
-  }
-
   /**
    * 数据校验
    * @param data 数据
    */
-  async checkData?(data: Attribute[]): Promise<void> {
-    let fields = ['formName', 'name', 'code', 'propCode'];
-    let fieldsName = this.sheetConfig.metaColumns
-      .filter((item) => fields.indexOf(item.code) != -1)
-      .map((item) => item.name)
-      .join('、');
-    for (let index = 0; index < data.length; index++) {
-      let item = data[index];
-      if (!item.formName || !item.name || !item.code || !item.propCode) {
-        this.pushError(index, `存在未填写的${fieldsName}！`);
+  checkData(context: Context) {
+    for (let index = 0; index < this.sheetConfig.data.length; index++) {
+      let item = this.sheetConfig.data[index];
+      if (!item.formCode || !item.name || !item.code || !item.propInfo) {
+        this.pushError(index, `存在未填写的表单代码、特性名称、特性代码、关联属性代码！`);
+      }
+      if (!context.formCodeMap.has(item.formCode)) {
+        this.pushError(index, `未获取到表单代码：${item.formCode}`);
+      }
+      if (!context.propertyMap.has(item.propInfo)) {
+        this.pushError(index, `未获取到关联属性代码：${item.propInfo}`);
       }
     }
+    return this.errors;
   }
   /**
    * 更新/创建属性
@@ -80,42 +75,41 @@ class CommAttrReadConfig<
    * @param row 行数据
    * @param context 上下文
    */
-  async operatingItem(row: Attribute, index: number): Promise<void> {
-    let form: IForm = this.formNameIndex[row.formName];
-    let prop = this.context.propCodeIndex[row.propCode];
-    let attr: XAttribute | undefined = this.context.formAttrIndex[row.formId][row.code];
-    let success: boolean = false;
-    if (attr) {
-      success = await form.updateAttribute(
-        {
-          ...attr,
-          name: row.name,
-          code: row.code,
-          remark: prop.remark,
+  async operating(context: Context, onItemCompleted: () => void): Promise<void> {
+    let requests: RequestIndex[] = [];
+    for (let index = 0; index < this.sheetConfig.data.length; index++) {
+      let row = this.sheetConfig.data[index];
+      row.formId = context.formCodeMap.get(row.formCode)!.id;
+      row.directoryId = context.formCodeMap.get(row.formCode)!.directoryId;
+      row.propId = context.propertyMap.get(row.propInfo)!.id;
+      requests.push({
+        rowNumber: index,
+        request: {
+          module: 'thing',
+          action: row.id ? 'UpdateAttribute' : 'CreateAttribute',
+          params: row,
         },
-        prop.metadata,
-      );
-    } else {
-      attr = await form.createAttribute({ ...row }, prop.metadata);
-      if (attr) {
-        this.context.formAttrIndex[row.formId][row.code] = attr;
+      });
+    }
+    for (let arr of partition(requests, 100)) {
+      await this.requests(arr, context, onItemCompleted);
+    }
+  }
+  /**
+   * @param requests 批量请求
+   */
+  private async requests(
+    requests: RequestIndex[],
+    _context: Context,
+    onItemCompleted: () => void,
+  ) {
+    await batchRequests(requests, (request, result) => {
+      if (result.success) {
+        assignment(result.data, this.sheetConfig.data[request.rowNumber]);
+      } else {
+        this.pushError(request.rowNumber, result.msg);
       }
-      success = !!form;
-    }
-    if (!success) {
-      this.pushError(index, '生成失败，请根据提示修改错误！');
-    }
-  }
-}
-
-export class FormAttrReadConfig extends CommAttrReadConfig<FormAttrSheetConfig> {
-  constructor(sheetConfig: FormAttrSheetConfig, excelConfig: ExcelConfig<Context>) {
-    super(sheetConfig, excelConfig, excelConfig.context.entityFormNameIndex);
-  }
-}
-
-export class WorkAttrReadConfig extends CommAttrReadConfig<WorkAttrSheetConfig> {
-  constructor(sheetConfig: FormAttrSheetConfig, excelConfig: ExcelConfig<Context>) {
-    super(sheetConfig, excelConfig, excelConfig.context.workFormNameIndex);
+      onItemCompleted();
+    });
   }
 }

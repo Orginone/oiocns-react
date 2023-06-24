@@ -1,18 +1,16 @@
 import { FormModel } from '@/ts/base/model';
-import { XAttribute } from '@/ts/base/schema';
-import { IDirectory, IForm } from '@/ts/core';
+import { IDirectory } from '@/ts/core';
+import { assignment, batchRequests, partition } from '../..';
 import {
   Context,
-  ExcelConfig,
-  ReadConfig,
   ReadConfigImpl,
-  SheetConfig,
+  RequestIndex,
   SheetConfigImpl,
   SheetName,
 } from '../../types';
 
 export interface Form extends FormModel {
-  directoryName: string;
+  directoryCode: string;
 }
 
 export class FormSheetConfig extends SheetConfigImpl<Form> {
@@ -20,78 +18,50 @@ export class FormSheetConfig extends SheetConfigImpl<Form> {
 
   constructor(directory: IDirectory) {
     super(SheetName.Form, 1, [
-      { name: '目录', code: 'directoryName', type: '描述型' },
-      { name: '表单名称', code: 'name', type: '描述型' },
-      { name: '表单代码', code: 'code', type: '描述型' },
-      { name: '表单定义', code: 'remark', type: '描述型' },
+      { title: '目录代码', dataIndex: 'directoryCode', valueType: '描述型' },
+      { title: '表单类型', dataIndex: 'typeName', valueType: '描述型' },
+      { title: '表单名称', dataIndex: 'name', valueType: '描述型' },
+      { title: '表单代码', dataIndex: 'code', valueType: '描述型' },
+      { title: '备注信息', dataIndex: 'remark', valueType: '描述型' },
+      { title: '主键', dataIndex: 'id', valueType: '描述型', hide: true },
+      { title: '目录主键', dataIndex: 'directoryId', valueType: '描述型', hide: true },
     ]);
     this.directory = directory;
   }
 }
 
-export class WorkSheetConfig extends SheetConfigImpl<Form> {
-  directory: IDirectory;
-
-  constructor(directory: IDirectory) {
-    super(SheetName.Work, 1, [
-      { name: '目录', code: 'directoryName', type: '描述型' },
-      { name: '事项名称', code: 'name', type: '描述型' },
-      { name: '事项代码', code: 'code', type: '描述型' },
-      { name: '事项定义', code: 'remark', type: '描述型' },
-    ]);
-    this.directory = directory;
+export class FormReadConfig extends ReadConfigImpl<Form, Context, FormSheetConfig> {
+  /**
+   * 初始化
+   * @param c 上下文
+   */
+  async initContext(c: Context): Promise<void> {
+    for (let item of this.sheetConfig.data) {
+      if (c.formCodeMap.has(item.code)) {
+        let old = c.formCodeMap.get(item.code)!;
+        assignment(old, item);
+      }
+      c.formCodeMap.set(item.code, item);
+    }
   }
-}
-
-class CommReadConfig<C extends FormSheetConfig | WorkSheetConfig> extends ReadConfigImpl<
-  Form,
-  Context,
-  C,
-  ExcelConfig<Context>
-> {
-  readonly replaceField: string;
-  readonly formIndex: { [directoryId: string]: { [formName: string]: IForm } } = {};
-  readonly formNameIndex: { [formName: string]: IForm } = {};
-
-  constructor(
-    sheetConfig: C,
-    excelConfig: ExcelConfig<Context>,
-    replaceField: string,
-    formIndex: { [directoryId: string]: { [formName: string]: IForm } },
-    formNameIndex: { [formName: string]: IForm },
-  ) {
-    super(sheetConfig, excelConfig);
-    this.replaceField = replaceField;
-    this.formIndex = formIndex;
-    this.formNameIndex = formNameIndex;
-  }
-
   /**
    * 数据校验
    * @param data 数据
    */
-  async checkData?(data: Form[]): Promise<void> {
-    let fields = ['directoryName', 'name', 'code'];
-    let fieldsName = this.sheetConfig.metaColumns
-      .filter((item) => fields.indexOf(item.code) != -1)
-      .map((item) => item.name)
-      .join('、');
-    for (let index = 0; index < data.length; index++) {
-      let item = data[index];
-      if (!item.directoryName || !item.name || !item.code) {
-        this.pushError(index, `存在未填写的${fieldsName}！`);
+  checkData(context: Context) {
+    for (let index = 0; index < this.sheetConfig.data.length; index++) {
+      let item = this.sheetConfig.data[index];
+      if (!item.directoryCode || !item.typeName || !item.name || !item.code) {
+        this.pushError(index, `存在未填写的目录代码，表单类型、表单名称、表单代码`);
+      }
+      if (!context.directoryCodeMap.has(item.directoryCode)) {
+        this.pushError(index, `未获取到目录代码：${item.directoryCode}`);
+      }
+      if (['实体配置', '事项配置'].indexOf(item.typeName) == -1) {
+        this.pushError(index, `表单类型只能填写实体配置或事项配置`);
       }
     }
-  }
-  /**
-   * 缓存一些数据
-   */
-  async cacheData(form: IForm): Promise<void> {
-    this.formNameIndex[form.name] = form;
-    let attrs = await form.loadAttributes();
-    let attrIndex: { [attrCode: string]: XAttribute } = {};
-    this.context.formAttrIndex[form.id] = attrIndex;
-    attrs.forEach((attr) => (attrIndex[attr.code] = attr));
+    return this.errors;
   }
   /**
    * 更新/创建属性
@@ -99,99 +69,41 @@ class CommReadConfig<C extends FormSheetConfig | WorkSheetConfig> extends ReadCo
    * @param row 行数据
    * @param context 上下文
    */
-  async operatingItem(row: Form, index: number): Promise<void> {
-    let directory = this.context.directoryIndex[row.directoryName];
-    let formIndex = this.formIndex[row.directoryId];
-    let form: IForm | undefined = formIndex[row.name];
-    let success: boolean = false;
-    if (form) {
-      success = await form.update({
-        ...form.metadata,
-        name: row.name,
-        code: row.code,
-        directoryId: row.directoryId,
-        remark: row.remark,
+  async operating(context: Context, onItemCompleted: () => void): Promise<void> {
+    let requests: RequestIndex[] = [];
+    for (let index = 0; index < this.sheetConfig.data.length; index++) {
+      let row = this.sheetConfig.data[index];
+      let dir = context.directoryCodeMap.get(row.directoryCode)!;
+      row.directoryId = dir.id;
+      requests.push({
+        rowNumber: index,
+        request: {
+          module: 'thing',
+          action: row.id ? 'UpdateForm' : 'CreateForm',
+          params: row,
+        },
       });
-    } else {
-      form = await directory.createForm(row);
-      if (form) {
-        formIndex[form.code] = form;
-      }
-      success = !!form;
     }
-    if (form) {
-      await this.cacheData(form);
-    }
-    if (!success) {
-      this.pushError(index, '生成失败，请根据提示修改错误！');
+    for (let arr of partition(requests, 100)) {
+      await this.requests(arr, context, onItemCompleted);
     }
   }
   /**
-   * 完成后回写特性表
-   * @param sheets 表格
+   * @param requests 批量请求
    */
-  completed(
-    sheets: ReadConfig<any, any, SheetConfig<any>, ExcelConfig<Context>>[],
-  ): void {
-    for (let readConfig of sheets) {
-      let sheetConfig = readConfig.sheetConfig;
-      if (sheetConfig.sheetName != this.sheetConfig.sheetName) {
-        let hasForm = sheetConfig.metaColumns.findIndex(
-          (item) => item.name == this.replaceField,
-        );
-        if (hasForm != -1) {
-          for (let index = 0; index < sheetConfig.data.length; index++) {
-            let item = sheetConfig.data[index];
-            if (item.formName && this.formNameIndex[item.formName]) {
-              item.formId = this.formNameIndex[item.formName].id;
-              item.directoryId = this.formNameIndex[item.formName].metadata.id;
-            } else {
-              readConfig.pushError(index, '未找到表单：' + item.formName);
-            }
-            if (item.propCode && this.context.propCodeIndex[item.propCode]) {
-              item.propId = this.context.propCodeIndex[item.propCode].metadata.id;
-            } else {
-              readConfig.pushError(index, '未找到库表要素：' + item.propCode);
-            }
-          }
-          if (readConfig.errors.length > 0) {
-            this.excelConfig.onReadError?.apply(this.excelConfig, [readConfig.errors]);
-            throw new Error();
-          }
-        }
+  private async requests(
+    requests: RequestIndex[],
+    context: Context,
+    onItemCompleted: () => void,
+  ) {
+    await batchRequests(requests, (request, result) => {
+      if (result.success) {
+        assignment(result.data, this.sheetConfig.data[request.rowNumber]);
+        context.formCodeMap.set(result.data.code, result.data);
+      } else {
+        this.pushError(request.rowNumber, result.msg);
       }
-    }
-  }
-}
-
-export class FormReadConfig extends CommReadConfig<FormSheetConfig> {
-  constructor(sheetConfig: FormSheetConfig, excelConfig: ExcelConfig<Context>) {
-    super(
-      sheetConfig,
-      excelConfig,
-      '表单名称',
-      excelConfig.context.entityFormIndex,
-      excelConfig.context.entityFormNameIndex,
-    );
-  }
-  async operatingItem(row: Form, index: number): Promise<void> {
-    row.typeName = '实体配置';
-    await super.operatingItem(row, index);
-  }
-}
-
-export class WorkReadConfig extends CommReadConfig<WorkSheetConfig> {
-  constructor(sheetConfig: WorkSheetConfig, excelConfig: ExcelConfig<Context>) {
-    super(
-      sheetConfig,
-      excelConfig,
-      '事项名称',
-      excelConfig.context.workFormIndex,
-      excelConfig.context.workFormNameIndex,
-    );
-  }
-  async operatingItem(row: Form, index: number): Promise<void> {
-    row.typeName = '事项配置';
-    await super.operatingItem(row, index);
+      onItemCompleted();
+    });
   }
 }
