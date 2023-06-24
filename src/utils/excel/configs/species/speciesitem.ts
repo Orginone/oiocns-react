@@ -39,8 +39,7 @@ export class ClassifyItemSheetConfig extends SheetConfigImpl<SpeciesItem> {
       { title: '分类代码', dataIndex: 'speciesCode', valueType: '描述型' },
       { title: '上级分类项代码', dataIndex: 'parentInfo', valueType: '描述型' },
       { title: '分类项名称', dataIndex: 'name', valueType: '描述型' },
-      { title: '分类项代码', dataIndex: 'code', valueType: '描述型' },
-      { title: '附加信息', dataIndex: 'info', valueType: '描述型' },
+      { title: '分类项代码', dataIndex: 'info', valueType: '描述型' },
       { title: '备注信息', dataIndex: 'remark', valueType: '描述型' },
       { title: '主键', dataIndex: 'id', valueType: '描述型', hide: true },
       { title: '分类主键', dataIndex: 'speciesId', valueType: '描述型', hide: true },
@@ -167,6 +166,7 @@ export class ClassifyItemReadConfig extends ReadConfigImpl<
       }
       if (item.parentInfo) {
         if (!context.speciesItemCodeMap.get(item.speciesCode)?.get(item.parentInfo)) {
+          debugger
           this.pushError(index, `未找到上级分类项代码：${item.parentInfo}！`);
         }
       }
