@@ -2,6 +2,7 @@ import React from 'react';
 import { schema } from '@/ts/base';
 import orgCtrl from '@/ts/controller';
 import { IDirectory, IEntity, ITarget } from '@/ts/core';
+import WorkForm from './workForm';
 import DirectoryForm from './directoryForm';
 import ApplicationForm from './applicationForm';
 import SpeciesForm from './speciesForm';
@@ -42,11 +43,16 @@ const EntityForm: React.FC<IProps> = ({ cmd, entity, finished }) => {
       return <DirectoryForm formType={cmd} current={directory} finished={reloadFinish} />;
     }
     case 'newApp':
+    case 'newModule':
     case 'updateApp':
     case 'remarkApp':
       return (
         <ApplicationForm formType={cmd} current={entity as any} finished={reloadFinish} />
       );
+    case 'newWork':
+    case 'updateWork':
+    case 'remarkWork':
+      return <WorkForm formType={cmd} current={entity as any} finished={reloadFinish} />;
     case 'newSpecies':
     case 'updateSpecies':
     case 'remarkSpecies':

@@ -2,17 +2,19 @@ import { ProForm } from '@ant-design/pro-components';
 import { Descriptions } from 'antd';
 import React, { useMemo, useRef } from 'react';
 import OioFormItem from './FormItems';
-import { IForm } from '@/ts/core';
+import { IBelong } from '@/ts/core';
 import cls from './index.module.less';
+import { schema } from '@/ts/base';
+import { ImInfo } from 'react-icons/im';
 type IProps = {
-  form: IForm;
+  form: schema.XForm;
+  belong: IBelong;
   submitter?: any;
   onValuesChange?: (changedValues: any, values: Record<string, any>) => void;
   onFinished?: Function;
   fieldsValue?: any;
   formRef?: any;
   disabled?: boolean;
-  noRule?: boolean; //所有数据均可修改，且不验证规则
 };
 
 /**
@@ -20,17 +22,17 @@ type IProps = {
  */
 const OioForm: React.FC<IProps> = ({
   form,
+  belong,
   submitter,
   onValuesChange,
   onFinished,
   fieldsValue,
   formRef = useRef(),
   disabled,
-  noRule,
 }) => {
-  let config: any = form.metadata.rule
-    ? JSON.parse(form.metadata.rule)
-    : { col: 8, layout: 'horizontal' };
+  const attributes = form.attributes || [];
+  if (attributes.length < 1) return <></>;
+  let config: any = form.rule ? JSON.parse(form.rule) : { col: 8, layout: 'horizontal' };
   const colNum = 3; //单行展示数量
   if (fieldsValue) {
     formRef?.current?.setFieldsValue(fieldsValue);
@@ -38,8 +40,8 @@ const OioForm: React.FC<IProps> = ({
 
   const fillArr = useMemo(() => {
     const fileTypeItems =
-      form.attributes.filter((v) => v.property!.valueType == '附件型') ?? [];
-    const leg = (form.attributes.length - fileTypeItems.length) % colNum;
+      attributes.filter((v) => v.property!.valueType == '附件型') ?? [];
+    const leg = (attributes.length - fileTypeItems.length) % colNum;
 
     const legArr: any[] = [];
     if (leg === 0) {
@@ -50,11 +52,10 @@ const OioForm: React.FC<IProps> = ({
     }
     // 返回数据为 填充+最后的附件类
     return [...legArr, ...fileTypeItems];
-  }, [form.attributes.length]);
+  }, [attributes.length]);
 
   return (
     <>
-      <div className={cls.formTitle}>{form.name}</div>
       <ProForm
         disabled={disabled === true}
         formRef={formRef}
@@ -87,21 +88,22 @@ const OioForm: React.FC<IProps> = ({
           className={cls.formRow}
           column={3}
           labelStyle={{ minWidth: '120px', textAlign: 'right' }}>
-          {form.attributes.map((item) => {
+          {attributes.map((item) => {
             if (item.property!.valueType === '附件型') {
               return <></>;
             }
             return (
               <Descriptions.Item
-                label={item.name}
                 key={item.id}
                 span={1}
+                label={
+                  <div style={{ cursor: 'pointer' }} title={item.remark}>
+                    <span style={{ marginRight: 6 }}>{item.name}</span>
+                    {item.remark && item.remark.length > 0 && <ImInfo />}
+                  </div>
+                }
                 contentStyle={{ width: '33%' }}>
-                <OioFormItem
-                  item={item}
-                  belong={form.directory.target.space}
-                  noRule={noRule}
-                />
+                <OioFormItem item={item} belong={belong} />
               </Descriptions.Item>
             );
           })}
@@ -117,7 +119,7 @@ const OioForm: React.FC<IProps> = ({
                   contentStyle={{ width: '33%' }}>
                   <OioFormItem
                     item={item}
-                    belong={form.directory.target.space}
+                    belong={belong}
                     disabled={disabled}
                     value={fieldsValue ? fieldsValue[item.id] : undefined}
                     onFilesValueChange={(key, files: any) => {
@@ -131,7 +133,6 @@ const OioForm: React.FC<IProps> = ({
                           formRef?.current.getFieldsValue(true),
                         );
                     }}
-                    noRule={noRule}
                   />
                 </Descriptions.Item>
               );

@@ -60,7 +60,7 @@ const IconMode = ({
       menu={{
         items: loadFileMenus(current, mode),
         onClick: ({ key }) => {
-          command.emitter(cmdType, key, current);
+          command.emitter(cmdType, key, current, current.key);
         },
       }}
       trigger={['contextMenu']}>

@@ -112,6 +112,9 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
   get isInherited(): boolean {
     return this.metadata.belongId != this.target.space.id;
   }
+  get locationKey(): string {
+    return this.key;
+  }
   content(mode: number = 0): IFileInfo<schema.XEntity>[] {
     const cnt: IFileInfo<schema.XEntity>[] = [...this.children];
     if (this.typeName === '成员目录') {

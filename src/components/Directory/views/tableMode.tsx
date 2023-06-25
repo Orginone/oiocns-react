@@ -39,6 +39,7 @@ const TableMode = ({
       }}
       dataSource={current.content(mode)}
       onContextMenuPreparing={(e: any) => {
+        const file = e.row?.data ?? current;
         e.component.selectRowsByIndexes([e.rowIndex]);
         const modal = Modal.info({
           mask: false,
@@ -63,10 +64,14 @@ const TableMode = ({
           content: (
             <Dropdown
               menu={{
-                items: loadFileMenus(e.row?.data ?? current, mode),
+                items: loadFileMenus(file, mode),
                 onClick: ({ key }) => {
                   modal.destroy();
-                  command.emitter(cmdType, key, current);
+                  if (file.key === current.key) {
+                    command.emitter(cmdType, key, file, current.key);
+                  } else {
+                    command.emitter(cmdType, key, file);
+                  }
                 },
               }}
               open>

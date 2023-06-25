@@ -4,20 +4,35 @@ import { IApplication, IWork } from '@/ts/core';
 import { model } from '@/ts/base';
 import SchemaForm from '@/components/SchemaForm';
 import { WorkDefineModel } from '@/ts/base/model';
-import UploadItem from '../../../tools/uploadItem';
+import UploadItem from '../../tools/uploadItem';
 
 interface Iprops {
-  open: boolean;
-  application: IApplication;
-  current?: IWork;
-  handleOk: (success: boolean) => void;
-  handleCancel: () => void;
+  formType: string;
+  current: IWork | IApplication;
+  finished: () => void;
 }
 
 /*
   业务标准编辑模态框
 */
-const WorkModal = ({ open, handleOk, handleCancel, application, current }: Iprops) => {
+const WorkModal = ({ finished, formType, current }: Iprops) => {
+  let title = '';
+  const readonly = formType === 'remarkDir';
+  let initialValue: any = current.metadata;
+  switch (formType) {
+    case 'newWork':
+      title = '新建办事';
+      initialValue = { shareId: current.directory.target.id };
+      break;
+    case 'updateWork':
+      title = '更新办事';
+      break;
+    case 'remarkWork':
+      title = '查看办事';
+      break;
+    default:
+      return <></>;
+  }
   const columns: ProFormColumnsType<WorkDefineModel>[] = [
     {
       title: '图标',
@@ -26,18 +41,20 @@ const WorkModal = ({ open, handleOk, handleCancel, application, current }: Iprop
       renderFormItem: (_, __, form) => {
         return (
           <UploadItem
-            typeName={'应用'}
+            typeName={'办事'}
+            readonly={readonly}
             icon={current?.metadata?.icon || ''}
             onChanged={(icon) => {
               form.setFieldValue('icon', icon);
             }}
-            directory={application.directory}
+            directory={current.directory}
           />
         );
       },
     },
     {
       title: '事项名称',
+      readonly: readonly,
       dataIndex: 'name',
       formItemProps: {
         rules: [{ required: true, message: '事项名称为必填项' }],
@@ -45,6 +62,7 @@ const WorkModal = ({ open, handleOk, handleCancel, application, current }: Iprop
     },
     {
       title: '事项编号',
+      readonly: readonly,
       dataIndex: 'code',
       formItemProps: {
         rules: [{ required: true, message: '事项编号为必填项' }],
@@ -52,35 +70,40 @@ const WorkModal = ({ open, handleOk, handleCancel, application, current }: Iprop
     },
     {
       title: '选择共享组织',
+      readonly: readonly,
       dataIndex: 'shareId',
       valueType: 'select',
       formItemProps: { rules: [{ required: true, message: '请选择共享组织' }] },
       fieldProps: {
-        options: application.directory.target.space.shareTarget.map((i) => {
-          return {
-            label: i.name,
-            value: i.id,
-          };
-        }),
+        options: [
+          {
+            label: current.directory.target.name,
+            value: current.directory.target.id,
+          },
+        ],
       },
     },
     {
       title: '允许新增实体',
       dataIndex: 'allowAdd',
       valueType: 'switch',
+      readonly: readonly,
     },
     {
       title: '允许变更实体',
       dataIndex: 'allowEdit',
       valueType: 'switch',
+      readonly: readonly,
     },
     {
       title: '允许选择实体',
       dataIndex: 'allowSelect',
       valueType: 'switch',
+      readonly: readonly,
     },
     {
       title: '备注',
+      readonly: readonly,
       dataIndex: 'remark',
       valueType: 'textarea',
       colProps: { span: 24 },
@@ -91,35 +114,35 @@ const WorkModal = ({ open, handleOk, handleCancel, application, current }: Iprop
   ];
   return (
     <SchemaForm<model.WorkDefineModel>
+      open
       key={'workDefineModal'}
-      open={open}
       width={640}
       layoutType="ModalForm"
-      initialValues={
-        current
-          ? current.metadata
-          : { allowEdit: true, allowAdd: true, allowSelect: true }
-      }
-      title={current ? `编辑[${current.name}]办事` : '新建办事'}
+      initialValues={initialValue}
+      title={title}
       onOpenChange={(open: boolean) => {
         if (!open) {
-          handleCancel();
+          finished();
         }
       }}
       rowProps={{
         gutter: [24, 0],
       }}
-      onFinish={async (model: any) => {
-        model.rule = JSON.stringify({
-          allowAdd: model.allowAdd,
-          allowEdit: model.allowEdit,
-          allowSelect: model.allowSelect,
+      onFinish={async (values: any) => {
+        values.rule = JSON.stringify({
+          allowAdd: values.allowAdd,
+          allowEdit: values.allowEdit,
+          allowSelect: values.allowSelect,
         });
-        if (current) {
-          handleOk(await current.update(model));
-        } else {
-          handleOk((await application.createWork(model)) != undefined);
+        switch (formType) {
+          case 'updateWork':
+            await (current as IWork).update(values);
+            break;
+          case 'newWork':
+            await (current as IApplication).createWork(values);
+            break;
         }
+        finished();
       }}
       columns={columns}
     />

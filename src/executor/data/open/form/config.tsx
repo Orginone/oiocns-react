@@ -1,16 +1,16 @@
 import { MenuItemType } from 'typings/globelType';
-import { IEntity, IFormView } from '@/ts/core';
+import { IForm } from '@/ts/core';
 import React from 'react';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import { schema } from '@/ts/base';
 /** 创建团队菜单 */
 const buildSpeciesItemTree = (
-  items: IEntity<schema.XSpeciesItem>[],
+  items: schema.XSpeciesItem[],
   parentId: string | undefined,
 ): MenuItemType[] => {
   const result: any[] = [];
   for (const item of items) {
-    if (item.metadata.parentId === parentId) {
+    if (item.parentId === parentId) {
       result.push({
         key: item.id,
         item: item,
@@ -26,7 +26,7 @@ const buildSpeciesItemTree = (
 };
 
 /** 加载表单分类菜单 */
-export const loadSpeciesItemMenu = (form: IFormView): MenuItemType => {
+export const loadSpeciesItemMenu = (form: IForm): MenuItemType => {
   return {
     key: form.key,
     label: form.name,

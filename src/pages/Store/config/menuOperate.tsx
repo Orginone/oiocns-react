@@ -1,6 +1,6 @@
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import orgCtrl from '@/ts/controller';
-import { IDirectory, IGroup, ITarget } from '@/ts/core';
+import { IApplication, IDirectory, IGroup, ITarget } from '@/ts/core';
 import React from 'react';
 import { MenuItemType } from 'typings/globelType';
 import { loadFileMenus } from '@/executor/fileOperate';
@@ -46,7 +46,10 @@ const buildDirectoryTree = (directorys: IDirectory[]): MenuItemType[] => {
       ),
       itemType: directory.typeName,
       menus: loadFileMenus(directory, 1),
-      children: buildDirectoryTree(directory.children),
+      children: [
+        ...buildDirectoryTree(directory.children),
+        ...buildApplicationTree(directory.applications),
+      ],
       beforeLoad: async () => {
         await directory.loadContent();
       },
@@ -54,6 +57,26 @@ const buildDirectoryTree = (directorys: IDirectory[]): MenuItemType[] => {
   });
 };
 
+/** 编译目录树 */
+const buildApplicationTree = (applications: IApplication[]): MenuItemType[] => {
+  return applications.map((application) => {
+    return {
+      key: application.key,
+      item: application,
+      label: application.name,
+      tag: [application.typeName],
+      icon: (
+        <EntityIcon entityId={application.id} typeName={application.typeName} size={18} />
+      ),
+      itemType: application.typeName,
+      menus: loadFileMenus(application),
+      children: buildApplicationTree(application.children),
+      beforeLoad: async () => {
+        await application.loadContent();
+      },
+    };
+  });
+};
 /** 获取个人菜单 */
 const getUserMenu = () => {
   return createMenu(orgCtrl.user, [
