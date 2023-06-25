@@ -4,6 +4,7 @@ import { Tag, Typography } from 'antd';
 import { schema } from '@/ts/base';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import { IWork } from '@/ts/core';
+import { StatusMap } from '@/ts/core/public/consts';
 
 /** 人员信息列 */
 export const PersonColumns: ProColumns<schema.XTarget>[] = [
@@ -303,7 +304,7 @@ export const TaskColumn: ProColumns<schema.XWorkTask>[] = [
     width: 80,
     dataIndex: 'status',
     render: (_: any, record: schema.XWorkTask) => {
-      const status = statusMap.get(record.status as number);
+      const status = StatusMap.get(record.status as number);
       return <Tag color={status!.color}>{status!.text}</Tag>;
     },
   },
@@ -328,62 +329,3 @@ export const TaskColumn: ProColumns<schema.XWorkTask>[] = [
     dataIndex: 'createTime',
   },
 ];
-
-const statusMap = new Map([
-  [
-    1,
-    {
-      color: 'blue',
-      text: '待处理',
-    },
-  ],
-  [
-    100,
-    {
-      color: 'green',
-      text: '已同意',
-    },
-  ],
-  [
-    200,
-    {
-      color: 'red',
-      text: '已拒绝',
-    },
-  ],
-  [
-    102,
-    {
-      color: 'green',
-      text: '已发货',
-    },
-  ],
-  [
-    220,
-    {
-      color: 'gold',
-      text: '买方取消订单',
-    },
-  ],
-  [
-    221,
-    {
-      color: 'volcano',
-      text: '卖方取消订单',
-    },
-  ],
-  [
-    222,
-    {
-      color: 'default',
-      text: '已退货',
-    },
-  ],
-  [
-    240,
-    {
-      color: 'red',
-      text: '已取消',
-    },
-  ],
-]);
