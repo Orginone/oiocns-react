@@ -10,6 +10,7 @@ const entityMap: any = {
   目录: 'Dir',
   应用: 'App',
   模块: 'App',
+  属性: 'Property',
   分类: 'Species',
   字典: 'Dict',
   角色: 'Identity',

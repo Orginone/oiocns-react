@@ -513,26 +513,28 @@ export type InstanceDataModel = {
   /** 提交的表单数据 */
   data: {
     // 表单id
-    [id: string]:  {
-      /** 选择的数据 */
-      source: {
-        // 特性id
-        [id: string]: any
-      }[];
-      /** 操作的数据 */
-      changed: {
-        // 唯一id
-        [id: string]: {
-          // 特性id
-          [id: string]: any
-        }
-      };
-      /** 操作人 */
-      creator: string;
-      /** 操作时间 */
-      createTime: string;
-    }[]
+    [id: string]: FormEditData[]
   };
+}
+
+export type FormEditData = {
+  /** 选择的数据 */
+  source: {
+    // 特性id
+    [id: string]: any
+  }[];
+  /** 操作的数据 */
+  changed: {
+    // 唯一id
+    [id: string]: {
+      // 特性id
+      [id: string]: any
+    }
+  };
+  /** 操作人 */
+  creator: string;
+  /** 操作时间 */
+  createTime: string;
 }
 
 export type WorkNodeModel = {

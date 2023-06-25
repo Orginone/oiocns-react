@@ -1,10 +1,10 @@
 import { IWork } from '@/ts/core';
 import { Button, Input } from 'antd';
 import React, { useEffect, useState } from 'react';
-import cls from './index.module.less';
 import WorkForm from '@/executor/tools/workForm';
 import FullScreenModal from '@/executor/tools/fullScreen';
 import { IWorkApply } from '@/ts/core/work/apply';
+import { model } from '@/ts/base';
 // 卡片渲染
 interface IProps {
   current: IWork;
@@ -14,10 +14,10 @@ interface IProps {
 /** 办事-业务流程--发起 */
 const WorkStartDo: React.FC<IProps> = ({ current, finished }) => {
   const [apply, setApply] = useState<IWorkApply>();
-  const [content, setContent] = useState<string>('');
+  const info: { content: string } = { content: '' };
+  const formData = new Map<string, model.FormEditData>();
   useEffect(() => {
     current.createApply().then((value) => {
-      console.log(value);
       if (value) {
         setApply(value);
       }
@@ -31,6 +31,7 @@ const WorkStartDo: React.FC<IProps> = ({ current, finished }) => {
         centered
         fullScreen
         width={'80vw'}
+        bodyHeight={'80vh'}
         destroyOnClose
         title={current.name}
         footer={[]}
@@ -40,64 +41,30 @@ const WorkStartDo: React.FC<IProps> = ({ current, finished }) => {
           belong={apply.belong}
           forms={apply.instanceData.node.forms || []}
           data={apply.instanceData}
+          onChanged={(id, data) => {
+            formData.set(id, data);
+            formData.forEach((v, k) => {
+              console.log(k, v);
+            });
+          }}
         />
-        <div className={cls.content}>
-          {/* {apply.primaryForms.map((form) => {
-            return (
-              <OioForm
-                key={form.id}
-                form={form}
-                belong={apply.belong}
-                submitter={{
-                  resetButtonProps: {
-                    style: { display: 'none' },
-                  },
-                  render: (_: any, _dom: any) => <></>,
-                }}
-                onValuesChange={(_, values) => {
-                  console.log(values);
-                }}
-              />
-            );
-          })}
-          {apply.detailForms.length > 0 && (
-            <ThingTable
-              headerTitle={
-                <Tabs
-                  activeKey={activeTab}
-                  tabPosition="bottom"
-                  key={activeTab}
-                  className={cls.tabBar}
-                  onTabClick={(tabKey) => setActiveTab(tabKey)}
-                  items={apply.detailForms.map((i) => {
-                    return {
-                      label: i.name,
-                      key: i.id,
-                    };
-                  })}></Tabs>
-              }
-              key={activeTab}
-              current={current}
-              formView={apply.detailForms.find((v) => v.id === activeTab)!}
-            />
-          )} */}
-          <div className={cls.approvalArea}>
-            <Input.TextArea
-              style={{ height: 150, width: 'calc(100% - 120px)' }}
-              placeholder="请填写备注信息"
-              onChange={(e) => {
-                setContent(e.target.value);
-              }}
-            />
-            <Button
-              type="primary"
-              onClick={() => {
-                apply.createApply(apply.belong.id, content);
-                finished();
-              }}>
-              提交
-            </Button>
-          </div>
+        <div style={{ padding: 10, display: 'flex', alignItems: 'flex-end' }}>
+          <Input.TextArea
+            style={{ height: 100, width: 'calc(100% - 80px)', marginRight: 10 }}
+            placeholder="请填写备注信息"
+            onChange={(e) => {
+              info.content = e.target.value;
+            }}
+          />
+          <Button
+            type="primary"
+            onClick={() => {
+              console.log(info);
+              // apply.createApply(apply.belong.id, info.content);
+              finished();
+            }}>
+            提交
+          </Button>
         </div>
       </FullScreenModal>
     </>

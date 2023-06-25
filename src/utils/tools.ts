@@ -313,6 +313,6 @@ export {
   resetParams,
   showChatTime,
   showMessage,
-  validIsSocialCreditCode,
   truncateString,
+  validIsSocialCreditCode,
 };

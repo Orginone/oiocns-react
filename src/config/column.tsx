@@ -64,3 +64,57 @@ export const IdentityColumn: ProColumns<schema.XIdentity>[] = [
     dataIndex: 'remark',
   },
 ];
+
+/** 物的默认列信息 */
+export const ThingColumns = (hideColumns?: string[]) => [
+  {
+    id: 'Id',
+    dataField: 'Id',
+    visible: !hideColumns?.includes('Id'),
+    name: '唯一标识',
+    valueType: '描述型',
+    remark: '由系统生成的唯一标记,无实义.',
+  },
+  {
+    id: 'Creater',
+    dataField: 'Creater',
+    visible: !hideColumns?.includes('Creater'),
+    name: '创建人',
+    valueType: '用户型',
+    remark: '创建标识的人',
+  },
+  {
+    id: 'Status',
+    dataField: 'Status',
+    visible: !hideColumns?.includes('Status'),
+    name: '状态',
+    valueType: '选择型',
+    remark: '数据状态',
+    lookupSource: [
+      {
+        text: '正常',
+        value: '正常',
+      },
+      {
+        text: '已销毁',
+        value: '已销毁',
+      },
+    ],
+  },
+  {
+    id: 'CreateTime',
+    dataField: 'CreateTime',
+    visible: !hideColumns?.includes('CreateTime'),
+    name: '创建时间',
+    valueType: '时间型',
+    remark: '创建标识的时间',
+  },
+  {
+    id: 'ModifiedTime',
+    dataField: 'ModifiedTime',
+    visible: !hideColumns?.includes('ModifiedTime'),
+    name: '修改时间',
+    valueType: '时间型',
+    remark: '最新修改时间',
+  },
+];

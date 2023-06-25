@@ -15,6 +15,7 @@ type IProps = {
   fieldsValue?: any;
   formRef?: any;
   disabled?: boolean;
+  showTitle?: boolean;
 };
 
 /**
@@ -29,6 +30,7 @@ const OioForm: React.FC<IProps> = ({
   fieldsValue,
   formRef = useRef(),
   disabled,
+  showTitle,
 }) => {
   const attributes = form.attributes || [];
   if (attributes.length < 1) return <></>;
@@ -56,6 +58,17 @@ const OioForm: React.FC<IProps> = ({
 
   return (
     <>
+      {showTitle && (
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            fontSize: 16,
+            marginBottom: 20,
+          }}>
+          {form.name}
+        </div>
+      )}
       <ProForm
         disabled={disabled === true}
         formRef={formRef}
