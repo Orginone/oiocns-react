@@ -1,42 +1,32 @@
-import { XAttribute, XSpeciesItem } from '@/ts/base/schema';
-import { IDirectory, IForm, IProperty, ISpecies } from '@/ts/core';
-import { WorkBook } from 'xlsx';
+import { model } from '@/ts/base';
+import { Directory } from './configs/base/directory';
+import { Form } from './configs/base/form';
+import { Species } from './configs/species/species';
+import { SpeciesItem } from './configs/species/speciesitem';
+import { Property } from './configs/store/property';
+import { Attribute } from './configs/base/attribute';
 
 export enum SheetName {
   Directory = '目录',
   Dict = '字典定义',
   DictItem = '字典项定义',
-  Species = '分类项',
-  SpeciesItem = '分类子项定义',
+  Species = '分类定义',
+  SpeciesItem = '分类项定义',
   Property = '属性定义',
-  Form = '实体定义',
-  FormAttr = '实体特性',
-  Work = '事项定义',
-  WorkAttr = '事项特性',
+  Form = '表单定义',
+  FormAttr = '表单特性',
 }
 
 /**
  * 导入上下文
  */
 export class Context {
-  directoryIndex: { [directoryName: string]: IDirectory } = {};
-  dictIndex: { [directoryId: string]: { [dictName: string]: ISpecies } } = {};
-  dictNameIndex: { [dictName: string]: ISpecies } = {};
-  dictCodeIndex: { [dictCode: string]: ISpecies } = {};
-  dictItemIndex: { [speciesId: string]: { [name: string]: XSpeciesItem } } = {};
-  dictItemCodeIndex: { [speciesId: string]: { [code: string]: XSpeciesItem } } = {};
-  speciesIndex: { [directoryId: string]: { [speciesName: string]: ISpecies } } = {};
-  speciesNameIndex: { [speciesName: string]: ISpecies } = {};
-  speciesCodeIndex: { [speciesCode: string]: ISpecies } = {};
-  speciesItemIndex: { [speciesId: string]: { [name: string]: XSpeciesItem } } = {};
-  speciesItemCodeIndex: { [speciesId: string]: { [code: string]: XSpeciesItem } } = {};
-  propIndex: { [directoryId: string]: { [propName: string]: IProperty } } = {};
-  propCodeIndex: { [propCode: string]: IProperty } = {};
-  entityFormIndex: { [directoryId: string]: { [formName: string]: IForm } } = {};
-  entityFormNameIndex: { [formName: string]: IForm } = {};
-  workFormIndex: { [directoryId: string]: { [formName: string]: IForm } } = {};
-  workFormNameIndex: { [formName: string]: IForm } = {};
-  formAttrIndex: { [formId: string]: { [attrCode: string]: XAttribute } } = {};
+  directoryCodeMap: Map<string, Directory> = new Map();
+  speciesCodeMap: Map<string, Species> = new Map();
+  speciesItemCodeMap: Map<String, Map<String, SpeciesItem>> = new Map();
+  propertyMap: Map<String, Property> = new Map();
+  formCodeMap: Map<String, Form> = new Map();
+  formAttrCodeMap: Map<String, Map<String, Attribute>> = new Map();
 }
 
 /**
@@ -46,6 +36,14 @@ export interface ErrorMessage {
   sheetName: string;
   row: number;
   message: string;
+}
+
+/**
+ * 请求
+ */
+export interface RequestIndex {
+  rowNumber: number;
+  request: model.ReqestType;
 }
 
 /**
@@ -78,9 +76,8 @@ export class SheetConfigImpl<T> implements SheetConfig<T> {
 /**
  * 读取 Excel 配置
  */
-export interface ExcelConfig<C> {
-  context: C;
-  initialize?: (totalRows: number, workbook?: WorkBook) => void;
+export interface DataHandler {
+  initialize?: (totalRows: number) => void;
   onItemCompleted?: () => void;
   onReadError?: (errors: ErrorMessage[]) => void;
   onError?: (error: string) => void;
@@ -91,48 +88,38 @@ export interface ExcelConfig<C> {
  * 元字段
  */
 export interface MetaColumn {
-  name: string;
-  code: string;
-  type: string;
-  options?: string[];
+  title: string;
+  dataIndex: string;
+  valueType: string;
+  hide?: boolean;
 }
 
 /**
  * 读取 Excel Sheet 配置
  */
-export interface ReadConfig<T, C, S extends SheetConfig<T>, E extends ExcelConfig<C>> {
+export interface ReadConfig<T, C, S extends SheetConfig<T>> {
   sheetConfig: S;
   errors: ErrorMessage[];
-  excelConfig: E;
 
-  checkData?(data: T[]): Promise<void>;
+  initContext?(context: C): Promise<void>;
   pushError(index: number, error: string): void;
-  operatingItem(row: T, index?: number): Promise<void>;
-  completed?(sheets: ReadConfig<any, any, SheetConfig<any>, E>[]): void;
+  checkData(context?: C): ErrorMessage[];
+  operating(context: C, onItemCompleted: () => void): Promise<void>;
+  completed?(sheets: ReadConfig<any, any, SheetConfig<any>>[], context: C): void;
 }
 
 /**
  * 读取 Excel Sheet 配置默认实现
  */
-export abstract class ReadConfigImpl<
-  T,
-  C,
-  S extends SheetConfig<T>,
-  E extends ExcelConfig<C>,
-> implements ReadConfig<T, C, S, E>
+export abstract class ReadConfigImpl<T, C, S extends SheetConfig<T>>
+  implements ReadConfig<T, C, S>
 {
   sheetConfig: S;
   errors: ErrorMessage[];
-  excelConfig: E;
 
-  get context(): C {
-    return this.excelConfig.context;
-  }
-
-  constructor(sheetConfig: S, excelConfig: E) {
+  constructor(sheetConfig: S) {
     this.sheetConfig = sheetConfig;
     this.errors = [];
-    this.excelConfig = excelConfig;
   }
 
   pushError(index: number, error: string): void {
@@ -143,7 +130,8 @@ export abstract class ReadConfigImpl<
     });
   }
 
-  checkData?(data: T[]): Promise<void>;
-  abstract operatingItem(row: T, index?: number): Promise<void>;
-  completed?(sheets: ReadConfig<any, any, SheetConfig<any>, E>[]): void;
+  initContext?(context: C): Promise<void>;
+  abstract checkData(context: C): ErrorMessage[];
+  abstract operating(context: C, onItemCompleted: () => void): Promise<void>;
+  completed?(sheets: ReadConfig<any, any, SheetConfig<any>>[], context: C): void;
 }

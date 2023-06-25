@@ -1,15 +1,16 @@
 import { PropertyModel } from '@/ts/base/model';
-import {
-  ReadConfigImpl,
-  SheetConfigImpl,
-  Context,
-  SheetName,
-  ExcelConfig,
-} from '../../types';
 import { IDirectory } from '@/ts/core';
+import { assignment, batchRequests, partition } from '../..';
+import {
+  Context,
+  ReadConfigImpl,
+  RequestIndex,
+  SheetConfigImpl,
+  SheetName,
+} from '../../types';
 
-interface Property extends PropertyModel {
-  directoryName: string;
+export interface Property extends PropertyModel {
+  directoryCode: string;
   speciesCode: string;
 }
 
@@ -18,71 +19,82 @@ export class PropSheetConfig extends SheetConfigImpl<Property> {
 
   constructor(directory: IDirectory) {
     super(SheetName.Property, 1, [
-      { name: '目录', code: 'directoryName', type: '描述型' },
-      { name: '属性名称', code: 'name', type: '描述型' },
-      { name: '属性代码', code: 'code', type: '描述型' },
+      { title: '目录代码', dataIndex: 'directoryCode', valueType: '描述型' },
+      { title: '属性名称', dataIndex: 'name', valueType: '描述型' },
+      { title: '属性代码', dataIndex: 'code', valueType: '描述型' },
+      { title: '属性类型', dataIndex: 'valueType', valueType: '选择型' },
+      { title: '单位', dataIndex: 'unit', valueType: '描述型' },
+      { title: '（字典/分类）代码/ID', dataIndex: 'speciesCode', valueType: '选择型' },
+      { title: '属性定义', dataIndex: 'remark', valueType: '描述型' },
+      { title: '附加信息', dataIndex: 'info', valueType: '描述型' },
+      { title: '主键', dataIndex: 'id', valueType: '描述型', hide: true },
+      { title: '目录主键', dataIndex: 'directoryId', valueType: '描述型', hide: true },
       {
-        name: '属性类型',
-        code: 'valueType',
-        type: '选择型',
-        options: [
-          '数值型',
-          '描述型',
-          '选择型',
-          '分类型',
-          '附件型',
-          '日期型',
-          '时间型',
-          '用户型',
-        ],
+        title: '(字典/分类) ID',
+        dataIndex: 'speciesId',
+        valueType: '描述型',
+        hide: true,
       },
-      { name: '单位', code: 'unit', type: '描述型' },
-      { name: '枚举字典', code: 'speciesCode', type: '选择型' },
-      { name: '属性定义', code: 'remark', type: '描述型' },
-      { name: '附加信息', code: 'info', type: '描述型' },
     ]);
     this.directory = directory;
   }
 }
 
-export class PropReadConfig extends ReadConfigImpl<
-  Property,
-  Context,
-  PropSheetConfig,
-  ExcelConfig<Context>
-> {
-  constructor(sheetConfig: PropSheetConfig, config: ExcelConfig<Context>) {
-    super(sheetConfig, config);
+const types = [
+  '数值型',
+  '描述型',
+  '选择型',
+  '分类型',
+  '附件型',
+  '日期型',
+  '时间型',
+  '用户型',
+];
+
+export class PropReadConfig extends ReadConfigImpl<Property, Context, PropSheetConfig> {
+  /**
+   * 数据初始化
+   * @param context 上下文
+   */
+  async initContext(c: Context): Promise<void> {
+    for (let item of this.sheetConfig.data) {
+      if (c.propertyMap.has(item.info)) {
+        let old = c.propertyMap.get(item.info)!;
+        c.propertyMap.set(item.info, { ...old, ...item });
+        assignment(old, item);
+      } else {
+        c.propertyMap.set(item.info, item);
+      }
+    }
   }
   /**
    * 数据校验
    * @param data 数据
    */
-  async checkData?(data: Property[]): Promise<void> {
-    let speciesCodeIndex = this.context.speciesCodeIndex;
-    let dictCodeIndex = this.context.dictCodeIndex;
-    for (let index = 0; index < data.length; index++) {
-      let item = data[index];
-      if (!item.directoryName || !item.name || !item.valueType) {
-        this.pushError(index, '存在未填写的目录、属性名称、属性类型！');
+  checkData(context: Context) {
+    for (let index = 0; index < this.sheetConfig.data.length; index++) {
+      let item = this.sheetConfig.data[index];
+      if (!item.directoryCode || !item.name || !item.valueType || !item.info) {
+        this.pushError(index, '存在未填写的目录代码、属性名称、属性类型、附加信息！');
+      }
+      if (!context.directoryCodeMap.has(item.directoryCode)) {
+        this.pushError(index, `未获取到目录代码：${item.directoryCode}`);
+      }
+      if (types.indexOf(item.valueType) == -1) {
+        this.pushError(index, `属性类型只能在[${types.join('，')}]中选择！`);
       }
       if (item.valueType == '选择型') {
         if (item.speciesCode) {
-          if (!speciesCodeIndex[item.speciesCode] && !dictCodeIndex[item.speciesCode]) {
-            this.pushError(index, `未获取到字典：${item.speciesCode}！`);
+          if (!context.speciesCodeMap.has(item.speciesCode)) {
+            this.pushError(index, `未获取到（字典/分类）代码：${item.speciesCode}！`);
             continue;
           }
-          if (speciesCodeIndex[item.speciesCode]) {
-            item.speciesId = speciesCodeIndex[item.speciesCode].id;
-          }
-          if (dictCodeIndex[item.speciesCode]) {
-            item.speciesId = dictCodeIndex[item.speciesCode].id;
-          }
         } else {
-          this.pushError(index, '当属性类型为选择型时，必须填写枚举字典！');
+          this.pushError(index, '当属性类型为选择型时，必须填写（字典/分类）代码！');
         }
       }
     }
+    return this.errors;
   }
   /**
    * 更新/创建属性
@@ -90,36 +102,44 @@ export class PropReadConfig extends ReadConfigImpl<
    * @param row 行数据
    * @param context 上下文
    */
-  async operatingItem(row: Property, index: number): Promise<void> {
-    let context = this.excelConfig.context;
-    let directory = context.directoryIndex[row.directoryName];
-    let property = context.propIndex[row.directoryId][row.name];
-    let success: boolean = false;
-    if (property) {
-      success = await property.update({
-        ...property.metadata,
-        name: row.name,
-        code: row.code,
-        valueType: row.valueType,
-        unit: row.unit,
-        directoryId: row.directoryId,
-        speciesId: row.valueType == '选择型' ? row.speciesId : undefined!,
-        remark: row.remark,
-        info: row.info,
-      });
-    } else {
-      let property = await directory.createProperty({
-        ...row,
-        speciesId: row.valueType == '选择型' ? row.speciesId : undefined!,
-      });
-      if (property) {
-        context.propIndex[row.directoryId][row.name] = property;
-        context.propCodeIndex[row.code] = property;
+  async operating(context: Context, onItemCompleted: () => void): Promise<void> {
+    let requests: RequestIndex[] = [];
+    for (let index = 0; index < this.sheetConfig.data.length; index++) {
+      let row = this.sheetConfig.data[index];
+      row.directoryId = context.directoryCodeMap.get(row.directoryCode)!.id;
+      if (row.speciesCode) {
+        row.speciesId = context.speciesCodeMap.get(row.speciesCode)!.id;
       }
-      success = !!property;
+      requests.push({
+        rowNumber: index,
+        request: {
+          module: 'thing',
+          action: row.id ? 'UpdateProperty' : 'CreateProperty',
+          params: row,
+        },
+      });
     }
-    if (!success) {
-      this.pushError(index, '生成失败，请根据提示修改错误！');
+    for (let arr of partition(requests, 100)) {
+      await this.requests(arr, context, onItemCompleted);
     }
+  }
+  /**
+   *
+   * @param requests 批量请求
+   */
+  private async requests(
+    requests: RequestIndex[],
+    context: Context,
+    onItemCompleted: () => void,
+  ) {
+    await batchRequests(requests, (request, result) => {
+      if (result.success) {
+        assignment(result.data, this.sheetConfig.data[request.rowNumber]);
+        context.propertyMap.set(result.data.info, result.data);
+      } else {
+        this.pushError(request.rowNumber, result.msg);
+      }
+      onItemCompleted();
+    });
   }
 }

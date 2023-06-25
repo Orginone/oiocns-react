@@ -16,9 +16,6 @@ import { Application, IApplication } from './application';
 import { BucketOpreates, DirectoryModel } from '@/ts/base/model';
 import { encodeKey } from '@/ts/base/common';
 import { ICompany } from '../target/team/company';
-import { readXlsx } from '@/utils/excel';
-import { getReadConfigs } from '@/utils/excel/configs';
-import { Context, ErrorMessage, ExcelConfig } from '@/utils/excel/types';
 /** 可为空的进度回调 */
 export type OnProgress = (p: number) => void;
 
@@ -72,12 +69,8 @@ export interface IDirectory extends IFileInfo<schema.XDirectory> {
   loadApplications(reload?: boolean): Promise<IApplication[]>;
   /** 新建应用 */
   createApplication(data: model.ApplicationModel): Promise<IApplication | undefined>;
-  /** 批量导入 */
-  createBatch(
-    file: Blob,
-    onReadError?: (errors: ErrorMessage[]) => void,
-    onError?: (error: string) => void,
-  ): undefined;
+  /** 创建文件任务 */
+  createTask(task: model.TaskModel): () => void;
 }
 
 /** 目录实现类 */
@@ -383,40 +376,8 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
         });
     }
   }
-  createBatch(
-    file: Blob,
-    onReadError: (errors: ErrorMessage[]) => void,
-    onError: (error: string) => void,
-  ): undefined {
-    const task: model.TaskModel = {
-      name: file.name,
-      finished: 0,
-      size: 0,
-      createTime: new Date(),
-    };
-    let config: ExcelConfig<Context> = {
-      context: new Context(),
-      initialize: (totalRows) => {
-        task.size = totalRows;
-        this.taskList.push(task);
-        this.taskEmitter.changCallback();
-      },
-      onItemCompleted: () => {
-        task.finished += 1;
-        this.taskEmitter.changCallback();
-      },
-      onReadError(errors) {
-        onReadError(errors);
-        this.onCompleted?.apply(this);
-      },
-      onCompleted: () => {
-        task.finished = task.size;
-        this.taskEmitter.changCallback();
-      },
-      onError: (error: string) => {
-        onError(error);
-      },
-    };
-    readXlsx(file, config, getReadConfigs(this, config));
+  createTask(task: model.TaskModel): () => void {
+    this.taskList.push(task);
+    return () => this.taskEmitter.changCallback();
   }
 }
