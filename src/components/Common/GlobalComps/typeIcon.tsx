@@ -40,6 +40,8 @@ const TypeIcon = ({ avatar, iconType, size }: TypeIconInfo) => {
         return <im.ImFolder {...config} />;
       case '成员目录':
         return <im.ImBooks {...config} />;
+      case '标准':
+        return <im.ImFileExcel {...config} />;
       case '字典':
         return <im.ImBook {...config} />;
       case '分类':
@@ -50,6 +52,10 @@ const TypeIcon = ({ avatar, iconType, size }: TypeIconInfo) => {
         return <im.ImJoomla {...config} />;
       case '应用':
         return <im.ImDropbox {...config} />;
+      case '模块':
+        return <im.ImDelicious {...config} />;
+      case '办事':
+        return <im.ImShuffle {...config} />;
       case '事项配置':
         return <im.ImInsertTemplate {...config} />;
       case '实体配置':

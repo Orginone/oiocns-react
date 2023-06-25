@@ -70,7 +70,7 @@ const PropertyForm = (props: Iprops) => {
           options: valueTypes.map((i) => {
             return {
               value: i,
-              label: i,
+              label: i === '选择型' ? '字典型' : i,
             };
           }),
           onSelect: (select: string) => {

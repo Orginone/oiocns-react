@@ -91,32 +91,50 @@ export const directoryOperates = {
     label: '新建应用',
     iconType: '应用',
   },
-  NewSpecies: {
+  Standard: {
     sort: 2,
+    cmd: 'standard',
+    label: '导入标准',
+    iconType: '标准',
+  },
+  NewSpecies: {
+    sort: 3,
     cmd: 'newSpecies',
     label: '新建分类',
     iconType: '分类',
   },
   NewDict: {
-    sort: 3,
+    sort: 4,
     cmd: 'newDict',
     label: '新建字典',
     iconType: '字典',
   },
   NewProperty: {
-    sort: 4,
+    sort: 5,
     cmd: 'newProperty',
     label: '新建属性',
     iconType: '属性',
   },
+  NewWork: {
+    sort: 6,
+    cmd: 'newWork',
+    label: '新建办事',
+    iconType: '流程',
+  },
+  NewModule: {
+    sort: 7,
+    cmd: 'newModule',
+    label: '新建模块',
+    iconType: '模块',
+  },
   NewThingConfig: {
-    sort: 5,
+    sort: 8,
     cmd: 'newThingConfig',
     label: '新建实体配置',
     iconType: '实体配置',
   },
   NewWorkConfig: {
-    sort: 6,
+    sort: 9,
     cmd: 'newWorkConfig',
     label: '新建事项配置',
     iconType: '事项配置',
@@ -131,6 +149,7 @@ export const directoryNew = {
   iconType: 'new',
   menus: [
     directoryOperates.NewDir,
+    directoryOperates.Standard,
     directoryOperates.NewDict,
     directoryOperates.NewSpecies,
     directoryOperates.NewProperty,

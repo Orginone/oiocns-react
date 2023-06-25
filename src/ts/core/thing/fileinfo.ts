@@ -7,12 +7,16 @@ import { Entity, IEntity, entityOperates } from '../public';
 import { fileOperates } from '../public';
 /** 文件类接口 */
 export interface IFileInfo<T extends schema.XEntity> extends IEntity<T> {
+  /** 空间ID */
+  spaceId: string;
   /** 归属ID */
   belongId: string;
   /** 是否为继承的类别 */
   isInherited: boolean;
   /** 目录 */
   directory: IDirectory;
+  /** 路径Key */
+  locationKey: string;
   /** 删除文件系统项 */
   delete(notity?: boolean): Promise<boolean>;
   /**
@@ -55,6 +59,12 @@ export abstract class FileInfo<T extends schema.XEntity>
   }
   get belongId(): string {
     return this.directory.metadata.belongId;
+  }
+  get spaceId(): string {
+    return this.directory.target.space.id;
+  }
+  get locationKey(): string {
+    return this.directory.key;
   }
   abstract delete(): Promise<boolean>;
   abstract rename(name: string): Promise<boolean>;

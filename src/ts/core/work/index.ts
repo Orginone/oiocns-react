@@ -1,9 +1,9 @@
 import { kernel, model, schema } from '../../base';
-import { IApplication } from './application';
-import { Entity, entityOperates } from '../public';
-import { IForm, Form } from './form';
-import { IFileInfo } from './fileinfo';
-import { IDirectory } from './directory';
+import { IApplication } from '../thing/application';
+import { IForm, Form } from '../thing/form';
+import { FileInfo, IFileInfo } from '../thing/fileinfo';
+import { IDirectory } from '../thing/directory';
+import { IWorkApply, WorkApply } from './apply';
 
 export interface IWork extends IFileInfo<schema.XWorkDefine> {
   /** 流程关联的表单 */
@@ -15,13 +15,11 @@ export interface IWork extends IFileInfo<schema.XWorkDefine> {
   /** 更新办事定义 */
   update(req: model.WorkDefineModel): Promise<boolean>;
   /** 加载事项定义节点 */
-  loadWorkNode(): Promise<model.WorkNodeModel | undefined>;
+  loadWorkNode(reload?: boolean): Promise<model.WorkNodeModel | undefined>;
   /** 加载事项定义节点关联的表单 */
   loadWorkForms(): Promise<IForm[]>;
-  /** 新建办事实例 */
-  createWorkInstance(
-    data: model.WorkInstanceModel,
-  ): Promise<schema.XWorkInstance | undefined>;
+  /** 生成办事申请单 */
+  createApply(): Promise<IWorkApply | undefined>;
 }
 
 export const fullDefineRule = (data: schema.XWorkDefine) => {
@@ -34,26 +32,20 @@ export const fullDefineRule = (data: schema.XWorkDefine) => {
     data.allowEdit = rule.allowEdit;
     data.allowSelect = rule.allowSelect;
   }
-  data.typeName = '事项';
+  data.typeName = '办事';
   return data;
 };
 
-export class Work extends Entity<schema.XWorkDefine> implements IWork {
+export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
   constructor(_metadata: schema.XWorkDefine, _application: IApplication) {
-    super(fullDefineRule(_metadata));
+    super(fullDefineRule(_metadata), _application.directory);
     this.application = _application;
   }
   forms: IForm[] = [];
   application: IApplication;
   node: model.WorkNodeModel | undefined;
-  get directory(): IDirectory {
-    return this.application.directory;
-  }
-  get isInherited(): boolean {
-    return this.application.isInherited;
-  }
-  get belongId(): string {
-    return this.application.belongId;
+  get locationKey(): string {
+    return this.application.key;
   }
   async delete(_notity: boolean = false): Promise<boolean> {
     if (this.application) {
@@ -119,32 +111,24 @@ export class Work extends Entity<schema.XWorkDefine> implements IWork {
     return false;
   }
   content(_mode: number = 0): IFileInfo<schema.XEntity>[] {
-    return [];
+    return this.forms;
   }
   async loadContent(_reload: boolean = false): Promise<boolean> {
     await this.loadWorkForms();
     return this.forms.length > 0;
-  }
-  override operates(mode: number = 0): model.OperateModel[] {
-    const operates = super.operates();
-    if (mode == 1) {
-      operates.unshift(entityOperates.Open);
-    }
-    return operates;
   }
   async update(data: model.WorkDefineModel): Promise<boolean> {
     data.id = this.id;
     data.applicationId = this.metadata.applicationId;
     const res = await kernel.createWorkDefine(data);
     if (res.success && res.data.id) {
-      res.data.typeName = '事项';
       this.setMetadata(fullDefineRule(res.data));
       this.node = data.resource;
     }
     return res.success;
   }
-  async loadWorkNode(): Promise<model.WorkNodeModel | undefined> {
-    if (this.node === undefined) {
+  async loadWorkNode(reload: boolean = false): Promise<model.WorkNodeModel | undefined> {
+    if (this.node === undefined || reload) {
       const res = await kernel.queryWorkNodes({ id: this.id });
       if (res.success) {
         this.node = res.data;
@@ -154,12 +138,12 @@ export class Work extends Entity<schema.XWorkDefine> implements IWork {
   }
   async loadWorkForms(): Promise<IForm[]> {
     const forms: IForm[] = [];
-    const res = await kernel.queryWorkNodes({ id: this.id });
-    if (res.success && res.data) {
+    await this.loadWorkNode(true);
+    if (this.node) {
       const recursionForms = async (node: model.WorkNodeModel) => {
         for (const item of node.forms ?? []) {
           const form = new Form(item, this.directory);
-          await form.loadAttributes();
+          item.attributes = await form.loadAttributes();
           forms.push(form);
         }
         if (node.children) {
@@ -173,17 +157,29 @@ export class Work extends Entity<schema.XWorkDefine> implements IWork {
           }
         }
       };
-      await recursionForms(res.data);
+      await recursionForms(this.node);
     }
     this.forms = forms;
     return forms;
   }
-  async createWorkInstance(
-    data: model.WorkInstanceModel,
-  ): Promise<schema.XWorkInstance | undefined> {
-    let res = await kernel.createWorkInstance(data);
-    if (res.success) {
-      return res.data;
+  async createApply(): Promise<IWorkApply | undefined> {
+    if (this.node) {
+      return new WorkApply(
+        {
+          hook: '',
+          taskId: '0',
+          title: this.name,
+          defineId: this.id,
+        } as model.WorkInstanceModel,
+        {
+          data: {},
+          node: this.node,
+          allowAdd: this.metadata.allowAdd,
+          allowEdit: this.metadata.allowEdit,
+          allowSelect: this.metadata.allowSelect,
+        },
+        this.directory.target.space,
+      );
     }
   }
 }

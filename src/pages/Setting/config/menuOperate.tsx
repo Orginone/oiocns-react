@@ -3,7 +3,7 @@ import orgCtrl from '@/ts/controller';
 import React from 'react';
 import { loadFileMenus } from '@/executor/fileOperate';
 import { MenuItemType } from 'typings/globelType';
-import { IDepartment, IGroup, ITarget, IDirectory } from '@/ts/core';
+import { IDepartment, IGroup, ITarget, IDirectory, IApplication } from '@/ts/core';
 
 /** 创建团队菜单 */
 const createMenu = (target: ITarget, children: MenuItemType[]) => {
@@ -54,9 +54,33 @@ const buildDirectoryTree = (directorys: IDirectory[]): MenuItemType[] => {
       ),
       itemType: directory.typeName,
       menus: loadFileMenus(directory),
-      children: buildDirectoryTree(directory.children),
+      children: [
+        ...buildDirectoryTree(directory.children),
+        ...buildApplicationTree(directory.applications),
+      ],
       beforeLoad: async () => {
         await directory.loadContent();
+      },
+    };
+  });
+};
+
+/** 编译目录树 */
+const buildApplicationTree = (applications: IApplication[]): MenuItemType[] => {
+  return applications.map((application) => {
+    return {
+      key: application.key,
+      item: application,
+      label: application.name,
+      tag: [application.typeName],
+      icon: (
+        <EntityIcon entityId={application.id} typeName={application.typeName} size={18} />
+      ),
+      itemType: application.typeName,
+      menus: loadFileMenus(application),
+      children: buildApplicationTree(application.children),
+      beforeLoad: async () => {
+        await application.loadContent();
       },
     };
   });

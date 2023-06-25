@@ -1,5 +1,5 @@
 import { common, kernel, model, schema } from '../../base';
-import { PageAll, storeCollName } from '../public/consts';
+import { PageAll } from '../public/consts';
 import { TaskStatus } from '../public/enums';
 import { UserProvider } from '../user';
 // 历史任务存储集合名称
@@ -21,17 +21,6 @@ export interface IWorkProvider {
   loadApply(req: model.IdPageModel): Promise<model.PageResult<schema.XWorkTask>>;
   /** 任务更新 */
   updateTask(task: schema.XWorkTask): void;
-  /** 任务审批 */
-  approvalTask(
-    tasks: schema.XWorkTask[],
-    status: number,
-    comment?: string,
-    data?: string,
-  ): Promise<void>;
-  /** 查询任务明细 */
-  loadTaskDetail(task: schema.XWorkTask): Promise<schema.XWorkInstance | undefined>;
-  /** 删除办事实例 */
-  deleteInstance(id: string): Promise<boolean>;
   /** 根据表单id查询表单特性 */
   loadAttributes(id: string, belongId: string): Promise<schema.XAttribute[]>;
   /** 根据分类id查询分类项 */
@@ -132,67 +121,7 @@ export class WorkProvider implements IWorkProvider {
     );
     return res.data;
   }
-  async approvalTask(
-    tasks: schema.XWorkTask[],
-    status: number,
-    comment: string,
-    data: any,
-  ): Promise<void> {
-    for (const task of tasks) {
-      if (task.status < TaskStatus.ApprovalStart) {
-        if (status === -1) {
-          await kernel.recallWorkInstance({
-            id: task.id,
-          });
-        } else {
-          const res = await kernel.approvalTask({
-            id: task.id,
-            status: status,
-            comment: comment,
-            data: data,
-          });
-          if (res.data && status < TaskStatus.RefuseStart && task.taskType == '加用户') {
-            let targets = <Array<schema.XTarget>>JSON.parse(task.content);
-            if (targets.length == 2) {
-              for (const item of this.user.targets) {
-                if (item.id === targets[1].id) {
-                  item.pullMembers([targets[0]]);
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-  async loadTaskDetail(
-    task: schema.XWorkTask,
-  ): Promise<schema.XWorkInstance | undefined> {
-    const res = await kernel.anystore.aggregate(
-      task.belongId,
-      storeCollName.WorkInstance,
-      {
-        match: {
-          id: task.instanceId,
-        },
-        limit: 1,
-        lookup: {
-          from: storeCollName.WorkTask,
-          localField: 'id',
-          foreignField: 'instanceId',
-          as: 'tasks',
-        },
-      },
-    );
-    if (res.data && res.data.length > 0) {
-      return res.data[0];
-    }
-  }
 
-  async deleteInstance(id: string): Promise<boolean> {
-    const res = await kernel.recallWorkInstance({ id });
-    return res.success;
-  }
   async loadAttributes(id: string, belongId: string): Promise<schema.XAttribute[]> {
     const res = await kernel.queryFormAttributes({
       id: id,

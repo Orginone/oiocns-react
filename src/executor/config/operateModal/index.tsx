@@ -4,7 +4,7 @@ import { IBelong, IDirectory, IEntity } from '@/ts/core';
 import PullMember from './pullMember';
 import JoinTarget from './joinTarget';
 import SpeciesModal from './speciesModal';
-import ApplicationModal from './applicationModal';
+import WorkModal from './workModal';
 import orgCtrl from '@/ts/controller';
 import LabelsModal from './labelsModal';
 interface IProps {
@@ -28,8 +28,8 @@ const OperateModal: React.FC<IProps> = ({ cmd, entity, finished }) => {
         case '事项配置':
         case '实体配置':
           return <LabelsModal finished={finished} current={entity as any} />;
-        case '应用':
-          return <ApplicationModal finished={finished} current={entity as any} />;
+        case '办事':
+          return <WorkModal finished={finished} current={entity as any} />;
         case '字典':
         case '分类':
           return <SpeciesModal finished={finished} current={entity as any} />;

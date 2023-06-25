@@ -12,7 +12,7 @@ import SelectThing from '../TreeSelectThing';
 import { IFormView } from '@/ts/core';
 
 interface IProps extends ProTableProps<Record<string, any>, ParamsType, 'text'> {
-  propertys: schema.XProperty[];
+  propertys?: schema.XProperty[];
   selectable?: boolean;
   height?: any;
   width?: any;

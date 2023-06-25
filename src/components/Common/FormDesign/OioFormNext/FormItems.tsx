@@ -163,7 +163,7 @@ const OioFormItem = ({
           required={rule.required}
           fieldProps={rule}
           rules={rules}
-          tooltip={rule.description}
+          tooltip={item.remark}
           labelAlign="right"
         />
       );
@@ -176,7 +176,7 @@ const OioFormItem = ({
           fieldProps={rule}
           rules={rules}
           // width={200}
-          tooltip={rule.description}
+          tooltip={item.remark}
           labelAlign="right"
         />
       );
@@ -188,7 +188,7 @@ const OioFormItem = ({
           fieldProps={rule}
           rules={rules}
           // width={200}
-          tooltip={rule.description}
+          tooltip={item.remark}
           labelAlign="right"
         />
       );
@@ -199,7 +199,7 @@ const OioFormItem = ({
           name={item.id}
           rules={rules}
           // width={200}
-          tooltip={rule.description}
+          tooltip={item.remark}
           labelAlign="right"
         />
       );
@@ -216,7 +216,7 @@ const OioFormItem = ({
             ...uploadProps,
           }}
           rules={rules}
-          tooltip={rule.description}
+          tooltip={item.remark}
           labelAlign="right"
         />
       );
@@ -229,7 +229,7 @@ const OioFormItem = ({
           name={item.id}
           rules={rules}
           // width={200}
-          tooltip={rule.description}
+          tooltip={item.remark}
           labelAlign="right"
         />
       );
@@ -240,7 +240,7 @@ const OioFormItem = ({
           name={item.id}
           rules={rules}
           // width={200}
-          tooltip={rule.description}
+          tooltip={item.remark}
           labelAlign="right"
         />
       );
@@ -251,7 +251,7 @@ const OioFormItem = ({
           name={item.id}
           rules={rules}
           // width={200}
-          tooltip={rule.description}
+          tooltip={item.remark}
           labelAlign="right"
         />
       );
@@ -262,7 +262,7 @@ const OioFormItem = ({
           name={item.id}
           rules={rules}
           // width={200}
-          tooltip={rule.description}
+          tooltip={item.remark}
           labelAlign="right"
         />
       );
@@ -273,7 +273,7 @@ const OioFormItem = ({
           name={item.id}
           rules={rules}
           // width={200}
-          tooltip={rule.description}
+          tooltip={item.remark}
           labelAlign="right"
         />
       );
@@ -284,7 +284,7 @@ const OioFormItem = ({
           name={item.id}
           rules={rules}
           // width={200}
-          tooltip={rule.description}
+          tooltip={item.remark}
           labelAlign="right"
         />
       );
@@ -295,7 +295,7 @@ const OioFormItem = ({
           name={item.id}
           rules={rules}
           // width={200}
-          tooltip={rule.description}
+          tooltip={item.remark}
           labelAlign="right"
         />
       );
@@ -306,7 +306,7 @@ const OioFormItem = ({
           speciesId={item.property!.speciesId}
           name={item.id}
           rules={rules}
-          tooltip={rule.description}
+          tooltip={item.remark}
           labelAlign="right"
           props={rule}
         />
@@ -319,7 +319,7 @@ const OioFormItem = ({
           belong={belong}
           name={item.id}
           rules={rules}
-          tooltip={rule.description}
+          tooltip={item.remark}
           labelAlign="right"
         />
       );
@@ -330,7 +330,7 @@ const OioFormItem = ({
           belong={belong}
           name={item.id}
           rules={rules}
-          tooltip={rule.description}
+          tooltip={item.remark}
           labelAlign="right"
         />
       );
@@ -341,7 +341,7 @@ const OioFormItem = ({
           belong={belong}
           name={item.id}
           rules={rules}
-          tooltip={rule.description}
+          tooltip={item.remark}
           labelAlign="right"
         />
       );
@@ -352,7 +352,7 @@ const OioFormItem = ({
           belong={belong}
           name={item.id}
           rules={rules}
-          tooltip={rule.description}
+          tooltip={item.remark}
           labelAlign="right"
         />
       );
@@ -363,7 +363,7 @@ const OioFormItem = ({
           belong={belong}
           name={item.id}
           rules={rules}
-          tooltip={rule.description}
+          tooltip={item.remark}
           labelAlign="right"
         />
       );
@@ -373,7 +373,7 @@ const OioFormItem = ({
           name={item.id}
           fieldProps={rule}
           rules={rules}
-          tooltip={rule.description}
+          tooltip={item.remark}
           labelAlign="right"
         />
       );

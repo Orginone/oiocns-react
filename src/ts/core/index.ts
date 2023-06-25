@@ -29,5 +29,5 @@ export type { IForm } from './thing/form';
 export type { IMemeber } from './thing/member';
 export type { IProperty } from './thing/property';
 export type { ISpecies } from './thing/species';
-export type { IWork } from './thing/work';
+export type { IWork } from './work';
 export { UserProvider } from './user';

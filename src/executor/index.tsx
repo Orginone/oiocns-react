@@ -19,11 +19,11 @@ const Executor = () => {
           type = 'data';
         }
         const resetContent = () => {
-          if (Array.isArray(args) && args.length > 0 && 'key' in args[0]) {
-            if ('directory' in args[0]) {
-              orgCtrl.currentKey = args[0].directory.key;
-            } else if ('files' in args[0]) {
-              orgCtrl.currentKey = args[0].key;
+          if (Array.isArray(args) && args.length > 0) {
+            if (args.length > 1 && args[0].key === args[1]) {
+              orgCtrl.currentKey = args[1];
+            } else if ('locationKey' in args[0]) {
+              orgCtrl.currentKey = args[0].locationKey;
             }
           }
           setContent(<></>);

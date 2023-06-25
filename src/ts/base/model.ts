@@ -1,4 +1,4 @@
-import { XForm, XIdentity, XTarget } from './schema';
+import { XForm, XIdentity, XTarget, XWorkTask, Xbase } from './schema';
 // 请求类型定义
 export type ReqestType = {
   // 模块
@@ -500,6 +500,40 @@ export type WorkInstanceModel = {
   // 发起用户ID
   applyId: string;
 };
+
+export type InstanceDataModel = {
+  /** 流程节点 */
+  node: WorkNodeModel;
+  // 允许新增
+  allowAdd: boolean;
+  // 允许变更
+  allowEdit: boolean;
+  // 允许选择
+  allowSelect: boolean;
+  /** 提交的表单数据 */
+  data: {
+    // 表单id
+    [id: string]:  {
+      /** 选择的数据 */
+      source: {
+        // 特性id
+        [id: string]: any
+      }[];
+      /** 操作的数据 */
+      changed: {
+        // 唯一id
+        [id: string]: {
+          // 特性id
+          [id: string]: any
+        }
+      };
+      /** 操作人 */
+      creator: string;
+      /** 操作时间 */
+      createTime: string;
+    }[]
+  };
+}
 
 export type WorkNodeModel = {
   id: string;
