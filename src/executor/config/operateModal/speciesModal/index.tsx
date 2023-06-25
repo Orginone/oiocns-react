@@ -1,17 +1,15 @@
-/* eslint-disable no-unused-vars */
 import React, { useState } from 'react';
 import { ISpecies } from '@/ts/core';
 import { Button, message } from 'antd';
 import { schema } from '@/ts/base';
-import { ProColumns } from '@ant-design/pro-table';
 import PageCard from '@/components/PageCard';
-import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import CardOrTable from '@/components/CardOrTableComp';
 import cls from './index.module.less';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import SpeciesItemModal from './itemModal';
 import EntityInfo from '@/components/Common/EntityInfo';
 import FullScreenModal from '@/executor/tools/fullScreen';
+import { SpeciesItemColumn } from '@/config/column';
 
 type IProps = {
   current: ISpecies;
@@ -72,65 +70,6 @@ const SpeciesModal: React.FC<IProps> = ({ current, finished }) => {
     },
   ];
 
-  const columns: ProColumns<schema.XSpeciesItem>[] = [
-    {
-      title: '序号',
-      valueType: 'index',
-      width: 50,
-    },
-    {
-      title: '名称',
-      dataIndex: 'name',
-      key: 'name',
-      width: 200,
-    },
-    {
-      title: '编号',
-      dataIndex: 'code',
-      key: 'code',
-      width: 200,
-    },
-    {
-      title: '信息',
-      dataIndex: 'info',
-      key: 'info',
-      width: 200,
-    },
-    {
-      title: '备注',
-      dataIndex: 'remark',
-      key: 'remark',
-      width: 150,
-    },
-    {
-      title: '归属组织',
-      dataIndex: 'belongId',
-      editable: false,
-      key: 'belongId',
-      width: 200,
-      render: (_: any, record: schema.XSpeciesItem) => {
-        return <EntityIcon entityId={record.belongId} showName />;
-      },
-    },
-    {
-      title: '创建人',
-      dataIndex: 'createUser',
-      editable: false,
-      key: 'createUser',
-      width: 150,
-      render: (_: any, record: schema.XSpeciesItem) => {
-        return <EntityIcon entityId={record.createUser} showName />;
-      },
-    },
-    {
-      title: '创建时间',
-      dataIndex: 'createTime',
-      key: 'createTime',
-      width: 200,
-      editable: false,
-    },
-  ];
-
   const loadSpeciesItemModal = () => {
     return activeModel == '新增' || (activeModel == '编辑' && item != undefined) ? (
       <SpeciesItemModal
@@ -176,10 +115,10 @@ const SpeciesModal: React.FC<IProps> = ({ current, finished }) => {
         tabBarExtraContent={renderBtns()}>
         <CardOrTable<schema.XSpeciesItem>
           key={tkey}
-          dataSource={current.items}
           rowKey={'id'}
+          dataSource={current.items}
           operation={renderOperate}
-          columns={columns}
+          columns={SpeciesItemColumn}
         />
       </PageCard>
       {loadSpeciesItemModal()}

@@ -3,15 +3,14 @@ import React, { useState } from 'react';
 import { IApplication, IWork } from '@/ts/core';
 import { Button, message } from 'antd';
 import WorkModal from './workModal';
-import { ProColumns } from '@ant-design/pro-table';
 import PageCard from '@/components/PageCard';
-import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import CardOrTable from '@/components/CardOrTableComp';
 import cls from './index.module.less';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import EntityInfo from '@/components/Common/EntityInfo';
 import FlowDesign from '@/components/Common/FlowDesign';
 import FullScreenModal from '@/executor/tools/fullScreen';
+import { WorkColumn } from '@/config/column';
 
 type IProps = {
   current: IApplication;
@@ -70,98 +69,60 @@ const ApplicationModal: React.FC<IProps> = ({ current, finished }) => {
     },
   ];
 
-  const columns: ProColumns<IWork>[] = [
-    {
-      title: '序号',
-      valueType: 'index',
-      width: 50,
-    },
-    {
-      title: '办事名称',
-      dataIndex: ['metadata', 'name'],
-      key: 'name',
-      width: 200,
-    },
-    {
-      title: '办事标识',
-      dataIndex: ['metadata', 'code'],
-      key: 'code',
-      width: 200,
-    },
-    {
-      title: '允许新增',
-      dataIndex: ['metadata', 'allowAdd'],
-      key: 'allowAdd',
-      width: 200,
-      render: (_: any, record: IWork) => {
-        return record.metadata.allowAdd ? '是' : '否';
-      },
-    },
-    {
-      title: '允许变更',
-      dataIndex: ['metadata', 'allowEdit'],
-      key: 'allowEdit',
-      width: 200,
-      render: (_: any, record: IWork) => {
-        return record.metadata.allowEdit ? '是' : '否';
-      },
-    },
-    {
-      title: '允许选择',
-      dataIndex: ['metadata', 'allowSelect'],
-      key: 'allowSelect',
-      width: 200,
-      render: (_: any, record: IWork) => {
-        return record.metadata.allowSelect ? '是' : '否';
-      },
-    },
-    {
-      title: '备注',
-      dataIndex: ['metadata', 'remark'],
-      key: 'remark',
-      width: 150,
-    },
-    {
-      title: '创建人',
-      dataIndex: ['metadata', 'createUser'],
-      editable: false,
-      key: 'createUser',
-      width: 150,
-      render: (_: any, record: IWork) => {
-        return <EntityIcon entityId={record.metadata.createUser} showName />;
-      },
-    },
-    {
-      title: '创建时间',
-      dataIndex: ['metadata', 'createTime'],
-      key: 'createTime',
-      width: 200,
-      editable: false,
-    },
-  ];
-
   const loadWorkNodal = () => {
-    return activeModel == '新增' || (activeModel == '编辑' && work != undefined) ? (
-      <WorkModal
-        open
-        application={current}
-        current={work}
-        handleCancel={() => {
-          setActiveModel('');
-          setWork(undefined);
-        }}
-        handleOk={(success: boolean) => {
-          if (success) {
-            message.success('操作成功');
-            setWork(undefined);
-            setActiveModel('');
-            tforceUpdate();
-          }
-        }}
-      />
-    ) : (
-      <></>
-    );
+    switch (activeModel) {
+      case '新增':
+      case '编辑':
+        return (
+          <WorkModal
+            open
+            application={current}
+            current={work}
+            handleCancel={() => {
+              setActiveModel('');
+              setWork(undefined);
+            }}
+            handleOk={(success: boolean) => {
+              if (success) {
+                message.success('操作成功');
+                setWork(undefined);
+                setActiveModel('');
+                tforceUpdate();
+              }
+            }}
+          />
+        );
+      default:
+        if (work) {
+          return (
+            <FullScreenModal
+              centered
+              fullScreen
+              destroyOnClose
+              footer={[]}
+              open={activeModel == '设计'}
+              width="80vw"
+              okText="发布"
+              cancelText="取消"
+              title={`事项[${work.name}]设计`}
+              onSave={() => setIsSave(true)}
+              onCancel={() => setWork(undefined)}>
+              <FlowDesign
+                current={work}
+                onSave={isSave}
+                onSaveFinished={(success) => {
+                  if (success) {
+                    message.info('保存成功');
+                    setWork(undefined);
+                  }
+                  setIsSave(false);
+                }}
+              />
+            </FullScreenModal>
+          );
+        }
+        return <></>;
+    }
   };
 
   return (
@@ -186,36 +147,10 @@ const ApplicationModal: React.FC<IProps> = ({ current, finished }) => {
           params={tkey}
           dataSource={current.works}
           operation={renderOperate}
-          columns={columns}
+          columns={WorkColumn}
         />
       </PageCard>
       {loadWorkNodal()}
-      {work && (
-        <FullScreenModal
-          centered
-          fullScreen
-          destroyOnClose
-          footer={[]}
-          open={activeModel == '设计'}
-          width="80vw"
-          okText="发布"
-          cancelText="取消"
-          title={`事项[${work.name}]设计`}
-          onSave={() => setIsSave(true)}
-          onCancel={() => setWork(undefined)}>
-          <FlowDesign
-            current={work}
-            onSave={isSave}
-            onSaveFinished={(success) => {
-              if (success) {
-                message.info('保存成功');
-                setWork(undefined);
-              }
-              setIsSave(false);
-            }}
-          />
-        </FullScreenModal>
-      )}
     </FullScreenModal>
   );
 };

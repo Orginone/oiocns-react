@@ -3,11 +3,11 @@ import orgCtrl from '@/ts/controller';
 import { IBelong, TaskStatus } from '@/ts/core';
 import { XWorkTask } from '@/ts/base/schema';
 import { model, schema } from '@/ts/base';
-import { WorkColumns } from '../config/columns';
 import { GroupMenuType } from '../config/menuType';
 import TaskDetail, { TaskDetailType } from './detail';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import CardOrTableComp from '@/components/CardOrTableComp';
+import { TaskColumn } from '@/config/column';
 
 interface IProps {
   filter: string;
@@ -136,7 +136,7 @@ const TaskContent = (props: IProps) => {
   return (
     <CardOrTableComp<schema.XWorkTask>
       key={key}
-      columns={WorkColumns}
+      columns={TaskColumn}
       operation={(item) => getOperation([item])}
       tabBarExtraContent={selectedRows.length > 0 ? getOperation(selectedRows) : []}
       request={getTaskList}

@@ -8,7 +8,7 @@ import AttributeConfig from '@/components/Common/FormDesign/attributeConfig';
 import SelectPropertys from './SelectPropertys';
 import { Modal } from 'antd';
 import { AttributeModel } from '@/ts/base/model';
-import { ProColumns } from '@ant-design/pro-components';
+import { AttributeColumn } from '@/config/column';
 
 interface IProps {
   current: IForm;
@@ -87,43 +87,7 @@ const Attritube = ({ current, modalType, setModalType }: IProps) => {
       ];
     }
   };
-  const AttributeColumns = (): ProColumns<XAttribute>[] => [
-    {
-      title: '序号',
-      valueType: 'index',
-      width: 50,
-    },
-    {
-      title: '特性编号',
-      dataIndex: 'code',
-      key: 'code',
-      width: 200,
-    },
-    {
-      title: '特性名称',
-      dataIndex: 'name',
-      key: 'name',
-      width: 200,
-    },
-    {
-      title: '值类型',
-      dataIndex: ['property', 'valueType'],
-      key: 'valueType',
-      width: 150,
-    },
-    {
-      title: '选择字典',
-      dataIndex: ['species', 'name'],
-      key: 'dictId',
-      width: 150,
-    },
-    {
-      title: '特性定义',
-      dataIndex: 'remark',
-      ellipsis: true,
-      key: 'remark',
-    },
-  ];
+
 
   return (
     <>
@@ -132,7 +96,7 @@ const Attritube = ({ current, modalType, setModalType }: IProps) => {
         rowKey={'id'}
         params={tkey}
         operation={renderOperate}
-        columns={AttributeColumns()}
+        columns={AttributeColumn}
         dataSource={current.attributes}
       />
       {/** 新增特性模态框 */}
