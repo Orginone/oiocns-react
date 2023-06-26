@@ -7,6 +7,7 @@ import { loadFileMenus } from '@/executor/fileOperate';
 
 /** 创建团队菜单 */
 const createMenu = (team: ITarget, children: MenuItemType[]) => {
+  children.unshift(...buildApplicationTree(team.directory.applications));
   return {
     key: team.key,
     item: team.directory,
