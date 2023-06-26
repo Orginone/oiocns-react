@@ -1,8 +1,10 @@
 import { ProColumns } from '@ant-design/pro-components';
 import React from 'react';
-import { Typography } from 'antd';
+import { Tag, Typography } from 'antd';
 import { schema } from '@/ts/base';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
+import { IWorkTask } from '@/ts/core';
+import { statusMap } from './consts';
 
 /** 人员信息列 */
 export const PersonColumns: ProColumns<schema.XTarget>[] = [
@@ -62,6 +64,80 @@ export const IdentityColumn: ProColumns<schema.XIdentity>[] = [
   {
     title: '备注',
     dataIndex: 'remark',
+  },
+];
+
+/** 办事列 */
+export const WorkColumns: ProColumns<IWorkTask>[] = [
+  {
+    title: '序号',
+    dataIndex: 'index',
+    valueType: 'index',
+    width: 60,
+  },
+  {
+    title: '类型',
+    dataIndex: ['metadata', 'taskType'],
+    width: 80,
+  },
+  {
+    title: '标题',
+    width: 150,
+    dataIndex: ['metadata', 'title'],
+  },
+  {
+    key: 'shareId',
+    width: 150,
+    title: '共享组织',
+    dataIndex: ['metadata', 'shareId'],
+    render: (_: any, record: IWorkTask) => {
+      return <EntityIcon entityId={record.metadata.shareId} showName />;
+    },
+  },
+  {
+    key: 'createUser',
+    width: 100,
+    title: '申请人',
+    dataIndex: ['metadata', 'createUser'],
+    render: (_: any, record: IWorkTask) => {
+      return <EntityIcon entityId={record.metadata.createUser} showName />;
+    },
+  },
+  {
+    title: '发起组织',
+    width: 100,
+    dataIndex: ['metadata', 'applyId'],
+    render: (_: any, record: IWorkTask) => {
+      return <EntityIcon entityId={record.metadata.applyId} showName />;
+    },
+  },
+  {
+    title: '状态',
+    width: 80,
+    dataIndex: ['metadata', 'status'],
+    render: (_: any, record: IWorkTask) => {
+      const status = statusMap.get(record.metadata.status as number);
+      return <Tag color={status!.color}>{status!.text}</Tag>;
+    },
+  },
+  {
+    title: '内容',
+    width: 400,
+    dataIndex: ['metadata', 'content'],
+    render: (_: any, record: IWorkTask) => {
+      if (record.metadata.taskType === '加用户') {
+        if (record.targets.length === 2) {
+          return `${record.targets[0].name}[${record.targets[0].typeName}]申请加入${record.targets[1].name}[${record.targets[1].typeName}]`;
+        }
+      }
+      return record.metadata.content;
+    },
+  },
+  {
+    title: '申请时间',
+    valueType: 'dateTime',
+    width: 200,
+    dataIndex: ['metadata', 'createTime'],
   },
 ];
 

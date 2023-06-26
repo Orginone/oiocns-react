@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import orgCtrl from '@/ts/controller';
 import { IBelong, IWorkTask, TaskStatus } from '@/ts/core';
 import { model } from '@/ts/base';
-import { WorkColumns } from '../config/columns';
+import { WorkColumns } from '@/config/column';
 import { GroupMenuType } from '../config/menuType';
 import TaskDetail from './detail';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';

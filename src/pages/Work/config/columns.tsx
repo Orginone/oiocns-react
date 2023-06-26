@@ -2,7 +2,7 @@ import React from 'react';
 import { Tag } from 'antd';
 import { ProColumns } from '@ant-design/pro-table';
 import { schema } from '@/ts/base';
-import { IWork } from '@/ts/core';
+import { IWork, IWorkTask } from '@/ts/core';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 
 export const DefineColumns: ProColumns<IWork>[] = [
@@ -61,7 +61,7 @@ export const DefineColumns: ProColumns<IWork>[] = [
     dataIndex: ['metadata', 'createTime'],
   },
 ];
-export const WorkColumns: ProColumns<schema.XWorkTask>[] = [
+export const WorkColumns: ProColumns<IWorkTask>[] = [
   {
     title: '序号',
     dataIndex: 'index',
@@ -70,68 +70,67 @@ export const WorkColumns: ProColumns<schema.XWorkTask>[] = [
   },
   {
     title: '类型',
-    dataIndex: 'taskType',
+    dataIndex: ['metadata', 'taskType'],
     width: 80,
   },
   {
     title: '标题',
     width: 150,
-    dataIndex: 'title',
+    dataIndex: ['metadata', 'title'],
   },
   {
     key: 'shareId',
     width: 150,
     title: '共享组织',
-    dataIndex: 'shareId',
-    render: (_: any, record: schema.XWorkTask) => {
-      return <EntityIcon entityId={record.shareId} showName />;
+    dataIndex: ['metadata', 'shareId'],
+    render: (_: any, record: IWorkTask) => {
+      return <EntityIcon entityId={record.metadata.shareId} showName />;
     },
   },
   {
     key: 'createUser',
     width: 100,
     title: '申请人',
-    dataIndex: 'createUser',
-    render: (_: any, record: schema.XWorkTask) => {
-      return <EntityIcon entityId={record.createUser} showName />;
+    dataIndex: ['metadata', 'createUser'],
+    render: (_: any, record: IWorkTask) => {
+      return <EntityIcon entityId={record.metadata.createUser} showName />;
     },
   },
   {
     title: '发起组织',
     width: 100,
-    dataIndex: 'applyId',
-    render: (_: any, record: schema.XWorkTask) => {
-      return <EntityIcon entityId={record.applyId} showName />;
+    dataIndex: ['metadata', 'applyId'],
+    render: (_: any, record: IWorkTask) => {
+      return <EntityIcon entityId={record.metadata.applyId} showName />;
     },
   },
   {
     title: '状态',
     width: 80,
-    dataIndex: 'status',
-    render: (_: any, record: schema.XWorkTask) => {
-      const status = statusMap.get(record.status as number);
+    dataIndex: ['metadata', 'status'],
+    render: (_: any, record: IWorkTask) => {
+      const status = statusMap.get(record.metadata.status as number);
       return <Tag color={status!.color}>{status!.text}</Tag>;
     },
   },
   {
     title: '内容',
     width: 400,
-    dataIndex: 'content',
-    render: (_: any, record: schema.XWorkTask) => {
-      if (record.taskType === '加用户') {
-        const targets: schema.XTarget[] = JSON.parse(record.content);
-        if (targets.length === 2) {
-          return `${targets[0].name}[${targets[0].typeName}]申请加入${targets[1].name}[${targets[1].typeName}]`;
+    dataIndex: ['metadata', 'content'],
+    render: (_: any, record: IWorkTask) => {
+      if (record.metadata.taskType === '加用户') {
+        if (record.targets.length === 2) {
+          return `${record.targets[0].name}[${record.targets[0].typeName}]申请加入${record.targets[1].name}[${record.targets[1].typeName}]`;
         }
       }
-      return record.content;
+      return record.metadata.content;
     },
   },
   {
     title: '申请时间',
     valueType: 'dateTime',
     width: 200,
-    dataIndex: 'createTime',
+    dataIndex: ['metadata', 'createTime'],
   },
 ];
 

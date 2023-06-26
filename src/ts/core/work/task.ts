@@ -110,7 +110,7 @@ export class WorkTask implements IWorkTask {
       if (status === -1) {
         return await this.recallApply();
       }
-      if (await this.loadInstance(true)) {
+      if (this.metadata.taskType === '加用户' || (await this.loadInstance(true))) {
         const res = await kernel.approvalTask({
           id: this.metadata.id,
           status: status,
