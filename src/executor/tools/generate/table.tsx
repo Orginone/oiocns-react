@@ -39,7 +39,11 @@ const GenerateTable = (props: IProps) => {
       headerFilter={{ visible: true }}
       filterRow={{ visible: true }}
       columnFixing={{ enabled: true }}
-      scrolling={{ showScrollbar: 'always', useNative: false }}
+      scrolling={{
+        showScrollbar: 'onHover',
+        mode: 'standard',
+      }}
+      pager={{ showInfo: true, showPageSizeSelector: true, showNavigationButtons: true }}
       searchPanel={{ width: 300, highlightCaseSensitive: true, visible: true }}
       width="100%"
       height={props.height ?? '100%'}

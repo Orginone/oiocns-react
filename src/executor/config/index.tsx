@@ -1,4 +1,5 @@
 import { TargetType } from '@/ts/core';
+import { message } from 'antd';
 import React from 'react';
 import EntityForm from './entityForm';
 import OperateModal from './operateModal';
@@ -37,6 +38,7 @@ const ConfigExecutor: React.FC<IProps> = ({ cmd, args, finished }) => {
           return <EntityForm cmd={cmd} entity={args[0]} finished={finished} />;
         }
       }
+      message.warn('不支持的类型');
       break;
     case 'settingAuth':
       return <SettingAuth space={args[0].target} finished={finished} />;

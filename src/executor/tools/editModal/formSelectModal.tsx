@@ -9,17 +9,10 @@ interface IFormSelectProps {
   form: schema.XForm;
   fields: model.FieldModel[];
   belong: IBelong;
-  selected?: string[];
   onSave: (values: model.AnyThingModel[]) => void;
 }
 
-const FormSelectModal = ({
-  form,
-  fields,
-  belong,
-  selected,
-  onSave,
-}: IFormSelectProps) => {
+const FormSelectModal = ({ form, fields, belong, onSave }: IFormSelectProps) => {
   const editData: { rows: model.AnyThingModel[] } = { rows: [] };
   const modal = Modal.confirm({
     icon: <></>,
@@ -33,7 +26,6 @@ const FormSelectModal = ({
         fields={fields}
         autoColumn
         height={'70vh'}
-        selectedRowKeys={selected ?? []}
         toolbar={{ visible: false }}
         selection={{
           mode: 'multiple',
@@ -66,7 +58,7 @@ const FormSelectModal = ({
     ),
     onOk: () => {
       modal.destroy();
-      onSave(editData.rows.filter((r) => selected?.includes(r.Id)));
+      onSave(editData.rows);
     },
   });
 };

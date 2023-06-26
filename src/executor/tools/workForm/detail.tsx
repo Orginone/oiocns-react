@@ -126,9 +126,12 @@ const DetailTable: React.FC<IProps> = (props) => {
                   form: form,
                   fields: fields,
                   belong: props.belong,
-                  selected: dataSource.map((i) => i.Id),
                   onSave: (values) => {
-                    setDataSource([...dataSource, ...values]);
+                    const keys = dataSource.map((i) => i.Id);
+                    setDataSource([
+                      ...dataSource,
+                      ...values.filter((i) => !keys.includes(i.Id)),
+                    ]);
                   },
                 });
               },
