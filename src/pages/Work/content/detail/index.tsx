@@ -44,7 +44,7 @@ const Detail: React.FC<TaskDetailType> = ({ task, belong, onBack }) => {
                 <WorkForm
                   allowEdit={false}
                   belong={belong}
-                  forms={task.instanceData.node.forms || []}
+                  node={task.instanceData.node}
                   data={task.instanceData}
                 />
               )}

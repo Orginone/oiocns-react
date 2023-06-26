@@ -1,20 +1,26 @@
 import { Modal } from 'antd';
 import React from 'react';
-import { kernel, schema } from '@/ts/base';
+import { kernel, model, schema } from '@/ts/base';
 import { IBelong } from '@/ts/core';
 import GenerateTable from '../generate/table';
 import CustomStore from 'devextreme/data/custom_store';
 
 interface IFormSelectProps {
   form: schema.XForm;
+  fields: model.FieldModel[];
   belong: IBelong;
   selected?: string[];
-  onSave: (values: any[]) => void;
+  onSave: (values: model.AnyThingModel[]) => void;
 }
 
-const FormSelectModal = ({ form, belong, selected, onSave }: IFormSelectProps) => {
-  console.log(selected);
-  const editData: { rows: any[] } = { rows: [] };
+const FormSelectModal = ({
+  form,
+  fields,
+  belong,
+  selected,
+  onSave,
+}: IFormSelectProps) => {
+  const editData: { rows: model.AnyThingModel[] } = { rows: [] };
   const modal = Modal.confirm({
     icon: <></>,
     width: '80vw',
@@ -24,6 +30,7 @@ const FormSelectModal = ({ form, belong, selected, onSave }: IFormSelectProps) =
     content: (
       <GenerateTable
         form={form}
+        fields={fields}
         autoColumn
         height={'70vh'}
         selectedRowKeys={selected ?? []}
@@ -43,7 +50,10 @@ const FormSelectModal = ({ form, belong, selected, onSave }: IFormSelectProps) =
             async load(loadOptions) {
               loadOptions.userData = [];
               let request: any = { ...loadOptions };
-              const result = await kernel.anystore.loadThing<any>(belong.id, request);
+              const result = await kernel.anystore.loadThing<model.AnyThingModel>(
+                belong.id,
+                request,
+              );
               if (result.success) {
                 return result.data;
               }

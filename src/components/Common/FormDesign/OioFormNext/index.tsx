@@ -4,10 +4,11 @@ import React, { useMemo, useRef } from 'react';
 import OioFormItem from './FormItems';
 import { IBelong } from '@/ts/core';
 import cls from './index.module.less';
-import { schema } from '@/ts/base';
+import { model, schema } from '@/ts/base';
 import { ImInfo } from 'react-icons/im';
 type IProps = {
   form: schema.XForm;
+  fields: model.FieldModel[];
   belong: IBelong;
   submitter?: any;
   onValuesChange?: (changedValues: any, values: Record<string, any>) => void;
@@ -23,6 +24,7 @@ type IProps = {
  */
 const OioForm: React.FC<IProps> = ({
   form,
+  fields,
   belong,
   submitter,
   onValuesChange,
@@ -32,8 +34,7 @@ const OioForm: React.FC<IProps> = ({
   disabled,
   showTitle,
 }) => {
-  const attributes = form.attributes || [];
-  if (attributes.length < 1) return <></>;
+  if (fields.length < 1) return <></>;
   let config: any = form.rule ? JSON.parse(form.rule) : { col: 8, layout: 'horizontal' };
   const colNum = 3; //单行展示数量
   if (fieldsValue) {
@@ -41,9 +42,8 @@ const OioForm: React.FC<IProps> = ({
   }
 
   const fillArr = useMemo(() => {
-    const fileTypeItems =
-      attributes.filter((v) => v.property!.valueType == '附件型') ?? [];
-    const leg = (attributes.length - fileTypeItems.length) % colNum;
+    const fileTypeItems = fields.filter((v) => v.valueType == '附件型') ?? [];
+    const leg = (fields.length - fileTypeItems.length) % colNum;
 
     const legArr: any[] = [];
     if (leg === 0) {
@@ -54,7 +54,7 @@ const OioForm: React.FC<IProps> = ({
     }
     // 返回数据为 填充+最后的附件类
     return [...legArr, ...fileTypeItems];
-  }, [attributes.length]);
+  }, [fields.length]);
 
   return (
     <>
@@ -101,22 +101,22 @@ const OioForm: React.FC<IProps> = ({
           className={cls.formRow}
           column={3}
           labelStyle={{ minWidth: '120px', textAlign: 'right' }}>
-          {attributes.map((item) => {
-            if (item.property!.valueType === '附件型') {
+          {fields.map((field) => {
+            if (field.valueType === '附件型') {
               return <></>;
             }
             return (
               <Descriptions.Item
-                key={item.id}
+                key={field.id}
                 span={1}
                 label={
-                  <div style={{ cursor: 'pointer' }} title={item.remark}>
-                    <span style={{ marginRight: 6 }}>{item.name}</span>
-                    {item.remark && item.remark.length > 0 && <ImInfo />}
+                  <div style={{ cursor: 'pointer' }} title={field.remark}>
+                    <span style={{ marginRight: 6 }}>{field.name}</span>
+                    {field.remark && field.remark.length > 0 && <ImInfo />}
                   </div>
                 }
                 contentStyle={{ width: '33%' }}>
-                <OioFormItem item={item} belong={belong} />
+                <OioFormItem field={field} belong={belong} />
               </Descriptions.Item>
             );
           })}
@@ -131,7 +131,7 @@ const OioForm: React.FC<IProps> = ({
                   span={3}
                   contentStyle={{ width: '33%' }}>
                   <OioFormItem
-                    item={item}
+                    field={item}
                     belong={belong}
                     disabled={disabled}
                     value={fieldsValue ? fieldsValue[item.id] : undefined}

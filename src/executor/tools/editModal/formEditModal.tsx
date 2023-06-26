@@ -3,11 +3,12 @@ import OioForm from '@/components/Common/FormDesign/OioFormNext';
 import { generateUuid } from '@/ts/base/common';
 import { formatDate } from '@/utils';
 import React from 'react';
-import { schema } from '@/ts/base';
+import { model, schema } from '@/ts/base';
 import { IBelong } from '@/ts/core';
 
 interface IFormEditProps {
   form: schema.XForm;
+  fields: model.FieldModel[];
   belong: IBelong;
   create: boolean;
   initialValues?: any;
@@ -16,6 +17,7 @@ interface IFormEditProps {
 
 const FormEditModal = ({
   form,
+  fields,
   belong,
   create,
   initialValues,
@@ -32,6 +34,7 @@ const FormEditModal = ({
       <OioForm
         showTitle
         form={form}
+        fields={fields}
         belong={belong}
         fieldsValue={initialValues || {}}
         onValuesChange={(_, values) => {

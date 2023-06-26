@@ -12,23 +12,21 @@ interface IProps {
   belong: IBelong;
   forms: schema.XForm[];
   data: model.InstanceDataModel;
+  node: model.WorkNodeModel;
   onChanged?: (id: string, data: model.FormEditData) => void;
 }
 
-const parseLastSource = (data: model.InstanceDataModel, id: string, userId: string) => {
-  if (data.data[id] && data.data[id].length > 0) {
-    const item = data.data[id].slice(-1)[0];
+const parseLastSource = (data: model.FormEditData[], userId: string) => {
+  if (data && data.length > 0) {
+    const item = data.slice(-1)[0];
     if (item.source && item.source.length > 0) {
-      const result = item.source.slice(-1)[0];
-      if (!result['Id']) {
-        result['Id'] = 'uuid' + generateUuid();
-      }
-      return result;
+      return item.source.slice(-1)[0];
     }
   }
   return {
     Status: '正常',
     Creater: userId,
+    Name: '',
     Id: 'uuid' + generateUuid(),
     CreateTime: formatDate(new Date(), 'yyyy-MM-dd hh:mm:ss.S'),
     ModifiedTime: formatDate(new Date(), 'yyyy-MM-dd hh:mm:ss.S'),
@@ -39,17 +37,18 @@ const PrimaryForms: React.FC<IProps> = (props) => {
   if (props.forms.length < 1) return <></>;
   const [activeTabKey, setActiveTabKey] = useState(props.forms[0].id);
   const loadItems = () => {
-    return props.forms.map((f) => {
-      const source = parseLastSource(props.data, f.id, props.belong.userId);
+    return props.forms.map((form) => {
+      const source = parseLastSource(props.data.data[form.id], props.belong.userId);
       const changed: any = {};
-      changed[source['Id']] = {};
+      changed[source.Id] = {};
       return {
-        key: f.id,
-        label: f.name,
+        key: form.id,
+        label: form.name,
         children: (
           <OioForm
-            key={f.id}
-            form={f}
+            key={form.id}
+            form={form}
+            fields={props.data.fields[form.id]}
             fieldsValue={source}
             belong={props.belong}
             disabled={!props.allowEdit}
@@ -61,13 +60,15 @@ const PrimaryForms: React.FC<IProps> = (props) => {
             }}
             onValuesChange={(a, values) => {
               Object.keys(a).forEach((k) => {
-                changed[source['Id']][k] = a[k];
+                changed[source.Id][k] = a[k];
+                props.data.primary[k] = a[k];
               });
               props.onChanged?.apply(this, [
-                f.id,
+                form.id,
                 {
                   source: [{ ...source, ...values }],
                   changed: changed,
+                  nodeId: props.node.id,
                   creator: props.belong.userId,
                   createTime: formatDate(new Date(), 'yyyy-MM-dd hh:mm:ss.S'),
                 },

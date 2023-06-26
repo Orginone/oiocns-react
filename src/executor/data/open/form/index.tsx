@@ -43,10 +43,8 @@ const FormView: React.FC<IProps> = ({ form, finished }) => {
           key={key}
           autoColumn
           height={'100%'}
-          form={{
-            ...form.metadata,
-            attributes: form.attributes,
-          }}
+          form={form.metadata}
+          fields={form.fields}
           dataSource={
             new CustomStore({
               key: 'Id',

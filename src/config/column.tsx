@@ -1,7 +1,7 @@
 import { ProColumns } from '@ant-design/pro-components';
 import React from 'react';
 import { Tag, Typography } from 'antd';
-import { schema } from '@/ts/base';
+import { model, schema } from '@/ts/base';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import { IWorkTask } from '@/ts/core';
 import { statusMap } from './consts';
@@ -142,36 +142,40 @@ export const WorkColumns: ProColumns<IWorkTask>[] = [
 ];
 
 /** 物的默认列信息 */
-export const ThingColumns = (hideColumns?: string[]) => [
+export const AnyThingColumns: model.FieldModel[] = [
   {
     id: 'Id',
-    dataField: 'Id',
-    visible: !hideColumns?.includes('Id'),
+    code: 'Id',
     name: '唯一标识',
     valueType: '描述型',
+    rule: '{}',
+    lookups: [],
     remark: '由系统生成的唯一标记,无实义.',
   },
   {
     id: 'Creater',
-    dataField: 'Creater',
-    visible: !hideColumns?.includes('Creater'),
+    code: 'Creater',
     name: '创建人',
     valueType: '用户型',
+    rule: '{}',
+    lookups: [],
     remark: '创建标识的人',
   },
   {
     id: 'Status',
-    dataField: 'Status',
-    visible: !hideColumns?.includes('Status'),
+    code: 'Status',
     name: '状态',
     valueType: '选择型',
+    rule: '{}',
     remark: '数据状态',
-    lookupSource: [
+    lookups: [
       {
+        id: 'normal',
         text: '正常',
         value: '正常',
       },
       {
+        id: 'dead',
         text: '已销毁',
         value: '已销毁',
       },
@@ -179,18 +183,20 @@ export const ThingColumns = (hideColumns?: string[]) => [
   },
   {
     id: 'CreateTime',
-    dataField: 'CreateTime',
-    visible: !hideColumns?.includes('CreateTime'),
+    code: 'CreateTime',
     name: '创建时间',
     valueType: '时间型',
+    rule: '{}',
+    lookups: [],
     remark: '创建标识的时间',
   },
   {
     id: 'ModifiedTime',
-    dataField: 'ModifiedTime',
-    visible: !hideColumns?.includes('ModifiedTime'),
+    code: 'ModifiedTime',
     name: '修改时间',
     valueType: '时间型',
+    rule: '{}',
+    lookups: [],
     remark: '最新修改时间',
   },
 ];

@@ -5,7 +5,6 @@ import React from 'react';
 import { Tabs } from 'antd';
 import { EditModal } from '../editModal';
 import GenerateTable from '../generate/table';
-import { ImCancelCircle, ImPencil2 } from 'react-icons/im';
 import { formatDate } from '@/utils';
 
 interface IProps {
@@ -13,12 +12,13 @@ interface IProps {
   belong: IBelong;
   forms: schema.XForm[];
   data: model.InstanceDataModel;
+  node: model.WorkNodeModel;
   onChanged?: (id: string, data: model.FormEditData) => void;
 }
 
-const parseLastSource = (data: model.InstanceDataModel, id: string) => {
-  if (data.data[id] && data.data[id].length > 0) {
-    const item = data.data[id].slice(-1)[0];
+const parseLastSource = (data?: model.FormEditData[]) => {
+  if (data && data.length > 0) {
+    const item = data.slice(-1)[0];
     if (item.source && item.source.length > 0) {
       return item.source;
     }
@@ -27,15 +27,19 @@ const parseLastSource = (data: model.InstanceDataModel, id: string) => {
 };
 
 const DetailTable: React.FC<IProps> = (props) => {
+  if (props.forms.length < 1) return <></>;
   const form = props.forms[0];
+  if (!props.data.fields[form.id]) return <></>;
+  const fields = props.data.fields[form.id];
   const [selectKeys, setSelectKeys] = useState<string[]>([]);
-  const [dataSource, setDataSource] = useState(parseLastSource(props.data, form.id));
+  const [dataSource, setDataSource] = useState(parseLastSource(props.data.data[form.id]));
   useEffect(() => {
     props.onChanged?.apply(this, [
       form.id,
       {
         source: dataSource,
         changed: {},
+        nodeId: props.node.id,
         creator: props.belong.userId,
         createTime: formatDate(new Date(), 'yyyy-MM-dd hh:mm:ss.S'),
       },
@@ -44,6 +48,7 @@ const DetailTable: React.FC<IProps> = (props) => {
   return (
     <GenerateTable
       form={form}
+      fields={fields}
       autoColumn
       height={600}
       dataIndex={'attribute'}
@@ -68,6 +73,7 @@ const DetailTable: React.FC<IProps> = (props) => {
               onClick: () => {
                 EditModal.showFormEdit({
                   form: form,
+                  fields: fields,
                   belong: props.belong,
                   create: true,
                   onSave: (values) => {
@@ -88,6 +94,7 @@ const DetailTable: React.FC<IProps> = (props) => {
               onClick: () => {
                 EditModal.showFormEdit({
                   form: form,
+                  fields: fields,
                   belong: props.belong,
                   create: false,
                   onSave: (values) => {
@@ -117,6 +124,7 @@ const DetailTable: React.FC<IProps> = (props) => {
               onClick: () => {
                 EditModal.showFormSelect({
                   form: form,
+                  fields: fields,
                   belong: props.belong,
                   selected: dataSource.map((i) => i.Id),
                   onSave: (values) => {
@@ -152,47 +160,6 @@ const DetailTable: React.FC<IProps> = (props) => {
         ],
       }}
       dataSource={dataSource}
-      dataMenus={{
-        items: [
-          {
-            key: 'remove',
-            icon: <ImCancelCircle fontSize={22} color={'#9498df'} />,
-            label: '移除',
-          },
-          {
-            key: 'edit',
-            icon: <ImPencil2 fontSize={22} color={'#9498df'} />,
-            label: '变更',
-          },
-        ],
-        onMenuClick(key, data) {
-          switch (key) {
-            case 'edit':
-              EditModal.showFormEdit({
-                form: form,
-                belong: props.belong,
-                create: false,
-                initialValues: data,
-                onSave(values) {
-                  setDataSource(
-                    dataSource.map((d) => {
-                      if (d.Id === data.Id) {
-                        Object.keys(values).forEach((k) => {
-                          d[k] = values[k];
-                        });
-                      }
-                      return d;
-                    }),
-                  );
-                },
-              });
-              break;
-            case 'remove':
-              setDataSource(dataSource.filter((i) => i.Id != data.Id));
-              break;
-          }
-        },
-      }}
       hideColumns={['Creater', 'CreateTime', 'ModifiedTime']}
     />
   );

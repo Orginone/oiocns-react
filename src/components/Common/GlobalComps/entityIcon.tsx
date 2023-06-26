@@ -2,13 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { Avatar, Image } from 'antd';
 import orgCtrl from '@/ts/controller';
 import { ShareIcon } from '@/ts/base/model';
-import { parseAvatar } from '@/ts/base';
+import { parseAvatar, schema } from '@/ts/base';
 import TypeIcon from './typeIcon';
 
 interface teamTypeInfo {
   preview?: boolean;
   size?: number;
-  entityId: string;
+  entityId?: string;
+  entity?: schema.XEntity;
   typeName?: string;
   notAvatar?: boolean;
   title?: string;
@@ -30,6 +31,13 @@ const EntityIcon = (info: teamTypeInfo) => {
             avatar: parseAvatar(value.icon),
           });
         }
+      });
+    }
+    if (info.entity) {
+      setShare({
+        name: info.entity.name,
+        typeName: info.entity.typeName,
+        avatar: parseAvatar(info.entity.icon),
       });
     }
   }, []);

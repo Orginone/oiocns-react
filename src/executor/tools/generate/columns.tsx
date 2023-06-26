@@ -4,29 +4,23 @@ import { Column, Lookup } from 'devextreme-react/data-grid';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import { formatSize, generateUuid } from '@/ts/base/common';
 
-export interface ColumnGenerateProps {
-  id: string;
-  name: string;
-  remark: string;
-  visible: boolean;
-  dataField: string;
-  valueType: string;
-  lookupSource?: {
-    text: string;
-    value: string;
-  }[];
-}
-
 /** 使用form生成表单列 */
-export const GenerateColumn = (props: ColumnGenerateProps) => {
-  switch (props.valueType) {
+export const GenerateColumn = (
+  field: model.FieldModel,
+  hideColumns: string[] | undefined,
+  dataIndex: 'attribute' | 'property' | undefined,
+) => {
+  const props = {
+    key: generateUuid(),
+    caption: field.name,
+    visible: !hideColumns?.includes(field.id),
+    dataField: dataIndex === 'attribute' ? field.id : field.code,
+  };
+  switch (field.valueType) {
     case '时间型':
       return (
         <Column
-          key={generateUuid()}
-          dataField={props.dataField}
-          caption={props.name}
-          visible={props.visible}
+          {...props}
           dataType="datetime"
           width={250}
           headerFilter={{
@@ -38,10 +32,7 @@ export const GenerateColumn = (props: ColumnGenerateProps) => {
     case '日期型':
       return (
         <Column
-          key={generateUuid()}
-          dataField={props.dataField}
-          caption={props.name}
-          visible={props.visible}
+          {...props}
           dataType="date"
           width={180}
           headerFilter={{
@@ -54,26 +45,20 @@ export const GenerateColumn = (props: ColumnGenerateProps) => {
     case '分类型':
       return (
         <Column
-          key={generateUuid()}
-          dataField={props.dataField}
-          caption={props.name}
-          visible={props.visible}
+          {...props}
           width={200}
           headerFilter={{
             allowSearch: true,
-            dataSource: props.lookupSource,
+            dataSource: field.lookups,
           }}>
-          <Lookup dataSource={props.lookupSource} displayExpr="text" valueExpr="value" />
+          <Lookup dataSource={field.lookups} displayExpr="text" valueExpr="value" />
         </Column>
       );
     case '数值型':
       return (
         <Column
-          key={generateUuid()}
-          dataField={props.dataField}
-          caption={props.name}
-          visible={props.visible}
-          fixed={props.id === 'Id'}
+          {...props}
+          fixed={field.id === 'Id'}
           dataType="number"
           width={150}
           allowHeaderFiltering={false}
@@ -82,10 +67,7 @@ export const GenerateColumn = (props: ColumnGenerateProps) => {
     case '用户型':
       return (
         <Column
-          key={generateUuid()}
-          dataField={props.dataField}
-          caption={props.name}
-          visible={props.visible}
+          {...props}
           dataType="string"
           width={150}
           allowFiltering={false}
@@ -97,10 +79,7 @@ export const GenerateColumn = (props: ColumnGenerateProps) => {
     case '附件型':
       return (
         <Column
-          key={generateUuid()}
-          dataField={props.dataField}
-          caption={props.name}
-          visible={props.visible}
+          {...props}
           dataType="string"
           width={150}
           allowFiltering={false}
@@ -117,15 +96,7 @@ export const GenerateColumn = (props: ColumnGenerateProps) => {
       );
     default:
       return (
-        <Column
-          key={generateUuid()}
-          dataField={props.dataField}
-          caption={props.name}
-          visible={props.visible}
-          dataType="string"
-          width={180}
-          allowHeaderFiltering={false}
-        />
+        <Column {...props} dataType="string" width={180} allowHeaderFiltering={false} />
       );
   }
 };

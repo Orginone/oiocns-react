@@ -17,7 +17,6 @@ interface IProps {
 }
 
 const EntityForm: React.FC<IProps> = ({ cmd, entity, finished }) => {
-  console.log(cmd, entity);
   const reloadFinish = () => {
     finished();
     if (!cmd.startsWith('remark')) {

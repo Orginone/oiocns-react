@@ -1,15 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import orgCtrl from '@/ts/controller';
-import { schema } from '@/ts/base';
+import React from 'react';
+import { model, schema } from '@/ts/base';
 import { Dropdown } from 'antd';
 import { AiOutlineEllipsis } from 'react-icons/ai';
-import { ColumnGenerateProps, GenerateColumn } from './columns';
+import { GenerateColumn } from './columns';
 import { Column, DataGrid, IDataGridOptions } from 'devextreme-react/data-grid';
-import { ThingColumns } from '@/config/column';
+import { AnyThingColumns } from '@/config/column';
 import { ItemType } from 'antd/lib/menu/hooks/useItems';
 
 interface IProps extends IDataGridOptions {
   form: schema.XForm;
+  fields: model.FieldModel[];
   autoColumn?: boolean;
   dataIndex?: 'attribute' | 'property';
   hideColumns?: string[];
@@ -19,50 +19,11 @@ interface IProps extends IDataGridOptions {
   };
 }
 
-const loadFormColumns = async (props: IProps) => {
-  const newColumnProps: ColumnGenerateProps[] = [];
-  if (props.autoColumn) {
-    newColumnProps.push(...ThingColumns(props.hideColumns));
-  }
-  const attributes =
-    props.form.attributes?.filter(
-      (attr) => attr.linkPropertys && attr.linkPropertys.length > 0,
-    ) || [];
-  for (const attr of attributes) {
-    const property = attr.linkPropertys![0];
-    const datasource: any[] = [];
-    if (property.speciesId && property.speciesId.length > 0) {
-      const items = await orgCtrl.work.loadItems(property.speciesId);
-      items?.forEach((i) => {
-        datasource.push({
-          text: i.name,
-          value: i.id,
-        });
-      });
-    }
-    newColumnProps.push({
-      id: attr.id,
-      name: attr.name,
-      remark: attr.remark,
-      lookupSource: datasource,
-      valueType: property.valueType,
-      visible: !props.hideColumns?.includes(attr.id),
-      dataField: props.dataIndex === 'attribute' ? attr.id : property.code,
-    });
-  }
-  return newColumnProps;
-};
-
 /** 使用form生成表单 */
 const GenerateTable = (props: IProps) => {
-  const [columnProps, setColumnProps] = useState<ColumnGenerateProps[]>([]);
-  useEffect(() => {
-    loadFormColumns(props).then((value) => {
-      setColumnProps(value);
-    });
-  }, []);
+  const fields = [...AnyThingColumns, ...props.fields];
   return (
-    <DataGrid<any, string>
+    <DataGrid<model.AnyThingModel, string>
       keyExpr="Id"
       key={props.form.id}
       columnMinWidth={props.columnMinWidth ?? 80}
@@ -88,16 +49,22 @@ const GenerateTable = (props: IProps) => {
         const info = { ...e };
         info.selectedRowsData = e.selectedRowsData.map((data) => {
           const newData: any = {};
-          columnProps.forEach((c) => {
-            if (data[c.dataField]) {
-              newData[c.id] = data[c.dataField];
+          fields.forEach((c) => {
+            if (props.dataIndex === 'attribute') {
+              if (data[c.id]) {
+                newData[c.id] = data[c.id];
+              }
+            } else {
+              if (data[c.code]) {
+                newData[c.id] = data[c.code];
+              }
             }
           });
           return newData;
         });
         props.onSelectionChanged?.apply(this, [info]);
       }}>
-      {columnProps.map((item) => GenerateColumn(item))}
+      {fields.map((field) => GenerateColumn(field, props.hideColumns, props.dataIndex))}
       {props.dataMenus && (
         <Column
           dataField="操作"

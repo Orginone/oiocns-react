@@ -39,7 +39,7 @@ const WorkStartDo: React.FC<IProps> = ({ current, finished }) => {
         <WorkForm
           allowEdit
           belong={apply.belong}
-          forms={apply.instanceData.node.forms || []}
+          node={apply.instanceData.node}
           data={apply.instanceData}
           onChanged={(id, data) => {
             formData.set(id, data);
@@ -59,7 +59,7 @@ const WorkStartDo: React.FC<IProps> = ({ current, finished }) => {
           <Button
             type="primary"
             onClick={() => {
-              console.log(info);
+              console.log(apply.instanceData);
               // apply.createApply(apply.belong.id, info.content);
               finished();
             }}>

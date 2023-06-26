@@ -18,20 +18,19 @@ import { Rule } from 'antd/es/form';
 import React, { useEffect, useState } from 'react';
 import ProFormAuth from './widgets/ProFormAuth';
 import ProFormDept from './widgets/ProFormDept';
-import ProFormDict from './widgets/ProFormDict';
 import ProFormGroup from './widgets/ProFormGroup';
 import ProFormPerson from './widgets/ProFormPerson';
 import ProFormIdentity from './widgets/ProFormIdentity';
-import { XAttribute } from '@/ts/base/schema';
 import { IBelong } from '@/ts/core';
 import { loadWidgetsOpts } from '../rule';
 import { Modal, UploadProps } from 'antd';
 import { FileItemShare } from '@/ts/base/model';
 import { downloadByUrl } from '@/utils/tools';
+import { model } from '@/ts/base';
 
 interface IProps {
   disabled?: boolean;
-  item: XAttribute;
+  field: model.FieldModel;
   belong: IBelong;
   noRule?: boolean;
   value?: any;
@@ -47,14 +46,14 @@ const defaultFilsUrl = [
  * 表单项渲染
  */
 const OioFormItem = ({
-  item,
+  field,
   belong,
   disabled,
   noRule,
   onFilesValueChange,
   value,
 }: IProps) => {
-  const rule = JSON.parse(item.rule || '{}');
+  const rule = JSON.parse(field.rule || '{}');
   // 规则校验
   let rules: Rule[] = [];
   if (rule.rules && !noRule) {
@@ -73,7 +72,7 @@ const OioFormItem = ({
     rules = [];
   }
   if (!rule.widget) {
-    rule.widget = loadWidgetsOpts(item.property!.valueType)[0].value;
+    rule.widget = loadWidgetsOpts(field.valueType)[0].value;
   }
 
   const [fileList, setFileList] = useState<any[]>([]);
@@ -109,7 +108,7 @@ const OioFormItem = ({
     onRemove(file: { key: string } & any) {
       const data = fileList.filter((v) => v.uid !== file.uid);
       setFileList(data);
-      onFilesValueChange && onFilesValueChange(item.id, data);
+      onFilesValueChange && onFilesValueChange(field.id, data);
     },
     async customRequest(options: { file: any }) {
       const file = options.file as File;
@@ -135,7 +134,7 @@ const OioFormItem = ({
             thumbUrl: showImg,
           };
           setFileList([...fileList, _file]);
-          onFilesValueChange && onFilesValueChange(item.id, [...fileList, _file]);
+          onFilesValueChange && onFilesValueChange(field.id, [...fileList, _file]);
         }
       }
     },
@@ -159,11 +158,11 @@ const OioFormItem = ({
       return (
         <ProFormText
           disabled={disabled}
-          name={item.id}
+          name={field.id}
           required={rule.required}
           fieldProps={rule}
           rules={rules}
-          tooltip={item.remark}
+          tooltip={field.remark}
           labelAlign="right"
         />
       );
@@ -172,11 +171,10 @@ const OioFormItem = ({
       return (
         <ProFormDigit
           disabled={disabled}
-          name={item.id}
+          name={field.id}
           fieldProps={rule}
           rules={rules}
-          // width={200}
-          tooltip={item.remark}
+          tooltip={field.remark}
           labelAlign="right"
         />
       );
@@ -184,11 +182,10 @@ const OioFormItem = ({
       return (
         <ProFormSelect
           disabled={disabled}
-          name={item.id}
+          name={field.id}
           fieldProps={rule}
           rules={rules}
-          // width={200}
-          tooltip={item.remark}
+          tooltip={field.remark}
           labelAlign="right"
         />
       );
@@ -196,10 +193,9 @@ const OioFormItem = ({
       return (
         <ProFormTreeSelect
           disabled={disabled}
-          name={item.id}
+          name={field.id}
           rules={rules}
-          // width={200}
-          tooltip={item.remark}
+          tooltip={field.remark}
           labelAlign="right"
         />
       );
@@ -207,7 +203,7 @@ const OioFormItem = ({
     case 'upload': {
       return (
         <ProFormUploadButton
-          name={item.id}
+          name={field.id}
           key={fileList.length}
           listType="picture"
           fileList={fileList}
@@ -216,7 +212,7 @@ const OioFormItem = ({
             ...uploadProps,
           }}
           rules={rules}
-          tooltip={item.remark}
+          tooltip={field.remark}
           labelAlign="right"
         />
       );
@@ -226,10 +222,9 @@ const OioFormItem = ({
       return (
         <ProFormDatePicker
           disabled={disabled}
-          name={item.id}
+          name={field.id}
           rules={rules}
-          // width={200}
-          tooltip={item.remark}
+          tooltip={field.remark}
           labelAlign="right"
         />
       );
@@ -237,10 +232,9 @@ const OioFormItem = ({
       return (
         <ProFormDateTimePicker
           disabled={disabled}
-          name={item.id}
+          name={field.id}
           rules={rules}
-          // width={200}
-          tooltip={item.remark}
+          tooltip={field.remark}
           labelAlign="right"
         />
       );
@@ -248,10 +242,9 @@ const OioFormItem = ({
       return (
         <ProFormDateRangePicker
           disabled={disabled}
-          name={item.id}
+          name={field.id}
           rules={rules}
-          // width={200}
-          tooltip={item.remark}
+          tooltip={field.remark}
           labelAlign="right"
         />
       );
@@ -259,10 +252,9 @@ const OioFormItem = ({
       return (
         <ProFormDateTimeRangePicker
           disabled={disabled}
-          name={item.id}
+          name={field.id}
           rules={rules}
-          // width={200}
-          tooltip={item.remark}
+          tooltip={field.remark}
           labelAlign="right"
         />
       );
@@ -270,10 +262,9 @@ const OioFormItem = ({
       return (
         <ProFormCheckbox
           disabled={disabled}
-          name={item.id}
+          name={field.id}
           rules={rules}
-          // width={200}
-          tooltip={item.remark}
+          tooltip={field.remark}
           labelAlign="right"
         />
       );
@@ -281,10 +272,9 @@ const OioFormItem = ({
       return (
         <ProFormRadio
           disabled={disabled}
-          name={item.id}
+          name={field.id}
           rules={rules}
-          // width={200}
-          tooltip={item.remark}
+          tooltip={field.remark}
           labelAlign="right"
         />
       );
@@ -292,23 +282,24 @@ const OioFormItem = ({
       return (
         <ProFormMoney
           disabled={disabled}
-          name={item.id}
+          name={field.id}
           rules={rules}
-          // width={200}
-          tooltip={item.remark}
+          tooltip={field.remark}
           labelAlign="right"
         />
       );
     case 'dict':
       return (
-        <ProFormDict
-          label=""
-          speciesId={item.property!.speciesId}
-          name={item.id}
+        <ProFormSelect
+          name={field.id}
+          tooltip={field.remark}
+          fieldProps={{
+            ...rules,
+            options: field.lookups.map((i) => {
+              return { label: i.text, value: i.value };
+            }),
+          }}
           rules={rules}
-          tooltip={item.remark}
-          labelAlign="right"
-          props={rule}
         />
       );
     case 'department':
@@ -317,9 +308,9 @@ const OioFormItem = ({
         <ProFormDept
           label=""
           belong={belong}
-          name={item.id}
+          name={field.id}
           rules={rules}
-          tooltip={item.remark}
+          tooltip={field.remark}
           labelAlign="right"
         />
       );
@@ -328,9 +319,9 @@ const OioFormItem = ({
         <ProFormPerson
           label=""
           belong={belong}
-          name={item.id}
+          name={field.id}
           rules={rules}
-          tooltip={item.remark}
+          tooltip={field.remark}
           labelAlign="right"
         />
       );
@@ -339,9 +330,9 @@ const OioFormItem = ({
         <ProFormGroup
           label=""
           belong={belong}
-          name={item.id}
+          name={field.id}
           rules={rules}
-          tooltip={item.remark}
+          tooltip={field.remark}
           labelAlign="right"
         />
       );
@@ -350,9 +341,9 @@ const OioFormItem = ({
         <ProFormAuth
           label=""
           belong={belong}
-          name={item.id}
+          name={field.id}
           rules={rules}
-          tooltip={item.remark}
+          tooltip={field.remark}
           labelAlign="right"
         />
       );
@@ -361,19 +352,19 @@ const OioFormItem = ({
         <ProFormIdentity
           label=""
           belong={belong}
-          name={item.id}
+          name={field.id}
           rules={rules}
-          tooltip={item.remark}
+          tooltip={field.remark}
           labelAlign="right"
         />
       );
     default:
       return (
         <ProFormText
-          name={item.id}
+          name={field.id}
           fieldProps={rule}
           rules={rules}
-          tooltip={item.remark}
+          tooltip={field.remark}
           labelAlign="right"
         />
       );
