@@ -125,7 +125,7 @@ const DetailTable: React.FC<IProps> = (props) => {
                 });
               },
             },
-            visible: props.allowEdit && props.data.allowAdd,
+            visible: props.allowEdit && props.data.allowSelect,
           },
           {
             name: 'remove',
