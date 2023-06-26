@@ -3,7 +3,7 @@ import { Button, Input } from 'antd';
 import React, { useEffect, useState } from 'react';
 import WorkForm from '@/executor/tools/workForm';
 import FullScreenModal from '@/executor/tools/fullScreen';
-import { IWorkApply } from '@/ts/core/work/apply';
+import { IWorkApply } from '@/ts/core';
 import { model } from '@/ts/base';
 // 卡片渲染
 interface IProps {

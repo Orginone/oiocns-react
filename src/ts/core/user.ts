@@ -103,7 +103,7 @@ export class UserProvider {
   private _loadUser(person: schema.XTarget) {
     sessionStorage.setItem(sessionUserName, JSON.stringify(person));
     this._user = new Person(person);
-    this._chat = new ChatProvider(this._user);
+    this._chat = new ChatProvider(this._user!);
     this._work = new WorkProvider(this);
     this.refresh();
   }
