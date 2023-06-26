@@ -110,7 +110,7 @@ export class Form extends FileInfo<schema.XForm> implements IForm {
             id: attr.id,
             rule: attr.rule,
             name: attr.name,
-            code: attr.code,
+            code: property.code,
             remark: attr.remark,
             lookups: [],
             valueType: property.valueType,
