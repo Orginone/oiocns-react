@@ -6,6 +6,7 @@
   width: 100vw;
   height: 100vh;
   overflow: hidden;
+  background-color: @component-background !important;
 }
 
 .layout__loading {
@@ -57,7 +58,7 @@
 
 // 全局树结构
 .ogo-tree .ogo-tree-node-content-wrapper.ogo-tree-node-selected {
-  background-color: #f2f6fc;
+  background-color: @component-background;
 }
 .ogo-tree .ogo-tree-treenode-draggable .ogo-tree-draggable-icon {
   display: none;
@@ -114,7 +115,7 @@
 }
 
 ::-webkit-scrollbar {
-  background-color: #fff;
+  background-color: @component-background;
 }
 
 ::-webkit-scrollbar-thumb {
@@ -162,4 +163,15 @@
 
 .ogo-image-preview-content{
   height: 100%;
+}
+
+.ogo-layout-header,
+.ogo-layout,
+.ogo-layout,
+.ogo-layout-sider,
+.CardWidthTitle-wrap,
+.dx-datagrid,
+.dx-toolbar {
+  background: @component-background;
+  background-color: @component-background;
 }
