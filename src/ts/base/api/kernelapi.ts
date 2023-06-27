@@ -1060,6 +1060,7 @@ export default class KernelApi {
   public async createWorkInstance(
     params: model.WorkInstanceModel,
   ): Promise<model.ResultType<schema.XWorkInstance>> {
+    console.log(params);
     return await this.request({
       module: 'work',
       action: 'CreateWorkInstance',

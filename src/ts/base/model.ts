@@ -516,6 +516,8 @@ export type WorkInstanceModel = {
   taskId: string;
   // 发起用户ID
   applyId: string;
+  // 子流程数据
+  childrenData: string;
 };
 
 export type InstanceDataModel = {
@@ -573,16 +575,10 @@ export type FieldModel = {
 }
 
 export type FormEditData = {
-  /** 选择的数据 */
-  source: AnyThingModel[];
-  /** 操作的数据 */
-  changed: {
-    // 唯一id
-    [id: string]: {
-      // 特性id
-      [id: string]: any
-    }
-  };
+  /** 操作前数据体 */
+  before: AnyThingModel[];
+  /** 操作后数据体 */
+  after: AnyThingModel[];
   /** 流程节点Id */
   nodeId: string;
   /** 操作人 */
@@ -648,6 +644,8 @@ export type ApprovalTaskReq = {
   comment: string;
   // 数据
   data: string;
+  // 子流程数据
+  childrenData: string;
 };
 
 export type TargetMessageModel = {

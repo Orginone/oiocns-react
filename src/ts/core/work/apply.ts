@@ -9,7 +9,11 @@ export interface IWorkApply {
   /** 实例携带的数据 */
   instanceData: model.InstanceDataModel;
   /** 发起申请 */
-  createApply(applyId: string, content: string): Promise<boolean>;
+  createApply(
+    applyId: string,
+    content: string,
+    fromData: Map<string, model.FormEditData>,
+  ): Promise<boolean>;
 }
 
 export class WorkApply implements IWorkApply {
@@ -25,13 +29,21 @@ export class WorkApply implements IWorkApply {
   belong: IBelong;
   metadata: model.WorkInstanceModel;
   instanceData: model.InstanceDataModel;
-  async createApply(applyId: string, content: string): Promise<boolean> {
+  async createApply(
+    applyId: string,
+    content: string,
+    fromData: Map<string, model.FormEditData>,
+  ): Promise<boolean> {
+    fromData.forEach((data, k) => {
+      this.instanceData.data[k] = [data];
+    });
     const res = await kernel.createWorkInstance({
       ...this.metadata,
       applyId: applyId,
       content: content,
       contentType: 'Text',
       data: JSON.stringify(this.instanceData),
+      childrenData: '',
     });
     return res.success;
   }

@@ -1,9 +1,7 @@
 import { Modal } from 'antd';
 import OioForm from '@/components/Common/FormDesign/OioFormNext';
-import { generateUuid } from '@/ts/base/common';
-import { formatDate } from '@/utils';
 import React from 'react';
-import { model, schema } from '@/ts/base';
+import { kernel, model, schema } from '@/ts/base';
 import { IBelong } from '@/ts/core';
 
 interface IFormEditProps {
@@ -14,6 +12,14 @@ interface IFormEditProps {
   initialValues?: any;
   onSave: (values: any) => void;
 }
+
+const createThing = async (userId: string, values: any) => {
+  const res = await kernel.anystore.createThing<model.AnyThingModel[]>(userId, 1);
+  if (res.success && res.data && res.data.length > 0) {
+    return { ...res.data[0], ...values };
+  }
+  return undefined;
+};
 
 const FormEditModal = ({
   form,
@@ -45,18 +51,16 @@ const FormEditModal = ({
       />
     ),
     onOk: () => {
-      modal.destroy();
       if (create) {
-        onSave({
-          ...editData,
-          Status: '正常',
-          Creater: belong.userId,
-          Id: 'uuid' + generateUuid(),
-          CreateTime: formatDate(new Date(), 'yyyy-MM-dd hh:mm:ss.S'),
-          ModifiedTime: formatDate(new Date(), 'yyyy-MM-dd hh:mm:ss.S'),
+        createThing(belong.userId, editData).then((item) => {
+          if (item) {
+            onSave(item);
+            modal.destroy();
+          }
         });
       } else {
         onSave(editData);
+        modal.destroy();
       }
     },
   });

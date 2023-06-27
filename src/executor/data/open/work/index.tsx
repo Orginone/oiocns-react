@@ -39,13 +39,10 @@ const WorkStartDo: React.FC<IProps> = ({ current, finished }) => {
         <WorkForm
           allowEdit
           belong={apply.belong}
-          node={apply.instanceData.node}
           data={apply.instanceData}
+          nodeId={apply.instanceData.node.id}
           onChanged={(id, data) => {
             formData.set(id, data);
-            formData.forEach((v, k) => {
-              console.log(k, v);
-            });
           }}
         />
         <div style={{ padding: 10, display: 'flex', alignItems: 'flex-end' }}>
@@ -59,8 +56,7 @@ const WorkStartDo: React.FC<IProps> = ({ current, finished }) => {
           <Button
             type="primary"
             onClick={() => {
-              console.log(apply.instanceData);
-              // apply.createApply(apply.belong.id, info.content);
+              apply.createApply(apply.belong.id, info.content, formData);
               finished();
             }}>
             提交

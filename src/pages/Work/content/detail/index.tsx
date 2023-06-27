@@ -1,11 +1,10 @@
 import Design from '@/components/Common/FlowDesign';
-import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
 import { ProFormInstance } from '@ant-design/pro-form';
 import { Button, Card, Collapse, Input, Tabs, TabsProps, Timeline } from 'antd';
 import React, { useRef, useState } from 'react';
 import { ImUndo2 } from 'react-icons/im';
 import cls from './index.module.less';
-import { IBelong, IWorkTask } from '@/ts/core';
+import { IBelong, IWorkTask, TaskStatus } from '@/ts/core';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import WorkForm from '@/executor/tools/workForm';
 
@@ -18,7 +17,6 @@ export interface TaskDetailType {
 const Detail: React.FC<TaskDetailType> = ({ task, belong, onBack }) => {
   const formRef = useRef<ProFormInstance<any>>();
   const [comment, setComment] = useState<string>('');
-  const [loading, setLoading] = useState<boolean>(false);
 
   /** 加载时间条 */
   const loadTimeline = () => {
@@ -44,26 +42,26 @@ const Detail: React.FC<TaskDetailType> = ({ task, belong, onBack }) => {
                 <WorkForm
                   allowEdit={false}
                   belong={belong}
-                  node={task.instanceData.node}
+                  nodeId={task.instanceData.node.id}
                   data={task.instanceData}
                 />
               )}
             </Card>
           </Timeline.Item>
-          {task.instance.tasks?.map((task, _index) => {
+          {task.instance.tasks?.map((item, _index) => {
             return (
-              <div key={task.id}>
-                {task.status >= 100 ? (
-                  task.records?.map((record) => {
+              <div key={item.id}>
+                {item.status >= 100 ? (
+                  item.records?.map((record) => {
                     return (
                       <Timeline.Item key={record.id} color={'green'}>
                         <Card>
                           <div style={{ display: 'flex' }}>
                             <div style={{ paddingRight: '24px' }}>
-                              {task.node?.nodeType}
+                              {item.node?.nodeType}
                             </div>
                             <div style={{ paddingRight: '24px' }}>
-                              {task.createTime.substring(0, task.createTime.length - 4)}
+                              {item.createTime.substring(0, item.createTime.length - 4)}
                             </div>
                             <div style={{ paddingRight: '24px' }}>
                               审批人：
@@ -75,12 +73,14 @@ const Detail: React.FC<TaskDetailType> = ({ task, belong, onBack }) => {
                             </div>
                           </div>
                           <Collapse ghost>
-                            {/* {task.node?.bindFroms &&
-                              loadFormItem(
-                                task.node.bindFroms,
-                                task.status == 100,
-                                record.data,
-                              )} */}
+                            {task.instanceData && (
+                              <WorkForm
+                                allowEdit={false}
+                                belong={belong}
+                                nodeId={item.nodeId}
+                                data={task.instanceData}
+                              />
+                            )}
                           </Collapse>
                         </Card>
                       </Timeline.Item>
@@ -90,9 +90,9 @@ const Detail: React.FC<TaskDetailType> = ({ task, belong, onBack }) => {
                   <Timeline.Item color={'red'}>
                     <Card>
                       <div style={{ display: 'flex' }}>
-                        <div style={{ paddingRight: '24px' }}>{task.node?.nodeType}</div>
+                        <div style={{ paddingRight: '24px' }}>{item.node?.nodeType}</div>
                         <div style={{ paddingRight: '24px' }}>
-                          {task.createTime.substring(0, task.createTime.length - 4)}
+                          {item.createTime.substring(0, item.createTime.length - 4)}
                         </div>
                         <div style={{ color: 'red' }}>待审批</div>
                       </div>
@@ -113,10 +113,8 @@ const Detail: React.FC<TaskDetailType> = ({ task, belong, onBack }) => {
   // 审批
   const approvalTask = async (status: number) => {
     await formRef.current?.validateFields();
-    setLoading(true);
-    await task.approvalTask(status, comment);
+    task.approvalTask(status, comment);
     onBack?.apply(this);
-    setLoading(false);
   };
 
   /** tab标签页 */
@@ -130,35 +128,25 @@ const Detail: React.FC<TaskDetailType> = ({ task, belong, onBack }) => {
             {/** 时间轴 */}
             {loadTimeline()}
           </div>
-          <Card className={cls['bootom_right']}>
-            <div style={{ display: 'flex', width: '100%' }}>
-              <Input.TextArea
-                style={{ width: '84%' }}
-                placeholder="请填写审批意见"
-                onChange={(e) => {
-                  setComment(e.target.value);
-                }}
-              />
-              <div style={{ width: '16%', display: 'flex', marginTop: '18px' }}>
-                <Button
-                  type="primary"
-                  danger
-                  icon={<CloseOutlined />}
-                  disabled={loading}
-                  onClick={() => approvalTask(200)}
-                  style={{ marginRight: '8px', marginLeft: '12px' }}>
-                  驳回
-                </Button>
-                <Button
-                  type="primary"
-                  icon={<CheckOutlined />}
-                  disabled={loading}
-                  onClick={() => approvalTask(100)}>
-                  同意
-                </Button>
-              </div>
-            </div>
-          </Card>
+
+          <div style={{ padding: 10, display: 'flex', alignItems: 'flex-end', gap: 10 }}>
+            <Input.TextArea
+              style={{ height: 100, width: 'calc(100% - 80px)' }}
+              placeholder="请填写备注信息"
+              onChange={(e) => {
+                setComment(e.target.value);
+              }}
+            />
+            <Button type="primary" onClick={() => approvalTask(TaskStatus.ApprovalStart)}>
+              通过
+            </Button>
+            <Button
+              type="primary"
+              danger
+              onClick={() => approvalTask(TaskStatus.RefuseStart)}>
+              驳回
+            </Button>
+          </div>
         </>
       ),
     },

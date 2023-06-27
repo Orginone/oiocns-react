@@ -9,6 +9,7 @@ import { ItemType } from 'antd/lib/menu/hooks/useItems';
 
 interface IProps extends IDataGridOptions {
   form: schema.XForm;
+  beforeSource?: model.AnyThingModel[];
   fields: model.FieldModel[];
   autoColumn?: boolean;
   dataIndex?: 'attribute' | 'property';
@@ -68,7 +69,9 @@ const GenerateTable = (props: IProps) => {
         });
         props.onSelectionChanged?.apply(this, [info]);
       }}>
-      {fields.map((field) => GenerateColumn(field, props.hideColumns, props.dataIndex))}
+      {fields.map((field) =>
+        GenerateColumn(field, props.beforeSource, props.hideColumns, props.dataIndex),
+      )}
       {props.dataMenus && (
         <Column
           dataField="操作"
