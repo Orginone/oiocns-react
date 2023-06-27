@@ -143,7 +143,7 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
       const recursionForms = async (node: model.WorkNodeModel) => {
         for (const item of node.forms ?? []) {
           const form = new Form(item, this.directory);
-          item.attributes = await form.loadAttributes();
+          await form.loadContent();
           forms.push(form);
         }
         if (node.children) {
@@ -163,7 +163,19 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
     return forms;
   }
   async createApply(): Promise<IWorkApply | undefined> {
-    if (this.node) {
+    if (this.node && this.forms.length > 0) {
+      const data: model.InstanceDataModel = {
+        data: {},
+        fields: {},
+        primary: {},
+        node: this.node,
+        allowAdd: this.metadata.allowAdd,
+        allowEdit: this.metadata.allowEdit,
+        allowSelect: this.metadata.allowSelect,
+      };
+      this.forms.forEach((form) => {
+        data.fields[form.id] = form.fields;
+      });
       return new WorkApply(
         {
           hook: '',
@@ -171,13 +183,7 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
           title: this.name,
           defineId: this.id,
         } as model.WorkInstanceModel,
-        {
-          data: {},
-          node: this.node,
-          allowAdd: this.metadata.allowAdd,
-          allowEdit: this.metadata.allowEdit,
-          allowSelect: this.metadata.allowSelect,
-        },
+        data,
         this.directory.target.space,
       );
     }

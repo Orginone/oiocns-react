@@ -61,6 +61,12 @@ export abstract class Target extends Team implements ITarget {
   directory: IDirectory;
   identitys: IIdentity[] = [];
   memberDirectory: IDirectory;
+  get spaceId(): string {
+    return this.space.id;
+  }
+  get locationKey(): string {
+    return this.id;
+  }
   private _identityLoaded: boolean = false;
   async loadIdentitys(reload?: boolean | undefined): Promise<IIdentity[]> {
     if (!this._identityLoaded || reload) {

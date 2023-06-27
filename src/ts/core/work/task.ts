@@ -1,21 +1,23 @@
 import { schema, model, kernel } from '../../base';
 import { TaskStatus, storeCollName } from '../public';
 import { IBelong } from '../target/base/belong';
-import { IPerson } from '../target/person';
+import { UserProvider } from '../user';
 
 export interface IWorkTask {
   /** 当前用户 */
-  user: IPerson;
+  user: UserProvider;
   /** 归属空间 */
   belong: IBelong;
   /** 任务元数据 */
   metadata: schema.XWorkTask;
   /** 流程实例 */
-  instance: schema.XWorkInstance;
+  instance: schema.XWorkInstance | undefined;
   /** 实例携带的数据 */
-  instanceData: model.InstanceDataModel;
+  instanceData: model.InstanceDataModel | undefined;
   /** 加用户任务信息 */
   targets: schema.XTarget[];
+  /** 是否满足条件 */
+  isMatch(filter: string): boolean;
   /** 任务更新 */
   updated(_metadata: schema.XWorkTask): Promise<boolean>;
   /** 加载流程实例数据 */
@@ -27,16 +29,22 @@ export interface IWorkTask {
 }
 
 export class WorkTask implements IWorkTask {
-  constructor(_metadata: schema.XWorkTask, _user: IPerson) {
+  constructor(_metadata: schema.XWorkTask, _user: UserProvider) {
     this.metadata = _metadata;
     this.user = _user;
-    this.belong = _user.companys.find((i) => i.belongId === _metadata.belongId) || _user;
   }
-  user: IPerson;
-  belong: IBelong;
+  user: UserProvider;
   metadata: schema.XWorkTask;
-  instance: schema.XWorkInstance;
-  instanceData: model.InstanceDataModel;
+  instance: schema.XWorkInstance | undefined;
+  instanceData: model.InstanceDataModel | undefined;
+  get belong(): IBelong {
+    for (const company of this.user.user!.companys) {
+      if (company.id === this.metadata.belongId) {
+        return company;
+      }
+    }
+    return this.user.user!;
+  }
   get targets(): schema.XTarget[] {
     if (this.metadata.taskType == '加用户') {
       try {
@@ -46,6 +54,9 @@ export class WorkTask implements IWorkTask {
       }
     }
     return [];
+  }
+  isMatch(filter: string): boolean {
+    return JSON.stringify(this.metadata).includes(filter);
   }
   async updated(_metadata: schema.XWorkTask): Promise<boolean> {
     if (this.metadata.id === _metadata.id) {
@@ -76,7 +87,7 @@ export class WorkTask implements IWorkTask {
     if (res.data && res.data.length > 0) {
       try {
         this.instance = res.data[0];
-        this.instanceData = JSON.parse(this.instance.data);
+        this.instanceData = this.instance ? JSON.parse(this.instance.data) : undefined;
         return this.instanceData !== undefined;
       } catch (ex) {
         console.log(ex);
@@ -85,8 +96,8 @@ export class WorkTask implements IWorkTask {
     return false;
   }
   async recallApply(): Promise<boolean> {
-    if (await this.loadInstance()) {
-      if (this.instance.createUser === this.user.id) {
+    if ((await this.loadInstance()) && this.instance) {
+      if (this.instance.createUser === this.belong.userId) {
         if (await kernel.recallWorkInstance({ id: this.instance.id })) {
           return true;
         }
@@ -99,7 +110,7 @@ export class WorkTask implements IWorkTask {
       if (status === -1) {
         return await this.recallApply();
       }
-      if (await this.loadInstance(true)) {
+      if (this.metadata.taskType === '加用户' || (await this.loadInstance(true))) {
         const res = await kernel.approvalTask({
           id: this.metadata.id,
           status: status,

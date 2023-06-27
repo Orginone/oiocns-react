@@ -182,6 +182,7 @@ async function batchRequests(
   requests: RequestIndex[],
   onItemCompleted: (request: RequestIndex, result: model.ResultType<any>) => void,
 ) {
+  if (requests.length == 0) return;
   let res = await kernel.requests(requests.map((item) => item.request));
   if (res.success) {
     let results: model.ResultType<any>[] = res.data;

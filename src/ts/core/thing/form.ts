@@ -7,6 +7,8 @@ import { FileInfo, IFileInfo } from './fileinfo';
 export interface IForm extends IFileInfo<schema.XForm> {
   /** 表单特性 */
   attributes: schema.XAttribute[];
+  /** 表单字段 */
+  fields: model.FieldModel[];
   /** 更新表单 */
   update(data: model.FormModel): Promise<boolean>;
   /** 删除表单 */
@@ -39,6 +41,7 @@ export class Form extends FileInfo<schema.XForm> implements IForm {
   }
   items: schema.XSpeciesItem[] = [];
   private _itemLoaded: boolean = false;
+  fields: model.FieldModel[] = [];
   attributes: schema.XAttribute[] = [];
   private _attributeLoaded: boolean = false;
   async rename(name: string): Promise<boolean> {
@@ -99,15 +102,40 @@ export class Form extends FileInfo<schema.XForm> implements IForm {
   async loadItems(reload: boolean = false): Promise<schema.XSpeciesItem[]> {
     if (!this._itemLoaded || reload) {
       this.items = [];
+      this.fields = [];
       for (const attr of this.attributes) {
-        if (attr.property?.valueType === '分类型') {
-          const res = await kernel.querySpeciesItems({
-            id: attr.property.speciesId,
-            page: PageAll,
-          });
-          if (res.success) {
-            this.items.push(...(res.data.result || []));
+        if (attr.linkPropertys && attr.linkPropertys.length > 0) {
+          const property = attr.linkPropertys[0];
+          const field: model.FieldModel = {
+            id: attr.id,
+            rule: attr.rule,
+            name: attr.name,
+            code: property.code,
+            remark: attr.remark,
+            lookups: [],
+            valueType: property.valueType,
+          };
+          if (property.speciesId && property.speciesId.length > 0) {
+            const res = await kernel.querySpeciesItems({
+              id: property.speciesId,
+              page: PageAll,
+            });
+            if (res.success) {
+              if (property.valueType === '分类型') {
+                this.items.push(...(res.data.result || []));
+              }
+              field.lookups = (res.data.result || []).map((i) => {
+                return {
+                  id: i.id,
+                  text: i.name,
+                  value: i.code,
+                  icon: i.icon,
+                  parentId: i.parentId,
+                };
+              });
+            }
           }
+          this.fields.push(field);
         }
       }
       this._itemLoaded = true;

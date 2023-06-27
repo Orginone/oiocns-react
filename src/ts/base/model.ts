@@ -461,6 +461,23 @@ export type GetDirectoryModel = {
   page: PageModel | undefined;
 };
 
+export type AnyThingModel = {
+  /** 唯一ID */
+  Id: string;
+  /** 名称 */
+  Name: string;
+  /** 状态 */
+  Status: string;
+  /** 创建人 */
+  Creater: string;
+  /** 创建时间 */
+  CreateTime: string;
+  /** 变更时间 */
+  ModifiedTime: string;
+  /** 其它信息 */
+  [field: string]: any;
+}
+
 export type WorkDefineModel = {
   // 流程ID
   id: string;
@@ -510,29 +527,68 @@ export type InstanceDataModel = {
   allowEdit: boolean;
   // 允许选择
   allowSelect: boolean;
+  /** 表单字段 */
+  fields: {
+    /** 表单id */
+    [id: string]: FieldModel[];
+  };
   /** 提交的表单数据 */
   data: {
     // 表单id
-    [id: string]:  {
-      /** 选择的数据 */
-      source: {
-        // 特性id
-        [id: string]: any
-      }[];
-      /** 操作的数据 */
-      changed: {
-        // 唯一id
-        [id: string]: {
-          // 特性id
-          [id: string]: any
-        }
-      };
-      /** 操作人 */
-      creator: string;
-      /** 操作时间 */
-      createTime: string;
-    }[]
+    [id: string]: FormEditData[]
   };
+  /** 填写的主表信息 */
+  primary: {
+    /** 特性id */
+    [id: string]: any
+  }
+}
+
+export type FieldModel = {
+  /** 标识(特性标识) */
+  id: string;
+  /** 名称(特性名称) */
+  name: string;
+  /** 代码(属性代码) */
+  code: string;
+  /** 类型(属性类型) */
+  valueType: string;
+  /** 规则(特性规则) */
+  rule: string;
+  /** 备注(特性描述) */
+  remark: string;
+  /** 字典(字典项/分类项) */
+  lookups: {
+    /** 唯一标识(项标识) */
+    id: string;
+    /** 描述(项名称) */
+    text: string;
+    /** 值(项代码) */
+    value: string;
+    /** 父级Id(项的父级Id) */
+    parentId?: string;
+    /** 图标 */
+    icon?: string;
+  }[];
+}
+
+export type FormEditData = {
+  /** 选择的数据 */
+  source: AnyThingModel[];
+  /** 操作的数据 */
+  changed: {
+    // 唯一id
+    [id: string]: {
+      // 特性id
+      [id: string]: any
+    }
+  };
+  /** 流程节点Id */
+  nodeId: string;
+  /** 操作人 */
+  creator: string;
+  /** 操作时间 */
+  createTime: string;
 }
 
 export type WorkNodeModel = {
@@ -559,7 +615,7 @@ export type WorkNodeModel = {
   belongId: string;
   // 节点归属定义Id
   defineId: string;
-  // 绑定的单信息
+  // 绑定的表单信息
   forms: XForm[] | undefined;
 };
 

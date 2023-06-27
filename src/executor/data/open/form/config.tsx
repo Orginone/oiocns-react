@@ -15,9 +15,18 @@ const buildSpeciesItemTree = (
         key: item.id,
         item: item,
         label: item.name,
-        itemType: item.typeName,
+        itemType: '分类项',
         menus: [],
-        icon: <EntityIcon notAvatar={true} entityId={item.id} size={18} />,
+        icon: (
+          <EntityIcon
+            notAvatar={true}
+            entity={{
+              ...item,
+              typeName: '分类项',
+            }}
+            size={18}
+          />
+        ),
         children: buildSpeciesItemTree(items, item.id),
       });
     }

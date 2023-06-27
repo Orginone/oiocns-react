@@ -1,14 +1,17 @@
 import React from 'react';
 import FullScreenModal from '@/executor/tools/fullScreen';
-import { IFormView } from '@/ts/core';
-import Thing from './Thing/Thing';
+import { IForm } from '@/ts/core';
 import * as config from './config';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import MainLayout from '@/components/MainLayout';
 import useMenuUpdate from '@/hooks/useMenuUpdate';
+import GenerateTable from '@/executor/tools/generate/table';
+import CustomStore from 'devextreme/data/custom_store';
+import { kernel } from '@/ts/base';
+import { ImCopy, ImShuffle, ImTicket } from 'react-icons/im';
 
 interface IProps {
-  form: IFormView;
+  form: IForm;
   finished: () => void;
 }
 
@@ -36,48 +39,67 @@ const FormView: React.FC<IProps> = ({ form, finished }) => {
           setSelectMenu(data);
         }}
         siderMenuData={rootMenu}>
-        <Thing
+        <GenerateTable
           key={key}
-          labels={selectMenu.item ? [`S${selectMenu.item.id}`] : []}
-          propertys={form.attributes.map((i) => i.property!)}
-          belongId={form.metadata.belongId}
-          menuItems={[
-            {
-              key: 'listStore',
-              label: '上架商店',
-              click(data) {
-                console.log(data);
+          autoColumn
+          height={'100%'}
+          form={form.metadata}
+          fields={form.fields}
+          dataSource={
+            new CustomStore({
+              key: 'Id',
+              async load(loadOptions) {
+                loadOptions.userData = selectMenu.item ? [`S${selectMenu.item.id}`] : [];
+                let request: any = { ...loadOptions };
+                const result = await kernel.anystore.loadThing<any>(
+                  form.belongId,
+                  request,
+                );
+                if (result.success) {
+                  return result.data;
+                }
+                return [];
               },
-            },
-            {
-              key: 'nft',
-              label: '生成NFT',
-              click(data) {
-                console.log(data);
+            })
+          }
+          remoteOperations={true}
+          columnChooser={{ enabled: true }}
+          toolbar={{
+            visible: true,
+            items: [
+              {
+                name: 'columnChooserButton',
+                location: 'after',
               },
-            },
-            {
-              key: 'assign',
-              label: '分配',
-              click(data) {
-                console.log(data);
+              {
+                name: 'searchPanel',
+                location: 'after',
               },
-            },
-            {
-              key: 'share',
-              label: '共享',
-              click(data) {
-                console.log(data);
+            ],
+          }}
+          dataMenus={{
+            items: [
+              {
+                key: 'createNFT',
+                label: '生成存证',
+                icon: <ImTicket fontSize={22} color={'#9498df'} />,
               },
-            },
-            {
-              key: 'handle',
-              label: '处置',
-              click(data) {
-                console.log(data);
+              {
+                key: 'copyBoard',
+                label: '复制数据',
+                icon: <ImCopy fontSize={22} color={'#9498df'} />,
               },
+              {
+                key: 'startWork',
+                label: '发起办事',
+                icon: <ImShuffle fontSize={22} color={'#9498df'} />,
+              },
+            ],
+            onMenuClick(key, data) {
+              console.log(key, data);
             },
-          ]}
+          }}
+          hideColumns={['Creater', 'CreateTime', 'ModifiedTime']}
         />
       </MainLayout>
     </FullScreenModal>

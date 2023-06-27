@@ -1,11 +1,10 @@
 import ImageView from './image';
 import { IEntity, ISysFileInfo } from '@/ts/core';
-import { schema } from '@/ts/base';
+import { command, schema } from '@/ts/base';
 import React from 'react';
 import FormView from './form';
 import WorkStart from './work';
 import OfficeView from './office';
-import { message } from 'antd';
 
 interface IOpenProps {
   cmd: string;
@@ -33,7 +32,7 @@ const ExecutorOpen: React.FC<IOpenProps> = (props: IOpenProps) => {
         return <OfficeView share={data} finished={props.finished} />;
     }
   }
-  message.warning('暂不支持打开该类型');
+  command.emitter('config', props.cmd, props.entity);
   return <></>;
 };
 

@@ -27,7 +27,6 @@ const PullMember: React.FC<IProps> = ({ current, finished }) => {
         members={current.space.members}
         exclude={current.members}
         finished={async (selected) => {
-          console.log(selected);
           if (await current.pullMembers(selected)) {
             finished();
           }

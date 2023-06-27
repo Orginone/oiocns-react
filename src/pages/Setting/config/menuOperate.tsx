@@ -7,7 +7,10 @@ import { IDepartment, IGroup, ITarget, IDirectory, IApplication } from '@/ts/cor
 
 /** 创建团队菜单 */
 const createMenu = (target: ITarget, children: MenuItemType[]) => {
-  children.unshift(...buildDirectoryTree([target.memberDirectory]));
+  children.unshift(
+    ...buildDirectoryTree([target.memberDirectory]),
+    ...buildApplicationTree(target.directory.applications),
+  );
   return {
     key: target.directory.key,
     item: target.directory,

@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
 import orgCtrl from '@/ts/controller';
-import { IBelong, TaskStatus } from '@/ts/core';
-import { XWorkTask } from '@/ts/base/schema';
-import { model, schema } from '@/ts/base';
+import { IBelong, IWorkTask, TaskStatus } from '@/ts/core';
+import { model } from '@/ts/base';
+import { WorkColumns } from '@/config/column';
 import { GroupMenuType } from '../config/menuType';
-import TaskDetail, { TaskDetailType } from './detail';
+import TaskDetail from './detail';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import CardOrTableComp from '@/components/CardOrTableComp';
-import { TaskColumn } from '@/config/column';
 
 interface IProps {
   filter: string;
@@ -17,12 +16,12 @@ interface IProps {
 
 const TaskContent = (props: IProps) => {
   const [key] = useCtrlUpdate(orgCtrl.work.notity);
-  const [task, setTask] = useState<TaskDetailType>();
-  const [selectedRows, setSelectRows] = useState<schema.XWorkTask[]>([]);
+  const [task, setTask] = useState<IWorkTask>();
+  const [selectedRows, setSelectRows] = useState<IWorkTask[]>([]);
 
   /** 查询任务项 */
   const getTaskList = async (page: model.PageModel) => {
-    let taskList: model.PageResult<XWorkTask> = {
+    let taskList: model.PageResult<IWorkTask> = {
       offset: page.offset,
       limit: page.limit,
       total: 0,
@@ -31,17 +30,10 @@ const TaskContent = (props: IProps) => {
     switch (props.taskType) {
       case GroupMenuType.Done:
         {
-          const res = await orgCtrl.work.loadDones({
+          taskList = await orgCtrl.work.loadDones({
             page: { ...page, filter: props.filter },
             id: props.space?.id || '0',
           });
-          taskList.total = res.total;
-          for (const item of res.result || []) {
-            if (item.task) {
-              delete item.task.records;
-              taskList.result!.push(item.task);
-            }
-          }
         }
         break;
       case GroupMenuType.Apply:
@@ -54,15 +46,10 @@ const TaskContent = (props: IProps) => {
         {
           let todos = orgCtrl.work.todos;
           if (props.space) {
-            const ids = props.space.targets.map((i) => i.id);
-            todos = todos.filter(
-              (t) => ids.includes(t.belongId) || ids.includes(t.shareId),
-            );
+            todos = todos.filter((t) => t.belong.id === props.space.id);
           }
           if (props.filter != '') {
-            todos = todos.filter(
-              (a) => a.title.includes(props.filter) || a.remark.includes(props.filter),
-            );
+            todos = todos.filter((t) => t.isMatch(props.filter));
           }
           taskList.total = todos.length;
           taskList.result = todos.slice(page.offset, page.limit);
@@ -73,23 +60,16 @@ const TaskContent = (props: IProps) => {
   };
 
   /** 加载操作功能 */
-  const getOperation = (items: XWorkTask[]) => {
+  const getOperation = (items: IWorkTask[]) => {
     const operates: any[] = [];
-    if (items.length === 1 && items[0].taskType != '加用户') {
+    if (items.length === 1 && items[0].metadata.taskType != '加用户') {
       operates.push({
         key: 'detail',
         label: '详情',
         onClick: async () => {
-          const instance = await orgCtrl.work.loadTaskDetail(items[0]);
-          if (instance) {
-            setTask({
-              instance,
-              task: items[0],
-              belong: props.space,
-              onBack: () => {
-                setTask(undefined);
-              },
-            });
+          await items[0].loadInstance(true);
+          if (items[0].instance) {
+            setTask(items[0]);
           }
         },
       });
@@ -98,12 +78,14 @@ const TaskContent = (props: IProps) => {
       case GroupMenuType.Done:
         break;
       case GroupMenuType.Apply:
-        if (items.filter((i) => i.status < TaskStatus.ApplyStart).length > 0) {
+        if (items.filter((i) => i.metadata.status < TaskStatus.ApplyStart).length > 0) {
           operates.push({
             key: 'confirm',
             label: '取消',
             onClick: async () => {
-              await orgCtrl.work.approvalTask(items, -1);
+              items.forEach(async (item) => {
+                await item.approvalTask(-1, '取消申请');
+              });
             },
           });
         }
@@ -114,14 +96,18 @@ const TaskContent = (props: IProps) => {
             key: 'confirm',
             label: '通过',
             onClick: async () => {
-              await orgCtrl.work.approvalTask(items, TaskStatus.ApprovalStart);
+              items.forEach(async (item) => {
+                await item.approvalTask(TaskStatus.ApprovalStart, '同意');
+              });
             },
           },
           {
             key: 'refuse',
             label: '拒绝',
             onClick: async () => {
-              await orgCtrl.work.approvalTask(items, TaskStatus.RefuseStart);
+              items.forEach(async (item) => {
+                await item.approvalTask(TaskStatus.ApprovalStart, '驳回');
+              });
             },
           },
         );
@@ -131,18 +117,20 @@ const TaskContent = (props: IProps) => {
   };
 
   if (task) {
-    return <TaskDetail {...task} />;
+    return (
+      <TaskDetail task={task} belong={props.space} onBack={() => setTask(undefined)} />
+    );
   }
   return (
-    <CardOrTableComp<schema.XWorkTask>
+    <CardOrTableComp<IWorkTask>
       key={key}
-      columns={TaskColumn}
+      columns={WorkColumns}
       operation={(item) => getOperation([item])}
       tabBarExtraContent={selectedRows.length > 0 ? getOperation(selectedRows) : []}
       request={getTaskList}
       rowSelection={{
         type: 'checkbox',
-        onChange: (_: React.Key[], selectedRows: schema.XWorkTask[]) => {
+        onChange: (_: React.Key[], selectedRows: IWorkTask[]) => {
           setSelectRows(selectedRows);
         },
       }}
