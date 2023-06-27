@@ -1,17 +1,8 @@
 import { WorkNodeModel } from '@/ts/base/model';
 import { getUuid } from '@/utils/tools';
+
 export const getNodeCode = () => {
   return `node_${getUuid()}`;
-};
-
-//判断是否为主要业务节点
-export const isPrimaryNode = (node: any) => {
-  return [
-    AddNodeType.ROOT,
-    AddNodeType.APPROVAL,
-    AddNodeType.CHILDWORK,
-    AddNodeType.CC,
-  ].includes(node.type);
 };
 
 export const isBranchNode = (type: AddNodeType) => {

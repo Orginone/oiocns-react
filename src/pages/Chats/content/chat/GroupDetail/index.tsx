@@ -87,7 +87,7 @@ const Groupdetail: React.FC<any> = ({ chat }: { chat: IMsgChat }) => {
           <div
             className={`${detailStyle.img_list_con} ${detailStyle.img_list_add}`}
             onClick={() => {
-              command.emitter('config', 'pull', chat);
+              command.emitter('config', 'pull', chat.directory, chat.chatdata.fullId);
             }}>
             +
           </div>

@@ -1,9 +1,10 @@
-import { ProColumns } from '@ant-design/pro-components';
 import React from 'react';
+import { statusMap } from './consts';
 import { Tag, Typography } from 'antd';
 import { model, schema } from '@/ts/base';
+import { ProColumns } from '@ant-design/pro-components';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
-import { IWork, IWorkTask } from '@/ts/core';
+import { IWorkTask } from '@/ts/core';
 
 /** 人员信息列 */
 export const PersonColumns: ProColumns<schema.XTarget>[] = [
@@ -120,95 +121,6 @@ export const SpeciesItemColumn: ProColumns<schema.XSpeciesItem>[] = [
   {
     title: '创建时间',
     dataIndex: 'createTime',
-    key: 'createTime',
-    width: 200,
-    editable: false,
-  },
-];
-
-/** 事项信息列 */
-export const WorkColumn: ProColumns<IWork>[] = [
-  {
-    title: '序号',
-    valueType: 'index',
-    width: 50,
-  },
-  {
-    title: '办事名称',
-    dataIndex: ['metadata', 'name'],
-    key: 'name',
-    width: 200,
-  },
-  {
-    title: '办事标识',
-    dataIndex: ['metadata', 'code'],
-    key: 'code',
-    width: 200,
-  },
-  {
-    title: '允许新增',
-    dataIndex: ['metadata', 'allowAdd'],
-    key: 'allowAdd',
-    width: 200,
-    render: (_: any, record: IWork) => {
-      return record.metadata.allowAdd ? '是' : '否';
-    },
-  },
-  {
-    title: '允许变更',
-    dataIndex: ['metadata', 'allowEdit'],
-    key: 'allowEdit',
-    width: 200,
-    render: (_: any, record: IWork) => {
-      return record.metadata.allowEdit ? '是' : '否';
-    },
-  },
-  {
-    title: '允许选择',
-    dataIndex: ['metadata', 'allowSelect'],
-    key: 'allowSelect',
-    width: 200,
-    render: (_: any, record: IWork) => {
-      return record.metadata.allowSelect ? '是' : '否';
-    },
-  },
-  {
-    title: '备注',
-    dataIndex: ['metadata', 'remark'],
-    key: 'remark',
-    width: 150,
-  },
-  {
-    key: 'belongId',
-    width: 100,
-    title: '归属用户',
-    dataIndex: ['metadata', 'belongId'],
-    render: (_: any, record: IWork) => {
-      return <EntityIcon entityId={record.metadata.belongId} showName />;
-    },
-  },
-  {
-    key: 'shareId',
-    width: 100,
-    title: '共享用户',
-    dataIndex: ['metadata', 'shareId'],
-    render: (_: any, record: IWork) => {
-      return <EntityIcon entityId={record.metadata.shareId} showName />;
-    },
-  },
-  {
-    title: '创建人',
-    dataIndex: ['metadata', 'createUser'],
-    editable: false,
-    key: 'createUser',
-    width: 150,
-    render: (_: any, record: IWork) => {
-      return <EntityIcon entityId={record.metadata.createUser} showName />;
-    },
-  },
-  {
-    title: '创建时间',
-    dataIndex: ['metadata', 'createTime'],
     key: 'createTime',
     width: 200,
     editable: false,
