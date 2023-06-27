@@ -14,14 +14,6 @@ interface IProps {
   onChanged?: (id: string, data: model.FormEditData) => void;
 }
 
-const createThing = async (userId: string) => {
-  const res = await kernel.anystore.createThing<model.AnyThingModel[]>(userId, 1);
-  if (res.success && res.data && res.data.length > 0) {
-    return res.data[0];
-  }
-  return undefined;
-};
-
 const PrimaryForm: React.FC<IProps> = (props) => {
   if (props.forms.length < 1) return <></>;
   const form = props.forms[0];
@@ -33,7 +25,11 @@ const PrimaryForm: React.FC<IProps> = (props) => {
   );
   useEffect(() => {
     if (!data) {
-      createThing(props.belong.userId).then((value) => setData(value));
+      kernel.anystore.createThing(props.belong.userId, '').then((res) => {
+        if (res.success && res.data) {
+          setData(res.data);
+        }
+      });
     }
   }, []);
   if (!data) return <></>;

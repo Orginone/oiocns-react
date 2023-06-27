@@ -13,14 +13,6 @@ interface IFormEditProps {
   onSave: (values: any) => void;
 }
 
-const createThing = async (userId: string, values: any) => {
-  const res = await kernel.anystore.createThing<model.AnyThingModel[]>(userId, 1);
-  if (res.success && res.data && res.data.length > 0) {
-    return { ...res.data[0], ...values };
-  }
-  return undefined;
-};
-
 const FormEditModal = ({
   form,
   fields,
@@ -52,9 +44,9 @@ const FormEditModal = ({
     ),
     onOk: () => {
       if (create) {
-        createThing(belong.userId, editData).then((item) => {
-          if (item) {
-            onSave(item);
+        kernel.anystore.createThing(belong.userId, '').then((res) => {
+          if (res.success && res.data) {
+            onSave({ ...res.data, ...editData });
             modal.destroy();
           }
         });
