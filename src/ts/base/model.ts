@@ -560,18 +560,20 @@ export type FieldModel = {
   /** 备注(特性描述) */
   remark: string;
   /** 字典(字典项/分类项) */
-  lookups: {
-    /** 唯一标识(项标识) */
-    id: string;
-    /** 描述(项名称) */
-    text: string;
-    /** 值(项代码) */
-    value: string;
-    /** 父级Id(项的父级Id) */
-    parentId?: string;
-    /** 图标 */
-    icon?: string;
-  }[];
+  lookups: FiledLookup[];
+}
+
+export type FiledLookup = {
+  /** 唯一标识(项标识) */
+  id: string;
+  /** 描述(项名称) */
+  text: string;
+  /** 值(项代码) */
+  value: string;
+  /** 父级Id(项的父级Id) */
+  parentId?: string;
+  /** 图标 */
+  icon?: string;
 }
 
 export type FormEditData = {

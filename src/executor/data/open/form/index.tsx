@@ -49,7 +49,8 @@ const FormView: React.FC<IProps> = ({ form, finished }) => {
             new CustomStore({
               key: 'Id',
               async load(loadOptions) {
-                loadOptions.userData = selectMenu.item ? [`S${selectMenu.item.id}`] : [];
+                const item = selectMenu.item?.value;
+                loadOptions.userData = item ? [item] : [];
                 let request: any = { ...loadOptions };
                 const result = await kernel.anystore.loadThing<any>(
                   form.belongId,
