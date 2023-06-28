@@ -252,6 +252,15 @@ export const AnyThingColumns: model.FieldModel[] = [
     remark: '由系统生成的唯一标记,无实义.',
   },
   {
+    id: 'Name',
+    code: 'Name',
+    name: '名称',
+    valueType: '描述型',
+    rule: '{}',
+    lookups: [],
+    remark: '描述信息',
+  },
+  {
     id: 'Creater',
     code: 'Creater',
     name: '创建人',

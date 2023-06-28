@@ -1,9 +1,7 @@
 import { Modal } from 'antd';
 import OioForm from '@/components/Common/FormDesign/OioFormNext';
-import { generateUuid } from '@/ts/base/common';
-import { formatDate } from '@/utils';
 import React from 'react';
-import { model, schema } from '@/ts/base';
+import { kernel, model, schema } from '@/ts/base';
 import { IBelong } from '@/ts/core';
 
 interface IFormEditProps {
@@ -45,18 +43,16 @@ const FormEditModal = ({
       />
     ),
     onOk: () => {
-      modal.destroy();
       if (create) {
-        onSave({
-          ...editData,
-          Status: '正常',
-          Creater: belong.userId,
-          Id: 'uuid' + generateUuid(),
-          CreateTime: formatDate(new Date(), 'yyyy-MM-dd hh:mm:ss.S'),
-          ModifiedTime: formatDate(new Date(), 'yyyy-MM-dd hh:mm:ss.S'),
+        kernel.anystore.createThing(belong.userId, '').then((res) => {
+          if (res.success && res.data) {
+            onSave({ ...res.data, ...editData });
+            modal.destroy();
+          }
         });
       } else {
         onSave(editData);
+        modal.destroy();
       }
     },
   });

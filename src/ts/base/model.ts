@@ -516,6 +516,8 @@ export type WorkInstanceModel = {
   taskId: string;
   // 发起用户ID
   applyId: string;
+  // 子流程数据
+  childrenData: string;
 };
 
 export type InstanceDataModel = {
@@ -558,31 +560,27 @@ export type FieldModel = {
   /** 备注(特性描述) */
   remark: string;
   /** 字典(字典项/分类项) */
-  lookups: {
-    /** 唯一标识(项标识) */
-    id: string;
-    /** 描述(项名称) */
-    text: string;
-    /** 值(项代码) */
-    value: string;
-    /** 父级Id(项的父级Id) */
-    parentId?: string;
-    /** 图标 */
-    icon?: string;
-  }[];
+  lookups: FiledLookup[];
+}
+
+export type FiledLookup = {
+  /** 唯一标识(项标识) */
+  id: string;
+  /** 描述(项名称) */
+  text: string;
+  /** 值(项代码) */
+  value: string;
+  /** 父级Id(项的父级Id) */
+  parentId?: string;
+  /** 图标 */
+  icon?: string;
 }
 
 export type FormEditData = {
-  /** 选择的数据 */
-  source: AnyThingModel[];
-  /** 操作的数据 */
-  changed: {
-    // 唯一id
-    [id: string]: {
-      // 特性id
-      [id: string]: any
-    }
-  };
+  /** 操作前数据体 */
+  before: AnyThingModel[];
+  /** 操作后数据体 */
+  after: AnyThingModel[];
   /** 流程节点Id */
   nodeId: string;
   /** 操作人 */
@@ -648,6 +646,8 @@ export type ApprovalTaskReq = {
   comment: string;
   // 数据
   data: string;
+  // 子流程数据
+  childrenData: string;
 };
 
 export type TargetMessageModel = {

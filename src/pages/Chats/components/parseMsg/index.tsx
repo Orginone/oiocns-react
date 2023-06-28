@@ -4,7 +4,7 @@ import { MessageType, IMessage } from '@/ts/core';
 import { FileItemShare } from '@/ts/base/model';
 import { parseAvatar } from '@/ts/base';
 import { formatSize } from '@/ts/base/common';
-import css from './index.module.less';
+import css from '../../content/chat/GroupContent/index.module.less';
 import { truncateString } from '@/utils/tools';
 
 /** 将链接转化为超链接 */

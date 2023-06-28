@@ -116,6 +116,7 @@ export class WorkTask implements IWorkTask {
           status: status,
           comment: comment,
           data: JSON.stringify(this.instanceData),
+          childrenData: '',
         });
         if (res.data && status < TaskStatus.RefuseStart) {
           if (this.targets && this.targets.length === 2) {

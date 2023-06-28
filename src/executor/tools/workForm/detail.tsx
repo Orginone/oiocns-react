@@ -5,46 +5,26 @@ import React from 'react';
 import { Tabs } from 'antd';
 import { EditModal } from '../editModal';
 import GenerateTable from '../generate/table';
-import { formatDate } from '@/utils';
 
 interface IProps {
   allowEdit: boolean;
   belong: IBelong;
   forms: schema.XForm[];
   data: model.InstanceDataModel;
-  node: model.WorkNodeModel;
+  getFormData: (id: string) => model.FormEditData;
   onChanged?: (id: string, data: model.FormEditData) => void;
 }
-
-const parseLastSource = (data?: model.FormEditData[]) => {
-  if (data && data.length > 0) {
-    const item = data.slice(-1)[0];
-    if (item.source && item.source.length > 0) {
-      return item.source;
-    }
-  }
-  return [];
-};
 
 const DetailTable: React.FC<IProps> = (props) => {
   if (props.forms.length < 1) return <></>;
   const form = props.forms[0];
   if (!props.data.fields[form.id]) return <></>;
   const fields = props.data.fields[form.id];
+  const [formData, setFormData] = useState(props.getFormData(form.id));
   const [selectKeys, setSelectKeys] = useState<string[]>([]);
-  const [dataSource, setDataSource] = useState(parseLastSource(props.data.data[form.id]));
   useEffect(() => {
-    props.onChanged?.apply(this, [
-      form.id,
-      {
-        source: dataSource,
-        changed: {},
-        nodeId: props.node.id,
-        creator: props.belong.userId,
-        createTime: formatDate(new Date(), 'yyyy-MM-dd hh:mm:ss.S'),
-      },
-    ]);
-  }, [dataSource]);
+    props.onChanged?.apply(this, [form.id, formData]);
+  }, [formData]);
   return (
     <GenerateTable
       form={form}
@@ -77,7 +57,8 @@ const DetailTable: React.FC<IProps> = (props) => {
                   belong: props.belong,
                   create: true,
                   onSave: (values) => {
-                    setDataSource([...dataSource, values]);
+                    formData.after.push(values);
+                    setFormData({ ...formData });
                   },
                 });
               },
@@ -98,16 +79,15 @@ const DetailTable: React.FC<IProps> = (props) => {
                   belong: props.belong,
                   create: false,
                   onSave: (values) => {
-                    setDataSource(
-                      dataSource.map((d) => {
-                        if (selectKeys.includes(d.Id)) {
-                          Object.keys(values).forEach((k) => {
-                            d[k] = values[k];
-                          });
-                        }
-                        return d;
-                      }),
-                    );
+                    formData.after = formData.after.map((item) => {
+                      if (selectKeys.includes(item.Id)) {
+                        Object.keys(values).forEach((k) => {
+                          item[k] = values[k];
+                        });
+                      }
+                      return item;
+                    });
+                    setFormData({ ...formData });
                   },
                 });
               },
@@ -127,11 +107,15 @@ const DetailTable: React.FC<IProps> = (props) => {
                   fields: fields,
                   belong: props.belong,
                   onSave: (values) => {
-                    const keys = dataSource.map((i) => i.Id);
-                    setDataSource([
-                      ...dataSource,
-                      ...values.filter((i) => !keys.includes(i.Id)),
-                    ]);
+                    values.forEach((item) => {
+                      if (formData.after.every((i) => i.Id !== item.Id)) {
+                        formData.after.unshift(item);
+                      }
+                      if (formData.before.every((i) => i.Id !== item.Id)) {
+                        formData.before.unshift({ ...item });
+                      }
+                    });
+                    setFormData({ ...formData });
                   },
                 });
               },
@@ -146,8 +130,12 @@ const DetailTable: React.FC<IProps> = (props) => {
               text: '移除',
               icon: 'remove',
               onClick: () => {
-                setDataSource(dataSource.filter((i) => !selectKeys.includes(i.Id)));
+                formData.before = formData.before.filter(
+                  (i) => !selectKeys.includes(i.Id),
+                );
+                formData.after = formData.after.filter((i) => !selectKeys.includes(i.Id));
                 setSelectKeys([]);
+                setFormData({ ...formData });
               },
             },
             visible: selectKeys.length > 0,
@@ -162,7 +150,8 @@ const DetailTable: React.FC<IProps> = (props) => {
           },
         ],
       }}
-      dataSource={dataSource}
+      dataSource={formData.after}
+      beforeSource={formData.before}
       hideColumns={['Creater', 'CreateTime', 'ModifiedTime']}
     />
   );

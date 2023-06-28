@@ -1,102 +1,120 @@
 import React from 'react';
 import { model, parseAvatar } from '../../../ts/base';
-import { Column, Lookup } from 'devextreme-react/data-grid';
+import { Column, IColumnProps } from 'devextreme-react/data-grid';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import { formatSize, generateUuid } from '@/ts/base/common';
+import { formatDate } from '@/utils';
 
 /** 使用form生成表单列 */
 export const GenerateColumn = (
   field: model.FieldModel,
+  beforeSource: model.AnyThingModel[] | undefined,
   hideColumns: string[] | undefined,
   dataIndex: 'attribute' | 'property' | undefined,
 ) => {
-  const props = {
-    key: generateUuid(),
+  const props: IColumnProps = {
     caption: field.name,
     visible: !hideColumns?.includes(field.id),
     dataField: dataIndex === 'attribute' ? field.id : field.code,
   };
+  const cellRender: any = {};
   switch (field.valueType) {
     case '时间型':
-      return (
-        <Column
-          {...props}
-          dataType="datetime"
-          width={250}
-          headerFilter={{
-            groupInterval: 'day',
-          }}
-          format="yyyy年MM月dd日 HH:mm:ss"
-        />
-      );
+      props.dataType = 'datetime';
+      props.width = 200;
+      props.headerFilter = {
+        groupInterval: 'day',
+      };
+      props.allowHeaderFiltering = false;
+      props.format = 'yyyy年MM月dd日 HH:mm:ss';
+      cellRender.calcText = (value: string) => {
+        return formatDate(new Date(value), 'yyyy年MM月dd日 HH:mm:ss');
+      };
+      break;
     case '日期型':
-      return (
-        <Column
-          {...props}
-          dataType="date"
-          width={180}
-          headerFilter={{
-            groupInterval: 'day',
-          }}
-          format="yyyy年MM月dd日"
-        />
-      );
+      props.dataType = 'date';
+      props.width = 180;
+      props.headerFilter = {
+        groupInterval: 'day',
+      };
+      props.allowHeaderFiltering = false;
+      props.format = 'yyyy年MM月dd日';
+      cellRender.calcText = (value: string) => {
+        return formatDate(new Date(value), 'yyyy年MM月dd日');
+      };
+      break;
     case '选择型':
     case '分类型':
-      return (
-        <Column
-          {...props}
-          width={200}
-          headerFilter={{
-            allowSearch: true,
-            dataSource: field.lookups,
-          }}>
-          <Lookup dataSource={field.lookups} displayExpr="text" valueExpr="value" />
-        </Column>
-      );
+      props.width = 200;
+      props.headerFilter = {
+        allowSearch: true,
+        dataSource: field.lookups,
+      };
+      props.lookup = {
+        dataSource: field.lookups,
+        displayExpr: 'text',
+        valueExpr: 'value',
+      };
+      cellRender.calcText = (value: string) => {
+        return field.lookups.find((i) => i.value === value)?.text || value;
+      };
+      break;
     case '数值型':
-      return (
-        <Column
-          {...props}
-          fixed={field.id === 'Id'}
-          dataType="number"
-          width={150}
-          allowHeaderFiltering={false}
-        />
-      );
+      props.dataType = 'number';
+      props.width = 150;
+      props.allowHeaderFiltering = false;
+      props.fixed = field.id === 'Id';
+      break;
     case '用户型':
-      return (
-        <Column
-          {...props}
-          dataType="string"
-          width={150}
-          allowFiltering={false}
-          cellRender={(data: any) => {
-            return <EntityIcon entityId={data.value} size={15} showName />;
-          }}
-        />
-      );
+      props.dataType = 'string';
+      props.width = 150;
+      props.allowFiltering = false;
+      cellRender.render = (data: any) => {
+        return <EntityIcon entityId={data.value} size={15} showName />;
+      };
+      break;
     case '附件型':
-      return (
-        <Column
-          {...props}
-          dataType="string"
-          width={150}
-          allowFiltering={false}
-          cellRender={(data: any) => {
-            const shares = parseAvatar(data.value);
-            if (shares) {
-              return shares.map((share: model.FileItemShare, i: number) => {
-                return <div key={i}>{`${share.name}(${formatSize(share.size)})`}</div>;
-              });
-            }
-            return '';
-          }}
-        />
-      );
+      props.dataType = 'string';
+      props.width = 150;
+      props.allowFiltering = false;
+      cellRender.render = (data: any) => {
+        const shares = parseAvatar(data.value);
+        if (shares) {
+          return shares.map((share: model.FileItemShare, i: number) => {
+            return <div key={i}>{`${share.name}(${formatSize(share.size)})`}</div>;
+          });
+        }
+        return '';
+      };
+      break;
     default:
-      return (
-        <Column {...props} dataType="string" width={180} allowHeaderFiltering={false} />
-      );
+      props.dataType = 'string';
+      props.width = 180;
+      props.allowHeaderFiltering = false;
+      break;
   }
+  if (beforeSource && beforeSource.length > 0) {
+    props.cellRender = (data: any) => {
+      const text = cellRender.render ? cellRender.render(data) : data.text;
+      if (data?.data?.Id && data?.column?.dataField) {
+        const before = beforeSource.find((i) => i.Id === data.data.Id);
+        if (before) {
+          const beforeValue = before[data.column.dataField];
+          if (beforeValue != data.value) {
+            const beforeText = cellRender.calcText
+              ? cellRender.calcText(beforeValue)
+              : beforeValue;
+            return (
+              <span>
+                <span style={{ marginRight: 6 }}>{beforeText}</span>
+                <a>{text}</a>
+              </span>
+            );
+          }
+        }
+      }
+      return text;
+    };
+  }
+  return <Column key={generateUuid()} {...props} />;
 };

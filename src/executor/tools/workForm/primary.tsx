@@ -1,36 +1,65 @@
 import OioForm from '@/components/Common/FormDesign/OioFormNext';
-import { formatDate } from '@/utils';
-import { model, schema } from '../../../ts/base';
+import { kernel, model, schema } from '../../../ts/base';
 import { IBelong } from '@/ts/core';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import React from 'react';
 import { Tabs } from 'antd';
-import { generateUuid } from '@/ts/base/common';
 
 interface IProps {
   allowEdit: boolean;
   belong: IBelong;
   forms: schema.XForm[];
   data: model.InstanceDataModel;
-  node: model.WorkNodeModel;
+  getFormData: (id: string) => model.FormEditData;
   onChanged?: (id: string, data: model.FormEditData) => void;
 }
 
-const parseLastSource = (data: model.FormEditData[], userId: string) => {
-  if (data && data.length > 0) {
-    const item = data.slice(-1)[0];
-    if (item.source && item.source.length > 0) {
-      return item.source.slice(-1)[0];
+const PrimaryForm: React.FC<IProps> = (props) => {
+  if (props.forms.length < 1) return <></>;
+  const form = props.forms[0];
+  if (!props.data.fields[form.id]) return <></>;
+  const fields = props.data.fields[form.id];
+  const formData = props.getFormData(form.id);
+  const [data, setData] = useState(
+    formData.after.length > 0 ? formData.after[0] : undefined,
+  );
+  useEffect(() => {
+    if (!data) {
+      kernel.anystore.createThing(props.belong.userId, '').then((res) => {
+        if (res.success && res.data) {
+          setData(res.data);
+        }
+      });
     }
-  }
-  return {
-    Status: '正常',
-    Creater: userId,
-    Name: '',
-    Id: 'uuid' + generateUuid(),
-    CreateTime: formatDate(new Date(), 'yyyy-MM-dd hh:mm:ss.S'),
-    ModifiedTime: formatDate(new Date(), 'yyyy-MM-dd hh:mm:ss.S'),
-  };
+  }, []);
+  if (!data) return <></>;
+  return (
+    <OioForm
+      key={form.id}
+      form={form}
+      fields={fields}
+      fieldsValue={data}
+      belong={props.belong}
+      disabled={!props.allowEdit}
+      submitter={{
+        resetButtonProps: {
+          style: { display: 'none' },
+        },
+        render: (_: any, _dom: any) => <></>,
+      }}
+      onValuesChange={(a) => {
+        if (props.allowEdit) {
+          Object.keys(a).forEach((k) => {
+            data[k] = a[k];
+            props.data.primary[k] = a[k];
+          });
+          formData.after = [data];
+          props.onChanged?.apply(this, [form.id, formData]);
+          setData({ ...data });
+        }
+      }}
+    />
+  );
 };
 
 const PrimaryForms: React.FC<IProps> = (props) => {
@@ -38,44 +67,10 @@ const PrimaryForms: React.FC<IProps> = (props) => {
   const [activeTabKey, setActiveTabKey] = useState(props.forms[0].id);
   const loadItems = () => {
     return props.forms.map((form) => {
-      const source = parseLastSource(props.data.data[form.id], props.belong.userId);
-      const changed: any = {};
-      changed[source.Id] = {};
       return {
         key: form.id,
         label: form.name,
-        children: (
-          <OioForm
-            key={form.id}
-            form={form}
-            fields={props.data.fields[form.id]}
-            fieldsValue={source}
-            belong={props.belong}
-            disabled={!props.allowEdit}
-            submitter={{
-              resetButtonProps: {
-                style: { display: 'none' },
-              },
-              render: (_: any, _dom: any) => <></>,
-            }}
-            onValuesChange={(a, values) => {
-              Object.keys(a).forEach((k) => {
-                changed[source.Id][k] = a[k];
-                props.data.primary[k] = a[k];
-              });
-              props.onChanged?.apply(this, [
-                form.id,
-                {
-                  source: [{ ...source, ...values }],
-                  changed: changed,
-                  nodeId: props.node.id,
-                  creator: props.belong.userId,
-                  createTime: formatDate(new Date(), 'yyyy-MM-dd hh:mm:ss.S'),
-                },
-              ]);
-            }}
-          />
-        ),
+        children: <PrimaryForm {...props} forms={[form]} />,
       };
     });
   };

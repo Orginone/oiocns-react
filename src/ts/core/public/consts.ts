@@ -14,7 +14,7 @@ export const orgAuth = {
 };
 /** 数据存储集合名称 */
 export const storeCollName = {
-  WorkTask: 'work-task',
+  WorkTask: 'work-tasks',
   WorkInstance: 'work-instances',
   ChatMessage: 'chat-message',
 };

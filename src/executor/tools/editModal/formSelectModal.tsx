@@ -4,6 +4,7 @@ import { kernel, model, schema } from '@/ts/base';
 import { IBelong } from '@/ts/core';
 import GenerateTable from '../generate/table';
 import CustomStore from 'devextreme/data/custom_store';
+import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 
 interface IFormSelectProps {
   form: schema.XForm;
@@ -15,7 +16,7 @@ interface IFormSelectProps {
 const FormSelectModal = ({ form, fields, belong, onSave }: IFormSelectProps) => {
   const editData: { rows: model.AnyThingModel[] } = { rows: [] };
   const modal = Modal.confirm({
-    icon: <></>,
+    icon: <EntityIcon entityId={form.id} showName />,
     width: '80vw',
     okText: `确认选择`,
     cancelText: '关闭',

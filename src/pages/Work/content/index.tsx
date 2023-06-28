@@ -78,7 +78,9 @@ const TaskContent = (props: IProps) => {
       case GroupMenuType.Done:
         break;
       case GroupMenuType.Apply:
-        if (items.filter((i) => i.metadata.status < TaskStatus.ApplyStart).length > 0) {
+        if (
+          items.filter((i) => i.metadata.status < TaskStatus.ApprovalStart).length > 0
+        ) {
           operates.push({
             key: 'confirm',
             label: '取消',
@@ -86,6 +88,7 @@ const TaskContent = (props: IProps) => {
               items.forEach(async (item) => {
                 await item.approvalTask(-1, '取消申请');
               });
+              orgCtrl.work.notity.changCallback();
             },
           });
         }

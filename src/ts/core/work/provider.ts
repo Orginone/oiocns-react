@@ -1,10 +1,8 @@
 import { common, kernel, model, schema } from '../../base';
-import { PageAll } from '../public/consts';
+import { PageAll, storeCollName } from '../public/consts';
 import { TaskStatus } from '../public/enums';
 import { UserProvider } from '../user';
 import { IWorkTask, WorkTask } from './task';
-// 历史任务存储集合名称
-const hisWorkCollName = 'work-task';
 export interface IWorkProvider {
   /** 用户ID */
   userId: string;
@@ -71,7 +69,7 @@ export class WorkProvider implements IWorkProvider {
   async loadDones(req: model.IdPageModel): Promise<model.PageResult<IWorkTask>> {
     const res = await kernel.anystore.pageRequest<schema.XWorkTask>(
       this.userId,
-      hisWorkCollName,
+      storeCollName.WorkTask,
       {
         match: {
           belongId: req.id,
@@ -98,7 +96,7 @@ export class WorkProvider implements IWorkProvider {
   async loadApply(req: model.IdPageModel): Promise<model.PageResult<IWorkTask>> {
     const res = await kernel.anystore.pageRequest<schema.XWorkTask>(
       this.userId,
-      hisWorkCollName,
+      storeCollName.WorkTask,
       {
         match: {
           belongId: req.id,

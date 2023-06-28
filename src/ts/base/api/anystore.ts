@@ -10,6 +10,7 @@ import {
 import StoreHub from './storehub';
 import { blobToDataUrl, encodeKey, generateUuid, logger, sliceFile } from '../common';
 import axios from 'axios';
+import { model } from '..';
 
 /**
  * 任意数据存储类
@@ -400,28 +401,16 @@ export default class AnyStore {
     return await this._restRequest('Thing', 'Load', options, {});
   }
   /**
-   * 加载物的归档信息
-   * @param  过滤参数
-   * @returns {ResultType<T>} 移除异步结果
-   */
-  public async loadThingArchives<T>(
-    belongId: string,
-    options: any,
-  ): Promise<ResultType<T>> {
-    if (this._storeHub.isConnected) {
-      return await this._storeHub.invoke('LoadArchives', belongId, options);
-    }
-    options.belongId = belongId;
-    return await this._restRequest('Thing', 'LoadArchives', options, {});
-  }
-  /**
    * 创建物
-   * @param  创建数量
-   * @returns {ResultType<T>} 移除异步结果
+   * @param name 物的名称
+   * @returns {ResultType<model.AnyThingModel>} 移除异步结果
    */
-  public async createThing<T>(belongId: string, number: number): Promise<ResultType<T>> {
+  public async createThing(
+    belongId: string,
+    name: string,
+  ): Promise<ResultType<model.AnyThingModel>> {
     if (this._storeHub.isConnected) {
-      return await this._storeHub.invoke('Create', belongId, number);
+      return await this._storeHub.invoke('Create', belongId, name);
     }
     return await this._restRequest(
       'Thing',
@@ -429,7 +418,7 @@ export default class AnyStore {
       {
         belongId: belongId,
       },
-      number,
+      name,
     );
   }
   /**

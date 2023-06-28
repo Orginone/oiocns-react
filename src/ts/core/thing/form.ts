@@ -44,6 +44,9 @@ export class Form extends FileInfo<schema.XForm> implements IForm {
   fields: model.FieldModel[] = [];
   attributes: schema.XAttribute[] = [];
   private _attributeLoaded: boolean = false;
+  get id(): string {
+    return this._metadata.id.replace('_', '');
+  }
   async rename(name: string): Promise<boolean> {
     return await this.update({ ...this.metadata, name: name });
   }
