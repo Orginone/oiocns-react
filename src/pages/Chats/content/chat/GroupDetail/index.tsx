@@ -77,7 +77,7 @@ const Groupdetail: React.FC<any> = ({ chat }: { chat: IMsgChat }) => {
       {chat.members.map((item) => {
         return (
           <div key={getUuid()} title={item.name} className={detailStyle.show_persons}>
-            <TeamIcon size={36} preview typeName={item.typeName} entityId={item.id} />
+            <TeamIcon size={36} typeName={item.typeName} entityId={item.id} />
             <Typography className={detailStyle.img_list_con_name}>{item.name}</Typography>
           </div>
         );

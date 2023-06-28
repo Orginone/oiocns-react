@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Avatar, Image } from 'antd';
+import { Avatar } from 'antd';
 import orgCtrl from '@/ts/controller';
 import { ShareIcon } from '@/ts/base/model';
 import { parseAvatar, schema } from '@/ts/base';
 import TypeIcon from './typeIcon';
 
 interface teamTypeInfo {
-  preview?: boolean;
   size?: number;
   entityId?: string;
   entity?: schema.XEntity;
@@ -18,7 +17,6 @@ interface teamTypeInfo {
 
 /** 组织图标 */
 const EntityIcon = (info: teamTypeInfo) => {
-  const [preview, setPreview] = useState(false);
   const [share, setShare] = useState<ShareIcon>();
   const size = info.size ?? 22;
   useEffect(() => {
@@ -44,25 +42,7 @@ const EntityIcon = (info: teamTypeInfo) => {
   if (share?.avatar && share?.avatar.thumbnail) {
     return (
       <div style={{ cursor: 'pointer', display: 'contents' }} title={info.title ?? ''}>
-        {info.preview && (
-          <Image
-            style={{ display: 'none' }}
-            preview={{
-              visible: preview,
-              src: share.avatar.shareLink,
-              onVisibleChange: (value) => {
-                setPreview(value);
-              },
-            }}
-          />
-        )}
-        <Avatar
-          size={size}
-          src={share.avatar.thumbnail}
-          onClick={() => {
-            setPreview(true);
-          }}
-        />
+        <Avatar size={size + 6} src={share.avatar.thumbnail} />
         {info.showName && <b style={{ marginLeft: 6 }}>{share.name}</b>}
       </div>
     );
