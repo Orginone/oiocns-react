@@ -27,7 +27,7 @@ const ChartDesign: React.FC<IProps> = (props) => {
             style={{ transform: `scale(${(props.scale ?? 100) / 100})` }}>
             {/* 树结构展示 */}
             <ProcessTree
-              define={props.current}
+              target={props.current?.directory.target}
               isEdit={props.isEdit}
               resource={props.resource}
               onSelectedNode={(params) => {

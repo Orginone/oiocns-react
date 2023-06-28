@@ -3,7 +3,7 @@ import InsertButton from '../InsertButton';
 import { AiOutlineClose } from 'react-icons/ai';
 import cls from './index.module.less';
 import SelectOrg from '../selectOrg';
-import { IWork } from '@/ts/core';
+import { ITarget } from '@/ts/core';
 import { dataType } from '@/components/Common/FlowDesign/processType';
 
 type DeptWayNodeProps = {
@@ -12,7 +12,7 @@ type DeptWayNodeProps = {
   onSelected: Function;
   config: any;
   level: any;
-  define?: IWork;
+  target?: ITarget;
   isEdit: boolean;
 };
 
@@ -22,10 +22,10 @@ type DeptWayNodeProps = {
  */
 const DeptWayNode: React.FC<DeptWayNodeProps> = (props: DeptWayNodeProps) => {
   const [key, setKey] = useState<number>(0);
-  const [orgId, setOrgId] = useState<string>();
+  const [orgId, setOrgId] = useState<string>(props.target?.id || '');
 
   useEffect(() => {
-    if (props.isEdit && props.define) {
+    if (props.isEdit && props.target) {
       if (props.config.conditions.length == 0) {
         props.config.conditions = [
           {
@@ -35,13 +35,13 @@ const DeptWayNode: React.FC<DeptWayNodeProps> = (props: DeptWayNodeProps) => {
             key: 'EQ',
             label: '=',
             type: dataType.BELONG,
-            val: props.define.application?.directory.target.id,
-            display: props.define.application?.directory.target.name,
+            val: props.target,
+            display: props.target.name,
           },
         ];
         setKey(key + 1);
       }
-      setOrgId(props.define.metadata.shareId);
+      setOrgId(props.target.id);
     }
   }, []);
 
@@ -76,12 +76,12 @@ const DeptWayNode: React.FC<DeptWayNodeProps> = (props: DeptWayNodeProps) => {
             className={cls['node-body-main-content']}
             onClick={() => props.onSelected()}>
             <span>
-              {props.isEdit && props.define ? (
+              {props.isEdit && props.target ? (
                 <SelectOrg
                   key={key}
                   onChange={onChange}
                   orgId={orgId}
-                  target={props.define.application!.directory.target}
+                  target={props.target}
                   value={props.config.conditions[0]?.val}
                   rootDisable={false}
                 />

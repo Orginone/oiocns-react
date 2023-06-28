@@ -1,13 +1,13 @@
-import { AddNodeType, NodeModel, dataType } from '../../processType';
+import { AddNodeType, NodeModel, dataType, getNewBranchNode } from '../../processType';
 import { Button, message } from 'antd';
-import { IWork } from '@/ts/core';
+import { ITarget } from '@/ts/core';
 import React, { useState } from 'react';
 import cls from './index.module.less';
-import { isBranchNode, getConditionNodeName, getNodeCode } from '../../processType';
-import { Concurrent, DeptWay, Condition, Node } from './Components';
+import { isBranchNode, getNodeName, getNodeCode } from '../../processType';
+import { decodeAppendDom } from './Components';
 
 type IProps = {
-  define?: IWork;
+  target?: ITarget;
   resource: NodeModel;
   isEdit: boolean;
   onSelectedNode: (params: NodeModel) => void;
@@ -17,7 +17,7 @@ type IProps = {
  * 流程树
  * @returns
  */
-const ProcessTree: React.FC<IProps> = ({ define, resource, onSelectedNode, isEdit }) => {
+const ProcessTree: React.FC<IProps> = ({ target, resource, onSelectedNode, isEdit }) => {
   const [key, setKey] = useState(0);
   const [nodeMap] = useState(new Map<string, NodeModel>());
 
@@ -25,143 +25,71 @@ const ProcessTree: React.FC<IProps> = ({ define, resource, onSelectedNode, isEdi
   const getDomTree = (node?: NodeModel): any => {
     if (node && node.code) {
       nodeMap.set(node.code, node);
-      switch (node.type) {
-        case AddNodeType.ROOT:
-        case AddNodeType.APPROVAL:
-        case AddNodeType.CHILDWORK:
-        case AddNodeType.CC:
-          return [
-            <div className={cls['primary-node']}>
-              {decodeAppendDom(node, {})}
-              {getDomTree(node.children)}
-            </div>,
-          ];
-        case AddNodeType.CONDITION:
-        case AddNodeType.CONCURRENTS:
-        case AddNodeType.ORGANIZATIONA:
-          //遍历分支节点，包含并行及条件节点
-          let branchItems = node.branches.map((branchNode: any, index: number) => {
-            nodeMap.set(node.code, node);
-            let childDoms = getDomTree(branchNode.children);
-            //插入4条横线，遮挡掉条件节点左右半边线条
-            insertCoverLine(index, childDoms, node.branches);
-            return (
-              <div key={branchNode.key} className={cls[`branch-node-item`]}>
-                {decodeAppendDom(branchNode, {
-                  level: index,
-                  size: node.branches?.length ?? 0,
-                  _disabled: branchNode?._disabled,
-                  _executable: branchNode?._executable,
-                  _passed: branchNode?._passed,
-                })}
-                {childDoms}
+      if (node.branches && node.branches.length > 0) {
+        //遍历分支节点，包含并行及条件节点
+        let branchItems = node.branches.map((branchNode: any, index: number) => {
+          nodeMap.set(branchNode.code, branchNode);
+          let childDoms = getDomTree(branchNode.children);
+          //插入4条横线，遮挡掉条件节点左右半边线条
+          insertCoverLine(index, childDoms, node.branches.length - 1);
+          return (
+            <div key={branchNode.key} className={cls[`branch-node-item`]}>
+              {loadNodeDom(branchNode)}
+              {childDoms}
+            </div>
+          );
+        });
+        return [
+          <div>
+            <div className={cls['branch-node']}>
+              <div className={cls['add-branch-btn']}>
+                <Button
+                  size="small"
+                  className={cls[`add-branch-btn-el`]}
+                  onClick={() => addBranchNode(node)}>
+                  {`添加${getNodeName(node.type)}`}
+                </Button>
               </div>
-            );
-          });
-          return [
-            <div>
-              <div className={cls['branch-node']}>
-                <div className={cls['add-branch-btn']}>
-                  <Button
-                    size="small"
-                    className={cls[`add-branch-btn-el`]}
-                    onClick={() => addBranchNode(node)}>
-                    {`添加${getConditionNodeName(node)}`}
-                  </Button>
-                </div>
-                {branchItems}
-              </div>
-              {getDomTree(node.children)}
-            </div>,
-          ];
-        case AddNodeType.EMPTY:
-          return [
-            <div className={cls['empty-node']}>
-              {decodeAppendDom(node, {})}
-              {getDomTree(node.children)}
-            </div>,
-          ];
-        default:
-          return [];
+              {branchItems}
+            </div>
+            {getDomTree(node.children)}
+          </div>,
+        ];
       }
+      return [
+        <div className={cls['primary-node']}>
+          {loadNodeDom(node)}
+          {getDomTree(node.children)}
+        </div>,
+      ];
     }
     return [];
   };
-  //解码渲染的时候插入dom到同级
-  const decodeAppendDom = (node: NodeModel, props = {}) => {
-    if (node && node.code != '') {
-      const config = {
-        isEdit,
-        level: 1,
-        ...props,
-        config: node,
-        define: define,
-        key: getNodeCode(),
-        //定义事件，插入节点，删除节点，选中节点，复制/移动
-        onInsertNode: (type: any) => insertNode(type, node),
-        onDelNode: () => delNode(node),
-        onSelected: () => onSelectedNode(node),
-      };
-      switch (node.type) {
-        case AddNodeType.CONDITION:
-          return <Condition {...config} />;
-        case AddNodeType.CONCURRENTS:
-          return <Concurrent {...config} />;
-        case AddNodeType.ORGANIZATIONA:
-          return <DeptWay {...config} />;
-        default:
-          return <Node {...config} />;
-      }
-    }
-    return <></>;
+
+  // 加载节点
+  const loadNodeDom = (node: NodeModel) => {
+    return decodeAppendDom(node, {
+      isEdit,
+      target,
+      level: 1,
+      config: node,
+      //定义事件，插入节点，删除节点，选中节点，复制/移动
+      onInsertNode: (type: any) => insertNode(type, node),
+      onDelNode: () => delNode(node),
+      onSelected: () => onSelectedNode(node),
+    });
   };
 
   // 新增连线
-  const insertCoverLine = (index: any, doms: any[], branches: NodeModel[]) => {
+  const insertCoverLine = (index: number, doms: any[], maxIndex: number) => {
+    //最左侧分支
     if (index === 0) {
-      //最左侧分支
-      doms.unshift(
-        React.createElement(
-          'div',
-          {
-            className: cls['line-top-left'],
-            key: getNodeCode(),
-          },
-          [],
-        ),
-      );
-      doms.unshift(
-        React.createElement(
-          'div',
-          {
-            className: cls['line-bot-left'],
-            key: getNodeCode(),
-          },
-          [],
-        ),
-      );
-    } else if (index === branches.length - 1) {
+      doms.unshift(<div key={getNodeCode()} className={cls['line-top-left']} />);
+      doms.unshift(<div key={getNodeCode()} className={cls['line-bot-left']} />);
+    } else if (index === maxIndex) {
       //最右侧分支
-      doms.unshift(
-        React.createElement(
-          'div',
-          {
-            className: cls['line-top-right'],
-            key: getNodeCode(),
-          },
-          [],
-        ),
-      );
-      doms.unshift(
-        React.createElement(
-          'div',
-          {
-            className: cls['line-bot-right'],
-            key: getNodeCode(),
-          },
-          [],
-        ),
-      );
+      doms.unshift(<div key={getNodeCode()} className={cls['line-top-right']} />);
+      doms.unshift(<div key={getNodeCode()} className={cls['line-bot-right']} />);
     }
   };
 
@@ -171,78 +99,21 @@ const ProcessTree: React.FC<IProps> = ({ define, resource, onSelectedNode, isEdi
     let nextNode = parentNode.children || {};
     let newNode: any = {
       type: type,
+      name: getNodeName(type),
       code: getNodeCode(),
       parentCode: parentNode.code,
     };
-    let emptyNode: any = {
-      code: getNodeCode(),
-      type: AddNodeType.EMPTY,
-    };
+    let isBrance = true;
     switch (type as AddNodeType) {
-      case AddNodeType.APPROVAL:
-        newNode.name = '审批对象';
-        break;
-      case AddNodeType.CC:
-        newNode.name = '抄送对象';
-        break;
-      case AddNodeType.CHILDWORK:
-        newNode.name = '其他办事';
-        break;
       case AddNodeType.CONDITION:
-        newNode.name = '条件分支';
-        newNode.branches = [
-          {
-            code: getNodeCode(),
-            parentCode: newNode.code,
-            type: AddNodeType.CONDITION,
-            conditions: [],
-            name: '条件1',
-          },
-          {
-            code: getNodeCode(),
-            parentCode: newNode.code,
-            type: AddNodeType.CONDITION,
-            conditions: [],
-            name: '条件2',
-          },
-        ];
-        break;
       case AddNodeType.CONCURRENTS:
-        newNode.name = '并行分支';
-        newNode.branches = [
-          {
-            code: getNodeCode(),
-            name: '并行分支1',
-            parentCode: newNode.code,
-            type: AddNodeType.CONCURRENTS,
-            props: {},
-            children: {},
-          },
-          {
-            code: getNodeCode(),
-            name: '并行分支2',
-            parentCode: newNode.code,
-            type: AddNodeType.CONCURRENTS,
-            props: {},
-            children: {},
-          },
-        ];
+        newNode.branches = [getNewBranchNode(newNode, 1), getNewBranchNode(newNode, 2)];
         break;
       case AddNodeType.ORGANIZATIONA:
-        newNode.name = '组织分支';
         newNode.branches = [
+          getNewBranchNode(newNode, 1),
           {
-            code: getNodeCode(),
-            parentCode: newNode.code,
-            type: AddNodeType.ORGANIZATIONA,
-            conditions: [],
-            name: '组织分支1',
-          },
-          {
-            code: getNodeCode(),
-            parentCode: newNode.code,
-            type: AddNodeType.ORGANIZATIONA,
-            conditions: [
+            ...getNewBranchNode(newNode, 1, [
               {
                 pos: 1,
                 paramKey: '0',
@@ -253,25 +124,27 @@ const ProcessTree: React.FC<IProps> = ({ define, resource, onSelectedNode, isEdi
                 type: dataType.BELONG,
                 val: '0',
               },
-            ],
+            ]),
             readonly: true,
             name: '其他',
           },
         ];
         break;
       default:
+        isBrance = false;
+        nextNode.parentCode = newNode.code;
+        newNode.children = nextNode;
         break;
     }
-    if (isBranchNode(type)) {
+    if (isBrance) {
+      let emptyCode = getNodeCode();
       newNode.children = {
-        ...emptyNode,
+        code: getNodeCode(),
+        type: AddNodeType.EMPTY,
         parentCode: newNode.code,
         children: nextNode,
       };
-      nextNode.parentCode = emptyNode.code;
-    } else {
-      nextNode.parentCode = newNode.code;
-      newNode.children = nextNode;
+      nextNode.parentCode = emptyCode;
     }
     parentNode.children = newNode;
     setKey(key + 1);
@@ -283,7 +156,7 @@ const ProcessTree: React.FC<IProps> = ({ define, resource, onSelectedNode, isEdi
     let parentNode = nodeMap.get(node.parentCode);
     if (parentNode) {
       //判断该节点的父节点是不是分支节点
-      if (isBranchNode(parentNode.type) && parentNode.branches.length > 0) {
+      if (isBranchNode(parentNode.type) && parentNode.branches) {
         //移除该分支
         parentNode.branches.splice(parentNode.branches.indexOf(node), 1);
         //处理只剩1个分支的情况
@@ -334,23 +207,13 @@ const ProcessTree: React.FC<IProps> = ({ define, resource, onSelectedNode, isEdi
   // 添加分支
   const addBranchNode = (node: any) => {
     if (node.type == AddNodeType.ORGANIZATIONA) {
-      node.branches.splice(node.branches.length - 1, 0, {
-        code: getNodeCode(),
-        parentCode: node.code,
-        name: getConditionNodeName(node) + node.branches.length,
-        conditions: [],
-        type: node.type,
-        children: {},
-      });
+      node.branches.splice(
+        node.branches.length - 1,
+        0,
+        getNewBranchNode(node, node.branches.length),
+      );
     } else {
-      node.branches.push({
-        code: getNodeCode(),
-        parentCode: node.code,
-        name: getConditionNodeName(node) + (node.branches.length + 1),
-        conditions: [],
-        type: node.type,
-        children: {},
-      });
+      node.branches.push(getNewBranchNode(node, node.branches.length + 1));
     }
     setKey(key + 1);
   };

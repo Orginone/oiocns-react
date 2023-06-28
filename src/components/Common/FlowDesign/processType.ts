@@ -13,8 +13,14 @@ export const isBranchNode = (type: AddNodeType) => {
   ].includes(type);
 };
 
-export const getConditionNodeName = (node: any) => {
-  switch (node.type) {
+export const getNodeName = (type: AddNodeType) => {
+  switch (type) {
+    case AddNodeType.APPROVAL:
+      return '审批对象';
+    case AddNodeType.CC:
+      return '抄送对象';
+    case AddNodeType.CHILDWORK:
+      return '其他办事';
     case AddNodeType.CONDITION:
       return '条件分支';
     case AddNodeType.CONCURRENTS:
@@ -24,6 +30,17 @@ export const getConditionNodeName = (node: any) => {
     default:
       return '';
   }
+};
+
+export const getNewBranchNode = (node: NodeModel, index: number, conditions?: any) => {
+  return {
+    code: getNodeCode(),
+    parentCode: node.code,
+    name: getNodeName(node.type) + index,
+    conditions: conditions || [],
+    type: node.type,
+    children: {},
+  };
 };
 
 // 类型 枚举
