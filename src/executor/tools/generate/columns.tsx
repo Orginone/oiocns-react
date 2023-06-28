@@ -25,6 +25,7 @@ export const GenerateColumn = (
       props.headerFilter = {
         groupInterval: 'day',
       };
+      props.allowHeaderFiltering = false;
       props.format = 'yyyy年MM月dd日 HH:mm:ss';
       cellRender.calcText = (value: string) => {
         return formatDate(new Date(value), 'yyyy年MM月dd日 HH:mm:ss');
@@ -36,6 +37,7 @@ export const GenerateColumn = (
       props.headerFilter = {
         groupInterval: 'day',
       };
+      props.allowHeaderFiltering = false;
       props.format = 'yyyy年MM月dd日';
       cellRender.calcText = (value: string) => {
         return formatDate(new Date(value), 'yyyy年MM月dd日');
@@ -60,6 +62,7 @@ export const GenerateColumn = (
     case '数值型':
       props.dataType = 'number';
       props.width = 150;
+      props.allowHeaderFiltering = false;
       props.fixed = field.id === 'Id';
       break;
     case '用户型':
