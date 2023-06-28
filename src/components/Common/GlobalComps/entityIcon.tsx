@@ -42,7 +42,7 @@ const EntityIcon = (info: teamTypeInfo) => {
   if (share?.avatar && share?.avatar.thumbnail) {
     return (
       <div style={{ cursor: 'pointer', display: 'contents' }} title={info.title ?? ''}>
-        <Avatar size={size + 6} src={share.avatar.thumbnail} />
+        <Avatar size={size + 4} src={share.avatar.thumbnail} />
         {info.showName && <b style={{ marginLeft: 6 }}>{share.name}</b>}
       </div>
     );
