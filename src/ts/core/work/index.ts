@@ -17,7 +17,7 @@ export interface IWork extends IFileInfo<schema.XWorkDefine> {
   /** 加载事项定义节点 */
   loadWorkNode(reload?: boolean): Promise<model.WorkNodeModel | undefined>;
   /** 加载事项定义节点关联的表单 */
-  loadWorkForms(): Promise<IForm[]>;
+  loadWorkForms(reload?: boolean): Promise<IForm[]>;
   /** 生成办事申请单 */
   createApply(): Promise<IWorkApply | undefined>;
 }
@@ -136,9 +136,11 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
     }
     return this.node;
   }
-  async loadWorkForms(): Promise<IForm[]> {
+  async loadWorkForms(reload: boolean = false): Promise<IForm[]> {
     const forms: IForm[] = [];
-    await this.loadWorkNode(true);
+    if (!reload) {
+      await this.loadWorkNode(true);
+    }
     if (this.node) {
       const recursionForms = async (node: model.WorkNodeModel) => {
         for (const item of node.forms ?? []) {

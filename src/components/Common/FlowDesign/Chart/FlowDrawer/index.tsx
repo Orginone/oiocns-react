@@ -6,10 +6,10 @@ import CcNode from './Components/CcNode';
 import RootNode from './Components/RootNode';
 import ConcurrentNode from './Components/ConcurrentNode';
 import ConditionNode from './Components/ConditionNode';
-import { AddNodeType, FieldCondition, NodeModel, dataType } from '../../processType';
+import { AddNodeType, NodeModel } from '../../processType';
 import orgCtrl from '@/ts/controller';
 import { IBelong, IWork } from '@/ts/core';
-import { schema } from '@/ts/base';
+import { model, schema } from '@/ts/base';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 /**
  * @description: 流程设置抽屉
@@ -27,57 +27,21 @@ interface IProps {
 }
 
 const FlowDrawer: React.FC<IProps> = (props) => {
-  const [conditions, setConditions] = useState<FieldCondition[]>([]);
+  const [conditions, setConditions] = useState<model.FieldModel[]>([]);
 
   useEffect(() => {
     if (props.define && props.current.type == AddNodeType.CONDITION) {
-      setTimeout(async () => {
-        let fields: FieldCondition[] = [];
-        for (const form of props.forms.filter((a) => a.typeName == '事项配置')) {
-          const attrs = await orgCtrl.work.loadAttributes(
-            form.id,
-            props.define!.metadata.belongId,
-          );
-          for (let attr of attrs.filter((a) => a.property)) {
-            if (attr.property) {
-              switch (attr.property.valueType) {
-                case '数值型':
-                  fields.push({
-                    label: attr.name,
-                    value: attr.id,
-                    type: dataType.NUMERIC,
-                  });
-                  break;
-                case '选择型':
-                case '分类型':
-                  {
-                    fields.push({
-                      label: attr.name,
-                      value: attr.id,
-                      type: dataType.DICT,
-                      dict: (await orgCtrl.work.loadItems(attr.property.speciesId)).map(
-                        (a) => {
-                          return { label: a.name, value: a.id };
-                        },
-                      ),
-                    });
-                  }
-                  break;
-                default:
-                  fields.push({
-                    label: attr.name,
-                    value: attr.id,
-                    type: dataType.STRING,
-                  });
-                  break;
-              }
-            }
+      props.define.loadWorkForms(true).then((forms) => {
+        const fields: model.FieldModel[] = [];
+        forms.forEach((f) => {
+          if (f.typeName === '主表') {
+            fields.push(...f.fields);
           }
-        }
+        });
         setConditions(fields);
-      }, 10);
+      });
     }
-  });
+  }, []);
 
   const Component = () => {
     if (props.defaultEditable && props.define) {

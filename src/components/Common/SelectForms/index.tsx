@@ -43,9 +43,8 @@ const SelectForms: React.FC<IProps> = ({ belong, typeName, selected, setSelected
     if (Array.isArray(checkedKeys)) {
       setCenterCheckedKeys(checkedKeys);
     }
-    const form: XForm = (info.node as any).item;
+    const form: XForm = { ...(info.node as any).item, typeName };
     if (info.checked) {
-      form.typeName = typeName;
       selected.push(form);
     } else {
       selected = selected.filter((i) => i.id != form.id);
@@ -86,7 +85,7 @@ const SelectForms: React.FC<IProps> = ({ belong, typeName, selected, setSelected
               checkable={false}
               autoExpandParent={true}
               onSelect={onSelect}
-              treeData={buildWorkThingTree([belong.directory])}
+              treeData={buildWorkThingTree(belong.shareTarget.map((i) => i.directory))}
             />
           </div>
         </div>
