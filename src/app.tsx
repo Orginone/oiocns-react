@@ -1,7 +1,7 @@
 import { ConfigProvider, Spin, message, notification } from 'antd';
 import React, { Suspense, useState } from 'react';
 import { renderRoutes } from 'react-router-config';
-import { HashRouter, useHistory } from 'react-router-dom';
+import { HashRouter } from 'react-router-dom';
 
 import routes from '@/routes';
 import 'devextreme/dist/css/dx.common.css';
@@ -34,7 +34,6 @@ notification.config({
 
 const App = () => {
   const [locale] = useState(zhCN);
-  const history = useHistory();
   logger.onLogger = (level, msg) => {
     switch (level) {
       case LoggerLevel.info:
@@ -49,7 +48,7 @@ const App = () => {
       case LoggerLevel.unauth:
         message.warn(msg);
         sessionStorage.clear();
-        return history.push('/passport/login');
+        location.reload();
     }
   };
   return (
