@@ -85,6 +85,7 @@ export class DirectoryReadConfig extends ReadConfigImpl<
             ...speciesItem,
             parentInfo: parentMap[speciesItem.parentId]?.info,
             speciesCode: species.code,
+            index: -1,
           });
         }
       }
