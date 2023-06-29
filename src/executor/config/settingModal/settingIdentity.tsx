@@ -14,6 +14,7 @@ import CardOrTableComp from '@/components/CardOrTableComp';
 import { schema } from '@/ts/base';
 import { PersonColumns } from '@/config/column';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
+import { Controller } from '@/ts/controller';
 
 interface IProps {
   target: ITarget;
@@ -22,8 +23,9 @@ interface IProps {
 
 /** 角色设置 */
 const SettingIdentity: React.FC<IProps> = ({ target, finished }) => {
-  const [key, rootMenu, selectMenu, setSelectMenu] = useMenuUpdate(() =>
-    loadSettingMenu(target),
+  const [key, rootMenu, selectMenu, setSelectMenu] = useMenuUpdate(
+    () => loadSettingMenu(target),
+    new Controller(target.key),
   );
   const [tabKey, refreshTable] = useObjectUpdate(key);
   const [operateKey, setOperateKey] = useState('');

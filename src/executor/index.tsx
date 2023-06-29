@@ -4,11 +4,13 @@ import ConfigExecutor from './config';
 import React, { useEffect, useState } from 'react';
 import { executeCmd, FileTaskList } from './action';
 import { useHistory } from 'react-router-dom';
-import orgCtrl from '@/ts/controller';
 
 const Executor = () => {
   const history = useHistory();
   const [content, setContent] = useState(<></>);
+  const resetContent = () => {
+    setContent(<></>);
+  };
   useEffect(() => {
     const id = command.subscribe((type, cmd, ...args: any[]) => {
       console.log(type, cmd, args);
@@ -18,16 +20,6 @@ const Executor = () => {
         if (['open', 'remark'].includes(cmd) && 'filedata' in args[0]) {
           type = 'data';
         }
-        const resetContent = () => {
-          if (Array.isArray(args) && args.length > 0) {
-            if (args.length > 1 && args[0].key === args[1]) {
-              orgCtrl.currentKey = args[1];
-            } else if ('locationKey' in args[0]) {
-              orgCtrl.currentKey = args[0].locationKey;
-            }
-          }
-          setContent(<></>);
-        };
         switch (type) {
           case 'data':
             setContent(<DataExecutor cmd={cmd} args={args} finished={resetContent} />);
