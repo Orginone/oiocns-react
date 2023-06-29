@@ -5,6 +5,7 @@ import {
   IFileInfo,
   IMemeber,
   IMsgChat,
+  ISysFileInfo,
   ITarget,
   TargetType,
 } from '@/ts/core';
@@ -25,6 +26,9 @@ export const executeCmd = (cmd: string, entity: any, args: any[]) => {
       return directoryRefresh(entity);
     case 'openChat':
       return openChat(entity);
+    case 'download':
+      window.open((entity as ISysFileInfo).shareInfo().shareLink, '_black');
+      return;
     case 'copy':
     case 'move':
       return setCopyFiles(cmd, entity);
@@ -233,7 +237,9 @@ export const uploadFile = (
     maskClosable: true,
     content: (
       <Upload
+        multiple
         type={'drag'}
+        maxCount={100}
         showUploadList={false}
         style={{ width: 550, height: 300 }}
         customRequest={async (options) => {

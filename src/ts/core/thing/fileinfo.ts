@@ -83,6 +83,7 @@ export abstract class FileInfo<T extends schema.XEntity>
         fileOperates.Copy,
         fileOperates.Move,
         fileOperates.Rename,
+        fileOperates.Download,
         entityOperates.Update,
         entityOperates.Delete,
       );
