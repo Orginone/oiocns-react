@@ -15,6 +15,7 @@ import { schema } from '@/ts/base';
 import { IdentityColumn, PersonColumns } from '@/config/column';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import EntityInfo from '@/components/Common/EntityInfo';
+import { Controller } from '@/ts/controller';
 
 interface IProps {
   company: ICompany;
@@ -23,8 +24,9 @@ interface IProps {
 
 /** 岗位设置 */
 const SettingStation: React.FC<IProps> = ({ company, finished }) => {
-  const [key, rootMenu, selectMenu, setSelectMenu] = useMenuUpdate(() =>
-    loadSettingMenu(company),
+  const [key, rootMenu, selectMenu, setSelectMenu] = useMenuUpdate(
+    () => loadSettingMenu(company),
+    new Controller(company.key),
   );
   const [tabKey, refreshTable] = useObjectUpdate(key);
   const [operateKey, setOperateKey] = useState('');

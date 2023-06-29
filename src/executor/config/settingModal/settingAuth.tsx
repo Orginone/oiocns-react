@@ -9,6 +9,7 @@ import * as im from 'react-icons/im';
 import { MenuItemType, OperateMenuType } from 'typings/globelType';
 import AuthForm from './subModal/authForm';
 import { Descriptions } from 'antd';
+import { Controller } from '@/ts/controller';
 
 interface IProps {
   space: IBelong;
@@ -17,8 +18,9 @@ interface IProps {
 
 /** 权限设置 */
 const SettingAuth: React.FC<IProps> = ({ space, finished }) => {
-  const [key, rootMenu, selectMenu, setSelectMenu] = useMenuUpdate(() =>
-    loadSettingMenu(space.superAuth!),
+  const [key, rootMenu, selectMenu, setSelectMenu] = useMenuUpdate(
+    () => loadSettingMenu(space.superAuth!),
+    new Controller(space.superAuth!.key),
   );
   const [operateKey, setOperateKey] = useState('');
   if (!selectMenu || !rootMenu) return <></>;

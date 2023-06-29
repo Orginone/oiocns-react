@@ -129,24 +129,31 @@ const Detail: React.FC<TaskDetailType> = ({ task, belong, onBack }) => {
             {loadTimeline()}
           </div>
 
-          <div style={{ padding: 10, display: 'flex', alignItems: 'flex-end', gap: 10 }}>
-            <Input.TextArea
-              style={{ height: 100, width: 'calc(100% - 80px)' }}
-              placeholder="请填写备注信息"
-              onChange={(e) => {
-                setComment(e.target.value);
-              }}
-            />
-            <Button type="primary" onClick={() => approvalTask(TaskStatus.ApprovalStart)}>
-              通过
-            </Button>
-            <Button
-              type="primary"
-              danger
-              onClick={() => approvalTask(TaskStatus.RefuseStart)}>
-              驳回
-            </Button>
-          </div>
+          {task.metadata.status < TaskStatus.ApprovalStart && (
+            <div
+              style={{ padding: 10, display: 'flex', alignItems: 'flex-end', gap: 10 }}>
+              <Input.TextArea
+                style={{ height: 100, width: 'calc(100% - 80px)' }}
+                placeholder="请填写备注信息"
+                onChange={(e) => {
+                  setComment(e.target.value);
+                }}
+              />
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                <Button
+                  type="primary"
+                  onClick={() => approvalTask(TaskStatus.ApprovalStart)}>
+                  通过
+                </Button>
+                <Button
+                  type="primary"
+                  danger
+                  onClick={() => approvalTask(TaskStatus.RefuseStart)}>
+                  驳回
+                </Button>
+              </div>
+            </div>
+          )}
         </>
       ),
     },

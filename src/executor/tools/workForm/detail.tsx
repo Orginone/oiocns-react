@@ -30,7 +30,7 @@ const DetailTable: React.FC<IProps> = (props) => {
       form={form}
       fields={fields}
       autoColumn
-      height={600}
+      height={500}
       dataIndex={'attribute'}
       columnChooser={{ enabled: true }}
       selection={{

@@ -9,6 +9,7 @@ import GenerateTable from '@/executor/tools/generate/table';
 import CustomStore from 'devextreme/data/custom_store';
 import { kernel } from '@/ts/base';
 import { ImCopy, ImShuffle, ImTicket } from 'react-icons/im';
+import { Controller } from '@/ts/controller';
 
 interface IProps {
   form: IForm;
@@ -17,8 +18,9 @@ interface IProps {
 
 /** 表单查看 */
 const FormView: React.FC<IProps> = ({ form, finished }) => {
-  const [key, rootMenu, selectMenu, setSelectMenu] = useMenuUpdate(() =>
-    config.loadSpeciesItemMenu(form),
+  const [key, rootMenu, selectMenu, setSelectMenu] = useMenuUpdate(
+    () => config.loadSpeciesItemMenu(form),
+    new Controller(form.key),
   );
   if (!selectMenu || !rootMenu) return <></>;
   return (

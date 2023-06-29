@@ -61,7 +61,7 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
   request,
   ...rest
 }) => {
-  const [segment, setSegment] = useSessionStorage('Kanban', 'segment');
+  const [segment, setSegment] = useSessionStorage('segment', 'List');
   const [defaultHeight, setDefaultHeight] = useState<number | 'auto'>('auto'); //计算高度
 
   // 监听父级高度
