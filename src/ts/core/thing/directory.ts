@@ -70,6 +70,8 @@ export interface IDirectory extends IFileInfo<schema.XDirectory> {
   loadApplications(reload?: boolean): Promise<IApplication[]>;
   /** 新建应用 */
   createApplication(data: model.ApplicationModel): Promise<IApplication | undefined>;
+  /** 加载全部应用 */
+  loadAllApplication(reload?: boolean): Promise<IApplication[]>;
 }
 
 /** 目录实现类 */
@@ -339,6 +341,15 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
       return application;
     }
   }
+  async loadAllApplication(reload: boolean = false): Promise<IApplication[]> {
+    await this.loadSubDirectory();
+    const applications: IApplication[] = [];
+    applications.push(...(await this.loadApplications(reload)));
+    for (const subDirectory of this.children) {
+      applications.push(...(await subDirectory.loadApplications(reload)));
+    }
+    return applications;
+  }
   override operates(mode: number = 0): model.OperateModel[] {
     const operates: model.OperateModel[] = [];
     if (this.typeName === '成员目录') {
@@ -377,7 +388,7 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
     return operates;
   }
   private async loadSubDirectory() {
-    if (!this.parent) {
+    if (!this.parent && this.children.length < 1) {
       const res = await kernel.queryDirectorys({
         id: this.target.id,
         page: PageAll,
