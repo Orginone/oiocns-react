@@ -51,17 +51,18 @@
   }
 
   .group-content {
-    padding: 10px 5px;
+    display: flex;
+    gap: 10px;
+    padding: 10px;
     p {
       text-align: center;
       font-size: small;
     }
-    // .el-icon-delete{
-    //   position: absolute;
-    //   cursor: pointer;
-    //   top: 12px;
-    //   right: 0;
-    // }
+    :global {
+      .ogo-form-item {
+        margin: auto;
+      }
+    }
   }
 
   .condition-title {

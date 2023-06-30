@@ -33,14 +33,20 @@ export const entityOperates = {
 };
 /** 文件支持的操作 */
 export const fileOperates = {
-  Copy: {
+  Download: {
     sort: 20,
+    cmd: 'download',
+    label: '下载文件',
+    iconType: 'rename',
+  },
+  Copy: {
+    sort: 21,
     cmd: 'copy',
     label: '复制文件',
     iconType: 'copy',
   },
   Move: {
-    sort: 21,
+    sort: 22,
     cmd: 'move',
     label: '剪切文件',
     iconType: 'move',
@@ -52,7 +58,7 @@ export const fileOperates = {
     iconType: 'parse',
   },
   Rename: {
-    sort: 23,
+    sort: 25,
     cmd: 'rename',
     label: '重名名',
     iconType: 'rename',

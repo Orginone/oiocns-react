@@ -1,4 +1,5 @@
 import ImageView from './image';
+import VideoView from './video';
 import { IEntity, ISysFileInfo } from '@/ts/core';
 import { command, schema } from '@/ts/base';
 import React from 'react';
@@ -23,6 +24,9 @@ const ExecutorOpen: React.FC<IOpenProps> = (props: IOpenProps) => {
     const data = props.entity.filedata;
     if (data.contentType?.startsWith('image')) {
       return <ImageView share={data} finished={props.finished} />;
+    }
+    if (data.contentType?.startsWith('video')) {
+      return <VideoView share={data} finished={props.finished} />;
     }
     switch (data?.extension) {
       case '.docx':

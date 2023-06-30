@@ -8,6 +8,7 @@ import {
 } from '@ant-design/icons';
 
 interface IFullModalProps extends ModalProps {
+  hideMaxed?: boolean;
   fullScreen?: boolean;
   onSave?: () => void;
   icon?: React.ReactNode;
@@ -64,14 +65,16 @@ const FullScreenModal: React.FC<IFullModalProps> = (props) => {
               <SaveOutlined />
             </Typography.Link>
           )}
-          <Typography.Link
-            title={modalState ? '最大化' : '恢复'}
-            style={{ fontSize: 18 }}
-            onClick={() => {
-              setModalState(!modalState);
-            }}>
-            {modalState ? <FullscreenOutlined /> : <FullscreenExitOutlined />}
-          </Typography.Link>
+          {!props.hideMaxed && (
+            <Typography.Link
+              title={modalState ? '最大化' : '恢复'}
+              style={{ fontSize: 18 }}
+              onClick={() => {
+                setModalState(!modalState);
+              }}>
+              {modalState ? <FullscreenOutlined /> : <FullscreenExitOutlined />}
+            </Typography.Link>
+          )}
           <Typography.Link
             title={'关闭'}
             style={{ fontSize: 18 }}

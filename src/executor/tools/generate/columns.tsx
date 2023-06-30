@@ -115,6 +115,10 @@ export const GenerateColumn = (
       }
       return text;
     };
+  } else {
+    if (cellRender.render) {
+      props.cellRender = cellRender.render;
+    }
   }
   return <Column key={generateUuid()} {...props} />;
 };

@@ -5,17 +5,19 @@ import {
   IFileInfo,
   IMemeber,
   IMsgChat,
+  ISysFileInfo,
   ITarget,
   TargetType,
 } from '@/ts/core';
 import orgCtrl from '@/ts/controller';
 import { command, schema } from '@/ts/base';
-import { Drawer, List, Modal, Progress, Upload, message } from 'antd';
+import { Drawer, List, Modal, Progress, Tabs, Upload, message } from 'antd';
 import QrCode from 'qrcode.react';
 import React, { useEffect, useState } from 'react';
 import { uploadTemplate } from './tools/uploadTemplate';
 import TypeIcon from '@/components/Common/GlobalComps/typeIcon';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
+import { TaskModel } from '@/ts/base/model';
 /** 执行非页面命令 */
 export const executeCmd = (cmd: string, entity: any, args: any[]) => {
   switch (cmd) {
@@ -25,6 +27,9 @@ export const executeCmd = (cmd: string, entity: any, args: any[]) => {
       return directoryRefresh(entity);
     case 'openChat':
       return openChat(entity);
+    case 'download':
+      window.open((entity as ISysFileInfo).shareInfo().shareLink, '_black');
+      return;
     case 'copy':
     case 'move':
       return setCopyFiles(cmd, entity);
@@ -233,7 +238,9 @@ export const uploadFile = (
     maskClosable: true,
     content: (
       <Upload
+        multiple
         type={'drag'}
+        maxCount={100}
         showUploadList={false}
         style={{ width: 550, height: 300 }}
         customRequest={async (options) => {
@@ -265,16 +272,11 @@ export const FileTaskList = ({ directory }: { directory: IDirectory }) => {
     s = s == 0 ? 1 : s;
     return parseInt(((f * 10000.0) / s).toFixed(0)) / 100;
   };
-  return (
-    <Drawer
-      title="操作记录"
-      open
-      width={500}
-      placement="right"
-      onClose={() => command.emitter('-', '-')}>
+  const loadTasks = (tlst: TaskModel[]) => {
+    return (
       <List
         itemLayout="horizontal"
-        dataSource={taskList}
+        dataSource={tlst}
         renderItem={(item) => {
           return (
             <List.Item
@@ -297,6 +299,34 @@ export const FileTaskList = ({ directory }: { directory: IDirectory }) => {
             </List.Item>
           );
         }}
+      />
+    );
+  };
+  return (
+    <Drawer
+      title="操作记录"
+      open
+      width={500}
+      placement="right"
+      onClose={() => command.emitter('-', '-')}>
+      <Tabs
+        centered
+        items={[
+          {
+            key: 'uploading',
+            label: '上传中',
+            children: loadTasks(
+              taskList.filter((i) => i.finished >= 0 && i.finished < i.size),
+            ),
+          },
+          {
+            key: 'uploaded',
+            label: '已完成',
+            children: loadTasks(
+              taskList.filter((i) => i.finished < 0 || i.finished >= i.size),
+            ),
+          },
+        ]}
       />
     </Drawer>
   );
