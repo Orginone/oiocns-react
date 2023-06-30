@@ -26,7 +26,7 @@ export default class KernelApi {
     this._methods = {};
     this._anystore = AnyStore.getInstance();
     this._storeHub = new StoreHub(url, 'json');
-    this._storeHub.on('Receive', this._receive);
+    this._storeHub.on('Receive', (res) => this._receive(res));
     this._storeHub.onConnected(() => {
       if (this._anystore.accessToken.length > 0) {
         this._storeHub
