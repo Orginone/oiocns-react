@@ -80,7 +80,13 @@ const SettingIdentity: React.FC<IProps> = ({ target, finished }) => {
           }
           setSelectMenu(data);
         }}
-        onMenuClick={(_, key) => setOperateKey(key)}
+        onMenuClick={(_, key) => {
+          if (key == '删除') {
+            setSelectMenu(rootMenu);
+          } else {
+            setOperateKey(key);
+          }
+        }}
         siderMenuData={rootMenu}>
         <EntityInfo key={key} entity={selectMenu.item} />
         {identity && (
@@ -112,7 +118,7 @@ const SettingIdentity: React.FC<IProps> = ({ target, finished }) => {
           </>
         )}
       </MainLayout>
-      {operateKey.includes('角色') && (
+      {['新增', '编辑'].includes(operateKey) && (
         <IdentityForm
           current={selectMenu.item}
           finished={(success) => {
@@ -163,12 +169,12 @@ const loadMenus = (item: ITarget | IIdentity) => {
           model: 'outside',
         },
         {
-          key: '编辑角色',
+          key: '编辑',
           icon: <im.ImCog />,
           label: '编辑角色',
         },
         {
-          key: '删除角色',
+          key: '删除',
           icon: <im.ImBin />,
           label: '删除角色',
           beforeLoad: async () => {
@@ -179,7 +185,7 @@ const loadMenus = (item: ITarget | IIdentity) => {
     }
   } else if (item.hasRelationAuth()) {
     items.push({
-      key: '新增角色',
+      key: '新增',
       icon: <im.ImPlus />,
       label: '新增角色',
       model: 'outside',
