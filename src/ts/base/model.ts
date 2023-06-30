@@ -37,6 +37,8 @@ export type ResultType<T> = {
  * @param {string} target 目标
  */
 export type ReceiveType = {
+  // 用户
+  userId: string;
   // 对象
   target: string;
   // 数据

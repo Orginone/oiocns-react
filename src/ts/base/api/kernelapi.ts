@@ -26,16 +26,7 @@ export default class KernelApi {
     this._methods = {};
     this._anystore = AnyStore.getInstance();
     this._storeHub = new StoreHub(url, 'json');
-    this._storeHub.on('Receive', (res: model.ReceiveType) => {
-      const methods = this._methods[res.target.toLowerCase()];
-      if (methods) {
-        try {
-          methods.forEach((m) => m.apply(this, [res.data]));
-        } catch (e) {
-          logger.error(e as Error);
-        }
-      }
-    });
+    this._storeHub.on('Receive', this._receive);
     this._storeHub.onConnected(() => {
       if (this._anystore.accessToken.length > 0) {
         this._storeHub
@@ -1245,6 +1236,27 @@ export default class KernelApi {
     }
 
     this._methods[methodName].push(newOperation);
+  }
+  /** 接收服务端消息 */
+  private _receive(res: model.ReceiveType) {
+    switch (res.target) {
+      case 'Online':
+        console.log('Online', res);
+        break;
+      case 'Outline':
+        console.log('Outline', res);
+        break;
+      default: {
+        const methods = this._methods[res.target.toLowerCase()];
+        if (methods) {
+          try {
+            methods.forEach((m) => m.apply(this, [res.data]));
+          } catch (e) {
+            logger.error(e as Error);
+          }
+        }
+      }
+    }
   }
   /**
    * 使用rest请求后端
