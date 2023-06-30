@@ -63,7 +63,7 @@ const DetailTable: React.FC<IProps> = (props) => {
                 });
               },
             },
-            visible: props.allowEdit && props.data.allowAdd != undefined,
+            visible: props.allowEdit && (props.data.allowAdd || false),
           },
           {
             name: 'edit',
@@ -93,9 +93,7 @@ const DetailTable: React.FC<IProps> = (props) => {
               },
             },
             visible:
-              props.allowEdit &&
-              props.data.allowEdit != undefined &&
-              selectKeys.length > 0,
+              props.allowEdit && (props.data.allowEdit || false) && selectKeys.length > 0,
           },
           {
             name: 'select',
@@ -123,7 +121,7 @@ const DetailTable: React.FC<IProps> = (props) => {
                 });
               },
             },
-            visible: props.allowEdit && props.data.allowSelect != undefined,
+            visible: props.allowEdit && (props.data.allowSelect || false),
           },
           {
             name: 'remove',
