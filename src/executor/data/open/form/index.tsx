@@ -10,6 +10,7 @@ import CustomStore from 'devextreme/data/custom_store';
 import { kernel } from '@/ts/base';
 import { ImCopy, ImShuffle, ImTicket } from 'react-icons/im';
 import { Controller } from '@/ts/controller';
+import { message } from 'antd';
 
 interface IProps {
   form: IForm;
@@ -86,6 +87,9 @@ const FormView: React.FC<IProps> = ({ form, finished }) => {
                 key: 'createNFT',
                 label: '生成存证',
                 icon: <ImTicket fontSize={22} color={'#9498df'} />,
+                onClick: () => {
+                  message.success('存证成功!');
+                },
               },
               {
                 key: 'copyBoard',

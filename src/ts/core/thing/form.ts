@@ -149,7 +149,7 @@ export class Form extends FileInfo<schema.XForm> implements IForm {
     if (!this._attributeLoaded || reload) {
       const res = await kernel.queryFormAttributes({
         id: this.id,
-        subId: this.spaceId,
+        subId: this.metadata.belongId,
       });
       if (res.success) {
         this._attributeLoaded = true;
