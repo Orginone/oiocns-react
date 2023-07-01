@@ -72,6 +72,8 @@ export interface IDirectory extends IFileInfo<schema.XDirectory> {
   createApplication(data: model.ApplicationModel): Promise<IApplication | undefined>;
   /** 加载全部应用 */
   loadAllApplication(reload?: boolean): Promise<IApplication[]>;
+  /** 加载目录树 */
+  loadSubDirectory(): void;
 }
 
 /** 目录实现类 */
@@ -105,6 +107,7 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
   propertys: IProperty[] = [];
   applications: IApplication[] = [];
   private _contentLoaded: boolean = false;
+  private _applicationLoaded: boolean = false;
   get id(): string {
     if (!this.parent) {
       return this.target.id;
@@ -316,12 +319,13 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
     }
   }
   async loadApplications(reload: boolean = false): Promise<IApplication[]> {
-    if (this.applications.length < 1 || reload) {
+    if (!this._applicationLoaded || reload) {
       const res = await kernel.queryApplications({
         id: this.id,
         page: PageAll,
       });
       if (res.success) {
+        this._applicationLoaded = true;
         const data = res.data.result || [];
         this.applications = data
           .filter((i) => !i.parentId || i.parentId.length < 1)
@@ -342,7 +346,6 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
     }
   }
   async loadAllApplication(reload: boolean = false): Promise<IApplication[]> {
-    await this.loadSubDirectory();
     const applications: IApplication[] = [];
     applications.push(...(await this.loadApplications(reload)));
     for (const subDirectory of this.children) {
@@ -387,7 +390,7 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
     }
     return operates;
   }
-  private async loadSubDirectory() {
+  public async loadSubDirectory() {
     if (!this.parent && this.children.length < 1) {
       const res = await kernel.queryDirectorys({
         id: this.target.id,

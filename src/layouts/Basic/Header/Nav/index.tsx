@@ -1,4 +1,4 @@
-import { Badge, Space } from 'antd';
+import { Badge, Drawer, List, Space } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { Link, RouteComponentProps, withRouter } from 'react-router-dom';
 import cls from './index.module.less';
@@ -6,6 +6,8 @@ import OrgIcons from '@/components/Common/GlobalComps/orgIcons';
 import TeamIcon from '@/components/Common/GlobalComps/entityIcon';
 import orgCtrl from '@/ts/controller';
 import { msgChatNotify } from '@/ts/core';
+import { kernel } from '@/ts/base';
+import { ImLink } from 'react-icons/im';
 
 /**
  * 顶部导航
@@ -13,10 +15,12 @@ import { msgChatNotify } from '@/ts/core';
  * @returns
  */
 const HeaderNav: React.FC<RouteComponentProps> = () => {
+  const [onlineVisible, setOnlineVisible] = useState(false);
   const [msgKey, setMsgKey] = useState('');
   const [taskKey, setTaskKey] = useState('');
   const [workCount, setWorkCount] = useState(0);
   const [msgCount, setMsgCount] = useState(0);
+  const [online, setOnline] = useState(0);
   useEffect(() => {
     const id = msgChatNotify.subscribe((key) => {
       let noReadCount = 0;
@@ -29,6 +33,9 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
     const workId = orgCtrl.work.notity.subscribe(async (key) => {
       setWorkCount(orgCtrl.work.todos.length);
       setTaskKey(key);
+    });
+    kernel.onlineNotity.subscribe(() => {
+      setOnline(kernel.Online.filter((i) => i.value != '0').length);
     });
     return () => {
       msgChatNotify.unsubscribe(id);
@@ -129,6 +136,15 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
   return (
     <div className={cls['header-nav-container']}>
       <Space size={30}>
+        {online > 0 && (
+          <div
+            style={{ display: 'flex', cursor: 'pointer' }}
+            onClick={() => setOnlineVisible(!onlineVisible)}>
+            <Badge count={online} size="small">
+              <ImLink size={22} color={'#4CAF50'} />
+            </Badge>
+          </div>
+        )}
         {navs.map((item) => {
           if (item.count > 0) {
             return (
@@ -141,6 +157,25 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
           }
         })}
       </Space>
+      <Drawer
+        open={onlineVisible}
+        width={300}
+        placement="right"
+        onClose={() => setOnlineVisible(false)}>
+        <List
+          itemLayout="horizontal"
+          dataSource={kernel.Online.filter((i) => i.value != '0')}
+          renderItem={(item) => {
+            return (
+              <List.Item style={{ cursor: 'pointer', padding: 6 }}>
+                <List.Item.Meta
+                  avatar={<TeamIcon entityId={item.value} size={28} showName />}
+                />
+              </List.Item>
+            );
+          }}
+        />
+      </Drawer>
     </div>
   );
 };

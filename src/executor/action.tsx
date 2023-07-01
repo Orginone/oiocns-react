@@ -49,6 +49,9 @@ export const executeCmd = (cmd: string, entity: any, args: any[]) => {
       return openDirectory(entity);
     case 'standard':
       return uploadTemplate(entity);
+    case 'online':
+    case 'outline':
+      return onlineChanged(cmd, entity);
   }
   return false;
 };
@@ -225,8 +228,25 @@ const entityQrCode = (entity: IEntity<schema.XEntity>) => {
   });
 };
 
+/** 上下线提醒 */
+const onlineChanged = (cmd: string, userId: string) => {
+  orgCtrl.user.findEntityAsync(userId).then((target) => {
+    if (target) {
+      message.open({
+        duration: 1,
+        type: cmd === 'online' ? 'success' : 'warning',
+        content: (
+          <div style={{ display: 'contents' }}>
+            {target.name} [{target.code}] {cmd === 'online' ? '上线啦' : '下线啦'}
+          </div>
+        ),
+      });
+    }
+  });
+};
+
 /** 文件上传 */
-export const uploadFile = (
+const uploadFile = (
   dir: IDirectory,
   uploaded?: (file: IFileInfo<schema.XEntity> | undefined) => void,
 ) => {

@@ -3,7 +3,8 @@ import StoreHub from './storehub';
 import * as model from '../model';
 import type * as schema from '../schema';
 import axios from 'axios';
-import { logger } from '../common';
+import { Emitter, logger } from '../common';
+import { command } from '../common/command';
 /**
  * 资产共享云内核api
  */
@@ -18,6 +19,10 @@ export default class KernelApi {
   private _anystore: AnyStore;
   // 订阅方法
   private _methods: { [name: string]: ((...args: any[]) => void)[] };
+  // 在线信息
+  private _onlines: any[] = [];
+  // 上下线提醒
+  onlineNotity = new Emitter();
   /**
    * 私有构造方法
    * @param url 远端地址
@@ -67,6 +72,13 @@ export default class KernelApi {
    */
   public get isOnline(): boolean {
     return this._storeHub.isConnected;
+  }
+  /**
+   * 在线信息
+   * @returns {any[]} 在线状态
+   */
+  public get Online(): any[] {
+    return this._onlines;
   }
   /**
    * 登录到后台核心获取accessToken
@@ -1241,10 +1253,17 @@ export default class KernelApi {
   private _receive(res: model.ReceiveType) {
     switch (res.target) {
       case 'Online':
-        console.log('Online', res);
-        break;
       case 'Outline':
-        console.log('Outline', res);
+        if (res.data) {
+          this._onlines = Object.keys(res.data).map((key) => {
+            return {
+              key,
+              value: res.data[key],
+            };
+          });
+        }
+        command.emitter('_', res.target.toLowerCase(), res.userId);
+        this.onlineNotity.changCallback();
         break;
       default: {
         const methods = this._methods[res.target.toLowerCase()];

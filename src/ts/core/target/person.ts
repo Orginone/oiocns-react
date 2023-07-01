@@ -211,6 +211,7 @@ export class Person extends Belong implements IPerson {
   }
   async deepLoad(reload: boolean = false): Promise<void> {
     await this.loadGivedIdentitys(reload);
+    await this.directory.loadSubDirectory();
     await this.loadCompanys(reload);
     await this.loadCohorts(reload);
     await this.loadMembers(reload);
@@ -263,19 +264,8 @@ export class Person extends Belong implements IPerson {
   }
   findShareById(id: string): model.ShareIcon {
     const metadata = this.findMetadata<schema.XEntity>(id);
-    if (!metadata) {
-      kernel
-        .queryTargetById({
-          ids: [id],
-          page: PageAll,
-        })
-        .then((res) => {
-          if (res.success && res.data.result) {
-            res.data.result.forEach((item) => {
-              this.updateMetadata(item);
-            });
-          }
-        });
+    if (metadata === undefined) {
+      this.findEntityAsync(id);
     }
     return {
       name: metadata?.name ?? '请稍后...',

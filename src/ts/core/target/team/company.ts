@@ -234,6 +234,7 @@ export class Company extends Belong implements ICompany {
     return targets;
   }
   async deepLoad(reload: boolean = false): Promise<void> {
+    await this.directory.loadSubDirectory();
     await this.loadGroups(reload);
     await this.loadDepartments(reload);
     await this.loadStations(reload);
