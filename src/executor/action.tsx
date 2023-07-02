@@ -232,9 +232,15 @@ const entityQrCode = (entity: IEntity<schema.XEntity>) => {
 const onlineChanged = (cmd: string, info: model.OnlineInfo) => {
   if (info.userId === '0') {
     if (cmd === 'online') {
-      message.success(`终端${info.remoteAddr}[${info.connectionId}]建立连接`);
+      message.success({
+        duration: 1,
+        content: `终端${info.remoteAddr}[${info.connectionId}]建立连接`,
+      });
     } else {
-      message.error(`终端${info.remoteAddr}[${info.connectionId}]断开连接`);
+      message.error({
+        duration: 1,
+        content: `终端${info.remoteAddr}[${info.connectionId}]断开连接`,
+      });
     }
   } else {
     orgCtrl.user.findEntityAsync(info.userId).then((target) => {

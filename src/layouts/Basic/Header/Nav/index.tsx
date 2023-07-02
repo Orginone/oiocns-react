@@ -1,4 +1,4 @@
-import { Badge, Drawer, List, Space, Tag } from 'antd';
+import { Badge, Drawer, List, Space, Tabs, Tag } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { Link, RouteComponentProps, withRouter } from 'react-router-dom';
 import cls from './index.module.less';
@@ -166,16 +166,44 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
 const OnlineInfo: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const [onlines, setOnlines] = useState<model.OnlineInfo[]>([]);
   useEffect(() => {
-    kernel.onlines().then((value) => {
-      setOnlines(value);
+    const id = kernel.onlineNotity.subscribe(() => {
+      kernel.onlines().then((value) => {
+        setOnlines(value);
+      });
     });
+    return () => {
+      kernel.onlineNotity.unsubscribe(id);
+    };
   }, []);
-  return (
-    <Drawer open width={400} placement="right" onClose={() => onClose()}>
+
+  const loadOnlineInfo = (onlines: model.OnlineInfo[]) => {
+    return (
       <List
         itemLayout="horizontal"
-        dataSource={onlines.filter((i) => i.userId != '0')}
+        dataSource={onlines.sort(
+          (a, b) => new Date(b.onlineTime).getTime() - new Date(a.onlineTime).getTime(),
+        )}
         renderItem={(item) => <OnlineItem data={item} />}
+      />
+    );
+  };
+
+  return (
+    <Drawer open width={500} placement="right" onClose={() => onClose()}>
+      <Tabs
+        centered
+        items={[
+          {
+            key: 'online_user',
+            label: `在线用户(${onlines.filter((i) => i.userId != '0').length})`,
+            children: loadOnlineInfo(onlines.filter((i) => i.userId != '0')),
+          },
+          {
+            key: 'online_connection',
+            label: `在线连接(${onlines.filter((i) => i.userId === '0').length})`,
+            children: loadOnlineInfo(onlines.filter((i) => i.userId == '0')),
+          },
+        ]}
       />
     </Drawer>
   );
@@ -184,23 +212,32 @@ const OnlineInfo: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 const OnlineItem: React.FC<{ data: model.OnlineInfo }> = ({ data }) => {
   const [target, setTarget] = useState<schema.XEntity>();
   useEffect(() => {
-    orgCtrl.user.findEntityAsync(data.userId).then((item) => {
-      setTarget(item);
-    });
+    if (data.userId != '0') {
+      orgCtrl.user.findEntityAsync(data.userId).then((item) => {
+        if (item) {
+          setTarget(item);
+        }
+      });
+    }
   }, []);
-  if (!target) return <></>;
   return (
     <List.Item
       style={{ cursor: 'pointer', padding: 6 }}
-      actions={[<div key={data.connectionId}>{showChatTime(data.onlineTime)}</div>]}>
+      actions={[
+        <div key={data.connectionId} title={data.onlineTime}>
+          {showChatTime(data.userId === '0' ? data.onlineTime : data.authTime)}
+        </div>,
+      ]}>
       <List.Item.Meta
         title={
           <>
-            <span style={{ marginRight: 10 }}>{target.name}</span>
-            <Tag color="green">{data.requestCount}</Tag>
+            <span style={{ marginRight: 10 }}>{target?.name || data.connectionId}</span>
+            <Tag color="green" title={'请求次数'}>
+              {data.requestCount}
+            </Tag>
           </>
         }
-        avatar={<TeamIcon entityId={data.userId} size={42} />}
+        avatar={<>{target && <TeamIcon entity={target} size={42} />}</>}
         description={`使用地址:${data.remoteAddr}`}
       />
     </List.Item>
