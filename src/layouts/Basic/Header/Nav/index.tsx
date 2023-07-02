@@ -1,4 +1,4 @@
-import { Badge, Drawer, List, Space } from 'antd';
+import { Badge, Drawer, List, Space, Tag } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { Link, RouteComponentProps, withRouter } from 'react-router-dom';
 import cls from './index.module.less';
@@ -6,8 +6,9 @@ import OrgIcons from '@/components/Common/GlobalComps/orgIcons';
 import TeamIcon from '@/components/Common/GlobalComps/entityIcon';
 import orgCtrl from '@/ts/controller';
 import { msgChatNotify } from '@/ts/core';
-import { kernel } from '@/ts/base';
+import { kernel, model, schema } from '@/ts/base';
 import { ImLink } from 'react-icons/im';
+import { showChatTime } from '@/utils/tools';
 
 /**
  * 顶部导航
@@ -35,7 +36,7 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
       setTaskKey(key);
     });
     kernel.onlineNotity.subscribe(() => {
-      setOnline(kernel.Online.filter((i) => i.value != '0').length);
+      setOnline(kernel.onlineIds.length);
     });
     return () => {
       msgChatNotify.unsubscribe(id);
@@ -157,26 +158,52 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
           }
         })}
       </Space>
-      <Drawer
-        open={onlineVisible}
-        width={300}
-        placement="right"
-        onClose={() => setOnlineVisible(false)}>
-        <List
-          itemLayout="horizontal"
-          dataSource={kernel.Online.filter((i) => i.value != '0')}
-          renderItem={(item) => {
-            return (
-              <List.Item style={{ cursor: 'pointer', padding: 6 }}>
-                <List.Item.Meta
-                  avatar={<TeamIcon entityId={item.value} size={28} showName />}
-                />
-              </List.Item>
-            );
-          }}
-        />
-      </Drawer>
+      {onlineVisible && <OnlineInfo onClose={() => setOnlineVisible(false)} />}
     </div>
+  );
+};
+
+const OnlineInfo: React.FC<{ onClose: () => void }> = ({ onClose }) => {
+  const [onlines, setOnlines] = useState<model.OnlineInfo[]>([]);
+  useEffect(() => {
+    kernel.onlines().then((value) => {
+      setOnlines(value);
+    });
+  }, []);
+  return (
+    <Drawer open width={400} placement="right" onClose={() => onClose()}>
+      <List
+        itemLayout="horizontal"
+        dataSource={onlines.filter((i) => i.userId != '0')}
+        renderItem={(item) => <OnlineItem data={item} />}
+      />
+    </Drawer>
+  );
+};
+
+const OnlineItem: React.FC<{ data: model.OnlineInfo }> = ({ data }) => {
+  const [target, setTarget] = useState<schema.XEntity>();
+  useEffect(() => {
+    orgCtrl.user.findEntityAsync(data.userId).then((item) => {
+      setTarget(item);
+    });
+  }, []);
+  if (!target) return <></>;
+  return (
+    <List.Item
+      style={{ cursor: 'pointer', padding: 6 }}
+      actions={[<div key={data.connectionId}>{showChatTime(data.onlineTime)}</div>]}>
+      <List.Item.Meta
+        title={
+          <>
+            <span style={{ marginRight: 10 }}>{target.name}</span>
+            <Tag color="green">{data.requestCount}</Tag>
+          </>
+        }
+        avatar={<TeamIcon entityId={data.userId} size={42} />}
+        description={`使用地址:${data.remoteAddr}`}
+      />
+    </List.Item>
   );
 };
 export default withRouter(HeaderNav);
