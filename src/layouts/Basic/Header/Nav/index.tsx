@@ -164,11 +164,13 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
 };
 
 const OnlineInfo: React.FC<{ onClose: () => void }> = ({ onClose }) => {
+  const [key, setKey] = useState('1');
   const [onlines, setOnlines] = useState<model.OnlineInfo[]>([]);
   useEffect(() => {
-    const id = kernel.onlineNotity.subscribe(() => {
+    const id = kernel.onlineNotity.subscribe((key) => {
       kernel.onlines().then((value) => {
         setOnlines(value);
+        setKey(key);
       });
     });
     return () => {
@@ -191,6 +193,7 @@ const OnlineInfo: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   return (
     <Drawer open width={500} placement="right" onClose={() => onClose()}>
       <Tabs
+        key={key}
         centered
         items={[
           {
