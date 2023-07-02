@@ -1,6 +1,6 @@
 import { FormModel } from '@/ts/base/model';
 import { IDirectory } from '@/ts/core';
-import { assignment, batchRequests, partition } from '../..';
+import { assignment, batchRequests } from '../..';
 import {
   Context,
   ReadConfigImpl,
@@ -84,8 +84,10 @@ export class FormReadConfig extends ReadConfigImpl<Form, Context, FormSheetConfi
         },
       });
     }
-    for (let arr of partition(requests, 100)) {
-      await this.requests(arr, context, onItemCompleted);
+    while (true) {
+      let temps = requests.splice(0, 100);
+      if (temps.length == 0) break;
+      await this.requests(temps, context, onItemCompleted);
     }
   }
   /**

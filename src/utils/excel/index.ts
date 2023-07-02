@@ -159,23 +159,6 @@ function assignment(oldObj: { [key: string]: any }, newObj: { [key: string]: any
 }
 
 /**
- * 数组分组
- * @param arr
- * @param length
- * @returns
- */
-function partition<T>(arr: T[], count: number): T[][] {
-  var result: T[][] = [];
-  for (var index = 0, total = arr.length; index < total; index++) {
-    if (index % count === 0) {
-      result.push([]);
-    }
-    result[result.length - 1].push(arr[index]);
-  }
-  return result;
-}
-
-/**
  * 批量请求
  */
 async function batchRequests(
@@ -194,4 +177,4 @@ async function batchRequests(
   }
 }
 
-export { assignment, batchRequests, dataHandling, generateXlsx, partition, readXlsx };
+export { assignment, batchRequests, dataHandling, generateXlsx, readXlsx };

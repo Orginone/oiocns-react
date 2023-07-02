@@ -1,7 +1,7 @@
 import { List } from '@/ts/base';
 import { SpeciesItemModel } from '@/ts/base/model';
 import { IDirectory } from '@/ts/core';
-import { assignment, batchRequests, partition } from '../..';
+import { assignment, batchRequests } from '../..';
 import {
   Context,
   ErrorMessage,
@@ -106,8 +106,11 @@ export class DictItemReadConfig extends ReadConfigImpl<
         },
       });
     }
-    for (let arr of partition(requests, 100)) {
-      await this.requests(arr, context, onItemCompleted);
+    while (true) {
+      let temps = requests.splice(0, 100);
+      if (temps.length == 0) break;
+      debugger
+      await this.requests(temps, context, onItemCompleted);
     }
   }
   /**
