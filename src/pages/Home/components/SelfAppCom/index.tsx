@@ -47,7 +47,7 @@ const AppCard: any = ({ className, app }: { className: string; app: IApplication
           history.push('/store');
         });
       }}>
-      <TeamIcon typeName={app.typeName} entityId={app.id} size={50} />
+      <TeamIcon entity={app.metadata} size={50} />
       <div className="app-info">
         <span className="app-info-name">{app.name}</span>
       </div>
