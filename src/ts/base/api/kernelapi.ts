@@ -19,10 +19,10 @@ export default class KernelApi {
   private _anystore: AnyStore;
   // 订阅方法
   private _methods: { [name: string]: ((...args: any[]) => void)[] };
-  // 在线信息
-  private _onlines: any[] = [];
   // 上下线提醒
   onlineNotity = new Emitter();
+  // 在线的连接
+  onlineIds: string[] = [];
   /**
    * 私有构造方法
    * @param url 远端地址
@@ -73,12 +73,21 @@ export default class KernelApi {
   public get isOnline(): boolean {
     return this._storeHub.isConnected;
   }
-  /**
-   * 在线信息
-   * @returns {any[]} 在线状态
-   */
-  public get Online(): any[] {
-    return this._onlines;
+  /** 连接信息 */
+  public async onlines(): Promise<model.OnlineInfo[]> {
+    if (this.onlineIds.length > 0) {
+      const result = await this._storeHub.invoke('Online');
+      if (result.success && Array.isArray(result.data)) {
+        var ids = result.data.map((i) => i.connectionId);
+        if (ids.length != this.onlineIds.length) {
+          this.onlineIds = ids;
+          this.onlineNotity.changCallback();
+        }
+        this.onlineIds = ids;
+        return result.data;
+      }
+    }
+    return [];
   }
   /**
    * 登录到后台核心获取accessToken
@@ -1254,16 +1263,25 @@ export default class KernelApi {
     switch (res.target) {
       case 'Online':
       case 'Outline':
-        if (res.data) {
-          this._onlines = Object.keys(res.data).map((key) => {
-            return {
-              key,
-              value: res.data[key],
-            };
-          });
+        {
+          const connectionId = res.data.connectionId;
+          if (connectionId && connectionId.length > 0) {
+            if (this.onlineIds.length < 1) {
+              this.onlineIds.push('');
+              this.onlines();
+            } else {
+              if (res.target === 'Online') {
+                if (this.onlineIds.every((i) => i != connectionId)) {
+                  this.onlineIds.push(connectionId);
+                }
+              } else {
+                this.onlineIds = this.onlineIds.filter((i) => i != connectionId);
+              }
+              this.onlineNotity.changCallback();
+            }
+            command.emitter('_', res.target.toLowerCase(), res.data);
+          }
         }
-        command.emitter('_', res.target.toLowerCase(), res.userId);
-        this.onlineNotity.changCallback();
         break;
       default: {
         const methods = this._methods[res.target.toLowerCase()];

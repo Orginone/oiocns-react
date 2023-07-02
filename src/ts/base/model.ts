@@ -44,6 +44,23 @@ export type ReceiveType = {
   // 数据
   data: any;
 };
+/** 在线信息 */
+export type OnlineInfo = {
+  // 用户Id
+  userId: string;
+  // 连接Id
+  connectionId: string;
+  // 远端地址
+  remoteAddr: string;
+  // 上线时间
+  onlineTime: string;
+  // 认证时间
+  authTime: string;
+  // 请求次数
+  requestCount: number;
+  // 终端类型
+  endPointType: string;
+}
 // 分页返回定义
 export type PageResult<T> = {
   // 便宜量

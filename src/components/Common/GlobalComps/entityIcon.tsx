@@ -39,30 +39,35 @@ const EntityIcon = (info: teamTypeInfo) => {
       });
     }
   }, []);
-  if (share?.avatar && share?.avatar.thumbnail) {
+  if (share?.avatar?.thumbnail) {
     return (
       <div style={{ cursor: 'pointer', display: 'contents' }} title={info.title ?? ''}>
         <Avatar size={size + 4} src={share.avatar.thumbnail} />
         {info.showName && <b style={{ marginLeft: 6 }}>{share.name}</b>}
       </div>
     );
-  }
-  const icon = (
-    <TypeIcon avatar iconType={info.typeName || share?.typeName || '其它'} size={size} />
-  );
-  if (info.notAvatar) {
-    return icon;
-  }
-  return (
-    <div style={{ display: 'contents' }}>
-      <Avatar
+  } else {
+    const icon = (
+      <TypeIcon
+        avatar
+        iconType={share?.typeName || info.typeName || '其它'}
         size={size}
-        icon={icon}
-        style={{ background: 'transparent', color: '#606060' }}
       />
-      {info.showName && <b style={{ marginLeft: 6 }}>{share?.name}</b>}
-    </div>
-  );
+    );
+    if (info.notAvatar) {
+      return icon;
+    }
+    return (
+      <div style={{ display: 'contents' }}>
+        <Avatar
+          size={size}
+          icon={icon}
+          style={{ background: 'transparent', color: '#606060' }}
+        />
+        {info.showName && <b style={{ marginLeft: 6 }}>{share?.name}</b>}
+      </div>
+    );
+  }
 };
 
 export default EntityIcon;

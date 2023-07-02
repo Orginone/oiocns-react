@@ -10,7 +10,7 @@ import {
   TargetType,
 } from '@/ts/core';
 import orgCtrl from '@/ts/controller';
-import { command, schema } from '@/ts/base';
+import { command, model, schema } from '@/ts/base';
 import { Drawer, List, Modal, Progress, Tabs, Upload, message } from 'antd';
 import QrCode from 'qrcode.react';
 import React, { useEffect, useState } from 'react';
@@ -229,20 +229,44 @@ const entityQrCode = (entity: IEntity<schema.XEntity>) => {
 };
 
 /** 上下线提醒 */
-const onlineChanged = (cmd: string, userId: string) => {
-  orgCtrl.user.findEntityAsync(userId).then((target) => {
-    if (target) {
-      message.open({
+const onlineChanged = (cmd: string, info: model.OnlineInfo) => {
+  if (info.userId === '0') {
+    if (cmd === 'online') {
+      message.success({
         duration: 1,
-        type: cmd === 'online' ? 'success' : 'warning',
-        content: (
-          <div style={{ display: 'contents' }}>
-            {target.name} [{target.code}] {cmd === 'online' ? '上线啦' : '下线啦'}
-          </div>
-        ),
+        content: `终端${info.remoteAddr}[${info.connectionId}]建立连接`,
+      });
+    } else {
+      message.error({
+        duration: 1,
+        content: `终端${info.remoteAddr}[${info.connectionId}]断开连接`,
       });
     }
-  });
+  } else {
+    orgCtrl.user.findEntityAsync(info.userId).then((target) => {
+      if (target) {
+        if (cmd === 'online') {
+          message.success({
+            duration: 1,
+            content: (
+              <div style={{ display: 'contents' }}>
+                {target.name} [{target.code}] 从{info.remoteAddr}上线啦
+              </div>
+            ),
+          });
+        } else {
+          message.error({
+            duration: 1,
+            content: (
+              <div style={{ display: 'contents' }}>
+                {target.name} [{target.code}] 从{info.remoteAddr}下线啦
+              </div>
+            ),
+          });
+        }
+      }
+    });
+  }
 };
 
 /** 文件上传 */
