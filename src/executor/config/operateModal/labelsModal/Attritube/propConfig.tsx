@@ -1,9 +1,8 @@
 import { IDirectory, IForm, IProperty } from '@/ts/core';
 import { XAttribute, XProperty } from '@/ts/base/schema';
 import React, { useEffect, useState } from 'react';
-import { Card, Typography } from 'antd';
+import { Card, Drawer, Typography } from 'antd';
 import { ImCheckmark, ImCross } from 'react-icons/im';
-import cls from './index.module.less';
 import CustomTree from '@/components/CustomTree';
 interface IProps {
   attr: XAttribute;
@@ -55,9 +54,11 @@ const PropertyConfig = (props: IProps) => {
     setPropertyTree(buildPropertyTree([props.form.directory.target.space.directory]));
   }, []);
   return (
-    <Card
+    <Drawer
+      open
       title="属性选择框"
-      className={cls.attrConfig}
+      closable={false}
+      onClose={props.onFinish}
       extra={[
         <Typography.Link
           key={'111'}
@@ -83,23 +84,25 @@ const PropertyConfig = (props: IProps) => {
           <ImCross fontSize={18} />
         </Typography.Link>,
       ]}>
-      <CustomTree
-        defaultExpandAll={true}
-        onSelect={(_, info) => {
-          const data = (info.node as any).item;
-          if ('propertys' in data) {
-            if ('复制属性' === props.modalType) {
-              setSelectedItem(data);
+      <Card>
+        <CustomTree
+          defaultExpandAll={true}
+          onSelect={(_, info) => {
+            const data = (info.node as any).item;
+            if ('propertys' in data) {
+              if ('复制属性' === props.modalType) {
+                setSelectedItem(data);
+              } else {
+                setSelectedItem(undefined);
+              }
             } else {
-              setSelectedItem(undefined);
+              setSelectedItem(data);
             }
-          } else {
-            setSelectedItem(data);
-          }
-        }}
-        treeData={propertyTree}
-      />
-    </Card>
+          }}
+          treeData={propertyTree}
+        />
+      </Card>
+    </Drawer>
   );
 };
 
