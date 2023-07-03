@@ -23,6 +23,7 @@ const BannerCom: React.FC<SelfAppComType> = () => {
     const apps: IApplication[] = [];
     for (const target of orgCtrl.targets) {
       apps.push(...(await target.directory.loadAllApplication()));
+      console.log(apps.length);
     }
     return apps.filter((a, i) => apps.findIndex((x) => x.id === a.id) === i);
   };
