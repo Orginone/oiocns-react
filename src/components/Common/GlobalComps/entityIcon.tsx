@@ -42,8 +42,10 @@ const EntityIcon = (info: teamTypeInfo) => {
   if (share?.avatar?.thumbnail) {
     return (
       <div style={{ cursor: 'pointer', display: 'contents' }} title={info.title ?? ''}>
-        <Avatar size={size + 4} src={share.avatar.thumbnail} />
-        {info.showName && <b style={{ marginLeft: 6 }}>{share.name}</b>}
+        <Avatar size={size} src={share.avatar.thumbnail} />
+        {info.showName && (
+          <strong style={{ marginLeft: 6, fontSize: size }}>{share.name}</strong>
+        )}
       </div>
     );
   } else {
@@ -64,7 +66,7 @@ const EntityIcon = (info: teamTypeInfo) => {
           icon={icon}
           style={{ background: 'transparent', color: '#606060' }}
         />
-        {info.showName && <b style={{ marginLeft: 6 }}>{share?.name}</b>}
+        {info.showName && <b style={{ marginLeft: 6, fontSize: size }}>{share?.name}</b>}
       </div>
     );
   }

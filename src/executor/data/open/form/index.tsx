@@ -52,7 +52,7 @@ const FormView: React.FC<IProps> = ({ form, finished }) => {
             new CustomStore({
               key: 'Id',
               async load(loadOptions) {
-                const item = selectMenu.item?.value;
+                const item = selectMenu.item?.value || selectMenu.item?.code;
                 loadOptions.userData = item ? [item] : [];
                 let request: any = { ...loadOptions };
                 const result = await kernel.anystore.loadThing<any>(

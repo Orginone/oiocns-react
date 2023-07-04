@@ -39,11 +39,11 @@ const IdentityForm: React.FC<IProps> = ({ current, finished }) => {
           ? current.current.space
           : current.space
         ).loadSuperAuth();
-        return superAuth ? [superAuth.metadata] : [];
+        return superAuth ? [superAuth] : [];
       },
       fieldProps: {
         disabled: isEdit,
-        fieldNames: { label: 'name', value: 'id', children: 'nodes' },
+        fieldNames: { label: 'name', value: 'id', children: 'children' },
         showSearch: true,
         filterTreeNode: true,
         treeNodeFilterProp: 'name',
