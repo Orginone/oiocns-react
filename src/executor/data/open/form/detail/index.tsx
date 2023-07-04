@@ -32,6 +32,13 @@ const ThingView: React.FC<IProps> = (props) => {
         items={[
           {
             key: '1',
+            label: `归档痕迹`,
+            children: (
+              <ThingArchive instances={Object.values(props.thingData.Archives)} />
+            ),
+          },
+          {
+            key: '2',
             label: `卡片信息`,
             children: (
               <OioForm
@@ -48,13 +55,6 @@ const ThingView: React.FC<IProps> = (props) => {
                   render: (_: any, _dom: any) => <></>,
                 }}
               />
-            ),
-          },
-          {
-            key: '2',
-            label: `归档痕迹`,
-            children: (
-              <ThingArchive instances={Object.values(props.thingData.Archives)} />
             ),
           },
         ]}

@@ -17,7 +17,7 @@ interface IProps {
 const ThingArchive: React.FC<IProps> = ({ instances }) => {
   return (
     <Card bordered={false}>
-      <Timeline>
+      <Timeline reverse>
         {instances.map((a) => (
           <ArchiveItem instance={a}></ArchiveItem>
         ))}
@@ -48,14 +48,12 @@ const ArchiveItem: React.FC<{ instance: schema.XWorkInstance }> = ({ instance })
   const loadDeatil = (instance: schema.XWorkInstance) => {
     if (task == undefined) return <></>;
     return (
-      <Timeline>
+      <Timeline reverse>
         <Timeline.Item key={'begin'} color={'green'}>
           <Card>
             <div style={{ display: 'flex' }}>
               <div style={{ paddingRight: '24px' }}>起始</div>
-              <div style={{ paddingRight: '24px' }}>
-                {instance.createTime.substring(0, instance.createTime.length - 4)}
-              </div>
+              <div style={{ paddingRight: '24px' }}>{instance.createTime}</div>
               <div style={{ paddingRight: '24px' }}>
                 发起人：
                 <EntityIcon entityId={instance.createUser} showName />
@@ -80,9 +78,7 @@ const ArchiveItem: React.FC<{ instance: schema.XWorkInstance }> = ({ instance })
                     <Card>
                       <div style={{ display: 'flex' }}>
                         <div style={{ paddingRight: '24px' }}>{item.node?.nodeType}</div>
-                        <div style={{ paddingRight: '24px' }}>
-                          {item.createTime.substring(0, item.createTime.length - 4)}
-                        </div>
+                        <div style={{ paddingRight: '24px' }}>{item.updateTime}</div>
                         <div style={{ paddingRight: '24px' }}>
                           审批人：
                           <EntityIcon entityId={record.createUser} showName />
@@ -123,7 +119,6 @@ const ArchiveItem: React.FC<{ instance: schema.XWorkInstance }> = ({ instance })
               <span style={{ paddingRight: '24px' }}>
                 {instance.updateTime.substring(0, instance.updateTime.length - 4)}
               </span>
-              <span style={{ paddingRight: '24px' }}>{instance.title}</span>
               <span style={{ paddingRight: '24px' }}>
                 归属用户：
                 <EntityIcon entityId={instance.belongId} showName />
