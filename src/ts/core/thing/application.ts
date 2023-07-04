@@ -97,6 +97,9 @@ export class Application extends FileInfo<schema.XApplication> implements IAppli
       this.directory.applications = this.directory.applications.filter(
         (i) => i.key != this.key,
       );
+      if (this.parent) {
+        this.parent.children = this.parent.children.filter((i) => i.key != this.key);
+      }
     }
     return res.success;
   }

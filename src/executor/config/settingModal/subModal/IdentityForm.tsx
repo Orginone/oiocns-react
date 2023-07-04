@@ -43,7 +43,11 @@ const IdentityForm: React.FC<IProps> = ({ current, finished }) => {
       },
       fieldProps: {
         disabled: isEdit,
-        fieldNames: { label: 'name', value: 'id', children: 'children' },
+        fieldNames: {
+          label: 'name',
+          value: 'id',
+          children: 'children',
+        },
         showSearch: true,
         filterTreeNode: true,
         treeNodeFilterProp: 'name',
