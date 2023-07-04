@@ -19,6 +19,7 @@ interface teamTypeInfo {
 const EntityIcon = (info: teamTypeInfo) => {
   const [share, setShare] = useState<ShareIcon>();
   const size = info.size ?? 22;
+  const fontSize = size > 14 ? 14 : size;
   useEffect(() => {
     if (info.entityId && info.entityId.length > 10) {
       orgCtrl.user.findEntityAsync(info.entityId).then((value) => {
@@ -44,7 +45,7 @@ const EntityIcon = (info: teamTypeInfo) => {
       <div style={{ cursor: 'pointer', display: 'contents' }} title={info.title ?? ''}>
         <Avatar size={size} src={share.avatar.thumbnail} />
         {info.showName && (
-          <strong style={{ marginLeft: 6, fontSize: size }}>{share.name}</strong>
+          <strong style={{ marginLeft: 6, fontSize: fontSize }}>{share.name}</strong>
         )}
       </div>
     );
@@ -66,7 +67,9 @@ const EntityIcon = (info: teamTypeInfo) => {
           icon={icon}
           style={{ background: 'transparent', color: '#606060' }}
         />
-        {info.showName && <b style={{ marginLeft: 6, fontSize: size }}>{share?.name}</b>}
+        {info.showName && (
+          <b style={{ marginLeft: 6, fontSize: fontSize }}>{share?.name}</b>
+        )}
       </div>
     );
   }
