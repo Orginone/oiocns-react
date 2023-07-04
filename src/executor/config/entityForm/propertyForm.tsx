@@ -52,7 +52,7 @@ const PropertyForm = (props: Iprops) => {
   const [inputValue, setInputValue] = useState(
     directory.directory.allSpecieses.filter(
       (item) => item.id === initialValue?.speciesId,
-    )[0].name,
+    )[0]?.name || initialValue?.speciesId,
   );
   const getFromColumns = () => {
     const columns: ProFormColumnsType<PropertyModel>[] = [
