@@ -53,6 +53,10 @@ export interface IDirectory extends IFileInfo<schema.XDirectory> {
   /** 新建表单 */
   createForm(data: model.FormModel): Promise<IForm | undefined>;
   /** 目录下的分类 */
+  allSpecieses: {
+    name: string;
+    id: string;
+  }[];
   specieses: ISpecies[];
   /** 加载分类 */
   loadSpecieses(reload?: boolean): Promise<ISpecies[]>;
@@ -102,6 +106,10 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
   forms: IForm[] = [];
   files: ISysFileInfo[] = [];
   specieses: ISpecies[] = [];
+  allSpecieses: {
+    name: string;
+    id: string;
+  }[] = [];
   propertys: IProperty[] = [];
   applications: IApplication[] = [];
   private _contentLoaded: boolean = false;
@@ -388,6 +396,7 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
     return operates;
   }
   private async loadSubDirectory() {
+    let that = this;
     if (!this.parent && this.children.length < 1) {
       const res = await kernel.queryDirectorys({
         id: this.target.id,
@@ -397,6 +406,17 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
       if (res.success && res.data) {
         this.children = [];
         this.loadChildren(res.data.result);
+        res.data.result.forEach((element) => {
+          if (element.species) {
+            element.species.forEach((elementX) => {
+              let obj = {
+                name: elementX.name,
+                id: elementX.id,
+              };
+              that.allSpecieses.push(obj);
+            });
+          }
+        });
       }
     }
   }
