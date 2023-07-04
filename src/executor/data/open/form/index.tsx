@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import FullScreenModal from '@/executor/tools/fullScreen';
-import { IForm, IWorkTask } from '@/ts/core';
+import { IForm } from '@/ts/core';
 import * as config from './config';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import MainLayout from '@/components/MainLayout';
@@ -9,11 +9,9 @@ import GenerateTable from '@/executor/tools/generate/table';
 import CustomStore from 'devextreme/data/custom_store';
 import { kernel, schema } from '@/ts/base';
 import { ImCopy, ImShuffle, ImTicket } from 'react-icons/im';
-import { Controller } from '@/ts/controller';
+import orgCtrl, { Controller } from '@/ts/controller';
 import { message } from 'antd';
 import ThingView from './detail';
-import { WorkTask } from '@/ts/core/work/task';
-import orgCtrl from '@/ts/controller';
 
 interface IProps {
   form: IForm;
@@ -26,7 +24,7 @@ const FormView: React.FC<IProps> = ({ form, finished }) => {
     () => config.loadSpeciesItemMenu(form),
     new Controller(form.key),
   );
-  const [archives, setArchives] = useState<IWorkTask[]>([]);
+  const [archives, setArchives] = useState<schema.XWorkInstance[]>([]);
   if (!selectMenu || !rootMenu) return <></>;
   const loadContent = () => {
     if (archives.length > 0) {
@@ -40,15 +38,16 @@ const FormView: React.FC<IProps> = ({ form, finished }) => {
         form={form.metadata}
         fields={form.fields}
         onRowDblClick={async (e: any) => {
-          let arhs: IWorkTask[] = [];
-          for (const v of Object.values(e.data.Archives)) {
-            const task = v as schema.XWorkTask;
-            task.instanceId = task.id;
-            const work = new WorkTask(task, orgCtrl.provider);
-            await work.loadInstance();
-            arhs.push(work);
+          const archs: schema.XWorkInstance[] = [];
+          for (const archive of Object.values(
+            e.data.Archives,
+          ) as schema.XWorkInstance[]) {
+            archs.push(
+              (await orgCtrl.work.loadInstanceDetail(archive.id, archive.belongId)) ||
+              archive,
+            );
           }
-          setArchives(arhs);
+          setArchives(archs);
         }}
         dataSource={
           new CustomStore({
