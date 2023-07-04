@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { schema } from '@/ts/base';
 import orgCtrl from '@/ts/controller';
 import { Card, Collapse, Timeline } from 'antd';
@@ -15,10 +15,38 @@ interface IProps {
  * 存储-物-归档日志
  */
 const ThingArchive: React.FC<IProps> = ({ instances }) => {
+  return (
+    <Card bordered={false}>
+      <Timeline>
+        {instances.map((a) => (
+          <ArchiveItem instance={a}></ArchiveItem>
+        ))}
+      </Timeline>
+    </Card>
+  );
+};
+
+const ArchiveItem: React.FC<{ instance: schema.XWorkInstance }> = ({ instance }) => {
+  const [task, setTask] = useState<schema.XWorkTask[]>();
+  const [data, setData] = useState<InstanceDataModel>();
+  const belong =
+    orgCtrl.user.companys.find((a) => a.id == instance.belongId) || orgCtrl.user;
+
+  useEffect(() => {
+    setTimeout(async () => {
+      const detail = await orgCtrl.work.loadInstanceDetail(
+        instance.id,
+        instance.belongId,
+      );
+      if (detail) {
+        setTask(detail.tasks);
+        setData(JSON.parse(detail.data || '{}'));
+      }
+    }, 10);
+  }, []);
+
   const loadDeatil = (instance: schema.XWorkInstance) => {
-    const belong =
-      orgCtrl.user.companys.find((a) => a.id == instance.belongId) || orgCtrl.user;
-    const instanceData: InstanceDataModel = JSON.parse(instance.data || '{}');
+    if (task == undefined) return <></>;
     return (
       <Timeline>
         <Timeline.Item key={'begin'} color={'green'}>
@@ -33,17 +61,17 @@ const ThingArchive: React.FC<IProps> = ({ instances }) => {
                 <EntityIcon entityId={instance.createUser} showName />
               </div>
             </div>
-            {instanceData.node && (
+            {data && data.node && (
               <WorkForm
                 allowEdit={false}
                 belong={belong}
-                nodeId={instanceData.node?.id}
-                data={instanceData}
+                nodeId={data.node?.id}
+                data={data}
               />
             )}
           </Card>
         </Timeline.Item>
-        {instance.tasks?.map((item) => {
+        {task.map((item) => {
           return (
             <div key={item.id}>
               {item.records?.map((record) => {
@@ -65,12 +93,12 @@ const ThingArchive: React.FC<IProps> = ({ instances }) => {
                         </div>
                       </div>
                       <Collapse ghost>
-                        {instanceData && (
+                        {data && (
                           <WorkForm
                             allowEdit={false}
                             belong={belong}
                             nodeId={item.nodeId}
-                            data={instanceData}
+                            data={data}
                           />
                         )}
                       </Collapse>
@@ -84,47 +112,40 @@ const ThingArchive: React.FC<IProps> = ({ instances }) => {
       </Timeline>
     );
   };
-
   return (
-    <Card bordered={false}>
-      <Timeline>
-        {instances.map((a) => {
-          return (
-            <Timeline.Item key={a.id}>
-              <Collapse>
-                <Panel
-                  key={a.id}
-                  header={
-                    <div style={{ display: 'flex' }}>
-                      <div style={{ paddingRight: '24px' }}>{a.title}</div>
-                      <div style={{ paddingRight: '24px' }}>
-                        {a.updateTime.substring(0, a.updateTime.length - 4)}
-                      </div>
-                      <div style={{ paddingRight: '24px' }}>{a.title}</div>
-                      <div style={{ paddingRight: '24px' }}>
-                        归属用户：
-                        <EntityIcon entityId={a.belongId} showName />
-                      </div>
-                      <div style={{ paddingRight: '24px' }}>
-                        申请用户：
-                        <EntityIcon entityId={a.applyId} showName />
-                      </div>
-                      {a.content && (
-                        <div style={{ paddingRight: '24px' }}>{'内容：' + a.content}</div>
-                      )}
-                      {a.remark && (
-                        <div style={{ paddingRight: '24px' }}>{'备注：' + a.remark}</div>
-                      )}
-                    </div>
-                  }>
-                  {loadDeatil(a)}
-                </Panel>
-              </Collapse>
-            </Timeline.Item>
-          );
-        })}
-      </Timeline>
-    </Card>
+    <Timeline.Item key={instance.id}>
+      <Collapse>
+        <Panel
+          key={instance.id}
+          header={
+            <div style={{ display: 'flex' }}>
+              <span style={{ paddingRight: '24px' }}>{instance.title}</span>
+              <span style={{ paddingRight: '24px' }}>
+                {instance.updateTime.substring(0, instance.updateTime.length - 4)}
+              </span>
+              <span style={{ paddingRight: '24px' }}>{instance.title}</span>
+              <span style={{ paddingRight: '24px' }}>
+                归属用户：
+                <EntityIcon entityId={instance.belongId} showName />
+              </span>
+              <span style={{ paddingRight: '24px' }}>
+                申请用户：
+                <EntityIcon entityId={instance.applyId} showName />
+              </span>
+              {instance.content && (
+                <span style={{ paddingRight: '24px' }}>
+                  {'内容：' + instance.content}
+                </span>
+              )}
+              {instance.remark && (
+                <span style={{ paddingRight: '24px' }}>{'备注：' + instance.remark}</span>
+              )}
+            </div>
+          }>
+          {loadDeatil(instance)}
+        </Panel>
+      </Collapse>
+    </Timeline.Item>
   );
 };
 export default ThingArchive;

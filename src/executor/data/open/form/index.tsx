@@ -7,9 +7,9 @@ import MainLayout from '@/components/MainLayout';
 import useMenuUpdate from '@/hooks/useMenuUpdate';
 import GenerateTable from '@/executor/tools/generate/table';
 import CustomStore from 'devextreme/data/custom_store';
-import { kernel, schema } from '@/ts/base';
+import { kernel } from '@/ts/base';
 import { ImCopy, ImShuffle, ImTicket } from 'react-icons/im';
-import orgCtrl, { Controller } from '@/ts/controller';
+import { Controller } from '@/ts/controller';
 import { message } from 'antd';
 import ThingView from './detail';
 
@@ -20,15 +20,18 @@ interface IProps {
 
 /** 表单查看 */
 const FormView: React.FC<IProps> = ({ form, finished }) => {
+  const [select, setSelcet] = useState();
   const [key, rootMenu, selectMenu, setSelectMenu] = useMenuUpdate(
     () => config.loadSpeciesItemMenu(form),
     new Controller(form.key),
   );
-  const [archives, setArchives] = useState<schema.XWorkInstance[]>([]);
   if (!selectMenu || !rootMenu) return <></>;
+
   const loadContent = () => {
-    if (archives.length > 0) {
-      return <ThingView archives={archives} onBack={() => setArchives([])} />;
+    if (select) {
+      return (
+        <ThingView form={form} thingData={select} onBack={() => setSelcet(undefined)} />
+      );
     }
     return (
       <GenerateTable
@@ -37,18 +40,7 @@ const FormView: React.FC<IProps> = ({ form, finished }) => {
         height={'100%'}
         form={form.metadata}
         fields={form.fields}
-        onRowDblClick={async (e: any) => {
-          const archs: schema.XWorkInstance[] = [];
-          for (const archive of Object.values(
-            e.data.Archives,
-          ) as schema.XWorkInstance[]) {
-            archs.push(
-              (await orgCtrl.work.loadInstanceDetail(archive.id, archive.belongId)) ||
-              archive,
-            );
-          }
-          setArchives(archs);
-        }}
+        onRowDblClick={(e: any) => setSelcet(e.data)}
         dataSource={
           new CustomStore({
             key: 'Id',

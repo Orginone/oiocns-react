@@ -2,10 +2,12 @@ import { Card, Tabs } from 'antd';
 import React from 'react';
 import { ImUndo2 } from 'react-icons/im';
 import ThingArchive from './archive';
-import { schema } from '@/ts/base';
+import { IForm } from '@/ts/core';
+import OioForm from '@/components/Common/FormDesign/OioFormNext';
 
 interface IProps {
-  archives: schema.XWorkInstance[];
+  form: IForm;
+  thingData: any;
   onBack: () => void;
 }
 
@@ -14,25 +16,48 @@ interface IProps {
  * @returns
  */
 const ThingView: React.FC<IProps> = (props) => {
-  const getItems = () => {
-    const items = [
-      {
-        key: '1',
-        label: `卡片信息`,
-        children: <></>,
-      },
-      {
-        key: '2',
-        label: `归档痕迹`,
-        children: <ThingArchive instances={props.archives} />,
-      },
-    ];
-    return items;
+  const convertData = () => {
+    let data: any = {};
+    for (let [key, value] of Object.entries(props.thingData)) {
+      const field = props.form.fields.find((a) => a.code == key);
+      if (field) {
+        data[field.id] = value;
+      }
+    }
+    return data;
   };
   return (
     <Card>
       <Tabs
-        items={getItems()}
+        items={[
+          {
+            key: '1',
+            label: `卡片信息`,
+            children: (
+              <OioForm
+                key={props.form.id}
+                form={props.form.metadata}
+                fields={props.form.fields}
+                fieldsValue={convertData()}
+                belong={props.form.directory.target.space}
+                disabled={true}
+                submitter={{
+                  resetButtonProps: {
+                    style: { display: 'none' },
+                  },
+                  render: (_: any, _dom: any) => <></>,
+                }}
+              />
+            ),
+          },
+          {
+            key: '2',
+            label: `归档痕迹`,
+            children: (
+              <ThingArchive instances={Object.values(props.thingData.Archives)} />
+            ),
+          },
+        ]}
         tabBarExtraContent={
           <div
             style={{ display: 'flex', cursor: 'pointer' }}
