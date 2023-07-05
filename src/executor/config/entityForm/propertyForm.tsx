@@ -16,6 +16,24 @@ interface Iprops {
 /*
   编辑
 */
+const findNameById = (obj: IDirectory, targetId: string, depth = 0): string | null => {
+  // 达到最大递归深度，停止递归
+  if (depth >= 10) {
+    return null;
+  }
+  if (obj.allSpecieses && obj.allSpecieses.length > 0) {
+    for (let i = 0; i < obj.allSpecieses.length; i++) {
+      const species = obj.allSpecieses[i];
+      if (species.id === targetId) {
+        return species.name;
+      }
+    }
+  } else {
+    const result = findNameById(obj.directory, targetId, depth + 1);
+    return result;
+  }
+  return null; // 如果未找到目标 id，则返回 null
+};
 const PropertyForm = (props: Iprops) => {
   const [form] = Form.useForm(); // 获取表单的引用
   const formRef = useRef<ProFormInstance>();
@@ -50,9 +68,8 @@ const PropertyForm = (props: Iprops) => {
       return <></>;
   }
   const [inputValue, setInputValue] = useState(
-    directory.directory.allSpecieses.filter(
-      (item) => item.id === initialValue?.speciesId,
-    )[0]?.name || initialValue?.speciesId,
+    findNameById(props.current.directory, initialValue?.speciesId) ||
+      initialValue?.speciesId,
   );
   const getFromColumns = () => {
     const columns: ProFormColumnsType<PropertyModel>[] = [
