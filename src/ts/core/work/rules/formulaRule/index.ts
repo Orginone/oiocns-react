@@ -23,7 +23,7 @@ class FormulaRule extends RuleBase implements IRuleBaseType {
     /*1 区分公式类型 */
     let ruleFunType: string = '';
 
-    /*1.1 处理简单计算公式 不包含特殊函数 :`「净值」=「原值」 -「累计折旧值」`*/
+    /*1.1 处理简单计算公式 不包含特殊函数 :`「净值」=「原值」 -「累计折旧值」`  类型：目标值=多个表单值（加减乘除等计算得出）*/
     if (ruleStr.includes('=') && !ruleStr.includes('$')) {
       ruleFunType = 'SIMPLE';
     }
