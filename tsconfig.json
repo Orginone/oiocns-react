@@ -3,8 +3,15 @@
     "target": "ESNext",
     "module": "ESNext",
     "moduleResolution": "Node",
-    "lib": ["DOM", "DOM.Iterable", "ESNext"],
-    "types": ["vite/client", "node"],
+    "lib": [
+      "DOM",
+      "DOM.Iterable",
+      "ES2021",
+    ],
+    "types": [
+      "vite/client",
+      "node"
+    ],
     "allowJs": true,
     "skipLibCheck": false,
     "esModuleInterop": false,
@@ -19,8 +26,12 @@
     "jsx": "react",
     "baseUrl": "./",
     "paths": {
-      "@/*": ["src/*"],
-      "@cfg/*": ["config/*"]
+      "@/*": [
+        "src/*"
+      ],
+      "@cfg/*": [
+        "config/*"
+      ]
     }
   },
   "include": [
@@ -30,5 +41,10 @@
     "vite.config.ts",
     "mock/_createProductionServer.ts"
   ],
-  "exclude": ["node_modules", "build", "dist", "**/*.js"]
+  "exclude": [
+    "node_modules",
+    "build",
+    "dist",
+    "**/*.js"
+  ]
 }
