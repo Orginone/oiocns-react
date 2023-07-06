@@ -35,14 +35,16 @@ const ApplicationForm = (props: Iprops) => {
       initialValue = {};
       break;
     case 'updateApp':
+    case 'updateModule':
       application = props.current as IApplication;
       directory = application.directory;
-      title = '更新应用';
+      types = [application.typeName];
+      title = '更新' + application.typeName;
       break;
     case 'remarkApp':
       application = props.current as IApplication;
       directory = application.directory;
-      title = '查看应用';
+      title = '查看' + application.typeName;
       break;
     default:
       return <></>;
@@ -56,7 +58,7 @@ const ApplicationForm = (props: Iprops) => {
         return (
           <UploadItem
             readonly={readonly}
-            typeName={'应用'}
+            typeName={props.formType.includes('Module') ? '模块' : '应用'}
             icon={initialValue.icon}
             onChanged={(icon) => {
               form.setFieldValue('icon', icon);

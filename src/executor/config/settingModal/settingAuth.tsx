@@ -41,7 +41,13 @@ const SettingAuth: React.FC<IProps> = ({ space, finished }) => {
         onSelect={(data) => {
           setSelectMenu(data);
         }}
-        onMenuClick={(_, key) => setOperateKey(key)}
+        onMenuClick={(_, key) => {
+          if (key == '删除') {
+            setSelectMenu(selectMenu.parentMenu || rootMenu);
+          } else {
+            setOperateKey(key);
+          }
+        }}
         siderMenuData={rootMenu}>
         <EntityInfo
           key={key}
@@ -60,7 +66,7 @@ const SettingAuth: React.FC<IProps> = ({ space, finished }) => {
           }
         />
       </MainLayout>
-      {operateKey.includes('权限') && (
+      {['新增', '编辑'].includes(operateKey) && (
         <AuthForm
           open
           title={operateKey}
@@ -113,7 +119,7 @@ const loadAuthorityMenus = (item: IAuthority) => {
   const items: OperateMenuType[] = [];
   if (item.space.hasRelationAuth()) {
     items.push({
-      key: '新增权限',
+      key: '新增',
       icon: <im.ImPlus />,
       label: '新增权限',
       model: 'outside',
@@ -121,12 +127,12 @@ const loadAuthorityMenus = (item: IAuthority) => {
     if (item.metadata.belongId == item.space.id) {
       items.push(
         {
-          key: '编辑权限',
+          key: '编辑',
           icon: <im.ImCog />,
           label: '编辑权限',
         },
         {
-          key: '删除权限',
+          key: '删除',
           icon: <im.ImBin />,
           label: '删除权限',
           beforeLoad: async () => {

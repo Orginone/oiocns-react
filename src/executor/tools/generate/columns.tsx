@@ -70,7 +70,7 @@ export const GenerateColumn = (
       props.width = 150;
       props.allowFiltering = false;
       cellRender.render = (data: any) => {
-        return <EntityIcon entityId={data.value} size={15} showName />;
+        return <EntityIcon entityId={data.value} size={14} showName />;
       };
       break;
     case '附件型':

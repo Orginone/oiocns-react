@@ -315,12 +315,14 @@ const OioFormItem = ({
         />
       );
     case 'person':
+    case 'myself':
       return (
         <ProFormPerson
           label=""
           belong={belong}
           name={field.id}
           rules={rules}
+          myself={rule.widget === 'myself'}
           tooltip={field.remark}
           labelAlign="right"
         />
