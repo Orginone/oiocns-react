@@ -3,6 +3,10 @@ export const loadWidgetsOpts = (valueType: string = '描述型') => {
     case '用户型':
       return [
         {
+          label: '本人',
+          value: 'myself',
+        },
+        {
           label: '人员',
           value: 'person',
         },

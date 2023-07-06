@@ -129,6 +129,7 @@ export abstract class Team extends MsgChat<schema.XTarget> implements ITeam {
     data.teamName = data.teamName || data.name;
     const res = await kernel.createTarget(data);
     if (res.success && res.data?.id) {
+      this.space.user.loadGivedIdentitys(true);
       return res.data;
     }
   }

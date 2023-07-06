@@ -120,9 +120,7 @@ const TaskContent = (props: IProps) => {
   };
 
   if (task) {
-    return (
-      <TaskDetail task={task} belong={props.space} onBack={() => setTask(undefined)} />
-    );
+    return <TaskDetail task={task} onBack={() => setTask(undefined)} />;
   }
   return (
     <CardOrTableComp<IWorkTask>

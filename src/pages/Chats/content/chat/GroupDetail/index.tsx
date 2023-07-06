@@ -3,13 +3,16 @@ import React, { useState } from 'react';
 import TeamIcon from '@/components/Common/GlobalComps/entityIcon';
 import detailStyle from './index.module.less';
 import { getUuid } from '@/utils/tools';
-import { IMsgChat, TargetType } from '@/ts/core';
+import { IMsgChat, ITarget, TargetType } from '@/ts/core';
 import ChatHistoryModal from '../ChatHistoryModal';
 import { AiOutlineRight } from 'react-icons/ai';
 import { command } from '@/ts/base';
+import { useHistory } from 'react-router-dom';
+import orgCtrl from '@/ts/controller';
 
 const Groupdetail: React.FC<any> = ({ chat }: { chat: IMsgChat }) => {
   const [historyOpen, setHistoryOpen] = useState<boolean>(false); // 历史消息搜索
+  const history = useHistory();
 
   /**
    * @description: 历史消息搜索弹窗
@@ -104,6 +107,20 @@ const Groupdetail: React.FC<any> = ({ chat }: { chat: IMsgChat }) => {
    */
   const operaButton = (
     <>
+      <div className={`${detailStyle.find_history}`}>
+        <Button
+          className={`${detailStyle.find_history_button}`}
+          type="ghost"
+          onClick={async () => {
+            if ('directory' in chat) {
+              await (chat as ITarget).directory.loadContent();
+              orgCtrl.currentKey = chat.key;
+              history.push('/store');
+            }
+          }}>
+          共享目录 <AiOutlineRight />
+        </Button>
+      </div>
       <div className={`${detailStyle.find_history}`}>
         <Button
           className={`${detailStyle.find_history_button}`}
