@@ -13,7 +13,7 @@ function extractContent(str: string, reg = /「(.*?)」/) {
   }
   return null; // 如果未找到匹配的内容，返回 null 或其他自定义的值
 }
-
+/* 通过name获取特性对应得id */
 function findKeyWidthName(
   name: string,
   ObjArr: { name: string; code: string; id: string }[],
