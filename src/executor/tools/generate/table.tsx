@@ -44,7 +44,13 @@ const GenerateTable = (props: IProps) => {
         showScrollbar: 'onHover',
         mode: 'standard',
       }}
-      pager={{ showInfo: true, showPageSizeSelector: true, showNavigationButtons: true }}
+      paging={{ pageSize: 20, enabled: true }}
+      pager={{
+        visible: true,
+        showInfo: true,
+        showNavigationButtons: true,
+        allowedPageSizes: [10, 30, 40, 50, 200],
+      }}
       searchPanel={{ width: 300, highlightCaseSensitive: true, visible: true }}
       width="100%"
       height={props.height ?? '100%'}

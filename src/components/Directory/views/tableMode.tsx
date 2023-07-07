@@ -87,7 +87,7 @@ const TableMode = ({
         dataField="name"
         caption="名称"
         cellRender={(e) => {
-          return <EntityIcon entityId={e.key} showName />;
+          return <EntityIcon entityId={e.key} showName size={20} />;
         }}
       />
       <Column dataField="code" caption="代码" width={200} />

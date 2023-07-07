@@ -4,17 +4,16 @@ import { Button, Card, Collapse, Input, Tabs, TabsProps, Timeline } from 'antd';
 import React, { useRef, useState } from 'react';
 import { ImUndo2 } from 'react-icons/im';
 import cls from './index.module.less';
-import { IBelong, IWorkTask, TaskStatus } from '@/ts/core';
+import { IWorkTask, TaskStatus } from '@/ts/core';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import WorkForm from '@/executor/tools/workForm';
 
 export interface TaskDetailType {
-  belong: IBelong;
   task: IWorkTask;
   onBack?: () => void;
 }
 
-const Detail: React.FC<TaskDetailType> = ({ task, belong, onBack }) => {
+const Detail: React.FC<TaskDetailType> = ({ task, onBack }) => {
   const formRef = useRef<ProFormInstance<any>>();
   const [comment, setComment] = useState<string>('');
 
@@ -41,7 +40,7 @@ const Detail: React.FC<TaskDetailType> = ({ task, belong, onBack }) => {
               {task.instanceData && (
                 <WorkForm
                   allowEdit={false}
-                  belong={belong}
+                  belong={task.belong}
                   nodeId={task.instanceData.node.id}
                   data={task.instanceData}
                 />
@@ -76,7 +75,7 @@ const Detail: React.FC<TaskDetailType> = ({ task, belong, onBack }) => {
                             {task.instanceData && (
                               <WorkForm
                                 allowEdit={false}
-                                belong={belong}
+                                belong={task.belong}
                                 nodeId={item.nodeId}
                                 data={task.instanceData}
                               />

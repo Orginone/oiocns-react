@@ -44,6 +44,7 @@ const EntityForm: React.FC<IProps> = ({ cmd, entity, finished }) => {
     case 'newApp':
     case 'newModule':
     case 'updateApp':
+    case 'updateModule':
     case 'remarkApp':
       return (
         <ApplicationForm formType={cmd} current={entity as any} finished={reloadFinish} />

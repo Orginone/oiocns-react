@@ -1,4 +1,4 @@
-import { Badge, Space } from 'antd';
+import { Badge, Drawer, List, Space, Tabs, Tag } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { Link, RouteComponentProps, withRouter } from 'react-router-dom';
 import cls from './index.module.less';
@@ -6,6 +6,9 @@ import OrgIcons from '@/components/Common/GlobalComps/orgIcons';
 import TeamIcon from '@/components/Common/GlobalComps/entityIcon';
 import orgCtrl from '@/ts/controller';
 import { msgChatNotify } from '@/ts/core';
+import { kernel, model, schema } from '@/ts/base';
+import { ImLink } from 'react-icons/im';
+import { showChatTime } from '@/utils/tools';
 
 /**
  * 顶部导航
@@ -13,10 +16,12 @@ import { msgChatNotify } from '@/ts/core';
  * @returns
  */
 const HeaderNav: React.FC<RouteComponentProps> = () => {
+  const [onlineVisible, setOnlineVisible] = useState(false);
   const [msgKey, setMsgKey] = useState('');
   const [taskKey, setTaskKey] = useState('');
   const [workCount, setWorkCount] = useState(0);
   const [msgCount, setMsgCount] = useState(0);
+  const [online, setOnline] = useState(0);
   useEffect(() => {
     const id = msgChatNotify.subscribe((key) => {
       let noReadCount = 0;
@@ -29,6 +34,9 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
     const workId = orgCtrl.work.notity.subscribe(async (key) => {
       setWorkCount(orgCtrl.work.todos.length);
       setTaskKey(key);
+    });
+    kernel.onlineNotity.subscribe(() => {
+      setOnline(kernel.onlineIds.length);
     });
     return () => {
       msgChatNotify.unsubscribe(id);
@@ -129,6 +137,15 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
   return (
     <div className={cls['header-nav-container']}>
       <Space size={30}>
+        {online > 0 && (
+          <div
+            style={{ display: 'flex', cursor: 'pointer' }}
+            onClick={() => setOnlineVisible(!onlineVisible)}>
+            <Badge count={online} size="small">
+              <ImLink size={22} color={'#4CAF50'} />
+            </Badge>
+          </div>
+        )}
         {navs.map((item) => {
           if (item.count > 0) {
             return (
@@ -141,7 +158,92 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
           }
         })}
       </Space>
+      {onlineVisible && <OnlineInfo onClose={() => setOnlineVisible(false)} />}
     </div>
+  );
+};
+
+const OnlineInfo: React.FC<{ onClose: () => void }> = ({ onClose }) => {
+  const [key, setKey] = useState('1');
+  const [onlines, setOnlines] = useState<model.OnlineInfo[]>([]);
+  useEffect(() => {
+    const id = kernel.onlineNotity.subscribe((key) => {
+      kernel.onlines().then((value) => {
+        setOnlines(value);
+        setKey(key);
+      });
+    });
+    return () => {
+      kernel.onlineNotity.unsubscribe(id);
+    };
+  }, []);
+
+  const loadOnlineInfo = (onlines: model.OnlineInfo[]) => {
+    return (
+      <List
+        itemLayout="horizontal"
+        dataSource={onlines.sort(
+          (a, b) => new Date(b.onlineTime).getTime() - new Date(a.onlineTime).getTime(),
+        )}
+        renderItem={(item) => <OnlineItem data={item} />}
+      />
+    );
+  };
+
+  return (
+    <Drawer open width={500} placement="right" onClose={() => onClose()}>
+      <Tabs
+        key={key}
+        centered
+        items={[
+          {
+            key: 'online_user',
+            label: `在线用户(${onlines.filter((i) => i.userId != '0').length})`,
+            children: loadOnlineInfo(onlines.filter((i) => i.userId != '0')),
+          },
+          {
+            key: 'online_connection',
+            label: `在线连接(${onlines.filter((i) => i.userId === '0').length})`,
+            children: loadOnlineInfo(onlines.filter((i) => i.userId == '0')),
+          },
+        ]}
+      />
+    </Drawer>
+  );
+};
+
+const OnlineItem: React.FC<{ data: model.OnlineInfo }> = ({ data }) => {
+  const [target, setTarget] = useState<schema.XEntity>();
+  useEffect(() => {
+    if (data.userId != '0') {
+      orgCtrl.user.findEntityAsync(data.userId).then((item) => {
+        if (item) {
+          setTarget(item);
+        }
+      });
+    }
+  }, []);
+  return (
+    <List.Item
+      style={{ cursor: 'pointer', padding: 6 }}
+      actions={[
+        <div key={data.connectionId} title={data.onlineTime}>
+          {showChatTime(data.userId === '0' ? data.onlineTime : data.authTime)}
+        </div>,
+      ]}>
+      <List.Item.Meta
+        title={
+          <>
+            <span style={{ marginRight: 10 }}>{target?.name || data.connectionId}</span>
+            <Tag color="green" title={'请求次数'}>
+              {data.requestCount}
+            </Tag>
+          </>
+        }
+        avatar={<>{target && <TeamIcon entity={target} size={42} />}</>}
+        description={`使用地址:${data.remoteAddr}`}
+      />
+    </List.Item>
   );
 };
 export default withRouter(HeaderNav);
