@@ -6,6 +6,7 @@ import React from 'react';
 import FormView from './form';
 import WorkStart from './work';
 import OfficeView from './office';
+import MyMdEditor from './MdEditor';
 
 interface IOpenProps {
   cmd: string;
@@ -35,6 +36,9 @@ const ExecutorOpen: React.FC<IOpenProps> = (props: IOpenProps) => {
       case '.webm':
         return <OfficeView share={data} finished={props.finished} />;
     }
+  }
+  if (props.entity.typeName.startsWith('text')) {
+    return <MyMdEditor finished={props.finished} form={props.entity} />;
   }
   command.emitter('config', props.cmd, props.entity);
   return <></>;
