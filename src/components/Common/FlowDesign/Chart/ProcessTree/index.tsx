@@ -44,7 +44,6 @@ const ProcessTree: React.FC<IProps> = ({ target, resource, onSelectedNode, isEdi
             <div className={cls['branch-node']}>
               <div className={cls['add-branch-btn']}>
                 <Button
-                  size="small"
                   className={cls[`add-branch-btn-el`]}
                   onClick={() => addBranchNode(node)}>
                   {`添加${getNodeName(node.type)}`}

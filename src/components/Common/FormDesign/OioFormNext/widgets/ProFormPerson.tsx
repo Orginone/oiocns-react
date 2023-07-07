@@ -9,6 +9,7 @@ interface IProps {
   rules: Rule[];
   name: string;
   belong?: IBelong;
+  myself: boolean;
   label: React.ReactNode;
   labelAlign: FormLabelAlign;
   tooltip: LabelTooltipType;
@@ -23,9 +24,11 @@ const ProFormPerson = (props: IProps) => {
     if (props.belong) {
       const initOptions = async () => {
         setOptions(
-          props.belong!.members?.map((xtarget) => {
-            return { label: xtarget.name, value: xtarget.id };
-          }) || [],
+          (props.myself ? [props.belong!.user.metadata] : props.belong!.members).map(
+            (xtarget) => {
+              return { label: xtarget.name, value: xtarget.id };
+            },
+          ) || [],
         );
       };
       initOptions();
