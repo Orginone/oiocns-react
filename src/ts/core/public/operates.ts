@@ -67,6 +67,12 @@ export const fileOperates = {
 
 /** 目录支持的操作 */
 export const directoryOperates = {
+  FolderUpload: {
+    sort: 25,
+    cmd: 'folderUpload',
+    label: '上传文件夹',
+    iconType: 'folderUpload',
+  },
   Refesh: {
     sort: 4,
     cmd: 'refresh',

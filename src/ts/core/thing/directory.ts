@@ -370,6 +370,7 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
         directoryOperates.NewFile,
         directoryOperates.TaskList,
         directoryOperates.Refesh,
+        directoryOperates.FolderUpload,
       );
       if (mode === 2 && this.target.hasRelationAuth()) {
         operates.push(directoryNew);

@@ -45,6 +45,8 @@ export const executeCmd = (cmd: string, entity: any, args: any[]) => {
           orgCtrl.changCallback();
         }
       });
+    case 'folderUpload':
+      return folderUpload(entity);
     case 'open':
       return openDirectory(entity);
     case 'standard':
@@ -53,6 +55,93 @@ export const executeCmd = (cmd: string, entity: any, args: any[]) => {
   return false;
 };
 
+
+/** 文件夹上传 */
+const folderUpload = (
+  dir: IDirectory,
+) => {
+  const parseFilesToTree=(files: any)=> {
+    const tree: any = [];
+    const data = Object.values(files);
+    data.forEach((file: any) => {
+      const path = file.webkitRelativePath.split("/");
+      let currentNode = tree;
+      for (let i = 0; i < path.length - 1; i++) {
+        const currentName = path[i];
+        let childNode = currentNode.find((node: any) => node.name === currentName);
+        if (!childNode) {
+          childNode = { name: currentName, children: [], type: 1 };
+          currentNode.push(childNode);
+        }
+        currentNode = childNode.children;
+      }
+      currentNode.push({ file: file, name: file.name, type: 2 });
+    });
+    uploadFolder(tree)
+  }
+    // 测试上传
+    const uploadFolder = async (tree: any, target1: any = '') => {
+      let target2 = null;
+      target1 ? target2 = target1 : target2 = dir
+      if (target2) {
+        for (const item of tree) {
+          // setTarget(target);
+          if (item.file && item.type === 2) {
+            if (await target2.createFile(item.file)) {
+              console.log(target2)
+              orgCtrl.changCallback();
+            }
+          }
+          if (item.type === 1) {
+            // 拿到刚创建的文件夹信息
+            // console.log(item,123123123);
+            // debugger
+            const folder: any = await target2.create({name: item.name, code: item.name, remark: item.name})
+            // {name: 'aaaaaaaaa', code: 'ceode', remark: '123123'}
+            uploadFolder(item.children, folder)
+          }
+        }
+      }
+    }
+  const uploadFolderChange = (e: any) => {
+    if (e.file.uid === e.fileList[0].uid) {
+      let list: any = []
+      e.fileList.forEach((item: any) => {
+        list.push(item.originFileObj)
+      })
+      parseFilesToTree(list)
+    }
+    modal.destroy()
+  }
+  const modal = Modal.info({
+    icon: <></>,
+    okText: '关闭',
+    width: 610,
+    title: '文件上传',
+    maskClosable: true,
+    content: (
+      <Upload
+        type={'drag'}
+        showUploadList={false}
+        directory={true}
+        style={{ width: 550, height: 300 }}
+        multiple={true}
+        
+        customRequest={async (options) => {
+          // modal.destroy();
+          // command.emitter('-', 'taskList', dir);
+          // const file = options.file as File;
+          // if (file) {
+          //   await dir.createFile(file)
+          // }
+        }}
+        onChange={uploadFolderChange}
+        >
+        <div style={{ color: 'limegreen', fontSize: 22 }}>点击或拖拽至此处上传</div>
+      </Upload>
+    ),
+  });
+};
 /** 刷新目录 */
 const directoryRefresh = (dir: IDirectory | IApplication) => {
   dir.loadContent(true).then(() => {
