@@ -24,6 +24,8 @@ const TableMode = ({
       keyExpr="id"
       columnAutoWidth
       allowColumnResizing
+      hoverStateEnabled
+      activeStateEnabled
       columnResizingMode={'nextColumn'}
       showColumnLines={false}
       selection={{

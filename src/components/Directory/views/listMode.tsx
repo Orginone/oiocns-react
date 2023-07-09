@@ -29,8 +29,10 @@ const ListMode = ({
             }}
             trigger={['contextMenu']}>
             <List.Item
+              className={'rlv-list-item'}
               style={{ cursor: 'pointer', padding: 6 }}
-              onDoubleClick={() => {
+              onDoubleClick={async () => {
+                await item.loadContent();
                 command.emitter(cmdType, 'open', item);
               }}
               actions={[

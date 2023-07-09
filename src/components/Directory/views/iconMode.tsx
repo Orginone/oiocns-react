@@ -26,7 +26,7 @@ const IconMode = ({
       trigger={['contextMenu']}>
       <Card
         size="small"
-        hoverable
+        className={cls.fileCard}
         bordered={false}
         key={el.key}
         onDoubleClick={async () => {

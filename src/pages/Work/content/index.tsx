@@ -9,7 +9,6 @@ import GenerateEntityTable from '@/executor/tools/generate/entityTable';
 import CustomStore from 'devextreme/data/custom_store';
 
 interface IProps {
-  filter: string;
   taskType: string;
   space: IBelong;
 }
@@ -29,14 +28,14 @@ const TaskContent = (props: IProps) => {
       case GroupMenuType.Done:
         {
           taskList = await orgCtrl.work.loadDones({
-            page: { ...page, filter: props.filter },
+            page: page,
             id: props.space?.id || '0',
           });
         }
         break;
       case GroupMenuType.Apply:
         taskList = await orgCtrl.work.loadApply({
-          page: { ...page, filter: props.filter },
+          page: page,
           id: props.space?.id || '0',
         });
         break;
@@ -46,8 +45,8 @@ const TaskContent = (props: IProps) => {
           if (props.space) {
             todos = todos.filter((t) => t.belong.id === props.space.id);
           }
-          if (props.filter != '') {
-            todos = todos.filter((t) => t.isMatch(props.filter));
+          if (page.filter != '') {
+            todos = todos.filter((t) => t.isMatch(page.filter));
           }
           taskList.total = todos.length;
           taskList.result = todos.slice(page.offset, page.limit);
@@ -71,10 +70,6 @@ const TaskContent = (props: IProps) => {
               offset: loadOptions.skip || 0,
               limit: loadOptions.take || 20,
               filter: loadOptions.searchValue || '',
-            });
-            console.log({
-              data: res.result,
-              totalCount: res.total,
             });
             return {
               data: res.result,
