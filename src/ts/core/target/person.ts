@@ -210,18 +210,24 @@ export class Person extends Belong implements IPerson {
     return targets;
   }
   async deepLoad(reload: boolean = false): Promise<void> {
-    await this.loadGivedIdentitys(reload);
-    await this.directory.loadSubDirectory();
-    await this.loadCompanys(reload);
-    await this.loadCohorts(reload);
-    await this.loadMembers(reload);
-    await this.loadSuperAuth(reload);
-    for (const company of this.companys) {
-      await company.deepLoad(reload);
-    }
-    for (const cohort of this.cohorts) {
-      await cohort.deepLoad(reload);
-    }
+    await Promise.all([
+      await this.loadGivedIdentitys(reload),
+      await this.directory.loadSubDirectory(),
+      await this.loadCompanys(reload),
+      await this.loadCohorts(reload),
+      await this.loadMembers(reload),
+      await this.loadSuperAuth(reload),
+    ]);
+    await Promise.all(
+      this.companys.map(async (company) => {
+        await company.deepLoad(reload);
+      }),
+    );
+    await Promise.all(
+      this.cohorts.map(async (cohort) => {
+        await cohort.deepLoad(reload);
+      }),
+    );
     this.superAuth?.deepLoad(reload);
   }
   async teamChangedNotity(target: schema.XTarget): Promise<boolean> {
