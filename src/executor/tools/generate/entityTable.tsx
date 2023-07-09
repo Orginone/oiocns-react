@@ -1,18 +1,13 @@
 import React from 'react';
-import { model, schema } from '@/ts/base';
+import { model } from '@/ts/base';
 import { Dropdown } from 'antd';
 import { AiOutlineEllipsis } from 'react-icons/ai';
 import { GenerateColumn } from './columns';
 import { Column, DataGrid, IDataGridOptions } from 'devextreme-react/data-grid';
-import { AnyThingColumns } from '@/config/column';
 import { ItemType } from 'antd/lib/menu/hooks/useItems';
 
 interface IProps extends IDataGridOptions {
-  form: schema.XForm;
-  beforeSource?: model.AnyThingModel[];
   fields: model.FieldModel[];
-  autoColumn?: boolean;
-  dataIndex?: 'attribute' | 'property';
   hideColumns?: string[];
   dataMenus?: {
     items: ItemType[];
@@ -21,12 +16,10 @@ interface IProps extends IDataGridOptions {
 }
 
 /** 使用form生成表单 */
-const GenerateTable = (props: IProps) => {
-  const fields = [...AnyThingColumns, ...props.fields];
+const GenerateEntityTable = (props: IProps) => {
   return (
-    <DataGrid<model.AnyThingModel, string>
-      keyExpr="Id"
-      key={props.form.id}
+    <DataGrid<any, string>
+      keyExpr="id"
       columnMinWidth={props.columnMinWidth ?? 80}
       focusedRowEnabled={true}
       allowColumnReordering={true}
@@ -55,28 +48,16 @@ const GenerateTable = (props: IProps) => {
       width="100%"
       height={props.height ?? '100%'}
       showBorders={true}
-      {...props}
-      onSelectionChanged={(e) => {
-        const info = { ...e };
-        info.selectedRowsData = e.selectedRowsData.map((data) => {
-          const newData: any = {};
-          fields.forEach((c) => {
-            if (props.dataIndex === 'attribute') {
-              if (data[c.id]) {
-                newData[c.id] = data[c.id];
-              }
-            } else {
-              if (data[c.code]) {
-                newData[c.id] = data[c.code];
-              }
-            }
-          });
-          return newData;
-        });
-        props.onSelectionChanged?.apply(this, [info]);
-      }}>
-      {fields.map((field) =>
-        GenerateColumn(field, props.beforeSource, props.hideColumns, props.dataIndex),
+      remoteOperations={{
+        paging: true,
+        sorting: false,
+        filtering: false,
+        grouping: false,
+        groupPaging: false,
+      }}
+      {...props}>
+      {props.fields.map((field) =>
+        GenerateColumn(field, [], props.hideColumns, 'property'),
       )}
       {props.dataMenus && (
         <Column
@@ -102,4 +83,4 @@ const GenerateTable = (props: IProps) => {
   );
 };
 
-export default GenerateTable;
+export default GenerateEntityTable;

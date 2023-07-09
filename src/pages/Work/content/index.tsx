@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import orgCtrl from '@/ts/controller';
-import { IBelong, IWorkTask, TaskStatus } from '@/ts/core';
+import { IBelong, IWorkTask } from '@/ts/core';
 import { model } from '@/ts/base';
-import { WorkColumns } from '@/config/column';
+import { WorkTaskColumns } from '@/config/column';
 import { GroupMenuType } from '../config/menuType';
 import TaskDetail from './detail';
-import useCtrlUpdate from '@/hooks/useCtrlUpdate';
-import CardOrTableComp from '@/components/CardOrTableComp';
+import GenerateEntityTable from '@/executor/tools/generate/entityTable';
+import CustomStore from 'devextreme/data/custom_store';
 
 interface IProps {
   filter: string;
@@ -15,9 +15,7 @@ interface IProps {
 }
 
 const TaskContent = (props: IProps) => {
-  const [key] = useCtrlUpdate(orgCtrl.work.notity);
   const [task, setTask] = useState<IWorkTask>();
-  const [selectedRows, setSelectRows] = useState<IWorkTask[]>([]);
 
   /** 查询任务项 */
   const getTaskList = async (page: model.PageModel) => {
@@ -59,84 +57,36 @@ const TaskContent = (props: IProps) => {
     return taskList;
   };
 
-  /** 加载操作功能 */
-  const getOperation = (items: IWorkTask[]) => {
-    const operates: any[] = [];
-    if (items.length === 1 && items[0].metadata.taskType != '加用户') {
-      operates.push({
-        key: 'detail',
-        label: '详情',
-        onClick: async () => {
-          await items[0].loadInstance(true);
-          if (items[0].instance) {
-            setTask(items[0]);
-          }
-        },
-      });
-    }
-    switch (props.taskType) {
-      case GroupMenuType.Done:
-        break;
-      case GroupMenuType.Apply:
-        if (
-          items.filter((i) => i.metadata.status < TaskStatus.ApprovalStart).length > 0
-        ) {
-          operates.push({
-            key: 'confirm',
-            label: '取消',
-            onClick: async () => {
-              items.forEach(async (item) => {
-                await item.approvalTask(-1, '取消申请');
-              });
-              orgCtrl.work.notity.changCallback();
-            },
-          });
-        }
-        break;
-      default:
-        operates.push(
-          {
-            key: 'confirm',
-            label: '通过',
-            onClick: async () => {
-              items.forEach(async (item) => {
-                await item.approvalTask(TaskStatus.ApprovalStart, '同意');
-              });
-            },
-          },
-          {
-            key: 'refuse',
-            label: '拒绝',
-            onClick: async () => {
-              items.forEach(async (item) => {
-                await item.approvalTask(TaskStatus.ApprovalStart, '驳回');
-              });
-            },
-          },
-        );
-        break;
-    }
-    return operates;
-  };
-
   if (task) {
     return <TaskDetail task={task} onBack={() => setTask(undefined)} />;
   }
   return (
-    <CardOrTableComp<IWorkTask>
-      key={key}
-      columns={WorkColumns}
-      operation={(item) => getOperation([item])}
-      tabBarExtraContent={selectedRows.length > 0 ? getOperation(selectedRows) : []}
-      request={getTaskList}
-      rowSelection={{
-        type: 'checkbox',
-        onChange: (_: React.Key[], selectedRows: IWorkTask[]) => {
-          setSelectRows(selectedRows);
-        },
+    <GenerateEntityTable
+      fields={WorkTaskColumns}
+      dataSource={
+        new CustomStore({
+          key: 'id',
+          async load(loadOptions) {
+            const res = await getTaskList({
+              offset: loadOptions.skip || 0,
+              limit: loadOptions.take || 20,
+              filter: loadOptions.searchValue || '',
+            });
+            return {
+              data: res.result,
+              totalCount: res.total,
+            };
+          },
+        })
+      }
+      columnChooser={{ enabled: true }}
+      onRowDblClick={async (e) => {
+        const data: IWorkTask = e.data;
+        await data.loadInstance(true);
+        if (data.instance && data.instanceData?.node) {
+          setTask(data);
+        }
       }}
-      dataSource={[]}
-      rowKey="id"
     />
   );
 };

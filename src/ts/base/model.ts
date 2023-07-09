@@ -575,11 +575,11 @@ export type FieldModel = {
   /** 类型(属性类型) */
   valueType: string;
   /** 规则(特性规则) */
-  rule: string;
+  rule?: string;
   /** 备注(特性描述) */
   remark: string;
   /** 字典(字典项/分类项) */
-  lookups: FiledLookup[];
+  lookups?: FiledLookup[];
 }
 
 export type FiledLookup = {

@@ -2,7 +2,7 @@ import { Modal } from 'antd';
 import React from 'react';
 import { kernel, model, schema } from '@/ts/base';
 import { IBelong } from '@/ts/core';
-import GenerateTable from '../generate/table';
+import GenerateThingTable from '../generate/thingTable';
 import CustomStore from 'devextreme/data/custom_store';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 
@@ -22,10 +22,8 @@ const FormSelectModal = ({ form, fields, belong, onSave }: IFormSelectProps) => 
     cancelText: '关闭',
     onCancel: () => modal.destroy(),
     content: (
-      <GenerateTable
-        form={form}
+      <GenerateThingTable
         fields={fields}
-        autoColumn
         height={'70vh'}
         toolbar={{ visible: false }}
         selection={{
@@ -43,10 +41,7 @@ const FormSelectModal = ({ form, fields, belong, onSave }: IFormSelectProps) => 
             async load(loadOptions) {
               loadOptions.userData = [];
               let request: any = { ...loadOptions };
-              const result = await kernel.anystore.loadThing<model.AnyThingModel>(
-                belong.id,
-                request,
-              );
+              const result = await kernel.anystore.loadThing<any>(belong.id, request);
               if (result.success) {
                 return result.data;
               }

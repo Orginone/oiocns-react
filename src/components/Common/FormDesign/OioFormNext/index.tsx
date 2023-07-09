@@ -96,7 +96,12 @@ const OioForm: React.FC<IProps> = ({
                   </div>
                 }
                 contentStyle={{ width: '33%' }}>
-                <OioFormItem field={field} belong={belong} disabled={disabled === true} />
+                <OioFormItem
+                  field={field}
+                  belong={belong}
+                  disabled={disabled === true}
+                  value={fieldsValue ? fieldsValue[field.id] : undefined}
+                />
               </Descriptions.Item>
             );
           })}

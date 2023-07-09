@@ -37,7 +37,7 @@ const IconMode = ({
           e.stopPropagation();
         }}>
         <div className={cls.fileImage}>
-          <EntityIcon entityId={el.id} size={50} />
+          <EntityIcon entity={el.metadata} size={50} />
         </div>
         <div className={cls.fileName} title={el.name}>
           <Typography.Text title={el.name} ellipsis>

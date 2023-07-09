@@ -247,8 +247,6 @@ export const AnyThingColumns: model.FieldModel[] = [
     code: 'Id',
     name: '唯一标识',
     valueType: '描述型',
-    rule: '{}',
-    lookups: [],
     remark: '由系统生成的唯一标记,无实义.',
   },
   {
@@ -256,8 +254,6 @@ export const AnyThingColumns: model.FieldModel[] = [
     code: 'Name',
     name: '名称',
     valueType: '描述型',
-    rule: '{}',
-    lookups: [],
     remark: '描述信息',
   },
   {
@@ -265,8 +261,6 @@ export const AnyThingColumns: model.FieldModel[] = [
     code: 'Creater',
     name: '创建人',
     valueType: '用户型',
-    rule: '{}',
-    lookups: [],
     remark: '创建标识的人',
   },
   {
@@ -274,7 +268,6 @@ export const AnyThingColumns: model.FieldModel[] = [
     code: 'Status',
     name: '状态',
     valueType: '选择型',
-    rule: '{}',
     remark: '数据状态',
     lookups: [
       {
@@ -294,8 +287,6 @@ export const AnyThingColumns: model.FieldModel[] = [
     code: 'CreateTime',
     name: '创建时间',
     valueType: '时间型',
-    rule: '{}',
-    lookups: [],
     remark: '创建标识的时间',
   },
   {
@@ -303,8 +294,141 @@ export const AnyThingColumns: model.FieldModel[] = [
     code: 'ModifiedTime',
     name: '修改时间',
     valueType: '时间型',
-    rule: '{}',
-    lookups: [],
     remark: '最新修改时间',
+  },
+];
+
+/** 实体默认列信息 */
+export const EntityColumns: model.FieldModel[] = [
+  {
+    id: 'id',
+    code: 'id',
+    name: '唯一标识',
+    valueType: '描述型',
+    remark: '由系统生成的唯一标记,无实义.',
+  },
+  {
+    id: 'name',
+    code: 'name',
+    name: '名称',
+    valueType: '描述型',
+    remark: '描述信息',
+  },
+  {
+    id: 'code',
+    code: 'code',
+    name: '代码',
+    valueType: '描述型',
+    remark: '标识代码',
+  },
+  {
+    id: 'createTime',
+    code: 'createTime',
+    name: '创建时间',
+    valueType: '时间型',
+    remark: '创建标识的时间',
+  },
+  {
+    id: 'updateTime',
+    code: 'updateTime',
+    name: '修改时间',
+    valueType: '时间型',
+    remark: '最新修改时间',
+  },
+];
+
+/** 办事列 */
+export const WorkTaskColumns: model.FieldModel[] = [
+  {
+    id: 'id',
+    code: 'id',
+    name: '唯一标识',
+    valueType: '描述型',
+    remark: '由系统生成的唯一标记,无实义.',
+  },
+  {
+    id: 'taskType',
+    code: 'metadata.taskType',
+    name: '类型',
+    valueType: '选择型',
+    remark: '任务类型',
+    lookups: [
+      {
+        id: '0',
+        text: '加用户',
+        value: '加用户',
+      },
+      {
+        id: '1',
+        text: '事项',
+        value: '事项',
+      },
+    ],
+  },
+  {
+    id: 'title',
+    code: 'metadata.title',
+    name: '标题',
+    valueType: '描述型',
+    remark: '任务类型',
+  },
+  {
+    id: 'shareId',
+    code: 'metadata.shareId',
+    name: '用户',
+    valueType: '用户型',
+    remark: '用户',
+  },
+  {
+    id: 'applyId',
+    code: 'metadata.applyId',
+    name: '发起用户',
+    valueType: '用户型',
+    remark: '发起用户',
+  },
+  {
+    id: 'status',
+    code: 'metadata.status',
+    name: '状态',
+    valueType: '选择型',
+    remark: '状态',
+    lookups: [
+      {
+        id: 'blue',
+        text: '待审批',
+        value: '1',
+      },
+      {
+        id: 'green',
+        text: '已同意',
+        value: '100',
+      },
+      {
+        id: 'red',
+        text: '已拒绝',
+        value: '200',
+      },
+    ],
+  },
+  {
+    id: 'content',
+    code: 'content',
+    name: '内容',
+    valueType: '描述型',
+    remark: '内容',
+  },
+  {
+    id: 'createUser',
+    code: 'metadata.createUser',
+    name: '申请人',
+    valueType: '用户型',
+    remark: '申请人',
+  },
+  {
+    id: 'createTime',
+    code: 'metadata.createTime',
+    name: '申请时间',
+    valueType: '时间型',
+    remark: '申请时间',
   },
 ];

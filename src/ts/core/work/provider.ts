@@ -118,7 +118,7 @@ export class WorkProvider implements IWorkProvider {
     );
     return {
       ...res.data,
-      result: res.data.result.map((task) => new WorkTask(task, this.user)),
+      result: (res.data.result || []).map((task) => new WorkTask(task, this.user)),
     };
   }
   async loadAttributes(id: string, belongId: string): Promise<schema.XAttribute[]> {

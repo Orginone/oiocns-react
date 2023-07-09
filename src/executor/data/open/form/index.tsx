@@ -5,7 +5,7 @@ import * as config from './config';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import MainLayout from '@/components/MainLayout';
 import useMenuUpdate from '@/hooks/useMenuUpdate';
-import GenerateTable from '@/executor/tools/generate/table';
+import GenerateThingTable from '@/executor/tools/generate/thingTable';
 import CustomStore from 'devextreme/data/custom_store';
 import { kernel } from '@/ts/base';
 import { ImCopy, ImShuffle, ImTicket } from 'react-icons/im';
@@ -34,11 +34,9 @@ const FormView: React.FC<IProps> = ({ form, finished }) => {
       );
     }
     return (
-      <GenerateTable
+      <GenerateThingTable
         key={key}
-        autoColumn
         height={'100%'}
-        form={form.metadata}
         fields={form.fields}
         onRowDblClick={(e: any) => setSelcet(e.data)}
         dataSource={
