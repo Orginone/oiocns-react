@@ -109,7 +109,7 @@ const TaskContent = (props: IProps) => {
             label: '拒绝',
             onClick: async () => {
               items.forEach(async (item) => {
-                await item.approvalTask(TaskStatus.ApprovalStart, '驳回');
+                await item.approvalTask(TaskStatus.RefuseStart, '驳回');
               });
             },
           },
