@@ -72,6 +72,10 @@ const TaskContent = (props: IProps) => {
               limit: loadOptions.take || 20,
               filter: loadOptions.searchValue || '',
             });
+            console.log({
+              data: res.result,
+              totalCount: res.total,
+            });
             return {
               data: res.result,
               totalCount: res.total,
@@ -86,6 +90,12 @@ const TaskContent = (props: IProps) => {
         if (data.instance && data.instanceData?.node) {
           setTask(data);
         }
+      }}
+      sorting={{ mode: 'none' }}
+      remoteOperations={{
+        paging: true,
+        filtering: false,
+        groupPaging: true,
       }}
     />
   );

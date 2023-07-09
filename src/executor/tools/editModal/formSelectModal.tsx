@@ -45,7 +45,10 @@ const FormSelectModal = ({ form, fields, belong, onSave }: IFormSelectProps) => 
               if (result.success) {
                 return result.data;
               }
-              return [];
+              return {
+                data: [],
+                totalCount: 0,
+              };
             },
           })
         }

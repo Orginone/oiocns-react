@@ -48,13 +48,6 @@ const GenerateEntityTable = (props: IProps) => {
       width="100%"
       height={props.height ?? '100%'}
       showBorders={true}
-      remoteOperations={{
-        paging: true,
-        sorting: false,
-        filtering: false,
-        grouping: false,
-        groupPaging: false,
-      }}
       {...props}>
       {props.fields.map((field) =>
         GenerateColumn(field, [], props.hideColumns, 'property'),
