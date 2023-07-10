@@ -1,10 +1,10 @@
 import React from 'react';
-import { FileItemModel } from '@/ts/base/model';
 import FullScreenModal from '@/executor/tools/fullScreen';
 import { SheetViewer, DocxViewer, PdfViewer } from 'react-office-viewer';
+import { FileItemShare } from '@/ts/base/model';
 
 interface IProps {
-  share: FileItemModel;
+  share: FileItemShare;
   finished: () => void;
 }
 

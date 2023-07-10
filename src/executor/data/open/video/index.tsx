@@ -1,10 +1,10 @@
 import React from 'react';
-import { FileItemModel } from '@/ts/base/model';
 import FullScreenModal from '@/executor/tools/fullScreen';
-import JolPlayer from 'jol-player';
+import { JolPlayer } from 'jol-player';
+import { FileItemShare } from '@/ts/base/model';
 
 interface IProps {
-  share: FileItemModel;
+  share: FileItemShare;
   finished: () => void;
 }
 
@@ -18,17 +18,16 @@ const VideoView: React.FC<IProps> = ({ share, finished }) => {
         centered
         hideMaxed
         open={true}
-        width={850}
         destroyOnClose
         title={share.name}
+        width={850}
         bodyHeight={500}
         onCancel={() => finished()}>
         <JolPlayer
-          style={{ width: '100%' }}
           option={{
             videoSrc: share.shareLink,
-            height: 490,
-            mode: 'heightFix',
+            width: 830,
+            height: 480,
             language: 'zh',
             pausePlacement: 'center',
             isShowScreenshot: false,
