@@ -2,6 +2,30 @@
   margin: 0 auto;
 }
 
+.layout-body {
+  padding: 0px;
+  // height: 800px;
+  height: calc(100vh - 150px);
+  // overflow: none;
+}
+
+.design {
+  margin-top: 100px;
+  padding: 0px;
+  display: flex;
+  transform-origin: 50% 0px 0px;
+}
+
+.publish {
+  width: 110px;
+  padding-bottom: 20px;
+  margin-right: 20px;
+  margin-left: auto;
+  .scale {
+    margin-left: auto;
+  }
+}
+
 .all-process-end {
   width: 100%;
   height: 60px;
@@ -69,7 +93,6 @@
 .branch-node-item {
   position: relative;
   display: flex;
-  background: #f5f6f6;
   flex-direction: column;
   align-items: center;
   border-top: 2px solid #cccccc;

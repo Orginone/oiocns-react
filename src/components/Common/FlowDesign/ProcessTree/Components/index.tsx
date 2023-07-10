@@ -2,7 +2,7 @@ import Node from './Node';
 import Concurrent from './ConcurrentNode';
 import Condition from './ConditionNode';
 import DeptWay from './DeptWayNode';
-import { AddNodeType, NodeModel } from '../../../processType';
+import { AddNodeType, NodeModel } from '../../processType';
 import React from 'react';
 import { ITarget } from '@/ts/core';
 

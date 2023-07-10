@@ -1,12 +1,14 @@
-import Design from '@/components/Common/FlowDesign';
 import { ProFormInstance } from '@ant-design/pro-form';
-import { Button, Card, Collapse, Input, Tabs, TabsProps, Timeline } from 'antd';
+import { Button, Card, Collapse, Drawer, Input, Tabs, TabsProps, Timeline } from 'antd';
 import React, { useRef, useState } from 'react';
 import { ImUndo2 } from 'react-icons/im';
 import cls from './index.module.less';
 import { IWorkTask, TaskStatus } from '@/ts/core';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import WorkForm from '@/executor/tools/workForm';
+import ProcessTree from '@/components/Common/FlowDesign/ProcessTree';
+import { NodeModel, loadResource } from '@/components/Common/FlowDesign/processType';
+import TaskDrawer from './drawer';
 
 export interface TaskDetailType {
   task: IWorkTask;
@@ -15,6 +17,7 @@ export interface TaskDetailType {
 
 const Detail: React.FC<TaskDetailType> = ({ task, onBack }) => {
   const formRef = useRef<ProFormInstance<any>>();
+  const [selectNode, setSelectNode] = useState<NodeModel>();
   const [comment, setComment] = useState<string>('');
 
   /** 加载时间条 */
@@ -159,28 +162,45 @@ const Detail: React.FC<TaskDetailType> = ({ task, onBack }) => {
     {
       key: '2',
       label: `流程图`,
-      children: <Design IsEdit={false} instance={task.instance} />,
+      children: (
+        <ProcessTree
+          isEdit={false}
+          resource={loadResource(JSON.parse(task.instance?.data || '{}').node, '')}
+          onSelectedNode={(node) => setSelectNode(node)}
+        />
+      ),
     },
   ];
 
   return (
-    <Card>
-      <Tabs
-        defaultActiveKey="1"
-        items={items}
-        tabBarExtraContent={
-          <div
-            style={{ display: 'flex', cursor: 'pointer' }}
-            onClick={() => {
-              onBack?.apply(this);
-            }}>
-            <a style={{ paddingTop: '2px' }}>
-              <ImUndo2 />
-            </a>
-            <a style={{ paddingLeft: '6px' }}>返回</a>
-          </div>
-        }></Tabs>
-    </Card>
+    <>
+      <Card>
+        <Tabs
+          defaultActiveKey="1"
+          items={items}
+          tabBarExtraContent={
+            <div
+              style={{ display: 'flex', cursor: 'pointer' }}
+              onClick={() => {
+                onBack?.apply(this);
+              }}>
+              <a style={{ paddingTop: '2px' }}>
+                <ImUndo2 />
+              </a>
+              <a style={{ paddingLeft: '6px' }}>返回</a>
+            </div>
+          }
+        />
+      </Card>
+      {selectNode && (
+        <TaskDrawer
+          current={selectNode}
+          isOpen={selectNode != undefined}
+          onClose={() => setSelectNode(undefined)}
+          instance={task.instance!}
+        />
+      )}
+    </>
   );
 };
 

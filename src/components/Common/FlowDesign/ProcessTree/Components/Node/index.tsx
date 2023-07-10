@@ -54,10 +54,7 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
   }
 
   return (
-    <div
-      className={`${props.isEdit ? cls['node'] : cls['node-unEdit']} ${
-        isRoot ? cls['root'] : ''
-      }`}>
+    <div className={`${cls['node']} ${isRoot ? cls['root'] : ''}`}>
       <div className={cls['node-body']}>
         <div
           className={

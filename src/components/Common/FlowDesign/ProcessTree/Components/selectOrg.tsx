@@ -1,5 +1,5 @@
 import { TreeSelect } from 'antd';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { ITarget } from '@/ts/core';
 interface IProps {
   rootDisable?: boolean;
@@ -9,12 +9,7 @@ interface IProps {
   target: ITarget;
 }
 const SelectOrg: React.FC<IProps> = (props: IProps) => {
-  const [treeData, setTreeData] = useState<any[]>([]);
-  if (!props.value || props.value.length < 2) return <div>其他组织</div>;
-
-  useEffect(() => {
-    setTreeData(buildTargetTree([props.target], false, 0));
-  }, [props]);
+  if (props.value == '0') return <div>其他组织</div>;
 
   /** 加载组织树 */
   const buildTargetTree = (targets: ITarget[], isChild: boolean, level: number) => {
@@ -56,7 +51,7 @@ const SelectOrg: React.FC<IProps> = (props: IProps) => {
       placeholder="请选择操作组织"
       treeDefaultExpandAll
       onChange={props.onChange}
-      treeData={treeData}
+      treeData={buildTargetTree([props.target], false, 0)}
     />
   );
 };

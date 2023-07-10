@@ -1,10 +1,11 @@
-import { AddNodeType, NodeModel, dataType, getNewBranchNode } from '../../processType';
-import { Button, message } from 'antd';
+import { AddNodeType, NodeModel, dataType, getNewBranchNode } from '../processType';
+import { Button, Card, Layout, Space, message } from 'antd';
+import cls from './index.module.less';
+import { decodeAppendDom } from './Components';
 import { ITarget } from '@/ts/core';
 import React, { useState } from 'react';
-import cls from './index.module.less';
-import { isBranchNode, getNodeName, getNodeCode } from '../../processType';
-import { decodeAppendDom } from './Components';
+import { isBranchNode, getNodeName, getNodeCode } from '../processType';
+import { AiOutlineMinus, AiOutlinePlus } from 'react-icons/ai';
 
 type IProps = {
   target?: ITarget;
@@ -19,6 +20,7 @@ type IProps = {
  */
 const ProcessTree: React.FC<IProps> = ({ target, resource, onSelectedNode, isEdit }) => {
   const [key, setKey] = useState(0);
+  const [scale, setScale] = useState<number>(100);
   const [nodeMap] = useState(new Map<string, NodeModel>());
 
   // 获取节点树
@@ -43,11 +45,13 @@ const ProcessTree: React.FC<IProps> = ({ target, resource, onSelectedNode, isEdi
           <div>
             <div className={cls['branch-node']}>
               <div className={cls['add-branch-btn']}>
-                <Button
-                  className={cls[`add-branch-btn-el`]}
-                  onClick={() => addBranchNode(node)}>
-                  {`添加${getNodeName(node.type)}`}
-                </Button>
+                {isEdit && (
+                  <Button
+                    className={cls[`add-branch-btn-el`]}
+                    onClick={() => addBranchNode(node)}>
+                    {`添加${getNodeName(node.type)}`}
+                  </Button>
+                )}
               </div>
               {branchItems}
             </div>
@@ -114,10 +118,10 @@ const ProcessTree: React.FC<IProps> = ({ target, resource, onSelectedNode, isEdi
           {
             ...getNewBranchNode(newNode, 1, [
               {
-                pos: 1,
+                pos: -1,
                 paramKey: '0',
                 paramLabel: '组织',
-                dispaly: '其他',
+                display: '其他组织',
                 key: 'EQ',
                 label: '=',
                 type: dataType.BELONG,
@@ -125,7 +129,7 @@ const ProcessTree: React.FC<IProps> = ({ target, resource, onSelectedNode, isEdi
               },
             ]),
             readonly: true,
-            name: '其他',
+            name: '其他分支',
           },
         ];
         break;
@@ -218,14 +222,56 @@ const ProcessTree: React.FC<IProps> = ({ target, resource, onSelectedNode, isEdi
   };
 
   return (
-    <div className={cls['_root']}>
-      {getDomTree(resource)}
-      <div className={cls['all-process-end']}>
-        <div className={cls['process-content']}>
-          <div className={cls['process-left']}>结束</div>
-          <div className={cls['process-right']}>数据归档</div>
-        </div>
-      </div>
+    <div className={cls['company-info-content']}>
+      <Card bordered={false}>
+        <Layout>
+          <Layout.Content>
+            <Card bordered={false}>
+              <div className={cls['publish']}>
+                <Space>
+                  <Button
+                    className={cls['scale']}
+                    size="small"
+                    disabled={scale <= 40}
+                    onClick={() => setScale(scale - 10)}>
+                    <AiOutlineMinus />
+                  </Button>
+                  <span>{scale}%</span>
+                  <Button
+                    size="small"
+                    className={cls['scale']}
+                    disabled={scale >= 150}
+                    onClick={() => setScale(scale + 10)}>
+                    <AiOutlinePlus />
+                  </Button>
+                </Space>
+              </div>
+              {/* 基本信息组件 */}
+              <div>
+                <div className={cls['container']}>
+                  <div className={cls['layout-body']}>
+                    <div style={{ height: 'calc(100vh - 220px )', overflowY: 'auto' }}>
+                      <div
+                        className={cls['design']}
+                        style={{ transform: `scale(${(scale ?? 100) / 100})` }}>
+                        <div className={cls['_root']}>
+                          {getDomTree(resource)}
+                          <div className={cls['all-process-end']}>
+                            <div className={cls['process-content']}>
+                              <div className={cls['process-left']}>结束</div>
+                              <div className={cls['process-right']}>数据归档</div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </Card>
+          </Layout.Content>
+        </Layout>
+      </Card>
     </div>
   );
 };
