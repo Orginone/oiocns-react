@@ -19,7 +19,7 @@ type IProps = {
  */
 const ConditionNode: React.FC<IProps> = (props) => {
   return (
-    <div className={`${props.isEdit ? cls['node'] : cls['node-unEdit']} `}>
+    <div className={cls['node']}>
       <div className={`${cls['node-body']}`}>
         <div className={cls['node-body-main']}>
           <div className={cls['node-body-main-header']}>

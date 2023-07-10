@@ -5,7 +5,7 @@ import {
   dataType,
   getConditionKeys,
   NodeModel,
-} from '../../../../processType';
+} from '../../../processType';
 import cls from './index.module.less';
 import { AiOutlineDelete } from 'react-icons/ai';
 import { model } from '@/ts/base';

@@ -17,7 +17,7 @@ type ConcurrentNodeProps = {
  */
 const ConcurrentNode: React.FC<ConcurrentNodeProps> = (props: ConcurrentNodeProps) => {
   return (
-    <div className={props.isEdit ? cls['node'] : cls['node-unEdit']}>
+    <div className={cls['node']}>
       <div className={cls['node-body']}>
         <div className={cls['node-body-main']}>
           <div className={cls['node-body-main-header']}>

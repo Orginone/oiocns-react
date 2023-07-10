@@ -1,6 +1,6 @@
 import React from 'react';
 import cls from './index.module.less';
-import { NodeModel } from '../../../../processType';
+import { NodeModel } from '../../../processType';
 interface IProps {
   current: NodeModel;
   orgId?: string;

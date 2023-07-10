@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { AiOutlineSetting } from 'react-icons/ai';
 import { Row, Button, Space, Modal, message } from 'antd';
 import cls from './index.module.less';
-import { NodeModel } from '../../../../processType';
+import { NodeModel } from '../../../processType';
 import { IBelong } from '@/ts/core';
 import SelectDefine from '@/components/Common/SelectDefine';
 import ShareShowComp from '@/components/Common/ShareShowComp';
