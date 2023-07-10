@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import orgCtrl from '@/ts/controller';
-import { IBelong, IWorkTask } from '@/ts/core';
+import { IBelong, IWorkTask, TaskStatus } from '@/ts/core';
 import { model } from '@/ts/base';
 import { WorkTaskColumns } from '@/config/column';
 import { GroupMenuType } from '../config/menuType';
 import TaskDetail from './detail';
 import GenerateEntityTable from '@/executor/tools/generate/entityTable';
 import CustomStore from 'devextreme/data/custom_store';
+import { ImCopy, ImShuffle, ImTicket } from 'react-icons/im';
+import { Modal, message } from 'antd';
 
 interface IProps {
   taskType: string;
@@ -56,6 +58,36 @@ const TaskContent = (props: IProps) => {
     return taskList;
   };
 
+  /** 进入详情 */
+  const setTaskDetail = async (data: IWorkTask) => {
+    if (data.metadata.instanceId) {
+      await data.loadInstance(true);
+      if (data.instance && data.instanceData?.node) {
+        setTask(data);
+      }
+    } else {
+      const readOnly = data.metadata.status >= TaskStatus.ApprovalStart;
+      Modal.confirm({
+        closable: true,
+        maskClosable: true,
+        title: data.metadata.title,
+        okText: readOnly ? '好的' : '同意',
+        cancelText: '拒绝',
+        cancelButtonProps: {
+          style: {
+            display: readOnly ? 'none' : 'block',
+          },
+        },
+        content: data.content,
+        onOk: async () => {
+          if (!readOnly) {
+            await data.approvalTask(TaskStatus.ApprovalStart, '同意');
+          }
+        },
+      });
+    }
+  };
+
   if (task) {
     return <TaskDetail task={task} onBack={() => setTask(undefined)} />;
   }
@@ -80,17 +112,42 @@ const TaskContent = (props: IProps) => {
       }
       columnChooser={{ enabled: true }}
       onRowDblClick={async (e) => {
-        const data: IWorkTask = e.data;
-        await data.loadInstance(true);
-        if (data.instance && data.instanceData?.node) {
-          setTask(data);
-        }
+        await setTaskDetail(e.data);
       }}
       sorting={{ mode: 'none' }}
       remoteOperations={{
         paging: true,
         filtering: false,
         groupPaging: true,
+      }}
+      dataMenus={{
+        items: [
+          {
+            key: 'remark',
+            label: '详情',
+            icon: <ImShuffle fontSize={22} color={'#9498df'} />,
+          },
+          {
+            key: 'createNFT',
+            label: '存证',
+            icon: <ImTicket fontSize={22} color={'#9498df'} />,
+            onClick: () => {
+              message.success('存证成功!');
+            },
+          },
+          {
+            key: 'print',
+            label: '打印',
+            icon: <ImCopy fontSize={22} color={'#9498df'} />,
+          },
+        ],
+        async onMenuClick(key, data) {
+          switch (key) {
+            case 'remark':
+              await setTaskDetail(data);
+              break;
+          }
+        },
       }}
     />
   );

@@ -6,6 +6,8 @@ import { UserProvider } from '../user';
 export interface IWorkTask {
   /** 唯一标识 */
   id: string;
+  /** 内容 */
+  content: string;
   /** 当前用户 */
   user: UserProvider;
   /** 归属空间 */

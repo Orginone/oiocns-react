@@ -142,10 +142,10 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
       } else {
         await Promise.all([
           await this.loadSubDirectory(),
-          await this.loadForms(),
-          await this.loadPropertys(),
-          await this.loadSpecieses(),
-          await this.loadApplications(),
+          await this.loadForms(reload),
+          await this.loadPropertys(reload),
+          await this.loadSpecieses(reload),
+          await this.loadApplications(reload),
         ]);
       }
     }
