@@ -27,6 +27,7 @@ import { Modal, UploadProps } from 'antd';
 import { FileItemShare } from '@/ts/base/model';
 import { downloadByUrl } from '@/utils/tools';
 import { model } from '@/ts/base';
+import EntityIcon from '../../GlobalComps/entityIcon';
 
 interface IProps {
   disabled?: boolean;
@@ -74,7 +75,6 @@ const OioFormItem = ({
   if (!rule.widget) {
     rule.widget = loadWidgetsOpts(field.valueType)[0].value;
   }
-
   const [fileList, setFileList] = useState<any[]>([]);
   useEffect(() => {
     if (value && ['file', 'upload'].includes(rule.widget)) {
@@ -151,6 +151,21 @@ const OioFormItem = ({
         return defaultFilsUrl[2];
     }
   };
+  if (disabled) {
+    switch (rule.widget) {
+      case 'dept':
+      case 'department':
+      case 'person':
+      case 'myself':
+      case 'group':
+      case 'auth':
+      case 'identity':
+        if (value) {
+          return <EntityIcon entityId={value} showName size={20} />;
+        }
+        return <></>;
+    }
+  }
   switch (rule.widget) {
     case 'input':
     case 'string':
@@ -295,7 +310,7 @@ const OioFormItem = ({
           tooltip={field.remark}
           fieldProps={{
             ...rules,
-            options: field.lookups.map((i) => {
+            options: (field.lookups || []).map((i) => {
               return { label: i.text, value: i.value };
             }),
           }}

@@ -159,23 +159,6 @@ function assignment(oldObj: { [key: string]: any }, newObj: { [key: string]: any
 }
 
 /**
- * 数组分组
- * @param arr
- * @param length
- * @returns
- */
-function partition<T>(arr: T[], count: number): T[][] {
-  var result: T[][] = [];
-  for (var index = 0, total = arr.length; index < total; index++) {
-    if (index % count === 0) {
-      result.push([]);
-    }
-    result[result.length - 1].push(arr[index]);
-  }
-  return result;
-}
-
-/**
  * 批量请求
  */
 async function batchRequests(
@@ -183,15 +166,12 @@ async function batchRequests(
   onItemCompleted: (request: RequestIndex, result: model.ResultType<any>) => void,
 ) {
   if (requests.length == 0) return;
-  let res = await kernel.requests(requests.map((item) => item.request));
-  if (res.success) {
-    let results: model.ResultType<any>[] = res.data;
-    for (let index = 0; index < results.length; index++) {
-      let request = requests[index];
-      let result = results[index];
-      onItemCompleted(request, result);
-    }
-  }
+  await Promise.all(
+    requests.map(async (item) => {
+      const result = await kernel.request(item.request);
+      onItemCompleted(item, result);
+    }),
+  );
 }
 
-export { assignment, batchRequests, dataHandling, generateXlsx, partition, readXlsx };
+export { assignment, batchRequests, dataHandling, generateXlsx, readXlsx };

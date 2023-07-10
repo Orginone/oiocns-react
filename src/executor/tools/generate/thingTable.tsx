@@ -1,5 +1,5 @@
 import React from 'react';
-import { model, schema } from '@/ts/base';
+import { model } from '@/ts/base';
 import { Dropdown } from 'antd';
 import { AiOutlineEllipsis } from 'react-icons/ai';
 import { GenerateColumn } from './columns';
@@ -8,10 +8,8 @@ import { AnyThingColumns } from '@/config/column';
 import { ItemType } from 'antd/lib/menu/hooks/useItems';
 
 interface IProps extends IDataGridOptions {
-  form: schema.XForm;
   beforeSource?: model.AnyThingModel[];
   fields: model.FieldModel[];
-  autoColumn?: boolean;
   dataIndex?: 'attribute' | 'property';
   hideColumns?: string[];
   dataMenus?: {
@@ -21,12 +19,11 @@ interface IProps extends IDataGridOptions {
 }
 
 /** 使用form生成表单 */
-const GenerateTable = (props: IProps) => {
+const GenerateThingTable = (props: IProps) => {
   const fields = [...AnyThingColumns, ...props.fields];
   return (
     <DataGrid<model.AnyThingModel, string>
       keyExpr="Id"
-      key={props.form.id}
       columnMinWidth={props.columnMinWidth ?? 80}
       focusedRowEnabled={true}
       allowColumnReordering={true}
@@ -102,4 +99,4 @@ const GenerateTable = (props: IProps) => {
   );
 };
 
-export default GenerateTable;
+export default GenerateThingTable;
