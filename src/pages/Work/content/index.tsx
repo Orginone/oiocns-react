@@ -9,6 +9,7 @@ import GenerateEntityTable from '@/executor/tools/generate/entityTable';
 import CustomStore from 'devextreme/data/custom_store';
 import { ImCopy, ImShuffle, ImTicket } from 'react-icons/im';
 import { Modal, message } from 'antd';
+import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 
 interface IProps {
   taskType: string;
@@ -17,6 +18,7 @@ interface IProps {
 
 const TaskContent = (props: IProps) => {
   const [task, setTask] = useState<IWorkTask>();
+  const [key] = useCtrlUpdate(orgCtrl.work.notity);
 
   /** 查询任务项 */
   const getTaskList = async (page: model.PageModel) => {
@@ -75,10 +77,15 @@ const TaskContent = (props: IProps) => {
         cancelText: '拒绝',
         cancelButtonProps: {
           style: {
-            display: readOnly ? 'none' : 'block',
+            display: readOnly ? 'none' : undefined,
           },
         },
         content: data.content,
+        onCancel: async (...args) => {
+          if (args.length == 0) {
+            await data.approvalTask(TaskStatus.RefuseStart, '拒绝');
+          }
+        },
         onOk: async () => {
           if (!readOnly) {
             await data.approvalTask(TaskStatus.ApprovalStart, '同意');
@@ -91,8 +98,10 @@ const TaskContent = (props: IProps) => {
   if (task) {
     return <TaskDetail task={task} onBack={() => setTask(undefined)} />;
   }
+
   return (
     <GenerateEntityTable
+      key={key}
       fields={WorkTaskColumns}
       dataSource={
         new CustomStore({
