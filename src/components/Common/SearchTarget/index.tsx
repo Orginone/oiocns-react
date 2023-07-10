@@ -21,6 +21,7 @@ type CompanySearchTableProps = {
 */
 const SearchTarget: React.FC<CompanySearchTableProps> = (props) => {
   const tableProps: CompanySearchTableProps = props;
+  const [checked, setChecked] = useState<string[]>([]);
 
   const [searchKey, setSearchKey] = useState<string>();
   const [dataSource, setDataSource] = useState<XTarget[]>([]);
@@ -49,8 +50,10 @@ const SearchTarget: React.FC<CompanySearchTableProps> = (props) => {
       <CheckCard.Group
         bordered={false}
         multiple
+        value={checked}
         style={{ width: '100%' }}
         onChange={(value: any) => {
+          setChecked(value);
           let checkObjs: XTarget[] = [];
           for (const target of dataSource) {
             if (value.includes(target.id)) {
@@ -130,6 +133,8 @@ const SearchTarget: React.FC<CompanySearchTableProps> = (props) => {
                 break;
             }
             setDataSource(res);
+            setChecked(res.map((i) => i.id));
+            tableProps.searchCallback(res);
           }
         }}
       />
