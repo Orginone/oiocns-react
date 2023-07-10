@@ -7,6 +7,8 @@ import FormView from './form';
 import WorkStart from './work';
 import OfficeView from './office';
 
+const officeExt = ['.pdf', '.xls', '.xlsx', '.doc', '.docx', '.ppt', '.pptx'];
+
 interface IOpenProps {
   cmd: string;
   entity: IEntity<schema.XEntity> | ISysFileInfo;
@@ -28,15 +30,12 @@ const ExecutorOpen: React.FC<IOpenProps> = (props: IOpenProps) => {
     if (data.contentType?.startsWith('video')) {
       return <VideoView share={data} finished={props.finished} />;
     }
-    switch (data?.extension) {
-      case '.docx':
-      case '.csv':
-      case '.mp4':
-      case '.webm':
-        return <OfficeView share={data} finished={props.finished} />;
+    if (officeExt.includes(data.extension ?? '-')) {
+      return <OfficeView share={data} finished={props.finished} />;
     }
+  } else {
+    command.emitter('config', props.cmd, props.entity);
   }
-  command.emitter('config', props.cmd, props.entity);
   return <></>;
 };
 

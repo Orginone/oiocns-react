@@ -1,7 +1,7 @@
 import React from 'react';
 import { FileItemModel } from '@/ts/base/model';
 import FullScreenModal from '@/executor/tools/fullScreen';
-import FileViewer from 'react-file-viewer';
+import { SheetViewer, DocxViewer, PdfViewer } from 'react-office-viewer';
 
 interface IProps {
   share: FileItemModel;
@@ -13,6 +13,24 @@ const OfficeView: React.FC<IProps> = ({ share, finished }) => {
     if (!share.shareLink.includes('/orginone/anydata/bucket/load')) {
       share.shareLink = `/orginone/anydata/bucket/load/${share.shareLink}`;
     }
+    const LoadViewer = () => {
+      const config = {
+        locale: 'zh',
+        timeout: 5000,
+        fileName: share.name,
+        file: share.shareLink,
+      };
+      switch (share.extension) {
+        case '.xls':
+        case '.xlsx':
+          return <SheetViewer {...config} />;
+        case '.docx':
+          return <DocxViewer {...config} />;
+        case '.pdfx':
+          return <PdfViewer {...config} />;
+      }
+      return <></>;
+    };
     return (
       <FullScreenModal
         centered
@@ -23,14 +41,7 @@ const OfficeView: React.FC<IProps> = ({ share, finished }) => {
         title={share.name}
         bodyHeight={'80vh'}
         onCancel={() => finished()}>
-        <FileViewer
-          key={share.key}
-          fileType={share.extension?.substring(1)}
-          filePath={share.shareLink}
-          errorComponent={(val: any) => {
-            console.log('err=', val);
-          }}
-        />
+        <LoadViewer />
       </FullScreenModal>
     );
   }
