@@ -6,6 +6,8 @@ import React from 'react';
 import FormView from './form';
 import WorkStart from './work';
 import OfficeView from './office';
+import MarkdownView from './markdown';
+import JsonView from './json';
 
 interface IOpenProps {
   cmd: string;
@@ -28,12 +30,17 @@ const ExecutorOpen: React.FC<IOpenProps> = (props: IOpenProps) => {
     if (data.contentType?.startsWith('video')) {
       return <VideoView share={data} finished={props.finished} />;
     }
+    if (data.contentType?.startsWith('text')) {
+      return <MarkdownView share={data} finished={props.finished} />;
+    }
     switch (data?.extension) {
       case '.docx':
       case '.csv':
       case '.mp4':
       case '.webm':
         return <OfficeView share={data} finished={props.finished} />;
+      case '.json':
+        return <JsonView share={data} finished={props.finished} />;
     }
   }
   command.emitter('config', props.cmd, props.entity);
