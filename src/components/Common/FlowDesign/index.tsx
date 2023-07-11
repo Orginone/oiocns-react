@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import cls from './index.module.less';
 import { WorkNodeModel } from '@/ts/base/model';
 import { Card, Modal } from 'antd';
 import { ImWarning } from 'react-icons/im';

@@ -119,8 +119,8 @@ export abstract class MsgChat<T extends schema.XEntity>
     this.findMe = _isFindMe;
     this.chatdata = {
       noReadCount: 0,
-      isToping: false,
       labels: _labels,
+      isToping: _labels.includes('置顶'),
       chatRemark: _metadata.remark,
       chatName: _metadata.name,
       lastMsgTime: nullTime,
@@ -204,6 +204,8 @@ export abstract class MsgChat<T extends schema.XEntity>
     if (this.chatdata.fullId === cache.fullId) {
       this.labels = this.labels.Union(new List<string>(cache.labels ?? []));
       this.chatdata.chatName = cache.chatName || this.chatdata.chatName;
+      this.chatdata.labels = this.labels.ToArray();
+      this.chatdata.isToping = this.chatdata.labels.includes('置顶');
       this.share.name = this.chatdata.chatName;
       cache.noReadCount = cache.noReadCount || this.chatdata.noReadCount;
       if (this.chatdata.noReadCount != cache.noReadCount) {
