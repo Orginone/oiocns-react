@@ -199,6 +199,12 @@ export abstract class MsgChat<T extends schema.XEntity>
         data: this.chatdata,
       },
     );
+    if (this.chatdata.noReadCount === 0) {
+      kernel.anystore.set(this.userId, storeCollName.ChatMessage + '.Changed', {
+        operation: 'replaceAll',
+        data: this.chatdata,
+      });
+    }
   }
   loadCache(cache: MsgChatData): void {
     if (this.chatdata.fullId === cache.fullId) {
@@ -207,7 +213,9 @@ export abstract class MsgChat<T extends schema.XEntity>
       this.chatdata.labels = this.labels.ToArray();
       this.chatdata.isToping = this.chatdata.labels.includes('置顶');
       this.share.name = this.chatdata.chatName;
-      cache.noReadCount = cache.noReadCount || this.chatdata.noReadCount;
+      if (cache.noReadCount === undefined) {
+        cache.noReadCount = this.chatdata.noReadCount;
+      }
       if (this.chatdata.noReadCount != cache.noReadCount) {
         this.chatdata.noReadCount = cache.noReadCount;
         msgChatNotify.changCallback();
@@ -316,7 +324,6 @@ export abstract class MsgChat<T extends schema.XEntity>
   }
   receiveMessage(msg: model.MsgSaveModel): void {
     const imsg = new Message(msg, this);
-    // 撤回走这里
     if (imsg.msgType === MessageType.Recall) {
       this.messages
         .find((m) => {
@@ -327,7 +334,7 @@ export abstract class MsgChat<T extends schema.XEntity>
       this.messages.push(imsg);
     }
     if (!this.messageNotify) {
-      this.chatdata.noReadCount += 1;
+      this.chatdata.noReadCount += imsg.isMySend ? 0 : 1;
       if (!this.chatdata.mentionMe) {
         this.chatdata.mentionMe = imsg.mentions.includes(this.userId);
       }

@@ -1,4 +1,4 @@
-import { Dropdown, Row, Col, Card, Typography, Badge, Tag } from 'antd';
+import { Dropdown, Row, Col, Card, Typography, Badge } from 'antd';
 
 import React from 'react';
 import cls from './less/icon.module.less';
@@ -24,6 +24,7 @@ const IconMode = ({ chats }: { chats: IMsgChat[] }) => {
         }}>
         <div className={cls.fileImage}>
           <Badge count={el.chatdata.noReadCount} size="small">
+            {el.chatdata.isToping && <Badge status="error" />}
             <EntityIcon entity={el.metadata} size={50} />
           </Badge>
         </div>
@@ -33,15 +34,12 @@ const IconMode = ({ chats }: { chats: IMsgChat[] }) => {
           </Typography.Text>
         </div>
         <div className={cls.fileName} title={el.typeName}>
-          {el.chatdata.labels
-            .filter((i) => i.length > 0)
-            .map((label) => {
-              return (
-                <Tag key={label} color={label === '置顶' ? 'red' : 'success'}>
-                  {label}
-                </Tag>
-              );
-            })}
+          <Typography.Text
+            style={{ fontSize: 12, color: '#888' }}
+            title={el.typeName}
+            ellipsis>
+            {el.typeName}
+          </Typography.Text>
         </div>
       </Card>
     </Dropdown>
