@@ -1,5 +1,5 @@
 import React from 'react';
-import useSessionStorage from '@/hooks/useSessionStorage';
+import useStorage from '@/hooks/useStorage';
 import IconMode from './views/iconMode';
 import ListMode from './views/listMode';
 import TableMode from './views/tableMode';
@@ -17,7 +17,7 @@ interface IProps {
 const Directory: React.FC<IProps> = ({ mode, current }: IProps) => {
   if (!current) return <></>;
   const [key] = useCtrlUpdate(current);
-  const [segmented, setSegmented] = useSessionStorage('segmented', 'icon');
+  const [segmented, setSegmented] = useStorage('segmented', 'list');
 
   return (
     <SegmentContent

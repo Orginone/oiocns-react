@@ -4,7 +4,7 @@ import orgCtrl from '@/ts/controller';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import { IMsgChat, msgChatNotify, ICompany } from '@/ts/core';
 import { orgAuth } from '@/ts/core/public/consts';
-import useSessionStorage from '@/hooks/useSessionStorage';
+import useStorage from '@/hooks/useStorage';
 import IconMode from './views/iconMode';
 import ListMode from './views/listMode';
 import TableMode from './views/tableMode';
@@ -24,7 +24,7 @@ const Book: React.FC<any> = ({
   filter: string;
   belong: ICompany;
 }) => {
-  const [segmented, setSegmented] = useSessionStorage('segmented', 'icon');
+  const [segmented, setSegmented] = useStorage('segmented', 'icon');
   const [isSupervise, setIsSupervise] = useState<boolean>(false); // 是否有超管权限
   const [msgKey] = useCtrlUpdate(msgChatNotify);
   if (chats === undefined) {

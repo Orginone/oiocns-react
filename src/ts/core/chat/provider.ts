@@ -42,7 +42,6 @@ export class ChatProvider implements IChatProvider {
       this.user.id,
       storeCollName.ChatMessage + '.Changed',
       (data: MsgChatData) => {
-        console.log(data);
         if (data && data.fullId) {
           const find = this.chats.find((i) => i.chatdata.fullId === data.fullId);
           find?.loadCache(data);

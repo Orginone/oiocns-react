@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import style from './index.module.less';
 import { Segmented, Card, Space, Divider, Typography, Affix } from 'antd';
-import useSessionStorage from '@/hooks/useSessionStorage';
+import useStorage from '@/hooks/useStorage';
 import * as fa from 'react-icons/fa';
 
 type segmentedTypes = 'icon' | 'table' | 'list';
@@ -19,7 +19,7 @@ const SegmentContent: React.FC<IProps> = ({
   description,
   onSegmentChanged,
 }: IProps) => {
-  const [segmented, setSegmented] = useSessionStorage('segmented', 'icon');
+  const [segmented, setSegmented] = useStorage('segmented', 'list');
   const parentRef = useRef<any>();
 
   return (
