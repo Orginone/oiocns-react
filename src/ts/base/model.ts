@@ -726,6 +726,8 @@ export type FileItemShare = {
   size: number;
   /** 名称 */
   name: string;
+  /** 文件类型 */
+  contentType?: string;
   /** 共享链接 */
   shareLink?: string;
   /** 拓展名 */
@@ -743,8 +745,6 @@ export type FileItemModel = {
   dateCreated: string;
   /** 修改时间 */
   dateModified: string;
-  /** 文件类型 */
-  contentType?: string;
   /** 是否是目录 */
   isDirectory: boolean;
   /** 是否包含子目录 */

@@ -130,6 +130,9 @@ export class Person extends Belong implements IPerson {
         .filter((i) => authIds.includes(i.identity!.authId)).length > 0
     );
   }
+  async pullMembers(members: schema.XTarget[]): Promise<boolean> {
+    return await this.applyJoin(members);
+  }
   async applyJoin(members: schema.XTarget[]): Promise<boolean> {
     members = members.filter(
       (i) =>
@@ -139,7 +142,7 @@ export class Person extends Belong implements IPerson {
     );
     for (const member of members) {
       if (member.typeName === TargetType.Person) {
-        await this.pullMembers([member]);
+        await super.pullMembers([member]);
       }
       await kernel.applyJoinTeam({
         id: member.id,

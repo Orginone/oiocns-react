@@ -8,7 +8,7 @@ import PullDown from '@/pages/Chats/components/pullDown';
 import Cutting from '../../cutting';
 import './index.less';
 import { parseCiteMsg } from '@/pages/Chats/components/parseMsg';
-import Emoji from '@/components/Emoji';
+import Emoji from '../../../components/emoji';
 
 /**
  * @description: 输入区域
