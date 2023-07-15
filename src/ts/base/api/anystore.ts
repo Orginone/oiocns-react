@@ -98,7 +98,6 @@ export default class AnyStore {
    * @param {(data:any)=>void} callback 变更回调，默认回调一次
    * @returns {void} 无返回值
    */
-  // eslint-disable-next-line no-unused-vars
   public subscribed<T>(belongId: string, key: string, callback: (data: T) => void): void {
     if (callback) {
       const fullKey = key + '|' + belongId;

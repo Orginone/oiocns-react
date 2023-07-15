@@ -10,7 +10,7 @@ import {
   TargetType,
 } from '@/ts/core';
 import orgCtrl from '@/ts/controller';
-import { command, schema } from '@/ts/base';
+import { command, model, schema } from '@/ts/base';
 import { Drawer, List, Modal, Progress, Tabs, Upload, message } from 'antd';
 import QrCode from 'qrcode.react';
 import React, { useEffect, useState } from 'react';
@@ -49,6 +49,9 @@ export const executeCmd = (cmd: string, entity: any, args: any[]) => {
       return openDirectory(entity);
     case 'standard':
       return uploadTemplate(entity);
+    case 'online':
+    case 'outline':
+      return onlineChanged(cmd, entity);
   }
   return false;
 };
@@ -91,7 +94,7 @@ const setCopyFiles = (cmd: string, file: IFileInfo<schema.XEntity>) => {
 
 /** 剪贴板操作 */
 const copyBoard = (dir: IDirectory) => {
-  const datasource = [];
+  const datasource: any[] = [];
   for (const item of orgCtrl.user.copyFiles.entries()) {
     if (
       (item[1].typeName === '人员' && dir.typeName === '成员目录') ||
@@ -104,9 +107,23 @@ const copyBoard = (dir: IDirectory) => {
       });
     }
   }
-  const modal = Modal.info({
+  const modal = Modal.confirm({
     icon: <></>,
     width: 500,
+    cancelText: '取消',
+    okText: '全部',
+    onOk: async () => {
+      for (const item of datasource) {
+        if (item.cmd === 'copy') {
+          await item.file.copy(dir);
+        } else {
+          await item.file.move(dir);
+        }
+        orgCtrl.user.copyFiles.delete(item.key);
+      }
+      orgCtrl.changCallback();
+      modal.destroy();
+    },
     content: (
       <List
         itemLayout="horizontal"
@@ -225,8 +242,49 @@ const entityQrCode = (entity: IEntity<schema.XEntity>) => {
   });
 };
 
+/** 上下线提醒 */
+const onlineChanged = (cmd: string, info: model.OnlineInfo) => {
+  if (info.userId === '0') {
+    if (cmd === 'online') {
+      message.success({
+        duration: 1,
+        content: `终端${info.remoteAddr}[${info.connectionId}]建立连接`,
+      });
+    } else {
+      message.error({
+        duration: 1,
+        content: `终端${info.remoteAddr}[${info.connectionId}]断开连接`,
+      });
+    }
+  } else {
+    orgCtrl.user.findEntityAsync(info.userId).then((target) => {
+      if (target) {
+        if (cmd === 'online') {
+          message.success({
+            duration: 1,
+            content: (
+              <div style={{ display: 'contents' }}>
+                {target.name} [{target.code}] 从{info.remoteAddr}上线啦
+              </div>
+            ),
+          });
+        } else {
+          message.error({
+            duration: 1,
+            content: (
+              <div style={{ display: 'contents' }}>
+                {target.name} [{target.code}] 从{info.remoteAddr}下线啦
+              </div>
+            ),
+          });
+        }
+      }
+    });
+  }
+};
+
 /** 文件上传 */
-export const uploadFile = (
+const uploadFile = (
   dir: IDirectory,
   uploaded?: (file: IFileInfo<schema.XEntity> | undefined) => void,
 ) => {

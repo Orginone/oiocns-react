@@ -3,7 +3,6 @@ import { OperateType, TargetType } from '../../public/enums';
 import { PageAll, orgAuth } from '../../public/consts';
 import { IBelong } from './belong';
 import { IMsgChatT, IMsgChat, MsgChat } from '../../chat/message/msgchat';
-import { IFileInfo } from '../../thing/fileinfo';
 import { entityOperates } from '../../public';
 
 /** 团队抽象接口类 */
@@ -42,9 +41,6 @@ export abstract class Team extends MsgChat<schema.XTarget> implements ITeam {
   ) {
     super(_metadata, _labels, _space, _metadata.belong);
     this.memberTypes = _memberTypes;
-  }
-  content(_mode?: number | undefined): IFileInfo<schema.XEntity>[] {
-    return [];
   }
   memberTypes: TargetType[];
   private _memberLoaded: boolean = false;
@@ -129,6 +125,7 @@ export abstract class Team extends MsgChat<schema.XTarget> implements ITeam {
     data.teamName = data.teamName || data.name;
     const res = await kernel.createTarget(data);
     if (res.success && res.data?.id) {
+      this.space.user.loadGivedIdentitys(true);
       return res.data;
     }
   }

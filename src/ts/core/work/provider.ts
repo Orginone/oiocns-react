@@ -24,6 +24,11 @@ export interface IWorkProvider {
   loadAttributes(id: string, belongId: string): Promise<schema.XAttribute[]>;
   /** 根据分类id查询分类项 */
   loadItems(id: string): Promise<schema.XSpeciesItem[]>;
+  /** 加载实例详情 */
+  loadInstanceDetail(
+    id: string,
+    belongId: string,
+  ): Promise<schema.XWorkInstance | undefined>;
 }
 
 export class WorkProvider implements IWorkProvider {
@@ -113,10 +118,9 @@ export class WorkProvider implements IWorkProvider {
     );
     return {
       ...res.data,
-      result: res.data.result.map((task) => new WorkTask(task, this.user)),
+      result: (res.data.result || []).map((task) => new WorkTask(task, this.user)),
     };
   }
-
   async loadAttributes(id: string, belongId: string): Promise<schema.XAttribute[]> {
     const res = await kernel.queryFormAttributes({
       id: id,
@@ -136,5 +140,25 @@ export class WorkProvider implements IWorkProvider {
       return res.data.result || [];
     }
     return [];
+  }
+  async loadInstanceDetail(
+    id: string,
+    belongId: string,
+  ): Promise<schema.XWorkInstance | undefined> {
+    const res = await kernel.anystore.aggregate(belongId, storeCollName.WorkInstance, {
+      match: {
+        id: id,
+      },
+      limit: 1,
+      lookup: {
+        from: storeCollName.WorkTask,
+        localField: 'id',
+        foreignField: 'instanceId',
+        as: 'tasks',
+      },
+    });
+    if (res.data && res.data.length > 0) {
+      return res.data[0];
+    }
   }
 }

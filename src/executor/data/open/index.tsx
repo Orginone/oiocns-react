@@ -1,42 +1,45 @@
 import ImageView from './image';
 import VideoView from './video';
 import { IEntity, ISysFileInfo } from '@/ts/core';
-import { command, schema } from '@/ts/base';
+import { command, model, schema } from '@/ts/base';
 import React from 'react';
 import FormView from './form';
 import WorkStart from './work';
 import OfficeView from './office';
 
+const officeExt = ['.pdf', '.xls', '.xlsx', '.doc', '.docx', '.ppt', '.pptx'];
+const videoExt = ['.mp4', '.avi', '.mov', '.mpg', '.swf', '.flv', '.mpeg'];
+
 interface IOpenProps {
   cmd: string;
-  entity: IEntity<schema.XEntity> | ISysFileInfo;
+  entity: IEntity<schema.XEntity> | ISysFileInfo | model.FileItemShare;
   finished: () => void;
 }
 const ExecutorOpen: React.FC<IOpenProps> = (props: IOpenProps) => {
-  switch (props.entity.typeName) {
-    case '事项配置':
-    case '实体配置':
-      return <FormView form={props.entity as any} finished={props.finished} />;
-    case '办事':
-      return <WorkStart current={props.entity as any} finished={props.finished} />;
-  }
-  if ('filedata' in props.entity) {
-    const data = props.entity.filedata;
-    if (data.contentType?.startsWith('image')) {
+  if ('size' in props.entity || 'filedata' in props.entity) {
+    const data = 'size' in props.entity ? props.entity : props.entity.filedata;
+    if (data.contentType?.startsWith('image') || data.thumbnail) {
       return <ImageView share={data} finished={props.finished} />;
     }
-    if (data.contentType?.startsWith('video')) {
+    if (
+      data.contentType?.startsWith('video') ||
+      videoExt.includes(data.extension ?? '-')
+    ) {
       return <VideoView share={data} finished={props.finished} />;
     }
-    switch (data?.extension) {
-      case '.docx':
-      case '.csv':
-      case '.mp4':
-      case '.webm':
-        return <OfficeView share={data} finished={props.finished} />;
+    if (officeExt.includes(data.extension ?? '-')) {
+      return <OfficeView share={data} finished={props.finished} />;
     }
+  } else {
+    switch (props.entity.typeName) {
+      case '事项配置':
+      case '实体配置':
+        return <FormView form={props.entity as any} finished={props.finished} />;
+      case '办事':
+        return <WorkStart current={props.entity as any} finished={props.finished} />;
+    }
+    command.emitter('config', props.cmd, props.entity);
   }
-  command.emitter('config', props.cmd, props.entity);
   return <></>;
 };
 

@@ -27,7 +27,7 @@ const buildSpeciesFiledsTree = (fields: model.FieldModel[]): MenuItemType[] => {
           size={18}
         />
       ),
-      children: buildSpeciesItemsTree(filed.lookups),
+      children: buildSpeciesItemsTree(filed.lookups || []),
     });
   }
   return result;

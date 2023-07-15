@@ -44,6 +44,23 @@ export type ReceiveType = {
   // 数据
   data: any;
 };
+/** 在线信息 */
+export type OnlineInfo = {
+  // 用户Id
+  userId: string;
+  // 连接Id
+  connectionId: string;
+  // 远端地址
+  remoteAddr: string;
+  // 上线时间
+  onlineTime: string;
+  // 认证时间
+  authTime: string;
+  // 请求次数
+  requestCount: number;
+  // 终端类型
+  endPointType: string;
+}
 // 分页返回定义
 export type PageResult<T> = {
   // 便宜量
@@ -558,11 +575,11 @@ export type FieldModel = {
   /** 类型(属性类型) */
   valueType: string;
   /** 规则(特性规则) */
-  rule: string;
+  rule?: string;
   /** 备注(特性描述) */
   remark: string;
   /** 字典(字典项/分类项) */
-  lookups: FiledLookup[];
+  lookups?: FiledLookup[];
 }
 
 export type FiledLookup = {
@@ -709,6 +726,8 @@ export type FileItemShare = {
   size: number;
   /** 名称 */
   name: string;
+  /** 文件类型 */
+  contentType?: string;
   /** 共享链接 */
   shareLink?: string;
   /** 拓展名 */
@@ -726,8 +745,6 @@ export type FileItemModel = {
   dateCreated: string;
   /** 修改时间 */
   dateModified: string;
-  /** 文件类型 */
-  contentType?: string;
   /** 是否是目录 */
   isDirectory: boolean;
   /** 是否包含子目录 */

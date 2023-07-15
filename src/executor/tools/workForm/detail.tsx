@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import React from 'react';
 import { Tabs } from 'antd';
 import { EditModal } from '../editModal';
-import GenerateTable from '../generate/table';
+import GenerateThingTable from '../generate/thingTable';
 
 interface IProps {
   allowEdit: boolean;
@@ -26,19 +26,21 @@ const DetailTable: React.FC<IProps> = (props) => {
     props.onChanged?.apply(this, [form.id, formData]);
   }, [formData]);
   return (
-    <GenerateTable
-      form={form}
+    <GenerateThingTable
       fields={fields}
-      autoColumn
       height={500}
       dataIndex={'attribute'}
       columnChooser={{ enabled: true }}
-      selection={{
-        mode: 'multiple',
-        allowSelectAll: true,
-        selectAllMode: 'allPages',
-        showCheckBoxesMode: 'always',
-      }}
+      selection={
+        props.allowEdit
+          ? {
+              mode: 'multiple',
+              allowSelectAll: true,
+              selectAllMode: 'allPages',
+              showCheckBoxesMode: 'always',
+            }
+          : undefined
+      }
       onSelectionChanged={(e) => setSelectKeys(e.selectedRowKeys)}
       toolbar={{
         visible: true,
@@ -139,7 +141,7 @@ const DetailTable: React.FC<IProps> = (props) => {
                 setFormData({ ...formData });
               },
             },
-            visible: selectKeys.length > 0,
+            visible: props.allowEdit && selectKeys.length > 0,
           },
           {
             name: 'columnChooserButton',

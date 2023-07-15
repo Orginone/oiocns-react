@@ -107,7 +107,6 @@ const loadChatMoreMenus = (allowDelete: boolean, isChat: boolean = false) => {
   }
   return items;
 };
-
 /** 加载会话菜单 */
 export const loadChatMenu = () => {
   const chatMenus = {

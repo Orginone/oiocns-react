@@ -234,24 +234,35 @@ export class Company extends Belong implements ICompany {
     return targets;
   }
   async deepLoad(reload: boolean = false): Promise<void> {
-    await this.loadGroups(reload);
-    await this.loadDepartments(reload);
-    await this.loadStations(reload);
-    await this.loadCohorts(reload);
-    await this.loadMembers(reload);
-    await this.loadSuperAuth(reload);
-    for (const group of this.groups) {
-      await group.deepLoad(reload);
-    }
-    for (const department of this.departments) {
-      await department.deepLoad(reload);
-    }
-    for (const station of this.stations) {
-      await station.deepLoad(reload);
-    }
-    for (const cohort of this.cohorts) {
-      await cohort.deepLoad(reload);
-    }
+    await Promise.all([
+      await this.directory.loadSubDirectory(),
+      await this.loadGroups(reload),
+      await this.loadDepartments(reload),
+      await this.loadStations(reload),
+      await this.loadCohorts(reload),
+      await this.loadMembers(reload),
+      await this.loadSuperAuth(reload),
+    ]);
+    await Promise.all(
+      this.groups.map(async (group) => {
+        await group.deepLoad(reload);
+      }),
+    );
+    await Promise.all(
+      this.departments.map(async (department) => {
+        await department.deepLoad(reload);
+      }),
+    );
+    await Promise.all(
+      this.stations.map(async (station) => {
+        await station.deepLoad(reload);
+      }),
+    );
+    await Promise.all(
+      this.cohorts.map(async (cohort) => {
+        await cohort.deepLoad(reload);
+      }),
+    );
     this.superAuth?.deepLoad(reload);
   }
 

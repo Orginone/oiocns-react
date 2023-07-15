@@ -56,7 +56,7 @@ export const GenerateColumn = (
         valueExpr: 'value',
       };
       cellRender.calcText = (value: string) => {
-        return field.lookups.find((i) => i.value === value)?.text || value;
+        return (field.lookups || []).find((i) => i.value === value)?.text || value;
       };
       break;
     case '数值型':
@@ -70,7 +70,7 @@ export const GenerateColumn = (
       props.width = 150;
       props.allowFiltering = false;
       cellRender.render = (data: any) => {
-        return <EntityIcon entityId={data.value} size={15} showName />;
+        return <EntityIcon entityId={data.value} size={14} showName />;
       };
       break;
     case '附件型':

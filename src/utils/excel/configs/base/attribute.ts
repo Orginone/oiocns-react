@@ -1,6 +1,6 @@
 import { AttributeModel } from '@/ts/base/model';
 import { IDirectory } from '@/ts/core';
-import { assignment, batchRequests, partition } from '../..';
+import { assignment, batchRequests } from '../..';
 import {
   Context,
   ReadConfigImpl,
@@ -91,8 +91,8 @@ export class AttrReadConfig extends ReadConfigImpl<Attribute, Context, AttrSheet
         },
       });
     }
-    for (let arr of partition(requests, 100)) {
-      await this.requests(arr, context, onItemCompleted);
+    while (requests.length > 0) {
+      await this.requests(requests.splice(0, 100), context, onItemCompleted);
     }
   }
   /**

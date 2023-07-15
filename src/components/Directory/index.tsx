@@ -1,11 +1,10 @@
-import React, { useRef } from 'react';
-import style from './index.module.less';
-import { Segmented, Card } from 'antd';
-import useSessionStorage from '@/hooks/useSessionStorage';
+import React from 'react';
+import useStorage from '@/hooks/useStorage';
 import IconMode from './views/iconMode';
+import ListMode from './views/listMode';
 import TableMode from './views/tableMode';
-import * as fa from 'react-icons/fa';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
+import SegmentContent from '@/components/Common/SegmentContent';
 import { IDirectory } from '@/ts/core';
 
 interface IProps {
@@ -18,43 +17,25 @@ interface IProps {
 const Directory: React.FC<IProps> = ({ mode, current }: IProps) => {
   if (!current) return <></>;
   const [key] = useCtrlUpdate(current);
-  const [segmented, setSegmented] = useSessionStorage('segmented', 'Kanban');
-  const parentRef = useRef<any>();
+  const [segmented, setSegmented] = useStorage('segmented', 'list');
 
   return (
-    <Card id={key} className={style.pageCard} bordered={false}>
-      <div className={style.mainContent} ref={parentRef}>
-        {segmented === 'List' ? (
-          <TableMode current={current} mode={mode} />
-        ) : (
-          <IconMode current={current} mode={mode} />
-        )}
-      </div>
-      <Segmented
-        value={segmented}
-        onChange={(value) => setSegmented(value as 'Kanban' | 'List')}
-        options={[
-          {
-            value: 'List',
-            icon: (
-              <fa.FaTable
-                fontSize={20}
-                color={segmented === 'List' ? 'blue' : '#9498df'}
-              />
-            ),
-          },
-          {
-            value: 'Kanban',
-            icon: (
-              <fa.FaTh
-                fontSize={20}
-                color={segmented === 'Kanban' ? 'blue' : '#9498df'}
-              />
-            ),
-          },
-        ]}
-      />
-    </Card>
+    <SegmentContent
+      key={key}
+      onSegmentChanged={setSegmented}
+      description={`${current.content(mode).length}个项目`}
+      content={
+        <>
+          {segmented === 'table' ? (
+            <TableMode current={current} mode={mode} />
+          ) : segmented === 'icon' ? (
+            <IconMode current={current} mode={mode} />
+          ) : (
+            <ListMode current={current} mode={mode} />
+          )}
+        </>
+      }
+    />
   );
 };
 export default Directory;

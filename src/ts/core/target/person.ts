@@ -130,6 +130,9 @@ export class Person extends Belong implements IPerson {
         .filter((i) => authIds.includes(i.identity!.authId)).length > 0
     );
   }
+  async pullMembers(members: schema.XTarget[]): Promise<boolean> {
+    return await this.applyJoin(members);
+  }
   async applyJoin(members: schema.XTarget[]): Promise<boolean> {
     members = members.filter(
       (i) =>
@@ -139,7 +142,7 @@ export class Person extends Belong implements IPerson {
     );
     for (const member of members) {
       if (member.typeName === TargetType.Person) {
-        await this.pullMembers([member]);
+        await super.pullMembers([member]);
       }
       await kernel.applyJoinTeam({
         id: member.id,
@@ -210,17 +213,24 @@ export class Person extends Belong implements IPerson {
     return targets;
   }
   async deepLoad(reload: boolean = false): Promise<void> {
-    await this.loadGivedIdentitys(reload);
-    await this.loadCompanys(reload);
-    await this.loadCohorts(reload);
-    await this.loadMembers(reload);
-    await this.loadSuperAuth(reload);
-    for (const company of this.companys) {
-      await company.deepLoad(reload);
-    }
-    for (const cohort of this.cohorts) {
-      await cohort.deepLoad(reload);
-    }
+    await Promise.all([
+      await this.loadGivedIdentitys(reload),
+      await this.directory.loadSubDirectory(),
+      await this.loadCompanys(reload),
+      await this.loadCohorts(reload),
+      await this.loadMembers(reload),
+      await this.loadSuperAuth(reload),
+    ]);
+    await Promise.all(
+      this.companys.map(async (company) => {
+        await company.deepLoad(reload);
+      }),
+    );
+    await Promise.all(
+      this.cohorts.map(async (cohort) => {
+        await cohort.deepLoad(reload);
+      }),
+    );
     this.superAuth?.deepLoad(reload);
   }
   async teamChangedNotity(target: schema.XTarget): Promise<boolean> {
@@ -263,19 +273,8 @@ export class Person extends Belong implements IPerson {
   }
   findShareById(id: string): model.ShareIcon {
     const metadata = this.findMetadata<schema.XEntity>(id);
-    if (!metadata) {
-      kernel
-        .queryTargetById({
-          ids: [id],
-          page: PageAll,
-        })
-        .then((res) => {
-          if (res.success && res.data.result) {
-            res.data.result.forEach((item) => {
-              this.updateMetadata(item);
-            });
-          }
-        });
+    if (metadata === undefined) {
+      this.findEntityAsync(id);
     }
     return {
       name: metadata?.name ?? '请稍后...',
