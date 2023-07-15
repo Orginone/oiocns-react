@@ -1,8 +1,9 @@
 import React from 'react';
 import { model } from '../../../ts/base';
 import { IBelong } from '@/ts/core';
-import PrimaryForms from './primary';
+// import PrimaryForms from './primary';
 import DetailForms from './detail';
+import FormRender from './primary';
 import { formatDate } from '@/utils';
 
 interface IWorkFormProps {
@@ -60,7 +61,7 @@ const WorkForm: React.FC<IWorkFormProps> = (props) => {
   const detailForms = node.forms.filter((f) => f.typeName === '子表');
   return (
     <div style={{ padding: 10 }}>
-      <PrimaryForms {...props} forms={primaryForms} getFormData={getFormData} />
+      <FormRender {...props} forms={primaryForms} getFormData={getFormData} />
       <DetailForms {...props} forms={detailForms} getFormData={getFormData} />
     </div>
   );

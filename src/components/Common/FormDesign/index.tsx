@@ -1,6 +1,6 @@
-import { Col, Row, Select } from 'antd';
+import { Col, Row, Button, Select } from 'antd';
 import cls from './index.module.less';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useState } from 'react';
 import { ProForm } from '@ant-design/pro-components';
 import OperateItem from './OperateItem';
@@ -8,7 +8,12 @@ import { IForm } from '@/ts/core';
 import { XAttribute } from '@/ts/base/schema';
 import AttributeConfig from './attributeConfig';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
-
+import FormEditModal from '@/components/Common/FormDesign/FormEdit';
+import { Rule } from 'antd/es/form';
+import { loadWidgetsOpts } from './schemaRule';
+import {
+  schemaType
+} from '@/ts/base/schema';
 type IProps = {
   current: IForm;
 };
@@ -25,16 +30,27 @@ type FormLayout = {
 const Design: React.FC<IProps> = ({ current }) => {
   const [tkey, tforceUpdate] = useObjectUpdate(current);
   const [showConfig, setShowConfig] = useState<boolean>(false);
+  const [editFormOpen, setEditFormOpen] = useState<boolean>(false);
+  const [defaultSchema, setDefaultSchema] = useState<schemaType>(
+    {
+      displayType: 'row',
+      type: 'object',
+      labelWidth: 120,
+      properties: {},
+      column: 1,
+    }
+  )
+  //const [defaultValue, setDefaultValue] = useState({});
   const [formLayout, setFormLayout] = useState<FormLayout>(
     current.metadata.rule
       ? JSON.parse(current.metadata.rule)
       : {
-          type: 'object',
-          properties: {},
-          labelWidth: 120,
-          layout: 'horizontal',
-          col: 12,
-        },
+        type: 'object',
+        properties: {},
+        labelWidth: 120,
+        layout: 'horizontal',
+        col: 12,
+      },
   );
   const [selectedItem, setSelectedItem] = useState<XAttribute>();
   // 表单项选中事件
@@ -48,6 +64,9 @@ const Design: React.FC<IProps> = ({ current }) => {
     const newFormLayout = { ...formLayout, ...value };
     setFormLayout(newFormLayout);
     current.metadata.rule = current.metadata.rule || '{}';
+    console.log("1", current.metadata)
+    console.log("2", current.metadata)
+    console.log('3', newFormLayout)
     current.update({
       ...current.metadata,
       rule: JSON.stringify({
@@ -91,12 +110,91 @@ const Design: React.FC<IProps> = ({ current }) => {
       });
   };
 
+
+  const onFinished = () => {
+    setEditFormOpen(false)
+  }
+  const onEditForm = () => {
+    setDefaultSchema(currentToSchemaFun(current))
+
+    // if (current.metadata.rule && JSON.parse(current?.metadata?.rule).schema) {
+    //   let schema = JSON.parse(current?.metadata?.rule).schema;
+    //   setDefaultSchema(schema)
+    // } else {
+    //   setDefaultSchema(currentToSchemaFun(current))
+    // }
+
+    setEditFormOpen(true)
+  }
+  const getType = (type: string) => {
+    switch (type) {
+      case 'string':
+        return 'string'
+        break
+
+    }
+  };
+
+  const currentToSchemaFun = (currentValue: IForm) => {
+    const schema: schemaType = {
+      displayType: 'row',
+      type: 'object',
+      properties: {},
+      labelWidth: 120,
+      column: 1,
+    };
+
+    let result = current.attributes.reduce((result, item: any) => {
+      const rule = JSON.parse(item.rule || '{}');
+      // 规则校验
+      let rules: Rule[] = [];
+      if (rule.rules ) {
+        if (typeof rule.rules === 'string') {
+          rules = [...rules, { message: '所填内容不符合要求', pattern: rule.rules }];
+        } else if (rule.rules instanceof Array) {
+          for (const r of rule.rules) {
+            rules = [...rules, { message: '所填内容不符合要求', pattern: r }];
+          }
+        }
+      }
+      if (rule.required === true) {
+        rules = [...rules, { required: true, message: `${rule.title}为必填项` }];
+      }
+     
+      if (!rule.widget) {
+        rule.widget = loadWidgetsOpts(item.property!.valueType)[0].value;
+        console.log("@@",rule.widget)
+      }
+      
+      return {
+        ...result,
+        [item.property!.info]: {
+          title: item.name,
+          type: rule.widget === "text"?'string':rule.widget,
+          ...item
+        }
+      }
+    }, {})
+    schema.properties = {
+      ...result,
+    };
+
+    const { metadata: { rule } } = currentValue;
+    const rules = rule ? JSON.parse(rule) : {};
+    const { col } = rules;
+    schema.column = col === 24 ? 1 : col === 12 ? 2 : col === 8 ? 3 : 1;
+    return schema;
+  }
   return (
     <div style={{ display: 'flex' }}>
+
       <div className={cls.content}>
         <div className={cls.head}>
-          <label style={{ padding: '6px' }}>整体布局：</label>
-          <Select
+          <Button type="primary" size='middle' onClick={onEditForm} className={cls.designButton}>
+            表单设计
+          </Button>
+
+          {/* <Select
             defaultValue={formLayout.col}
             style={{ width: '120px' }}
             options={[
@@ -118,7 +216,7 @@ const Design: React.FC<IProps> = ({ current }) => {
             onChange={(value) => {
               layoutChange({ layout: value });
             }}
-          />
+          /> */}
         </div>
         <ProForm
           key={tkey}
@@ -154,6 +252,15 @@ const Design: React.FC<IProps> = ({ current }) => {
           superAuth={current.directory.target.space.superAuth!.metadata}
         />
       )}
+      <FormEditModal
+        current={current}
+        defaultSchema={defaultSchema}
+        finished={onFinished}
+        editFormOpen={editFormOpen}
+        itemClick={(e: any) => {
+          itemClick(e);
+        }}
+      />
     </div>
   );
 };
