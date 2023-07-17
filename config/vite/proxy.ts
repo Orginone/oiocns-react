@@ -24,6 +24,12 @@ export function createProxy() {
       changeOrigin: true, // 是否允许跨域
       ws: true,
     },
+    '/internal': {
+      target: 'http://kgogs.jx868.com', // 后台接口
+      changeOrigin: true, // 是否允许跨域
+      rewrite: (path) => path.replace(/^\/internal/, ''),
+      ws: true,
+    },
   };
   return ProxyList;
 }
