@@ -24,17 +24,17 @@ export interface IRuleBaseType {
   /* 触发方式 初始化-修改时-提交时 */
   trigger: triggerType[];
   /* 规则支持的数据类型 */
-  accept: AcceptedAttrType[];
+  accept?: AcceptedAttrType[];
   /* 规则关联特性 */
   linkAttrs: { name: string; id: string; code: string }[];
   /* 关联项最大数量 */
-  max: number;
+  max?: number;
   /* 规则是否可扩展关联项 即增加关联数量*/
-  isExtend: boolean;
+  isExtend?: boolean;
   /* 规则错误提示 */
   errorMsg: string;
   /* 规则执行函数构造器 */
-  creatFun: string;
+  creatFun?: (attrs: any[]) => string;
   /* 规则执行函数 */
   content: string;
   /* 备注 */
@@ -61,7 +61,7 @@ abstract class RuleBase {
   /* 错误提示 */
   errorMsg: string = '规则错误！';
   /* 规则执行函数构造器 ：通过模板函数生成 执行函数*/
-  creatFun: string;
+  creatFun?: (attrs: any[]) => string;
   /* 规则执行函数 */
   content: string;
   /* 备注 */
@@ -71,14 +71,14 @@ abstract class RuleBase {
     this.id = data.id;
     this.name = data.name;
     this.trigger = data.trigger;
-    this.accept = data.accept;
     this.linkAttrs = data.linkAttrs;
-    this.max = data.max;
-    this.isExtend = data.isExtend;
     this.errorMsg = data.errorMsg;
-    this.creatFun = data.creatFun;
     this.content = data.content;
     this.remark = data.remark;
+    this.accept = data.accept ?? [];
+    this.max = data.max ?? 10;
+    this.isExtend = data.isExtend ?? false;
+    this.creatFun = data.creatFun;
   }
   /**
    *@desc 处理规则
@@ -86,7 +86,7 @@ abstract class RuleBase {
    *@param {Object} formData 当前表单数据
    *@return {} 返回处理结果 {【表单key】：value}
    */
-  dealRule = async (formData: { [key: string]: any }) => Promise<any>;
+  abstract dealRule(formData: { [key: string]: any }): Promise<any>;
   /**
    * @desc 加载外部规则库文件/模板规则
    */

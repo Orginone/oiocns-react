@@ -1,20 +1,24 @@
-import OrgCtrl from '@/ts/controller/index';
+// import OrgCtrl from '@/ts/controller/index';
 
 class FormRules {
   constructor(fromRuleInfo, beloneId) {
     this._beloneId = beloneId;
+    this.queryAllFormRules(fromRuleInfo);
   }
+  _beloneId: string;
   /* 所有初始化规则 */
   _StartRules: any[];
   /* 所有运行中规则 */
   _RunningRules: any[];
   /* 所有提交时 规则 */
   _SubmitRules: any[];
+
   /* 获取表单关联规则 */
-  queryAllFormRules() {
+  queryAllFormRules(frs: any) {
+    console.log('获取表单关联规则', frs);
+
     /* 处理规则分组 */
   }
-  _beloneId: string;
   /**
    * @desc 触发规则处理  处理完一类规则，返回所有要回显至表单的数据，通过回调页面方法操作表单 {attrId1：value1，attrId2：value2}
    * @param trigger 触发方式

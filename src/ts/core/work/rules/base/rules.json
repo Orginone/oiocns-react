@@ -1,0 +1,36 @@
+[
+  {
+    "id":"1",
+    "name": "合计规则",
+    "linkAttrs": ["值1", "值2"],
+    "accept": ["数值型"],
+    "ruleType": "method",
+    "trigger": ["Running", "Start", "Submit"],
+    "errorMsg": "合计规则错误",
+    "creatFun": "(linkAttrs) =>{ const renderedValues = linkAttrs.map(obj => `$formData['${obj.attrId}']`);const resultStr = renderedValues.join('+');return `({$formData})=>{return ${resultStr}}`;}",
+    "isExtend": true,
+    "remark": "用于计算合计，可扩展"
+  },
+  {
+    "id":"2",
+    "name": "a-b规则",
+    "linkAttrs": ["值1", "值2"],
+    "accept": ["数值型"],
+    "ruleType": "method",
+    "trigger": ["Running", "Submit"],
+    "errorMsg": "a-b规则错误",
+    "creatFun": "(linkAttrs) => {let str = ''; linkAttrs.forEach(obj => { const curStr = `$formData['${obj.attrId}']`; if (str === '') { str = curStr; } else { str = str + '-' + curStr; } }); return `({$formData})=>{return ${str}}`; }",
+    "remark": "用于计算相减规则"
+  },
+  {
+    "id":"3",
+    "name": "批量初始化",
+    "linkAttrs": ["值1", "值2"],
+    "accept": null,
+    "ruleType": "method",
+    "trigger": ["Start"],
+    "errorMsg": "批量初始化规则错误",
+    "creatFun": "(linkAttrs) => { function objectToString(obj) { let str = ''; for (let key in obj) { if (obj.hasOwnProperty(key)) { str += `${key}: ${obj[key]},`; } } return `{ ${str.slice(0, -1)} }`; } let res = {}; linkAttrs.forEach(obj => { if (obj.value) { res[obj.attrId] = obj.value; } }); return `({$formData})=>{return ${objectToString(res)}}`; };",
+    "remark": "用于批量初始化"
+  }
+]
