@@ -31,3 +31,4 @@ export type { IProperty } from './thing/property';
 export type { ISpecies } from './thing/species';
 export { UserProvider } from './user';
 export type { IWork } from './work';
+export type { IReport, IReportView } from './thing/report';

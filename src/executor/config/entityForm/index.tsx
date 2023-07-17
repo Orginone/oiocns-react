@@ -11,6 +11,7 @@ import LabelsForm from './labelsForm';
 import RenameForm from './renameForm';
 import IdentityForm from './IdentityForm';
 import AuthorityForm from './authorityForm';
+import LabelsReport from './labelsReport';
 import { IIdentity } from '@/ts/core/target/identity/identity';
 interface IProps {
   cmd: string;
@@ -74,6 +75,14 @@ const EntityForm: React.FC<IProps> = ({ cmd, entity, finished }) => {
         <LabelsForm
           formType={cmd.replace('WorkConfig', '').replace('ThingConfig', '')}
           typeName={cmd.includes('WorkConfig') ? '事项配置' : '实体配置'}
+          current={entity as any}
+          finished={reloadFinish}
+        />
+      );
+    case 'newReport':
+      return (
+        <LabelsReport
+          formType={cmd.replace('Report', '')}
           current={entity as any}
           finished={reloadFinish}
         />
