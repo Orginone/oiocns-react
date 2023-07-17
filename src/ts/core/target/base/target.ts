@@ -115,6 +115,9 @@ export abstract class Target extends Team implements ITarget {
     await this.loadIdentitys(reload);
     return true;
   }
+  content(_mode?: number | undefined): IFileInfo<schema.XEntity>[] {
+    return [];
+  }
   async rename(name: string): Promise<boolean> {
     return this.update({
       ...this.metadata,

@@ -140,11 +140,13 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
       if (this.typeName === '成员目录') {
         await this.target.loadContent(reload);
       } else {
-        await this.loadSubDirectory();
-        await this.loadForms();
-        await this.loadPropertys();
-        await this.loadSpecieses();
-        await this.loadApplications();
+        await Promise.all([
+          await this.loadSubDirectory(),
+          await this.loadForms(reload),
+          await this.loadPropertys(reload),
+          await this.loadSpecieses(reload),
+          await this.loadApplications(reload),
+        ]);
       }
     }
     return false;

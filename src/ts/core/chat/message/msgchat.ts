@@ -119,8 +119,8 @@ export abstract class MsgChat<T extends schema.XEntity>
     this.findMe = _isFindMe;
     this.chatdata = {
       noReadCount: 0,
-      isToping: false,
       labels: _labels,
+      isToping: _labels.includes('置顶'),
       chatRemark: _metadata.remark,
       chatName: _metadata.name,
       lastMsgTime: nullTime,
@@ -199,13 +199,23 @@ export abstract class MsgChat<T extends schema.XEntity>
         data: this.chatdata,
       },
     );
+    if (this.chatdata.noReadCount === 0) {
+      kernel.anystore.set(this.userId, storeCollName.ChatMessage + '.Changed', {
+        operation: 'replaceAll',
+        data: this.chatdata,
+      });
+    }
   }
   loadCache(cache: MsgChatData): void {
     if (this.chatdata.fullId === cache.fullId) {
       this.labels = this.labels.Union(new List<string>(cache.labels ?? []));
       this.chatdata.chatName = cache.chatName || this.chatdata.chatName;
+      this.chatdata.labels = this.labels.ToArray();
+      this.chatdata.isToping = this.chatdata.labels.includes('置顶');
       this.share.name = this.chatdata.chatName;
-      cache.noReadCount = cache.noReadCount || this.chatdata.noReadCount;
+      if (cache.noReadCount === undefined) {
+        cache.noReadCount = this.chatdata.noReadCount;
+      }
       if (this.chatdata.noReadCount != cache.noReadCount) {
         this.chatdata.noReadCount = cache.noReadCount;
         msgChatNotify.changCallback();
@@ -314,7 +324,6 @@ export abstract class MsgChat<T extends schema.XEntity>
   }
   receiveMessage(msg: model.MsgSaveModel): void {
     const imsg = new Message(msg, this);
-    // 撤回走这里
     if (imsg.msgType === MessageType.Recall) {
       this.messages
         .find((m) => {
@@ -325,7 +334,7 @@ export abstract class MsgChat<T extends schema.XEntity>
       this.messages.push(imsg);
     }
     if (!this.messageNotify) {
-      this.chatdata.noReadCount += 1;
+      this.chatdata.noReadCount += imsg.isMySend ? 0 : 1;
       if (!this.chatdata.mentionMe) {
         this.chatdata.mentionMe = imsg.mentions.includes(this.userId);
       }

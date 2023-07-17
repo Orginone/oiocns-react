@@ -2,7 +2,7 @@ import { kernel, model } from '../../base';
 import { storeCollName } from '../public/consts';
 import { TargetType } from '../public/enums';
 import { IPerson } from '../target/person';
-import { IMsgChat, msgChatNotify } from './message/msgchat';
+import { IMsgChat, MsgChatData, msgChatNotify } from './message/msgchat';
 export interface IChatProvider {
   /** 当前用户 */
   user: IPerson;
@@ -38,6 +38,16 @@ export class ChatProvider implements IChatProvider {
         this._preTags.push(data);
       }
     });
+    kernel.anystore.subscribed(
+      this.user.id,
+      storeCollName.ChatMessage + '.Changed',
+      (data: MsgChatData) => {
+        if (data && data.fullId) {
+          const find = this.chats.find((i) => i.chatdata.fullId === data.fullId);
+          find?.loadCache(data);
+        }
+      },
+    );
   }
   user: IPerson;
   PreMessage(): void {

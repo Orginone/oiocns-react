@@ -575,11 +575,11 @@ export type FieldModel = {
   /** 类型(属性类型) */
   valueType: string;
   /** 规则(特性规则) */
-  rule: string;
+  rule?: string;
   /** 备注(特性描述) */
   remark: string;
   /** 字典(字典项/分类项) */
-  lookups: FiledLookup[];
+  lookups?: FiledLookup[];
 }
 
 export type FiledLookup = {
@@ -726,6 +726,8 @@ export type FileItemShare = {
   size: number;
   /** 名称 */
   name: string;
+  /** 文件类型 */
+  contentType?: string;
   /** 共享链接 */
   shareLink?: string;
   /** 拓展名 */
@@ -743,8 +745,6 @@ export type FileItemModel = {
   dateCreated: string;
   /** 修改时间 */
   dateModified: string;
-  /** 文件类型 */
-  contentType?: string;
   /** 是否是目录 */
   isDirectory: boolean;
   /** 是否包含子目录 */

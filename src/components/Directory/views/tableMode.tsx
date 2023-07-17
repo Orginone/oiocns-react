@@ -24,6 +24,8 @@ const TableMode = ({
       keyExpr="id"
       columnAutoWidth
       allowColumnResizing
+      hoverStateEnabled
+      activeStateEnabled
       columnResizingMode={'nextColumn'}
       showColumnLines={false}
       selection={{
@@ -87,7 +89,7 @@ const TableMode = ({
         dataField="name"
         caption="名称"
         cellRender={(e) => {
-          return <EntityIcon entityId={e.key} showName size={20} />;
+          return <EntityIcon entity={e.data} showName size={20} />;
         }}
       />
       <Column dataField="code" caption="代码" width={200} />

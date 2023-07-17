@@ -4,6 +4,10 @@ import { IBelong } from '../target/base/belong';
 import { UserProvider } from '../user';
 
 export interface IWorkTask {
+  /** 唯一标识 */
+  id: string;
+  /** 内容 */
+  content: string;
   /** 当前用户 */
   user: UserProvider;
   /** 归属空间 */
@@ -37,6 +41,15 @@ export class WorkTask implements IWorkTask {
   metadata: schema.XWorkTask;
   instance: schema.XWorkInstance | undefined;
   instanceData: model.InstanceDataModel | undefined;
+  get id(): string {
+    return this.metadata.id;
+  }
+  get content(): string {
+    if (this.targets.length === 2) {
+      return `${this.targets[0].name}[${this.targets[0].typeName}]申请加入${this.targets[1].name}[${this.targets[1].typeName}]`;
+    }
+    return this.metadata.content;
+  }
   get belong(): IBelong {
     for (const company of this.user.user!.companys) {
       if (company.id === this.metadata.belongId) {

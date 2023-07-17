@@ -2,22 +2,23 @@ import React, { useState } from 'react';
 import orgCtrl from '@/ts/controller';
 import { IBelong, IWorkTask, TaskStatus } from '@/ts/core';
 import { model } from '@/ts/base';
-import { WorkColumns } from '@/config/column';
+import { WorkTaskColumns } from '@/config/column';
 import { GroupMenuType } from '../config/menuType';
 import TaskDetail from './detail';
+import GenerateEntityTable from '@/executor/tools/generate/entityTable';
+import CustomStore from 'devextreme/data/custom_store';
+import { ImCopy, ImShuffle, ImTicket } from 'react-icons/im';
+import { Modal, message } from 'antd';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
-import CardOrTableComp from '@/components/CardOrTableComp';
 
 interface IProps {
-  filter: string;
   taskType: string;
   space: IBelong;
 }
 
 const TaskContent = (props: IProps) => {
-  const [key] = useCtrlUpdate(orgCtrl.work.notity);
   const [task, setTask] = useState<IWorkTask>();
-  const [selectedRows, setSelectRows] = useState<IWorkTask[]>([]);
+  const [key] = useCtrlUpdate(orgCtrl.work.notity);
 
   /** 查询任务项 */
   const getTaskList = async (page: model.PageModel) => {
@@ -31,14 +32,14 @@ const TaskContent = (props: IProps) => {
       case GroupMenuType.Done:
         {
           taskList = await orgCtrl.work.loadDones({
-            page: { ...page, filter: props.filter },
+            page: page,
             id: props.space?.id || '0',
           });
         }
         break;
       case GroupMenuType.Apply:
         taskList = await orgCtrl.work.loadApply({
-          page: { ...page, filter: props.filter },
+          page: page,
           id: props.space?.id || '0',
         });
         break;
@@ -48,8 +49,8 @@ const TaskContent = (props: IProps) => {
           if (props.space) {
             todos = todos.filter((t) => t.belong.id === props.space.id);
           }
-          if (props.filter != '') {
-            todos = todos.filter((t) => t.isMatch(props.filter));
+          if (page.filter != '') {
+            todos = todos.filter((t) => t.isMatch(page.filter));
           }
           taskList.total = todos.length;
           taskList.result = todos.slice(page.offset, page.limit);
@@ -59,84 +60,104 @@ const TaskContent = (props: IProps) => {
     return taskList;
   };
 
-  /** 加载操作功能 */
-  const getOperation = (items: IWorkTask[]) => {
-    const operates: any[] = [];
-    if (items.length === 1 && items[0].metadata.taskType != '加用户') {
-      operates.push({
-        key: 'detail',
-        label: '详情',
-        onClick: async () => {
-          await items[0].loadInstance(true);
-          if (items[0].instance) {
-            setTask(items[0]);
+  /** 进入详情 */
+  const setTaskDetail = async (data: IWorkTask) => {
+    if (data.metadata.instanceId) {
+      await data.loadInstance(true);
+      if (data.instance && data.instanceData?.node) {
+        setTask(data);
+      }
+    } else {
+      const readOnly = data.metadata.status >= TaskStatus.ApprovalStart;
+      Modal.confirm({
+        closable: true,
+        maskClosable: true,
+        title: data.metadata.title,
+        okText: readOnly ? '好的' : '同意',
+        cancelText: '拒绝',
+        cancelButtonProps: {
+          style: {
+            display: readOnly ? 'none' : undefined,
+          },
+        },
+        content: data.content,
+        onCancel: async (...args) => {
+          if (args.length == 0) {
+            await data.approvalTask(TaskStatus.RefuseStart, '拒绝');
+          }
+        },
+        onOk: async () => {
+          if (!readOnly) {
+            await data.approvalTask(TaskStatus.ApprovalStart, '同意');
           }
         },
       });
     }
-    switch (props.taskType) {
-      case GroupMenuType.Done:
-        break;
-      case GroupMenuType.Apply:
-        if (
-          items.filter((i) => i.metadata.status < TaskStatus.ApprovalStart).length > 0
-        ) {
-          operates.push({
-            key: 'confirm',
-            label: '取消',
-            onClick: async () => {
-              items.forEach(async (item) => {
-                await item.approvalTask(-1, '取消申请');
-              });
-              orgCtrl.work.notity.changCallback();
-            },
-          });
-        }
-        break;
-      default:
-        operates.push(
-          {
-            key: 'confirm',
-            label: '通过',
-            onClick: async () => {
-              items.forEach(async (item) => {
-                await item.approvalTask(TaskStatus.ApprovalStart, '同意');
-              });
-            },
-          },
-          {
-            key: 'refuse',
-            label: '拒绝',
-            onClick: async () => {
-              items.forEach(async (item) => {
-                await item.approvalTask(TaskStatus.ApprovalStart, '驳回');
-              });
-            },
-          },
-        );
-        break;
-    }
-    return operates;
   };
 
   if (task) {
     return <TaskDetail task={task} onBack={() => setTask(undefined)} />;
   }
+
   return (
-    <CardOrTableComp<IWorkTask>
+    <GenerateEntityTable
       key={key}
-      columns={WorkColumns}
-      operation={(item) => getOperation([item])}
-      tabBarExtraContent={selectedRows.length > 0 ? getOperation(selectedRows) : []}
-      request={getTaskList}
-      rowSelection={{
-        type: 'checkbox',
-        onChange: (_: React.Key[], selectedRows: IWorkTask[]) => {
-          setSelectRows(selectedRows);
+      fields={WorkTaskColumns}
+      dataSource={
+        new CustomStore({
+          key: 'id',
+          async load(loadOptions) {
+            const res = await getTaskList({
+              offset: loadOptions.skip || 0,
+              limit: loadOptions.take || 20,
+              filter: loadOptions.searchValue || '',
+            });
+            return {
+              data: res.result || [],
+              totalCount: res.total || 0,
+            };
+          },
+        })
+      }
+      columnChooser={{ enabled: true }}
+      onRowDblClick={async (e) => {
+        await setTaskDetail(e.data);
+      }}
+      sorting={{ mode: 'none' }}
+      remoteOperations={{
+        paging: true,
+        filtering: false,
+        groupPaging: true,
+      }}
+      dataMenus={{
+        items: [
+          {
+            key: 'remark',
+            label: '详情',
+            icon: <ImShuffle fontSize={22} color={'#9498df'} />,
+          },
+          {
+            key: 'createNFT',
+            label: '存证',
+            icon: <ImTicket fontSize={22} color={'#9498df'} />,
+            onClick: () => {
+              message.success('存证成功!');
+            },
+          },
+          {
+            key: 'print',
+            label: '打印',
+            icon: <ImCopy fontSize={22} color={'#9498df'} />,
+          },
+        ],
+        async onMenuClick(key, data) {
+          switch (key) {
+            case 'remark':
+              await setTaskDetail(data);
+              break;
+          }
         },
       }}
-      dataSource={[]}
-      rowKey="id"
     />
   );
 };

@@ -183,7 +183,7 @@ const setCopyFiles = (cmd: string, file: IFileInfo<schema.XEntity>) => {
 
 /** 剪贴板操作 */
 const copyBoard = (dir: IDirectory) => {
-  const datasource = [];
+  const datasource: any[] = [];
   for (const item of orgCtrl.user.copyFiles.entries()) {
     if (
       (item[1].typeName === '人员' && dir.typeName === '成员目录') ||
@@ -196,9 +196,23 @@ const copyBoard = (dir: IDirectory) => {
       });
     }
   }
-  const modal = Modal.info({
+  const modal = Modal.confirm({
     icon: <></>,
     width: 500,
+    cancelText: '取消',
+    okText: '全部',
+    onOk: async () => {
+      for (const item of datasource) {
+        if (item.cmd === 'copy') {
+          await item.file.copy(dir);
+        } else {
+          await item.file.move(dir);
+        }
+        orgCtrl.user.copyFiles.delete(item.key);
+      }
+      orgCtrl.changCallback();
+      modal.destroy();
+    },
     content: (
       <List
         itemLayout="horizontal"

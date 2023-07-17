@@ -25,6 +25,9 @@ const AttributeConfig = ({ attr, onChanged, superAuth, onClose }: IProps) => {
         <Form.Item label="标题" name="name">
           <Input />
         </Form.Item>
+        <Form.Item label="编号" name="code">
+          <Input />
+        </Form.Item>
         <Form.Item label="组件" name="widget">
           <Select options={loadWidgetsOpts(attr.property!.valueType)} />
         </Form.Item>

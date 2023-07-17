@@ -1,9 +1,9 @@
 import React from 'react';
 import { Image } from 'antd';
-import { FileItemModel } from '@/ts/base/model';
+import { FileItemShare } from '@/ts/base/model';
 
 interface IProps {
-  share: FileItemModel;
+  share: FileItemShare;
   finished: () => void;
 }
 

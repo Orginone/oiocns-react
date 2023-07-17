@@ -167,7 +167,7 @@ const GroupContent = (props: Iprops) => {
         <Button type="text" style={{ color: '#3e5ed8' }} onClick={() => forward(item)}>
           转发
         </Button>
-        {item.isMySend && (
+        {item.isMySend && item.allowRecall && (
           <Button
             type="text"
             style={{ color: '#3e5ed8' }}

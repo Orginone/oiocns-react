@@ -15,9 +15,23 @@ const Executor = () => {
     const id = command.subscribe((type, cmd, ...args: any[]) => {
       console.log(type, cmd, args);
       if (cmd === 'link') return history.push(args[0]);
+      if (cmd === 'openFolderWithEditor') {
+        setContent(
+          <DataExecutor
+            cmd={cmd}
+            args={args}
+            finished={() => {
+              setContent(<></>);
+            }}
+          />,
+        );
+        return () => {
+          command.unsubscribe(id);
+        };
+      }
       if (cmd === 'taskList') return setContent(<FileTaskList directory={args[0]} />);
       if (executeCmd(cmd, args[0], args.slice(1)) === false) {
-        if (['open', 'remark'].includes(cmd) && 'filedata' in args[0]) {
+        if (['open','openFolderWithEditor', 'remark'].includes(cmd) && 'filedata' in args[0]) {
           type = 'data';
         }
         switch (type) {

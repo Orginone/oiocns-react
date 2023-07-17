@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import React from 'react';
 import { Tabs } from 'antd';
 import { EditModal } from '../editModal';
-import GenerateTable from '../generate/table';
+import GenerateThingTable from '../generate/thingTable';
 
 interface IProps {
   allowEdit: boolean;
@@ -26,23 +26,50 @@ const DetailTable: React.FC<IProps> = (props) => {
     props.onChanged?.apply(this, [form.id, formData]);
   }, [formData]);
   return (
-    <GenerateTable
-      form={form}
+    <GenerateThingTable
       fields={fields}
-      autoColumn
       height={500}
       dataIndex={'attribute'}
       columnChooser={{ enabled: true }}
-      selection={{
-        mode: 'multiple',
-        allowSelectAll: true,
-        selectAllMode: 'allPages',
-        showCheckBoxesMode: 'always',
-      }}
+      selection={
+        props.allowEdit
+          ? {
+              mode: 'multiple',
+              allowSelectAll: true,
+              selectAllMode: 'allPages',
+              showCheckBoxesMode: 'always',
+            }
+          : undefined
+      }
       onSelectionChanged={(e) => setSelectKeys(e.selectedRowKeys)}
       toolbar={{
         visible: true,
         items: [
+          {
+            name: 'edit',
+            location: 'after',
+            widget: 'dxButton',
+            options: {
+              text: '创建仓库',
+              icon: 'edit',
+              onClick: () => {
+                console.log(formData,selectKeys);
+                EditModal.SoftEditModal({
+                  form: form,
+                  fields: fields,
+                  belong: props.belong,
+                  create:true,
+                  formData:formData,
+                  selectKeys:selectKeys,
+                  onSave: (values) => {
+                    formData.after.push(values);
+                    setFormData({ ...formData });
+                  },
+                });
+              },
+            },
+            visible:selectKeys.length > 0&&props.forms[0].id=="465120285687943168",
+          },
           {
             name: 'add',
             location: 'after',
@@ -139,7 +166,7 @@ const DetailTable: React.FC<IProps> = (props) => {
                 setFormData({ ...formData });
               },
             },
-            visible: selectKeys.length > 0,
+            visible: props.allowEdit && selectKeys.length > 0,
           },
           {
             name: 'columnChooserButton',
