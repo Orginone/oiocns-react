@@ -79,6 +79,12 @@ export const directoryOperates = {
     label: '刷新目录',
     iconType: 'refresh',
   },
+  OpenFolderWithEditor: {
+    sort: 10,
+    cmd: 'openFolderWithEditor',
+    label: '打开项目',
+    iconType: 'open',
+  },
   NewFile: {
     sort: 5,
     cmd: 'newFile',

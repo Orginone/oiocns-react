@@ -7,6 +7,7 @@ import FormView from './form';
 import WorkStart from './work';
 import OfficeView from './office';
 import MyMdEditor from './MdEditor';
+import CodeEditor from './CodeEditor';
 
 interface IOpenProps {
   cmd: string;
@@ -39,6 +40,28 @@ const ExecutorOpen: React.FC<IOpenProps> = (props: IOpenProps) => {
   }
   if (props.entity.typeName.startsWith('text')) {
     return <MyMdEditor finished={props.finished} form={props.entity} />;
+  }
+    if (
+    (props.entity.typeName === '目录' && props.cmd === 'openFolderWithEditor') ||
+    ['.vue', '.tsx', '.jsx', '.js', '.json', '.html', '.java'].find(
+      (m) => m === props.entity.share.avatar?.extension,
+    )
+  ) {
+    return (
+      <CodeEditor
+        isProject={props.entity.typeName === '目录'}
+        finished={props.finished}
+        form={props.entity}
+        supportFiles={[
+          '.vue',
+          '.tsx',
+          '.jsx',
+          '.js',
+          '.json',
+          '.html',
+          '.java',
+        ]}></CodeEditor>
+    );
   }
   command.emitter('config', props.cmd, props.entity);
   return <></>;
