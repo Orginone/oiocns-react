@@ -1,4 +1,4 @@
-import OrgCtrl from '../../controller/index';
+import OrgCtrl from '@/ts/controller/index';
 
 class FormRules {
   constructor(fromRuleInfo, beloneId) {
@@ -10,7 +10,6 @@ class FormRules {
   _RunningRules: any[];
   /* 所有提交时 规则 */
   _SubmitRules: any[];
-
   /* 获取表单关联规则 */
   queryAllFormRules() {
     /* 处理规则分组 */

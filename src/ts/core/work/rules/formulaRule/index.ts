@@ -1,7 +1,7 @@
-import RuleBase, { IRuleBaseType, ruleResultType } from '../base/ruleBase';
+import RuleBase, { IRuleBaseType } from '../base/ruleBase';
 import handleSimple from './handleSimple';
-/* 
-使用特殊符号区分关键字 『』「」如 「使用人」「使用人部门」 「使用人手机号」 
+/*
+使用特殊符号区分关键字 『』「」如 「使用人」「使用人部门」 「使用人手机号」
     // let formData = { 666: 100, 888: 20 };
     // let attrs = [
     //   { name: '净值', id: '123', code: 'jingzhi' },
