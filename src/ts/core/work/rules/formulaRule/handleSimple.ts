@@ -1,7 +1,6 @@
-import { ruleResultType } from '../base/ruleBase';
 import { extractContent, findKeyWidthName, uniqueArray } from '../tools';
 
-export default function handleSimple(ruleStr: string, formData, attrs): ruleResultType {
+export default function handleSimple(ruleStr: string, formData, attrs): string {
   /* 切分字符为 目标内容 和 公式内容区 */
   const _RuleArr: string[] = ruleStr.split('=');
   let errInfoArr: string[] = [];
@@ -24,7 +23,7 @@ export default function handleSimple(ruleStr: string, formData, attrs): ruleResu
       errInfoArr.push('未找到计算项：' + item);
     }
     if (attrObj && formData?.[attrObj.id]) {
-      ruleContent = ruleContent.replaceAll(`「${item}」`, formData[attrObj.id]);
+      ruleContent = ruleContent.replace(`「${item}」`, formData[attrObj.id]);
     } else {
       /* 存在计算项 缺失 */
       isContinue = false;
@@ -35,27 +34,7 @@ export default function handleSimple(ruleStr: string, formData, attrs): ruleResu
 
   /* 拦截最终计算 :存在计算项缺失、目标对象不在关联项存在*/
   if (!isContinue || !ruleAimKey) {
-    return {
-      success: false,
-      data: {},
-      errMsg: errInfoArr.join('、'),
-    };
+    return '';
   }
-  /* 进行计算 */
-  try {
-    /* 正常返回 */
-    const value = eval(ruleContent!);
-    return {
-      success: true,
-      data: { [ruleAimKey]: value },
-      errMsg: '',
-    };
-  } catch (err) {
-    /* 异常返回 */
-    return {
-      success: false,
-      data: {},
-      errMsg: '规则解析有误' + this?.name,
-    };
-  }
+  return ruleContent;
 }

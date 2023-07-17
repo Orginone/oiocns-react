@@ -5,9 +5,9 @@ class MethodRule extends RuleBase implements IRuleBaseType {
     super(data);
     this.ruleType = 'method';
   }
-  dealRule(): any {
+  dealRule = async (): Promise<any> => {
     console.log('函数处理方法');
-  }
+  };
   loadRemoteRules(): void {
     throw new Error('loadRemoteRules not implemented.');
   }

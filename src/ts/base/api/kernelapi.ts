@@ -1009,7 +1009,7 @@ export default class KernelApi {
     });
   }
   /**
-   * 查询用户的应用
+   * 查询用户的应用Attributes
    * @param {model.IdPageModel} params 请求参数
    * @returns {model.ResultType<model.PageResult<schema.XApplication>>} 请求结果
    */

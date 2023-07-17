@@ -86,7 +86,7 @@ abstract class RuleBase {
    *@param {Object} formData 当前表单数据
    *@return {} 返回处理结果 {【表单key】：value}
    */
-  abstract dealRule(formData: { [key: string]: any }): ruleResultType;
+  dealRule = async (formData: { [key: string]: any }) => Promise<any>;
   /**
    * @desc 加载外部规则库文件/模板规则
    */

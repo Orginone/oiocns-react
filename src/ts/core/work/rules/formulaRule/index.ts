@@ -1,48 +1,34 @@
 import RuleBase, { IRuleBaseType } from '../base/ruleBase';
 import handleSimple from './handleSimple';
-/*
-使用特殊符号区分关键字 『』「」如 「使用人」「使用人部门」 「使用人手机号」
-    // let formData = { 666: 100, 888: 20 };
-    // let attrs = [
-    //   { name: '净值', id: '123', code: 'jingzhi' },
-    //   { name: '原值', id: '666', code: 'value' },
-    //   { name: '累计折旧值', id: '888', code: 'zhejiu' },
-    // ];
-    // const ruleStr = `「净值」=「原值」 -「累计折旧值」`;
-*/
+import handleExtra from './handleExtra';
 class FormulaRule extends RuleBase implements IRuleBaseType {
   constructor(data) {
     super(data);
     this.ruleType = 'formula';
   }
   /* 处理结果 formData，attrs ruleStr */
-  dealRule(formData: { [key: string]: any } = {}) {
+  dealRule = async (formData: { [key: string]: any } = {}): Promise<any> => {
     console.log('公式处理方法,返回结果');
     const ruleStr: string = this.content;
     const attrs: any[] = this.linkAttrs;
-    /*1 区分公式类型 */
-    let ruleFunType: string = '';
+    /*1 依次处理 特殊标记 */
+    let resultString: string = '';
 
-    /*1.1 处理简单计算公式 不包含特殊函数 :`「净值」=「原值」 -「累计折旧值」`  类型：目标值=多个表单值（加减乘除等计算得出）*/
-    if (ruleStr.includes('=') && !ruleStr.includes('$')) {
-      ruleFunType = 'SIMPLE';
-    }
-
-    /*1.2 处理系统内置公式 `自动生成 编码；获取系统时间；获取当前操作人，当前单位，当前部门` 「系统时间」「当前操作人」...  */
-    if (!ruleStr.includes('=') && ruleStr.includes('$SYSTEM')) {
-      ruleFunType = 'SYSTEM';
-    }
+    /*1.1 处理表单字符 不包含特殊函数 :`「净值」「原值」「累计折旧值」` */
+    resultString = await handleSimple(ruleStr, formData, attrs);
+    /*1.2 处理系统公式 `取数函数；获取系统时间；获取当前操作人，当前单位，当前部门` 「系统时间」「当前操作人」...  */
+    resultString = await handleExtra(ruleStr, formData, attrs);
 
     /*1.3复合公式 */
 
-    switch (ruleFunType) {
-      case 'SIMPLE':
-        return handleSimple(ruleStr, formData, attrs);
-      case 'SYSTEM':
-      default:
-        return handleSimple(ruleStr, formData, attrs);
+    /*最终处理 js函数  (a+b-c/d)*/
+    try {
+      let _data = eval(resultString);
+      return { success: false, data: _data, errMsg: '' };
+    } catch (err) {
+      return { success: false, data: null, errMsg: '处理函数有误' };
     }
-  }
+  };
   loadRemoteRules(): void {}
   generateRule(): void {}
 }
