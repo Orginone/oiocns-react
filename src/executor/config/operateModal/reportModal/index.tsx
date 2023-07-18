@@ -3,7 +3,8 @@ import React, { useState } from 'react';
 import FormDesign from '@/bizcomponents/FormDesign';
 import cls from './index.module.less';
 import PageCard from '@/components/PageCard';
-// import Attribute from './Attritube';
+import Attribute from './Attritube';
+import Sheet from './Sheet';
 import { IForm } from '@/ts/core';
 import FullScreenModal from '@/executor/tools/fullScreen';
 import EntityInfo from '@/bizcomponents/EntityInfo';
@@ -29,19 +30,41 @@ const ReportModal: React.FC<IProps> = ({ current, finished }: IProps) => {
         </Button>
       );
     }
+    if (!current.isInherited && tabKey === 'sheet') {
+      return (
+        <Button
+          key="edit"
+          type="link"
+          onClick={() => {
+            setModalType('新增sheet页');
+          }}>
+          新增sheet页
+        </Button>
+      );
+    }
     return <></>;
   };
 
   const content = () => {
     if (tabKey === 'attr') {
-      // return (
-      //   // <Attribute
-      //   //   current={current}
-      //   //   modalType={modalType}
-      //   //   recursionOrg={true}
-      //   //   setModalType={setModalType}
-      //   // />
-      // );
+      return (
+        <Attribute
+          current={current}
+          modalType={modalType}
+          recursionOrg={true}
+          setModalType={setModalType}
+        />
+      );
+    }
+    if(tabKey === 'sheet'){
+      return (
+        <Sheet
+          current={current}
+          modalType={modalType}
+          recursionOrg={true}
+          setModalType={setModalType}
+        />
+      );
     }
     return <FormDesign current={current} />;
   };
@@ -63,11 +86,15 @@ const ReportModal: React.FC<IProps> = ({ current, finished }: IProps) => {
             bordered={false}
             tabList={[
               {
-                tab: current.typeName + 'sheet页',
+                tab: current.typeName + '特性',
                 key: 'attr',
               },
               {
-                tab: current.typeName + '设计',
+                tab: current.typeName + 'sheet页',
+                key: 'sheet',
+              },
+              {
+                tab: current.typeName + '规则',
                 key: 'form',
                 disabled: current.directory.isInherited,
               },

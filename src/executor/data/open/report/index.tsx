@@ -1,5 +1,4 @@
-import React from 'react';
-import { useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import FullScreenModal from '../../../../executor/tools/fullScreen';
 import { HotTable } from "@handsontable/react";
 import { HyperFormula } from 'hyperformula';
