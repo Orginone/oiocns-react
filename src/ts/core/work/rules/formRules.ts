@@ -18,7 +18,9 @@ class FormRules {
     this._beloneId = beloneId;
     this.queryAllFormRules(RuleInfo);
   }
+  /* 表单归属 */
   _beloneId: string;
+  /* 所有规则 */
   _AllRules: any[] = [];
   /* 所有初始化规则 */
   _StartRules: any[] = [];
@@ -30,9 +32,6 @@ class FormRules {
   /* 获取表单关联规则 */
   queryAllFormRules(frs: any[]) {
     console.log('获取表单关联规则', frs);
-    this._StartRules = [];
-    this._RunningRules = [];
-    this._SubmitRules = [];
     frs.forEach((_r) => {
       switch (_r.ruleType) {
         case RuleType.formula:

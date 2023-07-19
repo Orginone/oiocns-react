@@ -10,8 +10,11 @@ type AcceptedAttrType =
 type triggerType = 'Start' | 'Running' | 'Submit';
 
 export type ruleResultType = {
+  /* 规则运行是否异常 */
   success: boolean;
+  /* 规则运行结果 */
   data: { [key: string]: any };
+  /* 规则运行错误提示 */
   errMsg: string;
 };
 export interface IRuleBaseType {
@@ -49,7 +52,7 @@ abstract class RuleBase {
   /* 规则名称 */
   name: string;
   /* 规则类型 方法-公式*/
-  ruleType: 'method' | 'formula' | undefined;
+  ruleType: 'method' | 'formula';
   targetId: string;
   /* 触发方式 初始化-修改时-提交时 */
   trigger: triggerType;
@@ -74,6 +77,7 @@ abstract class RuleBase {
     this.id = data.id;
     this.name = data.name;
     this.trigger = data.trigger;
+    this.ruleType = data.ruleType;
     this.linkAttrs = data.linkAttrs;
     this.targetId = data.targetId;
     this.errorMsg = data.errorMsg;
