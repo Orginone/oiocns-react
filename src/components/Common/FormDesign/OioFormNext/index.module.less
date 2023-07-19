@@ -8,6 +8,22 @@
 
 .formWrap {
   .formRow {
+    // 描述label，必填标识显示
+    .Required {
+      position: relative;
+
+      &::after {
+        position: absolute;
+        top: -7px;
+        right: -8px;
+        font-size: 18px;
+        content: '*';
+        /* 内容为星号 */
+        color: red;
+        /* 字体颜色为红色 */
+      }
+    }
+
     :global {
       .ogo-form-item,
       .ogo-descriptions-row,

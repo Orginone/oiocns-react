@@ -41,6 +41,7 @@ const PrimaryForm: React.FC<IProps> = (props) => {
       fieldsValue={data}
       belong={props.belong}
       disabled={!props.allowEdit}
+      useRule
       submitter={{
         resetButtonProps: {
           style: { display: 'none' },
