@@ -52,6 +52,7 @@ class FormRules {
    * @param trigger 触发方式
    * @param formData 当前表单数据  用于处理 运行中，及提交时 读取表单数据
    * @param callBack 处理完成的回调
+   * //TODO:通过增加 权重参数，修改规则执行顺序；当前为 按顺序执行
    */
   async renderRules(
     trigger: triggerType.start | triggerType.running | triggerType.submit,
