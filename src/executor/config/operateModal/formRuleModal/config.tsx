@@ -212,11 +212,13 @@ const getColumns: (
                             colProps: { span: 9 },
                             tooltip: '公式中用于匹配关键字',
                             renderFormItem() {
+                              const _target = attrs.find((v) => v.id === id);
                               return (
                                 <Input
                                   name="attrName"
                                   readOnly
-                                  value={attrs.find((v) => v.id === id)?.name}
+                                  title={id}
+                                  value={_target?.name + '/' + _target?.id}
                                 />
                               );
                             },

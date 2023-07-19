@@ -9,20 +9,19 @@ class MethodRule extends RuleBase implements IRuleBaseType {
     super(data);
     this.ruleType = 'method';
   }
-  dealRule = async (): Promise<any> => {
-    console.log('函数处理', this.name);
+  dealRule = async (props: any): Promise<any> => {
     /*最终处理 js函数*/
     try {
-      let _data = eval(this.content)();
-      if (this.trigger === 'Start') {
-        /* 初始化直接返回所有变更对象， 与目标对象无关 */
-        return { success: true, data: _data, errMsg: '' };
-      }
-      return { success: true, data: { [this.targetId]: _data }, errMsg: '' };
+      const _data = eval(this.content)(props);
+      const data: Record<string, any> =
+        typeof _data === 'object' ? _data : { [this.targetId]: _data };
+
+      return { success: true, data, errMsg: '' };
     } catch (err) {
       return { success: false, data: null, errMsg: '处理函数有误' };
     }
   };
+
   loadRemoteRules(): void {
     throw new Error('loadRemoteRules not implemented.');
   }
