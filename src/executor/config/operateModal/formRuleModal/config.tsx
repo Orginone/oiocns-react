@@ -23,7 +23,7 @@ const getColumns: (
     title: '规则编号',
     dataIndex: 'code',
     formItemProps: {
-      rules: [{ required: true, message: '规则代码为必填项' }],
+      rules: [{ required: true, message: '规则编号为必填项' }],
     },
   },
   {
@@ -66,7 +66,7 @@ const getColumns: (
       }),
     },
     formItemProps: {
-      rules: [{ required: true, message: '规则代码为必填项' }],
+      rules: [{ required: true, message: '规则触发类型为必填项' }],
     },
   },
   {
@@ -105,7 +105,7 @@ const getColumns: (
                 }),
               },
               formItemProps: {
-                rules: [{ required: true, message: '是否公开为必填项' }],
+                rules: [{ required: true, message: '规则类型为必填项' }],
               },
             },
             {
@@ -198,7 +198,7 @@ const getColumns: (
                         options: attrs,
                       },
                       formItemProps: {
-                        rules: [{ required: true, message: '规则定义为必填项' }],
+                        rules: [{ required: true, message: '属性编号为必填项' }],
                       },
                     },
                     {
@@ -249,7 +249,7 @@ const getColumns: (
                 }),
               },
               formItemProps: {
-                rules: [{ required: true, message: '是否公开为必填项' }],
+                rules: [{ required: true, message: '通用模板为必选项' }],
               },
             },
             {
@@ -312,7 +312,7 @@ const getColumns: (
                               // options: attrs,
                             },
                             formItemProps: {
-                              rules: [{ required: true, message: '规则定义为必填项' }],
+                              rules: [{ required: true, message: '属性名称为必选项' }],
                             },
                           },
                           {
@@ -326,7 +326,7 @@ const getColumns: (
                                   dataIndex: 'attrName',
                                   colProps: { span: 9 },
                                   // readonly: true,
-                                  renderFormItem(_schema, config, form, action) {
+                                  renderFormItem(_schema, _config, form, _action) {
                                     form.setFieldValue(
                                       'attrName',
                                       attrs.find((v) => v.id === id)?.name,
