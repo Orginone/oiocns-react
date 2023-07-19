@@ -1,1 +1,0 @@
-export { TxtHubProtocol } from './txtHubProtocol';
