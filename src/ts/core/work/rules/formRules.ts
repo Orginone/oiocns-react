@@ -41,7 +41,6 @@ class FormRules {
           this._AllRules.push(new MethodRule(_r));
           break;
 
-          break;
         default:
           break;
       }
@@ -55,7 +54,7 @@ class FormRules {
    * @param callBack 处理完成的回调
    */
   async renderRules(
-    trigger: 'Start' | 'Running' | 'Submit',
+    trigger: triggerType.start | triggerType.running | triggerType.submit,
     formData: DataType,
     attrs: DataType,
     callBack: any,
@@ -63,10 +62,11 @@ class FormRules {
     /* 最终输出结果 */
     let resultObj = {};
     let _Rules: any[] = this._AllRules.filter((item) => item.trigger === trigger);
-    console.log('打印', attrs, _Rules);
+    console.log('待处理规则', attrs, _Rules);
     for (let i = 0; i < _Rules.length; i++) {
       const _R = _Rules[i];
       try {
+        /* 对执行函数增加默认数据 依次为 表单数据、表单特性、单位数据、个人数据 ...*/
         let res = await _R.dealRule({
           $formData: formData,
           $attrs: attrs,
@@ -74,7 +74,7 @@ class FormRules {
             OrgCtrl.user.companys.find((v) => v.id === this._beloneId)?.metadata ?? {},
           $user: OrgCtrl.user.metadata,
         });
-        console.log(_R.name, res);
+        console.log('规则执行结果', _R.name, res);
         if (res.success) {
           resultObj = { ...resultObj, ...res.data };
         }
@@ -83,7 +83,8 @@ class FormRules {
       }
     }
 
-    console.log('最终数据结果', resultObj);
+    console.log('所有规则最终数据结果', resultObj);
+    /* 弹出数据，展示层处理数据展示逻辑 */
     callBack && callBack(resultObj);
   }
 }
