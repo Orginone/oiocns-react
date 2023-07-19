@@ -20,7 +20,6 @@ interface IProps {
 
 const ReportView: React.FC<IProps> = ({ current, finished }) => {
   const hotRef:any = useRef(null);
-  console.log(hotRef,'hotRef')
   let cellMeta:any = []
   let styleList:any = []
   let rulesData:any = []
@@ -43,7 +42,6 @@ const ReportView: React.FC<IProps> = ({ current, finished }) => {
       console.log('change', change.address, change.newValue);
     });
   };
-
   const mergeData:any = []
 
   // const Settings:any = {
@@ -97,6 +95,10 @@ const ReportView: React.FC<IProps> = ({ current, finished }) => {
   //   }},
   //   afterFormulasValuesUpdate:{afterFormulasValuesUpdate}
   // }
+
+  const change = (value:any) =>{
+    console.log(value,'value')
+  }
 
   useEffect(() => {
     const hot = hotRef.current.hotInstance;
@@ -180,7 +182,7 @@ const ReportView: React.FC<IProps> = ({ current, finished }) => {
       onCancel={finished}>
       <div className={cls['report-content-box']}>
         <div className={cls['report-tool-box']}>
-          <ToolBar current={current}></ToolBar>
+          <ToolBar current={current} reportChange={change}></ToolBar>
         </div>
         <HotTable
           ref={hotRef}

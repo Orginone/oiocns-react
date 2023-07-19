@@ -530,6 +530,10 @@ export type XReport = {
   directoryId: string;
   // 报表的特性
   attributes: XAttribute[] | undefined;
+  // // 报表的集合
+  // sheets: [] | undefined;
+  // // 报表的规则集合
+  // rules: [] | undefined;
   // 使用报表的流程节点
   bindNodes: XWorkNode[] | undefined;
   // 报表的目录

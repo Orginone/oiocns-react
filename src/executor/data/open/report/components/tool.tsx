@@ -15,6 +15,7 @@ function handleChange(value:any) {
 
 interface IProps {
   current: IReport;
+  reportChange: (value:any) => void;
 }
 
 const classDefault:string = 'htMiddle htLeft'
@@ -188,7 +189,7 @@ const items: MenuProps['items'] = [
   },
 ];
 
-const ToolBar: React.FC<IProps> = ({ current }: IProps) => {
+const ToolBar: React.FC<IProps> = ({ current,reportChange }: IProps) => {
   const [modalType, setModalType] = useState<string>('');
   const [tkey, tforceUpdate] = useObjectUpdate('');
 
@@ -206,6 +207,7 @@ const ToolBar: React.FC<IProps> = ({ current }: IProps) => {
   const reducePaddingLeft =()=>{}
   const addPaddingLeft=()=>{}
   const merge=()=>{}
+  const saveData:any = []
   const alignThis =(item:any)=>{console.log(item)}
 
   return (
@@ -389,12 +391,14 @@ const ToolBar: React.FC<IProps> = ({ current }: IProps) => {
           title="选择属性"
           destroyOnClose
           okText="确定"
-          onOk={() => setModalType('')}
+          onOk={() => {setModalType(''),reportChange(saveData),console.log(saveData)}}
           onCancel={() => setModalType('')}>
           <SelectPropertys
             target={current.directory.target}
             selected={current.attributes.map((a) => a.property!)}
             onAdded={async (prop) => {
+              saveData.push(prop)
+              console.log(saveData,'saveData')
               await current.createAttribute(
                 {
                   name: prop.name,
@@ -407,6 +411,8 @@ const ToolBar: React.FC<IProps> = ({ current }: IProps) => {
               tforceUpdate();
             }}
             onDeleted={async (id) => {
+              const index = saveData.findIndex((i:any) => i.id === id)
+              saveData.splice(index,1)
               const attr = current.attributes.find((i) => i.propId === id);
               if (attr) {
                 await current.deleteAttribute(attr);
@@ -415,10 +421,7 @@ const ToolBar: React.FC<IProps> = ({ current }: IProps) => {
             }}
           />
         </Modal>:''
-      }
-        
-      
-      {/* <div className={cls['page-content-table']}>{content()}</div> */}
+      }      
     </div>
   );
 };

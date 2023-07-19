@@ -1,10 +1,10 @@
 import { Button } from 'antd';
 import React, { useState } from 'react';
-import FormDesign from '@/bizcomponents/FormDesign';
 import cls from './index.module.less';
 import PageCard from '@/components/PageCard';
 import Attribute from './Attritube';
 import Sheet from './Sheet';
+import Rules from './Rules';
 import { IForm } from '@/ts/core';
 import FullScreenModal from '@/executor/tools/fullScreen';
 import EntityInfo from '@/bizcomponents/EntityInfo';
@@ -14,31 +14,20 @@ interface IProps {
   finished: () => void;
 }
 const ReportModal: React.FC<IProps> = ({ current, finished }: IProps) => {
+  console.log(current,'current')
   const [modalType, setModalType] = useState<string>('');
   const [tabKey, setTabKey] = useState<string>('attr');
   /** 操作按钮 */
   const renderButton = () => {
-    if (!current.isInherited && tabKey === 'attr') {
+    if (!current.isInherited) {
       return (
         <Button
           key="edit"
           type="link"
           onClick={() => {
-            setModalType('新增特性');
+            setModalType(tabKey=='attr'?'新增特性':tabKey=='sheet'?'新增sheet页':'新增规则');
           }}>
-          新增特性
-        </Button>
-      );
-    }
-    if (!current.isInherited && tabKey === 'sheet') {
-      return (
-        <Button
-          key="edit"
-          type="link"
-          onClick={() => {
-            setModalType('新增sheet页');
-          }}>
-          新增sheet页
+          {tabKey=='attr'?'新增特性':tabKey=='sheet'?'新增sheet页':'新增规则'}
         </Button>
       );
     }
@@ -63,10 +52,16 @@ const ReportModal: React.FC<IProps> = ({ current, finished }: IProps) => {
           modalType={modalType}
           recursionOrg={true}
           setModalType={setModalType}
+          finished={finished} 
         />
       );
     }
-    return <FormDesign current={current} />;
+    return <Rules
+      current={current}
+      modalType={modalType}
+      recursionOrg={true}
+      setModalType={setModalType}
+    />;
   };
 
   return (
@@ -95,8 +90,7 @@ const ReportModal: React.FC<IProps> = ({ current, finished }: IProps) => {
               },
               {
                 tab: current.typeName + '规则',
-                key: 'form',
-                disabled: current.directory.isInherited,
+                key: 'rules',
               },
             ]}
             activeTabKey={tabKey}
