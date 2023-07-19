@@ -8,6 +8,9 @@ import { useHistory } from 'react-router-dom';
 const Executor = () => {
   const history = useHistory();
   const [content, setContent] = useState(<></>);
+  const resetContent = () => {
+    setContent(<></>);
+  };
   useEffect(() => {
     const id = command.subscribe((type, cmd, ...args: any[]) => {
       console.log(type, cmd, args);
@@ -19,20 +22,10 @@ const Executor = () => {
         }
         switch (type) {
           case 'data':
-            setContent(
-              <DataExecutor
-                cmd={cmd}
-                args={args}
-                finished={() => {
-                  setContent(<></>);
-                }}
-              />,
-            );
+            setContent(<DataExecutor cmd={cmd} args={args} finished={resetContent} />);
             break;
           case 'config':
-            setContent(
-              <ConfigExecutor cmd={cmd} args={args} finished={() => setContent(<></>)} />,
-            );
+            setContent(<ConfigExecutor cmd={cmd} args={args} finished={resetContent} />);
             break;
           default:
             setContent(<></>);

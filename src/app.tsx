@@ -1,16 +1,15 @@
 import { ConfigProvider, Spin, message, notification } from 'antd';
 import React, { Suspense, useState } from 'react';
 import { renderRoutes } from 'react-router-config';
-import { HashRouter, useHistory } from 'react-router-dom';
+import { HashRouter } from 'react-router-dom';
 
 import routes from '@/routes';
+import 'devextreme/dist/css/dx.common.css';
+import 'devextreme/dist/css/dx.light.css';
 import './global.less';
-// import enUS from 'antd/es/locale/en_US';
 import zhCN from 'antd/es/locale/zh_CN';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
-import 'devextreme/dist/css/dx.common.css';
-import 'devextreme/dist/css/dx.light.css';
 import config from 'devextreme/core/config';
 import { loadMessages, locale } from 'devextreme/localization';
 import zhMessage from 'devextreme/localization/messages/zh.json';
@@ -35,7 +34,6 @@ notification.config({
 
 const App = () => {
   const [locale] = useState(zhCN);
-  const history = useHistory();
   logger.onLogger = (level, msg) => {
     switch (level) {
       case LoggerLevel.info:
@@ -50,7 +48,7 @@ const App = () => {
       case LoggerLevel.unauth:
         message.warn(msg);
         sessionStorage.clear();
-        return history.push('/passport/login');
+        location.reload();
     }
   };
   return (

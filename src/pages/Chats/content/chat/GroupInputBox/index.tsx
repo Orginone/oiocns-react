@@ -1,4 +1,4 @@
-import { IconFont } from '@/components/IconFont';
+import * as im from 'react-icons/im';
 import { Button, message, Popover, Spin, Upload, UploadProps } from 'antd';
 import { CloseCircleFilled } from '@ant-design/icons';
 import React, { useEffect, useState } from 'react';
@@ -8,6 +8,7 @@ import PullDown from '@/pages/Chats/components/pullDown';
 import Cutting from '../../cutting';
 import './index.less';
 import { parseCiteMsg } from '@/pages/Chats/components/parseMsg';
+import Emoji from '../../../components/emoji';
 
 /**
  * @description: 输入区域
@@ -26,7 +27,7 @@ interface IProps {
 const GroupInputBox = (props: IProps) => {
   const { writeContent, citeText, enterCiteMsg, closeCite } = props;
   const [task, setTask] = useState<model.TaskModel>();
-  const [imgUrls, setImgUrls] = useState<Array<string>>([]); // 表情图片
+  const [openEmoji, setOpenEmoji] = useState(false);
   const [IsCut, setIsCut] = useState<boolean>(false); // 是否截屏
   const [citeShow, setCiteShow] = useState<boolean>(false); // @展示
 
@@ -109,19 +110,6 @@ const GroupInputBox = (props: IProps) => {
     return [];
   };
 
-  /**
-   * @description: 处理表情图片
-   * @return {*}
-   */
-  useEffect(() => {
-    let imgUrl = ``;
-    let imgUrlss = [];
-    for (let i = 1; i <= 36; i++) {
-      imgUrl = `/emo/${i}.png`;
-      imgUrlss.push(imgUrl);
-    }
-    setImgUrls(imgUrlss);
-  }, []);
   useEffect(() => {
     let doc = document.getElementById('innerHtml');
     if (writeContent !== null && doc) {
@@ -169,13 +157,6 @@ const GroupInputBox = (props: IProps) => {
     document.getElementById('innerHtml')?.append(img);
   };
 
-  /** 创建img标签 */
-  const handleImgChoosed = (url: string) => {
-    const img = document.createElement('img');
-    img.src = url;
-    img.className = `emoji`;
-    document.getElementById('innerHtml')?.append(img);
-  };
   /** 文件上传参数 */
   const uploadProps: UploadProps = {
     multiple: false,
@@ -219,43 +200,37 @@ const GroupInputBox = (props: IProps) => {
       <div className="group-input-box">
         <div className="group-input-box__toolbar">
           <Popover
-            placement="top"
-            trigger="click"
             content={
-              <div className="emoticons-picker">
-                {imgUrls.map((index) => {
-                  return (
-                    <div
-                      className="emoticons-picker__item"
-                      key={index}
-                      onClick={() => {
-                        handleImgChoosed(index);
-                      }}>
-                      <img className="emoticon" src={`${index}`} alt="" />
-                    </div>
-                  );
-                })}
-              </div>
-            }>
-            <Button type="text" icon={<IconFont type="icon-biaoqing" />} />
+              <Emoji
+                onSelect={(emoji: string) => {
+                  setOpenEmoji(false);
+                  document.getElementById('innerHtml')?.append(emoji);
+                }}
+              />
+            }
+            open={openEmoji}
+            trigger={['click', 'contextMenu']}
+            onOpenChange={setOpenEmoji}>
+            <div onClick={() => setOpenEmoji(!openEmoji)} style={{ paddingTop: '6px' }}>
+              <im.ImSmile size={18} color={'#9498df'} />
+            </div>
           </Popover>
-
-          <Button
-            type="text"
+          <im.ImMic
+            size={18}
+            color={'#9498df'}
             onClick={() => {
               message.warning('功能暂未开放');
             }}
-            icon={<IconFont type="icon-maikefeng" />}
           />
           <Upload {...uploadProps}>
-            <Button type="text" icon={<IconFont type="icon-wenjian" />} />
+            <im.ImFolder size={18} color={'#9498df'} />
           </Upload>
-          <Button
-            type="text"
+          <im.ImVideoCamera
+            size={18}
+            color={'#9498df'}
             onClick={() => {
               message.warning('功能暂未开放');
             }}
-            icon={<IconFont type="icon-shipin" />}
           />
         </div>
         {/* @功能 */}

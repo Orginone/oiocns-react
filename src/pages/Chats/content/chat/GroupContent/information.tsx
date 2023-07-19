@@ -1,7 +1,7 @@
 import { IMessage, IMessageLabel } from '@/ts/core';
 import { Drawer, List, Tabs } from 'antd';
 import React, { useState } from 'react';
-import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
+import TeamIcon from '@/components/Common/GlobalComps/entityIcon';
 import { showChatTime } from '@/utils/tools';
 import type { TabsProps } from 'antd';
 

@@ -51,7 +51,7 @@ export class DirectoryReadConfig extends ReadConfigImpl<
     let queue = [root];
     let allDirs = [root];
     // 加载目录
-    while (true) {
+    while (queue.length > 0) {
       let first = queue.shift();
       if (!first) continue;
       await first.loadContent();
@@ -85,7 +85,7 @@ export class DirectoryReadConfig extends ReadConfigImpl<
             ...speciesItem,
             parentInfo: parentMap[speciesItem.parentId]?.info,
             speciesCode: species.code,
-            index: -1,
+            index: 0,
           });
         }
       }

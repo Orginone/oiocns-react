@@ -102,10 +102,8 @@ class CommonReadConfig<
         },
       });
     }
-    while (true) {
-      let temps = requests.splice(0, 100);
-      if (temps.length == 0) break;
-      await this.requests(temps, context, onItemCompleted);
+    while (requests.length > 0) {
+      await this.requests(requests.splice(0, 20), context, onItemCompleted);
     }
   }
   /**

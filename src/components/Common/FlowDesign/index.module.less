@@ -1,0 +1,53 @@
+.company-top-content {
+  :global {
+    .rowClass {
+      .ogo-table-cell-row-hover {
+        background: rgba(5, 5, 232, 0.3) !important;
+      }
+    }
+  }
+}
+.operation-btn {
+  display: flex;
+  align-items: center;
+  height: 20px;
+  width: 40px;
+  padding: 4px 10px;
+  cursor: pointer;
+  border-radius: 12px;
+  font-size: 18px;
+  overflow: hidden;
+  &:hover {
+    background-color: @primary-color;
+    color: @white-color;
+  }
+}
+.app-wrap {
+  height: 100%;
+}
+.rowClass {
+  // background: rgba(5, 5, 232, 0.3);
+  :global {
+    .ogo-table-cell-row-hover {
+      background: rgba(91, 91, 92, 0.1) !important;
+    }
+    td {
+      background: rgba(91, 91, 92, 0.1) !important;
+    }
+    .ogo-table-cell-fix-left,
+    .ogo-table-cell-fix-right {
+      background: rgba(91, 91, 92, 0.1) !important;
+    }
+  }
+}
+
+.layout-title {
+  position: 'sticky';
+  top: 0;
+  z-index: 100;
+  width: '100%';
+  text-align: 'center';
+  justify-content: 'center';
+  align-items: 'center';
+  font-size: '22px';
+}

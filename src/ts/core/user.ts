@@ -103,13 +103,9 @@ export class UserProvider {
   private _loadUser(person: schema.XTarget) {
     sessionStorage.setItem(sessionUserName, JSON.stringify(person));
     this._user = new Person(person);
-    this._chat = new ChatProvider(this._user);
-    this._work = new WorkProvider(this._user);
+    this._chat = new ChatProvider(this._user!);
+    this._work = new WorkProvider(this);
     this.refresh();
-  }
-  /** 更新用户 */
-  public update(person: schema.XTarget) {
-    sessionStorage.setItem(sessionUserName, JSON.stringify(person));
   }
   /** 重载数据 */
   public async refresh(): Promise<void> {

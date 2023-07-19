@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import EntityIcon from '@/bizcomponents/GlobalComps/entityIcon';
 import TypeIcon from '@/bizcomponents/GlobalComps/typeIcon';
 import { command, schema } from '@/ts/base';
@@ -8,6 +9,28 @@ import QrCode from 'qrcode.react';
 import React, { useEffect, useState } from 'react';
 import { uploadTemplate } from './tools/uploadTemplate';
 
+=======
+import {
+  IApplication,
+  IDirectory,
+  IEntity,
+  IFileInfo,
+  IMemeber,
+  IMsgChat,
+  ISysFileInfo,
+  ITarget,
+  TargetType,
+} from '@/ts/core';
+import orgCtrl from '@/ts/controller';
+import { command, model, schema } from '@/ts/base';
+import { Drawer, List, Modal, Progress, Tabs, Upload, message } from 'antd';
+import QrCode from 'qrcode.react';
+import React, { useEffect, useState } from 'react';
+import { uploadTemplate } from './tools/uploadTemplate';
+import TypeIcon from '@/components/Common/GlobalComps/typeIcon';
+import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
+import { TaskModel } from '@/ts/base/model';
+>>>>>>> 2fd7a9abcf299e5408ea9756a24426de86c2f778
 /** 执行非页面命令 */
 export const executeCmd = (cmd: string, entity: any, args: any[]) => {
   switch (cmd) {
@@ -17,6 +40,9 @@ export const executeCmd = (cmd: string, entity: any, args: any[]) => {
       return directoryRefresh(entity);
     case 'openChat':
       return openChat(entity);
+    case 'download':
+      window.open((entity as ISysFileInfo).shareInfo().shareLink, '_black');
+      return;
     case 'copy':
     case 'move':
       return setCopyFiles(cmd, entity);
@@ -36,27 +62,36 @@ export const executeCmd = (cmd: string, entity: any, args: any[]) => {
       return openDirectory(entity);
     case 'standard':
       return uploadTemplate(entity);
+<<<<<<< HEAD
+=======
+    case 'online':
+    case 'outline':
+      return onlineChanged(cmd, entity);
+>>>>>>> 2fd7a9abcf299e5408ea9756a24426de86c2f778
   }
   return false;
 };
 
 /** 刷新目录 */
-const directoryRefresh = (dir: IDirectory) => {
+const directoryRefresh = (dir: IDirectory | IApplication) => {
   dir.loadContent(true).then(() => {
     orgCtrl.changCallback();
   });
 };
 
 /** 进入目录 */
-const openDirectory = (entity: IDirectory | ITarget | IEntity<schema.XEntity>) => {
-  if ('identitys' in entity) {
+const openDirectory = (
+  entity: IDirectory | IApplication | ITarget | IEntity<schema.XEntity>,
+) => {
+  if ('identitys' in entity && entity.typeName != TargetType.Station) {
     entity = entity.directory;
   }
-  if ('files' in entity) {
+  if ('files' in entity || 'works' in entity) {
     entity.loadContent().then(() => {
       orgCtrl.currentKey = entity.key;
       orgCtrl.changCallback();
     });
+    return;
   }
   return false;
 };
@@ -75,17 +110,36 @@ const setCopyFiles = (cmd: string, file: IFileInfo<schema.XEntity>) => {
 
 /** 剪贴板操作 */
 const copyBoard = (dir: IDirectory) => {
-  const datasource = [];
+  const datasource: any[] = [];
   for (const item of orgCtrl.user.copyFiles.entries()) {
-    datasource.push({
-      key: item[0],
-      cmd: item[0].split('_')[0],
-      file: item[1],
-    });
+    if (
+      (item[1].typeName === '人员' && dir.typeName === '成员目录') ||
+      (item[1].typeName !== '人员' && dir.typeName === '目录')
+    ) {
+      datasource.push({
+        key: item[0],
+        cmd: item[0].split('_')[0],
+        file: item[1],
+      });
+    }
   }
-  const modal = Modal.info({
+  const modal = Modal.confirm({
     icon: <></>,
     width: 500,
+    cancelText: '取消',
+    okText: '全部',
+    onOk: async () => {
+      for (const item of datasource) {
+        if (item.cmd === 'copy') {
+          await item.file.copy(dir);
+        } else {
+          await item.file.move(dir);
+        }
+        orgCtrl.user.copyFiles.delete(item.key);
+      }
+      orgCtrl.changCallback();
+      modal.destroy();
+    },
     content: (
       <List
         itemLayout="horizontal"
@@ -204,8 +258,49 @@ const entityQrCode = (entity: IEntity<schema.XEntity>) => {
   });
 };
 
+/** 上下线提醒 */
+const onlineChanged = (cmd: string, info: model.OnlineInfo) => {
+  if (info.userId === '0') {
+    if (cmd === 'online') {
+      message.success({
+        duration: 1,
+        content: `终端${info.remoteAddr}[${info.connectionId}]建立连接`,
+      });
+    } else {
+      message.error({
+        duration: 1,
+        content: `终端${info.remoteAddr}[${info.connectionId}]断开连接`,
+      });
+    }
+  } else {
+    orgCtrl.user.findEntityAsync(info.userId).then((target) => {
+      if (target) {
+        if (cmd === 'online') {
+          message.success({
+            duration: 1,
+            content: (
+              <div style={{ display: 'contents' }}>
+                {target.name} [{target.code}] 从{info.remoteAddr}上线啦
+              </div>
+            ),
+          });
+        } else {
+          message.error({
+            duration: 1,
+            content: (
+              <div style={{ display: 'contents' }}>
+                {target.name} [{target.code}] 从{info.remoteAddr}下线啦
+              </div>
+            ),
+          });
+        }
+      }
+    });
+  }
+};
+
 /** 文件上传 */
-export const uploadFile = (
+const uploadFile = (
   dir: IDirectory,
   uploaded?: (file: IFileInfo<schema.XEntity> | undefined) => void,
 ) => {
@@ -217,7 +312,9 @@ export const uploadFile = (
     maskClosable: true,
     content: (
       <Upload
+        multiple
         type={'drag'}
+        maxCount={100}
         showUploadList={false}
         style={{ width: 550, height: 300 }}
         customRequest={async (options) => {
@@ -249,16 +346,11 @@ export const FileTaskList = ({ directory }: { directory: IDirectory }) => {
     s = s == 0 ? 1 : s;
     return parseInt(((f * 10000.0) / s).toFixed(0)) / 100;
   };
-  return (
-    <Drawer
-      title="操作记录"
-      open
-      width={500}
-      placement="right"
-      onClose={() => command.emitter('-', '-')}>
+  const loadTasks = (tlst: TaskModel[]) => {
+    return (
       <List
         itemLayout="horizontal"
-        dataSource={taskList}
+        dataSource={tlst}
         renderItem={(item) => {
           return (
             <List.Item
@@ -281,6 +373,34 @@ export const FileTaskList = ({ directory }: { directory: IDirectory }) => {
             </List.Item>
           );
         }}
+      />
+    );
+  };
+  return (
+    <Drawer
+      title="操作记录"
+      open
+      width={500}
+      placement="right"
+      onClose={() => command.emitter('-', '-')}>
+      <Tabs
+        centered
+        items={[
+          {
+            key: 'uploading',
+            label: '上传中',
+            children: loadTasks(
+              taskList.filter((i) => i.finished >= 0 && i.finished < i.size),
+            ),
+          },
+          {
+            key: 'uploaded',
+            label: '已完成',
+            children: loadTasks(
+              taskList.filter((i) => i.finished < 0 || i.finished >= i.size),
+            ),
+          },
+        ]}
       />
     </Drawer>
   );

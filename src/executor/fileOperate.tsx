@@ -1,4 +1,4 @@
-import TypeIcon from '@/bizcomponents/GlobalComps/typeIcon';
+import TypeIcon from '@/components/Common/GlobalComps/typeIcon';
 import { command, schema } from '@/ts/base';
 import { IFileInfo } from '@/ts/core';
 import React from 'react';

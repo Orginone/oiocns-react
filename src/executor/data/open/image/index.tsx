@@ -1,7 +1,6 @@
 import React from 'react';
 import { Image } from 'antd';
 import { FileItemShare } from '@/ts/base/model';
-import FullScreenModal from '@/executor/tools/fullScreen';
 
 interface IProps {
   share: FileItemShare;
@@ -14,15 +13,19 @@ const ImageView: React.FC<IProps> = ({ share, finished }) => {
       share.shareLink = `/orginone/anydata/bucket/load/${share.shareLink}`;
     }
     return (
-      <FullScreenModal
-        centered
-        open={true}
-        width={'50vw'}
-        destroyOnClose
-        title={share.name}
-        onCancel={() => finished()}>
-        <Image src={share.shareLink} preview={false} />
-      </FullScreenModal>
+      <Image
+        style={{ display: 'none' }}
+        src={share.shareLink}
+        preview={{
+          visible: true,
+          destroyOnClose: true,
+          onVisibleChange: (v) => {
+            if (!v) {
+              finished();
+            }
+          },
+        }}
+      />
     );
   }
   finished();

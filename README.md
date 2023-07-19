@@ -1,7 +1,5 @@
 # 资产共享云平台前端
 
-TS功能文档: [ts功能划分](https://docs.qq.com/sheet/DQ2JhZGtJZFlsWWln)
-
 
 ![Image text](https://user-images.githubusercontent.com/8328012/201800690-9f5e989e-4ed3-4817-85b9-b594ac89fd31.png)
 
@@ -10,6 +8,7 @@ TS功能文档: [ts功能划分](https://docs.qq.com/sheet/DQ2JhZGtJZFlsWWln)
 资产共享云是面向下一代互联网发展趋势，基于动态演化的复杂系统多主体建模方法，以所有权作为第一优先级，运用零信任安全机制，按自组织分形理念提炼和抽象“沟通、办事、存储、流通和设置”等基础功能，为b端和c端融合的全场景业务的提供新一代分布式应用架构。    
 
 本存储是资产共享云的前端 react 实现。
+体验地址：https://orginone.cn
 
 ### 项目目录
 

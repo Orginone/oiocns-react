@@ -67,7 +67,7 @@ export abstract class Entity<T extends schema.XEntity>
     return this.metadata.typeName;
   }
   get remark(): string {
-    return this.metadata.remark;
+    return this.metadata?.remark ?? '';
   }
   get metadata(): T {
     if (ShareIdSet.has(this._metadata.id)) {

@@ -95,11 +95,11 @@ const showChatTime = (chatDate: moment.MomentInput) => {
   const days = moment().diff(date, 'day');
   switch (days) {
     case 0:
-      return cdate.format('H:mm');
+      return cdate.format('H:mm:ss');
     case 1:
-      return '昨天 ' + cdate.format('H:mm');
+      return '昨天 ' + cdate.format('H:mm:ss');
     case 2:
-      return '前天 ' + cdate.format('H:mm');
+      return '前天 ' + cdate.format('H:mm:ss');
   }
   const year = moment().diff(cdate, 'year');
   if (year == 0) {
@@ -313,6 +313,6 @@ export {
   resetParams,
   showChatTime,
   showMessage,
-  validIsSocialCreditCode,
   truncateString,
+  validIsSocialCreditCode,
 };

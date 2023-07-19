@@ -1,51 +1,18 @@
 import { Button, Col, Modal, Row, Typography } from 'antd';
 import React, { useState } from 'react';
-import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
+import TeamIcon from '@/components/Common/GlobalComps/entityIcon';
 import detailStyle from './index.module.less';
-import { schema } from '@/ts/base';
-import AssignPosts from '@/bizcomponents/Indentity/components/AssignPosts';
 import { getUuid } from '@/utils/tools';
-import { ICohort, IMsgChat, TargetType } from '@/ts/core';
-import orgCtrl from '@/ts/controller';
+import { IMsgChat, ITarget, TargetType } from '@/ts/core';
 import ChatHistoryModal from '../ChatHistoryModal';
 import { AiOutlineRight } from 'react-icons/ai';
+import { command } from '@/ts/base';
+import { useHistory } from 'react-router-dom';
+import orgCtrl from '@/ts/controller';
 
 const Groupdetail: React.FC<any> = ({ chat }: { chat: IMsgChat }) => {
-  const [open, setOpen] = useState<boolean>(false); // 邀请弹窗开关
-  const [removeOpen, setRemoveOpen] = useState<boolean>(false); // 移出弹窗开关
-  const [selectPerson, setSelectPerson] = useState<schema.XTarget[]>([]); // 需要邀请的部门成员
   const [historyOpen, setHistoryOpen] = useState<boolean>(false); // 历史消息搜索
-
-  /**
-   * @description: 邀请确认
-   * @return {*}
-   */
-  const onOk = async () => {
-    if (selectPerson && selectPerson.length > 0) {
-      await (chat as ICohort).pullMembers(selectPerson);
-    }
-    setOpen(false);
-  };
-
-  /**
-   * @description: 移除确认
-   * @return {*}
-   */
-  const onRemoveOk = async () => {
-    setRemoveOpen(false);
-    if (selectPerson && selectPerson.length > 0) {
-      await (chat as ICohort).removeMembers(selectPerson);
-    }
-  };
-
-  /**
-   * @description: 取消
-   * @return {*}
-   */
-  const onCancel = () => {
-    setOpen(false);
-    setRemoveOpen(false);
-  };
+  const history = useHistory();
 
   /**
    * @description: 历史消息搜索弹窗
@@ -113,7 +80,7 @@ const Groupdetail: React.FC<any> = ({ chat }: { chat: IMsgChat }) => {
       {chat.members.map((item) => {
         return (
           <div key={getUuid()} title={item.name} className={detailStyle.show_persons}>
-            <TeamIcon size={36} preview typeName={item.typeName} entityId={item.id} />
+            <TeamIcon size={36} typeName={item.typeName} entityId={item.id} />
             <Typography className={detailStyle.img_list_con_name}>{item.name}</Typography>
           </div>
         );
@@ -123,16 +90,9 @@ const Groupdetail: React.FC<any> = ({ chat }: { chat: IMsgChat }) => {
           <div
             className={`${detailStyle.img_list_con} ${detailStyle.img_list_add}`}
             onClick={() => {
-              setOpen(true);
+              command.emitter('config', 'pull', chat.directory, chat.chatdata.fullId);
             }}>
             +
-          </div>
-          <div
-            className={`${detailStyle.img_list_con} ${detailStyle.img_list_add}`}
-            onClick={() => {
-              setRemoveOpen(true);
-            }}>
-            -
           </div>
         </>
       ) : (
@@ -147,6 +107,20 @@ const Groupdetail: React.FC<any> = ({ chat }: { chat: IMsgChat }) => {
    */
   const operaButton = (
     <>
+      <div className={`${detailStyle.find_history}`}>
+        <Button
+          className={`${detailStyle.find_history_button}`}
+          type="ghost"
+          onClick={async () => {
+            if ('directory' in chat) {
+              await (chat as ITarget).directory.loadContent();
+              orgCtrl.currentKey = chat.key;
+              history.push('/store');
+            }
+          }}>
+          共享目录 <AiOutlineRight />
+        </Button>
+      </div>
       <div className={`${detailStyle.find_history}`}>
         <Button
           className={`${detailStyle.find_history_button}`}
@@ -191,26 +165,6 @@ const Groupdetail: React.FC<any> = ({ chat }: { chat: IMsgChat }) => {
         onCancel={onHistoryCancel}
         chat={chat}
       />
-
-      <Modal
-        title={'邀请成员'}
-        destroyOnClose
-        open={open}
-        width={1024}
-        onOk={onOk}
-        onCancel={onCancel}>
-        <AssignPosts members={orgCtrl.user.members} searchFn={setSelectPerson} />
-      </Modal>
-
-      <Modal
-        title={'移出成员'}
-        destroyOnClose
-        open={removeOpen}
-        width={1024}
-        onCancel={onCancel}
-        onOk={onRemoveOk}>
-        <AssignPosts searchFn={setSelectPerson} members={chat.members} />
-      </Modal>
     </>
   );
 };

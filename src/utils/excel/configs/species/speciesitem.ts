@@ -106,11 +106,8 @@ export class DictItemReadConfig extends ReadConfigImpl<
         },
       });
     }
-    while (true) {
-      let temps = requests.splice(0, 100);
-      if (temps.length == 0) break;
-      debugger
-      await this.requests(temps, context, onItemCompleted);
+    while (requests.length > 0) {
+      await this.requests(requests.splice(0, 100), context, onItemCompleted);
     }
   }
   /**
@@ -283,7 +280,6 @@ export class Tree<T extends { [key: string]: any }> {
   private readonly freeMap: Map<string, Node<T>>;
 
   constructor(nodeData: T[], id: string, parentId: string) {
-    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     this.root = new Node<T>('root', {} as T, undefined);
     this.nodeMap = new Map<string, Node<T>>();
     this.freeMap = new Map<string, Node<T>>();
@@ -300,8 +296,6 @@ export class Tree<T extends { [key: string]: any }> {
   addNode(id: string, data: T, parentId?: string) {
     if (id == null) return;
     if (this.nodeMap.has(id)) return;
-
-    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     let node: Node<T> = new Node<T>(id, data, parentId);
     if (!parentId) this.root.addChild(node);
     else {

@@ -1,12 +1,12 @@
 import { Button } from 'antd';
 import React, { useState } from 'react';
-import FormDesign from '@/bizcomponents/FormDesign';
+import FormDesign from '@/components/Common/FormDesign';
 import cls from './index.module.less';
 import PageCard from '@/components/PageCard';
 import Attribute from './Attritube';
 import { IForm } from '@/ts/core';
 import FullScreenModal from '@/executor/tools/fullScreen';
-import EntityInfo from '@/bizcomponents/EntityInfo';
+import EntityInfo from '@/components/Common/EntityInfo';
 
 interface IProps {
   current: IForm;

@@ -7,14 +7,18 @@ import { Entity, IEntity, entityOperates } from '../public';
 import { fileOperates } from '../public';
 /** 文件类接口 */
 export interface IFileInfo<T extends schema.XEntity> extends IEntity<T> {
+  /** 空间ID */
+  spaceId: string;
   /** 归属ID */
   belongId: string;
   /** 是否为继承的类别 */
   isInherited: boolean;
   /** 目录 */
   directory: IDirectory;
+  /** 路径Key */
+  locationKey: string;
   /** 删除文件系统项 */
-  delete(): Promise<boolean>;
+  delete(notity?: boolean): Promise<boolean>;
   /**
    * 重命名
    * @param {string} name 新名称
@@ -32,6 +36,8 @@ export interface IFileInfo<T extends schema.XEntity> extends IEntity<T> {
   move(destination: IDirectory): Promise<boolean>;
   /** 加载文件内容 */
   loadContent(reload?: boolean): Promise<boolean>;
+  /** 目录下的内容 */
+  content(mode?: number): IFileInfo<schema.XEntity>[];
 }
 
 /** 文件类抽象实现 */
@@ -49,10 +55,16 @@ export abstract class FileInfo<T extends schema.XEntity>
   }
   directory: IDirectory;
   get isInherited(): boolean {
-    return this.metadata.belongId != this.directory.belongId;
+    return this.directory.isInherited;
   }
   get belongId(): string {
     return this.directory.metadata.belongId;
+  }
+  get spaceId(): string {
+    return this.directory.target.space.id;
+  }
+  get locationKey(): string {
+    return this.directory.key;
   }
   abstract delete(): Promise<boolean>;
   abstract rename(name: string): Promise<boolean>;
@@ -61,15 +73,19 @@ export abstract class FileInfo<T extends schema.XEntity>
   async loadContent(reload: boolean = false): Promise<boolean> {
     return await sleep(reload ? 10 : 0);
   }
+  content(_mode: number = 0): IFileInfo<schema.XEntity>[] {
+    return [];
+  }
   operates(mode: number = 0): model.OperateModel[] {
     const operates = super.operates(mode);
-    if (mode === 0 && this.directory.target.hasRelationAuth()) {
+    if (mode % 2 === 0 && this.directory.target.hasRelationAuth()) {
       operates.unshift(
-        entityOperates.Update,
         fileOperates.Copy,
         fileOperates.Move,
         fileOperates.Rename,
-        fileOperates.Delete,
+        fileOperates.Download,
+        entityOperates.Update,
+        entityOperates.Delete,
       );
     }
     return operates;
@@ -118,6 +134,7 @@ export class SysFileInfo extends FileInfo<schema.XEntity> implements ISysFileInf
       size: this.filedata.size,
       name: this.filedata.name,
       extension: this.filedata.extension,
+      contentType: this.filedata.contentType,
       shareLink:
         location.origin + '/orginone/anydata/bucket/load/' + this.filedata.shareLink,
       thumbnail: this.filedata.thumbnail,
@@ -177,8 +194,11 @@ export class SysFileInfo extends FileInfo<schema.XEntity> implements ISysFileInf
     }
     return false;
   }
-  override operates(mode?: number): model.OperateModel[] {
+  override operates(_mode?: number): model.OperateModel[] {
     const operates = super.operates();
     return operates.filter((i) => i.cmd != 'update');
+  }
+  content(_mode?: number | undefined): IFileInfo<schema.XEntity>[] {
+    return [];
   }
 }

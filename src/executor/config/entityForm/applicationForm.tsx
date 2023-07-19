@@ -18,6 +18,7 @@ const ApplicationForm = (props: Iprops) => {
   let title = '';
   let types = ['应用'];
   let directory: IDirectory;
+  let parentApp: IApplication;
   let application: IApplication | undefined;
   const readonly = props.formType === 'remarkApp';
   let initialValue: any = props.current.metadata;
@@ -27,15 +28,23 @@ const ApplicationForm = (props: Iprops) => {
       directory = props.current as IDirectory;
       initialValue = {};
       break;
+    case 'newModule':
+      title = '新建模块';
+      types = ['模块'];
+      parentApp = props.current as IApplication;
+      initialValue = {};
+      break;
     case 'updateApp':
+    case 'updateModule':
       application = props.current as IApplication;
       directory = application.directory;
-      title = '更新应用';
+      types = [application.typeName];
+      title = '更新' + application.typeName;
       break;
     case 'remarkApp':
       application = props.current as IApplication;
       directory = application.directory;
-      title = '查看应用';
+      title = '查看' + application.typeName;
       break;
     default:
       return <></>;
@@ -49,7 +58,7 @@ const ApplicationForm = (props: Iprops) => {
         return (
           <UploadItem
             readonly={readonly}
-            typeName={'应用'}
+            typeName={props.formType.includes('Module') ? '模块' : '应用'}
             icon={initialValue.icon}
             onChanged={(icon) => {
               form.setFieldValue('icon', icon);
@@ -135,6 +144,9 @@ const ApplicationForm = (props: Iprops) => {
             break;
           case 'newApp':
             await directory.createApplication(values);
+            break;
+          case 'newModule':
+            await parentApp.createModule(values);
             break;
         }
         props.finished();

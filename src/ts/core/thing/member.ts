@@ -2,7 +2,7 @@ import { OperateModel } from '@/ts/base/model';
 import { schema } from '../../base';
 import { IDirectory } from './directory';
 import { FileInfo, IFileInfo } from './fileinfo';
-import { targetOperates } from '../public';
+import { memberOperates, targetOperates } from '../public';
 
 /** 成员接口类 */
 export interface IMemeber extends IFileInfo<schema.XTarget> {
@@ -25,7 +25,8 @@ export class Member extends FileInfo<schema.XTarget> implements IMemeber {
     throw new Error('暂不支持.');
   }
   async copy(destination: IDirectory): Promise<boolean> {
-    throw new Error('暂不支持.');
+    await destination.target.pullMembers([this.metadata]);
+    return true;
   }
   async move(destination: IDirectory): Promise<boolean> {
     throw new Error('暂不支持.');
@@ -39,12 +40,7 @@ export class Member extends FileInfo<schema.XTarget> implements IMemeber {
       this.metadata.id != this.directory.belongId &&
       this.directory.target.hasRelationAuth()
     ) {
-      operates.unshift({
-        sort: 60,
-        cmd: 'remove',
-        label: '移除成员',
-        iconType: 'remove',
-      });
+      operates.unshift(memberOperates.Copy, memberOperates.Remove);
     }
     if (this.metadata.id != this.directory.target.userId) {
       operates.unshift(targetOperates.Chat);

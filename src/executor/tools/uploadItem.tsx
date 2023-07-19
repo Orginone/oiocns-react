@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { model, parseAvatar } from '@/ts/base';
 import { message, Upload, UploadProps, Image, Button, Space, Avatar } from 'antd';
 import { IDirectory } from '@/ts/core';
-import TypeIcon from '@/bizcomponents/GlobalComps/typeIcon';
+import TypeIcon from '@/components/Common/GlobalComps/typeIcon';
 
 interface IProps {
   icon: string;

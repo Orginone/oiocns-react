@@ -1,8 +1,9 @@
-import orgCtrl from '@/ts/controller';
+import orgCtrl, { Controller } from '@/ts/controller';
 import { useEffect } from 'react';
 import { useState } from 'react';
 import { MenuItemType } from 'typings/globelType';
 import { findMenuItemByKey } from '@/utils/tools';
+import { generateUuid } from '@/ts/base/common';
 /**
  * 监听控制器刷新hook
  * @param ctrl 控制器
@@ -11,6 +12,7 @@ import { findMenuItemByKey } from '@/utils/tools';
 
 const useMenuUpdate = (
   loadMenu: () => MenuItemType,
+  controller?: Controller,
 ): [
   string,
   MenuItemType | undefined,
@@ -20,16 +22,17 @@ const useMenuUpdate = (
   const [key, setKey] = useState<string>('');
   const [rootMenu, setRootMenu] = useState<MenuItemType>();
   const [selectMenu, setSelectMenu] = useState<MenuItemType>();
+  const ctrl = controller || orgCtrl;
 
   /** 刷新菜单 */
   const refreshMenu = () => {
-    setKey(key + '1');
+    setKey(generateUuid());
     const newMenus = loadMenu();
-    var item = findMenuItemByKey(newMenus, orgCtrl.currentKey);
+    var item = findMenuItemByKey(newMenus, ctrl.currentKey);
     if (item === undefined) {
       item = newMenus;
     }
-    orgCtrl.currentKey = item.key;
+    ctrl.currentKey = item.key;
     setSelectMenu(item);
     setRootMenu(newMenus);
   };
@@ -37,20 +40,20 @@ const useMenuUpdate = (
   /** 选中菜单 */
   const onSelectMenu = (item: MenuItemType | string) => {
     if (typeof item === 'string') {
-      orgCtrl.currentKey = item;
+      ctrl.currentKey = item;
     } else {
-      orgCtrl.currentKey = item.key;
+      ctrl.currentKey = item.key;
     }
     refreshMenu();
   };
 
   useEffect(() => {
-    const id = orgCtrl.subscribe((key) => {
+    const id = ctrl.subscribe((key) => {
       setKey(key);
       refreshMenu();
     });
     return () => {
-      orgCtrl.unsubscribe(id);
+      ctrl.unsubscribe(id);
     };
   }, []);
   return [key, rootMenu, selectMenu, onSelectMenu];

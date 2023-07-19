@@ -1,0 +1,72 @@
+.app-roval-node {
+  .roval-node {
+    .roval-node-title {
+      margin-left: 6px;
+    }
+  }
+}
+.group {
+  margin-bottom: 20px;
+  color: #5e5e5e;
+  overflow: hidden;
+  border-radius: 6px;
+  border: 1px solid #e3e3e3;
+
+  .group-header {
+    padding: 5px 10px;
+    background: #e3e3e3;
+    position: relative;
+
+    div {
+      display: inline-block;
+    }
+
+    .group-name {
+      font-size: small;
+      margin-left: 10px;
+    }
+
+    .group-cp {
+      font-size: small;
+      position: absolute;
+      left: 100px;
+      display: flex;
+      top: 0px;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .group-operation {
+      position: absolute;
+      right: 10px;
+
+      i {
+        padding: 0 10px;
+
+        &:hover {
+          cursor: pointer;
+        }
+      }
+    }
+  }
+
+  .group-content {
+    display: flex;
+    gap: 10px;
+    padding: 10px;
+    p {
+      text-align: center;
+      font-size: small;
+    }
+    :global {
+      .ogo-form-item {
+        margin: auto;
+      }
+    }
+  }
+
+  .condition-title {
+    display: block;
+    width: 100px;
+  }
+}

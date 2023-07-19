@@ -8,7 +8,6 @@ import { IReport } from '@/ts/core/thing/report';
 import { EntityColumns } from './entityColumns';
 
 interface Iprops {
-  typeName: string;
   formType: string;
   current: IDirectory | IReport;
   finished: () => void;
@@ -50,7 +49,7 @@ const LabelsReport = (props: Iprops) => {
         return (
           <UploadItem
             readonly={readonly}
-            typeName={props.typeName}
+            typeName={'报表'}
             icon={initialValue.icon}
             onChanged={(icon) => {
               form.setFieldValue('icon', icon);

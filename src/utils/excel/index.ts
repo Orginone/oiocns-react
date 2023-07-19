@@ -166,15 +166,12 @@ async function batchRequests(
   onItemCompleted: (request: RequestIndex, result: model.ResultType<any>) => void,
 ) {
   if (requests.length == 0) return;
-  let res = await kernel.requests(requests.map((item) => item.request));
-  if (res.success) {
-    let results: model.ResultType<any>[] = res.data;
-    for (let index = 0; index < results.length; index++) {
-      let request = requests[index];
-      let result = results[index];
-      onItemCompleted(request, result);
-    }
-  }
+  await Promise.all(
+    requests.map(async (item) => {
+      const result = await kernel.request(item.request);
+      onItemCompleted(item, result);
+    }),
+  );
 }
 
 export { assignment, batchRequests, dataHandling, generateXlsx, readXlsx };

@@ -142,19 +142,19 @@ const generate = async (
     finished: 0,
     createTime: new Date(),
   };
-  let refresh = dir.createTask(task);
+  dir.taskList.push(task);
   let handler: DataHandler = {
     initialize: (totalRows) => {
       task.size = totalRows;
-      refresh();
+      dir.taskEmitter.changCallback();
     },
     onItemCompleted: () => {
       task.finished += 1;
-      refresh();
+      dir.taskEmitter.changCallback();
     },
     onCompleted: () => {
       task.finished = task.size;
-      refresh();
+      dir.taskEmitter.changCallback();
       message.success(`模板导入成功！`);
       showData(
         configs,

@@ -1,6 +1,6 @@
 import React from 'react';
 import MainLayout from '@/components/MainLayout';
-import Content from './content';
+import Directory from '@/components/Directory';
 import useMenuUpdate from '@/hooks/useMenuUpdate';
 import * as config from './config/menuOperate';
 
@@ -11,12 +11,13 @@ const TeamSetting: React.FC = () => {
   if (!selectMenu || !rootMenu) return <></>;
   return (
     <MainLayout
+      menusHeight={'calc(100vh - 168px)'}
       selectMenu={selectMenu}
       onSelect={(data) => {
         setSelectMenu(data);
       }}
       siderMenuData={rootMenu}>
-      <Content key={key} current={selectMenu.item} />
+      <Directory key={key} current={selectMenu.item} mode={2} />
     </MainLayout>
   );
 };

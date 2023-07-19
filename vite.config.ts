@@ -58,7 +58,7 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
       outDir: 'dist', // 指定输出路径
       minify: 'terser', // 混淆器,terser构建后文件体积更小
       sourcemap: false, // 输出.map文件
-      chunkSizeWarningLimit: 8192,
+      chunkSizeWarningLimit: 2048,
       terserOptions: {
         compress: {
           drop_console: VITE_DROP_CONSOLE, // 生产环境移除console
@@ -79,10 +79,10 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
           entryFileNames: 'static/js/[name]-[hash].js',
           assetFileNames: 'static/[ext]/[name]-[hash].[ext]',
           // manualChunks(id) {
-          //   // if (id.includes('components')) {
-          //   //   // 把 components 文件里面的文件都打包到 components.js 中
-          //   //   return 'components'
-          //   // }
+          //   if (id.includes('components')) {
+          //     // 把 components 文件里面的文件都打包到 components.js 中
+          //     return 'components';
+          //   }
           //   // 静态资源拆分
           //   if (id.includes('node_modules')) {
           //     return id.toString().split('node_modules/')[1].split('/')[0].toString();

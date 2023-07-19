@@ -1,19 +1,28 @@
 @import '~antd/es/style/themes/variable';
-
+.layout {
+  height: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: row;
+}
 .sider {
   background-color: @component-background;
   height: 100%;
+  .menuBar {
+    display: flex;
+    padding: 0 30px;
+    margin-top: 10px;
+    justify-content: space-between;
+  }
   .container {
     padding: 0 @padding-xs;
-    height: calc(100% - 130px);
     overflow-y: scroll;
   }
   .title {
-    background-color: @system-menu-active-background;
     border-radius: @border-radius-base;
-    margin: @margin-md @margin-xs;
     clear: both;
     padding: 6px;
+    margin-top: -10px;
     text-align: center;
     cursor: pointer;
     .backup {
@@ -40,7 +49,7 @@
     font-size: 15px;
     font-weight: bold;
     cursor: pointer;
-    position: absolute;
+    position: fixed;
     bottom: 0;
     width: 250px;
     border-top: #efefef 1px solid;

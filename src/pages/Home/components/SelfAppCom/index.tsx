@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import './index.less';
 import CardWidthTitle from '@/components/CardWidthTitle';
 import orgCtrl from '@/ts/controller';
-import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
+import TeamIcon from '@/components/Common/GlobalComps/entityIcon';
 import { IApplication } from '@/ts/core';
 import { useHistory } from 'react-router-dom';
 interface SelfAppComType {
@@ -22,7 +22,7 @@ const BannerCom: React.FC<SelfAppComType> = () => {
   const loadApps = async () => {
     const apps: IApplication[] = [];
     for (const target of orgCtrl.targets) {
-      apps.push(...target.directory.applications);
+      apps.push(...(await target.directory.loadAllApplication()));
     }
     return apps.filter((a, i) => apps.findIndex((x) => x.id === a.id) === i);
   };
@@ -42,10 +42,12 @@ const AppCard: any = ({ className, app }: { className: string; app: IApplication
     <div
       className={`${className} app-box`}
       onClick={() => {
-        orgCtrl.currentKey = app.key;
-        history.push('/work');
+        app.loadWorks().then(() => {
+          orgCtrl.currentKey = app.key;
+          history.push('/store');
+        });
       }}>
-      <TeamIcon typeName={app.typeName} entityId={app.id} size={50} />
+      <TeamIcon entity={app.metadata} size={50} />
       <div className="app-info">
         <span className="app-info-name">{app.name}</span>
       </div>

@@ -1,19 +1,20 @@
 import { Col, Divider, Dropdown, Layout, Row, Space, Typography, Button } from 'antd';
-import React, { useState } from 'react';
+import React, { CSSProperties, useState } from 'react';
 import cls from './index.module.less';
 import CustomMenu from '@/components/CustomMenu';
 import CustomBreadcrumb from '@/components/CustomBreadcrumb';
 import { MenuItemType, OperateMenuType } from 'typings/globelType';
 import { ImArrowLeft2 } from 'react-icons/im';
 import { RiMenuFoldFill, RiMenuUnfoldFill, RiMore2Fill } from 'react-icons/ri';
-import OrgIcons from '@/bizcomponents/GlobalComps/orgIcons';
+import OrgIcons from '@/components/Common/GlobalComps/orgIcons';
 const { Content, Sider } = Layout;
 
 /**
  * 内容区模板类
  */
 type MainLayoutType = {
-  className?: string; //wrap calss
+  style?: CSSProperties;
+  menusHeight?: number | string;
   children?: React.ReactNode; // 子组件
   siderMenuData: MenuItemType;
   rightBar?: React.ReactNode;
@@ -64,25 +65,45 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
     props.onSelect?.apply(this, [item]);
   };
   return (
-    <Layout
-      className={`${props.className}`}
-      style={{ height: '100%', position: 'relative' }}>
+    <Layout className={cls.layout} style={props.style}>
       <Sider className={cls.sider} width={250} collapsed={collapsed}>
+        <div className={cls.menuBar}>
+          <Typography.Link
+            style={{ fontSize: 16 }}
+            onClick={() => {
+              onSelectClick(parentMenu);
+            }}>
+            {!collapsed && parentMenu.key != props.siderMenuData.key && (
+              <div className={cls.backup}>
+                <ImArrowLeft2 fontSize={20} />
+              </div>
+            )}
+          </Typography.Link>
+          <Typography.Link
+            style={{ fontSize: 16 }}
+            onClick={() => {
+              setCollapsed(!collapsed);
+            }}>
+            {collapsed ? (
+              <RiMenuUnfoldFill fontSize={22} />
+            ) : (
+              <RiMenuFoldFill fontSize={22} />
+            )}
+          </Typography.Link>
+        </div>
         <div
           className={cls.title}
           title={parentMenu.label}
           onClick={() => {
             onSelectClick(parentMenu);
           }}>
-          {!collapsed && parentMenu.key != props.siderMenuData.key && (
-            <div className={cls.backup}>
-              <ImArrowLeft2 fontSize={20} />
-            </div>
-          )}
           <span style={{ fontSize: 20, margin: '0 6px' }}>{parentMenu.icon}</span>
           {!collapsed && <strong>{parentMenu.label}</strong>}
         </div>
-        <div className={cls.container} id="templateMenu">
+        <div
+          className={cls.container}
+          id="templateMenu"
+          style={{ height: props.menusHeight }}>
           <CustomMenu
             item={parentMenu}
             collapsed={collapsed}
@@ -109,19 +130,6 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
         <Row className={cls[`content-top`]} justify="space-between">
           <Col>
             <CustomBreadcrumb
-              leftBar={
-                <Typography.Link
-                  style={{ fontSize: 16 }}
-                  onClick={() => {
-                    setCollapsed(!collapsed);
-                  }}>
-                  {collapsed ? (
-                    <RiMenuUnfoldFill fontSize={22} />
-                  ) : (
-                    <RiMenuFoldFill fontSize={22} />
-                  )}
-                </Typography.Link>
-              }
               selectKey={props.selectMenu.key}
               item={props.siderMenuData}
               onSelect={(item) => {

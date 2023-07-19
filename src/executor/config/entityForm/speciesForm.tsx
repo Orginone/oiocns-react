@@ -117,7 +117,8 @@ const SpeciesForm = (props: Iprops) => {
             break;
         }
         props.finished();
-      }}></SchemaForm>
+      }}
+    />
   );
 };
 

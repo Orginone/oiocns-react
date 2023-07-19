@@ -2,6 +2,7 @@ import React from 'react';
 import { schema } from '@/ts/base';
 import orgCtrl from '@/ts/controller';
 import { IDirectory, IEntity, ITarget } from '@/ts/core';
+import WorkForm from './workForm';
 import DirectoryForm from './directoryForm';
 import ApplicationForm from './applicationForm';
 import SpeciesForm from './speciesForm';
@@ -9,10 +10,7 @@ import PropertyForm from './propertyForm';
 import TargetForm from './targetForm';
 import LabelsForm from './labelsForm';
 import RenameForm from './renameForm';
-import IdentityForm from './IdentityForm';
-import AuthorityForm from './authorityForm';
 import LabelsReport from './labelsReport';
-import { IIdentity } from '@/ts/core/target/identity/identity';
 interface IProps {
   cmd: string;
   entity: IEntity<schema.XEntity>;
@@ -20,7 +18,6 @@ interface IProps {
 }
 
 const EntityForm: React.FC<IProps> = ({ cmd, entity, finished }) => {
-  console.log(cmd, entity);
   const reloadFinish = () => {
     finished();
     if (!cmd.startsWith('remark')) {
@@ -46,11 +43,17 @@ const EntityForm: React.FC<IProps> = ({ cmd, entity, finished }) => {
       return <DirectoryForm formType={cmd} current={directory} finished={reloadFinish} />;
     }
     case 'newApp':
+    case 'newModule':
     case 'updateApp':
+    case 'updateModule':
     case 'remarkApp':
       return (
         <ApplicationForm formType={cmd} current={entity as any} finished={reloadFinish} />
       );
+    case 'newWork':
+    case 'updateWork':
+    case 'remarkWork':
+      return <WorkForm formType={cmd} current={entity as any} finished={reloadFinish} />;
     case 'newSpecies':
     case 'updateSpecies':
     case 'remarkSpecies':
@@ -92,27 +95,6 @@ const EntityForm: React.FC<IProps> = ({ cmd, entity, finished }) => {
     case 'remarkProperty':
       return (
         <PropertyForm formType={cmd} current={entity as any} finished={reloadFinish} />
-      );
-    case 'newIdentity':
-    case 'updateIdentity':
-    case 'remarkIdentity': {
-      const target = cmd.startsWith('new')
-        ? (entity as IDirectory).target
-        : (entity as IIdentity).current;
-      const identity = cmd.startsWith('new') ? undefined : (entity as IIdentity);
-      return (
-        <IdentityForm
-          formType={cmd}
-          target={target}
-          identity={identity}
-          finished={reloadFinish}></IdentityForm>
-      );
-    }
-    case 'newAuthority':
-    case 'updateAuthority':
-    case 'remarkAuthority':
-      return (
-        <AuthorityForm formType={cmd} current={entity as any} finished={reloadFinish} />
       );
     default: {
       const target = cmd.startsWith('new')

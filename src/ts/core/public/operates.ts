@@ -12,6 +12,12 @@ export const entityOperates = {
     label: '更新信息',
     iconType: 'update',
   },
+  Delete: {
+    sort: 24,
+    cmd: 'delete',
+    label: '彻底删除',
+    iconType: 'delete',
+  },
   Remark: {
     sort: 100,
     cmd: 'remark',
@@ -27,14 +33,20 @@ export const entityOperates = {
 };
 /** 文件支持的操作 */
 export const fileOperates = {
-  Copy: {
+  Download: {
     sort: 20,
+    cmd: 'download',
+    label: '下载文件',
+    iconType: 'rename',
+  },
+  Copy: {
+    sort: 21,
     cmd: 'copy',
     label: '复制文件',
     iconType: 'copy',
   },
   Move: {
-    sort: 21,
+    sort: 22,
     cmd: 'move',
     label: '剪切文件',
     iconType: 'move',
@@ -46,16 +58,10 @@ export const fileOperates = {
     iconType: 'parse',
   },
   Rename: {
-    sort: 23,
+    sort: 25,
     cmd: 'rename',
     label: '重名名',
     iconType: 'rename',
-  },
-  Delete: {
-    sort: 24,
-    cmd: 'delete',
-    label: '彻底删除',
-    iconType: 'delete',
   },
 };
 
@@ -91,32 +97,50 @@ export const directoryOperates = {
     label: '新建应用',
     iconType: '应用',
   },
-  NewSpecies: {
+  Standard: {
     sort: 2,
+    cmd: 'standard',
+    label: '导入标准',
+    iconType: '标准',
+  },
+  NewSpecies: {
+    sort: 3,
     cmd: 'newSpecies',
     label: '新建分类',
     iconType: '分类',
   },
   NewDict: {
-    sort: 3,
+    sort: 4,
     cmd: 'newDict',
     label: '新建字典',
     iconType: '字典',
   },
   NewProperty: {
-    sort: 4,
+    sort: 5,
     cmd: 'newProperty',
     label: '新建属性',
     iconType: '属性',
   },
+  NewWork: {
+    sort: 6,
+    cmd: 'newWork',
+    label: '新建办事',
+    iconType: '流程',
+  },
+  NewModule: {
+    sort: 7,
+    cmd: 'newModule',
+    label: '新建模块',
+    iconType: '模块',
+  },
   NewThingConfig: {
-    sort: 5,
+    sort: 8,
     cmd: 'newThingConfig',
     label: '新建实体配置',
     iconType: '实体配置',
   },
   NewWorkConfig: {
-    sort: 6,
+    sort: 9,
     cmd: 'newWorkConfig',
     label: '新建事项配置',
     iconType: '事项配置',
@@ -125,12 +149,6 @@ export const directoryOperates = {
     sort: 7,
     cmd: 'newReport',
     label: '新建报表',
-    iconType: 'newDir',
-  },
-  Standard: {
-    sort: -1,
-    cmd: 'standard',
-    label: '导入初始化',
     iconType: 'newDir',
   },
 };
@@ -143,6 +161,7 @@ export const directoryNew = {
   iconType: 'new',
   menus: [
     directoryOperates.NewDir,
+    directoryOperates.Standard,
     directoryOperates.NewDict,
     directoryOperates.NewSpecies,
     directoryOperates.NewProperty,
@@ -150,7 +169,6 @@ export const directoryNew = {
     directoryOperates.NewThingConfig,
     directoryOperates.NewWorkConfig,
     directoryOperates.NewReport,
-    directoryOperates.Standard,
   ],
 };
 
@@ -172,12 +190,6 @@ export const teamOperates = {
 
 /** 用户的操作 */
 export const targetOperates = {
-  NewIdentity: {
-    sort: 32,
-    cmd: 'newIdentity',
-    label: '设立角色',
-    iconType: '角色',
-  },
   NewCohort: {
     sort: 33,
     cmd: 'newCohort',
@@ -201,18 +213,6 @@ export const targetOperates = {
     cmd: 'newDepartment',
     label: '设立部门',
     iconType: '部门',
-  },
-  NewStation: {
-    sort: 37,
-    cmd: 'newStation',
-    label: '设立岗位',
-    iconType: '岗位',
-  },
-  SettingAuth: {
-    sort: 38,
-    cmd: 'settingAuth',
-    label: '权限设置',
-    iconType: '权限',
   },
   Chat: {
     sort: 15,
@@ -248,4 +248,38 @@ export const personJoins = {
       iconType: 'joinCompany',
     },
   ],
+};
+
+/** 成员操作 */
+export const memberOperates = {
+  SettingAuth: {
+    sort: 56,
+    cmd: 'settingAuth',
+    label: '权限设置',
+    iconType: '权限',
+  },
+  SettingIdentity: {
+    sort: 57,
+    cmd: 'settingIdentity',
+    label: '角色设置',
+    iconType: '角色',
+  },
+  SettingStation: {
+    sort: 58,
+    cmd: 'settingStation',
+    label: '岗位设置',
+    iconType: '岗位',
+  },
+  Copy: {
+    sort: 59,
+    cmd: 'copy',
+    label: '分配成员',
+    iconType: 'copy',
+  },
+  Remove: {
+    sort: 60,
+    cmd: 'remove',
+    label: '移除成员',
+    iconType: 'remove',
+  },
 };

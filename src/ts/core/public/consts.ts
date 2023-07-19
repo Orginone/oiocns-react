@@ -14,7 +14,7 @@ export const orgAuth = {
 };
 /** 数据存储集合名称 */
 export const storeCollName = {
-  WorkTask: 'work-task',
+  WorkTask: 'work-tasks',
   WorkInstance: 'work-instances',
   ChatMessage: 'chat-message',
 };
@@ -58,3 +58,63 @@ export const PageAll: PageModel = {
   limit: (2 << 15) - 1, //ushort.max
   filter: '',
 };
+
+/** 通用状态信息Map */
+export const StatusMap = new Map([
+  [
+    1,
+    {
+      color: 'blue',
+      text: '待处理',
+    },
+  ],
+  [
+    100,
+    {
+      color: 'green',
+      text: '已同意',
+    },
+  ],
+  [
+    200,
+    {
+      color: 'red',
+      text: '已拒绝',
+    },
+  ],
+  [
+    102,
+    {
+      color: 'green',
+      text: '已发货',
+    },
+  ],
+  [
+    220,
+    {
+      color: 'gold',
+      text: '买方取消订单',
+    },
+  ],
+  [
+    221,
+    {
+      color: 'volcano',
+      text: '卖方取消订单',
+    },
+  ],
+  [
+    222,
+    {
+      color: 'default',
+      text: '已退货',
+    },
+  ],
+  [
+    240,
+    {
+      color: 'red',
+      text: '已取消',
+    },
+  ],
+]);

@@ -3,7 +3,8 @@ import StoreHub from './storehub';
 import * as model from '../model';
 import type * as schema from '../schema';
 import axios from 'axios';
-import { logger } from '../common';
+import { Emitter, logger } from '../common';
+import { command } from '../common/command';
 /**
  * 资产共享云内核api
  */
@@ -18,6 +19,10 @@ export default class KernelApi {
   private _anystore: AnyStore;
   // 订阅方法
   private _methods: { [name: string]: ((...args: any[]) => void)[] };
+  // 上下线提醒
+  onlineNotity = new Emitter();
+  // 在线的连接
+  onlineIds: string[] = [];
   /**
    * 私有构造方法
    * @param url 远端地址
@@ -26,16 +31,7 @@ export default class KernelApi {
     this._methods = {};
     this._anystore = AnyStore.getInstance();
     this._storeHub = new StoreHub(url, 'json');
-    this._storeHub.on('Receive', (res: model.ReceiveType) => {
-      const methods = this._methods[res.target.toLowerCase()];
-      if (methods) {
-        try {
-          methods.forEach((m) => m.apply(this, [res.data]));
-        } catch (e) {
-          logger.error(e as Error);
-        }
-      }
-    });
+    this._storeHub.on('Receive', (res) => this._receive(res));
     this._storeHub.onConnected(() => {
       if (this._anystore.accessToken.length > 0) {
         this._storeHub
@@ -76,6 +72,22 @@ export default class KernelApi {
    */
   public get isOnline(): boolean {
     return this._storeHub.isConnected;
+  }
+  /** 连接信息 */
+  public async onlines(): Promise<model.OnlineInfo[]> {
+    if (this.onlineIds.length > 0) {
+      const result = await this._storeHub.invoke('Online');
+      if (result.success && Array.isArray(result.data)) {
+        var ids = result.data.map((i) => i.connectionId);
+        if (ids.length != this.onlineIds.length) {
+          this.onlineIds = ids;
+          this.onlineNotity.changCallback();
+        }
+        this.onlineIds = ids;
+        return result.data;
+      }
+    }
+    return [];
   }
   /**
    * 登录到后台核心获取accessToken
@@ -527,6 +539,20 @@ export default class KernelApi {
     return await this.request({
       module: 'chat',
       action: 'CreateTargetMsg',
+      params: params,
+    });
+  }
+  /**
+   * 创建组织变更消息
+   * @param {model.IdentityMessageModel} params 请求参数
+   * @returns {model.ResultType<boolean>} 请求结果
+   */
+  public async createIdentityMsg(
+    params: model.IdentityMessageModel,
+  ): Promise<model.ResultType<boolean>> {
+    return await this.request({
+      module: 'chat',
+      action: 'CreateIdentityMsg',
       params: params,
     });
   }
@@ -1046,6 +1072,7 @@ export default class KernelApi {
   public async createWorkInstance(
     params: model.WorkInstanceModel,
   ): Promise<model.ResultType<schema.XWorkInstance>> {
+    console.log(params);
     return await this.request({
       module: 'work',
       action: 'CreateWorkInstance',
@@ -1230,6 +1257,43 @@ export default class KernelApi {
     }
 
     this._methods[methodName].push(newOperation);
+  }
+  /** 接收服务端消息 */
+  private _receive(res: model.ReceiveType) {
+    switch (res.target) {
+      case 'Online':
+      case 'Outline':
+        {
+          const connectionId = res.data.connectionId;
+          if (connectionId && connectionId.length > 0) {
+            if (this.onlineIds.length < 1) {
+              this.onlineIds.push('');
+              this.onlines();
+            } else {
+              if (res.target === 'Online') {
+                if (this.onlineIds.every((i) => i != connectionId)) {
+                  this.onlineIds.push(connectionId);
+                }
+              } else {
+                this.onlineIds = this.onlineIds.filter((i) => i != connectionId);
+              }
+              this.onlineNotity.changCallback();
+            }
+            command.emitter('_', res.target.toLowerCase(), res.data);
+          }
+        }
+        break;
+      default: {
+        const methods = this._methods[res.target.toLowerCase()];
+        if (methods) {
+          try {
+            methods.forEach((m) => m.apply(this, [res.data]));
+          } catch (e) {
+            logger.error(e as Error);
+          }
+        }
+      }
+    }
   }
   /**
    * 使用rest请求后端

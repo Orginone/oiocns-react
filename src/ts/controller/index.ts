@@ -2,14 +2,22 @@ import { IPerson, ITarget, UserProvider } from '@/ts/core';
 import { common } from '@/ts/base';
 import { IWorkProvider } from '../core/work/provider';
 import { IChatProvider } from '../core/chat/provider';
+
+/** 控制器基类 */
+export class Controller extends common.Emitter {
+  public currentKey: string;
+  constructor(key: string) {
+    super();
+    this.currentKey = key;
+  }
+}
 /**
  * 设置控制器
  */
-class IndexController extends common.Emitter {
-  public currentKey: string = '';
+class IndexController extends Controller {
   private _provider: UserProvider;
   constructor() {
-    super();
+    super('');
     this._provider = new UserProvider(this);
   }
   /** 是否已登录 */

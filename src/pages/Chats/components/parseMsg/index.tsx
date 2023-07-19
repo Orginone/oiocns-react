@@ -2,10 +2,10 @@ import React from 'react';
 import { Image } from 'antd';
 import { MessageType, IMessage } from '@/ts/core';
 import { FileItemShare } from '@/ts/base/model';
-import { parseAvatar } from '@/ts/base';
+import { command, parseAvatar } from '@/ts/base';
 import { formatSize } from '@/ts/base/common';
-import css from './index.module.less';
-import {truncateString} from "@/utils/tools";
+import css from '../../content/chat/GroupContent/index.module.less';
+import { truncateString } from '@/utils/tools';
 
 /** 将链接转化为超链接 */
 const linkText = (val: string) => {
@@ -21,11 +21,15 @@ export const parseMsg = (item: IMessage): any => {
   switch (item.msgType) {
     case MessageType.Image: {
       const img: FileItemShare = parseAvatar(item.msgBody);
-      if (img && img.thumbnail) {
+      if (img && img.shareLink) {
         return (
           <>
-            <div className={`${css.con_content_txt}`}>
-              <Image src={img.thumbnail} preview={{ src: img.shareLink }} />
+            <div
+              className={`${css.con_content_txt}`}
+              onClick={() => {
+                command.emitter('data', 'open', img);
+              }}>
+              <Image width={300} src={img.shareLink} preview={false} />
             </div>
           </>
         );
@@ -43,13 +47,13 @@ export const parseMsg = (item: IMessage): any => {
       }
       return (
         <>
-          <div className={`${css.con_content_txt}`}>
-            <a href={file.shareLink} title="点击下载">
-              <div>
-                <b>{file.name}</b>
-              </div>
-              <div>{formatSize(file.size)}</div>
-            </a>
+          <div
+            className={`${css.con_content_txt}`}
+            onClick={() => {
+              command.emitter('data', 'open', file);
+            }}>
+            <div>{file.name}</div>
+            <div>{formatSize(file.size)}</div>
           </div>
         </>
       );

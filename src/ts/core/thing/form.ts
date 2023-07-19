@@ -1,35 +1,22 @@
 import { schema, model, kernel } from '../../base';
-import { Entity, IEntity, PageAll, orgAuth } from '../../core/public';
+import { PageAll, orgAuth } from '../../core/public';
 import { IDirectory } from './directory';
 import { FileInfo, IFileInfo } from './fileinfo';
 
-/** 分类项实体接口 */
-export class SpeciesItem extends Entity<schema.XSpeciesItem> {
-  constructor(_metadata: schema.XSpeciesItem) {
-    super({ ..._metadata, typeName: '分类项' });
-  }
-}
-
-/** 表单类只读接口 */
-export interface IFormView extends IEntity<schema.XForm> {
-  /** 类目项 */
-  items: IEntity<schema.XSpeciesItem>[];
-  /** 表单特性 */
-  attributes: schema.XAttribute[];
-  /** 加载类目项 */
-  loadItems(reload?: boolean): Promise<IEntity<schema.XSpeciesItem>[]>;
-  /** 加载表单特性 */
-  loadAttributes(reload?: boolean): Promise<schema.XAttribute[]>;
-}
-
 /** 表单类接口 */
-export interface IForm extends IFileInfo<schema.XForm>, IFormView {
+export interface IForm extends IFileInfo<schema.XForm> {
   /** 表单特性 */
   attributes: schema.XAttribute[];
+  /** 表单字段 */
+  fields: model.FieldModel[];
   /** 更新表单 */
   update(data: model.FormModel): Promise<boolean>;
   /** 删除表单 */
   delete(): Promise<boolean>;
+  /** 加载类目项 */
+  loadFields(reload?: boolean): Promise<model.FieldModel[]>;
+  /** 加载表单特性 */
+  loadAttributes(reload?: boolean): Promise<schema.XAttribute[]>;
   /** 加载表单特性 */
   loadAttributes(reload?: boolean): Promise<schema.XAttribute[]>;
   /** 新建表单特性 */
@@ -46,58 +33,17 @@ export interface IForm extends IFileInfo<schema.XForm>, IFormView {
   deleteAttribute(data: schema.XAttribute): Promise<boolean>;
 }
 
-export class FormView extends Entity<schema.XForm> implements IFormView {
-  constructor(_metadata: schema.XForm) {
-    super(_metadata);
-  }
-  items: IEntity<schema.XSpeciesItem>[] = [];
-  attributes: schema.XAttribute[] = [];
-  private _itemLoaded: boolean = false;
-  private _attributeLoaded: boolean = false;
-  async loadAttributes(reload: boolean = false): Promise<schema.XAttribute[]> {
-    if (!this._attributeLoaded || reload) {
-      const res = await kernel.queryFormAttributes({
-        id: this.id,
-        subId: this.metadata.belongId,
-      });
-      if (res.success) {
-        this._attributeLoaded = true;
-        this.attributes = res.data.result || [];
-      }
-    }
-    return this.attributes;
-  }
-
-  async loadItems(reload: boolean = false): Promise<IEntity<schema.XSpeciesItem>[]> {
-    if (!this._itemLoaded || reload) {
-      this.items = [];
-      for (const attr of this.attributes) {
-        if (attr.property?.valueType === '分类型') {
-          const res = await kernel.querySpeciesItems({
-            id: attr.property.speciesId,
-            page: PageAll,
-          });
-          if (res.success) {
-            (res.data.result || []).forEach((item) => {
-              this.items.push(new SpeciesItem(item));
-            });
-          }
-        }
-      }
-      this._itemLoaded = true;
-    }
-    return this.items;
-  }
-}
-
 export class Form extends FileInfo<schema.XForm> implements IForm {
   constructor(_metadata: schema.XForm, _directory: IDirectory) {
     super(_metadata, _directory);
   }
-  items: IEntity<schema.XSpeciesItem>[] = [];
-  private _itemLoaded: boolean = false;
+  private _fieldsLoaded: boolean = false;
+  fields: model.FieldModel[] = [];
   attributes: schema.XAttribute[] = [];
   private _attributeLoaded: boolean = false;
+  get id(): string {
+    return this._metadata.id.replace('_', '');
+  }
   async rename(name: string): Promise<boolean> {
     return await this.update({ ...this.metadata, name: name });
   }
@@ -150,28 +96,49 @@ export class Form extends FileInfo<schema.XForm> implements IForm {
   }
   async loadContent(reload: boolean = false): Promise<boolean> {
     await this.loadAttributes(reload);
-    await this.loadItems(reload);
+    await this.loadFields(reload);
     return true;
   }
-  async loadItems(reload: boolean = false): Promise<IEntity<schema.XSpeciesItem>[]> {
-    if (!this._itemLoaded || reload) {
-      this.items = [];
-      for (const attr of this.attributes) {
-        if (attr.property?.valueType === '分类型') {
-          const res = await kernel.querySpeciesItems({
-            id: attr.property.speciesId,
-            page: PageAll,
-          });
-          if (res.success) {
-            (res.data.result || []).forEach((item) => {
-              this.items.push(new SpeciesItem(item));
-            });
+  async loadFields(reload: boolean = false): Promise<model.FieldModel[]> {
+    if (!this._fieldsLoaded || reload) {
+      this.fields = [];
+      await Promise.all(
+        this.attributes.map(async (attr) => {
+          if (attr.linkPropertys && attr.linkPropertys.length > 0) {
+            const property = attr.linkPropertys[0];
+            const field: model.FieldModel = {
+              id: attr.id,
+              rule: attr.rule,
+              name: attr.name,
+              code: property.code,
+              remark: attr.remark,
+              lookups: [],
+              valueType: property.valueType,
+            };
+            if (property.speciesId && property.speciesId.length > 0) {
+              const res = await kernel.querySpeciesItems({
+                id: property.speciesId,
+                page: PageAll,
+              });
+              if (res.success) {
+                field.lookups = (res.data.result || []).map((i) => {
+                  return {
+                    id: i.id,
+                    text: i.name,
+                    value: i.code,
+                    icon: i.icon,
+                    parentId: i.parentId,
+                  };
+                });
+              }
+            }
+            this.fields.push(field);
           }
-        }
-      }
-      this._itemLoaded = true;
+        }),
+      );
+      this._fieldsLoaded = true;
     }
-    return this.items;
+    return this.fields;
   }
   async loadAttributes(reload: boolean = false): Promise<schema.XAttribute[]> {
     if (!this._attributeLoaded || reload) {

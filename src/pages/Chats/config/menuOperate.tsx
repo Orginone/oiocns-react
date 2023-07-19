@@ -1,11 +1,11 @@
 import React from 'react';
 import { MenuType } from './menuType';
 import * as im from 'react-icons/im';
-import TeamIcon from '@/bizcomponents/GlobalComps/entityIcon';
+import TeamIcon from '@/components/Common/GlobalComps/entityIcon';
 import orgCtrl from '@/ts/controller';
 import { MenuItemType } from 'typings/globelType';
 import { IMsgChat } from '@/ts/core';
-import OrgIcons from '@/bizcomponents/GlobalComps/orgIcons';
+import OrgIcons from '@/components/Common/GlobalComps/orgIcons';
 import { orgAuth } from '@/ts/core/public/consts';
 
 /** 创建会话菜单 */
@@ -107,7 +107,6 @@ const loadChatMoreMenus = (allowDelete: boolean, isChat: boolean = false) => {
   }
   return items;
 };
-
 /** 加载会话菜单 */
 export const loadChatMenu = () => {
   const chatMenus = {

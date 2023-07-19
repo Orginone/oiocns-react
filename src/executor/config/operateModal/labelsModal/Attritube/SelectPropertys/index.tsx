@@ -1,7 +1,7 @@
 import { AiOutlineSearch } from 'react-icons/ai';
 import { Input, TreeProps } from 'antd';
 import React, { useState, Key } from 'react';
-import ShareShowComp from '@/bizcomponents/IndentityManage/ShareShowComp';
+import ShareShowComp from '@/components/Common/ShareShowComp';
 import cls from './index.module.less';
 import CustomTree from '@/components/CustomTree';
 import { XProperty } from '@/ts/base/schema';
@@ -30,7 +30,7 @@ const SelectForms: React.FC<IProps> = (props) => {
           key: item.id,
           title: item.name,
           value: item.id,
-          item: item,
+          item: item.metadata,
           children: [],
         };
       }),

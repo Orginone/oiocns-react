@@ -7,14 +7,14 @@ import { Property } from './configs/store/property';
 import { Attribute } from './configs/base/attribute';
 
 export enum SheetName {
-  Directory = '目录',
-  Dict = '字典定义',
-  DictItem = '字典项定义',
-  Species = '分类定义',
-  SpeciesItem = '分类项定义',
-  Property = '属性定义',
-  Form = '表单定义',
-  FormAttr = '表单特性',
+  'Directory' = '目录',
+  'Dict' = '字典定义',
+  'DictItem' = '字典项定义',
+  'Species' = '分类定义',
+  'SpeciesItem' = '分类项定义',
+  'Property' = '属性定义',
+  'Form' = '表单定义',
+  'FormAttr' = '表单特性',
 }
 
 /**

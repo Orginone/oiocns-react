@@ -1,17 +1,15 @@
-/* eslint-disable no-unused-vars */
 import React, { useState } from 'react';
 import { ISpecies } from '@/ts/core';
 import { Button, message } from 'antd';
 import { schema } from '@/ts/base';
-import { ProColumns } from '@ant-design/pro-table';
 import PageCard from '@/components/PageCard';
-import EntityIcon from '@/bizcomponents/GlobalComps/entityIcon';
 import CardOrTable from '@/components/CardOrTableComp';
 import cls from './index.module.less';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import SpeciesItemModal from './itemModal';
-import EntityInfo from '@/bizcomponents/EntityInfo';
+import EntityInfo from '@/components/Common/EntityInfo';
 import FullScreenModal from '@/executor/tools/fullScreen';
+import { SpeciesItemColumn } from '@/config/column';
 
 type IProps = {
   current: ISpecies;
@@ -46,7 +44,7 @@ const SpeciesModal: React.FC<IProps> = ({ current, finished }) => {
       },
       {
         key: `删除${current.typeName}项`,
-        label: <span style={{ color: 'red' }}>`删除${current.typeName}项`</span>,
+        label: <span style={{ color: 'red' }}>{`删除${current.typeName}项`}</span>,
         onClick: async () => {
           await current.deleteItem(item);
           tforceUpdate();
@@ -69,65 +67,6 @@ const SpeciesModal: React.FC<IProps> = ({ current, finished }) => {
     {
       tab: `${current.typeName}项`,
       key: 'Items',
-    },
-  ];
-
-  const columns: ProColumns<schema.XSpeciesItem>[] = [
-    {
-      title: '序号',
-      valueType: 'index',
-      width: 50,
-    },
-    {
-      title: '名称',
-      dataIndex: 'name',
-      key: 'name',
-      width: 200,
-    },
-    {
-      title: '编号',
-      dataIndex: 'code',
-      key: 'code',
-      width: 200,
-    },
-    {
-      title: '信息',
-      dataIndex: 'info',
-      key: 'info',
-      width: 200,
-    },
-    {
-      title: '备注',
-      dataIndex: 'remark',
-      key: 'remark',
-      width: 150,
-    },
-    {
-      title: '归属组织',
-      dataIndex: 'belongId',
-      editable: false,
-      key: 'belongId',
-      width: 150,
-      render: (_, record) => {
-        return <EntityIcon entityId={record.belongId} showName />;
-      },
-    },
-    {
-      title: '创建人',
-      dataIndex: 'createUser',
-      editable: false,
-      key: 'createUser',
-      width: 150,
-      render: (_, record) => {
-        return <EntityIcon entityId={record.createUser} showName />;
-      },
-    },
-    {
-      title: '创建时间',
-      dataIndex: 'createTime',
-      key: 'createTime',
-      width: 150,
-      editable: false,
     },
   ];
 
@@ -176,11 +115,10 @@ const SpeciesModal: React.FC<IProps> = ({ current, finished }) => {
         tabBarExtraContent={renderBtns()}>
         <CardOrTable<schema.XSpeciesItem>
           key={tkey}
-          dataSource={current.items}
           rowKey={'id'}
+          dataSource={current.items}
           operation={renderOperate}
-          columns={columns}
-          showChangeBtn={false}
+          columns={SpeciesItemColumn}
         />
       </PageCard>
       {loadSpeciesItemModal()}

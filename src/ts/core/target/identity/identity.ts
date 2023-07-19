@@ -1,12 +1,19 @@
 import { kernel, model, schema } from '../../../base';
-import { Entity, OperateType, entityOperates, fileOperates } from '../../public';
+import {
+  Entity,
+  IEntity,
+  OperateType,
+  TargetType,
+  entityOperates,
+  fileOperates,
+} from '../../public';
 import { PageAll } from '../../public/consts';
 import { IDirectory } from '../../thing/directory';
 import { IFileInfo } from '../../thing/fileinfo';
 import { ITarget } from '../base/target';
 
 /** 身份（角色）接口 */
-export interface IIdentity extends IFileInfo<schema.XIdentity> {
+export interface IIdentity extends IEntity<schema.XIdentity> {
   /** 设置身份（角色）的用户 */
   current: ITarget;
   /** 赋予身份（角色）的成员用户 */
@@ -50,10 +57,6 @@ export class Identity extends Entity<schema.XIdentity> implements IIdentity {
   current: ITarget;
   members: schema.XTarget[] = [];
   private _memberLoaded: boolean = false;
-  async loadContent(reload: boolean = false): Promise<boolean> {
-    await this.loadMembers(reload);
-    return true;
-  }
   async loadMembers(reload?: boolean | undefined): Promise<schema.XTarget[]> {
     if (!this._memberLoaded || reload) {
       const res = await kernel.queryIdentityTargets({
@@ -137,27 +140,30 @@ export class Identity extends Entity<schema.XIdentity> implements IIdentity {
   }
   override operates(mode: number = 0): model.OperateModel[] {
     const operates: model.OperateModel[] = [];
-    if (mode == 0 && this.current.hasRelationAuth()) {
-      operates.push(entityOperates.Update, fileOperates.Rename, fileOperates.Delete);
+    if (mode % 2 === 0 && this.current.hasRelationAuth()) {
+      operates.push(entityOperates.Update, fileOperates.Rename);
     }
     operates.push(...super.operates(1));
     return operates.sort((a, b) => (a.menus ? -10 : b.menus ? 10 : 0));
+  }
+  content(_mode?: number | undefined): IFileInfo<schema.XEntity>[] {
+    return [];
   }
   async createIdentityMsg(
     operate: OperateType,
     subTarget?: schema.XTarget,
   ): Promise<void> {
-    // await kernel.createIdentityMsg({
-    //   stationId: '0',
-    //   identityId: this.id,
-    //   excludeOperater: false,
-    //   group: this.current.typeName == TargetType.Group,
-    //   data: JSON.stringify({
-    //     operate,
-    //     subTarget,
-    //     identity: this.metadata,
-    //     operater: this.current.space.user.metadata,
-    //   }),
-    // });
+    await kernel.createIdentityMsg({
+      stationId: '0',
+      identityId: this.id,
+      excludeOperater: false,
+      group: this.current.typeName == TargetType.Group,
+      data: JSON.stringify({
+        operate,
+        subTarget,
+        identity: this.metadata,
+        operater: this.current.space.user.metadata,
+      }),
+    });
   }
 }

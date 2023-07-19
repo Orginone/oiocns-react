@@ -8,9 +8,11 @@ import {
 } from '@ant-design/icons';
 
 interface IFullModalProps extends ModalProps {
+  hideMaxed?: boolean;
   fullScreen?: boolean;
   onSave?: () => void;
   icon?: React.ReactNode;
+  bodyHeight?: number | string;
 }
 
 const FullScreenModal: React.FC<IFullModalProps> = (props) => {
@@ -21,6 +23,9 @@ const FullScreenModal: React.FC<IFullModalProps> = (props) => {
         ...props,
         bodyStyle: {
           ...props.bodyStyle,
+          height: props.bodyHeight,
+          padding: 6,
+          margin: 2,
           maxHeight: 'calc(100vh - 80px)',
         },
       };
@@ -35,6 +40,8 @@ const FullScreenModal: React.FC<IFullModalProps> = (props) => {
       },
       bodyStyle: {
         ...props.bodyStyle,
+        padding: 6,
+        margin: 2,
         height: 'calc(100vh - 80px)',
         maxHeight: 'calc(100vh - 80px)',
       },
@@ -50,7 +57,6 @@ const FullScreenModal: React.FC<IFullModalProps> = (props) => {
         <Space wrap split={<Divider type="vertical" />} size={2}>
           {props.onSave && (
             <Typography.Link
-              key={'max'}
               title={'保存'}
               style={{ fontSize: 18 }}
               onClick={() => {
@@ -59,17 +65,17 @@ const FullScreenModal: React.FC<IFullModalProps> = (props) => {
               <SaveOutlined />
             </Typography.Link>
           )}
+          {!props.hideMaxed && (
+            <Typography.Link
+              title={modalState ? '最大化' : '恢复'}
+              style={{ fontSize: 18 }}
+              onClick={() => {
+                setModalState(!modalState);
+              }}>
+              {modalState ? <FullscreenOutlined /> : <FullscreenExitOutlined />}
+            </Typography.Link>
+          )}
           <Typography.Link
-            key={'max'}
-            title={modalState ? '最大化' : '恢复'}
-            style={{ fontSize: 18 }}
-            onClick={() => {
-              setModalState(!modalState);
-            }}>
-            {modalState ? <FullscreenOutlined /> : <FullscreenExitOutlined />}
-          </Typography.Link>
-          <Typography.Link
-            key={'close'}
             title={'关闭'}
             style={{ fontSize: 18 }}
             onClick={(e) => {

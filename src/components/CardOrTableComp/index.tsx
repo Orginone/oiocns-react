@@ -1,12 +1,13 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { ProColumns } from '@ant-design/pro-components';
 import cls from './index.module.less';
-import { Dropdown, Pagination, Result } from 'antd';
+import { Dropdown, Pagination, Result, Segmented } from 'antd';
 import { ProTable } from '@ant-design/pro-components';
-import { IconFont } from '@/components/IconFont';
+import * as fa from 'react-icons/fa';
 import { PageShowType } from 'typings/globelType';
 import { PageModel } from '@/ts/base/model';
 import { RiMoreFill } from 'react-icons/ri';
+import useStorage from '@/hooks/useStorage';
 
 interface PageType<T> {
   dataSource: T[]; // 展示数据源
@@ -60,7 +61,7 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
   request,
   ...rest
 }) => {
-  const [pageType, setPageType] = useState<PageShowType>(defaultPageType); //切换设置
+  const [segment, setSegment] = useStorage('segment', 'List');
   const [defaultHeight, setDefaultHeight] = useState<number | 'auto'>('auto'); //计算高度
 
   // 监听父级高度
@@ -112,24 +113,30 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
     <div className={cls['common-table-footer']} key="pagetype">
       {/* 切换展示形式 */}
       {showChangeBtn && (
-        <div className={cls['btn-box']}>
-          <>
-            <IconFont
-              className={pageType === 'table' ? 'active' : ''}
-              type={'icon-chuangdanwei'}
-              onClick={() => {
-                setPageType('table');
-              }}
-            />
-            <IconFont
-              className={pageType === 'card' ? 'active' : ''}
-              type={'icon-jianyingyong'}
-              onClick={() => {
-                setPageType('card');
-              }}
-            />
-          </>
-        </div>
+        <Segmented
+          value={segment}
+          onChange={(value) => setSegment(value as 'Kanban' | 'List')}
+          options={[
+            {
+              value: 'List',
+              icon: (
+                <fa.FaTable
+                  fontSize={20}
+                  color={segment === 'List' ? 'blue' : '#9498df'}
+                />
+              ),
+            },
+            {
+              value: 'Kanban',
+              icon: (
+                <fa.FaTh
+                  fontSize={20}
+                  color={segment === 'Kanban' ? 'blue' : '#9498df'}
+                />
+              ),
+            },
+          ]}
+        />
       )}
     </div>
   );
@@ -190,7 +197,7 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
           }
         }}
         tableRender={(props: any, defaultDom, { toolbar }) => {
-          return pageType === 'table' ? (
+          return segment === 'List' ? (
             !showChangeBtn ||
             !props.action.dataSource ||
             props.action.dataSource.length === 0 ? (
@@ -236,7 +243,7 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
         {...rest}
       />
     );
-  }, [pageType, dataSource, resetColumns, defaultHeight]);
+  }, [segment, dataSource, resetColumns, defaultHeight]);
 
   return (
     <div className={cls['common-table-wrap']} style={style}>
