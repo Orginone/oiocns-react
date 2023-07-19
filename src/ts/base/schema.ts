@@ -527,7 +527,7 @@ export type XFormRule = {
   /* 规则名称 */
   name: string;
   /* 规则类型 */
-  ruleType: ('method' | 'formula')[];
+  ruleType: 'method' | 'formula';
   /* 触发方式 初始化-修改时-提交时 */
   trigger: 'Start' | 'Running' | 'Submit';
   /* 规则支持的数据类型 */
