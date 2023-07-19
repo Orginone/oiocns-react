@@ -1,11 +1,11 @@
-function uniqueArray(array) {
+function uniqueArray(array: any) {
   const isArray = Array.isArray(array);
   if (!isArray) {
     return [];
   }
   return Array.from(new Set(array));
 }
-/* 获取特殊字符中的内容 */
+/* 获取特殊字符中的内容 「」*/
 function extractContent(str: string, reg = /「(.*?)」/) {
   const match = str.match(reg);
   if (match && match[1]) {
