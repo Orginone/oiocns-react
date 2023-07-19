@@ -31,7 +31,7 @@ export const loadWidgetsOpts = (valueType: string = '描述型') => {
       return [
         {
           label: '字典',
-          value: 'dict',
+          value: 'select',
         },
         {
           label: '颜色选择',

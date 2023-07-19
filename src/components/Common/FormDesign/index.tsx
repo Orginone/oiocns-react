@@ -143,7 +143,6 @@ const Design: React.FC<IProps> = ({ current }) => {
       labelWidth: 120,
       column: 1,
     };
-
     let result = current.attributes.reduce((result, item: any) => {
       const rule = JSON.parse(item.rule || '{}');
       // 规则校验
@@ -170,11 +169,14 @@ const Design: React.FC<IProps> = ({ current }) => {
         ...result,
         [item.property!.info]: {
           title: item.name,
-          type: rule.widget === "text"?'string':rule.widget,
+          type: rule.widget === "text" ||  rule.widget === "datetime"?'string':rule.widget,
+          widget:rule.widget,
+          "format":rule.widget === "datetime"? "date":"",
           ...item
         }
       }
     }, {})
+
     schema.properties = {
       ...result,
     };
@@ -183,6 +185,7 @@ const Design: React.FC<IProps> = ({ current }) => {
     const rules = rule ? JSON.parse(rule) : {};
     const { col } = rules;
     schema.column = col === 24 ? 1 : col === 12 ? 2 : col === 8 ? 3 : 1;
+    debugger;
     return schema;
   }
   return (

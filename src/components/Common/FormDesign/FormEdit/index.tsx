@@ -1,6 +1,6 @@
-import { Col, Row, Select } from 'antd';
+// import { Col, Row, Select } from 'antd';
 import React, { useEffect, useState } from 'react';
-
+// import cls from './index.module.less';
 import FullScreenModal from '@/executor/tools/fullScreen';
 import { IForm } from '@/ts/core';
 import Generator, {
@@ -8,7 +8,7 @@ import Generator, {
   defaultGlobalSettings,
   defaultSettings,
 } from 'fr-generator';
-const { Provider, Sidebar, Canvas,Settings } = Generator;
+// const { Provider, Sidebar, Canvas, Settings } = Generator;
 // import Settings from './components/Settings';
 import {
   ProFormDatePicker,
@@ -25,7 +25,7 @@ type IProps = {
   current: IForm;
   finished: () => void;
   editFormOpen: boolean;
-  defaultSchema:schemaType
+  defaultSchema: schemaType
   itemClick: (e: any) => void;
 
 };
@@ -41,9 +41,9 @@ type FormLayout = {
  * 表单设计器
  * @param props
  */
-const FormEditModal: React.FC<IProps> = ({ current, finished, defaultSchema,editFormOpen = false, itemClick }) => {
+const FormEditModal: React.FC<IProps> = ({ current, finished, defaultSchema, editFormOpen = false, itemClick }) => {
   console.log("@@", current);
- 
+
 
 
   const [formLayout, setFormLayout] = useState<FormLayout>(
@@ -63,22 +63,23 @@ const FormEditModal: React.FC<IProps> = ({ current, finished, defaultSchema,edit
   //   <button onClick={() => onChange(value + 1)}>{value}</button>
   // );
   const onSchemaChange = (e: schemaType) => {
-  
-      current.update({
-        ...current.metadata,
-        rule: JSON.stringify({
-          schema: e,
-        }),
-      });
-    //window.localStorage.setItem('schema', JSON.stringify(e));
+
+    // current.update({
+    //   ...current.metadata,
+    //   rule: JSON.stringify({
+    //     schema: e,
+    //   }),
+    // });
+
+
+    window.localStorage.setItem('schema', JSON.stringify(e));
   }
   const onCanvasSelect = (e: any) => {
-    console.log("onCanvasSelect", e)
     if (JSON.stringify(e) !== '{}')
       itemClick(e);
   }
-  
- 
+
+
   // 布局改变
   const layoutChange = (value: any) => {
     const newFormLayout = { ...formLayout, ...value };
@@ -94,8 +95,45 @@ const FormEditModal: React.FC<IProps> = ({ current, finished, defaultSchema,edit
   };
   //页面重载获取默认schema或者配置后的schema
 
-  console.log("defaultSettings",defaultSettings)
- //const  settings = defaultSettings[2].
+  const settings = defaultSettings[0]
+  settings.widgets = [{
+    "text": "HTML",
+    "name": "html",
+    "schema": {
+      "title": "HTML",
+      "type": "string",
+      "widget": "html"
+    },
+    "setting": {
+      "props": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "title": "展示内容",
+            "type": "string"
+          }
+        }
+      }
+    }
+  }]
+  console.log('commonSettings',defaultCommonSettings)
+  defaultCommonSettings.margin = {
+    title: '外边距',
+    type: 'string',
+  }
+  delete defaultCommonSettings.bind;
+  const fieldRenderFun = (schema:any, widgetProps:any, children:any, originNode:any)=>{
+    // console.log("widgetProps",widgetProps)
+    // console.log("children",children)
+    // console.log("originNode",originNode)
+    return originNode
+  }
+  const fieldWrapperRenderFun= (schema:any, isSelected:any, children:any, originNode:any)=>{
+    console.log("schema",schema)
+    console.log("children",children)
+    console.log("originNode",originNode)
+    return originNode
+  }
   return (
     <FullScreenModal
       open={editFormOpen}
@@ -106,14 +144,17 @@ const FormEditModal: React.FC<IProps> = ({ current, finished, defaultSchema,edit
       title={'表单设计'}
       footer={[]}
       onCancel={finished}>
-        <Generator 
-         defaultValue={defaultSchema}
-         onSchemaChange={onSchemaChange}
-         settings={[defaultSettings[2]]}
-         hideId
-         onCanvasSelect={onCanvasSelect}
-         widgets={{ money: ProFormMoney }}
-       />
+      <Generator
+        defaultValue={defaultSchema}
+        onSchemaChange={onSchemaChange}
+        settings={[defaultSettings[2],settings]}
+        hideId
+       // onCanvasSelect={onCanvasSelect}
+        widgets={{ money: ProFormMoney }}
+        commonSettings={{...defaultCommonSettings}}
+        fieldRender = {fieldRenderFun}
+        fieldWrapperRender = {fieldWrapperRenderFun}
+      />
       {/* <Provider
         defaultValue={defaultSchema}
         onSchemaChange={onSchemaChange}
