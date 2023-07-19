@@ -7,7 +7,7 @@ import Sheet from './Sheet';
 import Rules from './Rules';
 import { IForm } from '@/ts/core';
 import FullScreenModal from '@/executor/tools/fullScreen';
-import EntityInfo from '@/bizcomponents/EntityInfo';
+import EntityInfo from '@/components/Common/EntityInfo';
 
 interface IProps {
   current: IForm;

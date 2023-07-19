@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import CardOrTable from '@/components/CardOrTableComp';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import { IForm } from '@/ts/core';
-import AttributeConfig from '@/bizcomponents/FormDesign/attributeConfig';
+import AttributeConfig from '@/components/Common/FormDesign/attributeConfig';
 import { ProColumns } from '@ant-design/pro-components';
 import SchemaForm from '@/components/SchemaForm';
 

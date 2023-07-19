@@ -4,7 +4,7 @@ import { XAttribute } from '@/ts/base/schema';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import { IForm } from '@/ts/core';
 import PropertyConfig from './propConfig';
-import AttributeConfig from '@/bizcomponents/FormDesign/attributeConfig';
+import AttributeConfig from '@/components/Common/FormDesign/attributeConfig';
 import SelectPropertys from './SelectPropertys';
 import { Modal } from 'antd';
 import { AttributeModel } from '@/ts/base/model';

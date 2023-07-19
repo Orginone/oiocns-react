@@ -1,15 +1,3 @@
-<<<<<<< HEAD
-import EntityIcon from '@/bizcomponents/GlobalComps/entityIcon';
-import TypeIcon from '@/bizcomponents/GlobalComps/typeIcon';
-import { command, schema } from '@/ts/base';
-import orgCtrl from '@/ts/controller';
-import { IDirectory, IEntity, IFileInfo, IMemeber, IMsgChat, ITarget } from '@/ts/core';
-import { Drawer, List, Modal, Progress, Upload, message } from 'antd';
-import QrCode from 'qrcode.react';
-import React, { useEffect, useState } from 'react';
-import { uploadTemplate } from './tools/uploadTemplate';
-
-=======
 import {
   IApplication,
   IDirectory,
@@ -30,7 +18,6 @@ import { uploadTemplate } from './tools/uploadTemplate';
 import TypeIcon from '@/components/Common/GlobalComps/typeIcon';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import { TaskModel } from '@/ts/base/model';
->>>>>>> 2fd7a9abcf299e5408ea9756a24426de86c2f778
 /** 执行非页面命令 */
 export const executeCmd = (cmd: string, entity: any, args: any[]) => {
   switch (cmd) {
@@ -62,12 +49,9 @@ export const executeCmd = (cmd: string, entity: any, args: any[]) => {
       return openDirectory(entity);
     case 'standard':
       return uploadTemplate(entity);
-<<<<<<< HEAD
-=======
     case 'online':
     case 'outline':
       return onlineChanged(cmd, entity);
->>>>>>> 2fd7a9abcf299e5408ea9756a24426de86c2f778
   }
   return false;
 };
