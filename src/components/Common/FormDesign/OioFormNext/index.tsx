@@ -52,9 +52,10 @@ const OioForm: React.FC<IProps> = ({
     form.ruleServices = new FormRules(configRules, form.belongId);
   }, [form, useRule]);
   useEffect(() => {
-    form.ruleServices.renderRules('Start', {}, fields, (data: DataType) => {
+    form?.ruleServices?.renderRules('Start', {}, fields, (data: DataType) => {
       console.log('初始化时结果', data);
       formRef?.current?.setFieldsValue(data);
+      onValuesChange && onValuesChange({}, data);
     });
   }, []);
   const colNum = 24 / configCol; //单行展示数量 默认3
@@ -98,9 +99,10 @@ const OioForm: React.FC<IProps> = ({
           onFinished?.call(this, values);
         }}
         onValuesChange={(val, vals) => {
-          form.ruleServices.renderRules('Running', vals, fields, (data: DataType) => {
+          form?.ruleServices?.renderRules('Running', vals, fields, (data: DataType) => {
             console.log('变化时返回结果', data);
             formRef?.current?.setFieldsValue(data);
+            onValuesChange && onValuesChange({}, data);
           });
           onValuesChange && onValuesChange(val, vals);
         }}

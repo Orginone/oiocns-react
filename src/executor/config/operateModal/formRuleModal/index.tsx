@@ -110,17 +110,6 @@ const FormRuleModal = (props: Iprops) => {
           handleOk({ success: true, type: 'updata', data: values });
         } else {
           handleOk({ success: true, type: 'create', data: handleSubt(values) });
-          // dbCtrl.delByObj('gz_list', { name: '333' });
-          // dbCtrl
-          //   .insertData({
-          //     ...handleSubt(values),
-          //     formId: form.id,
-          //   } as XFormRule)
-          //   .then((Res) => {
-          //   if (Res.success) {
-          //      handleOk({ success: true, type: 'create', data: values });
-          //   }
-          // });
         }
       }}></SchemaForm>
   );
