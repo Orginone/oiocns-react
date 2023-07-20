@@ -24,7 +24,7 @@ const ListMode = ({
             menu={{
               items: loadFileMenus(item, mode),
               onClick: ({ key }) => {
-                command.emitter(cmdType, key, current, current.key);
+                command.emitter(cmdType, key, item);
               },
             }}
             trigger={['contextMenu']}>
