@@ -10,7 +10,9 @@ import {
 } from '../public';
 import { ITarget } from '../target/base/target';
 import { Form, IForm } from './form';
-import { SysFileInfo, ISysFileInfo, IFileInfo, FileInfo } from './fileinfo';
+import { Report, IReport } from './report';
+import { SysFileInfo, ISysFileInfo, IFileInfo, FileInfo } from './fileinfo'; 
+
 import { Species, ISpecies } from './species';
 import { Member } from './member';
 import { Property, IProperty } from './property';
@@ -70,6 +72,14 @@ export interface IDirectory extends IFileInfo<schema.XDirectory> {
   loadApplications(reload?: boolean): Promise<IApplication[]>;
   /** 新建应用 */
   createApplication(data: model.ApplicationModel): Promise<IApplication | undefined>;
+  /** 创建文件任务 */
+  createTask(task: model.TaskModel): () => void;
+  /** 目录下的报表 */
+  reports: IReport[];
+  /** 加载报表 */
+  loadReports(reload?: boolean): Promise<IReport[]>;
+  /** 新建报表 */
+  createReport(data: model.FormModel): Promise<IReport | undefined>;
   /** 加载全部应用 */
   loadAllApplication(reload?: boolean): Promise<IApplication[]>;
   /** 加载目录树 */
@@ -105,6 +115,8 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
   specieses: ISpecies[] = [];
   propertys: IProperty[] = [];
   applications: IApplication[] = [];
+  reports: IReport[] = [];
+  private _contentLoaded: boolean = false;
   get id(): string {
     if (!this.parent) {
       return this.target.id;
@@ -146,6 +158,7 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
           await this.loadPropertys(reload),
           await this.loadSpecieses(reload),
           await this.loadApplications(reload),
+          await this.loadReports(reload)
         ]);
       }
     }
@@ -419,5 +432,30 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
         subDirectory.loadChildren(i, directorys);
         this.children.push(subDirectory);
       });
+  }
+  createTask(task: model.TaskModel): () => void {
+    this.taskList.push(task);
+    return () => this.taskEmitter.changCallback();
+  }
+  async loadReports(reload: boolean = false): Promise<IReport[]> {
+    if (this.reports.length < 1 || reload) {
+      const res = await kernel.queryForms({
+        id: this.id,
+        page: PageAll,
+      });
+      if (res.success) {
+        this.reports = (res.data.result || []).map((i) => new Report(i, this));
+      }
+    }
+    return this.reports;
+  }
+  async createReport(data: model.FormModel): Promise<IReport | undefined> {
+    data.directoryId = this.id;
+    const res = await kernel.createForm(data);
+    if (res.success && res.data.id) {
+      const report = new Report(res.data, this);
+      this.reports.push(report);
+      return report;
+    }
   }
 }
