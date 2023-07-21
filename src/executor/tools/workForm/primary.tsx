@@ -41,17 +41,18 @@ const PrimaryForm: React.FC<IProps> = (props) => {
       fieldsValue={data}
       belong={props.belong}
       disabled={!props.allowEdit}
+      useRule
       submitter={{
         resetButtonProps: {
           style: { display: 'none' },
         },
         render: (_: any, _dom: any) => <></>,
       }}
-      onValuesChange={(a) => {
+      onValuesChange={(_val, vals) => {
         if (props.allowEdit) {
-          Object.keys(a).forEach((k) => {
-            data[k] = a[k];
-            props.data.primary[k] = a[k];
+          Object.keys(vals).forEach((k) => {
+            data[k] = vals[k];
+            props.data.primary[k] = vals[k];
           });
           formData.after = [data];
           props.onChanged?.apply(this, [form.id, formData]);
