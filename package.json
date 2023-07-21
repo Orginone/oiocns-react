@@ -78,6 +78,7 @@
     "react-cropper": "^2.3.3",
     "react-dom": "^18.2.0",
     "react-icons": "^4.6.0",
+    "react-live": "^4.1.3",
     "react-office-viewer": "^1.0.4",
     "react-router-config": "^5.1.1",
     "react-router-dom": "^5.2.0",

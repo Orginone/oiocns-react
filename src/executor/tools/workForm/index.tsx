@@ -10,6 +10,7 @@ interface IWorkFormProps {
   belong: IBelong;
   nodeId: string;
   data: model.InstanceDataModel;
+  useformRule?: boolean;
   onChanged?: (id: string, data: model.FormEditData) => void;
 }
 
