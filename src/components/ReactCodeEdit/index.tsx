@@ -1,60 +1,42 @@
-import React, { useState } from 'react';
-import { LiveProvider, LiveEditor, LiveError, LivePreview } from 'react-live';
-import './index.less';
-import { debounce } from '@/utils/tools';
-// import { IBelong } from '@/ts/core';
-// import OrgCtrl from '@/ts/controller';
-// import { XAttribute } from '@/ts/base/schema';
-//  $formData:获取表单数据；$company:获取当前单位信息；$user:获取用户信息，$BM:编码生成器
-const defaultCode = `({$user}) => {
-  //输出用户名称
-  return $user.name;
-}`;
-// const User = OrgCtrl.user;
-const CodeEdit = ({
-  // attributes,
-  // belongId,
-  onCodeChange,
-  defaultVal,
-}: {
-  // attributes: XAttribute[];
-  // belongId: string;
+import React from 'react';
+
+import CodeMirror from '@uiw/react-codemirror';
+
+interface indexAType {
   onCodeChange: (d: string) => void;
-  defaultVal: any;
-}) => {
-  const [code, setCode] = useState<string>(defaultCode);
-
-  //TODO:升级为使用 vm，提高安全性
-
-  const handleEval = () => {
-    try {
-      // const evalResult = eval(code);
-      // console.log(
-      //   '运行规则',
-      //   evalResult({
-      //     $formData: undefined,
-      //     $attrs: attributes,
-      //     $company: Company,
-      //     $user: User,
-      //   }),
-      // );
-    } catch (err) {
-      console.log('handleEval错误', err);
-    }
-  };
-  const handleCodeChange = debounce((code: string) => {
-    handleEval();
-    setCode(code);
-    onCodeChange(code);
-  });
-
+  defaultVal: { value: string };
+}
+const Index: React.FC<indexAType> = ({ onCodeChange, defaultVal }) => {
   return (
-    <LiveProvider code={defaultVal?.value || code} noInline={false}>
-      <LiveEditor onChange={(code: string) => handleCodeChange(code)} />
-      {/* <LiveError /> */}
-      {/* <LivePreview /> */}
-    </LiveProvider>
+    <CodeMirror
+      value={defaultVal.value}
+      height={'200px'}
+      minHeight="100px"
+      placeholder="请设置规则内容"
+      theme="dark"
+      // options={{
+      //   theme: 'dark',
+      //   tabSize: 2,
+      //   mode: { name: 'javaScript' },
+      //   line: true,
+      //   autofocus: true, //自动获取焦点
+      //   styleActiveLine: true, //光标代码高亮
+      //   lineNumbers: false, //显示行号
+      //   smartIndent: true, //自动缩进
+      //   //start-设置支持代码折叠
+      //   lineWrapping: true,
+      //   foldGutter: true,
+      //   extraKeys: {
+      //     Ctrl: 'autocomplete',
+      //   },
+      //   matchBrackets: true, //括号匹配，光标旁边的括号都高亮显示
+      //   autoCloseBrackets: true, //键入时将自动关闭()[]{}''""
+      // }}
+      onChange={(code: string) => {
+        onCodeChange(code);
+      }}
+    />
   );
 };
 
-export default React.memo(CodeEdit);
+export default Index;
