@@ -1,7 +1,7 @@
 import OrgCtrl from '@/ts/controller/index';
 import FormulaRule from './formulaRule';
 import MethodRule from './methodRule';
-
+import { Emitter } from '@/ts/base/common';
 enum RuleType {
   'formula' = 'formula',
   'method' = 'method',
@@ -14,8 +14,9 @@ export enum triggerType {
 interface DataType {
   [key: string]: any;
 }
-class FormRules {
+class FormRules extends Emitter {
   constructor(RuleInfo: any[], beloneId: string) {
+    super();
     this._beloneId = beloneId;
     this.queryAllFormRules(RuleInfo);
   }
@@ -29,6 +30,7 @@ class FormRules {
   _RunningRules: any[] = [];
   /* 所有提交时 规则 */
   _SubmitRules: any[] = [];
+  isReady: boolean = false;
 
   /* 获取表单关联规则 */
   queryAllFormRules(frs: any[]) {
@@ -45,6 +47,8 @@ class FormRules {
         default:
           break;
       }
+      this.isReady = true;
+      this.changCallback()
     });
     /* 处理规则分组 */
   }
@@ -64,7 +68,7 @@ class FormRules {
     /* 最终输出结果 */
     let resultObj = {};
     let _Rules: any[] = this._AllRules.filter((item) => item.trigger === trigger);
-    console.log('待处理规则', attrs, _Rules);
+    console.log('待处理规则', _Rules);
     for (let i = 0; i < _Rules.length; i++) {
       const _R = _Rules[i];
       try {

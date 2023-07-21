@@ -50,17 +50,16 @@ const OioForm: React.FC<IProps> = ({
       return;
     }
     form.ruleServices = new FormRules(configRules, form.belongId);
-  }, [form, useformRule]);
-  useEffect(() => {
-    if (!useformRule) {
-      return;
-    }
-    form?.ruleServices?.renderRules('Start', {}, fields, (data: DataType) => {
-      console.log('初始化时结果', data);
-      formRef?.current?.setFieldsValue(data);
-      onValuesChange && onValuesChange({}, data);
+    form?.ruleServices?.subscribe(() => {
+      form?.ruleServices?.renderRules('Start', {}, fields, (data: DataType) => {
+        /* 设置表单数据 */
+        formRef?.current?.setFieldsValue(data);
+        /* 弹出数据 */
+        onValuesChange && onValuesChange({}, data);
+      });
     });
-  }, []);
+  }, [form, useformRule]);
+
   const colNum = 24 / configCol; //单行展示数量 默认3
   if (fieldsValue) {
     formRef?.current?.setFieldsValue(fieldsValue);
@@ -103,9 +102,8 @@ const OioForm: React.FC<IProps> = ({
         }}
         onValuesChange={(val, vals) => {
           form?.ruleServices?.renderRules('Running', vals, fields, (data: DataType) => {
-            console.log('变化时返回结果', data);
             formRef?.current?.setFieldsValue(data);
-            onValuesChange && onValuesChange({}, data);
+            onValuesChange && onValuesChange(val, data);
           });
           onValuesChange && onValuesChange(val, vals);
         }}
