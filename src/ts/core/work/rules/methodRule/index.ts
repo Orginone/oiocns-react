@@ -21,10 +21,10 @@ class MethodRule extends RuleBase implements IRuleBaseType {
       return { success: false, data: null, errMsg: '处理函数有误' };
     }
   };
-
-  loadRemoteRules(): void {
-    throw new Error('loadRemoteRules not implemented.');
+  loadRemoteDatas(): void {
+    throw new Error('Method not implemented.');
   }
+
   generateRule(): void {
     throw new Error('generateRule not implemented.');
   }

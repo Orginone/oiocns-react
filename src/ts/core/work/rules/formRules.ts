@@ -2,6 +2,7 @@ import OrgCtrl from '@/ts/controller/index';
 import FormulaRule from './formulaRule';
 import MethodRule from './methodRule';
 import { Emitter } from '@/ts/base/common';
+import { sleep } from '../../../base/common';
 enum RuleType {
   'formula' = 'formula',
   'method' = 'method',
@@ -33,9 +34,10 @@ class FormRules extends Emitter {
   isReady: boolean = false;
 
   /* 获取表单关联规则 */
-  queryAllFormRules(frs: any[]) {
-    console.log('获取表单关联规则', frs);
-    frs.forEach((_r) => {
+  queryAllFormRules(ruleInfo: any[]) {
+    console.log('获取表单关联规则', ruleInfo);
+    /* 处理规则类型 */
+    ruleInfo.forEach((_r) => {
       switch (_r.ruleType) {
         case RuleType.formula:
           this._AllRules.push(new FormulaRule(_r));
@@ -47,10 +49,16 @@ class FormRules extends Emitter {
         default:
           break;
       }
-      this.isReady = true;
-      this.changCallback()
     });
-    /* 处理规则分组 */
+    this.isReady = true;
+    this.changCallback();
+  }
+  /* 获取额外远程规则 */
+  async loadRemoteRules() {
+    await sleep(500);
+    console.log('暂无远程规则库');
+
+    // this._AllRules.push(new MethodRule(_r));
   }
   /**
    * @desc 触发规则处理  处理完一类规则，返回所有要回显至表单的数据，通过回调页面方法操作表单 {attrId1：value1，attrId2：value2}

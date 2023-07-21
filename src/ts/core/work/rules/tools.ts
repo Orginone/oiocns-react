@@ -5,8 +5,12 @@ function uniqueArray(array: any) {
   }
   return Array.from(new Set(array));
 }
-/* 获取特殊字符中的内容 「」*/
-function extractContent(str: string, reg = /「(.*?)」/) {
+/* 获取规则字符串里，所有的特殊字符 默认「」*/
+function getAllFixedCharacter(str: string, reg = /「(.*?)」/) {
+  return str.match(reg);
+}
+/* 获取特殊字符中的内容 默认「」*/
+function getChartcterContent(str: string, reg = /「(.*?)」/) {
   const match = str.match(reg);
   if (match && match[1]) {
     return match[1];
@@ -25,4 +29,10 @@ function findKeyWidthName(
 }
 /* 替换规则特殊字符=>表单值 */
 function replaceStringToValue() {}
-export { extractContent, findKeyWidthName, replaceStringToValue, uniqueArray };
+export {
+  findKeyWidthName,
+  getAllFixedCharacter,
+  getChartcterContent,
+  replaceStringToValue,
+  uniqueArray,
+};

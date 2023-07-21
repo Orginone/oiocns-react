@@ -17,6 +17,7 @@ export type ruleResultType = {
   /* 规则运行错误提示 */
   errMsg: string;
 };
+//TODO:区分 模板规则/可运行规则
 export interface IRuleBaseType {
   /* 规则主键 */
   id: string;
@@ -96,9 +97,9 @@ abstract class RuleBase {
    */
   abstract dealRule(formData: { [key: string]: any }): Promise<any>;
   /**
-   * @desc 加载外部规则库文件/模板规则
+   * @desc 加载需要远程获取的数据
    */
-  abstract loadRemoteRules(): void;
+  abstract loadRemoteDatas(): void;
   /**
    *@desc 使用模板生成规则函数
    */
