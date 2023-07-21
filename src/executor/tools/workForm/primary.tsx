@@ -10,6 +10,7 @@ interface IProps {
   belong: IBelong;
   forms: schema.XForm[];
   data: model.InstanceDataModel;
+  useformRule?: boolean;
   getFormData: (id: string) => model.FormEditData;
   onChanged?: (id: string, data: model.FormEditData) => void;
 }
@@ -41,7 +42,7 @@ const PrimaryForm: React.FC<IProps> = (props) => {
       fieldsValue={data}
       belong={props.belong}
       disabled={!props.allowEdit}
-      useRule
+      useformRule={props.useformRule}
       submitter={{
         resetButtonProps: {
           style: { display: 'none' },

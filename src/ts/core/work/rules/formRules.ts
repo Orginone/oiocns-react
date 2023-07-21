@@ -1,11 +1,12 @@
 import OrgCtrl from '@/ts/controller/index';
 import FormulaRule from './formulaRule';
 import MethodRule from './methodRule';
+
 enum RuleType {
   'formula' = 'formula',
   'method' = 'method',
 }
-enum triggerType {
+export enum triggerType {
   'start' = 'Start',
   'running' = 'Running',
   'submit' = 'Submit',

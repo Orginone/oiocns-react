@@ -18,7 +18,7 @@ type IProps = {
   formRef?: any;
   disabled?: boolean;
   showTitle?: boolean;
-  useRule?: boolean;
+  useformRule?: boolean;
 };
 interface DataType {
   [key: string]: any;
@@ -37,7 +37,7 @@ const OioForm: React.FC<IProps> = ({
   formRef = useRef(),
   disabled,
   showTitle,
-  useRule = false,
+  useformRule = false,
 }) => {
   if (fields.length < 1) return <></>;
   const {
@@ -46,12 +46,17 @@ const OioForm: React.FC<IProps> = ({
     list: configRules,
   } = JSON.parse(form.rule ?? '{}');
   useEffect(() => {
-    if (!useRule) {
+    console.log('useformRuleuseformRuleuseformRule', useformRule);
+
+    if (!useformRule) {
       return;
     }
     form.ruleServices = new FormRules(configRules, form.belongId);
-  }, [form, useRule]);
+  }, [form, useformRule]);
   useEffect(() => {
+    if (!useformRule) {
+      return;
+    }
     form?.ruleServices?.renderRules('Start', {}, fields, (data: DataType) => {
       console.log('初始化时结果', data);
       formRef?.current?.setFieldsValue(data);

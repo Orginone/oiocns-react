@@ -41,6 +41,7 @@ const WorkStartDo: React.FC<IProps> = ({ current, finished }) => {
           belong={apply.belong}
           data={apply.instanceData}
           nodeId={apply.instanceData.node.id}
+          useformRule
           onChanged={(id, data) => {
             formData.set(id, data);
           }}
