@@ -547,3 +547,20 @@ export type XFormRule = {
   /* 备注 */
   remark: string;
 };
+//报表定义
+export type XReport = {
+  // 报表布局
+  rule: string;
+  // 目录ID
+  directoryId: string;
+  // 报表的特性
+  attributes: XAttribute[] | undefined;
+  // // 报表的集合
+  // sheets: [] | undefined;
+  // // 报表的规则集合
+  // rules: [] | undefined;
+  // 使用报表的流程节点
+  bindNodes: XWorkNode[] | undefined;
+  // 报表的目录
+  directory: XDirectory | undefined;
+} & XEntity;

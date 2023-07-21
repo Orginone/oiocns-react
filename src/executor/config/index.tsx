@@ -19,6 +19,7 @@ const entityMap: any = {
   办事: 'Work',
   事项配置: 'WorkConfig',
   实体配置: 'ThingConfig',
+  报表: 'Report',
 };
 
 interface IProps {
@@ -27,6 +28,7 @@ interface IProps {
   finished: () => void;
 }
 const ConfigExecutor: React.FC<IProps> = ({ cmd, args, finished }) => {
+  console.log(cmd,'cmd')
   switch (cmd) {
     case 'open':
       if (Object.keys(entityMap).includes(args[0].typeName)) {
