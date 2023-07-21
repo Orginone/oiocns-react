@@ -10,6 +10,7 @@ import PropertyForm from './propertyForm';
 import TargetForm from './targetForm';
 import LabelsForm from './labelsForm';
 import RenameForm from './renameForm';
+import LabelsReport from './labelsReport';
 interface IProps {
   cmd: string;
   entity: IEntity<schema.XEntity>;
@@ -77,6 +78,14 @@ const EntityForm: React.FC<IProps> = ({ cmd, entity, finished }) => {
         <LabelsForm
           formType={cmd.replace('WorkConfig', '').replace('ThingConfig', '')}
           typeName={cmd.includes('WorkConfig') ? '事项配置' : '实体配置'}
+          current={entity as any}
+          finished={reloadFinish}
+        />
+      );
+    case 'newReport':
+      return (
+        <LabelsReport
+          formType={cmd.replace('Report', '')}
           current={entity as any}
           finished={reloadFinish}
         />

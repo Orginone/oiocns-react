@@ -145,6 +145,12 @@ export const directoryOperates = {
     label: '新建事项配置',
     iconType: '事项配置',
   },
+  NewReport: {
+    sort: 7,
+    cmd: 'newReport',
+    label: '新建报表',
+    iconType: 'newDir',
+  },
 };
 
 /** 目录下新增 */
@@ -162,6 +168,7 @@ export const directoryNew = {
     directoryOperates.NewApp,
     directoryOperates.NewThingConfig,
     directoryOperates.NewWorkConfig,
+    directoryOperates.NewReport,
   ],
 };
 
