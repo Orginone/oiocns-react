@@ -46,9 +46,7 @@ const OioForm: React.FC<IProps> = ({
     list: configRules,
   } = JSON.parse(form.rule ?? '{}');
   useEffect(() => {
-    console.log('useformRuleuseformRuleuseformRule', useformRule);
-
-    if (!useformRule) {
+    if (!useformRule || form.ruleServices) {
       return;
     }
     form.ruleServices = new FormRules(configRules, form.belongId);
