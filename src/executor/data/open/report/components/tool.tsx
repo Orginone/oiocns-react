@@ -8,14 +8,9 @@ import { IReport } from '@/ts/core';
 import SelectPropertys from '@/executor/config/operateModal/labelsModal/Attritube/SelectPropertys';
 import { AttributeModel } from '@/ts/base/model';
 const { Option } = Select;
-
-function handleChange(value:any) {
-  console.log(`selected ${value}`);
-}
-
 interface IProps {
   current: IReport;
-  reportChange: (value:any) => void;
+  handClick: any;
 }
 
 const classDefault:string = 'htMiddle htLeft'
@@ -189,26 +184,51 @@ const items: MenuProps['items'] = [
   },
 ];
 
-const ToolBar: React.FC<IProps> = ({ current,reportChange }: IProps) => {
+const ToolBar: React.FC<IProps> = ({ current,handClick }: IProps) => {
   const [modalType, setModalType] = useState<string>('');
   const [tkey, tforceUpdate] = useObjectUpdate('');
 
-  const defaultFontWeight:string = 'normal'
-  const fontWeight:string = '12'
-  const defaultFontStyle:string = 'normal'
-  const fontStyle:string = 'normal'
-  const defaultTextDecoration:string = 'none'
-  const textDecoration:string = 'none'
+  let defaultFontWeight:string = 'normal'
+  let fontWeight:string = 'normal'
+  let defaultFontStyle:string = 'normal'
+  let fontStyle:string = 'normal'
+  let defaultTextDecoration:string = 'none'
+  let textDecoration:string = 'none'
   const onSave = () =>{}
   const onPublish = () =>{}
-  const setFontWeight = ()=>{}
-  const setFontStyle =()=>{}
-  const setTextDecoration =()=>{}
+  const setFontWeight = ()=>{
+    if (fontWeight === 'bold') {
+      fontWeight = defaultFontWeight;
+    } else {
+      fontWeight = 'bold';
+    }
+    handClick(fontWeight,'setFontWeight')
+  }
+  const setFontStyle =()=>{
+    if (fontStyle === 'italic') {
+      fontStyle = defaultFontStyle;
+    } else {
+      fontStyle = 'italic';
+    }
+    handClick(fontStyle,'setFontStyle')
+  }
+  const setTextDecoration =()=>{
+    if (textDecoration === 'underline') {
+      textDecoration = defaultTextDecoration;
+    } else {
+      textDecoration = 'underline';
+    }
+    handClick(textDecoration,'setTextDecoration')
+  }
   const reducePaddingLeft =()=>{}
   const addPaddingLeft=()=>{}
   const merge=()=>{}
   const saveData:any = []
   const alignThis =(item:any)=>{console.log(item)}
+
+  const handleChange = (value:any,type:any) => {
+    handClick(value,type)
+  }
 
   return (
     <div className={cls['toolbar-start-tab']}>
@@ -223,14 +243,14 @@ const ToolBar: React.FC<IProps> = ({ current,reportChange }: IProps) => {
 
       <div className={cls['flex-box']}>
         <div className={cls['row-one']}>
-          <Select defaultValue="宋体" style={{ width: 170 }} onChange={handleChange}>
+          <Select defaultValue="宋体" style={{ width: 170 }} onChange={(value)=>handleChange(value,'typeFace')}>
             {
               fonts.map((item:any)=>{
-                return <Option value={item.value}>{item.label}</Option>
+                return <Option value={item.value} types={'typeface'}>{item.label}</Option>
               })
             }
           </Select>
-          <Select defaultValue="12" style={{ width: 80, marginLeft:4 }} onChange={handleChange}>
+          <Select defaultValue="12" style={{ width: 80, marginLeft:4 }} onChange={(value)=>handleChange(value,'fontSize')}>
             {
               fontSizes.map((item:any)=>{
                 return <Option value={item}>{item}</Option>

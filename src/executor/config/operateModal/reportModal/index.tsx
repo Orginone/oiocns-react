@@ -5,12 +5,12 @@ import PageCard from '@/components/PageCard';
 import Attribute from './Attritube';
 import Sheet from './Sheet';
 import Rules from './Rules';
-import { IForm } from '@/ts/core';
+import { IReport } from '@/ts/core';
 import FullScreenModal from '@/executor/tools/fullScreen';
 import EntityInfo from '@/components/Common/EntityInfo';
 
 interface IProps {
-  current: IForm;
+  current: IReport;
   finished: () => void;
 }
 const ReportModal: React.FC<IProps> = ({ current, finished }: IProps) => {
