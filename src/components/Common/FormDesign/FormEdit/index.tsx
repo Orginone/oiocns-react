@@ -1,5 +1,5 @@
 // import { Col, Row, Select } from 'antd';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState,useRef } from 'react';
 // import cls from './index.module.less';
 import FullScreenModal from '@/executor/tools/fullScreen';
 import { IForm } from '@/ts/core';
@@ -42,9 +42,11 @@ type FormLayout = {
  * @param props
  */
 const FormEditModal: React.FC<IProps> = ({ current, finished, defaultSchema, editFormOpen = false, itemClick }) => {
-  console.log("@@", current);
 
 
+
+  // 创建ref
+  const myComponentRef = useRef(null);
 
   const [formLayout, setFormLayout] = useState<FormLayout>(
     current.metadata.rule
@@ -116,24 +118,35 @@ const FormEditModal: React.FC<IProps> = ({ current, finished, defaultSchema, edi
       }
     }
   }]
-  console.log('commonSettings',defaultCommonSettings)
   defaultCommonSettings.margin = {
-    title: '外边距',
+    title: '外边距(px)',
     type: 'string',
   }
   delete defaultCommonSettings.bind;
   const fieldRenderFun = (schema:any, widgetProps:any, children:any, originNode:any)=>{
-    // console.log("widgetProps",widgetProps)
-    // console.log("children",children)
-    // console.log("originNode",originNode)
-    return originNode
+
+    const {margin} = schema;
+    
+    const marginResult = margin && typeof(Number(margin)) === 'number'? margin + "px":0
+    console.log(marginResult,"marginResult")
+    return <div style={{width:'100%',display:'flex',lineHeight:"30px",margin:marginResult}}>
+      {originNode}
+    </div>
   }
   const fieldWrapperRenderFun= (schema:any, isSelected:any, children:any, originNode:any)=>{
-    console.log("schema",schema)
-    console.log("children",children)
-    console.log("originNode",originNode)
-    return originNode
+    const {margin} = schema;
+    
+    const marginResult = margin && typeof(Number(margin)) === 'number'? margin + "px":0
+    console.log(marginResult,"marginResult")
+    return <div style={{width:'100%',display:'flex',lineHeight:"30px",margin:marginResult}}>
+      {originNode}
+    </div>
   }
+  useEffect(()=>{
+    console.log(myComponentRef.current,"@@")
+    const Generator:any = myComponentRef.current;
+    const PreSchema = Generator.getValue();
+  },[])
   return (
     <FullScreenModal
       open={editFormOpen}
@@ -154,6 +167,7 @@ const FormEditModal: React.FC<IProps> = ({ current, finished, defaultSchema, edi
         commonSettings={{...defaultCommonSettings}}
         fieldRender = {fieldRenderFun}
         fieldWrapperRender = {fieldWrapperRenderFun}
+        ref={myComponentRef}
       />
       {/* <Provider
         defaultValue={defaultSchema}
