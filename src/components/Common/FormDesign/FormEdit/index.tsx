@@ -65,16 +65,16 @@ const FormEditModal: React.FC<IProps> = ({ current, finished, defaultSchema, edi
   //   <button onClick={() => onChange(value + 1)}>{value}</button>
   // );
   const onSchemaChange = (e: schemaType) => {
+    
+    current.update({
+      ...current.metadata,
+      rule: JSON.stringify({
+        schema: e,
+      }),
+    });
+   
 
-    // current.update({
-    //   ...current.metadata,
-    //   rule: JSON.stringify({
-    //     schema: e,
-    //   }),
-    // });
-
-
-    window.localStorage.setItem('schema', JSON.stringify(e));
+    //window.localStorage.setItem('schema', JSON.stringify(e));
   }
   const onCanvasSelect = (e: any) => {
     if (JSON.stringify(e) !== '{}')
@@ -82,19 +82,7 @@ const FormEditModal: React.FC<IProps> = ({ current, finished, defaultSchema, edi
   }
 
 
-  // 布局改变
-  const layoutChange = (value: any) => {
-    const newFormLayout = { ...formLayout, ...value };
-    setFormLayout(newFormLayout);
-    current.metadata.rule = current.metadata.rule || '{}';
-    current.update({
-      ...current.metadata,
-      rule: JSON.stringify({
-        ...JSON.parse(current.metadata.rule),
-        ...newFormLayout,
-      }),
-    })
-  };
+
   //页面重载获取默认schema或者配置后的schema
 
   const settings = defaultSettings[0]
@@ -123,29 +111,29 @@ const FormEditModal: React.FC<IProps> = ({ current, finished, defaultSchema, edi
     type: 'string',
   }
   delete defaultCommonSettings.bind;
-  const fieldRenderFun = (schema:any, widgetProps:any, children:any, originNode:any)=>{
+  // const fieldRenderFun = (schema:any, widgetProps:any, children:any, originNode:any)=>{
 
-    const {margin} = schema;
+  //   const {margin} = schema;
     
-    const marginResult = margin && typeof(Number(margin)) === 'number'? margin + "px":0
-    console.log(marginResult,"marginResult")
-    return <div style={{width:'100%',display:'flex',lineHeight:"30px",margin:marginResult}}>
-      {originNode}
-    </div>
-  }
-  const fieldWrapperRenderFun= (schema:any, isSelected:any, children:any, originNode:any)=>{
-    const {margin} = schema;
+  //   const marginResult = margin && typeof(Number(margin)) === 'number'? margin + "px":0
+  //   console.log(marginResult,"marginResult")
+  //   return <div style={{width:'100%',display:'flex',lineHeight:"30px",margin:marginResult}}>
+  //     {originNode}
+  //   </div>
+  // }
+  // const fieldWrapperRenderFun= (schema:any, isSelected:any, children:any, originNode:any)=>{
+  //   const {margin} = schema;
     
-    const marginResult = margin && typeof(Number(margin)) === 'number'? margin + "px":0
-    console.log(marginResult,"marginResult")
-    return <div style={{width:'100%',display:'flex',lineHeight:"30px",margin:marginResult}}>
-      {originNode}
-    </div>
-  }
+  //   const marginResult = margin && typeof(Number(margin)) === 'number'? margin + "px":0
+  //   console.log(marginResult,"marginResult")
+  //   return <div style={{width:'100%',display:'flex',lineHeight:"30px",margin:marginResult}}>
+  //     {originNode}
+  //   </div>
+  // }
   useEffect(()=>{
     console.log(myComponentRef.current,"@@")
-    const Generator:any = myComponentRef.current;
-    const PreSchema = Generator.getValue();
+    // const Generator:any = myComponentRef.current;
+    // const PreSchema = Generator.getValue();
   },[])
   return (
     <FullScreenModal
@@ -165,8 +153,8 @@ const FormEditModal: React.FC<IProps> = ({ current, finished, defaultSchema, edi
        // onCanvasSelect={onCanvasSelect}
         widgets={{ money: ProFormMoney }}
         commonSettings={{...defaultCommonSettings}}
-        fieldRender = {fieldRenderFun}
-        fieldWrapperRender = {fieldWrapperRenderFun}
+       // fieldRender = {fieldRenderFun}
+       // fieldWrapperRender = {fieldWrapperRenderFun}
         ref={myComponentRef}
       />
       {/* <Provider

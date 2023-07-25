@@ -136,57 +136,62 @@ const Design: React.FC<IProps> = ({ current }) => {
   };
 
   const currentToSchemaFun = (currentValue: IForm) => {
-    const schema: schemaType = {
-      displayType: 'row',
-      type: 'object',
-      properties: {},
-      labelWidth: 120,
-      column: 1,
-    };
-    let result = current.attributes.reduce((result, item: any) => {
-      const rule = JSON.parse(item.rule || '{}');
-      // 规则校验
-      let rules: Rule[] = [];
-      if (rule.rules ) {
-        if (typeof rule.rules === 'string') {
-          rules = [...rules, { message: '所填内容不符合要求', pattern: rule.rules }];
-        } else if (rule.rules instanceof Array) {
-          for (const r of rule.rules) {
-            rules = [...rules, { message: '所填内容不符合要求', pattern: r }];
-          }
-        }
-      }
-      if (rule.required === true) {
-        rules = [...rules, { required: true, message: `${rule.title}为必填项` }];
-      }
-     
-      if (!rule.widget) {
-        rule.widget = loadWidgetsOpts(item.property!.valueType)[0].value;
-        console.log("@@",rule.widget)
-      }
-      
-      return {
-        ...result,
-        [item.property!.info]: {
-          title: item.name,
-          type: rule.widget === "text" ||  rule.widget === "datetime"?'string':rule.widget,
-          widget:rule.widget,
-          "format":rule.widget === "datetime"? "date":"",
-          ...item
-        }
-      }
-    }, {})
-
-    schema.properties = {
-      ...result,
-    };
-
     const { metadata: { rule } } = currentValue;
     const rules = rule ? JSON.parse(rule) : {};
-    const { col } = rules;
-    schema.column = col === 24 ? 1 : col === 12 ? 2 : col === 8 ? 3 : 1;
-    debugger;
-    return schema;
+    if(rules){
+      return rules.schema;
+    }else{
+      const schema: schemaType = {
+        displayType: 'row',
+        type: 'object',
+        properties: {},
+        labelWidth: 120,
+        column: 1,
+      };
+      let result = current.attributes.reduce((result, item: any) => {
+        const rule = JSON.parse(item.rule || '{}');
+        // 规则校验
+        let rules: Rule[] = [];
+        if (rule.rules ) {
+          if (typeof rule.rules === 'string') {
+            rules = [...rules, { message: '所填内容不符合要求', pattern: rule.rules }];
+          } else if (rule.rules instanceof Array) {
+            for (const r of rule.rules) {
+              rules = [...rules, { message: '所填内容不符合要求', pattern: r }];
+            }
+          }
+        }
+        if (rule.required === true) {
+          rules = [...rules, { required: true, message: `${rule.title}为必填项` }];
+        }
+       
+        if (!rule.widget) {
+          rule.widget = loadWidgetsOpts(item.property!.valueType)[0].value;
+          console.log("@@",rule.widget)
+        }
+        
+        return {
+          ...result,
+          [item.property!.info]: {
+            title: item.name,
+            type: rule.widget === "text" ||  rule.widget === "datetime"?'string':rule.widget,
+            widget:rule.widget,
+            "format":rule.widget === "datetime"? "date":"",
+            ...item
+          }
+        }
+      }, {})
+  
+      schema.properties = {
+        ...result,
+      };
+  
+      
+      const { col } = rules;
+      schema.column = col === 24 ? 1 : col === 12 ? 2 : col === 8 ? 3 : 1;
+      return schema;
+    }
+   
   }
   return (
     <div style={{ display: 'flex' }}>
