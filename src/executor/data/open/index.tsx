@@ -1,11 +1,12 @@
 import ImageView from './image';
 import VideoView from './video';
 import { IEntity, ISysFileInfo } from '@/ts/core';
-import { command, model, schema } from '@/ts/base';
+import { command, schema } from '@/ts/base';
 import React from 'react';
 import FormView from './form';
 import WorkStart from './work';
 import OfficeView from './office';
+import MarkdownView from "@/executor/data/open/markdown";
 
 const officeExt = ['.pdf', '.xls', '.xlsx', '.doc', '.docx', '.ppt', '.pptx'];
 const videoExt = ['.mp4', '.avi', '.mov', '.mpg', '.swf', '.flv', '.mpeg'];
@@ -26,6 +27,9 @@ const ExecutorOpen: React.FC<IOpenProps> = (props: IOpenProps) => {
       videoExt.includes(data.extension ?? '-')
     ) {
       return <VideoView share={data} finished={props.finished} />;
+    }
+    if (data?.extension === '.md') {
+      return <MarkdownView share={data} finished={props.finished}></MarkdownView>;
     }
     if (officeExt.includes(data.extension ?? '-')) {
       return <OfficeView share={data} finished={props.finished} />;
