@@ -73,7 +73,7 @@ export const loadWidgetsOpts = (valueType: string = '描述型') => {
       return [
         {
           label: '日期时间',
-          value: 'datetime',
+          value: 'range',
         },
         {
           label: '日期范围',
