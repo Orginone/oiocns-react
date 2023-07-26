@@ -1,3 +1,4 @@
+/* 去重 */
 function uniqueArray(array: any) {
   const isArray = Array.isArray(array);
   if (!isArray) {
@@ -28,11 +29,5 @@ function findKeyWidthName(
   return ObjArr.find((v) => v.name === name)?.id;
 }
 /* 替换规则特殊字符=>表单值 */
-function replaceStringToValue() {}
-export {
-  findKeyWidthName,
-  getAllFixedCharacter,
-  getChartcterContent,
-  replaceStringToValue,
-  uniqueArray,
-};
+
+export { findKeyWidthName, getAllFixedCharacter, getChartcterContent, uniqueArray };

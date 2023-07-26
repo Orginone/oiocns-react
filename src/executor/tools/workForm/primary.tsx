@@ -12,7 +12,7 @@ interface IProps {
   data: model.InstanceDataModel;
   useformRule?: boolean;
   getFormData: (id: string) => model.FormEditData;
-  onChanged?: (id: string, data: model.FormEditData) => void;
+  onChanged?: (id: string, data: model.FormEditData, changedData?: Object) => void;
 }
 
 const PrimaryForm: React.FC<IProps> = (props) => {
@@ -42,7 +42,6 @@ const PrimaryForm: React.FC<IProps> = (props) => {
       fieldsValue={data}
       belong={props.belong}
       disabled={!props.allowEdit}
-      useformRule={props.useformRule}
       submitter={{
         resetButtonProps: {
           style: { display: 'none' },
@@ -56,7 +55,7 @@ const PrimaryForm: React.FC<IProps> = (props) => {
             props.data.primary[k] = vals[k];
           });
           formData.after = [data];
-          props.onChanged?.apply(this, [form.id, formData]);
+          props.onChanged?.apply(this, [form.id, formData, _val]);
           setData({ ...data });
         }
       }}

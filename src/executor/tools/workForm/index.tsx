@@ -4,14 +4,15 @@ import { IBelong } from '@/ts/core';
 import PrimaryForms from './primary';
 import DetailForms from './detail';
 import { formatDate } from '@/utils';
+import { DataType } from 'typings/globelType';
 
 interface IWorkFormProps {
   allowEdit: boolean;
   belong: IBelong;
   nodeId: string;
   data: model.InstanceDataModel;
-  useformRule?: boolean;
-  onChanged?: (id: string, data: model.FormEditData) => void;
+  formRule?: any;
+  onChanged?: (id: string, data: model.FormEditData, changedData?: DataType) => void;
 }
 
 const getNodeByNodeId = (

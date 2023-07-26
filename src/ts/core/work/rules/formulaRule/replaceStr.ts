@@ -1,24 +1,50 @@
-import { uniqueArray, getAllFixedCharacter, getChartcterContent } from '../tools';
-// import { FixedCharacters } from '../base/const';
+import { uniqueArray, getAllFixedCharacter, getChartcterContent } from '../lib/tools';
+import { RuleTypes } from '../type.d';
+import { FixedCharacters } from '../lib/const';
 //定义replaceString函数，接收3个参数：ruleStr, formData, attrs
-export default function replaceString(
+export default async function replaceString(
   ruleStr: string,
   formData: { [key: string]: any },
-  attrs: { [key: string]: any },
-): string {
+  attrs: any[],
+): Promise<string> {
   //将ruleStr中的特殊字符「」 提取出来，放到一个数组中，用uniqueArray去重
   const AttrSet = uniqueArray(getAllFixedCharacter(ruleStr));
-
+  let replacedStr = '';
   //定义一个数组用来存储缺少的属性
   const missingAttrs: string[] = [];
   //一、判断是否有限定字符FixedCharacters，替换所有限定字符为对应数据值
-  // while(AttrSet.includes()){}
-
+  replacedStr = await fixedCharacterResolver(ruleStr);
   //二、替换所有表单特性为对应数据值 使用reduce对AttrSet数组进行遍历和处理,
-  const replacedStr = AttrSet.map((_str) => getChartcterContent(_str)).reduce(
-    (ruleContent, item) => {
+  replacedStr = await formAttrResolver(ruleStr, AttrSet, formData, attrs, missingAttrs);
+  //三、根据已有数据 执行内部函数，获取对应数据,
+  //TODO:
+  //如果missingAttrs数组中有缺少的属性，打印错误信息并返回空字符串
+  if (missingAttrs.length > 0) {
+    console.error(
+      `公式处理失败：${missingAttrs.map((item) => `${item}数据缺失`).join('、')}`,
+    );
+    return '';
+  }
+
+  //如果没有缺少的属性，返回替换后的字符串
+  return replacedStr ?? '';
+}
+/* 表单特性处理 */
+const formAttrResolver = async (
+  ruleStr: string,
+  ruleAttrs: any[],
+  formData: RuleTypes.DataType,
+  formAttr: any[],
+  missingAttrs: string[],
+) => {
+  if (!ruleStr) {
+    return '';
+  }
+  const replacedStr = await ruleAttrs
+    .map((_str) => getChartcterContent(_str))
+    .reduce((ruleContent, item) => {
       //在attrs数组中查找是否有name等于item的对象
-      const attrObj = attrs.find((v: { name: string }) => v.name === item);
+      const attrObj = formAttr.find((v: { name: string }) => v.name === item);
 
       //如果没找到，则将item加入到missingAttrs数组中，返回ruleContent
       if (!attrObj) {
@@ -37,18 +63,24 @@ export default function replaceString(
         missingAttrs.push(item!);
         return ruleContent;
       }
-    },
-    ruleStr,
-  );
+    }, ruleStr);
 
-  //如果missingAttrs数组中有缺少的属性，打印错误信息并返回空字符串
-  if (missingAttrs.length > 0) {
-    console.error(
-      `公式处理失败：${missingAttrs.map((item) => `${item}数据缺失`).join('、')}`,
-    );
+  return replacedStr ?? '';
+};
+
+/* 固定字符处理 */
+const fixedCharacterResolver = (ruleStr: string) => {
+  if (!ruleStr) {
     return '';
   }
+  //一、判断是否有限定字符FixedCharacters，替换所有限定字符为对应数据值
+  console.log('FixedCharacters', FixedCharacters);
+  //TODO:
+  return ruleStr;
+};
 
-  //如果没有缺少的属性，返回替换后的字符串
-  return replacedStr ?? '';
-}
+// /* 内置函数处理 */
+// const builtInFunResolver = () => {};
+
+// /* 外部请求处理处理 */
+// const externalFunResolver = () => {};
