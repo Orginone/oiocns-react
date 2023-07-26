@@ -3,16 +3,15 @@ import { kernel, model, schema } from '../../../ts/base';
 import { IBelong } from '@/ts/core';
 import { useEffect, useState } from 'react';
 import React from 'react';
-import { Tabs,Button } from 'antd';
+import { Tabs, Button } from 'antd';
 import FormRender, { useForm } from 'form-render';
 interface IProps {
   allowEdit: boolean;
   belong: IBelong;
   forms: schema.XForm[];
   data: model.InstanceDataModel;
-  useformRule?: boolean;
   getFormData: (id: string) => model.FormEditData;
-  onChanged?: (id: string, data: model.FormEditData, changedData?: Object) => void;
+  onChanged?: (id: string, data: model.FormEditData) => void;
 }
 
 const PrimaryForm: React.FC<IProps> = (props) => {
@@ -48,27 +47,26 @@ const PrimaryForm: React.FC<IProps> = (props) => {
         },
         render: (_: any, _dom: any) => <></>,
       }}
-      onValuesChange={(_val, vals) => {
+      onValuesChange={(a) => {
         if (props.allowEdit) {
-          Object.keys(vals).forEach((k) => {
-            data[k] = vals[k];
-            props.data.primary[k] = vals[k];
+          Object.keys(a).forEach((k) => {
+            data[k] = a[k];
+            props.data.primary[k] = a[k];
           });
           formData.after = [data];
-          props.onChanged?.apply(this, [form.id, formData, _val]);
+          props.onChanged?.apply(this, [form.id, formData]);
           setData({ ...data });
         }
       }}
     />
   );
 };
-const FormPreview: React.FC<IProps> = (props) => {
-  const formIns:any = useForm();
-  const onFinish = (formData:any, errors:any) => {
+const FormPreview2: React.FC<IProps> = (props) => {
+  const formIns: any = useForm();
+  const onFinish = (formData: any, errors: any) => {
     console.log('formData:', formData, 'errors', errors);
   };
   if (props.forms.length < 1) return <></>;
-  const [activeTabKey, setActiveTabKey] = useState(props.forms[0].id);
   // const loadItems = () => {
   //   return props.forms.map((form) => {
   //     return {
@@ -78,19 +76,14 @@ const FormPreview: React.FC<IProps> = (props) => {
   //     };
   //   });
   // };
-
+  const rule = props.forms.rule && JSON.parse(props.forms.rule);
   return (
-    props.forms.map((formResult) => {
-      const rule = formResult.rule && JSON.parse(formResult.rule);
-      if(rule.schema){
-        return <div>
-            <FormRender form={formIns} schema={rule.schema} onFinish={onFinish}/>
-            <Button type="primary" onClick={formIns.submit}>
-              提交
-            </Button>
-        </div>
-      }
-    })
+    <div>
+      <FormRender form={formIns} schema={rule.schema} onFinish={onFinish} />
+      <Button type="primary" onClick={formIns.submit}>
+        提交
+      </Button>
+    </div>
   );
 };
 
@@ -116,4 +109,4 @@ const FormPreview: React.FC<IProps> = (props) => {
 //   );
 // };
 
-export default FormPreview;
+export default FormPreview2;

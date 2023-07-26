@@ -133,7 +133,13 @@ export type XDirectory = {
   // 目录的结构
   nodes: XDirectory[] | undefined;
 } & XEntity;
-
+export type schemaType = {
+  displayType: 'row' | 'column';
+  type: 'object';
+  labelWidth: number | string;
+  properties: Record<string, object>;
+  column: 1 | 2 | 3;
+};
 //单定义
 export type XForm = {
   // 单布局
@@ -146,6 +152,7 @@ export type XForm = {
   bindNodes: XWorkNode[] | undefined;
   // 单的目录
   directory: XDirectory | undefined;
+  schema:schemaType
 } & XEntity;
 
 //身份证明
