@@ -13,9 +13,14 @@ interface IProps {
 const ReportView: React.FC<IProps> = ({ current, finished }) => {
   const [reportChange,setReportChange] = useState<any>();
   const [changeType,setChangeType] = useState<string>('');
+  const [modalType,setModalType] = useState<string>('');
   const handClick = (value:any,type:string) =>{
     setReportChange(value)
     setChangeType(type)
+  }
+
+  const setModal = (value:string) =>{
+    setModalType(value)
   }
 
 	return (
@@ -30,7 +35,7 @@ const ReportView: React.FC<IProps> = ({ current, finished }) => {
       onCancel={finished}>
       <div className={cls['report-content-box']}>
         <div className={cls['report-tool-box']}>
-          <ToolBar current={current} handClick={handClick}></ToolBar>
+          <ToolBar current={current} handClick={handClick} setModal={setModal}></ToolBar>
         </div>
         <HotTableView current={current} reportChange={reportChange} changeType={changeType}></HotTableView>
         {/* <HotTable
@@ -86,14 +91,6 @@ const ReportView: React.FC<IProps> = ({ current, finished }) => {
           afterFormulasValuesUpdate={afterFormulasValuesUpdate}
         /> */}
       </div>
-
-      {/* <div className="controls">
-        <button id="load" className="button button--primary button--blue" onClick={(...args) => loadClickCallback(...args)}>加载数据</button>&nbsp;
-        <button id="save" className="button button--primary button--blue" onClick={(...args) => saveClickCallback(...args)}>保存数据</button>
-        <button className="button button--primary button--blue" onClick={(...args) => changeSize(...args)}>列宽自适应</button>
-        <button className="button button--primary button--blue" onClick={(...args) => buttonClickCallback(...args)}>修改样式</button>
-        <button className="button button--primary button--blue" onClick={(...args) => selectOptionChangeCallback(...args)}>获取选择</button>
-      </div> */}
     </FullScreenModal>
 	);
 };

@@ -1,16 +1,14 @@
-import React, {useState} from 'react';
-import { Select, Dropdown, Button, Modal } from 'antd';
+import React from 'react';
+import { Select, Dropdown, Button } from 'antd';
 import { SmileOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import cls from './tool.module.less';
-import useObjectUpdate from '@/hooks/useObjectUpdate';
 import { IReport } from '@/ts/core';
-import SelectPropertys from '@/executor/config/operateModal/labelsModal/Attritube/SelectPropertys';
-import { AttributeModel } from '@/ts/base/model';
 const { Option } = Select;
 interface IProps {
   current: IReport;
   handClick: any;
+  setModal:any
 }
 
 const classDefault:string = 'htMiddle htLeft'
@@ -184,16 +182,16 @@ const items: MenuProps['items'] = [
   },
 ];
 
-const ToolBar: React.FC<IProps> = ({ current,handClick }: IProps) => {
-  const [modalType, setModalType] = useState<string>('');
-  const [tkey, tforceUpdate] = useObjectUpdate('');
-
+const ToolBar: React.FC<IProps> = ({ current,handClick,setModal }: IProps) => {
   let defaultFontWeight:string = 'normal'
   let fontWeight:string = 'normal'
   let defaultFontStyle:string = 'normal'
   let fontStyle:string = 'normal'
   let defaultTextDecoration:string = 'none'
   let textDecoration:string = 'none'
+  // 缩进
+  let defaultPaddingLeft:number = 4
+  let paddingLeft:number = 4
   const onSave = () =>{}
   const onPublish = () =>{}
   const setFontWeight = ()=>{
@@ -220,10 +218,31 @@ const ToolBar: React.FC<IProps> = ({ current,handClick }: IProps) => {
     }
     handClick(textDecoration,'setTextDecoration')
   }
-  const reducePaddingLeft =()=>{}
-  const addPaddingLeft=()=>{}
+  const setBackgroundColor = () => {
+    handClick('#ddd', 'backgroundColor');
+  }
+  const setColor = () =>{
+    handClick('#fff', 'color');
+  }
+  const setClassName = (className:string) =>{
+    handClick(className, 'calssName');
+  }
+  const reducePaddingLeft =()=>{
+    let nowLeft = paddingLeft;
+    if (nowLeft > 0) {
+      nowLeft = Math.max(defaultPaddingLeft, nowLeft - 24);
+    }
+    paddingLeft = nowLeft;
+    handClick(paddingLeft, 'setPaddingLeft');
+  }
+  const addPaddingLeft=()=>{
+    paddingLeft += 24;
+    handClick(paddingLeft, 'setPaddingLeft');
+  }
+  const setModalType = () => {
+    setModal('新增特性')
+  }
   const merge=()=>{}
-  const saveData:any = []
   const alignThis =(item:any)=>{console.log(item)}
 
   const handleChange = (value:any,type:any) => {
@@ -250,7 +269,7 @@ const ToolBar: React.FC<IProps> = ({ current,handClick }: IProps) => {
               })
             }
           </Select>
-          <Select defaultValue="12" style={{ width: 80, marginLeft:4 }} onChange={(value)=>handleChange(value,'fontSize')}>
+          <Select defaultValue="12" style={{ width: 80, marginLeft:4 }} onChange={(value)=>handleChange(value + 'px','fontSize')}>
             {
               fontSizes.map((item:any)=>{
                 return <Option value={item}>{item}</Option>
@@ -275,7 +294,7 @@ const ToolBar: React.FC<IProps> = ({ current,handClick }: IProps) => {
           </Dropdown>
           <Dropdown menu={{ items }}>
             <div className={cls['color-dropdown']}>
-              <a className={cls['icon-a']} title="背景色" onClick={setTextDecoration}>
+              <a className={cls['icon-a']} title="背景色" onClick={setBackgroundColor}>
                 <img className={cls['spreadsheet-icon']} src={'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTE3LjU0IDE0LjAzMmMtLjAyLS4wMjMtLjA0Ny0uMDM2LS4wNzctLjAzNkw2LjU4MiAxNGwtLjQ1Ny0uNDU3IDcuNDYyLTYuMzk2YS4xLjEgMCAwIDAgLjAxMS0uMTQxbC0yLjk1My0zLjQzYS4xLjEgMCAwIDAtLjE0MS0uMDExbC0xLjAwOC44NjhhLjEuMSAwIDAgMC0uMDEuMTQxbDEuOTUzIDIuMjY3YS4xLjEgMCAwIDEtLjAxMS4xNDFsLTcuNDcgNi40MDRjLS4wNDQuMDM4LS4wNDcuMTA1LS4wMDYuMTQ3bDcuNDM3IDcuNDM3YS4xLjEgMCAwIDAgLjEzNS4wMDZsNi45LTUuNzRjLjA0Mi0uMDM1LjA0OC0uMDk4LjAxMy0uMTRsLS44ODctMS4wNjN6bTEuOTYgMy4yNzdhLjU2LjU2IDAgMCAwLS45OTkgMHMtMS41MDYgMy4xODYuNSAzLjE4Ni41LTMuMTg2LjUtMy4xODZ6Ii8+PC9zdmc+'} />
                 <div className={cls['indicator']} style={{}}></div>
               </a>
@@ -283,7 +302,7 @@ const ToolBar: React.FC<IProps> = ({ current,handClick }: IProps) => {
           </Dropdown>
           <Dropdown menu={{ items }}>
             <div className={cls['color-dropdown']}>
-              <a className={cls['icon-a']} title="字体颜色" onClick={setTextDecoration}>
+              <a className={cls['icon-a']} title="字体颜色" onClick={setColor}>
                 <div className={cls['icon-x']}>A</div>
                 <div className={cls['indicator']} style={{}}></div>
               </a>
@@ -302,6 +321,7 @@ const ToolBar: React.FC<IProps> = ({ current,handClick }: IProps) => {
                     key={align.value}
                     className={classDefault.includes(align.className)? cls['icon-action']:cls['icon-action']}
                     title={align.label}
+                    onClick={()=>setClassName(align.className)}
                   >
                     <img className={cls['spreadsheet-icon']} src={align.icon} />
                   </a>
@@ -315,6 +335,7 @@ const ToolBar: React.FC<IProps> = ({ current,handClick }: IProps) => {
                     key={align.value}
                     className={classDefault.includes(align.className)? cls['icon-action']:cls['icon-action']}
                     title={align.label}
+                    onClick={()=>setClassName(align.className)}
                   >
                     <img className={cls['spreadsheet-icon']} src={align.icon} />
                   </a>
@@ -393,9 +414,7 @@ const ToolBar: React.FC<IProps> = ({ current,handClick }: IProps) => {
           <Button
             key="edit"
             type="link"
-            onClick={() => {
-              setModalType('新增特性');
-            }}>
+            onClick={setModalType}>
             插入特性
           </Button>
         </div>
@@ -403,7 +422,7 @@ const ToolBar: React.FC<IProps> = ({ current,handClick }: IProps) => {
         <div className={cls['flex-box-title']}>特性</div>
       </div>
 
-      {
+      {/* {
         modalType=='新增特性'?
         <Modal
           open
@@ -411,7 +430,7 @@ const ToolBar: React.FC<IProps> = ({ current,handClick }: IProps) => {
           title="选择属性"
           destroyOnClose
           okText="确定"
-          onOk={() => {setModalType(''),reportChange(saveData),console.log(saveData)}}
+          onOk={() => {setModalType(''),saveSpeciality}}
           onCancel={() => setModalType('')}>
           <SelectPropertys
             target={current.directory.target}
@@ -441,7 +460,7 @@ const ToolBar: React.FC<IProps> = ({ current,handClick }: IProps) => {
             }}
           />
         </Modal>:''
-      }      
+      }       */}
     </div>
   );
 };

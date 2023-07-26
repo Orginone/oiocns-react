@@ -14,7 +14,6 @@ interface IProps {
   finished: () => void;
 }
 const ReportModal: React.FC<IProps> = ({ current, finished }: IProps) => {
-  console.log(current,'current')
   const [modalType, setModalType] = useState<string>('');
   const [tabKey, setTabKey] = useState<string>('attr');
   /** 操作按钮 */
