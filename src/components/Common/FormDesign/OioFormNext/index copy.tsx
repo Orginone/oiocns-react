@@ -1,13 +1,14 @@
 import { ProForm } from '@ant-design/pro-components';
 import { Descriptions } from 'antd';
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import OioFormItem from './FormItems';
 import { IBelong } from '@/ts/core';
 import cls from './index.module.less';
 import { model, schema } from '@/ts/base';
 import { ImInfo } from 'react-icons/im';
+import FormRules from '@/ts/core/work/rules/formRules';
 type IProps = {
-  form: schema.XForm;
+  form: schema.XForm & { ruleServices?: any };
   fields: model.FieldModel[];
   belong: IBelong;
   submitter?: any;
@@ -17,7 +18,11 @@ type IProps = {
   formRef?: any;
   disabled?: boolean;
   showTitle?: boolean;
+  useformRule?: boolean;
 };
+interface DataType {
+  [key: string]: any;
+}
 /**
  * 资产共享云表单
  */
@@ -32,11 +37,28 @@ const OioForm: React.FC<IProps> = ({
   formRef = useRef(),
   disabled,
   showTitle,
+  useformRule = false,
 }) => {
   if (fields.length < 1) return <></>;
-  const { col: configCol = 8, layout: configLayout = 'horizontal' } = JSON.parse(
-    form.rule ?? '{}',
-  );
+  const {
+    col: configCol = 8,
+    layout: configLayout = 'horizontal',
+    list: configRules,
+  } = JSON.parse(form.rule ?? '{}');
+  useEffect(() => {
+    if (!useformRule || form.ruleServices) {
+      return;
+    }
+    form.ruleServices = new FormRules(configRules, form.belongId);
+    form?.ruleServices?.subscribe(() => {
+      form?.ruleServices?.renderRules('Start', {}, fields, (data: DataType) => {
+        /* 设置表单数据 */
+        formRef?.current?.setFieldsValue(data);
+        /* 弹出数据 */
+        onValuesChange && onValuesChange({}, data);
+      });
+    });
+  }, [form, useformRule]);
 
   const colNum = 24 / configCol; //单行展示数量 默认3
   if (fieldsValue) {
@@ -79,6 +101,10 @@ const OioForm: React.FC<IProps> = ({
           onFinished?.call(this, values);
         }}
         onValuesChange={(val, vals) => {
+          form?.ruleServices?.renderRules('Running', vals, fields, (data: DataType) => {
+            formRef?.current?.setFieldsValue(data);
+            onValuesChange && onValuesChange(val, data);
+          });
           onValuesChange && onValuesChange(val, vals);
         }}
         layout={configLayout}

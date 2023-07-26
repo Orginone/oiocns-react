@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { ProFormInstance } from '@ant-design/pro-components';
-import DefaultRules from '@/ts/core/work/rules/base/rules.json';
+import DefaultRules from '@/ts/core/work/rules/lib/rules.json';
 import SchemaForm from '@/components/SchemaForm';
 import { IForm } from '@/ts/core';
 import { XFormRule } from '@/ts/base/schema';
@@ -42,15 +42,13 @@ const FormRuleModal = (props: Iprops) => {
             errMsg: info.errorMsg,
             remark: info.remark,
             targetId: info.targetId,
-            linkAttrs: info.linkAttrs.map(
-              (it: { val: string; name: string; id: string }) => {
-                return {
-                  val: it.val,
-                  id: it.id,
-                  name: it.name,
-                };
-              },
-            ),
+            linkAttrs: info.linkAttrs.map((it: any) => {
+              return {
+                val: it.val,
+                id: it.id,
+                name: it.name,
+              };
+            }),
           });
         }
         break;

@@ -1,11 +1,11 @@
-import RuleBase, { IRuleBaseType } from '../base/ruleBase';
-import { getChartcterContent, findKeyWidthName } from '../tools';
+import RuleBase, { IRuleBase } from '../base/ruleBase';
+import { getChartcterContent, findKeyWidthName } from '../lib/tools';
 import replaceString from './replaceStr';
 /**
  *@desc 规定 公式取值必须使用「」作为中文字包裹特殊字符
  */
 
-interface FormulaRuleType extends IRuleBaseType {}
+interface FormulaRuleType extends IRuleBase {}
 class FormulaRule extends RuleBase implements FormulaRuleType {
   constructor(data: any) {
     super(data);
