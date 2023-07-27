@@ -139,9 +139,10 @@ const Design: React.FC<IProps> = ({ current }) => {
     const { metadata: { rule } } = currentValue;
     const rules = rule ? JSON.parse(rule) : {};
     //如果配置过
-    if(rules){
+    if(rules && JSON.stringify(rules) !== '{}' ){
       return rules.schema;
-    }else{
+    }
+    else{
       //没有配置过
       const schema: schemaType = {
         displayType: 'row',
@@ -186,8 +187,6 @@ const Design: React.FC<IProps> = ({ current }) => {
       schema.properties = {
         ...result,
       };
-  
-      
       const { col } = rules;
       schema.column = col === 24 ? 1 : col === 12 ? 2 : col === 8 ? 3 : 1;
       return schema;
