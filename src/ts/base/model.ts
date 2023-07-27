@@ -562,7 +562,8 @@ export type InstanceDataModel = {
   primary: {
     /** 特性id */
     [id: string]: any
-  }
+  };
+  formRules?:any
 }
 
 export type FieldModel = {

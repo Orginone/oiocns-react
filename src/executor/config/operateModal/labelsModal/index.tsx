@@ -4,6 +4,7 @@ import FormDesign from '@/components/Common/FormDesign';
 import cls from './index.module.less';
 import PageCard from '@/components/PageCard';
 import Attribute from './Attritube';
+import FormRules from './formRules';
 import { IForm } from '@/ts/core';
 import FullScreenModal from '@/executor/tools/fullScreen';
 import EntityInfo from '@/components/Common/EntityInfo';
@@ -28,6 +29,17 @@ const LabelModl: React.FC<IProps> = ({ current, finished }: IProps) => {
           新增特性
         </Button>
       );
+    } else if (!current.isInherited && tabKey === 'rule') {
+      return (
+        <Button
+          key="rules"
+          type="link"
+          onClick={() => {
+            setModalType('新增规则');
+          }}>
+          新增规则
+        </Button>
+      );
     }
     return <></>;
   };
@@ -40,6 +52,16 @@ const LabelModl: React.FC<IProps> = ({ current, finished }: IProps) => {
           modalType={modalType}
           recursionOrg={true}
           setModalType={setModalType}
+        />
+      );
+    }
+    if (tabKey === 'rule') {
+      return (
+        <FormRules
+          current={current}
+          setModalType={setModalType}
+          modalType={modalType}
+          recursionOrg={false}
         />
       );
     }
@@ -70,6 +92,11 @@ const LabelModl: React.FC<IProps> = ({ current, finished }: IProps) => {
                 tab: current.typeName + '设计',
                 key: 'form',
                 disabled: current.directory.isInherited,
+              },
+              {
+                tab: current.typeName + '规则',
+                key: 'rule',
+                // disabled: current.directory.isInherited,
               },
             ]}
             activeTabKey={tabKey}

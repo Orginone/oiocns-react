@@ -3,15 +3,16 @@ import { kernel, model, schema } from '../../../ts/base';
 import { IBelong } from '@/ts/core';
 import { useEffect, useState } from 'react';
 import React from 'react';
-import { Tabs } from 'antd';
-
+import { Tabs,Button } from 'antd';
+import FormRender, { useForm } from 'form-render';
 interface IProps {
   allowEdit: boolean;
   belong: IBelong;
   forms: schema.XForm[];
   data: model.InstanceDataModel;
+  useformRule?: boolean;
   getFormData: (id: string) => model.FormEditData;
-  onChanged?: (id: string, data: model.FormEditData) => void;
+  onChanged?: (id: string, data: model.FormEditData, changedData?: Object) => void;
 }
 
 const PrimaryForm: React.FC<IProps> = (props) => {
@@ -47,14 +48,14 @@ const PrimaryForm: React.FC<IProps> = (props) => {
         },
         render: (_: any, _dom: any) => <></>,
       }}
-      onValuesChange={(a) => {
+      onValuesChange={(_val, vals) => {
         if (props.allowEdit) {
-          Object.keys(a).forEach((k) => {
-            data[k] = a[k];
-            props.data.primary[k] = a[k];
+          Object.keys(vals).forEach((k) => {
+            data[k] = vals[k];
+            props.data.primary[k] = vals[k];
           });
           formData.after = [data];
-          props.onChanged?.apply(this, [form.id, formData]);
+          props.onChanged?.apply(this, [form.id, formData, _val]);
           setData({ ...data });
         }
       }}
@@ -62,25 +63,4 @@ const PrimaryForm: React.FC<IProps> = (props) => {
   );
 };
 
-const PrimaryForms: React.FC<IProps> = (props) => {
-  if (props.forms.length < 1) return <></>;
-  const [activeTabKey, setActiveTabKey] = useState(props.forms[0].id);
-  const loadItems = () => {
-    return props.forms.map((form) => {
-      return {
-        key: form.id,
-        label: form.name,
-        children: <PrimaryForm {...props} forms={[form]} />,
-      };
-    });
-  };
-  return (
-    <Tabs
-      items={loadItems()}
-      activeKey={activeTabKey}
-      onChange={(key) => setActiveTabKey(key)}
-    />
-  );
-};
-
-export default PrimaryForms;
+export default PrimaryForm;

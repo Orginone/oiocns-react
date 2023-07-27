@@ -18,7 +18,6 @@ type IProps = {
   disabled?: boolean;
   showTitle?: boolean;
 };
-
 /**
  * 资产共享云表单
  */
@@ -35,7 +34,11 @@ const OioForm: React.FC<IProps> = ({
   showTitle,
 }) => {
   if (fields.length < 1) return <></>;
-  let config: any = form.rule ? JSON.parse(form.rule) : { col: 8, layout: 'horizontal' };
+  const { col: configCol = 8, layout: configLayout = 'horizontal' } = JSON.parse(
+    form.rule ?? '{}',
+  );
+
+  const colNum = 24 / configCol; //单行展示数量 默认3
   if (fieldsValue) {
     formRef?.current?.setFieldsValue(fieldsValue);
   }
@@ -75,27 +78,38 @@ const OioForm: React.FC<IProps> = ({
           await formRef.current?.validateFields();
           onFinished?.call(this, values);
         }}
-        onValuesChange={onValuesChange}
-        layout={config.layout}
+        onValuesChange={(val, vals) => {
+          onValuesChange && onValuesChange(val, vals);
+        }}
+        layout={configLayout}
         labelAlign="left">
         <Descriptions
           bordered
           size="small"
           className={cls.formRow}
-          column={3}
-          labelStyle={{ minWidth: '120px', textAlign: 'right' }}>
+          column={colNum}
+          labelStyle={{ minWidth: '200px', textAlign: 'right' }}>
           {fields.map((field) => {
+            //增加对必填，隐藏的展示响应
+            const { required = false, hidden = false } = JSON.parse(field.rule ?? '{}');
+            if (hidden) {
+              return <></>;
+            }
             return (
               <Descriptions.Item
                 key={field.id}
                 span={1}
+                style={{ padding: '2px 10px' }}
                 label={
-                  <div style={{ cursor: 'pointer' }} title={field.remark}>
+                  <div
+                    style={{ cursor: 'pointer' }}
+                    title={field.remark}
+                    className={required ? cls.Required : ''}>
                     <span style={{ marginRight: 6 }}>{field.name}</span>
                     {field.remark && field.remark.length > 0 && <ImInfo />}
                   </div>
                 }
-                contentStyle={{ width: '33%' }}>
+                contentStyle={{ width: `${100 / colNum}%` }}>
                 <OioFormItem
                   field={field}
                   belong={belong}

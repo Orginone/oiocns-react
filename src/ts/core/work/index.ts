@@ -4,7 +4,7 @@ import { IForm, Form } from '../thing/form';
 import { FileInfo, IFileInfo } from '../thing/fileinfo';
 import { IDirectory } from '../thing/directory';
 import { IWorkApply, WorkApply } from './apply';
-
+import WorkFormRules from './rules/workFormRules';
 export interface IWork extends IFileInfo<schema.XWorkDefine> {
   /** 流程关联的表单 */
   forms: IForm[];
@@ -176,10 +176,14 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
         allowAdd: this.metadata.allowAdd,
         allowEdit: this.metadata.allowEdit,
         allowSelect: this.metadata.allowSelect,
+        formRules: new WorkFormRules(this.forms, 'belongId'),
       };
+      console.log(333, data, this.forms);
+
       this.forms.forEach((form) => {
         data.fields[form.id] = form.fields;
       });
+
       return new WorkApply(
         {
           hook: '',

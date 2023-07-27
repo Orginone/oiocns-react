@@ -3,7 +3,7 @@ import OioForm from '@/components/Common/FormDesign/OioFormNext';
 import React from 'react';
 import { kernel, model, schema } from '@/ts/base';
 import { IBelong } from '@/ts/core';
-
+import FormPreview2 from '../workForm/primaryCopy'
 interface IFormEditProps {
   form: schema.XForm;
   fields: model.FieldModel[];
@@ -22,6 +22,8 @@ const FormEditModal = ({
   onSave,
 }: IFormEditProps) => {
   const editData: any = {};
+ 
+  const rule = form.rule && JSON.parse(form.rule);
   const modal = Modal.confirm({
     icon: <></>,
     width: '80vw',
@@ -29,22 +31,27 @@ const FormEditModal = ({
     cancelText: '关闭',
     onCancel: () => modal.destroy(),
     content: (
-      <OioForm
-        showTitle
-        form={form}
-        fields={fields}
-        belong={belong}
-        fieldsValue={initialValues || {}}
-        onValuesChange={(_, values) => {
-          Object.keys(values).forEach((k) => {
-            editData[k] = values[k];
-          });
-        }}
-      />
+      <>
+        <OioForm
+          showTitle
+          form={form}
+          fields={fields}
+          belong={belong}
+          fieldsValue={initialValues || {}}
+          onValuesChange={(_, values) => {
+            Object.keys(values).forEach((k) => {
+              editData[k] = values[k];
+            });
+          }}
+        />
+       <FormPreview2 forms={form}  />
+      </>
+      
     ),
     onOk: () => {
       if (create) {
         kernel.anystore.createThing(belong.userId, '').then((res) => {
+          debugger;
           if (res.success && res.data) {
             onSave({ ...res.data, ...editData });
             modal.destroy();

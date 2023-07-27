@@ -5,6 +5,7 @@ import WorkForm from '@/executor/tools/workForm';
 import FullScreenModal from '@/executor/tools/fullScreen';
 import { IWorkApply } from '@/ts/core';
 import { model } from '@/ts/base';
+import { DataType } from 'typings/globelType';
 // 卡片渲染
 interface IProps {
   current: IWork;
@@ -24,6 +25,12 @@ const WorkStartDo: React.FC<IProps> = ({ current, finished }) => {
     });
   }, [current]);
   if (!apply) return <></>;
+  function resolveFormChange(id: string, data: DataType, _changedData?: DataType) {
+    formData.set(id, data as any);
+    console.log('表单变化打印', id, data, _changedData);
+    apply!.instanceData.formRules.resloveFormRule('Start', { id, data: data.after });
+    apply!.instanceData.formRules.resloveFormRule('Running', { id, data: data.after });
+  }
   return (
     <>
       <FullScreenModal
@@ -41,8 +48,10 @@ const WorkStartDo: React.FC<IProps> = ({ current, finished }) => {
           belong={apply.belong}
           data={apply.instanceData}
           nodeId={apply.instanceData.node.id}
-          onChanged={(id, data) => {
+          formRule={apply.instanceData?.formRules}
+          onChanged={(id, data, changedData) => {
             formData.set(id, data);
+            resolveFormChange(id, data, changedData);
           }}
         />
         <div style={{ padding: 10, display: 'flex', alignItems: 'flex-end' }}>
@@ -56,8 +65,10 @@ const WorkStartDo: React.FC<IProps> = ({ current, finished }) => {
           <Button
             type="primary"
             onClick={() => {
-              apply.createApply(apply.belong.id, info.content, formData);
-              finished();
+              console.log('提交打印所有规则', apply.instanceData.formRules);
+
+              // apply.createApply(apply.belong.id, info.content, formData);
+              // finished();
             }}>
             提交
           </Button>

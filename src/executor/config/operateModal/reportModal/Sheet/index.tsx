@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import CardOrTable from '@/components/CardOrTableComp';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
-import { IForm } from '@/ts/core';
+import { IReport } from '@/ts/core';
 import { ProColumns } from '@ant-design/pro-components';
 import SchemaForm from '@/components/SchemaForm';
 import ReportView from '@/executor/data/open/report';
 
 interface IProps {
-  current: IForm;
+  current: IReport;
   modalType: string;
   recursionOrg: boolean;
   setModalType: (modalType: string) => void;
