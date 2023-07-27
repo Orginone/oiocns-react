@@ -62,58 +62,5 @@ const PrimaryForm: React.FC<IProps> = (props) => {
     />
   );
 };
-const FormPreview: React.FC<IProps> = (props) => {
-  const formIns:any = useForm();
-  const onFinish = (formData:any, errors:any) => {
-    console.log('formData:', formData, 'errors', errors);
-  };
-  if (props.forms.length < 1) return <></>;
-  const [activeTabKey, setActiveTabKey] = useState(props.forms[0].id);
-  // const loadItems = () => {
-  //   return props.forms.map((form) => {
-  //     return {
-  //       key: form.id,
-  //       label: form.name,
-  //       children: <FormRender {...props} forms={[form]} />,
-  //     };
-  //   });
-  // };
 
-  return (
-    props.forms.map((formResult) => {
-      const rule = formResult.rule && JSON.parse(formResult.rule);
-      if(rule.schema){
-        return <div>
-            <FormRender form={formIns} schema={rule.schema} onFinish={onFinish}/>
-            <Button type="primary" onClick={formIns.submit}>
-              提交
-            </Button>
-        </div>
-      }
-    })
-  );
-};
-
-// const PrimaryForms: React.FC<IProps> = (props) => {
-
-//   if (props.forms.length < 1) return <></>;
-//   const [activeTabKey, setActiveTabKey] = useState(props.forms[0].id);
-//   const loadItems = () => {
-//     return props.forms.map((form) => {
-//       return {
-//         key: form.id,
-//         label: form.name,
-//         children: <FormRender {...props} forms={[form]} />,
-//       };
-//     });
-//   };
-//   return (
-//     <Tabs
-//       items={loadItems()}
-//       activeKey={activeTabKey}
-//       onChange={(key) => setActiveTabKey(key)}
-//     />
-//   );
-// };
-
-export default FormPreview;
+export default PrimaryForm;
