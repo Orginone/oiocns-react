@@ -1,12 +1,13 @@
 import ImageView from './image';
 import VideoView from './video';
 import { IEntity, ISysFileInfo } from '@/ts/core';
-import { command, model, schema } from '@/ts/base';
+import { command, schema } from '@/ts/base';
 import React from 'react';
 import FormView from './form';
 import WorkStart from './work';
 import OfficeView from './office';
-import MyMdEditor from './MdEditor';
+import MarkdownView from "@/executor/data/open/markdown";
+import MyMdEditor from "@/executor/data/open/MdEditor";
 import CodeEditor from './CodeEditor';
 
 const officeExt = ['.pdf', '.xls', '.xlsx', '.doc', '.docx', '.ppt', '.pptx'];
@@ -29,6 +30,12 @@ const ExecutorOpen: React.FC<IOpenProps> = (props: IOpenProps) => {
     ) {
       return <VideoView share={data} finished={props.finished} />;
     }
+    // if (data?.extension === '.md') {
+    //   return <MarkdownView share={data} finished={props.finished}></MarkdownView>;
+    // }
+    if (props.entity.typeName.startsWith('text')) {
+      return <MyMdEditor finished={props.finished} form={props.entity} />;
+    }
     if (officeExt.includes(data.extension ?? '-')) {
       return <OfficeView share={data} finished={props.finished} />;
     }
@@ -39,35 +46,27 @@ const ExecutorOpen: React.FC<IOpenProps> = (props: IOpenProps) => {
         return <FormView form={props.entity as any} finished={props.finished} />;
       case '办事':
         return <WorkStart current={props.entity as any} finished={props.finished} />;
+      case '目录':
+        if(props.cmd === 'openFolderWithEditor'){
+          return (
+            <CodeEditor
+            isProject={props.entity.typeName === '目录'}
+            finished={props.finished}
+            form={props.entity}
+            supportFiles={[
+              '.vue',
+              '.tsx',
+              '.jsx',
+              '.js',
+              '.json',
+              '.html',
+              '.java',
+            ]}></CodeEditor>
+          )
+        }
     }
     command.emitter('config', props.cmd, props.entity);
   }
-  if (props.entity.typeName.startsWith('text')) {
-    return <MyMdEditor finished={props.finished} form={props.entity} />;
-  }
-    if (
-    (props.entity.typeName === '目录' && props.cmd === 'openFolderWithEditor') ||
-    ['.vue', '.tsx', '.jsx', '.js', '.json', '.html', '.java'].find(
-      (m) => m === props.entity.share.avatar?.extension,
-    )
-  ) {
-    return (
-      <CodeEditor
-        isProject={props.entity.typeName === '目录'}
-        finished={props.finished}
-        form={props.entity}
-        supportFiles={[
-          '.vue',
-          '.tsx',
-          '.jsx',
-          '.js',
-          '.json',
-          '.html',
-          '.java',
-        ]}></CodeEditor>
-    );
-  }
-  command.emitter('config', props.cmd, props.entity);
   return <></>;
 };
 

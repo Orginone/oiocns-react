@@ -46,31 +46,6 @@ const DetailTable: React.FC<IProps> = (props) => {
         visible: true,
         items: [
           {
-            name: 'edit',
-            location: 'after',
-            widget: 'dxButton',
-            options: {
-              text: '创建仓库',
-              icon: 'edit',
-              onClick: () => {
-                console.log(formData,selectKeys);
-                EditModal.SoftEditModal({
-                  form: form,
-                  fields: fields,
-                  belong: props.belong,
-                  create:true,
-                  formData:formData,
-                  selectKeys:selectKeys,
-                  onSave: (values) => {
-                    formData.after.push(values);
-                    setFormData({ ...formData });
-                  },
-                });
-              },
-            },
-            visible:selectKeys.length > 0&&props.forms[0].id=="465120285687943168",
-          },
-          {
             name: 'add',
             location: 'after',
             widget: 'dxButton',

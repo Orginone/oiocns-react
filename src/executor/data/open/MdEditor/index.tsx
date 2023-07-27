@@ -95,7 +95,7 @@ const MyMdEditor: React.FC<IProps> = ({finished,form}) => {
     onCancel={() =>{ finished();saveFile();}}>
       <MdEditor
       placeholder="请输入Markdown文本"
-      height={'700px'}
+      height={'420px'}
       lineNum={0}
       toolbar={toolbar}
       value={mdContent}

@@ -98,14 +98,14 @@ const CodeEditor = ({ finished, form, supportFiles, isProject }: IProps) => {
   const initTreeData = (data, _treeData) => {
     data.children.forEach((m: any) => {
       _treeData.push({
-        key: m.name,
+        key: m.key,
         title: m.name,
         directory: m,
       });
     });
     data.files.forEach((m: any) => {
       _treeData.push({
-        key: m.name,
+        key: m.key,
         title: m.name,
         isLeaf: true,
         file: m,
