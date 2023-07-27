@@ -138,11 +138,11 @@ const Design: React.FC<IProps> = ({ current }) => {
   const currentToSchemaFun = (currentValue: IForm) => {
     const { metadata: { rule } } = currentValue;
     const rules = rule ? JSON.parse(rule) : {};
-    
-    // if(rules){
-    //   console.log('$$$',rules.schema)
-    //   return rules.schema;
-    // }else{
+    //如果配置过
+    if(rules){
+      return rules.schema;
+    }else{
+      //没有配置过
       const schema: schemaType = {
         displayType: 'row',
         type: 'object',
@@ -191,7 +191,7 @@ const Design: React.FC<IProps> = ({ current }) => {
       const { col } = rules;
       schema.column = col === 24 ? 1 : col === 12 ? 2 : col === 8 ? 3 : 1;
       return schema;
-    // }
+    }
    
   }
   return (

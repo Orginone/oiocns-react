@@ -65,16 +65,14 @@ const FormEditModal: React.FC<IProps> = ({ current, finished, defaultSchema, edi
   //   <button onClick={() => onChange(value + 1)}>{value}</button>
   // );
   const onSchemaChange = (e: schemaType) => {
-    
+    const ruleInfo = JSON.parse(current.metadata.rule || '{}');
     current.update({
       ...current.metadata,
       rule: JSON.stringify({
+        ...ruleInfo,
         schema: e,
       }),
     });
-   
-
-    //window.localStorage.setItem('schema', JSON.stringify(e));
   }
   const onCanvasSelect = (e: any) => {
     if (JSON.stringify(e) !== '{}')
