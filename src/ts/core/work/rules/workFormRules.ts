@@ -54,19 +54,19 @@ class WorkFormRules extends Emitter {
     this._beloneId = beloneId;
     this.initRules(forms);
   }
+  /* 当前主表id */
   public currentMainFormId: string = '';
-
+  // 是否所有规则都已加载完毕
+  public isReady: boolean = false;
   // 办事归属权
   private _beloneId: string;
-
   // 所有表单规则
   private _AllFormRules: Map<string, MapType> = new Map([]);
   // // 所有表单id，对应的主子表信息
   // private _FormIdtoType: Map<string, string> = new Map([]);
-  // 是否所有规则都已加载完毕
-  public isReady: boolean = false;
+  /* 当前办事所有表单数据 */
   private _formNow: Map<string, { after: DataType[] }> = new Map([]);
-
+  /* 设置当前办事已修改的所有信息 */
   public set formNow(data: any) {
     this._formNow = data;
   }
