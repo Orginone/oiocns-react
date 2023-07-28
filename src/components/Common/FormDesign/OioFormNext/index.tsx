@@ -45,7 +45,7 @@ const OioForm: React.FC<IProps> = ({
     formRef?.current?.setFieldsValue(fieldsValue);
   }
   useEffect(() => {
-    console.log('设置表单赋值回调', formRef.current);
+    /* 向规则服务里，加入修改表单数值的回调方法 */
     ruseService?.setFormCallback(form.id, (data: any) => {
       onValuesChange && onValuesChange({}, data);
       formRef?.current?.setFieldsValue(data);
