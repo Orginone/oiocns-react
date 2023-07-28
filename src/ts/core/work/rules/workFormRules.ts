@@ -8,6 +8,7 @@ import { IRuleBase } from './base/ruleBase';
 import { debounce } from '@/utils/tools';
 import { DataType } from 'typings/globelType';
 import { filterRules } from './lib/tools';
+import * as Tools from './lib';
 
 // 定义规则类型常量，方便代码维护
 const RuleType = {
@@ -20,6 +21,7 @@ export type WorkFormRulesType = {
   isReady: boolean;
   _beloneId: string;
   _AllFormRules: Map<string, { rules: IRuleBase[]; attrs: any[] }>;
+  currentMainFormId?: string;
   initRules: (forms: any[]) => void;
   setFormCallback: (formId: string, callBack: (data: any) => void) => void;
   loadRemoteRules: (forms: any[]) => void;
@@ -38,30 +40,38 @@ export type WorkFormRulesType = {
 type MapType = { rules: IRuleBase[]; attrs: any[]; callback?: (data: DataType) => void };
 
 class WorkFormRules extends Emitter {
-  constructor(forms: any[], beloneId: string) {
+  constructor(forms: DataType[], beloneId: string) {
     super();
     this._beloneId = beloneId;
     this.initRules(forms);
   }
+  public currentMainFormId: string = '';
 
   // 办事归属权
   private _beloneId: string;
 
   // 所有表单规则
   private _AllFormRules: Map<string, MapType> = new Map([]);
-
+  // // 所有表单id，对应的主子表信息
+  // private _FormIdtoType: Map<string, string> = new Map([]);
   // 是否所有规则都已加载完毕
   public isReady: boolean = false;
+  private _formNow: Map<string, { after: DataType[] }> = new Map([]);
+
+  public set formNow(data: any) {
+    console.log('3333', data, Tools.sum([1, 2, 3]));
+
+    this._formNow = data;
+  }
 
   // 初始化表单规则
   private initRules = async (forms: any[]) => {
     let count = 0;
     console.log(8888, forms);
-    //TODO:区分主子表
     // 遍历每个表单，获取其中的规则
     for (const formItem of forms) {
       const { list: ruleList = [] } = JSON.parse(formItem.metadata?.rule ?? '{}');
-
+      // this._FormIdtoType.set(formItem.id, formItem.typeName);
       // 将表单的规则存入 _AllFormRules 中
       this._AllFormRules.set(formItem.id, {
         rules: await this.setFormRules(ruleList),
@@ -130,15 +140,22 @@ class WorkFormRules extends Emitter {
       changeObj?: DataType | 'all',
     ) => {
       const { id, data } = formData;
+      const _formId = trigger == 'ThingsChanged' ? this.currentMainFormId : id;
 
       // 如果 _AllFormRules 中存在这个表单的规则，则取出该表单的规则进行处理
-      if (this._AllFormRules.has(id)) {
-        const _info: MapType = this._AllFormRules.get(id)!;
-
+      if (this._AllFormRules.has(_formId)) {
+        const _info: MapType = this._AllFormRules.get(_formId)!;
         // 执行该表单的所有规则，并将规则返回的数据保存到 resultObj 中
+        let params: any = {
+          data: data,
+          attrs: _info.attrs,
+        };
+        if (trigger == 'ThingsChanged') {
+          params['things'] = this._formNow.get(id)?.after;
+        }
         const resultObj = await this.renderRules(
           filterRules(_info.rules, trigger, changeObj),
-          { data: data, attrs: _info.attrs },
+          params,
         );
 
         // 如果该表单设置了回调函数，则调用回调函数将数据传递给页面
@@ -146,10 +163,11 @@ class WorkFormRules extends Emitter {
 
         // 如果该表单没有设置回调函数，则输出错误信息
         if (!_info.callback) {
-          console.error('未设置回调函数：' + id);
+          console.error('未设置回调函数：' + _formId);
         }
+        /* 若初始化结束，需执行一次运行态规则 */
         if (trigger == 'Start') {
-          this.resloveFormRule('Running', { id, data: resultObj }, 'all');
+          this.resloveFormRule('Running', { id: _formId, data: resultObj }, 'all');
         }
       }
     },
@@ -164,7 +182,11 @@ class WorkFormRules extends Emitter {
    */
   private async renderRules(
     Rules: any[],
-    formData: { attrs: RuleTypes.DataType[]; data: RuleTypes.DataType },
+    formData: {
+      attrs: RuleTypes.DataType[];
+      data: RuleTypes.DataType;
+      things?: DataType[];
+    },
   ) {
     let resultObj = {};
 
@@ -176,11 +198,12 @@ class WorkFormRules extends Emitter {
           let res = await _R.dealRule({
             $formData: formData.data,
             $attrs: formData.attrs,
+            $things: formData?.things ?? [],
             $company:
               OrgCtrl.user.companys.find((v) => v.id === this._beloneId)?.metadata ?? {},
             $user: OrgCtrl.user.metadata,
+            tools: Tools,
           });
-
           // 如果规则执行成功，则将规则返回的数据合并到 resultObj 中
           if (res.success) {
             resultObj = { ...resultObj, ...res.data };

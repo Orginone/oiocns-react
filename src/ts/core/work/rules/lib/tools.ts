@@ -50,6 +50,7 @@ function filterRules(
 
   switch (trigger) {
     case 'Start':
+    case 'ThingsChanged':
       willResloveRules = rules.filter((item) => item.trigger === trigger);
       break;
     case 'Running':
@@ -62,21 +63,16 @@ function filterRules(
         willResloveRules = rules.filter((item) => {
           if (changeId === '0') {
             return item.trigger === trigger;
-          }
-          if (changeId) {
+          } else {
             return (
               item.linkAttrs.some((v) => v.id === changeId) && item.trigger === trigger
             );
           }
-          return false;
         });
       }
       break;
     case 'Submit':
       break;
-    case 'ThingsChanged':
-      break;
-
     default:
       break;
   }

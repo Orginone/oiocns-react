@@ -3,7 +3,7 @@ import { kernel, model, schema } from '../../../ts/base';
 import { IBelong } from '@/ts/core';
 import { useEffect, useState } from 'react';
 import React from 'react';
-import { Tabs,Button } from 'antd';
+import { Tabs, Button } from 'antd';
 import FormRender, { useForm } from 'form-render';
 import { WorkFormRulesType } from '@/ts/core/work/rules/workFormRules';
 interface IProps {
@@ -33,6 +33,7 @@ const PrimaryForm: React.FC<IProps> = (props) => {
         }
       });
     }
+    props?.formRule && (props.formRule.currentMainFormId = form.id);
   }, []);
   if (!data) return <></>;
   return (

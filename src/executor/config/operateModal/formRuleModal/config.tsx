@@ -10,6 +10,7 @@ export const trigger: { [key: string]: string } = {
   Start: '初始化', //首次加载表单时触发
   Running: '运行时', //依赖项变更时触发
   Submit: '提交时', //表单提交时触发
+  ThingsChanged: '子表变化', //表单提交时触发
 };
 export const FormRuleType: { [key: string]: string } = {
   formula: '公式', //计算相关
