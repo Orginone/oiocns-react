@@ -1,6 +1,6 @@
 import { ProForm } from '@ant-design/pro-components';
 import { Descriptions } from 'antd';
-import React, { useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import OioFormItem from './FormItems';
 import { IBelong } from '@/ts/core';
 import cls from './index.module.less';
@@ -17,6 +17,7 @@ type IProps = {
   formRef?: any;
   disabled?: boolean;
   showTitle?: boolean;
+  ruseService?: any;
 };
 /**
  * 资产共享云表单
@@ -26,6 +27,7 @@ const OioForm: React.FC<IProps> = ({
   fields,
   belong,
   submitter,
+  ruseService,
   onValuesChange,
   onFinished,
   fieldsValue,
@@ -42,6 +44,13 @@ const OioForm: React.FC<IProps> = ({
   if (fieldsValue) {
     formRef?.current?.setFieldsValue(fieldsValue);
   }
+  useEffect(() => {
+    console.log('设置表单赋值回调', formRef.current);
+    ruseService?.setFormCallback(form.id, (data: any) => {
+      onValuesChange && onValuesChange({}, data);
+      formRef?.current?.setFieldsValue(data);
+    });
+  }, [form.id]);
   return (
     <>
       {showTitle && (
@@ -79,6 +88,7 @@ const OioForm: React.FC<IProps> = ({
           onFinished?.call(this, values);
         }}
         onValuesChange={(val, vals) => {
+          ruseService?.resloveFormRule('Running', { id: form.id, data: vals }, val);
           onValuesChange && onValuesChange(val, vals);
         }}
         layout={configLayout}
