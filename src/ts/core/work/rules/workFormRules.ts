@@ -18,18 +18,27 @@ const RuleType = {
 
 // 定义表单规则的类型
 export type WorkFormRulesType = {
+  /* 办事规则是否处理完成 */
   isReady: boolean;
+  /* 办事归属权 */
   _beloneId: string;
+  /* 收集办事表单的规则 */
   _AllFormRules: Map<string, { rules: IRuleBase[]; attrs: any[] }>;
+  /* 当前选中 主表的id标识 */
   currentMainFormId?: string;
+  /* 初始化规则*/
   initRules: (forms: any[]) => void;
+  /* 表单渲染时，需提交表单修改方式 至此，用于规则处理后的回显*/
   setFormCallback: (formId: string, callBack: (data: any) => void) => void;
+  /* 加载表单远程规则*/
   loadRemoteRules: (forms: any[]) => void;
+  /* 处理表单规则，需提供表单标识，表单数据，当前修改数据等*/
   resloveFormRule: (
     trigger: RuleTypes.TriggerType,
     formData: { id: string; data: RuleTypes.DataType },
     changeObj?: DataType, //变动项
   ) => void;
+  /* 执行筛选后的某一类规则，返回最终数据*/
   renderRules: (
     Rules: any[],
     formData: { attrs: RuleTypes.DataType[]; data: RuleTypes.DataType },
