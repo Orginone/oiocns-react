@@ -1,11 +1,11 @@
 // import { Col, Row, Select } from 'antd';
-import React, { useEffect, useState,useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 // import cls from './index.module.less';
 import FullScreenModal from '@/executor/tools/fullScreen';
 import { IForm } from '@/ts/core';
 import Generator, {
-  defaultCommonSettings,
-  defaultGlobalSettings,
+  // defaultCommonSettings,
+  // defaultGlobalSettings,
   defaultSettings,
 } from 'fr-generator';
 // const { Provider, Sidebar, Canvas, Settings } = Generator;
@@ -21,6 +21,7 @@ import {
 import {
   schemaType
 } from '@/ts/base/schema';
+import { defaultCommonSettings } from './setting.js';
 type IProps = {
   current: IForm;
   finished: () => void;
@@ -65,28 +66,28 @@ const FormEditModal: React.FC<IProps> = ({ current, finished, defaultSchema, edi
   //   <button onClick={() => onChange(value + 1)}>{value}</button>
   // );
   const onSchemaChange = (e: schemaType) => {
-    
+    const ruleInfo = JSON.parse(current.metadata.rule || '{}');
     current.update({
       ...current.metadata,
       rule: JSON.stringify({
+        ...ruleInfo,
         schema: e,
       }),
     });
-   
-
-    //window.localStorage.setItem('schema', JSON.stringify(e));
   }
   const onCanvasSelect = (e: any) => {
-    if (JSON.stringify(e) !== '{}')
-      itemClick(e);
+    // if (JSON.stringify(e) !== '{}')
+    //   itemClick(e);
+    console.log(e)
   }
 
 
 
   //页面重载获取默认schema或者配置后的schema
-
+  debugger;
   const settings = defaultSettings[0]
-  settings.widgets = [{
+  settings.widgets = [
+    {
     "text": "HTML",
     "name": "html",
     "schema": {
@@ -105,16 +106,58 @@ const FormEditModal: React.FC<IProps> = ({ current, finished, defaultSchema, edi
         }
       }
     }
-  }]
-  defaultCommonSettings.margin = {
-    title: '外边距(px)',
-    type: 'string',
-  }
-  delete defaultCommonSettings.bind;
+  },
+  {
+    "text": "数字输入框",
+    "name": "number",
+    "schema": {
+        "title": "数字输入框",
+        "type": "number"
+    },
+    "setting": {
+        "default": {
+            "title": "默认值",
+            "type": "number"
+        },
+      "format": {
+        "title": "类型",
+        "type": "string",
+        "enum": [
+          "number",
+          "gold"
+        ],
+        "enumNames": [
+          "数字",
+          "金额",
+        ]
+      }
+    }
+}
+  // {
+  //   "text": "11",
+  //   "name": "number",
+  //   "setting": {
+  //     "format": {
+  //       "title": "类型",
+  //       "type": "string",
+  //       "enum": [
+  //         "dateTime",
+  //         "date"
+  //       ],
+  //       "enumNames": [
+  //         "多行文本",
+  //         "文本",
+  //         "链接"
+  //       ]
+  //     }
+  //   }
+  // }
+  ]
+
   // const fieldRenderFun = (schema:any, widgetProps:any, children:any, originNode:any)=>{
 
   //   const {margin} = schema;
-    
+
   //   const marginResult = margin && typeof(Number(margin)) === 'number'? margin + "px":0
   //   console.log(marginResult,"marginResult")
   //   return <div style={{width:'100%',display:'flex',lineHeight:"30px",margin:marginResult}}>
@@ -123,18 +166,18 @@ const FormEditModal: React.FC<IProps> = ({ current, finished, defaultSchema, edi
   // }
   // const fieldWrapperRenderFun= (schema:any, isSelected:any, children:any, originNode:any)=>{
   //   const {margin} = schema;
-    
+
   //   const marginResult = margin && typeof(Number(margin)) === 'number'? margin + "px":0
   //   console.log(marginResult,"marginResult")
   //   return <div style={{width:'100%',display:'flex',lineHeight:"30px",margin:marginResult}}>
   //     {originNode}
   //   </div>
   // }
-  useEffect(()=>{
-    console.log(myComponentRef.current,"@@")
+  useEffect(() => {
+    console.log(myComponentRef.current, "@@")
     // const Generator:any = myComponentRef.current;
     // const PreSchema = Generator.getValue();
-  },[])
+  }, [])
   return (
     <FullScreenModal
       open={editFormOpen}
@@ -148,13 +191,13 @@ const FormEditModal: React.FC<IProps> = ({ current, finished, defaultSchema, edi
       <Generator
         defaultValue={defaultSchema}
         onSchemaChange={onSchemaChange}
-        settings={[defaultSettings[2],settings]}
+        settings={[defaultSettings[2], settings]}
         hideId
-       // onCanvasSelect={onCanvasSelect}
+        onCanvasSelect={onCanvasSelect}
         widgets={{ money: ProFormMoney }}
-        commonSettings={{...defaultCommonSettings}}
-       // fieldRender = {fieldRenderFun}
-       // fieldWrapperRender = {fieldWrapperRenderFun}
+        commonSettings={{ ...defaultCommonSettings }}
+        // fieldRender = {fieldRenderFun}
+        // fieldWrapperRender = {fieldWrapperRenderFun}
         ref={myComponentRef}
       />
       {/* <Provider
