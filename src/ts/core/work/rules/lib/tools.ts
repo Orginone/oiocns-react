@@ -44,9 +44,10 @@ function removeNullObj(data: DataType): DataType {
 function filterRules(
   rules: IRuleBase[],
   trigger: RuleTypes.TriggerType,
-  changeObj?: DataType,
+  changeObj?: DataType | 'all',
 ) {
   let willResloveRules: IRuleBase[] = [];
+
   switch (trigger) {
     case 'Start':
       willResloveRules = rules.filter((item) => item.trigger === trigger);
@@ -56,9 +57,12 @@ function filterRules(
         let changeId: string = '';
 
         if (changeObj) {
-          changeId = Object.keys(changeObj)[0];
+          changeId = changeObj === 'all' ? '0' : Object.keys(changeObj)[0];
         }
         willResloveRules = rules.filter((item) => {
+          if (changeId === '0') {
+            return item.trigger === trigger;
+          }
           if (changeId) {
             return (
               item.linkAttrs.some((v) => v.id === changeId) && item.trigger === trigger

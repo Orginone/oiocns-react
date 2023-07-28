@@ -121,13 +121,13 @@ class WorkFormRules extends Emitter {
    * 触发表单规则的处理
    * @param trigger 触发方式
    * @param formData 当前表单数据，用于处理运行中、提交时读取表单数据
-   * @param callBack 处理完成的回调
+   * @param changeObj 表单操作变化的值
    */
   public resloveFormRule = debounce(
     async (
       trigger: RuleTypes.TriggerType,
       formData: { id: string; data: RuleTypes.DataType },
-      changeObj?: DataType,
+      changeObj?: DataType | 'all',
     ) => {
       const { id, data } = formData;
 
@@ -147,6 +147,9 @@ class WorkFormRules extends Emitter {
         // 如果该表单没有设置回调函数，则输出错误信息
         if (!_info.callback) {
           console.error('未设置回调函数：' + id);
+        }
+        if (trigger == 'Start') {
+          this.resloveFormRule('Running', { id, data: resultObj }, 'all');
         }
       }
     },
