@@ -68,15 +68,12 @@ class WorkFormRules extends Emitter {
   private _formNow: Map<string, { after: DataType[] }> = new Map([]);
 
   public set formNow(data: any) {
-    console.log('3333', data, Tools.sum([1, 2, 3]));
-
     this._formNow = data;
   }
 
   // 初始化表单规则
   private initRules = async (forms: any[]) => {
     let count = 0;
-    console.log(8888, forms);
     // 遍历每个表单，获取其中的规则
     for (const formItem of forms) {
       const { list: ruleList = [] } = JSON.parse(formItem.metadata?.rule ?? '{}');
@@ -93,7 +90,6 @@ class WorkFormRules extends Emitter {
       if (count === forms.length) {
         this.isReady = true;
         this.changCallback();
-        console.log('已办事所有表单规则', forms, this._AllFormRules);
       }
     }
   };
@@ -159,6 +155,7 @@ class WorkFormRules extends Emitter {
           data: data,
           attrs: _info.attrs,
         };
+        /* 收集子表数据 */
         if (trigger == 'ThingsChanged') {
           params['things'] = this._formNow.get(id)?.after;
         }
@@ -205,13 +202,13 @@ class WorkFormRules extends Emitter {
         try {
           // 执行该规则，并将规则返回的数据保存到 res 中
           let res = await _R.dealRule({
-            $formData: formData.data,
-            $attrs: formData.attrs,
-            $things: formData?.things ?? [],
+            $formData: formData.data, //主表数据
+            $attrs: formData.attrs, //主表所有特性
+            $things: formData?.things ?? [], //子表数据
             $company:
-              OrgCtrl.user.companys.find((v) => v.id === this._beloneId)?.metadata ?? {},
-            $user: OrgCtrl.user.metadata,
-            tools: Tools,
+              OrgCtrl.user.companys.find((v) => v.id === this._beloneId)?.metadata ?? {}, //单位信息
+            $user: OrgCtrl.user.metadata, //用户信息
+            tools: Tools, //方法库
           });
           // 如果规则执行成功，则将规则返回的数据合并到 resultObj 中
           if (res.success) {
