@@ -1,3 +1,6 @@
+import { DataType } from 'typings/globelType';
+import { RuleTypes } from '../type';
+import { IRuleBase } from '../base/ruleBase';
 /* 去重 */
 function uniqueArray(array: any) {
   const isArray = Array.isArray(array);
@@ -28,6 +31,59 @@ function findKeyWidthName(
   }
   return ObjArr.find((v) => v.name === name)?.id;
 }
-/* 替换规则特殊字符=>表单值 */
+/* 过滤对象里的 空值 */
+function removeNullObj(data: DataType): DataType {
+  let _obj: DataType = {};
+  for (const item of Object.keys(data)) {
+    if (data[item] !== null || data[item] !== undefined) {
+      _obj[item] = data[item];
+    }
+  }
+  return _obj;
+}
+function filterRules(
+  rules: IRuleBase[],
+  trigger: RuleTypes.TriggerType,
+  changeObj?: DataType | 'all',
+) {
+  let willResloveRules: IRuleBase[] = [];
 
-export { findKeyWidthName, getAllFixedCharacter, getChartcterContent, uniqueArray };
+  switch (trigger) {
+    case 'Start':
+    case 'ThingsChanged':
+      willResloveRules = rules.filter((item) => item.trigger === trigger);
+      break;
+    case 'Running':
+      {
+        let changeId: string = '';
+
+        if (changeObj) {
+          changeId = changeObj === 'all' ? '0' : Object.keys(changeObj)[0];
+        }
+        willResloveRules = rules.filter((item) => {
+          if (changeId === '0') {
+            return item.trigger === trigger;
+          } else {
+            return (
+              item.linkAttrs.some((v) => v.id === changeId) && item.trigger === trigger
+            );
+          }
+        });
+      }
+      break;
+    case 'Submit':
+      break;
+    default:
+      break;
+  }
+  return willResloveRules;
+}
+
+export {
+  filterRules,
+  findKeyWidthName,
+  getAllFixedCharacter,
+  getChartcterContent,
+  removeNullObj,
+  uniqueArray,
+};

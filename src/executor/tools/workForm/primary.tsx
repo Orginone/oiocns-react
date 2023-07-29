@@ -3,14 +3,15 @@ import { kernel, model, schema } from '../../../ts/base';
 import { IBelong } from '@/ts/core';
 import { useEffect, useState } from 'react';
 import React from 'react';
-import { Tabs,Button } from 'antd';
+import { Tabs, Button } from 'antd';
 import FormRender, { useForm } from 'form-render';
+import { WorkFormRulesType } from '@/ts/core/work/rules/workFormRules';
 interface IProps {
   allowEdit: boolean;
   belong: IBelong;
   forms: schema.XForm[];
   data: model.InstanceDataModel;
-  useformRule?: boolean;
+  formRule?: WorkFormRulesType;
   getFormData: (id: string) => model.FormEditData;
   onChanged?: (id: string, data: model.FormEditData, changedData?: Object) => void;
 }
@@ -32,6 +33,7 @@ const PrimaryForm: React.FC<IProps> = (props) => {
         }
       });
     }
+    props?.formRule && (props.formRule.currentMainFormId = form.id);
   }, []);
   if (!data) return <></>;
   return (
@@ -40,6 +42,7 @@ const PrimaryForm: React.FC<IProps> = (props) => {
       form={form}
       fields={fields}
       fieldsValue={data}
+      ruseService={props.formRule}
       belong={props.belong}
       disabled={!props.allowEdit}
       submitter={{
