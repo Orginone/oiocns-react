@@ -1,6 +1,14 @@
 import { uniqueArray, getAllFixedCharacter, getChartcterContent } from '../lib/tools';
 import { RuleTypes } from '../type.d';
-import { FixedCharacters } from '../lib/const';
+// import { FixedCharacters } from '../lib/const';
+const FixedCharacters = [
+  '「单位名称」',
+  '「单位编码」',
+  '「使用人名称」',
+  '「使用人编码」',
+  '「系统时间」',
+  '「」',
+];
 //定义replaceString函数，接收3个参数：ruleStr, formData, attrs
 export default async function replaceString(
   ruleStr: string,
@@ -69,14 +77,31 @@ const formAttrResolver = async (
 };
 
 /* 固定字符处理 */
+/* 固定字符处理 */
 const fixedCharacterResolver = (ruleStr: string) => {
   if (!ruleStr) {
     return '';
   }
   //一、判断是否有限定字符FixedCharacters，替换所有限定字符为对应数据值
-  console.log('FixedCharacters', FixedCharacters);
-  //TODO:
-  return ruleStr;
+  //将FixedCharacters数组转化为一个正则表达式，匹配规则字符串中的所有固定字符，并将其替换为对应的数据值
+  const fixedRegex = new RegExp(`(${FixedCharacters.join('|')})`, 'g');
+  const replacedStr = ruleStr.replace(fixedRegex, (char) => {
+    switch (char) {
+      case '「单位名称」':
+        return 'ABC公司';
+      case '「单位编码」':
+        return '123456';
+      case '「使用人名称」':
+        return '张三';
+      case '「使用人编码」':
+        return '0001';
+      case '「系统时间」':
+        return new Date().toLocaleString();
+      default:
+        return '';
+    }
+  });
+  return replacedStr ?? '';
 };
 
 // /* 内置函数处理 */

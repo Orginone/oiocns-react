@@ -22,7 +22,7 @@ const FormEditModal = ({
   onSave,
 }: IFormEditProps) => {
   const editData: any = {};
- 
+
   const rule = form.rule && JSON.parse(form.rule);
   const modal = Modal.confirm({
     icon: <></>,
@@ -46,12 +46,11 @@ const FormEditModal = ({
         />
        <FormPreview2 forms={form}  />
       </>
-      
+
     ),
     onOk: () => {
       if (create) {
         kernel.anystore.createThing(belong.userId, '').then((res) => {
-          debugger;
           if (res.success && res.data) {
             onSave({ ...res.data, ...editData });
             modal.destroy();

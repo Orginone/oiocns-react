@@ -27,9 +27,9 @@ export type WorkFormRulesType = {
   /* 当前选中 主表的id标识 */
   currentMainFormId?: string;
   /* 初始化规则*/
-  initRules: (forms: any[]) => void;
+  initFormRules: (forms: any[]) => void;
   /* 表单渲染时，需提交表单修改方式 至此，用于规则处理后的回显*/
-  setFormCallback: (formId: string, callBack: (data: any) => void) => void;
+  setFormChangeCallback: (formId: string, callBack: (data: any) => void) => void;
   /* 加载表单远程规则*/
   loadRemoteRules: (forms: any[]) => void;
   /* 处理表单规则，需提供表单标识，表单数据，当前修改数据等*/
@@ -52,7 +52,7 @@ class WorkFormRules extends Emitter {
   constructor(forms: DataType[], beloneId: string) {
     super();
     this._beloneId = beloneId;
-    this.initRules(forms);
+    this.initFormRules(forms);
   }
   /* 当前主表id */
   public currentMainFormId: string = '';
@@ -62,8 +62,8 @@ class WorkFormRules extends Emitter {
   private _beloneId: string;
   // 所有表单规则
   private _AllFormRules: Map<string, MapType> = new Map([]);
-  // // 所有表单id，对应的主子表信息
-  // private _FormIdtoType: Map<string, string> = new Map([]);
+  // 所有表单id，对应的主子表信息
+  private _FormIdtoType: Map<string, string> = new Map([]);
   /* 当前办事所有表单数据 */
   private _formNow: Map<string, { after: DataType[] }> = new Map([]);
   /* 设置当前办事已修改的所有信息 */
@@ -72,12 +72,12 @@ class WorkFormRules extends Emitter {
   }
 
   // 初始化表单规则
-  private initRules = async (forms: any[]) => {
+  private initFormRules = async (forms: any[]) => {
     let count = 0;
     // 遍历每个表单，获取其中的规则
     for (const formItem of forms) {
       const { list: ruleList = [] } = JSON.parse(formItem.metadata?.rule ?? '{}');
-      // this._FormIdtoType.set(formItem.id, formItem.typeName);
+      this._FormIdtoType.set(formItem.id, formItem.typeName);
       // 将表单的规则存入 _AllFormRules 中
       this._AllFormRules.set(formItem.id, {
         rules: await this.setFormRules(ruleList),
@@ -95,7 +95,7 @@ class WorkFormRules extends Emitter {
   };
 
   // 设置表单的回调函数
-  public setFormCallback(formId: string, callback: () => DataType) {
+  public setFormChangeCallback(formId: string, callback: () => DataType) {
     const _aimFormInfo: MapType = this._AllFormRules.get(formId)!;
 
     // 如果该表单没有回调函数，则将该回调函数赋值给它，并执行一个 "Start" 触发器
@@ -138,11 +138,12 @@ class WorkFormRules extends Emitter {
    * @param formData 当前表单数据，用于处理运行中、提交时读取表单数据
    * @param changeObj 表单操作变化的值
    */
-  public resloveFormRule = debounce(
+  public resloveFormRule =
+    // debounce(
     async (
       trigger: RuleTypes.TriggerType,
       formData: { id: string; data: RuleTypes.DataType },
-      changeObj?: DataType | 'all',
+      changeObj: DataType | 'all' = 'all',
     ) => {
       const { id, data } = formData;
       const _formId = trigger == 'ThingsChanged' ? this.currentMainFormId : id;
@@ -163,6 +164,10 @@ class WorkFormRules extends Emitter {
           filterRules(_info.rules, trigger, changeObj),
           params,
         );
+        console.log('结果', trigger, resultObj);
+        if (trigger === 'Submit') {
+          return resultObj;
+        }
 
         // 如果该表单设置了回调函数，则调用回调函数将数据传递给页面
         _info.callback && _info.callback(resultObj);
@@ -176,10 +181,30 @@ class WorkFormRules extends Emitter {
           this.resloveFormRule('Running', { id: _formId, data: resultObj }, 'all');
         }
       }
-    },
-    300,
-  );
+    };
+  //   300,
+  // );
+  public resloveSubmitRules = async () => {
+    let PromiseAll = [];
+    for (const [key, value] of this._FormIdtoType) {
+      console.log(key, value);
+      if (value === '主表') {
+        const paramns: any = { id: key, data: this._formNow.get(key)?.after?.[0] };
 
+        // PromiseAll.push(await this.resloveFormRule('Submit', paramns, 'all'));
+        let a = await this.resloveFormRule('Submit', paramns, 'all');
+        PromiseAll.push(a);
+      }
+    }
+    let res = PromiseAll.flat().some((v) => v == false);
+
+    return !res;
+
+    // return await Promise.all(PromiseAll).then((res) => {
+    //   console.log(res);
+    //   console.log(123, res);
+    // });
+  };
   /**
    * 触发表单规则的处理，并返回所有要回显至表单的数据
    * @param trigger 触发方式
@@ -194,7 +219,13 @@ class WorkFormRules extends Emitter {
       things?: DataType[];
     },
   ) {
+    if (Rules.length == 0) {
+      return;
+    }
     let resultObj = {};
+    if (Rules?.[0].trigger === 'Submit') {
+      resultObj = [];
+    }
 
     // 遍历该表单的所有规则，并执行每一个规则
     await Promise.all(
@@ -210,9 +241,14 @@ class WorkFormRules extends Emitter {
             $user: OrgCtrl.user.metadata, //用户信息
             tools: Tools, //方法库
           });
+
           // 如果规则执行成功，则将规则返回的数据合并到 resultObj 中
           if (res.success) {
-            resultObj = { ...resultObj, ...res.data };
+            if (Array.isArray(resultObj)) {
+              resultObj.push(res.data);
+            } else {
+              resultObj = { ...resultObj, ...res.data };
+            }
           }
         } catch (error) {
           throw new Error('规则解析错误：' + _R.name);

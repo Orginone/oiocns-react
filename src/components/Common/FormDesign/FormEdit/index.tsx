@@ -84,7 +84,6 @@ const FormEditModal: React.FC<IProps> = ({ current, finished, defaultSchema, edi
 
 
   //页面重载获取默认schema或者配置后的schema
-  debugger;
   const settings = defaultSettings[0]
   settings.widgets = [
     {
