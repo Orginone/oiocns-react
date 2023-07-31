@@ -3,6 +3,7 @@ import { Avatar, Layout } from 'antd';
 import { Link } from 'react-router-dom';
 import cls from './index.module.less';
 import Navigation from '@/layouts/Basic/GlobalSidebar/Navigation';
+import OrgIcons from '@/components/Common/GlobalComps/orgIcons';
 
 const GlobalSidebar: React.FC = () => {
   return (
@@ -13,12 +14,19 @@ const GlobalSidebar: React.FC = () => {
             shape="square"
             src="/img/logo/logo3.jpg"
             alt="首页"
-            size={30}
+            size={50}
             style={{ marginRight: 10 }}
           />
         </Link>
         <Navigation></Navigation>
-        <div></div>
+        <div
+          onClick={() => {
+            sessionStorage.clear();
+            location.reload();
+          }}
+          style={{ cursor: 'pointer' }}>
+          <OrgIcons size={26} type="exit" title="注销" selected />
+        </div>
       </div>
     </Layout.Sider>
   );

@@ -5,7 +5,7 @@ import { kernel, model, schema } from '@/ts/base';
 import { Link } from 'react-router-dom';
 import TeamIcon from '@/components/Common/GlobalComps/entityIcon';
 import OrgIcons from '@/components/Common/GlobalComps/orgIcons';
-import { Badge, Drawer, List, Space, Tabs, Tag } from 'antd';
+import { Badge, Drawer, List, Tabs, Tag } from 'antd';
 import { ImLink } from 'react-icons/im';
 import { showChatTime } from '@/utils/tools';
 import cls from './index.module.less';
@@ -41,15 +41,6 @@ const Navigation: React.FC = () => {
 
   const navs = [
     {
-      key: 'home',
-      path: '/home',
-      title: '门户',
-      icon: 'home',
-      count: 0,
-      fath: '/home',
-      onClick: () => {},
-    },
-    {
       key: msgKey,
       path: '/chat',
       title: '沟通',
@@ -72,6 +63,15 @@ const Navigation: React.FC = () => {
         orgCtrl.currentKey = '';
         orgCtrl.changCallback();
       },
+    },
+    {
+      key: 'home',
+      path: '/home',
+      title: '门户',
+      icon: 'home',
+      count: 0,
+      fath: '/home',
+      onClick: () => {},
     },
     {
       key: 'store',
