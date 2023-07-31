@@ -1,21 +1,16 @@
-import { Badge, Drawer, List, Space, Tabs, Tag } from 'antd';
 import React, { useEffect, useState } from 'react';
-import { Link, RouteComponentProps, withRouter } from 'react-router-dom';
-import cls from './index.module.less';
-import OrgIcons from '@/components/Common/GlobalComps/orgIcons';
-import TeamIcon from '@/components/Common/GlobalComps/entityIcon';
-import orgCtrl from '@/ts/controller';
 import { msgChatNotify } from '@/ts/core';
+import orgCtrl from '@/ts/controller';
 import { kernel, model, schema } from '@/ts/base';
+import { Link } from 'react-router-dom';
+import TeamIcon from '@/components/Common/GlobalComps/entityIcon';
+import OrgIcons from '@/components/Common/GlobalComps/orgIcons';
+import { Badge, Drawer, List, Space, Tabs, Tag } from 'antd';
 import { ImLink } from 'react-icons/im';
 import { showChatTime } from '@/utils/tools';
+import cls from './index.module.less';
 
-/**
- * 顶部导航
- * @param
- * @returns
- */
-const HeaderNav: React.FC<RouteComponentProps> = () => {
+const Navigation: React.FC = () => {
   const [onlineVisible, setOnlineVisible] = useState(false);
   const [msgKey, setMsgKey] = useState('');
   const [taskKey, setTaskKey] = useState('');
@@ -43,6 +38,7 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
       orgCtrl.work.notity.unsubscribe(workId);
     };
   }, []);
+
   const navs = [
     {
       key: 'home',
@@ -102,7 +98,6 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
       },
     },
   ];
-
   const getLinkItem = (item: any) => {
     return (
       <Link
@@ -135,34 +130,31 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
   };
 
   return (
-    <div className={cls['header-nav-container']}>
-      <Space size={30}>
-        {online > 0 && (
-          <div
-            style={{ display: 'flex', cursor: 'pointer' }}
-            onClick={() => setOnlineVisible(!onlineVisible)}>
-            <Badge count={online} size="small">
-              <ImLink size={22} color={'#4CAF50'} />
+    <div className={cls.navigation}>
+      {online > 0 && (
+        <div
+          style={{ display: 'flex', cursor: 'pointer' }}
+          onClick={() => setOnlineVisible(!onlineVisible)}>
+          <Badge count={online} size="small">
+            <ImLink size={22} color={'#4CAF50'} />
+          </Badge>
+        </div>
+      )}
+      {navs.map((item) => {
+        if (item.count > 0) {
+          return (
+            <Badge key={item.key} count={item.count} size="small">
+              {getLinkItem(item)}
             </Badge>
-          </div>
-        )}
-        {navs.map((item) => {
-          if (item.count > 0) {
-            return (
-              <Badge key={item.key} count={item.count} size="small">
-                {getLinkItem(item)}
-              </Badge>
-            );
-          } else {
-            return getLinkItem(item);
-          }
-        })}
-      </Space>
+          );
+        } else {
+          return getLinkItem(item);
+        }
+      })}
       {onlineVisible && <OnlineInfo onClose={() => setOnlineVisible(false)} />}
     </div>
   );
 };
-
 const OnlineInfo: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const [key, setKey] = useState('1');
   const [onlines, setOnlines] = useState<model.OnlineInfo[]>([]);
@@ -211,7 +203,6 @@ const OnlineInfo: React.FC<{ onClose: () => void }> = ({ onClose }) => {
     </Drawer>
   );
 };
-
 const OnlineItem: React.FC<{ data: model.OnlineInfo }> = ({ data }) => {
   const [target, setTarget] = useState<schema.XEntity>();
   useEffect(() => {
@@ -246,4 +237,4 @@ const OnlineItem: React.FC<{ data: model.OnlineInfo }> = ({ data }) => {
     </List.Item>
   );
 };
-export default withRouter(HeaderNav);
+export default Navigation;
