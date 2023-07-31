@@ -27,9 +27,7 @@ const WorkStartDo: React.FC<IProps> = ({ current, finished }) => {
   if (!apply) return <></>;
   function resolveFormChange(id: string, data: DataType, _changedData?: DataType) {
     formData.set(id, data as any);
-    console.log('表单变化打印', id, data, _changedData);
-    apply!.instanceData.formRules.resloveFormRule('Start', { id, data: data.after });
-    apply!.instanceData.formRules.resloveFormRule('Running', { id, data: data.after });
+    console.log('表单变化打印', 'Start', data, id, _changedData, formData);
   }
   return (
     <>
@@ -52,6 +50,7 @@ const WorkStartDo: React.FC<IProps> = ({ current, finished }) => {
           onChanged={(id, data, changedData) => {
             formData.set(id, data);
             resolveFormChange(id, data, changedData);
+            apply.instanceData.formRules.formNow = formData;
           }}
         />
         <div style={{ padding: 10, display: 'flex', alignItems: 'flex-end' }}>
@@ -66,9 +65,10 @@ const WorkStartDo: React.FC<IProps> = ({ current, finished }) => {
             type="primary"
             onClick={() => {
              // console.log('提交打印所有规则', apply.instanceData.formRules);
+             
+              console.log('提交打印所有规则', apply.instanceData.formRules, formData);
 
               apply.createApply(apply.belong.id, info.content, formData);
-             
               finished();
             }}>
             提交

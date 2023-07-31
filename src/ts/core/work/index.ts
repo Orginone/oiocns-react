@@ -178,8 +178,7 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
         allowSelect: this.metadata.allowSelect,
         formRules: new WorkFormRules(this.forms, 'belongId'),
       };
-      console.log(333, data, this.forms);
-
+      //TODO:尝试在此处，执行规则初始化操作
       this.forms.forEach((form) => {
         data.fields[form.id] = form.fields;
       });
