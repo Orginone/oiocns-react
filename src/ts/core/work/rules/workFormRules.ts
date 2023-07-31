@@ -5,7 +5,7 @@ import { Emitter } from '@/ts/base/common';
 import { sleep } from '../../../base/common';
 import { RuleTypes } from './type.d';
 import { IRuleBase } from './base/ruleBase';
-import { debounce } from '@/utils/tools';
+// import { debounce } from '@/utils/tools';
 import { DataType } from 'typings/globelType';
 import { filterRules } from './lib/tools';
 import * as Tools from './lib';
@@ -164,20 +164,23 @@ class WorkFormRules extends Emitter {
           filterRules(_info.rules, trigger, changeObj),
           params,
         );
-        console.log('结果', trigger, resultObj);
+        /* 提交验证直接返回 */
         if (trigger === 'Submit') {
           return resultObj;
         }
-
-        // 如果该表单设置了回调函数，则调用回调函数将数据传递给页面
-        _info.callback && _info.callback(resultObj);
 
         // 如果该表单没有设置回调函数，则输出错误信息
         if (!_info.callback) {
           console.error('未设置回调函数：' + _formId);
         }
+        // 如果该表单设置了回调函数，则调用回调函数将数据传递给页面
+        _info.callback && _info.callback(resultObj as Object);
         /* 若初始化结束，需执行一次运行态规则 */
-        if (trigger == 'Start') {
+        if (
+          trigger == 'Start' &&
+          typeof resultObj == 'object' &&
+          Object.keys(resultObj).length > 0
+        ) {
           this.resloveFormRule('Running', { id: _formId, data: resultObj }, 'all');
         }
       }
@@ -187,10 +190,8 @@ class WorkFormRules extends Emitter {
   public resloveSubmitRules = async () => {
     let PromiseAll = [];
     for (const [key, value] of this._FormIdtoType) {
-      console.log(key, value);
       if (value === '主表') {
         const paramns: any = { id: key, data: this._formNow.get(key)?.after?.[0] };
-
         // PromiseAll.push(await this.resloveFormRule('Submit', paramns, 'all'));
         let a = await this.resloveFormRule('Submit', paramns, 'all');
         PromiseAll.push(a);
