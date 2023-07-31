@@ -44,7 +44,7 @@ const FormEditModal = ({
             });
           }}
         />
-       <FormPreview2 forms={form}  />
+       {/* <FormPreview2 forms={form}  /> */}
       </>
       
     ),

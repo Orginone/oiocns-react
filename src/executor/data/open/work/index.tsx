@@ -65,10 +65,11 @@ const WorkStartDo: React.FC<IProps> = ({ current, finished }) => {
           <Button
             type="primary"
             onClick={() => {
-              console.log('提交打印所有规则', apply.instanceData.formRules);
+             // console.log('提交打印所有规则', apply.instanceData.formRules);
 
-              // apply.createApply(apply.belong.id, info.content, formData);
-              // finished();
+              apply.createApply(apply.belong.id, info.content, formData);
+             
+              finished();
             }}>
             提交
           </Button>

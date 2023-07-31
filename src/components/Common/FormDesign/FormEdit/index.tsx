@@ -84,99 +84,35 @@ const FormEditModal: React.FC<IProps> = ({ current, finished, defaultSchema, edi
 
 
   //页面重载获取默认schema或者配置后的schema
-  debugger;
+
   const settings = defaultSettings[0]
   settings.widgets = [
     {
-    "text": "HTML",
-    "name": "html",
-    "schema": {
-      "title": "HTML",
-      "type": "string",
-      "widget": "html"
-    },
-    "setting": {
-      "props": {
-        "type": "object",
-        "properties": {
-          "value": {
-            "title": "展示内容",
-            "type": "string"
+      "text": "HTML",
+      "name": "html",
+      "schema": {
+        "title": "HTML",
+        "type": "string",
+        "widget": "html"
+      },
+      "setting": {
+        "props": {
+          "type": "object",
+          "properties": {
+            "value": {
+              "title": "展示内容",
+              "type": "string"
+            }
           }
         }
       }
     }
-  },
-  {
-    "text": "数字输入框",
-    "name": "number",
-    "schema": {
-        "title": "数字输入框",
-        "type": "number"
-    },
-    "setting": {
-        "default": {
-            "title": "默认值",
-            "type": "number"
-        },
-      "format": {
-        "title": "类型",
-        "type": "string",
-        "enum": [
-          "number",
-          "gold"
-        ],
-        "enumNames": [
-          "数字",
-          "金额",
-        ]
-      }
-    }
-}
-  // {
-  //   "text": "11",
-  //   "name": "number",
-  //   "setting": {
-  //     "format": {
-  //       "title": "类型",
-  //       "type": "string",
-  //       "enum": [
-  //         "dateTime",
-  //         "date"
-  //       ],
-  //       "enumNames": [
-  //         "多行文本",
-  //         "文本",
-  //         "链接"
-  //       ]
-  //     }
-  //   }
-  // }
   ]
 
-  // const fieldRenderFun = (schema:any, widgetProps:any, children:any, originNode:any)=>{
 
-  //   const {margin} = schema;
-
-  //   const marginResult = margin && typeof(Number(margin)) === 'number'? margin + "px":0
-  //   console.log(marginResult,"marginResult")
-  //   return <div style={{width:'100%',display:'flex',lineHeight:"30px",margin:marginResult}}>
-  //     {originNode}
-  //   </div>
-  // }
-  // const fieldWrapperRenderFun= (schema:any, isSelected:any, children:any, originNode:any)=>{
-  //   const {margin} = schema;
-
-  //   const marginResult = margin && typeof(Number(margin)) === 'number'? margin + "px":0
-  //   console.log(marginResult,"marginResult")
-  //   return <div style={{width:'100%',display:'flex',lineHeight:"30px",margin:marginResult}}>
-  //     {originNode}
-  //   </div>
-  // }
   useEffect(() => {
     console.log(myComponentRef.current, "@@")
-    // const Generator:any = myComponentRef.current;
-    // const PreSchema = Generator.getValue();
+
   }, [])
   return (
     <FullScreenModal
@@ -192,56 +128,11 @@ const FormEditModal: React.FC<IProps> = ({ current, finished, defaultSchema, edi
         defaultValue={defaultSchema}
         onSchemaChange={onSchemaChange}
         settings={[defaultSettings[2], settings]}
-        hideId
         onCanvasSelect={onCanvasSelect}
         widgets={{ money: ProFormMoney }}
         commonSettings={{ ...defaultCommonSettings }}
-        // fieldRender = {fieldRenderFun}
-        // fieldWrapperRender = {fieldWrapperRenderFun}
         ref={myComponentRef}
       />
-      {/* <Provider
-        defaultValue={defaultSchema}
-        onSchemaChange={onSchemaChange}
-        settings={[defaultSettings[2]]}
-        hideId
-      >
-        <div className="fr-generator-container">
-          <div>
-            <div style={{ padding: '16px 0 0 8px' }}>
-              <p >整体布局</p>
-              <Select
-                defaultValue={formLayout.col}
-                style={{ width: '120px' }}
-                options={[
-                  { value: 24, label: '一行一列' },
-                  { value: 12, label: '一行两列' },
-                  { value: 8, label: '一行三列' },
-                ]}
-                onChange={(value) => {
-                  layoutChange({ col: value });
-                }}
-              />
-              <Select
-                defaultValue={formLayout.layout}
-                style={{ width: '80px' }}
-                options={[
-                  { value: 'horizontal', label: '水平' },
-                  { value: 'vertical', label: '垂直' },
-                ]}
-                onChange={(value) => {
-                  layoutChange({ layout: value });
-                }}
-              />
-            </div>
-
-            <div style={{ height: "200px" }}>
-              <Sidebar fixedName />
-            </div>
-          </div>
-          <Canvas onCanvasSelect={onCanvasSelect}/>
-        </div>
-      </Provider> */}
     </FullScreenModal>
   );
 };

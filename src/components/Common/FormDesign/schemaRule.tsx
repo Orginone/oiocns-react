@@ -1,21 +1,19 @@
+//组件映射关系：https://1.xrender.fun/form-render/api/inner-widget
 export const loadWidgetsOpts = (valueType: string = '描述型') => {
+  console.log("valueType",valueType)
   switch (valueType) {
     case '用户型':
       return [
         {
-          label: '人员',
-          value: 'person',
+          label: '输入框',
+          value: 'string',
         },
         {
-          label: '部门',
-          value: 'dept',
-        },
-        {
-          label: '集群',
-          value: 'group',
-        },
+          label: '输入框',
+          value: '',
+        }
       ];
-    case '数值型':
+    case '数字输入框':
       return [
         {
           label: '数字',
@@ -23,74 +21,65 @@ export const loadWidgetsOpts = (valueType: string = '描述型') => {
         },
         {
           label: '金额',
-          value: 'number',
+          value: '',
         },
       ];
     case '选择型':
     case '分类型':
       return [
         {
-          label: '字典',
+          label: '下拉单选',
           value: 'select',
-        },
-        {
-          label: '颜色选择',
-          value: 'color',
         },
         {
           label: '下拉单选',
           value: 'select',
         },
-        {
-          label: '下拉多选',
-          value: 'multiSelect',
-        },
-        {
-          label: '树型选择',
-          value: 'treeSelect',
-        },
-        {
-          label: '单选',
-          value: 'radio',
-        },
-        {
-          label: '勾选',
-          value: 'checkbox',
-        },
-        {
-          label: '开关',
-          value: 'switch',
-        },
       ];
     case '日期型':
       return [
         {
+          label: '日期组件',
+          value: 'string',
+        },
+        {
           label: '日期',
-          value: 'date',
+          value: 'dateTime',
         },
       ];
     case '时间型':
       return [
         {
-          label: '日期时间',
-          value: 'range',
+          label: '时间型',
+          value: 'string',
         },
         {
-          label: '日期范围',
-          value: 'dateRange',
-        },
-        {
-          label: '时间范围',
-          value: 'timeRange',
+          label: '日期',
+          value: 'dateTime',
         },
       ];
     case '附件型':
       return [
         {
           label: '文件',
+          value: 'string',
+        },
+        {
+          label: '文件',
           value: 'upload',
         },
-      ];
+    ];
+    case '数值型':
+      return [
+        {
+          label: '数字输入框',
+          value: 'number',
+        },
+        {
+          label: '数字输入框',
+          value: '',
+        },
+    ];
     default:
       return [
         {
@@ -100,10 +89,6 @@ export const loadWidgetsOpts = (valueType: string = '描述型') => {
         {
           label: '多行文本',
           value: 'textarea',
-        },
-        {
-          label: '链接',
-          value: 'url',
         },
       ];
   }
@@ -183,3 +168,4 @@ export const loadRegexpOpts = (valueType: string = '描述型') => {
       return [];
   }
 };
+//获取类型
