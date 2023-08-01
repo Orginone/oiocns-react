@@ -303,5 +303,5 @@ export {
   isEmoji,
   isSpecialChar,
   visitTree,
-  getJsonText,
+  getJsonText
 };
