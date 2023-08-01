@@ -7,11 +7,8 @@ import FormView from './form';
 import WorkStart from './work';
 import OfficeView from './office';
 import MarkdownView from "@/executor/data/open/markdown";
-<<<<<<< HEAD
 import CodeEditor from './CodeEditor';
 import MyMdEditor from './MdEditor';
-=======
->>>>>>> upstream/dev
 
 const officeExt = ['.pdf', '.xls', '.xlsx', '.doc', '.docx', '.ppt', '.pptx'];
 const videoExt = ['.mp4', '.avi', '.mov', '.mpg', '.swf', '.flv', '.mpeg'];
