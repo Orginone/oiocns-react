@@ -21,3 +21,20 @@ export function subtractArray(arr: number[]): number {
   }
   return result;
 }
+/* 根据特性code获取特性id */
+export function findIdByCode(
+  code: string,
+  attrs: { code: string; id: string }[],
+): string {
+  const matchedAttr = attrs.find((attr) => attr.code === code);
+  return matchedAttr ? matchedAttr.id : '';
+}
+
+/* 根据特性名称获取特性id */
+export function findIdByName(
+  name: string,
+  attrs: { name: string; id: string }[],
+): string {
+  const matchedAttr = attrs.find((attr) => attr.name === name);
+  return matchedAttr ? matchedAttr.id : '';
+}
