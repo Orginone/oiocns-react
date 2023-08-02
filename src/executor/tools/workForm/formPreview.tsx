@@ -75,6 +75,7 @@ const FormPreview: React.FC<IProps> = (props) => {
   useEffect(() => {
     if (!data) {
       kernel.anystore.createThing(props.belong.userId, '').then((res) => {
+        debugger;
         if (res.success && res.data) {
           setData(res.data);
         }
@@ -98,9 +99,9 @@ const FormPreview: React.FC<IProps> = (props) => {
       if (rule?.schema) {
         console.log("%", rule.schema)
         return <div>
-          <FormRender form={formIns} schema={rule.schema} onFinish={onFinish} />
+          <FormRender form={formIns} schema={rule.schema} onFinish={onFinish}  disabled={!props.allowEdit}/>
           <Button type="primary" onClick={formIns.submit}>
-            提交
+            提交22
           </Button>
         </div>
       }

@@ -69,6 +69,7 @@ const WorkStartDo: React.FC<IProps> = ({ current, finished }) => {
               console.log('提交打印所有规则', apply.instanceData.formRules, formData);
 
               apply.createApply(apply.belong.id, info.content, formData);
+              debugger;
               finished();
             }}>
             提交

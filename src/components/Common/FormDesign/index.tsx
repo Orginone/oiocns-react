@@ -159,7 +159,7 @@ const Design: React.FC<IProps> = ({ current }) => {
 
         return {
           ...result,
-          [item.property!.code]: {
+          [item.property!.id]: {
             title,
             type,
             widget,
