@@ -69,7 +69,7 @@ const OioForm: React.FC<IProps> = ({
         disabled={disabled === true}
         formRef={formRef}
         className={cls.formWrap}
-        // initialValues={fieldsValue}
+        initialValues={fieldsValue}
         submitter={
           submitter || {
             searchConfig: {
