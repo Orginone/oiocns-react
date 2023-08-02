@@ -78,17 +78,21 @@ const OioFormItem = ({
   const [fileList, setFileList] = useState<any[]>([]);
   useEffect(() => {
     if (value && ['file', 'upload'].includes(rule.widget)) {
-      setFileList(
-        JSON.parse(value).map((a: FileItemShare) => {
-          return {
-            uid: a.name,
-            name: a.name,
-            status: 'done',
-            url: a.shareLink,
-            data: a,
-          };
-        }),
-      );
+      debugger;
+      if (Array.isArray(value)) {
+        setFileList(
+          (value).map((a: FileItemShare) => {
+            return {
+              uid: a.name,
+              name: a.name,
+              status: 'done',
+              url: a.shareLink,
+              data: a,
+            };
+          }),
+        );
+      }
+
     }
   }, [value]);
   // 上传文件区域
