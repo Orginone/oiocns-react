@@ -1,6 +1,7 @@
 import { DataType } from 'typings/globelType';
 import { RuleTypes } from '../type';
 import { IRuleBase } from '../base/ruleBase';
+import { RuleTriggers } from '@/ts/base/model';
 
 //去重函数
 function uniqueArray(array: any) {
@@ -55,12 +56,12 @@ function filterRules(
   let willResloveRules: IRuleBase[] = []; //将要处理的规则数组
 
   switch (trigger) {
-    case 'Start':
-    case 'ThingsChanged':
+    case RuleTriggers.Start:
+    case RuleTriggers.ThingsChanged:
       //如果触发条件是 "Start" 或 "ThingsChanged"，则过滤出规则的 trigger 属性等于该条件的规则
       willResloveRules = rules.filter((item) => item.trigger === trigger);
       break;
-    case 'Running':
+    case RuleTriggers.Running:
       {
         let changeId: string = '';
         if (changeObj) {
@@ -79,7 +80,7 @@ function filterRules(
         });
       }
       break;
-    case 'Submit':
+    case RuleTriggers.Submit:
       //如果触发条件是 "Submit"，则过滤出规则的 trigger 属性等于该条件的规则
       willResloveRules = rules.filter((item) => {
         return item.trigger === trigger;

@@ -4,7 +4,6 @@ import { IForm, Form } from '../thing/form';
 import { FileInfo, IFileInfo } from '../thing/fileinfo';
 import { IDirectory } from '../thing/directory';
 import { IWorkApply, WorkApply } from './apply';
-import WorkFormRules from './rules/workFormRules';
 export interface IWork extends IFileInfo<schema.XWorkDefine> {
   /** 流程关联的表单 */
   forms: IForm[];
@@ -176,9 +175,7 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
         allowAdd: this.metadata.allowAdd,
         allowEdit: this.metadata.allowEdit,
         allowSelect: this.metadata.allowSelect,
-        formRules: new WorkFormRules(this.forms, 'belongId'),
       };
-      //TODO:尝试在此处，执行规则初始化操作
       this.forms.forEach((form) => {
         data.fields[form.id] = form.fields;
       });
@@ -192,6 +189,7 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
         } as model.WorkInstanceModel,
         data,
         this.directory.target.space,
+        this.forms,
       );
     }
   }

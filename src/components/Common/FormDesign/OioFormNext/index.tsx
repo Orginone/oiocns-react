@@ -6,6 +6,7 @@ import { IBelong } from '@/ts/core';
 import cls from './index.module.less';
 import { model, schema } from '@/ts/base';
 import { ImInfo } from 'react-icons/im';
+import { RuleTriggers } from '@/ts/base/model';
 type IProps = {
   form: schema.XForm;
   fields: model.FieldModel[];
@@ -17,7 +18,7 @@ type IProps = {
   formRef?: any;
   disabled?: boolean;
   showTitle?: boolean;
-  ruseService?: any;
+  ruleService?: any;
 };
 /**
  * 资产共享云表单
@@ -27,7 +28,7 @@ const OioForm: React.FC<IProps> = ({
   fields,
   belong,
   submitter,
-  ruseService,
+  ruleService,
   onValuesChange,
   onFinished,
   fieldsValue,
@@ -46,7 +47,7 @@ const OioForm: React.FC<IProps> = ({
   }
   useEffect(() => {
     /* 向规则服务里，加入修改表单数值的回调方法 */
-    ruseService?.setFormChangeCallback(form.id, (data: any) => {
+    ruleService?.setFormChangeCallback(form.id, (data: any) => {
       onValuesChange && onValuesChange({}, data);
       formRef?.current?.setFieldsValue(data);
     });
@@ -68,7 +69,7 @@ const OioForm: React.FC<IProps> = ({
         disabled={disabled === true}
         formRef={formRef}
         className={cls.formWrap}
-        initialValues={fieldsValue}
+        // initialValues={fieldsValue}
         submitter={
           submitter || {
             searchConfig: {
@@ -88,7 +89,11 @@ const OioForm: React.FC<IProps> = ({
           onFinished?.call(this, values);
         }}
         onValuesChange={(val, vals) => {
-          ruseService?.resloveFormRule('Running', { id: form.id, data: vals }, val);
+          ruleService?.resloveFormRule(
+            RuleTriggers.Running,
+            { id: form.id, data: vals },
+            val,
+          );
           onValuesChange && onValuesChange(val, vals);
         }}
         layout={configLayout}

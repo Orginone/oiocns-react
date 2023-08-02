@@ -5,7 +5,6 @@ import WorkForm from '@/executor/tools/workForm';
 import FullScreenModal from '@/executor/tools/fullScreen';
 import { IWorkApply } from '@/ts/core';
 import { model } from '@/ts/base';
-import { DataType } from 'typings/globelType';
 // 卡片渲染
 interface IProps {
   current: IWork;
@@ -42,11 +41,11 @@ const WorkStartDo: React.FC<IProps> = ({ current, finished }) => {
           belong={apply.belong}
           data={apply.instanceData}
           nodeId={apply.instanceData.node.id}
-          formRule={apply.instanceData?.formRules}
+          ruleService={apply.ruleService}
           onChanged={(id, data) => {
             formData.set(id, data);
             /* 每次变化收集当前最新表单数据 */
-            apply.instanceData.formRules.formNow = formData;
+            apply.ruleService.serFormData = formData;
           }}
         />
         <div style={{ padding: 10, display: 'flex', alignItems: 'flex-end' }}>
@@ -60,7 +59,7 @@ const WorkStartDo: React.FC<IProps> = ({ current, finished }) => {
           <Button
             type="primary"
             onClick={async () => {
-              let res = await apply.instanceData.formRules.resloveSubmitRules();
+              let res = await apply.ruleService.resloveSubmitRules();
               if (res) {
                 apply.createApply(apply.belong.id, info.content, formData);
                 finished();
