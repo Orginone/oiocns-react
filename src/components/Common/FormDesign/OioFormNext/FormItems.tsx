@@ -78,7 +78,6 @@ const OioFormItem = ({
   const [fileList, setFileList] = useState<any[]>([]);
   useEffect(() => {
     if (value && ['file', 'upload'].includes(rule.widget)) {
-      debugger;
       if (Array.isArray(value)) {
         setFileList(
           (value).map((a: FileItemShare) => {
