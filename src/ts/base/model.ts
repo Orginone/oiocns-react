@@ -817,7 +817,7 @@ export const badRequest = (
   return { success: false, msg: msg, code: code, data: false };
 };
 
-/** 桶支持的操作 */
+/** 规则触发时机 */
 export enum RuleTriggers {
   'Start' = 'Start',//初始化
   'Running' = 'Running',//修改后
