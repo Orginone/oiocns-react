@@ -133,7 +133,13 @@ export type XDirectory = {
   // 目录的结构
   nodes: XDirectory[] | undefined;
 } & XEntity;
-
+export type schemaType = {
+  displayType: 'row' | 'column';
+  type: 'object';
+  labelWidth: number | string;
+  properties: Record<string, object>;
+  column: 1 | 2 | 3;
+};
 //单定义
 export type XForm = {
   // 单布局
@@ -146,6 +152,7 @@ export type XForm = {
   bindNodes: XWorkNode[] | undefined;
   // 单的目录
   directory: XDirectory | undefined;
+  schema:schemaType
 } & XEntity;
 
 //身份证明
@@ -522,6 +529,31 @@ export type XWorkTask = {
   instance: XWorkInstance | undefined;
 } & Xbase;
 
+export type XFormRule = {
+  id: string;
+  /* 规则名称 */
+  name: string;
+  /* 规则类型 */
+  ruleType: 'method' | 'formula';
+  /* 触发方式 初始化-修改时-提交时 */
+  trigger: 'Start' | 'Running' | 'Submit';
+  /* 规则支持的数据类型 */
+  accept: string[];
+  /* 规则关联特性 */
+  linkAttrs: any[];
+  /* 关联项最大数量 */
+  max?: number;
+  /* 规则是否可扩展关联项 */
+  isExtend: boolean;
+  /* 错误提示 */
+  errorMsg: string;
+  /* 规则执行函数构造器 */
+  creatFun?: string;
+  /* 规则执行函数 */
+  content: Function;
+  /* 备注 */
+  remark: string;
+};
 //报表定义
 export type XReport = {
   // 报表布局

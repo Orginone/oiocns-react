@@ -33,3 +33,4 @@ dist.zip
 test
 
 .idea
+.husky/_/husky.sh

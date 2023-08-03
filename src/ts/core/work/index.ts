@@ -4,7 +4,6 @@ import { IForm, Form } from '../thing/form';
 import { FileInfo, IFileInfo } from '../thing/fileinfo';
 import { IDirectory } from '../thing/directory';
 import { IWorkApply, WorkApply } from './apply';
-
 export interface IWork extends IFileInfo<schema.XWorkDefine> {
   /** 流程关联的表单 */
   forms: IForm[];
@@ -180,6 +179,7 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
       this.forms.forEach((form) => {
         data.fields[form.id] = form.fields;
       });
+
       return new WorkApply(
         {
           hook: '',
@@ -189,6 +189,7 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
         } as model.WorkInstanceModel,
         data,
         this.directory.target.space,
+        this.forms,
       );
     }
   }

@@ -72,3 +72,16 @@ export enum ValueType {
   'Date' = '日期型',
   'Target' = '用户型',
 }
+
+/** 规则内容类型 */
+export enum RuleContentType {
+  'Method' = '函数型',
+  'Formula' = '公式型',
+}
+
+/** 规则触发类型 */
+export enum RuleTriggerType {
+  'Start' = '初始化',
+  'Running' = '运行中',
+  'Submit' = '提交时',
+}
