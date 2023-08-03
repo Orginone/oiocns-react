@@ -3,7 +3,7 @@ import { msgChatNotify } from '@/ts/core';
 import orgCtrl from '@/ts/controller';
 
 import cls from './index.module.less';
-import { Image } from 'antd';
+import { Badge, Image } from 'antd';
 import { useHistory } from 'react-router-dom';
 
 const Navigation: React.FC = () => {
@@ -82,13 +82,28 @@ const Navigation: React.FC = () => {
           orgCtrl.currentKey = '';
           orgCtrl.changCallback();
         }}>
-        <Image
-          className={cls.navigationItem__icon}
-          preview={false}
-          width={30}
-          height={30}
-          src={`/svg/${item.key === currentKey ? item.key + '-select' : item.key}.svg`}
-        />
+        {item.count ? (
+          <Badge count={item.count}>
+            <Image
+              className={cls.navigationItem__icon}
+              preview={false}
+              width={30}
+              height={30}
+              src={`/svg/${
+                item.key === currentKey ? item.key + '-select' : item.key
+              }.svg`}
+            />
+          </Badge>
+        ) : (
+          <Image
+            className={cls.navigationItem__icon}
+            preview={false}
+            width={30}
+            height={30}
+            src={`/svg/${item.key === currentKey ? item.key + '-select' : item.key}.svg`}
+          />
+        )}
+
         <div
           className={
             item.key === currentKey
