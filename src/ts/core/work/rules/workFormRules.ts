@@ -32,7 +32,7 @@ export type WorkFormRulesType = {
   serFormData: any;
   /* 初始化规则*/
   initFormRules: (forms: any[]) => void;
-  /* 表单渲染时，需提交表单修改方式 至此，用于规则处理后的回显*/
+  /* 表单渲染时，需提交表单修改方式 至此，用于规则处理后的回显：考虑返回规则执行结果，到页面处理渲染逻辑*/
   setFormChangeCallback: (formId: string, callBack: (data: any) => void) => void;
   /* 加载表单远程规则*/
   loadRemoteRules: (forms: any[]) => void;
@@ -42,16 +42,14 @@ export type WorkFormRulesType = {
     formData: { id: string; data: RuleTypes.DataType },
     changeObj?: DataType, //变动项
   ) => void;
+  /* 执行所有表单的最终提交规则 */
   resloveSubmitRules: () => boolean;
-  /* 执行筛选后的某一类规则，返回最终数据*/
-  renderRules: (
-    Rules: any[],
-    formData: { attrs: RuleTypes.DataType[]; data: RuleTypes.DataType },
-  ) => void;
+  // /* 执行筛选后的某一类规则，返回最终数据*/
+  // renderRules: (
+  //   Rules: any[],
+  //   formData: { attrs: RuleTypes.DataType[]; data: RuleTypes.DataType },
+  // ) => void;
 };
-
-// 定义表单规则的键值对类型
-type MapType = { rules: IRuleBase[]; attrs: any[]; callback?: (data: DataType) => void };
 
 class WorkFormRules extends Emitter {
   constructor(forms: IForm[], beloneId: string) {
@@ -66,7 +64,7 @@ class WorkFormRules extends Emitter {
   // 办事归属权
   private _beloneId: string;
   // 所有表单规则
-  private _AllFormRules: Map<string, MapType> = new Map([]);
+  private _AllFormRules: Map<string, RuleTypes.MapType> = new Map([]);
   // 所有表单id，对应的主子表信息
   private _FormIdtoType: Map<string, string> = new Map([]);
   /* 当前办事所有表单数据 */
@@ -99,11 +97,11 @@ class WorkFormRules extends Emitter {
     }
   };
 
-  // 设置表单的回调函数
+  // 设置表单的回调函数，表单首次渲染时触发
   public setFormChangeCallback(formId: string, callback: () => DataType) {
-    const _aimFormInfo: MapType = this._AllFormRules.get(formId)!;
+    const _aimFormInfo: RuleTypes.MapType = this._AllFormRules.get(formId)!;
 
-    // 如果该表单没有回调函数，则将该回调函数赋值给它，并执行一个 "Start" 触发器
+    // 如果该表单没有回调函数，则将该回调函数赋值给它，并执行一个 "Start" 触发器-即表单初始化
     if (!_aimFormInfo.callback) {
       this._AllFormRules.set(formId, { ..._aimFormInfo, callback });
       this.resloveFormRule(RuleTriggers.Start, { id: formId, data: {} });
@@ -124,6 +122,7 @@ class WorkFormRules extends Emitter {
           _list.push(new MethodRule(_r));
           break;
         default:
+          console.error('暂不支持规则类型：' + _r.ruleType);
           break;
       }
     }
@@ -155,7 +154,7 @@ class WorkFormRules extends Emitter {
 
       // 如果 _AllFormRules 中存在这个表单的规则，则取出该表单的规则进行处理
       if (this._AllFormRules.has(_formId)) {
-        const _info: MapType = this._AllFormRules.get(_formId)!;
+        const _info: RuleTypes.MapType = this._AllFormRules.get(_formId)!;
         // 执行该表单的所有规则，并将规则返回的数据保存到 resultObj 中
         let params: any = {
           data: data,

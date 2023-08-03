@@ -14,6 +14,8 @@ export interface IRuleBase {
   accept?: RuleTypes.AcceptedType[];
   /* 规则关联特性 */
   linkAttrs: RuleTypes.AttrType[];
+  /* 返回结果类型 */
+  resType: RuleTypes.ResType;
   /* 关联项最大数量 */
   max?: number;
   /* 规则是否可扩展关联项 即增加关联数量*/
@@ -40,6 +42,7 @@ abstract class RuleBase implements IRuleBase {
   trigger: RuleTypes.TriggerType = 'Start';
   /* 规则支持的数据类型 */
   accept: RuleTypes.AcceptedType[] = [];
+  resType: RuleTypes.ResType = '赋值';
   /* 规则关联特性 */
   linkAttrs: any[] = [];
   /* 关联项最大数量 */
