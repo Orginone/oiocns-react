@@ -13,6 +13,20 @@ const Navigation: React.FC = () => {
   const [currentKey, setCurrentKey] = useState('home');
 
   const history = useHistory();
+
+  const IconItem: React.FC<{ item: NavigationItem }> = (props) => {
+    return (
+      <Image
+        className={cls.navigationItem__icon}
+        preview={false}
+        width={30}
+        height={30}
+        src={`/svg/${
+          props.item.key === currentKey ? props.item.key + '-select' : props.item.key
+        }.svg`}
+      />
+    );
+  };
   interface NavigationItem {
     key: string;
     path: string;
@@ -84,24 +98,10 @@ const Navigation: React.FC = () => {
         }}>
         {item.count ? (
           <Badge count={item.count}>
-            <Image
-              className={cls.navigationItem__icon}
-              preview={false}
-              width={30}
-              height={30}
-              src={`/svg/${
-                item.key === currentKey ? item.key + '-select' : item.key
-              }.svg`}
-            />
+            <IconItem item={item}></IconItem>
           </Badge>
         ) : (
-          <Image
-            className={cls.navigationItem__icon}
-            preview={false}
-            width={30}
-            height={30}
-            src={`/svg/${item.key === currentKey ? item.key + '-select' : item.key}.svg`}
-          />
+          <IconItem item={item}></IconItem>
         )}
 
         <div
