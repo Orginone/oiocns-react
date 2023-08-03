@@ -24,17 +24,23 @@ export function subtractArray(arr: number[]): number {
 /* 根据特性code获取特性id */
 export function findIdByCode(
   code: string,
-  attrs: { code: string; id: string }[],
+  attrs: { code: string; id: string; rule: string }[],
 ): string {
-  const matchedAttr = attrs.find((attr) => attr.code === code);
+  const matchedAttr = attrs.find((attr) => {
+    const _Data = JSON.parse(attr.rule ?? '{}');
+    return _Data.code === code;
+  });
+
   return matchedAttr ? matchedAttr.id : '';
 }
 
 /* 根据特性名称获取特性id */
 export function findIdByName(
   name: string,
-  attrs: { name: string; id: string }[],
+  attrs: { name: string; id: string; rule: string }[],
 ): string {
-  const matchedAttr = attrs.find((attr) => attr.name === name);
+  const matchedAttr = attrs.find((attr) => {
+    return attr.name === name;
+  });
   return matchedAttr ? matchedAttr.id : '';
 }

@@ -3,16 +3,16 @@ import { model } from '../../../ts/base';
 import { IBelong } from '@/ts/core';
 import PrimaryForms from './primary';
 import DetailForms from './detail';
-import FormRender from './primary';
 import { formatDate } from '@/utils';
 import { DataType } from 'typings/globelType';
+import { WorkFormRulesType } from '@/ts/core/work/rules/workFormRules';
 
 interface IWorkFormProps {
   allowEdit: boolean;
   belong: IBelong;
   nodeId: string;
   data: model.InstanceDataModel;
-  formRule?: any;
+  ruleService?: WorkFormRulesType;
   onChanged?: (id: string, data: model.FormEditData, changedData?: DataType) => void;
 }
 
@@ -64,7 +64,6 @@ const WorkForm: React.FC<IWorkFormProps> = (props) => {
   return (
     <div style={{ padding: 10 }}>
       <PrimaryForms {...props} forms={primaryForms} getFormData={getFormData} />
-      {/* <FormRender {...props} forms={primaryForms} getFormData={getFormData} /> */}
       <DetailForms {...props} forms={detailForms} getFormData={getFormData} />
     </div>
   );

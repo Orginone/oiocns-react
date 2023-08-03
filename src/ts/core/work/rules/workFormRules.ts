@@ -9,6 +9,8 @@ import { IRuleBase } from './base/ruleBase';
 import { DataType } from 'typings/globelType';
 import { filterRules } from './lib/tools';
 import * as Tools from './lib';
+import { IForm } from '../../thing/form';
+import { RuleTriggers } from '@/ts/base/model';
 
 // 定义规则类型常量，方便代码维护
 const RuleType = {
@@ -26,6 +28,8 @@ export type WorkFormRulesType = {
   _AllFormRules: Map<string, { rules: IRuleBase[]; attrs: any[] }>;
   /* 当前选中 主表的id标识 */
   currentMainFormId?: string;
+  /* 设置最新表单数据 */
+  serFormData: any;
   /* 初始化规则*/
   initFormRules: (forms: any[]) => void;
   /* 表单渲染时，需提交表单修改方式 至此，用于规则处理后的回显*/
@@ -38,6 +42,7 @@ export type WorkFormRulesType = {
     formData: { id: string; data: RuleTypes.DataType },
     changeObj?: DataType, //变动项
   ) => void;
+  resloveSubmitRules: () => boolean;
   /* 执行筛选后的某一类规则，返回最终数据*/
   renderRules: (
     Rules: any[],
@@ -49,7 +54,7 @@ export type WorkFormRulesType = {
 type MapType = { rules: IRuleBase[]; attrs: any[]; callback?: (data: DataType) => void };
 
 class WorkFormRules extends Emitter {
-  constructor(forms: DataType[], beloneId: string) {
+  constructor(forms: IForm[], beloneId: string) {
     super();
     this._beloneId = beloneId;
     this.initFormRules(forms);
@@ -65,10 +70,10 @@ class WorkFormRules extends Emitter {
   // 所有表单id，对应的主子表信息
   private _FormIdtoType: Map<string, string> = new Map([]);
   /* 当前办事所有表单数据 */
-  private _formNow: Map<string, { after: DataType[] }> = new Map([]);
+  private _NewFormData: Map<string, { after: DataType[] }> = new Map([]);
   /* 设置当前办事已修改的所有信息 */
-  public set formNow(data: any) {
-    this._formNow = data;
+  public set serFormData(data: any) {
+    this._NewFormData = data;
   }
 
   // 初始化表单规则
@@ -101,7 +106,7 @@ class WorkFormRules extends Emitter {
     // 如果该表单没有回调函数，则将该回调函数赋值给它，并执行一个 "Start" 触发器
     if (!_aimFormInfo.callback) {
       this._AllFormRules.set(formId, { ..._aimFormInfo, callback });
-      this.resloveFormRule('Start', { id: formId, data: {} });
+      this.resloveFormRule(RuleTriggers.Start, { id: formId, data: {} });
     }
   }
 
@@ -146,7 +151,7 @@ class WorkFormRules extends Emitter {
       changeObj: DataType | 'all' = 'all',
     ) => {
       const { id, data } = formData;
-      const _formId = trigger == 'ThingsChanged' ? this.currentMainFormId : id;
+      const _formId = trigger == RuleTriggers.ThingsChanged ? this.currentMainFormId : id;
 
       // 如果 _AllFormRules 中存在这个表单的规则，则取出该表单的规则进行处理
       if (this._AllFormRules.has(_formId)) {
@@ -157,15 +162,15 @@ class WorkFormRules extends Emitter {
           attrs: _info.attrs,
         };
         /* 收集子表数据 */
-        if (trigger == 'ThingsChanged') {
-          params['things'] = this._formNow.get(id)?.after;
+        if (trigger == RuleTriggers.ThingsChanged) {
+          params['things'] = this._NewFormData.get(id)?.after;
         }
         const resultObj = await this.renderRules(
           filterRules(_info.rules, trigger, changeObj),
           params,
         );
         /* 提交验证直接返回 */
-        if (trigger === 'Submit') {
+        if (trigger === RuleTriggers.Submit) {
           return resultObj;
         }
 
@@ -177,11 +182,15 @@ class WorkFormRules extends Emitter {
         _info.callback && _info.callback(resultObj as Object);
         /* 若初始化结束，需执行一次运行态规则 */
         if (
-          trigger == 'Start' &&
+          trigger == RuleTriggers.Start &&
           typeof resultObj == 'object' &&
           Object.keys(resultObj).length > 0
         ) {
-          this.resloveFormRule('Running', { id: _formId, data: resultObj }, 'all');
+          this.resloveFormRule(
+            RuleTriggers.Running,
+            { id: _formId, data: resultObj },
+            'all',
+          );
         }
       }
     };
@@ -191,9 +200,9 @@ class WorkFormRules extends Emitter {
     let PromiseAll = [];
     for (const [key, value] of this._FormIdtoType) {
       if (value === '主表') {
-        const paramns: any = { id: key, data: this._formNow.get(key)?.after?.[0] };
+        const paramns: any = { id: key, data: this._NewFormData.get(key)?.after?.[0] };
         // PromiseAll.push(await this.resloveFormRule('Submit', paramns, 'all'));
-        let a = await this.resloveFormRule('Submit', paramns, 'all');
+        let a = await this.resloveFormRule(RuleTriggers.Start, paramns, 'all');
         PromiseAll.push(a);
       }
     }
@@ -224,7 +233,7 @@ class WorkFormRules extends Emitter {
       return;
     }
     let resultObj = {};
-    if (Rules?.[0].trigger === 'Submit') {
+    if (Rules?.[0].trigger === RuleTriggers.Submit) {
       resultObj = [];
     }
 

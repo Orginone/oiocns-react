@@ -1,3 +1,4 @@
+import { RuleTriggers } from '@/ts/base/model';
 import RuleBase, { IRuleBase } from '../base/ruleBase';
 import { removeNullObj } from '../lib/tools';
 
@@ -38,7 +39,7 @@ class MethodRule extends RuleBase implements IRuleBase {
 
   /* 处理最终展示结果 */
   private async _handleResult(resValue: any): Promise<boolean | Record<string, any>> {
-    if (this.trigger === 'Submit') {
+    if (this.trigger === RuleTriggers.Submit) {
       return resValue;
     }
 
