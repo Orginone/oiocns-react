@@ -42,6 +42,7 @@ abstract class RuleBase implements IRuleBase {
   trigger: RuleTypes.TriggerType = 'Start';
   /* 规则支持的数据类型 */
   accept: RuleTypes.AcceptedType[] = [];
+  /* 返回值效果 */
   resType: RuleTypes.ResType = '赋值';
   /* 规则关联特性 */
   linkAttrs: any[] = [];

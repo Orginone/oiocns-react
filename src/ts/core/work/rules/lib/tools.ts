@@ -2,7 +2,13 @@ import { DataType } from 'typings/globelType';
 import { RuleTypes } from '../type';
 import { IRuleBase } from '../base/ruleBase';
 import { RuleTriggers } from '@/ts/base/model';
-
+import FormulaRule from '../formulaRule';
+import MethodRule from '../methodRule';
+// 定义规则类型常量，方便代码维护
+const RuleType = {
+  FORMULA: 'formula',
+  METHOD: 'method',
+};
 //去重函数
 function uniqueArray(array: any) {
   const isArray = Array.isArray(array);
@@ -91,12 +97,33 @@ function filterRules(
   }
   return willResloveRules;
 }
+// 获取表单的规则
+const setFormRules = async (ruleList: any[]) => {
+  let _list = [];
 
+  // 遍历所有规则，根据规则类型创建不同的规则对象
+  for (const _r of ruleList) {
+    switch (_r.ruleType) {
+      case RuleType.FORMULA:
+        _list.push(new FormulaRule(_r));
+        break;
+      case RuleType.METHOD:
+        _list.push(new MethodRule(_r));
+        break;
+      default:
+        console.error('暂不支持规则类型：' + _r.ruleType);
+        break;
+    }
+  }
+
+  return _list;
+};
 export {
   filterRules,
   findKeyWidthName,
   getAllFixedCharacter,
   getChartcterContent,
   removeNullObj,
+  setFormRules,
   uniqueArray,
 };

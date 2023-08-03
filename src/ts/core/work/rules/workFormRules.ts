@@ -1,37 +1,30 @@
 import OrgCtrl from '@/ts/controller';
-import FormulaRule from './formulaRule';
-import MethodRule from './methodRule';
+
 import { Emitter } from '@/ts/base/common';
 import { sleep } from '../../../base/common';
 import { RuleTypes } from './type.d';
-import { IRuleBase } from './base/ruleBase';
+// import { IRuleBase } from './base/ruleBase';
 // import { debounce } from '@/utils/tools';
 import { DataType } from 'typings/globelType';
-import { filterRules } from './lib/tools';
+import { filterRules, setFormRules } from './lib/tools';
 import * as Tools from './lib';
 import { IForm } from '../../thing/form';
 import { RuleTriggers } from '@/ts/base/model';
-
-// 定义规则类型常量，方便代码维护
-const RuleType = {
-  FORMULA: 'formula',
-  METHOD: 'method',
-};
 
 // 定义表单规则的类型
 export type WorkFormRulesType = {
   /* 办事规则是否处理完成 */
   isReady: boolean;
-  /* 办事归属权 */
-  _beloneId: string;
-  /* 收集办事表单的规则 */
-  _AllFormRules: Map<string, { rules: IRuleBase[]; attrs: any[] }>;
+  // /* 办事归属权 */
+  // _beloneId: string;
+  // /* 收集办事表单的规则 */
+  // _AllFormRules: Map<string, { rules: IRuleBase[]; attrs: any[] }>;
   /* 当前选中 主表的id标识 */
   currentMainFormId?: string;
   /* 设置最新表单数据 */
   serFormData: any;
-  /* 初始化规则*/
-  initFormRules: (forms: any[]) => void;
+  // /* 初始化规则*/
+  // initFormRules: (forms: any[]) => void;
   /* 表单渲染时，需提交表单修改方式 至此，用于规则处理后的回显：考虑返回规则执行结果，到页面处理渲染逻辑*/
   setFormChangeCallback: (formId: string, callBack: (data: any) => void) => void;
   /* 加载表单远程规则*/
@@ -44,11 +37,6 @@ export type WorkFormRulesType = {
   ) => void;
   /* 执行所有表单的最终提交规则 */
   resloveSubmitRules: () => boolean;
-  // /* 执行筛选后的某一类规则，返回最终数据*/
-  // renderRules: (
-  //   Rules: any[],
-  //   formData: { attrs: RuleTypes.DataType[]; data: RuleTypes.DataType },
-  // ) => void;
 };
 
 class WorkFormRules extends Emitter {
@@ -80,10 +68,11 @@ class WorkFormRules extends Emitter {
     // 遍历每个表单，获取其中的规则
     for (const formItem of forms) {
       const { list: ruleList = [] } = JSON.parse(formItem.metadata?.rule ?? '{}');
+      /* 收集主子表信息 */
       this._FormIdtoType.set(formItem.id, formItem.typeName);
       // 将表单的规则存入 _AllFormRules 中
       this._AllFormRules.set(formItem.id, {
-        rules: await this.setFormRules(ruleList),
+        rules: await setFormRules(ruleList),
         attrs: formItem.fields,
         callback: undefined,
       });
@@ -108,28 +97,6 @@ class WorkFormRules extends Emitter {
     }
   }
 
-  // 获取表单的规则
-  private async setFormRules(ruleList: any[]) {
-    let _list = [];
-
-    // 遍历所有规则，根据规则类型创建不同的规则对象
-    for (const _r of ruleList) {
-      switch (_r.ruleType) {
-        case RuleType.FORMULA:
-          _list.push(new FormulaRule(_r));
-          break;
-        case RuleType.METHOD:
-          _list.push(new MethodRule(_r));
-          break;
-        default:
-          console.error('暂不支持规则类型：' + _r.ruleType);
-          break;
-      }
-    }
-
-    return _list;
-  }
-
   // 加载远程的规则库
   async loadRemoteRules(path: string) {
     await sleep(500);
@@ -142,80 +109,66 @@ class WorkFormRules extends Emitter {
    * @param formData 当前表单数据，用于处理运行中、提交时读取表单数据
    * @param changeObj 表单操作变化的值
    */
-  public resloveFormRule =
-    // debounce(
-    async (
-      trigger: RuleTypes.TriggerType,
-      formData: { id: string; data: RuleTypes.DataType },
-      changeObj: DataType | 'all' = 'all',
-    ) => {
-      const { id, data } = formData;
-      const _formId = trigger == RuleTriggers.ThingsChanged ? this.currentMainFormId : id;
+  public resloveFormRule = async (
+    trigger: RuleTypes.TriggerType,
+    formData: { id: string; data: RuleTypes.DataType },
+    changeObj: DataType | 'all' = 'all',
+  ) => {
+    const { id, data } = formData;
+    const _formId = trigger == RuleTriggers.ThingsChanged ? this.currentMainFormId : id;
 
-      // 如果 _AllFormRules 中存在这个表单的规则，则取出该表单的规则进行处理
-      if (this._AllFormRules.has(_formId)) {
-        const _info: RuleTypes.MapType = this._AllFormRules.get(_formId)!;
-        // 执行该表单的所有规则，并将规则返回的数据保存到 resultObj 中
-        let params: any = {
-          data: data,
-          attrs: _info.attrs,
-        };
-        /* 收集子表数据 */
-        if (trigger == RuleTriggers.ThingsChanged) {
-          params['things'] = this._NewFormData.get(id)?.after;
-        }
-        const resultObj = await this.renderRules(
-          filterRules(_info.rules, trigger, changeObj),
-          params,
-        );
-        /* 提交验证直接返回 */
-        if (trigger === RuleTriggers.Submit) {
-          return resultObj;
-        }
-
-        // 如果该表单没有设置回调函数，则输出错误信息
-        if (!_info.callback) {
-          console.error('未设置回调函数：' + _formId);
-        }
-        // 如果该表单设置了回调函数，则调用回调函数将数据传递给页面
-        _info.callback && _info.callback(resultObj as Object);
-        /* 若初始化结束，需执行一次运行态规则 */
-        if (
-          trigger == RuleTriggers.Start &&
-          typeof resultObj == 'object' &&
-          Object.keys(resultObj).length > 0
-        ) {
-          this.resloveFormRule(
-            RuleTriggers.Running,
-            { id: _formId, data: resultObj },
-            'all',
-          );
-        }
+    // 如果 _AllFormRules 中存在这个表单的规则，则取出该表单的规则进行处理
+    if (this._AllFormRules.has(_formId)) {
+      const _info: RuleTypes.MapType = this._AllFormRules.get(_formId)!;
+      // 执行该表单的所有规则，并将规则返回的数据保存到 resultObj 中
+      let params: any = {
+        data: data,
+        attrs: _info.attrs,
+      };
+      /* 收集子表数据 */
+      if (trigger == RuleTriggers.ThingsChanged) {
+        params['things'] = this._NewFormData.get(id)?.after;
       }
-    };
-  //   300,
-  // );
+      const resultObj = await this.renderRules(
+        filterRules(_info.rules, trigger, changeObj),
+        params,
+      );
+      /* 提交验证直接返回 */
+      if (trigger === RuleTriggers.Submit) {
+        return resultObj;
+      }
+
+      // 如果该表单没有设置回调函数，则输出错误信息
+      if (!_info.callback) {
+        console.error('未设置回调函数：' + _formId);
+      }
+      // 如果该表单设置了回调函数，则调用回调函数将数据传递给页面
+      _info.callback && _info.callback(resultObj as Object);
+      /* 若初始化结束，需执行一次运行态规则 */
+      if (
+        trigger == RuleTriggers.Start &&
+        typeof resultObj == 'object' &&
+        Object.keys(resultObj).length > 0
+      ) {
+        this.resloveFormRule(RuleTriggers.Running, { id: _formId, data: resultObj });
+      }
+    }
+  };
+
   public resloveSubmitRules = async () => {
-    let PromiseAll = [];
+    let _Results = [];
     for (const [key, value] of this._FormIdtoType) {
       if (value === '主表') {
         const paramns: any = { id: key, data: this._NewFormData.get(key)?.after?.[0] };
-        // PromiseAll.push(await this.resloveFormRule('Submit', paramns, 'all'));
-        let a = await this.resloveFormRule(RuleTriggers.Start, paramns, 'all');
-        PromiseAll.push(a);
+        _Results.push(await this.resloveFormRule(RuleTriggers.Submit, paramns));
       }
     }
-    let res = PromiseAll.flat().some((v) => v == false);
+    let res = _Results.flat().some((v) => v == false);
 
     return !res;
-
-    // return await Promise.all(PromiseAll).then((res) => {
-    //   console.log(res);
-    //   console.log(123, res);
-    // });
   };
   /**
-   * 触发表单规则的处理，并返回所有要回显至表单的数据
+   * 执行过滤后的最终规则，并返回所有要回显至表单的数据
    * @param trigger 触发方式
    * @param formData 当前表单数据，用于处理运行中、提交时读取表单数据
    *  //TODO:通过增加 权重参数，修改规则执行顺序；当前为 按顺序执行
@@ -265,7 +218,7 @@ class WorkFormRules extends Emitter {
       }),
     );
 
-    console.log('所有规则最终数据结果', Rules, '===>', resultObj);
+    // console.log('所有规则最终数据结果', Rules, '===>', resultObj);
     return resultObj;
   }
 }
