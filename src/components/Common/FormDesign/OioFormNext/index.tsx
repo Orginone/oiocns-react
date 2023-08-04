@@ -48,7 +48,8 @@ const OioForm: React.FC<IProps> = ({
   useEffect(() => {
     /* 向规则服务里，加入修改表单数值的回调方法 */
     ruleService?.setFormChangeCallback(form.id, (data: any) => {
-      onValuesChange && onValuesChange({}, data);
+      onValuesChange &&
+        onValuesChange(data, { ...formRef?.current?.getFieldsValue(), ...data });
       formRef?.current?.setFieldsValue(data);
     });
   }, [form.id]);

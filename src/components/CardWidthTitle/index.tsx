@@ -4,7 +4,7 @@ import { Button, Divider } from 'antd';
 import React, { ReactNode } from 'react';
 
 interface IProps {
-  title: string; //props
+  title?: string; //props
   children?: ReactNode;
   className?: string;
   btns?: any;
@@ -14,14 +14,17 @@ const CardWidthTitle: React.FC<IProps> = ({ title, children, className }) => {
   return (
     <>
       <div className={`CardWidthTitle-wrap ${className}`}>
-        <ul className="head flex">
-          <li className="head-title">
-            <Divider plain className="head-title-con">
-              {title}
-            </Divider>
-          </li>
-          <Button className="head-btn" icon={<AiOutlineEdit />} size={'small'}></Button>
-        </ul>
+        {title && (
+          <ul className="head flex">
+            <li className="head-title">
+              <Divider plain className="head-title-con">
+                {title}
+              </Divider>
+            </li>
+
+            <Button className="head-btn" icon={<AiOutlineEdit />} size={'small'}></Button>
+          </ul>
+        )}
         {children}
       </div>
     </>
