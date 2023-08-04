@@ -26,9 +26,9 @@ export type WorkFormRulesType = {
   // /* 初始化规则*/
   // initFormRules: (forms: any[]) => void;
   /* 表单渲染时，需提交表单修改方式 至此，用于规则处理后的回显：考虑返回规则执行结果，到页面处理渲染逻辑*/
-  setFormChangeCallback: (formId: string, callBack: (data: any) => void) => void;
+  setFormChangeCallback: (formId: string, callback: () => DataType) => void;
   /* 加载表单远程规则*/
-  loadRemoteRules: (forms: any[]) => void;
+  loadRemoteRules: (path: string) => Promise<void>;
   /* 处理表单规则，需提供表单标识，表单数据，当前修改数据等*/
   resloveFormRule: (
     trigger: RuleTypes.TriggerType,
@@ -36,10 +36,10 @@ export type WorkFormRulesType = {
     changeObj?: DataType, //变动项
   ) => void;
   /* 执行所有表单的最终提交规则 */
-  resloveSubmitRules: () => boolean;
+  resloveSubmitRules: () => Promise<boolean>;
 };
 
-class WorkFormRules extends Emitter {
+class WorkFormRules extends Emitter implements WorkFormRulesType {
   constructor(forms: IForm[], beloneId: string) {
     super();
     this._beloneId = beloneId;
@@ -87,7 +87,7 @@ class WorkFormRules extends Emitter {
   };
 
   // 设置表单的回调函数，表单首次渲染时触发
-  public setFormChangeCallback(formId: string, callback: () => DataType) {
+  public setFormChangeCallback(formId: string, callback: () => DataType): void {
     const _aimFormInfo: RuleTypes.MapType = this._AllFormRules.get(formId)!;
 
     // 如果该表单没有回调函数，则将该回调函数赋值给它，并执行一个 "Start" 触发器-即表单初始化
@@ -218,7 +218,7 @@ class WorkFormRules extends Emitter {
       }),
     );
 
-    // console.log('所有规则最终数据结果', Rules, '===>', resultObj);
+    console.log('所有规则最终数据结果', Rules, '===>', resultObj);
     return resultObj;
   }
 }

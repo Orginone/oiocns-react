@@ -35,7 +35,7 @@ export class WorkApply implements IWorkApply {
   belong: IBelong;
   metadata: model.WorkInstanceModel;
   instanceData: model.InstanceDataModel;
-  ruleService: any;
+  ruleService: WorkFormRulesType;
   async createApply(
     applyId: string,
     content: string,
