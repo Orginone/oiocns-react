@@ -90,6 +90,10 @@ export const loadWidgetsOpts = (valueType: string = '描述型') => {
           label: '多行文本',
           value: 'textarea',
         },
+        {
+          label: '多行文本',
+          value: 'textarea',
+        },
       ];
   }
 };
