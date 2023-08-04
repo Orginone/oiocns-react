@@ -115,42 +115,49 @@ class WorkFormRules extends Emitter implements WorkFormRulesType {
     changeObj: DataType | 'all' = 'all',
   ) => {
     const { id, data } = formData;
-    const _formId = trigger == RuleTriggers.ThingsChanged ? this.currentMainFormId : id;
 
-    // 如果 _AllFormRules 中存在这个表单的规则，则取出该表单的规则进行处理
+    // 根据触发类型确定待处理规则所属的表单ID
+    const _formId = trigger === RuleTriggers.ThingsChanged ? this.currentMainFormId : id;
+
     if (this._AllFormRules.has(_formId)) {
       const _info: RuleTypes.MapType = this._AllFormRules.get(_formId)!;
-      // 执行该表单的所有规则，并将规则返回的数据保存到 resultObj 中
+
+      // 构建执行规则所需参数
       let params: any = {
-        data: data,
+        data,
         attrs: _info.attrs,
       };
+
       /* 收集子表数据 */
-      if (trigger == RuleTriggers.ThingsChanged) {
+      if (trigger === RuleTriggers.ThingsChanged) {
         params['things'] = this._NewFormData.get(id)?.after;
       }
+
+      // 执行符合条件的规则，并将结果保存到 resultObj 中
       const resultObj = await this.renderRules(
         filterRules(_info.rules, trigger, changeObj),
         params,
       );
+
       /* 提交验证直接返回 */
       if (trigger === RuleTriggers.Submit) {
         return resultObj;
       }
 
-      // 如果该表单没有设置回调函数，则输出错误信息
-      if (!_info.callback) {
-        console.error('未设置回调函数：' + _formId);
-      }
       // 如果该表单设置了回调函数，则调用回调函数将数据传递给页面
-      _info.callback && _info.callback(resultObj as Object);
-      /* 若初始化结束，需执行一次运行态规则 */
-      if (
-        trigger == RuleTriggers.Start &&
-        typeof resultObj == 'object' &&
-        Object.keys(resultObj).length > 0
-      ) {
-        this.resloveFormRule(RuleTriggers.Running, { id: _formId, data: resultObj });
+      if (_info.callback) {
+        _info.callback(resultObj as Object);
+
+        /* 若初始化结束，需执行一次运行态规则 */
+        if (
+          trigger === RuleTriggers.Start &&
+          typeof resultObj === 'object' &&
+          Object.keys(resultObj).length > 0
+        ) {
+          this.resloveFormRule(RuleTriggers.Running, { id: _formId, data: resultObj });
+        }
+      } else {
+        console.error('未设置回调函数：' + _formId);
       }
     }
   };
