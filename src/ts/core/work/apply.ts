@@ -1,6 +1,7 @@
 import { kernel, model } from '../../base';
 import { IBelong } from '../target/base/belong';
-
+import { IForm } from '../thing/form';
+import WorkFormRules, { WorkFormRulesType } from './rules/workFormRules';
 export interface IWorkApply {
   /** 办事空间 */
   belong: IBelong;
@@ -8,6 +9,8 @@ export interface IWorkApply {
   metadata: model.WorkInstanceModel;
   /** 实例携带的数据 */
   instanceData: model.InstanceDataModel;
+  /** 业务规则触发器  */
+  ruleService: WorkFormRulesType;
   /** 发起申请 */
   createApply(
     applyId: string,
@@ -21,14 +24,18 @@ export class WorkApply implements IWorkApply {
     _metadata: model.WorkInstanceModel,
     _data: model.InstanceDataModel,
     _belong: IBelong,
+    _forms: IForm[],
   ) {
     this.metadata = _metadata;
     this.instanceData = _data;
     this.belong = _belong;
+    this.ruleService = new WorkFormRules(_forms, _belong.belongId);
+    //TODO:尝试在此处，执行规则初始化操作 修改instanceData
   }
   belong: IBelong;
   metadata: model.WorkInstanceModel;
   instanceData: model.InstanceDataModel;
+  ruleService: any;
   async createApply(
     applyId: string,
     content: string,
@@ -37,6 +44,7 @@ export class WorkApply implements IWorkApply {
     fromData.forEach((data, k) => {
       this.instanceData.data[k] = [data];
     });
+
     const res = await kernel.createWorkInstance({
       ...this.metadata,
       applyId: applyId,

@@ -8,13 +8,14 @@ import FormRenders from './formPreview';
 
 import { formatDate } from '@/utils';
 import { DataType } from 'typings/globelType';
+import { WorkFormRulesType } from '@/ts/core/work/rules/workFormRules';
 
 interface IWorkFormProps {
   allowEdit: boolean;
   belong: IBelong;
   nodeId: string;
   data: model.InstanceDataModel;
-  formRule?: any;
+  ruleService?: WorkFormRulesType;
   onChanged?: (id: string, data: model.FormEditData, changedData?: DataType) => void;
 }
 

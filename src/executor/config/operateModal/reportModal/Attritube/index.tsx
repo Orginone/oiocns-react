@@ -52,6 +52,7 @@ const Attritube = ({ current, modalType, setModalType }: IProps) => {
           key: '配置特性',
           label: '配置特性',
           onClick: () => {
+            console.log(item,'item')
             setSelectedItem(item);
             setModalType('配置特性');
           },

@@ -276,6 +276,24 @@ function getScrollX(propsColumns: { [key: string]: any }[]) {
   return { columnsRes, scrollx };
 }
 
+function getJsonText(fileUrl: string): Promise<string> {
+  return new Promise((ok, error) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', fileUrl);
+    xhr.onreadystatechange = function () {
+      if (xhr.readyState === XMLHttpRequest.DONE) {
+        if (xhr.status === 200) {
+          // 获取响应数据的原始文本内容
+          const rawText = xhr.responseText;
+          ok(rawText);
+        } else {
+          error('请求失败');
+        }
+      }
+    };
+    xhr.send();
+  });
+}
 export {
   filterEmptyPropObj,
   formatDate,
@@ -285,4 +303,5 @@ export {
   isEmoji,
   isSpecialChar,
   visitTree,
+  getJsonText
 };

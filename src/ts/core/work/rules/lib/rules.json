@@ -48,8 +48,7 @@
     "ruleType": "method",
     "trigger": ["Running"],
     "errorMsg": "计算净值合计规则错误",
-    "creatFun": null,
-    "content": "({$formData})=>{return $formData['461133780242010112']-$formData['469075538993090560']; }",
+    "creatFun": "(linkAttrs) => {let str = ''; linkAttrs.forEach(obj => { const curStr = `$formData['${obj.id}']`; if (str === '') { str = curStr; } else { str = str + '-' + curStr; } }); return `({$formData})=>{return ${str}}`; }",
     "isExtend": false,
     "remark": "固定模板：用于计算净值合计"
   },

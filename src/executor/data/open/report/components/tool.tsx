@@ -93,40 +93,6 @@ const fonts:any = [
   },
 ]
 const fontSizes:any = [...Array(100).keys()].slice(9)
-const cellTypes:any = [
-  {
-    label: '文本',
-    value: 'text',
-    renderer: 'text',
-    editor: 'text',
-  },
-  {
-    label: '数字',
-    value: 'numeric',
-    renderer: 'numeric',
-    editor: 'numeric',
-  },
-  {
-    label: '日期',
-    value: 'date',
-    renderer: 'date',
-    editor: 'date',
-  }
-]
-const typeTypes:any = [
-  {
-    label: '附件',
-    value: 'text',
-    renderer: 'text',
-    editor: 'text',
-  },
-  {
-    label: '特性',
-    value: 'numeric',
-    renderer: 'numeric',
-    editor: 'numeric',
-  },
-]
 const formulasTypes:any = [
   {
     label: '求和',
@@ -192,7 +158,9 @@ const ToolBar: React.FC<IProps> = ({ current,handClick,setModal }: IProps) => {
   // 缩进
   let defaultPaddingLeft:number = 4
   let paddingLeft:number = 4
-  const onSave = () =>{}
+  const onSave = () =>{
+    handClick('onSave','onSave')
+  }
   const onPublish = () =>{}
   const setFontWeight = ()=>{
     if (fontWeight === 'bold') {
@@ -242,7 +210,9 @@ const ToolBar: React.FC<IProps> = ({ current,handClick,setModal }: IProps) => {
   const setModalType = () => {
     setModal('新增特性')
   }
-  const merge=()=>{}
+  const mergeAndCenter=()=>{
+    handClick('', 'mergeAndCenter');
+  }
   const alignThis =(item:any)=>{console.log(item)}
 
   const handleChange = (value:any,type:any) => {
@@ -357,31 +327,18 @@ const ToolBar: React.FC<IProps> = ({ current,handClick,setModal }: IProps) => {
           <div className={cls['column-divider']}></div>
           <div className={cls['column-three']}>
             <div className={cls['row-one']}>
-              <a className={cls['icon-action']} title="合并居中" onClick={merge}>
+              <a className={cls['icon-action']} title="合并居中" onClick={mergeAndCenter}>
                 <span>合并居中</span>
               </a>
             </div>
             <div className={cls['row-two']}>
-              <a className={cls['icon-action']} title="拆分单元格" onClick={merge}>
+              <a className={cls['icon-action']} title="拆分单元格" onClick={mergeAndCenter}>
                 <span>拆分单元格</span>
               </a>
             </div>
           </div>
         </div>
         <div className={cls['flex-box-title']}>对齐方式</div>
-      </div>
-      <div className={cls['flex-box']}>
-        <div className={cls['row-one']}>
-          <Select defaultValue="文本" style={{ width: 100 }} onChange={handleChange}>
-            {
-              cellTypes.map((item:any)=>{
-                return <Option value={item.value}>{item.label}</Option>
-              })
-            }
-          </Select>
-        </div>
-        <div className={cls['row-two']}></div>
-        <div className={cls['flex-box-title']}>类型</div>
       </div>
       <div className={cls['flex-box']}>
         <div className={cls['row-one']}>
@@ -395,19 +352,6 @@ const ToolBar: React.FC<IProps> = ({ current,handClick,setModal }: IProps) => {
         </div>
         <div className={cls['row-two']}></div>
         <div className={cls['flex-box-title']}>公式</div>
-      </div>
-      <div className={cls['flex-box']}>
-        <div className={cls['row-one']}>
-          <Select defaultValue="附件" style={{ width: 100 }} onChange={handleChange}>
-            {
-              typeTypes.map((item:any)=>{
-                return <Option value={item.value}>{item.label}</Option>
-              })
-            }
-          </Select>
-        </div>
-        <div className={cls['row-two']}></div>
-        <div className={cls['flex-box-title']}>插入</div>
       </div>
       <div className={cls['flex-box']}>
         <div className={cls['row-one']}>

@@ -105,7 +105,7 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
       },
     },
     define: {
-      global: {},
+      // global: {},
       // 设置应用信息
       __APP_INFO__: JSON.stringify(__APP_INFO__),
     },
