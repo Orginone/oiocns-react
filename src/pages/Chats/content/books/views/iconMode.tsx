@@ -1,5 +1,4 @@
 import { Dropdown, Row, Col, Card, Typography, Badge, Tag } from 'antd';
-
 import React from 'react';
 import cls from './less/icon.module.less';
 import { IMsgChat } from '@/ts/core';

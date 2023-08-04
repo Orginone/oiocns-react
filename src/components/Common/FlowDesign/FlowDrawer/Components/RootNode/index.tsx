@@ -33,7 +33,7 @@ const RootNode: React.FC<IProps> = (props) => {
       <div className={cls[`roval-node`]}>
         <Row style={{ marginBottom: '10px' }}>
           <AiOutlineSetting style={{ marginTop: '3px' }} />
-          <span className={cls[`roval-node-title`]}>选择角色</span>
+          <span className={cls[`roval-node-title`]}>选择权限</span>
         </Row>
         <SelectAuth
           space={props.belong}
