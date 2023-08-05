@@ -112,6 +112,7 @@ export const loadStoreMenu = () => {
     key: '存储',
     label: '存储',
     itemType: 'group',
+    item: orgCtrl.provider.disk,
     children: [getUserMenu(), ...getTeamMenu()],
     icon: <EntityIcon notAvatar={true} entityId={orgCtrl.user.id} size={18} />,
   };

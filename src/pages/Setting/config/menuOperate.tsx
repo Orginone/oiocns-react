@@ -123,6 +123,7 @@ export const loadSettingMenu = () => {
     key: '设置',
     label: '设置',
     itemType: 'Tab',
+    item: orgCtrl.provider.disk,
     children: [getUserMenu(), ...getTeamMenu()],
     icon: <EntityIcon notAvatar={true} entityId={orgCtrl.user.id} size={18} />,
   };

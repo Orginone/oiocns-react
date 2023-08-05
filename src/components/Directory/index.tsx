@@ -3,7 +3,6 @@ import useStorage from '@/hooks/useStorage';
 import IconMode from './views/iconMode';
 import ListMode from './views/listMode';
 import TableMode from './views/tableMode';
-import orgCtrl from '@/ts/controller';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import SegmentContent from '@/components/Common/SegmentContent';
 import { IDirectory } from '@/ts/core';
@@ -16,9 +15,7 @@ interface IProps {
  * 存储-文件系统
  */
 const Directory: React.FC<IProps> = ({ mode, current }: IProps) => {
-  if (!current) {
-    current = orgCtrl.provider.disk;
-  }
+  if (!current) return <></>;
   const [key] = useCtrlUpdate(current);
   const [segmented, setSegmented] = useStorage('segmented', 'list');
 
