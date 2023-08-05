@@ -9,6 +9,8 @@ import { IIdentity, Identity } from './target/identity/identity';
 import { IStation } from './target/innerTeam/station';
 import { ITeam } from './target/base/team';
 import { ITarget } from './target/base/target';
+import { IDisk, Disk } from './thing/disk';
+
 const sessionUserName = 'sessionUser';
 
 /** 当前用户提供层 */
@@ -61,6 +63,10 @@ export class UserProvider {
       }
     }
     return targets;
+  }
+  /** 用户存储 */
+  get disk(): IDisk {
+    return new Disk(this._user!);
   }
   /**
    * 登录

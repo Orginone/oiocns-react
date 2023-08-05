@@ -61,7 +61,7 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
   request,
   ...rest
 }) => {
-  const [segment, setSegment] = useStorage('segment', 'List');
+  const [segment, setSegment] = useStorage('segment', 'list');
   const [defaultHeight, setDefaultHeight] = useState<number | 'auto'>('auto'); //计算高度
 
   // 监听父级高度

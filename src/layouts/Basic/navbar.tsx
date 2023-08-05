@@ -1,39 +1,32 @@
-import { Badge, Drawer, List, Space, Tabs, Tag } from 'antd';
-import React, { useEffect, useState } from 'react';
-import { Link, RouteComponentProps, withRouter } from 'react-router-dom';
-import cls from './index.module.less';
-import OrgIcons from '@/components/Common/GlobalComps/orgIcons';
-import TeamIcon from '@/components/Common/GlobalComps/entityIcon';
-import orgCtrl from '@/ts/controller';
+import { useEffect, useState } from 'react';
+import { Badge, Drawer, Layout, List, Space, Tabs, Tag } from 'antd';
 import { msgChatNotify } from '@/ts/core';
+import orgCtrl from '@/ts/controller';
+import styles from './index.module.less';
+import { Link } from 'react-router-dom';
+import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
+import OrgIcons from '@/components/Common/GlobalComps/orgIcons';
+import React from 'react';
 import { kernel, model, schema } from '@/ts/base';
 import { ImLink } from 'react-icons/im';
 import { showChatTime } from '@/utils/tools';
+const { Sider } = Layout;
 
-/**
- * 顶部导航
- * @param
- * @returns
- */
-const HeaderNav: React.FC<RouteComponentProps> = () => {
-  const [onlineVisible, setOnlineVisible] = useState(false);
-  const [msgKey, setMsgKey] = useState('');
-  const [taskKey, setTaskKey] = useState('');
+const Navbar: React.FC = () => {
   const [workCount, setWorkCount] = useState(0);
   const [msgCount, setMsgCount] = useState(0);
   const [online, setOnline] = useState(0);
+  const [onlineVisible, setOnlineVisible] = useState(false);
   useEffect(() => {
-    const id = msgChatNotify.subscribe((key) => {
+    const id = msgChatNotify.subscribe(() => {
       let noReadCount = 0;
       for (const item of orgCtrl.chat.chats) {
         noReadCount += item.chatdata.noReadCount;
       }
       setMsgCount(noReadCount);
-      setMsgKey(key);
     });
-    const workId = orgCtrl.work.notity.subscribe(async (key) => {
+    const workId = orgCtrl.work.notity.subscribe(async () => {
       setWorkCount(orgCtrl.work.todos.length);
-      setTaskKey(key);
     });
     kernel.onlineNotity.subscribe(() => {
       setOnline(kernel.onlineIds.length);
@@ -43,123 +36,96 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
       orgCtrl.work.notity.unsubscribe(workId);
     };
   }, []);
-  const navs = [
+  const actions = [
     {
-      key: 'home',
-      path: '/home',
-      title: '门户',
-      icon: 'home',
-      count: 0,
-      fath: '/home',
-      onClick: () => {},
-    },
-    {
-      key: msgKey,
-      path: '/chat',
-      title: '沟通',
-      icon: 'chat',
-      count: msgCount,
-      fath: '/chat',
-      onClick: () => {
-        orgCtrl.currentKey = '';
-        orgCtrl.changCallback();
-      },
-    },
-    {
-      key: taskKey,
-      path: '/work',
-      title: '办事',
-      icon: 'work',
-      count: workCount,
-      fath: '/work',
-      onClick: () => {
-        orgCtrl.currentKey = '';
-        orgCtrl.changCallback();
-      },
-    },
-    {
-      key: 'store',
-      path: '/store',
-      title: '存储',
-      icon: 'store',
-      count: 0,
-      fath: '/store',
-      onClick: () => {
-        orgCtrl.currentKey = '';
-        orgCtrl.changCallback();
-      },
-    },
-    {
-      key: 'setting',
-      path: '/setting',
-      title: orgCtrl.user.name,
-      count: 0,
+      text: '设置',
       icon: 'setting',
-      fath: '/setting',
-      onClick: () => {
-        orgCtrl.currentKey = '';
-        orgCtrl.changCallback();
-      },
+      path: '/setting',
+      count: 0,
+    },
+    {
+      text: '消息',
+      icon: 'chat',
+      path: '/chat',
+      count: msgCount,
+    },
+    {
+      text: '办事',
+      icon: 'work',
+      path: '/work',
+      count: workCount,
+    },
+    {
+      text: '存储',
+      icon: 'store',
+      path: '/store',
+      count: 0,
+    },
+    {
+      text: '门户',
+      icon: 'home',
+      path: '/home',
+      count: 0,
     },
   ];
 
-  const getLinkItem = (item: any) => {
-    return (
-      <Link
-        key={item.key}
-        to={item.path}
-        title={item.title}
-        onClick={() => {
-          item.onClick();
-        }}>
-        {item.key === 'setting' ? (
-          <>
-            <TeamIcon entityId={orgCtrl.user.id} size={28} title="设置" />
-            <OrgIcons
-              className={cls.settingIcon}
-              size={13}
-              type={item.icon}
-              notAvatar
-              selected={location.hash.startsWith('#' + item.fath)}
-            />
-          </>
-        ) : (
-          <OrgIcons
-            size={26}
-            type={item.icon}
-            selected={location.hash.startsWith('#' + item.fath)}
-          />
-        )}
-      </Link>
-    );
-  };
-
   return (
-    <div className={cls['header-nav-container']}>
-      <Space size={30}>
-        {online > 0 && (
+    <Sider className={styles.header} width={60}>
+      <Space
+        direction="vertical"
+        wrap
+        align="center"
+        size={30}
+        style={{ width: '100%', marginTop: 15 }}>
+        {actions.map((item) => {
+          return (
+            <Link
+              key={item.path}
+              title={item.text}
+              to={item.path}
+              onClick={() => {
+                orgCtrl.currentKey = '';
+                orgCtrl.changCallback();
+              }}>
+              <Badge count={item.count} size="small">
+                {item.icon === 'setting' ? (
+                  <EntityIcon entityId={orgCtrl.user.id} size={40} />
+                ) : (
+                  <OrgIcons
+                    size={26}
+                    type={item.icon}
+                    notAvatar
+                    selected={location.hash.startsWith('#' + item.path)}
+                  />
+                )}
+              </Badge>
+            </Link>
+          );
+        })}
+        {online > 0 ? (
           <div
             style={{ display: 'flex', cursor: 'pointer' }}
             onClick={() => setOnlineVisible(!onlineVisible)}>
             <Badge count={online} size="small">
               <ImLink size={22} color={'#4CAF50'} />
             </Badge>
+            <div style={{ height: 'calc(100vh - 380px)' }}></div>
           </div>
+        ) : (
+          <div style={{ height: 'calc(100vh - 380px)' }}></div>
         )}
-        {navs.map((item) => {
-          if (item.count > 0) {
-            return (
-              <Badge key={item.key} count={item.count} size="small">
-                {getLinkItem(item)}
-              </Badge>
-            );
-          } else {
-            return getLinkItem(item);
-          }
-        })}
+        <Link
+          to={'/passport/login'}
+          title="注销"
+          onClick={() => {
+            sessionStorage.clear();
+            location.reload();
+          }}>
+          <OrgIcons size={26} exit selected />
+        </Link>
+        {onlineVisible && <OnlineInfo onClose={() => setOnlineVisible(false)} />}
       </Space>
-      {onlineVisible && <OnlineInfo onClose={() => setOnlineVisible(false)} />}
-    </div>
+    </Sider>
   );
 };
 
@@ -240,10 +206,11 @@ const OnlineItem: React.FC<{ data: model.OnlineInfo }> = ({ data }) => {
             </Tag>
           </>
         }
-        avatar={<>{target && <TeamIcon entity={target} size={42} />}</>}
+        avatar={<>{target && <EntityIcon entity={target} size={42} />}</>}
         description={`使用地址:${data.remoteAddr}`}
       />
     </List.Item>
   );
 };
-export default withRouter(HeaderNav);
+
+export default Navbar;

@@ -24,7 +24,7 @@ const Book: React.FC<any> = ({
   filter: string;
   belong: ICompany;
 }) => {
-  const [segmented, setSegmented] = useStorage('segmented', 'icon');
+  const [segmented, setSegmented] = useStorage('segmented', 'list');
   const [isSupervise, setIsSupervise] = useState<boolean>(false); // 是否有超管权限
   const [msgKey] = useCtrlUpdate(msgChatNotify);
   if (chats === undefined) {
