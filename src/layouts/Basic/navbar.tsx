@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Badge, Drawer, Layout, List, Space, Tabs, Tag } from 'antd';
+import { Avatar, Badge, Drawer, Layout, List, Space, Tabs, Tag } from 'antd';
 import { msgChatNotify } from '@/ts/core';
 import orgCtrl from '@/ts/controller';
 import styles from './index.module.less';
@@ -38,13 +38,7 @@ const Navbar: React.FC = () => {
   }, []);
   const actions = [
     {
-      text: '设置',
-      icon: 'setting',
-      path: '/setting',
-      count: 0,
-    },
-    {
-      text: '消息',
+      text: '沟通',
       icon: 'chat',
       path: '/chat',
       count: msgCount,
@@ -56,75 +50,81 @@ const Navbar: React.FC = () => {
       count: workCount,
     },
     {
+      text: '首页',
+      icon: 'home',
+      path: '/home',
+      count: 0,
+    },
+    {
       text: '存储',
       icon: 'store',
       path: '/store',
       count: 0,
     },
     {
-      text: '门户',
-      icon: 'home',
-      path: '/home',
+      text: '设置',
+      icon: 'setting',
+      path: '/setting',
       count: 0,
     },
   ];
 
+  const NavItem = (item: any) => {
+    const selected = location.hash.startsWith('#' + item.path);
+    let content = <></>;
+    if (item.icon === 'setting') {
+      content = <EntityIcon entityId={orgCtrl.user.id} size={32} />;
+    } else {
+      content = <OrgIcons size={26} type={item.icon} notAvatar selected={selected} />;
+    }
+    if (item.count > 0) {
+      content = (
+        <Badge count={item.count} size="small">
+          {content}
+        </Badge>
+      );
+    }
+    return (
+      <Link
+        key={item.path}
+        to={item.path}
+        onClick={() => {
+          orgCtrl.currentKey = '';
+          orgCtrl.changCallback();
+        }}>
+        {content}
+        <div className={selected ? styles.title_selected : styles.title}>{item.text}</div>
+      </Link>
+    );
+  };
+
   return (
     <Sider className={styles.header} width={60}>
-      <Space
-        direction="vertical"
-        wrap
-        align="center"
-        size={30}
-        style={{ width: '100%', marginTop: 15 }}>
-        {actions.map((item) => {
-          return (
-            <Link
-              key={item.path}
-              title={item.text}
-              to={item.path}
-              onClick={() => {
-                orgCtrl.currentKey = '';
-                orgCtrl.changCallback();
-              }}>
-              <Badge count={item.count} size="small">
-                {item.icon === 'setting' ? (
-                  <EntityIcon entityId={orgCtrl.user.id} size={40} />
-                ) : (
-                  <OrgIcons
-                    size={26}
-                    type={item.icon}
-                    notAvatar
-                    selected={location.hash.startsWith('#' + item.path)}
-                  />
-                )}
-              </Badge>
-            </Link>
-          );
-        })}
-        {online > 0 ? (
+      <Link key={'/orginone'} title={'资产共享云'} to={'/home'}>
+        <Avatar size={40} src="/img/logo/logo3.jpg" />
+      </Link>
+      <Space direction="vertical" wrap align="center" size={25} className={styles.navbar}>
+        {online > 0 && (
           <div
             style={{ display: 'flex', cursor: 'pointer' }}
             onClick={() => setOnlineVisible(!onlineVisible)}>
             <Badge count={online} size="small">
               <ImLink size={22} color={'#4CAF50'} />
             </Badge>
-            <div style={{ height: 'calc(100vh - 380px)' }}></div>
           </div>
-        ) : (
-          <div style={{ height: 'calc(100vh - 380px)' }}></div>
         )}
-        <Link
-          to={'/passport/login'}
-          title="注销"
-          onClick={() => {
-            sessionStorage.clear();
-            location.reload();
-          }}>
-          <OrgIcons size={26} exit selected />
-        </Link>
+        {actions.map((item) => NavItem(item))}
         {onlineVisible && <OnlineInfo onClose={() => setOnlineVisible(false)} />}
       </Space>
+      <Link
+        to={'/passport/login'}
+        onClick={() => {
+          sessionStorage.clear();
+          location.reload();
+        }}>
+        <OrgIcons size={26} exit selected />
+        <div className={styles.title}>注销</div>
+      </Link>
     </Sider>
   );
 };

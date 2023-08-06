@@ -3,10 +3,10 @@ import './index.less';
 // import { Card } from 'antd';
 import React, { useEffect } from 'react';
 
-import BannerCom from './components/BannerCom';
 import SelfAppCom from './components/SelfAppCom';
 import Shortcuts from './components/ShortcutsCom';
-import Charts from './components/Charts';
+import { Tabs } from 'antd';
+import Activity from './Activity';
 
 //TODO: 临时获取本地banner
 let imgList: any[] = [];
@@ -32,17 +32,25 @@ const Home: React.FC = () => {
   return (
     <div className="work-home-wrap">
       {/* 顶部图片11111 */}
-      <BannerCom imgList={imgList} />
-      {/* 快捷入口及应用 */}
-      <div className=" flex">
-        <Shortcuts props={[]} />
+      {/*<BannerCom imgList={imgList} />*/}
+      <div className="home-content">
+        <Tabs defaultActiveKey="1" size="large" tabBarStyle={{ alignSelf: 'center' }}>
+          <Tabs.TabPane tab="动态" key="1">
+            <Activity></Activity>
+          </Tabs.TabPane>
+          <Tabs.TabPane tab="常用" key="2">
+            {/* 快捷入口及应用 */}
+            <Shortcuts props={[]} />
+          </Tabs.TabPane>
+          <Tabs.TabPane tab="应用" key="3">
+            {/* 快捷入口及应用 */}
+            <SelfAppCom props={[]} />
+          </Tabs.TabPane>
+        </Tabs>
       </div>
-      {/* 快捷入口及应用 */}
-      <div className=" flex">
-        <SelfAppCom props={[]} />
-      </div>
+
       {/* 底部区域 //TODO:临时*/}
-      <Charts />
+      {/*<Charts />*/}
     </div>
   );
 };
