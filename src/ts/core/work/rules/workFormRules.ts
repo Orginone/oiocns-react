@@ -10,6 +10,7 @@ import { filterRules, setFormRules } from './lib/tools';
 import * as Tools from './lib';
 import { IForm } from '../../thing/form';
 import { RuleTriggers } from '@/ts/base/model';
+import { ValueGoal } from './base/enum';
 
 // 定义表单规则的类型
 export type WorkFormRulesType = {
@@ -195,6 +196,7 @@ class WorkFormRules extends Emitter implements WorkFormRulesType {
     if (Rules?.[0].trigger === RuleTriggers.Submit) {
       resultObj = [];
     }
+    let other: any[] = [];
 
     // 遍历该表单的所有规则，并执行每一个规则
     await Promise.all(
@@ -213,10 +215,15 @@ class WorkFormRules extends Emitter implements WorkFormRulesType {
 
           // 如果规则执行成功，则将规则返回的数据合并到 resultObj 中
           if (res.success) {
-            if (Array.isArray(resultObj)) {
-              resultObj.push(res.data);
+            // 判断赋值类型
+            if (_R.valueGoal === ValueGoal.主表赋值 || !_R.valueGoal) {
+              if (Array.isArray(resultObj)) {
+                resultObj.push(res.data);
+              } else {
+                resultObj = { ...resultObj, ...res.data };
+              }
             } else {
-              resultObj = { ...resultObj, ...res.data };
+              other.push(res);
             }
           }
         } catch (error) {
@@ -225,7 +232,15 @@ class WorkFormRules extends Emitter implements WorkFormRulesType {
       }),
     );
 
-    console.log('所有规则最终数据结果', Rules, '===>', resultObj);
+    console.log(
+      '所有规则最终数据结果',
+      Rules,
+      '===>',
+      resultObj,
+      '====',
+      '非赋值操作===》',
+      other,
+    );
     return resultObj;
   }
 }
