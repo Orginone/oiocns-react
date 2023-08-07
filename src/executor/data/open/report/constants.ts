@@ -5,7 +5,7 @@ export const data = [
     37,
     4,
     5,
-    '=IF(Sheet1!A1>10,"TRUE","FALSE")', 
+    '=IF(Sheet1!A1>10,"TRUE","FALSE")',
     "Cycling Cap",
     "11/10/2020",
     "01-2331942",
@@ -90,7 +90,7 @@ export const data = [
     1
   ],
   [
-    
+
   ],
 ];
 
@@ -233,7 +233,7 @@ export const columns = [
       firstDay: 0,
       showWeekNumber: true,
       licenseKey: 'non-commercial-and-evaluation',
-      disableDayFn(date:any) {
+      disableDayFn(date: any) {
         // Disable Sunday and Saturday
         return date.getDay() === 0 || date.getDay() === 6;
       }

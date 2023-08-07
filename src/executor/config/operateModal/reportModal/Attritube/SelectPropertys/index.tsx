@@ -111,7 +111,8 @@ const SelectForms: React.FC<IProps> = (props) => {
         <div style={{ width: '33%' }} className={cls.right}>
           <ShareShowComp
             departData={props.selected}
-            deleteFuc={handelDel}></ShareShowComp>
+            deleteFuc={handelDel}
+          ></ShareShowComp>
         </div>
       </div>
     </div>
