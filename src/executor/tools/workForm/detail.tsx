@@ -5,12 +5,15 @@ import React from 'react';
 import { Tabs } from 'antd';
 import { EditModal } from '../editModal';
 import GenerateThingTable from '../generate/thingTable';
+import { WorkFormRulesType } from '@/ts/core/work/rules/workFormRules';
+import { RuleTriggers } from '@/ts/base/model';
 
 interface IProps {
   allowEdit: boolean;
   belong: IBelong;
   forms: schema.XForm[];
   data: model.InstanceDataModel;
+  ruleService?: WorkFormRulesType;
   getFormData: (id: string) => model.FormEditData;
   onChanged?: (id: string, data: model.FormEditData) => void;
 }
@@ -24,6 +27,10 @@ const DetailTable: React.FC<IProps> = (props) => {
   const [selectKeys, setSelectKeys] = useState<string[]>([]);
   useEffect(() => {
     props.onChanged?.apply(this, [form.id, formData]);
+    props.ruleService?.resloveFormRule(RuleTriggers.ThingsChanged, {
+      id: form.id,
+      data: formData,
+    });
   }, [formData]);
   return (
     <GenerateThingTable

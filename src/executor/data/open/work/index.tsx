@@ -1,5 +1,5 @@
 import { IWork } from '@/ts/core';
-import { Button, Input } from 'antd';
+import { Button, Input, message } from 'antd';
 import React, { useEffect, useState } from 'react';
 import WorkForm from '@/executor/tools/workForm';
 import FullScreenModal from '@/executor/tools/fullScreen';
@@ -41,8 +41,11 @@ const WorkStartDo: React.FC<IProps> = ({ current, finished }) => {
           belong={apply.belong}
           data={apply.instanceData}
           nodeId={apply.instanceData.node.id}
+          ruleService={apply.ruleService}
           onChanged={(id, data) => {
             formData.set(id, data);
+            /* 每次变化收集当前最新表单数据 */
+            apply.ruleService.serFormData = formData;
           }}
         />
         <div style={{ padding: 10, display: 'flex', alignItems: 'flex-end' }}>
@@ -55,9 +58,14 @@ const WorkStartDo: React.FC<IProps> = ({ current, finished }) => {
           />
           <Button
             type="primary"
-            onClick={() => {
-              apply.createApply(apply.belong.id, info.content, formData);
-              finished();
+            onClick={async () => {
+              let res = await apply.ruleService.resloveSubmitRules();
+              if (res) {
+                apply.createApply(apply.belong.id, info.content, formData);
+                finished();
+              } else {
+                message.warning('表单提交规则验证失败，请检查');
+              }
             }}>
             提交
           </Button>

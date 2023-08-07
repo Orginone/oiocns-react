@@ -8,6 +8,7 @@ interface IProps {
 const DataExecutor: React.FC<IProps> = ({ cmd, args, finished }) => {
   switch (cmd) {
     case 'open':
+    case 'openFolderWithEditor':
     case 'remark':
       if (args && args.length > 0) {
         return <ExecutorOpen cmd={cmd} entity={args[0]} finished={finished} />;

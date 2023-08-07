@@ -88,7 +88,6 @@ const Attritube = ({ current, modalType, setModalType }: IProps) => {
     }
   };
 
-
   return (
     <>
       <CardOrTable<XAttribute>
