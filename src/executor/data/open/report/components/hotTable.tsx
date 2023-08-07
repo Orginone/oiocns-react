@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import { HotTable } from "@handsontable/react";
 import { Modal } from 'antd';
 import { HyperFormula } from 'hyperformula';
-// import { data,columns,columnSummary } from "./constants";
 import { textRenderer, registerRenderer } from 'handsontable/renderers';
 import { registerLanguageDictionary, zhCN } from 'handsontable/i18n';
 registerLanguageDictionary(zhCN);
@@ -22,14 +21,13 @@ interface IProps {
   reportChange:any,
   changeType:string,
 }
-let cells:any = []
 let mergeData:any = []
 
 const HotTableView: React.FC<IProps> = ({ current, selectItem, reportChange, changeType }) => {
-  console.log(current,'current')
   const [modalType, setModalType] = useState<string>('');
   const [tkey, tforceUpdate] = useObjectUpdate('');
   const [selectedItem,setSelectedItem] = useState<XAttribute>();
+  const [cells, setCells] = useState<any>([]);
   // 项配置改变
   const formValuesChange = (changedValues: any) => {
     if (selectedItem) {
@@ -43,15 +41,20 @@ const HotTableView: React.FC<IProps> = ({ current, selectItem, reportChange, cha
     }
   };
   const hotRef:any = useRef(null)
-  let cellMeta:any = []
   let sheetList = current.metadata?.rule?JSON.parse(current.metadata?.rule):[]
-  console.log(sheetList,'sheetList')
   let sheetIndex = sheetList.findIndex((it:any)=>it.code === selectItem.code)
-  let data = sheetList[sheetIndex]?.data?.length>0?sheetList[sheetIndex].data.data:[[]]
+  let datas = sheetList[sheetIndex]?.data?.data || [[]]
+  let setting = sheetList[sheetIndex]?.data?.setting || {}
+  cells?.forEach((item:any)=>{ //渲染单元格颜色
+    hotRef.current.hotInstance.getCellMeta(item.row, item.col).renderer = 'customStylesRenderer';
+  })
+  
   useEffect(() => {
     const hot = hotRef.current.hotInstance;
+    setCells(setting?.cells || [])
     hot.updateSettings({
-      data: data,
+      data: datas,
+      cell: cells,
     });
     // changeSize = () =>{
     //   autoColumn = !autoColumn
@@ -108,7 +111,6 @@ const HotTableView: React.FC<IProps> = ({ current, selectItem, reportChange, cha
   }
 
   const saveClickCallback = async() => { // 保存
-    console.log(cells,'cell111')
     let newData = hotRef.current.hotInstance.getData()
     let json = {
       data:newData,
@@ -124,7 +126,7 @@ const HotTableView: React.FC<IProps> = ({ current, selectItem, reportChange, cha
         // cellList:cellData
       }
     }
-    console.log(json)
+    console.log(json,'保存数据结构---还未更新完')
     sheetList[sheetIndex].data = json
     await current.update(
       {
@@ -134,13 +136,13 @@ const HotTableView: React.FC<IProps> = ({ current, selectItem, reportChange, cha
         rule: JSON.stringify(sheetList),
       } as model.FormModel,
     )
-    for(var i = 0;i<newData.length;i++){
-      for(var k=0;k<rulesData.length;k++){
-        if(i==rulesData[k].row){
-          newData[i][rulesData[k].col] = rulesData[k].val
-        }
-      }
-    }
+    // for(var i = 0;i<newData.length;i++){
+    //   for(var k=0;k<rulesData.length;k++){
+    //     if(i==rulesData[k].row){
+    //       newData[i][rulesData[k].col] = rulesData[k].val
+    //     }
+    //   }
+    // }
     // var mergeCellArr = hot.Plugins('Mergecells')
     // console.log(mergeCellArr,'mergeCellArr')
   }
@@ -149,9 +151,6 @@ const HotTableView: React.FC<IProps> = ({ current, selectItem, reportChange, cha
     saveClickCallback()
   }
   
-  let styleList:any = []
-  let rulesData:any = []
-  let cellData:any = []
   let autoColumn:boolean = true
   let autoRow:boolean = false
 
@@ -170,6 +169,7 @@ const HotTableView: React.FC<IProps> = ({ current, selectItem, reportChange, cha
       for (let rowIndex = startRow; rowIndex <= endRow; rowIndex += 1) {
         for (let columnIndex = startCol; columnIndex <= endCol; columnIndex += 1) {
           let json = { row: rowIndex, col: columnIndex, type:'', prop:prop}
+          console.log(cells,'cells')
           if(prop.property?.valueType === '数值型'){
             json.type = 'numeric'
             cells.push(json)
@@ -190,25 +190,31 @@ const HotTableView: React.FC<IProps> = ({ current, selectItem, reportChange, cha
     }
   }
 
-  const upDataCell = () =>{ // 更新特性rules
+  const upDataCell = () =>{ // 更新特性rules 但单元格只有只读属性 readOnly
     cells.forEach((item:any)=>{
       current.attributes.forEach(items=>{
         if(item.prop.propId === items.propId){
           item.prop = items
+          let newRule = JSON.parse(item.prop.rule)
+          if(newRule){
+            for(var key in newRule){
+              hotRef.current.hotInstance.setCellMeta(item.row,item.col,key,newRule[key])
+            }
+          }
         }
       })
     })
   }
 
-  const afterFormulasValuesUpdate = (changes:any) => {
+  const afterFormulasValuesUpdate = (changes:any) => { //公式更新后
     changes.forEach((change:any) => {
-      console.log('change', change.address, change.newValue);
+      // console.log('change', change.address, change.newValue);
     });
   };
 
   const afterOnCellMouseDown = (event:any,coords:any, TD:any) => {
     // console.log(event,coords,TD)
-    console.log(cells,'cell2')
+    // console.log(cells,'cell2')
     cells?.forEach((item:any)=>{
       if(item.row === coords.row && item.col === coords.col){
         setModalType('配置特性');
@@ -217,8 +223,8 @@ const HotTableView: React.FC<IProps> = ({ current, selectItem, reportChange, cha
     })
   }
 
-  const afterChange = (change:any,source:any) =>{
-    console.log(change,source,'123aa')
+  const afterChange = (change:any,source:any) =>{ // 修改后
+    // console.log(change,source,'123aa')
     let arr:any =[]
     if(change && change.length>0){
       change.forEach((item:any)=>{
@@ -226,7 +232,15 @@ const HotTableView: React.FC<IProps> = ({ current, selectItem, reportChange, cha
         arr.push(json1)
       })
     }
-    rulesData = arr
+    // rulesData = arr
+  }
+
+  const afterSetCellMeta = (row:Number, col:Number, key:string, val:boolean) =>{
+    console.log(row, col, key, val,'row, col, key, val')
+    if(key != 'hidden' && key != 'spanned'){
+      // let json = {row:row,col:col,key:key,val:val}
+      // cellMeta.push(json)
+    }
   }
 
   registerRenderer('customStylesRenderer', (hotInstance, TD, ...rest) => {
@@ -328,13 +342,7 @@ const HotTableView: React.FC<IProps> = ({ current, selectItem, reportChange, cha
         afterUpdateSettings={function(change){
           // console.log(change)
         }}
-        afterSetCellMeta={function(row, col, key, val) {
-          console.log(row, col, key, val,'row, col, key, val')
-          if(key != 'hidden' && key != 'spanned'){
-            // let json = {row:row,col:col,key:key,val:val}
-            // cellMeta.push(json)
-          }
-        }}
+        afterSetCellMeta={afterSetCellMeta}
         afterFormulasValuesUpdate={afterFormulasValuesUpdate}
       />
 

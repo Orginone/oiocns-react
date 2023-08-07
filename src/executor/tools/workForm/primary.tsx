@@ -11,7 +11,7 @@ interface IProps {
   data: model.InstanceDataModel;
   ruleService?: WorkFormRulesType;
   getFormData: (id: string) => model.FormEditData;
-  onChanged?: (id: string, data: model.FormEditData, changedData?: Object) => void;
+  onChanged?: (id: string, data: model.FormEditData) => void;
 }
 
 const PrimaryForm: React.FC<IProps> = (props) => {
@@ -56,7 +56,7 @@ const PrimaryForm: React.FC<IProps> = (props) => {
             props.data.primary[k] = vals[k];
           });
           formData.after = [data];
-          props.onChanged?.apply(this, [form.id, formData, _val]);
+          props.onChanged?.apply(this, [form.id, formData]);
           setData({ ...data });
         }
       }}
@@ -64,4 +64,25 @@ const PrimaryForm: React.FC<IProps> = (props) => {
   );
 };
 
-export default PrimaryForm;
+const PrimaryForms: React.FC<IProps> = (props) => {
+  if (props.forms.length < 1) return <></>;
+  const [activeTabKey, setActiveTabKey] = useState(props.forms[0].id);
+  const loadItems = () => {
+    return props.forms.map((form) => {
+      return {
+        key: form.id,
+        label: form.name,
+        children: <PrimaryForm {...props} forms={[form]} />,
+      };
+    });
+  };
+  return (
+    <Tabs
+      items={loadItems()}
+      activeKey={activeTabKey}
+      onChange={(key) => setActiveTabKey(key)}
+    />
+  );
+};
+
+export default PrimaryForms;
