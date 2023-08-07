@@ -46,6 +46,7 @@ const JoinTarget: React.FC<IProps> = ({ cmd, current, finished }) => {
       open={true}
       onOk={async () => {
         if (await current.applyJoin(selectMembers)) {
+          debugger;
           finished();
         }
       }}

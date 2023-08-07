@@ -28,7 +28,7 @@ getImgAssets();
  * @desc: 项目首页
  */
 const Home: React.FC = () => {
-  useEffect(() => {}, []);
+  useEffect(() => { }, []);
   return (
     <div className="work-home-wrap">
       {/* 顶部图片11111 */}
@@ -36,7 +36,14 @@ const Home: React.FC = () => {
       <div className="home-content">
         <Tabs defaultActiveKey="1" size="large" tabBarStyle={{ alignSelf: 'center' }}>
           <Tabs.TabPane tab="动态" key="1">
-            <Activity></Activity>
+            <iframe
+              id="iframeContain"
+              name="iframeContain"
+              seamless
+              src="http://localhost:8081/"
+            >
+              您当前的浏览器不支持页面上的功能，请升级您当前的浏览器版本或使用谷歌浏览器访问当前页面
+            </iframe>
           </Tabs.TabPane>
           <Tabs.TabPane tab="常用" key="2">
             {/* 快捷入口及应用 */}
