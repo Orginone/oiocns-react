@@ -1,8 +1,11 @@
 import React from 'react';
 import { model } from '../../../ts/base';
 import { IBelong } from '@/ts/core';
-import PrimaryForms from './primary';
+
 import DetailForms from './detail';
+import PrimaryForms from './primary';
+import FormRenders from './formPreview';
+
 import { formatDate } from '@/utils';
 import { DataType } from 'typings/globelType';
 import { WorkFormRulesType } from '@/ts/core/work/rules/workFormRules';
@@ -38,6 +41,7 @@ const WorkForm: React.FC<IWorkFormProps> = (props) => {
   /** 根据需求获取数据 */
   const getFormData = (id: string): model.FormEditData => {
     const source: model.AnyThingModel[] = [];
+    
     if (props.data.data && props.data.data[id]) {
       const beforeData = props.data.data[id];
       if (beforeData.length > 0) {
@@ -59,10 +63,12 @@ const WorkForm: React.FC<IWorkFormProps> = (props) => {
       createTime: formatDate(new Date(), 'yyyy-MM-dd hh:mm:ss.S'),
     };
   };
+  
   const primaryForms = node.forms.filter((f) => f.typeName === '主表');
   const detailForms = node.forms.filter((f) => f.typeName === '子表');
   return (
     <div style={{ padding: 10 }}>
+      <FormRenders {...props} forms={primaryForms} getFormData={getFormData}/>
       <PrimaryForms {...props} forms={primaryForms} getFormData={getFormData} />
       <DetailForms {...props} forms={detailForms} getFormData={getFormData} />
     </div>
