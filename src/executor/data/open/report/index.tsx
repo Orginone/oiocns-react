@@ -7,10 +7,12 @@ import { IReport } from '@/ts/core';
 
 interface IProps {
   current: IReport;
+  selectItem:any;
   finished: () => void;
 }
 
-const ReportView: React.FC<IProps> = ({ current, finished }) => {
+const ReportView: React.FC<IProps> = ({ current, selectItem, finished }) => {
+  console.log(current,'current',selectItem,'selectItem')
   const [reportChange,setReportChange] = useState<any>();
   const [changeType,setChangeType] = useState<string>('');
   const [modalType,setModalType] = useState<string>('');
@@ -37,7 +39,7 @@ const ReportView: React.FC<IProps> = ({ current, finished }) => {
         <div className={cls['report-tool-box']}>
           <ToolBar current={current} handClick={handClick} setModal={setModal}></ToolBar>
         </div>
-        <HotTableView current={current} reportChange={reportChange} changeType={changeType}></HotTableView>
+        <HotTableView current={current} selectItem={selectItem} reportChange={reportChange} changeType={changeType}></HotTableView>
         {/* <HotTable
           ref={hotRef}
           rowHeaders={true}

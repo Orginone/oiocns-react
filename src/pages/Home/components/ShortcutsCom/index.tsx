@@ -29,7 +29,7 @@ const BannerCom: React.FC<ShortcutsComType> = () => {
    */
 
   return (
-    <CardWidthTitle className="shortcuts-wrap" title={'常用'}>
+    <CardWidthTitle className="shortcuts-wrap">
       <div className="groupbuttons">
         {btns.map((item) => {
           return (

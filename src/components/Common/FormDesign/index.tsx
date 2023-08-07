@@ -126,23 +126,17 @@ const Design: React.FC<IProps> = ({ current }) => {
 
     setEditFormOpen(true)
   }
-  const getType = (type: string) => {
-    switch (type) {
-      case 'string':
-        return 'string'
-        break
 
-    }
-  };
 
   const currentToSchemaFun = (currentValue: IForm) => {
     const { metadata: { rule } } = currentValue;
     const rules = rule ? JSON.parse(rule) : {};
+
     //如果配置过
-    if(rules && JSON.stringify(rules) !== '{}' ){
-      return rules.schema;
-    }
-    else{
+    // if (rules && JSON.stringify(rules) !== '{}') {
+    //   return rules.schema;
+    // }
+    // else {
       //没有配置过
       const schema: schemaType = {
         displayType: 'row',
@@ -153,34 +147,32 @@ const Design: React.FC<IProps> = ({ current }) => {
       };
       let result = current.attributes.reduce((result, item: any) => {
         const rule = JSON.parse(item.rule || '{}');
-        // 规则校验
-        let rules: Rule[] = [];
-        if (rule.rules ) {
-          if (typeof rule.rules === 'string') {
-            rules = [...rules, { message: '所填内容不符合要求', pattern: rule.rules }];
-          } else if (rule.rules instanceof Array) {
-            for (const r of rule.rules) {
-              rules = [...rules, { message: '所填内容不符合要求', pattern: r }];
-            }
-          }
+        if (!rule.type) {
+          rule.type = loadWidgetsOpts(item.property!.valueType)[0].value;
         }
-        if (rule.required === true) {
-          rules = [...rules, { required: true, message: `${rule.title}为必填项` }];
+        //const title = item.name;
+        let title, type, widget, format, enums, enumNames;
+        title = item.name;
+        type = loadWidgetsOpts(item.property!.valueType)[0].value;
+        widget = loadWidgetsOpts(item.property!.valueType)[1].value;
+        if(widget === 'textarea'){
+          format ='textarea'
+          widget = '';
         }
-       
-        if (!rule.widget) {
-          rule.widget = loadWidgetsOpts(item.property!.valueType)[0].value;
-          console.log("@@",rule.widget)
+        if(widget === 'dateTime'){
+          format ='dateTime'
+          widget = null;
         }
-        
+
         return {
           ...result,
-          [item.property!.info]: {
-            title: item.name,
-            type: rule.widget === "text" ?'string':rule.widget,
-            widget:rule.widget=== "range" ?'':rule.widget ,
-            "format":rule.widget === "range"? "date":"",
-            ...item,
+          [item.property!.id]: {
+            title,
+            type,
+            widget,
+            enum: enums,
+            enumNames,
+            format,
           }
         }
       }, {})
@@ -190,8 +182,8 @@ const Design: React.FC<IProps> = ({ current }) => {
       const { col } = rules;
       schema.column = col === 24 ? 1 : col === 12 ? 2 : col === 8 ? 3 : 1;
       return schema;
-    }
-   
+    // }
+
   }
   return (
     <div style={{ display: 'flex' }}>

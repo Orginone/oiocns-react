@@ -85,7 +85,7 @@ const OioFormItem = ({
   useEffect(() => {
     if (value && ['file', 'upload'].includes(rule.widget)) {
       setFileList(
-        JSON.parse(value).map((a: FileItemShare) => {
+        value.map((a: FileItemShare) => {
           return {
             uid: a.name,
             name: a.name,
