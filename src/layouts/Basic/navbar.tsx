@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Avatar, Badge, Drawer, Layout, List, Space, Tabs, Tag } from 'antd';
+import { Badge, Drawer, Layout, List, Space, Tabs, Tag } from 'antd';
 import { msgChatNotify } from '@/ts/core';
 import orgCtrl from '@/ts/controller';
 import styles from './index.module.less';
@@ -71,12 +71,7 @@ const Navbar: React.FC = () => {
 
   const NavItem = (item: any) => {
     const selected = location.hash.startsWith('#' + item.path);
-    let content = <></>;
-    if (item.icon === 'setting') {
-      content = <EntityIcon entityId={orgCtrl.user.id} size={32} />;
-    } else {
-      content = <OrgIcons size={26} type={item.icon} notAvatar selected={selected} />;
-    }
+    let content = <OrgIcons size={26} type={item.icon} notAvatar selected={selected} />;
     if (item.count > 0) {
       content = (
         <Badge count={item.count} size="small">
@@ -101,7 +96,7 @@ const Navbar: React.FC = () => {
   return (
     <Sider className={styles.header} width={60}>
       <Link key={'/orginone'} title={'资产共享云'} to={'/home'}>
-        <Avatar size={40} src="/img/logo/logo3.jpg" />
+        <EntityIcon entityId={orgCtrl.user.id} size={45} />
       </Link>
       <Space direction="vertical" wrap align="center" size={25} className={styles.navbar}>
         {online > 0 && (
