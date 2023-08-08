@@ -27,6 +27,9 @@ import { Modal, UploadProps } from 'antd';
 import { FileItemShare } from '@/ts/base/model';
 import { downloadByUrl } from '@/utils/tools';
 import { model } from '@/ts/base';
+import PDF from '@/assets/img/pdf.png';
+import word from '@/assets/img/word.png';
+import file from '@/assets/img/file.png';
 import EntityIcon from '../../GlobalComps/entityIcon';
 
 interface IProps {
@@ -38,11 +41,7 @@ interface IProps {
   onFilesValueChange?: (key: string, files: any[]) => void;
 }
 
-const defaultFilsUrl = [
-  '/public/img/pdf.png',
-  '/public/img/word.png',
-  '/public/img/file.png',
-];
+const defaultFilsUrl = [PDF, word, file];
 /**
  * 表单项渲染
  */
@@ -57,7 +56,8 @@ const OioFormItem = ({
   const rule = JSON.parse(field.rule || '{}');
   // 规则校验
   let rules: Rule[] = [];
-  if (rule.rules && !noRule) {
+  // 基本规则
+  if (rule.rules) {
     if (typeof rule.rules === 'string') {
       rules = [...rules, { message: '所填内容不符合要求', pattern: rule.rules }];
     } else if (rule.rules instanceof Array) {
@@ -66,11 +66,17 @@ const OioFormItem = ({
       }
     }
   }
-  if (rule.required === true) {
-    rules = [...rules, { required: true, message: `${rule.title}为必填项` }];
-  }
+  // 对不展示规则需求，隐藏必填项
   if (noRule) {
-    rules = [];
+    rule.required = false;
+    rules = rules?.map((r) => {
+      return { ...r, required: false };
+    });
+  } else {
+    // 对展示规则需求，修改提示词
+    if (rule.required === true && !noRule) {
+      rules = [...rules, { required: true, message: `${field.name}为必填项` }];
+    }
   }
   if (!rule.widget) {
     rule.widget = loadWidgetsOpts(field.valueType)[0].value;
@@ -120,7 +126,6 @@ const OioFormItem = ({
 
         if (result) {
           const _data = result.shareInfo();
-          console.log('da', _data);
           const showImg =
             _data.extension && ['.png', '.jpg', '.jpeg'].includes(_data.extension)
               ? _data.shareLink

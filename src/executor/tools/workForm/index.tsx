@@ -1,16 +1,22 @@
 import React from 'react';
 import { model } from '../../../ts/base';
 import { IBelong } from '@/ts/core';
-import PrimaryForms from './primary';
+
 import DetailForms from './detail';
+import PrimaryForms from './primary';
+import FormRenders from './formPreview';
+
 import { formatDate } from '@/utils';
+import { DataType } from 'typings/globelType';
+import { WorkFormRulesType } from '@/ts/core/work/rules/workFormRules';
 
 interface IWorkFormProps {
   allowEdit: boolean;
   belong: IBelong;
   nodeId: string;
   data: model.InstanceDataModel;
-  onChanged?: (id: string, data: model.FormEditData) => void;
+  ruleService?: WorkFormRulesType;
+  onChanged?: (id: string, data: model.FormEditData, changedData?: DataType) => void;
 }
 
 const getNodeByNodeId = (
@@ -60,6 +66,7 @@ const WorkForm: React.FC<IWorkFormProps> = (props) => {
   const detailForms = node.forms.filter((f) => f.typeName === '子表');
   return (
     <div style={{ padding: 10 }}>
+      <FormRenders {...props} forms={primaryForms} getFormData={getFormData} />
       <PrimaryForms {...props} forms={primaryForms} getFormData={getFormData} />
       <DetailForms {...props} forms={detailForms} getFormData={getFormData} />
     </div>
