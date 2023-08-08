@@ -40,8 +40,7 @@ const Home: React.FC = () => {
               id="iframeContain"
               name="iframeContain"
               seamless
-              src="http://localhost:8081/"
-            >
+              src="http://localhost:8081/">
               您当前的浏览器不支持页面上的功能，请升级您当前的浏览器版本或使用谷歌浏览器访问当前页面
             </iframe>
           </Tabs.TabPane>
