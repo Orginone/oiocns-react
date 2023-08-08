@@ -1,18 +1,17 @@
 import React, { useState } from 'react';
 import CardOrTable from '@/components/CardOrTableComp';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
-import { IForm } from '@/ts/core';
+import { IReport } from '@/ts/core';
 import AttributeConfig from '@/components/Common/FormDesign/attributeConfig';
 import { ProColumns } from '@ant-design/pro-components';
 import SchemaForm from '@/components/SchemaForm';
 
 interface IProps {
-  current: IForm;
+  current: IReport;
   modalType: string;
   recursionOrg: boolean;
   setModalType: (modalType: string) => void;
 }
-
 
 /**
  * @description: 表报页标准
@@ -36,28 +35,30 @@ const Rules = ({ current, modalType, setModalType }: IProps) => {
   };
   // 操作内容渲染函数
   const renderOperate = (item: any) => {
-    if (!current.directory.isInherited) {
-      return [
-        {
-          key: '编辑规则',
-          label: '编辑规则',
-          onClick: () => {
-            setSelectedItem(item);
-            setModalType('编辑规则');
-          },
+    const operates = [
+      {
+        key: '编辑规则',
+        label: '编辑规则',
+        onClick: () => {
+          setSelectedItem(item);
+          setModalType('编辑规则');
         },
-        {
-          key: '删除',
-          label: <span style={{ color: 'red' }}>删除</span>,
-          onClick: async () => {
-            let index = rulesList.findIndex((it:any)=>{ return it.code === item.code})
-            rulesList.splice(index,1)
-            tforceUpdate();
-          },
+      },
+      {
+        key: '删除',
+        label: <span style={{ color: 'red' }}>删除</span>,
+        onClick: async () => {
+          let index = rulesList.findIndex((it: any) => {
+            return it.code === item.code;
+          });
+          rulesList.splice(index, 1);
+          tforceUpdate();
         },
-      ];
-    } 
+      },
+    ];
+    return operates;
   };
+
   const RulesColumns = (): ProColumns<any>[] => [
     {
       title: '序号',
@@ -90,7 +91,7 @@ const Rules = ({ current, modalType, setModalType }: IProps) => {
     },
   ];
 
-  const columns:any = [
+  const columns: any = [
     {
       title: '规则编号',
       dataIndex: 'code',
@@ -110,7 +111,7 @@ const Rules = ({ current, modalType, setModalType }: IProps) => {
           {
             value: 'all',
             label: '全部',
-          }
+          },
         ],
       },
     },
@@ -126,7 +127,7 @@ const Rules = ({ current, modalType, setModalType }: IProps) => {
           {
             value: 'all',
             label: '全部',
-          }
+          },
         ],
       },
     },
@@ -169,10 +170,11 @@ const Rules = ({ current, modalType, setModalType }: IProps) => {
             }
           }}
           onFinish={async (values) => {
-            setRulesList((current:any) => [...current,values])
+            setRulesList((current: any) => [...current, values]);
             setModalType('');
-            tforceUpdate()
-        }}></SchemaForm>  
+            tforceUpdate();
+          }}
+        ></SchemaForm>
       )}
       {/** 编辑特性模态框 */}
       {modalType.includes('修改规则') && selectedItem && (

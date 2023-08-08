@@ -4,6 +4,7 @@ import { IBelong } from '@/ts/core';
 import { useEffect, useState } from 'react';
 import React from 'react';
 import { WorkFormRulesType } from '@/ts/core/work/rules/workFormRules';
+import { Tabs } from 'antd';
 interface IProps {
   allowEdit: boolean;
   belong: IBelong;
