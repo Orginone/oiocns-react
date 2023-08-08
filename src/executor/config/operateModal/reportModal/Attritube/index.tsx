@@ -52,7 +52,7 @@ const Attritube = ({ current, modalType, setModalType }: IProps) => {
           key: '配置特性',
           label: '配置特性',
           onClick: () => {
-            console.log(item,'item')
+            console.log(item, 'item');
             setSelectedItem(item);
             setModalType('配置特性');
           },
@@ -146,7 +146,8 @@ const Attritube = ({ current, modalType, setModalType }: IProps) => {
           destroyOnClose
           okText="确定"
           onOk={() => setModalType('')}
-          onCancel={() => setModalType('')}>
+          onCancel={() => setModalType('')}
+        >
           <SelectPropertys
             target={current.directory.target}
             selected={current.attributes.map((a) => a.property!)}

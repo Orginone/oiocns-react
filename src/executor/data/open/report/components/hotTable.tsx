@@ -1,14 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { HotTable } from "@handsontable/react";
+import { HotTable } from '@handsontable/react';
 import { Modal } from 'antd';
 import { HyperFormula } from 'hyperformula';
-// import { data,columns,columnSummary } from "./constants";
 import { textRenderer, registerRenderer } from 'handsontable/renderers';
 import { registerLanguageDictionary, zhCN } from 'handsontable/i18n';
 registerLanguageDictionary(zhCN);
 import { registerAllModules } from 'handsontable/registry';
 registerAllModules();
-import "handsontable/dist/handsontable.min.css";
+import 'handsontable/dist/handsontable.min.css';
 import SelectPropertys from '@/executor/config/operateModal/labelsModal/Attritube/SelectPropertys';
 import AttributeConfig from '@/components/Common/FormDesign/attributeConfig';
 import { AttributeModel } from '@/ts/base/model';
@@ -17,19 +16,22 @@ import useObjectUpdate from '@/hooks/useObjectUpdate';
 import { XAttribute } from '@/ts/base/schema';
 import { model } from '@/ts/base';
 interface IProps {
-  current: IReport,
-  selectItem:any,
-  reportChange:any,
-  changeType:string,
+  current: IReport;
+  selectItem: any;
+  reportChange: any;
+  changeType: string;
 }
-let cells:any = []
-let mergeData:any = []
 
-const HotTableView: React.FC<IProps> = ({ current, selectItem, reportChange, changeType }) => {
-  console.log(current,'current')
+const HotTableView: React.FC<IProps> = ({
+  current,
+  selectItem,
+  reportChange,
+  changeType,
+}) => {
   const [modalType, setModalType] = useState<string>('');
   const [tkey, tforceUpdate] = useObjectUpdate('');
-  const [selectedItem,setSelectedItem] = useState<XAttribute>();
+  const [selectedItem, setSelectedItem] = useState<XAttribute>();
+  const [cells, setCells] = useState<any>([]);
   // 项配置改变
   const formValuesChange = (changedValues: any) => {
     if (selectedItem) {
@@ -42,28 +44,32 @@ const HotTableView: React.FC<IProps> = ({ current, selectItem, reportChange, cha
       current.updateAttribute({ ...selectedItem, ...rule, rule: JSON.stringify(rule) });
     }
   };
-  const hotRef:any = useRef(null)
-  let cellMeta:any = []
-  let sheetList = current.metadata?.rule?JSON.parse(current.metadata?.rule):[]
-  console.log(sheetList,'sheetList')
-  let sheetIndex = sheetList.findIndex((it:any)=>it.code === selectItem.code)
-  let data = sheetList[sheetIndex]?.data?.length>0?sheetList[sheetIndex].data.data:[[]]
+  const hotRef: any = useRef(null);
+  let sheetList = current.metadata?.rule ? JSON.parse(current.metadata?.rule) : [];
+  let sheetIndex = sheetList.findIndex((it: any) => it.code === selectItem.code);
+  let datas = sheetList[sheetIndex]?.data?.data || [[]];
+  let setting = sheetList[sheetIndex]?.data?.setting || {};
+  let mergeCells = setting?.mergeCells;
+  let autoColumn: boolean = true; //自适应
+  let autoRow: boolean = false;
+  cells?.forEach((item: any) => {
+    //渲染单元格颜色
+    hotRef.current.hotInstance.getCellMeta(item.row, item.col).renderer =
+      'customStylesRenderer';
+  });
+
   useEffect(() => {
     const hot = hotRef.current.hotInstance;
+    setCells(setting?.cells || []);
     hot.updateSettings({
-      data: data,
+      data: datas,
+      cell: cells,
+      mergeCells: mergeCells,
     });
-    // changeSize = () =>{
-    //   autoColumn = !autoColumn
-    // };
-    // selectOptionChangeCallback = event =>{
-    //   console.log(event,'event')
-    //   const selected = hot.getSelected() || [];
-    //   console.log(selected,'selected')
-    // } 
-  },[])
+  }, []);
 
-  const buttonClickCallback = () => { // 工具栏按钮点击
+  const buttonClickCallback = () => {
+    // 工具栏按钮点击
     const selected = hotRef.current.hotInstance.getSelected() || [];
     hotRef.current.hotInstance.suspendRender();
     for (let index = 0; index < selected.length; index += 1) {
@@ -74,92 +80,55 @@ const HotTableView: React.FC<IProps> = ({ current, selectItem, reportChange, cha
       const endCol = Math.max(column1, column2);
 
       for (let rowIndex = startRow; rowIndex <= endRow; rowIndex += 1) {
-        for (let columnIndex = startCol; columnIndex <= endCol; columnIndex += 1) {
-          // const kv = hot.getCellMeta(rowIndex, columnIndex)
-          // console.log(kv,'kv')
-          // const cell = hot.getCell(rowIndex, columnIndex);
-          // cell.style[changeType] = reportChange;
-          // kv[changeType] = reportChange;
-          // hot.setCellMeta(rowIndex, columnIndex, 'style', kv);
-          // hot.setDataAtCell(rowIndex, columnIndex, 'data changed');
-          // hot.getCellMeta(rowIndex, columnIndex).renderer = 'customStylesRenderer';
-          if(changeType == 'dataType'){
-            // let json = { row: rowIndex, col: columnIndex, type:reportChange}
-            // cell.push(json)
-            // reportChange=''
-            // // hot.setCellMeta(rowIndex, columnIndex, 'type', reportChange);
-            // hot.updateSettings({
-            //   cell: cell,
-            // });
-          }else if(changeType == 'mergeAndCenter'){
-
-          }else{
-            hotRef.current.hotInstance.setCellMeta(rowIndex, columnIndex, 'className', reportChange);
-          }
-        }
+        for (let columnIndex = startCol; columnIndex <= endCol; columnIndex += 1) {}
       }
     }
     hotRef.current.hotInstance.render();
     hotRef.current.hotInstance.resumeRender();
+  };
+
+  if (changeType !== '') {
+    buttonClickCallback();
   }
 
-  if(changeType !== ''){
-    buttonClickCallback()
-  }
-
-  const saveClickCallback = async() => { // 保存
-    console.log(cells,'cell111')
-    let newData = hotRef.current.hotInstance.getData()
+  const saveClickCallback = async () => {
+    // 保存 保存数据结构---还未更新完
+    let newData = hotRef.current.hotInstance.getData();
     let json = {
-      data:newData,
-      setting:{
-        mergeCells:hotRef.current.hotInstance.getPlugin('mergeCells').mergedCellsCollection.mergedCells,
-        autoColumnSize:hotRef.current.hotInstance.getPlugin('autoColumnSize').enabled,
-        AutoRowSize:hotRef.current.hotInstance.getPlugin('AutoRowSize').enabled,
-        cells:cells
+      data: newData,
+      setting: {
+        mergeCells:
+          hotRef.current.hotInstance.getPlugin('mergeCells').mergedCellsCollection
+            .mergedCells,
+        autoColumnSize: hotRef.current.hotInstance.getPlugin('autoColumnSize').enabled,
+        AutoRowSize: hotRef.current.hotInstance.getPlugin('AutoRowSize').enabled,
+        cells: cells,
         // columns:columns,
         // cellMeta:cellMeta,
         // styleList:styleList,
         // columnSummary:columnSummary,
         // cellList:cellData
-      }
-    }
-    console.log(json)
-    sheetList[sheetIndex].data = json
-    await current.update(
-      {
-        id:current.id,
-        name: current.name,
-        code: current.code,
-        rule: JSON.stringify(sheetList),
-      } as model.FormModel,
-    )
-    for(var i = 0;i<newData.length;i++){
-      for(var k=0;k<rulesData.length;k++){
-        if(i==rulesData[k].row){
-          newData[i][rulesData[k].col] = rulesData[k].val
-        }
-      }
-    }
-    // var mergeCellArr = hot.Plugins('Mergecells')
-    // console.log(mergeCellArr,'mergeCellArr')
-  }
+      },
+    };
+    sheetList[sheetIndex].data = json;
+    await current.update({
+      id: current.id,
+      name: current.name,
+      code: current.code,
+      rule: JSON.stringify(sheetList),
+    } as model.FormModel);
+  };
 
-  if(changeType == 'onSave'){
-    saveClickCallback()
+  if (changeType == 'onSave') {
+    saveClickCallback();
   }
-  
-  let styleList:any = []
-  let rulesData:any = []
-  let cellData:any = []
-  let autoColumn:boolean = true
-  let autoRow:boolean = false
 
   const hyperformulaInstance = HyperFormula.buildEmpty({
     licenseKey: 'internal-use-in-handsontable',
   });
 
-  const saveSpeciality = (prop:XAttribute) => {
+  const saveSpeciality = (prop: XAttribute) => {
+    //插入特性
     const selected = hotRef.current.hotInstance.getSelected() || [];
     for (let index = 0; index < selected.length; index += 1) {
       const [row1, column1, row2, column2] = selected[index];
@@ -169,69 +138,114 @@ const HotTableView: React.FC<IProps> = ({ current, selectItem, reportChange, cha
       const endCol = Math.max(column1, column2);
       for (let rowIndex = startRow; rowIndex <= endRow; rowIndex += 1) {
         for (let columnIndex = startCol; columnIndex <= endCol; columnIndex += 1) {
-          let json = { row: rowIndex, col: columnIndex, type:'', prop:prop}
-          if(prop.property?.valueType === '数值型'){
-            json.type = 'numeric'
-            cells.push(json)
-          }else if(prop.property?.valueType === '时间型'){
-            json.type = 'date'
-            cells.push(json)
-          }else{
-            json.type = 'text'
-            cells.push(json)
+          let json = { row: rowIndex, col: columnIndex, type: '', prop: prop };
+          if (prop.property?.valueType === '数值型') {
+            json.type = 'numeric';
+            cells.push(json);
+          } else if (prop.property?.valueType === '时间型') {
+            json.type = 'date';
+            cells.push(json);
+          } else {
+            json.type = 'text';
+            cells.push(json);
           }
           // hotRef.current.hotInstance.updateSettings({
           //   cell: cell,
           // });
-          hotRef.current.hotInstance.getCellMeta(rowIndex, columnIndex).renderer = 'customStylesRenderer';
+          hotRef.current.hotInstance.getCellMeta(rowIndex, columnIndex).renderer =
+            'customStylesRenderer';
           // hotRef.current.hotInstance.setDataAtCell(rowIndex, columnIndex, prop.name);
         }
       }
     }
-  }
+  };
 
-  const upDataCell = () =>{ // 更新特性rules
-    cells.forEach((item:any)=>{
-      current.attributes.forEach(items=>{
-        if(item.prop.propId === items.propId){
-          item.prop = items
+  const upDataCell = () => {
+    // 更新特性rules 但单元格只有只读属性 readOnly
+    cells.forEach((item: any) => {
+      current.attributes.forEach((items) => {
+        if (item.prop.propId === items.propId) {
+          item.prop = items;
+          let newRule = JSON.parse(item.prop.rule);
+          if (newRule) {
+            for (var key in newRule) {
+              hotRef.current.hotInstance.setCellMeta(
+                item.row,
+                item.col,
+                key,
+                newRule[key],
+              );
+            }
+          }
         }
-      })
-    })
-  }
-
-  const afterFormulasValuesUpdate = (changes:any) => {
-    changes.forEach((change:any) => {
-      console.log('change', change.address, change.newValue);
+      });
     });
   };
 
-  const afterOnCellMouseDown = (event:any,coords:any, TD:any) => {
-    // console.log(event,coords,TD)
-    console.log(cells,'cell2')
-    cells?.forEach((item:any)=>{
-      if(item.row === coords.row && item.col === coords.col){
-        setModalType('配置特性');
-        setSelectedItem(item.prop)
-      }
-    })
-  }
+  const afterFormulasValuesUpdate = (changes: any) => {
+    //公式更新后
+    changes.forEach((change: any) => {
+      // console.log('change', change);
+    });
+  };
 
-  const afterChange = (change:any,source:any) =>{
-    console.log(change,source,'123aa')
-    let arr:any =[]
-    if(change && change.length>0){
-      change.forEach((item:any)=>{
-        let json1={row:item[0],col:item[1],val:item[3]}
-        arr.push(json1)
-      })
+  const afterOnCellMouseDown = (event: any, coords: any, TD: any) => {
+    // console.log(event, coords, TD)
+    cells?.forEach((item: any) => {
+      if (item.row === coords.row && item.col === coords.col) {
+        setModalType('配置特性');
+        setSelectedItem(item.prop);
+      }
+    });
+  };
+
+  const afterChange = (change: any, source: any) => {
+    // 修改后
+    // console.log(change, source)
+    let arr: any = [];
+    if (change && change.length > 0) {
+      change.forEach((item: any) => {
+        let json1 = { row: item[0], col: item[1], val: item[3] };
+        arr.push(json1);
+      });
     }
-    rulesData = arr
-  }
+    // rulesData = arr
+  };
+
+  const afterSetCellMeta = (row: Number, col: Number, key: string, val: boolean) => {
+    // console.log(row, col, key, val, 'row, col, key, val')
+    if (key != 'hidden' && key != 'spanned') {
+      // let json = {row:row,col:col,key:key,val:val}
+      // cellMeta.push(json)
+    }
+  };
+
+  const afterBeginEditing = (row: Number, col: Number) => {
+    //修改后
+    // console.log(row, col, 'row,col')
+    const editobj = hotRef.current.hotInstance.getActiveEditor(); //当前编辑的对象
+    const nowcell = editobj.TD; //当前编辑的格子
+    // console.log(editobj, nowcell)
+    // editobj.textareaStyle.color = nowcell.style.color;//获取当前编辑格子的颜色
+    // nowcell.innerHTML = ""; //这个主要是解决上面颜色透明的问题
+  };
+
+  const afterUpdateSettings = (change: any) => {
+    console.log(change, 'change');
+  };
+
+  const afterSelection = (
+    row: Number,
+    column: Number,
+    row2: Number,
+    column2: Number,
+    preventScrolling: any,
+    selectionLayerLevel: any,
+  ) => {};
 
   registerRenderer('customStylesRenderer', (hotInstance, TD, ...rest) => {
     textRenderer(hotInstance, TD, ...rest);
-    TD.style.background = '#e1f3d8'
+    TD.style.background = '#e1f3d8';
     // if(changeType === 'typeFace'){
     //   TD.style.fontFamily = reportChange
     // }
@@ -260,7 +274,7 @@ const HotTableView: React.FC<IProps> = ({ current, selectItem, reportChange, cha
     // styleList.push(json)
   });
 
-	return (
+  return (
     <div>
       <HotTable
         ref={hotRef}
@@ -275,8 +289,6 @@ const HotTableView: React.FC<IProps> = ({ current, selectItem, reportChange, cha
         // manualColumnMove={true} // 列移动
         // manualRowMove={true} // 行移动
         height="auto"
-        mergeCells={mergeData}
-        // contextMenu={true}
         language={zhCN.languageCode}
         stretchH="all"
         manualColumnResize={true}
@@ -284,70 +296,46 @@ const HotTableView: React.FC<IProps> = ({ current, selectItem, reportChange, cha
         autoColumnSize={autoColumn}
         autoRowSize={autoRow}
         multiColumnSorting={true}
-        // cell={[
-        //   { row: 1, col: 0, type:'date' }
-        // ]}
-        // cell={cell}
         contextMenu={{
           items: {
-            'row_above': {},
-            'row_below': {},
-            'col_left':{},
-            'col_right':{},
-            'make_read_only':{},
-            'alignment':{},
-            'mergeCells':{},
-            // 'separator': ContextMenu.SEPARATOR,
-            // 'clear_custom': {
-            //   name: 'Clear all cells (custom)',
-            //   callback: function() {
-            //     this.clear();
-            //   }
-            // }
-            'insert_speciality': {
+            row_above: {},
+            row_below: {},
+            col_left: {},
+            col_right: {},
+            make_read_only: {},
+            alignment: {},
+            mergeCells: {},
+            insert_speciality: {
               name: '插入特性',
-              callback: function(key, options) {
-                console.log(key,options,'1234')
+              callback: function (key, options) {
                 setModalType('新增特性');
-              }
-            }
-          }
+              },
+            },
+          },
         }}
-        afterSelection={(row, column, row2, column2, preventScrolling, selectionLayerLevel) => {
-          // console.log(row, column, row2, column2, preventScrolling, selectionLayerLevel)
-          // preventScrolling.value = true;
-        }}
+        afterSelection={afterSelection}
         outsideClickDeselects={false}
         licenseKey="non-commercial-and-evaluation" // for non-commercial use only
         afterChange={afterChange}
-        afterMergeCells={function(change, source){
-          console.log(change,source)
-          mergeData.push(source)
-        }}
         afterOnCellMouseDown={afterOnCellMouseDown} //鼠标点击单元格边角后被调用
-        afterUpdateSettings={function(change){
-          // console.log(change)
-        }}
-        afterSetCellMeta={function(row, col, key, val) {
-          console.log(row, col, key, val,'row, col, key, val')
-          if(key != 'hidden' && key != 'spanned'){
-            // let json = {row:row,col:col,key:key,val:val}
-            // cellMeta.push(json)
-          }
-        }}
+        afterUpdateSettings={afterUpdateSettings}
+        afterBeginEditing={afterBeginEditing}
+        afterSetCellMeta={afterSetCellMeta}
         afterFormulasValuesUpdate={afterFormulasValuesUpdate}
       />
 
-      {
-        modalType=='新增特性'?
+      {modalType == '新增特性' ? (
         <Modal
           open
           width={800}
           title="选择属性"
           destroyOnClose
           okText="确定"
-          onOk={() => {setModalType('')}}
-          onCancel={() => setModalType('')}>
+          onOk={() => {
+            setModalType('');
+          }}
+          onCancel={() => setModalType('')}
+        >
           <SelectPropertys
             target={current.directory.target}
             selected={current.attributes.map((a) => a.property!)}
@@ -363,8 +351,8 @@ const HotTableView: React.FC<IProps> = ({ current, selectItem, reportChange, cha
               );
               tforceUpdate();
               const attr = current.attributes.find((i) => i.propId === prop.id);
-              if(attr){
-                saveSpeciality(attr)
+              if (attr) {
+                saveSpeciality(attr);
               }
             }}
             onDeleted={async (id) => {
@@ -375,8 +363,10 @@ const HotTableView: React.FC<IProps> = ({ current, selectItem, reportChange, cha
               }
             }}
           />
-        </Modal>:''
-      }
+        </Modal>
+      ) : (
+        ''
+      )}
 
       {/** 编辑特性模态框 */}
       {modalType.includes('配置特性') && selectedItem && (
@@ -387,20 +377,13 @@ const HotTableView: React.FC<IProps> = ({ current, selectItem, reportChange, cha
             setSelectedItem(undefined);
             setModalType('');
             tforceUpdate();
-            console.log(current,'12345')
-            upDataCell()
+            console.log(current, '12345');
+            upDataCell();
           }}
           superAuth={current.directory.target.space.superAuth!.metadata}
         />
       )}
     </div>
-    // {/* <div className="controls">
-    //   <button id="load" className="button button--primary button--blue" onClick={(...args) => loadClickCallback(...args)}>加载数据</button>&nbsp;
-    //   <button id="save" className="button button--primary button--blue" onClick={(...args) => saveClickCallback(...args)}>保存数据</button>
-    //   <button className="button button--primary button--blue" onClick={(...args) => changeSize(...args)}>列宽自适应</button>
-    //   <button className="button button--primary button--blue" onClick={(...args) => buttonClickCallback(...args)}>修改样式</button>
-    //   <button className="button button--primary button--blue" onClick={(...args) => selectOptionChangeCallback(...args)}>获取选择</button>
-    // </div> */}
-	)
+  );
 };
 export default HotTableView;

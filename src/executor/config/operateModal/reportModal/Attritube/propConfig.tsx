@@ -76,13 +76,15 @@ const PropertyConfig = (props: IProps) => {
               await props.form.updateAttribute(props.attr, selectedItem as XProperty);
             }
             props.onFinish.apply(this, []);
-          }}>
+          }}
+        >
           {selectedItem && <ImCheckmark fontSize={20} style={{ marginRight: 20 }} />}
         </Typography.Link>,
         <Typography.Link key={'222'} onClick={props.onFinish}>
           <ImCross fontSize={18} />
         </Typography.Link>,
-      ]}>
+      ]}
+    >
       <CustomTree
         defaultExpandAll={true}
         onSelect={(_, info) => {
