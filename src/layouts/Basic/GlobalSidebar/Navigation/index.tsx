@@ -59,7 +59,7 @@ const Navigation: React.FC = () => {
     {
       key: 'setting',
       path: '/setting',
-      title: orgCtrl.user.name,
+      title: '设置',
     },
   ];
 

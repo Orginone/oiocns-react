@@ -7,16 +7,10 @@ import OrgIcons from '@/components/Common/GlobalComps/orgIcons';
 
 const GlobalSidebar: React.FC = () => {
   return (
-    <Layout.Sider width={88}>
+    <Layout.Sider width={56}>
       <div className={cls.globalSlider}>
         <Link to="/home" style={{ fontSize: 16, fontWeight: 'bold' }}>
-          <Avatar
-            shape="square"
-            src="/img/logo/logo3.jpg"
-            alt="首页"
-            size={50}
-            style={{ marginRight: 10 }}
-          />
+          <Avatar shape="square" src="/img/logo/logo3.jpg" alt="首页" size={40} />
         </Link>
         <Navigation></Navigation>
         <div
