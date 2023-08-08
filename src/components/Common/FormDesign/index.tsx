@@ -94,7 +94,6 @@ const Design: React.FC<IProps> = ({ current }) => {
     setDefaultSchema(currentToSchemaFun(current));
     setEditFormOpen(true);
   };
-
   const currentToSchemaFun = (currentValue: IForm) => {
     const {
       metadata: { rule },
@@ -131,7 +130,6 @@ const Design: React.FC<IProps> = ({ current }) => {
           format = 'dateTime';
           widget = null;
         }
-
         return {
           ...result,
           [item.property!.id]: {

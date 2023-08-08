@@ -28,9 +28,6 @@ const FormEditModal: React.FC<IProps> = ({
   // 创建ref
   const myComponentRef = useRef(null);
 
-  // const NewWidget = ({ value = 0, onChange }) => (
-  //   <button onClick={() => onChange(value + 1)}>{value}</button>
-  // );
   const onSchemaChange = (e: schemaType) => {
     const ruleInfo = JSON.parse(current.metadata.rule || '{}');
     current.update({
@@ -41,11 +38,7 @@ const FormEditModal: React.FC<IProps> = ({
       }),
     });
   };
-  const onCanvasSelect = (e: any) => {
-    // if (JSON.stringify(e) !== '{}')
-    //   itemClick(e);
-    console.log(e);
-  };
+  //const onCanvasSelect = (e: any) => {};
 
   //页面重载获取默认schema或者配置后的schema
   const settings = defaultSettings[0];
@@ -86,7 +79,7 @@ const FormEditModal: React.FC<IProps> = ({
         defaultValue={defaultSchema}
         onSchemaChange={onSchemaChange}
         settings={[defaultSettings[2], settings]}
-        onCanvasSelect={onCanvasSelect}
+        //onCanvasSelect={onCanvasSelect}
         widgets={{ money: ProFormMoney }}
         commonSettings={{ ...defaultCommonSettings }}
         ref={myComponentRef}

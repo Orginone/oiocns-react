@@ -58,6 +58,7 @@ const FormRenders: React.FC<IProps> = (props) => {
         schema={rule.schema}
         disabled={!props.allowEdit}
         watch={watch}
+        //beforeFinish={beforeFinish}
       />
     );
   });

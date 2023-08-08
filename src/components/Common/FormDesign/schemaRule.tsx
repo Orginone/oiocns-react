@@ -1,6 +1,5 @@
 //组件映射关系：https://1.xrender.fun/form-render/api/inner-widget
 export const loadWidgetsOpts = (valueType: string = '描述型') => {
-  console.log("valueType",valueType)
   switch (valueType) {
     case '用户型':
       return [
