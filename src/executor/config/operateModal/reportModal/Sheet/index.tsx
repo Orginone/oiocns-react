@@ -22,39 +22,38 @@ interface IProps {
 const Sheet = ({ current, modalType, setModalType }: IProps) => {
   const [tkey, tforceUpdate] = useObjectUpdate('');
   const [selectedItem, setSelectedItem] = useState<any>();
-  let sheetList = current.metadata?.rule?JSON.parse(current.metadata?.rule):[]
+  let sheetList = current.metadata?.rule ? JSON.parse(current.metadata?.rule) : [];
 
   // 操作内容渲染函数
-  const renderOperate = (item:any) => {
-    if (!current.directory.isInherited) {
-      return [
-        {
-          key: '打开',
-          label: '打开',
-          onClick: () => {
-            setSelectedItem(item)
-            setModalType('配置sheet页')
-          },
+  const renderOperate = (item: any) => {
+    const operates = [
+      {
+        key: '打开',
+        label: '打开',
+        onClick: () => {
+          setSelectedItem(item);
+          setModalType('配置sheet页');
         },
-        {
-          key: '删除',
-          label: <span style={{ color: 'red' }}>删除</span>,
-          onClick: async () => {
-            let index = sheetList.findIndex((it:any)=>{ return it.code === item.code})
-            sheetList.splice(index,1)
-            await current.update(
-              {
-                id:current.id,
-                name: current.name,
-                code: current.code,
-                rule: JSON.stringify(sheetList),
-              } as model.FormModel,
-            )
-            tforceUpdate()
-          }
-        }
-      ]
-    } 
+      },
+      {
+        key: '删除',
+        label: <span style={{ color: 'red' }}>删除</span>,
+        onClick: async () => {
+          let index = sheetList.findIndex((it: any) => {
+            return it.code === item.code;
+          });
+          sheetList.splice(index, 1);
+          await current.update({
+            id: current.id,
+            name: current.name,
+            code: current.code,
+            rule: JSON.stringify(sheetList),
+          } as model.FormModel);
+          tforceUpdate();
+        },
+      },
+    ];
+    return operates;
   };
   const SheetColumns = (): ProColumns<any>[] => [
     {
@@ -76,7 +75,7 @@ const Sheet = ({ current, modalType, setModalType }: IProps) => {
     },
   ];
 
-  const columns:any[] = [
+  const columns: any[] = [
     {
       title: '名称',
       dataIndex: 'name',
@@ -90,7 +89,7 @@ const Sheet = ({ current, modalType, setModalType }: IProps) => {
       formItemProps: {
         rules: [{ required: true, message: '编号为必填项' }],
       },
-    }
+    },
   ];
 
   return (
@@ -121,22 +120,27 @@ const Sheet = ({ current, modalType, setModalType }: IProps) => {
             }
           }}
           onFinish={async (values) => {
-            sheetList = [...sheetList,values]
-            await current.update(
-              {
-                id:current.id,
-                name: current.name,
-                code: current.code,
-                rule: JSON.stringify(sheetList),
-              } as model.FormModel,
-            )
+            sheetList = [...sheetList, values];
+            await current.update({
+              id: current.id,
+              name: current.name,
+              code: current.code,
+              rule: JSON.stringify(sheetList),
+            } as model.FormModel);
             setModalType('');
-            tforceUpdate()
-        }}></SchemaForm> 
+            tforceUpdate();
+          }}
+        ></SchemaForm>
       )}
 
       {['配置sheet页'].includes(modalType) && (
-        <ReportView current={current} selectItem={selectedItem} finished={async()=>{setModalType('')}}></ReportView>
+        <ReportView
+          current={current}
+          selectItem={selectedItem}
+          finished={async () => {
+            setModalType('');
+          }}
+        ></ReportView>
       )}
     </>
   );
