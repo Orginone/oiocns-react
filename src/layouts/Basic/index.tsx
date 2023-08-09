@@ -28,7 +28,10 @@ const BasicLayout: React.FC<BasicLayoutProps> = (props) => {
       {inited ? (
         <>
           <Navbar />
-          <Layout>
+          <Layout
+            style={{
+              overflow: 'auto',
+            }}>
             {/** 命令执行器 */}
             <Executor />
             {/* 公共头部 */}

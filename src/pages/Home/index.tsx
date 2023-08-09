@@ -19,7 +19,7 @@ const Home: React.FC = () => {
     <div className={cls.homepage}>
       <NavigationBar></NavigationBar>
       <HeadBanner
-        backgroundImageUrl={'src/assets/img/activity-bg.png'}
+        backgroundImageUrl={'/img/banner/activity-bg.png'}
         title="群动态"></HeadBanner>
       <Row gutter={[24, 24]} className={cls.content}>
         <Col span={12}>
