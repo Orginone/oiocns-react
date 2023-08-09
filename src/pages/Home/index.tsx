@@ -1,56 +1,146 @@
-import './index.less';
-
-// import { Card } from 'antd';
+import cls from './index.module.less';
 import React, { useEffect } from 'react';
+import HeadBanner from '@/pages/Home/components/HeadBanner';
+import { Avatar, Card, Col, List, Row } from 'antd';
+import NavigationBar from '@/pages/Home/components/NavigationBar';
 
-import SelfAppCom from './components/SelfAppCom';
-import Shortcuts from './components/ShortcutsCom';
-import { Tabs } from 'antd';
-import Activity from '@/pages/Activity';
-
-//TODO: 临时获取本地banner
-let imgList: any[] = [];
-
-/**
- * @desc: 获取图片列表资源
- * @return  {url:string} 图片信息
- */
-function getImgAssets() {
-  for (let i = 1; i < 5; i++) {
-    imgList.push({
-      url: `/img/banner/${i}.png`,
-    });
-  }
-}
-getImgAssets();
-
-/**
- * @desc: 项目首页
- */
 const Home: React.FC = () => {
   useEffect(() => {}, []);
-  return (
-    <div className="work-home-wrap">
-      {/* 顶部图片11111 */}
-      {/*<BannerCom imgList={imgList} />*/}
-      <div className="home-content">
-        <Tabs defaultActiveKey="1" size="large" tabBarStyle={{ alignSelf: 'center' }}>
-          <Tabs.TabPane tab="动态" key="1">
-            <Activity></Activity>
-          </Tabs.TabPane>
-          <Tabs.TabPane tab="常用" key="2">
-            {/* 快捷入口及应用 */}
-            <Shortcuts props={[]} />
-          </Tabs.TabPane>
-          <Tabs.TabPane tab="应用" key="3">
-            {/* 快捷入口及应用 */}
-            <SelfAppCom props={[]} />
-          </Tabs.TabPane>
-        </Tabs>
-      </div>
 
-      {/* 底部区域 //TODO:临时*/}
-      {/*<Charts />*/}
+  const data = Array.from({ length: 23 }).map((_, i) => ({
+    href: '#',
+    title: `名字名字${i}`,
+    avatar: 'https://joeschmoe.io/api/v1/random',
+    content:
+      '动态内容动态内容动态内容动态内容动态内容动态内容动态内容动态内容动态内容动态内容动态内容动态内容动态内容动态内容...',
+  }));
+
+  return (
+    <div className={cls.homepage}>
+      <NavigationBar></NavigationBar>
+      <HeadBanner
+        backgroundImageUrl={'src/assets/img/activity-bg.png'}
+        title="群动态"></HeadBanner>
+      <Row gutter={[24, 24]} className={cls.content}>
+        <Col span={12}>
+          <Card title="经常浏览">
+            <List
+              itemLayout="vertical"
+              size="large"
+              dataSource={data}
+              footer={
+                <div>
+                  <b>ant design</b> footer part
+                </div>
+              }
+              renderItem={(item) => (
+                <List.Item
+                  key={item.title}
+                  extra={
+                    <img
+                      width={272}
+                      alt="logo"
+                      src="https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png"
+                    />
+                  }>
+                  <List.Item.Meta
+                    avatar={<Avatar src={item.avatar} />}
+                    title={<a href={item.href}>{item.title}</a>}
+                  />
+                  {item.content}
+                </List.Item>
+              )}
+            />
+          </Card>
+        </Col>
+        <Col span={12}>
+          <List
+            itemLayout="vertical"
+            size="large"
+            dataSource={data}
+            footer={
+              <div>
+                <b>ant design</b> footer part
+              </div>
+            }
+            renderItem={(item) => (
+              <List.Item key={item.title}>
+                <List.Item.Meta
+                  avatar={<Avatar src={item.avatar} />}
+                  title={<a href={item.href}>{item.title}</a>}
+                />
+                {item.content}
+
+                <Row gutter={[16, 16]}>
+                  <Col span={8}>
+                    <img
+                      width="100%"
+                      alt="logo"
+                      src="https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png"
+                    />
+                  </Col>
+                  <Col span={8}>
+                    <img
+                      width="100%"
+                      alt="logo"
+                      src="https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png"
+                    />
+                  </Col>
+                  <Col span={8}>
+                    <img
+                      width="100%"
+                      alt="logo"
+                      src="https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png"
+                    />
+                  </Col>
+                  <Col span={8}>
+                    <img
+                      width="100%"
+                      alt="logo"
+                      src="https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png"
+                    />
+                  </Col>
+                  <Col span={8}>
+                    <img
+                      width="100%"
+                      alt="logo"
+                      src="https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png"
+                    />
+                  </Col>
+                  <Col span={8}>
+                    <img
+                      width="100%"
+                      alt="logo"
+                      src="https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png"
+                    />
+                  </Col>
+                  <Col span={8}>
+                    <img
+                      width="100%"
+                      alt="logo"
+                      src="https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png"
+                    />
+                  </Col>
+                  <Col span={8}>
+                    <img
+                      width="100%"
+                      alt="logo"
+                      src="https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png"
+                    />
+                  </Col>
+                  <Col span={8}>
+                    <img
+                      width="100%"
+                      alt="logo"
+                      src="https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png"
+                    />
+                  </Col>
+                </Row>
+              </List.Item>
+            )}
+          />
+        </Col>
+      </Row>
     </div>
   );
 };
