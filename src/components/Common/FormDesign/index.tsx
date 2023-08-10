@@ -126,13 +126,18 @@ const Design: React.FC<IProps> = ({ current }) => {
           format = 'textarea';
           widget = '';
         }
+        if (widget === 'string') {
+          format = '';
+          widget = '';
+        }
         if (widget === 'dateTime') {
           format = 'dateTime';
           widget = null;
         }
+
         return {
           ...result,
-          [item.property!.id]: {
+          [item!.id]: {
             title,
             type,
             widget,

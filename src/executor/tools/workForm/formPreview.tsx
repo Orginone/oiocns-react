@@ -3,6 +3,8 @@ import { IBelong } from '@/ts/core';
 import { useEffect, useState } from 'react';
 import React from 'react';
 import FormRender, { useForm } from 'form-render';
+import { WorkFormRulesType } from '@/ts/core/work/rules/workFormRules';
+import moment from 'moment';
 interface IProps {
   allowEdit: boolean;
   belong: IBelong;
@@ -11,6 +13,7 @@ interface IProps {
   useformRule?: boolean;
   getFormData: (id: string) => model.FormEditData;
   onChanged?: (id: string, data: model.FormEditData, changedData?: Object) => void;
+  ruleService?: WorkFormRulesType;
 }
 
 const FormRenders: React.FC<IProps> = (props) => {
@@ -32,8 +35,22 @@ const FormRenders: React.FC<IProps> = (props) => {
         }
       });
     }
+
     //初始化数据
-    formIns.setValues(data);
+    props?.ruleService?.setFormChangeCallback(form.id, (data: any) => {
+      console.log('@@', data);
+      const timeFormatRegex = /^\d{4}\/\d{1,2}\/\d{1,2} \d{1,2}:\d{1,2}$/;
+      //如果是时间格式需要转换
+
+      const keys = Object.keys(data);
+      for (const key of keys) {
+        const value = data[key];
+        if (timeFormatRegex.test(value)) {
+          data[key] = moment(value).format('YYYY-MM-DD HH:mm:ss');
+        }
+      }
+      formIns.setValues(data);
+    });
   }, []);
   if (!data) return <></>;
   const watch = {
@@ -51,6 +68,7 @@ const FormRenders: React.FC<IProps> = (props) => {
   };
   return props.forms.map((formResult) => {
     const rule = formResult.rule && JSON.parse(formResult.rule);
+    console.log('@@', rule.schema);
     return (
       // eslint-disable-next-line react/jsx-key
       <FormRender

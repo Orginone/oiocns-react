@@ -1,6 +1,6 @@
 import { ProForm } from '@ant-design/pro-components';
 import { Descriptions } from 'antd';
-import React, { useEffect, useRef } from 'react';
+import React, { useRef } from 'react';
 import OioFormItem from './FormItems';
 import { IBelong } from '@/ts/core';
 import cls from './index.module.less';
@@ -45,14 +45,14 @@ const OioForm: React.FC<IProps> = ({
   if (fieldsValue) {
     formRef?.current?.setFieldsValue(fieldsValue);
   }
-  useEffect(() => {
-    /* 向规则服务里，加入修改表单数值的回调方法 */
-    ruleService?.setFormChangeCallback(form.id, (data: any) => {
-      onValuesChange &&
-        onValuesChange(data, { ...formRef?.current?.getFieldsValue(), ...data });
-      formRef?.current?.setFieldsValue(data);
-    });
-  }, [form.id]);
+  // useEffect(() => {
+  //   /* 向规则服务里，加入修改表单数值的回调方法 */
+  //   ruleService?.setFormChangeCallback(form.id, (data: any) => {
+  //     onValuesChange &&
+  //       onValuesChange(data, { ...formRef?.current?.getFieldsValue(), ...data });
+  //     formRef?.current?.setFieldsValue(data);
+  //   });
+  // }, [form.id]);
   return (
     <>
       {showTitle && (
