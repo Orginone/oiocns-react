@@ -9,7 +9,7 @@ import { loadFileMenus } from '@/executor/fileOperate';
 const createMenu = (team: ITarget, children: MenuItemType[]) => {
   children.unshift(...buildApplicationTree(team.directory.applications));
   return {
-    key: team.key,
+    key: team.directory.key,
     item: team.directory,
     label: team.name,
     itemType: team.directory.typeName,
@@ -18,6 +18,7 @@ const createMenu = (team: ITarget, children: MenuItemType[]) => {
     icon: <EntityIcon notAvatar={true} entityId={team.id} size={18} />,
     children: children,
     beforeLoad: async () => {
+      console.log(team);
       if ('directory' in team) {
         await (team as ITarget).directory.loadContent();
       }
@@ -111,6 +112,7 @@ export const loadStoreMenu = () => {
     key: '存储',
     label: '存储',
     itemType: 'group',
+    item: orgCtrl.provider.disk,
     children: [getUserMenu(), ...getTeamMenu()],
     icon: <EntityIcon notAvatar={true} entityId={orgCtrl.user.id} size={18} />,
   };

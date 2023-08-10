@@ -113,8 +113,8 @@ const TaskContent = (props: IProps) => {
               filter: loadOptions.searchValue || '',
             });
             return {
-              data: res.result,
-              totalCount: res.total,
+              data: res.result || [],
+              totalCount: res.total || 0,
             };
           },
         })

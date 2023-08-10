@@ -7,7 +7,7 @@ import * as fa from 'react-icons/fa';
 import { PageShowType } from 'typings/globelType';
 import { PageModel } from '@/ts/base/model';
 import { RiMoreFill } from 'react-icons/ri';
-import useSessionStorage from '@/hooks/useSessionStorage';
+import useStorage from '@/hooks/useStorage';
 
 interface PageType<T> {
   dataSource: T[]; // 展示数据源
@@ -61,7 +61,7 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
   request,
   ...rest
 }) => {
-  const [segment, setSegment] = useSessionStorage('segment', 'List');
+  const [segment, setSegment] = useStorage('segment', 'list');
   const [defaultHeight, setDefaultHeight] = useState<number | 'auto'>('auto'); //计算高度
 
   // 监听父级高度

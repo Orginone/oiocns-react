@@ -2,9 +2,9 @@ import { Layout, Spin } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { renderRoutes } from 'react-router-config';
 import { IRouteConfig } from 'typings/globelType';
-import BasicHeader from './Header';
-import styles from './index.module.less';
 import orgCtrl from '@/ts/controller';
+import styles from './index.module.less';
+import Navbar from './navbar';
 import Executor from '@/executor';
 
 type BasicLayoutProps = {
@@ -27,12 +27,15 @@ const BasicLayout: React.FC<BasicLayoutProps> = (props) => {
     <Layout className={styles['page-layout']}>
       {inited ? (
         <>
-          {/** 命令执行器 */}
-          <Executor />
-          {/* 公共头部 */}
-          <BasicHeader />
-          {/* 内容区域 */}
-          <Layout className={styles['main-content']}>{renderRoutes(route.routes)}</Layout>
+          <Navbar />
+          <Layout>
+            {/** 命令执行器 */}
+            <Executor />
+            {/* 公共头部 */}
+            {/* <BasicHeader /> */}
+            {/* 内容区域 */}
+            {renderRoutes(route.routes)}
+          </Layout>
         </>
       ) : (
         <Spin

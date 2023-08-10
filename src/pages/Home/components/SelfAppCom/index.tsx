@@ -27,7 +27,7 @@ const BannerCom: React.FC<SelfAppComType> = () => {
     return apps.filter((a, i) => apps.findIndex((x) => x.id === a.id) === i);
   };
   return (
-    <CardWidthTitle className="self-app" title={'应用'}>
+    <CardWidthTitle className="self-app" title={''}>
       <div className="app-content">
         {dataSource.map((item, index) => {
           return <AppCard className="app-wrap" key={index} app={item} />;
