@@ -4,9 +4,11 @@ import React, { useRef } from 'react';
 import FullScreenModal from '@/executor/tools/fullScreen';
 import { IForm } from '@/ts/core';
 import Generator, { defaultSettings } from 'fr-generator';
-import { ProFormMoney } from '@ant-design/pro-components';
 import { schemaType } from '@/ts/base/schema';
 import { defaultCommonSettings } from './setting.js';
+import MyDivider from '@/components/Common/FormDesign/FormEdit/widgets/divider';
+import MySpace from '@/components/Common/FormDesign/FormEdit/widgets/Space';
+
 type IProps = {
   current: IForm;
   finished: () => void;
@@ -44,6 +46,26 @@ const FormEditModal: React.FC<IProps> = ({
   const settings = defaultSettings[0];
   settings.widgets = [
     {
+      text: '评分',
+      name: 'rate',
+      schema: {
+        title: '评分',
+        type: 'string',
+        widget: 'rate',
+      },
+      setting: {
+        props: {
+          type: 'string',
+          properties: {
+            value: {
+              title: '评分',
+              type: 'string',
+            },
+          },
+        },
+      },
+    },
+    {
       text: 'HTML',
       name: 'html',
       schema: {
@@ -63,8 +85,32 @@ const FormEditModal: React.FC<IProps> = ({
         },
       },
     },
+    {
+      text: '分割线',
+      name: 'divider',
+      schema: {
+        title: '分割线',
+        type: 'string',
+        widget: 'MyDivider',
+      },
+      setting: {
+        children: { title: '嵌套的标题', type: 'string' },
+        dashed: { title: '是否虚线', type: 'boolean' },
+      },
+    },
+    {
+      text: '间距',
+      name: 'space',
+      schema: {
+        title: '分割线',
+        type: 'string',
+        widget: 'MySpace',
+      },
+      setting: {
+        api: { title: 'MySpace', type: 'string' },
+      },
+    },
   ];
-
   return (
     <FullScreenModal
       open={editFormOpen}
@@ -80,7 +126,8 @@ const FormEditModal: React.FC<IProps> = ({
         onSchemaChange={onSchemaChange}
         settings={[defaultSettings[2], settings]}
         //onCanvasSelect={onCanvasSelect}
-        widgets={{ money: ProFormMoney }}
+        hideId
+        widgets={{ MyDivider, MySpace }}
         commonSettings={{ ...defaultCommonSettings }}
         ref={myComponentRef}
       />

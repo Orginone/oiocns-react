@@ -5,6 +5,9 @@ import React from 'react';
 import FormRender, { useForm } from 'form-render';
 import { WorkFormRulesType } from '@/ts/core/work/rules/workFormRules';
 import moment from 'moment';
+import MyDivider from '@/components/Common/FormDesign/FormEdit/widgets/divider';
+import MySpace from '@/components/Common/FormDesign/FormEdit/widgets/Space';
+
 interface IProps {
   allowEdit: boolean;
   belong: IBelong;
@@ -76,6 +79,7 @@ const FormRenders: React.FC<IProps> = (props) => {
         schema={rule.schema}
         disabled={!props.allowEdit}
         watch={watch}
+        widgets={{ MyDivider: MyDivider, MySpace: MySpace }}
         //beforeFinish={beforeFinish}
       />
     );
