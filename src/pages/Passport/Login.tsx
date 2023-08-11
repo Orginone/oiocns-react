@@ -1,11 +1,11 @@
 import { AiOutlineLock, AiOutlineUser } from 'react-icons/ai';
-import { Button, Checkbox, Form, Input, message, Tabs, Modal } from 'antd';
+import { Button, Checkbox, Form, Input, message, Tabs } from 'antd';
 import React, { useState } from 'react';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import orgCtrl from '@/ts/controller';
-import { ExclamationCircleOutlined } from '@ant-design/icons';
+
 import cls from './index.module.less';
-import useStorage from '@/hooks/useStorage';
+
 const PassportLogin: React.FC<RouteComponentProps> = (props) => {
   const [loading, setLoading] = useState(false);
   return (
@@ -18,23 +18,7 @@ const PassportLogin: React.FC<RouteComponentProps> = (props) => {
             const res = await orgCtrl.provider.login(account, password);
             setLoading(false);
             if (res.success) {
-              const joinState = window.localStorage.getItem('jionState');
-
-              if (joinState !== 'yes') {
-                Modal.confirm({
-                  title: '提示',
-                  icon: <ExclamationCircleOutlined />,
-                  content: '会更好的帮你服务，登录会自动加入"豪波安全科技"客户服务群',
-                  okText: '确认',
-                  cancelText: '取消',
-                  onOk: () => {
-                    window.localStorage.setItem('jionState', 'yes');
-                    props.history.push('/home');
-                  },
-                });
-              } else {
-                props.history.push('/home');
-              }
+              props.history.push('/home');
             }
           } else {
             message.warning('请填写账号和密码 ！');
