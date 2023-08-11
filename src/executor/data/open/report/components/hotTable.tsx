@@ -20,6 +20,7 @@ interface IProps {
   selectItem: any;
   reportChange: any;
   changeType: string;
+  classType: string;
 }
 
 const HotTableView: React.FC<IProps> = ({
@@ -27,11 +28,14 @@ const HotTableView: React.FC<IProps> = ({
   selectItem,
   reportChange,
   changeType,
+  classType
 }) => {
   const [modalType, setModalType] = useState<string>('');
   const [tkey, tforceUpdate] = useObjectUpdate('');
   const [selectedItem, setSelectedItem] = useState<XAttribute>();
   const [cells, setCells] = useState<any>([]);
+  const [styleList, setStyleList] = useState<any>([]);
+  const [classList, setClassList] = useState<any>([]);
   // 项配置改变
   const formValuesChange = (changedValues: any) => {
     if (selectedItem) {
@@ -49,18 +53,16 @@ const HotTableView: React.FC<IProps> = ({
   let sheetIndex = sheetList.findIndex((it: any) => it.code === selectItem.code);
   let datas = sheetList[sheetIndex]?.data?.data || [[]];
   let setting = sheetList[sheetIndex]?.data?.setting || {};
-  let mergeCells = setting?.mergeCells;
+  let mergeCells = setting?.mergeCells || [];
   let autoColumn: boolean = true; //自适应
   let autoRow: boolean = false;
-  cells?.forEach((item: any) => {
-    //渲染单元格颜色
-    hotRef.current.hotInstance.getCellMeta(item.row, item.col).renderer =
-      'customStylesRenderer';
-  });
 
   useEffect(() => {
     const hot = hotRef.current.hotInstance;
+    
     setCells(setting?.cells || []);
+    setStyleList(setting?.styleList || []);
+    setClassList(setting?.classList || []);
     hot.updateSettings({
       data: datas,
       cell: cells,
@@ -68,26 +70,106 @@ const HotTableView: React.FC<IProps> = ({
     });
   }, []);
 
+  styleList?.forEach((item: any) => {
+    hotRef.current.hotInstance.getCellMeta(item.row, item.col).renderer =
+          'cellStylesRenderer';
+  })
+
+  classList?.forEach((item: any) => {
+    let arr = []
+    for (let k in item.class) {
+      arr.push(item.class[k])
+    }
+    hotRef.current.hotInstance.setCellMeta(item.row, item.col, 'className', arr.join(' '));
+  })
+
+  cells?.forEach((item: any) => {
+    //渲染单元格颜色
+    hotRef.current.hotInstance.getCellMeta(item.row, item.col).renderer =
+      'customStylesRenderer';
+  });
+
   const buttonClickCallback = () => {
     // 工具栏按钮点击
     const selected = hotRef.current.hotInstance.getSelected() || [];
     hotRef.current.hotInstance.suspendRender();
+    if (changeType === 'border') {
+      const customBordersPlugin = hotRef.current.hotInstance.getPlugin('customBorders');
+      if (classType !== 'none') {
+        customBordersPlugin.setBorders(hotRef.current.hotInstance.getSelectedRange(), { [classType]: { hide: false, width: 1, color: '#000000' } });
+      } else {
+        customBordersPlugin.clearBorders(hotRef.current.hotInstance.getSelectedRange());
+      }
+    }
     for (let index = 0; index < selected.length; index += 1) {
       const [row1, column1, row2, column2] = selected[index];
       const startRow = Math.max(Math.min(row1, row2), 0);
       const endRow = Math.max(row1, row2);
       const startCol = Math.max(Math.min(column1, column2), 0);
       const endCol = Math.max(column1, column2);
-
       for (let rowIndex = startRow; rowIndex <= endRow; rowIndex += 1) {
-        for (let columnIndex = startCol; columnIndex <= endCol; columnIndex += 1) {}
+        for (let columnIndex = startCol; columnIndex <= endCol; columnIndex += 1) {
+          if (changeType === 'className') {
+            if (classList.length > 0) {
+              let items = classList.find((it: any) => it.col === columnIndex && it.row === rowIndex)
+              if (items) {
+                for (let k in items.class) {
+                  if (k === classType) {
+                    items.class[k] = reportChange
+                  } else {
+                    items.class[classType] = reportChange
+                  }
+                }
+              } else {
+                let json: any = { col: columnIndex, row: rowIndex, class: {} }
+                json.class[classType] = reportChange
+                classList.push(json)
+              }
+            } else {
+              let json: any = { col: columnIndex, row: rowIndex, class: {} }
+              json.class[changeType] = reportChange
+              classList.push(json)
+            }
+            let items = classList.find((it: any) => it.row === rowIndex && it.col === columnIndex)
+            let arr = []
+            if (items) {
+              for (let k in items.class) {
+                arr.push(items.class[k])
+              }
+            }
+            hotRef.current.hotInstance.setCellMeta(rowIndex, columnIndex, 'className', arr.join(' '));
+          } else if(changeType !== 'border') {
+            if (styleList.length > 0) {
+              let items = styleList.find((it: any) => it.col === columnIndex && it.row === rowIndex)
+              if (items) {
+                for (let k in items.styles) {
+                  if (k === changeType) {
+                    items.styles[k] = reportChange
+                  } else {
+                    items.styles[changeType] = reportChange
+                  }
+                }
+              } else {
+                let json: any = { col: columnIndex, row: rowIndex, styles: {} }
+                json.styles[changeType] = reportChange
+                styleList.push(json)
+              }
+            } else {
+              let json: any = { col: columnIndex, row: rowIndex, styles: {} }
+              json.styles[changeType] = reportChange
+              styleList.push(json)
+            }
+            hotRef.current.hotInstance.getCellMeta(rowIndex, columnIndex).renderer =
+              'cellStylesRenderer';
+          }
+        }
       }
     }
     hotRef.current.hotInstance.render();
     hotRef.current.hotInstance.resumeRender();
   };
 
-  if (changeType !== '') {
+  if (changeType !== '' && changeType !== 'onSave') {
     buttonClickCallback();
   }
 
@@ -103,9 +185,10 @@ const HotTableView: React.FC<IProps> = ({
         autoColumnSize: hotRef.current.hotInstance.getPlugin('autoColumnSize').enabled,
         AutoRowSize: hotRef.current.hotInstance.getPlugin('AutoRowSize').enabled,
         cells: cells,
+        styleList: styleList,
+        classList: classList,
         // columns:columns,
         // cellMeta:cellMeta,
-        // styleList:styleList,
         // columnSummary:columnSummary,
         // cellList:cellData
       },
@@ -222,9 +305,9 @@ const HotTableView: React.FC<IProps> = ({
 
   const afterBeginEditing = (row: Number, col: Number) => {
     //修改后
-    // console.log(row, col, 'row,col')
-    const editobj = hotRef.current.hotInstance.getActiveEditor(); //当前编辑的对象
-    const nowcell = editobj.TD; //当前编辑的格子
+    console.log(row, col, 'row,col')
+    // const editobj = hotRef.current.hotInstance.getActiveEditor(); //当前编辑的对象
+    // const nowcell = editobj.TD; //当前编辑的格子
     // console.log(editobj, nowcell)
     // editobj.textareaStyle.color = nowcell.style.color;//获取当前编辑格子的颜色
     // nowcell.innerHTML = ""; //这个主要是解决上面颜色透明的问题
@@ -243,36 +326,22 @@ const HotTableView: React.FC<IProps> = ({
     selectionLayerLevel: any,
   ) => {};
 
-  registerRenderer('customStylesRenderer', (hotInstance, TD, ...rest) => {
+  registerRenderer('customStylesRenderer', (hotInstance, TD, ...rest) => { //渲染特性背景色
     textRenderer(hotInstance, TD, ...rest);
     TD.style.background = '#e1f3d8';
-    // if(changeType === 'typeFace'){
-    //   TD.style.fontFamily = reportChange
-    // }
-    // if(changeType === 'fontSize'){
-    //   TD.style.fontSize = reportChange + 'px'
-    // }
-    // if(changeType === 'setFontWeight'){
-    //   TD.style.fontWeight = reportChange
-    // }
-    // if(changeType === 'setFontStyle'){
-    //   TD.style.fontStyle = reportChange
-    // }
-    // if(changeType === 'backgroundColor'){
-    //   TD.style.background = reportChange
-    // }
-    // if(changeType === 'color'){
-    //   TD.style.color = reportChange
-    // }
-    // if(changeType === 'setPaddingLeft'){
-    //   TD.style.paddingLeft = reportChange
-    // }
-    // TD.style.fontWeight = 'bold';
-    // TD.style.color = 'green';
-    // TD.style.background = '#d7f1e1';
-    // let json = {row:rest[0],col:rest[1],color:'green',background:'#d7f1e1',fontWeight:'bold'}
-    // styleList.push(json)
   });
+
+  registerRenderer('cellStylesRenderer', (hotInstance, TD, ...rest) => { //渲染样式
+    textRenderer(hotInstance, TD, ...rest);
+    let items = styleList.find((it: any) => it.row === rest[0] && it.col === rest[1])
+    let td:any = TD.style
+    if (items) {
+      for (let key in items.styles) {
+        td[key] = items.styles[key];
+      }
+    }
+  });
+
 
   return (
     <div>
@@ -281,8 +350,8 @@ const HotTableView: React.FC<IProps> = ({
         formulas={{
           engine: hyperformulaInstance,
         }}
-        minCols={10}
-        minRows={20}
+        minCols={8}
+        minRows={60}
         rowHeaders={true}
         colHeaders={true}
         dropdownMenu={true}
@@ -377,7 +446,6 @@ const HotTableView: React.FC<IProps> = ({
             setSelectedItem(undefined);
             setModalType('');
             tforceUpdate();
-            console.log(current, '12345');
             upDataCell();
           }}
           superAuth={current.directory.target.space.superAuth!.metadata}
