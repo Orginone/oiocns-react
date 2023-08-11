@@ -15,10 +15,13 @@ const ReportView: React.FC<IProps> = ({ current, selectItem, finished }) => {
   console.log(current, 'current', selectItem, 'selectItem');
   const [reportChange, setReportChange] = useState<any>();
   const [changeType, setChangeType] = useState<string>('');
+  const [classType, setClassType] = useState<string>('');
   const [modalType, setModalType] = useState<string>('');
-  const handClick = (value: any, type: string) => {
+  const handClick = (value: any, type: string, classType: string) => {
+    console.log(reportChange,changeType,'2134')
     setReportChange(value);
     setChangeType(type);
+    setClassType(classType);
   };
 
   const setModal = (value: string) => {
@@ -45,6 +48,7 @@ const ReportView: React.FC<IProps> = ({ current, selectItem, finished }) => {
           selectItem={selectItem}
           reportChange={reportChange}
           changeType={changeType}
+          classType={classType}
         ></HotTableView>
       </div>
     </FullScreenModal>
