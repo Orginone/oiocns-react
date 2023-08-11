@@ -32,9 +32,9 @@ const Chat: React.FC<any> = ({
   };
 
   return (
-    <div className={charsStyle.cohort_wrap}>
+    <div className={charsStyle.chatWrap}>
       {/* 主体 */}
-      <div className={charsStyle.chart_page}>
+      <div className={charsStyle.chatContent}>
         {/* 聊天区域 */}
         <GroupContent
           chat={chat}
@@ -44,7 +44,7 @@ const Chat: React.FC<any> = ({
           enterCiteMsg={enterCiteMsg}
         />
         {/* 输入区域 */}
-        <div className={charsStyle.chart_input}>
+        <div className={charsStyle.chatInput}>
           <GroupInputBox
             chat={chat}
             writeContent={writeContent}
