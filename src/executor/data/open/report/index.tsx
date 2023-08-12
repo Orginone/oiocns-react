@@ -18,7 +18,7 @@ const ReportView: React.FC<IProps> = ({ current, selectItem, finished }) => {
   const [classType, setClassType] = useState<string>('');
   const [modalType, setModalType] = useState<string>('');
   const handClick = (value: any, type: string, classType: string) => {
-    console.log(reportChange,changeType,'2134')
+    console.log(reportChange, changeType, '2134')
     setReportChange(value);
     setChangeType(type);
     setClassType(classType);
