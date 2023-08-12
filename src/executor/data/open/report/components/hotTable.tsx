@@ -59,7 +59,7 @@ const HotTableView: React.FC<IProps> = ({
 
   useEffect(() => {
     const hot = hotRef.current.hotInstance;
-    
+
     setCells(setting?.cells || []);
     setStyleList(setting?.styleList || []);
     setClassList(setting?.classList || []);
@@ -72,7 +72,7 @@ const HotTableView: React.FC<IProps> = ({
 
   styleList?.forEach((item: any) => {
     hotRef.current.hotInstance.getCellMeta(item.row, item.col).renderer =
-          'cellStylesRenderer';
+      'cellStylesRenderer';
   })
 
   classList?.forEach((item: any) => {
@@ -138,7 +138,7 @@ const HotTableView: React.FC<IProps> = ({
               }
             }
             hotRef.current.hotInstance.setCellMeta(rowIndex, columnIndex, 'className', arr.join(' '));
-          } else if(changeType !== 'border') {
+          } else if (changeType !== 'border') {
             if (styleList.length > 0) {
               let items = styleList.find((it: any) => it.col === columnIndex && it.row === rowIndex)
               if (items) {
@@ -246,7 +246,7 @@ const HotTableView: React.FC<IProps> = ({
   const upDataCell = () => {
     // 更新特性rules 但单元格只有只读属性 readOnly
     cells.forEach((item: any) => {
-      current.attributes.forEach((items) => {
+      current.attributes.forEach((items: any) => {
         if (item.prop.propId === items.propId) {
           item.prop = items;
           let newRule = JSON.parse(item.prop.rule);
@@ -324,17 +324,17 @@ const HotTableView: React.FC<IProps> = ({
     column2: Number,
     preventScrolling: any,
     selectionLayerLevel: any,
-  ) => {};
+  ) => { };
 
-  registerRenderer('customStylesRenderer', (hotInstance, TD, ...rest) => { //渲染特性背景色
+  registerRenderer('customStylesRenderer', (hotInstance: any, TD: any, ...rest) => { //渲染特性背景色
     textRenderer(hotInstance, TD, ...rest);
     TD.style.background = '#e1f3d8';
   });
 
-  registerRenderer('cellStylesRenderer', (hotInstance, TD, ...rest) => { //渲染样式
+  registerRenderer('cellStylesRenderer', (hotInstance: any, TD: any, ...rest) => { //渲染样式
     textRenderer(hotInstance, TD, ...rest);
     let items = styleList.find((it: any) => it.row === rest[0] && it.col === rest[1])
-    let td:any = TD.style
+    let td: any = TD.style
     if (items) {
       for (let key in items.styles) {
         td[key] = items.styles[key];
@@ -407,8 +407,8 @@ const HotTableView: React.FC<IProps> = ({
         >
           <SelectPropertys
             target={current.directory.target}
-            selected={current.attributes.map((a) => a.property!)}
-            onAdded={async (prop) => {
+            selected={current.attributes.map((a: any) => a.property!)}
+            onAdded={async (prop: any) => {
               await current.createAttribute(
                 {
                   name: prop.name,
@@ -419,13 +419,13 @@ const HotTableView: React.FC<IProps> = ({
                 prop,
               );
               tforceUpdate();
-              const attr = current.attributes.find((i) => i.propId === prop.id);
+              const attr = current.attributes.find((i: any) => i.propId === prop.id);
               if (attr) {
                 saveSpeciality(attr);
               }
             }}
-            onDeleted={async (id) => {
-              const attr = current.attributes.find((i) => i.propId === id);
+            onDeleted={async (id: any) => {
+              const attr = current.attributes.find((i: any) => i.propId === id);
               if (attr) {
                 await current.deleteAttribute(attr);
                 tforceUpdate();
