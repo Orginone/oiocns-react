@@ -1,6 +1,5 @@
 //组件映射关系：https://1.xrender.fun/form-render/api/inner-widget
 export const loadWidgetsOpts = (valueType: string = '描述型') => {
-  console.log("valueType",valueType)
   switch (valueType) {
     case '用户型':
       return [
@@ -11,7 +10,7 @@ export const loadWidgetsOpts = (valueType: string = '描述型') => {
         {
           label: '输入框',
           value: '',
-        }
+        },
       ];
     case '数字输入框':
       return [
@@ -68,7 +67,7 @@ export const loadWidgetsOpts = (valueType: string = '描述型') => {
           label: '文件',
           value: 'upload',
         },
-    ];
+      ];
     case '数值型':
       return [
         {
@@ -79,7 +78,7 @@ export const loadWidgetsOpts = (valueType: string = '描述型') => {
           label: '数字输入框',
           value: '',
         },
-    ];
+      ];
     default:
       return [
         {
@@ -88,11 +87,11 @@ export const loadWidgetsOpts = (valueType: string = '描述型') => {
         },
         {
           label: '多行文本',
-          value: 'textarea',
+          value: 'string',
         },
         {
           label: '多行文本',
-          value: 'textarea',
+          value: 'string',
         },
       ];
   }
