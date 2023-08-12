@@ -1,18 +1,4 @@
 const defaultCommonSettings = {
-  $id: {
-    title: 'ID',
-    description: '字段名称/英文',
-    type: 'string',
-    widget: 'idInput',
-    require: true,
-    rules: [
-      {
-        pattern: '^#/.+$',
-        message: 'ID 必填',
-      },
-    ],
-  },
-
   title: {
     title: '标题',
     type: 'string',
@@ -30,10 +16,6 @@ const defaultCommonSettings = {
     enumNames: ['同行', '单独一行'],
     widget: 'radio',
   },
-  description: {
-    title: '说明',
-    type: 'string',
-  },
   default: {
     title: '默认值',
     type: 'string',
@@ -42,18 +24,18 @@ const defaultCommonSettings = {
     title: '必填',
     type: 'boolean',
   },
-  placeholder: {
-    title: '占位符',
-    type: 'string',
-  },
-  min: {
-    title: '最小值',
-    type: 'number',
-  },
-  max: {
-    title: '最大值',
-    type: 'number',
-  },
+  // placeholder: {
+  //   title: '占位符',
+  //   type: 'string',
+  // },
+  // min: {
+  //   title: '最小值',
+  //   type: 'number',
+  // },
+  // max: {
+  //   title: '最大值',
+  //   type: 'number',
+  // },
   disabled: {
     title: '禁用',
     type: 'boolean',
