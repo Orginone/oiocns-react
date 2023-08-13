@@ -80,6 +80,7 @@ const Speaker: React.FC<IProps> = ({ audioRef }) => {
 
   return (
     <Popover
+      overlayStyle={{ zIndex: 1025 }}
       onOpenChange={(isOpen) => {
         handleVolumeChange(volume, isOpen);
       }}

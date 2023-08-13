@@ -5,18 +5,18 @@ import cls from './index.module.less';
 import { FileItemModel } from 'src/ts/base/model';
 import { Directory } from '@/ts/core/thing/directory';
 interface IProp {
+  audioData: FileItemModel;
   setAudioData: (audioData: FileItemModel) => void;
   audioFiles: FileItemModel[];
-  share: FileItemModel;
-  directory: Directory;
   setAudioFiles: (audioFiles: FileItemModel[]) => void;
+  directory: Directory;
 }
 const Menus: React.FC<IProp> = ({
-  audioFiles,
-  share,
+  audioData,
   setAudioData,
-  directory,
+  audioFiles,
   setAudioFiles,
+  directory,
 }) => {
   const [menuIsOpen, setMenuIsOpen] = useState(false);
   const [audioList, setAudioList] = useState<MenuProps['items']>();
@@ -28,7 +28,7 @@ const Menus: React.FC<IProp> = ({
     setAudioFiles(audioInfo.map((item) => item.filedata));
     const item: MenuProps['items'] = [];
     audioFiles.forEach((each) => {
-      if (each.name === share.name) {
+      if (each.name === audioData.name) {
         item.push({
           key: each.name,
           label: (
@@ -43,12 +43,20 @@ const Menus: React.FC<IProp> = ({
       } else {
         item.push({
           key: each.name!.toString(),
-          label: <div>{each.name}</div>,
+          label: (
+            <div className={cls['audio-list']}>
+              {each.name}
+              <BsDisc
+                visibility={'hidden'}
+                className={`${cls['audio-disc-icon']} ${cls['rotate-animation']}`}
+                color={'#8875a9'}></BsDisc>
+            </div>
+          ),
         });
       }
     });
     setAudioList(item);
-  }, [share, audioFiles]);
+  }, [audioData, audioFiles]);
 
   useEffect(() => {
     const id = directory.taskEmitter.subscribe(() => {
@@ -75,8 +83,8 @@ const Menus: React.FC<IProp> = ({
         setMenuIsOpen(isOpen);
       }}
       overlayStyle={{
-        zIndex: '100',
         paddingTop: '10px',
+        width: 'max-content',
       }}
       placement="bottom"
       trigger={['click']}

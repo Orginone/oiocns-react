@@ -15,21 +15,16 @@ import Speaker from '@/executor/audio/speaker';
 import Menus from '@/executor/audio/menus';
 import AudioProgress from '@/executor/audio/progress';
 import { Directory } from '@/ts/core/thing/directory';
+import AudioController from '@/executor/audio/controller';
 interface IProps {
   share: FileItemModel;
   finished: () => void;
-  audioId: number;
-  setAudioData: (audioData: FileItemModel) => void;
   directory: Directory;
 }
 
-const AudioPlayer: React.FC<IProps> = ({
-  share,
-  finished,
-  audioId,
-  setAudioData,
-  directory,
-}) => {
+const AudioPlayer: React.FC<IProps> = ({ share, finished, directory }) => {
+  //当前播放的音频
+  const [audioData, setAudioData] = useState(share);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isRandPlay, setIsRandPlay] = useState(false);
   const [isLoop, setIsLoop] = useState(false);
@@ -38,9 +33,30 @@ const AudioPlayer: React.FC<IProps> = ({
   const audioInfo = directory.files.filter((item) =>
     item.filedata.contentType?.startsWith('audio'),
   );
+  //音频播放列表
   const [audioFiles, setAudioFiles] = useState<FileItemModel[]>(
     audioInfo.map((item) => item.filedata),
   );
+  useEffect(() => {
+    resetProgress();
+    if (!audioRef.current) {
+      return;
+    }
+    const handleAudioEnd = () => {
+      if (isLoop) {
+        resetProgress();
+        return;
+      }
+      isRandPlay ? handlePlay() : handlePlay(1);
+    };
+    audioRef.current?.addEventListener('ended', handleAudioEnd);
+    return () => {
+      audioRef.current?.removeEventListener('ended', handleAudioEnd);
+    };
+  }, [audioData]);
+  useEffect(() => {
+    setAudioData(share);
+  }, [share]);
 
   const togglePlay = () => {
     if (audioRef.current) {
@@ -71,7 +87,7 @@ const AudioPlayer: React.FC<IProps> = ({
   const playByStep = (step: number) => {
     let target: number = 0;
     for (let i = 0; i < audioFiles.length; ++i) {
-      if (audioFiles[i].name === share.name) {
+      if (audioFiles[i].name === audioData.name) {
         target = i;
       }
     }
@@ -90,74 +106,62 @@ const AudioPlayer: React.FC<IProps> = ({
     playByStep(randNumber);
   };
 
-  useEffect(() => {
-    resetProgress();
-    if (!audioRef.current) {
-      return;
-    }
-    const handleAudioEnd = () => {
-      if (isLoop) {
-        resetProgress();
-        return;
-      }
-      isRandPlay ? handlePlay() : handlePlay(1);
-    };
-    audioRef.current?.addEventListener('ended', handleAudioEnd);
-    return () => {
-      audioRef.current?.removeEventListener('ended', handleAudioEnd);
-    };
-  }, [share, audioId]);
-
-  if (share.shareLink) {
-    if (!share.shareLink.includes('/orginone/anydata/bucket/load')) {
-      share.shareLink = `/orginone/anydata/bucket/load/${share.shareLink}`;
+  if (audioData.shareLink) {
+    if (!audioData.shareLink.includes('/orginone/anydata/bucket/load')) {
+      audioData.shareLink = `/orginone/anydata/bucket/load/${audioData.shareLink}`;
     }
     return (
       <Draggable className={cls['audio-drag-box']}>
-        <div className={cls['audio-top']}>
-          <BiShuffle
-            className={cls['audio-icon']}
-            color={isRandPlay ? '#7c7cc5' : '#252525'}
-            onClick={() => {
-              setIsRandPlay((prevState) => !prevState);
-            }}
-          />
-          <AiFillStepBackward
-            className={cls['audio-icon']}
-            onClick={() => {
-              isRandPlay ? handlePlay() : handlePlay(-1);
-            }}
-          />
-          <div onClick={togglePlay} className={cls['audio-target-box']}>
-            {isPlaying ? (
-              <AiOutlinePauseCircle
-                className={`${cls['audio-icon']} ${cls['audio-icon-play']}`}
-              />
-            ) : (
-              <AiOutlinePlayCircle
-                className={`${cls['audio-icon']} ${cls['audio-icon-play']}`}
-              />
-            )}
-          </div>
-          <AiFillStepForward
-            onClick={() => {
-              isRandPlay ? handlePlay() : handlePlay(1);
-            }}
-            className={cls['audio-icon']}
-          />
-          <TbRepeatOnce
-            className={cls['audio-icon']}
-            color={isLoop ? '#7c7cc5' : '#252525'}
-            onClick={() => {
-              setIsLoop((prevState) => !prevState);
-            }}></TbRepeatOnce>
-        </div>
+        <AudioController
+          audioFiles={audioFiles}
+          audioData={audioData}
+          setAudioData={setAudioData}
+          audioRef={audioRef}
+          finished={finished}></AudioController>
+        {/*<div className={cls['audio-top']}>*/}
+        {/*  <BiShuffle*/}
+        {/*    className={cls['audio-icon']}*/}
+        {/*    color={isRandPlay ? '#7c7cc5' : '#252525'}*/}
+        {/*    onClick={() => {*/}
+        {/*      setIsRandPlay((prevState) => !prevState);*/}
+        {/*    }}*/}
+        {/*  />*/}
+        {/*  <AiFillStepBackward*/}
+        {/*    className={cls['audio-icon']}*/}
+        {/*    onClick={() => {*/}
+        {/*      isRandPlay ? handlePlay() : handlePlay(-1);*/}
+        {/*    }}*/}
+        {/*  />*/}
+        {/*  <div onClick={togglePlay} className={cls['audio-target-box']}>*/}
+        {/*    {isPlaying ? (*/}
+        {/*      <AiOutlinePauseCircle*/}
+        {/*        className={`${cls['audio-icon']} ${cls['audio-icon-play']}`}*/}
+        {/*      />*/}
+        {/*    ) : (*/}
+        {/*      <AiOutlinePlayCircle*/}
+        {/*        className={`${cls['audio-icon']} ${cls['audio-icon-play']}`}*/}
+        {/*      />*/}
+        {/*    )}*/}
+        {/*  </div>*/}
+        {/*  <AiFillStepForward*/}
+        {/*    onClick={() => {*/}
+        {/*      isRandPlay ? handlePlay() : handlePlay(1);*/}
+        {/*    }}*/}
+        {/*    className={cls['audio-icon']}*/}
+        {/*  />*/}
+        {/*  <TbRepeatOnce*/}
+        {/*    className={cls['audio-icon']}*/}
+        {/*    color={isLoop ? '#7c7cc5' : '#252525'}*/}
+        {/*    onClick={() => {*/}
+        {/*      setIsLoop((prevState) => !prevState);*/}
+        {/*    }}></TbRepeatOnce>*/}
+        {/*</div>*/}
         <div className={cls['audio-bottom']}>
           <Speaker audioRef={audioRef}></Speaker>
           <AudioProgress audioRef={audioRef} progress={progress}></AudioProgress>
           <Menus
             audioFiles={audioFiles}
-            share={share}
+            audioData={audioData}
             setAudioData={setAudioData}
             directory={directory}
             setAudioFiles={setAudioFiles}></Menus>
@@ -167,7 +171,7 @@ const AudioPlayer: React.FC<IProps> = ({
         </div>
         <audio
           autoPlay
-          src={share.shareLink}
+          src={audioData.shareLink}
           ref={audioRef}
           onTimeUpdate={updateProgress}></audio>
       </Draggable>
