@@ -3,52 +3,44 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Draggable } from 'devextreme-react';
 import cls from './index.module.less';
 import {
-  AiFillCaretRight,
+  AiFillStepBackward,
+  AiFillStepForward,
   AiOutlineCloseCircle,
-  AiOutlinePause,
-  AiOutlineStepBackward,
-  AiOutlineStepForward,
+  AiOutlinePauseCircle,
+  AiOutlinePlayCircle,
 } from 'react-icons/ai';
-import { HiOutlineSpeakerWave } from 'react-icons/hi2';
-import { AiOutlineUnorderedList } from 'react-icons/ai';
-import { Dropdown, Popover, Progress, Slider } from 'antd';
-import type { MenuProps } from 'antd';
-import { BsDisc } from 'react-icons/bs';
+import { BiShuffle } from 'react-icons/bi';
+import { TbRepeatOnce } from 'react-icons/tb';
+import Speaker from '@/executor/audio/speaker';
+import Menus from '@/executor/audio/menus';
+import AudioProgress from '@/executor/audio/progress';
+import { Directory } from '@/ts/core/thing/directory';
 interface IProps {
   share: FileItemModel;
   finished: () => void;
-  files: FileItemModel[] | undefined;
   audioId: number;
   setAudioData: (audioData: FileItemModel) => void;
+  directory: Directory;
 }
-
-const convertToTime = (decimal: number) => {
-  const hours = Math.floor(decimal / 3600);
-  const minutes = Math.floor((decimal % 3600) / 60);
-  const seconds = Math.floor(decimal % 60);
-  const hoursString = hours.toString().padStart(2, '0');
-  const minutesString = minutes.toString().padStart(2, '0');
-  const secondsString = seconds.toString().padStart(2, '0');
-  if (hours === 0) {
-    return `${minutesString}: ${secondsString}`;
-  }
-  return `${hoursString}: ${minutesString}: ${secondsString}`;
-};
 
 const AudioPlayer: React.FC<IProps> = ({
   share,
   finished,
-  files,
   audioId,
   setAudioData,
+  directory,
 }) => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [isRandPlay, setIsRandPlay] = useState(false);
+  const [isLoop, setIsLoop] = useState(false);
   const [isPlaying, setIsPlaying] = useState<boolean>(true);
-  const [volume, setVolume] = useState<number>(100);
   const [progress, setProgress] = useState<number>(0);
-  const [showVolume, setShowVolume] = useState(false);
-  const [listColor, setListColor] = useState('#252525');
-  const [audioList, setAudioList] = useState<MenuProps['items']>();
+  const audioInfo = directory.files.filter((item) =>
+    item.filedata.contentType?.startsWith('audio'),
+  );
+  const [audioFiles, setAudioFiles] = useState<FileItemModel[]>(
+    audioInfo.map((item) => item.filedata),
+  );
 
   const togglePlay = () => {
     if (audioRef.current) {
@@ -57,17 +49,8 @@ const AudioPlayer: React.FC<IProps> = ({
       } else {
         audioRef.current.play();
       }
-      setIsPlaying(!isPlaying);
+      setIsPlaying((prevState) => !prevState);
     }
-  };
-
-  const handleVolumeChange = (e: number) => {
-    const volume = e;
-    if (audioRef.current) {
-      audioRef.current.volume = volume / 100;
-    }
-    setVolume(volume);
-    return;
   };
 
   const updateProgress = () => {
@@ -76,95 +59,54 @@ const AudioPlayer: React.FC<IProps> = ({
     }
   };
 
-  // eslint-disable-next-line no-unused-vars
-  const openList = () => {
-    setListColor(listColor === '#252525' ? '#7c7cc5' : '#252525');
-  };
-
-  const formatter = (value: number | undefined) => `${value}%`;
-
-  const setMenus = () => {
-    const item: MenuProps['items'] = [];
-    if (!files) {
-      return;
-    }
-    files.forEach((each) => {
-      if (!each) {
-        return;
-      }
-      if (each.name === share.name) {
-        item.push({
-          key: each.name,
-          label: (
-            <div className={cls['audio-list']}>
-              {each.name}
-              <BsDisc
-                className={`${cls['audio-disc-icon']} ${cls['rotate-animation']}`}
-                color={'#8875a9'}></BsDisc>
-            </div>
-          ),
-        });
-      } else {
-        item.push({
-          key: each.name!.toString(),
-          label: <div>{each.name}</div>,
-        });
-      }
-    });
-    setAudioList(item);
-  };
-
-  const beginPlay = () => {
-    if (!audioRef.current) {
-      return;
-    }
-    if (!isPlaying) {
-      setIsPlaying(true);
-    }
-    audioRef.current.play();
-  };
-
   const resetProgress = () => {
     if (!audioRef.current) {
       return;
     }
     audioRef.current.currentTime = 0;
+    audioRef.current.play();
+    setIsPlaying(true);
   };
 
-  const preAudio = () => {
-    if (!files) {
-      return;
-    }
-    for (let i = 1; i < files.length; ++i) {
-      if (files[i].name === share.name) {
-        setAudioData(files[i - 1]);
-        return;
+  const playByStep = (step: number) => {
+    let target: number = 0;
+    for (let i = 0; i < audioFiles.length; ++i) {
+      if (audioFiles[i].name === share.name) {
+        target = i;
       }
     }
-    setAudioData(files[files.length - 1]);
+    setAudioData(audioFiles[(target + step + audioFiles.length) % audioFiles.length]);
   };
-  const nextAudio = () => {
-    if (!files) {
+
+  const handlePlay = (step?: number) => {
+    if (audioFiles.length === 0) {
+      finished();
+    }
+    if (step) {
+      playByStep(step);
       return;
     }
-    for (let i = 0; i < files.length - 1; ++i) {
-      if (files[i].name === share.name) {
-        setAudioData(files[i + 1]);
-        return;
-      }
-    }
-    setAudioData(files[0]);
+    const randNumber = Math.ceil(Math.random() * (audioFiles.length - 1));
+    playByStep(randNumber);
   };
 
   useEffect(() => {
-    beginPlay();
     resetProgress();
-    setMenus();
+    if (!audioRef.current) {
+      return;
+    }
+    const handleAudioEnd = () => {
+      if (isLoop) {
+        resetProgress();
+        return;
+      }
+      isRandPlay ? handlePlay() : handlePlay(1);
+    };
+    audioRef.current?.addEventListener('ended', handleAudioEnd);
+    return () => {
+      audioRef.current?.removeEventListener('ended', handleAudioEnd);
+    };
   }, [share, audioId]);
-
-  useEffect(() => {
-    setMenus();
-  }, [files]);
 
   if (share.shareLink) {
     if (!share.shareLink.includes('/orginone/anydata/bucket/load')) {
@@ -173,77 +115,52 @@ const AudioPlayer: React.FC<IProps> = ({
     return (
       <Draggable className={cls['audio-drag-box']}>
         <div className={cls['audio-top']}>
-          <AiOutlineStepBackward size={22} onClick={preAudio}></AiOutlineStepBackward>
-          <div className={cls['audio-but-box']}>
-            <div onClick={togglePlay} className={cls['audio-target-box']}>
-              {isPlaying ? (
-                <AiOutlinePause size={22}></AiOutlinePause>
-              ) : (
-                <AiFillCaretRight size={22}></AiFillCaretRight>
-              )}
-            </div>
+          <BiShuffle
+            className={cls['audio-icon']}
+            color={isRandPlay ? '#7c7cc5' : '#252525'}
+            onClick={() => {
+              setIsRandPlay((prevState) => !prevState);
+            }}
+          />
+          <AiFillStepBackward
+            className={cls['audio-icon']}
+            onClick={() => {
+              isRandPlay ? handlePlay() : handlePlay(-1);
+            }}
+          />
+          <div onClick={togglePlay} className={cls['audio-target-box']}>
+            {isPlaying ? (
+              <AiOutlinePauseCircle
+                className={`${cls['audio-icon']} ${cls['audio-icon-play']}`}
+              />
+            ) : (
+              <AiOutlinePlayCircle
+                className={`${cls['audio-icon']} ${cls['audio-icon-play']}`}
+              />
+            )}
           </div>
-          <AiOutlineStepForward size={22} onClick={nextAudio}></AiOutlineStepForward>
+          <AiFillStepForward
+            onClick={() => {
+              isRandPlay ? handlePlay() : handlePlay(1);
+            }}
+            className={cls['audio-icon']}
+          />
+          <TbRepeatOnce
+            className={cls['audio-icon']}
+            color={isLoop ? '#7c7cc5' : '#252525'}
+            onClick={() => {
+              setIsLoop((prevState) => !prevState);
+            }}></TbRepeatOnce>
         </div>
         <div className={cls['audio-bottom']}>
-          <Popover
-            content={
-              <div className={cls['audio-volume']}>
-                <Slider
-                  tooltip={{ formatter }}
-                  vertical
-                  value={volume}
-                  defaultValue={volume}
-                  onChange={handleVolumeChange}
-                />
-              </div>
-            }
-            open={showVolume}
-            onOpenChange={setShowVolume}>
-            <HiOutlineSpeakerWave
-              size={22}
-              onClick={() => setShowVolume(!showVolume)}></HiOutlineSpeakerWave>
-          </Popover>
-          <span>{convertToTime(progress)}</span>
-          <div className={cls['audio-progress']}>
-            <Progress
-              percent={
-                audioRef.current ? (progress / audioRef.current.duration) * 100 : 0
-              }
-              strokeColor={{
-                '0%': '#9d9df9',
-                '100%': '#9d9df9',
-              }}
-              showInfo={false}></Progress>
-          </div>
-          <span>
-            {audioRef.current?.duration
-              ? convertToTime(audioRef.current.duration)
-              : convertToTime(0)}
-          </span>
-          <Dropdown
-            onOpenChange={(isOpen) => {
-              setListColor(isOpen ? '#7c7cc5' : '#252525');
-            }}
-            overlayStyle={{
-              zIndex: '100',
-              paddingTop: '10px',
-            }}
-            placement="bottom"
-            trigger={['click']}
-            menu={{
-              items: audioList,
-              onClick: (e) => {
-                openList();
-                setAudioData(files?.filter((item) => item.name === e.key)[0]!);
-                console.log(e.key);
-              },
-            }}>
-            <AiOutlineUnorderedList
-              size={22}
-              color={listColor}
-              onClick={openList}></AiOutlineUnorderedList>
-          </Dropdown>
+          <Speaker audioRef={audioRef}></Speaker>
+          <AudioProgress audioRef={audioRef} progress={progress}></AudioProgress>
+          <Menus
+            audioFiles={audioFiles}
+            share={share}
+            setAudioData={setAudioData}
+            directory={directory}
+            setAudioFiles={setAudioFiles}></Menus>
           <AiOutlineCloseCircle
             className={cls['audio-close']}
             onClick={finished}></AiOutlineCloseCircle>

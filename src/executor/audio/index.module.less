@@ -21,6 +21,9 @@
   justify-content: center;
   align-items: center;
   white-space: nowrap;
+}
+
+.audio-top{
   span{
     margin: 0 5px;
   }
@@ -38,44 +41,30 @@
   display: block;
 }
 
-.audio-volume{
-  height: 100px;
-}
 
-.audio-but-box {
-}
+
 .audio-target-box{
   height: 100%;
   display: flex;
   justify-content: center;
 }
 
-.audio-progress{
-  width: 100px;
+.audio-icon{
+  margin: 0 1px;
+  font-size: 20px;
+  transition: transform 0.1s;
 }
-.audio-list{
-  padding-right: 15px;
-  .audio-disc-icon{
-    top: 0;
-    bottom: 0;
-    position: absolute;
-    margin: auto auto auto 10px;
-
-  }
+.audio-icon:active{
+  transform: scale(0.90);
 }
-
-@keyframes rotate {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.audio-icon-play{
+  font-size: 27px;
+  margin: 0 3px;
 }
 
-.rotate-animation {
-  animation: rotate 5s linear infinite;
-}
+
+
+
 
 
 

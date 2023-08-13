@@ -6,6 +6,7 @@ import { executeCmd, FileTaskList } from './action';
 import { useHistory } from 'react-router-dom';
 import AudioPlayer from '@/executor/audio';
 import { FileItemModel } from '@/ts/base/model';
+import { Directory } from '@/ts/core/thing/directory';
 const audioExt = ['.mp3', '.wav', '.ogg'];
 
 const Executor = () => {
@@ -13,8 +14,8 @@ const Executor = () => {
   const [content, setContent] = useState(<></>);
   const [playAudio, setPlayAudio] = useState(false);
   const [audioData, setAudioData] = useState<FileItemModel>();
-  const [audioFiles, setAudioFiles] = useState<FileItemModel[]>();
   const [audioId, setAudioId] = useState(1);
+  const [directory, setDirectory] = useState<Directory>();
   const resetContent = () => {
     setContent(<></>);
   };
@@ -44,14 +45,10 @@ const Executor = () => {
           args[0].filedata.contentType?.startsWith('audio') ||
           audioExt.includes(args[0].filedata.extension ?? '-')
         ) {
-          const files = args[0].directory.files.filter(
-            (item: { filedata: { contentType: string } }) =>
-              item.filedata.contentType?.startsWith('audio'),
-          );
+          setDirectory(args[0].directory);
           setAudioId((prevAudioId) => prevAudioId + 1);
           setPlayAudio(true);
           setAudioData(args[0].filedata);
-          setAudioFiles(files.map((item: { filedata: any }) => item.filedata));
         }
       }
     });
@@ -62,13 +59,13 @@ const Executor = () => {
   return (
     <>
       {content}
-      {playAudio && (
+      {playAudio && audioData && directory && (
         <AudioPlayer
           finished={stopPlay}
-          share={audioData!}
-          files={audioFiles}
+          share={audioData}
           audioId={audioId}
           setAudioData={setAudioData}
+          directory={directory}
         />
       )}
     </>
