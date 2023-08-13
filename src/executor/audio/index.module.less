@@ -2,7 +2,7 @@
   margin-left: 80%;
   margin-top: 10px;
   position: absolute;
-  z-index: 99;
+  z-index: 1025;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -15,15 +15,11 @@
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
-.audio-top,
 .audio-bottom {
   display: flex;
   justify-content: center;
   align-items: center;
   white-space: nowrap;
-  span{
-    margin: 0 5px;
-  }
 }
 
 
@@ -38,44 +34,22 @@
   display: block;
 }
 
-.audio-volume{
-  height: 100px;
+.audio-icon{
+  margin: 0 1px;
+  font-size: 20px;
+  transition: transform 0.1s;
+}
+.audio-icon:active{
+  transform: scale(0.90);
+}
+.audio-icon-play{
+  font-size: 27px;
+  margin: 0 3px;
 }
 
-.audio-but-box {
-}
-.audio-target-box{
-  height: 100%;
-  display: flex;
-  justify-content: center;
-}
 
-.audio-progress{
-  width: 100px;
-}
-.audio-list{
-  padding-right: 15px;
-  .audio-disc-icon{
-    top: 0;
-    bottom: 0;
-    position: absolute;
-    margin: auto auto auto 10px;
 
-  }
-}
 
-@keyframes rotate {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.rotate-animation {
-  animation: rotate 5s linear infinite;
-}
 
 
 
