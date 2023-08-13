@@ -8,7 +8,7 @@ import {
 import { TbRepeatOnce } from 'react-icons/tb';
 import cls from './index.module.less';
 import React, { useEffect, useState } from 'react';
-import { FileItemModel } from '../../../ts/base/model';
+import { FileItemModel } from '@/ts/base/model';
 
 interface IProp {
   audioData: FileItemModel;
@@ -84,7 +84,7 @@ const AudioController: React.FC<IProp> = ({
   };
 
   return (
-    <div className={cls['audio-top']}>
+    <div className={cls['audio-controller']}>
       <BiShuffle
         className={cls['audio-icon']}
         color={isRandPlay ? '#7c7cc5' : '#252525'}
