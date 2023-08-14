@@ -28,9 +28,12 @@ const FormEditModal: React.FC<IProps> = ({
   editFormOpen = false,
 }) => {
   // 创建ref
-  const myComponentRef = useRef(null);
-
-  const onSchemaChange = (e: schemaType) => {
+  const myComponentRef: any = useRef(null);
+  const onCloseFormModle = () => {
+    onFormSchemaChange(myComponentRef.current.getValue());
+    finished();
+  };
+  const onFormSchemaChange = (e: schemaType) => {
     const ruleInfo = JSON.parse(current.metadata.rule || '{}');
     current.update({
       ...current.metadata,
@@ -40,7 +43,6 @@ const FormEditModal: React.FC<IProps> = ({
       }),
     });
   };
-  //const onCanvasSelect = (e: any) => {};
 
   //页面重载获取默认schema或者配置后的schema
   const settings = defaultSettings[0];
@@ -120,12 +122,13 @@ const FormEditModal: React.FC<IProps> = ({
       destroyOnClose
       title={'表单设计'}
       footer={[]}
-      onCancel={finished}>
+      onCancel={onCloseFormModle}>
       <Generator
         defaultValue={defaultSchema}
-        onSchemaChange={onSchemaChange}
+        onSchemaChange={onFormSchemaChange}
         settings={[defaultSettings[2], settings]}
-        //onCanvasSelect={onCanvasSelect}
+        extraButtons={[true, false, false, false]}
+        canDelete={false}
         hideId
         widgets={{ MyDivider, MySpace }}
         commonSettings={{ ...defaultCommonSettings }}

@@ -41,18 +41,18 @@ const FormRenders: React.FC<IProps> = (props) => {
 
     //初始化数据
     props?.ruleService?.setFormChangeCallback(form.id, (data: any) => {
-      console.log('@@', data);
       const timeFormatRegex = /^\d{4}\/\d{1,2}\/\d{1,2} \d{1,2}:\d{1,2}$/;
       //如果是时间格式需要转换
-
-      const keys = Object.keys(data);
-      for (const key of keys) {
-        const value = data[key];
-        if (timeFormatRegex.test(value)) {
-          data[key] = moment(value).format('YYYY-MM-DD HH:mm:ss');
+      if (data) {
+        const keys = Object.keys(data);
+        for (const key of keys) {
+          const value = data[key];
+          if (timeFormatRegex.test(value)) {
+            data[key] = moment(value).format('YYYY-MM-DD HH:mm:ss');
+          }
         }
+        formIns.setValues(data);
       }
-      formIns.setValues(data);
     });
   }, []);
   if (!data) return <></>;
@@ -71,6 +71,7 @@ const FormRenders: React.FC<IProps> = (props) => {
   };
   return props.forms.map((formResult) => {
     const rule = formResult.rule && JSON.parse(formResult.rule);
+
     if (!rule) {
       return <></>;
     }
