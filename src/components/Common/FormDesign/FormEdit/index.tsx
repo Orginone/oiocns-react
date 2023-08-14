@@ -30,7 +30,6 @@ const FormEditModal: React.FC<IProps> = ({
   // 创建ref
   const myComponentRef: any = useRef(null);
   const onCloseFormModle = () => {
-    console.log(myComponentRef.current.getValue());
     onFormSchemaChange(myComponentRef.current.getValue());
     finished();
   };
@@ -43,12 +42,6 @@ const FormEditModal: React.FC<IProps> = ({
         schema: e,
       }),
     });
-  };
-  const onFormChange = (data: any) => {
-    console.log(data);
-  };
-  const onCanvasSelect = (e: schemaType) => {
-    console.log(e);
   };
 
   //页面重载获取默认schema或者配置后的schema
@@ -133,8 +126,6 @@ const FormEditModal: React.FC<IProps> = ({
       <Generator
         defaultValue={defaultSchema}
         onSchemaChange={onFormSchemaChange}
-        onChange={onFormChange}
-        onCanvasSelect={onCanvasSelect}
         settings={[defaultSettings[2], settings]}
         extraButtons={[true, false, false, false]}
         canDelete={false}
