@@ -53,7 +53,6 @@ const Speaker: React.FC<IProps> = ({ audioRef }) => {
           onClick={() => {
             setIsMute((prevState) => !prevState);
             audioRef.current.muted = true;
-            console.log(isMute);
           }}
           color={isOpen ? '#7c7cc5' : '#252525'}
           size={22}
@@ -80,6 +79,7 @@ const Speaker: React.FC<IProps> = ({ audioRef }) => {
 
   return (
     <Popover
+      overlayStyle={{ zIndex: 1025 }}
       onOpenChange={(isOpen) => {
         handleVolumeChange(volume, isOpen);
       }}
@@ -93,7 +93,6 @@ const Speaker: React.FC<IProps> = ({ audioRef }) => {
             onChange={(e) => {
               setIsMute(false);
               audioRef.current.muted = false;
-              console.log(isMute);
               handleVolumeChange(e);
             }}
           />
