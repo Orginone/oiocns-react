@@ -6,7 +6,7 @@ import { IForm } from '@/ts/core';
 import Generator, { defaultSettings } from 'fr-generator';
 import { schemaType } from '@/ts/base/schema';
 import { defaultCommonSettings } from './setting.js';
-import MyDivider from '@/components/Common/FormDesign/FormEdit/widgets/divider';
+import MyDivider from '@/components/Common/FormDesign/FormEdit/widgets/Divider';
 import MySpace from '@/components/Common/FormDesign/FormEdit/widgets/Space';
 
 type IProps = {
@@ -28,9 +28,13 @@ const FormEditModal: React.FC<IProps> = ({
   editFormOpen = false,
 }) => {
   // 创建ref
-  const myComponentRef = useRef(null);
-
-  const onSchemaChange = (e: schemaType) => {
+  const myComponentRef: any = useRef(null);
+  const onCloseFormModle = () => {
+    console.log(myComponentRef.current.getValue());
+    onFormSchemaChange(myComponentRef.current.getValue());
+    finished();
+  };
+  const onFormSchemaChange = (e: schemaType) => {
     const ruleInfo = JSON.parse(current.metadata.rule || '{}');
     current.update({
       ...current.metadata,
@@ -40,7 +44,12 @@ const FormEditModal: React.FC<IProps> = ({
       }),
     });
   };
-  //const onCanvasSelect = (e: any) => {};
+  const onFormChange = (data: any) => {
+    console.log(data);
+  };
+  const onCanvasSelect = (e: schemaType) => {
+    console.log(e);
+  };
 
   //页面重载获取默认schema或者配置后的schema
   const settings = defaultSettings[0];
@@ -120,12 +129,15 @@ const FormEditModal: React.FC<IProps> = ({
       destroyOnClose
       title={'表单设计'}
       footer={[]}
-      onCancel={finished}>
+      onCancel={onCloseFormModle}>
       <Generator
         defaultValue={defaultSchema}
-        onSchemaChange={onSchemaChange}
+        onSchemaChange={onFormSchemaChange}
+        onChange={onFormChange}
+        onCanvasSelect={onCanvasSelect}
         settings={[defaultSettings[2], settings]}
-        //onCanvasSelect={onCanvasSelect}
+        extraButtons={[true, false, false, false]}
+        canDelete={false}
         hideId
         widgets={{ MyDivider, MySpace }}
         commonSettings={{ ...defaultCommonSettings }}
