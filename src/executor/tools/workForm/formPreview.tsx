@@ -71,7 +71,9 @@ const FormRenders: React.FC<IProps> = (props) => {
   };
   return props.forms.map((formResult) => {
     const rule = formResult.rule && JSON.parse(formResult.rule);
-    console.log('@@', rule.schema);
+    if (!rule) {
+      return <></>;
+    }
     return (
       // eslint-disable-next-line react/jsx-key
       <FormRender
