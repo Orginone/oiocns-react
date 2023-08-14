@@ -6,7 +6,7 @@ import { IForm } from '@/ts/core';
 import Generator, { defaultSettings } from 'fr-generator';
 import { schemaType } from '@/ts/base/schema';
 import { defaultCommonSettings } from './setting.js';
-import MyDivider from '@/components/Common/FormDesign/FormEdit/widgets/divider';
+import MyDivider from '@/components/Common/FormDesign/FormEdit/widgets/Divider';
 import MySpace from '@/components/Common/FormDesign/FormEdit/widgets/Space';
 
 type IProps = {
