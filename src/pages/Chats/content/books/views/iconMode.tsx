@@ -1,4 +1,5 @@
-import { Dropdown, Row, Col, Card, Typography, Badge } from 'antd';
+import { Dropdown, Card, Typography, Badge } from 'antd';
+
 import React from 'react';
 import cls from './less/icon.module.less';
 import { IMsgChat } from '@/ts/core';
@@ -49,15 +50,7 @@ const IconMode = ({ chats }: { chats: IMsgChat[] }) => {
       onContextMenu={(e) => {
         e.stopPropagation();
       }}>
-      <Row gutter={[16, 16]}>
-        {chats.map((el) => {
-          return (
-            <Col xs={8} sm={8} md={6} lg={4} xl={3} xxl={2} key={el.key}>
-              {FileCard(el)}
-            </Col>
-          );
-        })}
-      </Row>
+      {chats.map((el) => FileCard(el))}
     </div>
   );
 };
