@@ -55,7 +55,7 @@ const HotTableView: React.FC<IProps> = ({
   let setting = sheetList[sheetIndex]?.data?.setting || {};
   let mergeCells = setting?.mergeCells || [];
   let autoColumn: boolean = true; //自适应
-  let autoRow: boolean = false;
+  let autoRow: boolean = true;
 
   useEffect(() => {
     const hot = hotRef.current.hotInstance;
@@ -175,6 +175,8 @@ const HotTableView: React.FC<IProps> = ({
 
   const saveClickCallback = async () => {
     // 保存 保存数据结构---还未更新完
+    let setRowHeightInstance = hotRef.current.hotInstance.getPlugin('ManualRowResize');
+    console.log(setRowHeightInstance,'123455')
     let newData = hotRef.current.hotInstance.getData();
     let json = {
       data: newData,
@@ -357,7 +359,7 @@ const HotTableView: React.FC<IProps> = ({
         dropdownMenu={true}
         // manualColumnMove={true} // 列移动
         // manualRowMove={true} // 行移动
-        height="auto"
+        height="700px"
         language={zhCN.languageCode}
         stretchH="all"
         manualColumnResize={true}
