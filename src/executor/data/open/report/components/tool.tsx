@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Select, Dropdown, Button, Popover } from 'antd';
 import type { MenuProps } from 'antd';
-import { SketchPicker } from "@hello-pangea/color-picker";
+import { SketchPicker } from '@hello-pangea/color-picker';
 import cls from './tool.module.less';
 import { IReport } from '@/ts/core';
 const { Option } = Select;
@@ -143,7 +143,7 @@ const ToolBar: React.FC<IProps> = ({ current, handClick, setModal }: IProps) => 
   const onSave = () => {
     handClick('onSave', 'onSave');
   };
-  const onPublish = () => { };
+  const onPublish = () => {};
   const setFontWeight = () => {
     if (fontWeight === 'bold') {
       fontWeight = defaultFontWeight;
@@ -174,13 +174,13 @@ const ToolBar: React.FC<IProps> = ({ current, handClick, setModal }: IProps) => 
     } else {
       handClick('1px solid #000000', 'border', type);
     }
-  }
+  };
   const setBackgroundColor = () => {
-    setOpenBackground(false)
+    setOpenBackground(false);
     handClick(background, 'backgroundColor');
   };
   const setColors = () => {
-    setOpenColor(false)
+    setOpenColor(false);
     handClick(color, 'color');
   };
   const setClassName = (className: string, classType: string) => {
@@ -205,9 +205,9 @@ const ToolBar: React.FC<IProps> = ({ current, handClick, setModal }: IProps) => 
   const mergeAndCenter = () => {
     handClick('', 'mergeAndCenter');
   };
-  const alignThis = (item: any) => {
-    console.log(item);
-  };
+  // const alignThis = (item: any) => {
+  //   console.log(item);
+  // };
 
   const handleChange = (value: any, type: any) => {
     handClick(value, type);
@@ -218,7 +218,7 @@ const ToolBar: React.FC<IProps> = ({ current, handClick, setModal }: IProps) => 
       key: 'bottom',
       label: (
         <div className={cls['border-item']} onClick={() => borderThis('bottom')}>
-          <img src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTQuOSAzSDMuMWEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMWgxLjhhLjEuMSAwIDAgMCAuMS0uMVYzLjFhLjEuMSAwIDAgMC0uMS0uMXptMCA0SDMuMWEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMWgxLjhhLjEuMSAwIDAgMCAuMS0uMVY3LjFhLjEuMSAwIDAgMC0uMS0uMXptMCA4SDMuMWEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMWgxLjhhLjEuMSAwIDAgMCAuMS0uMXYtMS44YS4xLjEgMCAwIDAtLjEtLjF6bS0xLjggNmgxNy44YS4xLjEgMCAwIDAgLjEtLjF2LTEuOGEuMS4xIDAgMCAwLS4xLS4xSDMuMWEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMXpNOC45IDNINy4xYS4xLjEgMCAwIDAtLjEuMXYxLjhhLjEuMSAwIDAgMCAuMS4xaDEuOGEuMS4xIDAgMCAwIC4xLS4xVjMuMWEuMS4xIDAgMCAwLS4xLS4xem00IDBoLTEuOGEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMWgxLjhhLjEuMSAwIDAgMCAuMS0uMVYzLjFhLjEuMSAwIDAgMC0uMS0uMXptMCA0aC0xLjhhLjEuMSAwIDAgMC0uMS4xdjEuOGEuMS4xIDAgMCAwIC4xLjFoMS44YS4xLjEgMCAwIDAgLjEtLjFWNy4xYS4xLjEgMCAwIDAtLjEtLjF6bTAgOGgtMS44YS4xLjEgMCAwIDAtLjEuMXYxLjhhLjEuMSAwIDAgMCAuMS4xaDEuOGEuMS4xIDAgMCAwIC4xLS4xdi0xLjhhLjEuMSAwIDAgMC0uMS0uMXptNi4yIDJoMS44YS4xLjEgMCAwIDAgLjEtLjF2LTEuOGEuMS4xIDAgMCAwLS4xLS4xaC0xLjhhLjEuMSAwIDAgMC0uMS4xdjEuOGEuMS4xIDAgMCAwIC4xLjF6bS02LjItNmgtMS44YS4xLjEgMCAwIDAtLjEuMXYxLjhhLjEuMSAwIDAgMCAuMS4xaDEuOGEuMS4xIDAgMCAwIC4xLS4xdi0xLjhhLjEuMSAwIDAgMC0uMS0uMXptNC04aC0xLjhhLjEuMSAwIDAgMC0uMS4xdjEuOGEuMS4xIDAgMCAwIC4xLjFoMS44YS4xLjEgMCAwIDAgLjEtLjFWMy4xYS4xLjEgMCAwIDAtLjEtLjF6bTIuMS4xdjEuOGEuMS4xIDAgMCAwIC4xLjFoMS44YS4xLjEgMCAwIDAgLjEtLjFWMy4xYS4xLjEgMCAwIDAtLjEtLjFoLTEuOGEuMS4xIDAgMCAwLS4xLjF6bS4xIDUuOWgxLjhhLjEuMSAwIDAgMCAuMS0uMVY3LjFhLjEuMSAwIDAgMC0uMS0uMWgtMS44YS4xLjEgMCAwIDAtLjEuMXYxLjhhLjEuMSAwIDAgMCAuMS4xek00LjkgMTFIMy4xYS4xLjEgMCAwIDAtLjEuMXYxLjhhLjEuMSAwIDAgMCAuMS4xaDEuOGEuMS4xIDAgMCAwIC4xLS4xdi0xLjhhLjEuMSAwIDAgMC0uMS0uMXptNCAwSDcuMWEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMWgxLjhhLjEuMSAwIDAgMCAuMS0uMXYtMS44YS4xLjEgMCAwIDAtLjEtLjF6bTggMGgtMS44YS4xLjEgMCAwIDAtLjEuMXYxLjhhLjEuMSAwIDAgMCAuMS4xaDEuOGEuMS4xIDAgMCAwIC4xLS4xdi0xLjhhLjEuMSAwIDAgMC0uMS0uMXptMi4yIDJoMS44YS4xLjEgMCAwIDAgLjEtLjF2LTEuOGEuMS4xIDAgMCAwLS4xLS4xaC0xLjhhLjEuMSAwIDAgMC0uMS4xdjEuOGEuMS4xIDAgMCAwIC4xLjF6Ii8+PC9zdmc+'></img>
+          <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTQuOSAzSDMuMWEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMWgxLjhhLjEuMSAwIDAgMCAuMS0uMVYzLjFhLjEuMSAwIDAgMC0uMS0uMXptMCA0SDMuMWEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMWgxLjhhLjEuMSAwIDAgMCAuMS0uMVY3LjFhLjEuMSAwIDAgMC0uMS0uMXptMCA4SDMuMWEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMWgxLjhhLjEuMSAwIDAgMCAuMS0uMXYtMS44YS4xLjEgMCAwIDAtLjEtLjF6bS0xLjggNmgxNy44YS4xLjEgMCAwIDAgLjEtLjF2LTEuOGEuMS4xIDAgMCAwLS4xLS4xSDMuMWEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMXpNOC45IDNINy4xYS4xLjEgMCAwIDAtLjEuMXYxLjhhLjEuMSAwIDAgMCAuMS4xaDEuOGEuMS4xIDAgMCAwIC4xLS4xVjMuMWEuMS4xIDAgMCAwLS4xLS4xem00IDBoLTEuOGEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMWgxLjhhLjEuMSAwIDAgMCAuMS0uMVYzLjFhLjEuMSAwIDAgMC0uMS0uMXptMCA0aC0xLjhhLjEuMSAwIDAgMC0uMS4xdjEuOGEuMS4xIDAgMCAwIC4xLjFoMS44YS4xLjEgMCAwIDAgLjEtLjFWNy4xYS4xLjEgMCAwIDAtLjEtLjF6bTAgOGgtMS44YS4xLjEgMCAwIDAtLjEuMXYxLjhhLjEuMSAwIDAgMCAuMS4xaDEuOGEuMS4xIDAgMCAwIC4xLS4xdi0xLjhhLjEuMSAwIDAgMC0uMS0uMXptNi4yIDJoMS44YS4xLjEgMCAwIDAgLjEtLjF2LTEuOGEuMS4xIDAgMCAwLS4xLS4xaC0xLjhhLjEuMSAwIDAgMC0uMS4xdjEuOGEuMS4xIDAgMCAwIC4xLjF6bS02LjItNmgtMS44YS4xLjEgMCAwIDAtLjEuMXYxLjhhLjEuMSAwIDAgMCAuMS4xaDEuOGEuMS4xIDAgMCAwIC4xLS4xdi0xLjhhLjEuMSAwIDAgMC0uMS0uMXptNC04aC0xLjhhLjEuMSAwIDAgMC0uMS4xdjEuOGEuMS4xIDAgMCAwIC4xLjFoMS44YS4xLjEgMCAwIDAgLjEtLjFWMy4xYS4xLjEgMCAwIDAtLjEtLjF6bTIuMS4xdjEuOGEuMS4xIDAgMCAwIC4xLjFoMS44YS4xLjEgMCAwIDAgLjEtLjFWMy4xYS4xLjEgMCAwIDAtLjEtLjFoLTEuOGEuMS4xIDAgMCAwLS4xLjF6bS4xIDUuOWgxLjhhLjEuMSAwIDAgMCAuMS0uMVY3LjFhLjEuMSAwIDAgMC0uMS0uMWgtMS44YS4xLjEgMCAwIDAtLjEuMXYxLjhhLjEuMSAwIDAgMCAuMS4xek00LjkgMTFIMy4xYS4xLjEgMCAwIDAtLjEuMXYxLjhhLjEuMSAwIDAgMCAuMS4xaDEuOGEuMS4xIDAgMCAwIC4xLS4xdi0xLjhhLjEuMSAwIDAgMC0uMS0uMXptNCAwSDcuMWEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMWgxLjhhLjEuMSAwIDAgMCAuMS0uMXYtMS44YS4xLjEgMCAwIDAtLjEtLjF6bTggMGgtMS44YS4xLjEgMCAwIDAtLjEuMXYxLjhhLjEuMSAwIDAgMCAuMS4xaDEuOGEuMS4xIDAgMCAwIC4xLS4xdi0xLjhhLjEuMSAwIDAgMC0uMS0uMXptMi4yIDJoMS44YS4xLjEgMCAwIDAgLjEtLjF2LTEuOGEuMS4xIDAgMCAwLS4xLS4xaC0xLjhhLjEuMSAwIDAgMC0uMS4xdjEuOGEuMS4xIDAgMCAwIC4xLjF6Ii8+PC9zdmc+"></img>
           <div>下框线</div>
         </div>
       ),
@@ -227,7 +227,7 @@ const ToolBar: React.FC<IProps> = ({ current, handClick, setModal }: IProps) => 
       key: 'top',
       label: (
         <div className={cls['border-item']} onClick={() => borderThis('top')}>
-          <img src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTE5LjEgMjFoMS44YS4xLjEgMCAwIDAgLjEtLjF2LTEuOGEuMS4xIDAgMCAwLS4xLS4xaC0xLjhhLjEuMSAwIDAgMC0uMS4xdjEuOGEuMS4xIDAgMCAwIC4xLjF6bTAtNGgxLjhhLjEuMSAwIDAgMCAuMS0uMXYtMS44YS4xLjEgMCAwIDAtLjEtLjFoLTEuOGEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMXptMC04aDEuOGEuMS4xIDAgMCAwIC4xLS4xVjcuMWEuMS4xIDAgMCAwLS4xLS4xaC0xLjhhLjEuMSAwIDAgMC0uMS4xdjEuOGEuMS4xIDAgMCAwIC4xLjF6TTMgMy4xdjEuOGEuMS4xIDAgMCAwIC4xLjFoMTcuOGEuMS4xIDAgMCAwIC4xLS4xVjMuMWEuMS4xIDAgMCAwLS4xLS4xSDMuMWEuMS4xIDAgMCAwLS4xLjF6TTE1LjEgMjFoMS44YS4xLjEgMCAwIDAgLjEtLjF2LTEuOGEuMS4xIDAgMCAwLS4xLS4xaC0xLjhhLjEuMSAwIDAgMC0uMS4xdjEuOGEuMS4xIDAgMCAwIC4xLjF6bS00IDBoMS44YS4xLjEgMCAwIDAgLjEtLjF2LTEuOGEuMS4xIDAgMCAwLS4xLS4xaC0xLjhhLjEuMSAwIDAgMC0uMS4xdjEuOGEuMS4xIDAgMCAwIC4xLjF6bTAtNGgxLjhhLjEuMSAwIDAgMCAuMS0uMXYtMS44YS4xLjEgMCAwIDAtLjEtLjFoLTEuOGEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMXptMC04aDEuOGEuMS4xIDAgMCAwIC4xLS4xVjcuMWEuMS4xIDAgMCAwLS4xLS4xaC0xLjhhLjEuMSAwIDAgMC0uMS4xdjEuOGEuMS4xIDAgMCAwIC4xLjF6bS04IDBoMS44YS4xLjEgMCAwIDAgLjEtLjFWNy4xYS4xLjEgMCAwIDAtLjEtLjFIMy4xYS4xLjEgMCAwIDAtLjEuMXYxLjhhLjEuMSAwIDAgMCAuMS4xem04IDRoMS44YS4xLjEgMCAwIDAgLjEtLjF2LTEuOGEuMS4xIDAgMCAwLS4xLS4xaC0xLjhhLjEuMSAwIDAgMC0uMS4xdjEuOGEuMS4xIDAgMCAwIC4xLjF6bS00IDhoMS44YS4xLjEgMCAwIDAgLjEtLjF2LTEuOGEuMS4xIDAgMCAwLS4xLS4xSDcuMWEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMXptLTQgMGgxLjhhLjEuMSAwIDAgMCAuMS0uMXYtMS44YS4xLjEgMCAwIDAtLjEtLjFIMy4xYS4xLjEgMCAwIDAtLjEuMXYxLjhhLjEuMSAwIDAgMCAuMS4xem0wLTRoMS44YS4xLjEgMCAwIDAgLjEtLjF2LTEuOGEuMS4xIDAgMCAwLS4xLS4xSDMuMWEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMXptMTYtNGgxLjhhLjEuMSAwIDAgMCAuMS0uMXYtMS44YS4xLjEgMCAwIDAtLjEtLjFoLTEuOGEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMXptLTQgMGgxLjhhLjEuMSAwIDAgMCAuMS0uMXYtMS44YS4xLjEgMCAwIDAtLjEtLjFoLTEuOGEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMXptLTggMGgxLjhhLjEuMSAwIDAgMCAuMS0uMXYtMS44YS4xLjEgMCAwIDAtLjEtLjFINy4xYS4xLjEgMCAwIDAtLjEuMXYxLjhhLjEuMSAwIDAgMCAuMS4xem0tNCAwaDEuOGEuMS4xIDAgMCAwIC4xLS4xdi0xLjhhLjEuMSAwIDAgMC0uMS0uMUgzLjFhLjEuMSAwIDAgMC0uMS4xdjEuOGEuMS4xIDAgMCAwIC4xLjF6Ii8+PC9zdmc+'></img>
+          <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTE5LjEgMjFoMS44YS4xLjEgMCAwIDAgLjEtLjF2LTEuOGEuMS4xIDAgMCAwLS4xLS4xaC0xLjhhLjEuMSAwIDAgMC0uMS4xdjEuOGEuMS4xIDAgMCAwIC4xLjF6bTAtNGgxLjhhLjEuMSAwIDAgMCAuMS0uMXYtMS44YS4xLjEgMCAwIDAtLjEtLjFoLTEuOGEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMXptMC04aDEuOGEuMS4xIDAgMCAwIC4xLS4xVjcuMWEuMS4xIDAgMCAwLS4xLS4xaC0xLjhhLjEuMSAwIDAgMC0uMS4xdjEuOGEuMS4xIDAgMCAwIC4xLjF6TTMgMy4xdjEuOGEuMS4xIDAgMCAwIC4xLjFoMTcuOGEuMS4xIDAgMCAwIC4xLS4xVjMuMWEuMS4xIDAgMCAwLS4xLS4xSDMuMWEuMS4xIDAgMCAwLS4xLjF6TTE1LjEgMjFoMS44YS4xLjEgMCAwIDAgLjEtLjF2LTEuOGEuMS4xIDAgMCAwLS4xLS4xaC0xLjhhLjEuMSAwIDAgMC0uMS4xdjEuOGEuMS4xIDAgMCAwIC4xLjF6bS00IDBoMS44YS4xLjEgMCAwIDAgLjEtLjF2LTEuOGEuMS4xIDAgMCAwLS4xLS4xaC0xLjhhLjEuMSAwIDAgMC0uMS4xdjEuOGEuMS4xIDAgMCAwIC4xLjF6bTAtNGgxLjhhLjEuMSAwIDAgMCAuMS0uMXYtMS44YS4xLjEgMCAwIDAtLjEtLjFoLTEuOGEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMXptMC04aDEuOGEuMS4xIDAgMCAwIC4xLS4xVjcuMWEuMS4xIDAgMCAwLS4xLS4xaC0xLjhhLjEuMSAwIDAgMC0uMS4xdjEuOGEuMS4xIDAgMCAwIC4xLjF6bS04IDBoMS44YS4xLjEgMCAwIDAgLjEtLjFWNy4xYS4xLjEgMCAwIDAtLjEtLjFIMy4xYS4xLjEgMCAwIDAtLjEuMXYxLjhhLjEuMSAwIDAgMCAuMS4xem04IDRoMS44YS4xLjEgMCAwIDAgLjEtLjF2LTEuOGEuMS4xIDAgMCAwLS4xLS4xaC0xLjhhLjEuMSAwIDAgMC0uMS4xdjEuOGEuMS4xIDAgMCAwIC4xLjF6bS00IDhoMS44YS4xLjEgMCAwIDAgLjEtLjF2LTEuOGEuMS4xIDAgMCAwLS4xLS4xSDcuMWEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMXptLTQgMGgxLjhhLjEuMSAwIDAgMCAuMS0uMXYtMS44YS4xLjEgMCAwIDAtLjEtLjFIMy4xYS4xLjEgMCAwIDAtLjEuMXYxLjhhLjEuMSAwIDAgMCAuMS4xem0wLTRoMS44YS4xLjEgMCAwIDAgLjEtLjF2LTEuOGEuMS4xIDAgMCAwLS4xLS4xSDMuMWEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMXptMTYtNGgxLjhhLjEuMSAwIDAgMCAuMS0uMXYtMS44YS4xLjEgMCAwIDAtLjEtLjFoLTEuOGEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMXptLTQgMGgxLjhhLjEuMSAwIDAgMCAuMS0uMXYtMS44YS4xLjEgMCAwIDAtLjEtLjFoLTEuOGEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMXptLTggMGgxLjhhLjEuMSAwIDAgMCAuMS0uMXYtMS44YS4xLjEgMCAwIDAtLjEtLjFINy4xYS4xLjEgMCAwIDAtLjEuMXYxLjhhLjEuMSAwIDAgMCAuMS4xem0tNCAwaDEuOGEuMS4xIDAgMCAwIC4xLS4xdi0xLjhhLjEuMSAwIDAgMC0uMS0uMUgzLjFhLjEuMSAwIDAgMC0uMS4xdjEuOGEuMS4xIDAgMCAwIC4xLjF6Ii8+PC9zdmc+"></img>
           <div>上框线</div>
         </div>
       ),
@@ -236,7 +236,7 @@ const ToolBar: React.FC<IProps> = ({ current, handClick, setModal }: IProps) => 
       key: 'start',
       label: (
         <div className={cls['border-item']} onClick={() => borderThis('start')}>
-          <img src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGQ9Ik0xOSAzLjF2MS44YS4xLjEgMCAwIDAgLjEuMWgxLjhhLjEuMSAwIDAgMCAuMS0uMVYzLjFhLjEuMSAwIDAgMC0uMS0uMWgtMS44YS4xLjEgMCAwIDAtLjEuMXpNMTUuMSA1aDEuOGEuMS4xIDAgMCAwIC4xLS4xVjMuMWEuMS4xIDAgMCAwLS4xLS4xaC0xLjhhLjEuMSAwIDAgMC0uMS4xdjEuOGEuMS4xIDAgMCAwIC4xLjF6bS04IDBoMS44YS4xLjEgMCAwIDAgLjEtLjFWMy4xYS4xLjEgMCAwIDAtLjEtLjFINy4xYS4xLjEgMCAwIDAtLjEuMXYxLjhhLjEuMSAwIDAgMCAuMS4xem0tNCAxNmgxLjhhLjEuMSAwIDAgMCAuMS0uMVYzLjFhLjEuMSAwIDAgMC0uMS0uMUgzLjFhLjEuMSAwIDAgMC0uMS4xdjE3LjhhLjEuMSAwIDAgMCAuMS4xem0xNi0xMmgxLjhhLjEuMSAwIDAgMCAuMS0uMVY3LjFhLjEuMSAwIDAgMC0uMS0uMWgtMS44YS4xLjEgMCAwIDAtLjEuMXYxLjhhLjEuMSAwIDAgMCAuMS4xeiIvPjx1c2UgeGxpbms6aHJlZj0iI0IiLz48dXNlIHhsaW5rOmhyZWY9IiNCIiB4PSItNCIvPjx1c2UgeGxpbms6aHJlZj0iI0MiLz48dXNlIHhsaW5rOmhyZWY9IiNDIiB5PSI4Ii8+PHVzZSB4bGluazpocmVmPSIjQiIgeD0iLTgiLz48dXNlIHhsaW5rOmhyZWY9IiNCIiB5PSI0Ii8+PHVzZSB4bGluazpocmVmPSIjQiIgeT0iOCIvPjx1c2UgeGxpbms6aHJlZj0iI0IiIHg9Ii00IiB5PSI4Ii8+PHBhdGggZD0iTTExLjEgNWgxLjhhLjEuMSAwIDAgMCAuMS0uMVYzLjFhLjEuMSAwIDAgMC0uMS0uMWgtMS44YS4xLjEgMCAwIDAtLjEuMXYxLjhhLjEuMSAwIDAgMCAuMS4xem0wIDRoMS44YS4xLjEgMCAwIDAgLjEtLjFWNy4xYS4xLjEgMCAwIDAtLjEtLjFoLTEuOGEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMXoiLz48dXNlIHhsaW5rOmhyZWY9IiNCIiB4PSItOCIgeT0iNCIvPjx1c2UgeGxpbms6aHJlZj0iI0IiIHg9Ii04IiB5PSI4Ii8+PGRlZnM+PHBhdGggaWQ9IkIiIGQ9Ik0xOS4xIDEzaDEuOGEuMS4xIDAgMCAwIC4xLS4xdi0xLjhhLjEuMSAwIDAgMC0uMS0uMWgtMS44YS4xLjEgMCAwIDAtLjEuMXYxLjhhLjEuMSAwIDAgMCAuMS4xeiIvPjxwYXRoIGlkPSJDIiBkPSJNNy4xIDEzaDEuOGEuMS4xIDAgMCAwIC4xLS4xdi0xLjhhLjEuMSAwIDAgMC0uMS0uMUg3LjFhLjEuMSAwIDAgMC0uMS4xdjEuOGEuMS4xIDAgMCAwIC4xLjF6Ii8+PC9kZWZzPjwvc3ZnPg=='></img>
+          <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGQ9Ik0xOSAzLjF2MS44YS4xLjEgMCAwIDAgLjEuMWgxLjhhLjEuMSAwIDAgMCAuMS0uMVYzLjFhLjEuMSAwIDAgMC0uMS0uMWgtMS44YS4xLjEgMCAwIDAtLjEuMXpNMTUuMSA1aDEuOGEuMS4xIDAgMCAwIC4xLS4xVjMuMWEuMS4xIDAgMCAwLS4xLS4xaC0xLjhhLjEuMSAwIDAgMC0uMS4xdjEuOGEuMS4xIDAgMCAwIC4xLjF6bS04IDBoMS44YS4xLjEgMCAwIDAgLjEtLjFWMy4xYS4xLjEgMCAwIDAtLjEtLjFINy4xYS4xLjEgMCAwIDAtLjEuMXYxLjhhLjEuMSAwIDAgMCAuMS4xem0tNCAxNmgxLjhhLjEuMSAwIDAgMCAuMS0uMVYzLjFhLjEuMSAwIDAgMC0uMS0uMUgzLjFhLjEuMSAwIDAgMC0uMS4xdjE3LjhhLjEuMSAwIDAgMCAuMS4xem0xNi0xMmgxLjhhLjEuMSAwIDAgMCAuMS0uMVY3LjFhLjEuMSAwIDAgMC0uMS0uMWgtMS44YS4xLjEgMCAwIDAtLjEuMXYxLjhhLjEuMSAwIDAgMCAuMS4xeiIvPjx1c2UgeGxpbms6aHJlZj0iI0IiLz48dXNlIHhsaW5rOmhyZWY9IiNCIiB4PSItNCIvPjx1c2UgeGxpbms6aHJlZj0iI0MiLz48dXNlIHhsaW5rOmhyZWY9IiNDIiB5PSI4Ii8+PHVzZSB4bGluazpocmVmPSIjQiIgeD0iLTgiLz48dXNlIHhsaW5rOmhyZWY9IiNCIiB5PSI0Ii8+PHVzZSB4bGluazpocmVmPSIjQiIgeT0iOCIvPjx1c2UgeGxpbms6aHJlZj0iI0IiIHg9Ii00IiB5PSI4Ii8+PHBhdGggZD0iTTExLjEgNWgxLjhhLjEuMSAwIDAgMCAuMS0uMVYzLjFhLjEuMSAwIDAgMC0uMS0uMWgtMS44YS4xLjEgMCAwIDAtLjEuMXYxLjhhLjEuMSAwIDAgMCAuMS4xem0wIDRoMS44YS4xLjEgMCAwIDAgLjEtLjFWNy4xYS4xLjEgMCAwIDAtLjEtLjFoLTEuOGEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMXoiLz48dXNlIHhsaW5rOmhyZWY9IiNCIiB4PSItOCIgeT0iNCIvPjx1c2UgeGxpbms6aHJlZj0iI0IiIHg9Ii04IiB5PSI4Ii8+PGRlZnM+PHBhdGggaWQ9IkIiIGQ9Ik0xOS4xIDEzaDEuOGEuMS4xIDAgMCAwIC4xLS4xdi0xLjhhLjEuMSAwIDAgMC0uMS0uMWgtMS44YS4xLjEgMCAwIDAtLjEuMXYxLjhhLjEuMSAwIDAgMCAuMS4xeiIvPjxwYXRoIGlkPSJDIiBkPSJNNy4xIDEzaDEuOGEuMS4xIDAgMCAwIC4xLS4xdi0xLjhhLjEuMSAwIDAgMC0uMS0uMUg3LjFhLjEuMSAwIDAgMC0uMS4xdjEuOGEuMS4xIDAgMCAwIC4xLjF6Ii8+PC9kZWZzPjwvc3ZnPg=="></img>
           <div>左框线</div>
         </div>
       ),
@@ -245,7 +245,7 @@ const ToolBar: React.FC<IProps> = ({ current, handClick, setModal }: IProps) => 
       key: 'end',
       label: (
         <div className={cls['border-item']} onClick={() => borderThis('end')}>
-          <img src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTMuMSAyMWgxLjhhLjEuMSAwIDAgMCAuMS0uMXYtMS44YS4xLjEgMCAwIDAtLjEtLjFIMy4xYS4xLjEgMCAwIDAtLjEuMXYxLjhhLjEuMSAwIDAgMCAuMS4xem00IDBoMS44YS4xLjEgMCAwIDAgLjEtLjF2LTEuOGEuMS4xIDAgMCAwLS4xLS4xSDcuMWEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMXptOCAwaDEuOGEuMS4xIDAgMCAwIC4xLS4xdi0xLjhhLjEuMSAwIDAgMC0uMS0uMWgtMS44YS4xLjEgMCAwIDAtLjEuMXYxLjhhLjEuMSAwIDAgMCAuMS4xek0xOSAzLjF2MTcuOGEuMS4xIDAgMCAwIC4xLjFoMS44YS4xLjEgMCAwIDAgLjEtLjFWMy4xYS4xLjEgMCAwIDAtLjEtLjFoLTEuOGEuMS4xIDAgMCAwLS4xLjF6TTMuMSAxN2gxLjhhLjEuMSAwIDAgMCAuMS0uMXYtMS44YS4xLjEgMCAwIDAtLjEtLjFIMy4xYS4xLjEgMCAwIDAtLjEuMXYxLjhhLjEuMSAwIDAgMCAuMS4xem0wLTRoMS44YS4xLjEgMCAwIDAgLjEtLjF2LTEuOGEuMS4xIDAgMCAwLS4xLS4xSDMuMWEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMXptNCAwaDEuOGEuMS4xIDAgMCAwIC4xLS4xdi0xLjhhLjEuMSAwIDAgMC0uMS0uMUg3LjFhLjEuMSAwIDAgMC0uMS4xdjEuOGEuMS4xIDAgMCAwIC4xLjF6bTggMGgxLjhhLjEuMSAwIDAgMCAuMS0uMXYtMS44YS4xLjEgMCAwIDAtLjEtLjFoLTEuOGEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMXptMC04aDEuOGEuMS4xIDAgMCAwIC4xLS4xVjMuMWEuMS4xIDAgMCAwLS4xLS4xaC0xLjhhLjEuMSAwIDAgMC0uMS4xdjEuOGEuMS4xIDAgMCAwIC4xLjF6bS00IDhoMS44YS4xLjEgMCAwIDAgLjEtLjF2LTEuOGEuMS4xIDAgMCAwLS4xLS4xaC0xLjhhLjEuMSAwIDAgMC0uMS4xdjEuOGEuMS4xIDAgMCAwIC4xLjF6bS04LTRoMS44YS4xLjEgMCAwIDAgLjEtLjFWNy4xYS4xLjEgMCAwIDAtLjEtLjFIMy4xYS4xLjEgMCAwIDAtLjEuMXYxLjhhLjEuMSAwIDAgMCAuMS4xem0wLTRoMS44YS4xLjEgMCAwIDAgLjEtLjFWMy4xYS4xLjEgMCAwIDAtLjEtLjFIMy4xYS4xLjEgMCAwIDAtLjEuMXYxLjhhLjEuMSAwIDAgMCAuMS4xem00IDBoMS44YS4xLjEgMCAwIDAgLjEtLjFWMy4xYS4xLjEgMCAwIDAtLjEtLjFINy4xYS4xLjEgMCAwIDAtLjEuMXYxLjhhLjEuMSAwIDAgMCAuMS4xem00IDE2aDEuOGEuMS4xIDAgMCAwIC4xLS4xdi0xLjhhLjEuMSAwIDAgMC0uMS0uMWgtMS44YS4xLjEgMCAwIDAtLjEuMXYxLjhhLjEuMSAwIDAgMCAuMS4xem0wLTRoMS44YS4xLjEgMCAwIDAgLjEtLjF2LTEuOGEuMS4xIDAgMCAwLS4xLS4xaC0xLjhhLjEuMSAwIDAgMC0uMS4xdjEuOGEuMS4xIDAgMCAwIC4xLjF6bTAtOGgxLjhhLjEuMSAwIDAgMCAuMS0uMVY3LjFhLjEuMSAwIDAgMC0uMS0uMWgtMS44YS4xLjEgMCAwIDAtLjEuMXYxLjhhLjEuMSAwIDAgMCAuMS4xem0wLTRoMS44YS4xLjEgMCAwIDAgLjEtLjFWMy4xYS4xLjEgMCAwIDAtLjEtLjFoLTEuOGEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMXoiLz48L3N2Zz4='></img>
+          <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTMuMSAyMWgxLjhhLjEuMSAwIDAgMCAuMS0uMXYtMS44YS4xLjEgMCAwIDAtLjEtLjFIMy4xYS4xLjEgMCAwIDAtLjEuMXYxLjhhLjEuMSAwIDAgMCAuMS4xem00IDBoMS44YS4xLjEgMCAwIDAgLjEtLjF2LTEuOGEuMS4xIDAgMCAwLS4xLS4xSDcuMWEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMXptOCAwaDEuOGEuMS4xIDAgMCAwIC4xLS4xdi0xLjhhLjEuMSAwIDAgMC0uMS0uMWgtMS44YS4xLjEgMCAwIDAtLjEuMXYxLjhhLjEuMSAwIDAgMCAuMS4xek0xOSAzLjF2MTcuOGEuMS4xIDAgMCAwIC4xLjFoMS44YS4xLjEgMCAwIDAgLjEtLjFWMy4xYS4xLjEgMCAwIDAtLjEtLjFoLTEuOGEuMS4xIDAgMCAwLS4xLjF6TTMuMSAxN2gxLjhhLjEuMSAwIDAgMCAuMS0uMXYtMS44YS4xLjEgMCAwIDAtLjEtLjFIMy4xYS4xLjEgMCAwIDAtLjEuMXYxLjhhLjEuMSAwIDAgMCAuMS4xem0wLTRoMS44YS4xLjEgMCAwIDAgLjEtLjF2LTEuOGEuMS4xIDAgMCAwLS4xLS4xSDMuMWEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMXptNCAwaDEuOGEuMS4xIDAgMCAwIC4xLS4xdi0xLjhhLjEuMSAwIDAgMC0uMS0uMUg3LjFhLjEuMSAwIDAgMC0uMS4xdjEuOGEuMS4xIDAgMCAwIC4xLjF6bTggMGgxLjhhLjEuMSAwIDAgMCAuMS0uMXYtMS44YS4xLjEgMCAwIDAtLjEtLjFoLTEuOGEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMXptMC04aDEuOGEuMS4xIDAgMCAwIC4xLS4xVjMuMWEuMS4xIDAgMCAwLS4xLS4xaC0xLjhhLjEuMSAwIDAgMC0uMS4xdjEuOGEuMS4xIDAgMCAwIC4xLjF6bS00IDhoMS44YS4xLjEgMCAwIDAgLjEtLjF2LTEuOGEuMS4xIDAgMCAwLS4xLS4xaC0xLjhhLjEuMSAwIDAgMC0uMS4xdjEuOGEuMS4xIDAgMCAwIC4xLjF6bS04LTRoMS44YS4xLjEgMCAwIDAgLjEtLjFWNy4xYS4xLjEgMCAwIDAtLjEtLjFIMy4xYS4xLjEgMCAwIDAtLjEuMXYxLjhhLjEuMSAwIDAgMCAuMS4xem0wLTRoMS44YS4xLjEgMCAwIDAgLjEtLjFWMy4xYS4xLjEgMCAwIDAtLjEtLjFIMy4xYS4xLjEgMCAwIDAtLjEuMXYxLjhhLjEuMSAwIDAgMCAuMS4xem00IDBoMS44YS4xLjEgMCAwIDAgLjEtLjFWMy4xYS4xLjEgMCAwIDAtLjEtLjFINy4xYS4xLjEgMCAwIDAtLjEuMXYxLjhhLjEuMSAwIDAgMCAuMS4xem00IDE2aDEuOGEuMS4xIDAgMCAwIC4xLS4xdi0xLjhhLjEuMSAwIDAgMC0uMS0uMWgtMS44YS4xLjEgMCAwIDAtLjEuMXYxLjhhLjEuMSAwIDAgMCAuMS4xem0wLTRoMS44YS4xLjEgMCAwIDAgLjEtLjF2LTEuOGEuMS4xIDAgMCAwLS4xLS4xaC0xLjhhLjEuMSAwIDAgMC0uMS4xdjEuOGEuMS4xIDAgMCAwIC4xLjF6bTAtOGgxLjhhLjEuMSAwIDAgMCAuMS0uMVY3LjFhLjEuMSAwIDAgMC0uMS0uMWgtMS44YS4xLjEgMCAwIDAtLjEuMXYxLjhhLjEuMSAwIDAgMCAuMS4xem0wLTRoMS44YS4xLjEgMCAwIDAgLjEtLjFWMy4xYS4xLjEgMCAwIDAtLjEtLjFoLTEuOGEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMXoiLz48L3N2Zz4="></img>
           <div>右框线</div>
         </div>
       ),
@@ -254,7 +254,7 @@ const ToolBar: React.FC<IProps> = ({ current, handClick, setModal }: IProps) => 
       key: 'border-none',
       label: (
         <div className={cls['border-item']} onClick={() => borderThis('none')}>
-          <img src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTMuMSA1aDEuOGEuMS4xIDAgMCAwIC4xLS4xVjMuMWEuMS4xIDAgMCAwLS4xLS4xSDMuMWEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMXptMCA0aDEuOGEuMS4xIDAgMCAwIC4xLS4xVjcuMWEuMS4xIDAgMCAwLS4xLS4xSDMuMWEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMXptMCA4aDEuOGEuMS4xIDAgMCAwIC4xLS4xdi0xLjhhLjEuMSAwIDAgMC0uMS0uMUgzLjFhLjEuMSAwIDAgMC0uMS4xdjEuOGEuMS4xIDAgMCAwIC4xLjF6bTQtMTJoMS44YS4xLjEgMCAwIDAgLjEtLjFWMy4xYS4xLjEgMCAwIDAtLjEtLjFINy4xYS4xLjEgMCAwIDAtLjEuMXYxLjhhLjEuMSAwIDAgMCAuMS4xem00IDBoMS44YS4xLjEgMCAwIDAgLjEtLjFWMy4xYS4xLjEgMCAwIDAtLjEtLjFoLTEuOGEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMXptMCA0aDEuOGEuMS4xIDAgMCAwIC4xLS4xVjcuMWEuMS4xIDAgMCAwLS4xLS4xaC0xLjhhLjEuMSAwIDAgMC0uMS4xdjEuOGEuMS4xIDAgMCAwIC4xLjF6bTAgOGgxLjhhLjEuMSAwIDAgMCAuMS0uMXYtMS44YS4xLjEgMCAwIDAtLjEtLjFoLTEuOGEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMXptOCAwaDEuOGEuMS4xIDAgMCAwIC4xLS4xdi0xLjhhLjEuMSAwIDAgMC0uMS0uMWgtMS44YS4xLjEgMCAwIDAtLjEuMXYxLjhhLjEuMSAwIDAgMCAuMS4xem0wIDRoMS44YS4xLjEgMCAwIDAgLjEtLjF2LTEuOGEuMS4xIDAgMCAwLS4xLS4xaC0xLjhhLjEuMSAwIDAgMC0uMS4xdjEuOGEuMS4xIDAgMCAwIC4xLjF6bS00IDBoMS44YS4xLjEgMCAwIDAgLjEtLjF2LTEuOGEuMS4xIDAgMCAwLS4xLS4xaC0xLjhhLjEuMSAwIDAgMC0uMS4xdjEuOGEuMS4xIDAgMCAwIC4xLjF6bS00IDBoMS44YS4xLjEgMCAwIDAgLjEtLjF2LTEuOGEuMS4xIDAgMCAwLS4xLS4xaC0xLjhhLjEuMSAwIDAgMC0uMS4xdjEuOGEuMS4xIDAgMCAwIC4xLjF6bS00IDBoMS44YS4xLjEgMCAwIDAgLjEtLjF2LTEuOGEuMS4xIDAgMCAwLS4xLS4xSDcuMWEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMXptLTQgMGgxLjhhLjEuMSAwIDAgMCAuMS0uMXYtMS44YS4xLjEgMCAwIDAtLjEtLjFIMy4xYS4xLjEgMCAwIDAtLjEuMXYxLjhhLjEuMSAwIDAgMCAuMS4xem04LThoMS44YS4xLjEgMCAwIDAgLjEtLjF2LTEuOGEuMS4xIDAgMCAwLS4xLS4xaC0xLjhhLjEuMSAwIDAgMC0uMS4xdjEuOGEuMS4xIDAgMCAwIC4xLjF6bTQtOGgxLjhhLjEuMSAwIDAgMCAuMS0uMVYzLjFhLjEuMSAwIDAgMC0uMS0uMWgtMS44YS4xLjEgMCAwIDAtLjEuMXYxLjhhLjEuMSAwIDAgMCAuMS4xek0xOSAzLjF2MS44YS4xLjEgMCAwIDAgLjEuMWgxLjhhLjEuMSAwIDAgMCAuMS0uMVYzLjFhLjEuMSAwIDAgMC0uMS0uMWgtMS44YS4xLjEgMCAwIDAtLjEuMXptLjEgNS45aDEuOGEuMS4xIDAgMCAwIC4xLS4xVjcuMWEuMS4xIDAgMCAwLS4xLS4xaC0xLjhhLjEuMSAwIDAgMC0uMS4xdjEuOGEuMS4xIDAgMCAwIC4xLjF6bS0xNiA0aDEuOGEuMS4xIDAgMCAwIC4xLS4xdi0xLjhhLjEuMSAwIDAgMC0uMS0uMUgzLjFhLjEuMSAwIDAgMC0uMS4xdjEuOGEuMS4xIDAgMCAwIC4xLjF6bTQgMGgxLjhhLjEuMSAwIDAgMCAuMS0uMXYtMS44YS4xLjEgMCAwIDAtLjEtLjFINy4xYS4xLjEgMCAwIDAtLjEuMXYxLjhhLjEuMSAwIDAgMCAuMS4xem04IDBoMS44YS4xLjEgMCAwIDAgLjEtLjF2LTEuOGEuMS4xIDAgMCAwLS4xLS4xaC0xLjhhLjEuMSAwIDAgMC0uMS4xdjEuOGEuMS4xIDAgMCAwIC4xLjF6bTQgMGgxLjhhLjEuMSAwIDAgMCAuMS0uMXYtMS44YS4xLjEgMCAwIDAtLjEtLjFoLTEuOGEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMXoiLz48L3N2Zz4='></img>
+          <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTMuMSA1aDEuOGEuMS4xIDAgMCAwIC4xLS4xVjMuMWEuMS4xIDAgMCAwLS4xLS4xSDMuMWEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMXptMCA0aDEuOGEuMS4xIDAgMCAwIC4xLS4xVjcuMWEuMS4xIDAgMCAwLS4xLS4xSDMuMWEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMXptMCA4aDEuOGEuMS4xIDAgMCAwIC4xLS4xdi0xLjhhLjEuMSAwIDAgMC0uMS0uMUgzLjFhLjEuMSAwIDAgMC0uMS4xdjEuOGEuMS4xIDAgMCAwIC4xLjF6bTQtMTJoMS44YS4xLjEgMCAwIDAgLjEtLjFWMy4xYS4xLjEgMCAwIDAtLjEtLjFINy4xYS4xLjEgMCAwIDAtLjEuMXYxLjhhLjEuMSAwIDAgMCAuMS4xem00IDBoMS44YS4xLjEgMCAwIDAgLjEtLjFWMy4xYS4xLjEgMCAwIDAtLjEtLjFoLTEuOGEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMXptMCA0aDEuOGEuMS4xIDAgMCAwIC4xLS4xVjcuMWEuMS4xIDAgMCAwLS4xLS4xaC0xLjhhLjEuMSAwIDAgMC0uMS4xdjEuOGEuMS4xIDAgMCAwIC4xLjF6bTAgOGgxLjhhLjEuMSAwIDAgMCAuMS0uMXYtMS44YS4xLjEgMCAwIDAtLjEtLjFoLTEuOGEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMXptOCAwaDEuOGEuMS4xIDAgMCAwIC4xLS4xdi0xLjhhLjEuMSAwIDAgMC0uMS0uMWgtMS44YS4xLjEgMCAwIDAtLjEuMXYxLjhhLjEuMSAwIDAgMCAuMS4xem0wIDRoMS44YS4xLjEgMCAwIDAgLjEtLjF2LTEuOGEuMS4xIDAgMCAwLS4xLS4xaC0xLjhhLjEuMSAwIDAgMC0uMS4xdjEuOGEuMS4xIDAgMCAwIC4xLjF6bS00IDBoMS44YS4xLjEgMCAwIDAgLjEtLjF2LTEuOGEuMS4xIDAgMCAwLS4xLS4xaC0xLjhhLjEuMSAwIDAgMC0uMS4xdjEuOGEuMS4xIDAgMCAwIC4xLjF6bS00IDBoMS44YS4xLjEgMCAwIDAgLjEtLjF2LTEuOGEuMS4xIDAgMCAwLS4xLS4xaC0xLjhhLjEuMSAwIDAgMC0uMS4xdjEuOGEuMS4xIDAgMCAwIC4xLjF6bS00IDBoMS44YS4xLjEgMCAwIDAgLjEtLjF2LTEuOGEuMS4xIDAgMCAwLS4xLS4xSDcuMWEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMXptLTQgMGgxLjhhLjEuMSAwIDAgMCAuMS0uMXYtMS44YS4xLjEgMCAwIDAtLjEtLjFIMy4xYS4xLjEgMCAwIDAtLjEuMXYxLjhhLjEuMSAwIDAgMCAuMS4xem04LThoMS44YS4xLjEgMCAwIDAgLjEtLjF2LTEuOGEuMS4xIDAgMCAwLS4xLS4xaC0xLjhhLjEuMSAwIDAgMC0uMS4xdjEuOGEuMS4xIDAgMCAwIC4xLjF6bTQtOGgxLjhhLjEuMSAwIDAgMCAuMS0uMVYzLjFhLjEuMSAwIDAgMC0uMS0uMWgtMS44YS4xLjEgMCAwIDAtLjEuMXYxLjhhLjEuMSAwIDAgMCAuMS4xek0xOSAzLjF2MS44YS4xLjEgMCAwIDAgLjEuMWgxLjhhLjEuMSAwIDAgMCAuMS0uMVYzLjFhLjEuMSAwIDAgMC0uMS0uMWgtMS44YS4xLjEgMCAwIDAtLjEuMXptLjEgNS45aDEuOGEuMS4xIDAgMCAwIC4xLS4xVjcuMWEuMS4xIDAgMCAwLS4xLS4xaC0xLjhhLjEuMSAwIDAgMC0uMS4xdjEuOGEuMS4xIDAgMCAwIC4xLjF6bS0xNiA0aDEuOGEuMS4xIDAgMCAwIC4xLS4xdi0xLjhhLjEuMSAwIDAgMC0uMS0uMUgzLjFhLjEuMSAwIDAgMC0uMS4xdjEuOGEuMS4xIDAgMCAwIC4xLjF6bTQgMGgxLjhhLjEuMSAwIDAgMCAuMS0uMXYtMS44YS4xLjEgMCAwIDAtLjEtLjFINy4xYS4xLjEgMCAwIDAtLjEuMXYxLjhhLjEuMSAwIDAgMCAuMS4xem04IDBoMS44YS4xLjEgMCAwIDAgLjEtLjF2LTEuOGEuMS4xIDAgMCAwLS4xLS4xaC0xLjhhLjEuMSAwIDAgMC0uMS4xdjEuOGEuMS4xIDAgMCAwIC4xLjF6bTQgMGgxLjhhLjEuMSAwIDAgMCAuMS0uMXYtMS44YS4xLjEgMCAwIDAtLjEtLjFoLTEuOGEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMXoiLz48L3N2Zz4="></img>
           <div>无框线</div>
         </div>
       ),
@@ -263,7 +263,7 @@ const ToolBar: React.FC<IProps> = ({ current, handClick, setModal }: IProps) => 
       key: 'border-all',
       label: (
         <div className={cls['border-item']} onClick={() => borderThis('all')}>
-          <img src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTMgMy4xdjE3LjhhLjEuMSAwIDAgMCAuMS4xaDE3LjhhLjEuMSAwIDAgMCAuMS0uMVYzLjFhLjEuMSAwIDAgMC0uMS0uMUgzLjFhLjEuMSAwIDAgMC0uMS4xek01LjEgNWg1LjhhLjEuMSAwIDAgMSAuMS4xdjUuOGEuMS4xIDAgMCAxLS4xLjFINS4xYS4xLjEgMCAwIDEtLjEtLjFWNS4xYS4xLjEgMCAwIDEgLjEtLjF6TTUgMTguOXYtNS44YS4xLjEgMCAwIDEgLjEtLjFoNS44YS4xLjEgMCAwIDEgLjEuMXY1LjhhLjEuMSAwIDAgMS0uMS4xSDUuMWEuMS4xIDAgMCAxLS4xLS4xem0xMy45LjFoLTUuOGEuMS4xIDAgMCAxLS4xLS4xdi01LjhhLjEuMSAwIDAgMSAuMS0uMWg1LjhhLjEuMSAwIDAgMSAuMS4xdjUuOGEuMS4xIDAgMCAxLS4xLjF6TTEzIDEwLjlWNS4xYS4xLjEgMCAwIDEgLjEtLjFoNS44YS4xLjEgMCAwIDEgLjEuMXY1LjhhLjEuMSAwIDAgMS0uMS4xaC01LjhhLjEuMSAwIDAgMS0uMS0uMXoiLz48L3N2Zz4='></img>
+          <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTMgMy4xdjE3LjhhLjEuMSAwIDAgMCAuMS4xaDE3LjhhLjEuMSAwIDAgMCAuMS0uMVYzLjFhLjEuMSAwIDAgMC0uMS0uMUgzLjFhLjEuMSAwIDAgMC0uMS4xek01LjEgNWg1LjhhLjEuMSAwIDAgMSAuMS4xdjUuOGEuMS4xIDAgMCAxLS4xLjFINS4xYS4xLjEgMCAwIDEtLjEtLjFWNS4xYS4xLjEgMCAwIDEgLjEtLjF6TTUgMTguOXYtNS44YS4xLjEgMCAwIDEgLjEtLjFoNS44YS4xLjEgMCAwIDEgLjEuMXY1LjhhLjEuMSAwIDAgMS0uMS4xSDUuMWEuMS4xIDAgMCAxLS4xLS4xem0xMy45LjFoLTUuOGEuMS4xIDAgMCAxLS4xLS4xdi01LjhhLjEuMSAwIDAgMSAuMS0uMWg1LjhhLjEuMSAwIDAgMSAuMS4xdjUuOGEuMS4xIDAgMCAxLS4xLjF6TTEzIDEwLjlWNS4xYS4xLjEgMCAwIDEgLjEtLjFoNS44YS4xLjEgMCAwIDEgLjEuMXY1LjhhLjEuMSAwIDAgMS0uMS4xaC01LjhhLjEuMSAwIDAgMS0uMS0uMXoiLz48L3N2Zz4="></img>
           <div>所有框线</div>
         </div>
       ),
@@ -272,7 +272,7 @@ const ToolBar: React.FC<IProps> = ({ current, handClick, setModal }: IProps) => 
       key: 'border-outline',
       label: (
         <div className={cls['border-item']} onClick={() => borderThis('border-outline')}>
-          <img src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTEyLjkgN2gtMS44YS4xLjEgMCAwIDAtLjEuMXYxLjhhLjEuMSAwIDAgMCAuMS4xaDEuOGEuMS4xIDAgMCAwIC4xLS4xVjcuMWEuMS4xIDAgMCAwLS4xLS4xem00IDRoLTEuOGEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMWgxLjhhLjEuMSAwIDAgMCAuMS0uMXYtMS44YS4xLjEgMCAwIDAtLjEtLjF6bS00IDBoLTEuOGEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMWgxLjhhLjEuMSAwIDAgMCAuMS0uMXYtMS44YS4xLjEgMCAwIDAtLjEtLjF6bTAgNGgtMS44YS4xLjEgMCAwIDAtLjEuMXYxLjhhLjEuMSAwIDAgMCAuMS4xaDEuOGEuMS4xIDAgMCAwIC4xLS4xdi0xLjhhLjEuMSAwIDAgMC0uMS0uMXpNMyAzLjF2MTcuOGEuMS4xIDAgMCAwIC4xLjFoMTcuOGEuMS4xIDAgMCAwIC4xLS4xVjMuMWEuMS4xIDAgMCAwLS4xLS4xSDMuMWEuMS4xIDAgMCAwLS4xLjF6TTE4LjkgMTlINS4xYS4xLjEgMCAwIDEtLjEtLjFWNS4xYS4xLjEgMCAwIDEgLjEtLjFoMTMuOGEuMS4xIDAgMCAxIC4xLjF2MTMuOGEuMS4xIDAgMCAxLS4xLjF6bS0xMC04SDcuMWEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMWgxLjhhLjEuMSAwIDAgMCAuMS0uMXYtMS44YS4xLjEgMCAwIDAtLjEtLjF6Ii8+PC9zdmc+'></img>
+          <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTEyLjkgN2gtMS44YS4xLjEgMCAwIDAtLjEuMXYxLjhhLjEuMSAwIDAgMCAuMS4xaDEuOGEuMS4xIDAgMCAwIC4xLS4xVjcuMWEuMS4xIDAgMCAwLS4xLS4xem00IDRoLTEuOGEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMWgxLjhhLjEuMSAwIDAgMCAuMS0uMXYtMS44YS4xLjEgMCAwIDAtLjEtLjF6bS00IDBoLTEuOGEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMWgxLjhhLjEuMSAwIDAgMCAuMS0uMXYtMS44YS4xLjEgMCAwIDAtLjEtLjF6bTAgNGgtMS44YS4xLjEgMCAwIDAtLjEuMXYxLjhhLjEuMSAwIDAgMCAuMS4xaDEuOGEuMS4xIDAgMCAwIC4xLS4xdi0xLjhhLjEuMSAwIDAgMC0uMS0uMXpNMyAzLjF2MTcuOGEuMS4xIDAgMCAwIC4xLjFoMTcuOGEuMS4xIDAgMCAwIC4xLS4xVjMuMWEuMS4xIDAgMCAwLS4xLS4xSDMuMWEuMS4xIDAgMCAwLS4xLjF6TTE4LjkgMTlINS4xYS4xLjEgMCAwIDEtLjEtLjFWNS4xYS4xLjEgMCAwIDEgLjEtLjFoMTMuOGEuMS4xIDAgMCAxIC4xLjF2MTMuOGEuMS4xIDAgMCAxLS4xLjF6bS0xMC04SDcuMWEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMWgxLjhhLjEuMSAwIDAgMCAuMS0uMXYtMS44YS4xLjEgMCAwIDAtLjEtLjF6Ii8+PC9zdmc+"></img>
           <div>外侧框线</div>
         </div>
       ),
@@ -280,8 +280,10 @@ const ToolBar: React.FC<IProps> = ({ current, handClick, setModal }: IProps) => 
     {
       key: 'border-outline-2',
       label: (
-        <div className={cls['border-item']} onClick={() => borderThis('border-outline-2')}>
-          <img src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTEyLjkgN2gtMS44YS4xLjEgMCAwIDAtLjEuMXYxLjhhLjEuMSAwIDAgMCAuMS4xaDEuOGEuMS4xIDAgMCAwIC4xLS4xVjcuMWEuMS4xIDAgMCAwLS4xLS4xem00IDRoLTEuOGEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMWgxLjhhLjEuMSAwIDAgMCAuMS0uMXYtMS44YS4xLjEgMCAwIDAtLjEtLjF6bS00IDBoLTEuOGEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMWgxLjhhLjEuMSAwIDAgMCAuMS0uMXYtMS44YS4xLjEgMCAwIDAtLjEtLjF6bTAgNGgtMS44YS4xLjEgMCAwIDAtLjEuMXYxLjhhLjEuMSAwIDAgMCAuMS4xaDEuOGEuMS4xIDAgMCAwIC4xLS4xdi0xLjhhLjEuMSAwIDAgMC0uMS0uMXpNMyAzLjF2MTcuOGEuMS4xIDAgMCAwIC4xLjFoMTcuOGEuMS4xIDAgMCAwIC4xLS4xVjMuMWEuMS4xIDAgMCAwLS4xLS4xSDMuMWEuMS4xIDAgMCAwLS4xLjF6TTE4LjkgMTlINS4xYS4xLjEgMCAwIDEtLjEtLjFWNS4xYS4xLjEgMCAwIDEgLjEtLjFoMTMuOGEuMS4xIDAgMCAxIC4xLjF2MTMuOGEuMS4xIDAgMCAxLS4xLjF6bS0xMC04SDcuMWEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMWgxLjhhLjEuMSAwIDAgMCAuMS0uMXYtMS44YS4xLjEgMCAwIDAtLjEtLjF6Ii8+PC9zdmc+'></img>
+        <div
+          className={cls['border-item']}
+          onClick={() => borderThis('border-outline-2')}>
+          <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTEyLjkgN2gtMS44YS4xLjEgMCAwIDAtLjEuMXYxLjhhLjEuMSAwIDAgMCAuMS4xaDEuOGEuMS4xIDAgMCAwIC4xLS4xVjcuMWEuMS4xIDAgMCAwLS4xLS4xem00IDRoLTEuOGEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMWgxLjhhLjEuMSAwIDAgMCAuMS0uMXYtMS44YS4xLjEgMCAwIDAtLjEtLjF6bS00IDBoLTEuOGEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMWgxLjhhLjEuMSAwIDAgMCAuMS0uMXYtMS44YS4xLjEgMCAwIDAtLjEtLjF6bTAgNGgtMS44YS4xLjEgMCAwIDAtLjEuMXYxLjhhLjEuMSAwIDAgMCAuMS4xaDEuOGEuMS4xIDAgMCAwIC4xLS4xdi0xLjhhLjEuMSAwIDAgMC0uMS0uMXpNMyAzLjF2MTcuOGEuMS4xIDAgMCAwIC4xLjFoMTcuOGEuMS4xIDAgMCAwIC4xLS4xVjMuMWEuMS4xIDAgMCAwLS4xLS4xSDMuMWEuMS4xIDAgMCAwLS4xLjF6TTE4LjkgMTlINS4xYS4xLjEgMCAwIDEtLjEtLjFWNS4xYS4xLjEgMCAwIDEgLjEtLjFoMTMuOGEuMS4xIDAgMCAxIC4xLjF2MTMuOGEuMS4xIDAgMCAxLS4xLjF6bS0xMC04SDcuMWEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMWgxLjhhLjEuMSAwIDAgMCAuMS0uMXYtMS44YS4xLjEgMCAwIDAtLjEtLjF6Ii8+PC9zdmc+"></img>
           <div>粗外侧框线</div>
         </div>
       ),
@@ -290,17 +292,29 @@ const ToolBar: React.FC<IProps> = ({ current, handClick, setModal }: IProps) => 
 
   const content = (
     <div>
-      <SketchPicker onChange={(color) => { setBackground(color.hex) }} />
-      <div className={cls['save-btn']} onClick={setBackgroundColor}>确定</div>
+      <SketchPicker
+        onChange={(color) => {
+          setBackground(color.hex);
+        }}
+      />
+      <div className={cls['save-btn']} onClick={setBackgroundColor}>
+        确定
+      </div>
     </div>
-  )
+  );
 
   const colorContent = (
     <div>
-      <SketchPicker onChange={(color) => { setColor(color.hex) }} />
-      <div className={cls['save-btn']} onClick={setColors}>确定</div>
+      <SketchPicker
+        onChange={(color) => {
+          setColor(color.hex);
+        }}
+      />
+      <div className={cls['save-btn']} onClick={setColors}>
+        确定
+      </div>
     </div>
-  )
+  );
 
   const handleOpenColor = (newOpen: boolean) => {
     setOpenColor(newOpen);
@@ -326,11 +340,10 @@ const ToolBar: React.FC<IProps> = ({ current, handClick, setModal }: IProps) => 
           <Select
             defaultValue="宋体"
             style={{ width: 170 }}
-            onChange={(value) => handleChange(value, 'fontFamily')}
-          >
+            onChange={(value) => handleChange(value, 'fontFamily')}>
             {fonts.map((item: any) => {
               return (
-                <Option value={item.value} types={'fontFamily'}>
+                <Option key={item.value} value={item.value} types={'fontFamily'}>
                   {item.label}
                 </Option>
               );
@@ -339,10 +352,13 @@ const ToolBar: React.FC<IProps> = ({ current, handClick, setModal }: IProps) => 
           <Select
             defaultValue="12"
             style={{ width: 80, marginLeft: 4 }}
-            onChange={(value) => handleChange((value + 'px'), 'fontSize')}
-          >
+            onChange={(value) => handleChange(value + 'px', 'fontSize')}>
             {fontSizes.map((item: any) => {
-              return <Option value={item}>{item}</Option>;
+              return (
+                <Option key={item} value={item}>
+                  {item}
+                </Option>
+              );
             })}
           </Select>
         </div>
@@ -352,8 +368,7 @@ const ToolBar: React.FC<IProps> = ({ current, handClick, setModal }: IProps) => 
               fontWeight === defaultFontWeight ? cls['icon-action'] : cls['icon-action']
             }
             title="加粗"
-            onClick={setFontWeight}
-          >
+            onClick={setFontWeight}>
             <img
               className={cls['spreadsheet-icon']}
               src={
@@ -366,8 +381,7 @@ const ToolBar: React.FC<IProps> = ({ current, handClick, setModal }: IProps) => 
               fontStyle === defaultFontStyle ? cls['icon-action'] : cls['icon-action']
             }
             title="倾斜"
-            onClick={setFontStyle}
-          >
+            onClick={setFontStyle}>
             <img
               className={cls['spreadsheet-icon']}
               src={
@@ -382,8 +396,7 @@ const ToolBar: React.FC<IProps> = ({ current, handClick, setModal }: IProps) => 
                 : cls['icon-action']
             }
             title="下划线"
-            onClick={setTextDecoration}
-          >
+            onClick={setTextDecoration}>
             <img
               className={cls['spreadsheet-icon']}
               src={
@@ -398,8 +411,7 @@ const ToolBar: React.FC<IProps> = ({ current, handClick, setModal }: IProps) => 
                   ? cls['icon-action']
                   : cls['icon-action']
               }
-              title="边框"
-            >
+              title="边框">
               <img
                 className={cls['spreadsheet-icon']}
                 src={
@@ -408,7 +420,12 @@ const ToolBar: React.FC<IProps> = ({ current, handClick, setModal }: IProps) => 
               />
             </a>
           </Dropdown>
-          <Popover placement="bottom" open={openBackground} onOpenChange={handleOpenBackground} content={content} trigger="click">
+          <Popover
+            placement="bottom"
+            open={openBackground}
+            onOpenChange={handleOpenBackground}
+            content={content}
+            trigger="click">
             <div className={cls['color-dropdown']}>
               <a className={cls['icon-a']} title="背景色">
                 <img
@@ -417,11 +434,18 @@ const ToolBar: React.FC<IProps> = ({ current, handClick, setModal }: IProps) => 
                     'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTE3LjU0IDE0LjAzMmMtLjAyLS4wMjMtLjA0Ny0uMDM2LS4wNzctLjAzNkw2LjU4MiAxNGwtLjQ1Ny0uNDU3IDcuNDYyLTYuMzk2YS4xLjEgMCAwIDAgLjAxMS0uMTQxbC0yLjk1My0zLjQzYS4xLjEgMCAwIDAtLjE0MS0uMDExbC0xLjAwOC44NjhhLjEuMSAwIDAgMC0uMDEuMTQxbDEuOTUzIDIuMjY3YS4xLjEgMCAwIDEtLjAxMS4xNDFsLTcuNDcgNi40MDRjLS4wNDQuMDM4LS4wNDcuMTA1LS4wMDYuMTQ3bDcuNDM3IDcuNDM3YS4xLjEgMCAwIDAgLjEzNS4wMDZsNi45LTUuNzRjLjA0Mi0uMDM1LjA0OC0uMDk4LjAxMy0uMTRsLS44ODctMS4wNjN6bTEuOTYgMy4yNzdhLjU2LjU2IDAgMCAwLS45OTkgMHMtMS41MDYgMy4xODYuNSAzLjE4Ni41LTMuMTg2LjUtMy4xODZ6Ii8+PC9zdmc+'
                   }
                 />
-                <div className={cls['indicator']} style={{ background: background }}></div>
+                <div
+                  className={cls['indicator']}
+                  style={{ background: background }}></div>
               </a>
             </div>
           </Popover>
-          <Popover placement="bottom" open={openColor} content={colorContent} onOpenChange={handleOpenColor} trigger="click">
+          <Popover
+            placement="bottom"
+            open={openColor}
+            content={colorContent}
+            onOpenChange={handleOpenColor}
+            trigger="click">
             <div className={cls['color-dropdown']}>
               <a className={cls['icon-a']} title="字体颜色">
                 <div className={cls['icon-x']}>A</div>
@@ -446,8 +470,7 @@ const ToolBar: React.FC<IProps> = ({ current, handClick, setModal }: IProps) => 
                         : cls['icon-action']
                     }
                     title={align.label}
-                    onClick={() => setClassName(align.className, align.type)}
-                  >
+                    onClick={() => setClassName(align.className, align.type)}>
                     <img className={cls['spreadsheet-icon']} src={align.icon} />
                   </a>
                 );
@@ -464,8 +487,7 @@ const ToolBar: React.FC<IProps> = ({ current, handClick, setModal }: IProps) => 
                         : cls['icon-action']
                     }
                     title={align.label}
-                    onClick={() => setClassName(align.className, align.type)}
-                  >
+                    onClick={() => setClassName(align.className, align.type)}>
                     <img className={cls['spreadsheet-icon']} src={align.icon} />
                   </a>
                 );
@@ -478,8 +500,7 @@ const ToolBar: React.FC<IProps> = ({ current, handClick, setModal }: IProps) => 
               <a
                 className={cls['icon-action']}
                 title="减少缩进量"
-                onClick={reducePaddingLeft}
-              >
+                onClick={reducePaddingLeft}>
                 <img
                   className={cls['spreadsheet-icon']}
                   src={
@@ -490,8 +511,7 @@ const ToolBar: React.FC<IProps> = ({ current, handClick, setModal }: IProps) => 
               <a
                 className={cls['icon-action']}
                 title="增加缩进量"
-                onClick={addPaddingLeft}
-              >
+                onClick={addPaddingLeft}>
                 <img
                   className={cls['spreadsheet-icon']}
                   src={
@@ -512,8 +532,7 @@ const ToolBar: React.FC<IProps> = ({ current, handClick, setModal }: IProps) => 
               <a
                 className={cls['icon-action']}
                 title="拆分单元格"
-                onClick={mergeAndCenter}
-              >
+                onClick={mergeAndCenter}>
                 <span>拆分单元格</span>
               </a>
             </div>
@@ -525,7 +544,11 @@ const ToolBar: React.FC<IProps> = ({ current, handClick, setModal }: IProps) => 
         <div className={cls['row-one']}>
           <Select defaultValue="求和" style={{ width: 100 }} onChange={handleChange}>
             {formulasTypes.map((item: any) => {
-              return <Option value={item.value}>{item.label}</Option>;
+              return (
+                <Option key={item.value} value={item.value}>
+                  {item.label}
+                </Option>
+              );
             })}
           </Select>
         </div>

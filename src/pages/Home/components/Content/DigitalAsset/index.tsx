@@ -6,7 +6,9 @@ import Meta from 'antd/es/card/Meta';
 import NewsList from '@/pages/Home/components/NewsList';
 import SwiperWall from '@/pages/Home/components/SwiperWall';
 
+// eslint-disable-next-line no-unused-vars
 enum AssetStatus {
+  // eslint-disable-next-line no-unused-vars
   SOLD_OUT = '已售罄',
 }
 const assetList = [
