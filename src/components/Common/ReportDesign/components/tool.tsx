@@ -184,7 +184,6 @@ const ToolBar: React.FC<IProps> = ({ current, handClick, setModal }: IProps) => 
     handClick(color, 'color');
   };
   const setClassName = (className: string, classType: string) => {
-    console.log(className,classType,'123')
     handClick(className, 'className', classType);
   };
   const reducePaddingLeft = () => {
