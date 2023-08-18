@@ -5,9 +5,87 @@
     <link rel="icon" type="image/svg+xml" href="/img/logo/logo3.jpg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>资产共享云 </title>
+    <style>
+      * {
+        padding: 0;
+        margin: 0;
+        box-sizing: border-box;
+      }
+      .screen {
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+      }
+      .screen .wating-text {
+        font-size: 0.86rem;
+        color: #acaaaa;
+        padding-top: 1rem;
+      }
+      .screen .loading-container {
+        position:relative;
+        width: 32px;
+        height: 32px;
+        overflow: hidden;
+        transform: rotate(45deg);
+        animation: preloader 1.2s infinite linear;
+      }
+      .loading-container i {
+        width: 12px;
+        height: 12px;
+        position:absolute;
+        background:#1890ff;
+        border-radius: 100%;
+        display:block;
+        transform-origin: 50% 50%;
+        opacity: .3;
+        animation: preloader_i 1.2s infinite linear;
+      }
+      .loading-container i:nth-child(1) {
+        top: 0;
+        left: 0;
+      }
+      .loading-container i:nth-child(2) {
+        top: 0;
+        right: 0;
+        animation-delay: 0.4s;
+      }
+      .loading-container i:nth-child(3) {
+        right: 0;
+        bottom: 0;
+        animation-delay: 0.8s;
+      }
+      .loading-container i:nth-child(4) {
+        bottom: 0;
+        left: 0;
+        animation-delay: 1.2s;
+      }
+      @keyframes preloader {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+      @keyframes preloader_i {
+        0% { opacity: .3; }
+        50% {  opacity: 1; }
+        100% { opacity: .3; }
+      }
+    </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <div class="screen">
+        <div class="loading-container">
+          <i></i>
+          <i></i>
+          <i></i>
+          <i></i>
+        </div>
+        <div class="wating-text">资源加载中...</div>
+      </div>
+    </div>
     <script type="module" src="/src/index.tsx"></script>
   </body>
 </html>
