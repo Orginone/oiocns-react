@@ -120,7 +120,8 @@ const FormEditModal: React.FC<IProps> = ({
       destroyOnClose
       title={'表单设计'}
       footer={[]}
-      onCancel={finished}>
+      onCancel={finished}
+    >
       <Generator
         defaultValue={defaultSchema}
         onSchemaChange={onSchemaChange}

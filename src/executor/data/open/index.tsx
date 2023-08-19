@@ -6,6 +6,7 @@ import React from 'react';
 import FormView from './form';
 import WorkStart from './work';
 import OfficeView from './office';
+import ReportView from './report';
 import MarkdownView from "@/executor/data/open/markdown";
 import CodeEditor from './CodeEditor';
 import MyMdEditor from './MdEditor';
@@ -65,6 +66,8 @@ const ExecutorOpen: React.FC<IOpenProps> = (props: IOpenProps) => {
         return <FormView form={props.entity as any} finished={props.finished} />;
       case '办事':
         return <WorkStart current={props.entity as any} finished={props.finished} />;
+      case '报表':
+        return <ReportView current={props.entity as any} finished={props.finished} />;
       case '目录':
         if(props.cmd === 'openFolderWithEditor'){
           return (
