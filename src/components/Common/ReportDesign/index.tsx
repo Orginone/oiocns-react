@@ -36,8 +36,7 @@ const ReportView: React.FC<IProps> = ({ current, selectItem, finished }) => {
       destroyOnClose
       title="报表"
       footer={[]}
-      onCancel={finished}
-    >
+      onCancel={finished}>
       <div className={cls['report-content-box']}>
         <div className={cls['report-tool-box']}>
           <ToolBar current={current} handClick={handClick} setModal={setModal}></ToolBar>
@@ -47,8 +46,7 @@ const ReportView: React.FC<IProps> = ({ current, selectItem, finished }) => {
           selectItem={selectItem}
           reportChange={reportChange}
           changeType={changeType}
-          classType={classType}
-        ></HotTableView>
+          classType={classType}></HotTableView>
       </div>
     </FullScreenModal>
   );
