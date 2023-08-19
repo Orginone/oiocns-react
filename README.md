@@ -66,6 +66,8 @@
 
 代码规范请前往 **project/rules** 文件夹下查看编码规则和规范。
 
+[css规范](./docs/style-guide.md)
+
 ### 项目依赖环境、安装和运行
 
 资产共享云是基于 **node 14+** 以上的环境运行，通过 **yarn** 或者 **npm install** 下载安装项目依赖包，并通过**npm run serve** 命令本地运行项目。
