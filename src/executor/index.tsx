@@ -19,7 +19,6 @@ const Executor = () => {
   };
   useEffect(() => {
     const id = command.subscribe((type, cmd, ...args: any[]) => {
-      console.log(1234);
       if (cmd === 'link') return history.push(args[0]);
       if (cmd === 'taskList') return setContent(<FileTaskList directory={args[0]} />);
       if (executeCmd(cmd, args[0], args.slice(1)) === false) {

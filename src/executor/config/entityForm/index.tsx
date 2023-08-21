@@ -77,7 +77,7 @@ const EntityForm: React.FC<IProps> = ({ cmd, entity, finished }) => {
       return (
         <LabelsForm
           formType={cmd.replace('WorkConfig', '').replace('ThingConfig', '')}
-          typeName={cmd.includes('WorkConfig') ? '事项配置22' : '实体配置'}
+          typeName={cmd.includes('WorkConfig') ? '事项配置' : '实体配置'}
           current={entity as any}
           finished={reloadFinish}
         />
