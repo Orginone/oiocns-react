@@ -1,5 +1,5 @@
 import { Col, Divider, Dropdown, Layout, Row, Space, Typography, Button } from 'antd';
-import React, { CSSProperties, useState } from 'react';
+import React, { CSSProperties } from 'react';
 import cls from './index.module.less';
 import CustomMenu from '@/components/CustomMenu';
 import CustomBreadcrumb from '@/components/CustomBreadcrumb';
@@ -8,6 +8,7 @@ import { ImArrowLeft2 } from 'react-icons/im';
 import { RiMore2Fill } from 'react-icons/ri';
 import { Resizable } from 'devextreme-react';
 import { LeftBarIcon, RightBarIcon } from '@/components/Common/GlobalComps/customIcon';
+import useStorage from '@/hooks/useStorage';
 const { Content, Sider } = Layout;
 
 /**
@@ -32,9 +33,9 @@ type MainLayoutType = {
  * @returns
  */
 const MainLayout: React.FC<MainLayoutType> = (props) => {
-  const [leftSider, setLeftSider] = useState<boolean>(true);
-  const [rightSider, setRightSider] = useState<boolean>(false);
-  const [mainWidth, setMainWidth] = useState<string | number>('40%');
+  const [leftSider, setLeftSider] = useStorage<boolean>('leftSider', false);
+  const [rightSider, setRightSider] = useStorage<boolean>('rightSider', false);
+  const [mainWidth, setMainWidth] = useStorage<string | number>('mainWidth', '40%');
   const parentMenu = props.selectMenu.parentMenu ?? props.siderMenuData;
   const outside =
     props.selectMenu.menus?.filter((item) => item.model === 'outside') ?? [];

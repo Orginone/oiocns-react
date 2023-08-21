@@ -1,21 +1,21 @@
 import React from 'react';
 import { IFileInfo, ISysFileInfo } from '@/ts/core';
-import { command, schema } from '@/ts/base';
+import { schema } from '@/ts/base';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import { showChatTime } from '@/utils/tools';
 import { formatSize } from '@/ts/base/common';
 import DataGrid, { Column, Scrolling } from 'devextreme-react/data-grid';
-import { Dropdown, Modal } from 'antd';
-import { loadFileMenus } from '@/executor/fileOperate';
+import { Dropdown, MenuProps, Modal } from 'antd';
 
 const TableMode = ({
-  current,
-  mode,
+  content,
+  fileOpen,
+  contextMenu,
 }: {
-  current: IFileInfo<schema.XEntity>;
-  mode: number;
+  content: IFileInfo<schema.XEntity>[];
+  fileOpen: (file: IFileInfo<schema.XEntity>) => Promise<void>;
+  contextMenu: (file: IFileInfo<schema.XEntity>, clicked?: Function) => MenuProps;
 }) => {
-  const cmdType = mode === 1 ? 'data' : 'config';
   return (
     <DataGrid<IFileInfo<schema.XEntity>, string>
       id="grid"
@@ -32,55 +32,47 @@ const TableMode = ({
         mode: 'single',
       }}
       onRowDblClick={async (e) => {
-        await e.data.loadContent();
-        command.emitter(cmdType, 'open', e.data);
+        await fileOpen(e.data);
       }}
       headerFilter={{
         visible: true,
         allowSearch: true,
       }}
-      dataSource={current.content(mode)}
+      dataSource={content}
       onContextMenuPreparing={(e: any) => {
-        const file = e.row?.data ?? current;
-        e.component.selectRowsByIndexes([e.rowIndex]);
-        const modal = Modal.info({
-          mask: false,
-          icon: <></>,
-          width: 1,
-          style: {
-            position: 'fixed',
-            left: e.event.pageX,
-            top: e.event.pageY,
-            padding: 0,
-          },
-          bodyStyle: {
-            padding: 0,
-            height: 1,
-          },
-          maskClosable: true,
-          okButtonProps: {
+        if (e.row.data) {
+          e.component.selectRowsByIndexes([e.rowIndex]);
+          const modal = Modal.info({
+            mask: false,
+            icon: <></>,
+            width: 1,
             style: {
-              display: 'none',
+              position: 'fixed',
+              left: e.event.pageX,
+              top: e.event.pageY,
+              padding: 0,
             },
-          },
-          content: (
-            <Dropdown
-              menu={{
-                items: loadFileMenus(file, mode),
-                onClick: ({ key }) => {
+            bodyStyle: {
+              padding: 0,
+              height: 1,
+            },
+            maskClosable: true,
+            okButtonProps: {
+              style: {
+                display: 'none',
+              },
+            },
+            content: (
+              <Dropdown
+                menu={contextMenu(e.row.data, () => {
                   modal.destroy();
-                  if (file.key === current.key) {
-                    command.emitter(cmdType, key, file, current.key);
-                  } else {
-                    command.emitter(cmdType, key, file);
-                  }
-                },
-              }}
-              open>
-              <div style={{ width: 1 }}></div>
-            </Dropdown>
-          ),
-        });
+                })}
+                open>
+                <div style={{ width: 1 }}></div>
+              </Dropdown>
+            ),
+          });
+        }
         e.items = [];
       }}>
       <Scrolling mode="virtual" />

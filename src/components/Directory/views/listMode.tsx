@@ -1,39 +1,31 @@
 import React from 'react';
 import { IFileInfo } from '@/ts/core';
-import { command, schema } from '@/ts/base';
-import { Dropdown, List, Tag } from 'antd';
+import { schema } from '@/ts/base';
+import { Dropdown, List, MenuProps, Tag } from 'antd';
 import { showChatTime } from '@/utils/tools';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
-import { loadFileMenus } from '@/executor/fileOperate';
 
 const ListMode = ({
-  current,
-  mode,
+  content,
+  fileOpen,
+  contextMenu,
 }: {
-  current: IFileInfo<schema.XEntity>;
-  mode: number;
+  content: IFileInfo<schema.XEntity>[];
+  fileOpen: (file: IFileInfo<schema.XEntity>) => Promise<void>;
+  contextMenu: (file: IFileInfo<schema.XEntity>) => MenuProps;
 }) => {
-  const cmdType = mode === 1 ? 'data' : 'config';
   return (
     <List
       itemLayout="horizontal"
-      dataSource={current.content(mode)}
+      dataSource={content}
       renderItem={(item) => {
         return (
-          <Dropdown
-            menu={{
-              items: loadFileMenus(item, mode),
-              onClick: ({ key }) => {
-                command.emitter(cmdType, key, current, current.key);
-              },
-            }}
-            trigger={['contextMenu']}>
+          <Dropdown menu={contextMenu(item)} trigger={['contextMenu']}>
             <List.Item
               className={'rlv-list-item'}
               style={{ cursor: 'pointer', padding: 6 }}
               onDoubleClick={async () => {
-                await item.loadContent();
-                command.emitter(cmdType, 'open', item);
+                await fileOpen(item);
               }}
               actions={[
                 <div key={item.id} title={item.metadata.updateTime}>
