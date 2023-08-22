@@ -8,9 +8,7 @@ import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import OrgIcons from '@/components/Common/GlobalComps/orgIcons';
 import React from 'react';
 import { kernel, model, schema } from '@/ts/base';
-import { ImLink } from 'react-icons/im';
 import { showChatTime } from '@/utils/tools';
-const { Sider } = Layout;
 
 const Navbar: React.FC = () => {
   const [workCount, setWorkCount] = useState(0);
@@ -94,20 +92,17 @@ const Navbar: React.FC = () => {
   };
 
   return (
-    <Sider className={styles.header} width={60}>
-      <Link key={'/orginone'} title={'资产共享云'} to={'/home'}>
-        <EntityIcon entityId={orgCtrl.user.id} size={45} />
-      </Link>
-      <Space direction="vertical" wrap align="center" size={25} className={styles.navbar}>
-        {online > 0 && (
-          <div
-            style={{ display: 'flex', cursor: 'pointer' }}
-            onClick={() => setOnlineVisible(!onlineVisible)}>
-            <Badge count={online} size="small">
-              <ImLink size={22} color={'#4CAF50'} />
-            </Badge>
-          </div>
+    <Layout.Sider className={styles.header} width={60}>
+      <div className="ogo-space-item" onClick={() => setOnlineVisible(!onlineVisible)}>
+        {online > 0 ? (
+          <Badge count={online} size="small" offset={[-15, 0]}>
+            <EntityIcon entityId={orgCtrl.user.id} size={45} />
+          </Badge>
+        ) : (
+          <EntityIcon entityId={orgCtrl.user.id} size={45} />
         )}
+      </div>
+      <Space direction="vertical" wrap align="center" size={25} className={styles.navbar}>
         {actions.map((item) => NavItem(item))}
         {onlineVisible && <OnlineInfo onClose={() => setOnlineVisible(false)} />}
       </Space>
@@ -118,9 +113,8 @@ const Navbar: React.FC = () => {
           location.reload();
         }}>
         <OrgIcons size={26} exit selected />
-        <div className={styles.title}>注销</div>
       </Link>
-    </Sider>
+    </Layout.Sider>
   );
 };
 

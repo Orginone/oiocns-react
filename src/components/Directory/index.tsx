@@ -6,7 +6,6 @@ import TableMode from './views/tableMode';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import SegmentContent from '@/components/Common/SegmentContent';
 import { IDirectory, IFileInfo } from '@/ts/core';
-import { Dropdown } from 'antd';
 import { loadFileMenus } from '@/executor/fileOperate';
 import { command, schema } from '@/ts/base';
 
@@ -22,9 +21,9 @@ const Directory: React.FC<IProps> = ({ mode, current }: IProps) => {
   const [key] = useCtrlUpdate(current);
   const cmdType = mode === 1 ? 'data' : 'config';
   const [segmented, setSegmented] = useStorage('segmented', 'list');
-  const contextMenu = (file: IFileInfo<schema.XEntity>, clicked?: Function) => {
+  const contextMenu = (file?: IFileInfo<schema.XEntity>, clicked?: Function) => {
     return {
-      items: loadFileMenus(file, mode),
+      items: loadFileMenus(file || current, mode),
       onClick: ({ key }: { key: string }) => {
         command.emitter(cmdType, key, current, current.key);
         clicked?.apply(this, []);
@@ -45,29 +44,13 @@ const Directory: React.FC<IProps> = ({ mode, current }: IProps) => {
       onSegmentChanged={setSegmented}
       description={`${current.content(mode).length}个项目`}
       content={
-        <Dropdown menu={contextMenu(current)} trigger={['contextMenu']}>
-          <div style={{ width: '100%', height: '100%' }}>
-            {segmented === 'table' ? (
-              <TableMode
-                content={content()}
-                fileOpen={fileOpen}
-                contextMenu={contextMenu}
-              />
-            ) : segmented === 'icon' ? (
-              <IconMode
-                content={content()}
-                fileOpen={fileOpen}
-                contextMenu={contextMenu}
-              />
-            ) : (
-              <ListMode
-                content={content()}
-                fileOpen={fileOpen}
-                contextMenu={contextMenu}
-              />
-            )}
-          </div>
-        </Dropdown>
+        segmented === 'table' ? (
+          <TableMode content={content()} fileOpen={fileOpen} contextMenu={contextMenu} />
+        ) : segmented === 'icon' ? (
+          <IconMode content={content()} fileOpen={fileOpen} contextMenu={contextMenu} />
+        ) : (
+          <ListMode content={content()} fileOpen={fileOpen} contextMenu={contextMenu} />
+        )
       }
     />
   );

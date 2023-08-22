@@ -13,7 +13,7 @@ const IconMode = ({
 }: {
   content: IFileInfo<schema.XEntity>[];
   fileOpen: (file: IFileInfo<schema.XEntity>) => Promise<void>;
-  contextMenu: (file: IFileInfo<schema.XEntity>) => MenuProps;
+  contextMenu: (file?: IFileInfo<schema.XEntity>) => MenuProps;
 }) => {
   const FileCard = (item: IFileInfo<schema.XEntity>) => (
     <Dropdown menu={contextMenu(item)} trigger={['contextMenu']}>
@@ -48,13 +48,15 @@ const IconMode = ({
     </Dropdown>
   );
   return (
-    <div
-      className={cls.content}
-      onContextMenu={(e) => {
-        e.stopPropagation();
-      }}>
-      {content.map((el) => FileCard(el))}
-    </div>
+    <Dropdown menu={contextMenu()} trigger={['contextMenu']} destroyPopupOnHide>
+      <div
+        className={cls.content}
+        onContextMenu={(e) => {
+          e.stopPropagation();
+        }}>
+        {content.map((el) => FileCard(el))}
+      </div>
+    </Dropdown>
   );
 };
 export default IconMode;
