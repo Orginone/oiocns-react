@@ -68,8 +68,8 @@ const FormRenders: React.FC<IProps> = (props) => {
         data[k] = val[k];
         props.data.primary[k] = val[k];
       });
-      val.after = [data];
-      props.onChanged?.apply(this, [form.id, val]);
+      formData.after = [data];
+      props.onChanged?.apply(this, [form.id, formData]);
       setData({ ...data });
     },
   };
