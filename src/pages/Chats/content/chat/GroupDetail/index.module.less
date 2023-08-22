@@ -28,14 +28,39 @@
   margin-bottom: 20px !important;
 }
 
-.group_detail_wrap {
+.groupDetail {
   position: relative;
   display: flex;
   flex-direction: column;
-  width: 290px;
-  // border-left: 1px solid #dcdfe6;
-  padding: 20px 20px;
+  width: 30%;
   background-color: #fff;
+
+  .header {
+    display: flex;
+    gap: 9px;
+    padding: 12px 20px;
+    height: 72px;
+    border-bottom: 1px solid @border-color-base;
+    &Meta {
+      flex: 1;
+      &Info {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        &Text {
+          font-size: 12px;
+          line-height: 22px;
+          color: @text-color-secondary;
+          display: flex;
+          align-items: baseline;
+        }
+        &Icon {
+
+        }
+      }
+    }
+  }
 
   .title {
     font-size: 14px;

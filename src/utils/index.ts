@@ -294,14 +294,19 @@ function getJsonText(fileUrl: string): Promise<string> {
     xhr.send();
   });
 }
+
+const ellipsisText = (text: string, length: number) => {
+  return text.substring(0, length) + '...';
+};
 export {
+  ellipsisText,
   filterEmptyPropObj,
   formatDate,
   formatTimeAgo,
+  getJsonText,
   getQueryString,
   getScrollX,
   isEmoji,
   isSpecialChar,
   visitTree,
-  getJsonText
 };

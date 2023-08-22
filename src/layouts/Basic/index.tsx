@@ -2,10 +2,10 @@ import { Layout, Spin } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { renderRoutes } from 'react-router-config';
 import { IRouteConfig } from 'typings/globelType';
-import styles from './index.module.less';
 import orgCtrl from '@/ts/controller';
+import styles from './index.module.less';
+import Navbar from './navbar';
 import Executor from '@/executor';
-import GlobalSidebar from '@/layouts/Basic/GlobalSidebar';
 
 type BasicLayoutProps = {
   route: IRouteConfig;
@@ -27,15 +27,17 @@ const BasicLayout: React.FC<BasicLayoutProps> = (props) => {
     <Layout className={styles['page-layout']}>
       {inited ? (
         <>
-          {/** 命令执行器 */}
-          <Executor />
-
-          <Layout>
-            <GlobalSidebar></GlobalSidebar>
+          <Navbar />
+          <Layout
+            style={{
+              overflow: 'auto',
+            }}>
+            {/** 命令执行器 */}
+            <Executor />
+            {/* 公共头部 */}
+            {/* <BasicHeader /> */}
             {/* 内容区域 */}
-            <Layout className={styles['main-content']}>
-              {renderRoutes(route.routes)}
-            </Layout>
+            {renderRoutes(route.routes)}
           </Layout>
         </>
       ) : (

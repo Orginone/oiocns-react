@@ -110,7 +110,6 @@ const FormView: React.FC<IProps> = ({ form, finished }) => {
       destroyOnClose
       onCancel={() => finished()}>
       <MainLayout
-        notExitIcon
         selectMenu={selectMenu}
         onSelect={(data) => {
           setSelectMenu(data);

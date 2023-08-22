@@ -9,7 +9,7 @@ import { IMsgChat, msgChatNotify } from '@/ts/core';
 
 const Setting: React.FC<any> = () => {
   const [filter, setFilter] = useState('');
-  const [openDetail, setOpenDetail] = useState<boolean>(false);
+  const [openDetail, setOpenDetail] = useState<boolean>(true);
   const [isSupervise, setIsSupervise] = useState<boolean>(false); // 查看所有会话
   const [key, rootMenu, selectMenu, setSelectMenu] = useMenuUpdate(config.loadChatMenu);
 
