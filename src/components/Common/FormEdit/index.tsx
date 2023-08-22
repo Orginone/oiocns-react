@@ -1,20 +1,20 @@
 // import { Col, Row, Select } from 'antd';
-import React, { useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 // import cls from './index.module.less';
 import FullScreenModal from '@/executor/tools/fullScreen';
 import { IForm } from '@/ts/core';
 import Generator, { defaultSettings } from 'fr-generator';
 import { schemaType } from '@/ts/base/schema';
-import { defaultCommonSettings } from './setting.js';
-import MyDivider from '@/components/Common/FormDesign/FormEdit/widgets/Divider';
-import MySpace from '@/components/Common/FormDesign/FormEdit/widgets/Space';
-
+import getDefaultCommonSettings from './setting.js';
+import MyDivider from './widgets/Divider';
+import MySpace from './widgets/Space';
+import ProFormPerson from './widgets/ProFormPerson';
+import { Setting, SettingWidget } from '@/ts/core/work/design';
 type IProps = {
   current: IForm;
   finished: () => void;
   editFormOpen: boolean;
   defaultSchema: schemaType;
-  itemClick: (e: any) => void;
 };
 
 /**
@@ -27,6 +27,7 @@ const FormEditModal: React.FC<IProps> = ({
   defaultSchema,
   editFormOpen = false,
 }) => {
+  const [commonSettings, setCommonSettings] = useState<any>({});
   // 创建ref
   const myComponentRef: any = useRef(null);
   const onCloseFormModle = () => {
@@ -35,6 +36,7 @@ const FormEditModal: React.FC<IProps> = ({
   };
   const onFormSchemaChange = (e: schemaType) => {
     const ruleInfo = JSON.parse(current.metadata.rule || '{}');
+
     current.update({
       ...current.metadata,
       rule: JSON.stringify({
@@ -45,6 +47,37 @@ const FormEditModal: React.FC<IProps> = ({
   };
 
   //页面重载获取默认schema或者配置后的schema
+
+  const onClickDelete = (e: any) => {
+    return false;
+  };
+  const copyObj = (obj = {}) => {
+    //变量先置空
+    let newobj = null;
+
+    //判断是否需要继续进行递归
+    if (typeof obj == 'object' && obj !== null) {
+      newobj = obj instanceof Array ? [] : {}; //进行下一层递归克隆
+      for (var i in obj) {
+        newobj[i] = copyObj(obj[i]);
+      } //如果不是对象直接赋值
+    } else newobj = obj;
+    return newobj;
+  };
+  const onCanvasSelect = async (e: any) => {
+    console.log(getDefaultCommonSettings(e));
+    const a = getDefaultCommonSettings(e);
+    console.log(copyObj(a));
+    setCommonSettings(copyObj(a));
+    const schema = myComponentRef.current.getValue();
+    console.log(schema);
+    //myComponentRef.current.setValue(schema)
+  };
+
+  // useEffect(() => {
+
+  //   debugger;
+  // }, []);
   const settings = defaultSettings[0];
   settings.widgets = [
     {
@@ -91,7 +124,7 @@ const FormEditModal: React.FC<IProps> = ({
       text: '分割线',
       name: 'divider',
       schema: {
-        title: '分割线',
+        title: '',
         type: 'string',
         widget: 'MyDivider',
       },
@@ -101,10 +134,24 @@ const FormEditModal: React.FC<IProps> = ({
       },
     },
     {
+      text: '人员',
+      name: 'ProFormPerson',
+      schema: {
+        title: '人员',
+        type: 'string',
+        widget: 'ProFormPerson',
+        metadata: current.metadata,
+      },
+      setting: {
+        // children: { title: '嵌套的标题', type: 'string' },
+        // dashed: { title: '是否虚线', type: 'boolean' },
+      },
+    },
+    {
       text: '间距',
       name: 'space',
       schema: {
-        title: '分割线',
+        title: '',
         type: 'string',
         widget: 'MySpace',
       },
@@ -113,6 +160,16 @@ const FormEditModal: React.FC<IProps> = ({
       },
     },
   ];
+  const setting = [defaultSettings[2], settings];
+  console.log('@@', setting);
+  // setting.map((item) => {
+  //   item.widgets.map((widgetsItem: SettingWidget) => {
+  //     return (widgetsItem.setting = {
+  //       ...widgetsItem.setting,
+  //       ...getDefaultCommonSettings(widgetsItem.schema.type),
+  //     });
+  //   });
+  // });
   return (
     <FullScreenModal
       open={editFormOpen}
@@ -126,12 +183,13 @@ const FormEditModal: React.FC<IProps> = ({
       <Generator
         defaultValue={defaultSchema}
         onSchemaChange={onFormSchemaChange}
-        settings={[defaultSettings[2], settings]}
-        extraButtons={[true, false, false, false]}
-        canDelete={false}
+        onCanvasSelect={onCanvasSelect}
+        settings={setting}
+        extraButtons={[true, false, false, true]}
+        canDelete={onClickDelete}
         hideId
-        widgets={{ MyDivider, MySpace }}
-        commonSettings={{ ...defaultCommonSettings }}
+        widgets={{ MyDivider, MySpace, ProFormPerson }}
+        commonSettings={commonSettings}
         ref={myComponentRef}
       />
     </FullScreenModal>
