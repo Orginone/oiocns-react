@@ -22,10 +22,11 @@ const Directory: React.FC<IProps> = ({ mode, current }: IProps) => {
   const cmdType = mode === 1 ? 'data' : 'config';
   const [segmented, setSegmented] = useStorage('segmented', 'list');
   const contextMenu = (file?: IFileInfo<schema.XEntity>, clicked?: Function) => {
+    const entity = file || current;
     return {
-      items: loadFileMenus(file || current, mode),
+      items: loadFileMenus(entity, mode),
       onClick: ({ key }: { key: string }) => {
-        command.emitter(cmdType, key, current, current.key);
+        command.emitter(cmdType, key, entity, current.key);
         clicked?.apply(this, []);
       },
     };
