@@ -8,7 +8,7 @@ import WorkStart from './work';
 import OfficeView from './office';
 import CodeEditor from './CodeEditor';
 import MyMdEditor from './MdEditor';
-import ReportView from '@/components/Common/ReportDesign';
+import ReportView from './report';
 
 const officeExt = ['.pdf', '.xls', '.xlsx', '.doc', '.docx', '.ppt', '.pptx'];
 const videoExt = ['.mp4', '.avi', '.mov', '.mpg', '.swf', '.flv', '.mpeg'];
@@ -73,7 +73,6 @@ const ExecutorOpen: React.FC<IOpenProps> = (props: IOpenProps) => {
       case '报表':
         return (
           <ReportView
-            selectItem={null}
             current={props.entity as any}
             finished={props.finished}
           />

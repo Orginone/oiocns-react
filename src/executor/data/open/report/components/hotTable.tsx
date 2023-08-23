@@ -9,11 +9,14 @@ import { registerAllModules } from 'handsontable/registry';
 registerAllModules();
 import 'handsontable/dist/handsontable.min.css';
 import { IReport } from '@/ts/core';
+import { EditorComponent } from './helpers'
+import orgCtrl from '@/ts/controller';
 interface IProps {
   current: IReport;
 }
 
 const HotTableView: React.FC<IProps> = ({ current }) => {
+  console.log(current,'current')
   const [cells, setCells] = useState<any>([]);
   const [styleList, setStyleList] = useState<any>([]);
   const [classList, setClassList] = useState<any>([]);
@@ -40,6 +43,7 @@ const HotTableView: React.FC<IProps> = ({ current }) => {
   }, [sheetIndex]);
 
   const setValidator = (item: any, rules: any) => {
+    // 设置单元格规则
     hotRef.current.hotInstance.setCellMeta(
       item.row,
       item.col,
@@ -60,11 +64,76 @@ const HotTableView: React.FC<IProps> = ({ current }) => {
   };
 
   const setEditor = (item: any) => {
+    console.log(item,'1234')
+    let valueType: string = JSON.parse(item.prop.rule).widget
+    let newType: string = ''
+    switch (valueType) {
+      case 'select':
+      case 'dept':
+      case 'person':
+      case 'group':
+        newType = 'select'
+        setSelectOptions(item, valueType)
+        break
+      case 'myself':
+        newType = item.type
+        setData(item)
+        break
+      default:
+        newType = item.type
+        break
+    }
+
     hotRef.current.hotInstance.setCellMeta(
       item.row,
       item.col,
       'editor',
-      item.type,
+      newType,
+    )
+  }
+
+  const setSelectOptions = (item: any, valueType: string) => {
+    //给下拉框插入数据
+    const belong = orgCtrl.targets.find(
+      (a) => a.id == current.metadata.belongId,
+    ) as any;
+    let arr: any = []
+    switch (valueType) {
+      case 'dept':
+        belong.departments?.map((xtarget: any) => {
+          arr.push(xtarget.name);
+        })
+        break
+      case 'person':
+        belong.members?.map((xtarget: any) => {
+          arr.push(xtarget.name);
+        })
+        break
+      case 'group':
+        belong.groups?.map((xtarget: any) => {
+          arr.push(xtarget.name);
+        })
+        break
+      default:
+        break
+    }
+    hotRef.current.hotInstance.setCellMeta(
+      item.row,
+      item.col,
+      'selectOptions',
+      arr,
+    )
+  }
+
+  const setData = (item: any) => {
+    const belong = orgCtrl.targets.find(
+      (a) => a.id == current.metadata.belongId,
+    ) as any;
+    
+    hotRef.current.hotInstance.setDataAtCell(
+      item.row,
+      item.col,
+      belong.user.name
     )
   }
 
@@ -75,8 +144,9 @@ const HotTableView: React.FC<IProps> = ({ current }) => {
 
   classList?.forEach((item: any) => {
     let arr = [];
-    for (let k in item.class) {
-      arr.push(item.class[k]);
+    let items: any = item.class;
+    for (let k in items) {
+      arr.push(items[k]);
     }
     hotRef.current.hotInstance.setCellMeta(
       item.row,
@@ -194,8 +264,6 @@ const HotTableView: React.FC<IProps> = ({ current }) => {
         rowHeaders={true}
         colHeaders={true}
         dropdownMenu={true}
-        // manualColumnMove={true} // 列移动
-        // manualRowMove={true} // 行移动
         height="770px"
         language={zhCN.languageCode}
         stretchH="all"
@@ -209,7 +277,9 @@ const HotTableView: React.FC<IProps> = ({ current }) => {
         afterChange={afterChange}
         afterUpdateSettings={afterUpdateSettings}
         afterSetCellMeta={afterSetCellMeta}
-      />
+      >
+        {/* <EditorComponent hot-editor></EditorComponent> */}
+      </HotTable>
       <div>
         <Tabs
           tabPosition={'bottom'}
