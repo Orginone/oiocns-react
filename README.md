@@ -23,18 +23,16 @@
     ├── constant.ts                     // 项目配置
     ├── themeConfig.ts                  // 主题配置
 ├── dist                                // 默认的 build 输出目录
-├── mock                                // 前端数据mock
 ├── public                              // vite项目下的静态目录
 └── src                                 // 源码目录
     ├── assets                          // 公共的文件（如image、css、font等）
-    ├── bizcomponents                   // 业务组件
     ├── components                      // 项目组件
-    ├── enums                           // 自定义 常量（枚举写法）
+    ├── executor                        // 文件操作执行器
     ├── hooks                           // 自定义 hooks
     ├── layouts                         // 全局布局
     ├── routes                          // 路由
     ├── services                        // api封装
-    ├── store                           // 状态管理器
+    ├── ts                              // 前端内核ts代码
     ├── utils                           // 工具库
     ├── pages                           // 页面模块目录 UI层
         ├── Home                        // Home页面模块
