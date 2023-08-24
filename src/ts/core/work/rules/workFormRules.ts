@@ -8,16 +8,17 @@ import { RuleTypes } from './type.d';
 import { DataType } from 'typings/globelType';
 import { filterRules, setFormRules } from './lib/tools';
 import * as Tools from './lib';
-import { IForm } from '../../thing/form';
 import { RuleTriggers } from '@/ts/base/model';
 import { ValueGoal } from './base/enum';
+import { XEntity } from '@/ts/base/schema';
+import { IBelong } from '../../target/base/belong';
 
 // 定义表单规则的类型
 export type WorkFormRulesType = {
   /* 办事规则是否处理完成 */
   isReady: boolean;
-  // /* 办事归属权 */
-  // _beloneId: string;
+  /* 办事归属权 */
+  currentCompanyInfo: XEntity;
   // /* 收集办事表单的规则 */
   // _AllFormRules: Map<string, { rules: IRuleBase[]; attrs: any[] }>;
   /* 当前选中 主表的id标识 */
@@ -41,17 +42,16 @@ export type WorkFormRulesType = {
 };
 
 class WorkFormRules extends Emitter implements WorkFormRulesType {
-  constructor(forms: IForm[], beloneId: string) {
+  constructor() {
     super();
-    this._beloneId = beloneId;
-    this.initFormRules(forms);
+    this.currentCompanyInfo = {} as any;
   }
   /* 当前主表id */
   public currentMainFormId: string = '';
   // 是否所有规则都已加载完毕
   public isReady: boolean = false;
-  // 办事归属权
-  private _beloneId: string;
+  // 单位信息
+  public currentCompanyInfo: XEntity;
   // 所有表单规则
   private _AllFormRules: Map<string, RuleTypes.MapType> = new Map([]);
   // 所有表单id，对应的主子表信息
@@ -64,7 +64,9 @@ class WorkFormRules extends Emitter implements WorkFormRulesType {
   }
 
   // 初始化表单规则
-  private initFormRules = async (forms: any[]) => {
+  public initFormRules = (forms: any[], belone: IBelong) => {
+    this._clearData();
+    this.currentCompanyInfo = belone.metadata.belong as XEntity;
     let count = 0;
     // 遍历每个表单，获取其中的规则
     for (const formItem of forms) {
@@ -73,7 +75,7 @@ class WorkFormRules extends Emitter implements WorkFormRulesType {
       this._FormIdtoType.set(formItem.id, formItem.typeName);
       // 将表单的规则存入 _AllFormRules 中
       this._AllFormRules.set(formItem.id, {
-        rules: await setFormRules(ruleList),
+        rules: setFormRules(ruleList),
         attrs: formItem.fields,
         callback: undefined,
       });
@@ -207,8 +209,7 @@ class WorkFormRules extends Emitter implements WorkFormRulesType {
             $formData: formData.data, //主表数据
             $attrs: formData.attrs, //主表所有特性
             $things: formData?.things ?? [], //子表数据
-            $company:
-              OrgCtrl.user.companys.find((v) => v.id === this._beloneId)?.metadata ?? {}, //单位信息
+            $company: this.currentCompanyInfo, //单位信息
             $user: OrgCtrl.user.metadata, //用户信息
             tools: Tools, //方法库
           });
@@ -243,6 +244,13 @@ class WorkFormRules extends Emitter implements WorkFormRulesType {
     );
     return resultObj;
   }
+  _clearData = () => {
+    this._AllFormRules = new Map([]);
+    this._FormIdtoType = new Map([]);
+    this._NewFormData = new Map([]);
+    this.currentCompanyInfo = {} as any;
+    this.isReady = false;
+  };
 }
 
-export default WorkFormRules;
+export default new WorkFormRules();
