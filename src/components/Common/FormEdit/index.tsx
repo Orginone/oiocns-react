@@ -1,6 +1,6 @@
 // import { Col, Row, Select } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
-// import cls from './index.module.less';
+import cls from './index.module.less';
 import FullScreenModal from '@/executor/tools/fullScreen';
 import { IForm } from '@/ts/core';
 import Generator, { defaultSettings } from 'fr-generator';
@@ -10,6 +10,11 @@ import MyDivider from './widgets/Divider';
 import MySpace from './widgets/Space';
 import ProFormPerson from './widgets/ProFormPerson';
 import { Setting, SettingWidget } from '@/ts/core/work/design';
+import FormDesign from '@/components/Common/FormDesign';
+import Attribute from '@/executor/config/operateModal/labelsModal/Attritube';
+import FormRules from '@/executor/config/operateModal/labelsModal/formRules';
+import { XAttribute } from '@/ts/base/schema';
+const { Provider, Sidebar, Canvas, Settings } = Generator;
 type IProps = {
   current: IForm;
   finished: () => void;
@@ -27,7 +32,11 @@ const FormEditModal: React.FC<IProps> = ({
   defaultSchema,
   editFormOpen = false,
 }) => {
+  console.log('@@@', current.fields);
   const [commonSettings, setCommonSettings] = useState<any>({});
+  const [modalType, setModalType] = useState<string>('');
+  const [tabKey, setTabKey] = useState<string>('attr');
+
   // 创建ref
   const myComponentRef: any = useRef(null);
   const onCloseFormModle = () => {
@@ -48,8 +57,19 @@ const FormEditModal: React.FC<IProps> = ({
 
   //页面重载获取默认schema或者配置后的schema
 
-  const onClickDelete = (e: any) => {
-    return false;
+  const onClickDelete = async (e: any) => {
+    const item: any = current.attributes
+      .map((item: XAttribute) => {
+        if (item.id === e.$id.replace('#/', '')) {
+          return item;
+        }
+      })
+      .filter((itemFl: any) => {
+        return itemFl && itemFl.id;
+      });
+    if (await current.deleteAttribute(item[0])) {
+      return true;
+    }
   };
   const copyObj = (obj = {}) => {
     //变量先置空
@@ -162,14 +182,32 @@ const FormEditModal: React.FC<IProps> = ({
   ];
   const setting = [defaultSettings[2], settings];
   console.log('@@', setting);
-  // setting.map((item) => {
-  //   item.widgets.map((widgetsItem: SettingWidget) => {
-  //     return (widgetsItem.setting = {
-  //       ...widgetsItem.setting,
-  //       ...getDefaultCommonSettings(widgetsItem.schema.type),
-  //     });
-  //   });
-  // });
+  const add = (e: any) => {
+    console.log(e);
+    setModalType('新增特性');
+  };
+  const content = () => {
+    if (tabKey === 'attr') {
+      return (
+        <Attribute
+          current={current}
+          modalType={modalType}
+          recursionOrg={true}
+          setModalType={setModalType}
+        />
+      );
+    }
+    if (tabKey === 'rule') {
+      return (
+        <FormRules
+          current={current}
+          setModalType={setModalType}
+          modalType={modalType}
+          recursionOrg={false}
+        />
+      );
+    }
+  };
   return (
     <FullScreenModal
       open={editFormOpen}
@@ -179,9 +217,8 @@ const FormEditModal: React.FC<IProps> = ({
       destroyOnClose
       title={'表单设计'}
       footer={[]}
-      onCancel={finished}
-    >
-      <Generator
+      onCancel={finished}>
+      {/* <Generator
         defaultValue={defaultSchema}
         onSchemaChange={onFormSchemaChange}
         onCanvasSelect={onCanvasSelect}
@@ -192,7 +229,47 @@ const FormEditModal: React.FC<IProps> = ({
         widgets={{ MyDivider, MySpace, ProFormPerson }}
         commonSettings={commonSettings}
         ref={myComponentRef}
-      />
+      /> */}
+      <div className={cls.frplayground}>
+        <Provider
+          defaultValue={defaultSchema}
+          onChange={(data) => console.log('data:change', data)}
+          onSchemaChange={onFormSchemaChange}
+          settings={setting}
+          extraButtons={[
+            true,
+            false,
+            false,
+            true,
+            {
+              /** 按钮文案 */
+              text: '新增特性',
+              /** 点击回调 */
+              onClick: (event: any) => {
+                add(event);
+              },
+              key: 'add',
+            },
+          ]}
+          canDelete={onClickDelete}
+          hideId
+          widgets={{ MyDivider, MySpace, ProFormPerson }}
+          commonSettings={commonSettings}
+          ref={myComponentRef}>
+          <div className="fr-generator-container">
+            <div style={{ width: '20%' }}>
+              <Sidebar fixedName />
+            </div>
+            <div style={{ width: '50%' }}>
+              <Canvas onCanvasSelect={onCanvasSelect} />
+            </div>
+            <div style={{ width: '30%' }}>
+              <Settings />
+            </div>
+          </div>
+        </Provider>
+      </div>
+      <div className={cls['page-content-table']}>{content()}</div>
     </FullScreenModal>
   );
 };
