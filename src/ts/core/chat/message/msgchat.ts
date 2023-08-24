@@ -294,7 +294,7 @@ export abstract class MsgChat<T extends schema.XEntity>
   }
   async deleteMessage(id: string): Promise<boolean> {
     const res = await kernel.anystore.remove(this.userId, storeCollName.ChatMessage, {
-      chatId: id,
+      id: id,
     });
     if (res.success && res.data > 0) {
       const index = this.messages.findIndex((i) => {
