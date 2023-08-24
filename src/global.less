@@ -12,6 +12,9 @@
 .layout__loading {
   width: 100%;
   height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .pages-wrap {
@@ -36,7 +39,9 @@
 .ogo-modal-wrap {
   overflow: hidden;
 }
-
+.ogo-tabs{
+  overflow-y: scroll!important;
+}
 .ogo-modal-footer {
   border-top: 0 !important;
   padding: 12px !important;
@@ -181,6 +186,16 @@
   color: #565656;
   font-weight: 600;
   line-height: 25px;
+}
+
+.dx-resizable-handle {
+  width: 2px;
+  border-left: 1px solid #e3e2e280;
+}
+
+.dx-resizable-handle:active,
+.dx-resizable-handle:hover {
+  border: 1px dotted #154ad8;
 }
 
 .rlv-list-item {

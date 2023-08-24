@@ -4,7 +4,31 @@
   height: 100%;
 }
 
+.header {
+  text-align: center;
+  padding: 10px 0;
+  border-right: rgba(227, 226, 226, 0.5) solid 1px;
+  .navbar {
+    width: 100%;
+    display: flex;
+    height: calc(100vh - 100px);
+    justify-content: center;
+    padding-bottom: 50px;
+  }
+  .title {
+    font-size: 12px;
+    text-align: center;
+    color: #888;
+  }
+  .title_selected {
+    font-size: 12px;
+    font-weight: bold;
+    text-align: center;
+  }
+}
+
 .main-content {
   height: 100%;
   background-color: aqua;
+  overflow: auto;
 }

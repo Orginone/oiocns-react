@@ -1,30 +1,16 @@
-import React, { useState } from 'react';
+import React from 'react';
 import FullScreenModal from '@/executor/tools/fullScreen';
 import HotTableView from './components/hotTable';
-import ToolBar from './components/tool';
+// import ToolBar from './components/tool';
 import cls from './index.module.less';
 import { IReport } from '@/ts/core';
 
 interface IProps {
   current: IReport;
-  selectItem: any;
   finished: () => void;
 }
 
-const ReportView: React.FC<IProps> = ({ current, selectItem, finished }) => {
-  console.log(current, 'current', selectItem, 'selectItem');
-  const [reportChange, setReportChange] = useState<any>();
-  const [changeType, setChangeType] = useState<string>('');
-  const [modalType, setModalType] = useState<string>('');
-  const handClick = (value: any, type: string) => {
-    setReportChange(value);
-    setChangeType(type);
-  };
-
-  const setModal = (value: string) => {
-    setModalType(value);
-  };
-
+const ReportView: React.FC<IProps> = ({ current, finished }) => {
   return (
     <FullScreenModal
       open
@@ -37,15 +23,7 @@ const ReportView: React.FC<IProps> = ({ current, selectItem, finished }) => {
       onCancel={finished}
     >
       <div className={cls['report-content-box']}>
-        <div className={cls['report-tool-box']}>
-          <ToolBar current={current} handClick={handClick} setModal={setModal}></ToolBar>
-        </div>
-        <HotTableView
-          current={current}
-          selectItem={selectItem}
-          reportChange={reportChange}
-          changeType={changeType}
-        ></HotTableView>
+        <HotTableView current={current}></HotTableView>
       </div>
     </FullScreenModal>
   );

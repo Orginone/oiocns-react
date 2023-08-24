@@ -72,7 +72,6 @@ const SettingStation: React.FC<IProps> = ({ company, finished }) => {
       destroyOnClose
       onCancel={() => finished()}>
       <MainLayout
-        notExitIcon
         selectMenu={selectMenu}
         onSelect={async (data) => {
           if ('company' in data.item) {

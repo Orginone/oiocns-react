@@ -1,56 +1,54 @@
-import './index.less';
+import cls from './index.module.less';
+import React, { useState } from 'react';
+import HeadBanner from '@/pages/Home/components/HeadBanner';
+import NavigationBar from '@/pages/Home/components/NavigationBar';
 
-// import { Card } from 'antd';
-import React, { useEffect } from 'react';
-
-import SelfAppCom from './components/SelfAppCom';
-import Shortcuts from './components/ShortcutsCom';
-import { Tabs } from 'antd';
-import Activity from '@/pages/Activity';
-
-//TODO: 临时获取本地banner
-let imgList: any[] = [];
-
-/**
- * @desc: 获取图片列表资源
- * @return  {url:string} 图片信息
- */
-function getImgAssets() {
-  for (let i = 1; i < 5; i++) {
-    imgList.push({
-      url: `/img/banner/${i}.png`,
-    });
-  }
+export interface NavigationItem {
+  key: string;
+  label: string;
+  backgroundImageUrl: string;
+  component: any;
 }
-getImgAssets();
-
-/**
- * @desc: 项目首页
- */
+const navigationList: NavigationItem[] = [
+  {
+    key: 'activity',
+    label: '群动态',
+    backgroundImageUrl: '/img/banner/activity-bg.png',
+    component: React.lazy(() => import('@/pages/Home/components/Content/Activity')),
+  },
+  {
+    key: 'circle',
+    label: '好友圈',
+    backgroundImageUrl: '/img/banner/circle-bg.jpeg',
+    component: React.lazy(() => import('@/pages/Home/components/Content/Circle')),
+  },
+  {
+    key: 'warehouse',
+    label: '公物仓',
+    backgroundImageUrl: '/img/banner/activity-bg.png',
+    component: React.lazy(() => import('@/pages/Home/components/Content/Warehouse')),
+  },
+  {
+    key: 'digital-asset',
+    label: '数据资产',
+    backgroundImageUrl: '/img/banner/digital-asset-bg.png',
+    component: React.lazy(() => import('@/pages/Home/components/Content/DigitalAsset')),
+  },
+];
 const Home: React.FC = () => {
-  useEffect(() => {}, []);
-  return (
-    <div className="work-home-wrap">
-      {/* 顶部图片11111 */}
-      {/*<BannerCom imgList={imgList} />*/}
-      <div className="home-content">
-        <Tabs defaultActiveKey="1" size="large" tabBarStyle={{ alignSelf: 'center' }}>
-          <Tabs.TabPane tab="动态" key="1">
-            <Activity></Activity>
-          </Tabs.TabPane>
-          <Tabs.TabPane tab="常用" key="2">
-            {/* 快捷入口及应用 */}
-            <Shortcuts props={[]} />
-          </Tabs.TabPane>
-          <Tabs.TabPane tab="应用" key="3">
-            {/* 快捷入口及应用 */}
-            <SelfAppCom props={[]} />
-          </Tabs.TabPane>
-        </Tabs>
-      </div>
+  const [current, setCurrent] = useState(navigationList[0]);
 
-      {/* 底部区域 //TODO:临时*/}
-      {/*<Charts />*/}
+  return (
+    <div className={cls.homepage}>
+      <NavigationBar
+        list={navigationList}
+        onChange={(item) => {
+          setCurrent(item);
+        }}></NavigationBar>
+      <HeadBanner
+        backgroundImageUrl={current.backgroundImageUrl}
+        title={current.label}></HeadBanner>
+      {React.createElement(current.component)}
     </div>
   );
 };

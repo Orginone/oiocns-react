@@ -68,7 +68,6 @@ const SettingIdentity: React.FC<IProps> = ({ target, finished }) => {
       destroyOnClose
       onCancel={() => finished()}>
       <MainLayout
-        notExitIcon
         selectMenu={selectMenu}
         onSelect={async (data) => {
           if ('current' in data.item) {

@@ -4,7 +4,7 @@ import useObjectUpdate from '@/hooks/useObjectUpdate';
 import { IReport } from '@/ts/core';
 import { ProColumns } from '@ant-design/pro-components';
 import SchemaForm from '@/components/SchemaForm';
-import ReportView from '@/executor/data/open/report';
+import ReportView from '@/components/Common/ReportDesign';
 import { model } from '@/ts/base';
 
 interface IProps {

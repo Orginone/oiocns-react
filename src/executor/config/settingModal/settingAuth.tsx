@@ -36,7 +36,6 @@ const SettingAuth: React.FC<IProps> = ({ space, finished }) => {
       destroyOnClose
       onCancel={() => finished()}>
       <MainLayout
-        notExitIcon
         selectMenu={selectMenu}
         onSelect={(data) => {
           setSelectMenu(data);
