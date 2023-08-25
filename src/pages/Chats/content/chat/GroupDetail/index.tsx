@@ -9,9 +9,14 @@ import { useHistory } from 'react-router-dom';
 import orgCtrl from '@/ts/controller';
 import { ellipsisText } from '@/utils';
 import GroupMember from '@/pages/Chats/content/chat/GroupMember';
+// @ts-ignore
+import { ReactComponent as PublishSvg } from '@/assets/svg/publish.svg';
 
+import Icon from '@ant-design/icons';
+import ActivityPublisher from '@/pages/Chats/components/ActivityPublisher';
 const GroupDetail: React.FC<any> = ({ chat }: { chat: IMsgChat }) => {
   const [historyOpen, setHistoryOpen] = useState<boolean>(false); // 历史消息搜索
+  const [activityPublisherOpen, setActivityPublisherOpen] = useState(false);
   const history = useHistory();
 
   /**
@@ -125,6 +130,23 @@ const GroupDetail: React.FC<any> = ({ chat }: { chat: IMsgChat }) => {
     </>
   );
 
+  const actionList = [
+    {
+      icon: <Icon color="red" component={PublishSvg} />,
+      title: '发布动态',
+      type: 'primary',
+    },
+    {
+      icon: <Icon component={PublishSvg} />,
+      title: '共享',
+      type: 'primary',
+    },
+    {
+      title: '交易',
+      icon: <Icon component={PublishSvg} />,
+      type: 'primary',
+    },
+  ];
   return (
     <>
       <div className={detailStyle.groupDetail}>
@@ -133,6 +155,29 @@ const GroupDetail: React.FC<any> = ({ chat }: { chat: IMsgChat }) => {
         <div className={detailStyle.user_list}>
           <div className={`${detailStyle.img_list} ${detailStyle.con}`}></div>
           {operaButton}
+        </div>
+        <div className={detailStyle.groupDetailActionArea}>
+          {actionList.map((item, index) => {
+            return (
+              <div
+                className={detailStyle.groupDetailActionAreaItem}
+                key={index}
+                onClick={() => {
+                  setActivityPublisherOpen(true);
+                }}>
+                <div
+                  className={
+                    detailStyle.groupDetailActionAreaItem__icon +
+                    (item.type === 'primary'
+                      ? ' ' + detailStyle.groupDetailActionAreaItem__iconActive
+                      : '')
+                  }>
+                  {item.icon}
+                </div>
+                <div>{item.title}</div>
+              </div>
+            );
+          })}
         </div>
       </div>
 
@@ -143,6 +188,12 @@ const GroupDetail: React.FC<any> = ({ chat }: { chat: IMsgChat }) => {
         onCancel={onHistoryCancel}
         chat={chat}
       />
+      <ActivityPublisher
+        open={activityPublisherOpen}
+        space={chat.space}
+        finish={() => {
+          setActivityPublisherOpen(false);
+        }}></ActivityPublisher>
     </>
   );
 };
