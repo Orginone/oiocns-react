@@ -36,6 +36,12 @@ const Navbar: React.FC = () => {
   }, []);
   const actions = [
     {
+      text: '首页',
+      icon: 'home',
+      path: '/home',
+      count: 0,
+    },
+    {
       text: '沟通',
       icon: 'chat',
       path: '/chat',
@@ -46,12 +52,6 @@ const Navbar: React.FC = () => {
       icon: 'work',
       path: '/work',
       count: workCount,
-    },
-    {
-      text: '首页',
-      icon: 'home',
-      path: '/home',
-      count: 0,
     },
     {
       text: '存储',

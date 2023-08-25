@@ -71,6 +71,28 @@
       margin-left: 4px;
     }
   }
+
+  &ActionArea {
+    width: 100%;
+    padding: 34px 70px;
+    display: flex;
+    justify-content: space-between;
+    &Item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      &__icon {
+        width: 50px;
+        height: 50px;
+        border: 2px solid @primary-color;
+        border-radius: 50%;
+        padding: 10px;
+        &Active {
+          background-color: @primary-color;
+        }
+      }
+    }
+  }
   .base_info_desc {
     font-size: 12px;
     color: #666;
