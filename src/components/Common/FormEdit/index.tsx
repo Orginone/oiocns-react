@@ -30,10 +30,10 @@ const FormEditModal: React.FC<IProps> = ({
   const [commonSettings, setCommonSettings] = useState<any>({});
   // 创建ref
   const myComponentRef: any = useRef(null);
-  const onCloseFormModle = () => {
-    onFormSchemaChange(myComponentRef.current.getValue());
-    finished();
-  };
+  // const onCloseFormModle = () => {
+  //   onFormSchemaChange(myComponentRef.current.getValue());
+  //   finished();
+  // };
   const onFormSchemaChange = (e: schemaType) => {
     const ruleInfo = JSON.parse(current.metadata.rule || '{}');
 
@@ -179,8 +179,7 @@ const FormEditModal: React.FC<IProps> = ({
       destroyOnClose
       title={'表单设计'}
       footer={[]}
-      onCancel={finished}
-    >
+      onCancel={finished}>
       <Generator
         defaultValue={defaultSchema}
         onSchemaChange={onFormSchemaChange}
