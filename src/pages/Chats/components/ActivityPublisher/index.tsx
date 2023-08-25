@@ -3,9 +3,13 @@ import FullScreenModal from '@/executor/tools/fullScreen';
 import { Button, Form, Input } from 'antd';
 import ImageUploader from '@/components/ImageUploader';
 import { IBelong, ISysFileInfo } from '@/ts/core';
+
 export interface Activity {
   content: string;
   imageList: ISysFileInfo[];
+  likes: number;
+  comments: Activity[];
+  space: IBelong;
 }
 const ActivityPublisher: React.FC<{
   open: boolean;
@@ -15,6 +19,9 @@ const ActivityPublisher: React.FC<{
   const [activity, setActivity] = useState<Activity>({
     content: '',
     imageList: [],
+    likes: 0,
+    space: props.space,
+    comments: [],
   });
   const publishActivity = () => {
     console.log(activity);
