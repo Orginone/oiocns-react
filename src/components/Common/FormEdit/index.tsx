@@ -14,6 +14,8 @@ import FormDesign from '@/components/Common/FormDesign';
 import Attribute from '@/executor/config/operateModal/labelsModal/Attritube';
 import FormRules from '@/executor/config/operateModal/labelsModal/formRules';
 import { XAttribute } from '@/ts/base/schema';
+import globalSettings from './globalSettings';
+import RuleComp from './widgets/RuleComp';
 const { Provider, Sidebar, Canvas, Settings } = Generator;
 type IProps = {
   current: IForm;
@@ -32,10 +34,10 @@ const FormEditModal: React.FC<IProps> = ({
   defaultSchema,
   editFormOpen = false,
 }) => {
-  console.log('@@@', current.fields);
   const [commonSettings, setCommonSettings] = useState<any>({});
   const [modalType, setModalType] = useState<string>('');
   const [tabKey, setTabKey] = useState<string>('attr');
+  console.log('@@@',current, current.fields, commonSettings);
 
   // 创建ref
   const myComponentRef: any = useRef(null);
@@ -85,12 +87,12 @@ const FormEditModal: React.FC<IProps> = ({
     return newobj;
   };
   const onCanvasSelect = async (e: any) => {
-    console.log(getDefaultCommonSettings(e));
+    console.log(1, getDefaultCommonSettings(e));
     const a = getDefaultCommonSettings(e);
-    console.log(copyObj(a));
+    console.log(2, copyObj(a));
     setCommonSettings(copyObj(a));
     const schema = myComponentRef.current.getValue();
-    console.log(schema);
+    console.log(3, schema);
     //myComponentRef.current.setValue(schema)
   };
 
@@ -180,8 +182,9 @@ const FormEditModal: React.FC<IProps> = ({
       },
     },
   ];
+
   const setting = [defaultSettings[2], settings];
-  console.log('@@', setting);
+  console.log('@@', defaultSettings, setting, commonSettings);
   const add = (e: any) => {
     console.log(e);
     setModalType('新增特性');
@@ -236,6 +239,7 @@ const FormEditModal: React.FC<IProps> = ({
           onChange={(data) => console.log('data:change', data)}
           onSchemaChange={onFormSchemaChange}
           settings={setting}
+          globalSettings={globalSettings}
           extraButtons={[
             true,
             false,
@@ -253,7 +257,8 @@ const FormEditModal: React.FC<IProps> = ({
           ]}
           canDelete={onClickDelete}
           hideId
-          widgets={{ MyDivider, MySpace, ProFormPerson }}
+          widgets={{ MyDivider, MySpace, ProFormPerson, RuleComp }}
+          settingsWidgets={{ RuleComp }}
           commonSettings={commonSettings}
           ref={myComponentRef}>
           <div className="fr-generator-container">
@@ -265,11 +270,12 @@ const FormEditModal: React.FC<IProps> = ({
             </div>
             <div style={{ width: '30%' }}>
               <Settings />
+              {/* <RuleComp form={current} /> */}
             </div>
           </div>
         </Provider>
       </div>
-      <div className={cls['page-content-table']}>{content()}</div>
+      {/* <div className={cls['page-content-table']}>{content()}</div> */}
     </FullScreenModal>
   );
 };
