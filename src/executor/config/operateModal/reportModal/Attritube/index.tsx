@@ -128,7 +128,7 @@ const Attritube = ({ current, modalType, setModalType }: IProps) => {
 
   return (
     <>
-      <CardOrTable<XAttribute>
+      {/* <CardOrTable<XAttribute>
         key={tkey}
         rowKey={'id'}
         params={tkey}
@@ -136,7 +136,7 @@ const Attritube = ({ current, modalType, setModalType }: IProps) => {
         columns={AttributeColumns()}
         showChangeBtn={false}
         dataSource={current.attributes}
-      />
+      /> */}
       {/** 新增特性模态框 */}
       {['新增特性', '编辑特性'].includes(modalType) && (
         <Modal
@@ -146,8 +146,7 @@ const Attritube = ({ current, modalType, setModalType }: IProps) => {
           destroyOnClose
           okText="确定"
           onOk={() => setModalType('')}
-          onCancel={() => setModalType('')}
-        >
+          onCancel={() => setModalType('')}>
           <SelectPropertys
             target={current.directory.target}
             selected={current.attributes.map((a) => a.property!)}
