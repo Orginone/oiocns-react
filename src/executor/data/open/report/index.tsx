@@ -1,7 +1,7 @@
 import React from 'react';
 import FullScreenModal from '@/executor/tools/fullScreen';
 import HotTableView from './components/hotTable';
-// import ToolBar from './components/tool';
+import { Button } from 'antd';
 import cls from './index.module.less';
 import { IReport } from '@/ts/core';
 

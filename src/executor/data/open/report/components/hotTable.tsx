@@ -1,15 +1,16 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Tabs } from 'antd';
-import { HotTable } from '@handsontable/react';
+import { Tabs, Button } from 'antd';
+import { HotTable, HotColumn } from '@handsontable/react';
 import { HyperFormula } from 'hyperformula';
 import { textRenderer, registerRenderer } from 'handsontable/renderers';
 import { registerLanguageDictionary, zhCN } from 'handsontable/i18n';
+import Handsontable from 'Handsontable'
 registerLanguageDictionary(zhCN);
 import { registerAllModules } from 'handsontable/registry';
 registerAllModules();
 import 'handsontable/dist/handsontable.min.css';
 import { IReport } from '@/ts/core';
-import { EditorComponent } from './helpers'
+import { selectEditor } from '../editor/select'
 import orgCtrl from '@/ts/controller';
 interface IProps {
   current: IReport;
@@ -31,6 +32,7 @@ const HotTableView: React.FC<IProps> = ({ current }) => {
 
   useEffect(() => {
     const hot = hotRef.current.hotInstance;
+    Handsontable.editors.registerEditor('SelectEditor', selectEditor)
     setCells(setting?.cells || []);
     setStyleList(setting?.styleList || []);
     setClassList(setting?.classList || []);
@@ -64,7 +66,7 @@ const HotTableView: React.FC<IProps> = ({ current }) => {
   };
 
   const setEditor = (item: any) => {
-    console.log(item,'1234')
+    // console.log(item,'1234')
     let valueType: string = JSON.parse(item.prop.rule).widget
     let newType: string = ''
     switch (valueType) {
@@ -154,7 +156,7 @@ const HotTableView: React.FC<IProps> = ({ current }) => {
       'className',
       arr.join(' '),
     );
-  });
+  })
 
   cells?.forEach((item: any) => {
     //渲染单元格颜色
@@ -200,7 +202,55 @@ const HotTableView: React.FC<IProps> = ({ current }) => {
         }
       }
     });
-  });
+  })
+
+  const saveData = () => {
+    const reportData = hotRef.current.hotInstance.getData()
+    const belong = orgCtrl.targets.find(
+      (a) => a.id == current.metadata.belongId,
+    ) as any;
+    let localData: any = []
+
+    cells?.forEach((item: any) => {
+      let json = { col: item.col, row: item.row, id: item.prop.propId, data: '', type: '' }
+      let newData: any
+      let items: any
+      let valueType: string = JSON.parse(item.prop.rule).widget
+      switch (valueType) {
+        case 'select':
+          json.type = 'select'
+          break
+        case 'dept':
+          json.type = 'dept'
+          newData = reportData[item.row][item.col]
+          items = belong.departments.find((it: any) => it.name === newData)
+          json.data = items?.id
+          break
+        case 'person':
+          json.type = 'person'
+          newData = reportData[item.row][item.col]
+          items = belong.members.find((it: any) => it.name === newData)
+          json.data = items?.id
+          break
+        case 'group':
+          json.type = 'group'
+          newData = reportData[item.row][item.col]
+          items = belong.groups.find((it: any) => it.name === newData)
+          json.data = items?.id
+          break
+        case 'myself':
+          json.type = 'myself'
+          json.data = belong.user.userId
+          break
+        default:
+          json.type = 'text'
+          json.data = reportData[item.row][item.col]
+          break
+      }
+      localData.push(json)
+    })
+    console.log(localData,'1234')
+  }
 
   const onChange = (key: string) => {
     setSheetIndex(key);
@@ -254,6 +304,17 @@ const HotTableView: React.FC<IProps> = ({ current }) => {
 
   return (
     <div>
+      <div>
+        <Button
+          type="primary"
+          shape="round"
+          size="small"
+          onClick={() => {
+            saveData()
+          }}>
+          提交
+        </Button>
+      </div>
       <HotTable
         ref={hotRef}
         formulas={{
@@ -264,7 +325,7 @@ const HotTableView: React.FC<IProps> = ({ current }) => {
         rowHeaders={true}
         colHeaders={true}
         dropdownMenu={true}
-        height="770px"
+        height="760px"
         language={zhCN.languageCode}
         stretchH="all"
         manualColumnResize={true}
@@ -278,7 +339,8 @@ const HotTableView: React.FC<IProps> = ({ current }) => {
         afterUpdateSettings={afterUpdateSettings}
         afterSetCellMeta={afterSetCellMeta}
       >
-        {/* <EditorComponent hot-editor></EditorComponent> */}
+        {/* @ts-ignore Element inherits some props. It's hard to type it. */}
+          {/* <SelectRenderer hot-renderer /> */}
       </HotTable>
       <div>
         <Tabs
