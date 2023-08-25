@@ -10,7 +10,6 @@ interface IProps {
   finished: () => void;
 }
 const LabelModl: React.FC<IProps> = ({ current, finished }: IProps) => {
-  console.log("@@",current)
   const [defaultSchema, setDefaultSchema] = useState<schemaType>({
     displayType: 'row',
     type: 'object',
@@ -18,10 +17,10 @@ const LabelModl: React.FC<IProps> = ({ current, finished }: IProps) => {
     properties: {},
     column: 1,
   });
-  let {
-    metadata: { rule },
-  } = current;
-  const rules = rule ? JSON.parse(rule) : {};
+  // let {
+  //   metadata: { rule },
+  // } = current;
+  //const rules = rule ? JSON.parse(rule) : {};
   let onSave = useRef({} as onSave);
   const onFinished = () => {
     // setEditFormOpen(false);
@@ -31,61 +30,61 @@ const LabelModl: React.FC<IProps> = ({ current, finished }: IProps) => {
     // if (rules && JSON.stringify(rules) !== '{}') {
     //   return rules.schema;
     // } else {
-      //没有配置过
-      const schema: schemaType = {
-        displayType: 'row',
-        type: 'object',
-        properties: {},
-        labelWidth: 120,
-        column: 1,
-      };
-      let result = current.fields.reduce((result, item: any) => {
-        const { valueType } = item;
-        let title, type, widget, format, enums, enumNames;
-        title = item.name;
-        type = loadWidgetsOpts(valueType)[0].value;
-        widget = loadWidgetsOpts(valueType)[0].value;
-        if (widget === 'textarea') {
-          format = 'textarea';
-          widget = '';
-        }
-        if (widget === 'string') {
-          format = '';
-          widget = '';
-        }
-        if (valueType === '时间型') {
-          format = 'dateTime';
-          widget = null;
-        }
-        if (valueType === '附件型') {
-          widget = 'upload';
-          format = null;
-        }
-        if (valueType === '选择型' || valueType === '分类型') {
-          enums = item.lookups.map((item: { value: any }) => {
-            return item.value;
-          });
-          enumNames = item.lookups.map((item: { text: any }) => {
-            return item.text;
-          });
-        }
-        return {
-          ...result,
-          [item!.id]: {
-            title,
-            type,
-            widget,
-            enum: enums,
-            enumNames,
-            format,
-            valueType,
-          },
-        };
-      }, {});
-      schema.properties = {
+    //没有配置过
+    const schema: schemaType = {
+      displayType: 'row',
+      type: 'object',
+      properties: {},
+      labelWidth: 120,
+      column: 1,
+    };
+    let result = current.fields.reduce((result, item: any) => {
+      const { valueType } = item;
+      let title, type, widget, format, enums, enumNames;
+      title = item.name;
+      type = loadWidgetsOpts(valueType)[0].value;
+      widget = loadWidgetsOpts(valueType)[0].value;
+      if (widget === 'textarea') {
+        format = 'textarea';
+        widget = '';
+      }
+      if (widget === 'string') {
+        format = '';
+        widget = '';
+      }
+      if (valueType === '时间型') {
+        format = 'dateTime';
+        widget = null;
+      }
+      if (valueType === '附件型') {
+        widget = 'upload';
+        format = null;
+      }
+      if (valueType === '选择型' || valueType === '分类型') {
+        enums = item.lookups.map((item: { value: any }) => {
+          return item.value;
+        });
+        enumNames = item.lookups.map((item: { text: any }) => {
+          return item.text;
+        });
+      }
+      return {
         ...result,
+        [item!.id]: {
+          title,
+          type,
+          widget,
+          enum: enums,
+          enumNames,
+          format,
+          valueType,
+        },
       };
-      return schema;
+    }, {});
+    schema.properties = {
+      ...result,
+    };
+    return schema;
     // }
   };
   useEffect(() => {
