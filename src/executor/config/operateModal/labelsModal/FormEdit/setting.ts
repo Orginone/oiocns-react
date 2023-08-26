@@ -1,4 +1,4 @@
-import { loadWidgetsOpts } from '../FormDesign/schemaRule2.js';
+import { loadWidgetsOpts } from '../../../../../components/Common/FormDesign/schemaRule2.js';
 
 function getDefaultCommonSettings(e: any) {
   const defaultCommonSettings = {

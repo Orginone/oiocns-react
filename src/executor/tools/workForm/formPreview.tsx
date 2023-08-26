@@ -5,8 +5,8 @@ import React from 'react';
 import FormRender, { useForm } from 'form-render';
 import { WorkFormRulesType } from '@/ts/core/work/rules/workFormRules';
 import moment from 'moment';
-import MyDivider from '@/components/Common/FormEdit/widgets/Divider';
-import MySpace from '@/components/Common/FormEdit/widgets/Space';
+import MyDivider from '@/executor/config/operateModal/labelsModal/FormEdit/widgets/Divider';
+import MySpace from '@/executor/config/operateModal/labelsModal/FormEdit/widgets/Space';
 import { Tabs } from 'antd';
 interface IProps {
   allowEdit: boolean;
