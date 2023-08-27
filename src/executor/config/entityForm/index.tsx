@@ -11,6 +11,8 @@ import TargetForm from './targetForm';
 import LabelsForm from './labelsForm';
 import RenameForm from './renameForm';
 import LabelsReport from './labelsReport';
+import LinkForm from './linkForm';
+
 interface IProps {
   cmd: string;
   entity: IEntity<schema.XEntity>;
@@ -86,6 +88,13 @@ const EntityForm: React.FC<IProps> = ({ cmd, entity, finished }) => {
       return (
         <LabelsReport
           formType={cmd.replace('Report', '')}
+          current={entity as any}
+          finished={reloadFinish}
+        />
+      );
+    case 'newLink':
+      return (
+        <LinkForm
           current={entity as any}
           finished={reloadFinish}
         />

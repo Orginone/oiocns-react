@@ -157,6 +157,24 @@ export const directoryOperates = {
     label: '新建报表',
     iconType: 'newDir',
   },
+  NewRequest: {
+    sort: 10,
+    cmd: 'newRequest',
+    label: '新建请求配置',
+    iconType: '请求配置',
+  },
+  NewLink: {
+    sort: 11,
+    cmd: 'newLink',
+    label: '新建链接配置',
+    iconType: '链接配置',
+  },
+  NewMapping: {
+    sort: 12,
+    cmd: 'newMapping',
+    label: '新建映射配置',
+    iconType: '映射配置',
+  },
 };
 
 /** 目录下新增 */
@@ -175,6 +193,9 @@ export const directoryNew = {
     directoryOperates.NewThingConfig,
     directoryOperates.NewWorkConfig,
     directoryOperates.NewReport,
+    directoryOperates.NewRequest,
+    directoryOperates.NewLink,
+    directoryOperates.NewMapping,
   ],
 };
 

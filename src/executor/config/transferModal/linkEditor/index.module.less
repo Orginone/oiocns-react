@@ -1,0 +1,50 @@
+.flex-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 12px;
+  width: 180px;
+  height: 48px;
+  color: rgba(0, 0, 0, 65%);
+  font-size: 12px;
+  font-family: PingFangSC;
+  line-height: 24px;
+  background-color: #fff;
+  box-shadow: 0 -1px 4px 0 rgba(209, 209, 209, 50%),
+    1px 1px 4px 0 rgba(217, 217, 217, 50%);
+  border-radius: 2px;
+  border: 1px solid transparent;
+}
+
+.plus-menu {
+  width: 48px;
+  height: 24px;
+  position: absolute;
+  left: 180px;
+  z-index: 50;
+
+  .dropdown {
+    position: absolute;
+    left: 48px;
+    width: 40px;
+    border-radius: 5px;
+    box-shadow: 5px 5px 4px rgba(148, 152, 223, 0.1);
+    background-color: #fff;
+  }
+
+  .dropdown .item {
+    text-align: center;
+    width: 100%;
+  }
+
+  .dropdown .item:hover {
+    background-color: rgba(148, 152, 223, 0.5);
+  }
+}
