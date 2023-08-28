@@ -11,16 +11,28 @@ import {
 import { ITarget } from '../target/base/target';
 import { Form, IForm } from './form';
 import { Report, IReport } from './report';
-import { SysFileInfo, ISysFileInfo, IFileInfo, FileInfo } from './fileinfo'; 
+import { SysFileInfo, ISysFileInfo, IFileInfo, FileInfo } from './fileinfo';
 
 import { Species, ISpecies } from './species';
 import { Member } from './member';
 import { Property, IProperty } from './property';
 import { Application, IApplication } from './application';
 import { BucketOpreates, DirectoryModel } from '@/ts/base/model';
-import { encodeKey } from '@/ts/base/common';
+import { encodeKey, generateUuid } from '@/ts/base/common';
+import { XExecutable, XFileInfo, XLink, XMapping, XRequest } from '@/ts/base/schema';
+import { formatDate } from '@/utils';
+import { Request, Executable, Link, Unknown, Mapping } from '@/ts/core/thing/config';
 /** 可为空的进度回调 */
 export type OnProgress = (p: number) => void;
+
+/** 配置集合名称 */
+export enum ConfigColl {
+  Requests = 'requests',
+  RequestLinks = 'request-links',
+  Scripts = 'scripts',
+  Mappings = 'mappings',
+  Unknown = 'unknown',
+}
 
 /** 目录接口类 */
 export interface IDirectory extends IFileInfo<schema.XDirectory> {
@@ -84,6 +96,15 @@ export interface IDirectory extends IFileInfo<schema.XDirectory> {
   loadAllApplication(reload?: boolean): Promise<IApplication[]>;
   /** 加载目录树 */
   loadSubDirectory(): void;
+  /** 目录下的所有配置项 */
+  configs: IFileInfo<schema.XFileInfo>[];
+  /** 新建请求配置 */
+  createConfig(
+    coll: string,
+    data: schema.XFileInfo,
+  ): Promise<IFileInfo<schema.XFileInfo> | undefined>;
+  /** 加载请求配置 */
+  loadConfigs(collName: string, reload?: boolean): Promise<IFileInfo<schema.XFileInfo>[]>;
 }
 
 /** 目录实现类 */
@@ -116,6 +137,7 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
   propertys: IProperty[] = [];
   applications: IApplication[] = [];
   reports: IReport[] = [];
+  configs: IFileInfo<XFileInfo>[] = [];
   private _contentLoaded: boolean = false;
   get id(): string {
     if (!this.parent) {
@@ -134,7 +156,7 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
     if (this.typeName === '成员目录') {
       cnt.push(...this.target.members.map((i) => new Member(i, this)));
     } else {
-      cnt.push(...this.forms, ...this.applications, ...this.files);
+      cnt.push(...this.forms, ...this.applications, ...this.files, ...this.configs);
       if (mode != 1) {
         cnt.push(...this.propertys);
         cnt.push(...this.specieses);
@@ -158,7 +180,10 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
           await this.loadPropertys(reload),
           await this.loadSpecieses(reload),
           await this.loadApplications(reload),
-          await this.loadReports(reload)
+          await this.loadReports(reload),
+          ...Object.entries(ConfigColl).map((item) => {
+            return this.loadConfigs(item[1], reload);
+          }),
         ]);
       }
     }
@@ -415,6 +440,9 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
           if (data) {
             this.loadChildren(data, res.data.result);
           }
+          for (let config of Object.entries(ConfigColl)) {
+            await this.loadConfigs(config[1], true);
+          }
         }
       }
     }
@@ -457,6 +485,81 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
       const report = new Report(res.data, this);
       this.reports.push(report);
       return report;
+    }
+  }
+  defaultEntity(collName: string, data: XFileInfo) {
+    const key = generateUuid();
+    data.id = key;
+    data.code = key;
+    data.belongId = this.belongId;
+    let current = formatDate(new Date(), 'yyyy-MM-dd hh:mm:ss.S');
+    data.createTime = current;
+    data.updateTime = current;
+    data.collName = collName;
+    data.directoryId = this.id;
+    switch (collName) {
+      case ConfigColl.Requests:
+        data.typeName = '请求';
+        break;
+      case ConfigColl.RequestLinks:
+        data.typeName = '链接';
+        break;
+      case ConfigColl.Scripts:
+        data.typeName = '脚本';
+        break;
+      case ConfigColl.Mappings:
+        data.typeName = '映射';
+        break;
+      default:
+        data.typeName = '未知';
+    }
+  }
+  async createConfig(
+    collName: ConfigColl,
+    data: schema.XFileInfo,
+  ): Promise<IFileInfo<schema.XFileInfo> | undefined> {
+    this.defaultEntity(collName, data);
+    let res = await kernel.anystore.insert(this.belongId, collName, data);
+    if (res.success) {
+      let config = this.converting(data);
+      this.configs.push(config);
+      return config;
+    }
+  }
+  async loadConfigs(
+    collName: ConfigColl,
+    reload?: boolean | undefined,
+  ): Promise<IFileInfo<schema.XFileInfo>[]> {
+    const configs = this.configs.filter((item) => item.metadata.collName == collName);
+    console.log(collName, configs);
+    if (configs.length < 1 || reload) {
+      const res = await kernel.anystore.aggregate(this.belongId, collName, {
+        match: {
+          directoryId: this.id,
+        },
+        limit: 65536,
+      });
+      if (res.success && res.data.length > 0) {
+        this.configs = this.configs.filter((item) => item.metadata.collName != collName);
+        let configs = (res.data as []).map((item) => this.converting(item));
+        this.configs.push(...configs);
+      }
+    }
+    return configs;
+  }
+  converting(data: XFileInfo): IFileInfo<schema.XFileInfo> {
+    const typeName = data.typeName;
+    switch (typeName) {
+      case '请求':
+        return new Request(data as XRequest, this);
+      case '链接':
+        return new Link(data as XLink, this);
+      case '脚本':
+        return new Executable(data as XExecutable, this);
+      case '映射':
+        return new Mapping(data as XMapping, this);
+      default:
+        return new Unknown(ConfigColl.Unknown, data, this);
     }
   }
 }
