@@ -17,10 +17,14 @@ export class Disk extends Directory implements IDisk {
 
   user: IPerson;
   override content(mode?: number): IFileInfo<schema.XEntity>[] {
-    return [this.user, ...this.user.companys];
+    return [this.user, ...this.user.companys].map((t) => t.directory);
   }
 
   override operates(mode?: number): OperateModel[] {
-    return [personJoins, targetOperates.NewCompany];
+    if (mode && mode % 2 === 0) {
+      return [personJoins, targetOperates.NewCompany];
+    } else {
+      return [];
+    }
   }
 }
