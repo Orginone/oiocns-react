@@ -2,7 +2,7 @@ export default {
   type: 'object',
   properties: {
     column: {
-      title: '整体布333局',
+      title: '整体布局',
       type: 'number',
       enum: [1, 2, 3],
       enumNames: ['一行一列', '一行二列', '一行三列'],
@@ -27,15 +27,6 @@ export default {
       enum: ['row', 'column'],
       enumNames: ['同行', '单独一行'],
       widget: 'radio',
-    },
-    url: {
-      title: '关联规则',
-      type: 'number',
-      enum: [1, 2, 3],
-      enumNames: ['规则1', '规则2', '规则3'],
-      props: {
-        placeholder: '请选择规则模板',
-      },
     },
   },
 };

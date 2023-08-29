@@ -1,115 +1,122 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { ProFormInstance } from '@ant-design/pro-components';
-import DefaultRules from '@/ts/core/work/rules/lib/rules.json';
-import SchemaForm from '@/components/SchemaForm';
-import { IForm } from '@/ts/core';
-import { XFormRule } from '@/ts/base/schema';
-import { getColumns } from './config';
-import dayjs from 'dayjs';
-interface Iprops {
-  open: boolean;
-  current?: any;
-  handleCancel: () => void;
-  handleOk: ({
-    success,
-    type,
-    data,
-  }: {
-    success: boolean;
-    type: 'create' | 'updata';
-    data: any;
-  }) => void;
-  form: IForm;
-}
-
-/*
-  规则编辑模态框
-*/
-const FormRuleModal = (props: Iprops) => {
-  const formRef = useRef<ProFormInstance>();
-  const { open, handleOk, form, current, handleCancel } = props;
-  const [defaultCode, setDefaultCode] = useState<string>('');
+import React, { useEffect, useState } from 'react';
+import { Avatar, List, Tabs } from 'antd';
+import { PlusCircleOutlined } from '@ant-design/icons';
+import CreateModal from './createModal';
+interface listType {}
+const RuleList: React.FC<listType> = (props: any) => {
+  // const { metaData, fields, update } = props.schema;
+  const { metaData, fields, update, comp } = props;
+  const [dataSource, setDataSource] = useState<any[]>([]);
+  const [selected, setSelecetd] = useState<any>({});
   useEffect(() => {
-    setDefaultCode(dayjs().unix() + '');
+    if (metaData) {
+      const list = JSON?.parse(metaData?.rule ?? '{}')?.list;
+      setDataSource(list ?? []);
+    }
   }, []);
 
-  const handleChange = (val: { [key: string]: any }, _vals: { [key: string]: any }) => {
-    switch (Object.keys(val)[0]) {
-      case 'templateId':
-        {
-          const info = DefaultRules.find((v) => v.id === val['templateId'])!;
-          formRef.current?.setFieldsValue({
-            errMsg: info.errorMsg,
-            remark: info.remark,
-            targetId: info.targetId,
-            linkAttrs: info.linkAttrs.map((it: any) => {
-              return {
-                val: it.val,
-                id: it.id,
-                name: it.name,
-              };
-            }),
-          });
-        }
-        break;
-      case 'modalType':
-        {
-          // formRef.current?.resetFields();
-        }
-        break;
-      default:
-        break;
-    }
-  };
-  const handleSubt = (values: { [key: string]: any }) => {
-    const { templateId, linkAttrs } = values;
-    try {
-      const info = DefaultRules.find((v) => v.id === templateId)!;
-      if (info.creatFun) {
-        return {
-          ...values,
-          ruleType: info.ruleType,
-          content: eval(info?.creatFun)(linkAttrs),
-        };
-      } else if (info.content) {
-        return { ...values, ruleType: info.ruleType, content: info.content };
-      }
-    } catch (e) {
-      return values;
-    }
-  };
+  const [cerateVisible, setcreateVisible] = useState<boolean>(false);
+
+  const RenderHeader = (
+    <div className="flex justify-between" style={{ padding: '10px' }}>
+      <span>规则配置</span>
+      <PlusCircleOutlined
+        onClick={() => {
+          setSelecetd({});
+          setcreateVisible(!cerateVisible);
+        }}
+      />
+    </div>
+  );
   return (
-    <SchemaForm<XFormRule>
-      formRef={formRef}
-      title={'新增规则'}
-      // title={current ? `编辑[${current.name}]规则` : '新增规则'}
-      open={true}
-      width={800}
-      layoutType="Form"
-      columns={getColumns(form.attributes, DefaultRules)}
-      rowProps={{
-        gutter: [24, 0],
-      }}
-      onValuesChange={handleChange}
-      modalProps={{ maskClosable: false }}
-      // initialValues={current?.name ? current : { code: defaultCode }}
-      onOpenChange={(open: boolean) => {
-        if (!open) {
-          formRef.current?.resetFields();
-          handleCancel();
-        }
-      }}
-      onFinish={async (values) => {
-        // console.log('提交数据',values, handleSubt(values));
-        // if (current) {
-        //   values = { ...current, ...handleSubt(values) };
-        //   console.log('提交结果2', values);
-        //   handleOk({ success: true, type: 'updata', data: values });
-        // } else {
-        //   handleOk({ success: true, type: 'create', data: handleSubt(values) });
-        // }
-      }}></SchemaForm>
+    <>
+      <Tabs
+        defaultActiveKey="1"
+        items={[
+          {
+            label: `表单配置`,
+            key: '1',
+            children: <>{comp}</>,
+          },
+
+          {
+            label: `规则配置`,
+            key: '3',
+            children: (
+              <>
+                {RenderHeader}
+                {!cerateVisible ? (
+                  <List
+                    itemLayout="horizontal"
+                    // header={RenderHeader}
+                    dataSource={dataSource}
+                    style={{ width: '100%', padding: '0 10px' }}
+                    rowKey={'code'}
+                    pagination={{
+                      onChange: (page) => {
+                        console.log(page);
+                      },
+                      pageSize: 4,
+                    }}
+                    renderItem={(item) => (
+                      <List.Item
+                        onClick={() => {
+                          setSelecetd(item);
+                          setcreateVisible(true);
+                        }}>
+                        <List.Item.Meta title={item.name} description={item.remark} />
+                      </List.Item>
+                    )}
+                  />
+                ) : (
+                  <CreateModal
+                    open={true}
+                    fields={fields}
+                    defaultValue={selected}
+                    setOpen={setcreateVisible}
+                    // current={props.schema.current}
+                  />
+                )}
+              </>
+            ),
+          },
+        ]}
+      />
+      {/* {RenderHeader}
+      {!cerateVisible ? (
+        <List
+          itemLayout="horizontal"
+          // header={RenderHeader}
+          dataSource={dataSource}
+          style={{ width: '100%', padding: '10px' }}
+          rowKey={'code'}
+          pagination={{
+            onChange: (page) => {
+              console.log(page);
+            },
+            pageSize: 4,
+          }}
+          renderItem={(item) => (
+            <List.Item
+              onClick={() => {
+                setSelecetd(item);
+                setcreateVisible(true);
+              }}>
+              <List.Item.Meta title={item.name} description={item.remark} />
+            </List.Item>
+          )}
+        />
+      ) : (
+        <CreateModal
+          open={true}
+          fields={fields}
+          defaultValue={selected}
+          setOpen={setcreateVisible}
+          // current={props.schema.current}
+        />
+      )} */}
+    </>
   );
 };
 
-export default FormRuleModal;
+export default React.memo(RuleList);

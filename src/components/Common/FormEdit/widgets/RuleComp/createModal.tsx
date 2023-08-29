@@ -2,24 +2,15 @@ import React, { useEffect, useRef, useState } from 'react';
 import { ProFormInstance } from '@ant-design/pro-components';
 import DefaultRules from '@/ts/core/work/rules/lib/rules.json';
 import SchemaForm from '@/components/SchemaForm';
-import { IForm } from '@/ts/core';
 import { XFormRule } from '@/ts/base/schema';
 import { getColumns } from './config';
 import dayjs from 'dayjs';
+import { schema } from '@/ts/base';
 interface Iprops {
   open: boolean;
-  current?: any;
-  handleCancel: () => void;
-  handleOk: ({
-    success,
-    type,
-    data,
-  }: {
-    success: boolean;
-    type: 'create' | 'updata';
-    data: any;
-  }) => void;
-  form: IForm;
+  setOpen: any;
+  fields: schema.XAttribute[];
+  defaultValue?: any; //修改数据
 }
 
 /*
@@ -27,7 +18,7 @@ interface Iprops {
 */
 const FormRuleModal = (props: Iprops) => {
   const formRef = useRef<ProFormInstance>();
-  const { open, handleOk, form, current, handleCancel } = props;
+  const { setOpen, fields, open, handleCancel, defaultValue } = props;
   const [defaultCode, setDefaultCode] = useState<string>('');
   useEffect(() => {
     setDefaultCode(dayjs().unix() + '');
@@ -63,8 +54,6 @@ const FormRuleModal = (props: Iprops) => {
   };
   const handleSubt = (values: { [key: string]: any }) => {
     const { templateId, linkAttrs } = values;
-    console.log('hahahahha', linkAttrs);
-
     try {
       const info = DefaultRules.find((v) => v.id === templateId)!;
       if (info.creatFun) {
@@ -83,32 +72,34 @@ const FormRuleModal = (props: Iprops) => {
   return (
     <SchemaForm<XFormRule>
       formRef={formRef}
-      title={current ? `编辑[${current.name}]规则` : '新增规则'}
+      title={defaultValue ? `编辑[${defaultValue.name}]规则` : '新增规则'}
       open={open}
-      width={800}
-      layoutType="ModalForm"
-      columns={getColumns(form.attributes, DefaultRules)}
+      style={{padding:'10px'}}
+      layoutType="Form"
+      columns={getColumns(fields, DefaultRules)}
       rowProps={{
         gutter: [24, 0],
       }}
       onValuesChange={handleChange}
       modalProps={{ maskClosable: false }}
-      initialValues={current?.name ? current : { code: defaultCode }}
+      key={defaultValue?.code ?? defaultCode}
+      // initialValues={current?.name ? current : { code: defaultCode }}
+      initialValues={defaultValue}
       onOpenChange={(open: boolean) => {
         if (!open) {
           formRef.current?.resetFields();
-          handleCancel();
+          setOpen();
         }
       }}
       onFinish={async (values) => {
         // console.log('提交数据',values, handleSubt(values));
-        if (current) {
-          values = { ...current, ...handleSubt(values) };
-          console.log('提交结果2', values);
-          handleOk({ success: true, type: 'updata', data: values });
-        } else {
-          handleOk({ success: true, type: 'create', data: handleSubt(values) });
-        }
+        // if (current) {
+        //   values = { ...current, ...handleSubt(values) };
+        //   console.log('提交结果2', values);
+        //   handleOk({ success: true, type: 'updata', data: values });
+        // } else {
+        //   handleOk({ success: true, type: 'create', data: handleSubt(values) });
+        // }
       }}></SchemaForm>
   );
 };
