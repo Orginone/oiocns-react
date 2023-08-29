@@ -31,6 +31,6 @@ export type { IProperty } from './thing/property';
 export type { ISpecies } from './thing/species';
 export { UserProvider } from './user';
 export type { IWork } from './work';
-export type { IReport, IReportView } from './thing/report';
+export type { IReport } from './thing/report';
 export type { IWorkApply } from './work/apply';
 export type { IWorkTask } from './work/task';

@@ -92,14 +92,11 @@ Navigation/index.module.less //该组件样式入口
 
 ## css命名
 
-为了引入更方便，在module样式选择器命名我们采用`大驼峰命名法`
+为了引入更方便，在module样式选择器命名我们采用`小驼峰命名法`
 
 ```less
 
-.Navigation {
-
-    
-    
+.navigation {
     // 这里最终解析出 NavigationItem, 其实相当于BEM中的 `navigation-item`
     &Item {
       &Active {
