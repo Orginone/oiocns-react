@@ -1205,6 +1205,134 @@ export default class KernelApi {
       params: params,
     });
   }
+  /* ------------- 数据核相关操作 -------------- */
+  /**
+   * 对象数据获取
+   * @param {model.IdPageModel} params 请求参数
+   * @returns {model.ResultType<model.PageResult<schema.XWorkTask>>} 请求结果
+   */
+  public async objectGet(
+    params: model.IdPageModel,
+  ): Promise<model.ResultType<model.PageResult<schema.XWorkTask>>> {
+    return await this.request({
+      module: 'data',
+      action: 'ObjectGet',
+      params: params,
+    });
+  }
+  /**
+   * 对象数据变更
+   * @param {model.IdPageModel} params 请求参数
+   * @returns {model.ResultType<model.PageResult<schema.XWorkTask>>} 请求结果
+   */
+  public async objectSet(
+    params: model.IdPageModel,
+  ): Promise<model.ResultType<model.PageResult<schema.XWorkTask>>> {
+    return await this.request({
+      module: 'data',
+      action: 'ObjectSet',
+      params: params,
+    });
+  }
+  /**
+   * 对象数据删除
+   * @param {model.IdPageModel} params 请求参数
+   * @returns {model.ResultType<model.PageResult<schema.XWorkTask>>} 请求结果
+   */
+  public async objectDelete(
+    params: model.IdPageModel,
+  ): Promise<model.ResultType<model.PageResult<schema.XWorkTask>>> {
+    return await this.request({
+      module: 'data',
+      action: 'ObjectDelete',
+      params: params,
+    });
+  }
+  /**
+   * 集合数据新增
+   * @param {model.IdPageModel} params 请求参数
+   * @returns {model.ResultType<model.PageResult<schema.XWorkTask>>} 请求结果
+   */
+  public async collectionInsert(
+    params: model.IdPageModel,
+  ): Promise<model.ResultType<model.PageResult<schema.XWorkTask>>> {
+    return await this.request({
+      module: 'data',
+      action: 'CollectionInsert',
+      params: params,
+    });
+  }
+  /**
+   * 集合数据变更
+   * @param {model.IdPageModel} params 请求参数
+   * @returns {model.ResultType<model.PageResult<schema.XWorkTask>>} 请求结果
+   */
+  public async collectionUpdate(
+    params: model.IdPageModel,
+  ): Promise<model.ResultType<model.PageResult<schema.XWorkTask>>> {
+    return await this.request({
+      module: 'data',
+      action: 'CollectionUpdate',
+      params: params,
+    });
+  }
+  /**
+   * 集合数据移除
+   * @param {model.IdPageModel} params 请求参数
+   * @returns {model.ResultType<model.PageResult<schema.XWorkTask>>} 请求结果
+   */
+  public async collectionRemove(
+    params: model.IdPageModel,
+  ): Promise<model.ResultType<model.PageResult<schema.XWorkTask>>> {
+    return await this.request({
+      module: 'data',
+      action: 'CollectionRemove',
+      params: params,
+    });
+  }
+  /**
+   * 集合数据查询
+   * @param {model.IdPageModel} params 请求参数
+   * @returns {model.ResultType<model.PageResult<schema.XWorkTask>>} 请求结果
+   */
+  public async collectionLoad(
+    params: model.IdPageModel,
+  ): Promise<model.ResultType<model.PageResult<schema.XWorkTask>>> {
+    return await this.request({
+      module: 'data',
+      action: 'CollectionLoad',
+      params: params,
+    });
+  }
+  /**
+   * 集合数据查询管道
+   * @param {model.IdPageModel} params 请求参数
+   * @returns {model.ResultType<model.PageResult<schema.XWorkTask>>} 请求结果
+   */
+  public async collectionAggregate(
+    params: model.IdPageModel,
+  ): Promise<model.ResultType<model.PageResult<schema.XWorkTask>>> {
+    return await this.request({
+      module: 'data',
+      action: 'CollectionAggregate',
+      params: params,
+    });
+  }
+  /**
+   * 文件存储桶操作
+   * @param {model.IdPageModel} params 请求参数
+   * @returns {model.ResultType<model.PageResult<schema.XWorkTask>>} 请求结果
+   */
+  public async bucketOpreate(
+    params: model.IdPageModel,
+  ): Promise<model.ResultType<model.PageResult<schema.XWorkTask>>> {
+    return await this.request({
+      module: 'data',
+      action: 'BucketOpreate',
+      params: params,
+    });
+  }
+  /* ------------- 操作执行 -------------- */
   /**
    * 请求一个内核方法
    * @param {ForwardType} reqs 请求体

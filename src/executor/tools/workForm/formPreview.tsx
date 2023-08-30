@@ -5,9 +5,9 @@ import React from 'react';
 import FormRender, { useForm } from 'form-render';
 import { WorkFormRulesType } from '@/ts/core/work/rules/workFormRules';
 import moment from 'moment';
-import MyDivider from '@/components/Common/FormDesign/FormEdit/widgets/Divider';
-import MySpace from '@/components/Common/FormDesign/FormEdit/widgets/Space';
-
+import MyDivider from '@/components/Common/FormEdit/widgets/Divider';
+import MySpace from '@/components/Common/FormEdit/widgets/Space';
+import { Tabs } from 'antd';
 interface IProps {
   allowEdit: boolean;
   belong: IBelong;
@@ -39,21 +39,25 @@ const FormRenders: React.FC<IProps> = (props) => {
       });
     }
 
-    //初始化数据
-    props?.ruleService?.setFormChangeCallback(form.id, (data: any) => {
-      console.log('@@', data);
-      const timeFormatRegex = /^\d{4}\/\d{1,2}\/\d{1,2} \d{1,2}:\d{1,2}$/;
-      //如果是时间格式需要转换
-
-      const keys = Object.keys(data);
-      for (const key of keys) {
-        const value = data[key];
-        if (timeFormatRegex.test(value)) {
-          data[key] = moment(value).format('YYYY-MM-DD HH:mm:ss');
+    if (props.allowEdit) {
+      //初始化数据
+      props?.ruleService?.setFormChangeCallback(form.id, (data: any) => {
+        const timeFormatRegex = /^\d{4}\/\d{1,2}\/\d{1,2} \d{1,2}:\d{1,2}$/;
+        //如果是时间格式需要转换
+        if (data) {
+          const keys = Object.keys(data);
+          for (const key of keys) {
+            const value = data[key];
+            if (timeFormatRegex.test(value)) {
+              data[key] = moment(value).format('YYYY-MM-DD HH:mm:ss');
+            }
+          }
+          formIns.setValues(data);
         }
-      }
+      });
+    } else {
       formIns.setValues(data);
-    });
+    }
   }, []);
   if (!data) return <></>;
   const watch = {
@@ -88,4 +92,24 @@ const FormRenders: React.FC<IProps> = (props) => {
   });
 };
 
-export default FormRenders;
+const FormRendersTabs: React.FC<IProps> = (props) => {
+  if (props.forms.length < 1) return <></>;
+  const [activeTabKey, setActiveTabKey] = useState(props.forms[0].id);
+  const loadItems = () => {
+    return props.forms.map((form) => {
+      return {
+        key: form.id,
+        label: form.name,
+        children: <FormRenders {...props} forms={[form]} />,
+      };
+    });
+  };
+  return (
+    <Tabs
+      items={loadItems()}
+      activeKey={activeTabKey}
+      onChange={(key) => setActiveTabKey(key)}
+    />
+  );
+};
+export default FormRendersTabs;
