@@ -36,10 +36,10 @@ const FormEditModal: React.FC<IProps> = ({
 
   // 创建ref
   const myComponentRef: any = useRef(null);
-  const onCloseFormModle = () => {
-    onFormSchemaChange(myComponentRef.current.getValue());
-    finished();
-  };
+  // const onCloseFormModle = () => {
+  //   onFormSchemaChange(myComponentRef.current.getValue());
+  //   finished();
+  // };
   const onFormSchemaChange = (e: schemaType) => {
     const ruleInfo = JSON.parse(current.metadata.rule || '{}');
     current.update({

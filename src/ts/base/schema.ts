@@ -529,20 +529,6 @@ export type XWorkTask = {
   instance: XWorkInstance | undefined;
 } & Xbase;
 
-//报表定义
-export type XReport = {
-  // 报表布局
-  rule: string;
-  // 目录ID
-  directoryId: string;
-  // 报表的特性
-  attributes: XAttribute[] | undefined;
-  // 使用报表的流程节点
-  bindNodes: XWorkNode[] | undefined;
-  // 报表的目录
-  directory: XDirectory | undefined;
-} & XEntity;
-
 /* 表单规则类型 */
 export type XFormRule = {
   id: string;
@@ -610,3 +596,56 @@ export type AttrRuleType = {
   /*  设计展示数据 */
   schema: any;
 };
+//报表定义
+export type XReport = {
+  // 报表布局
+  rule: string;
+  // 目录ID
+  directoryId: string;
+  // 报表的特性
+  attributes: XAttribute[] | undefined;
+  // 使用报表的流程节点
+  bindNodes: XWorkNode[] | undefined;
+  // 报表的目录
+  directory: XDirectory | undefined;
+} & XEntity;
+
+// 文件项
+export type XFileInfo = {
+  directoryId: string;
+  collName: string;
+} & XEntity;
+
+// 请求定义
+export type XRequest = {
+  axios: any;
+  params: readonly any[];
+  headers: readonly any[];
+  curTab: string;
+} & XFileInfo;
+
+// 链接定义
+export type XLink = {
+  data: any;
+} & XFileInfo;
+
+// 环境定义
+export type XEnvironment = {
+  [key: string]: string;
+} & XFileInfo;
+
+// 映射定义
+export type XMapping = {
+  sourceForm: XForm;
+  sourceAttrs: XAttribute[];
+  targetForm: XForm;
+  targetAttrs: XAttribute[];
+  mappings: {
+    sourceAttr: XAttribute;
+    targetAttr: XAttribute;
+    options?: { [key: string]: string };
+  }[];
+} & XFileInfo;
+
+// 脚本配置
+export type XExecutable = XFileInfo;

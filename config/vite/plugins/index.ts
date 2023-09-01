@@ -8,6 +8,7 @@ import legacy from '@vitejs/plugin-legacy';
 import react from '@vitejs/plugin-react';
 import type { PluginOption } from 'vite';
 import viteCompression from 'vite-plugin-compression';
+import svgr from 'vite-plugin-svgr';
 
 import {
   VITE_APP_ANALYZE,
@@ -50,6 +51,11 @@ export function createVitePlugins(viteEnv: string, isBuild: boolean) {
         viteCompression({ deleteOriginFile: VITE_APP_COMPRESS_GZIP_DELETE_FILE }),
       );
   }
-
+  vitePlugins.push(
+    svgr({
+      include: '**/*.svg',
+      svgrOptions: { icon: true },
+    }),
+  );
   return vitePlugins;
 }

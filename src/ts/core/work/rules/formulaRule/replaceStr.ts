@@ -56,7 +56,7 @@ const formAttrResolver = async (
   if (!ruleStr) {
     return '';
   }
-  const replacedStr = await ruleAttrs
+  const replacedStr = ruleAttrs
     .map((_str) => getChartcterContent(_str))
     .reduce((ruleContent, item) => {
       //在attrs数组中查找是否有name等于item的对象
