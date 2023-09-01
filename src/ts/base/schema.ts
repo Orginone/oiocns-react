@@ -580,6 +580,8 @@ export type XRequest = {
   params: readonly any[];
   headers: readonly any[];
   curTab: string;
+  envId?: string;
+  suffixExec?: string;
 } & XFileInfo;
 
 // 链接定义
@@ -589,7 +591,7 @@ export type XLink = {
 
 // 环境定义
 export type XEnvironment = {
-  [key: string]: string;
+  kvs: { [key: string]: string | undefined };
 } & XFileInfo;
 
 // 映射定义
@@ -606,4 +608,6 @@ export type XMapping = {
 } & XFileInfo;
 
 // 脚本配置
-export type XExecutable = XFileInfo;
+export type XExecutable = {
+  coder: string;
+} & XFileInfo;

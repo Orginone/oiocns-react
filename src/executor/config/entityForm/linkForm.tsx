@@ -33,7 +33,7 @@ const LinkModal: React.FC<IProps> = ({ current, finished }) => {
   return (
     <SchemaForm<XLink>
       open
-      title="请求配置"
+      title="链接定义"
       width={640}
       columns={columns}
       rowProps={{
@@ -46,6 +46,7 @@ const LinkModal: React.FC<IProps> = ({ current, finished }) => {
         }
       }}
       onFinish={async (values) => {
+        values.typeName = "链接";
         let request = await current.createConfig(ConfigColl.RequestLinks, values);
         finished(request as ILink);
       }}
