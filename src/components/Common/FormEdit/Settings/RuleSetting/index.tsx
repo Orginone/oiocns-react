@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { List } from 'antd';
+import { List, message } from 'antd';
 import Icon, { PlusCircleOutlined, RollbackOutlined } from '@ant-design/icons';
 import CreateModal from './createModal';
 interface listType {
@@ -13,7 +13,7 @@ const RuleList: React.FC<listType> = ({ current, activeKey, selectedFiled }) => 
   const [cerateVisible, setcreateVisible] = useState<boolean>(false);
   const [dataSource, setDataSource] = useState<any[]>([]);
   const [selected, setSelecetd] = useState<any>({});
-  // console.log(555, selectedFiled, current);
+  const [loading, setLoading] = useState<boolean>(false);
 
   // // 布局改变
   // const layoutChange = (value: any) => {
@@ -29,7 +29,6 @@ const RuleList: React.FC<listType> = ({ current, activeKey, selectedFiled }) => 
   //   });
   // };
 
-
   useEffect(() => {
     if (metadata) {
       const list = JSON?.parse(metadata?.rule ?? '{}')?.list;
@@ -43,6 +42,56 @@ const RuleList: React.FC<listType> = ({ current, activeKey, selectedFiled }) => 
       setcreateVisible(false);
     }
   }, [activeKey]);
+
+  async function handleRuleInfoUpdata(
+    type: 'updata' | 'create' | 'delete',
+    ruleInfo: Record<string, any>,
+  ) {
+    setLoading(true);
+    const oriRuleInfo = JSON.parse(current.metadata.rule || '{}');
+    let RuleList = oriRuleInfo.list ?? [];
+    let canContinue = false;
+
+    switch (type) {
+      case 'updata':
+        RuleList = RuleList.map((item: any) => {
+          if (item.code === ruleInfo.code) {
+            canContinue = true;
+            return ruleInfo;
+          }
+          return item;
+        });
+        break;
+      case 'create':
+        canContinue = true;
+        RuleList.push(ruleInfo);
+        break;
+      case 'delete':
+        canContinue = true;
+        RuleList = RuleList.filter((item: any) => item.code !== ruleInfo.code);
+        break;
+
+      default:
+        break;
+    }
+
+    if (!canContinue) {
+      message.warning('规则编码未匹配，请检查');
+      setLoading(false);
+      return false;
+    } else {
+      await current.update({
+        ...current.metadata,
+        rule: JSON.stringify({
+          ...oriRuleInfo,
+          list: RuleList,
+        }),
+      });
+      setLoading(false);
+      setcreateVisible(false);
+      setDataSource(RuleList);
+    }
+  }
   const RenderHeader = (
     <div className="flex justify-between" style={{ padding: '0 10px' }}>
       <span>规则列表</span>
@@ -83,11 +132,12 @@ const RuleList: React.FC<listType> = ({ current, activeKey, selectedFiled }) => 
         />
       ) : (
         <CreateModal
-          open={true}
           fields={fields}
           targetId={selectedFiled?.id}
           defaultValue={selected}
+          loading={loading}
           setOpen={setcreateVisible}
+          handleOk={handleRuleInfoUpdata}
           // current={props.schema.current}
         />
       )}

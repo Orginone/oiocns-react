@@ -7,11 +7,12 @@ import { getColumns } from './config';
 import dayjs from 'dayjs';
 import { schema } from '@/ts/base';
 interface Iprops {
-  open: boolean;
   setOpen: any;
   targetId?: string; //当前选中的特性
   fields: schema.XAttribute[];
   defaultValue?: any; //修改数据
+  loading: boolean;
+  handleOk: (type: 'updata' | 'create' | 'delete', data: Record<string, any>) => void;
 }
 
 /*
@@ -19,7 +20,7 @@ interface Iprops {
 */
 const FormRuleModal = (props: Iprops) => {
   const formRef = useRef<ProFormInstance>();
-  const { setOpen, fields, open, handleCancel, defaultValue, targetId } = props;
+  const { setOpen, fields, handleOk, defaultValue, loading, targetId } = props;
   const [defaultCode, setDefaultCode] = useState<string>('');
   useEffect(() => {
     setDefaultCode(dayjs().unix() + '');
@@ -30,10 +31,9 @@ const FormRuleModal = (props: Iprops) => {
       case 'templateId':
         {
           const info = DefaultRules.find((v) => v.id === val['templateId'])!;
-          formRef.current?.setFieldsValue({
+          const params: any = {
             errMsg: info.errorMsg,
             remark: info.remark,
-            targetId: info.targetId,
             linkAttrs: info.linkAttrs.map((it: any) => {
               return {
                 val: it.val,
@@ -41,7 +41,11 @@ const FormRuleModal = (props: Iprops) => {
                 name: it.name,
               };
             }),
-          });
+          };
+          if (info.targetId) {
+            params.targetId = info.targetId;
+          }
+          formRef.current?.setFieldsValue(params);
         }
         break;
       case 'modalType':
@@ -53,7 +57,7 @@ const FormRuleModal = (props: Iprops) => {
         break;
     }
   };
-  const handleSubt = (values: { [key: string]: any }) => {
+  const handleSubt: any = (values: { [key: string]: any }) => {
     const { templateId, linkAttrs } = values;
     try {
       const info = DefaultRules.find((v) => v.id === templateId)!;
@@ -73,8 +77,8 @@ const FormRuleModal = (props: Iprops) => {
   return (
     <SchemaForm<XFormRule>
       formRef={formRef}
+      loading={loading}
       title={defaultValue ? `编辑[${defaultValue.name}]规则` : '新增规则'}
-      open={open}
       style={{ padding: '10px', minwidth: '200px' }}
       layoutType="Form"
       columns={getColumns(fields, DefaultRules)}
@@ -85,7 +89,7 @@ const FormRuleModal = (props: Iprops) => {
       modalprops={{ maskClosable: false }}
       key={targetId ?? defaultValue?.code ?? defaultCode}
       // initialValues={current?.name ? current : { code: defaultCode }}
-      initialValues={targetId ? { targetId } : defaultValue}
+      initialValues={defaultValue?.code ? defaultValue : targetId ? { targetId } : {}}
       onOpenChange={(open: boolean) => {
         if (!open) {
           formRef.current?.resetFields();
@@ -93,15 +97,15 @@ const FormRuleModal = (props: Iprops) => {
         }
       }}
       onFinish={async (values) => {
-        console.log('提交数据', values, handleSubt(values));
-        // if (current) {
-        //   values = { ...current, ...handleSubt(values) };
-        //   console.log('提交结果2', values);
-        //   handleOk({ success: true, type: 'updata', data: values });
-        // } else {
-        //   handleOk({ success: true, type: 'create', data: handleSubt(values) });
-        // }
-      }}></SchemaForm>
+        // console.log('提交数据', values, handleSubt(values));
+        if (defaultValue?.code) {
+          values = { ...defaultValue, ...handleSubt(values) };
+          handleOk('updata', values);
+        } else {
+          handleOk('create', handleSubt(values));
+        }
+      }}
+      open={false}></SchemaForm>
   );
 };
 

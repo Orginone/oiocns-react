@@ -26,7 +26,7 @@ const Settings: React.FC<SettingsType> = ({
   console.log('选择组件', selectedFiled);
 
   const _curentField: any = current.attributes?.find(
-    (attr: { id: string }) => attr.id === selectedFiled?.$id?.replace('#/', ''),
+    (attr: { id: string }) => attr.id === selectedFiled?.$id?.split('/')?.at(-1),
   );
   /* 计算拖动宽度设置 */
   const renderWidth = () => {
@@ -39,7 +39,7 @@ const Settings: React.FC<SettingsType> = ({
     return '40%';
   };
   /* 监听变化，修改设计器状态 */
-  const handleValueChange = (changeVal: any) => {
+  const handleValueChange = (changeVal: Record<string, any>) => {
     const OriScame = scameRef?.current?.getValue();
     scameRef?.current?.setValue({ ...OriScame, ...changeVal });
   };

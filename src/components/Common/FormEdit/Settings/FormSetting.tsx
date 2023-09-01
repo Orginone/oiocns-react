@@ -19,7 +19,6 @@ const FormSetting: React.FC<FormSettingType> = ({ comp, OnFormChange }) => {
     onValuesChange({ labelWidth: newValue });
   };
   const onValuesChange = debounce((changeVal: any) => {
-    console.log('表单变化', changeVal);
     OnFormChange(changeVal);
   }, 500);
   return (

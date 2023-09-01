@@ -4,13 +4,13 @@ import cls from './index.module.less';
 import FullScreenModal from '@/executor/tools/fullScreen';
 import { IForm } from '@/ts/core';
 import Generator, { defaultSettings } from 'fr-generator';
-import { schemaType } from '@/ts/base/schema';
+import { scameType } from '@/ts/base/scame';
 import getDefaultCommonSettings from './setting.js';
 import MyDivider from './widgets/Divider';
 import MySpace from './widgets/Space';
 import ProFormPerson from './widgets/ProFormPerson';
 import { Setting, SettingWidget } from '@/ts/core/work/design';
-import { XAttribute } from '@/ts/base/schema';
+import { XAttribute } from '@/ts/base/scame';
 import { Input } from 'antd';
 import PageSetting from './Settings';
 import { Resizable } from 'devextreme-react';
@@ -20,7 +20,7 @@ type IProps = {
   current: IForm;
   finished: () => void;
   editFormOpen: boolean;
-  defaultSchema: schemaType;
+  defaultSchema: scameType;
 };
 
 /**
@@ -44,23 +44,21 @@ const FormEditModal: React.FC<IProps> = ({
     onFormSchemaChange(myComponentRef.current.getValue());
     finished();
   };
-  const onFormSchemaChange = (e: schemaType) => {
+  const onFormSchemaChange = (e: scameType) => {
     const ruleInfo = JSON.parse(current.metadata.rule || '{}');
-    console.log('输出scame', ruleInfo, e);
-    // current.update({
-    //   ...current.metadata,
-    //   rule: JSON.stringify({
-    //     ...ruleInfo,
-    //     schema: e,
-    //   }),
-    // });
+    console.log('输出scame', '============', e);
+    current.update({
+      ...current.metadata,
+      rule: JSON.stringify({
+        ...ruleInfo,
+        scame: e,
+      }),
+    });
   };
 
-  //页面重载获取默认schema或者配置后的schema
+  //页面重载获取默认scame或者配置后的scame
 
   const onClickDelete = async (e: any) => {
-    console.log('7777', e);
-
     const item: any = current.attributes
       .map((item: XAttribute) => {
         if (item.id === e.$id.replace('#/', '')) {
@@ -92,7 +90,7 @@ const FormEditModal: React.FC<IProps> = ({
     {
       text: '评分',
       name: 'rate',
-      schema: {
+      scame: {
         title: '评分',
         type: 'string',
         widget: 'rate',
@@ -112,7 +110,7 @@ const FormEditModal: React.FC<IProps> = ({
     {
       text: 'HTML',
       name: 'html',
-      schema: {
+      scame: {
         title: 'HTML',
         type: 'string',
         widget: 'html',
@@ -132,7 +130,7 @@ const FormEditModal: React.FC<IProps> = ({
     {
       text: '分割线',
       name: 'divider',
-      schema: {
+      scame: {
         title: '',
         type: 'string',
         widget: 'MyDivider',
@@ -145,7 +143,7 @@ const FormEditModal: React.FC<IProps> = ({
     {
       text: '人员',
       name: 'ProFormPerson',
-      schema: {
+      scame: {
         title: '人员',
         type: 'string',
         widget: 'ProFormPerson',
@@ -159,7 +157,7 @@ const FormEditModal: React.FC<IProps> = ({
     {
       text: '间距',
       name: 'space',
-      schema: {
+      scame: {
         title: '',
         type: 'string',
         widget: 'MySpace',
@@ -187,6 +185,8 @@ const FormEditModal: React.FC<IProps> = ({
           onChange={(data) => console.log('data:change', data)}
           onSchemaChange={onFormSchemaChange}
           settings={setting}
+          allCollapsed={false}
+          debug
           extraButtons={[
             true,
             false,
@@ -208,13 +208,15 @@ const FormEditModal: React.FC<IProps> = ({
           widgets={{ MyDivider, MySpace, ProFormPerson }}
           commonSettings={commonSettings}
           ref={myComponentRef}
-          fieldRender={(_schema, _widgetProps, _children, originNode) => {
+          onCanvasSelect={(v) => console.log(v)}
+          fieldRender={(_scame, _widgetProps, _children, originNode) => {
             return originNode;
           }}
-          fieldWrapperRender={(schema, isSelected, _children, originNode) => {
-            if (isSelected && selectedItem.title !== schema.title) {
+          fieldWrapperRender={(scame, isSelected, _children, originNode) => {
+            //&& selectedItem.title !== scame.title
+            if (isSelected && selectedItem.title !== scame.title) {
               /* 收集当前选中项 */
-              setSelectedItem(schema);
+              setSelectedItem(scame);
             }
             return originNode;
           }}>

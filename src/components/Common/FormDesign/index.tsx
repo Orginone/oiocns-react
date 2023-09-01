@@ -54,9 +54,11 @@ const Design: React.FC<IProps> = ({ current }) => {
   };
   const currentToSchemaFun = () => {
     //如果配置过
-    // if (rules && JSON.stringify(rules) !== '{}') {
-    //   return rules.schema;
-    // } else {
+    if (rules && JSON.stringify(rules) !== '{}') {
+      console.log('获取已保存的scame', rules.schema);
+      return rules.schema;
+    }
+    //  else {
     //没有配置过
     const schema: schemaType = {
       displayType: 'row',
