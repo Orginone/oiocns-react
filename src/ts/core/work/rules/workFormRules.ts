@@ -28,7 +28,7 @@ export type WorkFormRulesType = {
   // /* 初始化规则*/
   // initFormRules: (forms: any[]) => void;
   /* 表单渲染时，需提交表单修改方式 至此，用于规则处理后的回显：考虑返回规则执行结果，到页面处理渲染逻辑*/
-  setFormChangeCallback: (formId: string, callback: () => DataType) => void;
+  setFormChangeCallback: (formId: string, callback: (data: any) => any) => void;
   /* 加载表单远程规则*/
   loadRemoteRules: (path: string) => Promise<void>;
   /* 处理表单规则，需提供表单标识，表单数据，当前修改数据等*/

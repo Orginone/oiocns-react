@@ -7,7 +7,7 @@ import { WorkFormRulesType } from '@/ts/core/work/rules/workFormRules';
 import moment from 'moment';
 import MyDivider from '@/components/Common/FormEdit/widgets/Divider';
 import MySpace from '@/components/Common/FormEdit/widgets/Space';
-import { Input, InputNumber, Tabs } from 'antd';
+import { InputNumber, Tabs } from 'antd';
 import ProFormPerson from '@/components/Common/FormEdit/widgets/ProFormPerson';
 import ProFormDept from '@/components/Common/FormEdit/widgets/ProFormDept';
 interface IProps {
