@@ -567,3 +567,43 @@ export type XReport = {
   // 报表的目录
   directory: XDirectory | undefined;
 } & XEntity;
+
+// 文件项
+export type XFileInfo = {
+  directoryId: string;
+  collName: string;
+} & XEntity;
+
+// 请求定义
+export type XRequest = {
+  axios: any;
+  params: readonly any[];
+  headers: readonly any[];
+  curTab: string;
+} & XFileInfo;
+
+// 链接定义
+export type XLink = {
+  data: any;
+} & XFileInfo;
+
+// 环境定义
+export type XEnvironment = {
+  [key: string]: string;
+} & XFileInfo;
+
+// 映射定义
+export type XMapping = {
+  sourceForm: XForm;
+  sourceAttrs: XAttribute[];
+  targetForm: XForm;
+  targetAttrs: XAttribute[];
+  mappings: {
+    sourceAttr: XAttribute;
+    targetAttr: XAttribute;
+    options?: { [key: string]: string };
+  }[];
+} & XFileInfo;
+
+// 脚本配置
+export type XExecutable = XFileInfo;

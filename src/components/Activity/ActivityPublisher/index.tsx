@@ -2,19 +2,28 @@ import React, { useState } from 'react';
 import FullScreenModal from '@/executor/tools/fullScreen';
 import { Button, Form, Input } from 'antd';
 import ImageUploader from '@/components/ImageUploader';
-import { IBelong, ISysFileInfo } from '@/ts/core';
+import { ISysFileInfo, ITarget } from '@/ts/core';
+
 export interface Activity {
   content: string;
   imageList: ISysFileInfo[];
+  likes: number;
+  comments: Activity[];
+  tags: string[];
+  space: ITarget;
 }
 const ActivityPublisher: React.FC<{
   open: boolean;
-  space: IBelong;
+  space: ITarget;
   finish: () => void;
 }> = (props) => {
   const [activity, setActivity] = useState<Activity>({
     content: '',
     imageList: [],
+    likes: 0,
+    space: props.space,
+    comments: [],
+    tags: [],
   });
   const publishActivity = () => {
     console.log(activity);
