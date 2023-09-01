@@ -75,7 +75,7 @@ const FormRuleModal = (props: Iprops) => {
       formRef={formRef}
       title={defaultValue ? `编辑[${defaultValue.name}]规则` : '新增规则'}
       open={open}
-      style={{ padding: '10px' }}
+      style={{ padding: '10px', minwidth: '200px' }}
       layoutType="Form"
       columns={getColumns(fields, DefaultRules)}
       rowProps={{
@@ -93,7 +93,7 @@ const FormRuleModal = (props: Iprops) => {
         }
       }}
       onFinish={async (values) => {
-        // console.log('提交数据',values, handleSubt(values));
+        console.log('提交数据', values, handleSubt(values));
         // if (current) {
         //   values = { ...current, ...handleSubt(values) };
         //   console.log('提交结果2', values);

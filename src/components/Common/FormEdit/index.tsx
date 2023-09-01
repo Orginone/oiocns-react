@@ -13,6 +13,8 @@ import { Setting, SettingWidget } from '@/ts/core/work/design';
 import { XAttribute } from '@/ts/base/schema';
 import { Input } from 'antd';
 import PageSetting from './Settings';
+import { Resizable } from 'devextreme-react';
+import { DeleteOutlined } from '@ant-design/icons';
 const { Provider, Sidebar, Canvas, Settings } = Generator;
 type IProps = {
   current: IForm;
@@ -33,7 +35,8 @@ const FormEditModal: React.FC<IProps> = ({
 }) => {
   const [commonSettings, setCommonSettings] = useState<any>({});
   const [selectedItem, setSelectedItem] = useState<any>({});
-  console.log('@@@', current, current.fields, commonSettings);
+  const [mainWidth, setMainWidth] = useState<string | number>('40%');
+  // console.log('@@@', current, current.fields, commonSettings);
 
   // 创建ref
   const myComponentRef: any = useRef(null);
@@ -43,19 +46,21 @@ const FormEditModal: React.FC<IProps> = ({
   };
   const onFormSchemaChange = (e: schemaType) => {
     const ruleInfo = JSON.parse(current.metadata.rule || '{}');
-    console.log('输出scame', e);
-    current.update({
-      ...current.metadata,
-      rule: JSON.stringify({
-        ...ruleInfo,
-        schema: e,
-      }),
-    });
+    console.log('输出scame', ruleInfo, e);
+    // current.update({
+    //   ...current.metadata,
+    //   rule: JSON.stringify({
+    //     ...ruleInfo,
+    //     schema: e,
+    //   }),
+    // });
   };
 
   //页面重载获取默认schema或者配置后的schema
 
   const onClickDelete = async (e: any) => {
+    console.log('7777', e);
+
     const item: any = current.attributes
       .map((item: XAttribute) => {
         if (item.id === e.$id.replace('#/', '')) {
@@ -65,9 +70,9 @@ const FormEditModal: React.FC<IProps> = ({
       .filter((itemFl: any) => {
         return itemFl && itemFl.id;
       });
-    if (await current.deleteAttribute(item[0])) {
-      return true;
-    }
+    // if (await current.deleteAttribute(item[0])) {
+    //   return true;
+    // }
   };
   const copyObj = (obj = {} as any) => {
     //变量先置空
@@ -166,7 +171,6 @@ const FormEditModal: React.FC<IProps> = ({
   ];
 
   const setting = [defaultSettings[2], settings];
-  console.log('@@', defaultSettings, setting, commonSettings);
   return (
     <FullScreenModal
       open={editFormOpen}
@@ -199,6 +203,7 @@ const FormEditModal: React.FC<IProps> = ({
             },
           ]}
           canDelete={onClickDelete}
+          controlButtons={[true, false]}
           hideId
           widgets={{ MyDivider, MySpace, ProFormPerson }}
           commonSettings={commonSettings}
@@ -214,19 +219,27 @@ const FormEditModal: React.FC<IProps> = ({
             return originNode;
           }}>
           <div className="fr-generator-container">
-            <div style={{ width: '10%' }}>
+            <div style={{ width: '280px' }}>
               <Sidebar fixedName />
             </div>
-            <div style={{ width: '40%' }}>
+            <Resizable
+              handles={'right'}
+              width={mainWidth}
+              onResize={(e) => {
+                setMainWidth(e.width);
+              }}>
               <Canvas />
-            </div>
-            <div style={{ width: '50%' }}>
-              <PageSetting current={current} selectedFiled={selectedItem} />
-            </div>
+            </Resizable>
+            <PageSetting
+              current={current}
+              selectedFiled={selectedItem}
+              scameRef={myComponentRef}
+              canvasWidth={mainWidth as number}
+              comp={<Settings />}
+            />
           </div>
         </Provider>
       </div>
-      {/* <div className={cls['page-content-table']}>{content()}</div> */}
     </FullScreenModal>
   );
 };
