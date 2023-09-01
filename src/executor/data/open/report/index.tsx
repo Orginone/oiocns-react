@@ -33,7 +33,6 @@ const ReportView: React.FC<IProps> = ({ current, finished }) => {
     }
     const result = await kernel.anystore.loadThing<any>(current.belongId, request);
     if (result.success) {
-      console.log(result,'result')
       setDataInfo(result.data)
       setInfo(result.data?.data[0])
     } else {
