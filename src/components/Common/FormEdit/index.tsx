@@ -29,7 +29,6 @@ const FormEditModal: React.FC<IProps> = ({
   defaultSchema,
   editFormOpen = false,
 }) => {
-  const [commonSettings, setCommonSettings] = useState<any>({});
   const [selectedItem, setSelectedItem] = useState<any>({});
   const [mainWidth, setMainWidth] = useState<string | number>('40%');
   // console.log('@@@', current, current.fields, commonSettings);
@@ -201,12 +200,12 @@ const FormEditModal: React.FC<IProps> = ({
           controlButtons={[true, false]}
           hideId
           widgets={{ MyDivider, MySpace, ProFormPerson, person: ProFormPerson }}
-          commonSettings={commonSettings}
+          commonSettings={{}}
           ref={myComponentRef}
           onCanvasSelect={(v) => console.log(v)}
-          fieldRender={(_schema, _widgetProps, _children, originNode) => {
-            return originNode;
-          }}
+          // fieldRender={(_schema, _widgetProps, _children, originNode) => {
+          //   return originNode;
+          // }}
           fieldWrapperRender={(schema, isSelected, _children, originNode) => {
             //&& selectedItem.title !== schema.title
             if (isSelected && selectedItem.title !== schema.title) {
