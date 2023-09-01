@@ -9,25 +9,11 @@ interface listType {
 }
 const RuleList: React.FC<listType> = ({ current, activeKey, selectedFiled }) => {
   // const { metadata, fields, update } = props.schema;
-  const { metadata, fields, update } = current;
+  const { metadata, fields } = current;
   const [cerateVisible, setcreateVisible] = useState<boolean>(false);
   const [dataSource, setDataSource] = useState<any[]>([]);
   const [selected, setSelecetd] = useState<any>({});
   const [loading, setLoading] = useState<boolean>(false);
-
-  // // 布局改变
-  // const layoutChange = (value: any) => {
-  //   const newFormLayout = { ...formLayout, ...value };
-  //   setFormLayout(newFormLayout);
-  //   current.metadata.rule = current.metadata.rule || '{}';
-  //   current.update({
-  //     ...current.metadata,
-  //     rule: JSON.stringify({
-  //       ...JSON.parse(current.metadata.rule),
-  //       ...newFormLayout,
-  //     }),
-  //   });
-  // };
 
   useEffect(() => {
     if (metadata) {

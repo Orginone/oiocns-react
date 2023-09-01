@@ -109,6 +109,14 @@ export const loadWidgetsOpts = (valueType: string = '描述型') => {
           label: '链接',
           value: 'url',
         },
+        {
+          label: '人员',
+          value: 'person',
+        },
+        {
+          label: '部门',
+          value: 'dept',
+        },
       ];
   }
 };

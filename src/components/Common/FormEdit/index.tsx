@@ -4,23 +4,19 @@ import cls from './index.module.less';
 import FullScreenModal from '@/executor/tools/fullScreen';
 import { IForm } from '@/ts/core';
 import Generator, { defaultSettings } from 'fr-generator';
-import { scameType } from '@/ts/base/scame';
-import getDefaultCommonSettings from './setting.js';
 import MyDivider from './widgets/Divider';
 import MySpace from './widgets/Space';
 import ProFormPerson from './widgets/ProFormPerson';
-import { Setting, SettingWidget } from '@/ts/core/work/design';
-import { XAttribute } from '@/ts/base/scame';
-import { Input } from 'antd';
+import { XAttribute, schemaType } from '@/ts/base/schema';
 import PageSetting from './Settings';
 import { Resizable } from 'devextreme-react';
-import { DeleteOutlined } from '@ant-design/icons';
-const { Provider, Sidebar, Canvas, Settings } = Generator;
+const { Provider, Sidebar, Canvas } = Generator;
+// Settings
 type IProps = {
   current: IForm;
   finished: () => void;
   editFormOpen: boolean;
-  defaultSchema: scameType;
+  defaultSchema: schemaType;
 };
 
 /**
@@ -44,19 +40,18 @@ const FormEditModal: React.FC<IProps> = ({
     onFormSchemaChange(myComponentRef.current.getValue());
     finished();
   };
-  const onFormSchemaChange = (e: scameType) => {
+  const onFormSchemaChange = (e: schemaType) => {
     const ruleInfo = JSON.parse(current.metadata.rule || '{}');
-    console.log('输出scame', '============', e);
     current.update({
       ...current.metadata,
       rule: JSON.stringify({
         ...ruleInfo,
-        scame: e,
+        schema: e,
       }),
     });
   };
 
-  //页面重载获取默认scame或者配置后的scame
+  //页面重载获取默认schema或者配置后的schema
 
   const onClickDelete = async (e: any) => {
     const item: any = current.attributes
@@ -68,9 +63,9 @@ const FormEditModal: React.FC<IProps> = ({
       .filter((itemFl: any) => {
         return itemFl && itemFl.id;
       });
-    // if (await current.deleteAttribute(item[0])) {
-    //   return true;
-    // }
+    if (await current.deleteAttribute(item[0])) {
+      return true;
+    }
   };
   const copyObj = (obj = {} as any) => {
     //变量先置空
@@ -90,7 +85,7 @@ const FormEditModal: React.FC<IProps> = ({
     {
       text: '评分',
       name: 'rate',
-      scame: {
+      schema: {
         title: '评分',
         type: 'string',
         widget: 'rate',
@@ -110,7 +105,7 @@ const FormEditModal: React.FC<IProps> = ({
     {
       text: 'HTML',
       name: 'html',
-      scame: {
+      schema: {
         title: 'HTML',
         type: 'string',
         widget: 'html',
@@ -130,7 +125,7 @@ const FormEditModal: React.FC<IProps> = ({
     {
       text: '分割线',
       name: 'divider',
-      scame: {
+      schema: {
         title: '',
         type: 'string',
         widget: 'MyDivider',
@@ -143,7 +138,7 @@ const FormEditModal: React.FC<IProps> = ({
     {
       text: '人员',
       name: 'ProFormPerson',
-      scame: {
+      schema: {
         title: '人员',
         type: 'string',
         widget: 'ProFormPerson',
@@ -157,7 +152,7 @@ const FormEditModal: React.FC<IProps> = ({
     {
       text: '间距',
       name: 'space',
-      scame: {
+      schema: {
         title: '',
         type: 'string',
         widget: 'MySpace',
@@ -205,18 +200,18 @@ const FormEditModal: React.FC<IProps> = ({
           canDelete={onClickDelete}
           controlButtons={[true, false]}
           hideId
-          widgets={{ MyDivider, MySpace, ProFormPerson }}
+          widgets={{ MyDivider, MySpace, ProFormPerson, person: ProFormPerson }}
           commonSettings={commonSettings}
           ref={myComponentRef}
           onCanvasSelect={(v) => console.log(v)}
-          fieldRender={(_scame, _widgetProps, _children, originNode) => {
+          fieldRender={(_schema, _widgetProps, _children, originNode) => {
             return originNode;
           }}
-          fieldWrapperRender={(scame, isSelected, _children, originNode) => {
-            //&& selectedItem.title !== scame.title
-            if (isSelected && selectedItem.title !== scame.title) {
+          fieldWrapperRender={(schema, isSelected, _children, originNode) => {
+            //&& selectedItem.title !== schema.title
+            if (isSelected && selectedItem.title !== schema.title) {
               /* 收集当前选中项 */
-              setSelectedItem(scame);
+              setSelectedItem(schema);
             }
             return originNode;
           }}>
@@ -235,9 +230,9 @@ const FormEditModal: React.FC<IProps> = ({
             <PageSetting
               current={current}
               selectedFiled={selectedItem}
-              scameRef={myComponentRef}
+              schemaRef={myComponentRef}
               canvasWidth={mainWidth as number}
-              comp={<Settings />}
+              // comp={<Settings />}
             />
           </div>
         </Provider>

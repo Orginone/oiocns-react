@@ -27,8 +27,6 @@ const DetailTable: React.FC<IProps> = (props) => {
   const [selectKeys, setSelectKeys] = useState<string[]>([]);
   useEffect(() => {
     props.onChanged?.apply(this, [form.id, formData]);
-    console.log('props.ruleService', props.ruleService);
-    
     props.ruleService?.resloveFormRule(RuleTriggers.ThingsChanged, {
       id: form.id,
       data: formData,

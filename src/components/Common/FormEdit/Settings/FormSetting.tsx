@@ -1,25 +1,47 @@
-import React, { useState } from 'react';
-import { Col, Form, Input, InputNumber, Radio, Row, Select, Slider } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Col, Form, InputNumber, Radio, Row, Select, Slider } from 'antd';
 import { IForm } from '@/ts/core';
 import { debounce } from '@/utils/tools';
 
 interface FormSettingType {
   current: IForm;
-  OnFormChange: (changeVal: { [key: string]: any }) => void;
-  comp: any;
+  schemaRef: { current: { setValue: Function; getValue: Function } };
+  // comp: any;
 }
 /* 表单配置文件 */
-const FormSetting: React.FC<FormSettingType> = ({ comp, OnFormChange }) => {
+const FormSetting: React.FC<FormSettingType> = ({ current, schemaRef }) => {
   const [form] = Form.useForm();
 
   const [inputValue, setInputValue] = useState(120);
+
+  useEffect(() => {
+    const ruleInfo = JSON.parse(current.metadata.rule || '{}');
+    const defConfig = { column: 1, displayType: 'row', labelWidth: 120 };
+    if (ruleInfo?.schema) {
+      const { column, displayType, labelWidth } = ruleInfo?.schema || defConfig;
+      form.setFieldsValue({ column, displayType, labelWidth });
+
+      return;
+    }
+
+    form.setFieldsValue(defConfig);
+  }, []);
 
   const onChange: any = (newValue: number) => {
     setInputValue(newValue);
     onValuesChange({ labelWidth: newValue });
   };
   const onValuesChange = debounce((changeVal: any) => {
-    OnFormChange(changeVal);
+    const OriScame = schemaRef?.current?.getValue();
+    schemaRef?.current?.setValue({ ...OriScame, ...changeVal });
+    const ruleInfo = JSON.parse(current.metadata.rule || '{}');
+    current.update({
+      ...current.metadata,
+      rule: JSON.stringify({
+        ...ruleInfo,
+        schema: { ...OriScame, ...changeVal },
+      }),
+    });
   }, 500);
   return (
     <>
@@ -71,7 +93,7 @@ const FormSetting: React.FC<FormSettingType> = ({ comp, OnFormChange }) => {
             </Col>
           </Row>
         </Form.Item>
-        {comp}
+        {/* {comp} */}
       </Form>
     </>
   );

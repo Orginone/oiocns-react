@@ -1,4 +1,4 @@
-import { Button } from 'antd';
+import { Button, InputNumber } from 'antd';
 import cls from './index.module.less';
 import React from 'react';
 import { useState } from 'react';
@@ -134,7 +134,11 @@ const Design: React.FC<IProps> = ({ current }) => {
         </div>
 
         {rules.schema ? (
-          <FormRender schema={rules.schema} form={formIns} />
+          <FormRender
+            schema={rules.schema}
+            form={formIns}
+            widgets={{ number: InputNumber }}
+          />
         ) : (
           <div className={cls.designWrap}>
             使用

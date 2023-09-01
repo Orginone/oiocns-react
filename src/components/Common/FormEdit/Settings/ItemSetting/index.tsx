@@ -8,7 +8,7 @@ interface IProps {
   selectedFiled: XAttribute;
   superAuth?: XAuthority;
   current: IForm;
-  scameRef: { current: { setValue: Function; getValue: Function } };
+  schemaRef: { current: { setValue: Function; getValue: Function } };
 }
 type DataItem = {
   name: string;
@@ -21,8 +21,7 @@ const obj = {
   hidden: 'false',
   allowClear: 'false',
 };
-const AttributeConfig = ({ current, scameRef, selectedFiled, superAuth }: IProps) => {
-  console.log('attr', selectedFiled);
+const AttributeConfig = ({ current, schemaRef, selectedFiled, superAuth }: IProps) => {
   if (!selectedFiled) {
     return <>请选择特性</>;
   }
@@ -45,18 +44,17 @@ const AttributeConfig = ({ current, scameRef, selectedFiled, superAuth }: IProps
       current.updateAttribute({ ...selectedFiled, rule: JSON.stringify(rule) });
       const resultScame = UpdataScameItemById(
         selectedFiled.id,
-        scameRef.current.getValue(),
+        schemaRef.current.getValue(),
         changedValues,
       );
       /* 更新schma展示数据 */
-      scameRef.current.setValue(resultScame);
-      console.log('change修改后', resultScame);
+      schemaRef.current.setValue(resultScame);
       const ruleInfo = JSON.parse(current.metadata.rule || '{}');
       current.update({
         ...current.metadata,
         rule: JSON.stringify({
           ...ruleInfo,
-          scame: resultScame,
+          schema: resultScame,
         }),
       });
     }
