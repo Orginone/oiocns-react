@@ -5,6 +5,7 @@ import { IBelong } from '@/ts/core';
 import DetailForms from './detail';
 import PrimaryForms from './primary';
 import FormRenders from './formPreview';
+import ReportForms from '../workReport';
 
 import { formatDate } from '@/utils';
 import { DataType } from 'typings/globelType';
@@ -66,8 +67,10 @@ const WorkForm: React.FC<IWorkFormProps> = (props) => {
   const detailForms = node.forms.filter((f) => f.typeName === '子表');
   return (
     <div style={{ padding: 10 }}>
-      <FormRenders {...props} forms={primaryForms} getFormData={getFormData} />
-      <PrimaryForms {...props} forms={primaryForms} getFormData={getFormData} />
+      {/* 同样的类型 需要如何区分展示报表或者表单？ 所以我这边先注释掉了 */}
+      <ReportForms {...props} forms={primaryForms} getFormData={getFormData} />
+      {/* <FormRenders {...props} forms={primaryForms} getFormData={getFormData} />
+      <PrimaryForms {...props} forms={primaryForms} getFormData={getFormData} /> */}
       <DetailForms {...props} forms={detailForms} getFormData={getFormData} />
     </div>
   );
