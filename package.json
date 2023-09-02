@@ -80,7 +80,7 @@
     "for-editor": "^0.3.5",
     "form-render": "^2.2.13",
     "fr-generator": "^2.8.9",
-    "handsontable": "^13.0.0",
+    "handsontable": "^13.1.0",
     "html2canvas": "^1.4.1",
     "hyperformula": "^2.5.0",
     "jol-player": "^4.0.0",

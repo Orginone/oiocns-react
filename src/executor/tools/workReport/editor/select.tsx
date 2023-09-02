@@ -1,4 +1,4 @@
-import Handsontable from 'Handsontable'
+import Handsontable from 'handsontable';
 
 // an editor component
 export class selectEditor extends Handsontable.editors.BaseEditor {
@@ -13,7 +13,14 @@ export class selectEditor extends Handsontable.editors.BaseEditor {
     this.hot.rootElement.appendChild(this.select);
   }
 
-  prepare(row: any, col: any, prop: any, td: any, originalValue: any, cellProperties: any) {
+  prepare(
+    row: any,
+    col: any,
+    prop: any,
+    td: any,
+    originalValue: any,
+    cellProperties: any,
+  ) {
     super.prepare(row, col, prop, td, originalValue, cellProperties);
     const selectOptions: any = this.cellProperties.selectOptions;
     this.select.innerText = '';
@@ -28,19 +35,19 @@ export class selectEditor extends Handsontable.editors.BaseEditor {
 
   prepareOptions(optionsToPrepare: any) {
     let preparedOptions: any = {};
-  
-    if (Array.isArray(optionsToPrepare)) {
 
+    if (Array.isArray(optionsToPrepare)) {
+      //
     } else if (typeof optionsToPrepare === 'object') {
       preparedOptions = optionsToPrepare;
     }
-    console.log(preparedOptions,'preparedOptions')
+    console.log(preparedOptions, 'preparedOptions');
     return preparedOptions;
   }
   /**
    * 设置编辑器值
    * @param value 设置的值
-   * 
+   *
    */
   setValue(value: any) {
     this.select.value = value;
@@ -48,19 +55,14 @@ export class selectEditor extends Handsontable.editors.BaseEditor {
   /**
    * 显示编辑器
    * @param event MouseEvent
-   * 
+   *
    */
   open(event: any) {
-    const {
-      top,
-      start,
-      width,
-      height,
-    } = this.getEditedCellRect();
+    const { top, start, width, height } = this.getEditedCellRect();
     const selectStyle = this.select.style;
-  
+
     this._opened = true;
-  
+
     selectStyle.height = `${height}px`;
     selectStyle.minWidth = `${width}px`;
     selectStyle.top = `${top}px`;
@@ -68,15 +70,15 @@ export class selectEditor extends Handsontable.editors.BaseEditor {
     selectStyle.margin = '0px';
     selectStyle.display = '';
   }
-  
-  getEditedCellRect(): { top: any; start: any; width: any; height: any; } {
+
+  getEditedCellRect(): { top: any; start: any; width: any; height: any } {
     throw new Error('Method not implemented.');
   }
-  
+
   /**
    * 关闭编辑器
    * @param event MouseEvent
-   * 
+   *
    */
   close() {
     this._opened = false;
@@ -84,14 +86,14 @@ export class selectEditor extends Handsontable.editors.BaseEditor {
   }
   /**
    * 激活编辑器
-   * 
+   *
    */
   focus() {
     this.select.focus();
   }
   /**
    * 获取编辑器的值
-   * 
+   *
    */
   getValue() {
     return this.select.value;
