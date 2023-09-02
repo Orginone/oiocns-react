@@ -235,7 +235,7 @@ const getColumns: (
                             colProps: { span: 9 },
                             tooltip: '公式中用于匹配关键字',
                             renderFormItem() {
-                              const _target = attrs.find((v) => v.id === id);
+                              const _target = attrs?.find((v) => v.id === id);
                               return (
                                 <Input
                                   name="attrName"
@@ -329,12 +329,12 @@ const getColumns: (
                             },
                             fieldProps: {
                               fieldNames: { label: 'name', value: 'id' },
-                              options: accept
-                                ? attrs.filter((s) =>
-                                    accept?.includes(s.property!.valueType),
-                                  )
-                                : attrs,
-                              // options: attrs,
+                              // options: accept
+                              //   ? attrs?.filter((s) =>
+                              //       accept?.includes(s.property!.valueType),
+                              //     )
+                              //   : attrs,
+                              options: attrs,
                             },
                             formItemProps: {
                               rules: [{ required: true, message: '属性名称为必选项' }],
@@ -354,7 +354,7 @@ const getColumns: (
                                   renderFormItem(_schema, _config, form, _action) {
                                     form.setFieldValue(
                                       'attrName',
-                                      attrs.find((v) => v.id === id)?.name,
+                                      attrs?.find((v) => v.id === id)?.name,
                                     );
                                     return (
                                       <Input

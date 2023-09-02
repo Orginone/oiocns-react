@@ -1,4 +1,4 @@
-import { Button } from 'antd';
+import { Button, InputNumber } from 'antd';
 import cls from './index.module.less';
 import React from 'react';
 import { useState } from 'react';
@@ -54,9 +54,11 @@ const Design: React.FC<IProps> = ({ current }) => {
   };
   const currentToSchemaFun = () => {
     //如果配置过
-    // if (rules && JSON.stringify(rules) !== '{}') {
-    //   return rules.schema;
-    // } else {
+    if (rules && JSON.stringify(rules) !== '{}') {
+      console.log('获取已保存的scame', rules.schema);
+      return rules.schema;
+    }
+    //  else {
     //没有配置过
     const schema: schemaType = {
       displayType: 'row',
@@ -132,7 +134,11 @@ const Design: React.FC<IProps> = ({ current }) => {
         </div>
 
         {rules.schema ? (
-          <FormRender schema={rules.schema} form={formIns} />
+          <FormRender
+            schema={rules.schema}
+            form={formIns}
+            widgets={{ number: InputNumber }}
+          />
         ) : (
           <div className={cls.designWrap}>
             使用
