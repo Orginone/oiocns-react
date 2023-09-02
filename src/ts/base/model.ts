@@ -8,7 +8,17 @@ export type ReqestType = {
   // 参数
   params: any;
 };
-
+// 请求数据核类型定义
+export type DataProxyType = {
+  // 模块
+  module: string;
+  // 方法
+  action: string;
+  // 归属
+  belongId: string;
+  // 参数
+  params: any;
+};
 // 代理请求类型定义
 export type ForwardType = {
   // 目标地址
