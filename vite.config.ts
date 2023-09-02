@@ -56,7 +56,7 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
     build: {
       target: 'es5',
       outDir: 'dist', // 指定输出路径
-      minify: 'terser', // 混淆器,terser构建后文件体积更小
+      minify: false, // 混淆器,terser构建后文件体积更小
       sourcemap: false, // 输出.map文件
       chunkSizeWarningLimit: 2048,
       terserOptions: {
@@ -78,16 +78,28 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
           chunkFileNames: 'static/js/[name]-[hash].js',
           entryFileNames: 'static/js/[name]-[hash].js',
           assetFileNames: 'static/[ext]/[name]-[hash].[ext]',
-          // manualChunks(id) {
-          //   if (id.includes('components')) {
-          //     // 把 components 文件里面的文件都打包到 components.js 中
-          //     return 'components';
-          //   }
-          //   // 静态资源拆分
-          //   if (id.includes('node_modules')) {
-          //     return id.toString().split('node_modules/')[1].split('/')[0].toString();
-          //   }
-          // },
+          manualChunks(id) {
+            if (id.includes("node_modules/handsontable")) {
+              return 'handsontable'
+            }
+            if (id.includes("node_modules/axios")) {
+              return 'axios'
+            }
+            if (id.includes("node_modules/echarts")) {
+              return 'echarts'
+            }
+            if (id.includes("node_modules/loadash")) {
+              return 'loadash'
+            }
+            if (
+                id.includes("node_modules/devextreme") 
+                || id.includes("node_modules/react") 
+                || id.includes("node_modules/react-dom") 
+                || id.includes("node_modules/react-router-dom")
+              ) {
+                return 'react'
+            }
+          }
         },
         plugins: [
           {
