@@ -3,7 +3,14 @@ import StoreHub from './storehub';
 import * as model from '../model';
 import type * as schema from '../schema';
 import axios from 'axios';
-import { Emitter, logger } from '../common';
+import {
+  Emitter,
+  blobToDataUrl,
+  encodeKey,
+  generateUuid,
+  logger,
+  sliceFile,
+} from '../common';
 import { command } from '../common/command';
 /**
  * 资产共享云内核api
@@ -680,20 +687,20 @@ export default class KernelApi {
       params: params,
     });
   }
-  /**
-   * 创建物
-   * @param {model.ThingModel} params 请求参数
-   * @returns {model.ResultType<schema.XThing>} 请求结果
-   */
-  public async createThing(
-    params: model.ThingModel,
-  ): Promise<model.ResultType<schema.XThing>> {
-    return await this.request({
-      module: 'thing',
-      action: 'CreateThing',
-      params: params,
-    });
-  }
+  // /**
+  //  * 创建物
+  //  * @param {model.ThingModel} params 请求参数
+  //  * @returns {model.ResultType<schema.XThing>} 请求结果
+  //  */
+  // public async createThing(
+  //   params: model.ThingModel,
+  // ): Promise<model.ResultType<schema.XThing>> {
+  //   return await this.request({
+  //     module: 'thing',
+  //     action: 'CreateThing',
+  //     params: params,
+  //   });
+  // }
   /**
    * 删除目录
    * @param {model.IdModel} params 请求参数
@@ -1239,6 +1246,220 @@ export default class KernelApi {
         key,
         setData,
       },
+    });
+  }
+  /**
+   * 删除对象数据
+   * @param {string} belongId 对象所在的归属用户ID
+   * @param {string} key 对象名称（eg: rootName.person.name）
+   * @returns {model.ResultType<T>} 对象异步结果
+   */
+  public async objectDelete(
+    belongId: string,
+    key: string,
+  ): Promise<model.ResultType<any>> {
+    return await this.dataProxy({
+      module: 'Object',
+      action: 'Delete',
+      belongId,
+      params: key,
+    });
+  }
+  /**
+   * 添加数据到数据集
+   * @param {string} collName 数据集名称（eg: history-message）
+   * @param {any} data 要添加的数据，对象/数组
+   * @param {string} belongId 对象所在的归属用户ID
+   * @returns {model.ResultType<T>} 对象异步结果
+   */
+  public async collectionInsert(
+    belongId: string,
+    collName: string,
+    data: any,
+  ): Promise<model.ResultType<any>> {
+    return await this.dataProxy({
+      module: 'Collection',
+      action: 'Insert',
+      belongId,
+      params: { collName, data },
+    });
+  }
+  /**
+   * 更新数据到数据集
+   * @param {string} collName 数据集名称（eg: history-message）
+   * @param {any} update 更新操作（match匹配，update变更,options参数）
+   * @param {string} belongId 对象所在的归属用户ID
+   * @returns {model.ResultType<T>} 对象异步结果
+   */
+  public async collectionUpdate(
+    belongId: string,
+    collName: string,
+    update: any,
+  ): Promise<model.ResultType<any>> {
+    return await this.dataProxy({
+      module: 'Collection',
+      action: 'Update',
+      belongId,
+      params: { collName, update },
+    });
+  }
+  /**
+   * 从数据集移除数据
+   * @param {string} collName 数据集名称（eg: history-message）
+   * @param {any} match 匹配信息
+   * @param {string} belongId 对象所在的归属用户ID
+   * @returns {model.ResultType<T>} 对象异步结果
+   */
+  public async collectionRemove(
+    belongId: string,
+    collName: string,
+    match: any,
+  ): Promise<model.ResultType<any>> {
+    return await this.dataProxy({
+      module: 'Collection',
+      action: 'Remove',
+      belongId,
+      params: { collName, match },
+    });
+  }
+  /**
+   * 从数据集查询数据
+   * @param {string} collName 数据集名称（eg: history-message）
+   * @param {any} options 聚合管道(eg: {match:{a:1},skip:10,limit:10})
+   * @param {string} belongId 对象所在的归属用户ID
+   * @returns {model.ResultType<T>} 对象异步结果
+   */
+  public async collectionAggregate(
+    belongId: string,
+    collName: string,
+    options: any,
+  ): Promise<model.ResultType<any>> {
+    return await this.dataProxy({
+      module: 'Collection',
+      action: 'Aggregate',
+      belongId,
+      params: { collName, options },
+    });
+  }
+  /**
+   * 从数据集查询数据
+   * @param {string} collName 数据集名称（eg: history-message）
+   * @param {any} options 聚合管道(eg: {match:{a:1},skip:10,limit:10})
+   * @param {string} belongId 对象所在的归属用户ID
+   * @returns {model.ResultType<T>} 对象异步结果
+   */
+  public async collectionPageRequest<T>(
+    belongId: string,
+    collName: string,
+    options: any,
+    page: model.PageModel,
+  ): Promise<model.ResultType<model.PageResult<T>>> {
+    const total = await this.collectionAggregate(belongId, collName, options);
+    if (total.data && Array.isArray(total.data) && total.data.length > 0) {
+      options.skip = page.offset;
+      options.limit = page.limit;
+      const res = await this.collectionAggregate(belongId, collName, options);
+      return {
+        ...res,
+        data: {
+          offset: page.offset,
+          limit: page.limit,
+          total: total.data[0].count,
+          result: res.data,
+        },
+      };
+    }
+    return total;
+  }
+  /**
+   * 桶操作
+   * @param data 操作携带的数据
+   * @returns {ResultType<T>} 移除异步结果
+   */
+  public async bucketOpreate<T>(
+    belongId: string,
+    data: model.BucketOpreateModel,
+  ): Promise<model.ResultType<T>> {
+    return await this.dataProxy({
+      module: 'Bucket',
+      action: 'Operate',
+      belongId,
+      params: data,
+    });
+  }
+  /**
+   * 文件上传
+   * @param file 文件
+   * @param name 名称
+   * @param key 路径
+   */
+  public async fileUpdate(
+    belongId: string,
+    file: Blob,
+    key: string,
+    progress: (p: number) => void,
+  ): Promise<model.FileItemModel | undefined> {
+    const id = generateUuid();
+    const data: model.BucketOpreateModel = {
+      key: encodeKey(key),
+      operate: model.BucketOpreates.Upload,
+    };
+    progress.apply(this, [0]);
+    const slices = sliceFile(file, 1024 * 1024);
+    for (let i = 0; i < slices.length; i++) {
+      const s = slices[i];
+      data.fileItem = {
+        index: i,
+        uploadId: id,
+        size: file.size,
+        data: [],
+        dataUrl: await blobToDataUrl(s),
+      };
+      const res = await this.bucketOpreate<model.FileItemModel>(belongId, data);
+      if (!res.success) {
+        data.operate = model.BucketOpreates.AbortUpload;
+        await this.bucketOpreate<boolean>(belongId, data);
+        progress.apply(this, [-1]);
+        return;
+      }
+      const finished = i * 1024 * 1024 + s.size;
+      progress.apply(this, [finished]);
+      if (finished === file.size && res.data) {
+        return res.data;
+      }
+    }
+  }
+  /**
+   * 加载物
+   * @param  过滤参数
+   * @returns {model.ResultType<T>} 移除异步结果
+   */
+  public async loadThing<T>(
+    belongId: string,
+    options: any,
+  ): Promise<model.ResultType<T>> {
+    options.belongId = belongId;
+    return await this.dataProxy({
+      module: 'Thing',
+      action: 'Load',
+      belongId,
+      params: options,
+    });
+  }
+  /**
+   * 创建物
+   * @param name 物的名称
+   * @returns {model.ResultType<model.AnyThingModel>} 移除异步结果
+   */
+  public async createThing(
+    belongId: string,
+    name: string,
+  ): Promise<model.ResultType<model.AnyThingModel>> {
+    return await this.dataProxy({
+      module: 'Thing',
+      action: 'Create',
+      belongId,
+      params: name,
     });
   }
   /**

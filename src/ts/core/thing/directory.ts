@@ -211,7 +211,7 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
   }
   async loadFiles(reload: boolean = false): Promise<ISysFileInfo[]> {
     if (this.files.length < 1 || reload) {
-      const res = await kernel.anystore.bucketOpreate<model.FileItemModel[]>(
+      const res = await kernel.bucketOpreate<model.FileItemModel[]>(
         this.metadata.belongId,
         {
           key: encodeKey(this.id),
@@ -237,7 +237,7 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
       createTime: new Date(),
     };
     this.taskList.push(task);
-    const data = await kernel.anystore.fileUpdate(
+    const data = await kernel.fileUpdate(
       this.metadata.belongId,
       file,
       `${this.id}/${file.name}`,

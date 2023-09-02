@@ -81,7 +81,7 @@ export class WorkTask implements IWorkTask {
   }
   async loadInstance(reload: boolean = false): Promise<boolean> {
     if (this.instanceData !== undefined && !reload) return true;
-    const res = await kernel.anystore.aggregate(
+    const res = await kernel.collectionAggregate(
       this.metadata.belongId,
       storeCollName.WorkInstance,
       {

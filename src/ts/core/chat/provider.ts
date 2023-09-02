@@ -55,7 +55,7 @@ export class ChatProvider implements IChatProvider {
   }
   /** 加载挂起的消息 */
   loadPreMessage(): void {
-    kernel.anystore.get<any>(this.user.id, storeCollName.ChatMessage).then((res) => {
+    kernel.objectGet<any>(this.user.id, storeCollName.ChatMessage).then((res) => {
       if (res.success) {
         if (typeof res.data === 'object') {
           Object.keys(res.data).forEach((key) => {
