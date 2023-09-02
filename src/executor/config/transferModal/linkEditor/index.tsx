@@ -1,16 +1,24 @@
 import FullScreenModal from '@/executor/tools/fullScreen';
 import { ILink } from '@/ts/core/thing/config';
-import { Space } from 'antd';
 import React from 'react';
 import LinkEditor from './widgets/editor';
-import { NodeTools } from '../selector';
 
+// 运行状态
+export enum Retention {
+  Runtime,
+  Configuration,
+}
 interface IProps {
   current: ILink;
   finished: () => void;
+  retention?: Retention;
 }
 
-const LinkModal: React.FC<IProps> = ({ current, finished }) => {
+const LinkModal: React.FC<IProps> = ({
+  current,
+  finished,
+  retention = Retention.Configuration,
+}) => {
   return (
     <FullScreenModal
       open
@@ -21,16 +29,8 @@ const LinkModal: React.FC<IProps> = ({ current, finished }) => {
       destroyOnClose
       title={'链接配置'}
       onCancel={() => finished()}>
-      <LinkEditor current={current} children={<ToolBar current={current} />} />
+      <LinkEditor current={current} retention={retention} />
     </FullScreenModal>
-  );
-};
-
-const ToolBar: React.FC<{ current: ILink }> = ({ current }) => {
-  return (
-    <Space style={{ position: 'absolute', left: 10, top: 10 }}>
-      <NodeTools current={current}></NodeTools>
-    </Space>
   );
 };
 

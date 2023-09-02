@@ -24,9 +24,6 @@ const Mapper: React.FC<IProps> = ({ current, ctrl }) => {
               targetAttr={'source'}
             />
           </Col>
-          <Col span={12}>
-            <Center current={current} ctrl={ctrl}/>
-          </Col>
           <Col span={6}>
             <Fields
               current={current}
@@ -34,6 +31,9 @@ const Mapper: React.FC<IProps> = ({ current, ctrl }) => {
               targetAttrs={'targetAttrs'}
               targetAttr={'target'}
             />
+          </Col>
+          <Col span={12}>
+            <Center current={current} ctrl={ctrl} />
           </Col>
         </Row>
       </Content>

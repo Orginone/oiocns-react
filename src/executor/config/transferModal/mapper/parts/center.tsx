@@ -36,7 +36,7 @@ const Center: React.FC<IProps> = ({ current, ctrl }) => {
           targetAttr: current.target.attr,
         });
         current.clear();
-        current.changCallback();
+        current.refresh(current.metadata);
         ctrl.changCallback();
       }
       setMappings([...current.metadata.mappings]);

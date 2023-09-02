@@ -1,40 +1,42 @@
-import { Command } from '@/ts/base';
-import { generateUuid } from '@/ts/base/common';
-import { XEntity, XFileInfo } from '@/ts/base/schema';
-import { Graph, Node, StringExt } from '@antv/x6';
-import React, { useEffect, useState } from 'react';
-import { IconBaseProps } from 'react-icons';
-import { AiFillPlusCircle, AiOutlineCheck, AiOutlineLoading } from 'react-icons/ai';
-import { MenuItemType } from 'typings/globelType';
+import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
+import { generateUuid, sleep } from '@/ts/base/common';
 import { linkCmd } from '@/ts/base/common/command';
-import cls from './../../../index.module.less';
+import { XEntity, XExecutable } from '@/ts/base/schema';
+import { IEntity, ShareIdSet, ShareSet } from '@/ts/core/public/entity';
+import { IExecutable, IRequest } from '@/ts/core/thing/config';
 import { ConfigColl } from '@/ts/core/thing/directory';
+import Encryption from '@/utils/encryption';
+import { Sandbox } from '@/utils/sandbox';
+import {
+  CheckCircleOutlined,
+  CloseCircleOutlined,
+  LoadingOutlined,
+  PauseCircleOutlined,
+  StopOutlined,
+} from '@ant-design/icons';
+import { Cell, Graph, Model, Node } from '@antv/x6';
+import { message } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { AiFillPlusCircle } from 'react-icons/ai';
+import { MenuItemType } from 'typings/globelType';
+import cls from './../../../index.module.less';
+import { Persistence, Temping } from './graph';
+import { AxiosError } from 'axios';
 
 export enum ExecStatus {
   Stop = 'stop',
   Running = 'running',
   Completed = 'completed',
+  Error = 'error',
 }
 
-const config: IconBaseProps = { size: 12, color: '#9498df' };
-const statusMap: { [key: string]: React.ReactNode } = {
-  [ExecStatus.Stop]: <AiOutlineCheck {...config} />,
-  [ExecStatus.Running]: <AiOutlineLoading {...config} />,
-};
-
-export interface DataNode<S> {
-  entity: XEntity;
-  status: S;
+export interface DataNode {
+  entityId: string;
 }
 
 interface NodeOptions {
   graph: Graph;
   position: { x: number; y: number };
-}
-
-interface Info {
-  node: Node;
-  graph: Graph;
 }
 
 /**
@@ -92,21 +94,14 @@ const getPortsByType = (id: string) => {
   ];
 };
 
-export const addNode = <S extends {}>(
-  props: NodeOptions & DataNode<S>,
-): Node<Node.Properties> => {
-  const { graph, position, entity } = props;
+export const addNode = (props: NodeOptions & DataNode): Node<Node.Properties> => {
+  const { graph, position, entityId } = props;
   const id = generateUuid();
   const node: Node.Metadata = {
     id: id,
     shape: 'data-processing-dag-node',
     ...position,
-    data: {
-      nodeType: entity.typeName,
-      status: ExecStatus.Stop,
-      entity: entity,
-      cmd: Command,
-    },
+    data: { entityId: entityId },
     ports: getPortsByType(id),
   };
   return graph.addNode(node);
@@ -142,15 +137,14 @@ export const createEdge = (source: string, target: string, graph: Graph) => {
 };
 
 // 创建下游的节点和边
-export const createDownstream = (graph: Graph, node: Node, entity: XEntity) => {
+export const createDownstream = (graph: Graph, node: Node, entityId: string) => {
   // 获取下游节点的初始位置信息
   const position = getDownstreamNodePosition(node, graph);
   // 创建下游节点
   const newNode = addNode({
     graph: graph,
     position: { ...position },
-    entity: entity,
-    status: ExecStatus.Stop,
+    entityId: entityId,
   });
   const source = node.id;
   const target = newNode.id;
@@ -177,40 +171,193 @@ const menus: { [key: string]: MenuItemType } = {
     itemType: '映射',
     children: [],
   },
+  store: {
+    key: ConfigColl.Stores,
+    label: '数据',
+    itemType: '数据',
+    children: [],
+  },
+  form: {
+    key: 'form',
+    label: '表单',
+    itemType: '表单',
+    children: [],
+  },
 };
 
 /** 拉出节点可以创建的下一步节点 */
-const getNextMenu = (entity: XEntity): MenuItemType[] => {
-  switch (entity.typeName) {
+const getNextMenu = (typeName: string): MenuItemType[] => {
+  switch (typeName) {
     case '请求':
-      return [menus.request, menus.script, menus.mapping];
-    case '脚本':
       return [menus.script];
+    case '脚本':
+      return [menus.script, menus.request, menus.mapping, menus.store];
     case '映射':
-      return [];
+      return [menus.script, menus.mapping, menus.store];
+    case '实体配置':
+    case '事项配置':
+      return [menus.script];
     default:
       return [];
   }
 };
 
-export const ProcessingNode: React.FC<Info> = ({ node }) => {
-  const { entity, status } = node.getData() as DataNode<ExecStatus>;
+// 遍历参数
+interface ErgodicArgs {
+  preNode?: Node;
+  preData?: any;
+  nodeId: string;
+}
+
+// 发送消息
+const emitter = (type: string, preNode: Node, nextId: string, preData: any) => {
+  linkCmd.emitter('ergodic', type, {
+    preNode: preNode,
+    preData: preData,
+    nodeId: nextId,
+  });
+};
+
+interface Info {
+  node: Node;
+  graph: Graph;
+}
+
+export const getShareEntity = (
+  node: Node | Cell<Cell.Properties>,
+): IEntity<XEntity> | undefined => {
+  const { entityId } = node.getData() as DataNode;
+  return ShareSet.get(entityId);
+};
+
+export const ProcessingNode: React.FC<Info> = ({ node, graph }) => {
+  const [nodeStatus, setNodeStatus] = useState<ExecStatus>(ExecStatus.Stop);
   const [visible, setVisible] = useState<boolean>(false);
   const [visibleOperate, setVisibleOperate] = useState<boolean>(false);
-  const menus = getNextMenu(entity);
+  const [visibleClosing, setVisibleClosing] = useState<boolean>(false);
+  const entity = getShareEntity(node);
+  if (!entity) {
+    return <></>;
+  }
+
   useEffect(() => {
-    const id = linkCmd.subscribe((type, cmd, args) => {
-      console.log(args);
-      if (type != 'node') return;
-      if (args.node.id == node.id) {
-        switch (cmd) {
-          case 'selected':
-            setVisible(true);
-            break;
-          case 'unselected':
-            setVisible(false);
-            setVisibleOperate(false);
-            break;
+    const id = linkCmd.subscribe(async (type, cmd, args) => {
+      switch (type) {
+        case 'node':
+          if (args.node.id == node.id) {
+            switch (cmd) {
+              case 'selected':
+                setVisible(true);
+                break;
+              case 'unselected':
+                setVisible(false);
+                setVisibleOperate(false);
+                break;
+            }
+          }
+          break;
+        case 'ergodic':
+          const { nodeId, preData } = args as ErgodicArgs;
+          if (nodeId != node.id) return;
+          setNodeStatus(ExecStatus.Running);
+          const ergodic = (nextData: any) => {
+            console.log(nextData);
+            const iterator: Model.SearchIterator = (cell, distance) => {
+              if (distance == 1) {
+                const next = getShareEntity(cell);
+                if (next) {
+                  emitter(next.metadata.typeName, node, cell.id, nextData);
+                }
+              }
+            };
+            graph.searchCell(node, iterator, { outgoing: true });
+          };
+          const temping = graph.getPlugin<Temping>(Persistence);
+          const curEnv = temping?.curEnv();
+          try {
+            await sleep(1000);
+            switch (cmd) {
+              case '请求': {
+                const request = entity as IRequest;
+                const response = await request.exec({ ...curEnv, ...preData });
+                const exec = request.metadata.suffixExec;
+                if (exec) {
+                  const executable = ShareIdSet.get(exec) as XExecutable;
+                  const runtime = {
+                    environment: curEnv,
+                    preData: {},
+                    curData: response,
+                    nextData: {},
+                    ...Encryption,
+                  };
+                  Sandbox(executable.coder)(runtime);
+                }
+                ergodic(response);
+                break;
+              }
+              case '脚本': {
+                const exec = entity as IExecutable;
+                const runtime = {
+                  environment: curEnv,
+                  preData: preData,
+                  curData: {},
+                  nextData: {},
+                  ...Encryption,
+                };
+                Sandbox(exec.metadata.coder)(runtime);
+                linkCmd.emitter('environments', 'refresh');
+                ergodic(runtime.nextData);
+                break;
+              }
+              case '映射': {
+                const input = preData.array;
+                if (!(input instanceof Array)) {
+                  throw new Error('映射输入必须是一个数组！');
+                }
+                break;
+              }
+              case '实体配置':
+              case '事项配置': {
+                linkCmd.emitter('form', 'open', {
+                  formId: entity.id,
+                  call: (type: string, data: any, msg?: string) => {
+                    switch (type) {
+                      case '成功':
+                        ergodic(data);
+                        setNodeStatus(ExecStatus.Completed);
+                        break;
+                      case '取消':
+                      case '错误':
+                        message.error(msg);
+                        setNodeStatus(ExecStatus.Error);
+                        break;
+                    }
+                  },
+                });
+                return;
+              }
+            }
+            setNodeStatus(ExecStatus.Completed);
+          } catch (error) {
+            if (error instanceof AxiosError) {
+              if (error.response) {
+                const data = error.response.data;
+                const msg = '执行请求异常，错误信息：' + JSON.stringify(data);
+                message.error(msg);
+              } else {
+                message.error('执行请求异常，错误信息：' + error.message);
+              }
+            } else if (error instanceof Error) {
+              message.error('执行异常，错误信息：' + error.message);
+            } else {
+              message.error('执行异常');
+            }
+            setNodeStatus(ExecStatus.Error);
+          }
+          break;
+        case 'clearStatus': {
+          setNodeStatus(ExecStatus.Stop);
+          break;
         }
       }
     });
@@ -218,10 +365,11 @@ export const ProcessingNode: React.FC<Info> = ({ node }) => {
       linkCmd.unsubscribe(id);
     };
   });
-  return (
-    <div className={`${cls['flex-row']} ${cls['container']} `}>
-      <div>{entity.name}</div>
-      {statusMap[status]}
+
+  // 展开菜单
+  const PlusMenus: React.FC<{}> = () => {
+    const menus = getNextMenu(entity.typeName);
+    return (
       <div
         style={{ visibility: visible ? 'visible' : 'hidden' }}
         className={`${cls['flex-row']} ${cls['plus-menu']}`}>
@@ -236,6 +384,7 @@ export const ProcessingNode: React.FC<Info> = ({ node }) => {
           {menus.map((item) => {
             return (
               <li
+                key={item.key}
                 className={`${cls['item']}`}
                 onClick={() => {
                   switch (item.itemType) {
@@ -252,6 +401,75 @@ export const ProcessingNode: React.FC<Info> = ({ node }) => {
           })}
         </ul>
       </div>
+    );
+  };
+
+  // 状态
+  const Status: React.FC<{}> = () => {
+    switch (nodeStatus) {
+      case ExecStatus.Stop:
+        return <PauseCircleOutlined style={{ color: '#9498df', fontSize: 18 }} />;
+      case ExecStatus.Running:
+        return <LoadingOutlined style={{ color: '#9498df', fontSize: 18 }} />;
+      case ExecStatus.Completed:
+        return <CheckCircleOutlined style={{ color: '#52c41a', fontSize: 18 }} />;
+      case ExecStatus.Error:
+        return <StopOutlined style={{ color: '#ff4d4f', fontSize: 18 }} />;
+    }
+  };
+
+  // 节点信息
+  const Info: React.FC<{}> = () => {
+    return (
+      <div className={`${cls['flex-row']} ${cls['info']} ${cls['border']}`}>
+        <EntityIcon entity={entity.metadata} />
+        <div style={{ marginLeft: 10 }}>{entity.name}</div>
+      </div>
+    );
+  };
+
+  // 标签
+  const Tag: React.FC<{}> = () => {
+    return (
+      <div className={cls['tag']}>
+        <div className={`${cls['tag-item']} ${cls['flex-max']} ${cls['text-overflow']}`}>
+          {entity.typeName}
+        </div>
+        <div className={`${cls['tag-item']} ${cls['text-overflow']}`}>
+          {ShareIdSet.get(entity.metadata.belongId)?.name}
+        </div>
+      </div>
+    );
+  };
+
+  // 删除标记
+  const Remove: React.FC<{}> = () => {
+    if (visibleClosing) {
+      const style = { color: '#9498df', fontSize: 12 };
+      return (
+        <CloseCircleOutlined
+          style={style}
+          className={cls['remove']}
+          onClick={() => {
+            node.remove();
+          }}
+        />
+      );
+    }
+    return <></>;
+  };
+
+  // 结构
+  return (
+    <div
+      className={`${cls['flex-row']} ${cls['container']} ${cls['border']}`}
+      onMouseEnter={() => setVisibleClosing(true)}
+      onMouseLeave={() => setVisibleClosing(false)}>
+      <Remove></Remove>
+      <Tag></Tag>
+      <Status></Status>
+      <PlusMenus></PlusMenus>
+      <Info></Info>
     </div>
   );
 };

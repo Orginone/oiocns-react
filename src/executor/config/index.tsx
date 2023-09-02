@@ -24,7 +24,9 @@ const entityMap: any = {
   报表: 'Report',
   请求: 'Request',
   链接: 'Link',
-  映射: 'Mapping'
+  映射: 'Mapping',
+  脚本: 'Executable',
+  环境: 'Environment'
 };
 
 interface IProps {
@@ -68,7 +70,7 @@ const ConfigExecutor: React.FC<IProps> = ({ cmd, args, finished }) => {
         return <EntityForm cmd={cmd} entity={args[0]} finished={finished} />;
       }
       break;
-    case "newRequest":
+    case "batchRequest":
       return <RequestModal current={args[0]} finished={finished}></RequestModal>;
     case 'newMapping':
       return <MappingModal current={args[0]} finished={finished}></MappingModal>;

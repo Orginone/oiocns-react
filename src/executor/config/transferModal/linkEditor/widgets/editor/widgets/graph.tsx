@@ -1,10 +1,11 @@
 import { ILink } from '@/ts/core/thing/config';
-import { Graph, Path, Platform } from '@antv/x6';
+import { Basecoat, Graph, Path, Platform } from '@antv/x6';
 import { Selection } from '@antv/x6-plugin-selection';
 import { register } from '@antv/x6-react-shape';
 import { edgeRegistering } from './edge';
 import { ProcessingNode } from './node';
 import React from 'react';
+import { generateUuid } from '@/ts/base/common';
 
 /**
  * 创建画布
@@ -160,6 +161,53 @@ const using = (graph: Graph) => {
       rubberband: true,
       movable: true,
       showNodeSelectionBox: true,
+      pointerEvents: 'none',
     }),
   );
+  graph.use(new Temping());
 };
+
+export const Persistence = 'Persistence';
+
+/** 临时存储插件 */
+export class Temping extends Basecoat<{}> implements Graph.Plugin {
+  name: string;
+  params: { [key: string]: { [key: string]: string } };
+  current?: string;
+
+  constructor() {
+    super();
+    this.name = Persistence;
+    this.params = {};
+  }
+
+  init(_graph: Graph, ..._: any[]) {}
+
+  createEnv() {
+    let id = generateUuid();
+    this.params[id] = {};
+    this.current = id;
+  }
+
+  curEnv(): { [key: string]: string } | undefined {
+    if (this.current) {
+      return this.params[this.current];
+    }
+  }
+
+  add(k: string, v: string) {
+    if (this.current) {
+      this.params[this.current][k] = v;
+    }
+  }
+
+  addAll(kvs: { [key: string]: string }) {
+    for (const k in kvs) {
+      this.add(k, kvs[k]);
+    }
+  }
+
+  dispose(): void {
+    this.params = {};
+  }
+}
