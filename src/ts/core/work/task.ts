@@ -1,7 +1,9 @@
+import { IWork } from '.';
 import { schema, model, kernel } from '../../base';
 import { TaskStatus, storeCollName } from '../public';
 import { IBelong } from '../target/base/belong';
 import { UserProvider } from '../user';
+import { IWorkApply, WorkApply } from './apply';
 
 export interface IWorkTask {
   /** 唯一标识 */
@@ -28,6 +30,8 @@ export interface IWorkTask {
   loadInstance(reload?: boolean): Promise<boolean>;
   /** 撤回任务 */
   recallApply(): Promise<boolean>;
+  /** 创建申请(子流程) */
+  createApply(): Promise<IWorkApply | undefined>;
   /** 任务审批 */
   approvalTask(status: number, comment?: string): Promise<boolean>;
 }
@@ -129,7 +133,6 @@ export class WorkTask implements IWorkTask {
           status: status,
           comment: comment,
           data: JSON.stringify(this.instanceData),
-          childrenData: '',
         });
         if (res.data && status < TaskStatus.RefuseStart) {
           if (this.targets && this.targets.length === 2) {
@@ -143,5 +146,41 @@ export class WorkTask implements IWorkTask {
       }
     }
     return false;
+  }
+  async createApply(): Promise<IWorkApply | undefined> {
+    if (this.metadata.approveType == '子流程') {
+      var define: IWork | undefined;
+      var space: IBelong | undefined;
+      this.user.targets.forEach((a) => {
+        a.directory.applications.forEach((s) => {
+          define = s.works.find((w) => w.id == this.metadata.defineId);
+          space = a.space;
+        });
+      });
+      if (define && space) {
+        const data: model.InstanceDataModel = {
+          data: this.instanceData?.data!,
+          fields: {},
+          primary: {},
+          node: define.node!,
+          allowAdd: define.metadata.allowAdd,
+          allowEdit: define.metadata.allowEdit,
+          allowSelect: define.metadata.allowSelect,
+        };
+        define.forms.forEach((form) => {
+          data.fields[form.id] = form.fields;
+        });
+        return new WorkApply(
+          {
+            hook: '',
+            taskId: this.id,
+            title: define.name,
+            defineId: define.id,
+          } as model.WorkInstanceModel,
+          data,
+          space,
+        );
+      }
+    }
   }
 }

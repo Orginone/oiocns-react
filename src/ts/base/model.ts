@@ -70,7 +70,7 @@ export type OnlineInfo = {
   requestCount: number;
   // 终端类型
   endPointType: string;
-}
+};
 // 分页返回定义
 export type PageResult<T> = {
   // 便宜量
@@ -505,7 +505,7 @@ export type AnyThingModel = {
   ModifiedTime: string;
   /** 其它信息 */
   [field: string]: any;
-}
+};
 
 export type WorkDefineModel = {
   // 流程ID
@@ -566,14 +566,14 @@ export type InstanceDataModel = {
   /** 提交的表单数据 */
   data: {
     // 表单id
-    [id: string]: FormEditData[]
+    [id: string]: FormEditData[];
   };
   /** 填写的主表信息 */
   primary: {
     /** 特性id */
-    [id: string]: any
-  }
-}
+    [id: string]: any;
+  };
+};
 
 export type FieldModel = {
   /** 标识(特性标识) */
@@ -590,7 +590,7 @@ export type FieldModel = {
   remark: string;
   /** 字典(字典项/分类项) */
   lookups?: FiledLookup[];
-}
+};
 
 export type FiledLookup = {
   /** 唯一标识(项标识) */
@@ -603,7 +603,7 @@ export type FiledLookup = {
   parentId?: string;
   /** 图标 */
   icon?: string;
-}
+};
 
 export type FormEditData = {
   /** 操作前数据体 */
@@ -616,7 +616,7 @@ export type FormEditData = {
   creator: string;
   /** 操作时间 */
   createTime: string;
-}
+};
 
 export type WorkNodeModel = {
   id: string;
@@ -675,8 +675,6 @@ export type ApprovalTaskReq = {
   comment: string;
   // 数据
   data: string;
-  // 子流程数据
-  childrenData: string;
 };
 
 export type TargetMessageModel = {
