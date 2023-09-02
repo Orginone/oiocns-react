@@ -29,13 +29,14 @@ export class WorkApply implements IWorkApply {
     this.metadata = _metadata;
     this.instanceData = _data;
     this.belong = _belong;
-    this.ruleService = new WorkFormRules(_forms, _belong.belongId);
+    WorkFormRules.initFormRules(_forms, _belong);
+    this.ruleService = WorkFormRules;
     //TODO:尝试在此处，执行规则初始化操作 修改instanceData
   }
   belong: IBelong;
   metadata: model.WorkInstanceModel;
   instanceData: model.InstanceDataModel;
-  ruleService: any;
+  ruleService: WorkFormRulesType;
   async createApply(
     applyId: string,
     content: string,

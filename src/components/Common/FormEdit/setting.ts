@@ -64,7 +64,7 @@ function getDefaultCommonSettings(e: any) {
     },
     labelWidth: {
       title: '标签宽度',
-      description: '默认值120',
+      description: '默认值1200',
       type: 'number',
       widget: 'slider',
       max: 400,
