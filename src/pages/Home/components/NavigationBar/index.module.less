@@ -1,0 +1,37 @@
+.navigationBar {
+  width: 860px;
+  height: 40px;
+  border-radius: 30px;
+  position: fixed;
+  top: 16px;
+  right: calc(50vw - 430px - 24px);
+  background-color: rgba(@component-background, 0.5);
+  color: @text-color-inverse;
+  display: flex;
+  font-size: 16px;
+  align-items: center;
+  padding-left: 50px;
+  padding-right: 20px;
+  &Content {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    flex: 1;
+    &__item {
+      transition: 0.2s;
+      cursor: pointer;
+      &Active {
+        cursor: pointer;
+        color: @text-color;
+        font-size: 18px;
+        border-bottom: 2px solid @primary-color;
+      }
+    }
+  }
+
+  &More {
+    color: @text-color-inverse;
+    font-size: 30px;
+    cursor: pointer;
+  }
+}

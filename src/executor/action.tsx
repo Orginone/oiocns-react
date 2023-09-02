@@ -244,19 +244,7 @@ const entityQrCode = (entity: IEntity<schema.XEntity>) => {
 
 /** 上下线提醒 */
 const onlineChanged = (cmd: string, info: model.OnlineInfo) => {
-  if (info.userId === '0') {
-    if (cmd === 'online') {
-      message.success({
-        duration: 1,
-        content: `终端${info.remoteAddr}[${info.connectionId}]建立连接`,
-      });
-    } else {
-      message.error({
-        duration: 1,
-        content: `终端${info.remoteAddr}[${info.connectionId}]断开连接`,
-      });
-    }
-  } else {
+  if (info.userId != '0') {
     orgCtrl.user.findEntityAsync(info.userId).then((target) => {
       if (target) {
         if (cmd === 'online') {

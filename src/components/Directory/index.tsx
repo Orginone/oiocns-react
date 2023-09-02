@@ -5,7 +5,9 @@ import ListMode from './views/listMode';
 import TableMode from './views/tableMode';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import SegmentContent from '@/components/Common/SegmentContent';
-import { IDirectory } from '@/ts/core';
+import { IDirectory, IFileInfo } from '@/ts/core';
+import { loadFileMenus } from '@/executor/fileOperate';
+import { command, schema } from '@/ts/base';
 
 interface IProps {
   mode: number;
@@ -17,7 +19,25 @@ interface IProps {
 const Directory: React.FC<IProps> = ({ mode, current }: IProps) => {
   if (!current) return <></>;
   const [key] = useCtrlUpdate(current);
+  const cmdType = mode === 1 ? 'data' : 'config';
   const [segmented, setSegmented] = useStorage('segmented', 'list');
+  const contextMenu = (file?: IFileInfo<schema.XEntity>, clicked?: Function) => {
+    const entity = file || current;
+    return {
+      items: loadFileMenus(entity, mode),
+      onClick: ({ key }: { key: string }) => {
+        command.emitter(cmdType, key, entity, current.key);
+        clicked?.apply(this, []);
+      },
+    };
+  };
+  const fileOpen = async (file: IFileInfo<schema.XEntity>) => {
+    await file.loadContent();
+    command.emitter(cmdType, 'open', file);
+  };
+  const content = () => {
+    return current.content(mode);
+  };
 
   return (
     <SegmentContent
@@ -25,15 +45,13 @@ const Directory: React.FC<IProps> = ({ mode, current }: IProps) => {
       onSegmentChanged={setSegmented}
       description={`${current.content(mode).length}个项目`}
       content={
-        <>
-          {segmented === 'table' ? (
-            <TableMode current={current} mode={mode} />
-          ) : segmented === 'icon' ? (
-            <IconMode current={current} mode={mode} />
-          ) : (
-            <ListMode current={current} mode={mode} />
-          )}
-        </>
+        segmented === 'table' ? (
+          <TableMode content={content()} fileOpen={fileOpen} contextMenu={contextMenu} />
+        ) : segmented === 'icon' ? (
+          <IconMode content={content()} fileOpen={fileOpen} contextMenu={contextMenu} />
+        ) : (
+          <ListMode content={content()} fileOpen={fileOpen} contextMenu={contextMenu} />
+        )
       }
     />
   );

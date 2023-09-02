@@ -1206,12 +1206,60 @@ export default class KernelApi {
     });
   }
   /**
+   * 获取对象数据
+   * @param {string} belongId 对象所在的归属用户ID
+   * @param {string} key 对象名称（eg: rootName.person.name）
+   * @returns {model.ResultType<T>} 对象异步结果
+   */
+  public async objectGet<T>(belongId: string, key: string): Promise<model.ResultType<T>> {
+    return await this.dataProxy({
+      module: 'Object',
+      action: 'Get',
+      belongId,
+      params: key,
+    });
+  }
+  /**
+   * 变更对象数据
+   * @param {string} belongId 对象所在的归属用户ID
+   * @param {string} key 对象名称（eg: rootName.person.name）
+   * @param {any} setData 对象新的值
+   * @returns {model.ResultType<T>} 对象异步结果
+   */
+  public async objectSet(
+    belongId: string,
+    key: string,
+    setData: any,
+  ): Promise<model.ResultType<any>> {
+    return await this.dataProxy({
+      module: 'Object',
+      action: 'Set',
+      belongId,
+      params: {
+        key,
+        setData,
+      },
+    });
+  }
+  /**
    * 请求一个内核方法
    * @param {ForwardType} reqs 请求体
    * @returns 异步结果
    */
   public async forward<T>(req: model.ForwardType): Promise<model.ResultType<T>> {
     return await this._restRequest('forward', req, 20);
+  }
+  /**
+   * 请求一个数据核方法
+   * @param {ReqestType} reqs 请求体
+   * @returns 异步结果
+   */
+  public async dataProxy(req: model.DataProxyType): Promise<model.ResultType<any>> {
+    if (this._storeHub.isConnected) {
+      return await this._storeHub.invoke('DataProxy', req);
+    } else {
+      return await this._restRequest('dataProxy', req);
+    }
   }
   /**
    * 请求一个内核方法
