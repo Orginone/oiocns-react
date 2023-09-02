@@ -1,5 +1,5 @@
 import { kernel, model, schema } from '../../../ts/base';
-import { IBelong } from '@/ts/core';
+import { IBelong, IDepartment } from '@/ts/core';
 import { useEffect, useState } from 'react';
 import React from 'react';
 import FormRender, { useForm } from 'form-render';
@@ -7,7 +7,9 @@ import { WorkFormRulesType } from '@/ts/core/work/rules/workFormRules';
 import moment from 'moment';
 import MyDivider from '@/components/Common/FormEdit/widgets/Divider';
 import MySpace from '@/components/Common/FormEdit/widgets/Space';
-import { Tabs } from 'antd';
+import { InputNumber, Tabs } from 'antd';
+import ProFormPerson from '@/components/Common/FormEdit/widgets/ProFormPerson';
+import ProFormDept from '@/components/Common/FormEdit/widgets/ProFormDept';
 interface IProps {
   allowEdit: boolean;
   belong: IBelong;
@@ -73,6 +75,36 @@ const FormRenders: React.FC<IProps> = (props) => {
       setData({ ...data });
     },
   };
+
+  const handleSchemaData: any = (schema: any) => {
+    //TODO:向自定义组件传参方式验证完成；待优化此部分功能
+    // console.log(schema, props);
+    const properties = schema.properties;
+    const buildDepartments = (departments: IDepartment[]) => {
+      const data: any[] = [];
+      for (const item of departments) {
+        data.push({
+          key: item.id,
+          label: item.name,
+          value: item.id,
+          children: buildDepartments(item.children),
+        });
+      }
+      return data;
+    };
+    // console.log('depts');
+    Object.keys(properties).forEach((key) => {
+      const content = properties[key];
+      content['metadata'] = {
+        belongId: props.belong.metadata.id,
+        deptTree: buildDepartments(props.belong?.departments as any),
+      };
+
+      // content['metadata'] = props.belong;
+    });
+
+    return schema;
+  };
   return props.forms.map((formResult) => {
     const rule = formResult.rule && JSON.parse(formResult.rule);
     if (!rule) {
@@ -82,10 +114,16 @@ const FormRenders: React.FC<IProps> = (props) => {
       // eslint-disable-next-line react/jsx-key
       <FormRender
         form={formIns}
-        schema={rule.schema}
+        schema={handleSchemaData(rule.schema)}
         disabled={!props.allowEdit}
         watch={watch}
-        widgets={{ MyDivider: MyDivider, MySpace: MySpace }}
+        widgets={{
+          MyDivider: MyDivider,
+          MySpace: MySpace,
+          number: InputNumber, //增加对默认 数值型支持
+          person: ProFormPerson, //增加对人员列表的支持
+          dept: ProFormDept, //增加对部门列表的支持
+        }}
         //beforeFinish={beforeFinish}
       />
     );

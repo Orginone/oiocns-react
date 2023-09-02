@@ -1,5 +1,7 @@
 import { uniqueArray, getAllFixedCharacter, getChartcterContent } from '../lib/tools';
 import { RuleTypes } from '../type.d';
+import OrgCtrl from '@/ts/controller';
+
 // import { FixedCharacters } from '../lib/const';
 const FixedCharacters = [
   '「单位名称」',
@@ -23,7 +25,13 @@ export default async function replaceString(
   //一、判断是否有限定字符FixedCharacters，替换所有限定字符为对应数据值
   replacedStr = await fixedCharacterResolver(ruleStr);
   //二、替换所有表单特性为对应数据值 使用reduce对AttrSet数组进行遍历和处理,
-  replacedStr = await formAttrResolver(ruleStr, AttrSet, formData, attrs, missingAttrs);
+  replacedStr = await formAttrResolver(
+    ruleStr,
+    AttrSet.filter((v) => !FixedCharacters.includes(v)),
+    formData,
+    attrs,
+    missingAttrs,
+  );
   //三、根据已有数据 执行内部函数，获取对应数据,
   //TODO:
   //如果missingAttrs数组中有缺少的属性，打印错误信息并返回空字符串
@@ -48,7 +56,7 @@ const formAttrResolver = async (
   if (!ruleStr) {
     return '';
   }
-  const replacedStr = await ruleAttrs
+  const replacedStr = ruleAttrs
     .map((_str) => getChartcterContent(_str))
     .reduce((ruleContent, item) => {
       //在attrs数组中查找是否有name等于item的对象
@@ -78,7 +86,10 @@ const formAttrResolver = async (
 
 /* 固定字符处理 */
 /* 固定字符处理 */
-const fixedCharacterResolver = (ruleStr: string) => {
+const fixedCharacterResolver = async (ruleStr: string) => {
+  const _company = (await import('../workFormRules')).default.currentCompanyInfo;
+  console.log('sssss', _company);
+
   if (!ruleStr) {
     return '';
   }
@@ -88,13 +99,13 @@ const fixedCharacterResolver = (ruleStr: string) => {
   const replacedStr = ruleStr.replace(fixedRegex, (char) => {
     switch (char) {
       case '「单位名称」':
-        return 'ABC公司';
+        return _company.name;
       case '「单位编码」':
-        return '123456';
+        return _company.id;
       case '「使用人名称」':
-        return '张三';
+        return OrgCtrl.user.metadata.name;
       case '「使用人编码」':
-        return '0001';
+        return OrgCtrl.user.metadata.id;
       case '「系统时间」':
         return new Date().toLocaleString();
       default:

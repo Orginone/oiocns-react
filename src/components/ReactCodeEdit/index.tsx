@@ -4,12 +4,12 @@ import CodeMirror from '@uiw/react-codemirror';
 
 interface indexAType {
   onCodeChange: (d: string) => void;
-  defaultVal: { value: string };
+  defaultVal?: { value: string };
 }
 const Index: React.FC<indexAType> = ({ onCodeChange, defaultVal }) => {
   return (
     <CodeMirror
-      value={defaultVal.value}
+      value={defaultVal?.value}
       height={'200px'}
       minHeight="100px"
       placeholder="请设置规则内容"

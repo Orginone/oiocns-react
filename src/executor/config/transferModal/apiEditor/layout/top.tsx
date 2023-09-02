@@ -100,11 +100,13 @@ const Top: React.FC<IProps> = ({ cmd, dir }) => {
       {curTab && <RequestLayout current={curTab.item} />}
       {open && (
         <RequestForm
+          formType={'newRequest'}
           current={curDir}
-          cancel={() => setOpen(false)}
           finished={(request) => {
             setOpen(false);
-            cmd.emitter('', 'onAdd', loadEntity(request));
+            if (request) {
+              cmd.emitter('', 'onAdd', loadEntity(request));
+            }
           }}
         />
       )}

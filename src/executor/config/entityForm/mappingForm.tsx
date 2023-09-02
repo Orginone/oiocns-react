@@ -88,6 +88,7 @@ const MappingForm: React.FC<IProps> = ({ current, finished, cancel }) => {
         values.targetAttrs = [...await target.current!.loadAttributes()];
         values.mappings = [];
         values.name = source.current?.name + '->' + target.current?.name;
+        values.typeName = '映射'
         await current.createConfig(ConfigColl.Mappings, values);
         finished();
         orgCtrl.changCallback();

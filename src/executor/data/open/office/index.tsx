@@ -26,8 +26,6 @@ const OfficeView: React.FC<IProps> = ({ share, finished }) => {
           return <SheetViewer {...config} />;
         case '.docx':
           return <DocxViewer {...config} />;
-        case '.pdfx':
-          return <PdfViewer {...config} />;
         case '.pdf':
           return <PdfViewer {...config} />;
       }

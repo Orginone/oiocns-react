@@ -47,14 +47,6 @@ class MethodRule extends RuleBase implements IRuleBase {
       typeof resValue === 'object' ? resValue : { [this.targetId]: resValue };
     return await removeNullObj(data);
   }
-
-  public loadRemoteDatas(): void {
-    throw new Error('Method not implemented.');
-  }
-
-  public generateRule(): void {
-    throw new Error('generateRule not implemented.');
-  }
 }
 
 export default MethodRule;

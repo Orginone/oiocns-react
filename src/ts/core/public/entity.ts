@@ -5,6 +5,7 @@ import { entityOperates } from './operates';
 
 /** 共享信息数据集 */
 export const ShareIdSet = new Map<string, any>();
+export const ShareSet = new Map<string, IEntity<schema.XEntity>>(); 
 
 /** 实体类接口 */
 export interface IEntity<T> extends Emitter {
@@ -51,6 +52,7 @@ export abstract class Entity<T extends schema.XEntity>
     this.key = generateUuid();
     this._metadata = _metadata;
     ShareIdSet.set(_metadata.id, _metadata);
+    ShareSet.set(_metadata.id, this);
   }
   _metadata: T;
   key: string;
