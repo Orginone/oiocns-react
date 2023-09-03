@@ -1,4 +1,4 @@
-import { IWork } from '@/ts/core';
+import { IWork, IWorkTask } from '@/ts/core';
 import { Button, Input } from 'antd';
 import React, { useEffect, useState } from 'react';
 import WorkForm from '@/executor/tools/workForm';
@@ -7,7 +7,7 @@ import { IWorkApply } from '@/ts/core';
 import { model } from '@/ts/base';
 // 卡片渲染
 interface IProps {
-  current: IWork;
+  current: IWork | IWorkTask;
   finished: () => void;
 }
 
@@ -33,7 +33,7 @@ const WorkStartDo: React.FC<IProps> = ({ current, finished }) => {
         width={'80vw'}
         bodyHeight={'80vh'}
         destroyOnClose
-        title={current.name}
+        title={apply.metadata.title}
         footer={[]}
         onCancel={finished}>
         <WorkForm

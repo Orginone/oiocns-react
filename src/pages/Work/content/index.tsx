@@ -10,7 +10,7 @@ import CustomStore from 'devextreme/data/custom_store';
 import { ImCopy, ImShuffle, ImTicket } from 'react-icons/im';
 import { Modal, message } from 'antd';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
-import WorkStartDo from './start';
+import WorkStartDo from '@/executor/data/open/work';
 
 interface IProps {
   taskType: string;
@@ -97,12 +97,15 @@ const TaskContent = (props: IProps) => {
   };
 
   if (task) {
-    if (
-      task.metadata.approveType == '子流程' &&
-      task.metadata.status < TaskStatus.ApprovalStart
-    ) {
+    if (task.metadata.approveType == '子流程') {
       return (
-        <WorkStartDo current={task} finished={() => setTask(undefined)}></WorkStartDo>
+        <WorkStartDo
+          current={task}
+          finished={() => {
+            task.user.work?.loadTodos(true);
+            setTask(undefined);
+          }}
+        />
       );
     }
     return <TaskDetail task={task} onBack={() => setTask(undefined)} />;

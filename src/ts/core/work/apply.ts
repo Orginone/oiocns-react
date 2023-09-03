@@ -43,7 +43,6 @@ export class WorkApply implements IWorkApply {
       content: content,
       contentType: 'Text',
       data: JSON.stringify(this.instanceData),
-      childrenData: '',
     });
     return res.success;
   }

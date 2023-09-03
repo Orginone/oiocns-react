@@ -545,8 +545,6 @@ export type WorkInstanceModel = {
   taskId: string;
   // 发起用户ID
   applyId: string;
-  // 子流程数据
-  childrenData: string;
 };
 
 export type InstanceDataModel = {
