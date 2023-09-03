@@ -98,15 +98,7 @@ const TaskContent = (props: IProps) => {
 
   if (task) {
     if (task.metadata.approveType == '子流程') {
-      return (
-        <WorkStartDo
-          current={task}
-          finished={() => {
-            task.user.work?.loadTodos(true);
-            setTask(undefined);
-          }}
-        />
-      );
+      return <WorkStartDo current={task} finished={() => setTask(undefined)} />;
     }
     return <TaskDetail task={task} onBack={() => setTask(undefined)} />;
   }
@@ -132,9 +124,7 @@ const TaskContent = (props: IProps) => {
         })
       }
       columnChooser={{ enabled: true }}
-      onRowDblClick={async (e) => {
-        await setTaskDetail(e.data);
-      }}
+      onRowDblClick={async (e) => await setTaskDetail(e.data)}
       sorting={{ mode: 'none' }}
       remoteOperations={{
         paging: true,

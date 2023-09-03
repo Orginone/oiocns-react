@@ -149,15 +149,8 @@ export class WorkTask implements IWorkTask {
   }
   async createApply(): Promise<IWorkApply | undefined> {
     if (this.metadata.approveType == '子流程') {
-      var define: IWork | undefined;
-      var space: IBelong | undefined;
-      this.user.targets.forEach((a) => {
-        a.directory.applications.forEach((s) => {
-          define = s.works.find((w) => w.id == this.metadata.defineId);
-          space = a.space;
-        });
-      });
-      if (define && space) {
+      var define = await this.findWorkById(this.metadata.defineId);
+      if (define && (await define.loadWorkNode())) {
         const data: model.InstanceDataModel = {
           data: this.instanceData?.data!,
           fields: {},
@@ -167,7 +160,7 @@ export class WorkTask implements IWorkTask {
           allowEdit: define.metadata.allowEdit,
           allowSelect: define.metadata.allowSelect,
         };
-        define.forms.forEach((form) => {
+        (await define.loadWorkForms()).forEach((form) => {
           data.fields[form.id] = form.fields;
         });
         return new WorkApply(
@@ -176,10 +169,23 @@ export class WorkTask implements IWorkTask {
             taskId: this.id,
             title: define.name,
             defineId: define.id,
+            applyId: this.instance!.shareId,
           } as model.WorkInstanceModel,
           data,
-          space,
+          define.application.directory.target.space,
         );
+      }
+    }
+  }
+
+  private async findWorkById(wrokId: string): Promise<IWork | undefined> {
+    for (var target of this.user.targets) {
+      for (var app of await target.directory.loadAllApplication()) {
+        const works = await app.loadWorks();
+        const work = works.find((a) => a.metadata.id === wrokId);
+        if (work) {
+          return work;
+        }
       }
     }
   }
