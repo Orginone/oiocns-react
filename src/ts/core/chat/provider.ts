@@ -38,13 +38,16 @@ export class ChatProvider implements IChatProvider {
         this._preTags.push(data);
       }
     });
-    kernel.anystore.subscribed(
+    kernel.subscribed(
       this.user.id,
       storeCollName.ChatMessage + '.Changed',
       (data: MsgChatData) => {
         if (data && data.fullId) {
           const find = this.chats.find((i) => i.chatdata.fullId === data.fullId);
-          find?.loadCache(data);
+          if (find) {
+            find.loadCache(data);
+            msgChatNotify.changCallback();
+          }
         }
       },
     );
