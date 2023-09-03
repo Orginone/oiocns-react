@@ -1,4 +1,3 @@
-import AnyStore from './anystore';
 import StoreHub from './storehub';
 import * as model from '../model';
 import type * as schema from '../schema';
@@ -22,30 +21,47 @@ export default class KernelApi {
   private readonly _axiosInstance = axios.create({});
   // 单例
   private static _instance: KernelApi;
-  // 任意数据存储对象
-  private _anystore: AnyStore;
   // 订阅方法
   private _methods: { [name: string]: ((...args: any[]) => void)[] };
+  // 订阅回调字典
+  private _subscribeCallbacks: Record<string, (data: any) => void>;
   // 上下线提醒
   onlineNotity = new Emitter();
   // 在线的连接
   onlineIds: string[] = [];
+  // 获取accessToken
+  public get accessToken(): string {
+    return sessionStorage.getItem('accessToken') || '';
+  }
+  // 设置accessToken
+  private set accessToken(val: string) {
+    sessionStorage.setItem('accessToken', val);
+  }
   /**
    * 私有构造方法
    * @param url 远端地址
    */
   private constructor(url: string) {
     this._methods = {};
-    this._anystore = AnyStore.getInstance();
+    this._subscribeCallbacks = {};
+    // this._anystore = AnyStore.getInstance();
     this._storeHub = new StoreHub(url, 'json');
     this._storeHub.on('Receive', (res) => this._receive(res));
+    this._storeHub.on('Updated', (belongId, key, data) => {
+      this._updated(belongId, key, data);
+    });
     this._storeHub.onConnected(() => {
-      if (this._anystore.accessToken.length > 0) {
+      if (this.accessToken.length > 0) {
         this._storeHub
-          .invoke('TokenAuth', this._anystore.accessToken)
+          .invoke('TokenAuth', this.accessToken)
           .then((res: model.ResultType<any>) => {
             if (res.success) {
               logger.info('连接到内核成功!');
+              Object.keys(this._subscribeCallbacks).forEach(async (fullKey) => {
+                const key = fullKey.split('|')[0];
+                const belongId = fullKey.split('|')[1];
+                this.subscribed(belongId, key, this._subscribeCallbacks[fullKey]);
+              });
             }
           })
           .catch((err) => {
@@ -65,13 +81,6 @@ export default class KernelApi {
       this._instance = new KernelApi(url);
     }
     return this._instance;
-  }
-  /**
-   * 任意数据存储对象
-   * @returns {AnyStore | undefined} 可能为空的存储对象
-   */
-  public get anystore(): AnyStore {
-    return this._anystore;
   }
   /**
    * 是否在线
@@ -114,7 +123,7 @@ export default class KernelApi {
       res = await this._restRequest('login', req);
     }
     if (res.success) {
-      await this._anystore.updateToken(res.data.accessToken);
+      this.accessToken = res.data.accessToken;
     }
     return res;
   }
@@ -160,7 +169,7 @@ export default class KernelApi {
       res = await this._restRequest('Register', params);
     }
     if (res.success) {
-      await this._anystore.updateToken(res.data.accessToken);
+      this.accessToken = res.data.accessToken;
     }
     return res;
   }
@@ -1463,6 +1472,51 @@ export default class KernelApi {
     });
   }
   /**
+   * 订阅对象变更
+   * @param {string} key 对象名称（eg: rootName.person.name）
+   * @param {string} belongId 对象所在域, 个人域(user),单位域(company),开放域(all)
+   * @param {(data:any)=>void} callback 变更回调，默认回调一次
+   * @returns {void} 无返回值
+   */
+  public subscribed<T>(belongId: string, key: string, callback: (data: T) => void): void {
+    if (callback) {
+      const fullKey = key + '|' + belongId;
+      this._subscribeCallbacks[fullKey] = callback;
+      if (this._storeHub.isConnected) {
+        this._storeHub
+          .invoke('Subscribed', belongId, key)
+          .then((res: model.ResultType<T>) => {
+            if (res.success && res.data) {
+              callback.apply(this, [res.data]);
+            }
+          })
+          .catch((err) => {
+            logger.error(err);
+          });
+      }
+    }
+  }
+  /**
+   * 取消订阅对象变更
+   * @param {string} key 对象名称（eg: rootName.person.name）
+   * @param {string} belongId 对象所在域, 个人域(user),单位域(company),开放域(all)
+   * @returns {void} 无返回值
+   */
+  public unSubscribed(belongId: string, key: string): void {
+    const fullKey = key + '|' + belongId;
+    if (this._subscribeCallbacks[fullKey] && this._storeHub.isConnected) {
+      this._storeHub
+        .invoke('UnSubscribed', belongId, key)
+        .then(() => {
+          console.debug(`${key}取消订阅成功.`);
+        })
+        .catch((err) => {
+          logger.error(err);
+        });
+    }
+    delete this._subscribeCallbacks[fullKey];
+  }
+  /**
    * 请求一个内核方法
    * @param {ForwardType} reqs 请求体
    * @returns 异步结果
@@ -1565,6 +1619,23 @@ export default class KernelApi {
     }
   }
   /**
+   * 对象变更通知
+   * @param key 主键
+   * @param data 数据
+   * @returns {void} 无返回值
+   */
+  private _updated(belongId: string, key: string, data: any): void {
+    const lfullkey = key + '|' + belongId;
+    Object.keys(this._subscribeCallbacks).forEach((fullKey) => {
+      if (fullKey === lfullkey) {
+        const callback: (data: any) => void = this._subscribeCallbacks[fullKey];
+        if (callback) {
+          callback.call(callback, data);
+        }
+      }
+    });
+  }
+  /**
    * 使用rest请求后端
    * @param methodName 方法
    * @param data 参数
@@ -1580,7 +1651,7 @@ export default class KernelApi {
       timeout: timeout * 1000,
       url: '/orginone/kernel/rest/' + methodName,
       headers: {
-        Authorization: this._anystore.accessToken,
+        Authorization: this.accessToken,
       },
       data: args,
     });

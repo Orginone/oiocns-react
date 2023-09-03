@@ -208,10 +208,9 @@ export abstract class MsgChat<T extends schema.XEntity>
   }
   loadCache(cache: MsgChatData): void {
     if (this.chatdata.fullId === cache.fullId) {
-      this.labels = this.labels.Union(new List<string>(cache.labels ?? []));
       this.chatdata.chatName = cache.chatName || this.chatdata.chatName;
-      this.chatdata.labels = this.labels.ToArray();
-      this.chatdata.isToping = this.chatdata.labels.includes('置顶');
+      this.chatdata.labels = cache.labels || this.chatdata.labels;
+      this.chatdata.isToping = cache.isToping;
       this.share.name = this.chatdata.chatName;
       if (cache.noReadCount === undefined) {
         cache.noReadCount = this.chatdata.noReadCount;
