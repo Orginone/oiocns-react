@@ -1,7 +1,7 @@
-import { kernel, model, schema } from '../../base';
-import { PageAll } from '../public';
-import { IDirectory } from './directory';
-import { FileInfo, IFileInfo } from './fileinfo';
+import { kernel, model, schema } from '../../../base';
+import { PageAll } from '../../public';
+import { IDirectory } from '../directory';
+import { FileInfo, IFileInfo } from '../fileinfo';
 
 /** 元数据分类接口 */
 export interface ISpecies extends IFileInfo<schema.XSpecies> {

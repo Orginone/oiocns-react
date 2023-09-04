@@ -1,8 +1,8 @@
-import { kernel, model, schema } from '../../base';
-import { PageAll, directoryOperates, fileOperates } from '../public';
-import { IDirectory } from './directory';
-import { FileInfo, IFileInfo } from './fileinfo';
-import { IWork, Work } from '../work';
+import { kernel, model, schema } from '../../../base';
+import { PageAll, directoryOperates, fileOperates } from '../../public';
+import { IDirectory } from '../directory';
+import { FileInfo, IFileInfo } from '../fileinfo';
+import { IWork, Work } from '../../work';
 
 /** 应用/模块接口类 */
 export interface IApplication extends IFileInfo<schema.XApplication> {

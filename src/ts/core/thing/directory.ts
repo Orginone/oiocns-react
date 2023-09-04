@@ -9,12 +9,12 @@ import {
   teamOperates,
 } from '../public';
 import { ITarget } from '../target/base/target';
-import { Form, IForm } from './form';
+import { Form, IForm } from './standard/form';
 import { SysFileInfo, ISysFileInfo, IFileInfo, FileInfo } from './fileinfo';
-import { Species, ISpecies } from './species';
+import { Species, ISpecies } from './standard/species';
 import { Member } from './member';
-import { Property, IProperty } from './property';
-import { Application, IApplication } from './application';
+import { Property, IProperty } from './standard/property';
+import { Application, IApplication } from './standard/application';
 import { BucketOpreates, DirectoryModel } from '@/ts/base/model';
 import { encodeKey } from '@/ts/base/common';
 /** 可为空的进度回调 */

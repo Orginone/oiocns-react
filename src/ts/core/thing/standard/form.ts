@@ -1,7 +1,7 @@
-import { schema, model, kernel } from '../../base';
-import { PageAll, orgAuth } from '../../core/public';
-import { IDirectory } from './directory';
-import { FileInfo, IFileInfo } from './fileinfo';
+import { schema, model, kernel } from '../../../base';
+import { PageAll, orgAuth } from '../../../core/public';
+import { IDirectory } from '../directory';
+import { FileInfo, IFileInfo } from '../fileinfo';
 
 /** 表单类接口 */
 export interface IForm extends IFileInfo<schema.XForm> {

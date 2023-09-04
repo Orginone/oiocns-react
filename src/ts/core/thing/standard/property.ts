@@ -1,6 +1,6 @@
-import { schema, model, kernel } from '../../base';
-import { IDirectory } from './directory';
-import { FileInfo, IFileInfo } from './fileinfo';
+import { schema, model, kernel } from '../../../base';
+import { IDirectory } from '../directory';
+import { FileInfo, IFileInfo } from '../fileinfo';
 export interface IProperty extends IFileInfo<schema.XProperty> {
   /** 表单特性 */
   attributes: schema.XAttribute[];

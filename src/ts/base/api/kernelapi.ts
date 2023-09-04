@@ -1280,11 +1280,11 @@ export default class KernelApi {
    * @param {string} belongId 对象所在的归属用户ID
    * @returns {model.ResultType<T>} 对象异步结果
    */
-  public async collectionInsert(
+  public async collectionInsert<T>(
     belongId: string,
     collName: string,
-    data: any,
-  ): Promise<model.ResultType<any>> {
+    data: T,
+  ): Promise<model.ResultType<T>> {
     return await this.dataProxy({
       module: 'Collection',
       action: 'Insert',
@@ -1295,15 +1295,15 @@ export default class KernelApi {
   /**
    * 替换数据集数据
    * @param {string} collName 数据集名称（eg: history-message）
-   * @param {any} data 要添加的数据，对象/数组
+   * @param {T} data 要添加的数据，对象/数组
    * @param {string} belongId 对象所在的归属用户ID
    * @returns {model.ResultType<T>} 对象异步结果
    */
-  public async collectionReplace(
+  public async collectionReplace<T>(
     belongId: string,
     collName: string,
-    data: any,
-  ): Promise<model.ResultType<any>> {
+    data: T,
+  ): Promise<model.ResultType<T>> {
     return await this.dataProxy({
       module: 'Collection',
       action: 'Replace',

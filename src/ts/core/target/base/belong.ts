@@ -8,6 +8,7 @@ import { ITarget, Target } from './target';
 import { IChatMessage, ChatMessage } from '../../chat/message/chatmsg';
 import { IMsgChat, PersonMsgChat } from '../../chat/message/msgchat';
 import { targetOperates } from '../../public';
+import { DataResource } from '../../thing/resource';
 
 /** 自归属用户接口类 */
 export interface IBelong extends ITarget {
@@ -15,6 +16,8 @@ export interface IBelong extends ITarget {
   user: IPerson;
   /** 归属的消息 */
   message: IChatMessage;
+  /** 用户资源 */
+  resource: DataResource;
   /** 超管权限，权限为树结构 */
   superAuth: IAuthority | undefined;
   /** 加入/管理的群 */
@@ -46,8 +49,10 @@ export abstract class Belong extends Target implements IBelong {
     super(_metadata, _labels, undefined, _memberTypes);
     this.user = _user || (this as unknown as IPerson);
     this.message = new ChatMessage(this);
+    this.resource = new DataResource(_metadata.id);
   }
   user: IPerson;
+  resource: DataResource;
   cohorts: ICohort[] = [];
   message: IChatMessage;
   superAuth: IAuthority | undefined;
