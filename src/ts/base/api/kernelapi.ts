@@ -1276,7 +1276,7 @@ export default class KernelApi {
   /**
    * 添加数据到数据集
    * @param {string} collName 数据集名称（eg: history-message）
-   * @param {any} data 要添加的数据，对象/数组
+   * @param {} data 要添加的数据，对象/数组
    * @param {string} belongId 对象所在的归属用户ID
    * @returns {model.ResultType<T>} 对象异步结果
    */
@@ -1288,6 +1288,25 @@ export default class KernelApi {
     return await this.dataProxy({
       module: 'Collection',
       action: 'Insert',
+      belongId,
+      params: { collName, data },
+    });
+  }
+  /**
+   * 替换数据集数据
+   * @param {string} collName 数据集名称（eg: history-message）
+   * @param {any} data 要添加的数据，对象/数组
+   * @param {string} belongId 对象所在的归属用户ID
+   * @returns {model.ResultType<T>} 对象异步结果
+   */
+  public async collectionReplace(
+    belongId: string,
+    collName: string,
+    data: any,
+  ): Promise<model.ResultType<any>> {
+    return await this.dataProxy({
+      module: 'Collection',
+      action: 'Replace',
       belongId,
       params: { collName, data },
     });
@@ -1328,6 +1347,23 @@ export default class KernelApi {
       action: 'Remove',
       belongId,
       params: { collName, match },
+    });
+  }
+  /**
+   * 查询数据集数据
+   * @param  过滤参数
+   * @returns {model.ResultType<T>} 移除异步结果
+   */
+  public async collectionLoad<T>(
+    belongId: string,
+    options: any,
+  ): Promise<model.ResultType<T>> {
+    options.belongId = belongId;
+    return await this.dataProxy({
+      module: 'Collection',
+      action: 'Load',
+      belongId,
+      params: options,
     });
   }
   /**
