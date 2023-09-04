@@ -13,7 +13,7 @@ import axios from 'axios';
 import { model } from '..';
 
 /**
- * 任意数据存储类
+ * 任意数据存储类(弃用)
  */
 export default class AnyStore {
   // 存储集线器
