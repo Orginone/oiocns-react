@@ -63,6 +63,7 @@
     "@microsoft/signalr": "^6.0.10",
     "@monaco-editor/react": "^4.5.1",
     "@msgpack/msgpack": "^2.8.0",
+    "@react-icons/all-files": "^4.1.0",
     "@types/react-scroll": "^1.8.7",
     "@uiw/codemirror-extensions-langs": "^4.21.3",
     "@uiw/codemirror-theme-vscode": "^4.21.3",
