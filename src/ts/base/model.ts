@@ -20,17 +20,31 @@ export type DataProxyType = {
   params: any;
 };
 // 代理请求类型定义
-export type ForwardType = {
+export type HttpRequestType = {
   // 目标地址
   uri: string;
   // 请求方法
   method: string;
   // 请求头
-  header: any;
+  header: {
+    [key: string]: string;
+  };
   // 请求体
-  content: any;
+  content: string;
 };
-
+// Http请求响应类型定义
+export type HttpResponseType = {
+  // 状态码
+  status: number;
+  // 响应类型
+  contentType: string;
+  // 响应头
+  header: {
+    [key: string]: string[];
+  };
+  // 响应体
+  content: string;
+};
 // 返回类型定义
 export type ResultType<T> = {
   // http代码

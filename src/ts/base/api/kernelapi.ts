@@ -1552,12 +1552,18 @@ export default class KernelApi {
     delete this._subscribeCallbacks[fullKey];
   }
   /**
-   * 请求一个内核方法
-   * @param {ForwardType} reqs 请求体
+   * 由内核代理一个http请求
+   * @param {model.HttpRequestType} reqs 请求体
    * @returns 异步结果
    */
-  public async forward<T>(req: model.ForwardType): Promise<model.ResultType<T>> {
-    return await this._restRequest('forward', req, 20);
+  public async httpForward(
+    req: model.HttpRequestType,
+  ): Promise<model.ResultType<model.HttpResponseType>> {
+    if (this._storeHub.isConnected) {
+      return await this._storeHub.invoke('HttpForward', req);
+    } else {
+      return await this._restRequest('httpForward', req, 20);
+    }
   }
   /**
    * 请求一个数据核方法
