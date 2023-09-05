@@ -19,7 +19,10 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
   const isBuild = command === 'build';
 
   console.log({ command, mode });
-
+  const esbuildConfig = mode === 'production' ? {
+    drop: ['debugger'], // console 暂时有点问题，先不加
+    sourcemap: false
+  } : {}
   return {
     base: VITE_BASE_PATH,
     plugins: createVitePlugins(mode, isBuild),
@@ -53,25 +56,26 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
       },
       proxy: createProxy(),
     },
+    ...esbuildConfig,
     build: {
       target: 'es5',
       outDir: 'dist', // 指定输出路径
-      minify: false, // 混淆器,terser构建后文件体积更小
+      minify: true, // 混淆器,terser构建后文件体积更小
       sourcemap: false, // 输出.map文件
       chunkSizeWarningLimit: 2048,
-      terserOptions: {
-        compress: {
-          drop_console: VITE_DROP_CONSOLE, // 生产环境移除console
-          drop_debugger: true, // 生产环境移除debugger
-          pure_funcs: ['console.log'],
-        },
-        output: {
-          // 去掉注释内容
-          comments: true,
-        },
-      },
+      // terserOptions: {
+      //   compress: {
+      //     drop_console: VITE_DROP_CONSOLE, // 生产环境移除console
+      //     drop_debugger: true, // 生产环境移除debugger
+      //     pure_funcs: ['console.log'],
+      //   },
+      //   output: {
+      //     // 去掉注释内容
+      //     comments: true,
+      //   },
+      // },
       rollupOptions: {
-        // 确保外部化处理那些你不想打包进库的依赖
+        // 确保外部化处理那些你不想打包进库的依赖·
         // external: ['react', 'antd'], // 注意看这里
         treeshake: false,
         output: {
@@ -80,19 +84,20 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
           assetFileNames: 'static/[ext]/[name]-[hash].[ext]',
           manualChunks(id) {
             if (id.includes("node_modules/handsontable")) {
-              return 'handsontable'
+              return 'handsontable-[hash]'
             }
             if (id.includes("node_modules/axios")) {
-              return 'axios'
+              return 'axios-[hash]'
             }
             if (id.includes("node_modules/echarts")) {
-              return 'echarts'
+              return 'echarts-[hash]'
             }
             if (id.includes("node_modules/loadash")) {
-              return 'loadash'
+              return 'loadash-[hash]'
             }
             if (
                 id.includes("node_modules/devextreme") 
+                || id.includes("node_module/devextreme-react")
                 || id.includes("node_modules/react") 
                 || id.includes("node_modules/react-dom") 
                 || id.includes("node_modules/react-router-dom")
