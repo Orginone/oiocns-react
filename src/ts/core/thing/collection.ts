@@ -30,7 +30,7 @@ export class Collection<T extends schema.Xbase> {
       },
     };
     const res = await kernel.collectionLoad<T[]>(this.belongId, options);
-    if (res.success) {
+    if (res.success && res.data) {
       return res.data || [];
     }
     return [];

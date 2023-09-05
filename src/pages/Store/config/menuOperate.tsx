@@ -18,7 +18,6 @@ const createMenu = (team: ITarget, children: MenuItemType[]) => {
     icon: <EntityIcon notAvatar={true} entityId={team.id} size={18} />,
     children: children,
     beforeLoad: async () => {
-      console.log(team);
       if ('directory' in team) {
         await (team as ITarget).directory.loadContent();
       }

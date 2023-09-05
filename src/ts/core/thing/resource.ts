@@ -9,7 +9,7 @@ export class DataResource {
     this.speciesColl = new Collection<schema.XSpecies>(id, 'standard-species');
     this.speciesItemColl = new Collection<schema.XSpeciesItem>(
       id,
-      'standard-speciesItem',
+      'standard-species-item',
     );
     this.applicationColl = new Collection<schema.XApplication>(
       id,
@@ -31,7 +31,7 @@ export class DataResource {
   directoryColl: Collection<schema.XDirectory>;
   /** 资源预加载 */
   async preLoad(): Promise<void> {
-    Promise.all([
+    await Promise.all([
       this.formColl.all(),
       this.speciesColl.all(),
       this.propertyColl.all(),

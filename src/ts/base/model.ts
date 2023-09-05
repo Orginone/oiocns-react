@@ -46,6 +46,23 @@ export type HttpResponseType = {
   content: string;
 };
 // 返回类型定义
+export type LoadResult<T> = {
+  // 数据体
+  data: T;
+  // 分组数量
+  groupCount: number;
+  // 聚合运算结果
+  summary: any[];
+  // 总数
+  totalCount: number;
+  // 消息
+  msg: string;
+  // 结果
+  success: boolean;
+  // http代码
+  code: number;
+};
+// 返回类型定义
 export type ResultType<T> = {
   // http代码
   code: number;

@@ -1,6 +1,6 @@
 import { kernel, model, schema } from '../../base';
 import { IApplication } from '../thing/standard/application';
-import { IForm, Form } from '../thing/form';
+import { IForm, Form } from '../thing/standard/form';
 import { FileInfo, IFileInfo } from '../thing/fileinfo';
 import { IDirectory } from '../thing/directory';
 import { IWorkApply, WorkApply } from './apply';

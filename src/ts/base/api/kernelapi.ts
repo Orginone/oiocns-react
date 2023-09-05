@@ -1357,14 +1357,15 @@ export default class KernelApi {
   public async collectionLoad<T>(
     belongId: string,
     options: any,
-  ): Promise<model.ResultType<T>> {
+  ): Promise<model.LoadResult<T>> {
     options.belongId = belongId;
-    return await this.dataProxy({
+    const res = await this.dataProxy({
       module: 'Collection',
       action: 'Load',
       belongId,
       params: options,
     });
+    return { ...res, ...res.data };
   }
   /**
    * 从数据集查询数据

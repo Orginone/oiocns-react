@@ -1,7 +1,5 @@
 import { common, kernel, model, schema } from '../../base';
 import {
-  PageAll,
-  TargetType,
   directoryNew,
   directoryOperates,
   fileOperates,
@@ -17,6 +15,7 @@ import { Property, IProperty } from './standard/property';
 import { Application, IApplication } from './standard/application';
 import { BucketOpreates, DirectoryModel } from '@/ts/base/model';
 import { encodeKey } from '@/ts/base/common';
+import { DataResource } from './resource';
 /** 可为空的进度回调 */
 export type OnProgress = (p: number) => void;
 
@@ -116,6 +115,9 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
   }
   get locationKey(): string {
     return this.key;
+  }
+  get resource(): DataResource {
+    return this.target.space.resource;
   }
   content(mode: number = 0): IFileInfo<schema.XEntity>[] {
     const cnt: IFileInfo<schema.XEntity>[] = [...this.children];
@@ -255,13 +257,16 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
   }
   async loadForms(reload: boolean = false): Promise<IForm[]> {
     if (reload) {
-      const res = await kernel.queryForms({
-        id: this.id,
-        page: PageAll,
-      });
-      if (res.success) {
-        this.forms = (res.data.result || []).map((i) => new Form(i, this));
-      }
+      this.forms = this.resource.formColl.cache
+        .filter((i) => i.directoryId === this.id)
+        .map((i) => new Form(i, this));
+      // const res = await kernel.queryForms({
+      //   id: this.id,
+      //   page: PageAll,
+      // });
+      // if (res.success) {
+      //   this.forms = (res.data.result || []).map((i) => new Form(i, this));
+      // }
     }
     return this.forms;
   }
@@ -276,13 +281,16 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
   }
   async loadSpecieses(reload: boolean = false): Promise<ISpecies[]> {
     if (reload) {
-      const res = await kernel.querySpecies({
-        id: this.id,
-        page: PageAll,
-      });
-      if (res.success) {
-        this.specieses = (res.data.result || []).map((i) => new Species(i, this));
-      }
+      this.specieses = this.resource.speciesColl.cache
+        .filter((i) => i.directoryId === this.id)
+        .map((i) => new Species(i, this));
+      // const res = await kernel.querySpecies({
+      //   id: this.id,
+      //   page: PageAll,
+      // });
+      // if (res.success) {
+      //   this.specieses = (res.data.result || []).map((i) => new Species(i, this));
+      // }
     }
     return this.specieses;
   }
@@ -297,13 +305,16 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
   }
   async loadPropertys(reload: boolean = false): Promise<IProperty[]> {
     if (reload) {
-      const res = await kernel.queryPropertys({
-        id: this.id,
-        page: PageAll,
-      });
-      if (res.success) {
-        this.propertys = (res.data.result || []).map((i) => new Property(i, this));
-      }
+      this.propertys = this.resource.propertyColl.cache
+        .filter((i) => i.directoryId === this.id)
+        .map((i) => new Property(i, this));
+      // const res = await kernel.queryPropertys({
+      //   id: this.id,
+      //   page: PageAll,
+      // });
+      // if (res.success) {
+      //   this.propertys = (res.data.result || []).map((i) => new Property(i, this));
+      // }
     }
     return this.propertys;
   }
@@ -318,16 +329,22 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
   }
   async loadApplications(reload: boolean = false): Promise<IApplication[]> {
     if (reload) {
-      const res = await kernel.queryApplications({
-        id: this.id,
-        page: PageAll,
-      });
-      if (res.success) {
-        const data = res.data.result || [];
-        this.applications = data
-          .filter((i) => !i.parentId || i.parentId.length < 1)
-          .map((i) => new Application(i, this, undefined, data));
-      }
+      const data = this.resource.applicationColl.cache.filter(
+        (i) => i.directoryId === this.id,
+      );
+      this.applications = data
+        .filter((i) => !i.parentId || i.parentId.length < 1)
+        .map((i) => new Application(i, this, undefined, data));
+      // const res = await kernel.queryApplications({
+      //   id: this.id,
+      //   page: PageAll,
+      // });
+      // if (res.success) {
+      //   const data = res.data.result || [];
+      //   this.applications = data
+      //     .filter((i) => !i.parentId || i.parentId.length < 1)
+      //     .map((i) => new Application(i, this, undefined, data));
+      // }
     }
     return this.applications;
   }
@@ -389,29 +406,52 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
   }
   public async loadSubDirectory() {
     if (!this.parent && this.children.length < 1) {
-      const res = await kernel.queryDirectorys({
-        id: this.target.id,
-        page: PageAll,
-        upTeam: this.target.typeName === TargetType.Group,
-      });
-      if (res.success && res.data) {
-        this.children = [];
-        if (res.data.result && res.data.result.length > 0) {
-          const data = res.data.result.find((i) => i.id === this.id);
-          if (data) {
-            this.loadChildren(data, res.data.result);
-          }
-        }
+      const dirs = this.resource.directoryColl.cache.filter(
+        (i) => i.shareId === this.target.id,
+      );
+      this.children = [];
+      var data = dirs.find((i) => i.id === this.id);
+      if (data) {
+        this.loadChildren(data, dirs);
       }
+      // const res = await kernel.queryDirectorys({
+      //   id: this.target.id,
+      //   page: PageAll,
+      //   upTeam: this.target.typeName === TargetType.Group,
+      // });
+      // if (res.success && res.data) {
+      //   this.children = [];
+      //   if (res.data.result && res.data.result.length > 0) {
+      //     const data = res.data.result.find((i) => i.id === this.id);
+      //     if (data) {
+      //       this.loadChildren(data, res.data.result);
+      //     }
+      //   }
+      // }
     }
   }
   private loadChildren(data: schema.XDirectory, directorys: schema.XDirectory[]) {
-    this.forms = (data.forms || []).map((f) => new Form(f, this));
-    this.specieses = (data.species || []).map((s) => new Species(s, this));
-    this.propertys = (data.propertys || []).map((p) => new Property(p, this));
-    this.applications = (data.applications || [])
+    this.forms = this.resource.formColl.cache
+      .filter((i) => i.directoryId === this.id)
+      .map((f) => new Form(f, this));
+    this.specieses = this.resource.speciesColl.cache
+      .filter((i) => i.directoryId === this.id)
+      .map((s) => new Species(s, this));
+    this.propertys = this.resource.propertyColl.cache
+      .filter((i) => i.directoryId === this.id)
+      .map((p) => new Property(p, this));
+    var apps = this.resource.applicationColl.cache.filter(
+      (i) => i.directoryId === this.id,
+    );
+    this.applications = apps
       .filter((a) => !a.parentId || a.parentId.length < 1)
-      .map((a) => new Application(a, this, undefined, data.applications));
+      .map((a) => new Application(a, this, undefined, apps));
+    // this.forms = (data.forms || []).map((f) => new Form(f, this));
+    // this.specieses = (data.species || []).map((s) => new Species(s, this));
+    // this.propertys = (data.propertys || []).map((p) => new Property(p, this));
+    // this.applications = (data.applications || [])
+    //   .filter((a) => !a.parentId || a.parentId.length < 1)
+    //   .map((a) => new Application(a, this, undefined, data.applications));
     directorys
       .filter((i) => i.parentId === data.id)
       .forEach((i) => {
