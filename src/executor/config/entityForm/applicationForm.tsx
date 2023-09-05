@@ -1,10 +1,10 @@
 import React from 'react';
 import { ProFormColumnsType } from '@ant-design/pro-components';
 import SchemaForm from '@/components/SchemaForm';
-import { ApplicationModel } from '@/ts/base/model';
 import { IApplication, IDirectory } from '@/ts/core';
 import UploadItem from '../../tools/uploadItem';
 import { EntityColumns } from './entityColumns';
+import { schema } from '@/ts/base';
 
 interface Iprops {
   formType: string;
@@ -49,7 +49,7 @@ const ApplicationForm = (props: Iprops) => {
     default:
       return <></>;
   }
-  const columns: ProFormColumnsType<ApplicationModel>[] = [
+  const columns: ProFormColumnsType<schema.XApplication>[] = [
     {
       title: '图标',
       dataIndex: 'icon',
@@ -122,7 +122,7 @@ const ApplicationForm = (props: Iprops) => {
     },
   });
   return (
-    <SchemaForm<ApplicationModel>
+    <SchemaForm<schema.XApplication>
       open
       title={title}
       width={640}

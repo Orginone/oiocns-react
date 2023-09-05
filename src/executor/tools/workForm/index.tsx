@@ -31,7 +31,8 @@ const getNodeByNodeId = (
 /** 流程节点表单 */
 const WorkForm: React.FC<IWorkFormProps> = (props) => {
   const node = getNodeByNodeId(props.nodeId, props.data.node);
-  if (!node || !node?.forms || node?.forms.length < 1) return <></>;
+  if (!node || (node.primaryFormIds.length < 1 && node.detailFormIds.length < 1))
+    return <></>;
   /** 根据需求获取数据 */
   const getFormData = (id: string): model.FormEditData => {
     const source: model.AnyThingModel[] = [];
@@ -56,12 +57,10 @@ const WorkForm: React.FC<IWorkFormProps> = (props) => {
       createTime: formatDate(new Date(), 'yyyy-MM-dd hh:mm:ss.S'),
     };
   };
-  const primaryForms = node.forms.filter((f) => f.typeName === '主表');
-  const detailForms = node.forms.filter((f) => f.typeName === '子表');
   return (
     <div style={{ padding: 10 }}>
-      <PrimaryForms {...props} forms={primaryForms} getFormData={getFormData} />
-      <DetailForms {...props} forms={detailForms} getFormData={getFormData} />
+      <PrimaryForms {...props} forms={node.primaryForms} getFormData={getFormData} />
+      <DetailForms {...props} forms={node.detailForms} getFormData={getFormData} />
     </div>
   );
 };

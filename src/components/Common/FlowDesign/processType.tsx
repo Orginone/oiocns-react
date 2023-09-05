@@ -134,7 +134,10 @@ export const loadResource = (resource: any, parentCode: string): any => {
       destId: resource.destId,
       destName: resource.destName,
       num: resource.num || 1,
-      forms: resource.forms,
+      primaryFormIds: resource.primaryFormIds,
+      detailFormIds: resource.detailFormIds,
+      primaryForms: resource.primaryForms,
+      detailForms: resource.detailForms,
       belongId: resource.belongId,
       branches:
         resource.branches?.map((item: any) => {
@@ -186,7 +189,10 @@ export const convertNode = (resource: NodeModel | undefined, errors: any[]): any
     }
     switch (resource.type) {
       case AddNodeType.ROOT:
-        if (!resource.forms || resource.forms.length == 0) {
+        if (
+          (!resource.primaryFormIds || resource.primaryFormIds.length == 0) &&
+          (!resource.detailFormIds || resource.detailFormIds.length == 0)
+        ) {
           errors.push('ROOT节点未绑定表单');
         }
         break;
@@ -239,7 +245,10 @@ export const convertNode = (resource: NodeModel | undefined, errors: any[]): any
       name: resource.name,
       num: resource.num || 1,
       destType: resource.destType || '身份',
-      forms: resource.forms,
+      primaryFormIds: resource.primaryFormIds,
+      detailFormIds: resource.detailFormIds,
+      primaryForms: resource.primaryForms,
+      detailForms: resource.detailForms,
       destId: resource.destId,
       destName: resource.destName,
       children: convertNode(resource.children, errors),

@@ -20,12 +20,12 @@ export type XEntity = {
   name: string;
   // 编号
   code: string;
+  // 归属用户
+  belongId: string;
   // 备注
   remark: string;
   // 图标
   icon: string;
-  // 归属用户
-  belongId: string;
   // 类型
   typeName: string;
   // 创建类别标准的用户
@@ -82,8 +82,6 @@ export type XAttribute = {
   formId: string;
   // 归属用户ID
   belongId: string;
-  // 关联的各组织属性
-  linkPropertys: XProperty[] | undefined;
   // 属性关系
   links: XAttrLinkProp[] | undefined;
   // 关联属性
@@ -141,7 +139,7 @@ export type XForm = {
   // 目录ID
   directoryId: string;
   // 单的特性
-  attributes: XAttribute[] | undefined;
+  attributes: XAttribute[];
   // 使用单的流程节点
   bindNodes: XWorkNode[] | undefined;
   // 单的目录

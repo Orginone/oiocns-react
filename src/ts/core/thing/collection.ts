@@ -21,13 +21,13 @@ export class Collection<T extends schema.Xbase> {
   }
 
   async load(options: any): Promise<T[]> {
+    options.options = options.options || {};
+    options.options.match = options.options.match || {};
+    options.options.match.isDeleted = false;
     options = {
       ...options,
       userData: [],
       collName: this.collName,
-      options: {
-        match: { isDeleted: false },
-      },
     };
     const res = await kernel.collectionLoad<T[]>(this.belongId, options);
     if (res.success && res.data) {
@@ -37,6 +37,7 @@ export class Collection<T extends schema.Xbase> {
   }
 
   async insert(data: T): Promise<T | undefined> {
+    data.id = data.id || 'snowId()';
     const res = await kernel.collectionInsert<T>(this.belongId, this.collName, data);
     if (res.success) {
       if (res.data) {
@@ -47,6 +48,9 @@ export class Collection<T extends schema.Xbase> {
   }
 
   async insertMany(data: T[]): Promise<T[]> {
+    data = data.map((a) => {
+      return { ...a, id: a.id || 'snowId()' };
+    });
     const res = await kernel.collectionInsert<T[]>(this.belongId, this.collName, data);
     if (res.success) {
       if (res.data && res.data.length > 0) {
@@ -123,7 +127,7 @@ export class Collection<T extends schema.Xbase> {
     });
     if (res.success) {
       if (res.data?.MatchedCount > 0) {
-        this.cache = this.cache.filter((i) => data.every((i) => i.id != i.id));
+        this.cache = this.cache.filter((i) => data.every((a) => a.id != i.id));
       }
       return res.data?.MatchedCount > 0;
     }

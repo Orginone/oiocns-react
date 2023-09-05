@@ -1,4 +1,4 @@
-import { schema, model, kernel } from '../../../base';
+import { schema, model } from '../../../base';
 import { IDirectory } from '../directory';
 import { FileInfo, IFileInfo } from '../fileinfo';
 export interface IProperty extends IFileInfo<schema.XProperty> {
@@ -8,8 +8,6 @@ export interface IProperty extends IFileInfo<schema.XProperty> {
   update(data: model.PropertyModel): Promise<boolean>;
   /** 删除表单 */
   delete(): Promise<boolean>;
-  /** 加载表单特性 */
-  loadAttributes(reload?: boolean): Promise<schema.XAttribute[]>;
 }
 
 export class Property extends FileInfo<schema.XProperty> implements IProperty {
@@ -17,7 +15,6 @@ export class Property extends FileInfo<schema.XProperty> implements IProperty {
     super({ ..._metadata, typeName: '属性' }, _directory);
   }
   attributes: schema.XAttribute[] = [];
-  private _attributeLoaded: boolean = false;
   async rename(name: string): Promise<boolean> {
     return await this.update({ ...this.metadata, name: name });
   }
@@ -52,44 +49,31 @@ export class Property extends FileInfo<schema.XProperty> implements IProperty {
     }
     return false;
   }
-  async update(data: model.PropertyModel): Promise<boolean> {
+  async update(data: schema.XProperty): Promise<boolean> {
     data.id = this.id;
     data.directoryId = this.metadata.directoryId;
-    const res = await kernel.updateProperty(data);
-    if (res.success && res.data.id) {
-      res.data.typeName = '属性';
-      this.setMetadata(res.data);
+    const res = await this.directory.resource.propertyColl.replace({
+      ...this.metadata,
+      ...data,
+      directoryId: this.metadata.directoryId,
+    });
+    if (res) {
+      res.typeName = '属性';
+      this.setMetadata(res);
+      return true;
     }
-    return res.success;
+    return false;
   }
   async delete(): Promise<boolean> {
     if (this.directory) {
-      const res = await kernel.deleteProperty({
-        id: this.id,
-      });
-      if (res.success) {
+      const res = await this.directory.resource.propertyColl.delete(this.metadata);
+      if (res) {
         this.directory.propertys = this.directory.propertys.filter(
           (i) => i.key != this.key,
         );
       }
-      return res.success;
+      return res;
     }
     return false;
-  }
-  async loadContent(reload: boolean = false): Promise<boolean> {
-    await this.loadAttributes(reload);
-    return true;
-  }
-  async loadAttributes(reload: boolean = false): Promise<schema.XAttribute[]> {
-    if (!this._attributeLoaded || reload) {
-      const res = await kernel.queryPropAttributes({
-        id: this.id,
-      });
-      if (res.success) {
-        this._attributeLoaded = true;
-        this.attributes = res.data.result || [];
-      }
-    }
-    return this.attributes;
   }
 }

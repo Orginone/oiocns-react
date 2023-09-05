@@ -1,11 +1,10 @@
 import React from 'react';
 import { ProFormColumnsType } from '@ant-design/pro-components';
 import SchemaForm from '@/components/SchemaForm';
-import { FormModel } from '@/ts/base/model';
-import { IDirectory } from '@/ts/core';
+import { IDirectory, IForm } from '@/ts/core';
 import UploadItem from '../../tools/uploadItem';
-import { IForm } from '@/ts/core/thing/form';
 import { EntityColumns } from './entityColumns';
+import { schema } from '@/ts/base';
 
 interface Iprops {
   formType: string;
@@ -41,7 +40,7 @@ const LabelsForm = (props: Iprops) => {
     default:
       return <></>;
   }
-  const columns: ProFormColumnsType<FormModel>[] = [
+  const columns: ProFormColumnsType<schema.XForm>[] = [
     {
       title: '图标',
       dataIndex: 'icon',
@@ -91,7 +90,7 @@ const LabelsForm = (props: Iprops) => {
     },
   });
   return (
-    <SchemaForm<FormModel>
+    <SchemaForm<schema.XForm>
       open
       title={title}
       width={640}

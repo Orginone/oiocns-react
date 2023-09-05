@@ -13,7 +13,7 @@ import { Species, ISpecies } from './standard/species';
 import { Member } from './member';
 import { Property, IProperty } from './standard/property';
 import { Application, IApplication } from './standard/application';
-import { BucketOpreates, DirectoryModel } from '@/ts/base/model';
+import { BucketOpreates } from '@/ts/base/model';
 import { encodeKey } from '@/ts/base/common';
 import { DataResource } from './resource';
 /** 可为空的进度回调 */
@@ -23,6 +23,8 @@ export type OnProgress = (p: number) => void;
 export interface IDirectory extends IFileInfo<schema.XDirectory> {
   /** 当前加载目录的用户 */
   target: ITarget;
+  /** 资源类 */
+  resource: DataResource;
   /** 上级目录 */
   parent: IDirectory | undefined;
   /** 下级文件系统项数组 */
@@ -34,9 +36,9 @@ export interface IDirectory extends IFileInfo<schema.XDirectory> {
   /** 目录下的内容 */
   content(mode?: number): IFileInfo<schema.XEntity>[];
   /** 创建子目录 */
-  create(data: DirectoryModel): Promise<IDirectory | undefined>;
+  create(data: schema.XDirectory): Promise<IDirectory | undefined>;
   /** 更新目录 */
-  update(data: DirectoryModel): Promise<boolean>;
+  update(data: schema.XDirectory): Promise<boolean>;
   /** 删除目录 */
   delete(): Promise<boolean>;
   /** 目录下的文件 */
@@ -50,25 +52,25 @@ export interface IDirectory extends IFileInfo<schema.XDirectory> {
   /** 加载表单 */
   loadForms(reload?: boolean): Promise<IForm[]>;
   /** 新建表单 */
-  createForm(data: model.FormModel): Promise<IForm | undefined>;
+  createForm(data: schema.XForm): Promise<IForm | undefined>;
   /** 目录下的分类 */
   specieses: ISpecies[];
   /** 加载分类 */
   loadSpecieses(reload?: boolean): Promise<ISpecies[]>;
   /** 新建分类 */
-  createSpecies(data: model.SpeciesModel): Promise<ISpecies | undefined>;
+  createSpecies(data: schema.XSpecies): Promise<ISpecies | undefined>;
   /** 目录下的属性 */
   propertys: IProperty[];
   /** 加载属性 */
   loadPropertys(reload?: boolean): Promise<IProperty[]>;
   /** 新建属性 */
-  createProperty(data: model.PropertyModel): Promise<IProperty | undefined>;
+  createProperty(data: schema.XProperty): Promise<IProperty | undefined>;
   /** 目录下的应用 */
   applications: IApplication[];
   /** 加载应用 */
   loadApplications(reload?: boolean): Promise<IApplication[]>;
   /** 新建应用 */
-  createApplication(data: model.ApplicationModel): Promise<IApplication | undefined>;
+  createApplication(data: schema.XApplication): Promise<IApplication | undefined>;
   /** 加载全部应用 */
   loadAllApplication(reload?: boolean): Promise<IApplication[]>;
   /** 加载目录树 */
@@ -181,33 +183,33 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
     }
     return false;
   }
-  async create(data: DirectoryModel): Promise<IDirectory | undefined> {
-    data.parentId = this.id;
-    data.shareId = this.metadata.shareId;
-    const res = await kernel.createDirectory(data);
-    if (res.success && res.data.id) {
-      const directory = new Directory(res.data, this.target, this);
+  async create(data: schema.XDirectory): Promise<IDirectory | undefined> {
+    const res = await this.resource.directoryColl.insert({
+      ...data,
+      parentId: this.id,
+      shareId: this.metadata.shareId,
+    });
+    if (res) {
+      const directory = new Directory(res, this.target, this);
       this.children.push(directory);
       return directory;
     }
   }
-  async update(data: model.DirectoryModel): Promise<boolean> {
-    data.id = this.id;
-    data.parentId = this.metadata.parentId;
-    data.shareId = this.metadata.shareId;
-    const res = await kernel.updateDirectory(data);
-    if (res.success && res.data.id) {
-      this.setMetadata({ ...res.data, typeName: '目录' });
+  async update(data: schema.XDirectory): Promise<boolean> {
+    const res = await this.resource.directoryColl.replace({ ...this.metadata, ...data });
+    if (res) {
+      this.setMetadata({ ...res, typeName: '目录' });
+      return true;
     }
-    return res.success;
+    return false;
   }
   async delete(): Promise<boolean> {
     if (this.parent) {
-      const res = await kernel.deleteDirectory({ id: this.id });
-      if (res.success) {
+      const res = await this.resource.directoryColl.delete(this.metadata);
+      if (res) {
         this.parent.children = this.parent.children.filter((i) => i.key != this.key);
       }
-      return res.success;
+      return res;
     }
     return false;
   }
@@ -260,21 +262,16 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
       this.forms = this.resource.formColl.cache
         .filter((i) => i.directoryId === this.id)
         .map((i) => new Form(i, this));
-      // const res = await kernel.queryForms({
-      //   id: this.id,
-      //   page: PageAll,
-      // });
-      // if (res.success) {
-      //   this.forms = (res.data.result || []).map((i) => new Form(i, this));
-      // }
     }
     return this.forms;
   }
-  async createForm(data: model.FormModel): Promise<IForm | undefined> {
-    data.directoryId = this.id;
-    const res = await kernel.createForm(data);
-    if (res.success && res.data.id) {
-      const form = new Form(res.data, this);
+  async createForm(data: schema.XForm): Promise<IForm | undefined> {
+    const res = await this.resource.formColl.insert({
+      ...data,
+      directoryId: this.id,
+    });
+    if (res) {
+      const form = new Form(res, this);
       this.forms.push(form);
       return form;
     }
@@ -284,21 +281,16 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
       this.specieses = this.resource.speciesColl.cache
         .filter((i) => i.directoryId === this.id)
         .map((i) => new Species(i, this));
-      // const res = await kernel.querySpecies({
-      //   id: this.id,
-      //   page: PageAll,
-      // });
-      // if (res.success) {
-      //   this.specieses = (res.data.result || []).map((i) => new Species(i, this));
-      // }
     }
     return this.specieses;
   }
-  async createSpecies(data: model.SpeciesModel): Promise<ISpecies | undefined> {
-    data.directoryId = this.id;
-    const res = await kernel.createSpecies(data);
-    if (res.success && res.data.id) {
-      const species = new Species(res.data, this);
+  async createSpecies(data: schema.XSpecies): Promise<ISpecies | undefined> {
+    const res = await this.resource.speciesColl.insert({
+      ...data,
+      directoryId: this.id,
+    });
+    if (res) {
+      const species = new Species(res, this);
       this.specieses.push(species);
       return species;
     }
@@ -308,21 +300,17 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
       this.propertys = this.resource.propertyColl.cache
         .filter((i) => i.directoryId === this.id)
         .map((i) => new Property(i, this));
-      // const res = await kernel.queryPropertys({
-      //   id: this.id,
-      //   page: PageAll,
-      // });
-      // if (res.success) {
-      //   this.propertys = (res.data.result || []).map((i) => new Property(i, this));
-      // }
     }
     return this.propertys;
   }
-  async createProperty(data: model.PropertyModel): Promise<IProperty | undefined> {
+  async createProperty(data: schema.XProperty): Promise<IProperty | undefined> {
     data.directoryId = this.id;
-    const res = await kernel.createProperty(data);
-    if (res.success && res.data.id) {
-      const property = new Property(res.data, this);
+    const res = await this.resource.propertyColl.insert({
+      ...data,
+      directoryId: this.id,
+    });
+    if (res) {
+      const property = new Property(res, this);
       this.propertys.push(property);
       return property;
     }
@@ -335,26 +323,16 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
       this.applications = data
         .filter((i) => !i.parentId || i.parentId.length < 1)
         .map((i) => new Application(i, this, undefined, data));
-      // const res = await kernel.queryApplications({
-      //   id: this.id,
-      //   page: PageAll,
-      // });
-      // if (res.success) {
-      //   const data = res.data.result || [];
-      //   this.applications = data
-      //     .filter((i) => !i.parentId || i.parentId.length < 1)
-      //     .map((i) => new Application(i, this, undefined, data));
-      // }
     }
     return this.applications;
   }
-  async createApplication(
-    data: model.ApplicationModel,
-  ): Promise<IApplication | undefined> {
-    data.directoryId = this.id;
-    const res = await kernel.createApplication(data);
-    if (res.success && res.data.id) {
-      const application = new Application(res.data, this);
+  async createApplication(data: schema.XApplication): Promise<IApplication | undefined> {
+    const res = await this.resource.applicationColl.insert({
+      ...data,
+      directoryId: this.id,
+    });
+    if (res) {
+      const application = new Application(res, this);
       this.applications.push(application);
       return application;
     }
@@ -414,20 +392,6 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
       if (data) {
         this.loadChildren(data, dirs);
       }
-      // const res = await kernel.queryDirectorys({
-      //   id: this.target.id,
-      //   page: PageAll,
-      //   upTeam: this.target.typeName === TargetType.Group,
-      // });
-      // if (res.success && res.data) {
-      //   this.children = [];
-      //   if (res.data.result && res.data.result.length > 0) {
-      //     const data = res.data.result.find((i) => i.id === this.id);
-      //     if (data) {
-      //       this.loadChildren(data, res.data.result);
-      //     }
-      //   }
-      // }
     }
   }
   private loadChildren(data: schema.XDirectory, directorys: schema.XDirectory[]) {
@@ -446,12 +410,6 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
     this.applications = apps
       .filter((a) => !a.parentId || a.parentId.length < 1)
       .map((a) => new Application(a, this, undefined, apps));
-    // this.forms = (data.forms || []).map((f) => new Form(f, this));
-    // this.specieses = (data.species || []).map((s) => new Species(s, this));
-    // this.propertys = (data.propertys || []).map((p) => new Property(p, this));
-    // this.applications = (data.applications || [])
-    //   .filter((a) => !a.parentId || a.parentId.length < 1)
-    //   .map((a) => new Application(a, this, undefined, data.applications));
     directorys
       .filter((i) => i.parentId === data.id)
       .forEach((i) => {

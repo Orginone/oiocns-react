@@ -1,10 +1,9 @@
 import React, { useRef, useState } from 'react';
 import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components';
 import SchemaForm from '@/components/SchemaForm';
-import { PropertyModel } from '@/ts/base/model';
-import { IDirectory, valueTypes } from '@/ts/core';
-import { IProperty } from '@/ts/core/thing/property';
+import { IDirectory, valueTypes, IProperty } from '@/ts/core';
 import { EntityColumns } from './entityColumns';
+import { schema } from '@/ts/base';
 
 interface Iprops {
   formType: string;
@@ -44,7 +43,7 @@ const PropertyForm = (props: Iprops) => {
       return <></>;
   }
   const getFromColumns = () => {
-    const columns: ProFormColumnsType<PropertyModel>[] = [
+    const columns: ProFormColumnsType<schema.XProperty>[] = [
       {
         title: '名称',
         dataIndex: 'name',
@@ -136,7 +135,7 @@ const PropertyForm = (props: Iprops) => {
     return columns;
   };
   return (
-    <SchemaForm<PropertyModel>
+    <SchemaForm<schema.XProperty>
       open
       title={title}
       width={640}

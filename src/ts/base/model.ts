@@ -671,8 +671,14 @@ export type WorkNodeModel = {
   belongId: string;
   // 节点归属定义Id
   defineId: string;
-  // 绑定的表单信息
-  forms: XForm[] | undefined;
+  // 主表Id集合
+  primaryFormIds: string[];
+  // 子表Id集合
+  detailFormIds: string[];
+  // 主表
+  primaryForms: XForm[];
+  // 子表
+  detailForms: XForm[];
 };
 
 export type Branche = {

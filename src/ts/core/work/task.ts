@@ -160,7 +160,7 @@ export class WorkTask implements IWorkTask {
           allowEdit: define.metadata.allowEdit,
           allowSelect: define.metadata.allowSelect,
         };
-        (await define.loadWorkForms()).forEach((form) => {
+        define.primaryForms.forEach((form) => {
           data.fields[form.id] = form.fields;
         });
         return new WorkApply(

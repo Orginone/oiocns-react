@@ -6,8 +6,10 @@ import { IDirectory } from '../thing/directory';
 import { IWorkApply, WorkApply } from './apply';
 
 export interface IWork extends IFileInfo<schema.XWorkDefine> {
-  /** 流程关联的表单 */
-  forms: IForm[];
+  /** 主表 */
+  primaryForms: IForm[];
+  /** 子表 */
+  detailForms: IForm[];
   /** 应用 */
   application: IApplication;
   /** 流程节点 */
@@ -16,8 +18,6 @@ export interface IWork extends IFileInfo<schema.XWorkDefine> {
   update(req: model.WorkDefineModel): Promise<boolean>;
   /** 加载事项定义节点 */
   loadWorkNode(reload?: boolean): Promise<model.WorkNodeModel | undefined>;
-  /** 加载事项定义节点关联的表单 */
-  loadWorkForms(reload?: boolean): Promise<IForm[]>;
   /** 生成办事申请单 */
   createApply(): Promise<IWorkApply | undefined>;
 }
@@ -41,6 +41,8 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
     super(fullDefineRule(_metadata), _application.directory);
     this.application = _application;
   }
+  primaryForms: IForm[] = [];
+  detailForms: IForm[] = [];
   forms: IForm[] = [];
   application: IApplication;
   node: model.WorkNodeModel | undefined;
@@ -114,7 +116,6 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
     return this.forms;
   }
   async loadContent(_reload: boolean = false): Promise<boolean> {
-    await this.loadWorkForms();
     return this.forms.length > 0;
   }
   async update(data: model.WorkDefineModel): Promise<boolean> {
@@ -132,39 +133,10 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
       const res = await kernel.queryWorkNodes({ id: this.id });
       if (res.success) {
         this.node = res.data;
+        this.recursionForms(this.node);
       }
     }
     return this.node;
-  }
-  async loadWorkForms(reload: boolean = false): Promise<IForm[]> {
-    const forms: IForm[] = [];
-    if (!reload) {
-      await this.loadWorkNode(true);
-    }
-    if (this.node) {
-      const recursionForms = async (node: model.WorkNodeModel) => {
-        await Promise.all(
-          (node.forms ?? []).map(async (item) => {
-            const form = new Form({ ...item, id: item.id + '_' }, this.directory);
-            await form.loadContent();
-            forms.push(form);
-          }),
-        );
-        if (node.children) {
-          await recursionForms(node.children);
-        }
-        if (node.branches) {
-          for (const branch of node.branches) {
-            if (branch.children) {
-              await recursionForms(branch.children);
-            }
-          }
-        }
-      };
-      await recursionForms(this.node);
-    }
-    this.forms = forms;
-    return forms;
   }
   async createApply(): Promise<IWorkApply | undefined> {
     if (this.node && this.forms.length > 0) {
@@ -190,6 +162,30 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
         data,
         this.directory.target.space,
       );
+    }
+  }
+  private recursionForms(node: model.WorkNodeModel) {
+    node.primaryForms = this.application.directory.resource.formColl.cache.filter((a) =>
+      node.primaryFormIds.includes(a.id),
+    );
+    node.detailForms = this.application.directory.resource.formColl.cache.filter((a) =>
+      node.primaryFormIds.includes(a.id),
+    );
+    node.primaryForms.forEach((a) => {
+      this.primaryForms.push(new Form({ ...a, id: a.id + '_' }, this.directory));
+    });
+    node.detailForms.forEach((a) => {
+      this.detailForms.push(new Form({ ...a, id: a.id + '_' }, this.directory));
+    });
+    if (node.children) {
+      this.recursionForms(node.children);
+    }
+    if (node.branches) {
+      for (const branch of node.branches) {
+        if (branch.children) {
+          this.recursionForms(branch.children);
+        }
+      }
     }
   }
 }

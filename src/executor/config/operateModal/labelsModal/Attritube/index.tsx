@@ -9,6 +9,7 @@ import SelectPropertys from './SelectPropertys';
 import { Modal } from 'antd';
 import { AttributeModel } from '@/ts/base/model';
 import { AttributeColumn } from '@/config/column';
+import { schema } from '@/ts/base';
 
 interface IProps {
   current: IForm;
@@ -88,7 +89,6 @@ const Attritube = ({ current, modalType, setModalType }: IProps) => {
     }
   };
 
-
   return (
     <>
       <CardOrTable<XAttribute>
@@ -119,7 +119,7 @@ const Attritube = ({ current, modalType, setModalType }: IProps) => {
                   code: prop.code,
                   rule: '{}',
                   remark: prop.remark,
-                } as AttributeModel,
+                } as schema.XAttribute,
                 prop,
               );
               tforceUpdate();
