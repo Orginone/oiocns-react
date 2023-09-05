@@ -2,6 +2,8 @@ import cls from './index.module.less';
 import React, { useState } from 'react';
 import HeadBanner from '@/pages/Home/components/HeadBanner';
 import NavigationBar from '@/pages/Home/components/NavigationBar';
+import useMenuUpdate from '@/hooks/useMenuUpdate';
+import * as config from '@/pages/Chats/config/menuOperate';
 
 export interface NavigationItem {
   key: string;
