@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Dropdown, MenuProps } from 'antd';
-import { BsDisc, BsMusicNoteList } from 'react-icons/bs';
+import { CgDisc, BsMusicNoteList } from '@/icons/bs';
 import cls from './index.module.less';
 import { FileItemModel } from 'src/ts/base/model';
 import { Directory } from '@/ts/core/thing/directory';
@@ -34,9 +34,9 @@ const Menus: React.FC<IProp> = ({
           label: (
             <div className={cls['audio-list']}>
               {each.name}
-              <BsDisc
+              <CgDisc
                 className={`${cls['audio-disc-icon']} ${cls['rotate-animation']}`}
-                color={'#8875a9'}></BsDisc>
+                color={'#8875a9'}></CgDisc>
             </div>
           ),
         });
@@ -46,10 +46,10 @@ const Menus: React.FC<IProp> = ({
           label: (
             <div className={cls['audio-list']}>
               {each.name}
-              <BsDisc
+              <CgDisc
                 visibility={'hidden'}
                 className={`${cls['audio-disc-icon']} ${cls['rotate-animation']}`}
-                color={'#8875a9'}></BsDisc>
+                color={'#8875a9'}></CgDisc>
             </div>
           ),
         });

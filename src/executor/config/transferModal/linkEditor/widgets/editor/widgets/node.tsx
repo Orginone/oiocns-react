@@ -4,7 +4,7 @@ import { XEntity, XFileInfo } from '@/ts/base/schema';
 import { Graph, Node, StringExt } from '@antv/x6';
 import React, { useEffect, useState } from 'react';
 import { IconBaseProps } from 'react-icons';
-import { AiFillPlusCircle, AiOutlineCheck, AiOutlineLoading } from 'react-icons/ai';
+import { AiFillPlusCircle, AiOutlineCheck, AiOutlineLoading } from '@/icons/ai';
 import { MenuItemType } from 'typings/globelType';
 import { linkCmd } from '@/ts/base/common/command';
 import cls from './../../../index.module.less';

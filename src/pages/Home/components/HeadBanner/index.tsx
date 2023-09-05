@@ -1,7 +1,7 @@
 import React from 'react';
 import cls from './index.module.less';
 import { Typography, Input } from 'antd';
-import { SearchOutlined } from '@ant-design/icons';
+import { AiOutlineSearch} from '@/icons/ai'
 
 export interface HeadBannerProps {
   title: string;
@@ -18,7 +18,7 @@ const HeadBanner: React.FC<HeadBannerProps> = (props) => {
         className={cls.search}
         placeholder="请输入你要搜索的内容"
         allowClear
-        enterButton={<SearchOutlined />}
+        enterButton={<AiOutlineSearch />}
         size="large"
         onSearch={onSearch}
       />

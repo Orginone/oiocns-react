@@ -1,7 +1,7 @@
 import { TargetType } from '@/ts/core';
 import React from 'react';
-import * as im from 'react-icons/im';
-import * as fa from 'react-icons/fa';
+import * as im from '@/icons/im';
+import * as fa from '@/icons/fa';
 import { IconBaseProps } from 'react-icons';
 
 interface TypeIconInfo {

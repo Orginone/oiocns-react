@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 import cls from './index.module.less';
-import { EllipsisOutlined } from '@ant-design/icons';
+import { AiOutlineEllipsis } from '@/icons/ai';
 import { NavigationItem } from '@/pages/Home';
 
 const NavigationBar: React.FC<{
@@ -31,7 +31,7 @@ const NavigationBar: React.FC<{
           );
         })}
       </div>
-      <EllipsisOutlined className={cls.navigationBarMore} />
+      <AiOutlineEllipsis className={cls.navigationBarMore} />
     </div>
   );
 };

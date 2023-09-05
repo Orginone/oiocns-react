@@ -1,5 +1,5 @@
-import MainLayout from '@/components/MainLayout';
 import React from 'react';
+import MainLayout from '@/components/MainLayout';
 import Content from './content';
 import useMenuUpdate from '@/hooks/useMenuUpdate';
 import { loadWorkMenu } from './config/menuOperate';

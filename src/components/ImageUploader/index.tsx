@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
-import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
+import LoadingOutlined from '@ant-design/icons/LoadingOutlined';
+
+import { AiOutlinePlus } from '@/icons/ai'
+
 import { Image, message, Upload, UploadProps } from 'antd';
 import { IDirectory, ISysFileInfo } from '@/ts/core';
 import cls from './index.module.less';
@@ -12,7 +15,7 @@ const ImageUploader: React.FC<{
   const directory = props.directory;
   const uploadButton = (
     <div>
-      {loading ? <LoadingOutlined /> : <PlusOutlined />}
+      {loading ? <LoadingOutlined /> : <AiOutlinePlus />}
       <div style={{ marginTop: 8 }}>{loading ? '正在上传' : '选择图片'}</div>
     </div>
   );

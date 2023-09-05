@@ -4,14 +4,13 @@ import TeamIcon from '@/components/Common/GlobalComps/entityIcon';
 import detailStyle from './index.module.less';
 import { IMsgChat, ITarget } from '@/ts/core';
 import ChatHistoryModal from '../ChatHistoryModal';
-import { AiOutlineRight } from 'react-icons/ai';
+import { AiOutlineRight } from '@/icons/ai';
 import { useHistory } from 'react-router-dom';
 import orgCtrl from '@/ts/controller';
 import { ellipsisText } from '@/utils';
 import GroupMember from '@/pages/Chats/content/chat/GroupMember';
 // @ts-ignore
 import { ReactComponent as PublishSvg } from '@/assets/svg/publish.svg';
-
 import Icon from '@ant-design/icons';
 import ActivityPublisher from '@/components/Activity/ActivityPublisher';
 import ActivityList from '@/components/Activity/ActivityList';

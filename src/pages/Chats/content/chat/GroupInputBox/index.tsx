@@ -1,7 +1,7 @@
-import * as im from 'react-icons/im';
 import { Button, message, Popover, Spin, Upload, UploadProps } from 'antd';
-import { CloseCircleFilled } from '@ant-design/icons';
+import { AiFillCloseCircle } from '@/icons/ai';
 import React, { useEffect, useState } from 'react';
+import * as im from '@/icons/im';
 import { IMessage, IMsgChat, MessageType } from '@/ts/core';
 import { model, parseAvatar } from '@/ts/base';
 import PullDown from '@/pages/Chats/components/pullDown';
@@ -36,7 +36,7 @@ const GroupInputBox = (props: IProps) => {
     return (
       <div className="cite-text">
         <div className="cite-text__content">{parseCiteMsg(val)}</div>
-        <CloseCircleFilled
+        <AiFillCloseCircle
           onClick={() => closeCite('')}
           className="cite-text__close-icon"
         />

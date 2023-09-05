@@ -5,7 +5,7 @@ import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import MainLayout from '@/components/MainLayout';
 import useMenuUpdate from '@/hooks/useMenuUpdate';
 import EntityInfo from '@/components/Common/EntityInfo';
-import * as im from 'react-icons/im';
+import { ImUserPlus, ImCog, ImBin, ImPlus } from '@/icons/im';
 import { MenuItemType, OperateMenuType } from 'typings/globelType';
 import IdentityForm from './subModal/IdentityForm';
 import SelectMember from '@/components/Common/SelectMember';
@@ -163,18 +163,18 @@ const loadMenus = (item: ITarget | IIdentity) => {
       items.push(
         {
           key: '分配成员',
-          icon: <im.ImUserPlus />,
+          icon: <ImUserPlus />,
           label: '分配成员',
           model: 'outside',
         },
         {
           key: '编辑',
-          icon: <im.ImCog />,
+          icon: <ImCog />,
           label: '编辑角色',
         },
         {
           key: '删除',
-          icon: <im.ImBin />,
+          icon: <ImBin />,
           label: '删除角色',
           beforeLoad: async () => {
             return await item.delete();
@@ -185,7 +185,7 @@ const loadMenus = (item: ITarget | IIdentity) => {
   } else if (item.hasRelationAuth()) {
     items.push({
       key: '新增',
-      icon: <im.ImPlus />,
+      icon: <ImPlus />,
       label: '新增角色',
       model: 'outside',
     });

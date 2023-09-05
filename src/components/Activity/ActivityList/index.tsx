@@ -4,7 +4,8 @@ import BasicTitle from '@/pages/Home/components/BaseTitle';
 import { Col, Image, Row, Space, Tag, Typography } from 'antd';
 import { Activity } from '@/components/Activity/ActivityPublisher';
 import { ITarget } from '@/ts/core';
-import { LikeOutlined, MessageOutlined, StarOutlined } from '@ant-design/icons';
+import * as ai from '@/icons/ai';
+
 
 const ActivityList: React.FC<{ space: ITarget }> = ({ space }) => {
   // @ts-ignore
@@ -106,9 +107,9 @@ const ActivityList: React.FC<{ space: ITarget }> = ({ space }) => {
         </Row>
         <div className={cls.activityItemFooter}>
           <Space size="middle">
-            <IconText icon={StarOutlined} text="2" key="list-vertical-star-o" />
-            <IconText icon={LikeOutlined} text="36" key="list-vertical-star-o" />
-            <IconText icon={MessageOutlined} text="156" key="list-vertical-star-o" />
+            <IconText icon={ai.AiOutlineStar} text="2" key="list-vertical-star-o" />
+            <IconText icon={ai.AiOutlineLike} text="36" key="list-vertical-star-o" />
+            <IconText icon={ai.AiOutlineMessage} text="156" key="list-vertical-star-o" />
           </Space>
         </div>
       </div>

@@ -5,7 +5,7 @@ import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import MainLayout from '@/components/MainLayout';
 import useMenuUpdate from '@/hooks/useMenuUpdate';
 import EntityInfo from '@/components/Common/EntityInfo';
-import * as im from 'react-icons/im';
+import { ImPlus, ImCog, ImBin } from '@/icons/im';
 import { MenuItemType, OperateMenuType } from 'typings/globelType';
 import AuthForm from './subModal/authForm';
 import { Descriptions } from 'antd';
@@ -119,7 +119,7 @@ const loadAuthorityMenus = (item: IAuthority) => {
   if (item.space.hasRelationAuth()) {
     items.push({
       key: '新增',
-      icon: <im.ImPlus />,
+      icon: <ImPlus />,
       label: '新增权限',
       model: 'outside',
     });
@@ -127,12 +127,12 @@ const loadAuthorityMenus = (item: IAuthority) => {
       items.push(
         {
           key: '编辑',
-          icon: <im.ImCog />,
+          icon: <ImCog />,
           label: '编辑权限',
         },
         {
           key: '删除',
-          icon: <im.ImBin />,
+          icon: <ImBin />,
           label: '删除权限',
           beforeLoad: async () => {
             return await item.delete();

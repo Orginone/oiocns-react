@@ -5,7 +5,7 @@ import OioFormItem from './FormItems';
 import { IBelong } from '@/ts/core';
 import cls from './index.module.less';
 import { model, schema } from '@/ts/base';
-import { ImInfo } from 'react-icons/im';
+import { ImInfo } from '@/icons/im';
 import FormRules from '@/ts/core/work/rules/formRules';
 type IProps = {
   form: schema.XForm & { ruleServices?: any };

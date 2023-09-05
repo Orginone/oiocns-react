@@ -1,5 +1,5 @@
 import { IRequest } from '@/ts/core/thing/config';
-import { DownOutlined } from '@ant-design/icons';
+import { AiOutlineDown } from '@/icons/ai'
 import { Dropdown, Input, Space } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { Param } from './request/widgets/params';
@@ -66,7 +66,7 @@ const InputBox: React.FC<IProps> = ({ current, send }) => {
               alignItems: 'center',
             }}>
             <Space style={{ width: 80, userSelect: 'none' }}>{method}</Space>
-            <DownOutlined />
+            <AiOutlineDown />
           </div>
         </Dropdown>
       }

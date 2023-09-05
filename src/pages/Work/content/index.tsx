@@ -7,7 +7,7 @@ import { GroupMenuType } from '../config/menuType';
 import TaskDetail from './detail';
 import GenerateEntityTable from '@/executor/tools/generate/entityTable';
 import CustomStore from 'devextreme/data/custom_store';
-import { ImCopy, ImShuffle, ImTicket } from 'react-icons/im';
+import { ImCopy, ImShuffle, ImTicket } from '@/icons/im';
 import { Modal, message } from 'antd';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 
@@ -98,27 +98,25 @@ const TaskContent = (props: IProps) => {
   if (task) {
     return <TaskDetail task={task} onBack={() => setTask(undefined)} />;
   }
-
+  const store = new CustomStore({
+    key: 'id',
+    async load(loadOptions) {
+      const res = await getTaskList({
+        offset: loadOptions.skip || 0,
+        limit: loadOptions.take || 20,
+        filter: loadOptions.searchValue || '',
+      });
+      return {
+        data: res.result || [],
+        totalCount: res.total || 0,
+      };
+    },
+  })
   return (
     <GenerateEntityTable
       key={key}
       fields={WorkTaskColumns}
-      dataSource={
-        new CustomStore({
-          key: 'id',
-          async load(loadOptions) {
-            const res = await getTaskList({
-              offset: loadOptions.skip || 0,
-              limit: loadOptions.take || 20,
-              filter: loadOptions.searchValue || '',
-            });
-            return {
-              data: res.result || [],
-              totalCount: res.total || 0,
-            };
-          },
-        })
-      }
+      dataSource={store}
       columnChooser={{ enabled: true }}
       onRowDblClick={async (e) => {
         await setTaskDetail(e.data);

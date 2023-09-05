@@ -6,7 +6,7 @@ import { IBaseFileInfo, ILink } from '@/ts/core/thing/config';
 import { ConfigColl } from '@/ts/core/thing/directory';
 import { Button, Input, Modal, Space, TreeProps } from 'antd';
 import React, { Key, useState } from 'react';
-import { AiOutlineSearch } from 'react-icons/ai';
+import { AiOutlineSearch } from '@/icons/ai';
 import cls from './index.module.css';
 import { linkCmd } from '@/ts/base/common/command';
 

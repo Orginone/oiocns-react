@@ -1,11 +1,11 @@
-import { Col, Divider, Dropdown, Layout, Row, Space, Typography, Button } from 'antd';
 import React, { CSSProperties, useState } from 'react';
+import { Col, Divider, Dropdown, Layout, Row, Space, Typography, Button } from 'antd';
 import cls from './index.module.less';
 import CustomMenu from '@/components/CustomMenu';
 import CustomBreadcrumb from '@/components/CustomBreadcrumb';
 import { MenuItemType, OperateMenuType } from 'typings/globelType';
-import { ImArrowLeft2 } from 'react-icons/im';
-import { RiMore2Fill } from 'react-icons/ri';
+import { ImArrowLeft2 } from '@/icons/im';
+import { RiMore2Fill } from '@/icons/ri';
 import { Resizable } from 'devextreme-react';
 import { LeftBarIcon, RightBarIcon } from '@/components/Common/GlobalComps/customIcon';
 const { Content, Sider } = Layout;

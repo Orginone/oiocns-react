@@ -1,6 +1,6 @@
 import { Tabs } from 'antd';
 import React, { useEffect, useState } from 'react';
-import * as im from 'react-icons/im';
+import * as im from '@/icons/im';
 import { MenuItemType } from '../../../../../../typings/globelType';
 import { Command } from '../../../../../ts/base';
 import { IDirectory } from '../../../../../ts/core';

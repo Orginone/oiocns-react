@@ -1,11 +1,10 @@
-import { AiOutlineSearch } from 'react-icons/ai';
 import { Input, TreeProps } from 'antd';
 import React, { useState } from 'react';
 import cls from './index.module.less';
 import CustomTree from '@/components/CustomTree';
 import { XProperty } from '@/ts/base/schema';
 import { IDirectory, ITarget } from '@/ts/core';
-import { AiOutlineCloseCircle } from 'react-icons/ai';
+import { AiOutlineCloseCircle, AiOutlineSearch } from '@/icons/ai';
 
 interface IProps {
   target: ITarget;

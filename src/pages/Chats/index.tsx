@@ -4,7 +4,7 @@ import * as config from './config/menuOperate';
 import MainLayout from '@/components/MainLayout';
 import useMenuUpdate from '@/hooks/useMenuUpdate';
 import { Input } from 'antd';
-import { ImSearch } from 'react-icons/im';
+import { ImSearch } from '@/icons/im';
 import { IMsgChat, msgChatNotify } from '@/ts/core';
 
 const Setting: React.FC<any> = () => {
@@ -43,6 +43,8 @@ const Setting: React.FC<any> = () => {
       }
       onMenuClick={async (data, key) => {
         const chat = data.item as IMsgChat;
+        console.log('chat click')
+        return 
         switch (key) {
           case '查看会话':
             setIsSupervise(!isSupervise);

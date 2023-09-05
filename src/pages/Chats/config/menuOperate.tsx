@@ -1,6 +1,6 @@
 import React from 'react';
 import { MenuType } from './menuType';
-import * as im from 'react-icons/im';
+import * as im from '@/icons/im';
 import TeamIcon from '@/components/Common/GlobalComps/entityIcon';
 import orgCtrl from '@/ts/controller';
 import { MenuItemType } from 'typings/globelType';

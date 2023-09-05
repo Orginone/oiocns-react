@@ -5,7 +5,7 @@ import TeamIcon from '@/components/Common/GlobalComps/entityIcon';
 import { Button, Typography } from 'antd';
 import detailStyle from '@/pages/Chats/content/chat/GroupDetail/index.module.less';
 import { XTarget } from '@/ts/base/schema';
-import { RightOutlined } from '@ant-design/icons';
+import { AiOutlineRight } from '@/icons/ai';
 
 const SHOW_MEMBER_COUNT = 6;
 const GroupMember: React.FC<{ members: XTarget[] }> = (props) => {
@@ -25,7 +25,7 @@ const GroupMember: React.FC<{ members: XTarget[] }> = (props) => {
       </div>
       <Button type="text" className={cls.groupMemberMore}>
         查看更多群成员
-        <RightOutlined />
+        <AiOutlineRight />
       </Button>
     </div>
   );
