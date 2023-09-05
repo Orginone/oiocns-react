@@ -41,7 +41,7 @@ export class ChatMessage implements IChatMessage {
         minTime = this.messages[this.messages.length].createTime;
       }
     }
-    const res = await kernel.anystore.aggregate(
+    const res = await kernel.collectionAggregate(
       this.belong.id,
       storeCollName.ChatMessage,
       {

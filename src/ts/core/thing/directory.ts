@@ -42,13 +42,13 @@ export type OnProgress = (p: number) => void;
 
 /** 配置集合名称 */
 export enum ConfigColl {
-  Requests = 'requests',
-  RequestLinks = 'request-links',
-  Scripts = 'scripts',
-  Mappings = 'mappings',
-  Environments = 'environments',
-  Stores = 'stores',
-  Unknown = 'unknown',
+  "Requests" = 'requests',
+  "RequestLinks" = 'request-links',
+  "Scripts" = 'scripts',
+  "Mappings" = 'mappings',
+  "Environments" = 'environments',
+  "Stores" = 'stores',
+  "Unknown" = 'unknown',
 }
 
 /** 目录接口类 */
@@ -266,7 +266,7 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
   }
   async loadFiles(reload: boolean = false): Promise<ISysFileInfo[]> {
     if (this.files.length < 1 || reload) {
-      const res = await kernel.anystore.bucketOpreate<model.FileItemModel[]>(
+      const res = await kernel.bucketOpreate<model.FileItemModel[]>(
         this.metadata.belongId,
         {
           key: encodeKey(this.id),
@@ -292,7 +292,7 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
       createTime: new Date(),
     };
     this.taskList.push(task);
-    const data = await kernel.anystore.fileUpdate(
+    const data = await kernel.fileUpdate(
       this.metadata.belongId,
       file,
       `${this.id}/${file.name}`,
@@ -521,7 +521,7 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
     data: schema.XFileInfo,
   ): Promise<IFileInfo<schema.XFileInfo> | undefined> {
     this.defaultEntity(collName, data);
-    let res = await kernel.anystore.insert(this.belongId, collName, data);
+    let res = await kernel.collectionInsert(this.belongId, collName, data);
     if (res.success) {
       let config = this.converting(data);
       this.configs.push(config);
@@ -534,7 +534,7 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
   ): Promise<IFileInfo<schema.XFileInfo>[]> {
     const configs = this.configs.filter((item) => item.metadata.collName == collName);
     if (collName != ConfigColl.Unknown && (configs.length < 1 || reload)) {
-      const res = await kernel.anystore.aggregate(this.belongId, collName, {
+      const res = await kernel.collectionAggregate(this.belongId, collName, {
         match: {
           directoryId: this.id,
         },

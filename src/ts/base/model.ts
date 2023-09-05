@@ -1,4 +1,4 @@
-import { XForm, XIdentity, XTarget, XWorkTask, Xbase } from './schema';
+import { XForm, XIdentity, XTarget } from './schema';
 // 请求类型定义
 export type ReqestType = {
   // 模块
@@ -8,19 +8,60 @@ export type ReqestType = {
   // 参数
   params: any;
 };
-
+// 请求数据核类型定义
+export type DataProxyType = {
+  // 模块
+  module: string;
+  // 方法
+  action: string;
+  // 归属
+  belongId: string;
+  // 参数
+  params: any;
+};
 // 代理请求类型定义
-export type ForwardType = {
+export type HttpRequestType = {
   // 目标地址
   uri: string;
   // 请求方法
   method: string;
   // 请求头
-  header: any;
+  header: {
+    [key: string]: string;
+  };
   // 请求体
-  content: any;
+  content: string;
 };
-
+// Http请求响应类型定义
+export type HttpResponseType = {
+  // 状态码
+  status: number;
+  // 响应类型
+  contentType: string;
+  // 响应头
+  header: {
+    [key: string]: string[];
+  };
+  // 响应体
+  content: string;
+};
+// 返回类型定义
+export type LoadResult<T> = {
+  // 数据体
+  data: T;
+  // 分组数量
+  groupCount: number;
+  // 聚合运算结果
+  summary: any[];
+  // 总数
+  totalCount: number;
+  // 消息
+  msg: string;
+  // 结果
+  success: boolean;
+  // http代码
+  code: number;
+};
 // 返回类型定义
 export type ResultType<T> = {
   // http代码
@@ -60,7 +101,7 @@ export type OnlineInfo = {
   requestCount: number;
   // 终端类型
   endPointType: string;
-}
+};
 // 分页返回定义
 export type PageResult<T> = {
   // 便宜量
@@ -495,7 +536,7 @@ export type AnyThingModel = {
   ModifiedTime: string;
   /** 其它信息 */
   [field: string]: any;
-}
+};
 
 export type WorkDefineModel = {
   // 流程ID
@@ -535,8 +576,6 @@ export type WorkInstanceModel = {
   taskId: string;
   // 发起用户ID
   applyId: string;
-  // 子流程数据
-  childrenData: string;
 };
 
 export type InstanceDataModel = {
@@ -556,15 +595,15 @@ export type InstanceDataModel = {
   /** 提交的表单数据 */
   data: {
     // 表单id
-    [id: string]: FormEditData[]
+    [id: string]: FormEditData[];
   };
   /** 填写的主表信息 */
   primary: {
     /** 特性id */
-    [id: string]: any
+    [id: string]: any;
   };
   formRules?:any
-}
+};
 
 export type FieldModel = {
   /** 标识(特性标识) */
@@ -581,7 +620,7 @@ export type FieldModel = {
   remark: string;
   /** 字典(字典项/分类项) */
   lookups?: FiledLookup[];
-}
+};
 
 export type FiledLookup = {
   /** 唯一标识(项标识) */
@@ -594,7 +633,7 @@ export type FiledLookup = {
   parentId?: string;
   /** 图标 */
   icon?: string;
-}
+};
 
 export type FormEditData = {
   /** 操作前数据体 */
@@ -607,7 +646,7 @@ export type FormEditData = {
   creator: string;
   /** 操作时间 */
   createTime: string;
-}
+};
 
 export type WorkNodeModel = {
   id: string;
@@ -666,8 +705,6 @@ export type ApprovalTaskReq = {
   comment: string;
   // 数据
   data: string;
-  // 子流程数据
-  childrenData: string;
 };
 
 export type TargetMessageModel = {
@@ -816,7 +853,6 @@ export const badRequest = (
 ): ResultType<any> => {
   return { success: false, msg: msg, code: code, data: false };
 };
-
 /** 规则触发时机 */
 export enum RuleTriggers {
   'Start' = 'Start',//初始化

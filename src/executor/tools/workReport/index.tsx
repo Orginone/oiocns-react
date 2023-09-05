@@ -56,7 +56,7 @@ const ReportForms: React.FC<IProps> = (props) => {
       mergeCells: mergeCells,
     });
     if (props.allowEdit) {
-      kernel.anystore.createThing(props.belong.userId, '').then((res) => {
+      kernel.createThing(props.belong.userId, '').then((res) => {
         if (res.success && res.data) {
           setReallyData(res.data);
         }
