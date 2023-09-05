@@ -20,23 +20,25 @@
     ├── pre-commit                      // pre-commit钩子，主要是和eslint配合
 ├── config                              // 全局配置文件
     ├── vite                            // vite 相关配置 代理相关
+    ├── vite                            // 主题配置及全局less变量
     ├── constant.ts                     // 项目配置
-    ├── themeConfig.ts                  // 主题配置
 ├── dist                                // 默认的 build 输出目录
+├── docs                                // 文档目录
 ├── public                              // vite项目下的静态目录
 └── src                                 // 源码目录
     ├── assets                          // 公共的文件（如image、css、font等）
     ├── components                      // 项目组件
     ├── executor                        // 文件操作执行器
+    ├── config                          // 通用配置文件：常量、列表等
     ├── hooks                           // 自定义 hooks
     ├── layouts                         // 全局布局
     ├── routes                          // 路由
-    ├── services                        // api封装
     ├── ts                              // 前端内核ts代码
     ├── utils                           // 工具库
     ├── pages                           // 页面模块目录 UI层
         ├── Home                        // Home页面模块
         ├── ...
+    ├── global.less                     // 全局样式复写
     ├── app.tsx                         // 顶层文件
     ├── index.tsx                       // 项目入口文件
     ├── typings                         // 项目type类型定义文件夹
