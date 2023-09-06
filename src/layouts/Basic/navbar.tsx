@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Badge, Layout, Space, Popover, Row, Col } from 'antd';
+import { Badge, Layout, Space, Tabs, Drawer, Popover, Row, Col, List, Tag } from 'antd';
 import { msgChatNotify } from '@/ts/core';
 import orgCtrl from '@/ts/controller';
 import styles from './index.module.less';
@@ -12,9 +12,14 @@ import React from 'react';
 import { BsFillPaletteFill } from 'react-icons/bs';
 import { AiFillHome, AiFillCreditCard, AiOutlineSecurityScan } from 'react-icons/ai';
 import { ImExit } from 'react-icons/im';
+import { showChatTime } from '@/utils/tools';
+import { kernel, model, schema } from '@/ts/base';
+
 const Navbar: React.FC = () => {
   const [workCount, setWorkCount] = useState(0);
   const [msgCount, setMsgCount] = useState(0);
+  const [online, setOnline] = useState(0);
+  const [onlineVisible, setOnlineVisible] = useState(false);
   useEffect(() => {
     const id = msgChatNotify.subscribe(() => {
       let noReadCount = 0;
@@ -25,6 +30,9 @@ const Navbar: React.FC = () => {
     });
     const workId = orgCtrl.work.notity.subscribe(async () => {
       setWorkCount(orgCtrl.work.todos.length);
+    });
+    kernel.onlineNotity.subscribe(() => {
+      setOnline(kernel.onlineIds.length);
     });
     return () => {
       msgChatNotify.unsubscribe(id);
@@ -147,19 +155,35 @@ const Navbar: React.FC = () => {
   return (
     <Layout.Sider className={styles.header} width={60}>
       <div className="ogo-space-item">
-        <Popover
-          content={content}
-          trigger="click"
-          placement="right"
-          animation="false"
-          overlayClassName={navStyles['popover-style']}>
-          <div>
-            <EntityIcon entityId={orgCtrl.user.id} size={45} />
-          </div>
-        </Popover>
+        <div className="ogo-space-item" onClick={() => setOnlineVisible(!onlineVisible)}>
+          {online > 0 ? (
+            <Badge count={online} size="small" offset={[-15, 0]}>
+              <Popover
+                content={content}
+                trigger="hover"
+                placement="right"
+                animation="false"
+                overlayClassName={navStyles['popover-style']}>
+                <div>
+                  <EntityIcon entityId={orgCtrl.user.id} size={45} />
+                </div>
+              </Popover>
+            </Badge>
+          ) : (
+            <Popover
+              content={content}
+              trigger="hover"
+              placement="right"
+              animation="false"
+              overlayClassName={navStyles['popover-style']}>
+              <EntityIcon entityId={orgCtrl.user.id} size={45} />
+            </Popover>
+          )}
+        </div>
       </div>
       <Space direction="vertical" wrap align="center" size={25} className={styles.navbar}>
         {actions.map((item) => NavItem(item))}
+        {onlineVisible && <OnlineInfo onClose={() => setOnlineVisible(false)} />}
       </Space>
       <Link
         to={'/passport/login'}
@@ -170,6 +194,89 @@ const Navbar: React.FC = () => {
         <OrgIcons size={26} exit selected />
       </Link>
     </Layout.Sider>
+  );
+};
+
+const OnlineInfo: React.FC<{ onClose: () => void }> = ({ onClose }) => {
+  const [key, setKey] = useState('1');
+  const [onlines, setOnlines] = useState<model.OnlineInfo[]>([]);
+  useEffect(() => {
+    const id = kernel.onlineNotity.subscribe((key) => {
+      kernel.onlines().then((value) => {
+        setOnlines(value);
+        setKey(key);
+      });
+    });
+    return () => {
+      kernel.onlineNotity.unsubscribe(id);
+    };
+  }, []);
+
+  const loadOnlineInfo = (onlines: model.OnlineInfo[]) => {
+    return (
+      <List
+        itemLayout="horizontal"
+        dataSource={onlines.sort(
+          (a, b) => new Date(b.onlineTime).getTime() - new Date(a.onlineTime).getTime(),
+        )}
+        renderItem={(item) => <OnlineItem data={item} />}
+      />
+    );
+  };
+
+  return (
+    <Drawer open width={500} placement="right" onClose={() => onClose()}>
+      <Tabs
+        key={key}
+        centered
+        items={[
+          {
+            key: 'online_user',
+            label: `在线用户(${onlines.filter((i) => i.userId != '0').length})`,
+            children: loadOnlineInfo(onlines.filter((i) => i.userId != '0')),
+          },
+          {
+            key: 'online_connection',
+            label: `在线连接(${onlines.filter((i) => i.userId === '0').length})`,
+            children: loadOnlineInfo(onlines.filter((i) => i.userId == '0')),
+          },
+        ]}
+      />
+    </Drawer>
+  );
+};
+const OnlineItem: React.FC<{ data: model.OnlineInfo }> = ({ data }) => {
+  const [target, setTarget] = useState<schema.XEntity>();
+  useEffect(() => {
+    if (data.userId != '0') {
+      orgCtrl.user.findEntityAsync(data.userId).then((item) => {
+        if (item) {
+          setTarget(item);
+        }
+      });
+    }
+  }, []);
+  return (
+    <List.Item
+      style={{ cursor: 'pointer', padding: 6 }}
+      actions={[
+        <div key={data.connectionId} title={data.onlineTime}>
+          {showChatTime(data.userId === '0' ? data.onlineTime : data.authTime)}
+        </div>,
+      ]}>
+      <List.Item.Meta
+        title={
+          <>
+            <span style={{ marginRight: 10 }}>{target?.name || data.connectionId}</span>
+            <Tag color="green" title={'请求次数'}>
+              {data.requestCount}
+            </Tag>
+          </>
+        }
+        avatar={<>{target && <EntityIcon entity={target} size={42} />}</>}
+        description={`使用地址:${data.remoteAddr}`}
+      />
+    </List.Item>
   );
 };
 

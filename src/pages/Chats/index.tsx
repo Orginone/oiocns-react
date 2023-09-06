@@ -7,9 +7,8 @@ import { Input, Modal, Dropdown, MenuProps } from 'antd';
 import { ImSearch } from 'react-icons/im';
 import { IMsgChat, msgChatNotify, TargetType } from '@/ts/core';
 import { schema } from '@/ts/base';
-import { companyTypes } from '@/ts/core';
 import SearchCompany from '@/components/Common/SearchTarget';
-import CreateTeamModal from './createTeam';
+import TargetForm from '@/executor/config/entityForm/targetForm';
 import orgCtrl from '@/ts/controller';
 import * as ai from 'react-icons/ai';
 import * as im from 'react-icons/im';
@@ -20,12 +19,12 @@ const Setting: React.FC<any> = () => {
   const [isSupervise, setIsSupervise] = useState<boolean>(false); // 查看所有会话
   const [key, rootMenu, selectMenu, setSelectMenu] = useMenuUpdate(config.loadChatMenu);
 
-  const [showFormModal, setShowFormModal] = useState<boolean>(false); // 创建单位开关
-  const [isModalOpen, setIsModalOpen] = useState(false); // 添加好友的开关
-  const [modalTitle, setModalTitle] = useState<string>(''); // 创建单位开关
+  const [showFormModal, setShowFormModal] = useState<boolean>(false); // 创建开关
+  const [isModalOpen, setIsModalOpen] = useState(false); // 添加的开关
+  const [modalTitle, setModalTitle] = useState<string>(''); // 创建的标题
   const [selectTargetType, setSelectTargetType] = useState<TargetType>(); // 选中的用户类型
   const [selectTarget, setSelectTarget] = useState<schema.XTarget[]>([]); // 选中的用户
-  const [createTargetType, setCreateTargetType] = useState<TargetType[]>([]); // 选中的用户类型
+  const [createTargetType, setCreateTargetType] = useState<string>(''); // 选中的用户类型
   /**
    * @description: 是否展示超级管理权处理
    * @return {*}
@@ -63,6 +62,11 @@ const Setting: React.FC<any> = () => {
     }
   }, [selectMenu?.company]);
 
+  const reloadFinish = () => {
+    setShowFormModal(false);
+    orgCtrl.changCallback();
+  };
+
   if (!selectMenu || !rootMenu) return <></>;
   const handleItemClick: MenuProps['onClick'] = (item) => {
     switch (item.key) {
@@ -73,7 +77,7 @@ const Setting: React.FC<any> = () => {
         break;
       case '建群组':
         setModalTitle('创建群组');
-        setCreateTargetType([TargetType.Cohort]);
+        setCreateTargetType('newCohort');
         setShowFormModal(true);
         break;
       case '加群组':
@@ -83,7 +87,7 @@ const Setting: React.FC<any> = () => {
         break;
       case '建单位':
         setModalTitle('创建单位');
-        setCreateTargetType(companyTypes);
+        setCreateTargetType('newCompany');
         setShowFormModal(true);
         break;
       case '加单位':
@@ -176,21 +180,13 @@ const Setting: React.FC<any> = () => {
         </Modal>
       )}
       {/* 创建用户 */}
-      <CreateTeamModal
-        title={modalTitle}
-        isEdit={false}
-        open={showFormModal}
-        current={orgCtrl.user}
-        typeNames={createTargetType}
-        handleCancel={() => {
-          setShowFormModal(false);
-        }}
-        handleOk={(item) => {
-          if (item) {
-            setShowFormModal(false);
-          }
-        }}
-      />
+      {showFormModal && (
+        <TargetForm
+          formType={createTargetType}
+          target={orgCtrl.user}
+          finished={reloadFinish}
+        />
+      )}
     </MainLayout>
   );
 };
