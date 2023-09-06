@@ -247,8 +247,14 @@ export const convertNode = (resource: NodeModel | undefined, errors: any[]): any
       destType: resource.destType || '身份',
       primaryFormIds: resource.primaryFormIds,
       detailFormIds: resource.detailFormIds,
-      primaryForms: resource.primaryForms,
-      detailForms: resource.detailForms,
+      primaryForms:
+        resource.primaryForms?.map((a) => {
+          return { id: a.id, code: a.code, name: a.name };
+        }) || [],
+      detailForms:
+        resource.detailForms?.map((a) => {
+          return { id: a.id, code: a.code, name: a.name };
+        }) || [],
       destId: resource.destId,
       destName: resource.destName,
       children: convertNode(resource.children, errors),

@@ -21,6 +21,8 @@ interface IProps {
 const RootNode: React.FC<IProps> = (props) => {
   const [viewForm, setViewForm] = useState<XForm>();
   const [formModel, setFormModel] = useState<string>('');
+  const [primaryForms, setPrimaryForms] = useState(props.current.primaryForms || []);
+  const [detailForms, setDetailForms] = useState(props.current.detailForms || []);
   const [selectAuthValue, setSelectAuthValue] = useState<any>(props.current.destId);
   return (
     <div className={cls[`app-roval-node`]}>
@@ -49,17 +51,16 @@ const RootNode: React.FC<IProps> = (props) => {
             选择主表
           </Button>
         </Row>
-        {props.current.primaryForms.length > 0 && (
+        {primaryForms && primaryForms.length > 0 && (
           <span>
             <ShareShowComp
-              departData={props.current.primaryForms}
+              departData={primaryForms}
               onClick={(item: XForm) => {
                 setViewForm(item);
               }}
               deleteFuc={(id: string) => {
-                props.current.primaryForms = props.current.primaryForms?.filter(
-                  (a) => a.id != id,
-                );
+                props.current.primaryForms = primaryForms?.filter((a) => a.id != id);
+                setPrimaryForms(props.current.primaryForms);
                 props.current.primaryFormIds = props.current.primaryFormIds?.filter(
                   (a) => a != id,
                 );
@@ -78,20 +79,19 @@ const RootNode: React.FC<IProps> = (props) => {
             选择子表
           </Button>
         </Row>
-        {props.current.detailForms.length > 0 && (
+        {detailForms && detailForms.length > 0 && (
           <span>
             <ShareShowComp
-              departData={props.current.detailForms}
+              departData={detailForms}
               onClick={(item: XForm) => {
                 setViewForm(item);
               }}
               deleteFuc={(id: string) => {
-                props.current.detailForms = props.current.detailForms?.filter(
-                  (a) => a.id != id,
-                );
+                props.current.detailForms = detailForms?.filter((a) => a.id != id);
                 props.current.detailFormIds = props.current.detailFormIds?.filter(
                   (a) => a != id,
                 );
+                setDetailForms(props.current.detailForms);
               }}
             />
           </span>
@@ -111,18 +111,16 @@ const RootNode: React.FC<IProps> = (props) => {
             <SelectForms
               belong={props.belong}
               typeName={formModel}
-              selected={
-                formModel === '子表'
-                  ? props.current.detailForms
-                  : props.current.primaryForms
-              }
+              selected={formModel === '子表' ? detailForms : primaryForms}
               setSelected={(forms) => {
                 if (formModel === '子表') {
                   props.current.detailForms = forms;
                   props.current.detailFormIds = forms.map((a) => a.id);
+                  setDetailForms(forms);
                 } else {
                   props.current.primaryForms = forms;
                   props.current.primaryFormIds = forms.map((a) => a.id);
+                  setPrimaryForms(forms);
                 }
               }}
             />

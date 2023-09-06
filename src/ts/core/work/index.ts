@@ -127,6 +127,7 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
     if (res.success && res.data.id) {
       this.setMetadata(fullDefineRule(res.data));
       this.node = data.resource;
+      this.recursionForms(this.node!);
     }
     return res.success;
   }
@@ -171,17 +172,21 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
     }
   }
   private recursionForms(node: model.WorkNodeModel) {
-    node.primaryForms = this.application.directory.resource.formColl.cache.filter((a) =>
+    node.primaryForms = this.directory.resource.formColl.cache.filter((a) =>
       node.primaryFormIds?.includes(a.id),
     );
-    node.detailForms = this.application.directory.resource.formColl.cache.filter((a) =>
+    node.detailForms = this.directory.resource.formColl.cache.filter((a) =>
       node.detailFormIds?.includes(a.id),
     );
-    node.primaryForms.forEach((a) => {
-      this.primaryForms.push(new Form({ ...a, id: a.id + '_' }, this.directory));
+    node.primaryForms.forEach(async (a) => {
+      const form = new Form({ ...a, id: a.id + '_' }, this.directory);
+      this.primaryForms.push(form);
+      await form.loadFields();
     });
-    node.detailForms.forEach((a) => {
-      this.detailForms.push(new Form({ ...a, id: a.id + '_' }, this.directory));
+    node.detailForms.forEach(async (a) => {
+      const form = new Form({ ...a, id: a.id + '_' }, this.directory);
+      this.detailForms.push(form);
+      await form.loadFields();
     });
     if (node.children) {
       this.recursionForms(node.children);
