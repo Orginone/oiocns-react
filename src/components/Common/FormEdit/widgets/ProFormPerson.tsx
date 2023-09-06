@@ -17,10 +17,11 @@ interface IProps {
  */
 const ProFormPerson = (props: IProps) => {
   const [options, setOptions] = useState<{ label: string; value: string }[]>([]);
+  console.log('ssss', props);
 
   useEffect(() => {
     const belong = orgCtrl.targets.find(
-      (a) => a.id == props.schema.metadata.belongId,
+      (a) => a.id == props.schema?.metadata?.belongId,
     ) as any;
 
     const initOptions = async () => {
@@ -43,7 +44,7 @@ const ProFormPerson = (props: IProps) => {
   return (
     <ProFormSelect
       name={props.schema.title}
-      label={props.schema.title}
+      // label={props.schema.title}
       width={200}
       fieldProps={{
         ...{ options },

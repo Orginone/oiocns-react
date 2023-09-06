@@ -1,9 +1,10 @@
+import { generateUuid } from '@/ts/base/common';
 import { IRequest } from '@/ts/core/thing/config';
 import { AiOutlineDown } from '@/icons/ai'
-import { Dropdown, Input, Space } from 'antd';
+import { Button, Input, Select, Space, TreeSelect } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { Param } from './request/widgets/params';
-import { generateUuid } from '@/ts/base/common';
+import { expand, loadEnvironmentsMenu } from '../..';
 
 interface IProps {
   current: IRequest;
@@ -32,10 +33,13 @@ const toParams = (value?: string): Param[] => {
 };
 
 const InputBox: React.FC<IProps> = ({ current, send }) => {
+  const [envId, setEnvId] = useState<string | undefined>(current.metadata.envId);
   const [url, setUrl] = useState<string | undefined>(current.axios.url);
   const [method, setMethod] = useState<string>(current.axios.method ?? 'GET');
+  const treeData = [loadEnvironmentsMenu(current.directory.target.directory)];
   useEffect(() => {
     const id = current.subscribe(() => {
+      setEnvId(current.metadata.envId);
       setUrl(current.axios.url);
       setMethod(current.axios.method ?? 'GET');
     });
@@ -44,53 +48,53 @@ const InputBox: React.FC<IProps> = ({ current, send }) => {
     };
   });
   return (
-    <Input
-      addonBefore={
-        <Dropdown
-          menu={{
-            items: ['GET', 'POST'].map((item) => {
+    <Space.Compact style={{ width: '100%' }}>
+      <Input
+        addonBefore={
+          <Select
+            style={{ width: 100 }}
+            value={method}
+            options={['GET', 'POST'].map((item) => {
               return {
-                key: item,
+                value: item,
                 label: item,
               };
-            }),
-            onClick: (info) => {
-              current.metadata.axios.method = info.key;
+            })}
+            onChange={(value) => {
+              current.metadata.axios.method = value;
               current.refresh(current.metadata);
-            },
-          }}>
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}>
-            <Space style={{ width: 80, userSelect: 'none' }}>{method}</Space>
-            <AiOutlineDown />
-          </div>
-        </Dropdown>
-      }
-      addonAfter={
-        <Space
-          style={{
-            width: 60,
-            display: 'flex',
-            justifyContent: 'center',
-            userSelect: 'none',
-          }}
-          onClick={() => send()}>
-          Send
-        </Space>
-      }
-      size='large'
-      value={url}
-      placeholder="输入 URL 地址"
-      onChange={(event) => {
-        current.metadata.axios.url = event.target.value;
-        current.metadata.params = toParams(event.target.value);
-        current.refresh(current.metadata);
-      }}
-    />
+            }}
+          />
+        }
+        size="large"
+        value={url}
+        placeholder="输入 URL 地址"
+        onChange={(event) => {
+          current.metadata.axios.url = event.target.value;
+          current.metadata.params = toParams(event.target.value);
+          current.refresh(current.metadata);
+        }}
+      />
+      <TreeSelect
+        value={envId}
+        fieldNames={{
+          label: 'label',
+          value: 'key',
+          children: 'children',
+        }}
+        dropdownStyle={{ maxHeight: 400, overflow: 'auto', minWidth: 300 }}
+        treeData={treeData}
+        treeDefaultExpandedKeys={expand(treeData, '环境')}
+        placement="bottomRight"
+        onSelect={(value) => {
+          current.metadata.envId = value;
+          current.refresh(current.metadata);
+        }}
+      />
+      <Button onClick={() => send()}>
+        Send
+      </Button>
+    </Space.Compact>
   );
 };
 

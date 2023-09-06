@@ -4,7 +4,11 @@ import { IDirectory, IEntity } from '@/ts/core';
 import React from 'react';
 import { MenuItemType } from 'typings/globelType';
 
-export type MenuItem = MenuItemType & { isLeaf?: boolean; selectable: boolean };
+export type MenuItem = Omit<MenuItemType, 'Children'> & {
+  isLeaf?: boolean;
+  selectable: boolean;
+  children: MenuItem[];
+};
 
 /** 根据类型加载不同文件项 */
 const loadFiles = (current: IDirectory, typeNames: string[]) => {
@@ -57,6 +61,21 @@ export const loadFormsMenu = (current: IDirectory) => {
   return loadMenus(current, ['事项配置', '实体配置']);
 };
 
+/** 环境 */
+export const loadEnvironmentsMenu = (current: IDirectory) => {
+  return loadMenus(current, ['环境']);
+};
+
+/** 脚本 */
+export const loadScriptsMenu = (current: IDirectory) => {
+  return loadMenus(current, ['脚本']);
+};
+
+/** 请求 */
+export const loadRequestsMenu = (current: IDirectory) => {
+  return loadMenus(current, ['请求']);
+};
+
 /** 文件项菜单 */
 export const loadEntity = (entity: IEntity<XEntity>): MenuItem => {
   return {
@@ -69,4 +88,22 @@ export const loadEntity = (entity: IEntity<XEntity>): MenuItem => {
     isLeaf: true,
     selectable: true,
   };
+};
+
+/** 默认展开的树节点 */
+export const expand = (nodes: MenuItem[], targetType: string): string[] => {
+  let ans: string[] = [];
+  for (const node of nodes) {
+    if (node.children) {
+      const children = expand(node.children, targetType);
+      if (children.length > 0) {
+        ans.push(node.key);
+        ans.push(...children);
+      }
+    }
+    if (node.itemType == targetType) {
+      ans.push(node.key);
+    }
+  }
+  return ans;
 };

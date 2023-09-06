@@ -1,5 +1,5 @@
 import { Command } from '@/ts/base';
-import { Col, Layout, Row } from 'antd';
+import { Col, Layout, Row, message } from 'antd';
 import { Content } from 'antd/lib/layout/layout';
 import { AxiosError } from 'axios';
 import React, { useRef } from 'react';
@@ -25,11 +25,19 @@ const RequestLayout: React.FC<IProps> = ({ current }) => {
               try {
                 let res = await current.exec();
                 current.resp = res;
-                cmd.current.emitter('', 'onValueChange', res);
+                cmd.current.emitter('request', 'onValueChange', res);
               } catch (error) {
                 if (error instanceof AxiosError) {
-                  current.resp = (error as AxiosError).response;
-                  cmd.current.emitter('', 'onValueChange', current.resp);
+                  const axiosError = (error as AxiosError);
+                  if (axiosError.response) {
+                    current.resp = axiosError.response;
+                    cmd.current.emitter('request', 'onValueChange', axiosError.response);
+                  } else {
+                    console.log(axiosError);
+                    cmd.current.emitter('request', 'onValueChange', axiosError.message);
+                  }
+                } else if (error instanceof Error) {
+                  message.error("请求异常，异常信息" + error.message);
                 }
               }
             }}

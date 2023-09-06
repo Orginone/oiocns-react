@@ -50,7 +50,7 @@ const FormEditModal = ({
     ),
     onOk: () => {
       if (create) {
-        kernel.anystore.createThing(belong.userId, '').then((res) => {
+        kernel.createThing(belong.userId, '').then((res) => {
           if (res.success && res.data) {
             onSave({ ...res.data, ...editData });
             modal.destroy();

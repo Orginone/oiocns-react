@@ -104,7 +104,7 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
               ) {
                 return 'react'
             }
-          }
+          },
         },
         plugins: [
           {

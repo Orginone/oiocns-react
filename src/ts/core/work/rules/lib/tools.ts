@@ -98,7 +98,7 @@ function filterRules(
   return willResloveRules;
 }
 // 获取表单的规则
-const setFormRules = async (ruleList: any[]) => {
+const setFormRules = (ruleList: any[]) => {
   let _list = [];
 
   // 遍历所有规则，根据规则类型创建不同的规则对象

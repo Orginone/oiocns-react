@@ -1,15 +1,17 @@
 // import { Col, Row, Select } from 'antd';
-import React, { useEffect, useRef, useState } from 'react';
-// import cls from './index.module.less';
+import React, { useRef, useState } from 'react';
+import cls from './index.module.less';
 import FullScreenModal from '@/executor/tools/fullScreen';
 import { IForm } from '@/ts/core';
 import Generator, { defaultSettings } from 'fr-generator';
-import { schemaType } from '@/ts/base/schema';
-import getDefaultCommonSettings from './setting.js';
 import MyDivider from './widgets/Divider';
 import MySpace from './widgets/Space';
 import ProFormPerson from './widgets/ProFormPerson';
-import { Setting, SettingWidget } from '@/ts/core/work/design';
+import { XAttribute, schemaType } from '@/ts/base/schema';
+import PageSetting from './Settings';
+import { Resizable } from 'devextreme-react';
+const { Provider, Sidebar, Canvas } = Generator;
+// Settings
 type IProps = {
   current: IForm;
   finished: () => void;
@@ -27,7 +29,10 @@ const FormEditModal: React.FC<IProps> = ({
   defaultSchema,
   editFormOpen = false,
 }) => {
-  const [commonSettings, setCommonSettings] = useState<any>({});
+  const [selectedItem, setSelectedItem] = useState<any>({});
+  const [mainWidth, setMainWidth] = useState<string | number>('40%');
+  // console.log('@@@', current, current.fields, commonSettings);
+
   // 创建ref
   const myComponentRef: any = useRef(null);
   // const onCloseFormModle = () => {
@@ -36,7 +41,6 @@ const FormEditModal: React.FC<IProps> = ({
   // };
   const onFormSchemaChange = (e: schemaType) => {
     const ruleInfo = JSON.parse(current.metadata.rule || '{}');
-
     current.update({
       ...current.metadata,
       rule: JSON.stringify({
@@ -48,12 +52,23 @@ const FormEditModal: React.FC<IProps> = ({
 
   //页面重载获取默认schema或者配置后的schema
 
-  const onClickDelete = (e: any) => {
-    return false;
+  const onClickDelete = async (e: any) => {
+    const item: any = current.attributes
+      .map((item: XAttribute) => {
+        if (item.id === e.$id.replace('#/', '')) {
+          return item;
+        }
+      })
+      .filter((itemFl: any) => {
+        return itemFl && itemFl.id;
+      });
+    if (await current.deleteAttribute(item[0])) {
+      return true;
+    }
   };
-  const copyObj = (obj = {}) => {
+  const copyObj = (obj = {} as any) => {
     //变量先置空
-    let newobj = null;
+    let newobj: any = null;
 
     //判断是否需要继续进行递归
     if (typeof obj == 'object' && obj !== null) {
@@ -64,20 +79,6 @@ const FormEditModal: React.FC<IProps> = ({
     } else newobj = obj;
     return newobj;
   };
-  const onCanvasSelect = async (e: any) => {
-    console.log(getDefaultCommonSettings(e));
-    const a = getDefaultCommonSettings(e);
-    console.log(copyObj(a));
-    setCommonSettings(copyObj(a));
-    const schema = myComponentRef.current.getValue();
-    console.log(schema);
-    //myComponentRef.current.setValue(schema)
-  };
-
-  // useEffect(() => {
-
-  //   debugger;
-  // }, []);
   const settings = defaultSettings[0];
   settings.widgets = [
     {
@@ -160,16 +161,8 @@ const FormEditModal: React.FC<IProps> = ({
       },
     },
   ];
+
   const setting = [defaultSettings[2], settings];
-  console.log('@@', setting);
-  // setting.map((item) => {
-  //   item.widgets.map((widgetsItem: SettingWidget) => {
-  //     return (widgetsItem.setting = {
-  //       ...widgetsItem.setting,
-  //       ...getDefaultCommonSettings(widgetsItem.schema.type),
-  //     });
-  //   });
-  // });
   return (
     <FullScreenModal
       open={editFormOpen}
@@ -180,18 +173,69 @@ const FormEditModal: React.FC<IProps> = ({
       title={'表单设计'}
       footer={[]}
       onCancel={finished}>
-      <Generator
-        defaultValue={defaultSchema}
-        onSchemaChange={onFormSchemaChange}
-        onCanvasSelect={onCanvasSelect}
-        settings={setting}
-        extraButtons={[true, false, false, true]}
-        canDelete={onClickDelete}
-        hideId
-        widgets={{ MyDivider, MySpace, ProFormPerson }}
-        commonSettings={commonSettings}
-        ref={myComponentRef}
-      />
+      <div className={cls.frplayground}>
+        <Provider
+          defaultValue={defaultSchema}
+          onChange={(data) => console.log('data:change', data)}
+          onSchemaChange={onFormSchemaChange}
+          settings={setting}
+          allCollapsed={false}
+          debug
+          extraButtons={[
+            true,
+            false,
+            false,
+            true,
+            {
+              /** 按钮文案 */
+              text: '新增特性',
+              /** 点击回调 */
+              onClick: (event: any) => {
+                // add(event);
+              },
+              key: 'add',
+            },
+          ]}
+          canDelete={onClickDelete}
+          controlButtons={[true, false]}
+          hideId
+          widgets={{ MyDivider, MySpace, ProFormPerson, person: ProFormPerson }}
+          commonSettings={{}}
+          ref={myComponentRef}
+          onCanvasSelect={(v) => console.log(v)}
+          // fieldRender={(_schema, _widgetProps, _children, originNode) => {
+          //   return originNode;
+          // }}
+          fieldWrapperRender={(schema, isSelected, _children, originNode) => {
+            //&& selectedItem.title !== schema.title
+            if (isSelected && selectedItem.title !== schema.title) {
+              /* 收集当前选中项 */
+              setSelectedItem(schema);
+            }
+            return originNode;
+          }}>
+          <div className="fr-generator-container">
+            <div style={{ width: '280px' }}>
+              <Sidebar fixedName />
+            </div>
+            <Resizable
+              handles={'right'}
+              width={mainWidth}
+              onResize={(e) => {
+                setMainWidth(e.width);
+              }}>
+              <Canvas />
+            </Resizable>
+            <PageSetting
+              current={current}
+              selectedFiled={selectedItem}
+              schemaRef={myComponentRef}
+              canvasWidth={mainWidth as number}
+              // comp={<Settings />}
+            />
+          </div>
+        </Provider>
+      </div>
     </FullScreenModal>
   );
 };

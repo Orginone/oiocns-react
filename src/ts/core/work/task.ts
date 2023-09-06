@@ -81,7 +81,7 @@ export class WorkTask implements IWorkTask {
   }
   async loadInstance(reload: boolean = false): Promise<boolean> {
     if (this.instanceData !== undefined && !reload) return true;
-    const res = await kernel.anystore.aggregate(
+    const res = await kernel.collectionAggregate(
       this.metadata.belongId,
       storeCollName.WorkInstance,
       {
@@ -129,7 +129,6 @@ export class WorkTask implements IWorkTask {
           status: status,
           comment: comment,
           data: JSON.stringify(this.instanceData),
-          childrenData: '',
         });
         if (res.data && status < TaskStatus.RefuseStart) {
           if (this.targets && this.targets.length === 2) {

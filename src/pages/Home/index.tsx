@@ -2,6 +2,8 @@ import cls from './index.module.less';
 import React, { useState } from 'react';
 import HeadBanner from '@/pages/Home/components/HeadBanner';
 import NavigationBar from '@/pages/Home/components/NavigationBar';
+import useMenuUpdate from '@/hooks/useMenuUpdate';
+import * as config from '@/pages/Chats/config/menuOperate';
 
 export interface NavigationItem {
   key: string;
@@ -10,6 +12,12 @@ export interface NavigationItem {
   component: any;
 }
 const navigationList: NavigationItem[] = [
+  {
+    key: 'app',
+    label: '应用',
+    backgroundImageUrl: '/img/banner/digital-asset-bg.png',
+    component: React.lazy(() => import('@/pages/Home/components/Content/SelfAppCom')),
+  },
   {
     key: 'activity',
     label: '群动态',

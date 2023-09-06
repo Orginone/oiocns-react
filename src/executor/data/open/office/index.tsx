@@ -1,6 +1,6 @@
 import React from 'react';
 import FullScreenModal from '@/executor/tools/fullScreen';
-import { SheetViewer, DocxViewer, PdfViewer } from 'react-office-viewer';
+import { SheetViewer, DocxViewer, PdfViewer } from '@orginone/react-office-viewer';
 import { FileItemShare } from '@/ts/base/model';
 
 interface IProps {
@@ -26,8 +26,6 @@ const OfficeView: React.FC<IProps> = ({ share, finished }) => {
           return <SheetViewer {...config} />;
         case '.docx':
           return <DocxViewer {...config} />;
-        case '.pdfx':
-          return <PdfViewer {...config} />;
         case '.pdf':
           return <PdfViewer {...config} />;
       }

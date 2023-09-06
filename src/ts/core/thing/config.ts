@@ -1,16 +1,17 @@
 import { kernel } from '@/ts/base';
 import {
+  XAttribute,
+  XEnvironment,
   XExecutable,
   XFileInfo,
   XLink,
-  XRequest,
-  XEnvironment,
   XMapping,
-  XAttribute,
+  XRequest,
 } from '@/ts/base/schema';
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { ConfigColl, IDirectory } from './directory';
 import { FileInfo, IFileInfo } from './fileinfo';
+import { ShareSet } from '../public/entity';
 
 export interface IBaseFileInfo<T extends XFileInfo> extends IFileInfo<T> {
   refresh(data: T): void;
@@ -29,20 +30,19 @@ export class BaseFileInfo<T extends XFileInfo>
 
   refresh(data: T): void {
     this.setMetadata(data);
-    kernel.anystore
-      .remove(this.belongId, this.collName, {
+    kernel
+      .collectionRemove(this.belongId, this.collName, {
         id: this.metadata.id,
       })
       .then(() => {
-        kernel.anystore.insert(this.belongId, this.collName, this.metadata);
+        kernel.collectionInsert(this.belongId, this.collName, this.metadata);
       });
   }
 
   async delete(): Promise<boolean> {
-    const res = await kernel.anystore.remove(this.belongId, this.collName, {
+    const res = await kernel.collectionRemove(this.belongId, this.collName, {
       id: this.metadata.id,
     });
-    console.log(res);
     if (res.success) {
       this.directory.configs = this.directory.configs.filter((i) => i.key != this.key);
     }
@@ -50,7 +50,7 @@ export class BaseFileInfo<T extends XFileInfo>
   }
 
   async rename(name: string): Promise<boolean> {
-    let res = await kernel.anystore.update(this.belongId, this.collName, {
+    let res = await kernel.collectionUpdate(this.belongId, this.collName, {
       match: {
         id: this.metadata.id,
       },
@@ -67,7 +67,7 @@ export class BaseFileInfo<T extends XFileInfo>
   }
 
   async move(destination: IDirectory): Promise<boolean> {
-    let res = await kernel.anystore.update(this.belongId, this.collName, {
+    let res = await kernel.collectionAggregate(this.belongId, this.collName, {
       match: {
         id: this.metadata.id,
       },
@@ -87,7 +87,13 @@ export class Unknown extends BaseFileInfo<XFileInfo> implements IUnknown {}
 /** 环境配置 */
 export type IEnvironment = IBaseFileInfo<XEnvironment>;
 
-export class Environment extends BaseFileInfo<XEnvironment> implements IEnvironment {}
+export class Environment extends BaseFileInfo<XEnvironment> implements IEnvironment {
+  constructor(environment: XEnvironment, dir: IDirectory) {
+    super(ConfigColl.Environments, environment, dir);
+  }
+}
+
+type Kv = { [key: string]: string | undefined };
 
 /** 请求配置，需要持久化 */
 export interface IRequest extends IBaseFileInfo<XRequest> {
@@ -97,7 +103,7 @@ export interface IRequest extends IBaseFileInfo<XRequest> {
   resp?: AxiosResponse;
 
   /** 请求执行 */
-  exec(env?: IEnvironment): Promise<AxiosResponse>;
+  exec(kv?: Kv): Promise<any>;
 }
 
 export class Request extends BaseFileInfo<XRequest> implements IRequest {
@@ -109,35 +115,64 @@ export class Request extends BaseFileInfo<XRequest> implements IRequest {
     return this.metadata.axios;
   }
 
-  private replaceHolder(env: IEnvironment): AxiosRequestConfig {
-    return {
-      ...this.metadata.axios,
-      params: this.replace(this.metadata.axios.params, env),
-      headers: this.replace(this.metadata.axios.headers, env),
-      data: this.replace(this.metadata.axios.data, env),
-    };
-  }
-
-  private replace(data: any, env: IEnvironment): any {
-    let ansStr = JSON.stringify(data);
-    Object.keys(env.metadata).forEach((key) => {
-      ansStr = ansStr.replace(`{{${key}}}`, env.metadata[key]);
-    });
-    return JSON.parse(ansStr);
-  }
-
-  async exec(env?: IEnvironment): Promise<AxiosResponse> {
-    if (env) {
-      return await axios.request(this.replaceHolder(env));
+  private replace(data: any, kv: Kv): any {
+    if (data) {
+      let ansStr = JSON.stringify(data);
+      Object.keys(kv).forEach((key) => {
+        const value = kv[key];
+        ansStr = ansStr.replace(`{{${key}}}`, value ?? '');
+      });
+      return JSON.parse(ansStr);
     }
-    return await axios.request(this.metadata.axios);
+  }
+
+  private replaceClear(data: any) {
+    if (data) {
+      let ansStr = JSON.stringify(data);
+      ansStr = ansStr.replace(/\{\{[^{}]*\}\}/g, '');
+      return JSON.parse(ansStr);
+    }
+  }
+
+  private paramsEscape(url: string) {
+    const split: string[] = url.split('?');
+    const ans: string[] = [];
+    if (split.length > 1) {
+      const params = split[1].split('&');
+      for (const param of params) {
+        const kv = param.split('=', 2);
+        if (kv.length > 1) {
+          ans.push(kv[0] + '=' + encodeURIComponent(kv[1]));
+        }
+      }
+    }
+    return split[0] + '?' + ans.join('&');
+  }
+
+  async exec(kv?: Kv): Promise<any> {
+    let config = { ...this.axios };
+    let envId = this.metadata.envId;
+    if (envId && ShareSet.has(envId)) {
+      const env = ShareSet.get(envId) as IEnvironment;
+      config = this.replace(config, env.metadata.kvs);
+    }
+    if (kv) {
+      config = this.replace(config, kv);
+    }
+    config = this.replaceClear(config);
+    config.url = this.paramsEscape(config.url);
+    return await axios.request(config);
   }
 }
 
 /** 请求链接 */
-export interface ILink extends IBaseFileInfo<XLink> {}
+export interface ILink extends IBaseFileInfo<XLink> {
+  environment?: { [key: string]: string };
+}
 
 export class Link extends BaseFileInfo<XLink> implements ILink {
+  environment?: { [key: string]: string };
+
   constructor(link: XLink, dir: IDirectory) {
     super(ConfigColl.RequestLinks, link, dir);
   }
@@ -160,11 +195,12 @@ export interface IMapping extends IBaseFileInfo<XMapping> {
 }
 
 export class Mapping extends BaseFileInfo<XMapping> implements IMapping {
+  source?: { index: number; attr: XAttribute };
+  target?: { index: number; attr: XAttribute };
+
   constructor(mapping: XMapping, dir: IDirectory) {
     super(ConfigColl.Mappings, mapping, dir);
   }
-  source?: { index: number; attr: XAttribute };
-  target?: { index: number; attr: XAttribute };
 
   clear(): void {
     this.source = undefined;
