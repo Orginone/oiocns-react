@@ -119,7 +119,7 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
     return this.key;
   }
   get resource(): DataResource {
-    return this.target.space.resource;
+    return this.target.resource;
   }
   content(mode: number = 0): IFileInfo<schema.XEntity>[] {
     const cnt: IFileInfo<schema.XEntity>[] = [...this.children];
