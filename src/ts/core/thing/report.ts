@@ -1,10 +1,10 @@
 import { schema, model, kernel } from '../../base';
-import { Entity, IEntity, PageAll, orgAuth } from '../../core/public';
+import { PageAll, orgAuth } from '../../core/public';
 import { IDirectory } from './directory';
 import { FileInfo, IFileInfo } from './fileinfo';
 
 /** 报表类接口 */
-export interface IReport extends IFileInfo<schema.XReport>{
+export interface IReport extends IFileInfo<schema.XReport> {
   /** 报表特性 */
   attributes: schema.XAttribute[];
   /** 报表字段 */

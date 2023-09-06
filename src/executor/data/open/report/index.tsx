@@ -18,7 +18,7 @@ const ReportView: React.FC<IProps> = ({ current, finished }) => {
   useEffect(() => {
     getData()
   }, [current])
-  
+
   const getData = async () => {
     let request: any = {
       filter: undefined,
@@ -31,7 +31,7 @@ const ReportView: React.FC<IProps> = ({ current, finished }) => {
       take: 9999,
       userData:[]
     }
-    const result = await kernel.anystore.loadThing<any>(current.belongId, request);
+    const result = await kernel.loadThing<any>(current.belongId, request);
     if (result.success) {
       setDataInfo(result.data)
       setInfo(result.data?.data[0])

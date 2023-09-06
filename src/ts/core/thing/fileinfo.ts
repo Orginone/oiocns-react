@@ -142,7 +142,7 @@ export class SysFileInfo extends FileInfo<schema.XEntity> implements ISysFileInf
   }
   async rename(name: string): Promise<boolean> {
     if (this.filedata.name != name) {
-      const res = await kernel.anystore.bucketOpreate<FileItemModel>(this.belongId, {
+      const res = await kernel.bucketOpreate<FileItemModel>(this.belongId, {
         name: name,
         key: encodeKey(this.filedata.key),
         operate: BucketOpreates.Rename,
@@ -155,7 +155,7 @@ export class SysFileInfo extends FileInfo<schema.XEntity> implements ISysFileInf
     return false;
   }
   async delete(): Promise<boolean> {
-    const res = await kernel.anystore.bucketOpreate<FileItemModel[]>(this.belongId, {
+    const res = await kernel.bucketOpreate<FileItemModel[]>(this.belongId, {
       key: encodeKey(this.filedata.key),
       operate: BucketOpreates.Delete,
     });
@@ -166,7 +166,7 @@ export class SysFileInfo extends FileInfo<schema.XEntity> implements ISysFileInf
   }
   async copy(destination: IDirectory): Promise<boolean> {
     if (destination.id != this.directory.id) {
-      const res = await kernel.anystore.bucketOpreate<FileItemModel[]>(this.belongId, {
+      const res = await kernel.bucketOpreate<FileItemModel[]>(this.belongId, {
         key: encodeKey(this.filedata.key),
         destination: destination.id,
         operate: BucketOpreates.Copy,
@@ -180,7 +180,7 @@ export class SysFileInfo extends FileInfo<schema.XEntity> implements ISysFileInf
   }
   async move(destination: IDirectory): Promise<boolean> {
     if (destination.id != this.directory.id) {
-      const res = await kernel.anystore.bucketOpreate<FileItemModel[]>(this.belongId, {
+      const res = await kernel.bucketOpreate<FileItemModel[]>(this.belongId, {
         key: encodeKey(this.filedata.key),
         destination: destination.id,
         operate: BucketOpreates.Move,
