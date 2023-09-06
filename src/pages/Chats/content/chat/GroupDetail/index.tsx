@@ -1,19 +1,22 @@
-import { Button, Col, Modal, Row, Typography } from 'antd';
+import { Button, Col, Image, Modal, Row, Typography } from 'antd';
 import React, { useState } from 'react';
 import TeamIcon from '@/components/Common/GlobalComps/entityIcon';
 import detailStyle from './index.module.less';
-import { getUuid } from '@/utils/tools';
-import { IMsgChat, ITarget, TargetType } from '@/ts/core';
+import { IMsgChat, ITarget } from '@/ts/core';
 import ChatHistoryModal from '../ChatHistoryModal';
 import { AiOutlineRight } from 'react-icons/ai';
-import { command } from '@/ts/base';
 import { useHistory } from 'react-router-dom';
 import orgCtrl from '@/ts/controller';
+import { ellipsisText } from '@/utils';
+import GroupMember from '@/pages/Chats/content/chat/GroupMember';
 
-const Groupdetail: React.FC<any> = ({ chat }: { chat: IMsgChat }) => {
+import ActivityPublisher from '@/components/Activity/ActivityPublisher';
+import ActivityList from '@/components/Activity/ActivityList';
+import { ImCompass } from 'react-icons/im';
+const GroupDetail: React.FC<any> = ({ chat }: { chat: IMsgChat }) => {
   const [historyOpen, setHistoryOpen] = useState<boolean>(false); // 历史消息搜索
+  const [activityPublisherOpen, setActivityPublisherOpen] = useState(false);
   const history = useHistory();
-
   /**
    * @description: 历史消息搜索弹窗
    * @return {*}
@@ -21,31 +24,6 @@ const Groupdetail: React.FC<any> = ({ chat }: { chat: IMsgChat }) => {
   const onHistoryCancel = () => {
     setHistoryOpen(false);
   };
-
-  /**
-   * @description: 头像
-   * @return {*}
-   */
-  const heads = (
-    <Row style={{ paddingBottom: '12px' }}>
-      <Col span={4}>
-        <div style={{ color: '#888', width: 42 }}>
-          <TeamIcon typeName={chat.typeName} entityId={chat.id} size={32} />
-        </div>
-      </Col>
-      <Col span={20}>
-        <h4 className={detailStyle.title}>
-          {chat.chatdata.chatName}
-          {chat.members.length > 0 ? (
-            <span className={detailStyle.number}>({chat.members.length})</span>
-          ) : (
-            ''
-          )}
-        </h4>
-        <div className={detailStyle.base_info_desc}>{chat.chatdata.chatRemark}</div>
-      </Col>
-    </Row>
-  );
 
   /**
    * @description: 历史记录头像
@@ -71,34 +49,38 @@ const Groupdetail: React.FC<any> = ({ chat }: { chat: IMsgChat }) => {
     </Row>
   );
 
-  /**
-   * @description: 群组成员
-   * @return {*}
-   */
-  const grouppeoples = (
-    <>
-      {chat.members.map((item) => {
-        return (
-          <div key={getUuid()} title={item.name} className={detailStyle.show_persons}>
-            <TeamIcon size={36} typeName={item.typeName} entityId={item.id} />
-            <Typography className={detailStyle.img_list_con_name}>{item.name}</Typography>
+  const header = (
+    <div className={detailStyle.header}>
+      <TeamIcon typeName={chat.typeName} entityId={chat.id} size={50} />
+      <div className={detailStyle.headerMeta}>
+        <Typography.Text strong>
+          {chat.chatdata.chatName}
+          {chat.members.length > 0 ? (
+            <span className={detailStyle.number}> ({chat.members.length})</span>
+          ) : (
+            ''
+          )}
+        </Typography.Text>
+        <div className={detailStyle.headerMetaInfo}>
+          <div className={detailStyle.headerMetaInfoText}>
+            {ellipsisText(chat.chatdata.chatRemark, 9)}
+            <Image
+              style={{ marginLeft: '8px' }}
+              preview={false}
+              height={12}
+              width={6}
+              src={`/svg/right-arrow.svg`}></Image>
           </div>
-        );
-      })}
-      {chat.share.typeName === TargetType.Cohort ? (
-        <>
-          <div
-            className={`${detailStyle.img_list_con} ${detailStyle.img_list_add}`}
-            onClick={() => {
-              command.emitter('config', 'pull', chat.directory, chat.chatdata.fullId);
-            }}>
-            +
-          </div>
-        </>
-      ) : (
-        ''
-      )}
-    </>
+          <Image
+            className={detailStyle.headerMetaInfoIcon}
+            preview={false}
+            height={18}
+            width={18}
+            src={`/svg/qrcode.svg`}
+          />
+        </div>
+      </div>
+    </div>
   );
 
   /**
@@ -146,15 +128,60 @@ const Groupdetail: React.FC<any> = ({ chat }: { chat: IMsgChat }) => {
     </>
   );
 
+  const actionList = [
+    {
+      icon: <ImCompass size={20} color={'white'} />,
+      title: '发布动态',
+      type: 'primary',
+    },
+    {
+      icon: <ImCompass size={20} color={'white'} />,
+      title: '共享',
+      type: 'primary',
+    },
+    {
+      title: '交易',
+      icon: <ImCompass size={20} color={'white'} />,
+      type: 'primary',
+    },
+  ];
   return (
     <>
-      <div className={detailStyle.group_detail_wrap}>
-        {heads}
-        <div className={detailStyle.user_list}>
-          <div className={`${detailStyle.img_list} ${detailStyle.con}`}>
-            {grouppeoples}
+      <div className={detailStyle.groupDetail}>
+        {header}
+        <GroupMember members={chat.members}></GroupMember>
+        <div className={detailStyle.groupDetailContent}>
+          {'resource' in chat && (
+            <ActivityList coll={(chat as ITarget).resource.activityColl}></ActivityList>
+          )}
+          <div className={detailStyle.user_list}>
+            <div className={`${detailStyle.img_list} ${detailStyle.con}`}></div>
+            {operaButton}
           </div>
-          {operaButton}
+        </div>
+
+        <div className={detailStyle.groupDetailActionArea}>
+          {actionList.map((item, index) => {
+            return (
+              <div
+                className={detailStyle.groupDetailActionAreaItem}
+                key={index}
+                onClick={() => {
+                  setActivityPublisherOpen(true);
+                }}>
+                <div
+                  className={
+                    detailStyle.groupDetailActionAreaItem__icon +
+                    (item.type === 'primary'
+                      ? ' ' + detailStyle.groupDetailActionAreaItem__iconActive
+                      : '')
+                  }>
+                  {item.icon}
+                </div>
+                <div>{item.title}</div>
+              </div>
+            );
+          })}
         </div>
       </div>
 
@@ -165,7 +192,15 @@ const Groupdetail: React.FC<any> = ({ chat }: { chat: IMsgChat }) => {
         onCancel={onHistoryCancel}
         chat={chat}
       />
+      {'resource' in chat && (
+        <ActivityPublisher
+          open={activityPublisherOpen}
+          target={chat as ITarget}
+          finish={() => {
+            setActivityPublisherOpen(false);
+          }}></ActivityPublisher>
+      )}
     </>
   );
 };
-export default Groupdetail;
+export default GroupDetail;

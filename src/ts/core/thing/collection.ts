@@ -115,7 +115,7 @@ export class Collection<T extends schema.Xbase> {
 
   async delete(data: T): Promise<boolean> {
     const res = await kernel.collectionUpdate(this.belongId, this.collName, {
-      match: { id: data.id },
+      match: { _id: data.id },
       update: {
         _set_: {
           isDeleted: true,
@@ -134,7 +134,7 @@ export class Collection<T extends schema.Xbase> {
   async deleteMany(data: T[]): Promise<boolean> {
     const res = await kernel.collectionUpdate(this.belongId, this.collName, {
       match: {
-        id: {
+        _id: {
           _in_: data.map((i) => i.id),
         },
       },
@@ -142,6 +142,34 @@ export class Collection<T extends schema.Xbase> {
         _set_: {
           isDeleted: true,
         },
+      },
+    });
+    if (res.success) {
+      if (res.data?.MatchedCount > 0) {
+        this.cache = this.cache.filter((i) => data.every((a) => a.id != i.id));
+      }
+      return res.data?.MatchedCount > 0;
+    }
+    return false;
+  }
+
+  async remove(data: T): Promise<boolean> {
+    const res = await kernel.collectionRemove(this.belongId, this.collName, {
+      _id: data.id,
+    });
+    if (res.success) {
+      if (res.data?.MatchedCount > 0) {
+        this.cache = this.cache.filter((i) => i.id != data.id);
+      }
+      return res.data?.MatchedCount > 0;
+    }
+    return false;
+  }
+
+  async removeMany(data: T[]): Promise<boolean> {
+    const res = await kernel.collectionRemove(this.belongId, this.collName, {
+      _id: {
+        _in_: data.map((i) => i.id),
       },
     });
     if (res.success) {

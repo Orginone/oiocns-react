@@ -28,14 +28,39 @@
   margin-bottom: 20px !important;
 }
 
-.group_detail_wrap {
+.groupDetail {
   position: relative;
   display: flex;
   flex-direction: column;
-  width: 290px;
-  // border-left: 1px solid #dcdfe6;
-  padding: 20px 20px;
+  width: 30%;
   background-color: #fff;
+
+  .header {
+    display: flex;
+    gap: 9px;
+    padding: 12px 20px;
+    height: 72px;
+    border-bottom: 1px solid @border-color-base;
+    &Meta {
+      flex: 1;
+      &Info {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        &Text {
+          font-size: 12px;
+          line-height: 22px;
+          color: @text-color-secondary;
+          display: flex;
+          align-items: baseline;
+        }
+        &Icon {
+
+        }
+      }
+    }
+  }
 
   .title {
     font-size: 14px;
@@ -44,6 +69,31 @@
     margin-top: 0;
     .number {
       margin-left: 4px;
+    }
+  }
+  &Content {
+    flex: 1;
+    overflow-y: auto;
+  }
+  &ActionArea {
+    width: 100%;
+    padding: 34px 70px;
+    display: flex;
+    justify-content: space-between;
+    &Item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      &__icon {
+        width: 50px;
+        height: 50px;
+        border: 2px solid @primary-color;
+        border-radius: 50%;
+        padding: 10px;
+        &Active {
+          background-color: @primary-color;
+        }
+      }
     }
   }
   .base_info_desc {
@@ -107,7 +157,6 @@
       }
     }
     min-height: 188px;
-    flex: 1;
 
     .find_history {
       cursor: pointer;
