@@ -34,6 +34,7 @@ export class Cohort extends Target implements ICohort {
     return [this];
   }
   async deepLoad(reload: boolean = false): Promise<void> {
+    await this.resource.preLoad();
     await this.directory.loadSubDirectory();
     await this.loadMembers(reload);
   }

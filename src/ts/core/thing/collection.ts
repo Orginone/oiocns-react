@@ -5,11 +5,13 @@ export class Collection<T extends schema.Xbase> {
   cache: T[];
   collName: string;
   belongId: string;
-  constructor(id: string, name: string) {
+  shareId: string;
+  constructor(belongId: string, shareId: string, name: string) {
     this.cache = [];
     this.loaded = false;
-    this.belongId = id;
     this.collName = name;
+    this.shareId = shareId;
+    this.belongId = belongId;
   }
 
   async all(): Promise<T[]> {
@@ -21,13 +23,18 @@ export class Collection<T extends schema.Xbase> {
   }
 
   async load(options: any): Promise<T[]> {
-    options.options = options.options || {};
-    options.options.match = options.options.match || {};
-    options.options.match.isDeleted = false;
+    var match = options?.options?.match || {};
     options = {
       ...options,
       userData: [],
       collName: this.collName,
+      options: {
+        match: {
+          ...match,
+          isDeleted: false,
+          shareId: this.shareId,
+        },
+      },
     };
     const res = await kernel.collectionLoad<T[]>(this.belongId, options);
     if (res.success && res.data) {
@@ -38,6 +45,8 @@ export class Collection<T extends schema.Xbase> {
 
   async insert(data: T): Promise<T | undefined> {
     data.id = data.id || 'snowId()';
+    data.shareId = this.shareId;
+    data.belongId = data.belongId || this.belongId;
     const res = await kernel.collectionInsert<T>(this.belongId, this.collName, data);
     if (res.success) {
       if (res.data) {
@@ -49,7 +58,10 @@ export class Collection<T extends schema.Xbase> {
 
   async insertMany(data: T[]): Promise<T[]> {
     data = data.map((a) => {
-      return { ...a, id: a.id || 'snowId()' };
+      a.id = a.id || 'snowId()';
+      a.shareId = this.shareId;
+      a.belongId = a.belongId || this.belongId;
+      return a;
     });
     const res = await kernel.collectionInsert<T[]>(this.belongId, this.collName, data);
     if (res.success) {
@@ -62,6 +74,8 @@ export class Collection<T extends schema.Xbase> {
   }
 
   async replace(data: T): Promise<T | undefined> {
+    data.shareId = this.shareId;
+    data.belongId = data.belongId || this.belongId;
     const res = await kernel.collectionReplace<T>(this.belongId, this.collName, data);
     if (res.success) {
       if (res.data) {
@@ -77,6 +91,11 @@ export class Collection<T extends schema.Xbase> {
   }
 
   async replaceMany(data: T[]): Promise<T[]> {
+    data = data.map((a) => {
+      a.shareId = this.shareId;
+      a.belongId = a.belongId || this.belongId;
+      return a;
+    });
     const res = await kernel.collectionReplace<T[]>(this.belongId, this.collName, data);
     if (res.success) {
       if (res.data && res.data.length > 0) {

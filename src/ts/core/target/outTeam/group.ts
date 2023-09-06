@@ -97,6 +97,7 @@ export class Group extends Target implements IGroup {
     return targets;
   }
   async deepLoad(reload: boolean = false): Promise<void> {
+    await this.resource.preLoad();
     await Promise.all([
       await this.directory.loadSubDirectory(),
       await this.loadChildren(reload),

@@ -13,6 +13,10 @@ export type Xbase = {
   createTime: string;
   // 更新时间
   updateTime: string;
+  // 共享用户ID
+  shareId: string;
+  // 共享用户ID
+  belongId: string;
 };
 
 export type XEntity = {
@@ -20,8 +24,6 @@ export type XEntity = {
   name: string;
   // 编号
   code: string;
-  // 归属用户
-  belongId: string;
   // 备注
   remark: string;
   // 图标

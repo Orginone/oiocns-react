@@ -1,34 +1,47 @@
 import { Collection } from './collection';
-import { schema } from '../../base';
+import {
+  XApplication,
+  XDirectory,
+  XForm,
+  XProperty,
+  XSpecies,
+  XSpeciesItem,
+} from '../../base/schema';
 
 /** 数据核资源（前端开发） */
 export class DataResource {
-  constructor(id: string) {
-    this.formColl = new Collection<schema.XForm>(id, 'standard-form');
-    this.propertyColl = new Collection<schema.XProperty>(id, 'standard-property');
-    this.speciesColl = new Collection<schema.XSpecies>(id, 'standard-species');
-    this.speciesItemColl = new Collection<schema.XSpeciesItem>(
-      id,
+  constructor(belongId: string, shareId: string) {
+    this.formColl = new Collection<XForm>(belongId, shareId, 'standard-form');
+    this.propertyColl = new Collection<XProperty>(belongId, shareId, 'standard-property');
+    this.speciesColl = new Collection<XSpecies>(belongId, shareId, 'standard-species');
+    this.speciesItemColl = new Collection<XSpeciesItem>(
+      belongId,
+      shareId,
       'standard-species-item',
     );
-    this.applicationColl = new Collection<schema.XApplication>(
-      id,
+    this.applicationColl = new Collection<XApplication>(
+      belongId,
+      shareId,
       'standard-application',
     );
-    this.directoryColl = new Collection<schema.XDirectory>(id, 'resource-directory');
+    this.directoryColl = new Collection<XDirectory>(
+      belongId,
+      shareId,
+      'resource-directory',
+    );
   }
   /** 表单集合 */
-  formColl: Collection<schema.XForm>;
+  formColl: Collection<XForm>;
   /** 属性集合 */
-  propertyColl: Collection<schema.XProperty>;
+  propertyColl: Collection<XProperty>;
   /** 分类集合 */
-  speciesColl: Collection<schema.XSpecies>;
+  speciesColl: Collection<XSpecies>;
   /** 类目集合 */
-  speciesItemColl: Collection<schema.XSpeciesItem>;
+  speciesItemColl: Collection<XSpeciesItem>;
   /** 应用集合 */
-  applicationColl: Collection<schema.XApplication>;
+  applicationColl: Collection<XApplication>;
   /** 资源目录集合 */
-  directoryColl: Collection<schema.XDirectory>;
+  directoryColl: Collection<XDirectory>;
   /** 资源预加载 */
   async preLoad(): Promise<void> {
     await Promise.all([

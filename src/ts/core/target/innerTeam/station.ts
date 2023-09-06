@@ -100,7 +100,6 @@ export class Station extends Team implements IStation {
     return [this];
   }
   async deepLoad(reload: boolean = false): Promise<void> {
-    await this.directory.loadSubDirectory();
     await this.loadIdentitys(reload);
     await this.loadMembers(reload);
   }
