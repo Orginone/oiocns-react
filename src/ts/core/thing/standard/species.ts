@@ -1,4 +1,4 @@
-import { kernel, model, schema } from '../../../base';
+import { model, schema } from '../../../base';
 import { IDirectory } from '../directory';
 import { FileInfo, IFileInfo } from '../fileinfo';
 
@@ -62,9 +62,8 @@ export class Species extends FileInfo<schema.XSpecies> implements ISpecies {
     return false;
   }
   async update(data: schema.XSpecies): Promise<boolean> {
-    data.id = this.id;
-    data.directoryId = this.metadata.directoryId;
     const res = await this.directory.resource.speciesColl.replace({
+      ...this.metadata,
       ...data,
       id: this.id,
       directoryId: this.metadata.directoryId,
@@ -77,15 +76,13 @@ export class Species extends FileInfo<schema.XSpecies> implements ISpecies {
   }
   async delete(): Promise<boolean> {
     if (this.directory) {
-      const res = await kernel.deleteSpecies({
-        id: this.id,
-      });
-      if (res.success) {
+      const success = await this.directory.resource.speciesColl.delete(this.metadata);
+      if (success) {
         this.directory.specieses = this.directory.specieses.filter(
           (i) => i.key != this.key,
         );
       }
-      return res.success;
+      return success;
     }
     return false;
   }

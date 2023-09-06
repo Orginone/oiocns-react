@@ -196,7 +196,11 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
     }
   }
   async update(data: schema.XDirectory): Promise<boolean> {
-    const res = await this.resource.directoryColl.replace({ ...this.metadata, ...data });
+    const res = await this.resource.directoryColl.replace({
+      ...this.metadata,
+      ...data,
+      shareId: this.metadata.shareId,
+    });
     if (res) {
       this.setMetadata({ ...res, typeName: '目录' });
       return true;

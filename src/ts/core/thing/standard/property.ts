@@ -50,8 +50,6 @@ export class Property extends FileInfo<schema.XProperty> implements IProperty {
     return false;
   }
   async update(data: schema.XProperty): Promise<boolean> {
-    data.id = this.id;
-    data.directoryId = this.metadata.directoryId;
     const res = await this.directory.resource.propertyColl.replace({
       ...this.metadata,
       ...data,

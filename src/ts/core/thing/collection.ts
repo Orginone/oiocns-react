@@ -58,10 +58,12 @@ export class Collection<T extends schema.Xbase> {
   }
 
   async load(options: any): Promise<T[]> {
+    var match = options.options?.match || {};
     return await this.loadSpace({
       ...options,
       options: {
         match: {
+          ...match,
           shareId: this.shareId,
         },
       },
