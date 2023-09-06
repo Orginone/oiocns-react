@@ -95,7 +95,6 @@ const Navbar: React.FC = () => {
       </Link>
     );
   };
-  console.log('orgCtrl', orgCtrl.user);
   const content = (
     <div style={{ width: '200px' }}>
       <div className={navStyles['nav-head']}>
@@ -176,7 +175,9 @@ const Navbar: React.FC = () => {
               placement="right"
               animation="false"
               overlayClassName={navStyles['popover-style']}>
-              <EntityIcon entityId={orgCtrl.user.id} size={45} />
+              <div>
+                <EntityIcon entityId={orgCtrl.user.id} size={45} />
+              </div>
             </Popover>
           )}
         </div>
