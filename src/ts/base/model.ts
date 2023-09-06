@@ -869,6 +869,15 @@ export type ActivityType = {
   tags: string[];
 } & Xbase;
 
+// 加载请求类型
+export type LoadOptions = {
+  filter: any[];
+  take: number;
+  group: string;
+  skip: number;
+  options: any;
+}
+
 /** 请求失败 */
 export const badRequest = (
   msg: string = '请求失败',

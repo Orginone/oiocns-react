@@ -110,7 +110,7 @@ export class Form extends FileInfo<schema.XForm> implements IForm {
               valueType: attr.property.valueType,
             };
             if (attr.property.speciesId && attr.property.speciesId.length > 0) {
-              const data = await this.directory.resource.speciesItemColl.load({
+              const data = await this.directory.resource.speciesItemColl.loadSpace({
                 options: { match: { speciesId: attr.property.speciesId } },
               });
               if (data.length > 0) {

@@ -22,8 +22,23 @@ export class Collection<T extends schema.Xbase> {
     return this.cache;
   }
 
-  async load(options: any): Promise<T[]> {
-    var match = options?.options?.match || {};
+  async find(ids?: string[]): Promise<T[]> {
+    if (ids && ids.length > 0) {
+      return await this.loadSpace({
+        options: {
+          match: {
+            _id: {
+              _in_: ids,
+            },
+          },
+        },
+      });
+    }
+    return [];
+  }
+
+  async loadSpace(options: any): Promise<T[]> {
+    var match = options.options?.match || {};
     options = {
       ...options,
       userData: [],
@@ -32,7 +47,6 @@ export class Collection<T extends schema.Xbase> {
         match: {
           ...match,
           isDeleted: false,
-          shareId: this.shareId,
         },
       },
     };
@@ -41,6 +55,17 @@ export class Collection<T extends schema.Xbase> {
       return res.data || [];
     }
     return [];
+  }
+
+  async load(options: any): Promise<T[]> {
+    return await this.loadSpace({
+      ...options,
+      options: {
+        match: {
+          shareId: this.shareId,
+        },
+      },
+    });
   }
 
   async insert(data: T): Promise<T | undefined> {

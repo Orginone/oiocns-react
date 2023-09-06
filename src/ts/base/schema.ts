@@ -15,7 +15,7 @@ export type Xbase = {
   updateTime: string;
   // 共享用户ID
   shareId: string;
-  // 共享用户ID
+  // 归属用户ID
   belongId: string;
 };
 

@@ -6,6 +6,7 @@ import { Collection } from '@/ts/core';
 import { LikeOutlined, MessageOutlined, StarOutlined } from '@ant-design/icons';
 import { model } from '@/ts/base';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
+import { showChatTime } from '@/utils/tools';
 
 const ActivityList: React.FC<{ coll: Collection<model.ActivityType> }> = ({ coll }) => {
   const IconText = ({ icon, text }: { icon: React.FC; text: string }) => (
@@ -19,6 +20,7 @@ const ActivityList: React.FC<{ coll: Collection<model.ActivityType> }> = ({ coll
       <div className={cls.activityItem}>
         <div className={cls.activityItemHeader}>
           <EntityIcon entityId={item.createUser} showName />
+          <span style={{ fontSize: 14 }}>{showChatTime(item.createTime)}</span>
           {item.tags.map((item, index) => {
             return (
               <Tag color="processing" key={index}>

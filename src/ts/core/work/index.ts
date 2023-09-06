@@ -136,7 +136,7 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
       const res = await kernel.queryWorkNodes({ id: this.id });
       if (res.success) {
         this.node = res.data;
-        this.recursionForms(this.node);
+        await this.recursionForms(this.node);
       }
     }
     return this.node;
@@ -171,13 +171,9 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
       );
     }
   }
-  private recursionForms(node: model.WorkNodeModel) {
-    node.primaryForms = this.directory.resource.formColl.cache.filter((a) =>
-      node.primaryFormIds?.includes(a.id),
-    );
-    node.detailForms = this.directory.resource.formColl.cache.filter((a) =>
-      node.detailFormIds?.includes(a.id),
-    );
+  private async recursionForms(node: model.WorkNodeModel) {
+    node.detailForms = await this.directory.resource.formColl.find(node.detailFormIds);
+    node.primaryForms = await this.directory.resource.formColl.find(node.primaryFormIds);
     node.primaryForms.forEach(async (a) => {
       const form = new Form({ ...a, id: a.id + '_' }, this.directory);
       this.primaryForms.push(form);
@@ -189,7 +185,7 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
       await form.loadFields();
     });
     if (node.children) {
-      this.recursionForms(node.children);
+      await this.recursionForms(node.children);
     }
     if (node.branches) {
       for (const branch of node.branches) {

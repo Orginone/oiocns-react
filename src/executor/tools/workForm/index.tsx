@@ -31,8 +31,7 @@ const getNodeByNodeId = (
 /** 流程节点表单 */
 const WorkForm: React.FC<IWorkFormProps> = (props) => {
   const node = getNodeByNodeId(props.nodeId, props.data.node);
-  if (!node || (node.primaryFormIds.length < 1 && node.detailFormIds.length < 1))
-    return <></>;
+  if (!node) return <></>;
   /** 根据需求获取数据 */
   const getFormData = (id: string): model.FormEditData => {
     const source: model.AnyThingModel[] = [];
@@ -59,8 +58,12 @@ const WorkForm: React.FC<IWorkFormProps> = (props) => {
   };
   return (
     <div style={{ padding: 10 }}>
-      <PrimaryForms {...props} forms={node.primaryForms} getFormData={getFormData} />
-      <DetailForms {...props} forms={node.detailForms} getFormData={getFormData} />
+      {node.primaryForms && node.primaryForms.length > 0 && (
+        <PrimaryForms {...props} forms={node.primaryForms} getFormData={getFormData} />
+      )}
+      {node.detailForms && node.detailForms.length > 0 && (
+        <DetailForms {...props} forms={node.detailForms} getFormData={getFormData} />
+      )}
     </div>
   );
 };
