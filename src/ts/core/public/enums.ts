@@ -19,6 +19,7 @@ export enum TargetType {
   'Company' = '单位',
   'University' = '大学',
   'Hospital' = '医院',
+  'Storage' = '存储资源'
 }
 
 /** 分类基础类型 */

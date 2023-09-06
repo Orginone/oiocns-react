@@ -11,6 +11,8 @@ import { IMsgChat } from '../../chat/message/msgchat';
 import { ITarget } from '../base/target';
 import { ITeam } from '../base/team';
 import { targetOperates } from '../../public';
+import { Storage } from '../outTeam/storage';
+import { companyJoins } from '../../public/operates';
 
 /** 单位类型接口 */
 export interface ICompany extends IBelong {
@@ -62,12 +64,22 @@ export class Company extends Belong implements ICompany {
     if (!this._groupLoaded || reload) {
       const res = await kernel.queryJoinedTargetById({
         id: this.id,
-        typeNames: [TargetType.Group],
+        typeNames: [TargetType.Group, TargetType.Storage],
         page: PageAll,
       });
       if (res.success) {
         this._groupLoaded = true;
-        this.groups = (res.data.result || []).map((i) => new Group(i, this));
+        this.storages = [];
+        this.groups = [];
+        (res.data.result || []).forEach((i) => {
+          switch (i.typeName) {
+            case TargetType.Storage:
+              this.storages.push(new Storage(i, this));
+              break;
+            default:
+              this.groups.push(new Group(i, this));
+          }
+        });
       }
     }
     return this.groups;
@@ -166,7 +178,10 @@ export class Company extends Belong implements ICompany {
   }
   async applyJoin(members: schema.XTarget[]): Promise<boolean> {
     for (const member of members) {
-      if (member.typeName === TargetType.Group) {
+      if (
+        member.typeName === TargetType.Group ||
+        member.typeName === TargetType.Storage
+      ) {
         await kernel.applyJoinTeam({
           id: member.id,
           subId: this.id,
@@ -231,6 +246,9 @@ export class Company extends Belong implements ICompany {
     for (const item of this.cohorts) {
       targets.push(...item.targets);
     }
+    for (const item of this.storages) {
+      targets.push(...item.targets);
+    }
     return targets;
   }
   async deepLoad(reload: boolean = false): Promise<void> {
@@ -272,18 +290,13 @@ export class Company extends Belong implements ICompany {
     if (this.hasRelationAuth()) {
       operates.unshift(
         {
-          sort: 3,
+          sort: 2,
           cmd: 'setNew',
           label: '设立更多',
           iconType: 'setNew',
           menus: [targetOperates.NewGroup, targetOperates.NewDepartment],
         },
-        {
-          sort: 13,
-          cmd: 'joinGroup',
-          label: '加入集群',
-          iconType: 'joinGroup',
-        },
+        companyJoins,
       );
     }
     return operates;
@@ -325,6 +338,14 @@ export class Company extends Belong implements ICompany {
           const cohort = new Cohort(target, this);
           await cohort.deepLoad();
           this.cohorts.push(cohort);
+          return true;
+        }
+        break;
+      case TargetType.Storage:
+        if (this.storages.every((i) => i.id != target.id)) {
+          const storage = new Storage(target, this);
+          await storage.deepLoad();
+          this.storages.push(storage);
           return true;
         }
         break;

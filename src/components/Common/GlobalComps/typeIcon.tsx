@@ -64,10 +64,14 @@ const TypeIcon = ({ avatar, iconType, size }: TypeIconInfo) => {
         return <im.ImKey {...config} />;
       case '权限':
         return <im.ImShield {...config} />;
+      case '激活':
+        return <im.ImPowerCord {...config} />;
       case TargetType.Company:
       case TargetType.University:
       case TargetType.Hospital:
         return <im.ImOffice {...config} />;
+      case TargetType.Storage:
+        return <im.ImDrive {...config} />;
       case TargetType.Station:
         return <im.ImAddressBook {...config} />;
       case TargetType.Group:

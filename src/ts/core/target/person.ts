@@ -8,6 +8,7 @@ import { ICompany } from './team/company';
 import { IMsgChat } from '../chat/message/msgchat';
 import { ITarget } from './base/target';
 import { ITeam } from './base/team';
+import { IStorage, Storage } from './outTeam/storage';
 import { personJoins, targetOperates } from '../public';
 import { IFileInfo } from '../thing/fileinfo';
 
@@ -29,8 +30,6 @@ export interface IPerson extends IBelong {
   loadGivedIdentitys(reload?: boolean): Promise<schema.XIdProof[]>;
   /** 移除赋予人的身份(角色) */
   removeGivedIdentity(identityIds: string[], teamId?: string): void;
-  /** 加载单位 */
-  loadCompanys(reload?: boolean): Promise<ICompany[]>;
   /** 创建单位 */
   createCompany(data: model.TargetModel): Promise<ICompany | undefined>;
   /** 搜索用户 */
@@ -47,7 +46,6 @@ export class Person extends Belong implements IPerson {
   givedIdentitys: schema.XIdProof[] = [];
   copyFiles: Map<string, IFileInfo<schema.XEntity>>;
   private _cohortLoaded: boolean = false;
-  private _companyLoaded: boolean = false;
   private _givedIdentityLoaded: boolean = false;
   async loadGivedIdentitys(reload: boolean = false): Promise<schema.XIdProof[]> {
     if (!this._givedIdentityLoaded || reload) {
@@ -74,29 +72,29 @@ export class Person extends Belong implements IPerson {
     if (!this._cohortLoaded || reload) {
       const res = await kernel.queryJoinedTargetById({
         id: this.id,
-        typeNames: [TargetType.Cohort],
+        typeNames: [TargetType.Cohort, TargetType.Storage, ...companyTypes],
         page: PageAll,
       });
       if (res.success) {
         this._cohortLoaded = true;
-        this.cohorts = (res.data.result || []).map((i) => new Cohort(i, this));
+        this.cohorts = [];
+        this.storages = [];
+        this.companys = [];
+        (res.data.result || []).forEach((i) => {
+          switch (i.typeName) {
+            case TargetType.Cohort:
+              this.cohorts.push(new Cohort(i, this));
+              break;
+            case TargetType.Storage:
+              this.storages.push(new Storage(i, this));
+              break;
+            default:
+              this.companys.push(createCompany(i, this));
+          }
+        });
       }
     }
     return this.cohorts;
-  }
-  async loadCompanys(reload?: boolean | undefined): Promise<ICompany[]> {
-    if (!this._companyLoaded || reload) {
-      const res = await kernel.queryJoinedTargetById({
-        id: this.id,
-        typeNames: companyTypes,
-        page: PageAll,
-      });
-      if (res.success) {
-        this._companyLoaded = true;
-        this.companys = (res.data.result || []).map((i) => createCompany(i, this));
-      }
-    }
-    return this.companys;
   }
   async createCompany(data: model.TargetModel): Promise<ICompany | undefined> {
     if (!companyTypes.includes(data.typeName as TargetType)) {
@@ -114,10 +112,23 @@ export class Person extends Belong implements IPerson {
       return company;
     }
   }
+  async createStorage(data: model.TargetModel): Promise<IStorage | undefined> {
+    data.typeName = TargetType.Storage;
+    const metadata = await this.create(data);
+    if (metadata) {
+      const storage = new Storage(metadata, this);
+      await storage.deepLoad();
+      this.storages.push(storage);
+      await storage.pullMembers([this.user.metadata]);
+      return storage;
+    }
+  }
   async createTarget(data: model.TargetModel): Promise<ITeam | undefined> {
     switch (data.typeName) {
       case TargetType.Cohort:
         return this.createCohort(data);
+      case TargetType.Storage:
+        return this.createStorage(data);
       default:
         return this.createCompany(data);
     }
@@ -136,9 +147,12 @@ export class Person extends Belong implements IPerson {
   async applyJoin(members: schema.XTarget[]): Promise<boolean> {
     members = members.filter(
       (i) =>
-        [TargetType.Person, TargetType.Cohort, ...companyTypes].includes(
-          i.typeName as TargetType,
-        ) && i.id != this.id,
+        [
+          TargetType.Person,
+          TargetType.Cohort,
+          TargetType.Storage,
+          ...companyTypes,
+        ].includes(i.typeName as TargetType) && i.id != this.id,
     );
     for (const member of members) {
       if (member.typeName === TargetType.Person) {
@@ -200,13 +214,16 @@ export class Person extends Belong implements IPerson {
         chats.push(...item.chats);
       }
     }
+    for (const item of this.storages) {
+      chats.push(...item.chats);
+    }
     if (this.superAuth) {
       chats.push(...this.superAuth.chats);
     }
     return chats;
   }
   get targets(): ITarget[] {
-    const targets: ITarget[] = [this];
+    const targets: ITarget[] = [this, ...this.storages];
     for (const item of this.cohorts) {
       targets.push(...item.targets);
     }
@@ -217,7 +234,6 @@ export class Person extends Belong implements IPerson {
     await this.directory.loadSubDirectory();
     await Promise.all([
       await this.loadGivedIdentitys(reload),
-      await this.loadCompanys(reload),
       await this.loadCohorts(reload),
       await this.loadMembers(reload),
       await this.loadSuperAuth(reload),
@@ -232,6 +248,11 @@ export class Person extends Belong implements IPerson {
         await cohort.deepLoad(reload);
       }),
     );
+    await Promise.all(
+      this.storages.map(async (storage) => {
+        await storage.deepLoad(reload);
+      }),
+    );
     this.superAuth?.deepLoad(reload);
   }
   async teamChangedNotity(target: schema.XTarget): Promise<boolean> {
@@ -241,6 +262,14 @@ export class Person extends Belong implements IPerson {
           const cohort = new Cohort(target, this);
           await cohort.deepLoad();
           this.cohorts.push(cohort);
+          return true;
+        }
+        break;
+      case TargetType.Storage:
+        if (this.storages.every((i) => i.id != target.id)) {
+          const storage = new Storage(target, this);
+          await storage.deepLoad();
+          this.storages.push(storage);
           return true;
         }
         break;
@@ -258,7 +287,7 @@ export class Person extends Belong implements IPerson {
   }
   override operates(): model.OperateModel[] {
     const operates = super.operates();
-    operates.unshift(personJoins, targetOperates.NewCompany);
+    operates.unshift(personJoins, targetOperates.NewCompany, targetOperates.NewStorage);
     return operates;
   }
   async findEntityAsync(id: string): Promise<schema.XEntity | undefined> {
