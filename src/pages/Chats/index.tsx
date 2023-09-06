@@ -179,7 +179,7 @@ const Setting: React.FC<any> = () => {
           />
         </Modal>
       )}
-      {/* 创建用户 */}
+      {/* 创建单位或群组 */}
       {showFormModal && (
         <TargetForm
           formType={createTargetType}
