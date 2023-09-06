@@ -43,11 +43,13 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
   }
   primaryForms: IForm[] = [];
   detailForms: IForm[] = [];
-  forms: IForm[] = [];
   application: IApplication;
   node: model.WorkNodeModel | undefined;
   get locationKey(): string {
     return this.application.key;
+  }
+  get forms(): IForm[] {
+    return [...this.primaryForms, ...this.detailForms];
   }
   async delete(_notity: boolean = false): Promise<boolean> {
     if (this.application) {
@@ -139,6 +141,7 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
     return this.node;
   }
   async createApply(): Promise<IWorkApply | undefined> {
+    await this.loadWorkNode();
     if (this.node && this.forms.length > 0) {
       const data: model.InstanceDataModel = {
         data: {},
@@ -149,9 +152,12 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
         allowEdit: this.metadata.allowEdit,
         allowSelect: this.metadata.allowSelect,
       };
-      this.forms.forEach((form) => {
-        data.fields[form.id] = form.fields;
-      });
+      await Promise.all(
+        this.forms.map(async (form) => {
+          await form.loadContent();
+          data.fields[form.id] = form.fields;
+        }),
+      );
       return new WorkApply(
         {
           hook: '',
@@ -166,10 +172,10 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
   }
   private recursionForms(node: model.WorkNodeModel) {
     node.primaryForms = this.application.directory.resource.formColl.cache.filter((a) =>
-      node.primaryFormIds.includes(a.id),
+      node.primaryFormIds?.includes(a.id),
     );
     node.detailForms = this.application.directory.resource.formColl.cache.filter((a) =>
-      node.primaryFormIds.includes(a.id),
+      node.detailFormIds?.includes(a.id),
     );
     node.primaryForms.forEach((a) => {
       this.primaryForms.push(new Form({ ...a, id: a.id + '_' }, this.directory));

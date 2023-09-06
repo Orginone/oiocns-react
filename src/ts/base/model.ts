@@ -672,13 +672,13 @@ export type WorkNodeModel = {
   // 节点归属定义Id
   defineId: string;
   // 主表Id集合
-  primaryFormIds: string[];
+  primaryFormIds: string[] | undefined;
   // 子表Id集合
-  detailFormIds: string[];
+  detailFormIds: string[] | undefined;
   // 主表
-  primaryForms: XForm[];
+  primaryForms: XForm[] | undefined;
   // 子表
-  detailForms: XForm[];
+  detailForms: XForm[] | undefined;
 };
 
 export type Branche = {
