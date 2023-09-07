@@ -109,7 +109,6 @@ export class DirectoryReadConfig extends ReadConfigImpl<
           ...form.metadata,
           directoryCode: dir.code,
         });
-        await form.loadAttributes();
         c.formAttrCodeMap.set(form.code, new Map());
         for (let attribute of form.attributes) {
           c.formAttrCodeMap.get(form.code)?.set(attribute.code, {
