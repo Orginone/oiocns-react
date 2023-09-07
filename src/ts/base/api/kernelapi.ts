@@ -1283,20 +1283,20 @@ export default class KernelApi {
   /**
    * 替换数据集数据
    * @param {string} collName 数据集名称（eg: history-message）
-   * @param {T} data 要添加的数据，对象/数组
+   * @param {T} replace 要添加的数据，对象/数组
    * @param {string} belongId 对象所在的归属用户ID
    * @returns {model.ResultType<T>} 对象异步结果
    */
   public async collectionReplace<T>(
     belongId: string,
     collName: string,
-    data: T,
+    replace: T,
   ): Promise<model.ResultType<T>> {
     return await this.dataProxy({
       module: 'Collection',
       action: 'Replace',
       belongId,
-      params: { collName, data },
+      params: { collName, replace },
     });
   }
   /**
