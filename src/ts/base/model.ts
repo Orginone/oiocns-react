@@ -102,6 +102,13 @@ export type OnlineInfo = {
   // 终端类型
   endPointType: string;
 };
+/** 在线信息查询接口 */
+export type OnlineSet = {
+  // 用户连接
+  users: OnlineInfo[],
+  // 存储连接
+  storages: OnlineInfo[],
+}
 // 分页返回定义
 export type PageResult<T> = {
   // 便宜量
