@@ -25,7 +25,7 @@ export type MsgChatData = {
   /** 最后一次消息时间 */
   lastMsgTime: number;
   /** 最新消息 */
-  lastMessage?: model.MsgSaveModel;
+  lastMessage?: model.ChatMessageType;
   /** 提及我 */
   mentionMe: boolean;
 };
@@ -90,7 +90,7 @@ interface IChat {
   /** 清空历史记录 */
   clearMessage(): Promise<boolean>;
   /** 会话接收到消息 */
-  receiveMessage(msg: model.MsgSaveModel): void;
+  receiveMessage(msg: model.ChatMessageType): void;
   /** 会话接收标签 */
   receiveTags(ids: string[], tags: string[]): void;
 }
@@ -321,7 +321,7 @@ export abstract class MsgChat<T extends schema.XEntity>
     }
     return false;
   }
-  receiveMessage(msg: model.MsgSaveModel): void {
+  receiveMessage(msg: model.ChatMessageType): void {
     const imsg = new Message(msg, this);
     if (imsg.msgType === MessageType.Recall) {
       this.messages

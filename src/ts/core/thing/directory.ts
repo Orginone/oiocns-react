@@ -175,7 +175,6 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
     const res = await this.resource.directoryColl.insert({
       ...data,
       parentId: this.id,
-      shareId: this.metadata.shareId,
     });
     if (res) {
       const directory = new Directory(res, this.target, this);
