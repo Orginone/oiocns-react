@@ -169,6 +169,21 @@ export class Collection<T extends schema.Xbase> {
     return false;
   }
 
+  async deleteMatch(match: any): Promise<boolean> {
+    const res = await kernel.collectionUpdate(this.belongId, this.collName, {
+      match: match,
+      update: {
+        _set_: {
+          isDeleted: true,
+        },
+      },
+    });
+    if (res.success) {
+      return res.data?.MatchedCount > 0;
+    }
+    return false;
+  }
+
   async remove(data: T): Promise<boolean> {
     const res = await kernel.collectionRemove(this.belongId, this.collName, {
       _id: data.id,

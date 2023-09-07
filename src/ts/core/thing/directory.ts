@@ -65,7 +65,9 @@ export interface IDirectory extends IFileInfo<schema.XDirectory> {
   createApplication(data: schema.XApplication): Promise<IApplication | undefined>;
   /** 加载全部应用 */
   loadAllApplication(reload?: boolean): Promise<IApplication[]>;
-  /** 加载目录树 */
+  /** 加载目录资源 */
+  loadDirectoryResource(): Promise<void>;
+  /** 情况目录资源 */
   loadDirectoryResource(): Promise<void>;
 }
 
@@ -191,8 +193,12 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
   }
   async delete(): Promise<boolean> {
     if (this.parent) {
+      for (const item of this.children) {
+        await item.delete();
+      }
       const res = await this.resource.directoryColl.delete(this.metadata);
       if (res) {
+        await this.deleteDirectoryResource();
         this.parent.children = this.parent.children.filter((i) => i.key != this.key);
       }
       return res;
@@ -358,5 +364,23 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
         subDir.loadDirectoryResource();
         return subDir;
       });
+  }
+
+  public async deleteDirectoryResource(): Promise<void> {
+    await this.resource.formColl.deleteMany(this.forms.map((i) => i.metadata));
+    await this.resource.speciesColl.deleteMany(this.specieses.map((i) => i.metadata));
+    await this.resource.propertyColl.deleteMany(this.propertys.map((i) => i.metadata));
+    await this.resource.applicationColl.deleteMany(
+      this.applications.map((i) => i.metadata),
+    );
+    await this.resource.speciesItemColl.deleteMatch({
+      speciesId: {
+        _in_: this.specieses.map((i) => i.id),
+      },
+    });
+    this.forms = [];
+    this.specieses = [];
+    this.propertys = [];
+    this.applications = [];
   }
 }

@@ -33,7 +33,7 @@ const Directory: React.FC<IProps> = ({ mode, current }: IProps) => {
     return {
       items: loadFileMenus(entity, mode),
       onClick: ({ key }: { key: string }) => {
-        command.emitter(cmdType, key, entity, dircetory.key);
+        command.emitter(cmdType, key, file || dircetory, dircetory.key);
         clicked?.apply(this, []);
       },
     };
