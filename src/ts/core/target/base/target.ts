@@ -7,11 +7,14 @@ import { IBelong } from './belong';
 import { targetOperates } from '../../public';
 import { Directory, IDirectory } from '../../thing/directory';
 import { IFileInfo } from '../../thing/fileinfo';
+import { DataResource } from '../../thing/resource';
 
 /** 用户抽象接口类 */
 export interface ITarget extends ITeam, IFileInfo<schema.XTarget> {
   /** 用户设立的身份(角色) */
   identitys: IIdentity[];
+  /** 用户资源 */
+  resource: DataResource;
   /** 子用户 */
   subTarget: ITarget[];
   /** 所有相关用户 */
@@ -35,6 +38,7 @@ export abstract class Target extends Team implements ITarget {
     _memberTypes: TargetType[] = [TargetType.Person],
   ) {
     super(_metadata, _labels, _space, _memberTypes);
+    this.resource = new DataResource(_metadata.belongId, _metadata.id);
     this.directory = new Directory(
       {
         ..._metadata,
@@ -58,6 +62,7 @@ export abstract class Target extends Team implements ITarget {
       this.directory,
     );
   }
+  resource: DataResource;
   directory: IDirectory;
   identitys: IIdentity[] = [];
   memberDirectory: IDirectory;
