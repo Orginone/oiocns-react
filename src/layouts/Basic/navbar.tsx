@@ -120,7 +120,7 @@ const Navbar: React.FC = () => {
 
 const OnlineInfo: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const [key, setKey] = useState('1');
-  const [onlines, setOnlines] = useState<model.OnlineInfo[]>([]);
+  const [onlines, setOnlines] = useState<model.OnlineSet>();
   useEffect(() => {
     const id = kernel.onlineNotity.subscribe((key) => {
       kernel.onlines().then((value) => {
@@ -132,14 +132,33 @@ const OnlineInfo: React.FC<{ onClose: () => void }> = ({ onClose }) => {
       kernel.onlineNotity.unsubscribe(id);
     };
   }, []);
+  if (!onlines) return <></>;
 
   const loadOnlineInfo = (onlines: model.OnlineInfo[]) => {
+    var unAuth: model.OnlineInfo[] = [];
+    onlines
+      .filter((i) => i.userId === '0')
+      .forEach((item) => {
+        var index = unAuth.findIndex((i) => i.remoteAddr === item.remoteAddr);
+        if (index === -1) {
+          item.requestCount = 1;
+          unAuth.push(item);
+        } else {
+          unAuth[index].requestCount = unAuth[index].requestCount + 1;
+        }
+      });
     return (
       <List
         itemLayout="horizontal"
-        dataSource={onlines.sort(
-          (a, b) => new Date(b.onlineTime).getTime() - new Date(a.onlineTime).getTime(),
-        )}
+        dataSource={[
+          ...unAuth,
+          ...onlines
+            .filter((i) => i.userId != '0')
+            .sort(
+              (a, b) =>
+                new Date(b.onlineTime).getTime() - new Date(a.onlineTime).getTime(),
+            ),
+        ]}
         renderItem={(item) => <OnlineItem data={item} />}
       />
     );
@@ -153,13 +172,13 @@ const OnlineInfo: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         items={[
           {
             key: 'online_user',
-            label: `在线用户(${onlines.filter((i) => i.userId != '0').length})`,
-            children: loadOnlineInfo(onlines.filter((i) => i.userId != '0')),
+            label: `在线用户(${onlines.users.length})`,
+            children: loadOnlineInfo(onlines.users),
           },
           {
             key: 'online_connection',
-            label: `在线连接(${onlines.filter((i) => i.userId === '0').length})`,
-            children: loadOnlineInfo(onlines.filter((i) => i.userId == '0')),
+            label: `在线数据核(${onlines.storages.length})`,
+            children: loadOnlineInfo(onlines.storages),
           },
         ]}
       />
@@ -168,6 +187,7 @@ const OnlineInfo: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 };
 
 const OnlineItem: React.FC<{ data: model.OnlineInfo }> = ({ data }) => {
+  data.remoteAddr = data.remoteAddr === '[' ? '127.0.0.1' : data.remoteAddr;
   const [target, setTarget] = useState<schema.XEntity>();
   useEffect(() => {
     if (data.userId != '0') {
