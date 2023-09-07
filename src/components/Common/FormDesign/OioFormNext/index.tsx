@@ -101,6 +101,9 @@ const OioForm: React.FC<IProps> = ({
                   belong={belong}
                   disabled={disabled === true}
                   value={fieldsValue ? fieldsValue[field.id] : undefined}
+                  onFilesValueChange={(key, value) => {
+                    fieldsValue[key] = JSON.stringify(value);
+                  }}
                 />
               </Descriptions.Item>
             );

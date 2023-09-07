@@ -77,7 +77,7 @@ const OioFormItem = ({
   }
   const [fileList, setFileList] = useState<any[]>([]);
   useEffect(() => {
-    if (value && ['file', 'upload'].includes(rule.widget)) {
+    if (value && typeof value === 'string' && ['file', 'upload'].includes(rule.widget)) {
       setFileList(
         JSON.parse(value).map((a: FileItemShare) => {
           return {
@@ -143,7 +143,6 @@ const OioFormItem = ({
     switch (fileType) {
       case '.pdf':
         return defaultFilsUrl[0];
-
       case '.doc':
       case '.docx':
         return defaultFilsUrl[1];
