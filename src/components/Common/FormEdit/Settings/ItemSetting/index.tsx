@@ -23,7 +23,7 @@ const obj = {
 };
 const AttributeConfig = ({ current, schemaRef, selectedFiled, superAuth }: IProps) => {
   if (!selectedFiled) {
-    return <>请选择特性</>;
+    return <>请选择组件</>;
   }
 
   const formRef = useRef<ProFormInstance>();
