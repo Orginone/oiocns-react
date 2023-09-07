@@ -28,8 +28,6 @@ export interface IBelong extends ITarget {
   cohortChats: IMsgChat[];
   /** 共享组织 */
   shareTarget: ITarget[];
-  /** 加载群 */
-  loadCohorts(reload?: boolean): Promise<ICohort[]>;
   /** 加载超管权限 */
   loadSuperAuth(reload?: boolean): Promise<IAuthority | undefined>;
   /** 申请加用户 */
@@ -114,5 +112,4 @@ export abstract class Belong extends Target implements IBelong {
   abstract cohortChats: IMsgChat[];
   abstract get parentTarget(): ITarget[];
   abstract applyJoin(members: schema.XTarget[]): Promise<boolean>;
-  abstract loadCohorts(reload?: boolean | undefined): Promise<ICohort[]>;
 }

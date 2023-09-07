@@ -88,9 +88,10 @@ const EntityForm: React.FC<IProps> = ({ cmd, entity, finished }) => {
         <PropertyForm formType={cmd} current={entity as any} finished={reloadFinish} />
       );
     default: {
-      const target = cmd.startsWith('new')
-        ? (entity as IDirectory).target
-        : (entity as ITarget);
+      var target = entity as ITarget;
+      if (entity.typeName === '目录') {
+        target = (entity as IDirectory).target;
+      }
       return <TargetForm formType={cmd} target={target} finished={reloadFinish} />;
     }
   }

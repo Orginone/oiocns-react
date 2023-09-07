@@ -34,9 +34,10 @@ export class Cohort extends Target implements ICohort {
     return [this];
   }
   async deepLoad(reload: boolean = false): Promise<void> {
-    await this.resource.preLoad();
-    await this.directory.loadSubDirectory();
-    await this.loadMembers(reload);
+    await Promise.all([
+      await this.loadMembers(reload),
+      await this.directory.loadDirectoryResource(),
+    ]);
   }
   async teamChangedNotity(target: schema.XTarget): Promise<boolean> {
     return await this.pullMembers([target], true);

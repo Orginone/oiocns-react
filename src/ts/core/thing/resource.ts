@@ -14,6 +14,7 @@ import { ActivityType } from '@/ts/base/model';
 export class DataResource {
   shareId: string;
   belongId: string;
+  private _proLoaded: boolean = false;
   constructor(belongId: string, shareId: string) {
     this.shareId = shareId;
     this.belongId = belongId;
@@ -41,13 +42,16 @@ export class DataResource {
   activityColl: Collection<ActivityType>;
   /** 资源预加载 */
   async preLoad(): Promise<void> {
-    await Promise.all([
-      this.formColl.all(),
-      this.speciesColl.all(),
-      this.propertyColl.all(),
-      this.directoryColl.all(),
-      this.applicationColl.all(),
-    ]);
+    if (this._proLoaded === false) {
+      await Promise.all([
+        this.formColl.all(),
+        this.speciesColl.all(),
+        this.propertyColl.all(),
+        this.directoryColl.all(),
+        this.applicationColl.all(),
+      ]);
+    }
+    this._proLoaded = true;
   }
   /** 生成类型的集合 */
   genColl<T extends Xbase>(collName: string): Collection<T> {
