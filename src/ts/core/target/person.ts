@@ -230,13 +230,12 @@ export class Person extends Belong implements IPerson {
     return targets;
   }
   async deepLoad(reload: boolean = false): Promise<void> {
-    await this.resource.preLoad();
-    await this.directory.loadSubDirectory();
     await Promise.all([
-      await this.loadGivedIdentitys(reload),
       await this.loadCohorts(reload),
       await this.loadMembers(reload),
       await this.loadSuperAuth(reload),
+      await this.loadGivedIdentitys(reload),
+      await this.directory.loadDirectoryResource(),
     ]);
     await Promise.all(
       this.companys.map(async (company) => {

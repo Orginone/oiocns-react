@@ -43,38 +43,30 @@ export interface IDirectory extends IFileInfo<schema.XDirectory> {
   delete(): Promise<boolean>;
   /** 目录下的文件 */
   files: ISysFileInfo[];
+  /** 目录下的表单 */
+  forms: IForm[];
+  /** 目录下的分类 */
+  specieses: ISpecies[];
+  /** 目录下的属性 */
+  propertys: IProperty[];
+  /** 目录下的应用 */
+  applications: IApplication[];
   /** 加载文件 */
   loadFiles(reload?: boolean): Promise<ISysFileInfo[]>;
   /** 上传文件 */
   createFile(file: Blob, p?: OnProgress): Promise<ISysFileInfo | undefined>;
-  /** 目录下的表单 */
-  forms: IForm[];
-  /** 加载表单 */
-  loadForms(reload?: boolean): Promise<IForm[]>;
   /** 新建表单 */
   createForm(data: schema.XForm): Promise<IForm | undefined>;
-  /** 目录下的分类 */
-  specieses: ISpecies[];
-  /** 加载分类 */
-  loadSpecieses(reload?: boolean): Promise<ISpecies[]>;
   /** 新建分类 */
   createSpecies(data: schema.XSpecies): Promise<ISpecies | undefined>;
-  /** 目录下的属性 */
-  propertys: IProperty[];
-  /** 加载属性 */
-  loadPropertys(reload?: boolean): Promise<IProperty[]>;
   /** 新建属性 */
   createProperty(data: schema.XProperty): Promise<IProperty | undefined>;
-  /** 目录下的应用 */
-  applications: IApplication[];
-  /** 加载应用 */
-  loadApplications(reload?: boolean): Promise<IApplication[]>;
   /** 新建应用 */
   createApplication(data: schema.XApplication): Promise<IApplication | undefined>;
   /** 加载全部应用 */
   loadAllApplication(reload?: boolean): Promise<IApplication[]>;
   /** 加载目录树 */
-  loadSubDirectory(): void;
+  loadDirectoryResource(): Promise<void>;
 }
 
 /** 目录实现类 */
@@ -144,13 +136,7 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
       if (this.typeName === '成员目录') {
         await this.target.loadContent(reload);
       } else {
-        await Promise.all([
-          await this.loadSubDirectory(),
-          await this.loadForms(reload),
-          await this.loadPropertys(reload),
-          await this.loadSpecieses(reload),
-          await this.loadApplications(reload),
-        ]);
+        await this.loadDirectoryResource();
       }
     }
     return false;
@@ -261,14 +247,6 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
       return file;
     }
   }
-  async loadForms(reload: boolean = false): Promise<IForm[]> {
-    if (reload) {
-      this.forms = this.resource.formColl.cache
-        .filter((i) => i.directoryId === this.id)
-        .map((i) => new Form(i, this));
-    }
-    return this.forms;
-  }
   async createForm(data: schema.XForm): Promise<IForm | undefined> {
     const res = await this.resource.formColl.insert({
       ...data,
@@ -280,14 +258,6 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
       return form;
     }
   }
-  async loadSpecieses(reload: boolean = false): Promise<ISpecies[]> {
-    if (reload) {
-      this.specieses = this.resource.speciesColl.cache
-        .filter((i) => i.directoryId === this.id)
-        .map((i) => new Species(i, this));
-    }
-    return this.specieses;
-  }
   async createSpecies(data: schema.XSpecies): Promise<ISpecies | undefined> {
     const res = await this.resource.speciesColl.insert({
       ...data,
@@ -298,14 +268,6 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
       this.specieses.push(species);
       return species;
     }
-  }
-  async loadPropertys(reload: boolean = false): Promise<IProperty[]> {
-    if (reload) {
-      this.propertys = this.resource.propertyColl.cache
-        .filter((i) => i.directoryId === this.id)
-        .map((i) => new Property(i, this));
-    }
-    return this.propertys;
   }
   async createProperty(data: schema.XProperty): Promise<IProperty | undefined> {
     data.directoryId = this.id;
@@ -319,17 +281,6 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
       return property;
     }
   }
-  async loadApplications(reload: boolean = false): Promise<IApplication[]> {
-    if (reload) {
-      const data = this.resource.applicationColl.cache.filter(
-        (i) => i.directoryId === this.id,
-      );
-      this.applications = data
-        .filter((i) => !i.parentId || i.parentId.length < 1)
-        .map((i) => new Application(i, this, undefined, data));
-    }
-    return this.applications;
-  }
   async createApplication(data: schema.XApplication): Promise<IApplication | undefined> {
     const res = await this.resource.applicationColl.insert({
       ...data,
@@ -342,8 +293,7 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
     }
   }
   async loadAllApplication(reload: boolean = false): Promise<IApplication[]> {
-    const applications: IApplication[] = [];
-    applications.push(...(await this.loadApplications(reload)));
+    const applications: IApplication[] = [...this.applications];
     for (const subDirectory of this.children) {
       applications.push(...(await subDirectory.loadAllApplication(reload)));
     }
@@ -386,19 +336,10 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
     }
     return operates;
   }
-  public async loadSubDirectory() {
-    if (!this.parent && this.children.length < 1) {
-      const dirs = this.resource.directoryColl.cache.filter(
-        (i) => i.shareId === this.target.id,
-      );
-      this.children = [];
-      var data = dirs.find((i) => i.id === this.id);
-      if (data) {
-        this.loadChildren(data, dirs);
-      }
+  public async loadDirectoryResource() {
+    if (this.id === this.target.id) {
+      await this.resource.preLoad();
     }
-  }
-  private loadChildren(data: schema.XDirectory, directorys: schema.XDirectory[]) {
     this.forms = this.resource.formColl.cache
       .filter((i) => i.directoryId === this.id)
       .map((f) => new Form(f, this));
@@ -414,12 +355,12 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
     this.applications = apps
       .filter((a) => !a.parentId || a.parentId.length < 1)
       .map((a) => new Application(a, this, undefined, apps));
-    directorys
-      .filter((i) => i.parentId === data.id)
-      .forEach((i) => {
-        const subDirectory = new Directory(i, this.target, this, directorys);
-        subDirectory.loadChildren(i, directorys);
-        this.children.push(subDirectory);
+    this.children = this.resource.directoryColl.cache
+      .filter((i) => i.parentId === this.id)
+      .map((i) => {
+        const subDir = new Directory(i, this.target, this);
+        subDir.loadDirectoryResource();
+        return subDir;
       });
   }
 }

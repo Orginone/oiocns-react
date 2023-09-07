@@ -134,11 +134,10 @@ export class Department extends Target implements IDepartment {
     return targets;
   }
   async deepLoad(reload: boolean = false): Promise<void> {
-    await this.resource.preLoad();
     await Promise.all([
-      await this.directory.loadSubDirectory(),
-      await this.loadChildren(reload),
       await this.loadMembers(reload),
+      await this.loadChildren(reload),
+      await this.directory.loadDirectoryResource(),
     ]);
     await Promise.all(
       this.children.map(async (department) => {

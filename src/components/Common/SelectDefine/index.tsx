@@ -57,7 +57,7 @@ const SelectDefine = (props: Iprops) => {
   };
 
   const onSelectDirectory: TreeProps['onSelect'] = async (_, info: any) => {
-    setApps(loadApplicationMenu(await (info.node.item as IDirectory).loadApplications()));
+    setApps(loadApplicationMenu((info.node.item as IDirectory).applications));
   };
 
   const onSelect: TreeProps['onSelect'] = async (_, info: any) => {

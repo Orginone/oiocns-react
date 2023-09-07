@@ -23,9 +23,8 @@ const SelectForms: React.FC<IProps> = (props) => {
 
   const onSelectDirectory: TreeProps['onSelect'] = async (_, info: any) => {
     const directory: IDirectory = info.node.item;
-    let propertys = await directory.loadPropertys();
     setCenterTreeData(
-      propertys.map((item) => {
+      directory.propertys.map((item) => {
         return {
           key: item.id,
           title: item.name,

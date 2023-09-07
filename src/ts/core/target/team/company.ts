@@ -1,6 +1,5 @@
 import { kernel, model, schema } from '@/ts/base';
 import { IBelong, Belong } from '../base/belong';
-import { ICohort, Cohort } from '../outTeam/cohort';
 import { IGroup, Group } from '../outTeam/group';
 import { IDepartment, Department } from '../innerTeam/department';
 import { IStation, Station } from '../innerTeam/station';
@@ -13,6 +12,7 @@ import { ITeam } from '../base/team';
 import { targetOperates } from '../../public';
 import { Storage } from '../outTeam/storage';
 import { companyJoins } from '../../public/operates';
+import { Cohort } from '../outTeam/cohort';
 
 /** 单位类型接口 */
 export interface ICompany extends IBelong {
@@ -28,8 +28,6 @@ export interface ICompany extends IBelong {
   exit(): Promise<boolean>;
   /** 加载组织集群 */
   loadGroups(reload?: boolean): Promise<IGroup[]>;
-  /** 加载创建的群 */
-  loadStations(reload?: boolean): Promise<IStation[]>;
   /** 加载单位的部门 */
   loadDepartments(reload?: boolean): Promise<IDepartment[]>;
   /** 设立岗位 */
@@ -57,8 +55,6 @@ export class Company extends Belong implements ICompany {
   departments: IDepartment[] = [];
   departmentTypes: string[] = [];
   private _groupLoaded: boolean = false;
-  private _cohortLoaded: boolean = false;
-  private _stationLoaded: boolean = false;
   private _departmentLoaded: boolean = false;
   async loadGroups(reload: boolean = false): Promise<IGroup[]> {
     if (!this._groupLoaded || reload) {
@@ -84,44 +80,30 @@ export class Company extends Belong implements ICompany {
     }
     return this.groups;
   }
-  async loadCohorts(reload?: boolean | undefined): Promise<ICohort[]> {
-    if (!this._cohortLoaded || reload) {
-      const res = await kernel.querySubTargetById({
-        id: this.id,
-        subTypeNames: [TargetType.Cohort],
-        page: PageAll,
-      });
-      if (res.success) {
-        this._cohortLoaded = true;
-        this.cohorts = (res.data.result || []).map((i) => new Cohort(i, this));
-      }
-    }
-    return this.cohorts;
-  }
-  async loadStations(reload?: boolean | undefined): Promise<IStation[]> {
-    if (!this._stationLoaded || reload) {
-      const res = await kernel.querySubTargetById({
-        id: this.id,
-        subTypeNames: [TargetType.Station],
-        page: PageAll,
-      });
-      if (res.success) {
-        this._stationLoaded = true;
-        this.stations = (res.data.result || []).map((i) => new Station(i, this));
-      }
-    }
-    return this.stations;
-  }
   async loadDepartments(reload?: boolean | undefined): Promise<IDepartment[]> {
     if (!this._departmentLoaded || reload) {
       const res = await kernel.querySubTargetById({
         id: this.id,
-        subTypeNames: this.departmentTypes,
+        subTypeNames: [...this.departmentTypes, TargetType.Cohort, TargetType.Station],
         page: PageAll,
       });
       if (res.success) {
         this._departmentLoaded = true;
-        this.departments = (res.data.result || []).map((i) => new Department(i, this));
+        this.departments = [];
+        this.stations = [];
+        this.cohorts = [];
+        (res.data.result || []).forEach((i) => {
+          switch (i.typeName) {
+            case TargetType.Cohort:
+              this.cohorts.push(new Cohort(i, this));
+              break;
+            case TargetType.Station:
+              this.stations.push(new Station(i, this));
+              break;
+            default:
+              this.departments.push(new Department(i, this));
+          }
+        });
       }
     }
     return this.departments;
@@ -252,15 +234,12 @@ export class Company extends Belong implements ICompany {
     return targets;
   }
   async deepLoad(reload: boolean = false): Promise<void> {
-    await this.resource.preLoad();
-    await this.directory.loadSubDirectory();
     await Promise.all([
       await this.loadGroups(reload),
       await this.loadDepartments(reload),
-      await this.loadStations(reload),
-      await this.loadCohorts(reload),
       await this.loadMembers(reload),
       await this.loadSuperAuth(reload),
+      await this.directory.loadDirectoryResource(),
     ]);
     await Promise.all(
       this.groups.map(async (group) => {

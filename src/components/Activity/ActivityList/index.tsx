@@ -65,11 +65,19 @@ const ActivityList: React.FC<{ coll: Collection<model.ActivityType> }> = ({ coll
   const [actionList, setActivityList] = useState<model.ActivityType[]>([]);
 
   useEffect(() => {
-    coll.load({}).then(async (value) => {
-      if (value && value.length > 0) {
-        setActivityList(value);
-      }
-    });
+    coll
+      .load({
+        options: {
+          sort: {
+            createTime: -1,
+          },
+        },
+      })
+      .then(async (value) => {
+        if (value && value.length > 0) {
+          setActivityList(value);
+        }
+      });
   }, []);
 
   return (
