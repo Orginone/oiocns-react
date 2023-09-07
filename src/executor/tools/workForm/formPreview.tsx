@@ -44,6 +44,8 @@ const FormRenders: React.FC<IProps> = (props) => {
     if (props.allowEdit) {
       //初始化数据
       props?.ruleService?.setFormChangeCallback(form.id, (data: any) => {
+        console.log('规则输出数据', data);
+
         const timeFormatRegex = /^\d{4}\/\d{1,2}\/\d{1,2} \d{1,2}:\d{1,2}$/;
         //如果是时间格式需要转换
         if (data) {
@@ -54,6 +56,7 @@ const FormRenders: React.FC<IProps> = (props) => {
               data[key] = moment(value).format('YYYY-MM-DD HH:mm:ss');
             }
           }
+          console.log('setValues', data);
           formIns.setValues(data);
         }
       });
