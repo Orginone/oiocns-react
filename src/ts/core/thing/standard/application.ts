@@ -61,21 +61,32 @@ export class Application extends FileInfo<schema.XApplication> implements IAppli
   }
   async move(destination: IDirectory): Promise<boolean> {
     if (
+      !this.parent &&
       destination.id != this.directory.id &&
-      destination.metadata.belongId === this.directory.metadata.belongId
+      destination.target.belongId == this.directory.target.belongId
     ) {
-      this.setMetadata({ ...this.metadata, directoryId: destination.id });
-      const success = await this.update(this.metadata);
-      if (success) {
+      const applications = this.getChildren(this);
+      const res = await this.directory.resource.applicationColl.replaceMany(
+        applications.map((a) => {
+          return { ...a, directoryId: destination.id };
+        }),
+      );
+      if (res.length > 0) {
+        if (this.directory.target.id != destination.target.id) {
+          destination.resource.applicationColl.cache.push(...applications);
+          this.directory.resource.applicationColl.cache =
+            this.directory.resource.applicationColl.cache.filter((a) =>
+              applications.find((s) => s.id == a.id),
+            );
+        }
+        res.forEach((a) => this.updateMetadata(a));
         this.directory.applications = this.directory.applications.filter(
           (i) => i.key != this.key,
         );
         this.directory = destination;
         destination.applications.push(this);
-      } else {
-        this.setMetadata({ ...this.metadata, directoryId: this.directory.id });
+        return true;
       }
-      return success;
     }
     return false;
   }
@@ -84,7 +95,6 @@ export class Application extends FileInfo<schema.XApplication> implements IAppli
       ...this.metadata,
       ...data,
       typeName: this.metadata.typeName,
-      directoryId: this.metadata.directoryId,
     });
     if (res) {
       this.setMetadata(res);
@@ -93,7 +103,9 @@ export class Application extends FileInfo<schema.XApplication> implements IAppli
     return false;
   }
   async delete(): Promise<boolean> {
-    const res = await this.directory.resource.applicationColl.delete(this.metadata);
+    const res = await this.directory.resource.applicationColl.deleteMany(
+      this.getChildren(this),
+    );
     if (res) {
       this.directory.applications = this.directory.applications.filter(
         (i) => i.key != this.key,
@@ -156,7 +168,7 @@ export class Application extends FileInfo<schema.XApplication> implements IAppli
         operates.push(fileOperates.Parse);
       }
     }
-    return operates;
+    return operates.filter((a) => a != fileOperates.Copy);
   }
   private loadChildren(applications?: schema.XApplication[]) {
     if (applications && applications.length > 0) {
@@ -166,5 +178,13 @@ export class Application extends FileInfo<schema.XApplication> implements IAppli
           this.children.push(new Application(i, this.directory, this, applications));
         });
     }
+  }
+  private getChildren(application: IApplication): schema.XApplication[] {
+    const applications: schema.XApplication[] = [application.metadata];
+    for (const child of application.children) {
+      applications.push(child.metadata);
+      applications.push(...this.getChildren(child));
+    }
+    return applications;
   }
 }

@@ -13,11 +13,11 @@ export interface ISpecies extends IFileInfo<schema.XSpecies> {
   /** 加载类目项 */
   loadItems(reload?: boolean): Promise<schema.XSpeciesItem[]>;
   /** 新增类目项 */
-  createItem(data: model.SpeciesItemModel): Promise<schema.XSpeciesItem | undefined>;
+  createItem(data: schema.XSpeciesItem): Promise<schema.XSpeciesItem | undefined>;
   /** 删除类目项 */
   deleteItem(item: schema.XSpeciesItem): Promise<boolean>;
   /** 更新类目项 */
-  updateItem(data: model.SpeciesItemModel): Promise<boolean>;
+  updateItem(data: schema.XSpeciesItem): Promise<boolean>;
 }
 
 /** 元数据分类实现 */
@@ -31,12 +31,20 @@ export class Species extends FileInfo<schema.XSpecies> implements ISpecies {
     return await this.update({ ...this.metadata, name: name });
   }
   async copy(destination: IDirectory): Promise<boolean> {
-    if (destination.id != this.directory.id) {
+    if (
+      destination.id != this.directory.id &&
+      destination.target.belongId != this.directory.target.belongId
+    ) {
       const res = await destination.createSpecies({
         ...this.metadata,
         sourceId: this.metadata.belongId,
         directoryId: destination.id,
       });
+      if (res) {
+        this.items.forEach(async (a) => {
+          await res.createItem(a);
+        });
+      }
       return res != undefined;
     }
     return false;
@@ -44,20 +52,24 @@ export class Species extends FileInfo<schema.XSpecies> implements ISpecies {
   async move(destination: IDirectory): Promise<boolean> {
     if (
       destination.id != this.directory.id &&
-      destination.metadata.belongId === this.directory.metadata.belongId
+      destination.metadata.belongId == this.directory.metadata.belongId
     ) {
-      this.setMetadata({ ...this.metadata, directoryId: destination.id });
-      const success = await this.update(this.metadata);
-      if (success) {
+      const data = { ...this.metadata, directoryId: destination.id };
+      const species = await destination.resource.speciesColl.replace(data);
+      if (species) {
+        this.setMetadata(species);
+        if (this.directory.target.id != destination.target.id) {
+          destination.resource.speciesColl.cache.push(species);
+          this.directory.resource.speciesColl.cache =
+            this.directory.resource.speciesColl.cache.filter((a) => data.id != a.id);
+        }
         this.directory.specieses = this.directory.specieses.filter(
           (i) => i.key != this.key,
         );
         this.directory = destination;
         destination.specieses.push(this);
-      } else {
-        this.setMetadata({ ...this.metadata, directoryId: this.directory.id });
+        return true;
       }
-      return success;
     }
     return false;
   }
@@ -76,7 +88,10 @@ export class Species extends FileInfo<schema.XSpecies> implements ISpecies {
   }
   async delete(): Promise<boolean> {
     if (this.directory) {
-      const success = await this.directory.resource.speciesColl.delete(this.metadata);
+      const success =
+        (await this.directory.resource.speciesItemColl.deleteMatch({
+          speciesId: this.id,
+        })) && (await this.directory.resource.speciesColl.delete(this.metadata));
       if (success) {
         this.directory.specieses = this.directory.specieses.filter(
           (i) => i.key != this.key,

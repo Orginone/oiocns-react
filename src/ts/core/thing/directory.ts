@@ -153,21 +153,80 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
     if (
       this.parent &&
       destination.id != this.parent.id &&
-      destination.metadata.belongId === this.directory.metadata.belongId
+      destination.target.belongId === this.directory.target.belongId
     ) {
-      this.setMetadata({ ...this.metadata, parentId: destination.id });
-      const success = await this.update(this.metadata);
-      if (success) {
+      const data = { ...this.metadata, parentId: destination.id };
+      const directory = await destination.resource.directoryColl.replace(data);
+      if (directory) {
+        if (this.directory.target.id != destination.target.id) {
+          const data: {
+            forms: schema.XForm[];
+            specieses: schema.XSpecies[];
+            propertys: schema.XProperty[];
+            applications: schema.XApplication[];
+            directorys: schema.XDirectory[];
+          } = {
+            forms: [],
+            specieses: [],
+            propertys: [],
+            applications: [],
+            directorys: [],
+          };
+          this.getXConent(this, data);
+          destination.resource.formColl.replaceMany(
+            data.forms.map((a) => {
+              return { ...a, directoryId: destination.id };
+            }),
+          );
+          destination.resource.speciesColl.replaceMany(
+            data.specieses.map((a) => {
+              return { ...a, directoryId: destination.id };
+            }),
+          );
+          destination.resource.propertyColl.replaceMany(
+            data.propertys.map((a) => {
+              return { ...a, directoryId: destination.id };
+            }),
+          );
+          destination.resource.directoryColl.replaceMany(data.directorys);
+          this.directory.resource.formColl.cache =
+            this.directory.resource.formColl.cache.filter((a) =>
+              data.forms.find((s) => s.id == a.id),
+            );
+          this.directory.resource.speciesColl.cache =
+            this.directory.resource.speciesColl.cache.filter((a) =>
+              data.forms.find((s) => s.id == a.id),
+            );
+          this.directory.resource.propertyColl.cache =
+            this.directory.resource.propertyColl.cache.filter((a) =>
+              data.forms.find((s) => s.id == a.id),
+            );
+          this.directory.resource.applicationColl.cache =
+            this.directory.resource.applicationColl.cache.filter((a) =>
+              data.forms.find((s) => s.id == a.id),
+            );
+          this.directory.resource.directoryColl.cache =
+            this.directory.resource.directoryColl.cache.filter(
+              (a) => a.id == this.metadata.id || data.forms.find((s) => s.id == a.id),
+            );
+          destination.resource.formColl.cache.push(...data.forms);
+          destination.resource.speciesColl.cache.push(...data.specieses);
+          destination.resource.propertyColl.cache.push(...data.propertys);
+          destination.resource.applicationColl.cache.push(...data.applications);
+          destination.resource.directoryColl.cache.push(
+            ...data.directorys,
+            this.metadata,
+          );
+        }
+        this.setMetadata(directory);
         this.directory.children = this.directory.children.filter(
           (i) => i.key != this.key,
         );
         this.parent = destination;
         this.directory = destination;
         destination.children.push(this);
-      } else {
-        this.setMetadata({ ...this.metadata, parentId: this.directory.id });
+        return true;
       }
-      return success;
     }
     return false;
   }
@@ -368,6 +427,26 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
         subDir.loadDirectoryResource();
         return subDir;
       });
+  }
+
+  private getXConent(
+    directory: IDirectory,
+    content: {
+      forms: schema.XForm[];
+      specieses: schema.XSpecies[];
+      propertys: schema.XProperty[];
+      applications: schema.XApplication[];
+      directorys: schema.XDirectory[];
+    },
+  ) {
+    for (const child of directory.children) {
+      content.directorys.push(child.metadata);
+      this.getXConent(child, content);
+    }
+    content.forms.push(...directory.forms.map((a) => a.metadata));
+    content.specieses.push(...directory.specieses.map((a) => a.metadata));
+    content.propertys.push(...directory.propertys.map((a) => a.metadata));
+    content.applications.push(...directory.applications.map((a) => a.metadata));
   }
 
   public async deleteDirectoryResource(): Promise<void> {

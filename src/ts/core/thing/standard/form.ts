@@ -43,7 +43,10 @@ export class Form extends FileInfo<schema.XForm> implements IForm {
     return await this.update({ ...this.metadata, name: name });
   }
   async copy(destination: IDirectory): Promise<boolean> {
-    if (destination.id != this.directory.id) {
+    if (
+      destination.id != this.directory.id &&
+      this.directory.target.belongId != destination.target.belongId
+    ) {
       const res = await destination.createForm({
         ...this.metadata,
         directoryId: destination.id,
@@ -55,18 +58,25 @@ export class Form extends FileInfo<schema.XForm> implements IForm {
   async move(destination: IDirectory): Promise<boolean> {
     if (
       destination.id != this.directory.id &&
-      destination.metadata.belongId === this.directory.metadata.belongId
+      destination.target.belongId == this.directory.target.belongId
     ) {
-      this.setMetadata({ ...this.metadata, directoryId: destination.id });
-      const success = await this.update(this.metadata);
-      if (success) {
+      const data = {
+        ...this.metadata,
+        directoryId: destination.id,
+      };
+      const form = await destination.resource.formColl.replace(data);
+      if (form) {
+        this.setMetadata(data);
+        if (this.directory.target.id != destination.target.id) {
+          destination.resource.formColl.cache.push(data);
+          this.directory.resource.formColl.cache =
+            this.directory.resource.formColl.cache.filter((a) => data.id != a.id);
+        }
         this.directory.forms = this.directory.forms.filter((i) => i.key != this.key);
         this.directory = destination;
         destination.forms.push(this);
-      } else {
-        this.setMetadata({ ...this.metadata, directoryId: this.directory.id });
+        return true;
       }
-      return success;
     }
     return false;
   }
