@@ -154,7 +154,9 @@ const GroupDetail: React.FC<any> = ({ chat }: { chat: IMsgChat }) => {
         {header}
         <GroupMember members={chat.members}></GroupMember>
         <div className={detailStyle.groupDetailContent}>
-          <ActivityList space={chat.space}></ActivityList>
+          {'resource' in chat && (
+            <ActivityList coll={(chat as ITarget).resource.activityColl}></ActivityList>
+          )}
           <div className={detailStyle.user_list}>
             <div className={`${detailStyle.img_list} ${detailStyle.con}`}></div>
             {operaButton}
@@ -193,12 +195,14 @@ const GroupDetail: React.FC<any> = ({ chat }: { chat: IMsgChat }) => {
         onCancel={onHistoryCancel}
         chat={chat}
       />
-      <ActivityPublisher
-        open={activityPublisherOpen}
-        space={chat.space}
-        finish={() => {
-          setActivityPublisherOpen(false);
-        }}></ActivityPublisher>
+      {'resource' in chat && (
+        <ActivityPublisher
+          open={activityPublisherOpen}
+          target={chat as ITarget}
+          finish={() => {
+            setActivityPublisherOpen(false);
+          }}></ActivityPublisher>
+      )}
     </>
   );
 };

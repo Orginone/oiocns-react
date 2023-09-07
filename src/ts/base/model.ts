@@ -1,4 +1,4 @@
-import { XForm, XIdentity, XTarget } from './schema';
+import { XForm, XIdentity, XTarget, Xbase } from './schema';
 // 请求类型定义
 export type ReqestType = {
   // 模块
@@ -102,6 +102,13 @@ export type OnlineInfo = {
   // 终端类型
   endPointType: string;
 };
+/** 在线信息查询接口 */
+export type OnlineSet = {
+  // 用户连接
+  users: OnlineInfo[],
+  // 存储连接
+  storages: OnlineInfo[],
+}
 // 分页返回定义
 export type PageResult<T> = {
   // 便宜量
@@ -341,10 +348,10 @@ export type MsgSaveModel = {
   // 消息变更时间
   updateTime: string;
   // 消息标签
-  tags?: MsgTagLabel[];
+  tags?: CommentType[];
 };
 
-export type MsgTagLabel = {
+export type CommentType = {
   // 标签名称
   label: string;
   // 人员Id
@@ -845,6 +852,24 @@ export type OperateModel = {
   iconType: string;
   menus?: OperateModel[];
 };
+
+// 动态
+export type ActivityType = {
+  // 类型
+  typeName: string;
+  // 内容
+  content: string;
+  // 资源
+  resource: FileItemShare[];
+  // 评注
+  comment: CommentType[];
+  // 点赞
+  likes: string[];
+  // 转发
+  forward: string[];
+  // 标签
+  tags: string[];
+} & Xbase;
 
 /** 请求失败 */
 export const badRequest = (
