@@ -17,7 +17,7 @@ export class Disk extends Directory implements IDisk {
 
   user: IPerson;
   override content(mode?: number): IFileInfo<schema.XEntity>[] {
-    return [this.user, ...this.user.companys].map((t) => t.directory);
+    return [this.user, ...this.user.companys];
   }
 
   override operates(mode?: number): OperateModel[] {
