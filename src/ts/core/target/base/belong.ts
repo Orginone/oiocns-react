@@ -8,6 +8,7 @@ import { ITarget, Target } from './target';
 import { IChatMessage, ChatMessage } from '../../chat/message/chatmsg';
 import { IMsgChat, PersonMsgChat } from '../../chat/message/msgchat';
 import { targetOperates } from '../../public';
+import { IStorage } from '../outTeam/storage';
 
 /** 自归属用户接口类 */
 export interface IBelong extends ITarget {
@@ -19,6 +20,8 @@ export interface IBelong extends ITarget {
   superAuth: IAuthority | undefined;
   /** 加入/管理的群 */
   cohorts: ICohort[];
+  /** 存储资源群 */
+  storages: IStorage[];
   /** 上级用户 */
   parentTarget: ITarget[];
   /** 群会话 */
@@ -49,6 +52,7 @@ export abstract class Belong extends Target implements IBelong {
   }
   user: IPerson;
   cohorts: ICohort[] = [];
+  storages: IStorage[] = [];
   message: IChatMessage;
   superAuth: IAuthority | undefined;
   async loadSuperAuth(reload: boolean = false): Promise<IAuthority | undefined> {

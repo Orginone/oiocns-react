@@ -89,11 +89,14 @@ export default class KernelApi {
     return this._storeHub.isConnected;
   }
   /** 连接信息 */
-  public async onlines(): Promise<model.OnlineInfo[]> {
+  public async onlines(): Promise<model.OnlineSet | undefined> {
     if (this.onlineIds.length > 0) {
       const result = await this._storeHub.invoke('Online');
-      if (result.success && Array.isArray(result.data)) {
-        var ids = result.data.map((i) => i.connectionId);
+      if (result.success && result.data) {
+        var data: model.OnlineSet = result.data;
+        var uids = data?.users?.map((i) => i.connectionId) || [];
+        var sids = data?.storages?.map((i) => i.connectionId) || [];
+        var ids = [...uids, ...sids];
         if (ids.length != this.onlineIds.length) {
           this.onlineIds = ids;
           this.onlineNotity.changCallback();
@@ -102,7 +105,6 @@ export default class KernelApi {
         return result.data;
       }
     }
-    return [];
   }
   /**
    * 登录到后台核心获取accessToken
@@ -594,6 +596,460 @@ export default class KernelApi {
     return await this.request({
       module: 'chat',
       action: 'TagImMsg',
+      params: params,
+    });
+  }
+  /**
+   * 创建目录
+   * @param {model.DirectoryModel} params 请求参数
+   * @returns {model.ResultType<schema.XDirectory>} 请求结果
+   */
+  public async createDirectory(
+    params: model.DirectoryModel,
+  ): Promise<model.ResultType<schema.XDirectory>> {
+    return await this.request({
+      module: 'thing',
+      action: 'CreateDirectory',
+      params: params,
+    });
+  }
+  /**
+   * 创建元属性
+   * @param {model.PropertyModel} params 请求参数
+   * @returns {model.ResultType<schema.XProperty>} 请求结果
+   */
+  public async createProperty(
+    params: model.PropertyModel,
+  ): Promise<model.ResultType<schema.XProperty>> {
+    return await this.request({
+      module: 'thing',
+      action: 'CreateProperty',
+      params: params,
+    });
+  }
+  /**
+   * 创建分类
+   * @param {model.SpeciesModel} params 请求参数
+   * @returns {model.ResultType<schema.XSpecies>} 请求结果
+   */
+  public async createSpecies(
+    params: model.SpeciesModel,
+  ): Promise<model.ResultType<schema.XSpecies>> {
+    return await this.request({
+      module: 'thing',
+      action: 'CreateSpecies',
+      params: params,
+    });
+  }
+  /**
+   * 创建分类
+   * @param {model.SpeciesItemModel} params 请求参数
+   * @returns {model.ResultType<schema.XSpeciesItem>} 请求结果
+   */
+  public async createSpeciesItem(
+    params: model.SpeciesItemModel,
+  ): Promise<model.ResultType<schema.XSpeciesItem>> {
+    return await this.request({
+      module: 'thing',
+      action: 'CreateSpeciesItem',
+      params: params,
+    });
+  }
+  /**
+   * 创建特性
+   * @param {model.AttributeModel} params 请求参数
+   * @returns {model.ResultType<schema.XAttribute>} 请求结果
+   */
+  public async createAttribute(
+    params: model.AttributeModel,
+  ): Promise<model.ResultType<schema.XAttribute>> {
+    return await this.request({
+      module: 'thing',
+      action: 'CreateAttribute',
+      params: params,
+    });
+  }
+  /**
+   * 创建表单
+   * @param {model.FormModel} params 请求参数
+   * @returns {model.ResultType<schema.XForm>} 请求结果
+   */
+  public async createForm(
+    params: model.FormModel,
+  ): Promise<model.ResultType<schema.XForm>> {
+    return await this.request({
+      module: 'thing',
+      action: 'CreateForm',
+      params: params,
+    });
+  }
+  /**
+   * 创建应用
+   * @param {model.ApplicationModel} params 请求参数
+   * @returns {model.ResultType<schema.XApplication>} 请求结果
+   */
+  public async createApplication(
+    params: model.ApplicationModel,
+  ): Promise<model.ResultType<schema.XApplication>> {
+    return await this.request({
+      module: 'thing',
+      action: 'CreateApplication',
+      params: params,
+    });
+  }
+  /**
+   * 删除目录
+   * @param {model.IdModel} params 请求参数
+   * @returns {model.ResultType<boolean>} 请求结果
+   */
+  public async deleteDirectory(
+    params: model.IdModel,
+  ): Promise<model.ResultType<boolean>> {
+    return await this.request({
+      module: 'thing',
+      action: 'DeleteDirectory',
+      params: params,
+    });
+  }
+  /**
+   * 删除元属性
+   * @param {model.IdModel} params 请求参数
+   * @returns {model.ResultType<boolean>} 请求结果
+   */
+  public async deleteProperty(params: model.IdModel): Promise<model.ResultType<boolean>> {
+    return await this.request({
+      module: 'thing',
+      action: 'DeleteProperty',
+      params: params,
+    });
+  }
+  /**
+   * 删除分类
+   * @param {model.IdModel} params 请求参数
+   * @returns {model.ResultType<boolean>} 请求结果
+   */
+  public async deleteSpecies(params: model.IdModel): Promise<model.ResultType<boolean>> {
+    return await this.request({
+      module: 'thing',
+      action: 'DeleteSpecies',
+      params: params,
+    });
+  }
+  /**
+   * 删除分类类目
+   * @param {model.IdModel} params 请求参数
+   * @returns {model.ResultType<boolean>} 请求结果
+   */
+  public async deleteSpeciesItem(
+    params: model.IdModel,
+  ): Promise<model.ResultType<boolean>> {
+    return await this.request({
+      module: 'thing',
+      action: 'DeleteSpeciesItem',
+      params: params,
+    });
+  }
+  /**
+   * 删除度量标准
+   * @param {model.IdModel} params 请求参数
+   * @returns {model.ResultType<boolean>} 请求结果
+   */
+  public async deleteAttribute(
+    params: model.IdModel,
+  ): Promise<model.ResultType<boolean>> {
+    return await this.request({
+      module: 'thing',
+      action: 'DeleteAttribute',
+      params: params,
+    });
+  }
+  /**
+   * 删除表单
+   * @param {model.IdModel} params 请求参数
+   * @returns {model.ResultType<boolean>} 请求结果
+   */
+  public async deleteForm(params: model.IdModel): Promise<model.ResultType<boolean>> {
+    return await this.request({
+      module: 'thing',
+      action: 'DeleteForm',
+      params: params,
+    });
+  }
+  /**
+   * 删除应用
+   * @param {model.IdModel} params 请求参数
+   * @returns {model.ResultType<boolean>} 请求结果
+   */
+  public async deleteApplication(
+    params: model.IdModel,
+  ): Promise<model.ResultType<boolean>> {
+    return await this.request({
+      module: 'thing',
+      action: 'DeleteApplication',
+      params: params,
+    });
+  }
+  /**
+   * 删除物
+   * @param {model.IdModel} params 请求参数
+   * @returns {model.ResultType<boolean>} 请求结果
+   */
+  public async deleteThing(params: model.IdModel): Promise<model.ResultType<boolean>> {
+    return await this.request({
+      module: 'thing',
+      action: 'DeleteThing',
+      params: params,
+    });
+  }
+  /**
+   * 更新目录
+   * @param {model.DirectoryModel} params 请求参数
+   * @returns {model.ResultType<schema.XDirectory>} 请求结果
+   */
+  public async updateDirectory(
+    params: model.DirectoryModel,
+  ): Promise<model.ResultType<schema.XDirectory>> {
+    return await this.request({
+      module: 'thing',
+      action: 'UpdateDirectory',
+      params: params,
+    });
+  }
+  /**
+   * 更新元属性
+   * @param {model.PropertyModel} params 请求参数
+   * @returns {model.ResultType<schema.XProperty>} 请求结果
+   */
+  public async updateProperty(
+    params: model.PropertyModel,
+  ): Promise<model.ResultType<schema.XProperty>> {
+    return await this.request({
+      module: 'thing',
+      action: 'UpdateProperty',
+      params: params,
+    });
+  }
+  /**
+   * 更新分类
+   * @param {model.SpeciesModel} params 请求参数
+   * @returns {model.ResultType<schema.XSpecies>} 请求结果
+   */
+  public async updateSpecies(
+    params: model.SpeciesModel,
+  ): Promise<model.ResultType<schema.XSpecies>> {
+    return await this.request({
+      module: 'thing',
+      action: 'UpdateSpecies',
+      params: params,
+    });
+  }
+  /**
+   * 更新分类类目
+   * @param {model.SpeciesItemModel} params 请求参数
+   * @returns {model.ResultType<schema.XSpeciesItem>} 请求结果
+   */
+  public async updateSpeciesItem(
+    params: model.SpeciesItemModel,
+  ): Promise<model.ResultType<schema.XSpeciesItem>> {
+    return await this.request({
+      module: 'thing',
+      action: 'UpdateSpeciesItem',
+      params: params,
+    });
+  }
+  /**
+   * 更新度量标准
+   * @param {model.AttributeModel} params 请求参数
+   * @returns {model.ResultType<schema.XAttribute>} 请求结果
+   */
+  public async updateAttribute(
+    params: model.AttributeModel,
+  ): Promise<model.ResultType<schema.XAttribute>> {
+    return await this.request({
+      module: 'thing',
+      action: 'UpdateAttribute',
+      params: params,
+    });
+  }
+  /**
+   * 更新表单
+   * @param {model.FormModel} params 请求参数
+   * @returns {model.ResultType<schema.XForm>} 请求结果
+   */
+  public async updateForm(
+    params: model.FormModel,
+  ): Promise<model.ResultType<schema.XForm>> {
+    return await this.request({
+      module: 'thing',
+      action: 'UpdateForm',
+      params: params,
+    });
+  }
+  /**
+   * 更新应用
+   * @param {model.ApplicationModel} params 请求参数
+   * @returns {model.ResultType<schema.XApplication>} 请求结果
+   */
+  public async updateApplication(
+    params: model.ApplicationModel,
+  ): Promise<model.ResultType<schema.XApplication>> {
+    return await this.request({
+      module: 'thing',
+      action: 'UpdateApplication',
+      params: params,
+    });
+  }
+  /**
+   * 更新物
+   * @param {model.ThingModel} params 请求参数
+   * @returns {model.ResultType<schema.XThing>} 请求结果
+   */
+  public async updateThing(
+    params: model.ThingModel,
+  ): Promise<model.ResultType<schema.XThing>> {
+    return await this.request({
+      module: 'thing',
+      action: 'UpdateThing',
+      params: params,
+    });
+  }
+  /**
+   * 完善物的属性数据
+   * @param {model.SetPropModel} params 请求参数
+   * @returns {model.ResultType<boolean>} 请求结果
+   */
+  public async thingSetProperty(
+    params: model.SetPropModel,
+  ): Promise<model.ResultType<boolean>> {
+    return await this.request({
+      module: 'thing',
+      action: 'ThingSetProperty',
+      params: params,
+    });
+  }
+  /**
+   * 查询用户目录集
+   * @param {model.GetDirectoryModel} params 请求参数
+   * @returns {model.ResultType<model.PageResult<schema.XDirectory>>} 请求结果
+   */
+  public async queryDirectorys(
+    params: model.GetDirectoryModel,
+  ): Promise<model.ResultType<model.PageResult<schema.XDirectory>>> {
+    return await this.request({
+      module: 'thing',
+      action: 'QueryDirectorys',
+      params: params,
+    });
+  }
+  /**
+   * 查询用户属性集
+   * @param {model.IdPageModel} params 请求参数
+   * @returns {model.ResultType<model.PageResult<schema.XProperty>>} 请求结果
+   */
+  public async queryPropertys(
+    params: model.IdPageModel,
+  ): Promise<model.ResultType<model.PageResult<schema.XProperty>>> {
+    return await this.request({
+      module: 'thing',
+      action: 'QueryPropertys',
+      params: params,
+    });
+  }
+  /**
+   * 查询用户属性关联的特性
+   * @param {model.IdModel} params 请求参数
+   * @returns {model.ResultType<model.PageResult<schema.XAttribute>>} 请求结果
+   */
+  public async queryPropAttributes(
+    params: model.IdModel,
+  ): Promise<model.ResultType<model.PageResult<schema.XAttribute>>> {
+    return await this.request({
+      module: 'thing',
+      action: 'QueryPropAttributes',
+      params: params,
+    });
+  }
+  /**
+   * 查询用户分类集
+   * @param {model.IdPageModel} params 请求参数
+   * @returns {model.ResultType<model.PageResult<schema.XSpecies>>} 请求结果
+   */
+  public async querySpecies(
+    params: model.IdPageModel,
+  ): Promise<model.ResultType<model.PageResult<schema.XSpecies>>> {
+    return await this.request({
+      module: 'thing',
+      action: 'QuerySpecies',
+      params: params,
+    });
+  }
+  /**
+   * 查询分类类目
+   * @param {model.IdPageModel} params 请求参数
+   * @returns {model.ResultType<model.PageResult<schema.XSpeciesItem>>} 请求结果
+   */
+  public async querySpeciesItems(
+    params: model.IdPageModel,
+  ): Promise<model.ResultType<model.PageResult<schema.XSpeciesItem>>> {
+    return await this.request({
+      module: 'thing',
+      action: 'QuerySpeciesItems',
+      params: params,
+    });
+  }
+  /**
+   * 查询用户的表单
+   * @param {model.IdPageModel} params 请求参数
+   * @returns {model.ResultType<model.PageResult<schema.XForm>>} 请求结果
+   */
+  public async queryForms(
+    params: model.IdPageModel,
+  ): Promise<model.ResultType<model.PageResult<schema.XForm>>> {
+    return await this.request({
+      module: 'thing',
+      action: 'QueryForms',
+      params: params,
+    });
+  }
+  /**
+   * 查询用户的应用
+   * @param {model.IdPageModel} params 请求参数
+   * @returns {model.ResultType<model.PageResult<schema.XApplication>>} 请求结果
+   */
+  public async queryApplications(
+    params: model.IdPageModel,
+  ): Promise<model.ResultType<model.PageResult<schema.XApplication>>> {
+    return await this.request({
+      module: 'thing',
+      action: 'QueryApplications',
+      params: params,
+    });
+  }
+  /**
+   * 查询分类的度量标准
+   * @param {model.GainModel} params 请求参数
+   * @returns {model.ResultType<model.PageResult<schema.XAttribute>>} 请求结果
+   */
+  public async queryFormAttributes(
+    params: model.GainModel,
+  ): Promise<model.ResultType<model.PageResult<schema.XAttribute>>> {
+    return await this.request({
+      module: 'thing',
+      action: 'QueryFormAttributes',
+      params: params,
+    });
+  }
+  /**
+   * 物的属性值查询
+   * @param {model.GiveModel} params 请求参数
+   * @returns {model.ResultType<model.PageResult<schema.XThingProp>>} 请求结果
+   */
+  public async queryThingProperty(
+    params: model.GiveModel,
+  ): Promise<model.ResultType<model.PageResult<schema.XThingProp>>> {
+    return await this.request({
+      module: 'thing',
+      action: 'QueryThingProperty',
       params: params,
     });
   }

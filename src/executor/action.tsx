@@ -68,6 +68,9 @@ const openDirectory = (
   entity: IDirectory | IApplication | ITarget | IEntity<schema.XEntity>,
 ) => {
   if ('identitys' in entity && entity.typeName != TargetType.Station) {
+    if (entity.typeName === TargetType.Storage) {
+      return false;
+    }
     entity = entity.directory;
   }
   if ('files' in entity || 'works' in entity) {

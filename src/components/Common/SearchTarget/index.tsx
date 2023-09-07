@@ -131,6 +131,13 @@ const SearchTarget: React.FC<CompanySearchTableProps> = (props) => {
                   ])),
                 );
                 break;
+              case TargetType.Storage:
+                res.push(
+                  ...(await orgCtrl.user.searchTargets(event.target.value, [
+                    TargetType.Storage,
+                  ])),
+                );
+                break;
             }
             setDataSource(res);
             setChecked(res.map((i) => i.id));
