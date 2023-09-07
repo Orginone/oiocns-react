@@ -7,7 +7,6 @@ import PropertyConfig from './propConfig';
 import AttributeConfig from '@/components/Common/FormDesign/attributeConfig';
 import SelectPropertys from './SelectPropertys';
 import { Modal } from 'antd';
-import { AttributeModel } from '@/ts/base/model';
 import { AttributeColumn } from '@/config/column';
 import { schema } from '@/ts/base';
 
