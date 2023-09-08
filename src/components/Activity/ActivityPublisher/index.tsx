@@ -2,31 +2,28 @@ import React, { useState } from 'react';
 import FullScreenModal from '@/executor/tools/fullScreen';
 import { Button, Form, Input } from 'antd';
 import ImageUploader from '@/components/ImageUploader';
-import { ISysFileInfo, ITarget } from '@/ts/core';
+import { ITarget } from '@/ts/core';
+import { model } from '@/ts/base';
 
-export interface Activity {
-  content: string;
-  imageList: ISysFileInfo[];
-  likes: number;
-  comments: Activity[];
-  tags: string[];
-  space: ITarget;
-}
 const ActivityPublisher: React.FC<{
   open: boolean;
-  space: ITarget;
+  target: ITarget;
   finish: () => void;
 }> = (props) => {
-  const [activity, setActivity] = useState<Activity>({
-    content: '',
-    imageList: [],
-    likes: 0,
-    space: props.space,
-    comments: [],
+  const [activity, setActivity] = useState<model.ActivityType>({
     tags: [],
-  });
+    likes: [],
+    forward: [],
+    comment: [],
+    resource: [],
+    content: [],
+    typeName: 'Text',
+  } as unknown as model.ActivityType);
   const publishActivity = () => {
-    console.log(activity);
+    if (activity.content.length > 0) {
+      props.target.resource.activityColl.insert(activity);
+      props.finish();
+    }
   };
   return (
     <FullScreenModal
@@ -43,21 +40,25 @@ const ActivityPublisher: React.FC<{
         <Form.Item>
           <Input.TextArea
             showCount
-            maxLength={100}
+            maxLength={1000}
             style={{ height: 120, resize: 'none' }}
             placeholder="说点什么......."
             onChange={(e) => {
-              activity.content = e.target.value;
-              setActivity(activity);
+              setActivity({
+                ...activity,
+                content: e.target.value,
+              });
             }}
           />
         </Form.Item>
         <Form.Item>
           <ImageUploader
-            directory={props.space.directory}
+            directory={props.target.directory}
             onChange={(fileList) => {
-              activity.imageList = fileList;
-              setActivity(activity);
+              setActivity({
+                ...activity,
+                resource: fileList.map((item) => item.shareInfo()),
+              });
             }}></ImageUploader>
         </Form.Item>
       </Form>

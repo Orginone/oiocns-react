@@ -13,12 +13,12 @@ export interface IMessageLabel {
   userId: string;
 }
 export class MessageLabel implements IMessageLabel {
-  constructor(_matedata: model.MsgTagLabel, _user: IPerson) {
+  constructor(_matedata: model.CommentType, _user: IPerson) {
     this.user = _user;
     this.metadata = _matedata;
   }
   user: IPerson;
-  metadata: model.MsgTagLabel;
+  metadata: model.CommentType;
   get label(): string {
     return this.metadata.label;
   }
