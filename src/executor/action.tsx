@@ -7,6 +7,7 @@ import {
   IMsgChat,
   ISysFileInfo,
   ITarget,
+  IWork,
   TargetType,
 } from '@/ts/core';
 import orgCtrl from '@/ts/controller';
@@ -19,7 +20,7 @@ import TypeIcon from '@/components/Common/GlobalComps/typeIcon';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import { TaskModel } from '@/ts/base/model';
 /** 执行非页面命令 */
-export const executeCmd = (cmd: string, entity: any, args: any[]) => {
+export const executeCmd = (cmd: string, entity: any, args: any[], type: string) => {
   switch (cmd) {
     case 'qrcode':
       return entityQrCode(entity);
@@ -46,7 +47,7 @@ export const executeCmd = (cmd: string, entity: any, args: any[]) => {
         }
       });
     case 'open':
-      return openDirectory(entity);
+      return openDirectory(entity, type);
     case 'standard':
       return uploadTemplate(entity);
     case 'online':
@@ -65,7 +66,8 @@ const directoryRefresh = (dir: IDirectory | IApplication) => {
 
 /** 进入目录 */
 const openDirectory = (
-  entity: IDirectory | IApplication | ITarget | IEntity<schema.XEntity>,
+  entity: IDirectory | IApplication | ITarget | IWork | IEntity<schema.XEntity>,
+  type: string,
 ) => {
   if ('identitys' in entity && entity.typeName != TargetType.Station) {
     if (entity.typeName === TargetType.Storage) {
@@ -73,7 +75,13 @@ const openDirectory = (
     }
     entity = entity.directory;
   }
-  if ('files' in entity || 'works' in entity) {
+  if (
+    'files' in entity ||
+    'works' in entity ||
+    (type == 'config' &&
+      'node' in entity &&
+      entity.directory.target.space.belongId != entity.belongId)
+  ) {
     entity.loadContent().then(() => {
       orgCtrl.currentKey = entity.key;
       orgCtrl.changCallback();

@@ -116,9 +116,17 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
     return false;
   }
   content(_mode: number = 0): IFileInfo<schema.XEntity>[] {
-    return this.forms;
+    if (this.node) {
+      return this.forms.filter(
+        (a) =>
+          this.node?.primaryFormIds?.includes(a.id) ||
+          this.node?.detailFormIds?.includes(a.id),
+      );
+    }
+    return [];
   }
   async loadContent(_reload: boolean = false): Promise<boolean> {
+    await this.loadWorkNode();
     return this.forms.length > 0;
   }
   async update(data: model.WorkDefineModel): Promise<boolean> {

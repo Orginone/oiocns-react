@@ -78,15 +78,19 @@ export abstract class FileInfo<T extends schema.XEntity>
   }
   operates(mode: number = 0): model.OperateModel[] {
     const operates = super.operates(mode);
-    if (mode % 2 === 0 && this.directory.target.hasRelationAuth()) {
-      operates.unshift(
-        fileOperates.Copy,
-        fileOperates.Move,
-        fileOperates.Rename,
-        fileOperates.Download,
-        entityOperates.Update,
-        entityOperates.Delete,
-      );
+    if (mode % 2 === 0) {
+      if (this.directory.target.space.hasRelationAuth()) {
+        operates.unshift(fileOperates.Copy);
+      }
+      if (this.directory.target.hasRelationAuth()) {
+        operates.unshift(
+          fileOperates.Move,
+          fileOperates.Rename,
+          fileOperates.Download,
+          entityOperates.Update,
+          entityOperates.Delete,
+        );
+      }
     }
     return operates;
   }

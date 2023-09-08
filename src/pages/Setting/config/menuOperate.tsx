@@ -3,7 +3,7 @@ import orgCtrl from '@/ts/controller';
 import React from 'react';
 import { loadFileMenus } from '@/executor/fileOperate';
 import { MenuItemType } from 'typings/globelType';
-import { IDepartment, IGroup, ITarget, IDirectory, IApplication } from '@/ts/core';
+import { IDepartment, IGroup, ITarget, IDirectory, IApplication, IWork } from '@/ts/core';
 
 /** 创建团队菜单 */
 const createMenu = (target: ITarget, children: MenuItemType[]) => {
@@ -68,6 +68,40 @@ const buildDirectoryTree = (directorys: IDirectory[]): MenuItemType[] => {
   });
 };
 
+const buildWorks = (works: IWork[]): MenuItemType[] => {
+  return works.map((work) => {
+    return {
+      key: work.key,
+      item: work,
+      label: work.name,
+      tag: [work.typeName],
+      icon: <EntityIcon entityId={work.id} typeName={work.typeName} size={18} />,
+      itemType: work.typeName,
+      menus: loadFileMenus(work),
+      children: buildForms(work),
+      beforeLoad: async () => {
+        await work.loadContent();
+      },
+    };
+  });
+};
+
+const buildForms = (work: IWork): MenuItemType[] => {
+  return work.content().map((form) => {
+    return {
+      key: form.key,
+      item: form,
+      label: form.name,
+      tag: [form.typeName],
+      icon: <EntityIcon entityId={form.id} typeName={form.typeName} size={18} />,
+      itemType: form.typeName,
+      menus: loadFileMenus(form),
+      children: [],
+      beforeLoad: async () => {},
+    };
+  });
+};
+
 /** 编译目录树 */
 const buildApplicationTree = (applications: IApplication[]): MenuItemType[] => {
   return applications.map((application) => {
@@ -81,7 +115,10 @@ const buildApplicationTree = (applications: IApplication[]): MenuItemType[] => {
       ),
       itemType: application.typeName,
       menus: loadFileMenus(application),
-      children: buildApplicationTree(application.children),
+      children: [
+        ...buildApplicationTree(application.children),
+        ...buildWorks(application.works),
+      ],
       beforeLoad: async () => {
         await application.loadContent();
       },
