@@ -158,6 +158,7 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
       const data = { ...this.metadata, parentId: destination.id };
       const directory = await destination.resource.directoryColl.replace(data);
       if (directory) {
+        this.setMetadata(directory);
         if (this.directory.target.id != destination.target.id) {
           const xDatas: model.DirectoryContent = {
             forms: [],
@@ -175,39 +176,9 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
           await destination.resource.speciesColl.replaceMany(xDatas.specieses);
           await destination.resource.propertyColl.replaceMany(xDatas.propertys);
           await destination.resource.directoryColl.replaceMany(xDatas.directorys);
-          this.directory.resource.formColl.cache =
-            this.directory.resource.formColl.cache.filter((a) =>
-              xDatas.forms.find((s) => s.id == a.id),
-            );
-          this.directory.resource.speciesColl.cache =
-            this.directory.resource.speciesColl.cache.filter((a) =>
-              xDatas.forms.find((s) => s.id == a.id),
-            );
-          this.directory.resource.propertyColl.cache =
-            this.directory.resource.propertyColl.cache.filter((a) =>
-              xDatas.forms.find((s) => s.id == a.id),
-            );
-          this.directory.resource.applicationColl.cache =
-            this.directory.resource.applicationColl.cache.filter((a) =>
-              xDatas.forms.find((s) => s.id == a.id),
-            );
-          this.directory.resource.directoryColl.cache =
-            this.directory.resource.directoryColl.cache.filter(
-              (a) => a.id == this.metadata.id || xDatas.forms.find((s) => s.id == a.id),
-            );
-          destination.resource.formColl.cache.push(...xDatas.forms);
-          destination.resource.speciesColl.cache.push(...xDatas.specieses);
-          destination.resource.propertyColl.cache.push(...xDatas.propertys);
-          destination.resource.applicationColl.cache.push(...xDatas.applications);
-          destination.resource.directoryColl.cache.push(...xDatas.directorys, data);
         }
-        this.setMetadata(directory);
-        this.directory.children = this.directory.children.filter(
-          (i) => i.key != this.key,
-        );
-        this.parent = destination;
-        this.directory = destination;
-        destination.children.push(this);
+        await destination.loadDirectoryResource();
+        await destination.loadDirectoryResource();
         return true;
       }
     }

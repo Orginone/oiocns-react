@@ -35,17 +35,11 @@ export class Species extends FileInfo<schema.XSpecies> implements ISpecies {
       destination.id != this.directory.id &&
       destination.target.belongId != this.directory.target.belongId
     ) {
-      const res = await destination.createSpecies({
-        ...this.metadata,
-        sourceId: this.metadata.belongId,
-        directoryId: destination.id,
-      });
-      if (res) {
-        this.items.forEach(async (a) => {
-          await res.createItem(a);
-        });
+      const species = await destination.resource.speciesColl.copy(this.metadata);
+      if (species) {
+        destination.specieses.push(new Species(species, destination));
+        return true;
       }
-      return res != undefined;
     }
     return false;
   }
@@ -59,9 +53,8 @@ export class Species extends FileInfo<schema.XSpecies> implements ISpecies {
       if (species) {
         this.setMetadata(species);
         if (this.directory.target.id != destination.target.id) {
-          destination.resource.speciesColl.cache.push(species);
-          this.directory.resource.speciesColl.cache =
-            this.directory.resource.speciesColl.cache.filter((a) => data.id != a.id);
+          await this.directory.resource.speciesColl.all(true);
+          await destination.resource.speciesColl.all(true);
         }
         this.directory.specieses = this.directory.specieses.filter(
           (i) => i.key != this.key,

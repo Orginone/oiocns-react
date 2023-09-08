@@ -14,8 +14,8 @@ export class Collection<T extends schema.Xbase> {
     this.belongId = belongId;
   }
 
-  async all(): Promise<T[]> {
-    if (!this.loaded) {
+  async all(reflash: boolean = false): Promise<T[]> {
+    if (!this.loaded || reflash) {
       this.cache = await this.load({});
       this.loaded = true;
     }
@@ -57,6 +57,27 @@ export class Collection<T extends schema.Xbase> {
     options.options.match = options.options.match || {};
     options.options.match.shareId = this.shareId;
     return await this.loadSpace(options);
+  }
+
+  async copy(data: T): Promise<T | undefined> {
+    const success = await kernel.collectionRemove(this.belongId, this.collName, {
+      _id: data.id,
+    });
+    if (success) {
+      return await this.insert(data);
+    }
+  }
+
+  async copys(data: T[]): Promise<T[]> {
+    const res = await kernel.collectionRemove(this.belongId, this.collName, {
+      _id: {
+        _in_: data.map((i) => i.id),
+      },
+    });
+    if (res.success) {
+      return await this.insertMany(data);
+    }
+    return [];
   }
 
   async insert(data: T): Promise<T | undefined> {

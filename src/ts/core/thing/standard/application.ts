@@ -73,11 +73,8 @@ export class Application extends FileInfo<schema.XApplication> implements IAppli
       );
       if (res.length > 0) {
         if (this.directory.target.id != destination.target.id) {
-          destination.resource.applicationColl.cache.push(...applications);
-          this.directory.resource.applicationColl.cache =
-            this.directory.resource.applicationColl.cache.filter((a) =>
-              applications.find((s) => s.id == a.id),
-            );
+          await destination.resource.applicationColl.all(true);
+          await this.directory.resource.applicationColl.all(true);
         }
         res.forEach((a) => this.updateMetadata(a));
         this.directory.applications = this.directory.applications.filter(

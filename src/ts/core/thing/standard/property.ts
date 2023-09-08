@@ -23,12 +23,11 @@ export class Property extends FileInfo<schema.XProperty> implements IProperty {
       destination.id != this.directory.id &&
       destination.target.belongId !== this.directory.target.belongId
     ) {
-      const res = await destination.createProperty({
-        ...this.metadata,
-        sourceId: this.metadata.belongId,
-        directoryId: destination.id,
-      });
-      return res != undefined;
+      const property = await destination.resource.propertyColl.copy(this.metadata);
+      if (property) {
+        destination.propertys.push(new Property(property, destination));
+        return true;
+      }
     }
     return false;
   }
@@ -45,9 +44,8 @@ export class Property extends FileInfo<schema.XProperty> implements IProperty {
       if (property) {
         this.setMetadata(data);
         if (this.directory.target.id != destination.target.id) {
-          destination.resource.propertyColl.cache.push(data);
-          this.directory.resource.propertyColl.cache =
-            this.directory.resource.propertyColl.cache.filter((a) => data.id != a.id);
+          await this.directory.resource.propertyColl.all(true);
+          await destination.resource.propertyColl.all(true);
         }
         this.directory.propertys = this.directory.propertys.filter(
           (i) => i.key != this.key,

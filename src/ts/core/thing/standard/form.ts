@@ -47,11 +47,11 @@ export class Form extends FileInfo<schema.XForm> implements IForm {
       destination.id != this.directory.id &&
       this.directory.target.belongId != destination.target.belongId
     ) {
-      const res = await destination.createForm({
-        ...this.metadata,
-        directoryId: destination.id,
-      });
-      return res != undefined;
+      const form = await destination.resource.formColl.copy(this.metadata);
+      if (form) {
+        destination.forms.push(new Form(form, destination));
+        return true;
+      }
     }
     return false;
   }
@@ -68,9 +68,8 @@ export class Form extends FileInfo<schema.XForm> implements IForm {
       if (form) {
         this.setMetadata(data);
         if (this.directory.target.id != destination.target.id) {
-          destination.resource.formColl.cache.push(data);
-          this.directory.resource.formColl.cache =
-            this.directory.resource.formColl.cache.filter((a) => data.id != a.id);
+          await this.directory.resource.formColl.all(true);
+          await destination.resource.formColl.all(true);
         }
         this.directory.forms = this.directory.forms.filter((i) => i.key != this.key);
         this.directory = destination;
