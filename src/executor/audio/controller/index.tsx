@@ -5,7 +5,7 @@ import {
   AiOutlinePauseCircle,
   AiOutlinePlayCircle,
 } from '@/icons/ai';
-import { TbRepeatOnce } from 'react-icons/tb';
+import { RiRepeatOneFill } from '@/icons/ri';
 import cls from './index.module.less';
 import React, { useEffect, useState } from 'react';
 import { FileItemModel } from '@/ts/base/model';
@@ -115,12 +115,12 @@ const AudioController: React.FC<IProp> = ({
         }}
         className={cls['audio-icon']}
       />
-      <TbRepeatOnce
+      <RiRepeatOneFill
         className={cls['audio-icon']}
         color={isLoop ? '#7c7cc5' : '#252525'}
         onClick={() => {
           setIsLoop((prevState) => !prevState);
-        }}></TbRepeatOnce>
+        }}></RiRepeatOneFill>
     </div>
   );
 };
