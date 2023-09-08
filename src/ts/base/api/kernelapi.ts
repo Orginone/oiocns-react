@@ -575,11 +575,11 @@ export default class KernelApi {
   }
   /**
    * 消息撤回
-   * @param {model.MsgSaveModel} params 请求参数
+   * @param {model.ChatMessageType} params 请求参数
    * @returns {model.ResultType<boolean>} 请求结果
    */
   public async recallImMsg(
-    params: model.MsgSaveModel,
+    params: model.ChatMessageType,
   ): Promise<model.ResultType<boolean>> {
     return await this.request({
       module: 'chat',

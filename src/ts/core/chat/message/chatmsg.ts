@@ -6,13 +6,13 @@ export interface IChatMessage {
   /** 归属用户 */
   belong: IBelong;
   /** 会话的历史消息 */
-  messages: model.MsgSaveModel[];
+  messages: model.ChatMessageType[];
   /** 加载更多历史消息 */
   moreMessage(before: boolean, members?: string[]): Promise<number>;
   /** 禁用通知 */
   unMessage(): void;
   /** 消息变更通知 */
-  onMessage(callback: (messages: model.MsgSaveModel[]) => void): void;
+  onMessage(callback: (messages: model.ChatMessageType[]) => void): void;
 }
 
 export class ChatMessage implements IChatMessage {
@@ -20,12 +20,12 @@ export class ChatMessage implements IChatMessage {
     this.belong = _belong;
   }
   belong: IBelong;
-  messages: model.MsgSaveModel[] = [];
-  private messageNotify?: (messages: model.MsgSaveModel[]) => void;
+  messages: model.ChatMessageType[] = [];
+  private messageNotify?: (messages: model.ChatMessageType[]) => void;
   unMessage(): void {
     this.messageNotify = undefined;
   }
-  onMessage(callback: (messages: model.MsgSaveModel[]) => void): void {
+  onMessage(callback: (messages: model.ChatMessageType[]) => void): void {
     this.messageNotify = callback;
     if (this.messages.length < 10) {
       this.moreMessage();
@@ -76,7 +76,7 @@ export class ChatMessage implements IChatMessage {
     }
     return 0;
   }
-  private loadMessages(msgs: model.MsgSaveModel[], before: boolean): void {
+  private loadMessages(msgs: model.ChatMessageType[], before: boolean): void {
     msgs.forEach((item: any) => {
       if (item.chatId) {
         item.id = item.chatId;

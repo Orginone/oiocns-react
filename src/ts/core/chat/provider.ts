@@ -16,11 +16,11 @@ export interface IChatProvider {
 
 export class ChatProvider implements IChatProvider {
   private _preMessage: boolean = true;
-  private _preMessages: model.MsgSaveModel[] = [];
+  private _preMessages: model.ChatMessageType[] = [];
   private _preTags: model.MsgTagModel[] = [];
   constructor(_user: IPerson) {
     this.user = _user;
-    kernel.on('RecvMsg', (data: model.MsgSaveModel) => {
+    kernel.on('RecvMsg', (data: model.ChatMessageType) => {
       if (!this._preMessage) {
         this._chatReceive(data.sessionId, data.belongId, (c) => {
           c.receiveMessage(data);

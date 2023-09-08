@@ -328,28 +328,26 @@ export type MsgTagModel = {
   tags: string[];
 };
 
-export type MsgSaveModel = {
-  // 唯一ID
-  id: string;
-  // 归属用户ID
-  belongId: string;
+export type ChatMessageType = {
   // 发起方Id
   fromId: string;
   // 接收方Id
   toId: string;
   // 接收会话Id
   sessionId: string;
+  // 类型
+  typeName: string;
   // 消息类型
   msgType: string;
   // 消息体
   msgBody: string;
-  // 消息创建时间
-  createTime: string;
-  // 消息变更时间
-  updateTime: string;
-  // 消息标签
-  tags?: CommentType[];
-};
+  // 内容
+  content: string;
+  // 评注
+  comments: CommentType[];
+  // 标签
+  tags: CommentType[];
+} & Xbase;
 
 export type CommentType = {
   // 标签名称
@@ -858,6 +856,30 @@ export type OperateModel = {
   menus?: OperateModel[];
 };
 
+/** 会话元数据 */
+export type MsgChatData = {
+  /** 消息类会话完整Id */
+  fullId: string;
+  /** 会话标签 */
+  labels: string[];
+  /** 会话名称 */
+  chatName: string;
+  /** 会话的类型 */
+  typeName: string;
+  /** 会话备注 */
+  chatRemark: string;
+  /** 是否置顶 */
+  isToping: boolean;
+  /** 会话未读消息数量 */
+  noReadCount: number;
+  /** 最后一次消息时间 */
+  lastMsgTime: number;
+  /** 最新消息 */
+  lastMessage?: ChatMessageType;
+  /** 提及我 */
+  mentionMe: boolean;
+};
+
 // 动态
 export type ActivityType = {
   // 类型
@@ -867,7 +889,7 @@ export type ActivityType = {
   // 资源
   resource: FileItemShare[];
   // 评注
-  comment: CommentType[];
+  comments: CommentType[];
   // 点赞
   likes: string[];
   // 转发

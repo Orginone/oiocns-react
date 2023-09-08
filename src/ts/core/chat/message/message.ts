@@ -2,6 +2,7 @@ import { common, model, parseAvatar } from '../../../base';
 import { MessageType, TargetType } from '../../public';
 import { IPerson } from '../../target/person';
 import { IMsgChat } from './msgchat';
+import { ISession } from '../session';
 export interface IMessageLabel {
   /** 标签名称 */
   label: string;
@@ -36,7 +37,7 @@ export interface IMessage {
   /** 消息id */
   id: string;
   /** 元数据 */
-  metadata: model.MsgSaveModel;
+  metadata: model.ChatMessageType;
   /** 发送方 */
   from: model.ShareIcon;
   /** 接收方 */
@@ -80,7 +81,7 @@ export interface IMessage {
 }
 
 export class Message implements IMessage {
-  constructor(_metadata: model.MsgSaveModel, _chat: IMsgChat) {
+  constructor(_metadata: model.ChatMessageType, _chat: IMsgChat | ISession) {
     this._chat = _chat;
     this.user = _chat.space.user;
     if (_metadata.msgType === 'recall') {
@@ -105,10 +106,10 @@ export class Message implements IMessage {
   cite: IMessage | undefined;
   mentions: string[] = [];
   user: IPerson;
-  _chat: IMsgChat;
+  _chat: IMsgChat | ISession;
   _msgBody: string;
   labels: IMessageLabel[] = [];
-  metadata: model.MsgSaveModel;
+  metadata: model.ChatMessageType;
   get id(): string {
     return this.metadata.id;
   }

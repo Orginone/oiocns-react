@@ -8,7 +8,7 @@ import {
   XSpeciesItem,
   Xbase,
 } from '../../base/schema';
-import { ActivityType } from '@/ts/base/model';
+import { ActivityType, ChatMessageType } from '@/ts/base/model';
 
 /** 数据核资源（前端开发） */
 export class DataResource {
@@ -20,6 +20,7 @@ export class DataResource {
     this.belongId = belongId;
     this.formColl = this.genColl<XForm>('standard-form');
     this.speciesColl = this.genColl<XSpecies>('standard-species');
+    this.messageColl = this.genColl<ChatMessageType>('chat-messages');
     this.activityColl = this.genColl<ActivityType>('resource-activity');
     this.propertyColl = this.genColl<XProperty>('standard-property');
     this.directoryColl = this.genColl<XDirectory>('resource-directory');
@@ -40,6 +41,8 @@ export class DataResource {
   directoryColl: Collection<XDirectory>;
   /** 动态集合 */
   activityColl: Collection<ActivityType>;
+  /** 群消息集合 */
+  messageColl: Collection<ChatMessageType>;
   /** 资源预加载 */
   async preLoad(): Promise<void> {
     if (this._proLoaded === false) {
