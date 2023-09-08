@@ -1,16 +1,12 @@
-import { uniqueArray, getAllFixedCharacter, getChartcterContent } from '../lib/tools';
+import {
+  uniqueArray,
+  getAllSpecialCharacter,
+  getSpecialChartcterContent,
+} from '../lib/tools';
 import { RuleTypes } from '../type.d';
 import OrgCtrl from '@/ts/controller';
 
-// import { FixedCharacters } from '../lib/const';
-const FixedCharacters = [
-  '「单位名称」',
-  '「单位编码」',
-  '「使用人名称」',
-  '「使用人编码」',
-  '「系统时间」',
-  '「」',
-];
+import { FixedCharacters } from '../lib/const';
 //定义replaceString函数，接收3个参数：ruleStr, formData, attrs
 export default async function replaceString(
   ruleStr: string,
@@ -18,7 +14,7 @@ export default async function replaceString(
   attrs: any[],
 ): Promise<string> {
   //将ruleStr中的特殊字符「」 提取出来，放到一个数组中，用uniqueArray去重
-  const AttrSet = uniqueArray(getAllFixedCharacter(ruleStr));
+  const AttrSet = uniqueArray(getAllSpecialCharacter(ruleStr));
   let replacedStr = '';
   //定义一个数组用来存储缺少的属性
   const missingAttrs: string[] = [];
@@ -57,7 +53,7 @@ const formAttrResolver = async (
     return '';
   }
   const replacedStr = ruleAttrs
-    .map((_str) => getChartcterContent(_str))
+    .map((_str) => getSpecialChartcterContent(_str))
     .reduce((ruleContent, item) => {
       //在attrs数组中查找是否有name等于item的对象
       const attrObj = formAttr.find((v: { name: string }) => v.name === item);
@@ -85,10 +81,9 @@ const formAttrResolver = async (
 };
 
 /* 固定字符处理 */
-/* 固定字符处理 */
 const fixedCharacterResolver = async (ruleStr: string) => {
   const _company = (await import('../workFormRules')).default.currentCompanyInfo;
-  console.log('sssss', _company);
+  console.log('固定字符处理', _company);
 
   if (!ruleStr) {
     return '';
