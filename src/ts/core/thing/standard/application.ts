@@ -168,7 +168,9 @@ export class Application extends FileInfo<schema.XApplication> implements IAppli
         operates.push(fileOperates.Parse);
       }
     }
-    return operates.filter((a) => a != fileOperates.Copy);
+    return operates.filter(
+      (a) => ![fileOperates.Copy, fileOperates.Download].includes(a),
+    );
   }
   private loadChildren(applications?: schema.XApplication[]) {
     if (applications && applications.length > 0) {

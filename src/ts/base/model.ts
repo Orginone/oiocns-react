@@ -1,4 +1,13 @@
-import { Xbase, XForm, XIdentity, XTarget } from './schema';
+import {
+  XApplication,
+  Xbase,
+  XDirectory,
+  XForm,
+  XIdentity,
+  XProperty,
+  XSpecies,
+  XTarget,
+} from './schema';
 // 请求类型定义
 export type ReqestType = {
   // 模块
@@ -105,10 +114,10 @@ export type OnlineInfo = {
 /** 在线信息查询接口 */
 export type OnlineSet = {
   // 用户连接
-  users: OnlineInfo[],
+  users: OnlineInfo[];
   // 存储连接
-  storages: OnlineInfo[],
-}
+  storages: OnlineInfo[];
+};
 // 分页返回定义
 export type PageResult<T> = {
   // 便宜量
@@ -905,7 +914,15 @@ export type LoadOptions = {
   group: string;
   skip: number;
   options: any;
-}
+};
+
+export type DirectoryContent = {
+  forms: XForm[];
+  specieses: XSpecies[];
+  propertys: XProperty[];
+  applications: XApplication[];
+  directorys: XDirectory[];
+};
 
 /** 请求失败 */
 export const badRequest = (

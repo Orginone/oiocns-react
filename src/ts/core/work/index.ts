@@ -4,6 +4,7 @@ import { IForm, Form } from '../thing/standard/form';
 import { FileInfo, IFileInfo } from '../thing/fileinfo';
 import { IDirectory } from '../thing/directory';
 import { IWorkApply, WorkApply } from './apply';
+import { fileOperates } from '../public';
 
 export interface IWork extends IFileInfo<schema.XWorkDefine> {
   /** 主表 */
@@ -170,6 +171,13 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
         this.directory.target.space,
       );
     }
+  }
+  override operates(mode?: number): model.OperateModel[] {
+    return super
+      .operates(mode)
+      .filter(
+        (a) => ![fileOperates.Copy, fileOperates.Move, fileOperates.Download].includes(a),
+      );
   }
   private async recursionForms(node: model.WorkNodeModel) {
     node.detailForms = await this.directory.resource.formColl.find(node.detailFormIds);

@@ -159,64 +159,47 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
       const directory = await destination.resource.directoryColl.replace(data);
       if (directory) {
         if (this.directory.target.id != destination.target.id) {
-          const data: {
-            forms: schema.XForm[];
-            specieses: schema.XSpecies[];
-            propertys: schema.XProperty[];
-            applications: schema.XApplication[];
-            directorys: schema.XDirectory[];
-          } = {
+          const xDatas: model.DirectoryContent = {
             forms: [],
             specieses: [],
             propertys: [],
             applications: [],
             directorys: [],
           };
-          this.getXConent(this, data);
-          destination.resource.formColl.replaceMany(
-            data.forms.map((a) => {
-              return { ...a, directoryId: destination.id };
-            }),
-          );
-          destination.resource.speciesColl.replaceMany(
-            data.specieses.map((a) => {
-              return { ...a, directoryId: destination.id };
-            }),
-          );
-          destination.resource.propertyColl.replaceMany(
-            data.propertys.map((a) => {
-              return { ...a, directoryId: destination.id };
-            }),
-          );
-          destination.resource.directoryColl.replaceMany(data.directorys);
+          this.getXConent(this, xDatas);
+          xDatas.forms.forEach((a) => (a.directoryId = destination.id));
+          xDatas.specieses.forEach((a) => (a.directoryId = destination.id));
+          xDatas.propertys.forEach((a) => (a.directoryId = destination.id));
+          xDatas.forms.forEach((a) => (a.directoryId = destination.id));
+          await destination.resource.formColl.replaceMany(xDatas.forms);
+          await destination.resource.speciesColl.replaceMany(xDatas.specieses);
+          await destination.resource.propertyColl.replaceMany(xDatas.propertys);
+          await destination.resource.directoryColl.replaceMany(xDatas.directorys);
           this.directory.resource.formColl.cache =
             this.directory.resource.formColl.cache.filter((a) =>
-              data.forms.find((s) => s.id == a.id),
+              xDatas.forms.find((s) => s.id == a.id),
             );
           this.directory.resource.speciesColl.cache =
             this.directory.resource.speciesColl.cache.filter((a) =>
-              data.forms.find((s) => s.id == a.id),
+              xDatas.forms.find((s) => s.id == a.id),
             );
           this.directory.resource.propertyColl.cache =
             this.directory.resource.propertyColl.cache.filter((a) =>
-              data.forms.find((s) => s.id == a.id),
+              xDatas.forms.find((s) => s.id == a.id),
             );
           this.directory.resource.applicationColl.cache =
             this.directory.resource.applicationColl.cache.filter((a) =>
-              data.forms.find((s) => s.id == a.id),
+              xDatas.forms.find((s) => s.id == a.id),
             );
           this.directory.resource.directoryColl.cache =
             this.directory.resource.directoryColl.cache.filter(
-              (a) => a.id == this.metadata.id || data.forms.find((s) => s.id == a.id),
+              (a) => a.id == this.metadata.id || xDatas.forms.find((s) => s.id == a.id),
             );
-          destination.resource.formColl.cache.push(...data.forms);
-          destination.resource.speciesColl.cache.push(...data.specieses);
-          destination.resource.propertyColl.cache.push(...data.propertys);
-          destination.resource.applicationColl.cache.push(...data.applications);
-          destination.resource.directoryColl.cache.push(
-            ...data.directorys,
-            this.metadata,
-          );
+          destination.resource.formColl.cache.push(...xDatas.forms);
+          destination.resource.speciesColl.cache.push(...xDatas.specieses);
+          destination.resource.propertyColl.cache.push(...xDatas.propertys);
+          destination.resource.applicationColl.cache.push(...xDatas.applications);
+          destination.resource.directoryColl.cache.push(...xDatas.directorys, data);
         }
         this.setMetadata(directory);
         this.directory.children = this.directory.children.filter(
@@ -255,15 +238,21 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
   }
   async delete(): Promise<boolean> {
     if (this.parent) {
-      for (const item of this.children) {
-        await item.delete();
-      }
-      const res = await this.resource.directoryColl.delete(this.metadata);
-      if (res) {
-        await this.deleteDirectoryResource();
-        this.parent.children = this.parent.children.filter((i) => i.key != this.key);
-      }
-      return res;
+      const data: model.DirectoryContent = {
+        forms: [],
+        specieses: [],
+        propertys: [],
+        applications: [],
+        directorys: [],
+      };
+      this.getXConent(this, data);
+      await this.resource.formColl.deleteMany(data.forms);
+      await this.resource.speciesColl.deleteMany(data.specieses);
+      await this.resource.propertyColl.deleteMany(data.propertys);
+      await this.resource.directoryColl.deleteMany([...data.directorys, this.metadata]);
+      await this.resource.applicationColl.deleteMany(data.applications);
+      this.parent.children = this.parent.children.filter((i) => i.key != this.key);
+      return true;
     }
     return false;
   }
@@ -427,17 +416,7 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
         return subDir;
       });
   }
-
-  private getXConent(
-    directory: IDirectory,
-    content: {
-      forms: schema.XForm[];
-      specieses: schema.XSpecies[];
-      propertys: schema.XProperty[];
-      applications: schema.XApplication[];
-      directorys: schema.XDirectory[];
-    },
-  ) {
+  private getXConent(directory: IDirectory, content: model.DirectoryContent) {
     for (const child of directory.children) {
       content.directorys.push(child.metadata);
       this.getXConent(child, content);
@@ -446,23 +425,5 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
     content.specieses.push(...directory.specieses.map((a) => a.metadata));
     content.propertys.push(...directory.propertys.map((a) => a.metadata));
     content.applications.push(...directory.applications.map((a) => a.metadata));
-  }
-
-  public async deleteDirectoryResource(): Promise<void> {
-    await this.resource.formColl.deleteMany(this.forms.map((i) => i.metadata));
-    await this.resource.speciesColl.deleteMany(this.specieses.map((i) => i.metadata));
-    await this.resource.propertyColl.deleteMany(this.propertys.map((i) => i.metadata));
-    await this.resource.applicationColl.deleteMany(
-      this.applications.map((i) => i.metadata),
-    );
-    await this.resource.speciesItemColl.deleteMatch({
-      speciesId: {
-        _in_: this.specieses.map((i) => i.id),
-      },
-    });
-    this.forms = [];
-    this.specieses = [];
-    this.propertys = [];
-    this.applications = [];
   }
 }
