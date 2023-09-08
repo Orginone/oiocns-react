@@ -4,13 +4,13 @@ import cls from './index.module.less';
 import PageCard from '@/components/PageCard';
 import Attribute from './Attritube';
 import Sheet from './Sheet';
-import Rules from './Rules';
-import { IReport } from '@/ts/core';
+import FormRules from '../labelsModal/formRules';
+import { IForm } from '@/ts/core';
 import FullScreenModal from '@/executor/tools/fullScreen';
 import EntityInfo from '@/components/Common/EntityInfo';
 
 interface IProps {
-  current: IReport;
+  current: IForm;
   finished: () => void;
 }
 const ReportModal: React.FC<IProps> = ({ current, finished }: IProps) => {
@@ -63,11 +63,11 @@ const ReportModal: React.FC<IProps> = ({ current, finished }: IProps) => {
       );
     }
     return (
-      <Rules
+      <FormRules
         current={current}
-        modalType={modalType}
-        recursionOrg={true}
         setModalType={setModalType}
+        modalType={modalType}
+        recursionOrg={false}
       />
     );
   };

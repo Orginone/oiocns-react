@@ -3,12 +3,9 @@ import { Select, Dropdown, Button, Popover } from 'antd';
 import type { MenuProps } from 'antd';
 import { SketchPicker } from '@hello-pangea/color-picker';
 import cls from './tool.module.less';
-import { IReport } from '@/ts/core';
 const { Option } = Select;
 interface IProps {
-  current: IReport;
   handClick: any;
-  setModal: any;
 }
 
 const classDefault: string = 'htMiddle htLeft';
@@ -126,7 +123,7 @@ const formulasTypes: any = [
   },
 ];
 
-const ToolBar: React.FC<IProps> = ({ current, handClick, setModal }: IProps) => {
+const ToolBar: React.FC<IProps> = ({ handClick }: IProps) => {
   const [background, setBackground] = useState<string>();
   const [color, setColor] = useState<string>();
   const [openColor, setOpenColor] = useState(false);
@@ -140,10 +137,13 @@ const ToolBar: React.FC<IProps> = ({ current, handClick, setModal }: IProps) => 
   // 缩进
   let defaultPaddingLeft: number = 4;
   let paddingLeft: number = 4;
+
   const onSave = () => {
     handClick('onSave', 'onSave');
   };
-  const onPublish = () => {};
+
+  const onPublish = () => { };
+  
   const setFontWeight = () => {
     if (fontWeight === 'bold') {
       fontWeight = defaultFontWeight;
@@ -152,6 +152,7 @@ const ToolBar: React.FC<IProps> = ({ current, handClick, setModal }: IProps) => 
     }
     handClick(fontWeight, 'fontWeight');
   };
+
   const setFontStyle = () => {
     if (fontStyle === 'italic') {
       fontStyle = defaultFontStyle;
@@ -160,6 +161,7 @@ const ToolBar: React.FC<IProps> = ({ current, handClick, setModal }: IProps) => 
     }
     handClick(fontStyle, 'fontStyle');
   };
+
   const setTextDecoration = () => {
     if (textDecoration === 'underline') {
       textDecoration = defaultTextDecoration;
@@ -168,6 +170,7 @@ const ToolBar: React.FC<IProps> = ({ current, handClick, setModal }: IProps) => 
     }
     handClick(textDecoration, 'setTextDecoration');
   };
+
   const borderThis = (type: string) => {
     if (type === 'border-none') {
       handClick('none', 'border', type);
@@ -175,17 +178,21 @@ const ToolBar: React.FC<IProps> = ({ current, handClick, setModal }: IProps) => 
       handClick('1px solid #000000', 'border', type);
     }
   };
+
   const setBackgroundColor = () => {
     setOpenBackground(false);
     handClick(background, 'backgroundColor');
   };
+
   const setColors = () => {
     setOpenColor(false);
     handClick(color, 'color');
   };
+
   const setClassName = (className: string, classType: string) => {
     handClick(className, 'className', classType);
   };
+
   const reducePaddingLeft = () => {
     let nowLeft = paddingLeft;
     if (nowLeft > 0) {
@@ -194,19 +201,15 @@ const ToolBar: React.FC<IProps> = ({ current, handClick, setModal }: IProps) => 
     paddingLeft = nowLeft;
     handClick(paddingLeft, 'paddingLeft');
   };
+
   const addPaddingLeft = () => {
     paddingLeft += 24;
     handClick(paddingLeft, 'paddingLeft');
   };
-  // const setModalType = () => {
-  //   setModal('新增特性')
-  // }
+
   const mergeAndCenter = () => {
     handClick('', 'mergeAndCenter');
   };
-  // const alignThis = (item: any) => {
-  //   console.log(item);
-  // };
 
   const handleChange = (value: any, type: any) => {
     handClick(value, type);

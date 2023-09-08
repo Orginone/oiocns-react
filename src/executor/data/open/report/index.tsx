@@ -1,10 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import FullScreenModal from '@/executor/tools/fullScreen';
 import HotTableView from './components/hotTable';
+import MainLayout from '@/components/MainLayout';
+import useMenuUpdate from '@/hooks/useMenuUpdate';
 import cls from './index.module.less';
 import { IForm } from '@/ts/core';
 import { kernel } from '@/ts/base';
 import { Form, Button, Input, Pagination } from 'antd';
+import * as config from './config';
 
 interface IProps {
   current: IForm;
@@ -12,14 +15,16 @@ interface IProps {
 }
 
 const ReportView: React.FC<IProps> = ({ current, finished }) => {
-  const [dataInfo, setDataInfo] = useState<any>();
+  console.log(current,'key')
+  const [total, setTotal] = useState<number>(1);
   const [info, setInfo] = useState<any>();
-
-  useEffect(() => {
-    getData()
-  }, [current])
+  const [key, rootMenu, selectMenu, setSelectMenu] = useMenuUpdate(
+    () => config.loadStoreMenu(current),
+  );
+  console.log(rootMenu, 'rootMenu')
+  if (!selectMenu || !rootMenu) return <></>;
   
-  const getData = async () => {
+  const getData = async (page: number) => {
     let request: any = {
       filter: undefined,
       group: null,
@@ -27,34 +32,23 @@ const ReportView: React.FC<IProps> = ({ current, finished }) => {
       searchExpr: undefined,
       searchOperation: "contains",
       searchValue: null,
-      skip: 0,
-      take: 9999,
+      skip: page,
+      take: 1,
       userData:[]
     }
     const result = await kernel.anystore.loadThing<any>(current.belongId, request);
     if (result.success) {
-      setDataInfo(result.data)
+      setTotal(result.data?.totalCount)
       setInfo(result.data?.data[0])
-    } else {
-      setDataInfo([]);
     }
   }
 
   const onChange = (page: number) => {
-    setInfo(dataInfo?.data[page - 1])
+    getData(page)
   }
 
-  return (
-    <FullScreenModal
-      open
-      centered
-      fullScreen
-      width={'80vw'}
-      destroyOnClose
-      title="报表"
-      footer={[]}
-      onCancel={finished}
-    >
+  const loadContent = () => {
+    return (
       <div className={cls['report-content-box']}>
         <div className={cls['report-search-box']}>
           <Form layout="inline">
@@ -68,15 +62,33 @@ const ReportView: React.FC<IProps> = ({ current, finished }) => {
             </Form.Item>
           </Form>
         </div>
-        {info ?
-          <HotTableView info={info} current={current}></HotTableView>
-          : ''}
-        {dataInfo ?
-          <div className={cls['report-pagination-box']}>
-            <Pagination hideOnSinglePage={true} defaultCurrent={1} defaultPageSize={1} onChange={onChange} total={dataInfo.totalCount} />
-          </div>
-          : ''}
+        <HotTableView key={key} info={info} current={current}></HotTableView>
+        <div className={cls['report-pagination-box']}>
+          <Pagination hideOnSinglePage={true} defaultCurrent={1} defaultPageSize={1} onChange={onChange} total={total} />
+        </div>
       </div>
+    )
+  }
+
+  return (
+    <FullScreenModal
+      open
+      centered
+      fullScreen
+      width={'80vw'}
+      destroyOnClose
+      title="报表"
+      footer={[]}
+      onCancel={finished}
+    >
+      <MainLayout
+        selectMenu={selectMenu}
+        onSelect={(data) => {
+          setSelectMenu(data);
+        }}
+        siderMenuData={rootMenu}>
+          {loadContent()}
+      </MainLayout>
     </FullScreenModal>
   );
 };

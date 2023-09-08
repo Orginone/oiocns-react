@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Tabs, Button } from 'antd';
+import { Tabs } from 'antd';
 import { HotTable } from '@handsontable/react';
 import { HyperFormula } from 'hyperformula';
 import { textRenderer, registerRenderer } from 'handsontable/renderers';
@@ -26,11 +26,14 @@ interface IProps {
 }
 
 const ReportForms: React.FC<IProps> = (props) => {
-  console.log(props, 'props')
   const [cells, setCells] = useState<any>([]);
   const [styleList, setStyleList] = useState<any>([]);
   const [classList, setClassList] = useState<any>([]);
   const [sheetIndex, setSheetIndex] = useState<string>('0');
+  const [rowHeights, setRowHeights] = useState<any>([]);
+  const [colWidths, setColWidths] = useState<any>([]);
+  const [serviceData, setServiceData]  = useState<any>();
+  // const [sheetList, setSheetList] = useState<any>([]);
   const reportData = props.forms[0]
   const formData = props.getFormData(reportData.id);
   const [reallyData, setReallyData] = useState(
@@ -38,24 +41,29 @@ const ReportForms: React.FC<IProps> = (props) => {
   );
   const [readOnly, setReadOnly] = useState<boolean>(false)
   const hotRef: any = useRef(null);
-  let sheetList = reportData?.rule ? JSON.parse(reportData?.rule) : [];
+  let sheetList: any = reportData?.rule ? Object.values(JSON.parse(reportData?.rule)) : []
   let datas = sheetList[sheetIndex]?.data?.data || [[]];
   let setting = sheetList[sheetIndex]?.data?.setting || {};
   let mergeCells = setting?.mergeCells || [];
-  let autoColumn: boolean = true; //自适应
-  let autoRow: boolean = true;
 
   useEffect(() => {
     const hot = hotRef.current.hotInstance;
     Handsontable.editors.registerEditor('SelectEditor', selectEditor)
     setStyleList(setting?.styleList || []);
     setClassList(setting?.classList || []);
+    setRowHeights(setting?.row_h || []);
+    setColWidths(setting?.col_w || []);
     hot.updateSettings({
       data: datas,
       cell: cells,
       mergeCells: mergeCells,
     });
     if (props.allowEdit) {
+      props?.ruleService?.setFormChangeCallback(reportData.id, (data: any) => { 
+        if (data) {
+          setServiceData(data)
+        }
+      })
       kernel.anystore.createThing(props.belong.userId, '').then((res) => {
         if (res.success && res.data) {
           setReallyData(res.data);
@@ -73,7 +81,9 @@ const ReportForms: React.FC<IProps> = (props) => {
         });
       }
     }
-  }, [sheetIndex]);
+  }, []);
+
+  // if(!reallyData) return <></>;
 
   const setValidator = (item: any, rules: any) => {
     // 设置单元格规则
@@ -189,6 +199,11 @@ const ReportForms: React.FC<IProps> = (props) => {
   })
 
   cells?.forEach((item: any) => {
+    Object.keys(serviceData).map((k) => {
+      if (item.prop.id === k) {
+        hotRef.current.hotInstance.setDataAtCell([[item.row, item.col, serviceData[k]]])
+      }
+    })
     //渲染单元格颜色
     hotRef.current.hotInstance.getCellMeta(item.row, item.col).renderer =
       'customStylesRenderer';
@@ -312,18 +327,6 @@ const ReportForms: React.FC<IProps> = (props) => {
     }
   };
 
-  const afterSetCellMeta = (row: number, col: number, key: string, val: boolean) => {
-    // console.log(row, col, key, val, 'row, col, key, val')
-    if (key != 'hidden' && key != 'spanned') {
-      // let json = {row:row,col:col,key:key,val:val}
-      // cellMeta.push(json)
-    }
-  };
-
-  const afterUpdateSettings = (change: any) => {
-    // console.log(change, 'change');
-  };
-
   registerRenderer('customStylesRenderer', (hotInstance: any, TD: any, ...rest) => {
     //渲染特性背景色
     textRenderer(hotInstance, TD, ...rest);
@@ -354,20 +357,18 @@ const ReportForms: React.FC<IProps> = (props) => {
         rowHeaders={true}
         colHeaders={true}
         dropdownMenu={true}
+        colWidths={colWidths}
+        rowHeights={rowHeights}
         readOnly={readOnly}
         height="620px"
         language={zhCN.languageCode}
         stretchH="all"
         manualColumnResize={true}
         manualRowResize={true}
-        autoColumnSize={autoColumn}
-        autoRowSize={autoRow}
         multiColumnSorting={true}
         outsideClickDeselects={false}
         licenseKey="non-commercial-and-evaluation" // for non-commercial use only
         afterChange={afterChange}
-        afterUpdateSettings={afterUpdateSettings}
-        afterSetCellMeta={afterSetCellMeta}
       >
       </HotTable>
       <div>
@@ -375,7 +376,7 @@ const ReportForms: React.FC<IProps> = (props) => {
           tabPosition={'bottom'}
           type="card"
           onChange={onChange}
-          items={sheetList.map((it: any, index: string) => {
+          items={sheetList.map((it: any, index: number) => {
             return {
               label: it.name,
               key: index,

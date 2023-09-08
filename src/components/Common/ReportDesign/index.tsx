@@ -12,19 +12,15 @@ interface IProps {
 }
 
 const ReportView: React.FC<IProps> = ({ current, selectItem, finished }) => {
-  console.log(current, 'current', selectItem, 'selectItem');
+  console.log(selectItem, 'selectItem')
   const [reportChange, setReportChange] = useState<any>();
   const [changeType, setChangeType] = useState<string>('');
   const [classType, setClassType] = useState<string>('');
-  const [modalType, setModalType] = useState<string>('');
   const handClick = (value: any, type: string, classType: string) => {
+    // console.log(value, type, classType)
     setReportChange(value);
     setChangeType(type);
     setClassType(classType);
-  };
-
-  const setModal = (value: string) => {
-    setModalType(value);
   };
 
   return (
@@ -39,7 +35,7 @@ const ReportView: React.FC<IProps> = ({ current, selectItem, finished }) => {
       onCancel={finished}>
       <div className={cls['report-content-box']}>
         <div className={cls['report-tool-box']}>
-          <ToolBar current={current} handClick={handClick} setModal={setModal}></ToolBar>
+          <ToolBar handClick={handClick}></ToolBar>
         </div>
         <HotTableView
           current={current}

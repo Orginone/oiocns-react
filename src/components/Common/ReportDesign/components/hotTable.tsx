@@ -36,6 +36,8 @@ const HotTableView: React.FC<IProps> = ({
   const [cells, setCells] = useState<any>([]);
   const [styleList, setStyleList] = useState<any>([]);
   const [classList, setClassList] = useState<any>([]);
+  const [rowHeights, setRowHeights] = useState<any>([]);
+  const [colWidths, setColWidths] = useState<any>([]);
   // 项配置改变
   const formValuesChange = (changedValues: any) => {
     if (selectedItem) {
@@ -49,26 +51,21 @@ const HotTableView: React.FC<IProps> = ({
     }
   };
   const hotRef: any = useRef(null);
-  let sheetList = current.metadata?.rule ? JSON.parse(current.metadata?.rule) : [];
-  let sheetIndex = sheetList.findIndex((it: any) => it.code === selectItem.code);
-  let datas = sheetList[sheetIndex]?.data?.data || [[]];
-  let setting = sheetList[sheetIndex]?.data?.setting || {};
-  let mergeCells = setting?.mergeCells || [];
-  let autoColumn: boolean = true; //自适应
-  let autoRow: boolean = true;
+  let mergeCells = selectItem?.data?.setting?.mergeCells || [];
 
   useEffect(() => {
     const hot = hotRef.current.hotInstance;
-
-    setCells(setting?.cells || []);
-    setStyleList(setting?.styleList || []);
-    setClassList(setting?.classList || []);
+    setCells(selectItem?.data?.setting?.cells || []);
+    setStyleList(selectItem?.data?.setting?.styleList || []);
+    setClassList(selectItem?.data?.setting?.classList || []);
+    setRowHeights(selectItem?.data?.setting?.row_h || []);
+    setColWidths(selectItem?.data?.setting?.col_w || []);
     hot.updateSettings({
-      data: datas,
+      data: selectItem?.data?.data,
       cell: cells,
       mergeCells: mergeCells,
     });
-  }, []);
+  }, [selectItem]);
 
   styleList?.forEach((item: any) => {
     hotRef.current.hotInstance.getCellMeta(item.row, item.col).renderer =
@@ -176,7 +173,17 @@ const HotTableView: React.FC<IProps> = ({
   const saveClickCallback = async () => {
     // 保存 保存数据结构---还未更新完
     let setRowHeightInstance = hotRef.current.hotInstance.getPlugin('ManualRowResize');
-    console.log(setRowHeightInstance,'123455')
+    console.log(setRowHeightInstance, '12345')
+    let count_col = hotRef.current.hotInstance.countCols();//获取列数
+    let count_row = hotRef.current.hotInstance.countRows();//获取行数
+    let row_h: any = [];
+    let col_w: any = [];
+    for (var i = 0; i < count_col; i++){
+      col_w.push(hotRef.current.hotInstance.getColWidth(i))
+    }
+    for (var i = 0; i < count_row; i++){
+      row_h.push(hotRef.current.hotInstance.getRowHeight(i))
+    }       
     let newData = hotRef.current.hotInstance.getData();
     let json = {
       data: newData,
@@ -184,23 +191,23 @@ const HotTableView: React.FC<IProps> = ({
         mergeCells:
           hotRef.current.hotInstance.getPlugin('mergeCells').mergedCellsCollection
             .mergedCells,
-        autoColumnSize: hotRef.current.hotInstance.getPlugin('autoColumnSize').enabled,
-        AutoRowSize: hotRef.current.hotInstance.getPlugin('AutoRowSize').enabled,
         cells: cells,
         styleList: styleList,
         classList: classList,
+        row_h: row_h,
+        col_w: col_w
         // columns:columns,
         // cellMeta:cellMeta,
         // columnSummary:columnSummary,
         // cellList:cellData
       },
     };
-    sheetList[sheetIndex].data = json;
+    selectItem.data = json;
     await current.update({
       id: current.id,
       name: current.name,
       code: current.code,
-      rule: JSON.stringify(sheetList),
+      rule: JSON.stringify(selectItem),
     } as model.FormModel);
   };
 
@@ -236,7 +243,6 @@ const HotTableView: React.FC<IProps> = ({
           }
           hotRef.current.hotInstance.getCellMeta(rowIndex, columnIndex).renderer =
             'customStylesRenderer';
-          // hotRef.current.hotInstance.setDataAtCell(rowIndex, columnIndex, prop.name);
         }
       }
     }
@@ -264,13 +270,6 @@ const HotTableView: React.FC<IProps> = ({
     });
   };
 
-  const afterFormulasValuesUpdate = (changes: any) => {
-    //公式更新后
-    changes.forEach((change: any) => {
-      // console.log('change', change);
-    });
-  };
-
   const afterOnCellMouseDown = (event: any, coords: any, TD: any) => {
     // console.log(event, coords, TD)
     cells?.forEach((item: any) => {
@@ -280,44 +279,6 @@ const HotTableView: React.FC<IProps> = ({
       }
     });
   };
-
-  const afterChange = (change: any, source: any) => {
-    // 修改后
-    // console.log(change, source)
-    let arr: any = [];
-    if (change && change.length > 0) {
-      change.forEach((item: any) => {
-        let json1 = { row: item[0], col: item[1], val: item[3] };
-        arr.push(json1);
-      });
-    }
-    // rulesData = arr
-  };
-
-  const afterSetCellMeta = (row: Number, col: Number, key: string, val: boolean) => {
-    // console.log(row, col, key, val, 'row, col, key, val')
-    if (key != 'hidden' && key != 'spanned') {
-      // let json = {row:row,col:col,key:key,val:val}
-      // cellMeta.push(json)
-    }
-  };
-
-  const afterBeginEditing = (row: Number, col: Number) => {
-    //修改后
-  };
-
-  const afterUpdateSettings = (change: any) => {
-    // console.log(change, 'change');
-  };
-
-  const afterSelection = (
-    row: Number,
-    column: Number,
-    row2: Number,
-    column2: Number,
-    preventScrolling: any,
-    selectionLayerLevel: any,
-  ) => { };
 
   registerRenderer('customStylesRenderer', (hotInstance: any, TD: any, ...rest) => { //渲染特性背景色
     textRenderer(hotInstance, TD, ...rest);
@@ -347,14 +308,14 @@ const HotTableView: React.FC<IProps> = ({
         minRows={60}
         rowHeaders={true}
         colHeaders={true}
+        colWidths={colWidths}
+        rowHeights={rowHeights}
         dropdownMenu={true}
         height="700px"
         language={zhCN.languageCode}
         stretchH="all"
         manualColumnResize={true}
         manualRowResize={true}
-        autoColumnSize={autoColumn}
-        autoRowSize={autoRow}
         multiColumnSorting={true}
         contextMenu={{
           items: {
@@ -367,24 +328,18 @@ const HotTableView: React.FC<IProps> = ({
             mergeCells: {},
             insert_speciality: {
               name: '插入特性',
-              callback: function (key, options) {
+              callback: function () {
                 setModalType('新增特性');
               },
             },
           },
         }}
-        afterSelection={afterSelection}
         outsideClickDeselects={false}
         licenseKey="non-commercial-and-evaluation" // for non-commercial use only
-        afterChange={afterChange}
         afterOnCellMouseDown={afterOnCellMouseDown} //鼠标点击单元格边角后被调用
-        afterUpdateSettings={afterUpdateSettings}
-        afterBeginEditing={afterBeginEditing}
-        afterSetCellMeta={afterSetCellMeta}
-        afterFormulasValuesUpdate={afterFormulasValuesUpdate}
       />
 
-      {modalType == '新增特性' ? (
+      {modalType.includes('新增特性') && (
         <Modal
           open
           width={800}
@@ -424,8 +379,6 @@ const HotTableView: React.FC<IProps> = ({
             }}
           />
         </Modal>
-      ) : (
-        ''
       )}
 
       {/** 编辑特性模态框 */}
