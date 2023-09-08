@@ -66,6 +66,7 @@ const PrimaryForm: React.FC<IProps> = (props) => {
 };
 
 const PrimaryForms: React.FC<IProps> = (props) => {
+  console.log(props.forms)
   if (props.forms.length < 1) return <></>;
   const [activeTabKey, setActiveTabKey] = useState(props.forms[0].id);
   const loadItems = () => {

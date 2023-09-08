@@ -61,6 +61,7 @@ const ReportForms: React.FC<IProps> = (props) => {
     if (props.allowEdit) {
       props?.ruleService?.setFormChangeCallback(reportData.id, (data: any) => { 
         if (data) {
+          console.log(data)
           setServiceData(data)
         }
       })
