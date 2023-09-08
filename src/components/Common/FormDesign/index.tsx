@@ -10,6 +10,7 @@ import { loadWidgetsOpts } from './schemaRule';
 import { schemaType } from '@/ts/base/schema';
 import FormRender from '@/components/Common/FormEdit/FormRender';
 import { useForm } from 'form-render';
+import OioForm from './OioFormNext';
 type IProps = {
   current: IForm;
 };
@@ -55,7 +56,7 @@ const Design: React.FC<IProps> = ({ current }) => {
   const currentToSchemaFun = () => {
     //如果配置过
     if (rules && JSON.stringify(rules) !== '{}') {
-      console.log('获取已保存的scame', rules.schema);
+      console.log('获取已保存的scame', current, rules.schema);
       return rules.schema;
     }
     //  else {
@@ -134,11 +135,24 @@ const Design: React.FC<IProps> = ({ current }) => {
         </div>
 
         {rules.schema ? (
-          <FormRender
-            schema={rules.schema}
-            form={formIns}
-            widgets={{ number: InputNumber }}
-          />
+          <>
+            <FormRender
+              schema={rules.schema}
+              form={formIns}
+              widgets={{ number: InputNumber }}
+            />
+            <OioForm
+              key={current.id}
+              form={current}
+              fields={current.fields}
+              submitter={{
+                resetButtonProps: {
+                  style: { display: 'none' },
+                },
+                render: (_: any, _dom: any) => <></>,
+              }}
+            />
+          </>
         ) : (
           <div className={cls.designWrap}>
             使用

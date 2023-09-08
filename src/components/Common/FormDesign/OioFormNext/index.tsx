@@ -41,6 +41,13 @@ const OioForm: React.FC<IProps> = ({
     form.rule ?? '{}',
   );
 
+  console.log(
+    'fields',
+    fields.map((v) => {
+      return { name: v.name, rule: JSON.parse(v.rule ?? '{}') };
+    }),
+  );
+
   const colNum = 24 / configCol; //单行展示数量 默认3
   if (fieldsValue) {
     formRef?.current?.setFieldsValue(fieldsValue);
@@ -107,8 +114,9 @@ const OioForm: React.FC<IProps> = ({
           labelStyle={{ minWidth: '200px', textAlign: 'right' }}>
           {fields.map((field) => {
             //增加对必填，隐藏的展示响应
+
             const { required = false, hidden = false } = JSON.parse(field.rule ?? '{}');
-            if (hidden) {
+            if (hidden === true || hidden === 'true') {
               return <></>;
             }
             return (
@@ -120,7 +128,9 @@ const OioForm: React.FC<IProps> = ({
                   <div
                     style={{ cursor: 'pointer' }}
                     title={field.remark}
-                    className={required ? cls.Required : ''}>
+                    className={
+                      required === true || required == 'true' ? cls.Required : ''
+                    }>
                     <span style={{ marginRight: 6 }}>{field.name}</span>
                     {field.remark && field.remark.length > 0 && <ImInfo />}
                   </div>

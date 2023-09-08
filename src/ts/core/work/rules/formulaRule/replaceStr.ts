@@ -6,6 +6,8 @@ import {
 import { RuleTypes } from '../type.d';
 import OrgCtrl from '@/ts/controller';
 
+import dayjs from 'dayjs';
+
 import { FixedCharacters } from '../lib/const';
 //定义replaceString函数，接收3个参数：ruleStr, formData, attrs
 export default async function replaceString(
@@ -102,7 +104,7 @@ const fixedCharacterResolver = async (ruleStr: string) => {
       case '「使用人编码」':
         return OrgCtrl.user.metadata.id;
       case '「系统时间」':
-        return new Date().toLocaleString();
+        return dayjs().format('YYYY-MM-DD HH:mm:ss');
       default:
         return '';
     }

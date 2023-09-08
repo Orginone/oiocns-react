@@ -43,8 +43,13 @@ export class WorkApply implements IWorkApply {
     fromData: Map<string, model.FormEditData>,
   ): Promise<boolean> {
     fromData.forEach((data, k) => {
-      this.instanceData.data[k] = [data];
+      console.log('data, k', data, k);
+      const { after, before, createTime, creator, nodeId } = data;
+      const params = { after, before, createTime, creator, nodeId };
+
+      this.instanceData.data[k] = [params];
     });
+    console.log('打印提交数据', fromData, this.instanceData);
 
     const res = await kernel.createWorkInstance({
       ...this.metadata,

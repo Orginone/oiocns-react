@@ -23,29 +23,29 @@ interface IProps {
 
 const FormRenders: React.FC<IProps> = (props) => {
   const formIns: any = useForm();
-  if (props.forms.length < 1) return <></>;
-  const form = props.forms[0];
+  // if (props.forms.length < 1) return <></>;
+  const form = props.forms?.[0];
 
-  if (!props.data.fields[form.id]) return <></>;
+  if (props.data.data?.[form.id]?.length == 0) return <></>;
   // const fields = props.data.fields[form.id];
-  const formData = props.getFormData(form.id);
+  const formData = !props.allowEdit
+    ? props.data?.data?.[form.id]?.[0]
+    : props.getFormData(form.id);
+  //  props.getFormData(form.id);
   const [data, setData] = useState(
-    formData.after.length > 0 ? formData.after[0] : undefined,
+    formData?.after?.length > 0 ? formData.after[0] : undefined,
   );
   useEffect(() => {
-    if (!data) {
+    if (props.allowEdit && !data) {
       kernel.createThing(props.belong.userId, '').then((res) => {
         if (res.success && res.data) {
           setData(res.data);
         }
       });
     }
-
     if (props.allowEdit) {
       //初始化数据
       props?.ruleService?.setFormChangeCallback(form.id, (data: any) => {
-        console.log('规则输出数据', data);
-
         const timeFormatRegex = /^\d{4}\/\d{1,2}\/\d{1,2} \d{1,2}:\d{1,2}$/;
         //如果是时间格式需要转换
         if (data) {
@@ -56,7 +56,6 @@ const FormRenders: React.FC<IProps> = (props) => {
               data[key] = moment(value).format('YYYY-MM-DD HH:mm:ss');
             }
           }
-          console.log('setValues', data);
           formIns.setValues(data);
         }
       });
@@ -64,7 +63,9 @@ const FormRenders: React.FC<IProps> = (props) => {
       formIns.setValues(data);
     }
   }, []);
+
   if (!data) return <></>;
+
   const watch = {
     // # 为全局
     '#': (val: any) => {

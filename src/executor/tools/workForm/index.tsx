@@ -3,7 +3,7 @@ import { model } from '../../../ts/base';
 import { IBelong } from '@/ts/core';
 
 import DetailForms from './detail';
-import PrimaryForms from './primary';
+// import PrimaryForms from './primary';
 import FormRenders from './formPreview';
 // import ReportForms from '../workReport';
 
@@ -69,11 +69,11 @@ const WorkForm: React.FC<IWorkFormProps> = (props) => {
       {/* 同样的类型 需要如何区分展示报表或者表单？ 所以我这边先注释掉了 */}
       {/* <ReportForms {...props} forms={node.primaryForms || []} getFormData={getFormData} /> */}
       <FormRenders {...props} forms={node.primaryForms || []} getFormData={getFormData} />
-      <PrimaryForms
+      {/* <PrimaryForms
         {...props}
         forms={node.primaryForms || []}
         getFormData={getFormData}
-      />
+      /> */}
       <DetailForms {...props} forms={node.detailForms || []} getFormData={getFormData} />
     </div>
   );
