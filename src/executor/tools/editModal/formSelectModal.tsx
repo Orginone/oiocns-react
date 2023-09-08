@@ -41,7 +41,7 @@ const FormSelectModal = ({ form, fields, belong, onSave }: IFormSelectProps) => 
             async load(loadOptions) {
               loadOptions.userData = [];
               let request: any = { ...loadOptions };
-              const result = await kernel.anystore.loadThing<any>(belong.id, request);
+              const result = await kernel.loadThing<any>(belong.id, request);
               if (result.success) {
                 return result.data;
               }

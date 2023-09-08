@@ -13,6 +13,10 @@ export type Xbase = {
   createTime: string;
   // 更新时间
   updateTime: string;
+  // 共享用户
+  shareId: string;
+  // 归属用户
+  belongId: string;
 };
 
 export type XEntity = {
@@ -152,7 +156,7 @@ export type XForm = {
   bindNodes: XWorkNode[] | undefined;
   // 单的目录
   directory: XDirectory | undefined;
-  schema:schemaType
+  schema: schemaType;
 } & XEntity;
 
 //身份证明
@@ -529,6 +533,7 @@ export type XWorkTask = {
   instance: XWorkInstance | undefined;
 } & Xbase;
 
+/* 表单规则类型 */
 export type XFormRule = {
   id: string;
   /* 规则名称 */
@@ -553,6 +558,47 @@ export type XFormRule = {
   content: Function;
   /* 备注 */
   remark: string;
+};
+/* 表单规则类型 */
+export type FormRuleType = {
+  /* 规则数据 */
+  list: XFormRule[];
+  /* 设计展示数据 */
+  schema: any;
+};
+/* 表单特性规则类型 */
+export type AttrRuleType = {
+  /* 标题 */
+  name: string;
+  /* 编号 */
+  code: string;
+  /* 字段是否显示在输入区域 */
+  hidden?: boolean;
+  /* 字段是否只读 */
+  readonly?: boolean;
+  /*是否必填 */
+  required?: boolean;
+  allowClear?: boolean;
+  maxLength?: number;
+  minLength?: number;
+  /* 数值类型 最小值 */
+  min?: number;
+  /* 数值类型 最大值 */
+  max?: number;
+  /* 展示组件类型 */
+  widget?: string;
+  /* 输入提示 */
+  placeholder?: string;
+  /* 管理权限 */
+  authId?: string;
+  /* 特性定义 */
+  remark?: string;
+  /* 正则校验 */
+  rules: string;
+  /* 规则数据 */
+  list?: XFormRule[];
+  /*  设计展示数据 */
+  schema: any;
 };
 //报表定义
 export type XReport = {
@@ -580,6 +626,8 @@ export type XRequest = {
   params: readonly any[];
   headers: readonly any[];
   curTab: string;
+  envId?: string;
+  suffixExec?: string;
 } & XFileInfo;
 
 // 链接定义
@@ -589,7 +637,7 @@ export type XLink = {
 
 // 环境定义
 export type XEnvironment = {
-  [key: string]: string;
+  kvs: { [key: string]: string | undefined };
 } & XFileInfo;
 
 // 映射定义
@@ -606,4 +654,6 @@ export type XMapping = {
 } & XFileInfo;
 
 // 脚本配置
-export type XExecutable = XFileInfo;
+export type XExecutable = {
+  coder: string;
+} & XFileInfo;

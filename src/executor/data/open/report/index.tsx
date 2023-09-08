@@ -21,7 +21,6 @@ const ReportView: React.FC<IProps> = ({ current, finished }) => {
   const [key, rootMenu, selectMenu, setSelectMenu] = useMenuUpdate(
     () => config.loadStoreMenu(current),
   );
-  console.log(rootMenu, 'rootMenu')
   if (!selectMenu || !rootMenu) return <></>;
   
   const getData = async (page: number) => {
@@ -36,7 +35,7 @@ const ReportView: React.FC<IProps> = ({ current, finished }) => {
       take: 1,
       userData:[]
     }
-    const result = await kernel.anystore.loadThing<any>(current.belongId, request);
+    const result = await kernel.loadThing<any>(current.belongId, request);
     if (result.success) {
       setTotal(result.data?.totalCount)
       setInfo(result.data?.data[0])

@@ -8,15 +8,17 @@ import { RuleTypes } from './type.d';
 import { DataType } from 'typings/globelType';
 import { filterRules, setFormRules } from './lib/tools';
 import * as Tools from './lib';
-import { IForm } from '../../thing/form';
 import { RuleTriggers } from '@/ts/base/model';
+import { ValueGoal } from './base/enum';
+import { XEntity } from '@/ts/base/schema';
+import { IBelong } from '../../target/base/belong';
 
 // 定义表单规则的类型
 export type WorkFormRulesType = {
   /* 办事规则是否处理完成 */
   isReady: boolean;
-  // /* 办事归属权 */
-  // _beloneId: string;
+  /* 办事归属权 */
+  currentCompanyInfo: XEntity;
   // /* 收集办事表单的规则 */
   // _AllFormRules: Map<string, { rules: IRuleBase[]; attrs: any[] }>;
   /* 当前选中 主表的id标识 */
@@ -26,9 +28,9 @@ export type WorkFormRulesType = {
   // /* 初始化规则*/
   // initFormRules: (forms: any[]) => void;
   /* 表单渲染时，需提交表单修改方式 至此，用于规则处理后的回显：考虑返回规则执行结果，到页面处理渲染逻辑*/
-  setFormChangeCallback: (formId: string, callBack: (data: any) => void) => void;
+  setFormChangeCallback: (formId: string, callback: (data: any) => any) => void;
   /* 加载表单远程规则*/
-  loadRemoteRules: (forms: any[]) => void;
+  loadRemoteRules: (path: string) => Promise<void>;
   /* 处理表单规则，需提供表单标识，表单数据，当前修改数据等*/
   resloveFormRule: (
     trigger: RuleTypes.TriggerType,
@@ -36,21 +38,20 @@ export type WorkFormRulesType = {
     changeObj?: DataType, //变动项
   ) => void;
   /* 执行所有表单的最终提交规则 */
-  resloveSubmitRules: () => boolean;
+  resloveSubmitRules: () => Promise<boolean>;
 };
 
-class WorkFormRules extends Emitter {
-  constructor(forms: IForm[], beloneId: string) {
+class WorkFormRules extends Emitter implements WorkFormRulesType {
+  constructor() {
     super();
-    this._beloneId = beloneId;
-    this.initFormRules(forms);
+    this.currentCompanyInfo = {} as any;
   }
   /* 当前主表id */
   public currentMainFormId: string = '';
   // 是否所有规则都已加载完毕
   public isReady: boolean = false;
-  // 办事归属权
-  private _beloneId: string;
+  // 单位信息
+  public currentCompanyInfo: XEntity;
   // 所有表单规则
   private _AllFormRules: Map<string, RuleTypes.MapType> = new Map([]);
   // 所有表单id，对应的主子表信息
@@ -63,7 +64,9 @@ class WorkFormRules extends Emitter {
   }
 
   // 初始化表单规则
-  private initFormRules = async (forms: any[]) => {
+  public initFormRules = (forms: any[], belone: IBelong) => {
+    this._clearData();
+    this.currentCompanyInfo = belone.metadata.belong as XEntity;
     let count = 0;
     // 遍历每个表单，获取其中的规则
     for (const formItem of forms) {
@@ -72,7 +75,7 @@ class WorkFormRules extends Emitter {
       this._FormIdtoType.set(formItem.id, formItem.typeName);
       // 将表单的规则存入 _AllFormRules 中
       this._AllFormRules.set(formItem.id, {
-        rules: await setFormRules(ruleList),
+        rules: setFormRules(ruleList),
         attrs: formItem.fields,
         callback: undefined,
       });
@@ -87,7 +90,7 @@ class WorkFormRules extends Emitter {
   };
 
   // 设置表单的回调函数，表单首次渲染时触发
-  public setFormChangeCallback(formId: string, callback: () => DataType) {
+  public setFormChangeCallback(formId: string, callback: () => DataType): void {
     const _aimFormInfo: RuleTypes.MapType = this._AllFormRules.get(formId)!;
 
     // 如果该表单没有回调函数，则将该回调函数赋值给它，并执行一个 "Start" 触发器-即表单初始化
@@ -115,42 +118,49 @@ class WorkFormRules extends Emitter {
     changeObj: DataType | 'all' = 'all',
   ) => {
     const { id, data } = formData;
-    const _formId = trigger == RuleTriggers.ThingsChanged ? this.currentMainFormId : id;
 
-    // 如果 _AllFormRules 中存在这个表单的规则，则取出该表单的规则进行处理
+    // 根据触发类型确定待处理规则所属的表单ID
+    const _formId = trigger === RuleTriggers.ThingsChanged ? this.currentMainFormId : id;
+
     if (this._AllFormRules.has(_formId)) {
       const _info: RuleTypes.MapType = this._AllFormRules.get(_formId)!;
-      // 执行该表单的所有规则，并将规则返回的数据保存到 resultObj 中
+
+      // 构建执行规则所需参数
       let params: any = {
-        data: data,
+        data,
         attrs: _info.attrs,
       };
+
       /* 收集子表数据 */
-      if (trigger == RuleTriggers.ThingsChanged) {
+      if (trigger === RuleTriggers.ThingsChanged) {
         params['things'] = this._NewFormData.get(id)?.after;
       }
+
+      // 执行符合条件的规则，并将结果保存到 resultObj 中
       const resultObj = await this.renderRules(
         filterRules(_info.rules, trigger, changeObj),
         params,
       );
+
       /* 提交验证直接返回 */
       if (trigger === RuleTriggers.Submit) {
         return resultObj;
       }
 
-      // 如果该表单没有设置回调函数，则输出错误信息
-      if (!_info.callback) {
-        console.error('未设置回调函数：' + _formId);
-      }
       // 如果该表单设置了回调函数，则调用回调函数将数据传递给页面
-      _info.callback && _info.callback(resultObj as Object);
-      /* 若初始化结束，需执行一次运行态规则 */
-      if (
-        trigger == RuleTriggers.Start &&
-        typeof resultObj == 'object' &&
-        Object.keys(resultObj).length > 0
-      ) {
-        this.resloveFormRule(RuleTriggers.Running, { id: _formId, data: resultObj });
+      if (_info.callback) {
+        _info.callback(resultObj as Object);
+
+        /* 若初始化结束，需执行一次运行态规则 */
+        if (
+          trigger === RuleTriggers.Start &&
+          typeof resultObj === 'object' &&
+          Object.keys(resultObj).length > 0
+        ) {
+          this.resloveFormRule(RuleTriggers.Running, { id: _formId, data: resultObj });
+        }
+      } else {
+        console.error('未设置回调函数：' + _formId);
       }
     }
   };
@@ -188,6 +198,7 @@ class WorkFormRules extends Emitter {
     if (Rules?.[0].trigger === RuleTriggers.Submit) {
       resultObj = [];
     }
+    let other: any[] = [];
 
     // 遍历该表单的所有规则，并执行每一个规则
     await Promise.all(
@@ -198,18 +209,22 @@ class WorkFormRules extends Emitter {
             $formData: formData.data, //主表数据
             $attrs: formData.attrs, //主表所有特性
             $things: formData?.things ?? [], //子表数据
-            $company:
-              OrgCtrl.user.companys.find((v) => v.id === this._beloneId)?.metadata ?? {}, //单位信息
+            $company: this.currentCompanyInfo, //单位信息
             $user: OrgCtrl.user.metadata, //用户信息
             tools: Tools, //方法库
           });
 
           // 如果规则执行成功，则将规则返回的数据合并到 resultObj 中
           if (res.success) {
-            if (Array.isArray(resultObj)) {
-              resultObj.push(res.data);
+            // 判断赋值类型
+            if (_R.valueGoal === ValueGoal.主表赋值 || !_R.valueGoal) {
+              if (Array.isArray(resultObj)) {
+                resultObj.push(res.data);
+              } else {
+                resultObj = { ...resultObj, ...res.data };
+              }
             } else {
-              resultObj = { ...resultObj, ...res.data };
+              other.push(res);
             }
           }
         } catch (error) {
@@ -218,9 +233,24 @@ class WorkFormRules extends Emitter {
       }),
     );
 
-    // console.log('所有规则最终数据结果', Rules, '===>', resultObj);
+    console.log(
+      '所有规则最终数据结果',
+      Rules,
+      '===>',
+      resultObj,
+      '====',
+      '非赋值操作===》',
+      other,
+    );
     return resultObj;
   }
+  _clearData = () => {
+    this._AllFormRules = new Map([]);
+    this._FormIdtoType = new Map([]);
+    this._NewFormData = new Map([]);
+    this.currentCompanyInfo = {} as any;
+    this.isReady = false;
+  };
 }
 
-export default WorkFormRules;
+export default new WorkFormRules();

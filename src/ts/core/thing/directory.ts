@@ -4,6 +4,7 @@ import {
   TargetType,
   directoryNew,
   directoryOperates,
+  transferNew,
   fileOperates,
   memberOperates,
   teamOperates,
@@ -19,19 +20,35 @@ import { Property, IProperty } from './property';
 import { Application, IApplication } from './application';
 import { BucketOpreates, DirectoryModel } from '@/ts/base/model';
 import { encodeKey, generateUuid } from '@/ts/base/common';
-import { XExecutable, XFileInfo, XLink, XMapping, XRequest } from '@/ts/base/schema';
+import {
+  XEnvironment,
+  XExecutable,
+  XFileInfo,
+  XLink,
+  XMapping,
+  XRequest,
+} from '@/ts/base/schema';
 import { formatDate } from '@/utils';
-import { Request, Executable, Link, Unknown, Mapping } from '@/ts/core/thing/config';
+import {
+  Request,
+  Executable,
+  Link,
+  Unknown,
+  Mapping,
+  Environment,
+} from '@/ts/core/thing/config';
 /** 可为空的进度回调 */
 export type OnProgress = (p: number) => void;
 
 /** 配置集合名称 */
 export enum ConfigColl {
-  Requests = 'requests',
-  RequestLinks = 'request-links',
-  Scripts = 'scripts',
-  Mappings = 'mappings',
-  Unknown = 'unknown',
+  "Requests" = 'requests',
+  "RequestLinks" = 'request-links',
+  "Scripts" = 'scripts',
+  "Mappings" = 'mappings',
+  "Environments" = 'environments',
+  "Stores" = 'stores',
+  "Unknown" = 'unknown',
 }
 
 /** 目录接口类 */
@@ -249,7 +266,7 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
   }
   async loadFiles(reload: boolean = false): Promise<ISysFileInfo[]> {
     if (this.files.length < 1 || reload) {
-      const res = await kernel.anystore.bucketOpreate<model.FileItemModel[]>(
+      const res = await kernel.bucketOpreate<model.FileItemModel[]>(
         this.metadata.belongId,
         {
           key: encodeKey(this.id),
@@ -275,7 +292,7 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
       createTime: new Date(),
     };
     this.taskList.push(task);
-    const data = await kernel.anystore.fileUpdate(
+    const data = await kernel.fileUpdate(
       this.metadata.belongId,
       file,
       `${this.id}/${file.name}`,
@@ -412,6 +429,7 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
       );
       if (mode === 2 && this.target.hasRelationAuth()) {
         operates.push(directoryNew);
+        operates.push(transferNew);
         if (this.target.space.user.copyFiles.size > 0) {
           operates.push(fileOperates.Parse);
         }
@@ -497,29 +515,13 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
     data.updateTime = current;
     data.collName = collName;
     data.directoryId = this.id;
-    switch (collName) {
-      case ConfigColl.Requests:
-        data.typeName = '请求';
-        break;
-      case ConfigColl.RequestLinks:
-        data.typeName = '链接';
-        break;
-      case ConfigColl.Scripts:
-        data.typeName = '脚本';
-        break;
-      case ConfigColl.Mappings:
-        data.typeName = '映射';
-        break;
-      default:
-        data.typeName = '未知';
-    }
   }
   async createConfig(
     collName: ConfigColl,
     data: schema.XFileInfo,
   ): Promise<IFileInfo<schema.XFileInfo> | undefined> {
     this.defaultEntity(collName, data);
-    let res = await kernel.anystore.insert(this.belongId, collName, data);
+    let res = await kernel.collectionInsert(this.belongId, collName, data);
     if (res.success) {
       let config = this.converting(data);
       this.configs.push(config);
@@ -531,9 +533,8 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
     reload?: boolean | undefined,
   ): Promise<IFileInfo<schema.XFileInfo>[]> {
     const configs = this.configs.filter((item) => item.metadata.collName == collName);
-    console.log(collName, configs);
-    if (configs.length < 1 || reload) {
-      const res = await kernel.anystore.aggregate(this.belongId, collName, {
+    if (collName != ConfigColl.Unknown && (configs.length < 1 || reload)) {
+      const res = await kernel.collectionAggregate(this.belongId, collName, {
         match: {
           directoryId: this.id,
         },
@@ -558,6 +559,8 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
         return new Executable(data as XExecutable, this);
       case '映射':
         return new Mapping(data as XMapping, this);
+      case '环境':
+        return new Environment(data as XEnvironment, this);
       default:
         return new Unknown(ConfigColl.Unknown, data, this);
     }

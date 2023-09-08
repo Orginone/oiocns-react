@@ -1,9 +1,15 @@
-import AnyStore from './anystore';
 import StoreHub from './storehub';
 import * as model from '../model';
 import type * as schema from '../schema';
 import axios from 'axios';
-import { Emitter, logger } from '../common';
+import {
+  Emitter,
+  blobToDataUrl,
+  encodeKey,
+  generateUuid,
+  logger,
+  sliceFile,
+} from '../common';
 import { command } from '../common/command';
 /**
  * 资产共享云内核api
@@ -15,30 +21,46 @@ export default class KernelApi {
   private readonly _axiosInstance = axios.create({});
   // 单例
   private static _instance: KernelApi;
-  // 任意数据存储对象
-  private _anystore: AnyStore;
   // 订阅方法
   private _methods: { [name: string]: ((...args: any[]) => void)[] };
+  // 订阅回调字典
+  private _subscribeCallbacks: Record<string, (data: any) => void>;
   // 上下线提醒
   onlineNotity = new Emitter();
   // 在线的连接
   onlineIds: string[] = [];
+  // 获取accessToken
+  public get accessToken(): string {
+    return sessionStorage.getItem('accessToken') || '';
+  }
+  // 设置accessToken
+  private set accessToken(val: string) {
+    sessionStorage.setItem('accessToken', val);
+  }
   /**
    * 私有构造方法
    * @param url 远端地址
    */
   private constructor(url: string) {
     this._methods = {};
-    this._anystore = AnyStore.getInstance();
+    this._subscribeCallbacks = {};
     this._storeHub = new StoreHub(url, 'json');
     this._storeHub.on('Receive', (res) => this._receive(res));
+    this._storeHub.on('Updated', (belongId, key, data) => {
+      this._updated(belongId, key, data);
+    });
     this._storeHub.onConnected(() => {
-      if (this._anystore.accessToken.length > 0) {
+      if (this.accessToken.length > 0) {
         this._storeHub
-          .invoke('TokenAuth', this._anystore.accessToken)
+          .invoke('TokenAuth', this.accessToken)
           .then((res: model.ResultType<any>) => {
             if (res.success) {
               logger.info('连接到内核成功!');
+              Object.keys(this._subscribeCallbacks).forEach(async (fullKey) => {
+                const key = fullKey.split('|')[0];
+                const belongId = fullKey.split('|')[1];
+                this.subscribed(belongId, key, this._subscribeCallbacks[fullKey]);
+              });
             }
           })
           .catch((err) => {
@@ -60,13 +82,6 @@ export default class KernelApi {
     return this._instance;
   }
   /**
-   * 任意数据存储对象
-   * @returns {AnyStore | undefined} 可能为空的存储对象
-   */
-  public get anystore(): AnyStore {
-    return this._anystore;
-  }
-  /**
    * 是否在线
    * @returns {boolean} 在线状态
    */
@@ -74,11 +89,14 @@ export default class KernelApi {
     return this._storeHub.isConnected;
   }
   /** 连接信息 */
-  public async onlines(): Promise<model.OnlineInfo[]> {
+  public async onlines(): Promise<model.OnlineSet | undefined> {
     if (this.onlineIds.length > 0) {
       const result = await this._storeHub.invoke('Online');
-      if (result.success && Array.isArray(result.data)) {
-        var ids = result.data.map((i) => i.connectionId);
+      if (result.success && result.data) {
+        var data: model.OnlineSet = result.data;
+        var uids = data?.users?.map((i) => i.connectionId) || [];
+        var sids = data?.storages?.map((i) => i.connectionId) || [];
+        var ids = [...uids, ...sids];
         if (ids.length != this.onlineIds.length) {
           this.onlineIds = ids;
           this.onlineNotity.changCallback();
@@ -87,7 +105,6 @@ export default class KernelApi {
         return result.data;
       }
     }
-    return [];
   }
   /**
    * 登录到后台核心获取accessToken
@@ -107,7 +124,7 @@ export default class KernelApi {
       res = await this._restRequest('login', req);
     }
     if (res.success) {
-      await this._anystore.updateToken(res.data.accessToken);
+      this.accessToken = res.data.accessToken;
     }
     return res;
   }
@@ -153,7 +170,7 @@ export default class KernelApi {
       res = await this._restRequest('Register', params);
     }
     if (res.success) {
-      await this._anystore.updateToken(res.data.accessToken);
+      this.accessToken = res.data.accessToken;
     }
     return res;
   }
@@ -681,20 +698,6 @@ export default class KernelApi {
     });
   }
   /**
-   * 创建物
-   * @param {model.ThingModel} params 请求参数
-   * @returns {model.ResultType<schema.XThing>} 请求结果
-   */
-  public async createThing(
-    params: model.ThingModel,
-  ): Promise<model.ResultType<schema.XThing>> {
-    return await this.request({
-      module: 'thing',
-      action: 'CreateThing',
-      params: params,
-    });
-  }
-  /**
    * 删除目录
    * @param {model.IdModel} params 请求参数
    * @returns {model.ResultType<boolean>} 请求结果
@@ -1205,141 +1208,363 @@ export default class KernelApi {
       params: params,
     });
   }
-  /* ------------- 数据核相关操作 -------------- */
   /**
-   * 对象数据获取
-   * @param {model.IdPageModel} params 请求参数
-   * @returns {model.ResultType<model.PageResult<schema.XWorkTask>>} 请求结果
+   * 获取对象数据
+   * @param {string} belongId 对象所在的归属用户ID
+   * @param {string} key 对象名称（eg: rootName.person.name）
+   * @returns {model.ResultType<T>} 对象异步结果
    */
-  public async objectGet(
-    params: model.IdPageModel,
-  ): Promise<model.ResultType<model.PageResult<schema.XWorkTask>>> {
-    return await this.request({
-      module: 'data',
-      action: 'ObjectGet',
-      params: params,
+  public async objectGet<T>(belongId: string, key: string): Promise<model.ResultType<T>> {
+    return await this.dataProxy({
+      module: 'Object',
+      action: 'Get',
+      belongId,
+      params: key,
     });
   }
   /**
-   * 对象数据变更
-   * @param {model.IdPageModel} params 请求参数
-   * @returns {model.ResultType<model.PageResult<schema.XWorkTask>>} 请求结果
+   * 变更对象数据
+   * @param {string} belongId 对象所在的归属用户ID
+   * @param {string} key 对象名称（eg: rootName.person.name）
+   * @param {any} setData 对象新的值
+   * @returns {model.ResultType<T>} 对象异步结果
    */
   public async objectSet(
-    params: model.IdPageModel,
-  ): Promise<model.ResultType<model.PageResult<schema.XWorkTask>>> {
-    return await this.request({
-      module: 'data',
-      action: 'ObjectSet',
-      params: params,
+    belongId: string,
+    key: string,
+    setData: any,
+  ): Promise<model.ResultType<any>> {
+    return await this.dataProxy({
+      module: 'Object',
+      action: 'Set',
+      belongId,
+      params: {
+        key,
+        setData,
+      },
     });
   }
   /**
-   * 对象数据删除
-   * @param {model.IdPageModel} params 请求参数
-   * @returns {model.ResultType<model.PageResult<schema.XWorkTask>>} 请求结果
+   * 删除对象数据
+   * @param {string} belongId 对象所在的归属用户ID
+   * @param {string} key 对象名称（eg: rootName.person.name）
+   * @returns {model.ResultType<T>} 对象异步结果
    */
   public async objectDelete(
-    params: model.IdPageModel,
-  ): Promise<model.ResultType<model.PageResult<schema.XWorkTask>>> {
-    return await this.request({
-      module: 'data',
-      action: 'ObjectDelete',
-      params: params,
+    belongId: string,
+    key: string,
+  ): Promise<model.ResultType<any>> {
+    return await this.dataProxy({
+      module: 'Object',
+      action: 'Delete',
+      belongId,
+      params: key,
     });
   }
   /**
-   * 集合数据新增
-   * @param {model.IdPageModel} params 请求参数
-   * @returns {model.ResultType<model.PageResult<schema.XWorkTask>>} 请求结果
+   * 添加数据到数据集
+   * @param {string} collName 数据集名称（eg: history-message）
+   * @param {} data 要添加的数据，对象/数组
+   * @param {string} belongId 对象所在的归属用户ID
+   * @returns {model.ResultType<T>} 对象异步结果
    */
-  public async collectionInsert(
-    params: model.IdPageModel,
-  ): Promise<model.ResultType<model.PageResult<schema.XWorkTask>>> {
-    return await this.request({
-      module: 'data',
-      action: 'CollectionInsert',
-      params: params,
+  public async collectionInsert<T>(
+    belongId: string,
+    collName: string,
+    data: T,
+  ): Promise<model.ResultType<T>> {
+    return await this.dataProxy({
+      module: 'Collection',
+      action: 'Insert',
+      belongId,
+      params: { collName, data },
     });
   }
   /**
-   * 集合数据变更
-   * @param {model.IdPageModel} params 请求参数
-   * @returns {model.ResultType<model.PageResult<schema.XWorkTask>>} 请求结果
+   * 替换数据集数据
+   * @param {string} collName 数据集名称（eg: history-message）
+   * @param {T} replace 要添加的数据，对象/数组
+   * @param {string} belongId 对象所在的归属用户ID
+   * @returns {model.ResultType<T>} 对象异步结果
+   */
+  public async collectionReplace<T>(
+    belongId: string,
+    collName: string,
+    replace: T,
+  ): Promise<model.ResultType<T>> {
+    return await this.dataProxy({
+      module: 'Collection',
+      action: 'Replace',
+      belongId,
+      params: { collName, replace },
+    });
+  }
+  /**
+   * 更新数据到数据集
+   * @param {string} collName 数据集名称（eg: history-message）
+   * @param {any} update 更新操作（match匹配，update变更,options参数）
+   * @param {string} belongId 对象所在的归属用户ID
+   * @returns {model.ResultType<T>} 对象异步结果
    */
   public async collectionUpdate(
-    params: model.IdPageModel,
-  ): Promise<model.ResultType<model.PageResult<schema.XWorkTask>>> {
-    return await this.request({
-      module: 'data',
-      action: 'CollectionUpdate',
-      params: params,
+    belongId: string,
+    collName: string,
+    update: any,
+  ): Promise<model.ResultType<any>> {
+    return await this.dataProxy({
+      module: 'Collection',
+      action: 'Update',
+      belongId,
+      params: { collName, update },
     });
   }
   /**
-   * 集合数据移除
-   * @param {model.IdPageModel} params 请求参数
-   * @returns {model.ResultType<model.PageResult<schema.XWorkTask>>} 请求结果
+   * 从数据集移除数据
+   * @param {string} collName 数据集名称（eg: history-message）
+   * @param {any} match 匹配信息
+   * @param {string} belongId 对象所在的归属用户ID
+   * @returns {model.ResultType<T>} 对象异步结果
    */
   public async collectionRemove(
-    params: model.IdPageModel,
-  ): Promise<model.ResultType<model.PageResult<schema.XWorkTask>>> {
-    return await this.request({
-      module: 'data',
-      action: 'CollectionRemove',
-      params: params,
+    belongId: string,
+    collName: string,
+    match: any,
+  ): Promise<model.ResultType<any>> {
+    return await this.dataProxy({
+      module: 'Collection',
+      action: 'Remove',
+      belongId,
+      params: { collName, match },
     });
   }
   /**
-   * 集合数据查询
-   * @param {model.IdPageModel} params 请求参数
-   * @returns {model.ResultType<model.PageResult<schema.XWorkTask>>} 请求结果
+   * 查询数据集数据
+   * @param  过滤参数
+   * @returns {model.ResultType<T>} 移除异步结果
    */
-  public async collectionLoad(
-    params: model.IdPageModel,
-  ): Promise<model.ResultType<model.PageResult<schema.XWorkTask>>> {
-    return await this.request({
-      module: 'data',
-      action: 'CollectionLoad',
-      params: params,
+  public async collectionLoad<T>(
+    belongId: string,
+    options: any,
+  ): Promise<model.LoadResult<T>> {
+    options.belongId = belongId;
+    const res = await this.dataProxy({
+      module: 'Collection',
+      action: 'Load',
+      belongId,
+      params: options,
     });
+    return { ...res, ...res.data };
   }
   /**
-   * 集合数据查询管道
-   * @param {model.IdPageModel} params 请求参数
-   * @returns {model.ResultType<model.PageResult<schema.XWorkTask>>} 请求结果
+   * 从数据集查询数据
+   * @param {string} collName 数据集名称（eg: history-message）
+   * @param {any} options 聚合管道(eg: {match:{a:1},skip:10,limit:10})
+   * @param {string} belongId 对象所在的归属用户ID
+   * @returns {model.ResultType<T>} 对象异步结果
    */
   public async collectionAggregate(
-    params: model.IdPageModel,
-  ): Promise<model.ResultType<model.PageResult<schema.XWorkTask>>> {
-    return await this.request({
-      module: 'data',
-      action: 'CollectionAggregate',
-      params: params,
+    belongId: string,
+    collName: string,
+    options: any,
+  ): Promise<model.ResultType<any>> {
+    return await this.dataProxy({
+      module: 'Collection',
+      action: 'Aggregate',
+      belongId,
+      params: { collName, options },
     });
   }
   /**
-   * 文件存储桶操作
-   * @param {model.IdPageModel} params 请求参数
-   * @returns {model.ResultType<model.PageResult<schema.XWorkTask>>} 请求结果
+   * 从数据集查询数据
+   * @param {string} collName 数据集名称（eg: history-message）
+   * @param {any} options 聚合管道(eg: {match:{a:1},skip:10,limit:10})
+   * @param {string} belongId 对象所在的归属用户ID
+   * @returns {model.ResultType<T>} 对象异步结果
    */
-  public async bucketOpreate(
-    params: model.IdPageModel,
-  ): Promise<model.ResultType<model.PageResult<schema.XWorkTask>>> {
-    return await this.request({
-      module: 'data',
-      action: 'BucketOpreate',
-      params: params,
+  public async collectionPageRequest<T>(
+    belongId: string,
+    collName: string,
+    options: any,
+    page: model.PageModel,
+  ): Promise<model.ResultType<model.PageResult<T>>> {
+    const total = await this.collectionAggregate(belongId, collName, options);
+    if (total.data && Array.isArray(total.data) && total.data.length > 0) {
+      options.skip = page.offset;
+      options.limit = page.limit;
+      const res = await this.collectionAggregate(belongId, collName, options);
+      return {
+        ...res,
+        data: {
+          offset: page.offset,
+          limit: page.limit,
+          total: total.data[0].count,
+          result: res.data,
+        },
+      };
+    }
+    return total;
+  }
+  /**
+   * 桶操作
+   * @param data 操作携带的数据
+   * @returns {ResultType<T>} 移除异步结果
+   */
+  public async bucketOpreate<T>(
+    belongId: string,
+    data: model.BucketOpreateModel,
+  ): Promise<model.ResultType<T>> {
+    return await this.dataProxy({
+      module: 'Bucket',
+      action: 'Operate',
+      belongId,
+      params: data,
     });
   }
-  /* ------------- 操作执行 -------------- */
   /**
-   * 请求一个内核方法
-   * @param {ForwardType} reqs 请求体
+   * 文件上传
+   * @param file 文件
+   * @param name 名称
+   * @param key 路径
+   */
+  public async fileUpdate(
+    belongId: string,
+    file: Blob,
+    key: string,
+    progress: (p: number) => void,
+  ): Promise<model.FileItemModel | undefined> {
+    const id = generateUuid();
+    const data: model.BucketOpreateModel = {
+      key: encodeKey(key),
+      operate: model.BucketOpreates.Upload,
+    };
+    progress.apply(this, [0]);
+    const slices = sliceFile(file, 1024 * 1024);
+    for (let i = 0; i < slices.length; i++) {
+      const s = slices[i];
+      data.fileItem = {
+        index: i,
+        uploadId: id,
+        size: file.size,
+        data: [],
+        dataUrl: await blobToDataUrl(s),
+      };
+      const res = await this.bucketOpreate<model.FileItemModel>(belongId, data);
+      if (!res.success) {
+        data.operate = model.BucketOpreates.AbortUpload;
+        await this.bucketOpreate<boolean>(belongId, data);
+        progress.apply(this, [-1]);
+        return;
+      }
+      const finished = i * 1024 * 1024 + s.size;
+      progress.apply(this, [finished]);
+      if (finished === file.size && res.data) {
+        return res.data;
+      }
+    }
+  }
+  /**
+   * 加载物
+   * @param  过滤参数
+   * @returns {model.ResultType<T>} 移除异步结果
+   */
+  public async loadThing<T>(
+    belongId: string,
+    options: any,
+  ): Promise<model.ResultType<T>> {
+    options.belongId = belongId;
+    return await this.dataProxy({
+      module: 'Thing',
+      action: 'Load',
+      belongId,
+      params: options,
+    });
+  }
+  /**
+   * 创建物
+   * @param name 物的名称
+   * @returns {model.ResultType<model.AnyThingModel>} 移除异步结果
+   */
+  public async createThing(
+    belongId: string,
+    name: string,
+  ): Promise<model.ResultType<model.AnyThingModel>> {
+    return await this.dataProxy({
+      module: 'Thing',
+      action: 'Create',
+      belongId,
+      params: name,
+    });
+  }
+  /**
+   * 订阅对象变更
+   * @param {string} key 对象名称（eg: rootName.person.name）
+   * @param {string} belongId 对象所在域, 个人域(user),单位域(company),开放域(all)
+   * @param {(data:any)=>void} callback 变更回调，默认回调一次
+   * @returns {void} 无返回值
+   */
+  public subscribed<T>(belongId: string, key: string, callback: (data: T) => void): void {
+    if (callback) {
+      const fullKey = key + '|' + belongId;
+      this._subscribeCallbacks[fullKey] = callback;
+      if (this._storeHub.isConnected) {
+        this._storeHub
+          .invoke('Subscribed', belongId, key)
+          .then((res: model.ResultType<T>) => {
+            if (res.success && res.data) {
+              callback.apply(this, [res.data]);
+            }
+          })
+          .catch((err) => {
+            logger.error(err);
+          });
+      }
+    }
+  }
+  /**
+   * 取消订阅对象变更
+   * @param {string} key 对象名称（eg: rootName.person.name）
+   * @param {string} belongId 对象所在域, 个人域(user),单位域(company),开放域(all)
+   * @returns {void} 无返回值
+   */
+  public unSubscribed(belongId: string, key: string): void {
+    const fullKey = key + '|' + belongId;
+    if (this._subscribeCallbacks[fullKey] && this._storeHub.isConnected) {
+      this._storeHub
+        .invoke('UnSubscribed', belongId, key)
+        .then(() => {
+          console.debug(`${key}取消订阅成功.`);
+        })
+        .catch((err) => {
+          logger.error(err);
+        });
+    }
+    delete this._subscribeCallbacks[fullKey];
+  }
+  /**
+   * 由内核代理一个http请求
+   * @param {model.HttpRequestType} reqs 请求体
    * @returns 异步结果
    */
-  public async forward<T>(req: model.ForwardType): Promise<model.ResultType<T>> {
-    return await this._restRequest('forward', req, 20);
+  public async httpForward(
+    req: model.HttpRequestType,
+  ): Promise<model.ResultType<model.HttpResponseType>> {
+    if (this._storeHub.isConnected) {
+      return await this._storeHub.invoke('HttpForward', req);
+    } else {
+      return await this._restRequest('httpForward', req, 20);
+    }
+  }
+  /**
+   * 请求一个数据核方法
+   * @param {ReqestType} reqs 请求体
+   * @returns 异步结果
+   */
+  public async dataProxy(req: model.DataProxyType): Promise<model.ResultType<any>> {
+    if (this._storeHub.isConnected) {
+      return await this._storeHub.invoke('DataProxy', req);
+    } else {
+      return await this._restRequest('dataProxy', req);
+    }
   }
   /**
    * 请求一个内核方法
@@ -1424,6 +1649,23 @@ export default class KernelApi {
     }
   }
   /**
+   * 对象变更通知
+   * @param key 主键
+   * @param data 数据
+   * @returns {void} 无返回值
+   */
+  private _updated(belongId: string, key: string, data: any): void {
+    const lfullkey = key + '|' + belongId;
+    Object.keys(this._subscribeCallbacks).forEach((fullKey) => {
+      if (fullKey === lfullkey) {
+        const callback: (data: any) => void = this._subscribeCallbacks[fullKey];
+        if (callback) {
+          callback.call(callback, data);
+        }
+      }
+    });
+  }
+  /**
    * 使用rest请求后端
    * @param methodName 方法
    * @param data 参数
@@ -1439,7 +1681,7 @@ export default class KernelApi {
       timeout: timeout * 1000,
       url: '/orginone/kernel/rest/' + methodName,
       headers: {
-        Authorization: this._anystore.accessToken,
+        Authorization: this.accessToken,
       },
       data: args,
     });

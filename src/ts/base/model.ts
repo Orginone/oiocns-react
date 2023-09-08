@@ -1,4 +1,4 @@
-import { XForm, XIdentity, XTarget, XWorkTask, Xbase } from './schema';
+import { XForm, XIdentity, XTarget, Xbase } from './schema';
 // 请求类型定义
 export type ReqestType = {
   // 模块
@@ -8,19 +8,60 @@ export type ReqestType = {
   // 参数
   params: any;
 };
-
+// 请求数据核类型定义
+export type DataProxyType = {
+  // 模块
+  module: string;
+  // 方法
+  action: string;
+  // 归属
+  belongId: string;
+  // 参数
+  params: any;
+};
 // 代理请求类型定义
-export type ForwardType = {
+export type HttpRequestType = {
   // 目标地址
   uri: string;
   // 请求方法
   method: string;
   // 请求头
-  header: any;
+  header: {
+    [key: string]: string;
+  };
   // 请求体
-  content: any;
+  content: string;
 };
-
+// Http请求响应类型定义
+export type HttpResponseType = {
+  // 状态码
+  status: number;
+  // 响应类型
+  contentType: string;
+  // 响应头
+  header: {
+    [key: string]: string[];
+  };
+  // 响应体
+  content: string;
+};
+// 返回类型定义
+export type LoadResult<T> = {
+  // 数据体
+  data: T;
+  // 分组数量
+  groupCount: number;
+  // 聚合运算结果
+  summary: any[];
+  // 总数
+  totalCount: number;
+  // 消息
+  msg: string;
+  // 结果
+  success: boolean;
+  // http代码
+  code: number;
+};
 // 返回类型定义
 export type ResultType<T> = {
   // http代码
@@ -60,6 +101,13 @@ export type OnlineInfo = {
   requestCount: number;
   // 终端类型
   endPointType: string;
+};
+/** 在线信息查询接口 */
+export type OnlineSet = {
+  // 用户连接
+  users: OnlineInfo[],
+  // 存储连接
+  storages: OnlineInfo[],
 }
 // 分页返回定义
 export type PageResult<T> = {
@@ -300,10 +348,10 @@ export type MsgSaveModel = {
   // 消息变更时间
   updateTime: string;
   // 消息标签
-  tags?: MsgTagLabel[];
+  tags?: CommentType[];
 };
 
-export type MsgTagLabel = {
+export type CommentType = {
   // 标签名称
   label: string;
   // 人员Id
@@ -495,7 +543,7 @@ export type AnyThingModel = {
   ModifiedTime: string;
   /** 其它信息 */
   [field: string]: any;
-}
+};
 
 export type WorkDefineModel = {
   // 流程ID
@@ -535,8 +583,6 @@ export type WorkInstanceModel = {
   taskId: string;
   // 发起用户ID
   applyId: string;
-  // 子流程数据
-  childrenData: string;
 };
 
 export type InstanceDataModel = {
@@ -556,15 +602,15 @@ export type InstanceDataModel = {
   /** 提交的表单数据 */
   data: {
     // 表单id
-    [id: string]: FormEditData[]
+    [id: string]: FormEditData[];
   };
   /** 填写的主表信息 */
   primary: {
     /** 特性id */
-    [id: string]: any
+    [id: string]: any;
   };
   formRules?:any
-}
+};
 
 export type FieldModel = {
   /** 标识(特性标识) */
@@ -581,7 +627,7 @@ export type FieldModel = {
   remark: string;
   /** 字典(字典项/分类项) */
   lookups?: FiledLookup[];
-}
+};
 
 export type FiledLookup = {
   /** 唯一标识(项标识) */
@@ -594,7 +640,7 @@ export type FiledLookup = {
   parentId?: string;
   /** 图标 */
   icon?: string;
-}
+};
 
 export type FormEditData = {
   /** 操作前数据体 */
@@ -607,7 +653,7 @@ export type FormEditData = {
   creator: string;
   /** 操作时间 */
   createTime: string;
-}
+};
 
 export type WorkNodeModel = {
   id: string;
@@ -633,8 +679,14 @@ export type WorkNodeModel = {
   belongId: string;
   // 节点归属定义Id
   defineId: string;
-  // 绑定的表单信息
-  forms: XForm[] | undefined;
+  // 主表Id集合
+  primaryFormIds: string[] | undefined;
+  // 子表Id集合
+  detailFormIds: string[] | undefined;
+  // 主表
+  primaryForms: XForm[] | undefined;
+  // 子表
+  detailForms: XForm[] | undefined;
 };
 
 export type Branche = {
@@ -666,8 +718,6 @@ export type ApprovalTaskReq = {
   comment: string;
   // 数据
   data: string;
-  // 子流程数据
-  childrenData: string;
 };
 
 export type TargetMessageModel = {
@@ -809,6 +859,24 @@ export type OperateModel = {
   menus?: OperateModel[];
 };
 
+// 动态
+export type ActivityType = {
+  // 类型
+  typeName: string;
+  // 内容
+  content: string;
+  // 资源
+  resource: FileItemShare[];
+  // 评注
+  comment: CommentType[];
+  // 点赞
+  likes: string[];
+  // 转发
+  forward: string[];
+  // 标签
+  tags: string[];
+} & Xbase;
+
 /** 请求失败 */
 export const badRequest = (
   msg: string = '请求失败',
@@ -816,7 +884,6 @@ export const badRequest = (
 ): ResultType<any> => {
   return { success: false, msg: msg, code: code, data: false };
 };
-
 /** 规则触发时机 */
 export enum RuleTriggers {
   'Start' = 'Start',//初始化

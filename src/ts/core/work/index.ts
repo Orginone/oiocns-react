@@ -143,11 +143,13 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
     if (this.node) {
       const recursionForms = async (node: model.WorkNodeModel) => {
         await Promise.all(
-          (node.forms ?? []).map(async (item) => {
-            const form = new Form({ ...item, id: item.id + '_' }, this.directory);
-            await form.loadContent();
-            forms.push(form);
-          }),
+          [...(node.primaryForms ?? []), ...(node.detailForms ?? [])].map(
+            async (item) => {
+              const form = new Form({ ...item, id: item.id + '_' }, this.directory);
+              await form.loadContent();
+              forms.push(form);
+            },
+          ),
         );
         if (node.children) {
           await recursionForms(node.children);
