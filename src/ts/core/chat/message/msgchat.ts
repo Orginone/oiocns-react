@@ -191,7 +191,7 @@ export abstract class MsgChat<T extends schema.XEntity>
   }
   cache(): void {
     this.chatdata.labels = this.labels.ToArray();
-    kernel.anystore.set(
+    kernel.objectSet(
       this.userId,
       storeCollName.ChatMessage + '.T' + this.chatdata.fullId,
       {
@@ -200,7 +200,7 @@ export abstract class MsgChat<T extends schema.XEntity>
       },
     );
     if (this.chatdata.noReadCount === 0) {
-      kernel.anystore.set(this.userId, storeCollName.ChatMessage + '.Changed', {
+      kernel.objectSet(this.userId, storeCollName.ChatMessage + '.Changed', {
         operation: 'replaceAll',
         data: this.chatdata,
       });
@@ -227,7 +227,7 @@ export abstract class MsgChat<T extends schema.XEntity>
     }
   }
   async moreMessage(): Promise<number> {
-    const res = await kernel.anystore.aggregate(this.userId, storeCollName.ChatMessage, {
+    const res = await kernel.collectionAggregate(this.userId, storeCollName.ChatMessage, {
       match: {
         sessionId: this.chatId,
         belongId: this.belongId,
@@ -293,7 +293,7 @@ export abstract class MsgChat<T extends schema.XEntity>
     }
   }
   async deleteMessage(id: string): Promise<boolean> {
-    const res = await kernel.anystore.remove(this.userId, storeCollName.ChatMessage, {
+    const res = await kernel.collectionRemove(this.userId, storeCollName.ChatMessage, {
       chatId: id,
     });
     if (res.success && res.data > 0) {
@@ -310,7 +310,7 @@ export abstract class MsgChat<T extends schema.XEntity>
     return false;
   }
   async clearMessage(): Promise<boolean> {
-    const res = await kernel.anystore.remove(this.userId, storeCollName.ChatMessage, {
+    const res = await kernel.collectionRemove(this.userId, storeCollName.ChatMessage, {
       sessionId: this.chatId,
       belongId: this.belongId,
     });

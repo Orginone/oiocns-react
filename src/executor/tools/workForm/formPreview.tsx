@@ -34,7 +34,7 @@ const FormRenders: React.FC<IProps> = (props) => {
   );
   useEffect(() => {
     if (!data) {
-      kernel.anystore.createThing(props.belong.userId, '').then((res) => {
+      kernel.createThing(props.belong.userId, '').then((res) => {
         if (res.success && res.data) {
           setData(res.data);
         }

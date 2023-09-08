@@ -72,7 +72,7 @@ export class WorkProvider implements IWorkProvider {
     return this.todos;
   }
   async loadDones(req: model.IdPageModel): Promise<model.PageResult<IWorkTask>> {
-    const res = await kernel.anystore.pageRequest<schema.XWorkTask>(
+    const res = await kernel.collectionPageRequest<schema.XWorkTask>(
       this.userId,
       storeCollName.WorkTask,
       {
@@ -99,7 +99,7 @@ export class WorkProvider implements IWorkProvider {
     };
   }
   async loadApply(req: model.IdPageModel): Promise<model.PageResult<IWorkTask>> {
-    const res = await kernel.anystore.pageRequest<schema.XWorkTask>(
+    const res = await kernel.collectionPageRequest<schema.XWorkTask>(
       this.userId,
       storeCollName.WorkTask,
       {
@@ -145,7 +145,7 @@ export class WorkProvider implements IWorkProvider {
     id: string,
     belongId: string,
   ): Promise<schema.XWorkInstance | undefined> {
-    const res = await kernel.anystore.aggregate(belongId, storeCollName.WorkInstance, {
+    const res = await kernel.collectionAggregate(belongId, storeCollName.WorkInstance, {
       match: {
         id: id,
       },
