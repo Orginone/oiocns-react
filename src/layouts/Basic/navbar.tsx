@@ -26,7 +26,7 @@ const Navbar: React.FC = () => {
     const workId = orgCtrl.work.notity.subscribe(async () => {
       setWorkCount(orgCtrl.work.todos.length);
     });
-    kernel.onlineNotity.subscribe(() => {
+    kernel.onlineNotify.subscribe(() => {
       setOnline(kernel.onlineIds.length);
     });
     return () => {
@@ -122,14 +122,14 @@ const OnlineInfo: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const [key, setKey] = useState('1');
   const [onlines, setOnlines] = useState<model.OnlineSet>();
   useEffect(() => {
-    const id = kernel.onlineNotity.subscribe((key) => {
+    const id = kernel.onlineNotify.subscribe((key) => {
       kernel.onlines().then((value) => {
         setOnlines(value);
         setKey(key);
       });
     });
     return () => {
-      kernel.onlineNotity.unsubscribe(id);
+      kernel.onlineNotify.unsubscribe(id);
     };
   }, []);
   if (!onlines) return <></>;

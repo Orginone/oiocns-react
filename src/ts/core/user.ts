@@ -103,6 +103,7 @@ export class UserProvider {
   /** 加载用户 */
   private _loadUser(person: schema.XTarget) {
     sessionStorage.setItem(sessionUserName, JSON.stringify(person));
+    kernel.userId = person.id;
     this._user = new Person(person);
     this._chat = new ChatProvider(this._user!);
     this._work = new WorkProvider(this);

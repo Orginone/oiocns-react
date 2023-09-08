@@ -140,7 +140,7 @@ export abstract class MsgChat<T extends schema.XEntity>
   abstract directory: IDirectory;
   private messageNotify?: (messages: IMessage[]) => void;
   get userId(): string {
-    return this.space.user.id;
+    return this.space.user?.id ?? this.space.id;
   }
   get belongId(): string {
     return this._belong.id;

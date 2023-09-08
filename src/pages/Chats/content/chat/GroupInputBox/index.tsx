@@ -2,7 +2,7 @@ import * as im from 'react-icons/im';
 import { Button, message, Popover, Spin, Upload, UploadProps } from 'antd';
 import { CloseCircleFilled } from '@ant-design/icons';
 import React, { useEffect, useState } from 'react';
-import { IMessage, IMsgChat, MessageType } from '@/ts/core';
+import { IMessage, IMsgChat, ITarget, MessageType } from '@/ts/core';
 import { model, parseAvatar } from '@/ts/base';
 import PullDown from '@/pages/Chats/components/pullDown';
 import Cutting from '../../cutting';
@@ -77,7 +77,15 @@ const GroupInputBox = (props: IProps) => {
       let massage = text.join('').trim();
       if (massage.length > 0) {
         innerHtml.innerHTML = '发送中,请稍后...';
-        await props.chat.sendMessage(MessageType.Text, massage, mentions, citeText);
+        // await props.chat.sendMessage(MessageType.Text, massage, mentions, citeText);
+        if ('session' in props.chat) {
+          (props.chat as ITarget).session.sendMessage(
+            MessageType.Text,
+            massage,
+            mentions,
+            citeText,
+          );
+        }
       }
       innerHtml.innerHTML = '';
       closeCite('');

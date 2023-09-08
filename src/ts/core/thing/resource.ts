@@ -1,4 +1,4 @@
-import { Collection } from './collection';
+import { Collection } from '../public/collection';
 import {
   XApplication,
   XDirectory,
@@ -6,18 +6,17 @@ import {
   XProperty,
   XSpecies,
   XSpeciesItem,
+  XTarget,
   Xbase,
 } from '../../base/schema';
 import { ActivityType, ChatMessageType } from '@/ts/base/model';
 
 /** 数据核资源（前端开发） */
 export class DataResource {
-  shareId: string;
-  belongId: string;
+  private target: XTarget;
   private _proLoaded: boolean = false;
-  constructor(belongId: string, shareId: string) {
-    this.shareId = shareId;
-    this.belongId = belongId;
+  constructor(target: XTarget) {
+    this.target = target;
     this.formColl = this.genColl<XForm>('standard-form');
     this.speciesColl = this.genColl<XSpecies>('standard-species');
     this.messageColl = this.genColl<ChatMessageType>('chat-messages');
@@ -58,6 +57,6 @@ export class DataResource {
   }
   /** 生成类型的集合 */
   genColl<T extends Xbase>(collName: string): Collection<T> {
-    return new Collection<T>(this.belongId, this.shareId, collName);
+    return new Collection<T>(this.target, collName);
   }
 }

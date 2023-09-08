@@ -1,8 +1,8 @@
-import { common, model, schema } from '../../base';
+import { common, kernel, model, schema } from '../../base';
 import { MessageType } from '../public';
 import { IBelong } from '../target/base/belong';
 import { ITarget } from '../target/base/target';
-import { Collection } from '../thing/collection';
+import { Collection } from '../public/collection';
 import { IMessage, Message } from './message/message';
 import { msgChatNotify } from './message/msgchat';
 // 空时间
@@ -47,8 +47,6 @@ export interface ISession {
   deleteMessage(id: string): Promise<boolean>;
   /** 清空历史记录 */
   clearMessage(): Promise<boolean>;
-  /** 会话接收到消息 */
-  receiveMessage(msg: model.ChatMessageType): void;
 }
 
 /** 会话实现 */
@@ -65,7 +63,7 @@ export class Session implements ISession {
     this.metadata = _metadata;
     this.chatdata = {
       typeName: _metadata.typeName,
-      fullId: id,
+      fullId: `${target.id}_${id}`,
       labels: [],
       chatName: _metadata.name,
       chatRemark: _metadata.remark,
@@ -74,6 +72,10 @@ export class Session implements ISession {
       lastMsgTime: nullTime,
       mentionMe: false,
     };
+    this.subscribe();
+  }
+  get userId(): string {
+    return kernel.userId;
   }
   get space(): IBelong {
     return this.target.space;
@@ -85,18 +87,18 @@ export class Session implements ISession {
     return this.isGroup ? this.target.members : [];
   }
   get isGroup(): boolean {
-    return this.target.id === this.sessionId && this.sessionId !== this.target.userId;
+    return this.target.id === this.sessionId && this.sessionId !== this.userId;
   }
   get sessionMatch(): any {
     return this.isGroup
-      ? { sessionId: this.sessionId }
+      ? { toId: this.sessionId }
       : {
-          formId: { _in_: [this.sessionId, this.target.userId] },
-          toId: { _in_: [this.sessionId, this.target.userId] },
+          formId: { _in_: [this.sessionId, this.userId] },
+          toId: { _in_: [this.sessionId, this.userId] },
         };
   }
   get isBelongPerson(): boolean {
-    return this.target.id === this.target.userId;
+    return this.target.id === this.userId;
   }
   get information(): string {
     if (this.chatdata.lastMessage) {
@@ -133,15 +135,13 @@ export class Session implements ISession {
   onMessage(callback: (messages: IMessage[]) => void): void {
     this.messageNotify = callback;
     this.moreMessage().then(async () => {
-      if (this.chatdata.noReadCount > 0) {
-        const ids = this.messages.filter((i) => !i.isReaded).map((i) => i.id);
-        if (ids.length > 0) {
-          this.tagMessage(ids, '已读');
-        }
-        this.chatdata.mentionMe = false;
-        this.chatdata.noReadCount = 0;
-        msgChatNotify.changCallback();
+      const ids = this.messages.filter((i) => !i.isReaded).map((i) => i.id);
+      if (ids.length > 0) {
+        this.tagMessage(ids, '已读');
       }
+      this.chatdata.mentionMe = false;
+      this.chatdata.noReadCount = 0;
+      msgChatNotify.changCallback();
       this.messageNotify?.apply(this, [this.messages]);
     });
   }
@@ -154,9 +154,9 @@ export class Session implements ISession {
     if (cite) {
       cite.metadata.tags = [];
     }
-    const res = await this.coll.insert({
+    const data = await this.coll.insert({
       typeName: type,
-      fromId: this.target.userId,
+      fromId: this.userId,
       toId: this.sessionId,
       comments: [],
       content: common.StringPako.deflate(
@@ -168,29 +168,35 @@ export class Session implements ISession {
           }),
       ),
     } as unknown as model.ChatMessageType);
-    return res !== undefined;
+    if (data) {
+      await this.notify('insert', [data]);
+    }
+    return data !== undefined;
   }
   async recallMessage(id: string): Promise<void> {
-    for (const item of this.messages) {
-      if (item.id === id) {
-        await this.coll.replace(item.metadata);
-      }
+    const data = await this.coll.update(id, {
+      _set_: { typeName: MessageType.Recall },
+    });
+    if (data) {
+      await this.notify('update', [data]);
     }
   }
   async tagMessage(ids: string[], tag: string): Promise<void> {
-    for (const item of this.messages) {
-      if (ids.indexOf(item.id)) {
-        item.metadata.tags.push({
+    const data = await this.coll.updateMany(ids, {
+      _push_: {
+        comments: {
           label: tag,
           time: 'sysdate()',
-          userId: this.target.userId,
-        });
-        await this.coll.replace(item.metadata);
-      }
+          userId: this.userId,
+        },
+      },
+    });
+    if (data) {
+      await this.notify('update', data);
     }
   }
   async deleteMessage(id: string): Promise<boolean> {
-    if (this.target.id === this.target.userId) {
+    if (this.target.id === this.userId) {
       for (const item of this.messages) {
         if (item.id === id) {
           if (await this.coll.delete(item.metadata)) {
@@ -210,7 +216,7 @@ export class Session implements ISession {
     return false;
   }
   async clearMessage(): Promise<boolean> {
-    if (this.target.id === this.target.userId) {
+    if (this.target.id === this.userId) {
       const success = await this.coll.deleteMatch(this.sessionMatch);
       if (success) {
         this.messages = [];
@@ -221,28 +227,59 @@ export class Session implements ISession {
     }
     return false;
   }
-  receiveMessage(msg: model.ChatMessageType): void {
-    const imsg = new Message(msg, this);
-    if (imsg.msgType === MessageType.Recall) {
-      this.messages
-        .find((m) => {
-          return m.id === msg.id;
-        })
-        ?.recall();
+
+  subscribe(): void {
+    if (this.isGroup) {
+      this.coll.subscribe((res: { operate: string; data: model.ChatMessageType[] }) => {
+        res.data.map((item) => this.receiveMessage(res.operate, item));
+      });
     } else {
+      this.coll.subscribe((res: { operate: string; data: model.ChatMessageType[] }) => {
+        res.data.forEach((item) => {
+          if (
+            [item.fromId, item.toId].includes(this.sessionId) &&
+            [item.fromId, item.toId].includes(this.userId)
+          ) {
+            this.receiveMessage(res.operate, item);
+          }
+        });
+      }, this.userId);
+    }
+  }
+
+  receiveMessage(operate: string, data: model.ChatMessageType): void {
+    const imsg = new Message(data, this);
+    if (operate === 'insert') {
       this.messages.push(imsg);
-    }
-    if (!this.messageNotify) {
-      this.chatdata.noReadCount += imsg.isMySend ? 0 : 1;
-      if (!this.chatdata.mentionMe) {
-        this.chatdata.mentionMe = imsg.mentions.includes(this.target.userId);
+      if (!this.messageNotify) {
+        this.chatdata.noReadCount += imsg.isMySend ? 0 : 1;
+        if (!this.chatdata.mentionMe) {
+          this.chatdata.mentionMe = imsg.mentions.includes(this.userId);
+        }
+        msgChatNotify.changCallback();
+      } else if (!imsg.isMySend) {
+        this.tagMessage([imsg.id], '已读');
       }
-      msgChatNotify.changCallback();
-    } else if (!imsg.isMySend) {
-      this.tagMessage([imsg.id], '已读');
+      this.chatdata.lastMsgTime = new Date().getTime();
+      this.chatdata.lastMessage = data;
+    } else {
+      const index = this.messages.findIndex((i) => i.id === data.id);
+      if (index > -1) {
+        this.messages[index] = imsg;
+      }
     }
-    this.chatdata.lastMsgTime = new Date().getTime();
-    this.chatdata.lastMessage = msg;
     this.messageNotify?.apply(this, [this.messages]);
+  }
+
+  async notify(operate: string, data: model.ChatMessageType[]): Promise<boolean> {
+    return await this.coll.notity(
+      {
+        data,
+        operate,
+      },
+      false,
+      this.sessionId,
+      true,
+    );
   }
 }

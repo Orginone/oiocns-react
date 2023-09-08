@@ -15,6 +15,8 @@ import { command } from '../common/command';
  * 资产共享云内核api
  */
 export default class KernelApi {
+  // 当前用户
+  userId: string = '';
   // 存储集线器
   private _storeHub: StoreHub;
   // axios实例
@@ -26,7 +28,7 @@ export default class KernelApi {
   // 订阅回调字典
   private _subscribeCallbacks: Record<string, (data: any) => void>;
   // 上下线提醒
-  onlineNotity = new Emitter();
+  onlineNotify = new Emitter();
   // 在线的连接
   onlineIds: string[] = [];
   // 获取accessToken
@@ -99,7 +101,7 @@ export default class KernelApi {
         var ids = [...uids, ...sids];
         if (ids.length != this.onlineIds.length) {
           this.onlineIds = ids;
-          this.onlineNotity.changCallback();
+          this.onlineNotify.changCallback();
         }
         this.onlineIds = ids;
         return result.data;
@@ -1281,6 +1283,25 @@ export default class KernelApi {
     });
   }
   /**
+   * 变更数据集数据
+   * @param {string} collName 数据集名称（eg: history-message）
+   * @param {} data 要添加的数据，对象/数组
+   * @param {string} belongId 对象所在的归属用户ID
+   * @returns {model.ResultType<T>} 对象异步结果
+   */
+  public async collectionSetFields<T>(
+    belongId: string,
+    collName: string,
+    collSet: any,
+  ): Promise<model.ResultType<T>> {
+    return await this.dataProxy({
+      module: 'Collection',
+      action: 'SetFields',
+      belongId,
+      params: { collName, collSet },
+    });
+  }
+  /**
    * 替换数据集数据
    * @param {string} collName 数据集名称（eg: history-message）
    * @param {T} replace 要添加的数据，对象/数组
@@ -1567,6 +1588,18 @@ export default class KernelApi {
     }
   }
   /**
+   * 数据变更通知
+   * @param {ReqestType} reqs 请求体
+   * @returns 异步结果
+   */
+  public async dataNotify(req: model.DataNotityType): Promise<model.ResultType<boolean>> {
+    if (this._storeHub.isConnected) {
+      return await this._storeHub.invoke('DataNotify', req);
+    } else {
+      return await this._restRequest('dataNotify', req);
+    }
+  }
+  /**
    * 请求一个内核方法
    * @param {ReqestType} reqs 请求体
    * @returns 异步结果
@@ -1613,6 +1646,12 @@ export default class KernelApi {
   }
   /** 接收服务端消息 */
   private _receive(res: model.ReceiveType) {
+    if (res.target === 'DataNotify') {
+      const data: model.DataNotityType = res.data;
+      res.target = `${data.belongId}-${data.targetId}-${data.flag}`;
+      res.data = data.data;
+      console.log(res);
+    }
     switch (res.target) {
       case 'Online':
       case 'Outline':
@@ -1630,7 +1669,7 @@ export default class KernelApi {
               } else {
                 this.onlineIds = this.onlineIds.filter((i) => i != connectionId);
               }
-              this.onlineNotity.changCallback();
+              this.onlineNotify.changCallback();
             }
             command.emitter('_', res.target.toLowerCase(), res.data);
           }

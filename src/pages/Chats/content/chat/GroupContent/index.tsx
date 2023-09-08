@@ -6,7 +6,7 @@ import { CopyToClipboard } from 'react-copy-to-clipboard';
 import TeamIcon from '@/components/Common/GlobalComps/entityIcon';
 import Information from './information';
 import { showChatTime, downloadByUrl } from '@/utils/tools';
-import { IMessage, IMsgChat, MessageType } from '@/ts/core';
+import { IMessage, IMsgChat, ITarget, MessageType } from '@/ts/core';
 import { parseAvatar } from '@/ts/base';
 import css from './index.module.less';
 import { parseCiteMsg, parseMsg } from '@/pages/Chats/components/parseMsg';
@@ -38,12 +38,20 @@ const GroupContent = (props: Iprops) => {
   const [formwardCode, setFormwardCode] = useState<IMessage>(); // 转发时用户
 
   useEffect(() => {
-    props.chat.onMessage((ms) => {
-      setMessages([...ms]);
-    });
-    return () => {
-      props.chat.unMessage();
-    };
+    // props.chat.onMessage((ms) => {
+    //   setMessages([...ms]);
+    // });
+    // return () => {
+    //   props.chat.unMessage();
+    // };
+    if ('session' in props.chat) {
+      (props.chat as ITarget).session.onMessage((ms) => {
+        setMessages([...ms]);
+      });
+      return () => {
+        (props.chat as ITarget).session.unMessage();
+      };
+    }
   }, [props]);
 
   useEffect(() => {

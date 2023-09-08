@@ -19,6 +19,23 @@ export type DataProxyType = {
   // 参数
   params: any;
 };
+// 请求数据核类型定义
+export type DataNotityType = {
+  // 数据
+	data: any;
+  // 通知的用户
+	targetId: string;
+  // 是否忽略自己
+	ignoreSelf: boolean;
+  // 标签
+	flag: string;
+  // 关系举证(用户鉴权[user=>relations=>target],最大支持2级关系)
+	relations: string[];
+  // 归属用户
+	belongId: string;
+  // 通知用户自身
+  onlyTarget: boolean;
+};
 // 代理请求类型定义
 export type HttpRequestType = {
   // 目标地址

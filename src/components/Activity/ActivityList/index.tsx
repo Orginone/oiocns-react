@@ -5,26 +5,36 @@ import { Col, Image, Row, Space, Tag, Typography } from 'antd';
 import { Collection } from '@/ts/core';
 import { LikeOutlined, MessageOutlined, StarOutlined } from '@ant-design/icons';
 import { model } from '@/ts/base';
+import orgCtrl from '@/ts/controller';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import { showChatTime } from '@/utils/tools';
 
 const ActivityList: React.FC<{ coll: Collection<model.ActivityType> }> = ({ coll }) => {
-  const IconText = ({ icon, text }: { icon: React.FC; text: string }) => (
-    <Space>
+  const IconText = ({
+    icon,
+    text,
+    onClick,
+  }: {
+    icon: React.FC;
+    text: string;
+    onClick?: () => void;
+  }) => (
+    <Space onClick={onClick}>
       {React.createElement(icon)}
       {text}
     </Space>
   );
-  const ActivityItem: React.FC<{ item: model.ActivityType }> = ({ item }) => {
+  const ActivityItem: React.FC<{ item1: model.ActivityType }> = ({ item1 }) => {
+    const [item, setItem] = useState(item1);
     return (
       <div className={cls.activityItem}>
         <div className={cls.activityItemHeader}>
           <EntityIcon entityId={item.createUser} showName />
           <span style={{ fontSize: 14 }}>{showChatTime(item.createTime)}</span>
-          {item.tags.map((item, index) => {
+          {item.tags.map((tag, index) => {
             return (
               <Tag color="processing" key={index}>
-                {item}
+                {tag}
               </Tag>
             );
           })}
@@ -43,13 +53,26 @@ const ActivityList: React.FC<{ coll: Collection<model.ActivityType> }> = ({ coll
           <Space size="middle">
             <IconText
               icon={StarOutlined}
-              text={`${item.comment.length}`}
+              text={`${item.comments?.length ?? 0}`}
               key="list-vertical-star-o"
             />
             <IconText
               icon={LikeOutlined}
               text={`${item.likes.length}`}
               key="list-vertical-star-o"
+              onClick={async () => {
+                var data;
+                if (item.likes.find((i) => i === orgCtrl.user.id)) {
+                  data = await coll.update(item.id, {
+                    _pull_: { likes: orgCtrl.user.id },
+                  });
+                } else {
+                  data = await coll.update(item.id, {
+                    _push_: { likes: orgCtrl.user.id },
+                  });
+                }
+                setItem(data || item);
+              }}
             />
             <IconText
               icon={MessageOutlined}
@@ -87,7 +110,7 @@ const ActivityList: React.FC<{ coll: Collection<model.ActivityType> }> = ({ coll
         {actionList.map((item, index) => {
           return (
             <Col key={index} span={24}>
-              <ActivityItem item={item}></ActivityItem>
+              <ActivityItem item1={item}></ActivityItem>
             </Col>
           );
         })}

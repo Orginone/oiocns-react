@@ -87,6 +87,11 @@ export class Message implements IMessage {
     if (_metadata.msgType === 'recall') {
       _metadata.msgType = MessageType.Recall;
     }
+    if (_metadata.typeName) {
+      _metadata.msgType = _metadata.typeName;
+      _metadata.msgBody = _metadata.content;
+      _metadata.tags = _metadata.comments || [];
+    }
     const txt = common.StringPako.inflate(_metadata.msgBody);
     if (txt.startsWith('[obj]')) {
       const content = JSON.parse(txt.substring(5));
