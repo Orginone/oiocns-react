@@ -1,7 +1,7 @@
-import { common, model, parseAvatar } from '../../../base';
-import { MessageType, TargetType } from '../../public';
-import { IPerson } from '../../target/person';
-import { ISession } from '../session';
+import { common, model, parseAvatar } from '../../base';
+import { MessageType, TargetType } from '../public';
+import { IPerson } from '../target/person';
+import { ISession } from './session';
 export interface IMessageLabel {
   /** 标签名称 */
   label: string;
@@ -78,7 +78,7 @@ export interface IMessage {
 export class Message implements IMessage {
   constructor(_metadata: model.ChatMessageType, _chat: ISession) {
     this._chat = _chat;
-    this.user = _chat.target.space.user;
+    this.user = _chat.target.user;
     _metadata.comments = _metadata.comments || [];
     const txt = common.StringPako.inflate(_metadata.content);
     if (txt.startsWith('[obj]')) {

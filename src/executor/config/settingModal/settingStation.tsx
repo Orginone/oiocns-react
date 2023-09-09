@@ -46,7 +46,7 @@ const SettingStation: React.FC<IProps> = ({ company, finished }) => {
               okText: '确认',
               cancelText: '取消',
               onOk: async () => {
-                if ('shareId' in item) {
+                if ('authId' in item) {
                   await station?.removeIdentitys([item]);
                 } else {
                   await station?.removeMembers([item]);
@@ -185,7 +185,7 @@ const loadSettingMenu = (company: ICompany): MenuItemType => {
 const loadMenus = (item: ICompany | IStation) => {
   const items: OperateMenuType[] = [];
   if ('company' in item) {
-    if (item.company.hasRelationAuth()) {
+    if (item.space.hasRelationAuth()) {
       items.push(
         {
           key: '添加角色',

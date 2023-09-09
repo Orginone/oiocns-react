@@ -1,5 +1,5 @@
+export type { IMessage, IMessageLabel } from './chat/message';
 export { ChatMessage } from './chat/message/chatmsg';
-export type { IMessage, IMessageLabel } from './chat/message/message';
 export type { ISession } from './chat/session';
 export { msgChatNotify } from './chat/session';
 export type { IEntity } from './public';

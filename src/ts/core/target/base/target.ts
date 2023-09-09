@@ -3,7 +3,6 @@ import { IIdentity, Identity } from '../identity/identity';
 import { OperateType, TargetType } from '../../public/enums';
 import { PageAll } from '../../public/consts';
 import { ITeam, Team } from './team';
-import { IBelong } from './belong';
 import { targetOperates } from '../../public';
 import { Directory, IDirectory } from '../../thing/directory';
 import { IFileInfo } from '../../thing/fileinfo';
@@ -38,12 +37,11 @@ export interface ITarget extends ITeam, IFileInfo<schema.XTarget> {
 export abstract class Target extends Team implements ITarget {
   constructor(
     _metadata: schema.XTarget,
-    _labels: string[],
-    _space?: IBelong,
+    _relations: string[],
     _memberTypes: TargetType[] = [TargetType.Person],
   ) {
-    super(_metadata, _space, _memberTypes);
-    this.resource = new DataResource(_metadata);
+    super(_metadata, _memberTypes);
+    this.resource = new DataResource(_metadata, _memberTypes);
     this.directory = new Directory(
       {
         ..._metadata,
@@ -69,8 +67,8 @@ export abstract class Target extends Team implements ITarget {
     this.session = new Session(this.id, this, this.metadata);
   }
   session: ISession;
-  resource: DataResource;
   directory: IDirectory;
+  resource: DataResource;
   identitys: IIdentity[] = [];
   memberDirectory: IDirectory;
   get spaceId(): string {

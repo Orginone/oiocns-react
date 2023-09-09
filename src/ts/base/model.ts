@@ -20,6 +20,8 @@ export type DataProxyType = {
   copyId?: string;
   // 参数
   params: any;
+  // 关系举证(用户鉴权[user=>relations=>target],最大支持2级关系)
+	relations: string[];
 };
 // 请求数据核类型定义
 export type DataNotityType = {
@@ -879,8 +881,6 @@ export type MsgChatData = {
   labels: string[];
   /** 会话名称 */
   chatName: string;
-  /** 会话的类型 */
-  typeName: string;
   /** 会话备注 */
   chatRemark: string;
   /** 是否置顶 */

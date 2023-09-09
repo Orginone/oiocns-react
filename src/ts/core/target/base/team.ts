@@ -5,9 +5,12 @@ import { IBelong } from './belong';
 import { Entity, IEntity, entityOperates } from '../../public';
 import { IDirectory } from '../../thing/directory';
 import { ISession } from '../../chat/session';
+import { IPerson } from '../person';
 
 /** 团队抽象接口类 */
 export interface ITeam extends IEntity<schema.XTarget> {
+  /** 当前用户 */
+  user: IPerson;
   /** 加载归属组织 */
   space: IBelong;
   /** 当前目录 */
@@ -20,6 +23,8 @@ export interface ITeam extends IEntity<schema.XTarget> {
   memberChats: ISession[];
   /** 深加载 */
   deepLoad(reload?: boolean): Promise<void>;
+  /** 加载成员 */
+  loadMembers(reload?: boolean): Promise<schema.XTarget[]>;
   /** 创建用户 */
   createTarget(data: model.TargetModel): Promise<ITeam | undefined>;
   /** 更新团队信息 */
@@ -42,14 +47,11 @@ export interface ITeam extends IEntity<schema.XTarget> {
 export abstract class Team extends Entity<schema.XTarget> implements ITeam {
   constructor(
     _metadata: schema.XTarget,
-    _space?: IBelong,
     _memberTypes: TargetType[] = [TargetType.Person],
   ) {
     super(_metadata);
-    this.space = _space || (this as unknown as IBelong);
     this.memberTypes = _memberTypes;
   }
-  space: IBelong;
   memberTypes: TargetType[];
   members: schema.XTarget[] = [];
   memberChats: ISession[] = [];
@@ -136,7 +138,7 @@ export abstract class Team extends Entity<schema.XTarget> implements ITeam {
     data.teamName = data.teamName || data.name;
     const res = await kernel.createTarget(data);
     if (res.success && res.data?.id) {
-      this.space.user.loadGivedIdentitys(true);
+      this.user.loadGivedIdentitys(true);
       return res.data;
     }
   }
@@ -181,6 +183,8 @@ export abstract class Team extends Entity<schema.XTarget> implements ITeam {
     }
     return operates;
   }
+  abstract space: IBelong;
+  abstract user: IPerson;
   abstract deepLoad(reload?: boolean): Promise<void>;
   abstract createTarget(data: model.TargetModel): Promise<ITeam | undefined>;
   abstract teamChangedNotity(target: schema.XTarget): Promise<boolean>;
@@ -193,7 +197,7 @@ export abstract class Team extends Entity<schema.XTarget> implements ITeam {
   hasAuthoritys(authIds: string[]): boolean {
     authIds = this.space.superAuth?.loadParentAuthIds(authIds) ?? authIds;
     const orgIds = [this.metadata.belongId, this.id];
-    return this.space.user.authenticate(orgIds, authIds);
+    return this.user.authenticate(orgIds, authIds);
   }
   async createTargetMsg(operate: OperateType, sub?: schema.XTarget): Promise<void> {
     await kernel.createTargetMsg({
@@ -204,7 +208,7 @@ export abstract class Team extends Entity<schema.XTarget> implements ITeam {
         operate,
         target: this.metadata,
         subTarget: sub,
-        operater: this.space.user.metadata,
+        operater: this.user.metadata,
       }),
     });
   }

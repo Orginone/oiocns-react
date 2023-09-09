@@ -2,14 +2,7 @@ import StoreHub from './storehub';
 import * as model from '../model';
 import type * as schema from '../schema';
 import axios from 'axios';
-import {
-  Emitter,
-  blobToDataUrl,
-  encodeKey,
-  generateUuid,
-  logger,
-  sliceFile,
-} from '../common';
+import { Emitter, logger } from '../common';
 import { command } from '../common/command';
 /**
  * 资产共享云内核api
@@ -1218,11 +1211,16 @@ export default class KernelApi {
    * @param {string} key 对象名称（eg: rootName.person.name）
    * @returns {model.ResultType<T>} 对象异步结果
    */
-  public async objectGet<T>(belongId: string, key: string): Promise<model.ResultType<T>> {
+  public async objectGet<T>(
+    belongId: string,
+    relations: string[],
+    key: string,
+  ): Promise<model.ResultType<T>> {
     return await this.dataProxy({
       module: 'Object',
       action: 'Get',
       belongId,
+      relations,
       params: key,
     });
   }
@@ -1235,6 +1233,7 @@ export default class KernelApi {
    */
   public async objectSet(
     belongId: string,
+    relations: string[],
     key: string,
     setData: any,
   ): Promise<model.ResultType<any>> {
@@ -1242,6 +1241,7 @@ export default class KernelApi {
       module: 'Object',
       action: 'Set',
       belongId,
+      relations,
       params: {
         key,
         setData,
@@ -1256,12 +1256,14 @@ export default class KernelApi {
    */
   public async objectDelete(
     belongId: string,
+    relations: string[],
     key: string,
   ): Promise<model.ResultType<any>> {
     return await this.dataProxy({
       module: 'Object',
       action: 'Delete',
       belongId,
+      relations,
       params: key,
     });
   }
@@ -1274,6 +1276,7 @@ export default class KernelApi {
    */
   public async collectionInsert<T>(
     belongId: string,
+    relations: string[],
     collName: string,
     data: T,
     copyId?: string,
@@ -1283,6 +1286,7 @@ export default class KernelApi {
       action: 'Insert',
       belongId,
       copyId,
+      relations,
       params: { collName, data },
     });
   }
@@ -1295,6 +1299,7 @@ export default class KernelApi {
    */
   public async collectionSetFields<T>(
     belongId: string,
+    relations: string[],
     collName: string,
     collSet: any,
     copyId?: string,
@@ -1304,6 +1309,7 @@ export default class KernelApi {
       action: 'SetFields',
       belongId,
       copyId,
+      relations,
       params: { collName, collSet },
     });
   }
@@ -1316,6 +1322,7 @@ export default class KernelApi {
    */
   public async collectionReplace<T>(
     belongId: string,
+    relations: string[],
     collName: string,
     replace: T,
     copyId?: string,
@@ -1325,6 +1332,7 @@ export default class KernelApi {
       action: 'Replace',
       belongId,
       copyId,
+      relations,
       params: { collName, replace },
     });
   }
@@ -1337,6 +1345,7 @@ export default class KernelApi {
    */
   public async collectionUpdate(
     belongId: string,
+    relations: string[],
     collName: string,
     update: any,
     copyId?: string,
@@ -1346,6 +1355,7 @@ export default class KernelApi {
       action: 'Update',
       belongId,
       copyId,
+      relations,
       params: { collName, update },
     });
   }
@@ -1358,6 +1368,7 @@ export default class KernelApi {
    */
   public async collectionRemove(
     belongId: string,
+    relations: string[],
     collName: string,
     match: any,
     copyId?: string,
@@ -1367,6 +1378,7 @@ export default class KernelApi {
       action: 'Remove',
       belongId,
       copyId,
+      relations,
       params: { collName, match },
     });
   }
@@ -1377,6 +1389,7 @@ export default class KernelApi {
    */
   public async collectionLoad<T>(
     belongId: string,
+    relations: string[],
     options: any,
   ): Promise<model.LoadResult<T>> {
     options.belongId = belongId;
@@ -1385,6 +1398,7 @@ export default class KernelApi {
       action: 'Load',
       belongId,
       params: options,
+      relations,
     });
     return { ...res, ...res.data };
   }
@@ -1397,6 +1411,7 @@ export default class KernelApi {
    */
   public async collectionAggregate(
     belongId: string,
+    relations: string[],
     collName: string,
     options: any,
   ): Promise<model.ResultType<any>> {
@@ -1404,6 +1419,7 @@ export default class KernelApi {
       module: 'Collection',
       action: 'Aggregate',
       belongId,
+      relations,
       params: { collName, options },
     });
   }
@@ -1416,15 +1432,16 @@ export default class KernelApi {
    */
   public async collectionPageRequest<T>(
     belongId: string,
+    relations: string[],
     collName: string,
     options: any,
     page: model.PageModel,
   ): Promise<model.ResultType<model.PageResult<T>>> {
-    const total = await this.collectionAggregate(belongId, collName, options);
+    const total = await this.collectionAggregate(belongId, relations, collName, options);
     if (total.data && Array.isArray(total.data) && total.data.length > 0) {
       options.skip = page.offset;
       options.limit = page.limit;
-      const res = await this.collectionAggregate(belongId, collName, options);
+      const res = await this.collectionAggregate(belongId, relations, collName, options);
       return {
         ...res,
         data: {
@@ -1444,56 +1461,16 @@ export default class KernelApi {
    */
   public async bucketOpreate<T>(
     belongId: string,
+    relations: string[],
     data: model.BucketOpreateModel,
   ): Promise<model.ResultType<T>> {
     return await this.dataProxy({
       module: 'Bucket',
       action: 'Operate',
       belongId,
+      relations,
       params: data,
     });
-  }
-  /**
-   * 文件上传
-   * @param file 文件
-   * @param name 名称
-   * @param key 路径
-   */
-  public async fileUpdate(
-    belongId: string,
-    file: Blob,
-    key: string,
-    progress: (p: number) => void,
-  ): Promise<model.FileItemModel | undefined> {
-    const id = generateUuid();
-    const data: model.BucketOpreateModel = {
-      key: encodeKey(key),
-      operate: model.BucketOpreates.Upload,
-    };
-    progress.apply(this, [0]);
-    const slices = sliceFile(file, 1024 * 1024);
-    for (let i = 0; i < slices.length; i++) {
-      const s = slices[i];
-      data.fileItem = {
-        index: i,
-        uploadId: id,
-        size: file.size,
-        data: [],
-        dataUrl: await blobToDataUrl(s),
-      };
-      const res = await this.bucketOpreate<model.FileItemModel>(belongId, data);
-      if (!res.success) {
-        data.operate = model.BucketOpreates.AbortUpload;
-        await this.bucketOpreate<boolean>(belongId, data);
-        progress.apply(this, [-1]);
-        return;
-      }
-      const finished = i * 1024 * 1024 + s.size;
-      progress.apply(this, [finished]);
-      if (finished === file.size && res.data) {
-        return res.data;
-      }
-    }
   }
   /**
    * 加载物
@@ -1502,6 +1479,7 @@ export default class KernelApi {
    */
   public async loadThing<T>(
     belongId: string,
+    relations: string[],
     options: any,
   ): Promise<model.ResultType<T>> {
     options.belongId = belongId;
@@ -1509,6 +1487,7 @@ export default class KernelApi {
       module: 'Thing',
       action: 'Load',
       belongId,
+      relations,
       params: options,
     });
   }
@@ -1519,12 +1498,14 @@ export default class KernelApi {
    */
   public async createThing(
     belongId: string,
+    relations: string[],
     name: string,
   ): Promise<model.ResultType<model.AnyThingModel>> {
     return await this.dataProxy({
       module: 'Thing',
       action: 'Create',
       belongId,
+      relations,
       params: name,
     });
   }

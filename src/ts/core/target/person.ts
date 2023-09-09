@@ -39,9 +39,11 @@ export interface IPerson extends IBelong {
 /** 人员类型实现 */
 export class Person extends Belong implements IPerson {
   constructor(_metadata: schema.XTarget) {
-    super(_metadata, ['本人']);
+    super(_metadata, []);
+    this.user = this;
     this.copyFiles = new Map();
   }
+  user: IPerson;
   companys: ICompany[] = [];
   givedIdentitys: schema.XIdProof[] = [];
   copyFiles: Map<string, IFileInfo<schema.XEntity>>;
@@ -83,7 +85,7 @@ export class Person extends Belong implements IPerson {
         (res.data.result || []).forEach((i) => {
           switch (i.typeName) {
             case TargetType.Cohort:
-              this.cohorts.push(new Cohort(i, this));
+              this.cohorts.push(new Cohort(i, this, i.id));
               break;
             case TargetType.Storage:
               this.storages.push(new Storage(i, this));
@@ -255,7 +257,7 @@ export class Person extends Belong implements IPerson {
     switch (target.typeName) {
       case TargetType.Cohort:
         if (this.cohorts.every((i) => i.id != target.id)) {
-          const cohort = new Cohort(target, this);
+          const cohort = new Cohort(target, this, target.id);
           await cohort.deepLoad();
           this.cohorts.push(cohort);
           return true;

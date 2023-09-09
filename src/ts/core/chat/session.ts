@@ -2,7 +2,7 @@ import { common, model, schema } from '../../base';
 import { Entity, IEntity, MessageType, TargetType } from '../public';
 import { ITarget } from '../target/base/target';
 import { Collection } from '../public/collection';
-import { IMessage, Message } from './message/message';
+import { IMessage, Message } from './message';
 // 空时间
 const nullTime = new Date('2022-07-01').getTime();
 // 消息变更推送
@@ -64,7 +64,6 @@ export class Session extends Entity<schema.XEntity> implements ISession {
     this.sessionId = id;
     this.target = target;
     this.chatdata = {
-      typeName: _metadata.typeName,
       fullId: `${target.id}_${id}`,
       labels: [...(tags || [_metadata.typeName])],
       chatName: _metadata.name,
@@ -107,11 +106,11 @@ export class Session extends Entity<schema.XEntity> implements ISession {
   get isFriend(): boolean {
     return (
       this.metadata.typeName !== TargetType.Person ||
-      this.target.space.user.members.some((i) => i.id === this.sessionId)
+      this.target.user.members.some((i) => i.id === this.sessionId)
     );
   }
   get copyId(): string | undefined {
-    if (this.isBelongPerson) {
+    if (this.target.id === this.userId && this.sessionId !== this.userId) {
       return this.sessionId;
     }
     return undefined;

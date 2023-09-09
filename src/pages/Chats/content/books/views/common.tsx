@@ -77,7 +77,7 @@ export const loadChatOperation = (item: ISession) => {
         key="加好友"
         title="加好友"
         onClick={async () => {
-          if (await item.target.space.user.pullMembers([item.metadata as XTarget])) {
+          if (await item.target.user.pullMembers([item.metadata as XTarget])) {
             msgChatNotify.changCallback();
           }
         }}>

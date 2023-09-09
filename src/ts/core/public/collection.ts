@@ -6,11 +6,13 @@ export class Collection<T extends schema.Xbase> {
   private _cache: T[];
   private _collName: string;
   private _target: schema.XTarget;
-  constructor(target: schema.XTarget, name: string) {
+  private _relations: string[];
+  constructor(target: schema.XTarget, name: string, relations: string[]) {
     this._cache = [];
     this._loaded = false;
     this._collName = name;
     this._target = target;
+    this._relations = relations;
   }
 
   get cache(): T[] {
@@ -51,7 +53,11 @@ export class Collection<T extends schema.Xbase> {
     options.options = options.options || {};
     options.options.match = options.options.match || {};
     options.options.match.isDeleted = false;
-    const res = await kernel.collectionLoad<T[]>(this._target.belongId, options);
+    const res = await kernel.collectionLoad<T[]>(
+      this._target.belongId,
+      this._relations,
+      options,
+    );
     if (res.success && res.data) {
       return res.data || [];
     }
@@ -72,6 +78,7 @@ export class Collection<T extends schema.Xbase> {
     data.belongId = data.belongId || this._target.belongId;
     const res = await kernel.collectionInsert<T>(
       this._target.belongId,
+      this._relations,
       this._collName,
       data,
       copyId,
@@ -93,6 +100,7 @@ export class Collection<T extends schema.Xbase> {
     });
     const res = await kernel.collectionInsert<T[]>(
       this._target.belongId,
+      this._relations,
       this._collName,
       data,
       copyId,
@@ -111,6 +119,7 @@ export class Collection<T extends schema.Xbase> {
     data.belongId = data.belongId || this._target.belongId;
     const res = await kernel.collectionReplace<T>(
       this._target.belongId,
+      this._relations,
       this._collName,
       data,
       copyId,
@@ -136,6 +145,7 @@ export class Collection<T extends schema.Xbase> {
     });
     const res = await kernel.collectionReplace<T[]>(
       this._target.belongId,
+      this._relations,
       this._collName,
       data,
       copyId,
@@ -158,6 +168,7 @@ export class Collection<T extends schema.Xbase> {
   async update(id: string, update: any, copyId?: string): Promise<T | undefined> {
     const res = await kernel.collectionSetFields<T>(
       this._target.belongId,
+      this._relations,
       this._collName,
       {
         id,
@@ -172,6 +183,7 @@ export class Collection<T extends schema.Xbase> {
   async updateMany(ids: string[], update: any, copyId?: string): Promise<T[]> {
     const res = await kernel.collectionSetFields<T[]>(
       this._target.belongId,
+      this._relations,
       this._collName,
       {
         ids,
@@ -187,6 +199,7 @@ export class Collection<T extends schema.Xbase> {
   async delete(data: T, copyId?: string): Promise<boolean> {
     const res = await kernel.collectionUpdate(
       this._target.belongId,
+      this._relations,
       this._collName,
       {
         match: { _id: data.id },
@@ -210,6 +223,7 @@ export class Collection<T extends schema.Xbase> {
   async deleteMany(data: T[], copyId?: string): Promise<boolean> {
     const res = await kernel.collectionUpdate(
       this._target.belongId,
+      this._relations,
       this._collName,
       {
         match: {
@@ -237,6 +251,7 @@ export class Collection<T extends schema.Xbase> {
   async deleteMatch(match: any, copyId?: string): Promise<boolean> {
     const res = await kernel.collectionUpdate(
       this._target.belongId,
+      this._relations,
       this._collName,
       {
         match: match,
@@ -257,6 +272,7 @@ export class Collection<T extends schema.Xbase> {
   async remove(data: T, copyId?: string): Promise<boolean> {
     const res = await kernel.collectionRemove(
       this._target.belongId,
+      this._relations,
       this._collName,
       {
         _id: data.id,
@@ -275,6 +291,7 @@ export class Collection<T extends schema.Xbase> {
   async removeMany(data: T[], copyId?: string): Promise<boolean> {
     const res = await kernel.collectionRemove(
       this._target.belongId,
+      this._relations,
       this._collName,
       {
         _id: {

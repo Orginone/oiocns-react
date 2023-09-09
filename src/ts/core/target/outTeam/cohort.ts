@@ -2,15 +2,20 @@ import { schema } from '@/ts/base';
 import { ITarget, Target } from '../base/target';
 import { IBelong } from '../base/belong';
 import { ISession } from '../../chat/session';
+import { IPerson } from '../person';
 export interface ICohort extends ITarget {}
 
 export class Cohort extends Target implements ICohort {
-  constructor(_metadata: schema.XTarget, _space: IBelong) {
-    super(_metadata, [_metadata.belong?.name ?? '', _metadata.typeName], _space);
+  constructor(_metadata: schema.XTarget, _space: IBelong, relationId: string) {
+    super(_metadata, [relationId]);
+    this.space = _space;
+    this.user = _space.user;
   }
+  user: IPerson;
+  space: IBelong;
   async exit(): Promise<boolean> {
     if (this.metadata.belongId !== this.space.id) {
-      if (await this.removeMembers([this.space.user.metadata])) {
+      if (await this.removeMembers([this.user.metadata])) {
         this.space.cohorts = this.space.cohorts.filter((i) => i.key != this.key);
         return true;
       }
