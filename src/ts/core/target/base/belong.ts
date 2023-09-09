@@ -6,7 +6,7 @@ import { Cohort, ICohort } from '../outTeam/cohort';
 import { IPerson } from '../person';
 import { ITarget, Target } from './target';
 import { IChatMessage, ChatMessage } from '../../chat/message/chatmsg';
-import { IMsgChat, PersonMsgChat } from '../../chat/message/msgchat';
+import { ISession, Session } from '../../chat/session';
 import { targetOperates } from '../../public';
 import { IStorage } from '../outTeam/storage';
 
@@ -25,7 +25,7 @@ export interface IBelong extends ITarget {
   /** 上级用户 */
   parentTarget: ITarget[];
   /** 群会话 */
-  cohortChats: IMsgChat[];
+  cohortChats: ISession[];
   /** 共享组织 */
   shareTarget: ITarget[];
   /** 加载超管权限 */
@@ -87,12 +87,12 @@ export abstract class Belong extends Target implements IBelong {
       const labels = this.id === this.user.id ? ['好友'] : [this.name, '同事'];
       _newMembers.forEach((i) => {
         if (!this.memberChats.some((a) => a.id === i.id)) {
-          this.memberChats.push(new PersonMsgChat(i, labels, this));
+          this.memberChats.push(new Session(i.id, this, i, labels));
         }
       });
     } else {
       this.memberChats = this.memberChats.filter((i) =>
-        _newMembers.every((a) => a.id != i.chatId),
+        _newMembers.every((a) => a.id != i.sessionId),
       );
     }
   }
@@ -109,7 +109,7 @@ export abstract class Belong extends Target implements IBelong {
     return operates;
   }
   abstract get shareTarget(): ITarget[];
-  abstract cohortChats: IMsgChat[];
+  abstract cohortChats: ISession[];
   abstract get parentTarget(): ITarget[];
   abstract applyJoin(members: schema.XTarget[]): Promise<boolean>;
 }

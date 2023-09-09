@@ -22,6 +22,8 @@ export interface ITarget extends ITeam, IFileInfo<schema.XTarget> {
   subTarget: ITarget[];
   /** 所有相关用户 */
   targets: ITarget[];
+  /** 用户相关的所有会话 */
+  chats: ISession[];
   /** 成员目录 */
   memberDirectory: IDirectory;
   /** 退出用户群 */
@@ -40,7 +42,7 @@ export abstract class Target extends Team implements ITarget {
     _space?: IBelong,
     _memberTypes: TargetType[] = [TargetType.Person],
   ) {
-    super(_metadata, _labels, _space, _memberTypes);
+    super(_metadata, _space, _memberTypes);
     this.resource = new DataResource(_metadata);
     this.directory = new Directory(
       {
@@ -105,7 +107,7 @@ export abstract class Target extends Team implements ITarget {
   }
   override operates(): model.OperateModel[] {
     const operates = super.operates();
-    if (this.isMyChat) {
+    if (this.session.isMyChat) {
       operates.unshift(targetOperates.Chat);
     }
     return operates;
@@ -143,6 +145,7 @@ export abstract class Target extends Team implements ITarget {
     throw new Error('暂不支持.');
   }
   abstract exit(): Promise<boolean>;
+  abstract get chats(): ISession[];
   abstract get targets(): ITarget[];
   abstract get subTarget(): ITarget[];
   createTarget(_data: model.TargetModel): Promise<ITeam | undefined> {

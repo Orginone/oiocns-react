@@ -2,15 +2,22 @@ import { schema, kernel, model } from '../../../base';
 import { OperateType, TargetType } from '../../public/enums';
 import { PageAll, orgAuth } from '../../public/consts';
 import { IBelong } from './belong';
-import { IMsgChatT, IMsgChat, MsgChat } from '../../chat/message/msgchat';
-import { entityOperates } from '../../public';
+import { Entity, IEntity, entityOperates } from '../../public';
+import { IDirectory } from '../../thing/directory';
+import { ISession } from '../../chat/session';
 
 /** 团队抽象接口类 */
-export interface ITeam extends IMsgChatT<schema.XTarget> {
+export interface ITeam extends IEntity<schema.XTarget> {
+  /** 加载归属组织 */
+  space: IBelong;
+  /** 当前目录 */
+  directory: IDirectory;
+  /** 成员 */
+  members: schema.XTarget[];
   /** 限定成员类型 */
   memberTypes: TargetType[];
-  /** 用户相关的所有会话 */
-  chats: IMsgChat[];
+  /** 成员会话 */
+  memberChats: ISession[];
   /** 深加载 */
   deepLoad(reload?: boolean): Promise<void>;
   /** 创建用户 */
@@ -32,17 +39,21 @@ export interface ITeam extends IMsgChatT<schema.XTarget> {
 }
 
 /** 团队基类实现 */
-export abstract class Team extends MsgChat<schema.XTarget> implements ITeam {
+export abstract class Team extends Entity<schema.XTarget> implements ITeam {
   constructor(
     _metadata: schema.XTarget,
-    _labels: string[],
     _space?: IBelong,
     _memberTypes: TargetType[] = [TargetType.Person],
   ) {
-    super(_metadata, _labels, _space, _metadata.belong);
+    super(_metadata);
+    this.space = _space || (this as unknown as IBelong);
     this.memberTypes = _memberTypes;
   }
+  space: IBelong;
   memberTypes: TargetType[];
+  members: schema.XTarget[] = [];
+  memberChats: ISession[] = [];
+  abstract directory: IDirectory;
   private _memberLoaded: boolean = false;
   get isInherited(): boolean {
     return this.metadata.belongId != this.space.id;
@@ -170,7 +181,6 @@ export abstract class Team extends MsgChat<schema.XTarget> implements ITeam {
     }
     return operates;
   }
-  abstract get chats(): IMsgChat[];
   abstract deepLoad(reload?: boolean): Promise<void>;
   abstract createTarget(data: model.TargetModel): Promise<ITeam | undefined>;
   abstract teamChangedNotity(target: schema.XTarget): Promise<boolean>;

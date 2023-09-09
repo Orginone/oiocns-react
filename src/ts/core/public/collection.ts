@@ -66,7 +66,7 @@ export class Collection<T extends schema.Xbase> {
     return await this.loadSpace(options);
   }
 
-  async insert(data: T): Promise<T | undefined> {
+  async insert(data: T, copyId?: string): Promise<T | undefined> {
     data.id = data.id || 'snowId()';
     data.shareId = this._target.id;
     data.belongId = data.belongId || this._target.belongId;
@@ -74,6 +74,7 @@ export class Collection<T extends schema.Xbase> {
       this._target.belongId,
       this._collName,
       data,
+      copyId,
     );
     if (res.success) {
       if (res.data && this._loaded) {
@@ -83,7 +84,7 @@ export class Collection<T extends schema.Xbase> {
     }
   }
 
-  async insertMany(data: T[]): Promise<T[]> {
+  async insertMany(data: T[], copyId?: string): Promise<T[]> {
     data = data.map((a) => {
       a.id = a.id || 'snowId()';
       a.shareId = this._target.id;
@@ -94,6 +95,7 @@ export class Collection<T extends schema.Xbase> {
       this._target.belongId,
       this._collName,
       data,
+      copyId,
     );
     if (res.success) {
       if (res.data && res.data.length > 0 && this._loaded) {
@@ -104,13 +106,14 @@ export class Collection<T extends schema.Xbase> {
     return [];
   }
 
-  async replace(data: T): Promise<T | undefined> {
+  async replace(data: T, copyId?: string): Promise<T | undefined> {
     data.shareId = this._target.id;
     data.belongId = data.belongId || this._target.belongId;
     const res = await kernel.collectionReplace<T>(
       this._target.belongId,
       this._collName,
       data,
+      copyId,
     );
     if (res.success) {
       if (res.data && this._loaded) {
@@ -125,7 +128,7 @@ export class Collection<T extends schema.Xbase> {
     }
   }
 
-  async replaceMany(data: T[]): Promise<T[]> {
+  async replaceMany(data: T[], copyId?: string): Promise<T[]> {
     data = data.map((a) => {
       a.shareId = this._target.id;
       a.belongId = a.belongId || this._target.belongId;
@@ -135,6 +138,7 @@ export class Collection<T extends schema.Xbase> {
       this._target.belongId,
       this._collName,
       data,
+      copyId,
     );
     if (res.success) {
       if (res.data && res.data.length > 0 && this._loaded) {
@@ -151,7 +155,7 @@ export class Collection<T extends schema.Xbase> {
     }
     return [];
   }
-  async update(id: string, update: any): Promise<T | undefined> {
+  async update(id: string, update: any, copyId?: string): Promise<T | undefined> {
     const res = await kernel.collectionSetFields<T>(
       this._target.belongId,
       this._collName,
@@ -159,12 +163,13 @@ export class Collection<T extends schema.Xbase> {
         id,
         update,
       },
+      copyId,
     );
     if (res.success) {
       return res.data;
     }
   }
-  async updateMany(ids: string[], update: any): Promise<T[]> {
+  async updateMany(ids: string[], update: any, copyId?: string): Promise<T[]> {
     const res = await kernel.collectionSetFields<T[]>(
       this._target.belongId,
       this._collName,
@@ -172,21 +177,27 @@ export class Collection<T extends schema.Xbase> {
         ids,
         update,
       },
+      copyId,
     );
     if (res.success) {
       return res.data;
     }
     return [];
   }
-  async delete(data: T): Promise<boolean> {
-    const res = await kernel.collectionUpdate(this._target.belongId, this._collName, {
-      match: { _id: data.id },
-      update: {
-        _set_: {
-          isDeleted: true,
+  async delete(data: T, copyId?: string): Promise<boolean> {
+    const res = await kernel.collectionUpdate(
+      this._target.belongId,
+      this._collName,
+      {
+        match: { _id: data.id },
+        update: {
+          _set_: {
+            isDeleted: true,
+          },
         },
       },
-    });
+      copyId,
+    );
     if (res.success) {
       if (res.data?.MatchedCount > 0 && this._loaded) {
         this._cache = this._cache.filter((i) => i.id != data.id);
@@ -196,19 +207,24 @@ export class Collection<T extends schema.Xbase> {
     return false;
   }
 
-  async deleteMany(data: T[]): Promise<boolean> {
-    const res = await kernel.collectionUpdate(this._target.belongId, this._collName, {
-      match: {
-        _id: {
-          _in_: data.map((i) => i.id),
+  async deleteMany(data: T[], copyId?: string): Promise<boolean> {
+    const res = await kernel.collectionUpdate(
+      this._target.belongId,
+      this._collName,
+      {
+        match: {
+          _id: {
+            _in_: data.map((i) => i.id),
+          },
+        },
+        update: {
+          _set_: {
+            isDeleted: true,
+          },
         },
       },
-      update: {
-        _set_: {
-          isDeleted: true,
-        },
-      },
-    });
+      copyId,
+    );
     if (res.success) {
       if (res.data?.MatchedCount > 0 && this._loaded) {
         this._cache = this._cache.filter((i) => data.every((a) => a.id != i.id));
@@ -218,25 +234,35 @@ export class Collection<T extends schema.Xbase> {
     return false;
   }
 
-  async deleteMatch(match: any): Promise<boolean> {
-    const res = await kernel.collectionUpdate(this._target.belongId, this._collName, {
-      match: match,
-      update: {
-        _set_: {
-          isDeleted: true,
+  async deleteMatch(match: any, copyId?: string): Promise<boolean> {
+    const res = await kernel.collectionUpdate(
+      this._target.belongId,
+      this._collName,
+      {
+        match: match,
+        update: {
+          _set_: {
+            isDeleted: true,
+          },
         },
       },
-    });
+      copyId,
+    );
     if (res.success) {
       return res.data?.MatchedCount > 0;
     }
     return false;
   }
 
-  async remove(data: T): Promise<boolean> {
-    const res = await kernel.collectionRemove(this._target.belongId, this._collName, {
-      _id: data.id,
-    });
+  async remove(data: T, copyId?: string): Promise<boolean> {
+    const res = await kernel.collectionRemove(
+      this._target.belongId,
+      this._collName,
+      {
+        _id: data.id,
+      },
+      copyId,
+    );
     if (res.success) {
       if (res.data?.MatchedCount > 0 && this._loaded) {
         this._cache = this._cache.filter((i) => i.id != data.id);
@@ -246,12 +272,17 @@ export class Collection<T extends schema.Xbase> {
     return false;
   }
 
-  async removeMany(data: T[]): Promise<boolean> {
-    const res = await kernel.collectionRemove(this._target.belongId, this._collName, {
-      _id: {
-        _in_: data.map((i) => i.id),
+  async removeMany(data: T[], copyId?: string): Promise<boolean> {
+    const res = await kernel.collectionRemove(
+      this._target.belongId,
+      this._collName,
+      {
+        _id: {
+          _in_: data.map((i) => i.id),
+        },
       },
-    });
+      copyId,
+    );
     if (res.success) {
       if (res.data?.MatchedCount > 0 && this._loaded) {
         this._cache = this._cache.filter((i) => data.every((a) => a.id != i.id));
@@ -266,10 +297,12 @@ export class Collection<T extends schema.Xbase> {
     ignoreSelf?: boolean,
     targetId?: string,
     onlyTarget?: boolean,
+    onlineOnly: boolean = true,
   ): Promise<boolean> {
     const res = await kernel.dataNotify({
       data: data,
       flag: this.collName,
+      onlineOnly: onlineOnly,
       belongId: this._target.belongId,
       relations: [this._target.id],
       onlyTarget: onlyTarget === true,

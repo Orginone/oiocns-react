@@ -16,6 +16,8 @@ export type DataProxyType = {
   action: string;
   // 归属
   belongId: string;
+  // 抄送
+  copyId?: string;
   // 参数
   params: any;
 };
@@ -35,6 +37,8 @@ export type DataNotityType = {
 	belongId: string;
   // 通知用户自身
   onlyTarget: boolean;
+  // 仅通知在线用户
+  onlineOnly: boolean;
 };
 // 代理请求类型定义
 export type HttpRequestType = {
@@ -354,16 +358,10 @@ export type ChatMessageType = {
   sessionId: string;
   // 类型
   typeName: string;
-  // 消息类型
-  msgType: string;
-  // 消息体
-  msgBody: string;
   // 内容
   content: string;
   // 评注
   comments: CommentType[];
-  // 标签
-  tags: CommentType[];
 } & Xbase;
 
 export type CommentType = {

@@ -1,7 +1,6 @@
 import { common, model, parseAvatar } from '../../../base';
 import { MessageType, TargetType } from '../../public';
 import { IPerson } from '../../target/person';
-import { IMsgChat } from './msgchat';
 import { ISession } from '../session';
 export interface IMessageLabel {
   /** 标签名称 */
@@ -74,25 +73,14 @@ export interface IMessage {
   unreadInfo: IMessageLabel[];
   /** 评论数 */
   comments: number;
-  /** 消息撤回 */
-  recall(): void;
-  /** 接收标签 */
-  receiveTags(tags: string[]): void;
 }
 
 export class Message implements IMessage {
-  constructor(_metadata: model.ChatMessageType, _chat: IMsgChat | ISession) {
+  constructor(_metadata: model.ChatMessageType, _chat: ISession) {
     this._chat = _chat;
-    this.user = _chat.space.user;
-    if (_metadata.msgType === 'recall') {
-      _metadata.msgType = MessageType.Recall;
-    }
-    if (_metadata.typeName) {
-      _metadata.msgType = _metadata.typeName;
-      _metadata.msgBody = _metadata.content;
-      _metadata.tags = _metadata.comments || [];
-    }
-    const txt = common.StringPako.inflate(_metadata.msgBody);
+    this.user = _chat.target.space.user;
+    _metadata.comments = _metadata.comments || [];
+    const txt = common.StringPako.inflate(_metadata.content);
     if (txt.startsWith('[obj]')) {
       const content = JSON.parse(txt.substring(5));
       this._msgBody = content.body;
@@ -104,14 +92,14 @@ export class Message implements IMessage {
       this._msgBody = txt;
     }
     this.metadata = _metadata;
-    _metadata.tags?.map((tag) => {
+    _metadata.comments.map((tag) => {
       this.labels.push(new MessageLabel(tag, this.user));
     });
   }
   cite: IMessage | undefined;
   mentions: string[] = [];
   user: IPerson;
-  _chat: IMsgChat | ISession;
+  _chat: ISession;
   _msgBody: string;
   labels: IMessageLabel[] = [];
   metadata: model.ChatMessageType;
@@ -119,7 +107,7 @@ export class Message implements IMessage {
     return this.metadata.id;
   }
   get msgType(): string {
-    return this.metadata.msgType;
+    return this.metadata.typeName;
   }
   get createTime(): string {
     return this.metadata.createTime;
@@ -213,13 +201,5 @@ export class Message implements IMessage {
   }
   get msgSource(): string {
     return this._msgBody;
-  }
-  recall(): void {
-    this.metadata.msgType = MessageType.Recall;
-  }
-  receiveTags(tags: string[]): void {
-    tags.forEach((tag) => {
-      this.labels.push(new MessageLabel(JSON.parse(tag), this.user));
-    });
   }
 }

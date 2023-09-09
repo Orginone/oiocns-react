@@ -3,9 +3,9 @@ import { ITarget, Target } from '../base/target';
 import { ICompany } from '../team/company';
 import { TargetType } from '../../public/enums';
 import { PageAll } from '../../public/consts';
-import { IMsgChat } from '../../chat/message/msgchat';
 import { ITeam } from '../base/team';
 import { targetOperates } from '../../public';
+import { ISession } from '../../chat/session';
 
 /** 单位内部机构（部门）接口 */
 export interface IDepartment extends ITarget {
@@ -123,8 +123,8 @@ export class Department extends Target implements IDepartment {
   get subTarget(): ITarget[] {
     return this.children;
   }
-  get chats(): IMsgChat[] {
-    return this.targets;
+  get chats(): ISession[] {
+    return this.targets.map((i) => i.session);
   }
   get targets(): ITarget[] {
     const targets: ITarget[] = [this];

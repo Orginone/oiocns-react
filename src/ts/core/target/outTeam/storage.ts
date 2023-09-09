@@ -1,9 +1,9 @@
 import { OperateModel } from '@/ts/base/model';
 import { schema } from '../../../base';
-import { IMsgChat } from '../../chat/message/msgchat';
 import { TargetType, companyTypes, targetOperates } from '../../public';
 import { IBelong } from '../base/belong';
 import { ITarget, Target } from '../base/target';
+import { ISession } from '../../chat/session';
 
 /** 存储资源接口 */
 export interface IStorage extends ITarget {}
@@ -34,7 +34,7 @@ export class Storage extends Target implements IStorage {
   get subTarget(): ITarget[] {
     return [];
   }
-  get chats(): IMsgChat[] {
+  get chats(): ISession[] {
     return [];
   }
   get targets(): ITarget[] {

@@ -23,6 +23,8 @@ export default class KernelApi {
   private readonly _axiosInstance = axios.create({});
   // 单例
   private static _instance: KernelApi;
+  // 必达消息缓存
+  private _cacheData: any = {};
   // 订阅方法
   private _methods: { [name: string]: ((...args: any[]) => void)[] };
   // 订阅回调字典
@@ -1274,11 +1276,13 @@ export default class KernelApi {
     belongId: string,
     collName: string,
     data: T,
+    copyId?: string,
   ): Promise<model.ResultType<T>> {
     return await this.dataProxy({
       module: 'Collection',
       action: 'Insert',
       belongId,
+      copyId,
       params: { collName, data },
     });
   }
@@ -1293,11 +1297,13 @@ export default class KernelApi {
     belongId: string,
     collName: string,
     collSet: any,
+    copyId?: string,
   ): Promise<model.ResultType<T>> {
     return await this.dataProxy({
       module: 'Collection',
       action: 'SetFields',
       belongId,
+      copyId,
       params: { collName, collSet },
     });
   }
@@ -1312,11 +1318,13 @@ export default class KernelApi {
     belongId: string,
     collName: string,
     replace: T,
+    copyId?: string,
   ): Promise<model.ResultType<T>> {
     return await this.dataProxy({
       module: 'Collection',
       action: 'Replace',
       belongId,
+      copyId,
       params: { collName, replace },
     });
   }
@@ -1331,11 +1339,13 @@ export default class KernelApi {
     belongId: string,
     collName: string,
     update: any,
+    copyId?: string,
   ): Promise<model.ResultType<any>> {
     return await this.dataProxy({
       module: 'Collection',
       action: 'Update',
       belongId,
+      copyId,
       params: { collName, update },
     });
   }
@@ -1350,11 +1360,13 @@ export default class KernelApi {
     belongId: string,
     collName: string,
     match: any,
+    copyId?: string,
   ): Promise<model.ResultType<any>> {
     return await this.dataProxy({
       module: 'Collection',
       action: 'Remove',
       belongId,
+      copyId,
       params: { collName, match },
     });
   }
@@ -1643,14 +1655,20 @@ export default class KernelApi {
     }
 
     this._methods[methodName].push(newOperation);
+    const data = this._cacheData[methodName] || [];
+    data.forEach((item: any) => {
+      newOperation.apply(this, [item]);
+    });
+    this._cacheData[methodName] = [];
   }
   /** 接收服务端消息 */
   private _receive(res: model.ReceiveType) {
+    var onlineOnly: boolean = true;
     if (res.target === 'DataNotify') {
       const data: model.DataNotityType = res.data;
       res.target = `${data.belongId}-${data.targetId}-${data.flag}`;
       res.data = data.data;
-      console.log(res);
+      onlineOnly = data.onlineOnly;
     }
     switch (res.target) {
       case 'Online':
@@ -1683,6 +1701,9 @@ export default class KernelApi {
           } catch (e) {
             logger.error(e as Error);
           }
+        } else if (!onlineOnly) {
+          const data = this._cacheData[res.target.toLowerCase()] || [];
+          this._cacheData[res.target.toLowerCase()] = [...data, res.data];
         }
       }
     }

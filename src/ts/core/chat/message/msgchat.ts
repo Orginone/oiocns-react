@@ -4,6 +4,7 @@ import { IMessage, Message } from './message';
 import { IEntity, Entity, MessageType, TargetType, storeCollName } from '../../public';
 import { XTarget } from '@/ts/base/schema';
 import { IDirectory } from '../../thing/directory';
+import { ISession } from '../session';
 // 空时间
 const nullTime = new Date('2022-07-01').getTime();
 // 消息变更推送
@@ -53,7 +54,7 @@ interface IChat {
   /** 会话的成员 */
   members: schema.XTarget[];
   /** 会话的成员的会话 */
-  memberChats: PersonMsgChat[];
+  memberChats: ISession[];
   /** 是否为我的会话 */
   isMyChat: boolean;
   /** 是否归属人员用户 */
@@ -136,7 +137,7 @@ export abstract class MsgChat<T extends schema.XEntity>
   members: schema.XTarget[] = [];
   chatdata: MsgChatData;
   _belong: schema.XTarget;
-  memberChats: PersonMsgChat[] = [];
+  memberChats: ISession[] = [];
   abstract directory: IDirectory;
   private messageNotify?: (messages: IMessage[]) => void;
   get userId(): string {

@@ -38,11 +38,9 @@ export class Identity extends Entity<schema.XIdentity> implements IIdentity {
       typeName: '角色',
     });
     this.current = current;
-    this.belongId = _metadata.belongId;
     this.isInherited = false;
     this.directory = current.directory;
   }
-  belongId: string;
   isInherited: boolean;
   directory: IDirectory;
   async rename(name: string): Promise<boolean> {

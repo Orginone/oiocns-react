@@ -1,7 +1,7 @@
 import { schema } from '@/ts/base';
 import { ITarget, Target } from '../base/target';
 import { IBelong } from '../base/belong';
-import { IMsgChat } from '../../chat/message/msgchat';
+import { ISession } from '../../chat/session';
 export interface ICohort extends ITarget {}
 
 export class Cohort extends Target implements ICohort {
@@ -27,8 +27,8 @@ export class Cohort extends Target implements ICohort {
   get subTarget(): ITarget[] {
     return [];
   }
-  get chats(): IMsgChat[] {
-    return this.targets;
+  get chats(): ISession[] {
+    return this.targets.map((i) => i.session);
   }
   get targets(): ITarget[] {
     return [this];

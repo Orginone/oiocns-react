@@ -3,9 +3,9 @@ import { ITarget, Target } from '../base/target';
 import { PageAll, companyTypes } from '../../public/consts';
 import { TargetType } from '../../public/enums';
 import { ICompany } from '../team/company';
-import { IMsgChat } from '../../chat/message/msgchat';
 import { ITeam } from '../base/team';
 import { targetOperates } from '../../public';
+import { ISession } from '../../chat/session';
 
 /** 组织集群接口 */
 export interface IGroup extends ITarget {
@@ -86,7 +86,7 @@ export class Group extends Target implements IGroup {
   get subTarget(): ITarget[] {
     return this.children;
   }
-  get chats(): IMsgChat[] {
+  get chats(): ISession[] {
     return [];
   }
   get targets(): ITarget[] {

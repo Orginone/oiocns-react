@@ -1,5 +1,4 @@
 import { kernel, model, schema } from '../../../base';
-import { IMsgChat } from '../../chat/message/msgchat';
 import { OperateType, teamOperates } from '../../public';
 import { PageAll } from '../../public/consts';
 import { IDirectory } from '../../thing/directory';
@@ -22,7 +21,7 @@ export interface IStation extends ITeam {
 
 export class Station extends Team implements IStation {
   constructor(_metadata: schema.XTarget, _space: ICompany) {
-    super(_metadata, [_metadata.belong?.name ?? '', _metadata.typeName + '群'], _space);
+    super(_metadata, _space);
     this.company = _space;
     this.directory = _space.directory;
   }
@@ -95,9 +94,6 @@ export class Station extends Team implements IStation {
       this.id,
     );
     return notity;
-  }
-  get chats(): IMsgChat[] {
-    return [this];
   }
   async deepLoad(reload: boolean = false): Promise<void> {
     await this.loadIdentitys(reload);

@@ -2,13 +2,13 @@ import { Dropdown, Card, Typography, Badge } from 'antd';
 
 import React from 'react';
 import cls from './less/icon.module.less';
-import { IMsgChat } from '@/ts/core';
+import { ISession } from '@/ts/core';
 import orgCtrl from '@/ts/controller';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import { loadChatOperation } from './common';
 
-const IconMode = ({ chats }: { chats: IMsgChat[] }) => {
-  const FileCard = (el: IMsgChat) => (
+const IconMode = ({ chats }: { chats: ISession[] }) => {
+  const FileCard = (el: ISession) => (
     <Dropdown menu={{ items: loadChatOperation(el) }} trigger={['contextMenu']}>
       <Card
         size="small"

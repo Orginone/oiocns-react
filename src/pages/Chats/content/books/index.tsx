@@ -1,9 +1,8 @@
 import { Empty } from 'antd';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import orgCtrl from '@/ts/controller';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
-import { IMsgChat, msgChatNotify, ICompany } from '@/ts/core';
-import { orgAuth } from '@/ts/core/public/consts';
+import { msgChatNotify, ICompany, ISession } from '@/ts/core';
 import useStorage from '@/hooks/useStorage';
 import IconMode from './views/iconMode';
 import ListMode from './views/listMode';
@@ -18,14 +17,12 @@ import SegmentContent from '@/components/Common/SegmentContent';
 const Book: React.FC<any> = ({
   chats,
   filter,
-  belong,
 }: {
-  chats: IMsgChat[];
+  chats: ISession[];
   filter: string;
   belong: ICompany;
 }) => {
   const [segmented, setSegmented] = useStorage('segmented', 'list');
-  const [isSupervise, setIsSupervise] = useState<boolean>(false); // 是否有超管权限
   const [msgKey] = useCtrlUpdate(msgChatNotify);
   if (chats === undefined) {
     chats = orgCtrl.chat.chats.filter((i) => i.isMyChat);
@@ -45,16 +42,6 @@ const Book: React.FC<any> = ({
       return num;
     });
 
-  /**
-   * @description: 页面加载判断是否有超管权限
-   * @return {*}
-   */
-  useEffect(() => {
-    if (belong !== undefined) {
-      setIsSupervise(belong.hasAuthoritys([orgAuth.SuperAuthId]));
-    }
-  }, [belong]);
-
   return (
     <SegmentContent
       key={msgKey}
@@ -67,7 +54,7 @@ const Book: React.FC<any> = ({
           ) : segmented === 'icon' ? (
             <IconMode chats={chats} />
           ) : (
-            <ListMode chats={chats} isSupervise={isSupervise} />
+            <ListMode chats={chats} />
           )}
           {chats.length == 0 && <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />}
         </>

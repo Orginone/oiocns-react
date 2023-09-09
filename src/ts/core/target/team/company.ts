@@ -6,13 +6,13 @@ import { IStation, Station } from '../innerTeam/station';
 import { IPerson } from '../person';
 import { PageAll } from '../../public/consts';
 import { TargetType } from '../../public/enums';
-import { IMsgChat } from '../../chat/message/msgchat';
 import { ITarget } from '../base/target';
 import { ITeam } from '../base/team';
 import { targetOperates } from '../../public';
 import { Storage } from '../outTeam/storage';
 import { companyJoins } from '../../public/operates';
 import { Cohort } from '../outTeam/cohort';
+import { ISession } from '../../chat/session';
 
 /** 单位类型接口 */
 export interface ICompany extends IBelong {
@@ -195,25 +195,19 @@ export class Company extends Belong implements ICompany {
   get parentTarget(): ITarget[] {
     return this.groups;
   }
-  get chats(): IMsgChat[] {
-    const chats: IMsgChat[] = [this];
+  get chats(): ISession[] {
+    const chats: ISession[] = [this.session];
     chats.push(...this.cohortChats);
     chats.push(...this.memberChats);
     return chats;
   }
-  get cohortChats(): IMsgChat[] {
-    const chats: IMsgChat[] = [];
+  get cohortChats(): ISession[] {
+    const chats: ISession[] = [];
     for (const item of this.departments) {
-      chats.push(...item.chats);
-    }
-    for (const item of this.stations) {
       chats.push(...item.chats);
     }
     for (const item of this.cohorts) {
       chats.push(...item.chats);
-    }
-    if (this.superAuth) {
-      chats.push(...this.superAuth.chats);
     }
     return chats;
   }
