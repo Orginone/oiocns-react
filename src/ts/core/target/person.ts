@@ -11,6 +11,7 @@ import { IStorage, Storage } from './outTeam/storage';
 import { personJoins, targetOperates } from '../public';
 import { IFileInfo } from '../thing/fileinfo';
 import { ISession } from '../chat/session';
+import { XObject } from '../public/object';
 
 /** 人员类型接口 */
 export interface IPerson extends IBelong {
@@ -18,6 +19,8 @@ export interface IPerson extends IBelong {
   companys: ICompany[];
   /** 赋予人的身份(角色)实体 */
   givedIdentitys: schema.XIdProof[];
+  /** 用户缓存对象 */
+  cacheObj: XObject<schema.Xbase>;
   /** 拷贝的文件 */
   copyFiles: Map<string, IFileInfo<schema.XEntity>>;
   /** 根据ID查询共享信息 */
@@ -40,11 +43,11 @@ export interface IPerson extends IBelong {
 export class Person extends Belong implements IPerson {
   constructor(_metadata: schema.XTarget) {
     super(_metadata, []);
-    this.user = this;
     this.copyFiles = new Map();
+    this.cacheObj = new XObject(_metadata, 'target-cache', []);
   }
-  user: IPerson;
   companys: ICompany[] = [];
+  cacheObj: XObject<schema.Xbase>;
   givedIdentitys: schema.XIdProof[] = [];
   copyFiles: Map<string, IFileInfo<schema.XEntity>>;
   private _cohortLoaded: boolean = false;
@@ -229,6 +232,7 @@ export class Person extends Belong implements IPerson {
     return targets;
   }
   async deepLoad(reload: boolean = false): Promise<void> {
+    await this.cacheObj.all();
     await Promise.all([
       await this.loadCohorts(reload),
       await this.loadMembers(reload),

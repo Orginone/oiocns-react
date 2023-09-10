@@ -6,7 +6,6 @@ import { ICompany } from '../team/company';
 import { ITeam } from '../base/team';
 import { targetOperates } from '../../public';
 import { ISession } from '../../chat/session';
-import { IPerson } from '../person';
 
 /** 组织集群接口 */
 export interface IGroup extends ITarget {
@@ -23,12 +22,10 @@ export interface IGroup extends ITarget {
 /** 组织集群实现 */
 export class Group extends Target implements IGroup {
   constructor(_metadata: schema.XTarget, _relations: string[], _company: ICompany) {
-    super(_metadata, [..._relations, _metadata.id], companyTypes);
+    super(_metadata, [..._relations, _metadata.id], _company.user, companyTypes);
     this.space = _company;
-    this.user = _company.user;
     this.relations = [..._relations, _metadata.id];
   }
-  user: IPerson;
   space: ICompany;
   parent?: IGroup | undefined;
   children: IGroup[] = [];

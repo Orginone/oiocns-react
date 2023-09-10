@@ -13,7 +13,6 @@ import { Storage } from '../outTeam/storage';
 import { companyJoins } from '../../public/operates';
 import { Cohort } from '../outTeam/cohort';
 import { ISession } from '../../chat/session';
-import { DataResource } from '../../thing/resource';
 
 /** 单位类型接口 */
 export interface ICompany extends IBelong {
@@ -42,8 +41,7 @@ export interface ICompany extends IBelong {
 /** 单位类型实现 */
 export class Company extends Belong implements ICompany {
   constructor(_metadata: schema.XTarget, _user: IPerson) {
-    super(_metadata, [_metadata.id]);
-    this.user = _user;
+    super(_metadata, [_metadata.id], _user);
     this.departmentTypes = [
       TargetType.Department,
       TargetType.Office,
@@ -51,10 +49,7 @@ export class Company extends Belong implements ICompany {
       TargetType.Research,
       TargetType.Laboratory,
     ];
-    this.resource = new DataResource(_metadata, [_metadata.id]);
   }
-  user: IPerson;
-  resource: DataResource;
   groups: IGroup[] = [];
   stations: IStation[] = [];
   departments: IDepartment[] = [];

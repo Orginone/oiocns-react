@@ -5,7 +5,7 @@ import MainLayout from '@/components/MainLayout';
 import useMenuUpdate from '@/hooks/useMenuUpdate';
 import { Input } from 'antd';
 import { ImSearch } from 'react-icons/im';
-import { IMsgChat, msgChatNotify } from '@/ts/core';
+import { ISession, msgChatNotify } from '@/ts/core';
 
 const Setting: React.FC<any> = () => {
   const [filter, setFilter] = useState('');
@@ -31,7 +31,7 @@ const Setting: React.FC<any> = () => {
           }}></Input>
       }
       onMenuClick={async (data, key) => {
-        const chat = data.item as IMsgChat;
+        const chat = data.item as ISession;
         switch (key) {
           case '清空消息':
             await chat.clearMessage();
@@ -42,7 +42,6 @@ const Setting: React.FC<any> = () => {
           case '标记为未读':
             setSelectMenu(rootMenu);
             chat.chatdata.noReadCount += 1;
-            chat.cache();
             msgChatNotify.changCallback();
             break;
         }

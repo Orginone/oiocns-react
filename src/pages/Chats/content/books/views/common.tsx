@@ -1,5 +1,4 @@
 import { CheckboxChangeEvent } from 'antd/lib/checkbox';
-import SuperMsgs from '@/ts/core/chat/message/supermsg';
 import { ISession, msgChatNotify } from '@/ts/core';
 import React from 'react';
 import { XTarget } from '@/ts/base/schema';
@@ -22,7 +21,6 @@ export const selectChange = (
     const newIdArr = [...newSet, ...SuperSet];
     selectMenus = newIdArr;
   }
-  SuperMsgs.getSuperChatIds(selectMenus);
   return selectMenus;
 };
 
@@ -35,7 +33,7 @@ export const loadChatOperation = (item: ISession) => {
         title="标记为未读"
         onClick={async () => {
           item.chatdata.noReadCount += 1;
-          // item.cache();
+          item.cacheChatData();
           msgChatNotify.changCallback();
         }}>
         标记为未读
@@ -48,9 +46,9 @@ export const loadChatOperation = (item: ISession) => {
         key="取消置顶"
         title="取消置顶"
         onClick={async () => {
-          // item.labels = item.labels.RemoveAll((i) => i === '置顶');
+          item.chatdata.labels = item.chatdata.labels.filter((i) => i != '置顶');
           item.chatdata.isToping = false;
-          // item.cache();
+          item.cacheChatData();
           msgChatNotify.changCallback();
         }}>
         取消置顶
@@ -63,8 +61,10 @@ export const loadChatOperation = (item: ISession) => {
         title="置顶会话"
         onClick={async () => {
           item.chatdata.isToping = true;
-          // item.labels.Add('置顶');
-          // item.cache();
+          if (item.chatdata.labels.every((i) => i != '置顶')) {
+            item.chatdata.labels.push('置顶');
+          }
+          item.cacheChatData();
           msgChatNotify.changCallback();
         }}>
         置顶会话

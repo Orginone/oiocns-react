@@ -315,4 +315,10 @@ export const memberOperates = {
     label: '移除成员',
     iconType: 'remove',
   },
+  Exit: {
+    sort: 60,
+    cmd: 'exit',
+    label: '退出',
+    iconType: 'exit',
+  },
 };

@@ -2,14 +2,14 @@ import React, { useEffect, useState } from 'react';
 import cls from './index.module.less';
 import BasicTitle from '@/pages/Home/components/BaseTitle';
 import { Col, Image, Row, Space, Tag, Typography } from 'antd';
-import { Collection } from '@/ts/core';
+import { XCollection } from '@/ts/core';
 import { LikeOutlined, MessageOutlined, StarOutlined } from '@ant-design/icons';
 import { model } from '@/ts/base';
 import orgCtrl from '@/ts/controller';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import { showChatTime } from '@/utils/tools';
 
-const ActivityList: React.FC<{ coll: Collection<model.ActivityType> }> = ({ coll }) => {
+const ActivityList: React.FC<{ coll: XCollection<model.ActivityType> }> = ({ coll }) => {
   const IconText = ({
     icon,
     text,

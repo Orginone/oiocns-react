@@ -1,9 +1,8 @@
 export type { IMessage, IMessageLabel } from './chat/message';
-export { ChatMessage } from './chat/message/chatmsg';
 export type { ISession } from './chat/session';
 export { msgChatNotify } from './chat/session';
 export type { IEntity } from './public';
-export type { Collection } from './public/collection';
+export type { XCollection } from './public/collection';
 export { companyTypes, departmentTypes, orgAuth, valueTypes } from './public/consts';
 export {
   MessageType,
@@ -12,6 +11,7 @@ export {
   TaskStatus,
   ValueType,
 } from './public/enums';
+export type { XObject } from './public/object';
 export type { IAuthority } from './target/authority/authority';
 export type { IBelong } from './target/base/belong';
 export type { ITarget } from './target/base/target';

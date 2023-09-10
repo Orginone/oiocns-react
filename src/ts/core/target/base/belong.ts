@@ -7,6 +7,7 @@ import { ITarget, Target } from './target';
 import { ISession, Session } from '../../chat/session';
 import { targetOperates } from '../../public';
 import { IStorage } from '../outTeam/storage';
+import { IPerson } from '../person';
 
 /** 自归属用户接口类 */
 export interface IBelong extends ITarget {
@@ -35,9 +36,10 @@ export abstract class Belong extends Target implements IBelong {
   constructor(
     _metadata: schema.XTarget,
     _relations: string[],
+    _user?: IPerson,
     _memberTypes: TargetType[] = [TargetType.Person],
   ) {
-    super(_metadata, _relations, _memberTypes);
+    super(_metadata, _relations, _user, _memberTypes);
     this.space = this;
   }
   space: IBelong;

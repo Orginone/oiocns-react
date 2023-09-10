@@ -6,7 +6,6 @@ import { PageAll } from '../../public/consts';
 import { ITeam } from '../base/team';
 import { targetOperates } from '../../public';
 import { ISession } from '../../chat/session';
-import { IPerson } from '../person';
 
 /** 单位内部机构（部门）接口 */
 export interface IDepartment extends ITarget {
@@ -25,9 +24,8 @@ export interface IDepartment extends ITarget {
 /** 单位内部机构（部门）实现 */
 export class Department extends Target implements IDepartment {
   constructor(_metadata: schema.XTarget, _company: ICompany, parent?: IDepartment) {
-    super(_metadata, [_company.id]);
+    super(_metadata, [_company.id], _company.user);
     this.space = _company;
-    this.user = _company.user;
     this.parent = parent;
     switch (_metadata.typeName as TargetType) {
       case TargetType.College:
@@ -55,7 +53,6 @@ export class Department extends Target implements IDepartment {
         break;
     }
   }
-  user: IPerson;
   space: ICompany;
   parent: IDepartment | undefined;
   children: IDepartment[] = [];
