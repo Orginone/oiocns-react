@@ -1,22 +1,25 @@
-// import { Col, Row, Select } from 'antd';
 import React, { useRef, useState } from 'react';
+import Generator, { defaultSettings } from 'fr-generator';
 import cls from './index.module.less';
 import FullScreenModal from '@/executor/tools/fullScreen';
 import { IForm } from '@/ts/core';
-import Generator, { defaultSettings } from 'fr-generator';
 import MyDivider from './widgets/Divider';
 import MySpace from './widgets/Space';
 import ProFormPerson from './widgets/ProFormPerson';
-import { XAttribute, schemaType } from '@/ts/base/schema';
+import { schemaType } from '@/ts/base/schema';
 import PageSetting from './Settings';
 import { Resizable } from 'devextreme-react';
+import AttrModal from '@/executor/config/operateModal/labelsModal/Attritube/attrModal';
+
 const { Provider, Sidebar, Canvas } = Generator;
-// Settings
+
 type IProps = {
   current: IForm;
-  finished: () => void;
-  editFormOpen: boolean;
-  defaultSchema: schemaType;
+  updateSchema: () => void;
+  getCurFormSchema: () => Promise<schemaType>;
+  setIsOpen: (ble: boolean) => void;
+  isOpen: boolean;
+  formSchema: schemaType;
 };
 
 /**
@@ -25,9 +28,11 @@ type IProps = {
  */
 const FormEditModal: React.FC<IProps> = ({
   current,
-  finished,
-  defaultSchema,
-  editFormOpen = false,
+  updateSchema,
+  getCurFormSchema,
+  formSchema,
+  isOpen = false,
+  setIsOpen,
 }) => {
   const [selectedItem, setSelectedItem] = useState<any>({});
   const [mainWidth, setMainWidth] = useState<string | number>('40%');
@@ -35,10 +40,6 @@ const FormEditModal: React.FC<IProps> = ({
 
   // 创建ref
   const myComponentRef: any = useRef(null);
-  // const onCloseFormModle = () => {
-  //   onFormSchemaChange(myComponentRef.current.getValue());
-  //   finished();
-  // };
   const onFormSchemaChange = (e: schemaType) => {
     const ruleInfo = JSON.parse(current.metadata.rule || '{}');
     current.update({
@@ -53,31 +54,37 @@ const FormEditModal: React.FC<IProps> = ({
   //页面重载获取默认schema或者配置后的schema
 
   const onClickDelete = async (e: any) => {
-    const item: any = current.attributes
-      .map((item: XAttribute) => {
-        if (item.id === e.$id.replace('#/', '')) {
-          return item;
-        }
-      })
-      .filter((itemFl: any) => {
-        return itemFl && itemFl.id;
-      });
-    if (await current.deleteAttribute(item[0])) {
+    const id = e?.$id?.replace('#/', '');
+    const attr = current.attributes.find((item) => item.id === id);
+    // 删除的是特性组件
+    if (attr) {
+      const sucDelAttr = await current.deleteAttribute(attr);
+      sucDelAttr && current.loadFields(true);
+      return sucDelAttr;
+    } else {
+      // 删除的是布局类等非特性组件，需要删除其内部的包裹特性
+      const schema: schemaType = await getCurFormSchema();
+      const matchProperty: { properties: Record<string, any> } = schema?.properties?.[
+        id
+      ] as any;
+      // 假如非特性类组件包裹特性组件，则需要遍历删除（目前只做了一层，后续根据实际业务需要，考虑递归多层）
+      if (matchProperty?.properties) {
+        const toDelAttrIds = Object.keys(matchProperty?.properties).filter(
+          (subId) => !isNaN(+subId),
+        );
+        const toDelAttrs = current.attributes.filter((item) =>
+          toDelAttrIds.includes(item.id),
+        );
+        const toDelAttrFns: Promise<boolean>[] = toDelAttrs.reduce((pre, cur) => {
+          pre.push(current.deleteAttribute(cur));
+          return pre;
+        }, [] as Promise<boolean>[]);
+        // console.log('toDelAttrs', toDelAttrs);
+        // console.log('toDelAttrFns', toDelAttrFns);
+        if (toDelAttrFns.length) await Promise.all(toDelAttrFns);
+      }
       return true;
     }
-  };
-  const copyObj = (obj = {} as any) => {
-    //变量先置空
-    let newobj: any = null;
-
-    //判断是否需要继续进行递归
-    if (typeof obj == 'object' && obj !== null) {
-      newobj = obj instanceof Array ? [] : {}; //进行下一层递归克隆
-      for (var i in obj) {
-        newobj[i] = copyObj(obj[i]);
-      } //如果不是对象直接赋值
-    } else newobj = obj;
-    return newobj;
   };
   const settings = defaultSettings[0];
   settings.widgets = [
@@ -161,26 +168,32 @@ const FormEditModal: React.FC<IProps> = ({
       },
     },
   ];
-
   const setting = [defaultSettings[2], settings];
+  const [isAttrModalOpen, setIsAttrModalOpen] = useState(false);
+  /**
+   * FormEdit表单完成监听
+   */
+  const onFinished = () => {
+    updateSchema();
+    setIsOpen(false);
+  };
+
   return (
     <FullScreenModal
-      open={editFormOpen}
+      open={isOpen}
       centered
       fullScreen
       width={'80vw'}
       destroyOnClose
       title={'表单设计'}
       footer={[]}
-      onCancel={finished}>
+      onCancel={onFinished}>
       <div className={cls.frplayground}>
+        {/*@ts-ignore*/}
         <Provider
-          defaultValue={defaultSchema}
-          onChange={(data) => console.log('data:change', data)}
+          defaultValue={formSchema}
           onSchemaChange={onFormSchemaChange}
-          settings={setting}
           allCollapsed={false}
-          debug
           extraButtons={[
             true,
             false,
@@ -190,24 +203,18 @@ const FormEditModal: React.FC<IProps> = ({
               /** 按钮文案 */
               text: '新增特性',
               /** 点击回调 */
-              onClick: (event: any) => {
-                // add(event);
-              },
+              onClick: () => setIsAttrModalOpen(true),
               key: 'add',
             },
           ]}
           canDelete={onClickDelete}
           controlButtons={[true, false]}
-          hideId
           widgets={{ MyDivider, MySpace, ProFormPerson, person: ProFormPerson }}
+          settings={setting}
           commonSettings={{}}
           ref={myComponentRef}
           onCanvasSelect={(v) => console.log(v)}
-          // fieldRender={(_schema, _widgetProps, _children, originNode) => {
-          //   return originNode;
-          // }}
           fieldWrapperRender={(schema, isSelected, _children, originNode) => {
-            //&& selectedItem.title !== schema.title
             if (isSelected && selectedItem.title !== schema.title) {
               /* 收集当前选中项 */
               setSelectedItem(schema);
@@ -236,6 +243,13 @@ const FormEditModal: React.FC<IProps> = ({
           </div>
         </Provider>
       </div>
+      {/*特性编辑表单*/}
+      <AttrModal
+        current={current}
+        updateSchema={updateSchema}
+        isOpen={isAttrModalOpen}
+        setIsOpen={setIsAttrModalOpen}
+      />
     </FullScreenModal>
   );
 };
