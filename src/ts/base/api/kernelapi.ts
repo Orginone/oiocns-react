@@ -2,31 +2,28 @@ import StoreHub from './storehub';
 import * as model from '../model';
 import type * as schema from '../schema';
 import axios from 'axios';
-import {
-  Emitter,
-  blobToDataUrl,
-  encodeKey,
-  generateUuid,
-  logger,
-  sliceFile,
-} from '../common';
+import { Emitter, logger } from '../common';
 import { command } from '../common/command';
 /**
  * 资产共享云内核api
  */
 export default class KernelApi {
+  // 当前用户
+  userId: string = '';
   // 存储集线器
   private _storeHub: StoreHub;
   // axios实例
   private readonly _axiosInstance = axios.create({});
   // 单例
   private static _instance: KernelApi;
+  // 必达消息缓存
+  private _cacheData: any = {};
   // 订阅方法
   private _methods: { [name: string]: ((...args: any[]) => void)[] };
   // 订阅回调字典
   private _subscribeCallbacks: Record<string, (data: any) => void>;
   // 上下线提醒
-  onlineNotity = new Emitter();
+  onlineNotify = new Emitter();
   // 在线的连接
   onlineIds: string[] = [];
   // 获取accessToken
@@ -99,7 +96,7 @@ export default class KernelApi {
         var ids = [...uids, ...sids];
         if (ids.length != this.onlineIds.length) {
           this.onlineIds = ids;
-          this.onlineNotity.changCallback();
+          this.onlineNotify.changCallback();
         }
         this.onlineIds = ids;
         return result.data;
@@ -1172,11 +1169,16 @@ export default class KernelApi {
    * @param {string} key 对象名称（eg: rootName.person.name）
    * @returns {model.ResultType<T>} 对象异步结果
    */
-  public async objectGet<T>(belongId: string, key: string): Promise<model.ResultType<T>> {
+  public async objectGet<T>(
+    belongId: string,
+    relations: string[],
+    key: string,
+  ): Promise<model.ResultType<T>> {
     return await this.dataProxy({
       module: 'Object',
       action: 'Get',
       belongId,
+      relations,
       params: key,
     });
   }
@@ -1189,6 +1191,7 @@ export default class KernelApi {
    */
   public async objectSet(
     belongId: string,
+    relations: string[],
     key: string,
     setData: any,
   ): Promise<model.ResultType<any>> {
@@ -1196,6 +1199,7 @@ export default class KernelApi {
       module: 'Object',
       action: 'Set',
       belongId,
+      relations,
       params: {
         key,
         setData,
@@ -1210,12 +1214,14 @@ export default class KernelApi {
    */
   public async objectDelete(
     belongId: string,
+    relations: string[],
     key: string,
   ): Promise<model.ResultType<any>> {
     return await this.dataProxy({
       module: 'Object',
       action: 'Delete',
       belongId,
+      relations,
       params: key,
     });
   }
@@ -1228,14 +1234,41 @@ export default class KernelApi {
    */
   public async collectionInsert<T>(
     belongId: string,
+    relations: string[],
     collName: string,
     data: T,
+    copyId?: string,
   ): Promise<model.ResultType<T>> {
     return await this.dataProxy({
       module: 'Collection',
       action: 'Insert',
       belongId,
+      copyId,
+      relations,
       params: { collName, data },
+    });
+  }
+  /**
+   * 变更数据集数据
+   * @param {string} collName 数据集名称（eg: history-message）
+   * @param {} data 要添加的数据，对象/数组
+   * @param {string} belongId 对象所在的归属用户ID
+   * @returns {model.ResultType<T>} 对象异步结果
+   */
+  public async collectionSetFields<T>(
+    belongId: string,
+    relations: string[],
+    collName: string,
+    collSet: any,
+    copyId?: string,
+  ): Promise<model.ResultType<T>> {
+    return await this.dataProxy({
+      module: 'Collection',
+      action: 'SetFields',
+      belongId,
+      copyId,
+      relations,
+      params: { collName, collSet },
     });
   }
   /**
@@ -1247,13 +1280,17 @@ export default class KernelApi {
    */
   public async collectionReplace<T>(
     belongId: string,
+    relations: string[],
     collName: string,
     replace: T,
+    copyId?: string,
   ): Promise<model.ResultType<T>> {
     return await this.dataProxy({
       module: 'Collection',
       action: 'Replace',
       belongId,
+      copyId,
+      relations,
       params: { collName, replace },
     });
   }
@@ -1266,13 +1303,17 @@ export default class KernelApi {
    */
   public async collectionUpdate(
     belongId: string,
+    relations: string[],
     collName: string,
     update: any,
+    copyId?: string,
   ): Promise<model.ResultType<any>> {
     return await this.dataProxy({
       module: 'Collection',
       action: 'Update',
       belongId,
+      copyId,
+      relations,
       params: { collName, update },
     });
   }
@@ -1285,13 +1326,17 @@ export default class KernelApi {
    */
   public async collectionRemove(
     belongId: string,
+    relations: string[],
     collName: string,
     match: any,
+    copyId?: string,
   ): Promise<model.ResultType<any>> {
     return await this.dataProxy({
       module: 'Collection',
       action: 'Remove',
       belongId,
+      copyId,
+      relations,
       params: { collName, match },
     });
   }
@@ -1302,6 +1347,7 @@ export default class KernelApi {
    */
   public async collectionLoad<T>(
     belongId: string,
+    relations: string[],
     options: any,
   ): Promise<model.LoadResult<T>> {
     options.belongId = belongId;
@@ -1310,6 +1356,7 @@ export default class KernelApi {
       action: 'Load',
       belongId,
       params: options,
+      relations,
     });
     return { ...res, ...res.data };
   }
@@ -1322,6 +1369,7 @@ export default class KernelApi {
    */
   public async collectionAggregate(
     belongId: string,
+    relations: string[],
     collName: string,
     options: any,
   ): Promise<model.ResultType<any>> {
@@ -1329,6 +1377,7 @@ export default class KernelApi {
       module: 'Collection',
       action: 'Aggregate',
       belongId,
+      relations,
       params: { collName, options },
     });
   }
@@ -1341,15 +1390,16 @@ export default class KernelApi {
    */
   public async collectionPageRequest<T>(
     belongId: string,
+    relations: string[],
     collName: string,
     options: any,
     page: model.PageModel,
   ): Promise<model.ResultType<model.PageResult<T>>> {
-    const total = await this.collectionAggregate(belongId, collName, options);
+    const total = await this.collectionAggregate(belongId, relations, collName, options);
     if (total.data && Array.isArray(total.data) && total.data.length > 0) {
       options.skip = page.offset;
       options.limit = page.limit;
-      const res = await this.collectionAggregate(belongId, collName, options);
+      const res = await this.collectionAggregate(belongId, relations, collName, options);
       return {
         ...res,
         data: {
@@ -1369,56 +1419,16 @@ export default class KernelApi {
    */
   public async bucketOpreate<T>(
     belongId: string,
+    relations: string[],
     data: model.BucketOpreateModel,
   ): Promise<model.ResultType<T>> {
     return await this.dataProxy({
       module: 'Bucket',
       action: 'Operate',
       belongId,
+      relations,
       params: data,
     });
-  }
-  /**
-   * 文件上传
-   * @param file 文件
-   * @param name 名称
-   * @param key 路径
-   */
-  public async fileUpdate(
-    belongId: string,
-    file: Blob,
-    key: string,
-    progress: (p: number) => void,
-  ): Promise<model.FileItemModel | undefined> {
-    const id = generateUuid();
-    const data: model.BucketOpreateModel = {
-      key: encodeKey(key),
-      operate: model.BucketOpreates.Upload,
-    };
-    progress.apply(this, [0]);
-    const slices = sliceFile(file, 1024 * 1024);
-    for (let i = 0; i < slices.length; i++) {
-      const s = slices[i];
-      data.fileItem = {
-        index: i,
-        uploadId: id,
-        size: file.size,
-        data: [],
-        dataUrl: await blobToDataUrl(s),
-      };
-      const res = await this.bucketOpreate<model.FileItemModel>(belongId, data);
-      if (!res.success) {
-        data.operate = model.BucketOpreates.AbortUpload;
-        await this.bucketOpreate<boolean>(belongId, data);
-        progress.apply(this, [-1]);
-        return;
-      }
-      const finished = i * 1024 * 1024 + s.size;
-      progress.apply(this, [finished]);
-      if (finished === file.size && res.data) {
-        return res.data;
-      }
-    }
   }
   /**
    * 加载物
@@ -1427,6 +1437,7 @@ export default class KernelApi {
    */
   public async loadThing<T>(
     belongId: string,
+    relations: string[],
     options: any,
   ): Promise<model.ResultType<T>> {
     options.belongId = belongId;
@@ -1434,6 +1445,7 @@ export default class KernelApi {
       module: 'Thing',
       action: 'Load',
       belongId,
+      relations,
       params: options,
     });
   }
@@ -1444,12 +1456,14 @@ export default class KernelApi {
    */
   public async createThing(
     belongId: string,
+    relations: string[],
     name: string,
   ): Promise<model.ResultType<model.AnyThingModel>> {
     return await this.dataProxy({
       module: 'Thing',
       action: 'Create',
       belongId,
+      relations,
       params: name,
     });
   }
@@ -1525,6 +1539,18 @@ export default class KernelApi {
     }
   }
   /**
+   * 数据变更通知
+   * @param {ReqestType} reqs 请求体
+   * @returns 异步结果
+   */
+  public async dataNotify(req: model.DataNotityType): Promise<model.ResultType<boolean>> {
+    if (this._storeHub.isConnected) {
+      return await this._storeHub.invoke('DataNotify', req);
+    } else {
+      return await this._restRequest('dataNotify', req);
+    }
+  }
+  /**
    * 请求一个内核方法
    * @param {ReqestType} reqs 请求体
    * @returns 异步结果
@@ -1568,9 +1594,21 @@ export default class KernelApi {
     }
 
     this._methods[methodName].push(newOperation);
+    const data = this._cacheData[methodName] || [];
+    data.forEach((item: any) => {
+      newOperation.apply(this, [item]);
+    });
+    this._cacheData[methodName] = [];
   }
   /** 接收服务端消息 */
   private _receive(res: model.ReceiveType) {
+    var onlineOnly: boolean = true;
+    if (res.target === 'DataNotify') {
+      const data: model.DataNotityType = res.data;
+      res.target = `${data.belongId}-${data.targetId}-${data.flag}`;
+      res.data = data.data;
+      onlineOnly = data.onlineOnly;
+    }
     switch (res.target) {
       case 'Online':
       case 'Outline':
@@ -1588,7 +1626,7 @@ export default class KernelApi {
               } else {
                 this.onlineIds = this.onlineIds.filter((i) => i != connectionId);
               }
-              this.onlineNotity.changCallback();
+              this.onlineNotify.changCallback();
             }
             command.emitter('_', res.target.toLowerCase(), res.data);
           }
@@ -1602,6 +1640,9 @@ export default class KernelApi {
           } catch (e) {
             logger.error(e as Error);
           }
+        } else if (!onlineOnly) {
+          const data = this._cacheData[res.target.toLowerCase()] || [];
+          this._cacheData[res.target.toLowerCase()] = [...data, res.data];
         }
       }
     }

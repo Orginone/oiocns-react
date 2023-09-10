@@ -3,14 +3,13 @@ import { ITarget, Target } from '../base/target';
 import { PageAll, companyTypes } from '../../public/consts';
 import { TargetType } from '../../public/enums';
 import { ICompany } from '../team/company';
-import { IMsgChat } from '../../chat/message/msgchat';
 import { ITeam } from '../base/team';
 import { targetOperates } from '../../public';
+import { ISession } from '../../chat/session';
+import { IPerson } from '../person';
 
 /** 组织集群接口 */
 export interface IGroup extends ITarget {
-  /** 加载组织集群的单位 */
-  company: ICompany;
   /** 父级组织集群  */
   parent?: IGroup;
   /** 子组织集群 */
@@ -24,10 +23,12 @@ export interface IGroup extends ITarget {
 /** 组织集群实现 */
 export class Group extends Target implements IGroup {
   constructor(_metadata: schema.XTarget, _company: ICompany) {
-    super(_metadata, [_metadata.belong?.name ?? '', '组织集群'], _company, companyTypes);
-    this.company = _company;
+    super(_metadata, [_company.id, _metadata.id], companyTypes);
+    this.space = _company;
+    this.user = _company.user;
   }
-  company: ICompany;
+  user: IPerson;
+  space: ICompany;
   parent?: IGroup | undefined;
   children: IGroup[] = [];
   private _childrenLoaded: boolean = false;
@@ -40,7 +41,7 @@ export class Group extends Target implements IGroup {
       });
       if (res.success) {
         this._childrenLoaded = true;
-        this.children = (res.data.result || []).map((i) => new Group(i, this.company));
+        this.children = (res.data.result || []).map((i) => new Group(i, this.space));
       }
     }
     return this.children;
@@ -49,7 +50,7 @@ export class Group extends Target implements IGroup {
     data.typeName = TargetType.Group;
     const metadata = await this.create(data);
     if (metadata) {
-      const group = new Group(metadata, this.company);
+      const group = new Group(metadata, this.space);
       if (await this.pullSubTarget(group)) {
         this.children.push(group);
         return group;
@@ -60,12 +61,12 @@ export class Group extends Target implements IGroup {
     return this.createChildren(data);
   }
   async exit(): Promise<boolean> {
-    if (this.metadata.belongId !== this.company.id) {
-      if (await this.removeMembers([this.company.metadata])) {
+    if (this.metadata.belongId !== this.space.id) {
+      if (await this.removeMembers([this.space.metadata])) {
         if (this.parent) {
           this.parent.children = this.parent.children.filter((i) => i.key != this.key);
         } else {
-          this.company.groups = this.company.groups.filter((i) => i.key != this.key);
+          this.space.groups = this.space.groups.filter((i) => i.key != this.key);
         }
         return true;
       }
@@ -78,7 +79,7 @@ export class Group extends Target implements IGroup {
       if (this.parent) {
         this.parent.children = this.parent.children.filter((i) => i.key != this.key);
       } else {
-        this.company.groups = this.company.groups.filter((i) => i.key != this.key);
+        this.space.groups = this.space.groups.filter((i) => i.key != this.key);
       }
     }
     return notity;
@@ -86,7 +87,7 @@ export class Group extends Target implements IGroup {
   get subTarget(): ITarget[] {
     return this.children;
   }
-  get chats(): IMsgChat[] {
+  get chats(): ISession[] {
     return [];
   }
   get targets(): ITarget[] {
@@ -119,7 +120,7 @@ export class Group extends Target implements IGroup {
     switch (target.typeName) {
       case TargetType.Group:
         if (this.children.every((i) => i.id != target.id)) {
-          const group = new Group(target, this.company);
+          const group = new Group(target, this.space);
           await group.deepLoad();
           this.children.push(group);
           return true;

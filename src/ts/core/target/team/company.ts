@@ -6,13 +6,14 @@ import { IStation, Station } from '../innerTeam/station';
 import { IPerson } from '../person';
 import { PageAll } from '../../public/consts';
 import { TargetType } from '../../public/enums';
-import { IMsgChat } from '../../chat/message/msgchat';
 import { ITarget } from '../base/target';
 import { ITeam } from '../base/team';
 import { targetOperates } from '../../public';
 import { Storage } from '../outTeam/storage';
 import { companyJoins } from '../../public/operates';
 import { Cohort } from '../outTeam/cohort';
+import { ISession } from '../../chat/session';
+import { DataResource } from '../../thing/resource';
 
 /** 单位类型接口 */
 export interface ICompany extends IBelong {
@@ -41,7 +42,8 @@ export interface ICompany extends IBelong {
 /** 单位类型实现 */
 export class Company extends Belong implements ICompany {
   constructor(_metadata: schema.XTarget, _user: IPerson) {
-    super(_metadata, ['全员群'], _user);
+    super(_metadata, [_metadata.id]);
+    this.user = _user;
     this.departmentTypes = [
       TargetType.Department,
       TargetType.Office,
@@ -49,7 +51,10 @@ export class Company extends Belong implements ICompany {
       TargetType.Research,
       TargetType.Laboratory,
     ];
+    this.resource = new DataResource(_metadata, [_metadata.id]);
   }
+  user: IPerson;
+  resource: DataResource;
   groups: IGroup[] = [];
   stations: IStation[] = [];
   departments: IDepartment[] = [];
@@ -95,7 +100,7 @@ export class Company extends Belong implements ICompany {
         (res.data.result || []).forEach((i) => {
           switch (i.typeName) {
             case TargetType.Cohort:
-              this.cohorts.push(new Cohort(i, this));
+              this.cohorts.push(new Cohort(i, this, this.id));
               break;
             case TargetType.Station:
               this.stations.push(new Station(i, this));
@@ -195,25 +200,19 @@ export class Company extends Belong implements ICompany {
   get parentTarget(): ITarget[] {
     return this.groups;
   }
-  get chats(): IMsgChat[] {
-    const chats: IMsgChat[] = [this];
+  get chats(): ISession[] {
+    const chats: ISession[] = [this.session];
     chats.push(...this.cohortChats);
     chats.push(...this.memberChats);
     return chats;
   }
-  get cohortChats(): IMsgChat[] {
-    const chats: IMsgChat[] = [];
+  get cohortChats(): ISession[] {
+    const chats: ISession[] = [];
     for (const item of this.departments) {
-      chats.push(...item.chats);
-    }
-    for (const item of this.stations) {
       chats.push(...item.chats);
     }
     for (const item of this.cohorts) {
       chats.push(...item.chats);
-    }
-    if (this.superAuth) {
-      chats.push(...this.superAuth.chats);
     }
     return chats;
   }
@@ -314,7 +313,7 @@ export class Company extends Belong implements ICompany {
         break;
       case TargetType.Cohort:
         if (this.cohorts.every((i) => i.id != target.id)) {
-          const cohort = new Cohort(target, this);
+          const cohort = new Cohort(target, this, this.id);
           await cohort.deepLoad();
           this.cohorts.push(cohort);
           return true;

@@ -5,12 +5,12 @@ import { createCompany } from './team';
 import { PageAll, companyTypes } from '../public/consts';
 import { OperateType, TargetType } from '../public/enums';
 import { ICompany } from './team/company';
-import { IMsgChat } from '../chat/message/msgchat';
 import { ITarget } from './base/target';
 import { ITeam } from './base/team';
 import { IStorage, Storage } from './outTeam/storage';
 import { personJoins, targetOperates } from '../public';
 import { IFileInfo } from '../thing/fileinfo';
+import { ISession } from '../chat/session';
 
 /** 人员类型接口 */
 export interface IPerson extends IBelong {
@@ -39,9 +39,11 @@ export interface IPerson extends IBelong {
 /** 人员类型实现 */
 export class Person extends Belong implements IPerson {
   constructor(_metadata: schema.XTarget) {
-    super(_metadata, ['本人']);
+    super(_metadata, []);
+    this.user = this;
     this.copyFiles = new Map();
   }
+  user: IPerson;
   companys: ICompany[] = [];
   givedIdentitys: schema.XIdProof[] = [];
   copyFiles: Map<string, IFileInfo<schema.XEntity>>;
@@ -83,7 +85,7 @@ export class Person extends Belong implements IPerson {
         (res.data.result || []).forEach((i) => {
           switch (i.typeName) {
             case TargetType.Cohort:
-              this.cohorts.push(new Cohort(i, this));
+              this.cohorts.push(new Cohort(i, this, i.id));
               break;
             case TargetType.Storage:
               this.storages.push(new Storage(i, this));
@@ -195,30 +197,27 @@ export class Person extends Belong implements IPerson {
   get parentTarget(): ITarget[] {
     return [...this.cohorts, ...this.companys];
   }
-  get chats(): IMsgChat[] {
-    const chats: IMsgChat[] = [this];
+  get chats(): ISession[] {
+    const chats: ISession[] = [this.session];
     chats.push(...this.cohortChats);
     chats.push(...this.memberChats);
     return chats;
   }
-  get cohortChats(): IMsgChat[] {
-    const chats: IMsgChat[] = [];
+  get cohortChats(): ISession[] {
+    const chats: ISession[] = [];
     const companyChatIds: string[] = [];
     this.companys.forEach((company) => {
       company.cohorts.forEach((item) => {
-        companyChatIds.push(item.chatdata.fullId);
+        companyChatIds.push(item.session.chatdata.fullId);
       });
     });
     for (const item of this.cohorts) {
-      if (!companyChatIds.includes(item.chatdata.fullId)) {
+      if (!companyChatIds.includes(item.session.chatdata.fullId)) {
         chats.push(...item.chats);
       }
     }
     for (const item of this.storages) {
       chats.push(...item.chats);
-    }
-    if (this.superAuth) {
-      chats.push(...this.superAuth.chats);
     }
     return chats;
   }
@@ -258,7 +257,7 @@ export class Person extends Belong implements IPerson {
     switch (target.typeName) {
       case TargetType.Cohort:
         if (this.cohorts.every((i) => i.id != target.id)) {
-          const cohort = new Cohort(target, this);
+          const cohort = new Cohort(target, this, target.id);
           await cohort.deepLoad();
           this.cohorts.push(cohort);
           return true;

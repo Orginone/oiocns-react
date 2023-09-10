@@ -4,12 +4,12 @@ import * as im from 'react-icons/im';
 import TeamIcon from '@/components/Common/GlobalComps/entityIcon';
 import orgCtrl from '@/ts/controller';
 import { MenuItemType } from 'typings/globelType';
-import { IMsgChat } from '@/ts/core';
+import { ISession } from '@/ts/core';
 import OrgIcons from '@/components/Common/GlobalComps/orgIcons';
 import { orgAuth } from '@/ts/core/public/consts';
 
 /** 创建会话菜单 */
-const createChatMenu = (chat: IMsgChat, children: MenuItemType[]) => {
+const createChatMenu = (chat: ISession, children: MenuItemType[]) => {
   return {
     key: chat.chatdata.fullId,
     item: chat,
@@ -50,7 +50,7 @@ const loadBookMenu = () => {
         : [],
       children: [
         createChatMenu(
-          company,
+          company.session,
           company.memberChats.map((item) => createChatMenu(item, [])),
         ),
         ...company.cohortChats
@@ -62,12 +62,12 @@ const loadBookMenu = () => {
   return [
     {
       key: orgCtrl.user.key,
-      label: orgCtrl.user.chatdata.chatName,
-      itemType: orgCtrl.user.chatdata.chatName,
+      label: orgCtrl.user.session.chatdata.chatName,
+      itemType: orgCtrl.user.session.chatdata.chatName,
       item: orgCtrl.user.chats.filter((i) => i.isMyChat),
       children: [
         createChatMenu(
-          orgCtrl.user,
+          orgCtrl.user.session,
           orgCtrl.user.memberChats.map((chat) => createChatMenu(chat, [])),
         ),
         ...orgCtrl.user.cohortChats

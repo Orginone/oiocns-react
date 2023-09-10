@@ -27,7 +27,7 @@ const Directory: React.FC<IProps> = ({ mode, current }: IProps) => {
   const [segmented, setSegmented] = useStorage('segmented', 'list');
   const contextMenu = (file?: IFileInfo<schema.XEntity>, clicked?: Function) => {
     var entity = file || dircetory;
-    if ('resource' in entity) {
+    if ('targets' in entity) {
       entity = entity.directory;
     }
     return {

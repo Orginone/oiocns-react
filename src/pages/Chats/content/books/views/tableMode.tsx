@@ -1,5 +1,5 @@
 import React from 'react';
-import { IFileInfo, IMsgChat } from '@/ts/core';
+import { IFileInfo, ISession } from '@/ts/core';
 import { schema } from '@/ts/base';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import { showChatTime } from '@/utils/tools';
@@ -9,9 +9,9 @@ import { Badge, Dropdown, Modal, Tag, Typography } from 'antd';
 import { loadChatOperation } from './common';
 const { Text } = Typography;
 
-const TableMode = ({ chats }: { chats: IMsgChat[] }) => {
+const TableMode = ({ chats }: { chats: ISession[] }) => {
   return (
-    <DataGrid<IMsgChat, string>
+    <DataGrid<ISession, string>
       id="grid"
       width="100%"
       height="100%"

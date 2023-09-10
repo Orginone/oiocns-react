@@ -1,4 +1,4 @@
-import { common, kernel, model, schema } from '../../base';
+import { common, model, schema } from '../../base';
 import {
   directoryNew,
   directoryOperates,
@@ -13,7 +13,7 @@ import { Species, ISpecies } from './standard/species';
 import { Member } from './member';
 import { Property, IProperty } from './standard/property';
 import { Application, IApplication } from './standard/application';
-import { BucketOpreates } from '@/ts/base/model';
+import { BucketOpreates, FileItemModel } from '@/ts/base/model';
 import { encodeKey } from '@/ts/base/common';
 import { DataResource } from './resource';
 /** 可为空的进度回调 */
@@ -229,13 +229,10 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
   }
   async loadFiles(reload: boolean = false): Promise<ISysFileInfo[]> {
     if (this.files.length < 1 || reload) {
-      const res = await kernel.bucketOpreate<model.FileItemModel[]>(
-        this.metadata.belongId,
-        {
-          key: encodeKey(this.id),
-          operate: BucketOpreates.List,
-        },
-      );
+      const res = await this.resource.bucketOpreate<FileItemModel[]>({
+        key: encodeKey(this.id),
+        operate: BucketOpreates.List,
+      });
       if (res.success && res.data.length > 0) {
         this.files = res.data
           .filter((i) => !i.isDirectory)
@@ -255,16 +252,11 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
       createTime: new Date(),
     };
     this.taskList.push(task);
-    const data = await kernel.fileUpdate(
-      this.metadata.belongId,
-      file,
-      `${this.id}/${file.name}`,
-      (pn) => {
-        task.finished = pn;
-        p?.apply(this, [pn]);
-        this.taskEmitter.changCallback();
-      },
-    );
+    const data = await this.resource.fileUpdate(file, `${this.id}/${file.name}`, (pn) => {
+      task.finished = pn;
+      p?.apply(this, [pn]);
+      this.taskEmitter.changCallback();
+    });
     if (data) {
       const file = new SysFileInfo(data, this);
       this.files.push(file);
@@ -327,7 +319,7 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
     const operates: model.OperateModel[] = [];
     if (this.typeName === '成员目录') {
       if (this.target.hasRelationAuth()) {
-        if (this.target.space.user.copyFiles.size > 0) {
+        if (this.target.user.copyFiles.size > 0) {
           operates.push(fileOperates.Parse);
         }
         operates.push(teamOperates.Pull, memberOperates.SettingIdentity);
@@ -346,7 +338,7 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
       );
       if (mode === 2 && this.target.hasRelationAuth()) {
         operates.push(directoryNew);
-        if (this.target.space.user.copyFiles.size > 0) {
+        if (this.target.user.copyFiles.size > 0) {
           operates.push(fileOperates.Parse);
         }
       }

@@ -2,17 +2,29 @@ import { schema, kernel, model } from '../../../base';
 import { OperateType, TargetType } from '../../public/enums';
 import { PageAll, orgAuth } from '../../public/consts';
 import { IBelong } from './belong';
-import { IMsgChatT, IMsgChat, MsgChat } from '../../chat/message/msgchat';
-import { entityOperates } from '../../public';
+import { Entity, IEntity, entityOperates } from '../../public';
+import { IDirectory } from '../../thing/directory';
+import { ISession } from '../../chat/session';
+import { IPerson } from '../person';
 
 /** 团队抽象接口类 */
-export interface ITeam extends IMsgChatT<schema.XTarget> {
+export interface ITeam extends IEntity<schema.XTarget> {
+  /** 当前用户 */
+  user: IPerson;
+  /** 加载归属组织 */
+  space: IBelong;
+  /** 当前目录 */
+  directory: IDirectory;
+  /** 成员 */
+  members: schema.XTarget[];
   /** 限定成员类型 */
   memberTypes: TargetType[];
-  /** 用户相关的所有会话 */
-  chats: IMsgChat[];
+  /** 成员会话 */
+  memberChats: ISession[];
   /** 深加载 */
   deepLoad(reload?: boolean): Promise<void>;
+  /** 加载成员 */
+  loadMembers(reload?: boolean): Promise<schema.XTarget[]>;
   /** 创建用户 */
   createTarget(data: model.TargetModel): Promise<ITeam | undefined>;
   /** 更新团队信息 */
@@ -32,17 +44,18 @@ export interface ITeam extends IMsgChatT<schema.XTarget> {
 }
 
 /** 团队基类实现 */
-export abstract class Team extends MsgChat<schema.XTarget> implements ITeam {
+export abstract class Team extends Entity<schema.XTarget> implements ITeam {
   constructor(
     _metadata: schema.XTarget,
-    _labels: string[],
-    _space?: IBelong,
     _memberTypes: TargetType[] = [TargetType.Person],
   ) {
-    super(_metadata, _labels, _space, _metadata.belong);
+    super(_metadata);
     this.memberTypes = _memberTypes;
   }
   memberTypes: TargetType[];
+  members: schema.XTarget[] = [];
+  memberChats: ISession[] = [];
+  abstract directory: IDirectory;
   private _memberLoaded: boolean = false;
   get isInherited(): boolean {
     return this.metadata.belongId != this.space.id;
@@ -186,7 +199,8 @@ export abstract class Team extends MsgChat<schema.XTarget> implements ITeam {
     }
     return operates;
   }
-  abstract get chats(): IMsgChat[];
+  abstract space: IBelong;
+  abstract user: IPerson;
   abstract deepLoad(reload?: boolean): Promise<void>;
   abstract createTarget(data: model.TargetModel): Promise<ITeam | undefined>;
   abstract teamChangedNotity(target: schema.XTarget): Promise<boolean>;
@@ -199,7 +213,7 @@ export abstract class Team extends MsgChat<schema.XTarget> implements ITeam {
   hasAuthoritys(authIds: string[]): boolean {
     authIds = this.space.superAuth?.loadParentAuthIds(authIds) ?? authIds;
     const orgIds = [this.metadata.belongId, this.id];
-    return this.space.user.authenticate(orgIds, authIds);
+    return this.user.authenticate(orgIds, authIds);
   }
   async createTargetMsg(operate: OperateType, sub?: schema.XTarget): Promise<void> {
     await kernel.createTargetMsg({
@@ -210,7 +224,7 @@ export abstract class Team extends MsgChat<schema.XTarget> implements ITeam {
         operate,
         target: this.metadata,
         subTarget: sub,
-        operater: this.space.user.metadata,
+        operater: this.user.metadata,
       }),
     });
   }

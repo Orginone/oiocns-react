@@ -2,7 +2,7 @@ import { Button, Col, Image, Modal, Row, Typography } from 'antd';
 import React, { useState } from 'react';
 import TeamIcon from '@/components/Common/GlobalComps/entityIcon';
 import detailStyle from './index.module.less';
-import { IMsgChat, ITarget } from '@/ts/core';
+import { ISession } from '@/ts/core';
 import ChatHistoryModal from '../ChatHistoryModal';
 import { AiOutlineRight } from 'react-icons/ai';
 import { useHistory } from 'react-router-dom';
@@ -13,7 +13,7 @@ import GroupMember from '@/pages/Chats/content/chat/GroupMember';
 import ActivityPublisher from '@/components/Activity/ActivityPublisher';
 import ActivityList from '@/components/Activity/ActivityList';
 import { ImCompass } from 'react-icons/im';
-const GroupDetail: React.FC<any> = ({ chat }: { chat: IMsgChat }) => {
+const GroupDetail: React.FC<any> = ({ chat }: { chat: ISession }) => {
   const [historyOpen, setHistoryOpen] = useState<boolean>(false); // 历史消息搜索
   const [activityPublisherOpen, setActivityPublisherOpen] = useState(false);
   const history = useHistory();
@@ -94,11 +94,9 @@ const GroupDetail: React.FC<any> = ({ chat }: { chat: IMsgChat }) => {
           className={`${detailStyle.find_history_button}`}
           type="ghost"
           onClick={async () => {
-            if ('directory' in chat) {
-              await (chat as ITarget).directory.loadContent();
-              orgCtrl.currentKey = chat.key;
-              history.push('/store');
-            }
+            await chat.target.directory.loadContent();
+            orgCtrl.currentKey = chat.key;
+            history.push('/store');
           }}>
           共享目录 <AiOutlineRight />
         </Button>
@@ -152,7 +150,7 @@ const GroupDetail: React.FC<any> = ({ chat }: { chat: IMsgChat }) => {
         <GroupMember members={chat.members}></GroupMember>
         <div className={detailStyle.groupDetailContent}>
           {'resource' in chat && (
-            <ActivityList coll={(chat as ITarget).resource.activityColl}></ActivityList>
+            <ActivityList coll={chat.target.resource.activityColl}></ActivityList>
           )}
           <div className={detailStyle.user_list}>
             <div className={`${detailStyle.img_list} ${detailStyle.con}`}></div>
@@ -195,7 +193,7 @@ const GroupDetail: React.FC<any> = ({ chat }: { chat: IMsgChat }) => {
       {'resource' in chat && (
         <ActivityPublisher
           open={activityPublisherOpen}
-          target={chat as ITarget}
+          target={chat.target}
           finish={() => {
             setActivityPublisherOpen(false);
           }}></ActivityPublisher>

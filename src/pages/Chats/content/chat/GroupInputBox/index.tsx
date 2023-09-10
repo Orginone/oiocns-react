@@ -2,7 +2,7 @@ import * as im from 'react-icons/im';
 import { Button, message, Popover, Spin, Upload, UploadProps } from 'antd';
 import { CloseCircleFilled } from '@ant-design/icons';
 import React, { useEffect, useState } from 'react';
-import { IMessage, IMsgChat, MessageType } from '@/ts/core';
+import { IMessage, ISession, MessageType } from '@/ts/core';
 import { model, parseAvatar } from '@/ts/base';
 import PullDown from '@/pages/Chats/components/pullDown';
 import Cutting from '../../cutting';
@@ -16,7 +16,7 @@ import Emoji from '../../../components/emoji';
  */
 
 interface IProps {
-  chat: IMsgChat;
+  chat: ISession;
   writeContent: any;
   citeText: IMessage | undefined;
   closeCite: any;
@@ -77,7 +77,7 @@ const GroupInputBox = (props: IProps) => {
       let massage = text.join('').trim();
       if (massage.length > 0) {
         innerHtml.innerHTML = '发送中,请稍后...';
-        await props.chat.sendMessage(MessageType.Text, massage, mentions, citeText);
+        props.chat.sendMessage(MessageType.Text, massage, mentions, citeText);
       }
       innerHtml.innerHTML = '';
       closeCite('');
@@ -164,7 +164,7 @@ const GroupInputBox = (props: IProps) => {
     async customRequest(options) {
       const file = options.file as File;
       if (file) {
-        const result = await props.chat.directory.createFile(file, (p: number) => {
+        const result = await props.chat.target.directory.createFile(file, (p: number) => {
           return setTask({
             finished: p,
             size: file.size,

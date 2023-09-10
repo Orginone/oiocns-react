@@ -1,18 +1,18 @@
 import { kernel, model, schema } from '../../../base';
-import { IMsgChat, IMsgChatT, MsgChat } from '../../chat/message/msgchat';
+import { Entity, IEntity } from '../../public';
 import { IDirectory } from '../../thing/directory';
 import { IBelong } from '../base/belong';
 
 /** 权限接口 */
-export interface IAuthority extends IMsgChatT<schema.XAuthority> {
+export interface IAuthority extends IEntity<schema.XAuthority> {
+  /** 加载归属组织 */
+  space: IBelong;
   /** 拥有该权限的成员 */
   members: schema.XTarget[];
   /** 父级权限 */
   parent: IAuthority | undefined;
   /** 子级权限 */
   children: IAuthority[];
-  /** 用户相关的所有会话 */
-  chats: IMsgChat[];
   /** 深加载 */
   deepLoad(reload?: boolean): Promise<void>;
   /** 加载成员用户实体 */
@@ -32,16 +32,9 @@ export interface IAuthority extends IMsgChatT<schema.XAuthority> {
 }
 
 /** 权限实现类 */
-export class Authority extends MsgChat<schema.XAuthority> implements IAuthority {
+export class Authority extends Entity<schema.XAuthority> implements IAuthority {
   constructor(_metadata: schema.XAuthority, _space: IBelong, _parent?: IAuthority) {
-    super(
-      {
-        ..._metadata,
-        typeName: '权限',
-      },
-      [_space.name ?? '', '权限群'],
-      _space,
-    );
+    super(_metadata);
     this.space = _space;
     this.parent = _parent;
     for (const node of _metadata.nodes || []) {
@@ -49,6 +42,7 @@ export class Authority extends MsgChat<schema.XAuthority> implements IAuthority 
     }
     this.directory = _space.directory;
   }
+  space: IBelong;
   members: schema.XTarget[] = [];
   parent: IAuthority | undefined;
   children: IAuthority[] = [];
@@ -130,13 +124,6 @@ export class Authority extends MsgChat<schema.XAuthority> implements IAuthority 
         await item.deepLoad(reload);
       }),
     );
-  }
-  get chats(): IMsgChat[] {
-    const chats: IMsgChat[] = [this];
-    for (const item of this.children) {
-      chats.push(...item.chats);
-    }
-    return chats;
   }
   hasAuthoritys(authIds: string[]): boolean {
     authIds = this.loadParentAuthIds(authIds);

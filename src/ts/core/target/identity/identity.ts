@@ -38,11 +38,9 @@ export class Identity extends Entity<schema.XIdentity> implements IIdentity {
       typeName: '角色',
     });
     this.current = current;
-    this.belongId = _metadata.belongId;
     this.isInherited = false;
     this.directory = current.directory;
   }
-  belongId: string;
   isInherited: boolean;
   directory: IDirectory;
   async rename(name: string): Promise<boolean> {
@@ -102,8 +100,8 @@ export class Identity extends Entity<schema.XIdentity> implements IIdentity {
         if (!res.success) return false;
         members.forEach((a) => this.createIdentityMsg(OperateType.Remove, a));
       }
-      if (members.some((a) => a.id === this.current.space.user.id)) {
-        this.current.space.user.removeGivedIdentity([this.metadata.id]);
+      if (members.some((a) => a.id === this.current.user.id)) {
+        this.current.user.removeGivedIdentity([this.metadata.id]);
       }
       this.members = this.members.filter((i) => members.every((s) => s.id !== i.id));
     }
@@ -134,7 +132,7 @@ export class Identity extends Entity<schema.XIdentity> implements IIdentity {
       });
       if (!res.success) return false;
     }
-    this.current.space.user.removeGivedIdentity([this.metadata.id]);
+    this.current.user.removeGivedIdentity([this.metadata.id]);
     this.current.identitys = this.current.identitys.filter((i) => i.key != this.key);
     return true;
   }
@@ -162,7 +160,7 @@ export class Identity extends Entity<schema.XIdentity> implements IIdentity {
         operate,
         subTarget,
         identity: this.metadata,
-        operater: this.current.space.user.metadata,
+        operater: this.current.user.metadata,
       }),
     });
   }

@@ -161,7 +161,7 @@ export class Application extends FileInfo<schema.XApplication> implements IAppli
     ];
     if (mode === 2 && this.directory.target.hasRelationAuth()) {
       operates.push(directoryOperates.NewModule, directoryOperates.NewWork);
-      if (this.directory.target.space.user.copyFiles.size > 0) {
+      if (this.directory.target.user.copyFiles.size > 0) {
         operates.push(fileOperates.Parse);
       }
     }

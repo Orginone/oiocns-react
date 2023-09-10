@@ -1,15 +1,15 @@
 import { kernel, model, schema } from '../../../base';
-import { IMsgChat } from '../../chat/message/msgchat';
 import { OperateType, teamOperates } from '../../public';
 import { PageAll } from '../../public/consts';
 import { IDirectory } from '../../thing/directory';
 import { ITeam, Team } from '../base/team';
+import { IPerson } from '../person';
 import { ICompany } from '../team/company';
 
 /** 岗位接口 */
 export interface IStation extends ITeam {
   /** 设立岗位的单位 */
-  company: ICompany;
+  space: ICompany;
   /** 岗位下的角色 */
   identitys: schema.XIdentity[];
   /** 加载用户设立的身份(角色)对象 */
@@ -22,11 +22,13 @@ export interface IStation extends ITeam {
 
 export class Station extends Team implements IStation {
   constructor(_metadata: schema.XTarget, _space: ICompany) {
-    super(_metadata, [_metadata.belong?.name ?? '', _metadata.typeName + '群'], _space);
-    this.company = _space;
+    super(_metadata);
+    this.space = _space;
+    this.user = _space.user;
     this.directory = _space.directory;
   }
-  company: ICompany;
+  user: IPerson;
+  space: ICompany;
   directory: IDirectory;
   identitys: schema.XIdentity[] = [];
   private _identityLoaded: boolean = false;
@@ -76,7 +78,7 @@ export class Station extends Team implements IStation {
           if (!res.success) return false;
           this.createIdentityMsg(OperateType.Remove, identity);
         }
-        this.company.user.removeGivedIdentity(
+        this.space.user.removeGivedIdentity(
           identitys.map((a) => a.id),
           this.id,
         );
@@ -88,16 +90,13 @@ export class Station extends Team implements IStation {
   override async delete(notity: boolean = false): Promise<boolean> {
     notity = await super.delete(notity);
     if (notity) {
-      this.company.stations = this.company.stations.filter((i) => i.key != this.key);
+      this.space.stations = this.space.stations.filter((i) => i.key != this.key);
     }
-    this.company.user.removeGivedIdentity(
+    this.space.user.removeGivedIdentity(
       this.identitys.map((a) => a.id),
       this.id,
     );
     return notity;
-  }
-  get chats(): IMsgChat[] {
-    return [this];
   }
   async deepLoad(reload: boolean = false): Promise<void> {
     await this.loadIdentitys(reload);
@@ -131,7 +130,7 @@ export class Station extends Team implements IStation {
         operate,
         station: this.metadata,
         identity: identity,
-        operater: this.space.user.metadata,
+        operater: this.user.metadata,
       }),
     });
   }

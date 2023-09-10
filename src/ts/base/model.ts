@@ -25,8 +25,31 @@ export type DataProxyType = {
   action: string;
   // 归属
   belongId: string;
+  // 抄送
+  copyId?: string;
   // 参数
   params: any;
+  // 关系举证(用户鉴权[user=>relations=>target],最大支持2级关系)
+	relations: string[];
+};
+// 请求数据核类型定义
+export type DataNotityType = {
+  // 数据
+	data: any;
+  // 通知的用户
+	targetId: string;
+  // 是否忽略自己
+	ignoreSelf: boolean;
+  // 标签
+	flag: string;
+  // 关系举证(用户鉴权[user=>relations=>target],最大支持2级关系)
+	relations: string[];
+  // 归属用户
+	belongId: string;
+  // 通知用户自身
+  onlyTarget: boolean;
+  // 仅通知在线用户
+  onlineOnly: boolean;
 };
 // 代理请求类型定义
 export type HttpRequestType = {
@@ -346,16 +369,10 @@ export type ChatMessageType = {
   sessionId: string;
   // 类型
   typeName: string;
-  // 消息类型
-  msgType: string;
-  // 消息体
-  msgBody: string;
   // 内容
   content: string;
   // 评注
   comments: CommentType[];
-  // 标签
-  tags: CommentType[];
 } & Xbase;
 
 export type CommentType = {
@@ -873,8 +890,6 @@ export type MsgChatData = {
   labels: string[];
   /** 会话名称 */
   chatName: string;
-  /** 会话的类型 */
-  typeName: string;
   /** 会话备注 */
   chatRemark: string;
   /** 是否置顶 */

@@ -3,19 +3,13 @@ import { PageAll } from '../../public/consts';
 import { TargetType } from '../../public/enums';
 import { IAuthority, Authority } from '../authority/authority';
 import { Cohort, ICohort } from '../outTeam/cohort';
-import { IPerson } from '../person';
 import { ITarget, Target } from './target';
-import { IChatMessage, ChatMessage } from '../../chat/message/chatmsg';
-import { IMsgChat, PersonMsgChat } from '../../chat/message/msgchat';
+import { ISession, Session } from '../../chat/session';
 import { targetOperates } from '../../public';
 import { IStorage } from '../outTeam/storage';
 
 /** 自归属用户接口类 */
 export interface IBelong extends ITarget {
-  /** 当前用户 */
-  user: IPerson;
-  /** 归属的消息 */
-  message: IChatMessage;
   /** 超管权限，权限为树结构 */
   superAuth: IAuthority | undefined;
   /** 加入/管理的群 */
@@ -25,7 +19,7 @@ export interface IBelong extends ITarget {
   /** 上级用户 */
   parentTarget: ITarget[];
   /** 群会话 */
-  cohortChats: IMsgChat[];
+  cohortChats: ISession[];
   /** 共享组织 */
   shareTarget: ITarget[];
   /** 加载超管权限 */
@@ -40,18 +34,15 @@ export interface IBelong extends ITarget {
 export abstract class Belong extends Target implements IBelong {
   constructor(
     _metadata: schema.XTarget,
-    _labels: string[],
-    _user?: IPerson,
+    _relations: string[],
     _memberTypes: TargetType[] = [TargetType.Person],
   ) {
-    super(_metadata, _labels, undefined, _memberTypes);
-    this.user = _user || (this as unknown as IPerson);
-    this.message = new ChatMessage(this);
+    super(_metadata, _relations, _memberTypes);
+    this.space = this;
   }
-  user: IPerson;
+  space: IBelong;
   cohorts: ICohort[] = [];
   storages: IStorage[] = [];
-  message: IChatMessage;
   superAuth: IAuthority | undefined;
   async loadSuperAuth(reload: boolean = false): Promise<IAuthority | undefined> {
     if (!this.superAuth || reload) {
@@ -69,7 +60,7 @@ export abstract class Belong extends Target implements IBelong {
     data.typeName = TargetType.Cohort;
     const metadata = await this.create(data);
     if (metadata) {
-      const cohort = new Cohort(metadata, this);
+      const cohort = new Cohort(metadata, this, metadata.id);
       await cohort.deepLoad();
       if (this.typeName != TargetType.Person) {
         if (!(await this.pullSubTarget(cohort))) {
@@ -87,12 +78,12 @@ export abstract class Belong extends Target implements IBelong {
       const labels = this.id === this.user.id ? ['好友'] : [this.name, '同事'];
       _newMembers.forEach((i) => {
         if (!this.memberChats.some((a) => a.id === i.id)) {
-          this.memberChats.push(new PersonMsgChat(i, labels, this));
+          this.memberChats.push(new Session(i.id, this, i, labels));
         }
       });
     } else {
       this.memberChats = this.memberChats.filter((i) =>
-        _newMembers.every((a) => a.id != i.chatId),
+        _newMembers.every((a) => a.id != i.sessionId),
       );
     }
   }
@@ -109,7 +100,7 @@ export abstract class Belong extends Target implements IBelong {
     return operates;
   }
   abstract get shareTarget(): ITarget[];
-  abstract cohortChats: IMsgChat[];
+  abstract cohortChats: ISession[];
   abstract get parentTarget(): ITarget[];
   abstract applyJoin(members: schema.XTarget[]): Promise<boolean>;
 }

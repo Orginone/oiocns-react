@@ -4,11 +4,11 @@ import { IChatProvider, ChatProvider } from './chat/provider';
 import { IWorkProvider, WorkProvider } from './work/provider';
 import { OperateType } from './public/enums';
 import { logger } from '../base/common';
-import { msgChatNotify } from './chat/message/msgchat';
 import { IIdentity, Identity } from './target/identity/identity';
 import { IStation } from './target/innerTeam/station';
 import { ITeam } from './target/base/team';
 import { ITarget } from './target/base/target';
+import { msgChatNotify } from './chat/session';
 
 const sessionUserName = 'sessionUser';
 
@@ -103,6 +103,7 @@ export class UserProvider {
   /** 加载用户 */
   private _loadUser(person: schema.XTarget) {
     sessionStorage.setItem(sessionUserName, JSON.stringify(person));
+    kernel.userId = person.id;
     this._user = new Person(person);
     this._chat = new ChatProvider(this._user!);
     this._work = new WorkProvider(this);
@@ -111,11 +112,9 @@ export class UserProvider {
   /** 重载数据 */
   public async refresh(): Promise<void> {
     this._inited = false;
-    this._chat?.PreMessage();
     await this._user?.deepLoad(true);
     await this.work?.loadTodos(true);
     this._inited = true;
-    this._chat?.loadPreMessage();
     this._emiter.changCallback();
   }
   /** 接受组织变更 */

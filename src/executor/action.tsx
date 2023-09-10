@@ -4,7 +4,7 @@ import {
   IEntity,
   IFileInfo,
   IMemeber,
-  IMsgChat,
+  ISession,
   ISysFileInfo,
   ITarget,
   IWork,
@@ -172,9 +172,9 @@ const copyBoard = (dir: IDirectory) => {
 };
 
 /** 打开会话 */
-const openChat = (chat: IDirectory | IMemeber | IMsgChat) => {
+const openChat = (chat: IDirectory | IMemeber | ISession) => {
   if ('taskList' in chat) {
-    orgCtrl.currentKey = chat.target.chatdata.fullId;
+    orgCtrl.currentKey = chat.target.session.chatdata.fullId;
   } else if ('fullId' in chat) {
     orgCtrl.currentKey = chat.fullId;
   } else {
