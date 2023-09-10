@@ -24,7 +24,7 @@ export class DataResource {
     this.formColl = this.genColl<XForm>('standard-form');
     this.speciesColl = this.genColl<XSpecies>('standard-species');
     this.messageColl = this.genColl<ChatMessageType>('chat-messages');
-    this.activityColl = this.genColl<ActivityType>('-resource-activity');
+    this.activityColl = this.genColl<ActivityType>('resource-activity');
     this.propertyColl = this.genColl<XProperty>('standard-property');
     this.directoryColl = this.genColl<XDirectory>('resource-directory');
     this.applicationColl = this.genColl<XApplication>('standard-application');

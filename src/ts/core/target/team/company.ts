@@ -75,10 +75,10 @@ export class Company extends Belong implements ICompany {
         (res.data.result || []).forEach((i) => {
           switch (i.typeName) {
             case TargetType.Storage:
-              this.storages.push(new Storage(i, this));
+              this.storages.push(new Storage(i, [this.id], this));
               break;
             default:
-              this.groups.push(new Group(i, this));
+              this.groups.push(new Group(i, [this.id], this));
           }
         });
       }
@@ -117,7 +117,7 @@ export class Company extends Belong implements ICompany {
     data.typeName = TargetType.Group;
     const metadata = await this.create(data);
     if (metadata) {
-      const group = new Group(metadata, this);
+      const group = new Group(metadata, [this.id], this);
       await group.deepLoad();
       this.groups.push(group);
       await group.pullMembers([this.metadata]);
@@ -297,7 +297,7 @@ export class Company extends Belong implements ICompany {
         return this.pullMembers([target], true);
       case TargetType.Group:
         if (this.groups.every((i) => i.id != target.id)) {
-          const group = new Group(target, this);
+          const group = new Group(target, [this.id], this);
           await group.deepLoad();
           this.groups.push(group);
           return true;
@@ -321,7 +321,7 @@ export class Company extends Belong implements ICompany {
         break;
       case TargetType.Storage:
         if (this.storages.every((i) => i.id != target.id)) {
-          const storage = new Storage(target, this);
+          const storage = new Storage(target, [this.id], this);
           await storage.deepLoad();
           this.storages.push(storage);
           return true;

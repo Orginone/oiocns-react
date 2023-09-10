@@ -10,8 +10,8 @@ import { IPerson } from '../person';
 export interface IStorage extends ITarget {}
 
 export class Storage extends Target implements IStorage {
-  constructor(_metadata: schema.XTarget, _space: IBelong) {
-    super(_metadata, [_metadata.id], [...companyTypes, TargetType.Person]);
+  constructor(_metadata: schema.XTarget, _relations: string[], _space: IBelong) {
+    super(_metadata, [..._relations, _metadata.id], [...companyTypes, TargetType.Person]);
     this.space = _space;
     this.user = _space.user;
   }

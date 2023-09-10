@@ -88,7 +88,7 @@ export class Person extends Belong implements IPerson {
               this.cohorts.push(new Cohort(i, this, i.id));
               break;
             case TargetType.Storage:
-              this.storages.push(new Storage(i, this));
+              this.storages.push(new Storage(i, [], this));
               break;
             default:
               this.companys.push(createCompany(i, this));
@@ -118,7 +118,7 @@ export class Person extends Belong implements IPerson {
     data.typeName = TargetType.Storage;
     const metadata = await this.create(data);
     if (metadata) {
-      const storage = new Storage(metadata, this);
+      const storage = new Storage(metadata, [], this);
       await storage.deepLoad();
       this.storages.push(storage);
       await storage.pullMembers([this.user.metadata]);
@@ -265,7 +265,7 @@ export class Person extends Belong implements IPerson {
         break;
       case TargetType.Storage:
         if (this.storages.every((i) => i.id != target.id)) {
-          const storage = new Storage(target, this);
+          const storage = new Storage(target, [], this);
           await storage.deepLoad();
           this.storages.push(storage);
           return true;
