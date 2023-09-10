@@ -1,7 +1,7 @@
 import { common, model, schema } from '../../base';
 import { Entity, IEntity, MessageType, TargetType } from '../public';
 import { ITarget } from '../target/base/target';
-import { Collection } from '../public/collection';
+import { XCollection } from '../public/collection';
 import { IMessage, Message } from './message';
 // 空时间
 const nullTime = new Date('2022-07-01').getTime();
@@ -50,6 +50,8 @@ export interface ISession extends IEntity<schema.XEntity> {
   deleteMessage(id: string): Promise<boolean>;
   /** 清空历史记录 */
   clearMessage(): Promise<boolean>;
+  /** 缓存会话数据 */
+  cacheChatData(): Promise<boolean>;
 }
 
 /** 会话实现 */
@@ -63,19 +65,25 @@ export class Session extends Entity<schema.XEntity> implements ISession {
     super(_metadata);
     this.sessionId = id;
     this.target = target;
+    if (tags === undefined) {
+      tags = [_metadata.belong!.name, _metadata.typeName];
+    }
     this.chatdata = {
       fullId: `${target.id}_${id}`,
-      labels: [...(tags || [_metadata.typeName])],
       chatName: _metadata.name,
       chatRemark: _metadata.remark,
       isToping: false,
       noReadCount: 0,
       lastMsgTime: nullTime,
       mentionMe: false,
+      labels: id === this.userId ? ['本人'] : tags,
     };
     this.subscribeOperations();
+    if (this.id != this.userId) {
+      this.loadCacheChatData();
+    }
   }
-  get coll(): Collection<model.ChatMessageType> {
+  get coll(): XCollection<model.ChatMessageType> {
     return this.target.resource.messageColl;
   }
   get members(): schema.XTarget[] {
@@ -156,6 +164,7 @@ export class Session extends Entity<schema.XEntity> implements ISession {
       }
       this.chatdata.mentionMe = false;
       this.chatdata.noReadCount = 0;
+      this.cacheChatData();
       msgChatNotify.changCallback();
       this.messageNotify?.apply(this, [this.messages]);
     });
@@ -254,7 +263,7 @@ export class Session extends Entity<schema.XEntity> implements ISession {
     return false;
   }
 
-  subscribeOperations(): void {
+  async subscribeOperations(): Promise<void> {
     if (this.isGroup) {
       this.coll.subscribe((res: { operate: string; data: model.ChatMessageType[] }) => {
         res.data.map((item) => this.receiveMessage(res.operate, item));
@@ -288,6 +297,7 @@ export class Session extends Entity<schema.XEntity> implements ISession {
       }
       this.chatdata.lastMsgTime = new Date().getTime();
       this.chatdata.lastMessage = data;
+      this.cacheChatData();
     } else {
       const index = this.messages.findIndex((i) => i.id === data.id);
       if (index > -1) {
@@ -312,5 +322,21 @@ export class Session extends Entity<schema.XEntity> implements ISession {
       true,
       onlineOnly,
     );
+  }
+
+  async loadCacheChatData(): Promise<void> {
+    const data = await this.target.user.cacheObj.get<model.MsgChatData>(
+      `session.${this.chatdata.fullId}`,
+    );
+    if (data && data.fullId === this.chatdata.fullId) {
+      this.chatdata = data;
+      msgChatNotify.changCallback();
+    }
+  }
+  async cacheChatData(): Promise<boolean> {
+    return this.target.user.cacheObj.set(`session.${this.chatdata.fullId}`, {
+      operation: 'replaceAll',
+      data: this.chatdata,
+    });
   }
 }

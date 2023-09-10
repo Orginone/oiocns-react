@@ -8,6 +8,7 @@ import { Directory, IDirectory } from '../../thing/directory';
 import { IFileInfo } from '../../thing/fileinfo';
 import { DataResource } from '../../thing/resource';
 import { ISession, Session } from '../../chat/session';
+import { IPerson } from '../person';
 
 /** 用户抽象接口类 */
 export interface ITarget extends ITeam, IFileInfo<schema.XTarget> {
@@ -38,9 +39,11 @@ export abstract class Target extends Team implements ITarget {
   constructor(
     _metadata: schema.XTarget,
     _relations: string[],
+    _user?: IPerson,
     _memberTypes: TargetType[] = [TargetType.Person],
   ) {
     super(_metadata, _memberTypes);
+    this.user = _user || (this as unknown as IPerson);
     this.resource = new DataResource(_metadata, _relations);
     this.directory = new Directory(
       {
@@ -64,8 +67,9 @@ export abstract class Target extends Team implements ITarget {
       this,
       this.directory,
     );
-    this.session = new Session(this.id, this, this.metadata);
+    this.session = new Session(this.id, this, _metadata);
   }
+  user: IPerson;
   session: ISession;
   directory: IDirectory;
   resource: DataResource;

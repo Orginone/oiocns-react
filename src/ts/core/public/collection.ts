@@ -1,7 +1,7 @@
 import { kernel, schema } from '../../base';
 
 /** 集合工具类 */
-export class Collection<T extends schema.Xbase> {
+export class XCollection<T extends schema.Xbase> {
   private _loaded: boolean;
   private _cache: T[];
   private _collName: string;

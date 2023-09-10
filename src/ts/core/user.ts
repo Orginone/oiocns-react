@@ -1,14 +1,13 @@
 import { IPerson, Person } from './target/person';
 import { common, kernel, model, schema } from '../base';
-import { IChatProvider, ChatProvider } from './chat/provider';
 import { IWorkProvider, WorkProvider } from './work/provider';
 import { OperateType } from './public/enums';
 import { logger } from '../base/common';
 import { IIdentity, Identity } from './target/identity/identity';
 import { IStation } from './target/innerTeam/station';
 import { ITeam } from './target/base/team';
-import { ITarget } from './target/base/target';
 import { msgChatNotify } from './chat/session';
+import { ITarget } from './target/base/target';
 
 const sessionUserName = 'sessionUser';
 
@@ -16,7 +15,6 @@ const sessionUserName = 'sessionUser';
 export class UserProvider {
   private _user: IPerson | undefined;
   private _work: IWorkProvider | undefined;
-  private _chat: IChatProvider | undefined;
   private _inited: boolean = false;
   private _emiter: common.Emitter;
   constructor(emiter: common.Emitter) {
@@ -43,10 +41,6 @@ export class UserProvider {
   /** 办事提供层 */
   get work(): IWorkProvider | undefined {
     return this._work;
-  }
-  /** 会话 */
-  get chat(): IChatProvider | undefined {
-    return this._chat;
   }
   /** 是否完成初始化 */
   get inited(): boolean {
@@ -105,7 +99,6 @@ export class UserProvider {
     sessionStorage.setItem(sessionUserName, JSON.stringify(person));
     kernel.userId = person.id;
     this._user = new Person(person);
-    this._chat = new ChatProvider(this._user!);
     this._work = new WorkProvider(this);
     this.refresh();
   }

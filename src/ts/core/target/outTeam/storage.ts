@@ -4,18 +4,18 @@ import { TargetType, companyTypes, targetOperates } from '../../public';
 import { IBelong } from '../base/belong';
 import { ITarget, Target } from '../base/target';
 import { ISession } from '../../chat/session';
-import { IPerson } from '../person';
 
 /** 存储资源接口 */
 export interface IStorage extends ITarget {}
 
 export class Storage extends Target implements IStorage {
   constructor(_metadata: schema.XTarget, _relations: string[], _space: IBelong) {
-    super(_metadata, [..._relations, _metadata.id], [...companyTypes, TargetType.Person]);
+    super(_metadata, [..._relations, _metadata.id], _space.user, [
+      ...companyTypes,
+      TargetType.Person,
+    ]);
     this.space = _space;
-    this.user = _space.user;
   }
-  user: IPerson;
   space: IBelong;
   async exit(): Promise<boolean> {
     if (this.metadata.belongId !== this.space.id) {

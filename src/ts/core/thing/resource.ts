@@ -1,4 +1,4 @@
-import { Collection } from '../public/collection';
+import { XCollection } from '../public/collection';
 import {
   XApplication,
   XDirectory,
@@ -31,21 +31,21 @@ export class DataResource {
     this.speciesItemColl = this.genColl<XSpeciesItem>('standard-species-item');
   }
   /** 表单集合 */
-  formColl: Collection<XForm>;
+  formColl: XCollection<XForm>;
   /** 属性集合 */
-  propertyColl: Collection<XProperty>;
+  propertyColl: XCollection<XProperty>;
   /** 分类集合 */
-  speciesColl: Collection<XSpecies>;
+  speciesColl: XCollection<XSpecies>;
   /** 类目集合 */
-  speciesItemColl: Collection<XSpeciesItem>;
+  speciesItemColl: XCollection<XSpeciesItem>;
   /** 应用集合 */
-  applicationColl: Collection<XApplication>;
+  applicationColl: XCollection<XApplication>;
   /** 资源目录集合 */
-  directoryColl: Collection<XDirectory>;
+  directoryColl: XCollection<XDirectory>;
   /** 动态集合 */
-  activityColl: Collection<ActivityType>;
+  activityColl: XCollection<ActivityType>;
   /** 群消息集合 */
-  messageColl: Collection<ChatMessageType>;
+  messageColl: XCollection<ChatMessageType>;
   /** 资源预加载 */
   async preLoad(): Promise<void> {
     if (this._proLoaded === false) {
@@ -60,8 +60,8 @@ export class DataResource {
     this._proLoaded = true;
   }
   /** 生成类型的集合 */
-  genColl<T extends Xbase>(collName: string): Collection<T> {
-    return new Collection<T>(this.target, collName, this.relations);
+  genColl<T extends Xbase>(collName: string): XCollection<T> {
+    return new XCollection<T>(this.target, collName, this.relations);
   }
   /** 文件桶操作 */
   async bucketOpreate<R>(data: model.BucketOpreateModel): Promise<model.ResultType<R>> {

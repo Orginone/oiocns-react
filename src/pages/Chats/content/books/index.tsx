@@ -25,7 +25,7 @@ const Book: React.FC<any> = ({
   const [segmented, setSegmented] = useStorage('segmented', 'list');
   const [msgKey] = useCtrlUpdate(msgChatNotify);
   if (chats === undefined) {
-    chats = orgCtrl.chat.chats.filter((i) => i.isMyChat);
+    chats = orgCtrl.chats.filter((i) => i.isMyChat);
   }
   chats = chats
     .filter(
@@ -35,9 +35,13 @@ const Book: React.FC<any> = ({
         a.chatdata.labels.filter((l) => l.includes(filter)).length > 0,
     )
     .sort((a, b) => {
-      const num = (b.chatdata.isToping ? 10 : 0) - (a.chatdata.isToping ? 10 : 0);
+      var num = (b.chatdata.isToping ? 10 : 0) - (a.chatdata.isToping ? 10 : 0);
       if (num === 0) {
-        return b.chatdata.lastMsgTime > a.chatdata.lastMsgTime ? 1 : -1;
+        if (b.chatdata.lastMsgTime == a.chatdata.lastMsgTime) {
+          num = b.isBelongPerson ? 1 : -1;
+        } else {
+          num = b.chatdata.lastMsgTime > a.chatdata.lastMsgTime ? 5 : -5;
+        }
       }
       return num;
     });
