@@ -1,128 +1,141 @@
+import { useState, useEffect } from 'react';
 import { Button, InputNumber } from 'antd';
 import cls from './index.module.less';
 import React from 'react';
-import { useState } from 'react';
 import { IForm } from '@/ts/core';
-// import { XAttribute } from '@/ts/base/schema';
-// import AttributeConfig from './attributeConfig';
 import FormEditModal from '@/components/Common/FormEdit';
 import { loadWidgetsOpts } from './schemaRule';
 import { schemaType } from '@/ts/base/schema';
 import FormRender from '@/components/Common/FormEdit/FormRender';
 import { useForm } from 'form-render';
+import { sortObjByKeys } from '@/utils';
+import { deepClone } from '@/ts/base/common';
+
 type IProps = {
   current: IForm;
 };
-
-// type FormLayout = {
-//   layout: 'horizontal' | 'vertical';
-//   col: 8 | 12 | 24;
-// };
 
 /**
  * 表单设计器
  * @param props
  */
 const Design: React.FC<IProps> = ({ current }) => {
-  // const [showConfig, setShowConfig] = useState<boolean>(false);
-  const [editFormOpen, setEditFormOpen] = useState<boolean>(false);
-  const [defaultSchema, setDefaultSchema] = useState<schemaType>({
+  const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
+  // 默认schema
+  const defaultFormSchema: schemaType = {
     displayType: 'row',
     type: 'object',
     labelWidth: 120,
     properties: {},
     column: 1,
-  });
-
-  //const [selectedItem, setSelectedItem] = useState<XAttribute>();
-  const {
-    metadata: { rule },
-  } = current;
+  };
+  // FormRender实例
   const formIns = useForm();
-  const rules = rule ? JSON.parse(rule) : {};
-  // 表单项选中事件
-  // const itemClick = (item: any) => {
-  //   setSelectedItem(item);
-  //   //setShowConfig(true);
-  // };
-  const onFinished = () => {
-    setEditFormOpen(false);
-  };
-  const onEditForm = () => {
-    setDefaultSchema(currentToSchemaFun());
-    setEditFormOpen(true);
-  };
-  const currentToSchemaFun = () => {
-    //如果配置过
-    if (rules && JSON.stringify(rules) !== '{}') {
-      console.log('获取已保存的scame', rules.schema);
-      return rules.schema;
-    }
-    //  else {
-    //没有配置过
-    const schema: schemaType = {
-      displayType: 'row',
-      type: 'object',
-      properties: {},
-      labelWidth: 120,
-      column: 1,
-    };
-    let result = current.fields.reduce((result, item: any) => {
-      const { valueType } = item;
-      let title, type, widget, format, enums, enumNames;
-      title = item.name;
-      type = loadWidgetsOpts(valueType)[0].value;
-      widget = loadWidgetsOpts(valueType)[0].value;
-      if (widget === 'textarea') {
-        format = 'textarea';
-        widget = '';
+  // 表单schema
+  const [formSchema, setFormSchema] = useState<schemaType>(defaultFormSchema);
+  /**
+   * 获取表单的schema
+   */
+  const getCurFormSchema = async (): Promise<schemaType> => {
+    // 加载最新的fields
+    await current.loadFields(true);
+    const rules = current.metadata.rule ? JSON.parse(current.metadata.rule) : {};
+    // 配置过的取之前配置的schema作为基础schema，否则取默认的schema
+    const schema: schemaType = rules?.schema || deepClone(defaultFormSchema);
+    // 之前已存properties
+    const preProperties = rules?.schema?.properties || {};
+    const prePropertySortIds = Object.keys(preProperties);
+    // 为兼容之前可能在表单schema配置有布局等非特性组件，特定义此变量使用
+    console.log(current.fields);
+    const useFields = [
+      ...current.fields,
+      ...prePropertySortIds.filter((id) => isNaN(+id)).map((item) => ({ id: item })),
+    ];
+    // 组装待用properties
+    const tplProperties: Record<string, object> = useFields.reduce((pre, cur: any) => {
+      const { valueType, id } = cur;
+      // 非特性组件
+      if (isNaN(+id)) {
+        return {
+          ...pre,
+          [id]: preProperties?.[id],
+        };
+      } else {
+        let title, type, widget, format, enums, enumNames;
+        title = cur.name;
+        type = loadWidgetsOpts(valueType)[0].value;
+        widget = loadWidgetsOpts(valueType)[0].value;
+        if (widget === 'textarea') {
+          format = 'textarea';
+          widget = '';
+        }
+        if (widget === 'string') {
+          format = '';
+          widget = '';
+        }
+        if (valueType === '时间型') {
+          format = 'dateTime';
+          widget = null;
+        }
+        if (valueType === '附件型') {
+          widget = 'upload';
+          format = null;
+        }
+        if (['选择型', '分类型'].includes(valueType)) {
+          enums = cur.lookups.map((item: { value: any }) => item.value);
+          enumNames = cur.lookups.map((item: { text: any }) => item.text);
+        }
+        return {
+          ...pre,
+          [id]: preProperties?.[id] || {
+            title,
+            type,
+            widget,
+            enum: enums,
+            enumNames,
+            format,
+            valueType,
+          },
+        };
       }
-      if (widget === 'string') {
-        format = '';
-        widget = '';
-      }
-      if (valueType === '时间型') {
-        format = 'dateTime';
-        widget = null;
-      }
-      if (valueType === '附件型') {
-        widget = 'upload';
-        format = null;
-      }
-      if (valueType === '选择型' || valueType === '分类型') {
-        enums = item.lookups.map((item: { value: any }) => {
-          return item.value;
-        });
-        enumNames = item.lookups.map((item: { text: any }) => {
-          return item.text;
-        });
-      }
-      return {
-        ...result,
-        [item!.id]: {
-          title,
-          type,
-          widget,
-          enum: enums,
-          enumNames,
-          format,
-          valueType,
-        },
-      };
     }, {});
-    schema.properties = {
-      ...result,
-    };
-    // const { col } = rules;
-    // schema.column = col === 24 ? 1 : col === 12 ? 2 : col === 8 ? 3 : 1;
+    // 最终使用的properties
+    const useProperties = sortObjByKeys<Record<string, object>>(
+      tplProperties,
+      prePropertySortIds,
+    );
+    // 布局等非特性组件（可能会嵌套特性，需要从外层删除对应特性回显）
+    Object.keys(useProperties).forEach((id) => {
+      if (isNaN(+id) && (useProperties[id] as any)?.properties) {
+        // 可能是嵌套有特性的布局组件，如果对应特性已删除，其内部特性也需要删除
+        Object.keys((useProperties[id] as any).properties).forEach(
+          (key) => delete useProperties[key],
+        );
+      }
+    });
+    schema.properties = useProperties as Record<string, object>;
+    console.log('current', current);
+    // console.log('schema', schema);
     return schema;
-    // }
   };
+  // 根据schema
+  const updateSchema = async () => {
+    setFormSchema(await getCurFormSchema());
+  };
+  // 开始编辑（因初始化已执行过获取最新schema，因此开启编辑只是打开即可）
+  const onEditForm = () => {
+    setIsEditModalOpen(true);
+  };
+  // 初始化执行一次获取schema，用于渲染
+  useEffect(() => {
+    updateSchema();
+  }, []);
+
   return (
     <div style={{ display: 'flex' }}>
       <div className={cls.content}>
         <div className={cls.head}>
-          {rules.schema && (
+          {
             <Button
               type="primary"
               size="middle"
@@ -130,12 +143,11 @@ const Design: React.FC<IProps> = ({ current }) => {
               className={cls.designButton}>
               表单设计
             </Button>
-          )}
+          }
         </div>
-
-        {rules.schema ? (
+        {formSchema ? (
           <FormRender
-            schema={rules.schema}
+            schema={formSchema}
             form={formIns}
             widgets={{ number: InputNumber }}
           />
@@ -165,9 +177,11 @@ const Design: React.FC<IProps> = ({ current }) => {
       )} */}
       <FormEditModal
         current={current}
-        defaultSchema={defaultSchema}
-        finished={onFinished}
-        editFormOpen={editFormOpen}
+        formSchema={formSchema}
+        updateSchema={updateSchema}
+        getCurFormSchema={getCurFormSchema}
+        isOpen={isEditModalOpen}
+        setIsOpen={setIsEditModalOpen}
       />
     </div>
   );

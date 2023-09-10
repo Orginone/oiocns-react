@@ -26,6 +26,17 @@ const columns: any = (type: string) => {
         xs: 12,
         md: 12,
       },
+      title: '标签宽度',
+      width: '100%',
+      dataIndex: 'labelWidth',
+      valueType: 'digit',
+      tooltip: '',
+    },
+    {
+      colProps: {
+        xs: 12,
+        md: 12,
+      },
       title: '编号',
       dataIndex: 'code',
       valueType: 'text',
