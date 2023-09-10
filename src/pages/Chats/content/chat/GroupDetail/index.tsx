@@ -149,9 +149,7 @@ const GroupDetail: React.FC<any> = ({ chat }: { chat: ISession }) => {
         {header}
         <GroupMember members={chat.members}></GroupMember>
         <div className={detailStyle.groupDetailContent}>
-          {'resource' in chat && (
-            <ActivityList coll={chat.target.resource.activityColl}></ActivityList>
-          )}
+          <ActivityList activity={chat.activity}></ActivityList>
           <div className={detailStyle.user_list}>
             <div className={`${detailStyle.img_list} ${detailStyle.con}`}></div>
             {operaButton}
@@ -190,10 +188,10 @@ const GroupDetail: React.FC<any> = ({ chat }: { chat: ISession }) => {
         onCancel={onHistoryCancel}
         chat={chat}
       />
-      {'resource' in chat && (
+      {chat.activity.allPublish && (
         <ActivityPublisher
           open={activityPublisherOpen}
-          target={chat.target}
+          activity={chat.activity}
           finish={() => {
             setActivityPublisherOpen(false);
           }}></ActivityPublisher>
