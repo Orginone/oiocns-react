@@ -214,6 +214,22 @@ export const directoryNew = {
   ],
 };
 
+/** 新建仓库 */
+export const newWarehouse = {
+  sort: 0,
+  cmd: 'newWarehouses',
+  label: '仓库管理',
+  iconType: 'newWarehouses',
+  menus: [
+    {
+      sort: -1,
+      cmd: 'newWarehouse',
+      label: '新建仓库',
+      iconType: 'newWarehouse',
+    }
+  ],
+};
+
 /** 数据迁移 */
 export const transferNew = {
   sort: 1,

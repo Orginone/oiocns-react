@@ -8,6 +8,7 @@ import SettingStation from './settingModal/settingStation';
 import SettingIdentity from './settingModal/settingIdentity';
 import RequestModal from './transferModal/apiEditor';
 import MappingModal from './transferModal/mapper';
+import NewWarehouse from './transferModal/newWarehouse';
 
 const entityMap: any = {
   目录: 'Dir',
@@ -74,6 +75,8 @@ const ConfigExecutor: React.FC<IProps> = ({ cmd, args, finished }) => {
       return <RequestModal current={args[0]} finished={finished}></RequestModal>;
     case 'newMapping':
       return <MappingModal current={args[0]} finished={finished}></MappingModal>;
+    case 'newWarehouse': 
+      return <NewWarehouse  current={args[0]} finished={finished}></NewWarehouse>;
     default:
       if (cmd === 'pull' || cmd.startsWith('join')) {
         return <OperateModal cmd={cmd} entity={args[0]} finished={finished} />;

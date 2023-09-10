@@ -5,6 +5,7 @@ import {
   directoryNew,
   directoryOperates,
   transferNew,
+  newWarehouse,
   fileOperates,
   memberOperates,
   teamOperates,
@@ -430,6 +431,7 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
       if (mode === 2 && this.target.hasRelationAuth()) {
         operates.push(directoryNew);
         operates.push(transferNew);
+        operates.push(newWarehouse);
         if (this.target.space.user.copyFiles.size > 0) {
           operates.push(fileOperates.Parse);
         }

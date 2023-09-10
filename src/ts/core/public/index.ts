@@ -11,6 +11,7 @@ export { Entity } from './entity';
 export { MessageType, OperateType, SpeciesType, TargetType, TaskStatus } from './enums';
 export {
   directoryNew,
+  newWarehouse,
   directoryOperates,
   transferNew,
   entityOperates,
