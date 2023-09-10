@@ -3,6 +3,7 @@ import { Entity, IEntity, MessageType, TargetType } from '../public';
 import { ITarget } from '../target/base/target';
 import { XCollection } from '../public/collection';
 import { IMessage, Message } from './message';
+import { IActivity, Activity } from './activity';
 // 空时间
 const nullTime = new Date('2022-07-01').getTime();
 // 消息变更推送
@@ -29,6 +30,8 @@ export interface ISession extends IEntity<schema.XEntity> {
   isGroup: boolean;
   /** 会话的成员 */
   members: schema.XTarget[];
+  /** 会话动态 */
+  activity: IActivity;
   /** 加载更多历史消息 */
   moreMessage(): Promise<number>;
   /** 禁用通知 */
@@ -58,10 +61,11 @@ export interface ISession extends IEntity<schema.XEntity> {
 export class Session extends Entity<schema.XEntity> implements ISession {
   sessionId: string;
   target: ITarget;
+  activity: IActivity;
   chatdata: model.MsgChatData;
   messages: IMessage[] = [];
   private messageNotify?: (messages: IMessage[]) => void;
-  constructor(id: string, target: ITarget, _metadata: schema.XEntity, tags?: string[]) {
+  constructor(id: string, target: ITarget, _metadata: schema.XTarget, tags?: string[]) {
     super(_metadata);
     this.sessionId = id;
     this.target = target;
@@ -78,6 +82,7 @@ export class Session extends Entity<schema.XEntity> implements ISession {
       mentionMe: false,
       labels: id === this.userId ? ['本人'] : tags,
     };
+    this.activity = new Activity(_metadata, this);
     this.subscribeOperations();
     if (this.id != this.userId) {
       this.loadCacheChatData();
@@ -96,8 +101,10 @@ export class Session extends Entity<schema.XEntity> implements ISession {
     return this.isGroup
       ? { toId: this.sessionId }
       : {
-          fromId: { _in_: [this.sessionId, this.userId] },
-          toId: { _in_: [this.sessionId, this.userId] },
+          _or_: [
+            { fromId: this.sessionId, toId: this.userId },
+            { fromId: this.userId, toId: this.sessionId },
+          ],
         };
   }
   get isBelongPerson(): boolean {
@@ -107,7 +114,7 @@ export class Session extends Entity<schema.XEntity> implements ISession {
   }
   get isMyChat(): boolean {
     return (
-      this.members.length === 0 ||
+      this.metadata.typeName === TargetType.Person ||
       this.members.filter((i) => i.id === this.userId).length > 0
     );
   }

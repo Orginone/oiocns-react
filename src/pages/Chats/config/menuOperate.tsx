@@ -29,7 +29,7 @@ const loadBookMenu = () => {
   for (const company of orgCtrl.user.companys) {
     const innnerChats = [];
     for (const item of company.departments) {
-      innnerChats.push(...item.chats);
+      innnerChats.push(...item.chats.filter((i) => i.isMyChat));
     }
     companyItems.push({
       key: company.key + '同事',

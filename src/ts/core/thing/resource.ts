@@ -9,7 +9,7 @@ import {
   XTarget,
   Xbase,
 } from '../../base/schema';
-import { ActivityType, ChatMessageType } from '@/ts/base/model';
+import { ChatMessageType } from '@/ts/base/model';
 import { kernel, model } from '@/ts/base';
 import { blobToDataUrl, encodeKey, generateUuid, sliceFile } from '@/ts/base/common';
 
@@ -21,14 +21,13 @@ export class DataResource {
   constructor(target: XTarget, relations: string[]) {
     this.target = target;
     this.relations = relations;
-    this.formColl = this.genColl<XForm>('standard-form');
-    this.speciesColl = this.genColl<XSpecies>('standard-species');
-    this.messageColl = this.genColl<ChatMessageType>('chat-messages');
-    this.activityColl = this.genColl<ActivityType>('resource-activity');
-    this.propertyColl = this.genColl<XProperty>('standard-property');
-    this.directoryColl = this.genColl<XDirectory>('resource-directory');
-    this.applicationColl = this.genColl<XApplication>('standard-application');
-    this.speciesItemColl = this.genColl<XSpeciesItem>('standard-species-item');
+    this.formColl = this.genTargetColl<XForm>('standard-form');
+    this.speciesColl = this.genTargetColl<XSpecies>('standard-species');
+    this.messageColl = this.genTargetColl<ChatMessageType>('chat-messages');
+    this.propertyColl = this.genTargetColl<XProperty>('standard-property');
+    this.directoryColl = this.genTargetColl<XDirectory>('resource-directory');
+    this.applicationColl = this.genTargetColl<XApplication>('standard-application');
+    this.speciesItemColl = this.genTargetColl<XSpeciesItem>('standard-species-item');
   }
   /** 表单集合 */
   formColl: XCollection<XForm>;
@@ -42,8 +41,6 @@ export class DataResource {
   applicationColl: XCollection<XApplication>;
   /** 资源目录集合 */
   directoryColl: XCollection<XDirectory>;
-  /** 动态集合 */
-  activityColl: XCollection<ActivityType>;
   /** 群消息集合 */
   messageColl: XCollection<ChatMessageType>;
   /** 资源预加载 */
@@ -59,8 +56,12 @@ export class DataResource {
     }
     this._proLoaded = true;
   }
-  /** 生成类型的集合 */
-  genColl<T extends Xbase>(collName: string): XCollection<T> {
+  /** 生成集合 */
+  genColl<T extends Xbase>(collName: string, relations?: string[]): XCollection<T> {
+    return new XCollection<T>(this.target, collName, relations || this.relations);
+  }
+  /** 生成用户类型的集合 */
+  genTargetColl<T extends Xbase>(collName: string): XCollection<T> {
     return new XCollection<T>(this.target, collName, this.relations);
   }
   /** 文件桶操作 */
