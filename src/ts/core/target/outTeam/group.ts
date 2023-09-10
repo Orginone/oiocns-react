@@ -22,15 +22,17 @@ export interface IGroup extends ITarget {
 
 /** 组织集群实现 */
 export class Group extends Target implements IGroup {
-  constructor(_metadata: schema.XTarget, _company: ICompany) {
-    super(_metadata, [_company.id, _metadata.id], companyTypes);
+  constructor(_metadata: schema.XTarget, _relations: string[], _company: ICompany) {
+    super(_metadata, [..._relations, _metadata.id], companyTypes);
     this.space = _company;
     this.user = _company.user;
+    this.relations = [..._relations, _metadata.id];
   }
   user: IPerson;
   space: ICompany;
   parent?: IGroup | undefined;
   children: IGroup[] = [];
+  relations: string[];
   private _childrenLoaded: boolean = false;
   async loadChildren(reload?: boolean | undefined): Promise<IGroup[]> {
     if (!this._childrenLoaded || reload) {
@@ -41,7 +43,9 @@ export class Group extends Target implements IGroup {
       });
       if (res.success) {
         this._childrenLoaded = true;
-        this.children = (res.data.result || []).map((i) => new Group(i, this.space));
+        this.children = (res.data.result || []).map(
+          (i) => new Group(i, this.relations, this.space),
+        );
       }
     }
     return this.children;
@@ -50,7 +54,7 @@ export class Group extends Target implements IGroup {
     data.typeName = TargetType.Group;
     const metadata = await this.create(data);
     if (metadata) {
-      const group = new Group(metadata, this.space);
+      const group = new Group(metadata, this.relations, this.space);
       if (await this.pullSubTarget(group)) {
         this.children.push(group);
         return group;
@@ -120,7 +124,7 @@ export class Group extends Target implements IGroup {
     switch (target.typeName) {
       case TargetType.Group:
         if (this.children.every((i) => i.id != target.id)) {
-          const group = new Group(target, this.space);
+          const group = new Group(target, this.relations, this.space);
           await group.deepLoad();
           this.children.push(group);
           return true;

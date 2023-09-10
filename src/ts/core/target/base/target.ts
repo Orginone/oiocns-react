@@ -41,7 +41,7 @@ export abstract class Target extends Team implements ITarget {
     _memberTypes: TargetType[] = [TargetType.Person],
   ) {
     super(_metadata, _memberTypes);
-    this.resource = new DataResource(_metadata, _memberTypes);
+    this.resource = new DataResource(_metadata, _relations);
     this.directory = new Directory(
       {
         ..._metadata,

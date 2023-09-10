@@ -321,7 +321,7 @@ export class Collection<T extends schema.Xbase> {
       flag: this.collName,
       onlineOnly: onlineOnly,
       belongId: this._target.belongId,
-      relations: [this._target.id],
+      relations: this._relations,
       onlyTarget: onlyTarget === true,
       ignoreSelf: ignoreSelf === true,
       targetId: targetId ?? this._target.id,
