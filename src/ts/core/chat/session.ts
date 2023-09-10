@@ -123,7 +123,7 @@ export class Session extends Entity<schema.XEntity> implements ISession {
     return this.metadata.remark.substring(0, 60);
   }
   async moreMessage(): Promise<number> {
-    const data = await this.coll.load({
+    const data = await this.coll.loadSpace({
       take: 30,
       skip: this.messages.length,
       options: {
