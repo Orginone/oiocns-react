@@ -1,6 +1,6 @@
 import { ProForm } from '@ant-design/pro-components';
 import { Descriptions } from 'antd';
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import OioFormItem from './FormItems';
 import { IBelong } from '@/ts/core';
 import cls from './index.module.less';
@@ -41,25 +41,18 @@ const OioForm: React.FC<IProps> = ({
     form.rule ?? '{}',
   );
 
-  console.log(
-    'fields',
-    fields.map((v) => {
-      return { name: v.name, rule: JSON.parse(v.rule ?? '{}') };
-    }),
-  );
-
   const colNum = 24 / configCol; //单行展示数量 默认3
   if (fieldsValue) {
     formRef?.current?.setFieldsValue(fieldsValue);
   }
-  // useEffect(() => {
-  //   /* 向规则服务里，加入修改表单数值的回调方法 */
-  //   ruleService?.setFormChangeCallback(form.id, (data: any) => {
-  //     onValuesChange &&
-  //       onValuesChange(data, { ...formRef?.current?.getFieldsValue(), ...data });
-  //     formRef?.current?.setFieldsValue(data);
-  //   });
-  // }, [form.id]);
+  useEffect(() => {
+    /* 向规则服务里，加入修改表单数值的回调方法 */
+    ruleService?.setFormChangeCallback(form.id, (data: any) => {
+      onValuesChange &&
+        onValuesChange(data, { ...formRef?.current?.getFieldsValue(), ...data });
+      formRef?.current?.setFieldsValue(data);
+    });
+  }, [form.id]);
   return (
     <>
       {showTitle && (

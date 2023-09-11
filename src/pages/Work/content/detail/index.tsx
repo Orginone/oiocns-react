@@ -19,6 +19,7 @@ const Detail: React.FC<TaskDetailType> = ({ task, onBack }) => {
   const formRef = useRef<ProFormInstance<any>>();
   const [selectNode, setSelectNode] = useState<NodeModel>();
   const [comment, setComment] = useState<string>('');
+console.log(5555,task);
 
   /** 加载时间条 */
   const loadTimeline = () => {

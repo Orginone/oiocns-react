@@ -85,8 +85,6 @@ const formAttrResolver = async (
 /* 固定字符处理 */
 const fixedCharacterResolver = async (ruleStr: string) => {
   const _company = (await import('../workFormRules')).default.currentCompanyInfo;
-  console.log('固定字符处理', _company);
-
   if (!ruleStr) {
     return '';
   }
@@ -104,13 +102,15 @@ const fixedCharacterResolver = async (ruleStr: string) => {
       case '「使用人编码」':
         return OrgCtrl.user.metadata.id;
       case '「系统时间」':
-        return dayjs().format('YYYY-MM-DD HH:mm:ss');
+        return `'${dayjs().format('YYYY-MM-DD HH:mm:ss')}'`;
       default:
         return '';
     }
   });
   return replacedStr ?? '';
 };
+
+export { fixedCharacterResolver };
 
 // /* 内置函数处理 */
 // const builtInFunResolver = () => {};

@@ -3,7 +3,7 @@ import { model } from '../../../ts/base';
 import { IBelong } from '@/ts/core';
 
 import DetailForms from './detail';
-// import PrimaryForms from './primary';
+import PrimaryForms from './primary';
 import FormRenders from './formPreview';
 // import ReportForms from '../workReport';
 
@@ -38,6 +38,14 @@ const getNodeByNodeId = (
 /** 流程节点表单 */
 const WorkForm: React.FC<IWorkFormProps> = (props) => {
   const node = getNodeByNodeId(props.nodeId, props.data.node);
+
+  console.log('nodenodenode', node,props);
+  /* 收集主子表信息 */
+  props?.ruleService?.collectData('formsType', {
+    primaryFormIds: node?.primaryFormIds || [],
+    detailFormIds: node?.detailFormIds || [],
+  });
+
   const forms = [...(node?.primaryForms || []), ...(node?.detailForms || [])];
   if (!node || forms.length < 1) return <></>;
   /** 根据需求获取数据 */
@@ -47,6 +55,9 @@ const WorkForm: React.FC<IWorkFormProps> = (props) => {
       const beforeData = props.data.data[id];
       if (beforeData.length > 0) {
         if (!props.allowEdit) {
+
+          console.log('56565',id,beforeData);
+          
           const nodeData = beforeData.filter((i) => i.nodeId === node.id);
           if (nodeData && nodeData.length > 0) {
             return nodeData.slice(-1)[0];
@@ -56,6 +67,15 @@ const WorkForm: React.FC<IWorkFormProps> = (props) => {
         }
       }
     }
+
+    console.log('mode',{
+      before: [...source],
+      after: [...source],
+      nodeId: node.id,
+      creator: props.belong.userId,
+      createTime: formatDate(new Date(), 'yyyy-MM-dd hh:mm:ss.S'),
+    });
+    
     return {
       before: [...source],
       after: [...source],

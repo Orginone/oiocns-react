@@ -43,7 +43,6 @@ export class WorkApply implements IWorkApply {
     fromData: Map<string, model.FormEditData>,
   ): Promise<boolean> {
     fromData.forEach((data, k) => {
-      console.log('data, k', data, k);
       const { after, before, createTime, creator, nodeId } = data;
       const params = { after, before, createTime, creator, nodeId };
 

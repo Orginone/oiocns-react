@@ -141,17 +141,6 @@ const Design: React.FC<IProps> = ({ current }) => {
               form={formIns}
               widgets={{ number: InputNumber }}
             />
-            <OioForm
-              key={current.id}
-              form={current}
-              fields={current.fields}
-              submitter={{
-                resetButtonProps: {
-                  style: { display: 'none' },
-                },
-                render: (_: any, _dom: any) => <></>,
-              }}
-            />
           </>
         ) : (
           <div className={cls.designWrap}>
