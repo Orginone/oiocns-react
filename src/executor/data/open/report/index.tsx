@@ -15,11 +15,10 @@ interface IProps {
 }
 
 const ReportView: React.FC<IProps> = ({ current, finished }) => {
-  console.log(current,'key')
   const [total, setTotal] = useState<number>(1);
   const [info, setInfo] = useState<any>();
   const [key, rootMenu, selectMenu, setSelectMenu] = useMenuUpdate(
-    () => config.loadStoreMenu(current),
+    () => config.loadSpeciesItemMenu(current),
   );
   if (!selectMenu || !rootMenu) return <></>;
   

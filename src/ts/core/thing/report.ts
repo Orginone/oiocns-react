@@ -49,7 +49,7 @@ export class Report extends FileInfo<schema.XReport> implements IReport {
   }
   async copy(destination: IDirectory): Promise<boolean> {
     if (destination.id != this.directory.id) {
-      const res = await destination.createForm({
+      const res = await destination.createReport({
         ...this.metadata,
         directoryId: destination.id,
       });
@@ -65,9 +65,9 @@ export class Report extends FileInfo<schema.XReport> implements IReport {
       this.setMetadata({ ...this.metadata, directoryId: destination.id });
       const success = await this.update(this.metadata);
       if (success) {
-        this.directory.forms = this.directory.forms.filter((i) => i.key != this.key);
+        this.directory.reports = this.directory.reports.filter((i) => i.key != this.key);
         this.directory = destination;
-        destination.forms.push(this);
+        destination.reports.push(this);
       } else {
         this.setMetadata({ ...this.metadata, directoryId: this.directory.id });
       }
@@ -90,7 +90,7 @@ export class Report extends FileInfo<schema.XReport> implements IReport {
       id: this.id,
     });
     if (res.success) {
-      this.directory.forms = this.directory.forms.filter((i) => i.key != this.key);
+      this.directory.reports = this.directory.reports.filter((i) => i.key != this.key);
     }
     return res.success;
   }

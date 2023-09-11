@@ -173,7 +173,7 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
     if (this.typeName === '成员目录') {
       cnt.push(...this.target.members.map((i) => new Member(i, this)));
     } else {
-      cnt.push(...this.forms, ...this.applications, ...this.files, ...this.configs);
+      cnt.push(...this.forms, ...this.applications, ...this.files, ...this.configs, ...this.reports);
       if (mode != 1) {
         cnt.push(...this.propertys);
         cnt.push(...this.specieses);

@@ -48,7 +48,7 @@ const ReportForms: React.FC<IProps> = (props) => {
 
   useEffect(() => {
     const hot = hotRef.current.hotInstance;
-    Handsontable.editors.registerEditor('SelectEditor', selectEditor);
+    Handsontable.editors.registerEditor('SelectEditor', selectEditor);// 还未完成同步组件
     setStyleList(setting?.styleList || []);
     setClassList(setting?.classList || []);
     setRowHeights(setting?.row_h || []);
@@ -83,8 +83,6 @@ const ReportForms: React.FC<IProps> = (props) => {
       }
     }
   }, []);
-
-  // if(!reallyData) return <></>;
 
   const setValidator = (item: any, rules: any) => {
     // 设置单元格规则
@@ -126,7 +124,6 @@ const ReportForms: React.FC<IProps> = (props) => {
         newType = item.type;
         break;
     }
-
     hotRef.current.hotInstance.setCellMeta(item.row, item.col, 'editor', newType);
   };
 
@@ -347,7 +344,7 @@ const ReportForms: React.FC<IProps> = (props) => {
         colWidths={colWidths}
         rowHeights={rowHeights}
         readOnly={readOnly}
-        height="620px"
+        height="580px"
         language={zhCN.languageCode}
         stretchH="all"
         manualColumnResize={true}
