@@ -1,4 +1,4 @@
-import { Xbase, XForm, XIdentity, XTarget } from './schema';
+import { Xbase, XEntity, XForm, XIdentity, XTarget } from './schema';
 // 请求类型定义
 export type ReqestType = {
   // 模块
@@ -929,3 +929,122 @@ export const badRequest = (
 ): ResultType<any> => {
   return { success: false, msg: msg, code: code, data: false };
 };
+
+
+
+// 边
+export type Edge = {
+  // 主键
+  id: string;
+  // 开始
+  start: string;
+  // 结束
+  end: string;
+};
+
+// 映射
+export type Mapping = {
+  // 源
+  source: string;
+  // 目标
+  target: string;
+  // 映射
+  mappings: Mapping[];
+};
+
+// 存储
+export type Store = {
+  // 表单 ID
+  formId: string;
+  // 目录 ID
+  directoryId: string;
+};
+
+// 选择
+export type Selection = {
+  // 类型
+  type: 'checkbox' | 'radio';
+  // 关键字
+  key: string;
+  // 表单 ID
+  formId: string;
+};
+
+// 环境
+export type Environment = {
+  id: string;
+  name: string;
+  params: KeyValue;
+};
+
+// 脚本
+export type Script = {
+  id: string;
+  name: string;
+  code: string;
+};
+
+// 图状态
+export type GraphStatus = 'Editable' | 'Viewable' | 'Running';
+
+// 节点状态
+export type NodeStatus = 'Completed' | 'Error' | GraphStatus;
+
+// 节点类型
+export type NodeType = '请求' | '链接' | '映射' | '存储';
+
+// 事件
+export type Event = 'Edit' | 'View' | 'Run';
+
+// 节点
+export type Node<T> = {
+  // 主键
+  id: string;
+  // 名称
+  name: string;
+  // 类型
+  typeName: string;
+  // 前置脚本
+  preScripts: Script[];
+  // 后置脚本
+  postScripts: Script[];
+  // 数据（请求、子链接、映射、存储）
+  data: T;
+};
+
+// 运行时
+export type RunNode<T> = NodeStatus & Node<T>;
+
+// 请求节点
+export type RequestNode = Node<HttpRequestType>;
+
+// 链接节点
+export type LinkNode = Node<string>;
+
+// 脚本节点
+export type ScriptNode = Node<Script>;
+
+// 映射节点
+export type MappingNode = Node<Mapping>;
+
+// 存储节点
+export type StoreNode = Node<Store>;
+
+// 键值对
+export type KeyValue = { [key: string]: string | undefined };
+
+// 链接
+export type Link = {
+  // 目录
+  directoryId: string;
+  // 环境集合
+  envs: Environment[];
+  // 当前环境
+  curEnv?: string;
+  // 节点集合
+  nodes: Node<any>[];
+  // 边集合
+  edges: Edge[];
+  // 图数据
+  graph: any;
+} & XEntity;
