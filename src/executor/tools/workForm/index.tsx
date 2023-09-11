@@ -62,6 +62,7 @@ const WorkForm: React.FC<IWorkFormProps> = (props) => {
         }
       }
     }
+
     return {
       before: [...source],
       after: [...source],
