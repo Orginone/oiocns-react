@@ -10,7 +10,6 @@ import { loadWidgetsOpts } from './schemaRule';
 import { schemaType } from '@/ts/base/schema';
 import FormRender from '@/components/Common/FormEdit/FormRender';
 import { useForm } from 'form-render';
-import OioForm from './OioFormNext';
 type IProps = {
   current: IForm;
 };
