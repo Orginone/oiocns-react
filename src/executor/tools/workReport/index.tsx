@@ -33,7 +33,6 @@ const ReportForms: React.FC<IProps> = (props) => {
   const [rowHeights, setRowHeights] = useState<any>([]);
   const [colWidths, setColWidths] = useState<any>([]);
   const [serviceData, setServiceData]  = useState<any>();
-  // const [sheetList, setSheetList] = useState<any>([]);
   const reportData = props.forms[0]
   const formData = props.getFormData(reportData.id);
   const [reallyData, setReallyData] = useState(

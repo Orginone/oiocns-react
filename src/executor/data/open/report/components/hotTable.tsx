@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Tabs } from 'antd';
 import { HotTable } from '@handsontable/react';
-import { HyperFormula } from 'hyperformula';
 import { textRenderer, registerRenderer } from 'handsontable/renderers';
 import { registerLanguageDictionary, zhCN } from 'handsontable/i18n';
 registerLanguageDictionary(zhCN);
@@ -17,7 +16,6 @@ interface IProps {
 
 // 数据还未获取,明细待完善
 const HotTableView: React.FC<IProps> = ({ current, info }) => {
-  console.log(info, '事项明细info')
   const [cells, setCells] = useState<any>([]);
   const [styleList, setStyleList] = useState<any>([]);
   const [classList, setClassList] = useState<any>([]);
@@ -68,10 +66,6 @@ const HotTableView: React.FC<IProps> = ({ current, info }) => {
     setSheetIndex(key);
   };
 
-  const hyperformulaInstance = HyperFormula.buildEmpty({
-    licenseKey: 'internal-use-in-handsontable',
-  });
-
   registerRenderer('cellStylesRenderer', (hotInstance: any, TD: any, ...rest) => {
     //渲染样式
     textRenderer(hotInstance, TD, ...rest);
@@ -88,9 +82,6 @@ const HotTableView: React.FC<IProps> = ({ current, info }) => {
     <div>
       <HotTable
         ref={hotRef}
-        formulas={{
-          engine: hyperformulaInstance,
-        }}
         minCols={8}
         minRows={60}
         readOnly={true}

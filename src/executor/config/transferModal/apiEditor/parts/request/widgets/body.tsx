@@ -1,19 +1,21 @@
 import React from 'react';
 import MonacoEditor from './../../monacor';
-import { IRequest } from '@/ts/core/thing/config';
+import { model } from '@/ts/base';
+import { ILink } from '@/ts/core/thing/link';
 
 export interface IProps {
-  current: IRequest;
+  current: ILink;
+  node: model.RequestNode;
 }
 
-const Body: React.FC<IProps> = ({ current }) => {
+const Body: React.FC<IProps> = ({ current, node }) => {
   return (
     <MonacoEditor
       style={{ margin: 4 }}
-      defaultValue={current.metadata.axios.data}
+      defaultValue={node.data.content}
       onChange={(value) => {
-        current.metadata.axios.data = value;
-        current.refresh(current.metadata);
+        node.data.content = value ?? '';
+        current.updNode(node);
       }}
     />
   );

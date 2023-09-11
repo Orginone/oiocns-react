@@ -51,6 +51,7 @@
     "@ant-design/icons": "^4.6.2",
     "@ant-design/pro-components": "^2.3.37",
     "@antv/x6": "^2.13.1",
+    "@antv/x6-plugin-dnd": "^2.0.6",
     "@antv/x6-plugin-selection": "^2.1.7",
     "@antv/x6-react-shape": "^2.2.2",
     "@dnd-kit/core": "^6.0.7",

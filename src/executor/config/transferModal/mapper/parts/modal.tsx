@@ -1,16 +1,16 @@
 import FullScreenModal from '@/executor/tools/fullScreen';
 import React from 'react';
-import RequestLayout from './main';
+import Mapper from './mapper';
 import { ILink } from '@/ts/core/thing/link';
 import { model } from '@/ts/base';
 
 interface IProps {
-  current: ILink;
-  node: model.RequestNode;
+  link: ILink;
+  current: model.MappingNode;
   finished: () => void;
 }
 
-const RequestModal: React.FC<IProps> = ({ current, node, finished }) => {
+const MappingModal: React.FC<IProps> = ({ link, current, finished }) => {
   return (
     <FullScreenModal
       open
@@ -19,11 +19,11 @@ const RequestModal: React.FC<IProps> = ({ current, node, finished }) => {
       width={'80vw'}
       bodyHeight={'80vh'}
       destroyOnClose
-      title={'请求配置'}
+      title={'映射配置'}
       onCancel={() => finished()}>
-      <RequestLayout current={current} node={node} />
+      <Mapper link={link} current={current} />
     </FullScreenModal>
   );
 };
 
-export default RequestModal;
+export default MappingModal;

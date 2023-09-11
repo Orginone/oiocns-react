@@ -1,11 +1,10 @@
-import { ILink } from '@/ts/core/thing/config';
+import { ILink } from '@/ts/core/thing/link';
 import { Basecoat, Graph, Path, Platform } from '@antv/x6';
 import { Selection } from '@antv/x6-plugin-selection';
 import { register } from '@antv/x6-react-shape';
-import { edgeRegistering } from './edge';
-import { ProcessingNode } from './node';
 import React from 'react';
-import { generateUuid } from '@/ts/base/common';
+import { generateEdge } from './edge';
+import { ProcessingNode } from './node';
 
 /**
  * 创建画布
@@ -13,7 +12,7 @@ import { generateUuid } from '@/ts/base/common';
  * @param link 链接数据
  * @returns
  */
-export const createGraph = (ref: React.RefObject<HTMLDivElement>, link: ILink): Graph => {
+export const createGraph = (ref: React.RefObject<HTMLDivElement>): Graph => {
   const graph: Graph = new Graph({
     container: ref.current!,
     grid: true,
@@ -50,15 +49,7 @@ export const createGraph = (ref: React.RefObject<HTMLDivElement>, link: ILink): 
         },
       },
       createEdge() {
-        return graph.createEdge({
-          shape: 'data-processing-curve',
-          attrs: {
-            line: {
-              strokeDasharray: '5 5',
-            },
-          },
-          zIndex: -1,
-        });
+        return graph.createEdge(generateEdge());
       },
       validateConnection({ sourceMagnet, targetMagnet }) {
         if (sourceMagnet?.getAttribute('port-group') === 'in') {
@@ -73,10 +64,6 @@ export const createGraph = (ref: React.RefObject<HTMLDivElement>, link: ILink): 
   });
   using(graph);
   registering();
-  if (link.metadata.data) {
-    graph.fromJSON(link.metadata.data);
-  }
-  graph.centerContent();
   return graph;
 };
 
@@ -84,7 +71,6 @@ export const createGraph = (ref: React.RefObject<HTMLDivElement>, link: ILink): 
  * 注册自定义组件
  */
 const registering = () => {
-  edgeRegistering();
   Graph.registerConnector(
     'curveConnector',
     (sourcePoint, targetPoint) => {
@@ -160,54 +146,22 @@ const using = (graph: Graph) => {
       multiple: true,
       rubberband: true,
       movable: true,
-      showNodeSelectionBox: true,
       pointerEvents: 'none',
+      modifiers: ['shift'],
     }),
   );
-  graph.use(new Temping());
 };
 
-export const Persistence = 'Persistence';
-
 /** 临时存储插件 */
-export class Temping extends Basecoat<{}> implements Graph.Plugin {
+export class LinkStore extends Basecoat<{}> implements Graph.Plugin {
   name: string;
-  params: { [key: string]: { [key: string]: string } };
-  current?: string;
+  link: ILink;
 
-  constructor() {
+  constructor(link: ILink) {
     super();
-    this.name = Persistence;
-    this.params = {};
+    this.name = 'LinkStore';
+    this.link = link;
   }
 
   init(_graph: Graph, ..._: any[]) {}
-
-  createEnv() {
-    let id = generateUuid();
-    this.params[id] = {};
-    this.current = id;
-  }
-
-  curEnv(): { [key: string]: string } | undefined {
-    if (this.current) {
-      return this.params[this.current];
-    }
-  }
-
-  add(k: string, v: string) {
-    if (this.current) {
-      this.params[this.current][k] = v;
-    }
-  }
-
-  addAll(kvs: { [key: string]: string }) {
-    for (const k in kvs) {
-      this.add(k, kvs[k]);
-    }
-  }
-
-  dispose(): void {
-    this.params = {};
-  }
 }
