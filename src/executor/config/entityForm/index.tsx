@@ -12,9 +12,6 @@ import LabelsForm from './labelsForm';
 import RenameForm from './renameForm';
 import LabelsReport from './labelsReport';
 import LinkForm from './linkForm';
-import ExecutableForm from './executableForm';
-import EnvironmentForm from './environmentForm';
-import RequestForm from './requestForm';
 
 interface IProps {
   cmd: string;
@@ -95,23 +92,9 @@ const EntityForm: React.FC<IProps> = ({ cmd, entity, finished }) => {
           finished={reloadFinish}
         />
       );
-    case 'newRequest':
-    case 'updateRequest':
-      return (
-        <RequestForm formType={cmd} current={entity as any} finished={reloadFinish} />
-      );
     case 'newLink':
-      return <LinkForm current={entity as any} finished={reloadFinish} />;
-    case 'newExecutable':
-    case 'updateExecutable':
-      return (
-        <ExecutableForm formType={cmd} current={entity as any} finished={reloadFinish} />
-      );
-    case 'newEnvironment':
-    case 'updateEnvironment':
-      return (
-        <EnvironmentForm formType={cmd} current={entity as any} finished={reloadFinish} />
-      );
+    case 'updateLink':
+      return <LinkForm formType={cmd} current={entity as any} finished={reloadFinish} />;
     case 'newProperty':
     case 'updateProperty':
     case 'remarkProperty':

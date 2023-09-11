@@ -1,18 +1,15 @@
-import { Command } from '@/ts/base';
+import { ILink } from '@/ts/core/thing/link';
 import React from 'react';
-import MonacoEditor, { toJsonString } from '../monacor';
-import { IRequest } from '@/ts/core/thing/config';
+import MonacoEditor from '../monacor';
 
 interface IProps {
-  current: IRequest;
-  cmd: Command;
+  current: ILink;
 }
 
-const ResponsePart: React.FC<IProps> = ({ current, cmd }) => {
+const ResponsePart: React.FC<IProps> = ({ current }) => {
   return (
     <MonacoEditor
-      defaultValue={toJsonString(current.resp)}
-      cmd={cmd}
+      cmd={current.command}
       style={{ margin: 10 }}
       options={{ readOnly: true }}
     />
