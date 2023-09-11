@@ -75,13 +75,9 @@ const FormEditModal: React.FC<IProps> = ({
         const toDelAttrs = current.attributes.filter((item) =>
           toDelAttrIds.includes(item.id),
         );
-        const toDelAttrFns: Promise<boolean>[] = toDelAttrs.reduce((pre, cur) => {
-          pre.push(current.deleteAttribute(cur));
-          return pre;
-        }, [] as Promise<boolean>[]);
-        // console.log('toDelAttrs', toDelAttrs);
-        // console.log('toDelAttrFns', toDelAttrFns);
-        if (toDelAttrFns.length) await Promise.all(toDelAttrFns);
+        for (let i = 0; i < toDelAttrs.length; i++) {
+          await current.deleteAttribute(toDelAttrs[i]);
+        }
       }
       return true;
     }
