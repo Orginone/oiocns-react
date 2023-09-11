@@ -42,7 +42,7 @@ class FormulaRule extends RuleBase implements FormulaRuleType {
       let result: any = eval(resultString);
 
       if (isNaN(result)) {
-        return { success: false, data: null, errMsg: '计算结果非数字' };
+        return { success: false, data: null, errMsg: '计算结果异常' };
       }
 
       let finalResult = {

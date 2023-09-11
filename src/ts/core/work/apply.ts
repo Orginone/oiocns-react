@@ -48,7 +48,6 @@ export class WorkApply implements IWorkApply {
 
       this.instanceData.data[k] = [params];
     });
-    console.log('打印提交数据', fromData, this.instanceData);
 
     const res = await kernel.createWorkInstance({
       ...this.metadata,

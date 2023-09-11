@@ -9,8 +9,10 @@ export interface IRuleTemp extends IRuleBase {
 }
 /* 规则基础数据模型 */
 class RuleTemp extends RuleBase implements IRuleBase {
-  constructor(data: any) {
+  creatFun: Function; //创建最终规则的方法
+  constructor(data: IRuleTemp) {
     super(data);
+    this.creatFun = data.creatFun!;
   }
   /**
    *@desc 处理模板为规则规则

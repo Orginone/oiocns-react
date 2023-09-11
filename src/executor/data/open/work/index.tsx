@@ -45,7 +45,7 @@ const WorkStartDo: React.FC<IProps> = ({ current, finished }) => {
           onChanged={(id, data) => {
             formData.set(id, data);
             /* 每次变化收集当前最新表单数据 */
-            apply.ruleService.serFormData = formData;
+            apply.ruleService.collectData('hotData', formData);
           }}
         />
         <div style={{ padding: 10, display: 'flex', alignItems: 'flex-end' }}>
@@ -61,24 +61,11 @@ const WorkStartDo: React.FC<IProps> = ({ current, finished }) => {
             onClick={async () => {
               let { values = {}, success = true } =
                 await apply.ruleService.resloveSubmitRules();
-
-              console.log(
-                '提交数据修海',
-                apply.ruleService.currentMainFormId,
-                99,
-                values,
-                formData,
-                apply,
-              );
-
-              const changedForm = formData.get(
-                apply.ruleService.currentMainFormId as string,
-              );
+              const changedForm = formData.get(apply.ruleService.currentMainFormId);
               formData.set(apply.ruleService.currentMainFormId!, {
                 ...changedForm,
                 after: [{ ...changedForm!.after[0]!, ...values }],
               } as any);
-              console.log('提交', formData);
               if (success) {
                 apply.createApply(apply.belong.id, info.content, formData);
                 finished();

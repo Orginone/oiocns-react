@@ -22,11 +22,11 @@ export type WorkFormRulesType = {
   // /* 收集办事表单的规则 */
   // _AllFormRules: Map<string, { rules: IRuleBase[]; attrs: any[] }>;
   /* 当前选中 主表的id标识 */
-  currentMainFormId?: string;
+  currentMainFormId: string;
   /* 设置最新表单数据 */
   serFormData: any;
   // /* 初始化规则*/
-  // initFormRules: (forms: any[]) => void;
+  initFormRules: (forms: any[], belone: IBelong) => void;
   /* 表单渲染时，需提交表单修改方式 至此，用于规则处理后的回显：考虑返回规则执行结果，到页面处理渲染逻辑*/
   setFormChangeCallback: (formId: string, callback: (data: any) => any) => void;
   /* 加载表单远程规则*/
@@ -37,7 +37,8 @@ export type WorkFormRulesType = {
     formData: { id: string; data: RuleTypes.DataType },
     changeObj?: DataType, //变动项
   ) => void;
-  collectData: (type: string, data: any) => void;
+  /* 收集关键数据 */
+  collectData: (type: 'formsType' | 'hotData', data: any) => void;
   /* 执行所有表单的最终提交规则 */
   resloveSubmitRules: () => Promise<{ values: Record<string, any>; success: boolean }>;
 };
@@ -46,9 +47,10 @@ class WorkFormRules extends Emitter implements WorkFormRulesType {
   constructor() {
     super();
     this.currentCompanyInfo = {} as any;
+    this.currentMainFormId = '';
   }
   /* 当前主表id */
-  public currentMainFormId: string = '';
+  public currentMainFormId: string;
   // 是否所有规则都已加载完毕
   public isReady: boolean = false;
   // 单位信息
@@ -72,16 +74,6 @@ class WorkFormRules extends Emitter implements WorkFormRulesType {
     // 遍历每个表单，获取其中的规则
     for (const formItem of forms) {
       const { list: ruleList = [] } = JSON.parse(formItem.metadata?.rule ?? '{}');
-      /* 收集主子表信息 */
-
-      console.log(
-        '遍历每个表单，获取其中的规则,获取表单类型',
-        formItem.id,
-        formItem.name,
-        formItem.typeName,
-      );
-
-      // this._FormIdtoType.set(formItem.id, formItem.typeName);
       // 将表单的规则存入 _AllFormRules 中
       this._AllFormRules.set(formItem.id, {
         rules: setFormRules(ruleList),
@@ -97,14 +89,17 @@ class WorkFormRules extends Emitter implements WorkFormRulesType {
       }
     }
   };
-  public collectData(type: string, data: any) {
+  /* 收集数据 */
+  public collectData(type: 'formsType' | 'hotData', data: Record<string, string[]>) {
     switch (type) {
       case 'formsType':
         for (let key in data) {
           this._FormsTypeMap.set(key === 'primaryFormIds' ? '主表' : '子表', data[key]);
         }
         break;
-
+      case 'hotData':
+        this._hotData = data as any;
+        break;
       default:
         break;
     }
@@ -188,8 +183,8 @@ class WorkFormRules extends Emitter implements WorkFormRulesType {
   public resloveSubmitRules = async () => {
     let _Results = [];
     for (const item of this._FormsTypeMap.get('主表')!) {
-      const paramns: any = { id: item, data: this._hotData.get(item)?.after?.[0] };
-      _Results.push(await this.resloveFormRule(RuleTriggers.Submit, paramns));
+      const params: any = { id: item, data: this._hotData.get(item)?.after?.[0] };
+      _Results.push(await this.resloveFormRule(RuleTriggers.Submit, params));
     }
 
     let vals = {}; // 提交时赋值
@@ -204,7 +199,7 @@ class WorkFormRules extends Emitter implements WorkFormRulesType {
       }
     });
 
-    let res = boolArr.length > 0 ? boolArr.some((v) => v == false) : true;
+    const res = boolArr.length > 0 ? boolArr.some((v) => v == false) : true;
     return { values: vals, success: res };
   };
   /**
@@ -247,7 +242,7 @@ class WorkFormRules extends Emitter implements WorkFormRulesType {
           // 如果规则执行成功，则将规则返回的数据合并到 resultObj 中
           if (res.success) {
             // 判断赋值类型
-            if (_R.valueGoal === ValueGoal.主表赋值 || !_R.valueGoal) {
+            if (_R.effect === ValueGoal.mainVals || !_R.effect) {
               if (Array.isArray(resultObj)) {
                 resultObj.push(res.data);
               } else {
