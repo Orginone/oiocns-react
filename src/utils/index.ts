@@ -87,31 +87,6 @@ const formatDate = (date?: any, fmt?: string) => {
 
   return fmt;
 };
-function formatTimeByPattern(val: any) {
-  // 2016-05-23 13:58:02.0
-  if (val.length > 19) {
-    val = val.substring(0, 19);
-  }
-
-  let pattern = /-|\./g;
-  let year;
-  let month;
-  let day;
-  let reset;
-
-  if (pattern.test(val)) {
-    return val.replace(pattern, '/');
-  } else {
-    // 若无’-‘，则不处理
-    if (!~val.indexOf('-')) {
-      year = val.slice(0, 4);
-      month = val.slice(4, 6);
-      day = val.slice(6, 8);
-      reset = val.slice(8);
-      return year + '/' + month + '/' + day + reset;
-    }
-  }
-}
 
 /**
  * 将时间转化为几天前,几小时前，几分钟前
@@ -295,9 +270,29 @@ function getJsonText(fileUrl: string): Promise<string> {
   });
 }
 
-const ellipsisText = (text: string, length: number) => {
+function ellipsisText(text: string, length: number) {
   return text.substring(0, length) + '...';
-};
+}
+
+/**
+ * 根据传入keys顺序，对传入obj对象键值对排序
+ * @param obj
+ * @param sortedKeys
+ */
+function sortObjByKeys<T extends object>(obj: T, sortedKeys: string[]): T {
+  const sortedObj: Partial<T> = {};
+  sortedKeys.forEach((key) => {
+    if (obj?.hasOwnProperty(key)) {
+      sortedObj[key as keyof T] = obj[key as keyof T];
+    }
+  });
+  // 将原对象的其他键值对复制到排序后的对象中
+  for (const key in obj) {
+    if (!sortedObj.hasOwnProperty(key)) sortedObj[key] = obj[key];
+  }
+  return sortedObj as T;
+}
+
 export {
   ellipsisText,
   filterEmptyPropObj,
@@ -308,5 +303,6 @@ export {
   getScrollX,
   isEmoji,
   isSpecialChar,
+  sortObjByKeys,
   visitTree,
 };

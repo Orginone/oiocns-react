@@ -36,6 +36,10 @@ const SelectForms: React.FC<IProps> = (props) => {
       }),
     );
   };
+  const delFromSelected = (id: string) => {
+    const idxInSelected = props.selected.findIndex((item) => item.id === id);
+    props.selected.splice(idxInSelected, 1);
+  };
   // 中间树形点击事件
   const onCheck: TreeProps['onCheck'] = (checkedKeys, info) => {
     if (Array.isArray(checkedKeys)) {
@@ -46,14 +50,13 @@ const SelectForms: React.FC<IProps> = (props) => {
       props.selected.push(property);
       props.onAdded(property);
     } else {
-      props.selected = props.selected.filter((i) => i.id != property.id);
+      delFromSelected(property.id);
       props.onDeleted(property.id);
     }
   };
-
-  const buildDirectoryTree = (directorys: IDirectory[]): any[] => {
+  const buildDirectoryTree = (directors: IDirectory[]): any[] => {
     const result: any[] = [];
-    for (const item of directorys) {
+    for (const item of directors) {
       result.push({
         key: item.id,
         title: item.name,
@@ -64,9 +67,9 @@ const SelectForms: React.FC<IProps> = (props) => {
     }
     return result;
   };
-
   const handelDel = (id: string) => {
     setCenterCheckedKeys(centerCheckedKeys.filter((data) => data != id));
+    delFromSelected(id);
     props.onDeleted(id);
   };
 
