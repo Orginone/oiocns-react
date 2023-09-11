@@ -17,8 +17,6 @@ interface IProps {
  */
 const ProFormPerson = (props: IProps) => {
   const [options, setOptions] = useState<{ label: string; value: string }[]>([]);
-  console.log('ssss', props);
-
   useEffect(() => {
     const belong = orgCtrl.targets.find(
       (a) => a.id == props.schema?.metadata?.belongId,

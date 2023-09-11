@@ -34,6 +34,7 @@ const PrimaryForm: React.FC<IProps> = (props) => {
     }
     props?.ruleService && (props.ruleService.currentMainFormId = form.id);
   }, []);
+
   if (!data) return <></>;
   return (
     <OioForm

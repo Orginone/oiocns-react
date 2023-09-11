@@ -20,12 +20,12 @@ function uniqueArray(array: any) {
 }
 
 //获取规则字符串中所有特殊字符，默认为「」
-function getAllFixedCharacter(str: string, reg = /「(.*?)」/) {
+function getAllSpecialCharacter(str: string, reg = /「(.*?)」/) {
   return str.match(reg);
 }
 
 //获取特殊字符中的内容，默认为「」
-function getChartcterContent(str: string, reg = /「(.*?)」/) {
+function getSpecialChartcterContent(str: string, reg = /「(.*?)」/) {
   const match = str.match(reg);
   if (match && match[1]) {
     //如果匹配成功则返回匹配到的内容
@@ -35,7 +35,7 @@ function getChartcterContent(str: string, reg = /「(.*?)」/) {
 }
 
 //通过name获取特性对应的id
-function findKeyWidthName(
+function findKeyByName(
   name: string,
   ObjArr: { name: string; code: string; id: string }[],
 ): string | undefined {
@@ -120,9 +120,9 @@ const setFormRules = (ruleList: any[]) => {
 };
 export {
   filterRules,
-  findKeyWidthName,
-  getAllFixedCharacter,
-  getChartcterContent,
+  findKeyByName,
+  getAllSpecialCharacter,
+  getSpecialChartcterContent,
   removeNullObj,
   setFormRules,
   uniqueArray,

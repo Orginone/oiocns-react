@@ -1,7 +1,7 @@
 import { RuleTriggers } from '@/ts/base/model';
 import RuleBase, { IRuleBase } from '../base/ruleBase';
 import { removeNullObj } from '../lib/tools';
-
+import { fixedCharacterResolver } from '../formulaRule/replaceStr';
 interface MethodRuleData extends IRuleBase {
   targetId: string;
 }
@@ -29,10 +29,11 @@ class MethodRule extends RuleBase implements IRuleBase {
   /* 执行js，生成结果 */
   public async dealRule(props: any): Promise<RuleResult> {
     try {
-      const _data = eval(this.content)(props);
+      const _data = eval(await fixedCharacterResolver(this.content))(props);
       const result = await this._handleResult(_data);
       return { success: true, data: result, errMsg: '' };
     } catch (err) {
+      console.error(this.name, '：函数内容执行有误，请检查函数定义');
       return { success: false, data: null, errMsg: '处理函数有误' };
     }
   }

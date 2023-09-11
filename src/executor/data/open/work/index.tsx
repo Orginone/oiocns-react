@@ -59,8 +59,27 @@ const WorkStartDo: React.FC<IProps> = ({ current, finished }) => {
           <Button
             type="primary"
             onClick={async () => {
-              let res = await apply.ruleService.resloveSubmitRules();
-              if (res) {
+              let { values = {}, success = true } =
+                await apply.ruleService.resloveSubmitRules();
+
+              console.log(
+                '提交数据修海',
+                apply.ruleService.currentMainFormId,
+                99,
+                values,
+                formData,
+                apply,
+              );
+
+              const changedForm = formData.get(
+                apply.ruleService.currentMainFormId as string,
+              );
+              formData.set(apply.ruleService.currentMainFormId!, {
+                ...changedForm,
+                after: [{ ...changedForm!.after[0]!, ...values }],
+              } as any);
+              console.log('提交', formData);
+              if (success) {
                 apply.createApply(apply.belong.id, info.content, formData);
                 finished();
               } else {
