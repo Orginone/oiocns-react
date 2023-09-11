@@ -22,26 +22,27 @@ interface IProps {
 }
 
 const FormRenders: React.FC<IProps> = (props) => {
+  if (props.forms?.length < 1) return <></>;
+  const form = props.forms?.[0];
   const formIns: any = useForm();
-  if (props.forms.length < 1) return <></>;
-  const form = props.forms[0];
 
-  if (!props.data.fields[form.id]) return <></>;
   // const fields = props.data.fields[form.id];
   const formData = props.getFormData(form.id);
   const [data, setData] = useState(
-    formData.after.length > 0 ? formData.after[0] : undefined,
+    formData?.after?.length > 0 ? formData.after[0] : undefined,
   );
   useEffect(() => {
-    if (!data) {
+    // 无边编辑权限时，也无需获取id
+    if (props.allowEdit && !data) {
       kernel.createThing(props.belong.userId, '').then((res) => {
         if (res.success && res.data) {
           setData(res.data);
         }
       });
     }
-
     if (props.allowEdit) {
+      //TODO:默认收集选中主表id：目前未做多主表切换动态修改选中id
+      props?.ruleService && (props.ruleService.currentMainFormId = form.id);
       //初始化数据
       props?.ruleService?.setFormChangeCallback(form.id, (data: any) => {
         const timeFormatRegex = /^\d{4}\/\d{1,2}\/\d{1,2} \d{1,2}:\d{1,2}$/;
@@ -62,6 +63,7 @@ const FormRenders: React.FC<IProps> = (props) => {
     }
   }, []);
   if (!data) return <></>;
+
   const watch = {
     // # 为全局
     '#': (val: any) => {
@@ -71,13 +73,16 @@ const FormRenders: React.FC<IProps> = (props) => {
         props.data.primary[k] = val[k];
       });
       val.after = [data];
-      props.onChanged?.apply(this, [form.id, val]);
+      // 数据提交bug处理
+      formData.after = [data];
+
+      props.onChanged?.apply(this, [form.id, formData]);
       setData({ ...data });
     },
   };
 
   const handleSchemaData: any = (schema: any) => {
-    //TODO:向自定义组件传参方式验证完成；待优化此部分功能
+    //TODO:；待优化此部分功能---根据组件类型区别传入的参数
     // console.log(schema, props);
     const properties = schema.properties;
     const buildDepartments = (departments: IDepartment[]) => {
@@ -97,7 +102,7 @@ const FormRenders: React.FC<IProps> = (props) => {
       const content = properties[key];
       content['metadata'] = {
         belongId: props.belong.metadata.id,
-        deptTree: buildDepartments(props.belong?.departments as any),
+        deptTree: buildDepartments(props.belong?.departments),
       };
 
       // content['metadata'] = props.belong;

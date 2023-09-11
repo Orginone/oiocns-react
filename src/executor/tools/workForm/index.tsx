@@ -3,9 +3,9 @@ import { model } from '../../../ts/base';
 import { IBelong } from '@/ts/core';
 
 import DetailForms from './detail';
-import PrimaryForms from './primary';
+// import PrimaryForms from './primary';
 import FormRenders from './formPreview';
-import ReportForms from '../workReport';
+// import ReportForms from '../workReport';
 
 import { formatDate } from '@/utils';
 import { DataType } from 'typings/globelType';
@@ -38,6 +38,12 @@ const getNodeByNodeId = (
 /** 流程节点表单 */
 const WorkForm: React.FC<IWorkFormProps> = (props) => {
   const node = getNodeByNodeId(props.nodeId, props.data.node);
+  /* 收集主子表信息 */
+  props?.ruleService?.collectData('formsType', {
+    primaryFormIds: node?.primaryFormIds || [],
+    detailFormIds: node?.detailFormIds || [],
+  });
+
   const forms = [...(node?.primaryForms || []), ...(node?.detailForms || [])];
   if (!node || forms.length < 1) return <></>;
   /** 根据需求获取数据 */
@@ -56,6 +62,7 @@ const WorkForm: React.FC<IWorkFormProps> = (props) => {
         }
       }
     }
+
     return {
       before: [...source],
       after: [...source],
@@ -68,12 +75,12 @@ const WorkForm: React.FC<IWorkFormProps> = (props) => {
     <div style={{ padding: 10 }}>
       {/* 同样的类型 需要如何区分展示报表或者表单？ 所以我这边先注释掉了 */}
       {/* <ReportForms {...props} forms={node.primaryForms || []} getFormData={getFormData} /> */}
-      {/* <FormRenders {...props} forms={node.primaryForms || []} getFormData={getFormData} /> */}
-      <PrimaryForms
+      <FormRenders {...props} forms={node.primaryForms || []} getFormData={getFormData} />
+      {/* <PrimaryForms
         {...props}
         forms={node.primaryForms || []}
         getFormData={getFormData}
-      />
+      /> */}
       <DetailForms {...props} forms={node.detailForms || []} getFormData={getFormData} />
     </div>
   );

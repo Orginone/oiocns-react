@@ -1,3 +1,4 @@
+import { getUuid } from '@/utils/tools';
 /* 规则函数库
  * Author:      SEN
  * CreateTime:  7/20/2023, 10:41:42 AM
@@ -43,4 +44,9 @@ export function findIdByName(
     return attr.name === name;
   });
   return matchedAttr ? matchedAttr.id : '';
+}
+
+/* 根据特性名称获取特性id */
+export function uuid(): string {
+  return getUuid(20);
 }

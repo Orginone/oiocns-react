@@ -1,5 +1,5 @@
 import RuleBase, { IRuleBase } from '../base/ruleBase';
-import { getChartcterContent, findKeyWidthName } from '../lib/tools';
+import { getSpecialChartcterContent, findKeyByName } from '../lib/tools';
 import replaceString from './replaceStr';
 /**
  *@desc 规定 公式取值必须使用「」作为中文字包裹特殊字符
@@ -20,7 +20,7 @@ class FormulaRule extends RuleBase implements FormulaRuleType {
 
     // 获取目标键（id）
     let targetKey: string | undefined =
-      findKeyWidthName(getChartcterContent(targetContent) as string, $attrs) ?? '';
+      findKeyByName(getSpecialChartcterContent(targetContent) as string, $attrs) ?? '';
 
     if (!targetKey) {
       return {
@@ -42,7 +42,7 @@ class FormulaRule extends RuleBase implements FormulaRuleType {
       let result: any = eval(resultString);
 
       if (isNaN(result)) {
-        return { success: false, data: null, errMsg: '计算结果非数字' };
+        return { success: false, data: null, errMsg: '计算结果异常' };
       }
 
       let finalResult = {

@@ -30,7 +30,7 @@ export class WorkApply implements IWorkApply {
     this.instanceData = _data;
     this.belong = _belong;
     WorkFormRules.initFormRules(_forms, _belong);
-    this.ruleService = WorkFormRules;
+    this.ruleService = WorkFormRules as any;
     //TODO:尝试在此处，执行规则初始化操作 修改instanceData
   }
   belong: IBelong;
@@ -43,7 +43,10 @@ export class WorkApply implements IWorkApply {
     fromData: Map<string, model.FormEditData>,
   ): Promise<boolean> {
     fromData.forEach((data, k) => {
-      this.instanceData.data[k] = [data];
+      const { after, before, createTime, creator, nodeId } = data;
+      const params = { after, before, createTime, creator, nodeId };
+
+      this.instanceData.data[k] = [params];
     });
 
     const res = await kernel.createWorkInstance({
