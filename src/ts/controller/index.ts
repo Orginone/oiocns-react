@@ -32,7 +32,7 @@ class IndexController extends Controller {
   get user(): IPerson {
     return this._provider.user!;
   }
- 
+
   /** 所有相关的用户 */
   get targets(): ITarget[] {
     return this._provider.targets;

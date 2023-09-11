@@ -89,11 +89,14 @@ export default class KernelApi {
     return this._storeHub.isConnected;
   }
   /** 连接信息 */
-  public async onlines(): Promise<model.OnlineInfo[]> {
+  public async onlines(): Promise<model.OnlineSet | undefined> {
     if (this.onlineIds.length > 0) {
       const result = await this._storeHub.invoke('Online');
-      if (result.success && Array.isArray(result.data)) {
-        var ids = result.data.map((i) => i.connectionId);
+      if (result.success && result.data) {
+        var data: model.OnlineSet = result.data;
+        var uids = data?.users?.map((i) => i.connectionId) || [];
+        var sids = data?.storages?.map((i) => i.connectionId) || [];
+        var ids = [...uids, ...sids];
         if (ids.length != this.onlineIds.length) {
           this.onlineIds = ids;
           this.onlineNotity.changCallback();
@@ -102,7 +105,6 @@ export default class KernelApi {
         return result.data;
       }
     }
-    return [];
   }
   /**
    * 登录到后台核心获取accessToken
@@ -695,20 +697,6 @@ export default class KernelApi {
       params: params,
     });
   }
-  // /**
-  //  * 创建物
-  //  * @param {model.ThingModel} params 请求参数
-  //  * @returns {model.ResultType<schema.XThing>} 请求结果
-  //  */
-  // public async createThing(
-  //   params: model.ThingModel,
-  // ): Promise<model.ResultType<schema.XThing>> {
-  //   return await this.request({
-  //     module: 'thing',
-  //     action: 'CreateThing',
-  //     params: params,
-  //   });
-  // }
   /**
    * 删除目录
    * @param {model.IdModel} params 请求参数
@@ -1295,20 +1283,20 @@ export default class KernelApi {
   /**
    * 替换数据集数据
    * @param {string} collName 数据集名称（eg: history-message）
-   * @param {T} data 要添加的数据，对象/数组
+   * @param {T} replace 要添加的数据，对象/数组
    * @param {string} belongId 对象所在的归属用户ID
    * @returns {model.ResultType<T>} 对象异步结果
    */
   public async collectionReplace<T>(
     belongId: string,
     collName: string,
-    data: T,
+    replace: T,
   ): Promise<model.ResultType<T>> {
     return await this.dataProxy({
       module: 'Collection',
       action: 'Replace',
       belongId,
-      params: { collName, data },
+      params: { collName, replace },
     });
   }
   /**
