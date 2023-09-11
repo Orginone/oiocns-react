@@ -38,6 +38,12 @@ const getNodeByNodeId = (
 /** 流程节点表单 */
 const WorkForm: React.FC<IWorkFormProps> = (props) => {
   const node = getNodeByNodeId(props.nodeId, props.data.node);
+  /* 收集主子表信息 */
+  props?.ruleService?.collectData('formsType', {
+    primaryFormIds: node?.primaryFormIds || [],
+    detailFormIds: node?.detailFormIds || [],
+  });
+
   const forms = [...(node?.primaryForms || []), ...(node?.detailForms || [])];
   if (!node || forms.length < 1) return <></>;
   /** 根据需求获取数据 */

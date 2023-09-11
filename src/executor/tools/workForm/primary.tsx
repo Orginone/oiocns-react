@@ -25,7 +25,7 @@ const PrimaryForm: React.FC<IProps> = (props) => {
     formData.after.length > 0 ? formData.after[0] : undefined,
   );
   useEffect(() => {
-    if (props.allowEdit && !data) {
+    if (!data) {
       kernel.createThing(props.belong.userId, '').then((res) => {
         if (res.success && res.data) {
           setData(res.data);
@@ -34,8 +34,6 @@ const PrimaryForm: React.FC<IProps> = (props) => {
     }
     props?.ruleService && (props.ruleService.currentMainFormId = form.id);
   }, []);
-
-  console.log('PrimaryForm', data);
 
   if (!data) return <></>;
   return (
