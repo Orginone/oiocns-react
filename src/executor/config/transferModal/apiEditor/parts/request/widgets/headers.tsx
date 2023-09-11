@@ -1,46 +1,60 @@
-import { IRequest } from '@/ts/core/thing/config';
-import { AxiosHeaderValue, AxiosHeaders, RawAxiosRequestHeaders } from 'axios';
 import React, { useEffect, useState } from 'react';
 import EditableTable from './editable';
+import { ILink } from '@/ts/core/thing/link';
+import { model } from '@/ts/base';
+import { generateUuid } from '@/ts/base/common';
 
 export interface IProps {
-  current: IRequest;
+  current: ILink;
+  node: model.RequestNode;
 }
-
-export type Header = RawAxiosRequestHeaders | AxiosHeaders;
 
 interface HeaderData {
   id: string;
   key?: string;
-  value?: AxiosHeaderValue;
+  value?: string;
 }
 
-const toAxiosHeader = (headers: readonly HeaderData[]): Header => {
-  const final: Header = {};
+const toHeader = (header: { [key: string]: string }): HeaderData[] => {
+  const headers: HeaderData[] = [];
+  Object.keys(header).forEach((key) => {
+    headers.push({
+      id: generateUuid(),
+      key: key,
+      value: header[key],
+    });
+  });
+  return headers;
+};
+
+const toKvHeader = (headers: readonly HeaderData[]) => {
+  const final: { [key: string]: string } = {};
   for (const header of headers) {
     if (header.key) {
-      final[header.key] = header.value;
+      final[header.key] = header.value ?? '';
     }
   }
   return final;
 };
 
-const Header: React.FC<IProps> = ({ current }) => {
-  const [headers, setHeaders] = useState<readonly HeaderData[]>(current.metadata.headers);
+const Header: React.FC<IProps> = ({ current, node }) => {
+  const [headers, setHeaders] = useState(toHeader(node.data.header));
   useEffect(() => {
-    const id = current.subscribe(() => {
-      setHeaders(current.metadata.headers);
+    const id = current.command.subscribe((type, cmd, args) => {
+      if (type == 'node' && cmd == 'update') {
+        setHeaders(args.data.headers);
+      }
     });
     return () => {
       current.unsubscribe(id);
     };
-  }, [current.axios.headers]);
+  });
 
   const onChange = (headers: readonly HeaderData[]) => {
-    current.metadata.headers = headers;
-    current.axios.headers = toAxiosHeader(headers);
-    current.refresh(current.metadata);
+    node.data.header = toKvHeader(headers);
+    current.updNode(node);
   };
+
   return (
     <EditableTable<HeaderData>
       value={headers}

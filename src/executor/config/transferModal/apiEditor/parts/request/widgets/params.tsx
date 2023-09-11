@@ -1,10 +1,14 @@
-import { IRequest } from '@/ts/core/thing/config';
 import React, { useEffect, useState } from 'react';
 import EditableTable from './editable';
+import { ILink } from '@/ts/core/thing/link';
+import { model } from '@/ts/base';
+import { generateUuid } from '@/ts/base/common';
 
 export interface IProps {
-  current: IRequest;
+  current: ILink;
+  node: model.RequestNode;
 }
+
 export interface Param {
   id: string;
   key?: string;
@@ -18,23 +22,45 @@ const toUrlParams = (url: string = '', params: readonly Param[]): string => {
   return parts[0] + '?' + ans;
 };
 
-const Params: React.FC<IProps> = ({ current }) => {
-  const [params, setParams] = useState<readonly Param[]>(current.metadata.params);
+const toParams = (value?: string): Param[] => {
+  if (value) {
+    let mark = value.indexOf('?');
+    if (mark != -1) {
+      let params = value.substring(mark + 1);
+      let groups = params.split('&');
+      let data: Param[] = [];
+      for (let group of groups) {
+        let split = group.split('=', 2);
+        data.push({
+          id: generateUuid(),
+          key: split[0],
+          value: split.length > 1 ? split[1] : '',
+        });
+      }
+      return data;
+    }
+  }
+  return [];
+};
+
+const Params: React.FC<IProps> = ({ current, node }) => {
+  const [params, setParams] = useState<readonly Param[]>(toParams(node.data.uri));
 
   useEffect(() => {
-    const id = current.subscribe(() => {
-      setParams(current.metadata.params);
+    const id = current.command.subscribe((type, cmd, args) => {
+      if (type == 'node' && cmd == 'update') {
+        setParams(toParams(args.data.uri));
+      }
     });
     return () => {
       current.unsubscribe(id!);
     };
-  }, [current.axios.params]);
+  });
 
   const onChange = (params: readonly Param[]) => {
-    const url = toUrlParams(current.metadata.axios.url, params);
-    current.metadata.axios.url = url;
-    current.metadata.params = params;
-    current.refresh(current.metadata);
+    const url = toUrlParams(node.data.uri, params);
+    node.data.uri = url;
+    current.updNode(node);
   };
 
   return (
