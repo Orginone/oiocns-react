@@ -40,13 +40,15 @@ const FormEditModal: React.FC<IProps> = ({
 
   // 创建ref
   const myComponentRef: any = useRef(null);
-  const onFormSchemaChange = (e: schemaType) => {
+  const onFormSchemaChange = (schema: schemaType) => {
+    // 更新设计器中schema，避免fieldWrapperRender方法中取到原来的缓存节点
+    myComponentRef.current.setValue(schema);
     const ruleInfo = JSON.parse(current.metadata.rule || '{}');
     current.update({
       ...current.metadata,
       rule: JSON.stringify({
         ...ruleInfo,
-        schema: e,
+        schema,
       }),
     });
   };
@@ -209,9 +211,9 @@ const FormEditModal: React.FC<IProps> = ({
           settings={setting}
           commonSettings={{}}
           ref={myComponentRef}
-          onCanvasSelect={(v) => console.log(v)}
+          onCanvasSelect={(v) => console.log('~!~~~onCanvasSelect', v)}
           fieldWrapperRender={(schema, isSelected, _children, originNode) => {
-            if (isSelected && selectedItem.title !== schema.title) {
+            if (isSelected && selectedItem.$id !== schema.$id) {
               /* 收集当前选中项 */
               console.log('~!~~~schema', schema);
               setSelectedItem(schema);

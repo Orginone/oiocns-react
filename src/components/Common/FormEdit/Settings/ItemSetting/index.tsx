@@ -21,7 +21,7 @@ const obj = {
   hidden: 'false',
   allowClear: 'false',
 };
-const AttributeConfig = ({ current, schemaRef, selectedFiled, superAuth }: IProps) => {
+const AttributeConfig = ({ current, schemaRef, selectedFiled }: IProps) => {
   if (!selectedFiled) {
     return <>请选择组件</>;
   }
@@ -47,30 +47,27 @@ const AttributeConfig = ({ current, schemaRef, selectedFiled, superAuth }: IProp
     if (selectedFiled) {
       selectedFiled.rule = selectedFiled.rule || '{}';
       const rule = { ...JSON.parse(selectedFiled.rule), ...changedValues };
-      console.log('selectedFiled', selectedFiled);
       /* 更新保存数据 */
       const attrData = {
         ...selectedFiled,
-        name: selectedFiled.title ?? selectedFiled.name,
+        name: rule.title ?? selectedFiled.name,
         rule: JSON.stringify(rule),
       };
-      // delete attrData.$id
+      delete attrData.$id;
       current.updateAttribute(attrData);
-      const resultScame = updateSchemaById(
+      const schema = updateSchemaById(
         selectedFiled?.$id as string,
         schemaRef.current.getValue(),
         changedValues,
       );
-      // console.log('resultScame', resultScame);
-      // debugger;
-      /* 更新schma展示数据 */
-      schemaRef.current.setValue(resultScame);
+      // 更新schema
+      schemaRef.current.setValue(schema);
       const ruleInfo = JSON.parse(current.metadata.rule || '{}');
       current.update({
         ...current.metadata,
         rule: JSON.stringify({
           ...ruleInfo,
-          schema: resultScame,
+          schema,
         }),
       });
     }
