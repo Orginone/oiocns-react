@@ -170,7 +170,7 @@ export const directoryOperates = {
     iconType: '批量请求配置',
   },
   NewLink: {
-    sort: 11,
+    sort: 9,
     cmd: 'newLink',
     label: '新建链接配置',
     iconType: '链接配置',
@@ -180,6 +180,12 @@ export const directoryOperates = {
     cmd: 'newMapping',
     label: '新建映射配置',
     iconType: '映射配置',
+  },
+  BatchMapping: {
+    sort: 12,
+    cmd: 'batchMapping',
+    label: '批量映射配置',
+    iconType: '批量映射配置',
   },
   NewExecutable: {
     sort: 13,
@@ -192,6 +198,18 @@ export const directoryOperates = {
     cmd: 'newEnvironment',
     label: '新建环境配置',
     iconType: '环境配置',
+  },
+  NewSelection: {
+    sort: 15,
+    cmd: 'newSelection',
+    label: '新建选择配置',
+    iconType: '选择配置',
+  },
+  NewStore: {
+    sort: 15,
+    cmd: 'newStore',
+    label: '新建存储配置',
+    iconType: '存储配置',
   },
 };
 
@@ -211,22 +229,7 @@ export const directoryNew = {
     directoryOperates.NewThingConfig,
     directoryOperates.NewWorkConfig,
     directoryOperates.NewReport,
-  ],
-};
-
-/** 数据迁移 */
-export const transferNew = {
-  sort: 1,
-  cmd: 'transfer',
-  label: '迁移配置',
-  iconType: 'new',
-  menus: [
-    directoryOperates.NewRequest,
-    directoryOperates.BatchRequest,
     directoryOperates.NewLink,
-    directoryOperates.NewMapping,
-    directoryOperates.NewExecutable,
-    directoryOperates.NewEnvironment
   ],
 };
 
