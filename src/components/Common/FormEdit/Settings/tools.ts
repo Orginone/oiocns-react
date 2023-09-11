@@ -1,38 +1,37 @@
 import { deepClone } from '@/ts/base/common';
 import { schemaType } from '@/ts/base/schema';
 
-const UpdataScameItemById = (
-  id: string,
-  scame: schemaType,
-  changeValue: Record<string, any>,
+const updateSchemaById = (
+  originId: string,
+  schema: schemaType,
+  updateValues: Record<string, any>,
 ) => {
-  let _scame: any = scame;
-  const dataObj: Record<string, any> = _scame.properties;
-  if (dataObj?.[id]) {
-    dataObj[id] = hadnleScameUpdata(dataObj[id], changeValue);
-  } else {
-    const ObjItems: Record<string, any> = _scame.properties?.object?.properties;
-    if (ObjItems?.[id]) {
-      ObjItems[id] = hadnleScameUpdata(ObjItems[id], changeValue);
-    }
+  const idList: string[] = originId?.split('/')?.slice(1);
+  const id = idList?.at(-1) as string;
+  let property: any = schema;
+  let properties: Record<string, object> = schema.properties;
+  // debugger;
+  for (let i = 0; i < idList.length; i++) {
+    const curId = idList[i];
+    if (i < idList.length - 1) properties = (properties?.[curId] as any)?.properties;
+    property = properties?.[curId];
   }
-
-  return _scame;
+  // console.log('properties----', properties);
+  // console.log('property---------', property);
+  properties[id] = updateProperty(property, updateValues);
+  return schema;
 };
 
-const hadnleScameUpdata = (
-  data: { props: Record<string, any> },
-  changeValue: Record<string, any>,
-) => {
-  let newObj: any = deepClone(data);
-  const keys = Object.keys(changeValue);
+const updateProperty = (property: object, updateValues: Record<string, any>) => {
+  let newObj: any = deepClone(property);
+  const keys = Object.keys(updateValues);
   keys.forEach((key) => {
     switch (key) {
       /* 输入框删除按钮 */
       case 'allowClear':
         {
           const props = newObj?.props ?? {};
-          if (changeValue[key] === 'true') {
+          if (updateValues[key] === 'true') {
             props[key] = true;
           } else {
             delete props[key];
@@ -43,15 +42,14 @@ const hadnleScameUpdata = (
 
       default:
         {
-          if (changeValue[key] === 'true') {
+          if (updateValues[key] === 'true') {
             newObj[key] = true;
-          } else if (changeValue[key] === 'false') {
+          } else if (updateValues[key] === 'false') {
             delete newObj[key];
           } else {
-            newObj[key] = changeValue[key];
+            newObj[key] = updateValues[key];
           }
         }
-
         break;
     }
   });
@@ -61,4 +59,4 @@ const hadnleScameUpdata = (
   return newObj;
 };
 
-export { UpdataScameItemById };
+export { updateSchemaById };

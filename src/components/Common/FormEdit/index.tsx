@@ -54,7 +54,7 @@ const FormEditModal: React.FC<IProps> = ({
   //页面重载获取默认schema或者配置后的schema
 
   const onClickDelete = async (e: any) => {
-    const id = e?.$id?.replace('#/', '');
+    const id = e?.$id?.split('/')?.at(-1);
     const attr = current.attributes.find((item) => item.id === id);
     // 删除的是特性组件
     if (attr) {
@@ -217,13 +217,14 @@ const FormEditModal: React.FC<IProps> = ({
           fieldWrapperRender={(schema, isSelected, _children, originNode) => {
             if (isSelected && selectedItem.title !== schema.title) {
               /* 收集当前选中项 */
+              console.log('~!~~~schema', schema);
               setSelectedItem(schema);
             }
             return originNode;
           }}>
           <div className="fr-generator-container">
             <div style={{ width: '280px' }}>
-              <Sidebar fixedName />
+              <Sidebar />
             </div>
             <Resizable
               handles={'right'}
