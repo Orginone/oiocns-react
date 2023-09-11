@@ -1,4 +1,4 @@
-import * as im from 'react-icons/im';
+import * as im from '@/icons/im';
 import { Button, message, Popover, Spin, Upload, UploadProps } from 'antd';
 import { CloseCircleFilled } from '@ant-design/icons';
 import React, { useEffect, useState } from 'react';

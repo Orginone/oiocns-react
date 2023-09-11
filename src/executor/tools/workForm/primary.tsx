@@ -1,9 +1,11 @@
 import OioForm from '@/components/Common/FormDesign/OioFormNext';
+import FormRenders from './form';
 import { kernel, model, schema } from '../../../ts/base';
 import { IBelong } from '@/ts/core';
 import { useEffect, useState } from 'react';
 import React from 'react';
 import { Tabs } from 'antd';
+import ReportForms from '../workReport';
 
 interface IProps {
   allowEdit: boolean;
@@ -67,11 +69,20 @@ const PrimaryForms: React.FC<IProps> = (props) => {
   const [activeTabKey, setActiveTabKey] = useState(props.forms[0].id);
   const loadItems = () => {
     return props.forms.map((form) => {
-      return {
-        key: form.id,
-        label: form.name,
-        children: <PrimaryForm {...props} forms={[form]} />,
-      };
+      switch (form.typeName) {
+        case '报表':
+          return {
+            key: form.id,
+            label: form.name,
+            children: <ReportForms {...props} forms={[form]} />,
+          };
+        default:
+          return {
+            key: form.id,
+            label: form.name,
+            children: <PrimaryForm {...props} forms={[form]} />,
+          };
+      }
     });
   };
   return (

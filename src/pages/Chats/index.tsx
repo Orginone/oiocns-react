@@ -4,7 +4,7 @@ import * as config from './config/menuOperate';
 import MainLayout from '@/components/MainLayout';
 import useMenuUpdate from '@/hooks/useMenuUpdate';
 import { Input } from 'antd';
-import { ImSearch } from 'react-icons/im';
+import { ImSearch } from '@/icons/im';
 import { ISession, msgChatNotify } from '@/ts/core';
 
 const Setting: React.FC<any> = () => {

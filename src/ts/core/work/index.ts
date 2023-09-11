@@ -168,6 +168,7 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
         } as model.WorkInstanceModel,
         data,
         this.directory.target.space,
+        this.forms,
       );
     }
   }

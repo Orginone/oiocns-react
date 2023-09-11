@@ -4,7 +4,7 @@ import TeamIcon from '@/components/Common/GlobalComps/entityIcon';
 import detailStyle from './index.module.less';
 import { ISession } from '@/ts/core';
 import ChatHistoryModal from '../ChatHistoryModal';
-import { AiOutlineRight } from 'react-icons/ai';
+import { AiOutlineRight } from '@/icons/ai';
 import { useHistory } from 'react-router-dom';
 import orgCtrl from '@/ts/controller';
 import { ellipsisText } from '@/utils';
@@ -12,7 +12,7 @@ import GroupMember from '@/pages/Chats/content/chat/GroupMember';
 
 import ActivityPublisher from '@/components/Activity/ActivityPublisher';
 import ActivityList from '@/components/Activity/ActivityList';
-import { ImCompass } from 'react-icons/im';
+import { ImCompass } from '@/icons/im';
 const GroupDetail: React.FC<any> = ({ chat }: { chat: ISession }) => {
   const [historyOpen, setHistoryOpen] = useState<boolean>(false); // 历史消息搜索
   const [activityPublisherOpen, setActivityPublisherOpen] = useState(false);

@@ -4,12 +4,18 @@ import ConfigExecutor from './config';
 import React, { useEffect, useState } from 'react';
 import { executeCmd, FileTaskList } from './action';
 import { useHistory } from 'react-router-dom';
+import AudioPlayer from '@/executor/audio';
+const audioExt = ['.mp3', '.wav', '.ogg'];
 
 const Executor = () => {
   const history = useHistory();
+  const [audio, setAudio] = useState(<></>);
   const [content, setContent] = useState(<></>);
   const resetContent = () => {
     setContent(<></>);
+  };
+  const resetAudio = () => {
+    setAudio(<></>);
   };
   useEffect(() => {
     const id = command.subscribe((type, cmd, ...args: any[]) => {
@@ -27,6 +33,21 @@ const Executor = () => {
             setContent(<ConfigExecutor cmd={cmd} args={args} finished={resetContent} />);
             break;
           default:
+            if (type === 'config' || type === 'data') {
+              if (
+                args[0].filedata?.contentType?.startsWith('audio') ||
+                audioExt.includes(args[0].filedata?.extension ?? '-')
+              ) {
+                console.log(args);
+                setAudio(
+                  <AudioPlayer
+                    finished={resetAudio}
+                    directory={args[0].directory}
+                    share={args[0].filedata}
+                  />,
+                );
+              }
+            }
             setContent(<></>);
             break;
         }
@@ -36,7 +57,12 @@ const Executor = () => {
       command.unsubscribe(id);
     };
   }, []);
-  return content;
+  return (
+    <>
+      {content}
+      {audio}
+    </>
+  );
 };
 
 export default Executor;

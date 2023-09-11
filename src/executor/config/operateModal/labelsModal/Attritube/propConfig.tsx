@@ -2,7 +2,7 @@ import { IDirectory, IForm, IProperty } from '@/ts/core';
 import { XAttribute, XProperty } from '@/ts/base/schema';
 import React, { useEffect, useState } from 'react';
 import { Card, Drawer, Typography } from 'antd';
-import { ImCheckmark, ImCross } from 'react-icons/im';
+import { ImCheckmark, ImCross } from '@/icons/im';
 import CustomTree from '@/components/CustomTree';
 interface IProps {
   attr: XAttribute;

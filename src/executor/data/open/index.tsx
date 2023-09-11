@@ -6,6 +6,9 @@ import React from 'react';
 import FormView from './form';
 import WorkStart from './work';
 import OfficeView from './office';
+import CodeEditor from './CodeEditor';
+import MyMdEditor from './MdEditor';
+import ReportView from './report';
 
 const officeExt = ['.pdf', '.xls', '.xlsx', '.doc', '.docx', '.ppt', '.pptx'];
 const videoExt = ['.mp4', '.avi', '.mov', '.mpg', '.swf', '.flv', '.mpeg'];
@@ -30,6 +33,31 @@ const ExecutorOpen: React.FC<IOpenProps> = (props: IOpenProps) => {
     if (officeExt.includes(data.extension ?? '-')) {
       return <OfficeView share={data} finished={props.finished} />;
     }
+    if (
+      ['.vue', '.tsx', '.jsx', '.js', '.json', '.html', '.java'].find(
+        (m) => m === data?.extension,
+      )
+    ) {
+      return (
+        <CodeEditor
+          isProject={false}
+          finished={props.finished}
+          form={props.entity}
+          supportFiles={[
+            '.vue',
+            '.tsx',
+            '.jsx',
+            '.js',
+            '.json',
+            '.html',
+            '.java',
+          ]}></CodeEditor>
+      );
+    }
+    if (data.contentType?.startsWith('text')) {
+      //注释md文档
+      return <MyMdEditor finished={props.finished} form={props.entity} />;
+    }
   } else {
     switch (props.entity.typeName) {
       case '事项配置':
@@ -37,6 +65,8 @@ const ExecutorOpen: React.FC<IOpenProps> = (props: IOpenProps) => {
         return <FormView form={props.entity as any} finished={props.finished} />;
       case '办事':
         return <WorkStart current={props.entity as any} finished={props.finished} />;
+      case '报表':
+        return <ReportView current={props.entity as any} finished={props.finished} />;
     }
     command.emitter('config', props.cmd, props.entity);
   }
