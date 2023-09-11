@@ -7,7 +7,7 @@ import { GroupMenuType } from '../config/menuType';
 import TaskDetail from './detail';
 import GenerateEntityTable from '@/executor/tools/generate/entityTable';
 import CustomStore from 'devextreme/data/custom_store';
-import { ImCopy, ImShuffle, ImTicket } from 'react-icons/im';
+import { ImCopy, ImShuffle, ImTicket } from '@/icons/im';
 import { Modal, message } from 'antd';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import WorkStartDo from '@/executor/data/open/work';

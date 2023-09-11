@@ -1,0 +1,47 @@
+.audio-drag-box {
+  margin-left: 80%;
+  margin-top: 10px;
+  position: absolute;
+  z-index: 1025;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: white;
+  border-radius: 15px;
+  padding: 10px 7px;
+  backdrop-filter: blur(13px);
+  background-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.audio-bottom {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.audio-close {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  display: none;
+}
+
+.audio-drag-box:hover .audio-close {
+  display: block;
+}
+
+.audio-icon {
+  margin: 0 1px;
+  font-size: 20px;
+  transition: transform 0.1s;
+}
+.audio-icon:active {
+  transform: scale(0.9);
+}
+.audio-icon-play {
+  font-size: 27px;
+  margin: 0 3px;
+}

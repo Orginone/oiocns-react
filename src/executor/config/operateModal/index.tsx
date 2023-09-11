@@ -7,6 +7,7 @@ import SpeciesModal from './speciesModal';
 import WorkModal from './workModal';
 import orgCtrl from '@/ts/controller';
 import LabelsModal from './labelsModal';
+import ReportModal from './reportModal';
 interface IProps {
   cmd: string;
   entity: IEntity<schema.XEntity>;
@@ -28,6 +29,8 @@ const OperateModal: React.FC<IProps> = ({ cmd, entity, finished }) => {
         case '事项配置':
         case '实体配置':
           return <LabelsModal finished={finished} current={entity as any} />;
+        case '报表':
+          return <ReportModal finished={finished} current={entity as any} />;
         case '办事':
           return <WorkModal finished={finished} current={entity as any} />;
         case '字典':

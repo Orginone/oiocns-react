@@ -2,7 +2,7 @@ import { model, schema } from '../../base';
 import { Entity, IEntity, MessageType } from '../public';
 import { XCollection } from '../public/collection';
 import { ISession } from './session';
-/** 会话接口类 */
+/** 动态接口类 */
 export interface IActivity extends IEntity<schema.XTarget> {
   /** 会话对象 */
   session: ISession;
@@ -24,7 +24,7 @@ export interface IActivity extends IEntity<schema.XTarget> {
   load(take: number, beforeTime?: string): Promise<model.ActivityType[]>;
 }
 
-/** 会话实现 */
+/** 动态实现 */
 export class Activity extends Entity<schema.XTarget> implements IActivity {
   session: ISession;
   activityList: model.ActivityType[];
@@ -71,7 +71,7 @@ export class Activity extends Entity<schema.XTarget> implements IActivity {
     var newData: model.ActivityType | undefined;
     if (data.likes.find((i) => i === this.userId)) {
       newData = await this.coll.update(data.id, {
-        _pull_: { likes: this.userId },
+        _pullAll_: { likes: this.userId },
       });
     } else {
       newData = await this.coll.update(data.id, {

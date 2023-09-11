@@ -4,6 +4,7 @@ import FormDesign from '@/components/Common/FormDesign';
 import cls from './index.module.less';
 import PageCard from '@/components/PageCard';
 import Attribute from './Attritube';
+import FormRules from './formRules';
 import { IForm } from '@/ts/core';
 import FullScreenModal from '@/executor/tools/fullScreen';
 import EntityInfo from '@/components/Common/EntityInfo';
@@ -14,6 +15,7 @@ interface IProps {
 }
 const LabelModl: React.FC<IProps> = ({ current, finished }: IProps) => {
   const [modalType, setModalType] = useState<string>('');
+  const [isOpen, setIsOpen] = useState<boolean>(false);
   const [tabKey, setTabKey] = useState<string>('attr');
   /** 操作按钮 */
   const renderButton = () => {
@@ -23,9 +25,21 @@ const LabelModl: React.FC<IProps> = ({ current, finished }: IProps) => {
           key="edit"
           type="link"
           onClick={() => {
-            setModalType('新增特性');
+            setModalType('表单设计');
+            setIsOpen(true);
           }}>
-          新增特性
+          表单设计
+        </Button>
+      );
+    } else if (!current.isInherited && tabKey === 'rule') {
+      return (
+        <Button
+          key="rules"
+          type="link"
+          onClick={() => {
+            setModalType('新增规则');
+          }}>
+          新增规则
         </Button>
       );
     }
@@ -35,15 +49,28 @@ const LabelModl: React.FC<IProps> = ({ current, finished }: IProps) => {
   const content = () => {
     if (tabKey === 'attr') {
       return (
-        <Attribute
+        <>
+          <Attribute
+            current={current}
+            modalType={modalType}
+            recursionOrg={true}
+            setModalType={setModalType}
+          />
+
+          <FormDesign current={current} isOpen={isOpen} setIsOpen={setIsOpen} />
+        </>
+      );
+    }
+    if (tabKey === 'rule') {
+      return (
+        <FormRules
           current={current}
-          modalType={modalType}
-          recursionOrg={true}
           setModalType={setModalType}
+          modalType={modalType}
+          recursionOrg={false}
         />
       );
     }
-    return <FormDesign current={current} />;
   };
 
   return (
@@ -66,10 +93,15 @@ const LabelModl: React.FC<IProps> = ({ current, finished }: IProps) => {
                 tab: current.typeName + '特性',
                 key: 'attr',
               },
+              // {
+              //   tab: current.typeName + '设计',
+              //   key: 'form',
+              //   disabled: current.directory.isInherited,
+              // },
               {
-                tab: current.typeName + '设计',
-                key: 'form',
-                disabled: current.directory.isInherited,
+                tab: current.typeName + '规则',
+                key: 'rule',
+                // disabled: current.directory.isInherited,
               },
             ]}
             activeTabKey={tabKey}

@@ -73,3 +73,11 @@ export enum ValueType {
   'Date' = '日期型',
   'Target' = '用户型',
 }
+
+/** 规则触发时机 */
+export enum RuleTriggers {
+  'Start' = 'Start',//初始化
+  'Running' = 'Running',//修改后
+  'Submit' = 'Submit',//提交前
+  'ThingsChanged' = 'ThingsChanged',//子表变化后
+}

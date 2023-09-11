@@ -3,7 +3,7 @@ import { Button, Divider, Modal, Row } from 'antd';
 import cls from './index.module.less';
 import { NodeModel } from '../../../processType';
 import ShareShowComp from '@/components/Common/ShareShowComp';
-import { AiOutlineSetting } from 'react-icons/ai';
+import { AiOutlineSetting } from '@/icons/ai';
 import SelectAuth from '@/components/Common/SelectAuth';
 import SelectForms from '@/components/Common/SelectForms';
 import { IBelong } from '@/ts/core';

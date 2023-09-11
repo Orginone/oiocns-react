@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { AiFillHome } from 'react-icons/ai';
+import { AiFillHome } from '@/icons/ai';
 import { IRouteConfig } from '../../typings/globelType.d';
 
 import PassportLayout from '@/layouts/Passport';

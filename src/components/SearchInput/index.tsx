@@ -1,4 +1,4 @@
-import { AiOutlineSearch } from 'react-icons/ai';
+import { AiOutlineSearch } from '@/icons/ai';
 import { Col, Input, Row } from 'antd';
 import React from 'react';
 import styles from './index.module.less';

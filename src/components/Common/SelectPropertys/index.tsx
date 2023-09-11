@@ -1,9 +1,9 @@
-import { AiOutlineSearch } from 'react-icons/ai';
+import { AiOutlineSearch } from '@/icons/ai';
 import { Input, TreeProps } from 'antd';
 import React, { useState, Key } from 'react';
-import ShareShowComp from '@/components/Common/ShareShowComp';
+import ShareShowComp from '../ShareShowComp';
 import cls from './index.module.less';
-import CustomTree from '@/components/CustomTree';
+import CustomTree from '../../CustomTree';
 import { XProperty } from '@/ts/base/schema';
 import { IDirectory, ITarget } from '@/ts/core';
 
@@ -14,7 +14,7 @@ interface IProps {
   onDeleted: (id: string) => void;
 }
 
-const SelectForms: React.FC<IProps> = (props) => {
+const SelectPropertys: React.FC<IProps> = (props) => {
   const [filter, setFilter] = useState<string>('');
   const [centerTreeData, setCenterTreeData] = useState<any[]>([]);
   const [centerCheckedKeys, setCenterCheckedKeys] = useState<Key[]>(
@@ -117,4 +117,4 @@ const SelectForms: React.FC<IProps> = (props) => {
   );
 };
 
-export default SelectForms;
+export default SelectPropertys;

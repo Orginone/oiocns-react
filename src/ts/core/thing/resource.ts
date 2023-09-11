@@ -9,7 +9,7 @@ import {
   XTarget,
   Xbase,
 } from '../../base/schema';
-import { ChatMessageType } from '@/ts/base/model';
+import { ChatMessageType, Link } from '@/ts/base/model';
 import { kernel, model } from '@/ts/base';
 import { blobToDataUrl, encodeKey, generateUuid, sliceFile } from '@/ts/base/common';
 
@@ -22,6 +22,7 @@ export class DataResource {
     this.target = target;
     this.relations = relations;
     this.formColl = this.genTargetColl<XForm>('standard-form');
+    this.transferColl = this.genTargetColl<Link>('standrand-transfer');
     this.speciesColl = this.genTargetColl<XSpecies>('standard-species');
     this.messageColl = this.genTargetColl<ChatMessageType>('chat-messages');
     this.propertyColl = this.genTargetColl<XProperty>('standard-property');
@@ -43,6 +44,8 @@ export class DataResource {
   directoryColl: XCollection<XDirectory>;
   /** 群消息集合 */
   messageColl: XCollection<ChatMessageType>;
+  /** 数据传输配置集合 */
+  transferColl: XCollection<Link>;
   /** 资源预加载 */
   async preLoad(): Promise<void> {
     if (this._proLoaded === false) {
@@ -50,6 +53,7 @@ export class DataResource {
         this.formColl.all(),
         this.speciesColl.all(),
         this.propertyColl.all(),
+        this.transferColl.all(),
         this.directoryColl.all(),
         this.applicationColl.all(),
       ]);

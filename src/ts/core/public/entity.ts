@@ -113,6 +113,12 @@ export abstract class Entity<T extends schema.XEntity>
   updateMetadata<U extends schema.XEntity>(data: U): void {
     ShareIdSet.set(data.id, data);
   }
+  setEntity(): void {
+    ShareIdSet.set(this.id + '*', this);
+  }
+  getEntity<U>(id: string): U | undefined {
+    return ShareIdSet.get(id + '*');
+  }
   findShare(id: string): model.ShareIcon {
     const metadata = this.findMetadata<schema.XTarget>(id);
     return {

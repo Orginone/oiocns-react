@@ -1,7 +1,7 @@
 import React from 'react';
 import InsertButton from '../InsertButton';
 import cls from './index.module.less';
-import { AiOutlineClose } from 'react-icons/ai';
+import { AiOutlineClose } from '@/icons/ai';
 import { NodeModel } from '@/components/Common/FlowDesign/processType';
 
 type IProps = {

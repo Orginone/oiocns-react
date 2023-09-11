@@ -8,6 +8,7 @@ import {
 } from '../public';
 import { ITarget } from '../target/base/target';
 import { Form, IForm } from './standard/form';
+import { Link, ILink } from './standard/transfer';
 import { SysFileInfo, ISysFileInfo, IFileInfo, FileInfo } from './fileinfo';
 import { Species, ISpecies } from './standard/species';
 import { Member } from './member';
@@ -51,6 +52,12 @@ export interface IDirectory extends IFileInfo<schema.XDirectory> {
   propertys: IProperty[];
   /** 目录下的应用 */
   applications: IApplication[];
+  /** 目录下的链接 */
+  links: ILink[];
+  /** 新建链接配置 */
+  createLink(data: model.Link): Promise<ILink | undefined>;
+  /** 加载链接配置 */
+  loadAllLink(reload?: boolean): Promise<ILink[]>;
   /** 加载文件 */
   loadFiles(reload?: boolean): Promise<ISysFileInfo[]>;
   /** 上传文件 */
@@ -96,6 +103,7 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
   children: IDirectory[] = [];
   taskList: model.TaskModel[] = [];
   forms: IForm[] = [];
+  links: ILink[] = [];
   files: ISysFileInfo[] = [];
   specieses: ISpecies[] = [];
   propertys: IProperty[] = [];
@@ -315,6 +323,27 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
     }
     return applications;
   }
+  async createLink(data: model.Link): Promise<ILink | undefined> {
+    const res = await this.resource.transferColl.insert({
+      ...data,
+      envs: [],
+      nodes: [],
+      edges: [],
+      directoryId: this.id,
+    });
+    if (res) {
+      const link = new Link(res, this);
+      this.links.push(link);
+      return link;
+    }
+  }
+  async loadAllLink(reload: boolean = false): Promise<ILink[]> {
+    const links: ILink[] = [...this.links];
+    for (const subDirectory of this.children) {
+      links.push(...(await subDirectory.loadAllLink(reload)));
+    }
+    return links;
+  }
   override operates(mode: number = 0): model.OperateModel[] {
     const operates: model.OperateModel[] = [];
     if (this.typeName === '成员目录') {
@@ -356,6 +385,9 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
     if (this.id === this.target.id) {
       await this.resource.preLoad();
     }
+    this.links = this.resource.transferColl.cache
+      .filter((i) => i.directoryId === this.id)
+      .map((l) => new Link(l, this));
     this.forms = this.resource.formColl.cache
       .filter((i) => i.directoryId === this.id)
       .map((f) => new Form(f, this));

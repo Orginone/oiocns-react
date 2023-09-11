@@ -31,6 +31,7 @@ export type { IApplication } from './thing/standard/application';
 export type { IForm } from './thing/standard/form';
 export type { IProperty } from './thing/standard/property';
 export type { ISpecies } from './thing/standard/species';
+export type { ILink } from './thing/standard/transfer';
 export { UserProvider } from './user';
 export type { IWork } from './work';
 export type { IWorkApply } from './work/apply';
