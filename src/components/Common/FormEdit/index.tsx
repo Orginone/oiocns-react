@@ -211,7 +211,6 @@ const FormEditModal: React.FC<IProps> = ({
           settings={setting}
           commonSettings={{}}
           ref={myComponentRef}
-          onCanvasSelect={(v) => console.log('~!~~~onCanvasSelect', v)}
           fieldWrapperRender={(schema, isSelected, _children, originNode) => {
             if (isSelected && selectedItem.$id !== schema.$id) {
               /* 收集当前选中项 */

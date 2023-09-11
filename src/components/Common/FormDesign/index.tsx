@@ -10,7 +10,7 @@ import { deepClone } from '@/ts/base/common';
 type IProps = {
   current: IForm;
   isOpen: boolean;
-  setIsOpen:any
+  setIsOpen: (ble: boolean) => void;
 };
 
 /**
@@ -123,14 +123,14 @@ const Design: React.FC<IProps> = ({ current, isOpen, setIsOpen }) => {
   }, []);
 
   return (
-       <FormEditModal
-        current={current}
-        formSchema={formSchema}
-        updateSchema={updateSchema}
-        getCurFormSchema={getCurFormSchema}
-        isOpen={isOpen}
-        setIsOpen={setIsOpen}
-      />
+    <FormEditModal
+      current={current}
+      formSchema={formSchema}
+      updateSchema={updateSchema}
+      getCurFormSchema={getCurFormSchema}
+      isOpen={isOpen}
+      setIsOpen={setIsOpen}
+    />
   );
 };
 
