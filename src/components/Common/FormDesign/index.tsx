@@ -1,26 +1,23 @@
 import { useState, useEffect } from 'react';
-import { Button, InputNumber } from 'antd';
-import cls from './index.module.less';
 import React from 'react';
 import { IForm } from '@/ts/core';
 import FormEditModal from '@/components/Common/FormEdit';
 import { loadWidgetsOpts } from './schemaRule';
 import { schemaType } from '@/ts/base/schema';
-import FormRender from '@/components/Common/FormEdit/FormRender';
-import { useForm } from 'form-render';
 import { sortObjByKeys } from '@/utils';
 import { deepClone } from '@/ts/base/common';
 
 type IProps = {
   current: IForm;
+  isOpen: boolean;
+  setIsOpen:any
 };
 
 /**
  * 表单设计器
  * @param props
  */
-const Design: React.FC<IProps> = ({ current }) => {
-  const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
+const Design: React.FC<IProps> = ({ current, isOpen, setIsOpen }) => {
   // 默认schema
   const defaultFormSchema: schemaType = {
     displayType: 'row',
@@ -29,9 +26,7 @@ const Design: React.FC<IProps> = ({ current }) => {
     properties: {},
     column: 1,
   };
-  // FormRender实例
-  const formIns = useForm();
-  // 表单schema
+
   const [formSchema, setFormSchema] = useState<schemaType>(defaultFormSchema);
   /**
    * 获取表单的schema
@@ -122,68 +117,20 @@ const Design: React.FC<IProps> = ({ current }) => {
   const updateSchema = async () => {
     setFormSchema(await getCurFormSchema());
   };
-  // 开始编辑（因初始化已执行过获取最新schema，因此开启编辑只是打开即可）
-  const onEditForm = () => {
-    setIsEditModalOpen(true);
-  };
   // 初始化执行一次获取schema，用于渲染
   useEffect(() => {
     updateSchema();
   }, []);
 
   return (
-    <div style={{ display: 'flex' }}>
-      <div className={cls.content}>
-        <div className={cls.head}>
-          {
-            <Button
-              type="primary"
-              size="middle"
-              onClick={onEditForm}
-              className={cls.designButton}>
-              表单设计
-            </Button>
-          }
-        </div>
-        {formSchema ? (
-          <FormRender
-            schema={formSchema}
-            form={formIns}
-            widgets={{ number: InputNumber }}
-          />
-        ) : (
-          <div className={cls.designWrap}>
-            使用
-            <Button
-              type="primary"
-              size="middle"
-              onClick={onEditForm}
-              className={cls.designButton}>
-              表单设计器
-            </Button>
-            来定义你的表单
-          </div>
-        )}
-      </div>
-      {/* {showConfig && !current.isInherited && selectedItem && (
-        <AttributeConfig
-          attr={selectedItem}
-          onChanged={formValuesChange}
-          onClose={() => {
-            setShowConfig(false);
-          }}
-          superAuth={current.directory.target.space.superAuth!.metadata}
-        />
-      )} */}
-      <FormEditModal
+       <FormEditModal
         current={current}
         formSchema={formSchema}
         updateSchema={updateSchema}
         getCurFormSchema={getCurFormSchema}
-        isOpen={isEditModalOpen}
-        setIsOpen={setIsEditModalOpen}
+        isOpen={isOpen}
+        setIsOpen={setIsOpen}
       />
-    </div>
   );
 };
 

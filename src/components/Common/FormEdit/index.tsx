@@ -199,7 +199,7 @@ const FormEditModal: React.FC<IProps> = ({
             true,
             {
               /** 按钮文案 */
-              text: '新增特性',
+              text: '选择属性',
               /** 点击回调 */
               onClick: () => setIsAttrModalOpen(true),
               key: 'add',
@@ -215,7 +215,6 @@ const FormEditModal: React.FC<IProps> = ({
           fieldWrapperRender={(schema, isSelected, _children, originNode) => {
             if (isSelected && selectedItem.$id !== schema.$id) {
               /* 收集当前选中项 */
-              console.log('~!~~~schema', schema);
               setSelectedItem(schema);
             }
             return originNode;
