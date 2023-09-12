@@ -82,6 +82,7 @@
     "react-copy-to-clipboard": "^5.1.0",
     "react-cropper": "^2.3.3",
     "react-dom": "^18.2.0",
+    "react-markdown": "^8.0.7",
     "react-router-config": "^5.1.1",
     "react-router-dom": "^5.2.0",
     "react-scroll": "^1.8.9",

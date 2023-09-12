@@ -17,14 +17,14 @@ function FileHome() {
   /**
    * 复制git 地址
    */
-  let copyRef = useRef<any>(null);
+  let copyRef = useRef(null);
   const copyGitUrl = () => {
     navigator.clipboard
       .writeText(copyRef.current.outerText)
       .then(() => {
         message.success('复制成功');
       })
-      .catch((_error) => {
+      .catch((error) => {
         message.error('复制失败');
       });
   };

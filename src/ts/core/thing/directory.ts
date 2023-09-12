@@ -1,6 +1,7 @@
 import { common, model, schema } from '../../base';
 import {
   directoryNew,
+  newWarehouse,
   directoryOperates,
   fileOperates,
   memberOperates,
@@ -22,6 +23,7 @@ export type OnProgress = (p: number) => void;
 
 /** 目录接口类 */
 export interface IDirectory extends IFileInfo<schema.XDirectory> {
+  [x: string]: any;
   /** 当前加载目录的用户 */
   target: ITarget;
   /** 资源类 */
@@ -345,6 +347,7 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
       );
       if (mode === 2 && this.target.hasRelationAuth()) {
         operates.push(directoryNew);
+        operates.push(newWarehouse);
         if (this.target.user.copyFiles.size > 0) {
           operates.push(fileOperates.Parse);
         }
