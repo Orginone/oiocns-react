@@ -17,14 +17,14 @@ function FileHome() {
   /**
    * 复制git 地址
    */
-  let copyRef = useRef(null);
+  let copyRef = useRef<any>(null);
   const copyGitUrl = () => {
     navigator.clipboard
       .writeText(copyRef.current.outerText)
       .then(() => {
         message.success('复制成功');
       })
-      .catch((error) => {
+      .catch((_error) => {
         message.error('复制失败');
       });
   };
@@ -108,7 +108,7 @@ function FileHome() {
           <Select
             style={{ width: 200 }}
             placeholder="分支: main"
-            dropdownRender={(menu) => (
+            dropdownRender={(menu: any) => (
               <>
                 <Space style={{ padding: '6px 8px 0' }}>
                   <Input placeholder="过滤分支或标签..." style={{ width: '185px' }} />

@@ -73,6 +73,12 @@ export const directoryOperates = {
     label: '刷新目录',
     iconType: 'refresh',
   },
+  OpenFolderWithEditor: {
+    sort: 10,
+    cmd: 'openFolderWithEditor',
+    label: '打开项目',
+    iconType: 'open',
+  },
   NewFile: {
     sort: 5,
     cmd: 'newFile',
@@ -169,6 +175,22 @@ export const directoryNew = {
     directoryOperates.NewThingConfig,
     directoryOperates.NewWorkConfig,
     directoryOperates.NewTransferConfig,
+  ],
+};
+
+/** 新建仓库 */
+export const newWarehouse = {
+  sort: 0,
+  cmd: 'newWarehouses',
+  label: '仓库管理',
+  iconType: 'newWarehouses',
+  menus: [
+    {
+      sort: -1,
+      cmd: 'newWarehouse',
+      label: '新建仓库',
+      iconType: 'newWarehouse',
+    },
   ],
 };
 

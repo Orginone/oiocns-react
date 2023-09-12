@@ -67,6 +67,25 @@ const ExecutorOpen: React.FC<IOpenProps> = (props: IOpenProps) => {
         return <WorkStart current={props.entity as any} finished={props.finished} />;
       case '报表':
         return <ReportView current={props.entity as any} finished={props.finished} />;
+      case '目录':
+        if (props.cmd === 'openFolderWithEditor') {
+          return (
+            <CodeEditor
+              isProject={props.entity.typeName === '目录'}
+              finished={props.finished}
+              form={props.entity}
+              supportFiles={[
+                '.vue',
+                '.tsx',
+                '.jsx',
+                '.js',
+                '.json',
+                '.html',
+                '.java',
+              ]}></CodeEditor>
+          );
+        }
+        break;
     }
     command.emitter('config', props.cmd, props.entity);
   }

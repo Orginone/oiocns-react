@@ -2,8 +2,8 @@ import React from 'react';
 import { useEffect } from 'react';
 import { useState } from 'react';
 import CodeMirror from '@uiw/react-codemirror';
-// import { vscodeDark } from '@uiw/codemirror-theme-vscode';
-// import { langs } from '@uiw/codemirror-extensions-langs';
+import { vscodeDark } from '@uiw/codemirror-theme-vscode';
+import { langs } from '@uiw/codemirror-extensions-langs';
 import FullScreenModal from '@/executor/tools/fullScreen';
 import { getJsonText } from '@/utils';
 import axios from 'axios';
@@ -17,7 +17,7 @@ const { DirectoryTree } = Tree;
 interface IProps {
   finished: () => void;
   form: any;
-  supportFiles: string[];
+  supportFiles?: string[];
   isProject: boolean;
 }
 
@@ -43,7 +43,7 @@ const updateTreeData = (
   });
 
 /** 文件预览 */
-const CodeEditor = ({ finished, form, supportFiles, isProject }: IProps) => {
+const CodeEditor = ({ finished, form, isProject }: IProps) => {
   const [mdContent, setMdContent] = useState(''); // 保存Markdown文本内容
   const onTextChange = React.useCallback((value: string) => {
     setMdContent(value);
@@ -79,21 +79,23 @@ const CodeEditor = ({ finished, form, supportFiles, isProject }: IProps) => {
     }
     if (current.share.avatar?.shareLink) {
       if (current.share.avatar.extension === '.json') {
-        getJsonText(`/orginone/kernel/load/${current.share.avatar.shareLink}`).then(
-          (data) => {
-            setMdContent(data);
-          },
-        );
+        getJsonText(
+          '/orginone/anydata/bucket/load/' + current.share.avatar.shareLink,
+        ).then((data) => {
+          setMdContent(data);
+        });
         return;
       }
-      axios.get(`/orginone/kernel/load/${current.share.avatar.shareLink}`).then((res) => {
-        if (res.status === 200) {
-          setMdContent(res.data);
-        }
-      });
+      axios
+        .get('/orginone/anydata/bucket/load/' + current.share.avatar.shareLink)
+        .then((res) => {
+          if (res.status === 200) {
+            setMdContent(res.data);
+          }
+        });
     }
   };
-  const initTreeData = (data, _treeData) => {
+  const initTreeData = (data: { children: any[]; files: any[] }, _treeData: any[]) => {
     data.children.forEach((m: any) => {
       _treeData.push({
         key: m.key,
@@ -172,7 +174,7 @@ const CodeEditor = ({ finished, form, supportFiles, isProject }: IProps) => {
                 rootStyle={{ whiteSpace: 'nowrap' }}
                 showLine={true}
                 loadData={onLoadData}
-                onSelect={(keys, e) => {
+                onSelect={(_keys, e: any) => {
                   if (e.node.file) {
                     setCurrent(e.node.file);
                   }
