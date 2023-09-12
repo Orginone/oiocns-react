@@ -20,8 +20,6 @@ export interface IWorkProvider {
   loadApply(req: model.IdPageModel): Promise<model.PageResult<IWorkTask>>;
   /** 任务更新 */
   updateTask(task: schema.XWorkTask): void;
-  /** 根据分类id查询分类项 */
-  loadItems(id: string): Promise<schema.XSpeciesItem[]>;
   /** 加载实例详情 */
   loadInstanceDetail(
     id: string,
@@ -118,16 +116,6 @@ export class WorkProvider implements IWorkProvider {
       ...res.data,
       result: (res.data.result || []).map((task) => new WorkTask(task, this.user)),
     };
-  }
-  async loadItems(id: string): Promise<schema.XSpeciesItem[]> {
-    const res = await kernel.querySpeciesItems({
-      id: id,
-      page: PageAll,
-    });
-    if (res.success) {
-      return res.data.result || [];
-    }
-    return [];
   }
   async loadInstanceDetail(
     id: string,

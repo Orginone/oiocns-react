@@ -1,36 +1,37 @@
 import { kernel, model, schema } from '../../../base';
 import { PageAll, directoryOperates, fileOperates } from '../../public';
 import { IDirectory } from '../directory';
-import { FileInfo, IFileInfo } from '../fileinfo';
+import { IFileInfo, IStandardFileInfo, StandardFileInfo } from '../fileinfo';
 import { IWork, Work } from '../../work';
 
 /** 应用/模块接口类 */
-export interface IApplication extends IFileInfo<schema.XApplication> {
+export interface IApplication extends IStandardFileInfo<schema.XApplication> {
   /** 上级模块 */
   parent: IApplication | undefined;
   /** 下级模块 */
   children: IApplication[];
   /** 流程定义 */
   works: IWork[];
-  /** 更新应用 */
-  update(data: schema.XApplication): Promise<boolean>;
   /** 加载办事 */
   loadWorks(reload?: boolean): Promise<IWork[]>;
   /** 新建办事 */
   createWork(data: model.WorkDefineModel): Promise<IWork | undefined>;
   /** 新建模块 */
-  createModule(data: model.ApplicationModel): Promise<IApplication | undefined>;
+  createModule(data: schema.XApplication): Promise<schema.XApplication | undefined>;
 }
 
 /** 应用实现类 */
-export class Application extends FileInfo<schema.XApplication> implements IApplication {
+export class Application
+  extends StandardFileInfo<schema.XApplication>
+  implements IApplication
+{
   constructor(
     _metadata: schema.XApplication,
     _directory: IDirectory,
     _parent?: IApplication,
     _applications?: schema.XApplication[],
   ) {
-    super(_metadata, _directory);
+    super(_metadata, _directory, _directory.resource.applicationColl);
     this.parent = _parent;
     this.loadChildren(_applications);
   }
@@ -46,9 +47,6 @@ export class Application extends FileInfo<schema.XApplication> implements IAppli
       a.metadata.updateTime < b.metadata.updateTime ? 1 : -1,
     );
   }
-  async rename(name: string): Promise<boolean> {
-    return await this.update({ ...this.metadata, name: name });
-  }
   async copy(destination: IDirectory): Promise<boolean> {
     if (destination.id != this.directory.id) {
       const res = await destination.createApplication({
@@ -59,50 +57,28 @@ export class Application extends FileInfo<schema.XApplication> implements IAppli
     }
     return false;
   }
-  async move(destination: IDirectory): Promise<boolean> {
-    if (
-      destination.id != this.directory.id &&
-      destination.metadata.belongId === this.directory.metadata.belongId
-    ) {
-      this.setMetadata({ ...this.metadata, directoryId: destination.id });
-      const success = await this.update(this.metadata);
-      if (success) {
-        this.directory.applications = this.directory.applications.filter(
-          (i) => i.key != this.key,
-        );
-        this.directory = destination;
-        destination.applications.push(this);
-      } else {
-        this.setMetadata({ ...this.metadata, directoryId: this.directory.id });
+  override async move(destination: IDirectory): Promise<boolean> {
+    if (!this.parent) {
+      const applications = this.getChildren(this);
+      const res = await destination.resource.applicationColl.replaceMany(
+        applications.map((a) => {
+          return { ...a, directoryId: destination.id };
+        }),
+      );
+      if (res.length > 0) {
+        return await super.move(destination);
       }
-      return success;
-    }
-    return false;
-  }
-  async update(data: schema.XApplication): Promise<boolean> {
-    const res = await this.directory.resource.applicationColl.replace({
-      ...this.metadata,
-      ...data,
-      typeName: this.metadata.typeName,
-      directoryId: this.metadata.directoryId,
-    });
-    if (res) {
-      this.setMetadata(res);
-      return true;
     }
     return false;
   }
   async delete(): Promise<boolean> {
-    const res = await this.directory.resource.applicationColl.delete(this.metadata);
-    if (res) {
-      this.directory.applications = this.directory.applications.filter(
-        (i) => i.key != this.key,
-      );
-      if (this.parent) {
-        this.parent.children = this.parent.children.filter((i) => i.key != this.key);
-      }
+    const success = await this.directory.resource.applicationColl.deleteMany(
+      this.getChildren(this),
+    );
+    if (success) {
+      return await super.delete();
     }
-    return res;
+    return success;
   }
   async loadWorks(reload?: boolean | undefined): Promise<IWork[]> {
     if (!this._worksLoaded || reload) {
@@ -126,19 +102,16 @@ export class Application extends FileInfo<schema.XApplication> implements IAppli
       return work;
     }
   }
-  async createModule(data: schema.XApplication): Promise<IApplication | undefined> {
+  async createModule(
+    data: schema.XApplication,
+  ): Promise<schema.XApplication | undefined> {
     data.parentId = this.id;
     data.typeName = '模块';
     data.directoryId = this.directory.id;
-    const res = await this.directory.resource.applicationColl.insert({
-      ...data,
-      parentId: this.id,
-      typeName: '模块',
-    });
+    const res = await this.directory.resource.applicationColl.insert(data);
     if (res) {
-      const application = new Application(res, this.directory, this);
-      this.children.push(application);
-      return application;
+      this.notify('insert', [res]);
+      return res;
     }
   }
   async loadContent(reload: boolean = false): Promise<boolean> {
@@ -156,7 +129,9 @@ export class Application extends FileInfo<schema.XApplication> implements IAppli
         operates.push(fileOperates.Parse);
       }
     }
-    return operates;
+    return operates.filter(
+      (a) => ![fileOperates.Copy, fileOperates.Download].includes(a),
+    );
   }
   private loadChildren(applications?: schema.XApplication[]) {
     if (applications && applications.length > 0) {
@@ -165,6 +140,33 @@ export class Application extends FileInfo<schema.XApplication> implements IAppli
         .forEach((i) => {
           this.children.push(new Application(i, this.directory, this, applications));
         });
+    }
+  }
+  private getChildren(application: IApplication): schema.XApplication[] {
+    const applications: schema.XApplication[] = [];
+    for (const child of application.children) {
+      applications.push(child.metadata);
+      applications.push(...this.getChildren(child));
+    }
+    return applications;
+  }
+  protected override receiveMessage(operate: string, data: schema.XApplication): void {
+    super.receiveMessage(operate, data);
+    if (data.parentId == this.id) {
+      switch (operate) {
+        case 'delete':
+          this.children = this.children.filter((a) => a.id != data.id);
+          this.coll.removeCache(data.id);
+          this.changCallback();
+          break;
+        case 'insert':
+          this.children.push(new Application(data, this.directory, this));
+          this.coll.cache.push(data);
+          this.changCallback();
+          break;
+        default:
+          break;
+      }
     }
   }
 }

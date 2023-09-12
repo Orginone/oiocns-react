@@ -1,4 +1,15 @@
-import { Xbase, XEntity, XForm, XIdentity, XTarget } from './schema';
+import {
+  XApplication,
+  Xbase,
+  XDirectory,
+  XEntity,
+  XForm,
+  XIdentity,
+  XProperty,
+  XSpecies,
+  XStandard,
+  XTarget,
+} from './schema';
 // 请求类型定义
 export type ReqestType = {
   // 模块
@@ -21,22 +32,22 @@ export type DataProxyType = {
   // 参数
   params: any;
   // 关系举证(用户鉴权[user=>relations=>target],最大支持2级关系)
-	relations: string[];
+  relations: string[];
 };
 // 请求数据核类型定义
 export type DataNotityType = {
   // 数据
-	data: any;
+  data: any;
   // 通知的用户
-	targetId: string;
+  targetId: string;
   // 是否忽略自己
-	ignoreSelf: boolean;
+  ignoreSelf: boolean;
   // 标签
-	flag: string;
+  flag: string;
   // 关系举证(用户鉴权[user=>relations=>target],最大支持2级关系)
-	relations: string[];
+  relations: string[];
   // 归属用户
-	belongId: string;
+  belongId: string;
   // 通知用户自身
   onlyTarget: boolean;
   // 仅通知在线用户
@@ -128,10 +139,10 @@ export type OnlineInfo = {
 /** 在线信息查询接口 */
 export type OnlineSet = {
   // 用户连接
-  users: OnlineInfo[],
+  users: OnlineInfo[];
   // 存储连接
-  storages: OnlineInfo[],
-}
+  storages: OnlineInfo[];
+};
 // 分页返回定义
 export type PageResult<T> = {
   // 便宜量
@@ -920,7 +931,15 @@ export type LoadOptions = {
   group: string;
   skip: number;
   options: any;
-}
+};
+
+export type DirectoryContent = {
+  forms: XForm[];
+  specieses: XSpecies[];
+  propertys: XProperty[];
+  applications: XApplication[];
+  directorys: XDirectory[];
+};
 
 /** 请求失败 */
 export const badRequest = (
@@ -929,8 +948,6 @@ export const badRequest = (
 ): ResultType<any> => {
   return { success: false, msg: msg, code: code, data: false };
 };
-
-
 
 // 边
 export type Edge = {
@@ -1050,8 +1067,7 @@ export type Transfer = {
   edges: Edge[];
   // 图数据
   graph: any;
-} & XEntity;
-
+} & XStandard;
 
 export type SettingWidget = {
   /** 按钮生成的 schema 的 key 值 */
@@ -1066,7 +1082,7 @@ export type SettingWidget = {
   schema?: any;
   /** 组件的配置信息，使用 form-render 的 schema 来描述 */
   setting?: any;
-}
+};
 
 export type Setting = {
   /** 最外层的分组名称 */
@@ -1075,7 +1091,7 @@ export type Setting = {
   widgets: SettingWidget[];
   show?: boolean;
   useCommon?: boolean;
-}
+};
 
 export type SchemaType = {
   displayType: 'row' | 'column';
