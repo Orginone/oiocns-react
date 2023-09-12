@@ -11,7 +11,6 @@ const Executor = () => {
   const history = useHistory();
   const [audio, setAudio] = useState(<></>);
   const [content, setContent] = useState(<></>);
-  const [audio, setAudio] = useState(<></>);
   const resetContent = () => {
     setContent(<></>);
   };

@@ -159,8 +159,9 @@ const PropertyForm = (props: Iprops) => {
       onOpenChange={(open: boolean) => {
         if (!open) {
           props.finished();
-        }}
-      />
+        }
+      }}
+      ></SchemaForm>
       {isModalOpen && (
         <Modal
           open

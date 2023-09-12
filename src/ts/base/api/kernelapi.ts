@@ -23,11 +23,8 @@ export default class KernelApi {
   private readonly _axiosInstance = axios.create({});
   // 单例
   private static _instance: KernelApi;
-<<<<<<< HEAD
-=======
   // 必达消息缓存
   private _cacheData: any = {};
->>>>>>> 51b118c7f69226cfcafb9ef42ed80e27a36b3ff0
   // 订阅方法
   private _methods: { [name: string]: ((...args: any[]) => void)[] };
   // 订阅回调字典
