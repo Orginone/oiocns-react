@@ -77,15 +77,13 @@ export class Species extends FileInfo<schema.XSpecies> implements ISpecies {
   }
   async delete(): Promise<boolean> {
     if (this.directory) {
-      const res = await kernel.deleteSpecies({
-        id: this.id,
-      });
-      if (res.success) {
+      const res = await this.directory.resource.speciesColl.delete(this.metadata);
+      if (res) {
         this.directory.specieses = this.directory.specieses.filter(
           (i) => i.key != this.key,
         );
+        return true;
       }
-      return res.success;
     }
     return false;
   }

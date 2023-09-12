@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import EditableTable from './editable';
-import { ILink } from '@/ts/core/thing/link';
+import { ITransfer } from '@/ts/core';
 import { model } from '@/ts/base';
 import { generateUuid } from '@/ts/base/common';
 
 export interface IProps {
-  current: ILink;
-  node: model.RequestNode;
+  transfer: ITransfer;
+  current: model.RequestNode;
 }
 
 export interface Param {
@@ -43,24 +43,24 @@ const toParams = (value?: string): Param[] => {
   return [];
 };
 
-const Params: React.FC<IProps> = ({ current, node }) => {
-  const [params, setParams] = useState<readonly Param[]>(toParams(node.data.uri));
+const Params: React.FC<IProps> = ({ transfer, current }) => {
+  const [params, setParams] = useState<readonly Param[]>(toParams(current.data.uri));
 
   useEffect(() => {
-    const id = current.command.subscribe((type, cmd, args) => {
+    const id = transfer.command.subscribe((type, cmd, args) => {
       if (type == 'node' && cmd == 'update') {
         setParams(toParams(args.data.uri));
       }
     });
     return () => {
-      current.unsubscribe(id!);
+      transfer.unsubscribe(id!);
     };
   });
 
   const onChange = (params: readonly Param[]) => {
-    const url = toUrlParams(node.data.uri, params);
-    node.data.uri = url;
-    current.updNode(node);
+    const url = toUrlParams(current.data.uri, params);
+    current.data.uri = url;
+    transfer.updNode(current);
   };
 
   return (

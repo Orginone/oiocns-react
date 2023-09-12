@@ -5,9 +5,8 @@ import { IDirectory } from '../directory';
 import { FileInfo, IFileInfo } from '../fileinfo';
 
 export type GraphData = () => any;
-export type Pos = 'pre' | 'post';
 
-export interface ILink extends IFileInfo<model.Link> {
+export interface ITransfer extends IFileInfo<model.Transfer> {
   /** 集合名称 */
   collName: string;
   /** 触发器 */
@@ -19,7 +18,7 @@ export interface ILink extends IFileInfo<model.Link> {
   /** 已遍历点 */
   curVisited?: Set<string>;
   /** 前置链接 */
-  curPreLink?: ILink;
+  curPreLink?: ITransfer;
   /** 图状态 */
   status: model.GraphStatus;
   /** 状态转移 */
@@ -29,7 +28,7 @@ export interface ILink extends IFileInfo<model.Link> {
   /** 绑定图 */
   binding(getData: GraphData): void;
   /** 刷新数据 */
-  refresh(data: model.Link): Promise<void>;
+  refresh(data: model.Transfer): Promise<boolean>;
   /** 增加节点 */
   addNode(node: model.Node<any>): Promise<void>;
   /** 更新节点 */
@@ -37,11 +36,19 @@ export interface ILink extends IFileInfo<model.Link> {
   /** 删除节点 */
   delNode(id: string): Promise<void>;
   /** 节点添加脚本 */
-  addNodeScript(pos: Pos, node: model.Node<any>, script: model.Script): Promise<void>;
+  addNodeScript(
+    pos: model.ScriptPos,
+    node: model.Node<any>,
+    script: model.Script,
+  ): Promise<void>;
   /** 节点更新脚本 */
-  updNodeScript(pos: Pos, node: model.Node<any>, script: model.Script): Promise<void>;
+  updNodeScript(
+    pos: model.ScriptPos,
+    node: model.Node<any>,
+    script: model.Script,
+  ): Promise<void>;
   /** 节点删除脚本 */
-  delNodeScript(pos: Pos, node: model.Node<any>, script: model.Script): Promise<void>;
+  delNodeScript(pos: model.ScriptPos, node: model.Node<any>, id: string): Promise<void>;
   /** 遍历节点 */
   visitNode(node: model.Node<any>, preData?: any): Promise<void>;
   /** 增加边 */
@@ -65,10 +72,10 @@ export interface ILink extends IFileInfo<model.Link> {
   /** 映射 */
   mapping(node: model.Node<any>, array: any[]): Promise<any[]>;
   /** 开始执行 */
-  execute(link?: ILink): void;
+  execute(link?: ITransfer): void;
 }
 
-export class Link extends FileInfo<model.Link> implements ILink {
+export class Transfer extends FileInfo<model.Transfer> implements ITransfer {
   collName: string;
   command: Command;
   taskList: model.Environment[];
@@ -76,10 +83,10 @@ export class Link extends FileInfo<model.Link> implements ILink {
   status: model.GraphStatus;
   curTask?: model.Environment;
   curVisited?: Set<string>;
-  curPreLink?: ILink;
+  curPreLink?: ITransfer;
   getData?: GraphData;
 
-  constructor(metadata: model.Link, dir: IDirectory) {
+  constructor(metadata: model.Transfer, dir: IDirectory) {
     super(metadata, dir);
     this.collName = storeCollName.Transfer;
     this.command = new Command();
@@ -121,15 +128,17 @@ export class Link extends FileInfo<model.Link> implements ILink {
     this.getData = getData;
   }
 
-  async refresh(data: model.Link): Promise<void> {
+  async refresh(data: model.Transfer): Promise<boolean> {
     data.graph = this.getData?.();
     this.setMetadata(data);
-    await this.directory.resource.transferColl.replace(this.metadata);
+    return !!(await this.directory.resource.transferColl.replace(this.metadata));
   }
 
   async delete(): Promise<boolean> {
     if (await this.directory.resource.transferColl.delete(this.metadata)) {
-      this.directory.links = this.directory.links.filter((item) => item.key != this.key);
+      this.directory.transfers = this.directory.transfers.filter(
+        (item) => item.key != this.key,
+      );
       return true;
     }
     return false;
@@ -142,14 +151,16 @@ export class Link extends FileInfo<model.Link> implements ILink {
       })
     ) {
       this.setMetadata({ ...this._metadata, name: name });
-      this.directory.links = this.directory.links.filter((item) => item.key != this.key);
+      this.directory.transfers = this.directory.transfers.filter(
+        (item) => item.key != this.key,
+      );
       return true;
     }
     return false;
   }
 
   async copy(destination: IDirectory): Promise<boolean> {
-    let res = await destination.createLink(this.metadata);
+    let res = await destination.createTransfer(this.metadata);
     return !!res;
   }
 
@@ -160,14 +171,16 @@ export class Link extends FileInfo<model.Link> implements ILink {
       })
     ) {
       this.setMetadata({ ...this._metadata, directoryId: destination.id });
-      destination.links.push(this);
-      this.directory.links = this.directory.links.filter((item) => item.key != this.key);
+      destination.transfers.push(this);
+      this.directory.transfers = this.directory.transfers.filter(
+        (item) => item.key != this.key,
+      );
       return true;
     }
     return false;
   }
 
-  execute(link?: ILink) {
+  execute(link?: ITransfer) {
     this.machine('Run');
     this.curVisited = new Set();
     const env = this.metadata.envs.find((item) => item.id == this.metadata.curEnv);
@@ -245,7 +258,9 @@ export class Link extends FileInfo<model.Link> implements ILink {
     let index = this.metadata.nodes.findIndex((item) => item.id == node.id);
     if (index == -1) {
       this.metadata.nodes.push(node);
-      await this.refresh(this.metadata);
+      if (await this.refresh(this.metadata)) {
+        this.command.emitter('node', 'add', node);
+      }
     }
   }
 
@@ -253,20 +268,25 @@ export class Link extends FileInfo<model.Link> implements ILink {
     let index = this.metadata.nodes.findIndex((item) => item.id == node.id);
     if (index != -1) {
       this.metadata.nodes[index] = node;
-      await this.refresh(this.metadata);
+      if (await this.refresh(this.metadata)) {
+        this.command.emitter('node', 'update', node);
+      }
     }
   }
 
   async delNode(id: string): Promise<void> {
     let index = this.metadata.nodes.findIndex((item) => item.id == id);
     if (index != -1) {
+      let node = this.metadata.nodes[index];
       this.metadata.nodes.splice(index, 1);
-      await this.refresh(this.metadata);
+      if (await this.refresh(this.metadata)) {
+        this.command.emitter('node', 'delete', node);
+      }
     }
   }
 
   async addNodeScript(
-    pos: Pos,
+    pos: model.ScriptPos,
     node: model.Node<any>,
     script: model.Script,
   ): Promise<void> {
@@ -283,7 +303,7 @@ export class Link extends FileInfo<model.Link> implements ILink {
   }
 
   async updNodeScript(
-    pos: Pos,
+    pos: model.ScriptPos,
     node: model.Node<any>,
     script: model.Script,
   ): Promise<void> {
@@ -307,18 +327,18 @@ export class Link extends FileInfo<model.Link> implements ILink {
   }
 
   async delNodeScript(
-    pos: Pos,
+    pos: model.ScriptPos,
     node: model.Node<any>,
-    script: model.Script,
+    id: string,
   ): Promise<void> {
     switch (pos) {
       case 'pre': {
-        let index = node.preScripts.findIndex((item) => item.id == script.id);
+        let index = node.preScripts.findIndex((item) => item.id == id);
         node.preScripts.splice(index, 1);
         break;
       }
       case 'post': {
-        let index = node.postScripts.findIndex((item) => item.id == script.id);
+        let index = node.postScripts.findIndex((item) => item.id == id);
         node.postScripts.splice(index, 1);
         break;
       }
@@ -339,7 +359,7 @@ export class Link extends FileInfo<model.Link> implements ILink {
           break;
         case 'link':
           // TODO 替换其它方案
-          this.getEntity<ILink>((node.data as model.Link).id)?.execute(this);
+          this.getEntity<ITransfer>((node.data as model.Transfer).id)?.execute(this);
           break;
         case 'mapping':
           nextData = await this.mapping(node, preData.array);
@@ -386,7 +406,9 @@ export class Link extends FileInfo<model.Link> implements ILink {
       return item.id == env.id;
     });
     if (index == -1) {
-      this.metadata.envs.push({ ...env, id: common.generateUuid() });
+      const id = common.generateUuid();
+      this.metadata.envs.push({ ...env, id: id });
+      this.metadata.curEnv = id;
       await this.refresh(this.metadata);
       this.command.emitter('environments', 'refresh');
     }
@@ -410,11 +432,10 @@ export class Link extends FileInfo<model.Link> implements ILink {
     if (index != -1) {
       this.metadata.envs.splice(index, 1);
       await this.refresh(this.metadata);
-      this.command.emitter('environments', 'refresh');
       if (id == this.metadata.curEnv) {
         this.metadata.curEnv = undefined;
-        this.command.emitter('environments', 'refresh');
       }
+      this.command.emitter('environments', 'refresh');
     }
   }
 

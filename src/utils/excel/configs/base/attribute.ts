@@ -1,18 +1,15 @@
-import { AttributeModel } from '@/ts/base/model';
-import { IDirectory } from '@/ts/core';
-import { assignment, batchRequests } from '../..';
-import {
-  Context,
-  ReadConfigImpl,
-  RequestIndex,
-  SheetConfigImpl,
-  SheetName,
-} from '../../types';
+import { XAttribute } from '@/ts/base/schema';
+import { IDirectory, orgAuth } from '@/ts/core';
+import { Context, ReadConfigImpl, SheetConfigImpl, SheetName } from '../../types';
+import { assignment } from '../..';
+import { List } from '@/ts/base';
 
-export interface Attribute extends AttributeModel {
+export interface Attribute extends XAttribute {
   directoryId: string;
   formCode: string;
   propInfo: string;
+  info?: string;
+  index?: number;
 }
 
 export class AttrSheetConfig extends SheetConfigImpl<Attribute> {
@@ -22,9 +19,8 @@ export class AttrSheetConfig extends SheetConfigImpl<Attribute> {
     super(SheetName.FormAttr, 1, [
       { title: '表单代码', dataIndex: 'formCode', valueType: '描述型' },
       { title: '特性名称', dataIndex: 'name', valueType: '描述型' },
-      { title: '特性代码', dataIndex: 'code', valueType: '描述型' },
+      { title: '特性代码', dataIndex: 'info', valueType: '描述型' },
       { title: '关联属性代码/id', dataIndex: 'propInfo', valueType: '描述型' },
-      { title: '附加信息', dataIndex: 'info', valueType: '描述型' },
       { title: '主键', dataIndex: 'id', valueType: '描述型', hide: true },
       { title: '表单主键', dataIndex: 'formId', valueType: '描述型', hide: true },
       { title: '关联属性主键', dataIndex: 'propId', valueType: '描述型', hide: true },
@@ -40,13 +36,14 @@ export class AttrReadConfig extends ReadConfigImpl<Attribute, Context, AttrSheet
    */
   async initContext(c: Context): Promise<void> {
     for (let item of this.sheetConfig.data) {
-      if (c.formAttrCodeMap.has(item.formCode)) {
-        let attrCodeMap = c.formAttrCodeMap.get(item.formCode)!;
-        if (attrCodeMap.has(item.code)) {
-          let old = attrCodeMap.get(item.code)!;
+      if (c.formAttrMap.has(item.formCode)) {
+        let attrMap = c.formAttrMap.get(item.formCode)!;
+        if (attrMap.has(item.propInfo)) {
+          let old = attrMap.get(item.propInfo)!;
           assignment(old, item);
+          item.code = old.code;
         }
-        attrCodeMap.set(item.code, item);
+        attrMap.set(item.code, item);
       }
     }
   }
@@ -57,10 +54,10 @@ export class AttrReadConfig extends ReadConfigImpl<Attribute, Context, AttrSheet
   checkData(context: Context) {
     for (let index = 0; index < this.sheetConfig.data.length; index++) {
       let item = this.sheetConfig.data[index];
-      if (!item.formCode || !item.name || !item.code || !item.propInfo) {
+      if (!item.formCode || !item.name || !item.info || !item.propInfo) {
         this.pushError(index, `存在未填写的表单代码、特性名称、特性代码、关联属性代码！`);
       }
-      if (!context.formCodeMap.has(item.formCode)) {
+      if (!context.formMap.has(item.formCode)) {
         this.pushError(index, `未获取到表单代码：${item.formCode}`);
       }
       if (!context.propertyMap.has(item.propInfo)) {
@@ -73,43 +70,38 @@ export class AttrReadConfig extends ReadConfigImpl<Attribute, Context, AttrSheet
    * 更新/创建属性
    * @param index 行索引
    * @param row 行数据
-   * @param context 上下文
+   * @param _context 上下文
    */
   async operating(context: Context, onItemCompleted: () => void): Promise<void> {
-    let requests: RequestIndex[] = [];
-    for (let index = 0; index < this.sheetConfig.data.length; index++) {
-      let row = this.sheetConfig.data[index];
-      row.formId = context.formCodeMap.get(row.formCode)!.id;
-      row.directoryId = context.formCodeMap.get(row.formCode)!.directoryId;
-      row.propId = context.propertyMap.get(row.propInfo)!.id;
-      requests.push({
-        rowNumber: index,
-        request: {
-          module: 'thing',
-          action: row.id ? 'UpdateAttribute' : 'CreateAttribute',
-          params: row,
-        },
-      });
-    }
-    while (requests.length > 0) {
-      await this.requests(requests.splice(0, 100), context, onItemCompleted);
-    }
-  }
-  /**
-   * @param requests 批量请求
-   */
-  private async requests(
-    requests: RequestIndex[],
-    _context: Context,
-    onItemCompleted: () => void,
-  ) {
-    await batchRequests(requests, (request, result) => {
-      if (result.success) {
-        assignment(result.data, this.sheetConfig.data[request.rowNumber]);
-      } else {
-        this.pushError(request.rowNumber, result.msg);
+    this.sheetConfig.data.forEach((item, index) => (item.index = index));
+    let groups = new List(this.sheetConfig.data).GroupBy((item) => item.formCode);
+    for (const key in groups) {
+      if (context.formMap.has(key)) {
+        const form = context.formMap.get(key)!;
+        const attrs = groups[key];
+        attrs.forEach((attr) => {
+          if (!attr.id) {
+            attr.id = 'snowId()';
+            attr.authId = orgAuth.SuperAuthId;
+            attr.code = 'SsnowId()';
+          }
+          attr.formId = form.id;
+          let prop = context.propertyMap.get(attr.propInfo);
+          if (prop) {
+            attr.property = prop;
+            attr.propId = prop.id;
+          }
+          onItemCompleted();
+        });
+        form.attributes = attrs;
+        let result = await this.sheetConfig.directory.resource.formColl.replace(form);
+        result?.attributes.forEach((item) => {
+          let attr = item as Attribute;
+          if (attr.index) {
+            this.sheetConfig.data[attr.index] = item as Attribute;
+          }
+        });
       }
-      onItemCompleted();
-    });
+    }
   }
 }

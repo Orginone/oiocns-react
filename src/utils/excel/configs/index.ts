@@ -1,6 +1,6 @@
 import { IDirectory } from '@/ts/core';
 import { ReadConfig, SheetConfig, SheetName } from '../types';
-import { AttrSheetConfig, AttrReadConfig } from './base/attribute';
+import { AttrReadConfig, AttrSheetConfig } from './base/attribute';
 import { DirectoryReadConfig, DirectorySheetConfig } from './base/directory';
 import { FormReadConfig, FormSheetConfig } from './base/form';
 import {
