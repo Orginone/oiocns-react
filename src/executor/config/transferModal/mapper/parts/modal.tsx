@@ -1,11 +1,11 @@
 import FullScreenModal from '@/executor/tools/fullScreen';
 import React from 'react';
 import Mapper from './mapper';
-import { ILink } from '@/ts/core/thing/link';
+import { ITransfer } from '@/ts/core';
 import { model } from '@/ts/base';
 
 interface IProps {
-  link: ILink;
+  link: ITransfer;
   current: model.MappingNode;
   finished: () => void;
 }

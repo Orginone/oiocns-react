@@ -21,12 +21,12 @@ export enum SheetName {
  * 导入上下文
  */
 export class Context {
-  directoryCodeMap: Map<string, Directory> = new Map();
-  speciesCodeMap: Map<string, Species> = new Map();
-  speciesItemCodeMap: Map<String, Map<String, SpeciesItem>> = new Map();
+  directoryMap: Map<string, Directory> = new Map();
+  speciesMap: Map<string, Species> = new Map();
+  speciesItemMap: Map<String, Map<String, SpeciesItem>> = new Map();
   propertyMap: Map<String, Property> = new Map();
-  formCodeMap: Map<String, Form> = new Map();
-  formAttrCodeMap: Map<String, Map<String, Attribute>> = new Map();
+  formMap: Map<String, Form> = new Map();
+  formAttrMap: Map<String, Map<String, Attribute>> = new Map();
 }
 
 /**

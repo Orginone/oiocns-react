@@ -26,7 +26,7 @@ interface IProps {
 //   return tree;
 // };
 
-const StoreForm: React.FC<IProps> = ({  }) => {
+export const StoreForm: React.FC<IProps> = ({}) => {
   // let initialValue = {};
   // switch (formType) {
   //   case 'updateStore':
@@ -124,5 +124,3 @@ const StoreForm: React.FC<IProps> = ({  }) => {
   // );
   return <></>;
 };
-
-export { StoreForm };

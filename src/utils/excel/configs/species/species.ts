@@ -1,15 +1,9 @@
-import { SpeciesModel } from '@/ts/base/model';
+import { XSpecies } from '@/ts/base/schema';
 import { IDirectory } from '@/ts/core';
-import { assignment, batchRequests } from '../..';
-import {
-  Context,
-  ReadConfigImpl,
-  RequestIndex,
-  SheetConfigImpl,
-  SheetName,
-} from '../../types';
+import { assignment } from '../..';
+import { Context, ReadConfigImpl, SheetConfigImpl, SheetName } from '../../types';
 
-export interface Species extends SpeciesModel {
+export interface Species extends XSpecies {
   directoryCode: string;
 }
 
@@ -54,11 +48,11 @@ class CommonReadConfig<
    */
   async initContext(c: Context): Promise<void> {
     for (let item of this.sheetConfig.data) {
-      if (c.speciesCodeMap.has(item.code)) {
-        let old = c.speciesCodeMap.get(item.code)!;
+      if (c.speciesMap.has(item.code)) {
+        let old = c.speciesMap.get(item.code)!;
         assignment(old, item);
       }
-      c.speciesCodeMap.set(item.code, item);
+      c.speciesMap.set(item.code, item);
     }
   }
   /**
@@ -75,7 +69,7 @@ class CommonReadConfig<
           this.pushError(index, `存在未填写的目录代码、字典代码、字典名称！`);
         }
       }
-      if (!context.directoryCodeMap.has(item.directoryCode)) {
+      if (!context.directoryMap.has(item.directoryCode)) {
         this.pushError(index, `未获取到目录代码：${item.directoryCode}`);
       }
     }
@@ -88,42 +82,39 @@ class CommonReadConfig<
    * @param context 上下文
    */
   async operating(context: Context, onItemCompleted: () => void): Promise<void> {
-    let requests: RequestIndex[] = [];
+    let insertSpecies: { index: number; species: XSpecies }[] = [];
+    let replaceSpecies: { index: number; species: XSpecies }[] = [];
     for (let index = 0; index < this.sheetConfig.data.length; index++) {
       let row = this.sheetConfig.data[index];
-      let dir = context.directoryCodeMap.get(row.directoryCode)!;
+      let dir = context.directoryMap.get(row.directoryCode)!;
       row.directoryId = dir.id;
-      requests.push({
-        rowNumber: index,
-        request: {
-          module: 'thing',
-          action: row.id ? 'UpdateSpecies' : 'CreateSpecies',
-          params: row,
-        },
-      });
-    }
-    while (requests.length > 0) {
-      await this.requests(requests.splice(0, 20), context, onItemCompleted);
-    }
-  }
-  /**
-   *
-   * @param requests 批量请求
-   */
-  private async requests(
-    requests: RequestIndex[],
-    context: Context,
-    onItemCompleted: () => void,
-  ) {
-    await batchRequests(requests, (request, result) => {
-      if (result.success) {
-        assignment(result.data, this.sheetConfig.data[request.rowNumber]);
-        context.speciesCodeMap.set(result.data.code, result.data);
+      if (row.id) {
+        replaceSpecies.push({ index, species: row });
       } else {
-        this.pushError(request.rowNumber, result.msg);
+        insertSpecies.push({ index, species: row });
       }
       onItemCompleted();
-    });
+    }
+    if (insertSpecies.length > 0) {
+      let insertRes = await this.sheetConfig.directory.resource.speciesColl.insertMany(
+        insertSpecies.map((item) => item.species),
+      );
+      for (let index = 0; index < insertRes.length; index++) {
+        let species = insertRes[index] as Species;
+        this.sheetConfig.data[insertSpecies[index].index] = species;
+        context.speciesMap.set(species.code, species);
+      }
+    }
+    if (replaceSpecies.length > 0) {
+      let replaceRes = await this.sheetConfig.directory.resource.speciesColl.replaceMany(
+        replaceSpecies.map((item) => item.species),
+      );
+      for (let index = 0; index < replaceRes.length; index++) {
+        let species = replaceRes[index] as Species;
+        this.sheetConfig.data[replaceSpecies[index].index] = species;
+        context.speciesMap.set(species.code, species);
+      }
+    }
   }
 }
 

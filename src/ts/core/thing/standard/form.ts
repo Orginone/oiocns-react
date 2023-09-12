@@ -30,6 +30,7 @@ export interface IForm extends IFileInfo<schema.XForm> {
 export class Form extends FileInfo<schema.XForm> implements IForm {
   constructor(_metadata: schema.XForm, _directory: IDirectory) {
     super(_metadata, _directory);
+    this.setEntity();
   }
   private _fieldsLoaded: boolean = false;
   fields: model.FieldModel[] = [];

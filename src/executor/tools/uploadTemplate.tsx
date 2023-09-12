@@ -166,9 +166,7 @@ const generate = async (
         },
         '生成数据模板',
       );
-      dir.loadContent(true).then(() => {
-        orgCtrl.changCallback();
-      });
+      dir.resource.directoryColl.notity({ operate: 'refresh', data: dir.metadata });
     },
     onReadError: (errors) => {
       showErrors(errors);
