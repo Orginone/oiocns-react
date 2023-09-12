@@ -7,6 +7,7 @@ import FormView from './form';
 import WorkStart from './work';
 import OfficeView from './office';
 import ReportView from './report';
+import CodeEditor from './codeeditor';
 
 const officeExt = ['.pdf', '.xls', '.xlsx', '.doc', '.docx', '.ppt', '.pptx'];
 const videoExt = ['.mp4', '.avi', '.mov', '.mpg', '.swf', '.flv', '.mpeg'];
