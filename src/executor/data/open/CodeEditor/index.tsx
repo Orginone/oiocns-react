@@ -79,20 +79,18 @@ const CodeEditor = ({ finished, form, supportFiles, isProject }: IProps) => {
     }
     if (current.share.avatar?.shareLink) {
       if (current.share.avatar.extension === '.json') {
-        getJsonText(
-          '/orginone/anydata/bucket/load/' + current.share.avatar.shareLink,
-        ).then((data) => {
-          setMdContent(data);
-        });
+        getJsonText(`/orginone/kernel/load/${current.share.avatar.shareLink}`).then(
+          (data) => {
+            setMdContent(data);
+          },
+        );
         return;
       }
-      axios
-        .get('/orginone/anydata/bucket/load/' + current.share.avatar.shareLink)
-        .then((res) => {
-          if (res.status === 200) {
-            setMdContent(res.data);
-          }
-        });
+      axios.get(`/orginone/kernel/load/${current.share.avatar.shareLink}`).then((res) => {
+        if (res.status === 200) {
+          setMdContent(res.data);
+        }
+      });
     }
   };
   const initTreeData = (data, _treeData) => {

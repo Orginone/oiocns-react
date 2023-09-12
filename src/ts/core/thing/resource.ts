@@ -47,8 +47,8 @@ export class DataResource {
   /** 数据传输配置集合 */
   transferColl: XCollection<Link>;
   /** 资源预加载 */
-  async preLoad(): Promise<void> {
-    if (this._proLoaded === false) {
+  async preLoad(reload: boolean = false): Promise<void> {
+    if (this._proLoaded === false || reload) {
       await Promise.all([
         this.formColl.all(),
         this.speciesColl.all(),

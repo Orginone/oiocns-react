@@ -16,21 +16,19 @@ const MyMdEditor: React.FC<IProps> = ({ finished, form }) => {
   const init = () => {
     if (form.share.avatar.shareLink && isInitialization) {
       if (form.share.avatar.extension === '.json') {
-        getJsonText('/orginone/anydata/bucket/load/' + form.share.avatar.shareLink).then(
+        getJsonText(`/orginone/kernel/load/${form.share.avatar.shareLink}`).then(
           (data) => {
             setMdContent(data);
           },
         );
         return;
       }
-      axios
-        .get('/orginone/anydata/bucket/load/' + form.share.avatar.shareLink)
-        .then((res) => {
-          if (res.status === 200) {
-            setInitialization(false);
-            setMdContent(res.data);
-          }
-        });
+      axios.get(`/orginone/kernel/load/${form.share.avatar.shareLink}`).then((res) => {
+        if (res.status === 200) {
+          setInitialization(false);
+          setMdContent(res.data);
+        }
+      });
     }
   };
   useEffect(() => {

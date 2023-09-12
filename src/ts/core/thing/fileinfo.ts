@@ -135,8 +135,7 @@ export class SysFileInfo extends FileInfo<schema.XEntity> implements ISysFileInf
       name: this.filedata.name,
       extension: this.filedata.extension,
       contentType: this.filedata.contentType,
-      shareLink:
-        location.origin + '/orginone/anydata/bucket/load/' + this.filedata.shareLink,
+      shareLink: this.filedata.shareLink,
       thumbnail: this.filedata.thumbnail,
     };
   }

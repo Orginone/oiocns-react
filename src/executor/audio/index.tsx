@@ -37,9 +37,6 @@ const AudioPlayer: React.FC<IProps> = ({ share, finished, directory }) => {
   };
 
   if (audioData.shareLink) {
-    if (!audioData.shareLink.includes('/orginone/anydata/bucket/load')) {
-      audioData.shareLink = `/orginone/anydata/bucket/load/${audioData.shareLink}`;
-    }
     return (
       <Draggable className={cls['audio-drag-box']}>
         <AudioController
@@ -63,7 +60,7 @@ const AudioPlayer: React.FC<IProps> = ({ share, finished, directory }) => {
         </div>
         <audio
           autoPlay
-          src={audioData.shareLink}
+          src={`/orginone/kernel/load/${audioData.shareLink}`}
           ref={audioRef}
           onTimeUpdate={updateProgress}></audio>
       </Draggable>
