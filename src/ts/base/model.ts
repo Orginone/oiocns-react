@@ -1,4 +1,4 @@
-import { XForm, XIdentity, XTarget, Xbase } from './schema';
+import { Xbase, XEntity, XForm, XIdentity, XTarget } from './schema';
 // 请求类型定义
 export type ReqestType = {
   // 模块
@@ -16,8 +16,31 @@ export type DataProxyType = {
   action: string;
   // 归属
   belongId: string;
+  // 抄送
+  copyId?: string;
   // 参数
   params: any;
+  // 关系举证(用户鉴权[user=>relations=>target],最大支持2级关系)
+	relations: string[];
+};
+// 请求数据核类型定义
+export type DataNotityType = {
+  // 数据
+	data: any;
+  // 通知的用户
+	targetId: string;
+  // 是否忽略自己
+	ignoreSelf: boolean;
+  // 标签
+	flag: string;
+  // 关系举证(用户鉴权[user=>relations=>target],最大支持2级关系)
+	relations: string[];
+  // 归属用户
+	belongId: string;
+  // 通知用户自身
+  onlyTarget: boolean;
+  // 仅通知在线用户
+  onlineOnly: boolean;
 };
 // 代理请求类型定义
 export type HttpRequestType = {
@@ -328,28 +351,20 @@ export type MsgTagModel = {
   tags: string[];
 };
 
-export type MsgSaveModel = {
-  // 唯一ID
-  id: string;
-  // 归属用户ID
-  belongId: string;
+export type ChatMessageType = {
   // 发起方Id
   fromId: string;
   // 接收方Id
   toId: string;
   // 接收会话Id
   sessionId: string;
-  // 消息类型
-  msgType: string;
-  // 消息体
-  msgBody: string;
-  // 消息创建时间
-  createTime: string;
-  // 消息变更时间
-  updateTime: string;
-  // 消息标签
-  tags?: CommentType[];
-};
+  // 类型
+  typeName: string;
+  // 内容
+  content: string;
+  // 评注
+  comments: CommentType[];
+} & Xbase;
 
 export type CommentType = {
   // 标签名称
@@ -609,7 +624,6 @@ export type InstanceDataModel = {
     /** 特性id */
     [id: string]: any;
   };
-  formRules?:any
 };
 
 export type FieldModel = {
@@ -859,6 +873,28 @@ export type OperateModel = {
   menus?: OperateModel[];
 };
 
+/** 会话元数据 */
+export type MsgChatData = {
+  /** 消息类会话完整Id */
+  fullId: string;
+  /** 会话标签 */
+  labels: string[];
+  /** 会话名称 */
+  chatName: string;
+  /** 会话备注 */
+  chatRemark: string;
+  /** 是否置顶 */
+  isToping: boolean;
+  /** 会话未读消息数量 */
+  noReadCount: number;
+  /** 最后一次消息时间 */
+  lastMsgTime: number;
+  /** 最新消息 */
+  lastMessage?: ChatMessageType;
+  /** 提及我 */
+  mentionMe: boolean;
+};
+
 // 动态
 export type ActivityType = {
   // 类型
@@ -868,7 +904,7 @@ export type ActivityType = {
   // 资源
   resource: FileItemShare[];
   // 评注
-  comment: CommentType[];
+  comments: CommentType[];
   // 点赞
   likes: string[];
   // 转发
@@ -877,6 +913,15 @@ export type ActivityType = {
   tags: string[];
 } & Xbase;
 
+// 加载请求类型
+export type LoadOptions = {
+  filter: any[];
+  take: number;
+  group: string;
+  skip: number;
+  options: any;
+}
+
 /** 请求失败 */
 export const badRequest = (
   msg: string = '请求失败',
@@ -884,10 +929,155 @@ export const badRequest = (
 ): ResultType<any> => {
   return { success: false, msg: msg, code: code, data: false };
 };
-/** 规则触发时机 */
-export enum RuleTriggers {
-  'Start' = 'Start',//初始化
-  'Running' = 'Running',//修改后
-  'Submit' = 'Submit',//提交前
-  'ThingsChanged' = 'ThingsChanged',//子表变化后
+
+
+
+// 边
+export type Edge = {
+  // 主键
+  id: string;
+  // 开始
+  start: string;
+  // 结束
+  end: string;
+};
+
+// 映射
+export type Mapping = {
+  // 源
+  source: string;
+  // 目标
+  target: string;
+  // 映射
+  mappings: Mapping[];
+};
+
+// 存储
+export type Store = {
+  // 表单 ID
+  formId: string;
+  // 目录 ID
+  directoryId: string;
+};
+
+// 选择
+export type Selection = {
+  // 类型
+  type: 'checkbox' | 'radio';
+  // 关键字
+  key: string;
+  // 表单 ID
+  formId: string;
+};
+
+// 环境
+export type Environment = {
+  id: string;
+  name: string;
+  params: KeyValue;
+};
+
+// 脚本
+export type Script = {
+  id: string;
+  name: string;
+  code: string;
+};
+
+// 图状态
+export type GraphStatus = 'Editable' | 'Viewable' | 'Running';
+
+// 节点状态
+export type NodeStatus = 'Completed' | 'Error' | GraphStatus;
+
+// 节点类型
+export type NodeType = '请求' | '链接' | '映射' | '存储';
+
+// 事件
+export type Event = 'Edit' | 'View' | 'Run';
+
+// 节点
+export type Node<T> = {
+  // 主键
+  id: string;
+  // 名称
+  name: string;
+  // 类型
+  typeName: string;
+  // 前置脚本
+  preScripts: Script[];
+  // 后置脚本
+  postScripts: Script[];
+  // 数据（请求、子链接、映射、存储）
+  data: T;
+};
+
+// 运行时
+export type RunNode<T> = NodeStatus & Node<T>;
+
+// 请求节点
+export type RequestNode = Node<HttpRequestType>;
+
+// 链接节点
+export type LinkNode = Node<string>;
+
+// 脚本节点
+export type ScriptNode = Node<Script>;
+
+// 映射节点
+export type MappingNode = Node<Mapping>;
+
+// 存储节点
+export type StoreNode = Node<Store>;
+
+// 键值对
+export type KeyValue = { [key: string]: string | undefined };
+
+// 链接
+export type Link = {
+  // 目录
+  directoryId: string;
+  // 环境集合
+  envs: Environment[];
+  // 当前环境
+  curEnv?: string;
+  // 节点集合
+  nodes: Node<any>[];
+  // 边集合
+  edges: Edge[];
+  // 图数据
+  graph: any;
+} & XEntity;
+
+
+export type SettingWidget = {
+  /** 按钮生成的 schema 的 key 值 */
+  name: string;
+  /** 在左侧栏按钮展示文案 */
+  text: string;
+  /** 在左侧栏按钮展示图标 */
+  icon?: string;
+  /** 如果是基本组件，这个字段注明它对应的 widgets */
+  widget?: string;
+  /** 组件对应的 schema 片段 */
+  schema?: any;
+  /** 组件的配置信息，使用 form-render 的 schema 来描述 */
+  setting?: any;
 }
+
+export type Setting = {
+  /** 最外层的分组名称 */
+  title: string;
+  /** 每个组件的配置，在左侧栏是一个按钮 */
+  widgets: SettingWidget[];
+  show?: boolean;
+  useCommon?: boolean;
+}
+
+export type SchemaType = {
+  displayType: 'row' | 'column';
+  type: 'object';
+  labelWidth: number | string;
+  properties: Record<string, object>;
+  column: 1 | 2 | 3;
+};

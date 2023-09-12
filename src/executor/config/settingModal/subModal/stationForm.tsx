@@ -13,7 +13,7 @@ interface IProps {
   编辑
 */
 const IdentityForm: React.FC<IProps> = ({ current, finished }) => {
-  const isEdit = 'company' in current;
+  const isEdit = !('groups' in current);
   const columns: ProFormColumnsType<TargetModel>[] = [
     {
       title: '图标',
@@ -27,7 +27,7 @@ const IdentityForm: React.FC<IProps> = ({ current, finished }) => {
             onChanged={(icon) => {
               form.setFieldValue('icon', icon);
             }}
-            directory={isEdit ? current.company.directory : current.directory}
+            directory={isEdit ? current.space.directory : current.directory}
           />
         );
       },

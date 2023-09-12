@@ -1,4 +1,4 @@
-import { AiOutlineSelect } from 'react-icons/ai';
+import { AiOutlineSelect } from '@/icons/ai';
 import { ProForm } from '@ant-design/pro-components';
 import { Button, Input } from 'antd';
 import React, { useState } from 'react';

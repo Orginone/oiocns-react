@@ -1,11 +1,11 @@
-import { BiShuffle } from 'react-icons/bi';
+import { BiShuffle } from '@/icons/bi';
 import {
   AiFillStepBackward,
   AiFillStepForward,
   AiOutlinePauseCircle,
   AiOutlinePlayCircle,
-} from 'react-icons/ai';
-import { TbRepeatOnce } from 'react-icons/tb';
+} from '@/icons/ai';
+// import { TbRepeatOnce } from '@/icons/tb';
 import cls from './index.module.less';
 import React, { useEffect, useState } from 'react';
 import { FileItemModel } from '@/ts/base/model';

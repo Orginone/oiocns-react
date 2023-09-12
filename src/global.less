@@ -12,9 +12,6 @@
 .layout__loading {
   width: 100%;
   height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .pages-wrap {
@@ -28,20 +25,16 @@
   border-bottom: 0 !important;
 }
 
-.ogo-modal-header+.ogo-modal-body {
+.ogo-modal-header + .ogo-modal-body {
   border: 1px solid @border-color-base;
   border-radius: @border-radius-base;
   margin: @margin-xs @margin-lg;
-  max-height: calc(100vh - 260px);
+  max-height: 684px;
   overflow-y: auto;
 }
 
 .ogo-modal-wrap {
   overflow: hidden;
-}
-
-.ogo-tabs {
-  overflow-y: scroll !important;
 }
 
 .ogo-modal-footer {
@@ -55,11 +48,9 @@
 .ogo-dropdown-menu {
   padding: @padding-xxs @padding-xs !important;
 }
-
 .ogo-dropdown-menu-item {
   border-radius: @border-radius-base;
 }
-
 // more ··· 下拉操作菜单样式  end
 .ogo-result-title {
   font-size: 20px;
@@ -69,15 +60,12 @@
 .ogo-tree .ogo-tree-node-content-wrapper.ogo-tree-node-selected {
   background-color: @component-background;
 }
-
 .ogo-tree .ogo-tree-treenode-draggable .ogo-tree-draggable-icon {
   display: none;
 }
-
 .ogo-tree-indent-unit {
   width: 8px !important;
 }
-
 .ogo-tree-switcher {
   width: 16px !important;
 }
@@ -194,7 +182,6 @@
   font-weight: 600;
   line-height: 25px;
 }
-
 .dx-resizable-handle {
   width: 2px;
   border-left: 1px solid #e3e2e280;
@@ -204,24 +191,8 @@
 .dx-resizable-handle:hover {
   border: 1px dotted #154ad8;
 }
-
 .rlv-list-item {
   &:hover {
     background-color: #efefef;
-  }
-}
-
-
-.fr-generator-container .right-layout {
-  width: 100%;
-
-  .ogo-input-number {
-    width: 100% !important;
-  }
-}
-
-.fr-form {
-  .ogo-input-number,.ogo-select  {
-    width: 100% !important;
   }
 }

@@ -1,4 +1,4 @@
-import { IWork } from '@/ts/core';
+import { IWork, IWorkTask } from '@/ts/core';
 import { Button, Input, message } from 'antd';
 import React, { useEffect, useState } from 'react';
 import WorkForm from '@/executor/tools/workForm';
@@ -7,7 +7,7 @@ import { IWorkApply } from '@/ts/core';
 import { model } from '@/ts/base';
 // 卡片渲染
 interface IProps {
-  current: IWork;
+  current: IWork | IWorkTask;
   finished: () => void;
 }
 
@@ -33,7 +33,7 @@ const WorkStartDo: React.FC<IProps> = ({ current, finished }) => {
         width={'80vw'}
         bodyHeight={'80vh'}
         destroyOnClose
-        title={current.name}
+        title={apply.metadata.title}
         footer={[]}
         onCancel={finished}>
         <WorkForm
@@ -41,11 +41,8 @@ const WorkStartDo: React.FC<IProps> = ({ current, finished }) => {
           belong={apply.belong}
           data={apply.instanceData}
           nodeId={apply.instanceData.node.id}
-          ruleService={apply.ruleService}
           onChanged={(id, data) => {
             formData.set(id, data);
-            /* 每次变化收集当前最新表单数据 */
-            apply.ruleService.serFormData = formData;
           }}
         />
         <div style={{ padding: 10, display: 'flex', alignItems: 'flex-end' }}>
@@ -59,8 +56,14 @@ const WorkStartDo: React.FC<IProps> = ({ current, finished }) => {
           <Button
             type="primary"
             onClick={async () => {
-              let res = await apply.ruleService.resloveSubmitRules();
-              if (res) {
+              let { values = {}, success = true } =
+                await apply.ruleService.resloveSubmitRules();
+              const changedForm = formData.get(apply.ruleService.currentMainFormId);
+              formData.set(apply.ruleService.currentMainFormId!, {
+                ...changedForm,
+                after: [{ ...changedForm!.after[0]!, ...values }],
+              } as any);
+              if (success) {
                 apply.createApply(apply.belong.id, info.content, formData);
                 finished();
               } else {

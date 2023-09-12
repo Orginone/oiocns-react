@@ -15,7 +15,7 @@ interface Iprops {
 /*
   业务标准编辑模态框
 */
-const WorkModal = ({ finished, formType, current }: Iprops) => {
+const WorkForm = ({ finished, formType, current }: Iprops) => {
   let title = '';
   const readonly = formType === 'remarkDir';
   let initialValue: any = current.metadata;
@@ -149,4 +149,4 @@ const WorkModal = ({ finished, formType, current }: Iprops) => {
   );
 };
 
-export default WorkModal;
+export default WorkForm;

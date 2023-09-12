@@ -1,7 +1,7 @@
-import { RiMore2Fill } from 'react-icons/ri';
+import { RiMore2Fill } from '@/icons/ri';
 import { Dropdown, Menu, MenuProps, Typography, Input, Badge } from 'antd';
 import React, { useEffect, useState } from 'react';
-import { ImSearch } from 'react-icons/im';
+import { ImSearch } from '@/icons/im';
 import { MenuItemType } from 'typings/globelType';
 import style from './index.module.less';
 

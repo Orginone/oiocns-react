@@ -1,7 +1,7 @@
 import React from 'react';
 import { ProFormColumnsType } from '@ant-design/pro-components';
 
-import CodeEdit from '@/components/ReactCodeEdit';
+import CodeEdit from '@/components/Common/ReactCodeEdit';
 import { XAttribute, XFormRule } from '@/ts/base/schema';
 import { Input } from 'antd';
 import { ValueGoal } from '@/ts/core/work/rules/base/enum';
@@ -95,7 +95,7 @@ const getColumns: (
   {
     title: '规则效果类别',
     tooltip: '规则执行后的作用效果',
-    dataIndex: 'valueGoal',
+    dataIndex: 'effect',
     valueType: 'select',
     initialValue: '0',
     colProps: {

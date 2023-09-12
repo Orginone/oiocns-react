@@ -4,7 +4,7 @@ import {
   IEntity,
   IFileInfo,
   IMemeber,
-  IMsgChat,
+  ISession,
   ISysFileInfo,
   ITarget,
   TargetType,
@@ -68,6 +68,9 @@ const openDirectory = (
   entity: IDirectory | IApplication | ITarget | IEntity<schema.XEntity>,
 ) => {
   if ('identitys' in entity && entity.typeName != TargetType.Station) {
+    if (entity.typeName === TargetType.Storage) {
+      return false;
+    }
     entity = entity.directory;
   }
   if ('files' in entity || 'works' in entity) {
@@ -161,9 +164,9 @@ const copyBoard = (dir: IDirectory) => {
 };
 
 /** 打开会话 */
-const openChat = (chat: IDirectory | IMemeber | IMsgChat) => {
+const openChat = (chat: IDirectory | IMemeber | ISession) => {
   if ('taskList' in chat) {
-    orgCtrl.currentKey = chat.target.chatdata.fullId;
+    orgCtrl.currentKey = chat.target.session.chatdata.fullId;
   } else if ('fullId' in chat) {
     orgCtrl.currentKey = chat.fullId;
   } else {
@@ -244,19 +247,7 @@ const entityQrCode = (entity: IEntity<schema.XEntity>) => {
 
 /** 上下线提醒 */
 const onlineChanged = (cmd: string, info: model.OnlineInfo) => {
-  if (info.userId === '0') {
-    if (cmd === 'online') {
-      message.success({
-        duration: 1,
-        content: `终端${info.remoteAddr}[${info.connectionId}]建立连接`,
-      });
-    } else {
-      message.error({
-        duration: 1,
-        content: `终端${info.remoteAddr}[${info.connectionId}]断开连接`,
-      });
-    }
-  } else {
+  if (info.userId != '0') {
     orgCtrl.user.findEntityAsync(info.userId).then((target) => {
       if (target) {
         if (cmd === 'online') {

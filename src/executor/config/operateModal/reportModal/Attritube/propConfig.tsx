@@ -2,7 +2,7 @@ import { IDirectory, IForm, IProperty } from '@/ts/core';
 import { XAttribute, XProperty } from '@/ts/base/schema';
 import React, { useEffect, useState } from 'react';
 import { Card, Typography } from 'antd';
-import { ImCheckmark, ImCross } from 'react-icons/im';
+import { ImCheckmark, ImCross } from '@/icons/im';
 import cls from './index.module.less';
 import CustomTree from '@/components/CustomTree';
 interface IProps {
@@ -76,15 +76,13 @@ const PropertyConfig = (props: IProps) => {
               await props.form.updateAttribute(props.attr, selectedItem as XProperty);
             }
             props.onFinish.apply(this, []);
-          }}
-        >
+          }}>
           {selectedItem && <ImCheckmark fontSize={20} style={{ marginRight: 20 }} />}
         </Typography.Link>,
         <Typography.Link key={'222'} onClick={props.onFinish}>
           <ImCross fontSize={18} />
         </Typography.Link>,
-      ]}
-    >
+      ]}>
       <CustomTree
         defaultExpandAll={true}
         onSelect={(_, info) => {

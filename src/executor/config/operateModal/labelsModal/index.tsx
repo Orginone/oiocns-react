@@ -15,6 +15,7 @@ interface IProps {
 }
 const LabelModl: React.FC<IProps> = ({ current, finished }: IProps) => {
   const [modalType, setModalType] = useState<string>('');
+  const [isOpen, setIsOpen] = useState<boolean>(false);
   const [tabKey, setTabKey] = useState<string>('attr');
   /** 操作按钮 */
   const renderButton = () => {
@@ -24,9 +25,10 @@ const LabelModl: React.FC<IProps> = ({ current, finished }: IProps) => {
           key="edit"
           type="link"
           onClick={() => {
-            setModalType('新增特性');
+            setModalType('表单设计');
+            setIsOpen(true);
           }}>
-          新增特性
+          表单设计
         </Button>
       );
     } else if (!current.isInherited && tabKey === 'rule') {
@@ -47,12 +49,16 @@ const LabelModl: React.FC<IProps> = ({ current, finished }: IProps) => {
   const content = () => {
     if (tabKey === 'attr') {
       return (
-        <Attribute
-          current={current}
-          modalType={modalType}
-          recursionOrg={true}
-          setModalType={setModalType}
-        />
+        <>
+          <Attribute
+            current={current}
+            modalType={modalType}
+            recursionOrg={true}
+            setModalType={setModalType}
+          />
+
+          <FormDesign current={current} isOpen={isOpen} setIsOpen={setIsOpen} />
+        </>
       );
     }
     if (tabKey === 'rule') {
@@ -65,7 +71,6 @@ const LabelModl: React.FC<IProps> = ({ current, finished }: IProps) => {
         />
       );
     }
-    return <FormDesign current={current} />;
   };
 
   return (
@@ -88,11 +93,11 @@ const LabelModl: React.FC<IProps> = ({ current, finished }: IProps) => {
                 tab: current.typeName + '特性',
                 key: 'attr',
               },
-              {
-                tab: current.typeName + '设计',
-                key: 'form',
-                disabled: current.directory.isInherited,
-              },
+              // {
+              //   tab: current.typeName + '设计',
+              //   key: 'form',
+              //   disabled: current.directory.isInherited,
+              // },
               {
                 tab: current.typeName + '规则',
                 key: 'rule',

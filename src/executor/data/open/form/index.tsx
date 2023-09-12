@@ -8,7 +8,7 @@ import useMenuUpdate from '@/hooks/useMenuUpdate';
 import GenerateThingTable from '@/executor/tools/generate/thingTable';
 import CustomStore from 'devextreme/data/custom_store';
 import { kernel } from '@/ts/base';
-import { ImCopy, ImShuffle, ImTicket } from 'react-icons/im';
+import { ImCopy, ImShuffle, ImTicket } from '@/icons/im';
 import { Controller } from '@/ts/controller';
 import { message } from 'antd';
 import ThingView from './detail';
@@ -110,6 +110,7 @@ const FormView: React.FC<IProps> = ({ form, finished }) => {
       destroyOnClose
       onCancel={() => finished()}>
       <MainLayout
+        notExitIcon
         selectMenu={selectMenu}
         onSelect={(data) => {
           setSelectMenu(data);

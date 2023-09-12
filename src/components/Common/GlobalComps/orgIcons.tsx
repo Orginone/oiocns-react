@@ -18,7 +18,6 @@ interface IProps {
   css?: React.CSSProperties;
   notAvatar?: boolean;
   className?: string;
-  showTitle?: boolean;
 }
 
 const OrgIcons = (props: IProps) => {

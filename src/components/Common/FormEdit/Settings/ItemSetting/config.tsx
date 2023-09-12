@@ -17,8 +17,20 @@ const columns: any = (type: string) => {
         md: 12,
       },
       title: '标题',
-      dataIndex: 'name',
+      dataIndex: 'title',
       valueType: 'text',
+      tooltip: '',
+    },
+    {
+      colProps: {
+        xs: 12,
+        md: 12,
+      },
+      title: '标签宽度',
+      width: '100%',
+      dataIndex: 'labelWidth',
+      initialValue: 120,
+      valueType: 'digit',
       tooltip: '',
     },
     {
@@ -161,6 +173,16 @@ const ObjectColumns = [
     dataIndex: 'theme',
     valueType: 'radio',
     valueEnum: flexEnum,
+  },
+  {
+    colProps: {
+      xs: 12,
+      md: 12,
+    },
+    title: '标题',
+    dataIndex: 'title',
+    valueType: 'text',
+    tooltip: '',
   },
   {
     valueType: 'dependency',

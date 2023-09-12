@@ -42,6 +42,7 @@
     ├── app.tsx                         // 顶层文件
     ├── index.tsx                       // 项目入口文件
     ├── typings                         // 项目type类型定义文件夹
+    ├── icons                           // 项目react-icons文件夹
 ├── .editorconfig                       // IDE格式规范
 ├── .env                                // 环境变量
 ├── .eslintignore                       // eslint忽略
@@ -68,6 +69,7 @@
 
 [css规范](./docs/style-guide.md)
 [敏捷规范](./docs/scrum-guid.md)
+[icon规范](./docs/icon-guid.md)
 
 ### 项目依赖环境、安装和运行
 

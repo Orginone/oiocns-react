@@ -1,6 +1,6 @@
 import { UserOutlined } from '@ant-design/icons';
 import { Avatar } from 'antd';
-import React, { useRef, useState } from 'react';
+import React from 'react';
 import './index.less';
 import { Input } from 'antd';
 
@@ -8,7 +8,7 @@ const { Search } = Input;
 
 function HistoryCommit() {
   const onSearch = (value: string) => console.log(value);
-  const arrs = [1, 1, 1, 1, 1, 1, , 1, 1, 1, 1];
+  const arrs = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
   return (
     <div className="history_commit">
       <div className="flex_align_center search_header">

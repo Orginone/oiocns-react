@@ -1,11 +1,11 @@
 import React from 'react';
 import { ProFormColumnsType } from '@ant-design/pro-components';
 import SchemaForm from '@/components/SchemaForm';
-import { SpeciesModel } from '@/ts/base/model';
 import { IDirectory } from '@/ts/core';
 import UploadItem from '../../tools/uploadItem';
 import { ISpecies } from '@/ts/core';
 import { EntityColumns } from './entityColumns';
+import { schema } from '@/ts/base';
 
 interface Iprops {
   formType: string;
@@ -41,7 +41,7 @@ const SpeciesForm = (props: Iprops) => {
     default:
       return <></>;
   }
-  const columns: ProFormColumnsType<SpeciesModel>[] = [
+  const columns: ProFormColumnsType<schema.XSpecies>[] = [
     {
       title: '图标',
       dataIndex: 'icon',
@@ -91,7 +91,7 @@ const SpeciesForm = (props: Iprops) => {
     },
   });
   return (
-    <SchemaForm<SpeciesModel>
+    <SchemaForm<schema.XSpecies>
       open
       title={title}
       width={640}

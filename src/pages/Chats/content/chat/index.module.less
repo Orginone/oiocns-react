@@ -1,21 +1,31 @@
-.chatWrap {
+.cohort_wrap {
   width: 100%;
   height: 100%;
   display: flex;
   justify-content: space-between;
   overflow: hidden;
   position: relative;
-  .chatContent {
+  // margin-top: -10px;
+  // border-top: 1px solid #f2f2f2;
+  .custom_group_silder_menu {
+    width: 300px;
+    // border-right: 1px solid #dcdfe6;
+    background-color: #fff;
+  }
+
+  .chart_page {
+    height: 100%;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     flex: 1;
     overflow: hidden;
     background-color: #f2f2f25c;
-    .chatInput {
+    padding-left: 12px;
+
+    .chart_input {
       height: max-content;
       min-height: 227px;
-      padding-left: 16px;
       border-top: 1px solid #dde4f3;
       .el-textarea__inner {
         // color: #fff;
@@ -39,5 +49,4 @@
       color: #dcdfe6;
     }
   }
-
 }

@@ -8,7 +8,7 @@ import FullScreenModal from '@/executor/tools/fullScreen';
 import { getJsonText } from '@/utils';
 import axios from 'axios';
 import orgCtrl from '@/ts/controller';
-import { Card, Modal, Tree } from 'antd';
+import { Tree } from 'antd';
 import type { DataNode } from 'antd/es/tree';
 import './index.less';
 import { ProConfigProvider } from '@ant-design/pro-components';
@@ -17,7 +17,7 @@ const { DirectoryTree } = Tree;
 interface IProps {
   finished: () => void;
   form: any;
-  supportFiles: string[];
+  supportFiles?: string[];
   isProject: boolean;
 }
 
@@ -43,7 +43,7 @@ const updateTreeData = (
   });
 
 /** 文件预览 */
-const CodeEditor = ({ finished, form, supportFiles, isProject }: IProps) => {
+const CodeEditor = ({ finished, form, isProject }: IProps) => {
   const [mdContent, setMdContent] = useState(''); // 保存Markdown文本内容
   const onTextChange = React.useCallback((value: string) => {
     setMdContent(value);
@@ -95,7 +95,7 @@ const CodeEditor = ({ finished, form, supportFiles, isProject }: IProps) => {
         });
     }
   };
-  const initTreeData = (data, _treeData) => {
+  const initTreeData = (data: { children: any[]; files: any[] }, _treeData: any[]) => {
     data.children.forEach((m: any) => {
       _treeData.push({
         key: m.key,
@@ -174,7 +174,7 @@ const CodeEditor = ({ finished, form, supportFiles, isProject }: IProps) => {
                 rootStyle={{ whiteSpace: 'nowrap' }}
                 showLine={true}
                 loadData={onLoadData}
-                onSelect={(keys, e) => {
+                onSelect={(_keys, e: any) => {
                   if (e.node.file) {
                     setCurrent(e.node.file);
                   }

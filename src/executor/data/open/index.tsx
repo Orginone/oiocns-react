@@ -6,7 +6,7 @@ import React from 'react';
 import FormView from './form';
 import WorkStart from './work';
 import OfficeView from './office';
-import CodeEditor from './CodeEditor';
+import CodeEditor from './codeEditor';
 import MyMdEditor from './MdEditor';
 import ReportView from './report';
 
@@ -30,14 +30,9 @@ const ExecutorOpen: React.FC<IOpenProps> = (props: IOpenProps) => {
     ) {
       return <VideoView share={data} finished={props.finished} />;
     }
-    // if (data?.extension === '.md') {
-    //   return <MarkdownView share={data} finished={props.finished}></MarkdownView>;
-    // }
     if (officeExt.includes(data.extension ?? '-')) {
       return <OfficeView share={data} finished={props.finished} />;
     }
-    console.log(data);
-
     if (
       ['.vue', '.tsx', '.jsx', '.js', '.json', '.html', '.java'].find(
         (m) => m === data?.extension,
@@ -71,12 +66,7 @@ const ExecutorOpen: React.FC<IOpenProps> = (props: IOpenProps) => {
       case '办事':
         return <WorkStart current={props.entity as any} finished={props.finished} />;
       case '报表':
-        return (
-          <ReportView
-            current={props.entity as any}
-            finished={props.finished}
-          />
-        );
+        return <ReportView current={props.entity as any} finished={props.finished} />;
       case '目录':
         if (props.cmd === 'openFolderWithEditor') {
           return (

@@ -3,7 +3,7 @@ import { Button, Divider, Modal, Row } from 'antd';
 import cls from './index.module.less';
 import { NodeModel } from '../../../processType';
 import ShareShowComp from '@/components/Common/ShareShowComp';
-import { AiOutlineSetting } from 'react-icons/ai';
+import { AiOutlineSetting } from '@/icons/ai';
 import SelectAuth from '@/components/Common/SelectAuth';
 import SelectForms from '@/components/Common/SelectForms';
 import { IBelong } from '@/ts/core';
@@ -20,20 +20,16 @@ interface IProps {
 
 const RootNode: React.FC<IProps> = (props) => {
   const [viewForm, setViewForm] = useState<XForm>();
-  const [workforms, setWorkForms] = useState<XForm[]>(
-    (props.current.forms || []).filter((i) => i.typeName === '主表'),
-  );
-  const [thingforms, setThingForms] = useState<XForm[]>(
-    (props.current.forms || []).filter((i) => i.typeName === '子表'),
-  );
   const [formModel, setFormModel] = useState<string>('');
+  const [primaryForms, setPrimaryForms] = useState(props.current.primaryForms || []);
+  const [detailForms, setDetailForms] = useState(props.current.detailForms || []);
   const [selectAuthValue, setSelectAuthValue] = useState<any>(props.current.destId);
   return (
     <div className={cls[`app-roval-node`]}>
       <div className={cls[`roval-node`]}>
         <Row style={{ marginBottom: '10px' }}>
           <AiOutlineSetting style={{ marginTop: '3px' }} />
-          <span className={cls[`roval-node-title`]}>选择角色</span>
+          <span className={cls[`roval-node-title`]}>选择权限</span>
         </Row>
         <SelectAuth
           space={props.belong}
@@ -55,16 +51,19 @@ const RootNode: React.FC<IProps> = (props) => {
             选择主表
           </Button>
         </Row>
-        {workforms && workforms.length > 0 && (
+        {primaryForms && primaryForms.length > 0 && (
           <span>
             <ShareShowComp
-              departData={workforms}
+              departData={primaryForms}
               onClick={(item: XForm) => {
                 setViewForm(item);
               }}
               deleteFuc={(id: string) => {
-                setWorkForms([...workforms.filter((i) => i.id != id)]);
-                props.current.forms = props.current.forms?.filter((a) => a.id != id);
+                props.current.primaryForms = primaryForms?.filter((a) => a.id != id);
+                setPrimaryForms(props.current.primaryForms);
+                props.current.primaryFormIds = props.current.primaryFormIds?.filter(
+                  (a) => a != id,
+                );
               }}
             />
           </span>
@@ -80,16 +79,19 @@ const RootNode: React.FC<IProps> = (props) => {
             选择子表
           </Button>
         </Row>
-        {thingforms && thingforms.length > 0 && (
+        {detailForms && detailForms.length > 0 && (
           <span>
             <ShareShowComp
-              departData={thingforms}
+              departData={detailForms}
               onClick={(item: XForm) => {
                 setViewForm(item);
               }}
               deleteFuc={(id: string) => {
-                setThingForms([...thingforms.filter((i) => i.id != id)]);
-                props.current.forms = props.current.forms?.filter((a) => a.id != id);
+                props.current.detailForms = detailForms?.filter((a) => a.id != id);
+                props.current.detailFormIds = props.current.detailFormIds?.filter(
+                  (a) => a != id,
+                );
+                setDetailForms(props.current.detailForms);
               }}
             />
           </span>
@@ -103,15 +105,24 @@ const RootNode: React.FC<IProps> = (props) => {
             open={formModel != ''}
             okText="确定"
             onOk={() => {
-              props.current.forms = [...workforms, ...thingforms];
               setFormModel('');
             }}
             onCancel={() => setFormModel('')}>
             <SelectForms
               belong={props.belong}
               typeName={formModel}
-              selected={formModel === '子表' ? thingforms : workforms}
-              setSelected={formModel === '子表' ? setThingForms : setWorkForms}
+              selected={formModel === '子表' ? detailForms : primaryForms}
+              setSelected={(forms) => {
+                if (formModel === '子表') {
+                  props.current.detailForms = forms;
+                  props.current.detailFormIds = forms.map((a) => a.id);
+                  setDetailForms(forms);
+                } else {
+                  props.current.primaryForms = forms;
+                  props.current.primaryFormIds = forms.map((a) => a.id);
+                  setPrimaryForms(forms);
+                }
+              }}
             />
           </Modal>
           {viewForm && (

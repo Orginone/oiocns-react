@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AiOutlineSetting } from 'react-icons/ai';
+import { AiOutlineSetting } from '@/icons/ai';
 import { Row, Button, Space, Modal, message } from 'antd';
 import cls from './index.module.less';
 import { NodeModel } from '../../../processType';

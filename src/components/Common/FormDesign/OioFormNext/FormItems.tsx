@@ -86,7 +86,7 @@ const OioFormItem = ({
     if (value && ['file', 'upload'].includes(rule.widget)) {
       if (Array.isArray(value)) {
         setFileList(
-          (value).map((a: FileItemShare) => {
+          value.map((a: FileItemShare) => {
             return {
               uid: a.name,
               name: a.name,
@@ -97,7 +97,6 @@ const OioFormItem = ({
           }),
         );
       }
-
     }
   }, [value]);
   // 上传文件区域
@@ -182,7 +181,7 @@ const OioFormItem = ({
         <ProFormText
           disabled={disabled}
           name={field.id}
-          required={rule.required}
+          required={rule.required === true || rule.required === 'true'}
           fieldProps={rule}
           rules={rules}
           tooltip={field.remark}
@@ -195,6 +194,7 @@ const OioFormItem = ({
         <ProFormDigit
           disabled={disabled}
           name={field.id}
+          required={rule.required === true || rule.required === 'true'}
           fieldProps={rule}
           rules={rules}
           tooltip={field.remark}
@@ -206,6 +206,7 @@ const OioFormItem = ({
         <ProFormSelect
           disabled={disabled}
           name={field.id}
+          required={rule.required === true || rule.required === 'true'}
           fieldProps={rule}
           rules={rules}
           tooltip={field.remark}
@@ -217,6 +218,7 @@ const OioFormItem = ({
         <ProFormTreeSelect
           disabled={disabled}
           name={field.id}
+          required={rule.required === true || rule.required === 'true'}
           rules={rules}
           tooltip={field.remark}
           labelAlign="right"
@@ -246,6 +248,7 @@ const OioFormItem = ({
         <ProFormDatePicker
           disabled={disabled}
           name={field.id}
+          required={rule.required === true || rule.required === 'true'}
           rules={rules}
           tooltip={field.remark}
           labelAlign="right"
@@ -256,6 +259,7 @@ const OioFormItem = ({
         <ProFormDateTimePicker
           disabled={disabled}
           name={field.id}
+          required={rule.required === true || rule.required === 'true'}
           rules={rules}
           tooltip={field.remark}
           labelAlign="right"
@@ -266,6 +270,7 @@ const OioFormItem = ({
         <ProFormDateRangePicker
           disabled={disabled}
           name={field.id}
+          required={rule.required === true || rule.required === 'true'}
           rules={rules}
           tooltip={field.remark}
           labelAlign="right"
@@ -276,6 +281,7 @@ const OioFormItem = ({
         <ProFormDateTimeRangePicker
           disabled={disabled}
           name={field.id}
+          required={rule.required === true || rule.required === 'true'}
           rules={rules}
           tooltip={field.remark}
           labelAlign="right"
@@ -286,6 +292,7 @@ const OioFormItem = ({
         <ProFormCheckbox
           disabled={disabled}
           name={field.id}
+          required={rule.required === true || rule.required === 'true'}
           rules={rules}
           tooltip={field.remark}
           labelAlign="right"
@@ -296,6 +303,7 @@ const OioFormItem = ({
         <ProFormRadio
           disabled={disabled}
           name={field.id}
+          required={rule.required === true || rule.required === 'true'}
           rules={rules}
           tooltip={field.remark}
           labelAlign="right"
@@ -306,6 +314,7 @@ const OioFormItem = ({
         <ProFormMoney
           disabled={disabled}
           name={field.id}
+          required={rule.required === true || rule.required === 'true'}
           rules={rules}
           tooltip={field.remark}
           labelAlign="right"
@@ -315,6 +324,7 @@ const OioFormItem = ({
       return (
         <ProFormSelect
           name={field.id}
+          required={rule.required === true || rule.required === 'true'}
           tooltip={field.remark}
           fieldProps={{
             ...rules,
@@ -388,6 +398,7 @@ const OioFormItem = ({
         <ProFormText
           name={field.id}
           fieldProps={rule}
+          required={rule.required === true || rule.required === 'true'}
           rules={rules}
           tooltip={field.remark}
           labelAlign="right"

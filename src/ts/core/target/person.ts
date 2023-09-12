@@ -5,11 +5,13 @@ import { createCompany } from './team';
 import { PageAll, companyTypes } from '../public/consts';
 import { OperateType, TargetType } from '../public/enums';
 import { ICompany } from './team/company';
-import { IMsgChat } from '../chat/message/msgchat';
 import { ITarget } from './base/target';
 import { ITeam } from './base/team';
+import { IStorage, Storage } from './outTeam/storage';
 import { personJoins, targetOperates } from '../public';
 import { IFileInfo } from '../thing/fileinfo';
+import { ISession } from '../chat/session';
+import { XObject } from '../public/object';
 
 /** 人员类型接口 */
 export interface IPerson extends IBelong {
@@ -17,6 +19,8 @@ export interface IPerson extends IBelong {
   companys: ICompany[];
   /** 赋予人的身份(角色)实体 */
   givedIdentitys: schema.XIdProof[];
+  /** 用户缓存对象 */
+  cacheObj: XObject<schema.Xbase>;
   /** 拷贝的文件 */
   copyFiles: Map<string, IFileInfo<schema.XEntity>>;
   /** 根据ID查询共享信息 */
@@ -29,8 +33,6 @@ export interface IPerson extends IBelong {
   loadGivedIdentitys(reload?: boolean): Promise<schema.XIdProof[]>;
   /** 移除赋予人的身份(角色) */
   removeGivedIdentity(identityIds: string[], teamId?: string): void;
-  /** 加载单位 */
-  loadCompanys(reload?: boolean): Promise<ICompany[]>;
   /** 创建单位 */
   createCompany(data: model.TargetModel): Promise<ICompany | undefined>;
   /** 搜索用户 */
@@ -40,14 +42,15 @@ export interface IPerson extends IBelong {
 /** 人员类型实现 */
 export class Person extends Belong implements IPerson {
   constructor(_metadata: schema.XTarget) {
-    super(_metadata, ['本人']);
+    super(_metadata, []);
     this.copyFiles = new Map();
+    this.cacheObj = new XObject(_metadata, 'target-cache', []);
   }
   companys: ICompany[] = [];
+  cacheObj: XObject<schema.Xbase>;
   givedIdentitys: schema.XIdProof[] = [];
   copyFiles: Map<string, IFileInfo<schema.XEntity>>;
   private _cohortLoaded: boolean = false;
-  private _companyLoaded: boolean = false;
   private _givedIdentityLoaded: boolean = false;
   async loadGivedIdentitys(reload: boolean = false): Promise<schema.XIdProof[]> {
     if (!this._givedIdentityLoaded || reload) {
@@ -74,29 +77,29 @@ export class Person extends Belong implements IPerson {
     if (!this._cohortLoaded || reload) {
       const res = await kernel.queryJoinedTargetById({
         id: this.id,
-        typeNames: [TargetType.Cohort],
+        typeNames: [TargetType.Cohort, TargetType.Storage, ...companyTypes],
         page: PageAll,
       });
       if (res.success) {
         this._cohortLoaded = true;
-        this.cohorts = (res.data.result || []).map((i) => new Cohort(i, this));
+        this.cohorts = [];
+        this.storages = [];
+        this.companys = [];
+        (res.data.result || []).forEach((i) => {
+          switch (i.typeName) {
+            case TargetType.Cohort:
+              this.cohorts.push(new Cohort(i, this, i.id));
+              break;
+            case TargetType.Storage:
+              this.storages.push(new Storage(i, [], this));
+              break;
+            default:
+              this.companys.push(createCompany(i, this));
+          }
+        });
       }
     }
     return this.cohorts;
-  }
-  async loadCompanys(reload?: boolean | undefined): Promise<ICompany[]> {
-    if (!this._companyLoaded || reload) {
-      const res = await kernel.queryJoinedTargetById({
-        id: this.id,
-        typeNames: companyTypes,
-        page: PageAll,
-      });
-      if (res.success) {
-        this._companyLoaded = true;
-        this.companys = (res.data.result || []).map((i) => createCompany(i, this));
-      }
-    }
-    return this.companys;
   }
   async createCompany(data: model.TargetModel): Promise<ICompany | undefined> {
     if (!companyTypes.includes(data.typeName as TargetType)) {
@@ -114,10 +117,23 @@ export class Person extends Belong implements IPerson {
       return company;
     }
   }
+  async createStorage(data: model.TargetModel): Promise<IStorage | undefined> {
+    data.typeName = TargetType.Storage;
+    const metadata = await this.create(data);
+    if (metadata) {
+      const storage = new Storage(metadata, [], this);
+      await storage.deepLoad();
+      this.storages.push(storage);
+      await storage.pullMembers([this.user.metadata]);
+      return storage;
+    }
+  }
   async createTarget(data: model.TargetModel): Promise<ITeam | undefined> {
     switch (data.typeName) {
       case TargetType.Cohort:
         return this.createCohort(data);
+      case TargetType.Storage:
+        return this.createStorage(data);
       default:
         return this.createCompany(data);
     }
@@ -136,9 +152,12 @@ export class Person extends Belong implements IPerson {
   async applyJoin(members: schema.XTarget[]): Promise<boolean> {
     members = members.filter(
       (i) =>
-        [TargetType.Person, TargetType.Cohort, ...companyTypes].includes(
-          i.typeName as TargetType,
-        ) && i.id != this.id,
+        [
+          TargetType.Person,
+          TargetType.Cohort,
+          TargetType.Storage,
+          ...companyTypes,
+        ].includes(i.typeName as TargetType) && i.id != this.id,
     );
     for (const member of members) {
       if (member.typeName === TargetType.Person) {
@@ -181,45 +200,45 @@ export class Person extends Belong implements IPerson {
   get parentTarget(): ITarget[] {
     return [...this.cohorts, ...this.companys];
   }
-  get chats(): IMsgChat[] {
-    const chats: IMsgChat[] = [this];
+  get chats(): ISession[] {
+    const chats: ISession[] = [this.session];
     chats.push(...this.cohortChats);
     chats.push(...this.memberChats);
     return chats;
   }
-  get cohortChats(): IMsgChat[] {
-    const chats: IMsgChat[] = [];
+  get cohortChats(): ISession[] {
+    const chats: ISession[] = [];
     const companyChatIds: string[] = [];
     this.companys.forEach((company) => {
       company.cohorts.forEach((item) => {
-        companyChatIds.push(item.chatdata.fullId);
+        companyChatIds.push(item.session.chatdata.fullId);
       });
     });
     for (const item of this.cohorts) {
-      if (!companyChatIds.includes(item.chatdata.fullId)) {
+      if (!companyChatIds.includes(item.session.chatdata.fullId)) {
         chats.push(...item.chats);
       }
     }
-    if (this.superAuth) {
-      chats.push(...this.superAuth.chats);
+    for (const item of this.storages) {
+      chats.push(...item.chats);
     }
     return chats;
   }
   get targets(): ITarget[] {
-    const targets: ITarget[] = [this];
+    const targets: ITarget[] = [this, ...this.storages];
     for (const item of this.cohorts) {
       targets.push(...item.targets);
     }
     return targets;
   }
   async deepLoad(reload: boolean = false): Promise<void> {
+    await this.cacheObj.all();
     await Promise.all([
-      await this.loadGivedIdentitys(reload),
-      await this.directory.loadSubDirectory(),
-      await this.loadCompanys(reload),
       await this.loadCohorts(reload),
       await this.loadMembers(reload),
       await this.loadSuperAuth(reload),
+      await this.loadGivedIdentitys(reload),
+      await this.directory.loadDirectoryResource(),
     ]);
     await Promise.all(
       this.companys.map(async (company) => {
@@ -231,15 +250,28 @@ export class Person extends Belong implements IPerson {
         await cohort.deepLoad(reload);
       }),
     );
+    await Promise.all(
+      this.storages.map(async (storage) => {
+        await storage.deepLoad(reload);
+      }),
+    );
     this.superAuth?.deepLoad(reload);
   }
   async teamChangedNotity(target: schema.XTarget): Promise<boolean> {
     switch (target.typeName) {
       case TargetType.Cohort:
         if (this.cohorts.every((i) => i.id != target.id)) {
-          const cohort = new Cohort(target, this);
+          const cohort = new Cohort(target, this, target.id);
           await cohort.deepLoad();
           this.cohorts.push(cohort);
+          return true;
+        }
+        break;
+      case TargetType.Storage:
+        if (this.storages.every((i) => i.id != target.id)) {
+          const storage = new Storage(target, [], this);
+          await storage.deepLoad();
+          this.storages.push(storage);
           return true;
         }
         break;
@@ -257,7 +289,7 @@ export class Person extends Belong implements IPerson {
   }
   override operates(): model.OperateModel[] {
     const operates = super.operates();
-    operates.unshift(personJoins, targetOperates.NewCompany);
+    operates.unshift(personJoins, targetOperates.NewCompany, targetOperates.NewStorage);
     return operates;
   }
   async findEntityAsync(id: string): Promise<schema.XEntity | undefined> {

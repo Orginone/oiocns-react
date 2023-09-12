@@ -1,7 +1,7 @@
 import React from 'react';
 import { model } from '@/ts/base';
 import { Dropdown } from 'antd';
-import { AiOutlineEllipsis } from 'react-icons/ai';
+import { AiOutlineEllipsis } from '@/icons/ai';
 import { GenerateColumn } from './columns';
 import { Column, DataGrid, IDataGridOptions } from 'devextreme-react/data-grid';
 import { ItemType } from 'antd/lib/menu/hooks/useItems';

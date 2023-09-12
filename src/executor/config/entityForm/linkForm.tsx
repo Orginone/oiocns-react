@@ -1,23 +1,36 @@
 import SchemaForm from '@/components/SchemaForm';
-import { XLink } from '@/ts/base/schema';
+import { Link } from '@/ts/base/model';
 import { IDirectory } from '@/ts/core';
-import { ILink } from '@/ts/core/thing/config';
-import { ConfigColl } from '@/ts/core/thing/directory';
+import { ILink } from '@/ts/core/';
 import { ProFormColumnsType } from '@ant-design/pro-components';
 import React from 'react';
 
 interface IProps {
-  current: IDirectory;
+  formType: string;
+  current: IDirectory | ILink;
   finished: (link?: ILink) => void;
 }
 
-const LinkModal: React.FC<IProps> = ({ current, finished }) => {
-  const columns: ProFormColumnsType<XLink>[] = [
+const LinkModal: React.FC<IProps> = ({ formType, current, finished }) => {
+  let initialValue = {};
+  switch (formType) {
+    case 'updateLink':
+      initialValue = current.metadata;
+      break;
+  }
+  const columns: ProFormColumnsType<Link>[] = [
     {
       title: '名称',
       dataIndex: 'name',
       formItemProps: {
         rules: [{ required: true, message: '名称为必填项' }],
+      },
+    },
+    {
+      title: '编码',
+      dataIndex: 'code',
+      formItemProps: {
+        rules: [{ required: true, message: '编码为必填项' }],
       },
     },
     {
@@ -31,11 +44,12 @@ const LinkModal: React.FC<IProps> = ({ current, finished }) => {
     },
   ];
   return (
-    <SchemaForm<XLink>
+    <SchemaForm<Link>
       open
       title="链接定义"
       width={640}
       columns={columns}
+      initialValues={initialValue}
       rowProps={{
         gutter: [24, 0],
       }}
@@ -46,9 +60,21 @@ const LinkModal: React.FC<IProps> = ({ current, finished }) => {
         }
       }}
       onFinish={async (values) => {
-        values.typeName = "链接";
-        let request = await current.createConfig(ConfigColl.RequestLinks, values);
-        finished(request as ILink);
+        switch (formType) {
+          case 'newLink': {
+            values.typeName = '链接';
+            let directory = current as IDirectory;
+            let request = await directory.createLink(values);
+            finished(request as ILink);
+            break;
+          }
+          case 'updateLink': {
+            let link = current as ILink;
+            link.refresh({ ...initialValue, ...values });
+            finished(link);
+            break;
+          }
+        }
       }}
     />
   );

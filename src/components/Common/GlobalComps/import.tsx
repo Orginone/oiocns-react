@@ -3,7 +3,7 @@ import { message, Upload, UploadProps, Button, Space, Avatar, Progress } from 'a
 import { ProFormColumnsType } from '@ant-design/pro-components';
 import SchemaForm from '@/components/SchemaForm';
 import { IPropClass } from '@/ts/core';
-import { AiOutlineBank, AiOutlineCheck } from 'react-icons/ai';
+import { AiOutlineBank, AiOutlineCheck } from '@/icons/ai';
 import { ExcelConfig, readXlsx } from '@/utils/excel';
 import { SheetReadConfig } from '@/utils/excel';
 

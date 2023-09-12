@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { WorkNodeModel } from '@/ts/base/model';
 import { Card, Modal } from 'antd';
-import { ImWarning } from 'react-icons/im';
+import { ImWarning } from '@/icons/im';
 import { IWork } from '@/ts/core';
 import {
   AddNodeType,
@@ -27,7 +27,7 @@ const Design: React.FC<IProps> = ({ current, onSave, node, onSaveFinished }) => 
     code: getNodeCode(),
     parentCode: '',
     type: AddNodeType.ROOT,
-    name: '发起角色',
+    name: '发起权限',
     destType: '角色',
     destId: '0',
     destName: '全员',
@@ -87,7 +87,6 @@ const Design: React.FC<IProps> = ({ current, onSave, node, onSaveFinished }) => 
       />
       {currentNode && (
         <FlowDrawer
-          forms={resource?.forms || []}
           define={current}
           isOpen={currentNode != undefined}
           current={currentNode}

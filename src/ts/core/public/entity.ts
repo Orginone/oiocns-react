@@ -1,11 +1,10 @@
 import { Emitter } from '@/ts/base/common';
-import { schema, model, parseAvatar } from '../../base';
+import { schema, model, parseAvatar, kernel } from '../../base';
 import { generateUuid } from '../../base/common/uuid';
 import { entityOperates } from './operates';
 
 /** 共享信息数据集 */
 export const ShareIdSet = new Map<string, any>();
-export const ShareSet = new Map<string, IEntity<schema.XEntity>>(); 
 
 /** 实体类接口 */
 export interface IEntity<T> extends Emitter {
@@ -23,6 +22,10 @@ export interface IEntity<T> extends Emitter {
   remark: string;
   /** 数据实体 */
   metadata: T;
+  /** 用户ID */
+  userId: string;
+  /** 归属Id */
+  belongId: string;
   /** 共享信息 */
   share: model.ShareIcon;
   /** 创建人 */
@@ -52,7 +55,6 @@ export abstract class Entity<T extends schema.XEntity>
     this.key = generateUuid();
     this._metadata = _metadata;
     ShareIdSet.set(_metadata.id, _metadata);
-    ShareSet.set(_metadata.id, this);
   }
   _metadata: T;
   key: string;
@@ -76,6 +78,12 @@ export abstract class Entity<T extends schema.XEntity>
       return ShareIdSet.get(this._metadata.id);
     }
     return this._metadata;
+  }
+  get userId(): string {
+    return kernel.userId;
+  }
+  get belongId(): string {
+    return this._metadata.belongId;
   }
   get share(): model.ShareIcon {
     return this.findShare(this.id);
@@ -104,6 +112,12 @@ export abstract class Entity<T extends schema.XEntity>
   }
   updateMetadata<U extends schema.XEntity>(data: U): void {
     ShareIdSet.set(data.id, data);
+  }
+  setEntity(): void {
+    ShareIdSet.set(this.id + '*', this);
+  }
+  getEntity<U>(id: string): U | undefined {
+    return ShareIdSet.get(id + '*');
   }
   findShare(id: string): model.ShareIcon {
     const metadata = this.findMetadata<schema.XTarget>(id);

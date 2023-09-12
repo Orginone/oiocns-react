@@ -1,4 +1,4 @@
-import { RuleTriggers } from '@/ts/base/model';
+import { RuleTriggers } from '../../../public';
 import RuleBase, { IRuleBase } from '../base/ruleBase';
 import { removeNullObj } from '../lib/tools';
 

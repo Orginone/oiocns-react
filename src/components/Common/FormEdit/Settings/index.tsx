@@ -25,13 +25,15 @@ const Settings: React.FC<SettingsType> = ({
   canvasWidth,
   selectedFiled,
 }) => {
-  const [activeKey, setActiceKey] = useState<string>('1');
+  const [activeKey, setActiveKey] = useState<string>(selectedFiled?.$id ? '2' : '1');
 
-  const _curentField: any = current.attributes?.find(
-    (attr: { id: string }) => attr.id === selectedFiled?.$id?.split('/')?.at(-1),
-  );
+  const selectedAttr = current.attributes?.find((attr: { id: string }) => {
+    const $id = selectedFiled?.$id;
+    const id = $id?.split('/')?.at(-1);
+    return attr.id === id;
+  });
 
-  console.log('已选择组件', selectedFiled, '=======', _curentField);
+  console.log('已选择组件', selectedFiled, '=======', selectedAttr);
 
   /* 计算拖动宽度设置 */
   const renderWidth = () => {
@@ -43,7 +45,6 @@ const Settings: React.FC<SettingsType> = ({
     }
     return '40%';
   };
-  /* 监听变化，修改设计器状态 */
 
   return (
     <div
@@ -53,7 +54,7 @@ const Settings: React.FC<SettingsType> = ({
       <Tabs
         defaultActiveKey={activeKey}
         style={{ paddingLeft: '10px', minWidth: '10px' }}
-        onChange={(key) => setActiceKey(key)}
+        onChange={(key) => setActiveKey(key)}
         items={[
           {
             label: `表单配置`,
@@ -74,7 +75,9 @@ const Settings: React.FC<SettingsType> = ({
                 selectedFiled={
                   (selectedFiled?.type === 'object'
                     ? selectedFiled
-                    : _curentField) as XAttribute
+                    : { ...selectedAttr, $id: selectedFiled?.$id }) as XAttribute & {
+                    $id?: string;
+                  }
                 }
                 current={current}
                 schemaRef={schemaRef}
@@ -89,7 +92,7 @@ const Settings: React.FC<SettingsType> = ({
               <RuleSetting
                 current={current}
                 activeKey={activeKey}
-                selectedFiled={_curentField}
+                selectedFiled={selectedAttr}
               />
             ),
           },

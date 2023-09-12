@@ -1,14 +1,16 @@
 import FullScreenModal from '@/executor/tools/fullScreen';
-import { IRequest } from '@/ts/core/thing/config';
 import React from 'react';
 import RequestLayout from './main';
+import { ILink } from '@/ts/core/thing/link';
+import { model } from '@/ts/base';
 
 interface IProps {
-  current: IRequest;
+  current: ILink;
+  node: model.RequestNode;
   finished: () => void;
 }
 
-const RequestModal: React.FC<IProps> = ({ current, finished }) => {
+const RequestModal: React.FC<IProps> = ({ current, node, finished }) => {
   return (
     <FullScreenModal
       open
@@ -19,7 +21,7 @@ const RequestModal: React.FC<IProps> = ({ current, finished }) => {
       destroyOnClose
       title={'请求配置'}
       onCancel={() => finished()}>
-      <RequestLayout current={current} />
+      <RequestLayout current={current} node={node} />
     </FullScreenModal>
   );
 };

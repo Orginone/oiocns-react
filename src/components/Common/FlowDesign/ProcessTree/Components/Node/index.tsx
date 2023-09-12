@@ -1,4 +1,4 @@
-import * as ai from 'react-icons/ai';
+import * as ai from '@/icons/ai';
 import InsertButton from '../InsertButton';
 import React from 'react';
 import cls from './index.module.less';

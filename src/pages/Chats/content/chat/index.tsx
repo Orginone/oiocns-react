@@ -3,7 +3,7 @@ import GroupContent from './GroupContent';
 import GroupInputBox from './GroupInputBox';
 import GroupDetail from './GroupDetail';
 import charsStyle from './index.module.less';
-import { IMsgChat } from '@/ts/core';
+import { ISession } from '@/ts/core';
 
 /**
  * @description: 沟通聊天
@@ -15,7 +15,7 @@ const Chat: React.FC<any> = ({
   filter,
 }: {
   openDetail: boolean;
-  chat: IMsgChat;
+  chat: ISession;
   filter: string;
 }) => {
   const [writeContent, setWriteContent] = useState<any>(null); // 重新编辑
@@ -32,9 +32,9 @@ const Chat: React.FC<any> = ({
   };
 
   return (
-    <div className={charsStyle.chatWrap}>
+    <div className={charsStyle.cohort_wrap}>
       {/* 主体 */}
-      <div className={charsStyle.chatContent}>
+      <div className={charsStyle.chart_page}>
         {/* 聊天区域 */}
         <GroupContent
           chat={chat}
@@ -44,7 +44,7 @@ const Chat: React.FC<any> = ({
           enterCiteMsg={enterCiteMsg}
         />
         {/* 输入区域 */}
-        <div className={charsStyle.chatInput}>
+        <div className={charsStyle.chart_input}>
           <GroupInputBox
             chat={chat}
             writeContent={writeContent}

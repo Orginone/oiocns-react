@@ -3,7 +3,7 @@
     "target": "ESNext",
     "module": "ESNext",
     "moduleResolution": "Node",
-    "lib": ["DOM", "DOM.Iterable", "ES6", "es2021"],
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "types": ["vite/client", "node"],
     "allowJs": true,
     "skipLibCheck": false,

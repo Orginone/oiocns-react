@@ -19,6 +19,7 @@ export enum TargetType {
   'Company' = '单位',
   'University' = '大学',
   'Hospital' = '医院',
+  'Storage' = '存储资源'
 }
 
 /** 分类基础类型 */
@@ -73,15 +74,10 @@ export enum ValueType {
   'Target' = '用户型',
 }
 
-/** 规则内容类型 */
-export enum RuleContentType {
-  'Method' = '函数型',
-  'Formula' = '公式型',
-}
-
-/** 规则触发类型 */
-export enum RuleTriggerType {
-  'Start' = '初始化',
-  'Running' = '运行中',
-  'Submit' = '提交时',
+/** 规则触发时机 */
+export enum RuleTriggers {
+  'Start' = 'Start',//初始化
+  'Running' = 'Running',//修改后
+  'Submit' = 'Submit',//提交前
+  'ThingsChanged' = 'ThingsChanged',//子表变化后
 }

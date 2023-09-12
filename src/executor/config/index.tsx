@@ -1,13 +1,12 @@
 import { TargetType } from '@/ts/core';
 import { message } from 'antd';
 import React from 'react';
+
 import EntityForm from './entityForm';
 import OperateModal from './operateModal';
 import SettingAuth from './settingModal/settingAuth';
 import SettingStation from './settingModal/settingStation';
 import SettingIdentity from './settingModal/settingIdentity';
-import RequestModal from './transferModal/apiEditor';
-import MappingModal from './transferModal/mapper';
 
 const entityMap: any = {
   目录: 'Dir',
@@ -21,12 +20,8 @@ const entityMap: any = {
   办事: 'Work',
   事项配置: 'WorkConfig',
   实体配置: 'ThingConfig',
-  报表: 'Report',
-  请求: 'Request',
   链接: 'Link',
-  映射: 'Mapping',
-  脚本: 'Executable',
-  环境: 'Environment'
+  报表: 'Report',
 };
 
 interface IProps {
@@ -35,7 +30,6 @@ interface IProps {
   finished: () => void;
 }
 const ConfigExecutor: React.FC<IProps> = ({ cmd, args, finished }) => {
-  console.log(cmd,'cmd')
   switch (cmd) {
     case 'open':
       if (Object.keys(entityMap).includes(args[0].typeName)) {
@@ -70,10 +64,6 @@ const ConfigExecutor: React.FC<IProps> = ({ cmd, args, finished }) => {
         return <EntityForm cmd={cmd} entity={args[0]} finished={finished} />;
       }
       break;
-    case "batchRequest":
-      return <RequestModal current={args[0]} finished={finished}></RequestModal>;
-    case 'newMapping':
-      return <MappingModal current={args[0]} finished={finished}></MappingModal>;
     default:
       if (cmd === 'pull' || cmd.startsWith('join')) {
         return <OperateModal cmd={cmd} entity={args[0]} finished={finished} />;

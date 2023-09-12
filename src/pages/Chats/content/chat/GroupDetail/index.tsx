@@ -2,24 +2,21 @@ import { Button, Col, Image, Modal, Row, Typography } from 'antd';
 import React, { useState } from 'react';
 import TeamIcon from '@/components/Common/GlobalComps/entityIcon';
 import detailStyle from './index.module.less';
-import { IMsgChat, ITarget } from '@/ts/core';
+import { ISession } from '@/ts/core';
 import ChatHistoryModal from '../ChatHistoryModal';
-import { AiOutlineRight } from 'react-icons/ai';
+import { AiOutlineRight } from '@/icons/ai';
 import { useHistory } from 'react-router-dom';
 import orgCtrl from '@/ts/controller';
 import { ellipsisText } from '@/utils';
 import GroupMember from '@/pages/Chats/content/chat/GroupMember';
-// @ts-ignore
-import { ReactComponent as PublishSvg } from '@/assets/svg/publish.svg';
 
-import Icon from '@ant-design/icons';
 import ActivityPublisher from '@/components/Activity/ActivityPublisher';
 import ActivityList from '@/components/Activity/ActivityList';
-const GroupDetail: React.FC<any> = ({ chat }: { chat: IMsgChat }) => {
+import { ImCompass } from '@/icons/im';
+const GroupDetail: React.FC<any> = ({ chat }: { chat: ISession }) => {
   const [historyOpen, setHistoryOpen] = useState<boolean>(false); // 历史消息搜索
   const [activityPublisherOpen, setActivityPublisherOpen] = useState(false);
   const history = useHistory();
-
   /**
    * @description: 历史消息搜索弹窗
    * @return {*}
@@ -97,11 +94,9 @@ const GroupDetail: React.FC<any> = ({ chat }: { chat: IMsgChat }) => {
           className={`${detailStyle.find_history_button}`}
           type="ghost"
           onClick={async () => {
-            if ('directory' in chat) {
-              await (chat as ITarget).directory.loadContent();
-              orgCtrl.currentKey = chat.key;
-              history.push('/store');
-            }
+            await chat.target.directory.loadContent();
+            orgCtrl.currentKey = chat.key;
+            history.push('/store');
           }}>
           共享目录 <AiOutlineRight />
         </Button>
@@ -133,18 +128,18 @@ const GroupDetail: React.FC<any> = ({ chat }: { chat: IMsgChat }) => {
 
   const actionList = [
     {
-      icon: <Icon color="red" component={PublishSvg} />,
+      icon: <ImCompass size={20} color={'white'} />,
       title: '发布动态',
       type: 'primary',
     },
     {
-      icon: <Icon component={PublishSvg} />,
+      icon: <ImCompass size={20} color={'white'} />,
       title: '共享',
       type: 'primary',
     },
     {
       title: '交易',
-      icon: <Icon component={PublishSvg} />,
+      icon: <ImCompass size={20} color={'white'} />,
       type: 'primary',
     },
   ];
@@ -154,9 +149,7 @@ const GroupDetail: React.FC<any> = ({ chat }: { chat: IMsgChat }) => {
         {header}
         <GroupMember members={chat.members}></GroupMember>
         <div className={detailStyle.groupDetailContent}>
-          {'resource' in chat && (
-            <ActivityList coll={(chat as ITarget).resource.activityColl}></ActivityList>
-          )}
+          <ActivityList activity={chat.activity}></ActivityList>
           <div className={detailStyle.user_list}>
             <div className={`${detailStyle.img_list} ${detailStyle.con}`}></div>
             {operaButton}
@@ -195,10 +188,10 @@ const GroupDetail: React.FC<any> = ({ chat }: { chat: IMsgChat }) => {
         onCancel={onHistoryCancel}
         chat={chat}
       />
-      {'resource' in chat && (
+      {chat.activity.allPublish && (
         <ActivityPublisher
           open={activityPublisherOpen}
-          target={chat as ITarget}
+          activity={chat.activity}
           finish={() => {
             setActivityPublisherOpen(false);
           }}></ActivityPublisher>

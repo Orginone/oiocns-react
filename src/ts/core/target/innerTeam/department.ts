@@ -3,14 +3,12 @@ import { ITarget, Target } from '../base/target';
 import { ICompany } from '../team/company';
 import { TargetType } from '../../public/enums';
 import { PageAll } from '../../public/consts';
-import { IMsgChat } from '../../chat/message/msgchat';
 import { ITeam } from '../base/team';
 import { targetOperates } from '../../public';
+import { ISession } from '../../chat/session';
 
 /** 单位内部机构（部门）接口 */
 export interface IDepartment extends ITarget {
-  /** 设立部门的单位 */
-  company: ICompany;
   /** 父级部门 */
   parent: IDepartment | undefined;
   /** 子级部门 */
@@ -25,9 +23,9 @@ export interface IDepartment extends ITarget {
 
 /** 单位内部机构（部门）实现 */
 export class Department extends Target implements IDepartment {
-  constructor(_metadata: schema.XTarget, _space: ICompany, parent?: IDepartment) {
-    super(_metadata, [_metadata.belong?.name ?? '', _metadata.typeName + '群'], _space);
-    this.company = _space;
+  constructor(_metadata: schema.XTarget, _company: ICompany, parent?: IDepartment) {
+    super(_metadata, [_company.id], _company.user);
+    this.space = _company;
     this.parent = parent;
     switch (_metadata.typeName as TargetType) {
       case TargetType.College:
@@ -55,7 +53,7 @@ export class Department extends Target implements IDepartment {
         break;
     }
   }
-  company: ICompany;
+  space: ICompany;
   parent: IDepartment | undefined;
   children: IDepartment[] = [];
   childrenTypes: string[] = [];
@@ -70,7 +68,7 @@ export class Department extends Target implements IDepartment {
       if (res.success) {
         this._childrenLoaded = true;
         this.children = (res.data.result || []).map(
-          (i) => new Department(i, this.company, this),
+          (i) => new Department(i, this.space, this),
         );
       }
     }
@@ -83,7 +81,7 @@ export class Department extends Target implements IDepartment {
     data.public = false;
     const metadata = await this.create(data);
     if (metadata) {
-      const department = new Department(metadata, this.company, this);
+      const department = new Department(metadata, this.space, this);
       await department.deepLoad();
       if (await this.pullSubTarget(department)) {
         this.children.push(department);
@@ -95,13 +93,11 @@ export class Department extends Target implements IDepartment {
     return this.createDepartment(data);
   }
   async exit(): Promise<boolean> {
-    if (await this.removeMembers([this.space.user.metadata])) {
+    if (await this.removeMembers([this.user.metadata])) {
       if (this.parent) {
         this.parent.children = this.parent.children.filter((i) => i.key != this.key);
       } else {
-        this.company.departments = this.company.departments.filter(
-          (i) => i.key != this.key,
-        );
+        this.space.departments = this.space.departments.filter((i) => i.key != this.key);
       }
       return true;
     }
@@ -113,9 +109,7 @@ export class Department extends Target implements IDepartment {
       if (this.parent) {
         this.parent.children = this.parent.children.filter((i) => i.key != this.key);
       } else {
-        this.company.departments = this.company.departments.filter(
-          (i) => i.key != this.key,
-        );
+        this.space.departments = this.space.departments.filter((i) => i.key != this.key);
       }
     }
     return notity;
@@ -123,8 +117,8 @@ export class Department extends Target implements IDepartment {
   get subTarget(): ITarget[] {
     return this.children;
   }
-  get chats(): IMsgChat[] {
-    return this.targets;
+  get chats(): ISession[] {
+    return this.targets.map((i) => i.session);
   }
   get targets(): ITarget[] {
     const targets: ITarget[] = [this];
@@ -135,9 +129,9 @@ export class Department extends Target implements IDepartment {
   }
   async deepLoad(reload: boolean = false): Promise<void> {
     await Promise.all([
-      await this.directory.loadSubDirectory(),
-      await this.loadChildren(reload),
       await this.loadMembers(reload),
+      await this.loadChildren(reload),
+      await this.directory.loadDirectoryResource(),
     ]);
     await Promise.all(
       this.children.map(async (department) => {
@@ -155,7 +149,7 @@ export class Department extends Target implements IDepartment {
   async teamChangedNotity(target: schema.XTarget): Promise<boolean> {
     if (this.childrenTypes.includes(target.typeName as TargetType)) {
       if (this.children.every((i) => i.id != target.id)) {
-        const department = new Department(target, this.company);
+        const department = new Department(target, this.space);
         await department.deepLoad();
         this.children.push(department);
         return true;

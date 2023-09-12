@@ -5,7 +5,7 @@ import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import MainLayout from '@/components/MainLayout';
 import useMenuUpdate from '@/hooks/useMenuUpdate';
 import EntityInfo from '@/components/Common/EntityInfo';
-import * as im from 'react-icons/im';
+import * as im from '@/icons/im';
 import { MenuItemType, OperateMenuType } from 'typings/globelType';
 import AuthForm from './subModal/authForm';
 import { Descriptions } from 'antd';
@@ -36,6 +36,7 @@ const SettingAuth: React.FC<IProps> = ({ space, finished }) => {
       destroyOnClose
       onCancel={() => finished()}>
       <MainLayout
+        notExitIcon
         selectMenu={selectMenu}
         onSelect={(data) => {
           setSelectMenu(data);

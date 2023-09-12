@@ -5,7 +5,7 @@ import useObjectUpdate from '@/hooks/useObjectUpdate';
 import { IForm } from '@/ts/core';
 import PropertyConfig from './propConfig';
 import AttributeConfig from '@/components/Common/FormDesign/attributeConfig';
-import SelectPropertys from './SelectPropertys';
+import SelectPropertys from '@/components/Common/SelectPropertys';
 import { Modal } from 'antd';
 import { AttributeModel } from '@/ts/base/model';
 import { ProColumns } from '@ant-design/pro-components';
@@ -146,8 +146,7 @@ const Attritube = ({ current, modalType, setModalType }: IProps) => {
           destroyOnClose
           okText="确定"
           onOk={() => setModalType('')}
-          onCancel={() => setModalType('')}
-        >
+          onCancel={() => setModalType('')}>
           <SelectPropertys
             target={current.directory.target}
             selected={current.attributes.map((a) => a.property!)}
