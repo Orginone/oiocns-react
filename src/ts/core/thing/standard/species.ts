@@ -1,15 +1,12 @@
-import { model, schema } from '../../../base';
+import { schema } from '../../../base';
+import { XCollection } from '../../public/collection';
 import { IDirectory } from '../directory';
-import { FileInfo, IFileInfo } from '../fileinfo';
+import { IStandardFileInfo, StandardFileInfo } from '../fileinfo';
 
 /** 元数据分类接口 */
-export interface ISpecies extends IFileInfo<schema.XSpecies> {
+export interface ISpecies extends IStandardFileInfo<schema.XSpecies> {
   /** 类目项 */
   items: schema.XSpeciesItem[];
-  /** 更新类目 */
-  update(data: schema.XSpecies): Promise<boolean>;
-  /** 删除类目 */
-  delete(): Promise<boolean>;
   /** 加载类目项 */
   loadItems(reload?: boolean): Promise<schema.XSpeciesItem[]>;
   /** 新增类目项 */
@@ -21,76 +18,25 @@ export interface ISpecies extends IFileInfo<schema.XSpecies> {
 }
 
 /** 元数据分类实现 */
-export class Species extends FileInfo<schema.XSpecies> implements ISpecies {
+export class Species extends StandardFileInfo<schema.XSpecies> implements ISpecies {
+  itemColl: XCollection<schema.XSpeciesItem>;
   constructor(_metadata: schema.XSpecies, _directory: IDirectory) {
-    super(_metadata, _directory);
+    super(_metadata, _directory, _directory.resource.speciesColl);
+    this.itemColl = _directory.resource.speciesItemColl;
+    this.itemColl.subscribe((res: { operate: string; data: schema.XSpeciesItem[] }) => {
+      res.data.map((item) => this.receiveItems(res.operate, item));
+    });
   }
   items: schema.XSpeciesItem[] = [];
   private _itemLoaded: boolean = false;
-  async rename(name: string): Promise<boolean> {
-    return await this.update({ ...this.metadata, name: name });
-  }
-  async copy(destination: IDirectory): Promise<boolean> {
-    if (
-      destination.id != this.directory.id &&
-      destination.target.belongId != this.directory.target.belongId
-    ) {
-      const species = await destination.resource.speciesColl.copy(this.metadata);
-      if (species) {
-        destination.specieses.push(new Species(species, destination));
-        return true;
-      }
-    }
-    return false;
-  }
-  async move(destination: IDirectory): Promise<boolean> {
-    if (
-      destination.id != this.directory.id &&
-      destination.metadata.belongId == this.directory.metadata.belongId
-    ) {
-      const data = { ...this.metadata, directoryId: destination.id };
-      const species = await destination.resource.speciesColl.replace(data);
-      if (species) {
-        this.setMetadata(species);
-        if (this.directory.target.id != destination.target.id) {
-          await this.directory.resource.speciesColl.all(true);
-          await destination.resource.speciesColl.all(true);
-        }
-        this.directory.specieses = this.directory.specieses.filter(
-          (i) => i.key != this.key,
-        );
-        this.directory = destination;
-        destination.specieses.push(this);
-        return true;
-      }
-    }
-    return false;
-  }
-  async update(data: schema.XSpecies): Promise<boolean> {
-    const res = await this.directory.resource.speciesColl.replace({
-      ...this.metadata,
-      ...data,
-      id: this.id,
-      directoryId: this.metadata.directoryId,
-    });
-    if (res) {
-      this.setMetadata(res);
-      return true;
-    }
-    return false;
-  }
-  async delete(): Promise<boolean> {
+  override async delete(): Promise<boolean> {
     if (this.directory) {
-      const success =
-        (await this.directory.resource.speciesItemColl.deleteMatch({
-          speciesId: this.id,
-        })) && (await this.directory.resource.speciesColl.delete(this.metadata));
+      const success = await this.directory.resource.speciesItemColl.deleteMatch({
+        speciesId: this.id,
+      });
       if (success) {
-        this.directory.specieses = this.directory.specieses.filter(
-          (i) => i.key != this.key,
-        );
+        return super.delete();
       }
-      return success;
     }
     return false;
   }
@@ -137,5 +83,33 @@ export class Species extends FileInfo<schema.XSpecies> implements ISpecies {
       return true;
     }
     return false;
+  }
+  receiveItems(operate: string, data: schema.XSpeciesItem): void {
+    if (data.speciesId == this.id) {
+      switch (operate) {
+        case 'insert':
+          this.itemColl.cache.push(data);
+          this.items.push(data);
+          break;
+        case 'replace':
+          const index = this.itemColl.cache.findIndex((a) => a.id == data.id);
+          this.itemColl.cache[index] = data;
+          const itemindex = this.items.findIndex((a) => a.id == data.id);
+          this.items[itemindex] = data;
+          break;
+        case 'delete':
+          this.itemColl.removeCache(data.id);
+          this.items = this.items.filter((i) => i.id != data.id);
+          break;
+        default:
+          break;
+      }
+    }
+  }
+  override copy(
+    destination: IDirectory,
+    _coll?: XCollection<schema.XSpecies>,
+  ): Promise<boolean> {
+    return super.copy(destination, destination.resource.speciesColl);
   }
 }

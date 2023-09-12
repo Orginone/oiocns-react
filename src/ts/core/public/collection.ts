@@ -213,6 +213,7 @@ export class XCollection<T extends schema.Xbase> {
       return res.data;
     }
   }
+
   async updateMany(ids: string[], update: any, copyId?: string): Promise<T[]> {
     const res = await kernel.collectionSetFields<T[]>(
       this._target.belongId,
@@ -229,6 +230,7 @@ export class XCollection<T extends schema.Xbase> {
     }
     return [];
   }
+
   async delete(data: T, copyId?: string): Promise<boolean> {
     const res = await kernel.collectionUpdate(
       this._target.belongId,
@@ -340,6 +342,10 @@ export class XCollection<T extends schema.Xbase> {
       return res.data?.MatchedCount > 0;
     }
     return false;
+  }
+
+  async removeCache(id: string): Promise<void> {
+    this._cache = this._cache.filter((a) => a.id !== id);
   }
 
   async notity(

@@ -47,15 +47,15 @@ export class DataResource {
   /** 数据传输配置集合 */
   transferColl: XCollection<Link>;
   /** 资源预加载 */
-  async preLoad(): Promise<void> {
-    if (this._proLoaded === false) {
+  async preLoad(reflash: boolean = false): Promise<void> {
+    if (this._proLoaded === false || reflash) {
       await Promise.all([
-        this.formColl.all(),
-        this.speciesColl.all(),
-        this.propertyColl.all(),
-        this.transferColl.all(),
-        this.directoryColl.all(),
-        this.applicationColl.all(),
+        this.formColl.all(reflash),
+        this.speciesColl.all(reflash),
+        this.propertyColl.all(reflash),
+        this.transferColl.all(reflash),
+        this.directoryColl.all(reflash),
+        this.applicationColl.all(reflash),
       ]);
     }
     this._proLoaded = true;

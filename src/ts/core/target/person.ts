@@ -238,7 +238,7 @@ export class Person extends Belong implements IPerson {
       await this.loadMembers(reload),
       await this.loadSuperAuth(reload),
       await this.loadGivedIdentitys(reload),
-      await this.directory.loadDirectoryResource(),
+      await this.directory.loadDirectoryResource(reload),
     ]);
     await Promise.all(
       this.companys.map(async (company) => {
