@@ -29,11 +29,16 @@ export namespace RuleTypes {
     /* 规则运行是否异常 */
     success: boolean;
     /* 规则运行结果 */
-    data: { [key: string]: any };
+    data: any;
     /* 规则运行错误提示 */
     errMsg: string;
   };
   type DataType = {
     [key: string]: any;
+  };
+/* 表单变化时，返回类型 */
+  type callBackType = {
+    formId: string;
+    callback: (data: any) => void;
   };
 }
