@@ -32,22 +32,24 @@ const ReportForms: React.FC<IProps> = (props) => {
   const [sheetIndex, setSheetIndex] = useState<string>('0');
   const [rowHeights, setRowHeights] = useState<any>([]);
   const [colWidths, setColWidths] = useState<any>([]);
-  const [serviceData, setServiceData]  = useState<any>();
-  const reportData = props.forms[0]
+  const [serviceData, setServiceData] = useState<any>();
+  const reportData = props.forms[0];
   const formData = props.getFormData(reportData.id);
   const [reallyData, setReallyData] = useState(
     formData.after.length > 0 ? formData.after[0] : undefined,
   );
   const [readOnly, setReadOnly] = useState<boolean>(false);
   const hotRef: any = useRef(null);
-  let sheetList: any = reportData?.rule ? Object.values(JSON.parse(reportData?.rule)) : []
+  let sheetList: any = reportData?.rule
+    ? Object.values(JSON.parse(reportData?.rule))
+    : [];
   let datas = sheetList[sheetIndex]?.data?.data || [[]];
   let setting = sheetList[sheetIndex]?.data?.setting || {};
   let mergeCells = setting?.mergeCells || [];
 
   useEffect(() => {
     const hot = hotRef.current.hotInstance;
-    Handsontable.editors.registerEditor('SelectEditor', selectEditor);// 还未完成同步组件
+    Handsontable.editors.registerEditor('SelectEditor', selectEditor); // 还未完成同步组件
     setStyleList(setting?.styleList || []);
     setClassList(setting?.classList || []);
     setRowHeights(setting?.row_h || []);
@@ -58,13 +60,13 @@ const ReportForms: React.FC<IProps> = (props) => {
       mergeCells: mergeCells,
     });
     if (props.allowEdit) {
-      props?.ruleService?.setFormChangeCallback(reportData.id, (data: any) => { 
+      props?.ruleService?.setFormChangeCallback(reportData.id, (data: any) => {
         if (data) {
-          console.log(data)
-          setServiceData(data)
+          console.log(data);
+          setServiceData(data);
         }
-      })
-      kernel.createThing(props.belong.userId, '').then((res) => {
+      });
+      kernel.createThing(props.belong.userId, [], '').then((res) => {
         if (res.success && res.data) {
           setReallyData(res.data);
         }
@@ -184,9 +186,9 @@ const ReportForms: React.FC<IProps> = (props) => {
   cells?.forEach((item: any) => {
     Object.keys(serviceData).map((k) => {
       if (item.prop.id === k) {
-        hotRef.current.hotInstance.setDataAtCell([[item.row, item.col, serviceData[k]]])
+        hotRef.current.hotInstance.setDataAtCell([[item.row, item.col, serviceData[k]]]);
       }
-    })
+    });
     //渲染单元格颜色
     hotRef.current.hotInstance.getCellMeta(item.row, item.col).renderer =
       'customStylesRenderer';

@@ -3,16 +3,16 @@ import FullScreenModal from '@/executor/tools/fullScreen';
 import HotTableView from './components/hotTable';
 import ToolBar from './components/tool';
 import cls from './index.module.less';
-import { IReport } from '@/ts/core';
+import { IForm } from '@/ts/core';
 
 interface IProps {
-  current: IReport;
+  current: IForm;
   selectItem: any;
   finished: () => void;
 }
 
 const ReportView: React.FC<IProps> = ({ current, selectItem, finished }) => {
-  console.log(selectItem, 'selectItem')
+  console.log(selectItem, 'selectItem');
   const [reportChange, setReportChange] = useState<any>();
   const [changeType, setChangeType] = useState<string>('');
   const [classType, setClassType] = useState<string>('');

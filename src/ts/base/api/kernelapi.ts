@@ -15,18 +15,25 @@ import { command } from '../common/command';
  * 资产共享云内核api
  */
 export default class KernelApi {
+  // 当前用户
+  userId: string = '';
   // 存储集线器
   private _storeHub: StoreHub;
   // axios实例
   private readonly _axiosInstance = axios.create({});
   // 单例
   private static _instance: KernelApi;
+<<<<<<< HEAD
+=======
+  // 必达消息缓存
+  private _cacheData: any = {};
+>>>>>>> 51b118c7f69226cfcafb9ef42ed80e27a36b3ff0
   // 订阅方法
   private _methods: { [name: string]: ((...args: any[]) => void)[] };
   // 订阅回调字典
   private _subscribeCallbacks: Record<string, (data: any) => void>;
   // 上下线提醒
-  onlineNotity = new Emitter();
+  onlineNotify = new Emitter();
   // 在线的连接
   onlineIds: string[] = [];
   // 获取accessToken
@@ -99,7 +106,7 @@ export default class KernelApi {
         var ids = [...uids, ...sids];
         if (ids.length != this.onlineIds.length) {
           this.onlineIds = ids;
-          this.onlineNotity.changCallback();
+          this.onlineNotify.changCallback();
         }
         this.onlineIds = ids;
         return result.data;
@@ -532,20 +539,6 @@ export default class KernelApi {
     });
   }
   /**
-   * 创建即时消息
-   * @param {model.MsgSendModel} params 请求参数
-   * @returns {model.ResultType<boolean>} 请求结果
-   */
-  public async createImMsg(
-    params: model.MsgSendModel,
-  ): Promise<model.ResultType<boolean>> {
-    return await this.request({
-      module: 'chat',
-      action: 'CreateImMsg',
-      params: params,
-    });
-  }
-  /**
    * 创建组织变更消息
    * @param {model.TargetMessageModel} params 请求参数
    * @returns {model.ResultType<boolean>} 请求结果
@@ -570,486 +563,6 @@ export default class KernelApi {
     return await this.request({
       module: 'chat',
       action: 'CreateIdentityMsg',
-      params: params,
-    });
-  }
-  /**
-   * 消息撤回
-   * @param {model.MsgSaveModel} params 请求参数
-   * @returns {model.ResultType<boolean>} 请求结果
-   */
-  public async recallImMsg(
-    params: model.MsgSaveModel,
-  ): Promise<model.ResultType<boolean>> {
-    return await this.request({
-      module: 'chat',
-      action: 'RecallImMsg',
-      params: params,
-    });
-  }
-  /**
-   * 标记消息
-   * @param {model.MsgTagModel} params 请求参数
-   * @returns {model.ResultType<boolean>} 请求结果
-   */
-  public async tagImMsg(params: model.MsgTagModel): Promise<model.ResultType<boolean>> {
-    return await this.request({
-      module: 'chat',
-      action: 'TagImMsg',
-      params: params,
-    });
-  }
-  /**
-   * 创建目录
-   * @param {model.DirectoryModel} params 请求参数
-   * @returns {model.ResultType<schema.XDirectory>} 请求结果
-   */
-  public async createDirectory(
-    params: model.DirectoryModel,
-  ): Promise<model.ResultType<schema.XDirectory>> {
-    return await this.request({
-      module: 'thing',
-      action: 'CreateDirectory',
-      params: params,
-    });
-  }
-  /**
-   * 创建元属性
-   * @param {model.PropertyModel} params 请求参数
-   * @returns {model.ResultType<schema.XProperty>} 请求结果
-   */
-  public async createProperty(
-    params: model.PropertyModel,
-  ): Promise<model.ResultType<schema.XProperty>> {
-    return await this.request({
-      module: 'thing',
-      action: 'CreateProperty',
-      params: params,
-    });
-  }
-  /**
-   * 创建分类
-   * @param {model.SpeciesModel} params 请求参数
-   * @returns {model.ResultType<schema.XSpecies>} 请求结果
-   */
-  public async createSpecies(
-    params: model.SpeciesModel,
-  ): Promise<model.ResultType<schema.XSpecies>> {
-    return await this.request({
-      module: 'thing',
-      action: 'CreateSpecies',
-      params: params,
-    });
-  }
-  /**
-   * 创建分类
-   * @param {model.SpeciesItemModel} params 请求参数
-   * @returns {model.ResultType<schema.XSpeciesItem>} 请求结果
-   */
-  public async createSpeciesItem(
-    params: model.SpeciesItemModel,
-  ): Promise<model.ResultType<schema.XSpeciesItem>> {
-    return await this.request({
-      module: 'thing',
-      action: 'CreateSpeciesItem',
-      params: params,
-    });
-  }
-  /**
-   * 创建特性
-   * @param {model.AttributeModel} params 请求参数
-   * @returns {model.ResultType<schema.XAttribute>} 请求结果
-   */
-  public async createAttribute(
-    params: model.AttributeModel,
-  ): Promise<model.ResultType<schema.XAttribute>> {
-    return await this.request({
-      module: 'thing',
-      action: 'CreateAttribute',
-      params: params,
-    });
-  }
-  /**
-   * 创建表单
-   * @param {model.FormModel} params 请求参数
-   * @returns {model.ResultType<schema.XForm>} 请求结果
-   */
-  public async createForm(
-    params: model.FormModel,
-  ): Promise<model.ResultType<schema.XForm>> {
-    return await this.request({
-      module: 'thing',
-      action: 'CreateForm',
-      params: params,
-    });
-  }
-  /**
-   * 创建应用
-   * @param {model.ApplicationModel} params 请求参数
-   * @returns {model.ResultType<schema.XApplication>} 请求结果
-   */
-  public async createApplication(
-    params: model.ApplicationModel,
-  ): Promise<model.ResultType<schema.XApplication>> {
-    return await this.request({
-      module: 'thing',
-      action: 'CreateApplication',
-      params: params,
-    });
-  }
-  /**
-   * 删除目录
-   * @param {model.IdModel} params 请求参数
-   * @returns {model.ResultType<boolean>} 请求结果
-   */
-  public async deleteDirectory(
-    params: model.IdModel,
-  ): Promise<model.ResultType<boolean>> {
-    return await this.request({
-      module: 'thing',
-      action: 'DeleteDirectory',
-      params: params,
-    });
-  }
-  /**
-   * 删除元属性
-   * @param {model.IdModel} params 请求参数
-   * @returns {model.ResultType<boolean>} 请求结果
-   */
-  public async deleteProperty(params: model.IdModel): Promise<model.ResultType<boolean>> {
-    return await this.request({
-      module: 'thing',
-      action: 'DeleteProperty',
-      params: params,
-    });
-  }
-  /**
-   * 删除分类
-   * @param {model.IdModel} params 请求参数
-   * @returns {model.ResultType<boolean>} 请求结果
-   */
-  public async deleteSpecies(params: model.IdModel): Promise<model.ResultType<boolean>> {
-    return await this.request({
-      module: 'thing',
-      action: 'DeleteSpecies',
-      params: params,
-    });
-  }
-  /**
-   * 删除分类类目
-   * @param {model.IdModel} params 请求参数
-   * @returns {model.ResultType<boolean>} 请求结果
-   */
-  public async deleteSpeciesItem(
-    params: model.IdModel,
-  ): Promise<model.ResultType<boolean>> {
-    return await this.request({
-      module: 'thing',
-      action: 'DeleteSpeciesItem',
-      params: params,
-    });
-  }
-  /**
-   * 删除度量标准
-   * @param {model.IdModel} params 请求参数
-   * @returns {model.ResultType<boolean>} 请求结果
-   */
-  public async deleteAttribute(
-    params: model.IdModel,
-  ): Promise<model.ResultType<boolean>> {
-    return await this.request({
-      module: 'thing',
-      action: 'DeleteAttribute',
-      params: params,
-    });
-  }
-  /**
-   * 删除表单
-   * @param {model.IdModel} params 请求参数
-   * @returns {model.ResultType<boolean>} 请求结果
-   */
-  public async deleteForm(params: model.IdModel): Promise<model.ResultType<boolean>> {
-    return await this.request({
-      module: 'thing',
-      action: 'DeleteForm',
-      params: params,
-    });
-  }
-  /**
-   * 删除应用
-   * @param {model.IdModel} params 请求参数
-   * @returns {model.ResultType<boolean>} 请求结果
-   */
-  public async deleteApplication(
-    params: model.IdModel,
-  ): Promise<model.ResultType<boolean>> {
-    return await this.request({
-      module: 'thing',
-      action: 'DeleteApplication',
-      params: params,
-    });
-  }
-  /**
-   * 删除物
-   * @param {model.IdModel} params 请求参数
-   * @returns {model.ResultType<boolean>} 请求结果
-   */
-  public async deleteThing(params: model.IdModel): Promise<model.ResultType<boolean>> {
-    return await this.request({
-      module: 'thing',
-      action: 'DeleteThing',
-      params: params,
-    });
-  }
-  /**
-   * 更新目录
-   * @param {model.DirectoryModel} params 请求参数
-   * @returns {model.ResultType<schema.XDirectory>} 请求结果
-   */
-  public async updateDirectory(
-    params: model.DirectoryModel,
-  ): Promise<model.ResultType<schema.XDirectory>> {
-    return await this.request({
-      module: 'thing',
-      action: 'UpdateDirectory',
-      params: params,
-    });
-  }
-  /**
-   * 更新元属性
-   * @param {model.PropertyModel} params 请求参数
-   * @returns {model.ResultType<schema.XProperty>} 请求结果
-   */
-  public async updateProperty(
-    params: model.PropertyModel,
-  ): Promise<model.ResultType<schema.XProperty>> {
-    return await this.request({
-      module: 'thing',
-      action: 'UpdateProperty',
-      params: params,
-    });
-  }
-  /**
-   * 更新分类
-   * @param {model.SpeciesModel} params 请求参数
-   * @returns {model.ResultType<schema.XSpecies>} 请求结果
-   */
-  public async updateSpecies(
-    params: model.SpeciesModel,
-  ): Promise<model.ResultType<schema.XSpecies>> {
-    return await this.request({
-      module: 'thing',
-      action: 'UpdateSpecies',
-      params: params,
-    });
-  }
-  /**
-   * 更新分类类目
-   * @param {model.SpeciesItemModel} params 请求参数
-   * @returns {model.ResultType<schema.XSpeciesItem>} 请求结果
-   */
-  public async updateSpeciesItem(
-    params: model.SpeciesItemModel,
-  ): Promise<model.ResultType<schema.XSpeciesItem>> {
-    return await this.request({
-      module: 'thing',
-      action: 'UpdateSpeciesItem',
-      params: params,
-    });
-  }
-  /**
-   * 更新度量标准
-   * @param {model.AttributeModel} params 请求参数
-   * @returns {model.ResultType<schema.XAttribute>} 请求结果
-   */
-  public async updateAttribute(
-    params: model.AttributeModel,
-  ): Promise<model.ResultType<schema.XAttribute>> {
-    return await this.request({
-      module: 'thing',
-      action: 'UpdateAttribute',
-      params: params,
-    });
-  }
-  /**
-   * 更新表单
-   * @param {model.FormModel} params 请求参数
-   * @returns {model.ResultType<schema.XForm>} 请求结果
-   */
-  public async updateForm(
-    params: model.FormModel,
-  ): Promise<model.ResultType<schema.XForm>> {
-    return await this.request({
-      module: 'thing',
-      action: 'UpdateForm',
-      params: params,
-    });
-  }
-  /**
-   * 更新应用
-   * @param {model.ApplicationModel} params 请求参数
-   * @returns {model.ResultType<schema.XApplication>} 请求结果
-   */
-  public async updateApplication(
-    params: model.ApplicationModel,
-  ): Promise<model.ResultType<schema.XApplication>> {
-    return await this.request({
-      module: 'thing',
-      action: 'UpdateApplication',
-      params: params,
-    });
-  }
-  /**
-   * 更新物
-   * @param {model.ThingModel} params 请求参数
-   * @returns {model.ResultType<schema.XThing>} 请求结果
-   */
-  public async updateThing(
-    params: model.ThingModel,
-  ): Promise<model.ResultType<schema.XThing>> {
-    return await this.request({
-      module: 'thing',
-      action: 'UpdateThing',
-      params: params,
-    });
-  }
-  /**
-   * 完善物的属性数据
-   * @param {model.SetPropModel} params 请求参数
-   * @returns {model.ResultType<boolean>} 请求结果
-   */
-  public async thingSetProperty(
-    params: model.SetPropModel,
-  ): Promise<model.ResultType<boolean>> {
-    return await this.request({
-      module: 'thing',
-      action: 'ThingSetProperty',
-      params: params,
-    });
-  }
-  /**
-   * 查询用户目录集
-   * @param {model.GetDirectoryModel} params 请求参数
-   * @returns {model.ResultType<model.PageResult<schema.XDirectory>>} 请求结果
-   */
-  public async queryDirectorys(
-    params: model.GetDirectoryModel,
-  ): Promise<model.ResultType<model.PageResult<schema.XDirectory>>> {
-    return await this.request({
-      module: 'thing',
-      action: 'QueryDirectorys',
-      params: params,
-    });
-  }
-  /**
-   * 查询用户属性集
-   * @param {model.IdPageModel} params 请求参数
-   * @returns {model.ResultType<model.PageResult<schema.XProperty>>} 请求结果
-   */
-  public async queryPropertys(
-    params: model.IdPageModel,
-  ): Promise<model.ResultType<model.PageResult<schema.XProperty>>> {
-    return await this.request({
-      module: 'thing',
-      action: 'QueryPropertys',
-      params: params,
-    });
-  }
-  /**
-   * 查询用户属性关联的特性
-   * @param {model.IdModel} params 请求参数
-   * @returns {model.ResultType<model.PageResult<schema.XAttribute>>} 请求结果
-   */
-  public async queryPropAttributes(
-    params: model.IdModel,
-  ): Promise<model.ResultType<model.PageResult<schema.XAttribute>>> {
-    return await this.request({
-      module: 'thing',
-      action: 'QueryPropAttributes',
-      params: params,
-    });
-  }
-  /**
-   * 查询用户分类集
-   * @param {model.IdPageModel} params 请求参数
-   * @returns {model.ResultType<model.PageResult<schema.XSpecies>>} 请求结果
-   */
-  public async querySpecies(
-    params: model.IdPageModel,
-  ): Promise<model.ResultType<model.PageResult<schema.XSpecies>>> {
-    return await this.request({
-      module: 'thing',
-      action: 'QuerySpecies',
-      params: params,
-    });
-  }
-  /**
-   * 查询分类类目
-   * @param {model.IdPageModel} params 请求参数
-   * @returns {model.ResultType<model.PageResult<schema.XSpeciesItem>>} 请求结果
-   */
-  public async querySpeciesItems(
-    params: model.IdPageModel,
-  ): Promise<model.ResultType<model.PageResult<schema.XSpeciesItem>>> {
-    return await this.request({
-      module: 'thing',
-      action: 'QuerySpeciesItems',
-      params: params,
-    });
-  }
-  /**
-   * 查询用户的表单
-   * @param {model.IdPageModel} params 请求参数
-   * @returns {model.ResultType<model.PageResult<schema.XForm>>} 请求结果
-   */
-  public async queryForms(
-    params: model.IdPageModel,
-  ): Promise<model.ResultType<model.PageResult<schema.XForm>>> {
-    return await this.request({
-      module: 'thing',
-      action: 'QueryForms',
-      params: params,
-    });
-  }
-  /**
-   * 查询用户的应用
-   * @param {model.IdPageModel} params 请求参数
-   * @returns {model.ResultType<model.PageResult<schema.XApplication>>} 请求结果
-   */
-  public async queryApplications(
-    params: model.IdPageModel,
-  ): Promise<model.ResultType<model.PageResult<schema.XApplication>>> {
-    return await this.request({
-      module: 'thing',
-      action: 'QueryApplications',
-      params: params,
-    });
-  }
-  /**
-   * 查询分类的度量标准
-   * @param {model.GainModel} params 请求参数
-   * @returns {model.ResultType<model.PageResult<schema.XAttribute>>} 请求结果
-   */
-  public async queryFormAttributes(
-    params: model.GainModel,
-  ): Promise<model.ResultType<model.PageResult<schema.XAttribute>>> {
-    return await this.request({
-      module: 'thing',
-      action: 'QueryFormAttributes',
-      params: params,
-    });
-  }
-  /**
-   * 物的属性值查询
-   * @param {model.GiveModel} params 请求参数
-   * @returns {model.ResultType<model.PageResult<schema.XThingProp>>} 请求结果
-   */
-  public async queryThingProperty(
-    params: model.GiveModel,
-  ): Promise<model.ResultType<model.PageResult<schema.XThingProp>>> {
-    return await this.request({
-      module: 'thing',
-      action: 'QueryThingProperty',
       params: params,
     });
   }
@@ -1214,11 +727,16 @@ export default class KernelApi {
    * @param {string} key 对象名称（eg: rootName.person.name）
    * @returns {model.ResultType<T>} 对象异步结果
    */
-  public async objectGet<T>(belongId: string, key: string): Promise<model.ResultType<T>> {
+  public async objectGet<T>(
+    belongId: string,
+    relations: string[],
+    key: string,
+  ): Promise<model.ResultType<T>> {
     return await this.dataProxy({
       module: 'Object',
       action: 'Get',
       belongId,
+      relations,
       params: key,
     });
   }
@@ -1231,6 +749,7 @@ export default class KernelApi {
    */
   public async objectSet(
     belongId: string,
+    relations: string[],
     key: string,
     setData: any,
   ): Promise<model.ResultType<any>> {
@@ -1238,6 +757,7 @@ export default class KernelApi {
       module: 'Object',
       action: 'Set',
       belongId,
+      relations,
       params: {
         key,
         setData,
@@ -1252,12 +772,14 @@ export default class KernelApi {
    */
   public async objectDelete(
     belongId: string,
+    relations: string[],
     key: string,
   ): Promise<model.ResultType<any>> {
     return await this.dataProxy({
       module: 'Object',
       action: 'Delete',
       belongId,
+      relations,
       params: key,
     });
   }
@@ -1270,14 +792,41 @@ export default class KernelApi {
    */
   public async collectionInsert<T>(
     belongId: string,
+    relations: string[],
     collName: string,
     data: T,
+    copyId?: string,
   ): Promise<model.ResultType<T>> {
     return await this.dataProxy({
       module: 'Collection',
       action: 'Insert',
       belongId,
+      copyId,
+      relations,
       params: { collName, data },
+    });
+  }
+  /**
+   * 变更数据集数据
+   * @param {string} collName 数据集名称（eg: history-message）
+   * @param {} data 要添加的数据，对象/数组
+   * @param {string} belongId 对象所在的归属用户ID
+   * @returns {model.ResultType<T>} 对象异步结果
+   */
+  public async collectionSetFields<T>(
+    belongId: string,
+    relations: string[],
+    collName: string,
+    collSet: any,
+    copyId?: string,
+  ): Promise<model.ResultType<T>> {
+    return await this.dataProxy({
+      module: 'Collection',
+      action: 'SetFields',
+      belongId,
+      copyId,
+      relations,
+      params: { collName, collSet },
     });
   }
   /**
@@ -1289,13 +838,17 @@ export default class KernelApi {
    */
   public async collectionReplace<T>(
     belongId: string,
+    relations: string[],
     collName: string,
     replace: T,
+    copyId?: string,
   ): Promise<model.ResultType<T>> {
     return await this.dataProxy({
       module: 'Collection',
       action: 'Replace',
       belongId,
+      copyId,
+      relations,
       params: { collName, replace },
     });
   }
@@ -1308,13 +861,17 @@ export default class KernelApi {
    */
   public async collectionUpdate(
     belongId: string,
+    relations: string[],
     collName: string,
     update: any,
+    copyId?: string,
   ): Promise<model.ResultType<any>> {
     return await this.dataProxy({
       module: 'Collection',
       action: 'Update',
       belongId,
+      copyId,
+      relations,
       params: { collName, update },
     });
   }
@@ -1327,13 +884,17 @@ export default class KernelApi {
    */
   public async collectionRemove(
     belongId: string,
+    relations: string[],
     collName: string,
     match: any,
+    copyId?: string,
   ): Promise<model.ResultType<any>> {
     return await this.dataProxy({
       module: 'Collection',
       action: 'Remove',
       belongId,
+      copyId,
+      relations,
       params: { collName, match },
     });
   }
@@ -1344,6 +905,7 @@ export default class KernelApi {
    */
   public async collectionLoad<T>(
     belongId: string,
+    relations: string[],
     options: any,
   ): Promise<model.LoadResult<T>> {
     options.belongId = belongId;
@@ -1352,6 +914,7 @@ export default class KernelApi {
       action: 'Load',
       belongId,
       params: options,
+      relations,
     });
     return { ...res, ...res.data };
   }
@@ -1364,6 +927,7 @@ export default class KernelApi {
    */
   public async collectionAggregate(
     belongId: string,
+    relations: string[],
     collName: string,
     options: any,
   ): Promise<model.ResultType<any>> {
@@ -1371,6 +935,7 @@ export default class KernelApi {
       module: 'Collection',
       action: 'Aggregate',
       belongId,
+      relations,
       params: { collName, options },
     });
   }
@@ -1383,15 +948,16 @@ export default class KernelApi {
    */
   public async collectionPageRequest<T>(
     belongId: string,
+    relations: string[],
     collName: string,
     options: any,
     page: model.PageModel,
   ): Promise<model.ResultType<model.PageResult<T>>> {
-    const total = await this.collectionAggregate(belongId, collName, options);
+    const total = await this.collectionAggregate(belongId, relations, collName, options);
     if (total.data && Array.isArray(total.data) && total.data.length > 0) {
       options.skip = page.offset;
       options.limit = page.limit;
-      const res = await this.collectionAggregate(belongId, collName, options);
+      const res = await this.collectionAggregate(belongId, relations, collName, options);
       return {
         ...res,
         data: {
@@ -1411,56 +977,16 @@ export default class KernelApi {
    */
   public async bucketOpreate<T>(
     belongId: string,
+    relations: string[],
     data: model.BucketOpreateModel,
   ): Promise<model.ResultType<T>> {
     return await this.dataProxy({
       module: 'Bucket',
       action: 'Operate',
       belongId,
+      relations,
       params: data,
     });
-  }
-  /**
-   * 文件上传
-   * @param file 文件
-   * @param name 名称
-   * @param key 路径
-   */
-  public async fileUpdate(
-    belongId: string,
-    file: Blob,
-    key: string,
-    progress: (p: number) => void,
-  ): Promise<model.FileItemModel | undefined> {
-    const id = generateUuid();
-    const data: model.BucketOpreateModel = {
-      key: encodeKey(key),
-      operate: model.BucketOpreates.Upload,
-    };
-    progress.apply(this, [0]);
-    const slices = sliceFile(file, 1024 * 1024);
-    for (let i = 0; i < slices.length; i++) {
-      const s = slices[i];
-      data.fileItem = {
-        index: i,
-        uploadId: id,
-        size: file.size,
-        data: [],
-        dataUrl: await blobToDataUrl(s),
-      };
-      const res = await this.bucketOpreate<model.FileItemModel>(belongId, data);
-      if (!res.success) {
-        data.operate = model.BucketOpreates.AbortUpload;
-        await this.bucketOpreate<boolean>(belongId, data);
-        progress.apply(this, [-1]);
-        return;
-      }
-      const finished = i * 1024 * 1024 + s.size;
-      progress.apply(this, [finished]);
-      if (finished === file.size && res.data) {
-        return res.data;
-      }
-    }
   }
   /**
    * 加载物
@@ -1469,6 +995,7 @@ export default class KernelApi {
    */
   public async loadThing<T>(
     belongId: string,
+    relations: string[],
     options: any,
   ): Promise<model.ResultType<T>> {
     options.belongId = belongId;
@@ -1476,6 +1003,7 @@ export default class KernelApi {
       module: 'Thing',
       action: 'Load',
       belongId,
+      relations,
       params: options,
     });
   }
@@ -1486,12 +1014,14 @@ export default class KernelApi {
    */
   public async createThing(
     belongId: string,
+    relations: string[],
     name: string,
   ): Promise<model.ResultType<model.AnyThingModel>> {
     return await this.dataProxy({
       module: 'Thing',
       action: 'Create',
       belongId,
+      relations,
       params: name,
     });
   }
@@ -1567,6 +1097,18 @@ export default class KernelApi {
     }
   }
   /**
+   * 数据变更通知
+   * @param {ReqestType} reqs 请求体
+   * @returns 异步结果
+   */
+  public async dataNotify(req: model.DataNotityType): Promise<model.ResultType<boolean>> {
+    if (this._storeHub.isConnected) {
+      return await this._storeHub.invoke('DataNotify', req);
+    } else {
+      return await this._restRequest('dataNotify', req);
+    }
+  }
+  /**
    * 请求一个内核方法
    * @param {ReqestType} reqs 请求体
    * @returns 异步结果
@@ -1610,9 +1152,21 @@ export default class KernelApi {
     }
 
     this._methods[methodName].push(newOperation);
+    const data = this._cacheData[methodName] || [];
+    data.forEach((item: any) => {
+      newOperation.apply(this, [item]);
+    });
+    this._cacheData[methodName] = [];
   }
   /** 接收服务端消息 */
   private _receive(res: model.ReceiveType) {
+    var onlineOnly: boolean = true;
+    if (res.target === 'DataNotify') {
+      const data: model.DataNotityType = res.data;
+      res.target = `${data.belongId}-${data.targetId}-${data.flag}`;
+      res.data = data.data;
+      onlineOnly = data.onlineOnly;
+    }
     switch (res.target) {
       case 'Online':
       case 'Outline':
@@ -1630,7 +1184,7 @@ export default class KernelApi {
               } else {
                 this.onlineIds = this.onlineIds.filter((i) => i != connectionId);
               }
-              this.onlineNotity.changCallback();
+              this.onlineNotify.changCallback();
             }
             command.emitter('_', res.target.toLowerCase(), res.data);
           }
@@ -1644,6 +1198,9 @@ export default class KernelApi {
           } catch (e) {
             logger.error(e as Error);
           }
+        } else if (!onlineOnly) {
+          const data = this._cacheData[res.target.toLowerCase()] || [];
+          this._cacheData[res.target.toLowerCase()] = [...data, res.data];
         }
       }
     }

@@ -2,15 +2,24 @@ import React, { useEffect, useState } from 'react';
 import cls from './index.module.less';
 import BasicTitle from '@/pages/Home/components/BaseTitle';
 import { Col, Image, Row, Space, Tag, Typography } from 'antd';
-import { Collection } from '@/ts/core';
+import { IActivity } from '@/ts/core';
 import { LikeOutlined, MessageOutlined, StarOutlined } from '@ant-design/icons';
 import { model } from '@/ts/base';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import { showChatTime } from '@/utils/tools';
 
-const ActivityList: React.FC<{ coll: Collection<model.ActivityType> }> = ({ coll }) => {
-  const IconText = ({ icon, text }: { icon: React.FC; text: string }) => (
-    <Space>
+const ActivityList: React.FC<{ activity: IActivity }> = ({ activity }) => {
+  const [actionList, setActivityList] = useState(activity.activityList);
+  const IconText = ({
+    icon,
+    text,
+    onClick,
+  }: {
+    icon: React.FC;
+    text: string;
+    onClick?: () => void;
+  }) => (
+    <Space onClick={onClick}>
       {React.createElement(icon)}
       {text}
     </Space>
@@ -21,10 +30,10 @@ const ActivityList: React.FC<{ coll: Collection<model.ActivityType> }> = ({ coll
         <div className={cls.activityItemHeader}>
           <EntityIcon entityId={item.createUser} showName />
           <span style={{ fontSize: 14 }}>{showChatTime(item.createTime)}</span>
-          {item.tags.map((item, index) => {
+          {item.tags.map((tag, index) => {
             return (
               <Tag color="processing" key={index}>
-                {item}
+                {tag}
               </Tag>
             );
           })}
@@ -43,13 +52,14 @@ const ActivityList: React.FC<{ coll: Collection<model.ActivityType> }> = ({ coll
           <Space size="middle">
             <IconText
               icon={StarOutlined}
-              text={`${item.comment.length}`}
+              text={`${item.comments?.length ?? 0}`}
               key="list-vertical-star-o"
             />
             <IconText
               icon={LikeOutlined}
               text={`${item.likes.length}`}
               key="list-vertical-star-o"
+              onClick={() => activity.links(item)}
             />
             <IconText
               icon={MessageOutlined}
@@ -62,27 +72,23 @@ const ActivityList: React.FC<{ coll: Collection<model.ActivityType> }> = ({ coll
     );
   };
 
-  const [actionList, setActivityList] = useState<model.ActivityType[]>([]);
-
   useEffect(() => {
-    coll
-      .load({
-        options: {
-          sort: {
-            createTime: -1,
-          },
-        },
-      })
-      .then(async (value) => {
-        if (value && value.length > 0) {
-          setActivityList(value);
-        }
+    const id = activity.subscribe(() => {
+      setActivityList([...activity.activityList]);
+    });
+    if (activity.activityList.length < 1) {
+      activity.load(10).then(() => {
+        setActivityList([...activity.activityList]);
       });
+    }
+    return () => {
+      activity.unsubscribe(id);
+    };
   }, []);
 
   return (
     <div className={cls.activityList}>
-      <BasicTitle title="动态" more="更多"></BasicTitle>
+      <BasicTitle title="动态" more="更多" onClick={() => activity.load(10)}></BasicTitle>
       <Row gutter={[16, 0]}>
         {actionList.map((item, index) => {
           return (

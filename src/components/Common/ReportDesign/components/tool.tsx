@@ -142,8 +142,8 @@ const ToolBar: React.FC<IProps> = ({ handClick }: IProps) => {
     handClick('onSave', 'onSave');
   };
 
-  const onPublish = () => { };
-  
+  const onPublish = () => {};
+
   const setFontWeight = () => {
     if (fontWeight === 'bold') {
       fontWeight = defaultFontWeight;

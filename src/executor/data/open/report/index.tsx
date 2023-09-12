@@ -17,33 +17,33 @@ interface IProps {
 const ReportView: React.FC<IProps> = ({ current, finished }) => {
   const [total, setTotal] = useState<number>(1);
   const [info, setInfo] = useState<any>();
-  const [key, rootMenu, selectMenu, setSelectMenu] = useMenuUpdate(
-    () => config.loadSpeciesItemMenu(current),
+  const [key, rootMenu, selectMenu, setSelectMenu] = useMenuUpdate(() =>
+    config.loadSpeciesItemMenu(current),
   );
   if (!selectMenu || !rootMenu) return <></>;
-  
+
   const getData = async (page: number) => {
     let request: any = {
       filter: undefined,
       group: null,
       requireTotalCount: true,
       searchExpr: undefined,
-      searchOperation: "contains",
+      searchOperation: 'contains',
       searchValue: null,
       skip: page,
       take: 1,
-      userData:[]
-    }
-    const result = await kernel.loadThing<any>(current.belongId, request);
+      userData: [],
+    };
+    const result = await kernel.loadThing<any>(current.belongId, [], request);
     if (result.success) {
-      setTotal(result.data?.totalCount)
-      setInfo(result.data?.data[0])
+      setTotal(result.data?.totalCount);
+      setInfo(result.data?.data[0]);
     }
-  }
+  };
 
   const onChange = (page: number) => {
-    getData(page)
-  }
+    getData(page);
+  };
 
   const loadContent = () => {
     return (
@@ -62,11 +62,17 @@ const ReportView: React.FC<IProps> = ({ current, finished }) => {
         </div>
         <HotTableView key={key} info={info} current={current}></HotTableView>
         <div className={cls['report-pagination-box']}>
-          <Pagination hideOnSinglePage={true} defaultCurrent={1} defaultPageSize={1} onChange={onChange} total={total} />
+          <Pagination
+            hideOnSinglePage={true}
+            defaultCurrent={1}
+            defaultPageSize={1}
+            onChange={onChange}
+            total={total}
+          />
         </div>
       </div>
-    )
-  }
+    );
+  };
 
   return (
     <FullScreenModal
@@ -77,15 +83,14 @@ const ReportView: React.FC<IProps> = ({ current, finished }) => {
       destroyOnClose
       title="报表"
       footer={[]}
-      onCancel={finished}
-    >
+      onCancel={finished}>
       <MainLayout
         selectMenu={selectMenu}
         onSelect={(data) => {
           setSelectMenu(data);
         }}
         siderMenuData={rootMenu}>
-          {loadContent()}
+        {loadContent()}
       </MainLayout>
     </FullScreenModal>
   );

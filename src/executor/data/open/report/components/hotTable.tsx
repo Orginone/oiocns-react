@@ -9,9 +9,9 @@ registerAllModules();
 import 'handsontable/dist/handsontable.min.css';
 import { IForm } from '@/ts/core';
 interface IProps {
-  key: string; 
+  key: string;
   current: IForm; // 获取样式
-  info: any // 数据
+  info: any; // 数据
 }
 
 // 数据还未获取,明细待完善
@@ -24,7 +24,9 @@ const HotTableView: React.FC<IProps> = ({ current, info }) => {
   const [colWidths, setColWidths] = useState<any>([]);
 
   const hotRef: any = useRef(null);
-  let sheetList: any = current.metadata?.rule ? Object.values(JSON.parse(current.metadata?.rule)) : []
+  let sheetList: any = current.metadata?.rule
+    ? Object.values(JSON.parse(current.metadata?.rule))
+    : [];
   let datas = sheetList[sheetIndex]?.data?.data || [[]];
   let setting = sheetList[sheetIndex]?.data?.setting || {};
   let mergeCells = setting?.mergeCells || [];
@@ -60,7 +62,7 @@ const HotTableView: React.FC<IProps> = ({ current, info }) => {
       'className',
       arr.join(' '),
     );
-  })
+  });
 
   const onChange = (key: string) => {
     setSheetIndex(key);
@@ -97,7 +99,7 @@ const HotTableView: React.FC<IProps> = ({ current, info }) => {
         manualRowResize={true}
         multiColumnSorting={true}
         outsideClickDeselects={false}
-        licenseKey="non-commercial-and-evaluation" // for non-commercial use only 
+        licenseKey="non-commercial-and-evaluation" // for non-commercial use only
       />
       <div>
         <Tabs

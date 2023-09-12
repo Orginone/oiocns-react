@@ -31,8 +31,7 @@ const ReportModal: React.FC<IProps> = ({ current, finished }: IProps) => {
                 ? '新增sheet页'
                 : '新增规则',
             );
-          }}
-        >
+          }}>
           {tabKey == 'attr' ? '新增特性' : tabKey == 'sheet' ? '新增sheet页' : '新增规则'}
         </Button>
       );
@@ -81,8 +80,7 @@ const ReportModal: React.FC<IProps> = ({ current, finished }: IProps) => {
       destroyOnClose
       title={current.typeName + '管理'}
       footer={[]}
-      onCancel={finished}
-    >
+      onCancel={finished}>
       <div className={cls[`dept-content-box`]}>
         <div className={cls['pages-wrap']}>
           <EntityInfo entity={current}></EntityInfo>
@@ -105,8 +103,7 @@ const ReportModal: React.FC<IProps> = ({ current, finished }: IProps) => {
             activeTabKey={tabKey}
             onTabChange={(key) => setTabKey(key)}
             tabBarExtraContent={renderButton()}
-            bodyStyle={{ paddingTop: 16 }}
-          >
+            bodyStyle={{ paddingTop: 16 }}>
             <div className={cls['page-content-table']}>{content()}</div>
           </PageCard>
         </div>

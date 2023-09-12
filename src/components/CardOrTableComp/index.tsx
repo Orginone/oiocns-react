@@ -3,10 +3,10 @@ import { ProColumns } from '@ant-design/pro-components';
 import cls from './index.module.less';
 import { Dropdown, Pagination, Result, Segmented } from 'antd';
 import { ProTable } from '@ant-design/pro-components';
-import * as fa from 'react-icons/fa';
+import * as fa from '@/icons/fa';
 import { PageShowType } from 'typings/globelType';
 import { PageModel } from '@/ts/base/model';
-import { RiMoreFill } from 'react-icons/ri';
+import { RiMoreFill } from '@/icons/ri';
 import useStorage from '@/hooks/useStorage';
 
 interface PageType<T> {
@@ -61,7 +61,7 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
   request,
   ...rest
 }) => {
-  const [segment, setSegment] = useStorage('segment', 'List');
+  const [segment, setSegment] = useStorage('segment', 'list');
   const [defaultHeight, setDefaultHeight] = useState<number | 'auto'>('auto'); //计算高度
 
   // 监听父级高度

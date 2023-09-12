@@ -252,10 +252,16 @@ export const teamOperates = {
 /** 用户的操作 */
 export const targetOperates = {
   NewCohort: {
-    sort: 33,
+    sort: 32,
     cmd: 'newCohort',
     label: '设立群组',
     iconType: '群组',
+  },
+  NewStorage: {
+    sort: 33,
+    cmd: 'newStorage',
+    label: '设立存储资源',
+    iconType: '存储资源',
   },
   NewCompany: {
     sort: 34,
@@ -280,6 +286,12 @@ export const targetOperates = {
     cmd: 'openChat',
     label: '打开会话',
     iconType: '群组',
+  },
+  Activate: {
+    sort: 15,
+    cmd: 'activate',
+    label: '激活存储',
+    iconType: '激活',
   },
 };
 
@@ -307,6 +319,34 @@ export const personJoins = {
       cmd: 'joinCompany',
       label: '加入单位',
       iconType: 'joinCompany',
+    },
+    {
+      sort: 43,
+      cmd: 'joinStorage',
+      label: '加入存储资源群',
+      iconType: '存储资源',
+    },
+  ],
+};
+
+/** 单位的申请 */
+export const companyJoins = {
+  sort: 1,
+  cmd: 'join',
+  label: '申请加入',
+  iconType: 'join',
+  menus: [
+    {
+      sort: 42,
+      cmd: 'joinGroup',
+      label: '加入集群',
+      iconType: 'joinGroup',
+    },
+    {
+      sort: 43,
+      cmd: 'joinStorage',
+      label: '加入存储资源群',
+      iconType: '存储资源',
     },
   ],
 };
@@ -342,5 +382,11 @@ export const memberOperates = {
     cmd: 'remove',
     label: '移除成员',
     iconType: 'remove',
+  },
+  Exit: {
+    sort: 60,
+    cmd: 'exit',
+    label: '退出',
+    iconType: 'exit',
   },
 };

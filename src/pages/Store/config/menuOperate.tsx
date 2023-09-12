@@ -9,7 +9,7 @@ import { loadFileMenus } from '@/executor/fileOperate';
 const createMenu = (team: ITarget, children: MenuItemType[]) => {
   children.unshift(...buildApplicationTree(team.directory.applications));
   return {
-    key: team.key,
+    key: team.directory.key,
     item: team.directory,
     label: team.name,
     itemType: team.directory.typeName,
@@ -111,6 +111,7 @@ export const loadStoreMenu = () => {
     key: '存储',
     label: '存储',
     itemType: 'group',
+    item: 'disk',
     children: [getUserMenu(), ...getTeamMenu()],
     icon: <EntityIcon notAvatar={true} entityId={orgCtrl.user.id} size={18} />,
   };

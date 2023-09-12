@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import FullScreenModal from '@/executor/tools/fullScreen';
 import { Button, Form, Input } from 'antd';
 import ImageUploader from '@/components/ImageUploader';
-import { ITarget } from '@/ts/core';
+import { IActivity } from '@/ts/core';
 import { model } from '@/ts/base';
 
 const ActivityPublisher: React.FC<{
@@ -10,22 +10,13 @@ const ActivityPublisher: React.FC<{
   target: ITarget;
   finish: () => void;
 }> = (props) => {
-  const [activity, setActivity] = useState<model.ActivityType>({
-    tags: [],
-    likes: [],
-    forward: [],
-    comment: [],
-    resource: [],
-    content: [],
-    typeName: 'Text',
-  } as unknown as model.ActivityType);
+  const [resource, setResource] = useState<model.FileItemShare[]>([]);
   const publishActivity = () => {
-    if (activity.content.length > 0) {
-      props.target.resource.activityColl.insert(activity);
+    if (content.length > 0) {
+      props.activity.send(content, resource, []);
       props.finish();
     }
   };
-  return (
     <FullScreenModal
       {...props}
       destroyOnClose
@@ -44,21 +35,15 @@ const ActivityPublisher: React.FC<{
             style={{ height: 120, resize: 'none' }}
             placeholder="说点什么......."
             onChange={(e) => {
-              setActivity({
-                ...activity,
-                content: e.target.value,
-              });
+              setContent(e.target.value);
             }}
           />
         </Form.Item>
         <Form.Item>
           <ImageUploader
-            directory={props.target.directory}
+            directory={props.activity.session.target.directory}
             onChange={(fileList) => {
-              setActivity({
-                ...activity,
-                resource: fileList.map((item) => item.shareInfo()),
-              });
+              setResource(fileList.map((item) => item.shareInfo()) || []);
             }}></ImageUploader>
         </Form.Item>
       </Form>

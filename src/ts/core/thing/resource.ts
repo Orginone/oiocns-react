@@ -1,4 +1,4 @@
-import { Collection } from './collection';
+import { XCollection } from '../public/collection';
 import {
   XApplication,
   XDirectory,
@@ -6,51 +6,106 @@ import {
   XProperty,
   XSpecies,
   XSpeciesItem,
+  XTarget,
   Xbase,
 } from '../../base/schema';
-import { ActivityType } from '../../base/model';
+import { ChatMessageType, Link } from '@/ts/base/model';
+import { kernel, model } from '@/ts/base';
+import { blobToDataUrl, encodeKey, generateUuid, sliceFile } from '@/ts/base/common';
 
 /** 数据核资源（前端开发） */
 export class DataResource {
-  shareId: string;
-  belongId: string;
-  constructor(belongId: string, shareId: string) {
-    this.shareId = shareId;
-    this.belongId = belongId;
-    this.formColl = this.genColl<XForm>('standard-form');
-    this.speciesColl = this.genColl<XSpecies>('standard-species');
-    this.activityColl = this.genColl<ActivityType>('resource-activity');
-    this.propertyColl = this.genColl<XProperty>('standard-property');
-    this.directoryColl = this.genColl<XDirectory>('resource-directory');
-    this.applicationColl = this.genColl<XApplication>('standard-application');
-    this.speciesItemColl = this.genColl<XSpeciesItem>('standard-species-item');
+  private target: XTarget;
+  private relations: string[];
+  private _proLoaded: boolean = false;
+  constructor(target: XTarget, relations: string[]) {
+    this.target = target;
+    this.relations = relations;
+    this.formColl = this.genTargetColl<XForm>('standard-form');
+    this.transferColl = this.genTargetColl<Link>('standrand-transfer');
+    this.speciesColl = this.genTargetColl<XSpecies>('standard-species');
+    this.messageColl = this.genTargetColl<ChatMessageType>('chat-messages');
+    this.propertyColl = this.genTargetColl<XProperty>('standard-property');
+    this.directoryColl = this.genTargetColl<XDirectory>('resource-directory');
+    this.applicationColl = this.genTargetColl<XApplication>('standard-application');
+    this.speciesItemColl = this.genTargetColl<XSpeciesItem>('standard-species-item');
   }
   /** 表单集合 */
-  formColl: Collection<XForm>;
+  formColl: XCollection<XForm>;
   /** 属性集合 */
-  propertyColl: Collection<XProperty>;
+  propertyColl: XCollection<XProperty>;
   /** 分类集合 */
-  speciesColl: Collection<XSpecies>;
+  speciesColl: XCollection<XSpecies>;
   /** 类目集合 */
-  speciesItemColl: Collection<XSpeciesItem>;
+  speciesItemColl: XCollection<XSpeciesItem>;
   /** 应用集合 */
-  applicationColl: Collection<XApplication>;
+  applicationColl: XCollection<XApplication>;
   /** 资源目录集合 */
-  directoryColl: Collection<XDirectory>;
-  /** 动态集合 */
-  activityColl: Collection<ActivityType>;
+  directoryColl: XCollection<XDirectory>;
+  /** 群消息集合 */
+  messageColl: XCollection<ChatMessageType>;
+  /** 数据传输配置集合 */
+  transferColl: XCollection<Link>;
   /** 资源预加载 */
   async preLoad(): Promise<void> {
-    await Promise.all([
-      this.formColl.all(),
-      this.speciesColl.all(),
-      this.propertyColl.all(),
-      this.directoryColl.all(),
-      this.applicationColl.all(),
-    ]);
+    if (this._proLoaded === false) {
+      await Promise.all([
+        this.formColl.all(),
+        this.speciesColl.all(),
+        this.propertyColl.all(),
+        this.transferColl.all(),
+        this.directoryColl.all(),
+        this.applicationColl.all(),
+      ]);
+    }
+    this._proLoaded = true;
   }
-  /** 生成类型的集合 */
-  genColl<T extends Xbase>(collName: string): Collection<T> {
-    return new Collection<T>(this.belongId, this.shareId, collName);
+  /** 生成集合 */
+  genColl<T extends Xbase>(collName: string, relations?: string[]): XCollection<T> {
+    return new XCollection<T>(this.target, collName, relations || this.relations);
+  }
+  /** 生成用户类型的集合 */
+  genTargetColl<T extends Xbase>(collName: string): XCollection<T> {
+    return new XCollection<T>(this.target, collName, this.relations);
+  }
+  /** 文件桶操作 */
+  async bucketOpreate<R>(data: model.BucketOpreateModel): Promise<model.ResultType<R>> {
+    return await kernel.bucketOpreate<R>(this.target.belongId, this.relations, data);
+  }
+  /** 上传文件 */
+  public async fileUpdate(
+    file: Blob,
+    key: string,
+    progress: (p: number) => void,
+  ): Promise<model.FileItemModel | undefined> {
+    const id = generateUuid();
+    const data: model.BucketOpreateModel = {
+      key: encodeKey(key),
+      operate: model.BucketOpreates.Upload,
+    };
+    progress.apply(this, [0]);
+    const slices = sliceFile(file, 1024 * 1024);
+    for (let i = 0; i < slices.length; i++) {
+      const s = slices[i];
+      data.fileItem = {
+        index: i,
+        uploadId: id,
+        size: file.size,
+        data: [],
+        dataUrl: await blobToDataUrl(s),
+      };
+      const res = await this.bucketOpreate<model.FileItemModel>(data);
+      if (!res.success) {
+        data.operate = model.BucketOpreates.AbortUpload;
+        await this.bucketOpreate<boolean>(data);
+        progress.apply(this, [-1]);
+        return;
+      }
+      const finished = i * 1024 * 1024 + s.size;
+      progress.apply(this, [finished]);
+      if (finished === file.size && res.data) {
+        return res.data;
+      }
+    }
   }
 }

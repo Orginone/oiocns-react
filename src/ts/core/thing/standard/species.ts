@@ -1,14 +1,13 @@
-import { kernel, model, schema } from '../../base';
-import { PageAll } from '../public';
-import { IDirectory } from './directory';
-import { FileInfo, IFileInfo } from './fileinfo';
+import { kernel, model, schema } from '../../../base';
+import { IDirectory } from '../directory';
+import { FileInfo, IFileInfo } from '../fileinfo';
 
 /** 元数据分类接口 */
 export interface ISpecies extends IFileInfo<schema.XSpecies> {
   /** 类目项 */
   items: schema.XSpeciesItem[];
   /** 更新类目 */
-  update(data: model.SpeciesModel): Promise<boolean>;
+  update(data: schema.XSpecies): Promise<boolean>;
   /** 删除类目 */
   delete(): Promise<boolean>;
   /** 加载类目项 */
@@ -62,14 +61,19 @@ export class Species extends FileInfo<schema.XSpecies> implements ISpecies {
     }
     return false;
   }
-  async update(data: model.SpeciesModel): Promise<boolean> {
+  async update(data: schema.XSpecies): Promise<boolean> {
     data.id = this.id;
     data.directoryId = this.metadata.directoryId;
-    const res = await kernel.updateSpecies(data);
-    if (res.success && res.data?.id) {
-      this.setMetadata(res.data);
+    const res = await this.directory.resource.speciesColl.replace({
+      ...data,
+      id: this.id,
+      directoryId: this.metadata.directoryId,
+    });
+    if (res) {
+      this.setMetadata(res);
+      return true;
     }
-    return res.success;
+    return false;
   }
   async delete(): Promise<boolean> {
     if (this.directory) {
@@ -91,43 +95,42 @@ export class Species extends FileInfo<schema.XSpecies> implements ISpecies {
   }
   async loadItems(reload: boolean = false): Promise<schema.XSpeciesItem[]> {
     if (!this._itemLoaded || reload) {
-      const res = await kernel.querySpeciesItems({
-        id: this.id,
-        page: PageAll,
+      const res = await this.directory.resource.speciesItemColl.load({
+        options: { match: { speciesId: this.id } },
       });
-      if (res.success) {
-        this._itemLoaded = true;
-        this.items = res.data.result || [];
-      }
+      this._itemLoaded = true;
+      this.items = res || [];
     }
     return this.items;
   }
-  async createItem(
-    data: model.SpeciesItemModel,
-  ): Promise<schema.XSpeciesItem | undefined> {
-    data.speciesId = this.id;
-    const res = await kernel.createSpeciesItem(data);
-    if (res.success && res.data?.id) {
-      this.items.push(res.data);
-      return res.data;
+  async createItem(data: schema.XSpeciesItem): Promise<schema.XSpeciesItem | undefined> {
+    const res = await this.directory.resource.speciesItemColl.insert({
+      ...data,
+      speciesId: this.id,
+    });
+    if (res) {
+      this.items.push(res);
+      return res;
     }
   }
   async deleteItem(item: schema.XSpeciesItem): Promise<boolean> {
-    const res = await kernel.deleteSpeciesItem({
-      id: item.id,
-    });
-    if (res.success) {
+    const res = await this.directory.resource.speciesItemColl.delete(item);
+    if (res) {
       this.items = this.items.filter((i) => i.id != item.id);
     }
-    return res.success;
+    return res;
   }
-  async updateItem(data: model.SpeciesItemModel): Promise<boolean> {
+  async updateItem(data: schema.XSpeciesItem): Promise<boolean> {
+    const res = await this.directory.resource.speciesItemColl.replace({
+      ...data,
+      speciesId: this.id,
+    });
     data.speciesId = this.id;
-    const res = await kernel.updateSpeciesItem(data);
-    if (res.success) {
+    if (res) {
       this.items = this.items.filter((i) => i.id != data.id);
-      this.items.push(res.data);
+      this.items.push(res);
+      return true;
     }
-    return res.success;
+    return false;
   }
 }

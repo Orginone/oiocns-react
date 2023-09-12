@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react';
-import { AiOutlineSmile } from 'react-icons/ai';
+import { AiOutlineSmile } from '@/icons/ai';
 import { Result, Row, Col, Descriptions, Space, Tag } from 'antd';
 import { CheckCard } from '@ant-design/pro-components';
 import SearchInput from '@/components/SearchInput';
@@ -128,6 +128,13 @@ const SearchTarget: React.FC<CompanySearchTableProps> = (props) => {
                 res.push(
                   ...(await orgCtrl.user.searchTargets(event.target.value, [
                     TargetType.Cohort,
+                  ])),
+                );
+                break;
+              case TargetType.Storage:
+                res.push(
+                  ...(await orgCtrl.user.searchTargets(event.target.value, [
+                    TargetType.Storage,
                   ])),
                 );
                 break;

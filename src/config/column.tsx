@@ -153,12 +153,6 @@ export const AttributeColumn: ProColumns<schema.XAttribute>[] = [
     width: 150,
   },
   {
-    title: '选择字典',
-    dataIndex: ['species', 'name'],
-    key: 'dictId',
-    width: 150,
-  },
-  {
     title: '特性定义',
     dataIndex: 'remark',
     ellipsis: true,

@@ -14,7 +14,7 @@ interface Iprops {
 /*
   编辑
 */
-const DirectoryForm = (props: Iprops) => {
+const TargetForm = (props: Iprops) => {
   let title = '';
   let typeName = '';
   let types: string[] = [props.target.typeName];
@@ -25,6 +25,12 @@ const DirectoryForm = (props: Iprops) => {
       typeName = '群组';
       title = '设立群组';
       types = [TargetType.Cohort];
+      initialValue = {};
+      break;
+    case 'newStorage':
+      typeName = '存储资源';
+      title = '设立存储资源';
+      types = [TargetType.Storage];
       initialValue = {};
       break;
     case 'newStation':
@@ -180,4 +186,4 @@ const DirectoryForm = (props: Iprops) => {
   );
 };
 
-export default DirectoryForm;
+export default TargetForm;

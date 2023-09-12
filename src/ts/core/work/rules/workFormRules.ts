@@ -8,7 +8,7 @@ import { RuleTypes } from './type.d';
 import { DataType } from 'typings/globelType';
 import { filterRules, setFormRules } from './lib/tools';
 import * as Tools from './lib';
-import { RuleTriggers } from '@/ts/base/model';
+import { RuleTriggers } from '../../public';
 import { ValueGoal } from './base/enum';
 import { XEntity } from '@/ts/base/schema';
 import { IBelong } from '../../target/base/belong';
@@ -22,7 +22,7 @@ export type WorkFormRulesType = {
   // /* 收集办事表单的规则 */
   // _AllFormRules: Map<string, { rules: IRuleBase[]; attrs: any[] }>;
   /* 当前选中 主表的id标识 */
-  currentMainFormId?: string;
+  currentMainFormId: string;
   /* 设置最新表单数据 */
   serFormData: any;
   // /* 初始化规则*/

@@ -1,10 +1,10 @@
 import React from 'react';
 import { ProFormColumnsType } from '@ant-design/pro-components';
 import SchemaForm from '@/components/SchemaForm';
-import { DirectoryModel } from '@/ts/base/model';
 import { IDirectory } from '@/ts/core';
 import UploadItem from '../../tools/uploadItem';
 import { EntityColumns } from './entityColumns';
+import { schema } from '@/ts/base';
 
 interface Iprops {
   formType: string;
@@ -32,7 +32,7 @@ const DirectoryForm = (props: Iprops) => {
     default:
       return <></>;
   }
-  const columns: ProFormColumnsType<DirectoryModel>[] = [
+  const columns: ProFormColumnsType<schema.XDirectory>[] = [
     {
       title: '图标',
       dataIndex: 'icon',
@@ -98,7 +98,7 @@ const DirectoryForm = (props: Iprops) => {
     },
   });
   return (
-    <SchemaForm<DirectoryModel>
+    <SchemaForm<schema.XDirectory>
       open
       title={title}
       width={640}

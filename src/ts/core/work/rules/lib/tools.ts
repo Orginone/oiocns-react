@@ -1,7 +1,7 @@
 import { DataType } from 'typings/globelType';
 import { RuleTypes } from '../type';
 import { IRuleBase } from '../base/ruleBase';
-import { RuleTriggers } from '@/ts/base/model';
+import { RuleTriggers } from '../../../public';
 import FormulaRule from '../formulaRule';
 import MethodRule from '../methodRule';
 // 定义规则类型常量，方便代码维护

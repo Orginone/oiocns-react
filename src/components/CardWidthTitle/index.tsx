@@ -1,5 +1,5 @@
 import './index.less';
-import { AiOutlineEdit } from 'react-icons/ai';
+import { AiOutlineEdit } from '@/icons/ai';
 import { Button, Divider } from 'antd';
 import React, { ReactNode } from 'react';
 

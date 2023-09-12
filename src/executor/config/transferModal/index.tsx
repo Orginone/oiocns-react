@@ -1,8 +1,6 @@
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import { XEntity } from '@/ts/base/schema';
 import { IDirectory, IEntity } from '@/ts/core';
-import { EditOutlined } from '@ant-design/icons';
-import { Space } from 'antd';
 import React, { ReactNode } from 'react';
 import { MenuItemType } from 'typings/globelType';
 

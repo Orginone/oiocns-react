@@ -1,8 +1,8 @@
-import { kernel, model, schema } from '../../base';
-import { PageAll, directoryOperates, fileOperates } from '../public';
-import { IDirectory } from './directory';
-import { FileInfo, IFileInfo } from './fileinfo';
-import { IWork, Work } from '../work';
+import { kernel, model, schema } from '../../../base';
+import { PageAll, directoryOperates, fileOperates } from '../../public';
+import { IDirectory } from '../directory';
+import { FileInfo, IFileInfo } from '../fileinfo';
+import { IWork, Work } from '../../work';
 
 /** 应用/模块接口类 */
 export interface IApplication extends IFileInfo<schema.XApplication> {
@@ -13,7 +13,7 @@ export interface IApplication extends IFileInfo<schema.XApplication> {
   /** 流程定义 */
   works: IWork[];
   /** 更新应用 */
-  update(data: model.ApplicationModel): Promise<boolean>;
+  update(data: schema.XApplication): Promise<boolean>;
   /** 加载办事 */
   loadWorks(reload?: boolean): Promise<IWork[]>;
   /** 新建办事 */
@@ -79,21 +79,22 @@ export class Application extends FileInfo<schema.XApplication> implements IAppli
     }
     return false;
   }
-  async update(data: model.ApplicationModel): Promise<boolean> {
-    data.id = this.id;
-    data.directoryId = this.metadata.directoryId;
-    data.typeName = this.metadata.typeName;
-    const res = await kernel.updateApplication(data);
-    if (res.success && res.data.id) {
-      this.setMetadata(res.data);
+  async update(data: schema.XApplication): Promise<boolean> {
+    const res = await this.directory.resource.applicationColl.replace({
+      ...this.metadata,
+      ...data,
+      typeName: this.metadata.typeName,
+      directoryId: this.metadata.directoryId,
+    });
+    if (res) {
+      this.setMetadata(res);
+      return true;
     }
-    return res.success;
+    return false;
   }
   async delete(): Promise<boolean> {
-    const res = await kernel.deleteApplication({
-      id: this.id,
-    });
-    if (res.success) {
+    const res = await this.directory.resource.applicationColl.delete(this.metadata);
+    if (res) {
       this.directory.applications = this.directory.applications.filter(
         (i) => i.key != this.key,
       );
@@ -101,7 +102,7 @@ export class Application extends FileInfo<schema.XApplication> implements IAppli
         this.parent.children = this.parent.children.filter((i) => i.key != this.key);
       }
     }
-    return res.success;
+    return res;
   }
   async loadWorks(reload?: boolean | undefined): Promise<IWork[]> {
     if (!this._worksLoaded || reload) {
@@ -125,13 +126,17 @@ export class Application extends FileInfo<schema.XApplication> implements IAppli
       return work;
     }
   }
-  async createModule(data: model.ApplicationModel): Promise<IApplication | undefined> {
+  async createModule(data: schema.XApplication): Promise<IApplication | undefined> {
     data.parentId = this.id;
     data.typeName = '模块';
     data.directoryId = this.directory.id;
-    const res = await kernel.createApplication(data);
-    if (res.success && res.data.id) {
-      const application = new Application(res.data, this.directory, this);
+    const res = await this.directory.resource.applicationColl.insert({
+      ...data,
+      parentId: this.id,
+      typeName: '模块',
+    });
+    if (res) {
+      const application = new Application(res, this.directory, this);
       this.children.push(application);
       return application;
     }
@@ -147,7 +152,7 @@ export class Application extends FileInfo<schema.XApplication> implements IAppli
     ];
     if (mode === 2 && this.directory.target.hasRelationAuth()) {
       operates.push(directoryOperates.NewModule, directoryOperates.NewWork);
-      if (this.directory.target.space.user.copyFiles.size > 0) {
+      if (this.directory.target.user.copyFiles.size > 0) {
         operates.push(fileOperates.Parse);
       }
     }

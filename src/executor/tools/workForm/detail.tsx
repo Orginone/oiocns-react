@@ -6,7 +6,7 @@ import { Tabs } from 'antd';
 import { EditModal } from '../editModal';
 import GenerateThingTable from '../generate/thingTable';
 import { WorkFormRulesType } from '@/ts/core/work/rules/workFormRules';
-import { RuleTriggers } from '@/ts/base/model';
+import { RuleTriggers } from '@/ts/core/public';
 
 interface IProps {
   allowEdit: boolean;

@@ -3,14 +3,19 @@ import { IIdentity, Identity } from '../identity/identity';
 import { OperateType, TargetType } from '../../public/enums';
 import { PageAll } from '../../public/consts';
 import { ITeam, Team } from './team';
-import { IBelong } from './belong';
 import { targetOperates } from '../../public';
 import { Directory, IDirectory } from '../../thing/directory';
 import { IFileInfo } from '../../thing/fileinfo';
 import { DataResource } from '../../thing/resource';
+import { ISession, Session } from '../../chat/session';
+import { IPerson } from '../person';
 
 /** 用户抽象接口类 */
 export interface ITarget extends ITeam, IFileInfo<schema.XTarget> {
+  /** 会话 */
+  session: ISession;
+  /** 用户资源 */
+  resource: DataResource;
   /** 用户设立的身份(角色) */
   identitys: IIdentity[];
   /** 用户资源 */
@@ -19,6 +24,8 @@ export interface ITarget extends ITeam, IFileInfo<schema.XTarget> {
   subTarget: ITarget[];
   /** 所有相关用户 */
   targets: ITarget[];
+  /** 用户相关的所有会话 */
+  chats: ISession[];
   /** 成员目录 */
   memberDirectory: IDirectory;
   /** 退出用户群 */
@@ -33,12 +40,13 @@ export interface ITarget extends ITeam, IFileInfo<schema.XTarget> {
 export abstract class Target extends Team implements ITarget {
   constructor(
     _metadata: schema.XTarget,
-    _labels: string[],
-    _space?: IBelong,
+    _relations: string[],
+    _user?: IPerson,
     _memberTypes: TargetType[] = [TargetType.Person],
   ) {
-    super(_metadata, _labels, _space, _memberTypes);
-    this.resource = new DataResource(_metadata.belongId, _metadata.id);
+    super(_metadata, _memberTypes);
+    this.user = _user || (this as unknown as IPerson);
+    this.resource = new DataResource(_metadata, _relations);
     this.directory = new Directory(
       {
         ..._metadata,
@@ -61,9 +69,12 @@ export abstract class Target extends Team implements ITarget {
       this,
       this.directory,
     );
+    this.session = new Session(this.id, this, _metadata);
   }
-  resource: DataResource;
+  user: IPerson;
+  session: ISession;
   directory: IDirectory;
+  resource: DataResource;
   identitys: IIdentity[] = [];
   memberDirectory: IDirectory;
   get spaceId(): string {
@@ -100,7 +111,7 @@ export abstract class Target extends Team implements ITarget {
   }
   override operates(): model.OperateModel[] {
     const operates = super.operates();
-    if (this.isMyChat) {
+    if (this.session.isMyChat) {
       operates.unshift(targetOperates.Chat);
     }
     return operates;
@@ -138,6 +149,7 @@ export abstract class Target extends Team implements ITarget {
     throw new Error('暂不支持.');
   }
   abstract exit(): Promise<boolean>;
+  abstract get chats(): ISession[];
   abstract get targets(): ITarget[];
   abstract get subTarget(): ITarget[];
   createTarget(_data: model.TargetModel): Promise<ITeam | undefined> {

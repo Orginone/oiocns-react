@@ -44,7 +44,7 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
       // 占用端口 开发环境启动的端口
       port: PORT,
       // 是否使用https请求
-      //  https: ,
+      //  https: true,
       // 扩展访问端口
       host: true,
       hmr: true,

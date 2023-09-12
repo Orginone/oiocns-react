@@ -5,10 +5,10 @@ import useObjectUpdate from '@/hooks/useObjectUpdate';
 import { IForm } from '@/ts/core';
 import PropertyConfig from './propConfig';
 import AttributeConfig from '@/components/Common/FormDesign/attributeConfig';
-import SelectPropertys from './SelectPropertys';
+import SelectPropertys from '@/components/Common/SelectPropertys';
 import { Modal } from 'antd';
-import { AttributeModel } from '@/ts/base/model';
 import { AttributeColumn } from '@/config/column';
+import { schema } from '@/ts/base';
 
 interface IProps {
   current: IForm;
@@ -118,7 +118,7 @@ const Attritube = ({ current, modalType, setModalType }: IProps) => {
                   code: prop.code,
                   rule: '{}',
                   remark: prop.remark,
-                } as AttributeModel,
+                } as schema.XAttribute,
                 prop,
               );
               tforceUpdate();

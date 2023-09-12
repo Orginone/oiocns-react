@@ -1,5 +1,5 @@
-import React, { useRef, useState } from 'react';
-import FullScreenModal from '@/executor/tools/fullScreen';
+import React, { useState } from 'react';
+import FullScreenModal from '../../../tools/fullScreen';
 import { ProConfigProvider } from '@ant-design/pro-components';
 import './index.less';
 import { Col, Row, Tabs } from 'antd';
@@ -10,12 +10,11 @@ import VersionPage from './components/Content/VersionPage';
 import { BranchesOutlined, ClockCircleOutlined, TagOutlined } from '@ant-design/icons';
 
 const CodeRepository = ({ finished, args }) => {
-  
-  const [fileStates, setFileStates] = useState(<FileHome />)
+  const [fileStates, setFileStates] = useState(<FileHome />);
 
   const handleTabClick = (key: any) => {
-    if(key == 1){
-      setFileStates(<FileHome />)
+    if (key == 1) {
+      setFileStates(<FileHome />);
     }
   };
 
@@ -47,19 +46,25 @@ const CodeRepository = ({ finished, args }) => {
             {/*提交史分支版本发布*/}
             <Row className="history_contianer">
               <Col span={8}>
-                <p className="public_text_center" onClick={()=>setFileStates(<HistoryCommit/>)}>
+                <p
+                  className="public_text_center"
+                  onClick={() => setFileStates(<HistoryCommit />)}>
                   <ClockCircleOutlined style={{ marginRight: '.4rem' }} />
                   26次提交史
                 </p>
               </Col>
               <Col span={8}>
-                <p className="public_text_center"  onClick={()=>setFileStates(<BranchPage/>)}>
+                <p
+                  className="public_text_center"
+                  onClick={() => setFileStates(<BranchPage />)}>
                   <BranchesOutlined style={{ marginRight: '.4rem' }} />
                   2个代码分支
                 </p>
               </Col>
               <Col span={8}>
-                <p className="public_text_center"  onClick={()=>setFileStates(<VersionPage/>)}>
+                <p
+                  className="public_text_center"
+                  onClick={() => setFileStates(<VersionPage />)}>
                   <TagOutlined style={{ marginRight: '.4rem' }} />
                   0版本发布
                 </p>

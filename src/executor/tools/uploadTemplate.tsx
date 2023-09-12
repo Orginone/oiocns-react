@@ -1,5 +1,5 @@
 import { command, model } from '@/ts/base';
-import { IDirectory } from '@/ts/core/thing/directory';
+import { IDirectory } from '@/ts/core';
 import { formatDate } from '@/utils';
 import { dataHandling, generateXlsx, readXlsx } from '@/utils/excel';
 import {

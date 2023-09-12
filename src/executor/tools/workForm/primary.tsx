@@ -1,4 +1,5 @@
 import OioForm from '@/components/Common/FormDesign/OioFormNext';
+import FormRenders from './form';
 import { kernel, model, schema } from '../../../ts/base';
 import { IBelong } from '@/ts/core';
 import { useEffect, useState } from 'react';
@@ -6,7 +7,6 @@ import React from 'react';
 import { WorkFormRulesType } from '@/ts/core/work/rules/workFormRules';
 import { Tabs } from 'antd';
 import ReportForms from '../workReport';
-import FormRenders from './formPreview';
 
 interface IProps {
   allowEdit: boolean;
@@ -29,7 +29,7 @@ const PrimaryForm: React.FC<IProps> = (props) => {
   );
   useEffect(() => {
     if (!data) {
-      kernel.createThing(props.belong.userId, '').then((res) => {
+      kernel.createThing(props.belong.userId, [], '').then((res) => {
         if (res.success && res.data) {
           setData(res.data);
         }
@@ -79,13 +79,13 @@ const PrimaryForms: React.FC<IProps> = (props) => {
             key: form.id,
             label: form.name,
             children: <ReportForms {...props} forms={[form]} />,
-          }
+          };
         default:
           return {
             key: form.id,
             label: form.name,
             children: <PrimaryForm {...props} forms={[form]} />,
-          }
+          };
       }
     });
   };

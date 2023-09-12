@@ -9,10 +9,9 @@ import SpeciesForm from './speciesForm';
 import PropertyForm from './propertyForm';
 import TargetForm from './targetForm';
 import LabelsForm from './labelsForm';
-import RenameForm from './renameForm';
 import LabelsReport from './labelsReport';
+import RenameForm from './renameForm';
 import LinkForm from './linkForm';
-
 interface IProps {
   cmd: string;
   entity: IEntity<schema.XEntity>;
@@ -101,10 +100,14 @@ const EntityForm: React.FC<IProps> = ({ cmd, entity, finished }) => {
       return (
         <PropertyForm formType={cmd} current={entity as any} finished={reloadFinish} />
       );
+    case 'newLink':
+    case 'updateLink':
+      return <LinkForm formType={cmd} current={entity as any} finished={reloadFinish} />;
     default: {
-      const target = cmd.startsWith('new')
-        ? (entity as IDirectory).target
-        : (entity as ITarget);
+      var target = entity as ITarget;
+      if (entity.typeName === '目录') {
+        target = (entity as IDirectory).target;
+      }
       return <TargetForm formType={cmd} target={target} finished={reloadFinish} />;
     }
   }

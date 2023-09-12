@@ -6,7 +6,7 @@ import { CopyToClipboard } from 'react-copy-to-clipboard';
 import TeamIcon from '@/components/Common/GlobalComps/entityIcon';
 import Information from './information';
 import { showChatTime, downloadByUrl } from '@/utils/tools';
-import { IMessage, IMsgChat, MessageType } from '@/ts/core';
+import { IMessage, ISession, MessageType } from '@/ts/core';
 import { parseAvatar } from '@/ts/base';
 import css from './index.module.less';
 import { parseCiteMsg, parseMsg } from '@/pages/Chats/components/parseMsg';
@@ -17,7 +17,7 @@ import { parseCiteMsg, parseMsg } from '@/pages/Chats/components/parseMsg';
  */
 
 interface Iprops {
-  chat: IMsgChat;
+  chat: ISession;
   filter: string;
   handleReWrites: Function;
   /** 返回值，引用 */

@@ -1,7 +1,7 @@
-import { schema, model, kernel } from '../../base';
-import { PageAll, orgAuth } from '../../core/public';
-import { IDirectory } from './directory';
-import { FileInfo, IFileInfo } from './fileinfo';
+import { schema, model } from '../../../base';
+import { orgAuth } from '../../../core/public';
+import { IDirectory } from '../directory';
+import { FileInfo, IFileInfo } from '../fileinfo';
 
 /** 表单类接口 */
 export interface IForm extends IFileInfo<schema.XForm> {
@@ -10,15 +10,9 @@ export interface IForm extends IFileInfo<schema.XForm> {
   /** 表单字段 */
   fields: model.FieldModel[];
   /** 更新表单 */
-  update(data: model.FormModel): Promise<boolean>;
+  update(data: schema.XForm): Promise<boolean>;
   /** 删除表单 */
   delete(): Promise<boolean>;
-  /** 加载类目项 */
-  loadFields(reload?: boolean): Promise<model.FieldModel[]>;
-  /** 加载表单特性 */
-  loadAttributes(reload?: boolean): Promise<schema.XAttribute[]>;
-  /** 加载表单特性 */
-  loadAttributes(reload?: boolean): Promise<schema.XAttribute[]>;
   /** 新建表单特性 */
   createAttribute(
     data: model.AttributeModel,
@@ -39,8 +33,9 @@ export class Form extends FileInfo<schema.XForm> implements IForm {
   }
   private _fieldsLoaded: boolean = false;
   fields: model.FieldModel[] = [];
-  attributes: schema.XAttribute[] = [];
-  private _attributeLoaded: boolean = false;
+  get attributes(): schema.XAttribute[] {
+    return this.metadata.attributes || [];
+  }
   get id(): string {
     return this._metadata.id.replace('_', '');
   }
@@ -75,27 +70,27 @@ export class Form extends FileInfo<schema.XForm> implements IForm {
     }
     return false;
   }
-  async update(data: model.FormModel): Promise<boolean> {
-    data.id = this.id;
-    data.directoryId = this.metadata.directoryId;
-    data.typeName = this.metadata.typeName;
-    const res = await kernel.updateForm(data);
-    if (res.success && res.data.id) {
-      this.setMetadata(res.data);
+  async update(data: schema.XForm): Promise<boolean> {
+    const res = await this.directory.resource.formColl.replace({
+      ...this.metadata,
+      ...data,
+      directoryId: this.metadata.directoryId,
+      typeName: this.metadata.typeName,
+    });
+    if (res) {
+      this.setMetadata(res);
+      return true;
     }
-    return res.success;
+    return false;
   }
   async delete(): Promise<boolean> {
-    const res = await kernel.deleteForm({
-      id: this.id,
-    });
-    if (res.success) {
+    const res = await this.directory.resource.formColl.delete(this.metadata);
+    if (res) {
       this.directory.forms = this.directory.forms.filter((i) => i.key != this.key);
     }
-    return res.success;
+    return res;
   }
   async loadContent(reload: boolean = false): Promise<boolean> {
-    await this.loadAttributes(reload);
     await this.loadFields(reload);
     return true;
   }
@@ -104,24 +99,22 @@ export class Form extends FileInfo<schema.XForm> implements IForm {
       this.fields = [];
       await Promise.all(
         this.attributes.map(async (attr) => {
-          if (attr.linkPropertys && attr.linkPropertys.length > 0) {
-            const property = attr.linkPropertys[0];
+          if (attr.property) {
             const field: model.FieldModel = {
               id: attr.id,
               rule: attr.rule,
               name: attr.name,
-              code: property.code,
+              code: 'T' + attr.property.id,
               remark: attr.remark,
               lookups: [],
-              valueType: property.valueType,
+              valueType: attr.property.valueType,
             };
-            if (property.speciesId && property.speciesId.length > 0) {
-              const res = await kernel.querySpeciesItems({
-                id: property.speciesId,
-                page: PageAll,
+            if (attr.property.speciesId && attr.property.speciesId.length > 0) {
+              const data = await this.directory.resource.speciesItemColl.loadSpace({
+                options: { match: { speciesId: attr.property.speciesId } },
               });
-              if (res.success) {
-                field.lookups = (res.data.result || []).map((i) => {
+              if (data.length > 0) {
+                field.lookups = data.map((i) => {
                   return {
                     id: i.id,
                     text: i.name,
@@ -140,73 +133,53 @@ export class Form extends FileInfo<schema.XForm> implements IForm {
     }
     return this.fields;
   }
-  async loadAttributes(reload: boolean = false): Promise<schema.XAttribute[]> {
-    if (!this._attributeLoaded || reload) {
-      const res = await kernel.queryFormAttributes({
-        id: this.id,
-        subId: this.metadata.belongId,
-      });
-      if (res.success) {
-        this._attributeLoaded = true;
-        this.attributes = res.data.result || [];
-      }
-    }
-    return this.attributes;
-  }
   async createAttribute(
-    data: model.AttributeModel,
+    data: schema.XAttribute,
     property?: schema.XProperty,
   ): Promise<schema.XAttribute | undefined> {
-    data.formId = this.id;
     if (property) {
+      data.property = property;
       data.propId = property.id;
     }
     if (!data.authId || data.authId.length < 5) {
       data.authId = orgAuth.SuperAuthId;
     }
-    const res = await kernel.createAttribute(data);
-    if (res.success && res.data.id) {
-      if (property) {
-        res.data.property = property;
-        res.data.linkPropertys = [property];
-      }
-      this.attributes.push(res.data);
-      return res.data;
+    data.id = 'snowId()';
+    const res = await this.update({
+      ...this.metadata,
+      attributes: [...(this.metadata.attributes || []), data],
+    });
+    if (res) {
+      return data;
     }
   }
   async updateAttribute(
-    data: model.AttributeModel,
+    data: schema.XAttribute,
     property?: schema.XProperty,
   ): Promise<boolean> {
-    const index = this.attributes.findIndex((i) => i.id === data.id);
-    if (index > -1) {
-      data.formId = this.id;
+    const oldData = this.attributes.find((i) => i.id === data.id);
+    if (oldData) {
+      data = { ...oldData, ...data };
       if (property) {
         data.propId = property.id;
+        data.property = property;
       }
-      const res = await kernel.updateAttribute(data);
-      if (res.success && res.data.id) {
-        res.data.property = this.attributes[index].property;
-        res.data.linkPropertys = this.attributes[index].linkPropertys;
-        if (property) {
-          res.data.linkPropertys = [property];
-        }
-        this.attributes[index] = res.data;
-      }
-      return res.success;
+      const res = await this.update({
+        ...this.metadata,
+        attributes: [...this.attributes.filter((a) => a.id != data.id), data],
+      });
+      return res;
     }
     return false;
   }
   async deleteAttribute(data: schema.XAttribute): Promise<boolean> {
     const index = this.attributes.findIndex((i) => i.id === data.id);
     if (index > -1) {
-      const res = await kernel.deleteAttribute({
-        id: data.id,
+      const res = await this.update({
+        ...this.metadata,
+        attributes: [...this.attributes.filter((a) => a.id != data.id)],
       });
-      if (res.success) {
-        this.attributes.splice(index, 1);
-      }
-      return res.success;
+      return res;
     }
     return false;
   }

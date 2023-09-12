@@ -1,4 +1,4 @@
-import { AiOutlineArrowRight } from 'react-icons/ai';
+import { AiOutlineArrowRight } from '@/icons/ai';
 import { Alert, Button, Form, Input, message, Modal } from 'antd';
 import React, { useState } from 'react';
 import { Link, useHistory } from 'react-router-dom';

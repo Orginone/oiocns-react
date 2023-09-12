@@ -1,7 +1,7 @@
 import SchemaForm from '@/components/SchemaForm';
 import { Link } from '@/ts/base/model';
 import { IDirectory } from '@/ts/core';
-import { ILink } from '@/ts/core/thing/link';
+import { ILink } from '@/ts/core/';
 import { ProFormColumnsType } from '@ant-design/pro-components';
 import React from 'react';
 

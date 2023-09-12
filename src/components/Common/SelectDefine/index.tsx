@@ -3,10 +3,9 @@ import { TreeProps } from 'antd';
 import CustomTree from '@/components/CustomTree';
 import React, { useState } from 'react';
 import cls from './index.module.less';
-import { IApplication, IBelong, ITarget } from '@/ts/core';
+import { IApplication, IBelong, ITarget, IDirectory } from '@/ts/core';
 import { XWorkDefine } from '@/ts/base/schema';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
-import { IDirectory } from '@/ts/core/thing/directory';
 interface Iprops {
   belong: IBelong;
   excludeIds: string[];
@@ -58,7 +57,7 @@ const SelectDefine = (props: Iprops) => {
   };
 
   const onSelectDirectory: TreeProps['onSelect'] = async (_, info: any) => {
-    setApps(loadApplicationMenu(await (info.node.item as IDirectory).loadApplications()));
+    setApps(loadApplicationMenu((info.node.item as IDirectory).applications));
   };
 
   const onSelect: TreeProps['onSelect'] = async (_, info: any) => {

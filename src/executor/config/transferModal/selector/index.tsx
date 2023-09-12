@@ -5,7 +5,7 @@
 // import { IBelong, IDirectory, IEntity } from '@/ts/core';
 // import { Input, Tree, TreeProps } from 'antd';
 // import React, { Key, ReactNode, useEffect, useState } from 'react';
-// import { AiOutlineSearch } from 'react-icons/ai';
+// import { AiOutlineSearch } from '@/icons/ai';
 // import cls from './index.module.css';
 // interface IExtends<X extends XEntity> {
 //   current: IBelong;

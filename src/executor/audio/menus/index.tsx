@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Dropdown, MenuProps } from 'antd';
-import { BsDisc, BsMusicNoteList } from 'react-icons/bs';
+import { BsMusicNoteList } from '@/icons/bs';
 import cls from './index.module.less';
 import { FileItemModel } from 'src/ts/base/model';
 import { Directory } from '@/ts/core/thing/directory';
+import { ImSpinner4 } from '@/icons/im';
 interface IProp {
   audioData: FileItemModel;
   setAudioData: (audioData: FileItemModel) => void;
@@ -34,9 +35,9 @@ const Menus: React.FC<IProp> = ({
           label: (
             <div className={cls['audio-list']}>
               {each.name}
-              <BsDisc
+              <ImSpinner4
                 className={`${cls['audio-disc-icon']} ${cls['rotate-animation']}`}
-                color={'#8875a9'}></BsDisc>
+                color={'#8875a9'}></ImSpinner4>
             </div>
           ),
         });
@@ -46,10 +47,10 @@ const Menus: React.FC<IProp> = ({
           label: (
             <div className={cls['audio-list']}>
               {each.name}
-              <BsDisc
+              <ImSpinner4
                 visibility={'hidden'}
                 className={`${cls['audio-disc-icon']} ${cls['rotate-animation']}`}
-                color={'#8875a9'}></BsDisc>
+                color={'#8875a9'}></ImSpinner4>
             </div>
           ),
         });

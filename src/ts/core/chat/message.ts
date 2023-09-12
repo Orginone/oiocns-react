@@ -1,7 +1,7 @@
-import { common, model, parseAvatar } from '../../../base';
-import { MessageType, TargetType } from '../../public';
-import { IPerson } from '../../target/person';
-import { IMsgChat } from './msgchat';
+import { common, model, parseAvatar } from '../../base';
+import { MessageType, TargetType } from '../public';
+import { IPerson } from '../target/person';
+import { ISession } from './session';
 export interface IMessageLabel {
   /** 标签名称 */
   label: string;
@@ -36,7 +36,7 @@ export interface IMessage {
   /** 消息id */
   id: string;
   /** 元数据 */
-  metadata: model.MsgSaveModel;
+  metadata: model.ChatMessageType;
   /** 发送方 */
   from: model.ShareIcon;
   /** 接收方 */
@@ -73,20 +73,14 @@ export interface IMessage {
   unreadInfo: IMessageLabel[];
   /** 评论数 */
   comments: number;
-  /** 消息撤回 */
-  recall(): void;
-  /** 接收标签 */
-  receiveTags(tags: string[]): void;
 }
 
 export class Message implements IMessage {
-  constructor(_metadata: model.MsgSaveModel, _chat: IMsgChat) {
+  constructor(_metadata: model.ChatMessageType, _chat: ISession) {
     this._chat = _chat;
-    this.user = _chat.space.user;
-    if (_metadata.msgType === 'recall') {
-      _metadata.msgType = MessageType.Recall;
-    }
-    const txt = common.StringPako.inflate(_metadata.msgBody);
+    this.user = _chat.target.user;
+    _metadata.comments = _metadata.comments || [];
+    const txt = common.StringPako.inflate(_metadata.content);
     if (txt.startsWith('[obj]')) {
       const content = JSON.parse(txt.substring(5));
       this._msgBody = content.body;
@@ -98,22 +92,22 @@ export class Message implements IMessage {
       this._msgBody = txt;
     }
     this.metadata = _metadata;
-    _metadata.tags?.map((tag) => {
+    _metadata.comments.map((tag) => {
       this.labels.push(new MessageLabel(tag, this.user));
     });
   }
   cite: IMessage | undefined;
   mentions: string[] = [];
   user: IPerson;
-  _chat: IMsgChat;
+  _chat: ISession;
   _msgBody: string;
   labels: IMessageLabel[] = [];
-  metadata: model.MsgSaveModel;
+  metadata: model.ChatMessageType;
   get id(): string {
     return this.metadata.id;
   }
   get msgType(): string {
-    return this.metadata.msgType;
+    return this.metadata.typeName;
   }
   get createTime(): string {
     return this.metadata.createTime;
@@ -207,13 +201,5 @@ export class Message implements IMessage {
   }
   get msgSource(): string {
     return this._msgBody;
-  }
-  recall(): void {
-    this.metadata.msgType = MessageType.Recall;
-  }
-  receiveTags(tags: string[]): void {
-    tags.forEach((tag) => {
-      this.labels.push(new MessageLabel(JSON.parse(tag), this.user));
-    });
   }
 }
