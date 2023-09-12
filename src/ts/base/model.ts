@@ -996,6 +996,9 @@ export type NodeType = '请求' | '链接' | '映射' | '存储';
 // 事件
 export type Event = 'Edit' | 'View' | 'Run';
 
+// 脚本位置
+export type ScriptPos = 'pre' | 'post'
+
 // 节点
 export type Node<T> = {
   // 主键
@@ -1034,7 +1037,7 @@ export type StoreNode = Node<Store>;
 export type KeyValue = { [key: string]: string | undefined };
 
 // 链接
-export type Link = {
+export type Transfer = {
   // 目录
   directoryId: string;
   // 环境集合

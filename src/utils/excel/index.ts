@@ -1,6 +1,5 @@
-import { kernel, model } from '@/ts/base';
 import * as XLSX from 'xlsx';
-import { DataHandler, ReadConfig, RequestIndex, SheetConfig } from './types';
+import { DataHandler, ReadConfig, SheetConfig } from './types';
 
 /**
  * 生成一份 Excel 文件
@@ -158,20 +157,4 @@ function assignment(oldObj: { [key: string]: any }, newObj: { [key: string]: any
   });
 }
 
-/**
- * 批量请求
- */
-async function batchRequests(
-  requests: RequestIndex[],
-  onItemCompleted: (request: RequestIndex, result: model.ResultType<any>) => void,
-) {
-  if (requests.length == 0) return;
-  await Promise.all(
-    requests.map(async (item) => {
-      const result = await kernel.request(item.request);
-      onItemCompleted(item, result);
-    }),
-  );
-}
-
-export { assignment, batchRequests, dataHandling, generateXlsx, readXlsx };
+export { assignment, dataHandling, generateXlsx, readXlsx };

@@ -1,5 +1,5 @@
 import FullScreenModal from '@/executor/tools/fullScreen';
-import { ILink } from '@/ts/core/thing/link';
+import { ITransfer } from '@/ts/core';
 import React from 'react';
 import LinkEditor from './graph';
 import { ToolBar } from './tools';
@@ -7,7 +7,7 @@ import { ToolBar } from './tools';
 export type Retention = 'runtime' | 'configuration';
 
 interface IProps {
-  current: ILink;
+  current: ITransfer;
   finished: () => void;
 }
 

@@ -9,7 +9,7 @@ import {
 } from '../public';
 import { ITarget } from '../target/base/target';
 import { Form, IForm } from './standard/form';
-import { Link, ILink } from './standard/transfer';
+import { Transfer, ITransfer } from './standard/transfer';
 import { SysFileInfo, ISysFileInfo, IFileInfo, FileInfo } from './fileinfo';
 import { Species, ISpecies } from './standard/species';
 import { Member } from './member';
@@ -18,6 +18,8 @@ import { Application, IApplication } from './standard/application';
 import { BucketOpreates, FileItemModel } from '@/ts/base/model';
 import { encodeKey } from '@/ts/base/common';
 import { DataResource } from './resource';
+import orgCtrl from '@/ts/controller';
+
 /** 可为空的进度回调 */
 export type OnProgress = (p: number) => void;
 
@@ -54,11 +56,11 @@ export interface IDirectory extends IFileInfo<schema.XDirectory> {
   /** 目录下的应用 */
   applications: IApplication[];
   /** 目录下的链接 */
-  links: ILink[];
-  /** 新建链接配置 */
-  createLink(data: model.Link): Promise<ILink | undefined>;
-  /** 加载链接配置 */
-  loadAllLink(reload?: boolean): Promise<ILink[]>;
+  transfers: ITransfer[];
+  /** 新建迁移配置 */
+  createTransfer(data: model.Transfer): Promise<ITransfer | undefined>;
+  /** 加载迁移配置 */
+  loadAllTransfer(reload?: boolean): Promise<ITransfer[]>;
   /** 加载文件 */
   loadFiles(reload?: boolean): Promise<ISysFileInfo[]>;
   /** 上传文件 */
@@ -73,10 +75,8 @@ export interface IDirectory extends IFileInfo<schema.XDirectory> {
   createApplication(data: schema.XApplication): Promise<IApplication | undefined>;
   /** 加载全部应用 */
   loadAllApplication(reload?: boolean): Promise<IApplication[]>;
-  /** 加载目录资源 */
-  loadDirectoryResource(): Promise<void>;
   /** 情况目录资源 */
-  loadDirectoryResource(): Promise<void>;
+  loadDirectoryResource(reload?: boolean): Promise<void>;
 }
 
 /** 目录实现类 */
@@ -97,6 +97,19 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
     this.target = _target;
     this.parent = _parent;
     this.taskEmitter = new common.Emitter();
+    if (!_parent) {
+      this.resource.directoryColl.subscribe((res: { operate: string; data: any }) => {
+        switch (res.operate ?? '') {
+          case 'refresh':
+            if (res.data && res.data.id == this.metadata.id) {
+              this.loadContent(true).then(() => {
+                orgCtrl.changCallback();
+              });
+            }
+            break;
+        }
+      });
+    }
   }
   target: ITarget;
   taskEmitter: common.Emitter;
@@ -104,7 +117,7 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
   children: IDirectory[] = [];
   taskList: model.TaskModel[] = [];
   forms: IForm[] = [];
-  links: ILink[] = [];
+  transfers: ITransfer[] = [];
   files: ISysFileInfo[] = [];
   specieses: ISpecies[] = [];
   propertys: IProperty[] = [];
@@ -133,7 +146,7 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
     if (this.typeName === '成员目录') {
       cnt.push(...this.target.members.map((i) => new Member(i, this)));
     } else {
-      cnt.push(...this.forms, ...this.applications, ...this.files, ...this.links, ...this.reports);
+      cnt.push(...this.forms, ...this.applications, ...this.files, ...this.links, ...this.reports, ...this.transfers);
       if (mode != 1) {
         cnt.push(...this.propertys);
         cnt.push(...this.specieses);
@@ -152,7 +165,7 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
       if (this.typeName === '成员目录') {
         await this.target.loadContent(reload);
       } else {
-        await this.loadDirectoryResource();
+        await this.loadDirectoryResource(reload);
       }
     }
     return false;
@@ -306,7 +319,7 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
     }
     return applications;
   }
-  async createLink(data: model.Link): Promise<ILink | undefined> {
+  async createTransfer(data: model.Transfer): Promise<ITransfer | undefined> {
     const res = await this.resource.transferColl.insert({
       ...data,
       envs: [],
@@ -315,15 +328,15 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
       directoryId: this.id,
     });
     if (res) {
-      const link = new Link(res, this);
-      this.links.push(link);
+      const link = new Transfer(res, this);
+      this.transfers.push(link);
       return link;
     }
   }
-  async loadAllLink(reload: boolean = false): Promise<ILink[]> {
-    const links: ILink[] = [...this.links];
+  async loadAllTransfer(reload: boolean = false): Promise<ITransfer[]> {
+    const links: ITransfer[] = [...this.transfers];
     for (const subDirectory of this.children) {
-      links.push(...(await subDirectory.loadAllLink(reload)));
+      links.push(...(await subDirectory.loadAllTransfer(reload)));
     }
     return links;
   }
@@ -365,13 +378,13 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
     }
     return operates;
   }
-  public async loadDirectoryResource() {
+  public async loadDirectoryResource(reload: boolean = false) {
     if (this.id === this.target.id) {
-      await this.resource.preLoad();
+      await this.resource.preLoad(reload);
     }
-    this.links = this.resource.transferColl.cache
+    this.transfers = this.resource.transferColl.cache
       .filter((i) => i.directoryId === this.id)
-      .map((l) => new Link(l, this));
+      .map((l) => new Transfer(l, this));
     this.forms = this.resource.formColl.cache
       .filter((i) => i.directoryId === this.id)
       .map((f) => new Form(f, this));
@@ -391,7 +404,7 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
       .filter((i) => i.parentId === this.id)
       .map((i) => {
         const subDir = new Directory(i, this.target, this);
-        subDir.loadDirectoryResource();
+        subDir.loadDirectoryResource(reload);
         return subDir;
       });
   }

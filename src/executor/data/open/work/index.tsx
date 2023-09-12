@@ -59,19 +59,14 @@ const WorkStartDo: React.FC<IProps> = ({ current, finished }) => {
           <Button
             type="primary"
             onClick={async () => {
-              let { values = {}, success = true } =
-                await apply.ruleService.resloveSubmitRules();
-              const changedForm = formData.get(apply.ruleService.currentMainFormId);
-              formData.set(apply.ruleService.currentMainFormId!, {
-                ...changedForm,
-                after: [{ ...changedForm!.after[0]!, ...values }],
-              } as any);
-              if (success) {
-                apply.createApply(apply.belong.id, info.content, formData);
-                finished();
-              } else {
-                message.warning('表单提交规则验证失败，请检查');
-              }
+              apply.ruleService.handleSubmit(formData).then(({ values, success }) => {
+                if (success) {
+                  apply.createApply(apply.belong.id, info.content, values);
+                  finished();
+                } else {
+                  message.warning('表单提交规则验证失败，请检查');
+                }
+              });
             }}>
             提交
           </Button>

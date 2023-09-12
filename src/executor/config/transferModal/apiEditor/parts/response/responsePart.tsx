@@ -1,15 +1,15 @@
-import { ILink } from '@/ts/core/thing/link';
+import { ITransfer } from '@/ts/core';
 import React from 'react';
 import MonacoEditor from '../monacor';
 
 interface IProps {
-  current: ILink;
+  transfer: ITransfer;
 }
 
-const ResponsePart: React.FC<IProps> = ({ current }) => {
+const ResponsePart: React.FC<IProps> = ({ transfer }) => {
   return (
     <MonacoEditor
-      cmd={current.command}
+      cmd={transfer.command}
       style={{ margin: 10 }}
       options={{ readOnly: true }}
     />

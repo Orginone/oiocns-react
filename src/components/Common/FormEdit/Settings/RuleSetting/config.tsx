@@ -4,7 +4,7 @@ import { ProFormColumnsType } from '@ant-design/pro-components';
 import CodeEdit from '../../../ReactCodeEdit';
 import { XAttribute, XFormRule } from '@/ts/base/schema';
 import { Input } from 'antd';
-import { ValueGoal } from '@/ts/core/work/rules/base/enum';
+import { EffectEnum, EffectEnumOption } from '@/ts/core/work/rules/base/enum';
 
 /** 规则运行类型 */
 export const trigger: { [key: string]: string } = {
@@ -18,8 +18,8 @@ export const FormRuleType: { [key: string]: string } = {
   method: '函数体', //依赖项变更时触发
 };
 
-const GoalsOpt = Object.keys(ValueGoal).map((v) => {
-  return { label: ValueGoal[v], value: v };
+const GoalsOpt = Object.keys(EffectEnum).map((v) => {
+  return { label: EffectEnumOption[v], value: v };
 });
 
 const getColumns: (

@@ -20,7 +20,7 @@ const entityMap: any = {
   办事: 'Work',
   事项配置: 'WorkConfig',
   实体配置: 'ThingConfig',
-  链接: 'Link',
+  迁移配置: 'TransferConfig',
   报表: 'Report',
 };
 

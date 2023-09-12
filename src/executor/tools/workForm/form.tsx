@@ -44,20 +44,26 @@ const FormRenders: React.FC<IProps> = (props) => {
       //TODO:默认收集选中主表id：目前未做多主表切换动态修改选中id
       props?.ruleService && (props.ruleService.currentMainFormId = form.id);
       //初始化数据
-      props?.ruleService?.setFormChangeCallback(form.id, (data: any) => {
-        const timeFormatRegex = /^\d{4}\/\d{1,2}\/\d{1,2} \d{1,2}:\d{1,2}$/;
-        //如果是时间格式需要转换
-        if (data) {
-          const keys = Object.keys(data);
-          for (const key of keys) {
-            const value = data[key];
-            if (timeFormatRegex.test(value)) {
-              data[key] = moment(value).format('YYYY-MM-DD HH:mm:ss');
+      props?.ruleService?.collectData<{ formId: string; callback: (data: any) => void }>(
+        'formCallBack',
+        {
+          formId: form.id,
+          callback: (data: any) => {
+            const timeFormatRegex = /^\d{4}\/\d{1,2}\/\d{1,2} \d{1,2}:\d{1,2}$/;
+            //如果是时间格式需要转换
+            if (data) {
+              const keys = Object.keys(data);
+              for (const key of keys) {
+                const value = data[key];
+                if (timeFormatRegex.test(value)) {
+                  data[key] = moment(value).format('YYYY-MM-DD HH:mm:ss');
+                }
+              }
+              formIns.setValues(data);
             }
-          }
-          formIns.setValues(data);
-        }
-      });
+          },
+        },
+      );
     } else {
       formIns.setValues(data);
     }

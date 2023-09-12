@@ -211,6 +211,12 @@ export const directoryOperates = {
     label: '新建存储配置',
     iconType: '存储配置',
   },
+  NewTransferConfig: {
+    sort: 10,
+    cmd: 'newTransferConfig',
+    label: '新建迁移配置',
+    iconType: '迁移配置',
+  },
 };
 
 /** 目录下新增 */
@@ -229,7 +235,7 @@ export const directoryNew = {
     directoryOperates.NewThingConfig,
     directoryOperates.NewWorkConfig,
     directoryOperates.NewReport,
-    directoryOperates.NewLink,
+    directoryOperates.NewTransferConfig,
   ],
 };
 

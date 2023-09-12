@@ -23,8 +23,8 @@ export class XCollection<T extends schema.Xbase> {
     return this._collName;
   }
 
-  async all(): Promise<T[]> {
-    if (!this._loaded) {
+  async all(reload: boolean = false): Promise<T[]> {
+    if (!this._loaded || reload) {
       this._cache = await this.load({});
       this._loaded = true;
     }
@@ -106,6 +106,9 @@ export class XCollection<T extends schema.Xbase> {
       copyId,
     );
     if (res.success) {
+      if (!Array.isArray(res.data)) {
+        res.data = [res.data as unknown as T];
+      }
       if (res.data && res.data.length > 0 && this._loaded) {
         this._cache.push(...res.data);
       }
