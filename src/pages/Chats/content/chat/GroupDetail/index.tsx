@@ -10,12 +10,9 @@ import orgCtrl from '@/ts/controller';
 import { ellipsisText } from '@/utils';
 import GroupMember from '@/pages/Chats/content/chat/GroupMember';
 
-import ActivityPublisher from '@/components/Activity/ActivityPublisher';
-import ActivityList from '@/components/Activity/ActivityList';
-import { ImCompass } from '@/icons/im';
+import Activity from '@/components/Activity';
 const GroupDetail: React.FC<any> = ({ chat }: { chat: ISession }) => {
   const [historyOpen, setHistoryOpen] = useState<boolean>(false); // 历史消息搜索
-  const [activityPublisherOpen, setActivityPublisherOpen] = useState(false);
   const history = useHistory();
   /**
    * @description: 历史消息搜索弹窗
@@ -126,58 +123,17 @@ const GroupDetail: React.FC<any> = ({ chat }: { chat: ISession }) => {
     </>
   );
 
-  const actionList = [
-    {
-      icon: <ImCompass size={20} color={'white'} />,
-      title: '发布动态',
-      type: 'primary',
-    },
-    {
-      icon: <ImCompass size={20} color={'white'} />,
-      title: '共享',
-      type: 'primary',
-    },
-    {
-      title: '交易',
-      icon: <ImCompass size={20} color={'white'} />,
-      type: 'primary',
-    },
-  ];
   return (
     <>
       <div className={detailStyle.groupDetail}>
         {header}
         <GroupMember members={chat.members}></GroupMember>
         <div className={detailStyle.groupDetailContent}>
-          <ActivityList activity={chat.activity}></ActivityList>
+          <Activity activity={chat.activity}></Activity>
           <div className={detailStyle.user_list}>
             <div className={`${detailStyle.img_list} ${detailStyle.con}`}></div>
             {operaButton}
           </div>
-        </div>
-
-        <div className={detailStyle.groupDetailActionArea}>
-          {actionList.map((item, index) => {
-            return (
-              <div
-                className={detailStyle.groupDetailActionAreaItem}
-                key={index}
-                onClick={() => {
-                  setActivityPublisherOpen(true);
-                }}>
-                <div
-                  className={
-                    detailStyle.groupDetailActionAreaItem__icon +
-                    (item.type === 'primary'
-                      ? ' ' + detailStyle.groupDetailActionAreaItem__iconActive
-                      : '')
-                  }>
-                  {item.icon}
-                </div>
-                <div>{item.title}</div>
-              </div>
-            );
-          })}
         </div>
       </div>
 
@@ -188,14 +144,6 @@ const GroupDetail: React.FC<any> = ({ chat }: { chat: ISession }) => {
         onCancel={onHistoryCancel}
         chat={chat}
       />
-      {chat.activity.allPublish && (
-        <ActivityPublisher
-          open={activityPublisherOpen}
-          activity={chat.activity}
-          finish={() => {
-            setActivityPublisherOpen(false);
-          }}></ActivityPublisher>
-      )}
     </>
   );
 };

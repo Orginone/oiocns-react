@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import cls from './index.module.less';
 import BasicTitle from '@/pages/Home/components/BaseTitle';
-import { Col, Image, Row, Space, Tag, Typography } from 'antd';
+import { Button, Col, Image, Row, Space, Tag, Typography } from 'antd';
 import { IActivity } from '@/ts/core';
 import { LikeOutlined, MessageOutlined, StarOutlined } from '@ant-design/icons';
 import { model } from '@/ts/base';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import { showChatTime } from '@/utils/tools';
+import ActivityPublisher from '@/components/Activity/ActivityPublisher';
 
-const ActivityList: React.FC<{ activity: IActivity }> = ({ activity }) => {
+const Activity: React.FC<{ activity: IActivity }> = ({ activity }) => {
   const [actionList, setActivityList] = useState(activity.activityList);
   const IconText = ({
     icon,
@@ -85,10 +86,22 @@ const ActivityList: React.FC<{ activity: IActivity }> = ({ activity }) => {
       activity.unsubscribe(id);
     };
   }, []);
+  const [activityPublisherOpen, setActivityPublisherOpen] = useState(false);
 
   return (
     <div className={cls.activityList}>
-      <BasicTitle title="动态" more="更多" onClick={() => activity.load(10)}></BasicTitle>
+      <BasicTitle
+        title="动态"
+        onClick={() => activity.load(10)}
+        left={
+          <Button
+            type="link"
+            onClick={() => {
+              activity.allPublish && setActivityPublisherOpen(true);
+            }}>
+            发布动态
+          </Button>
+        }></BasicTitle>
       <Row gutter={[16, 0]}>
         {actionList.map((item, index) => {
           return (
@@ -98,8 +111,16 @@ const ActivityList: React.FC<{ activity: IActivity }> = ({ activity }) => {
           );
         })}
       </Row>
+      {activity.allPublish && (
+        <ActivityPublisher
+          open={activityPublisherOpen}
+          activity={activity}
+          finish={() => {
+            setActivityPublisherOpen(false);
+          }}></ActivityPublisher>
+      )}
     </div>
   );
 };
 
-export default ActivityList;
+export default Activity;
