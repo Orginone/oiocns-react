@@ -7,6 +7,7 @@ import cls from './index.module.less';
 import { model, schema } from '@/ts/base';
 import { ImInfo } from '@/icons/im';
 import { RuleTriggers } from '@/ts/core/public';
+import { WorkFormRulesType } from '@/ts/core/work/rules/workFormRules';
 type IProps = {
   form: schema.XForm;
   fields: model.FieldModel[];
@@ -18,7 +19,7 @@ type IProps = {
   formRef?: any;
   disabled?: boolean;
   showTitle?: boolean;
-  ruleService?: any;
+  ruleService?: WorkFormRulesType;
 };
 /**
  * 资产共享云表单
@@ -47,11 +48,17 @@ const OioForm: React.FC<IProps> = ({
   }
   useEffect(() => {
     /* 向规则服务里，加入修改表单数值的回调方法 */
-    ruleService?.setFormChangeCallback(form.id, (data: any) => {
-      onValuesChange &&
-        onValuesChange(data, { ...formRef?.current?.getFieldsValue(), ...data });
-      formRef?.current?.setFieldsValue(data);
-    });
+    ruleService?.collectData<{ formId: string; callback: (data: any) => void }>(
+      'formCallBack',
+      {
+        formId: form.id,
+        callback: (data: any) => {
+          onValuesChange &&
+            onValuesChange(data, { ...formRef?.current?.getFieldsValue(), ...data });
+          formRef?.current?.setFieldsValue(data);
+        },
+      },
+    );
   }, [form.id]);
   return (
     <>
@@ -90,7 +97,7 @@ const OioForm: React.FC<IProps> = ({
           onFinished?.call(this, values);
         }}
         onValuesChange={(val, vals) => {
-          ruleService?.resloveFormRule(
+          ruleService?.waitingTask(
             RuleTriggers.Running,
             { id: form.id, data: vals },
             val,

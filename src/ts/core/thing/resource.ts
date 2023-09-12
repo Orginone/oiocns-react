@@ -9,7 +9,7 @@ import {
   XTarget,
   Xbase,
 } from '../../base/schema';
-import { ChatMessageType, Link } from '@/ts/base/model';
+import { ChatMessageType, Transfer } from '@/ts/base/model';
 import { kernel, model } from '@/ts/base';
 import { blobToDataUrl, encodeKey, generateUuid, sliceFile } from '@/ts/base/common';
 
@@ -22,7 +22,7 @@ export class DataResource {
     this.target = target;
     this.relations = relations;
     this.formColl = this.genTargetColl<XForm>('standard-form');
-    this.transferColl = this.genTargetColl<Link>('standrand-transfer');
+    this.transferColl = this.genTargetColl<Transfer>('standard-transfer');
     this.speciesColl = this.genTargetColl<XSpecies>('standard-species');
     this.messageColl = this.genTargetColl<ChatMessageType>('chat-messages');
     this.propertyColl = this.genTargetColl<XProperty>('standard-property');
@@ -45,17 +45,17 @@ export class DataResource {
   /** 群消息集合 */
   messageColl: XCollection<ChatMessageType>;
   /** 数据传输配置集合 */
-  transferColl: XCollection<Link>;
+  transferColl: XCollection<Transfer>;
   /** 资源预加载 */
   async preLoad(reload: boolean = false): Promise<void> {
     if (this._proLoaded === false || reload) {
       await Promise.all([
-        this.formColl.all(),
-        this.speciesColl.all(),
-        this.propertyColl.all(),
-        this.transferColl.all(),
-        this.directoryColl.all(),
-        this.applicationColl.all(),
+        this.formColl.all(reload),
+        this.speciesColl.all(reload),
+        this.propertyColl.all(reload),
+        this.transferColl.all(reload),
+        this.directoryColl.all(reload),
+        this.applicationColl.all(reload),
       ]);
     }
     this._proLoaded = true;

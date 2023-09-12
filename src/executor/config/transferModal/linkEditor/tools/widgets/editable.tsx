@@ -1,10 +1,10 @@
-import { ILink } from '@/ts/core/thing/link';
+import { ITransfer } from '@/ts/core';
 import React, { ReactNode, useEffect, useState } from 'react';
 import RequestModal from './../../../apiEditor/layout';
 import MappingModal from './../../../mapper/parts/modal';
 
 interface IProps {
-  current: ILink;
+  current: ITransfer;
 }
 
 const Editable: React.FC<IProps> = ({ current }) => {
@@ -19,8 +19,8 @@ const Editable: React.FC<IProps> = ({ current }) => {
               setCenter(
                 <RequestModal
                   finished={() => setCenter(<></>)}
-                  current={current}
-                  node={args}
+                  transfer={current}
+                  current={args}
                 />,
               );
               break;

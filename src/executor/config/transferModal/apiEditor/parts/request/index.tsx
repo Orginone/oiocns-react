@@ -1,21 +1,22 @@
+import { model } from '@/ts/base';
+import { ITransfer } from '@/ts/core';
 import { Tabs } from 'antd';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import Body from './widgets/body';
 import Headers from './widgets/headers';
 import Params from './widgets/params';
-import { ILink } from '@/ts/core/thing/link';
-import { model } from '@/ts/base';
+
 interface IProps {
-  current: ILink;
-  node: model.RequestNode;
+  transfer: ITransfer;
+  current: model.RequestNode;
 }
 
-const RequestPart: React.FC<IProps> = ({ current, node }) => {
+const RequestPart: React.FC<IProps> = ({ transfer, current }) => {
   const [curTab, setCurTab] = useState<string>('Param');
   const keys: { [key in string]: () => React.ReactNode } = {
-    Param: () => <Params current={current} node={node} />,
-    Header: () => <Headers current={current} node={node} />,
-    Body: () => <Body current={current} node={node} />,
+    Param: () => <Params transfer={transfer} current={current} />,
+    Header: () => <Headers transfer={transfer} current={current} />,
+    Body: () => <Body current={transfer} node={current} />,
   };
   return (
     <>

@@ -7,7 +7,6 @@
 // import { Button, Modal, Space } from 'antd';
 // import React, { useEffect, useState } from 'react';
 // import Mapper from './mapper';
-// import { ShareIdSet } from '@/ts/core/public/entity';
 
 // interface IProps {
 //   current: IDirectory;
@@ -60,14 +59,14 @@
 //             title: '源表单',
 //             dataIndex: 'sourceName',
 //             render: (_: any, record: IMapping) => (
-//               <EntityIcon entity={ShareIdSet.get(record.metadata.source)} showName />
+//               <EntityIcon entity={current.findMetadata(record.metadata.source)} showName />
 //             ),
 //           },
 //           {
 //             title: '目标表单',
 //             dataIndex: 'targetName',
 //             render: (_, record: IMapping) => (
-//               <EntityIcon entity={ShareIdSet.get(record.metadata.target)} showName />
+//               <EntityIcon entity={current.findMetadata(record.metadata.target)} showName />
 //             ),
 //           },
 //           {

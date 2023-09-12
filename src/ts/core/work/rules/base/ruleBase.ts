@@ -1,5 +1,5 @@
 import { RuleTypes } from '../type.d';
-import { ValueGoal } from './enum';
+import { EffectEnum } from './enum';
 /* 基础规则数据类型 */
 export interface IRuleBase {
   /* 规则主键 */
@@ -15,13 +15,7 @@ export interface IRuleBase {
   /* 规则关联特性 */
   linkAttrs: RuleTypes.AttrType[];
   /** 规则执行结果的使用方式 */
-  valueGoal?:
-    | ValueGoal.主表赋值
-    | ValueGoal.子表赋值
-    | ValueGoal.校验主表数据
-    | ValueGoal.校验子表数据
-    | ValueGoal.修改主表展示方案
-    | ValueGoal.限制子表编辑功能;
+  effect?: keyof typeof EffectEnum;
   /* 关联项最大数量 */
   max?: number;
   /* 规则是否可扩展关联项 即增加关联数量*/
@@ -49,13 +43,7 @@ abstract class RuleBase implements IRuleBase {
   /* 规则支持的数据类型 */
   accept: RuleTypes.AcceptedType[] = [];
   /* 返回值效果 */
-  valueGoal:
-    | ValueGoal.主表赋值
-    | ValueGoal.子表赋值
-    | ValueGoal.校验主表数据
-    | ValueGoal.校验子表数据
-    | ValueGoal.修改主表展示方案
-    | ValueGoal.限制子表编辑功能 = ValueGoal.主表赋值;
+  effect?: keyof typeof EffectEnum;
   /* 规则关联特性 */
   linkAttrs: any[] = [];
   /* 关联项最大数量 */
@@ -81,11 +69,6 @@ abstract class RuleBase implements IRuleBase {
    * @return {} 返回处理结果 {【表单key】：value}
    */
   abstract dealRule(formData: { [key: string]: any }): Promise<any>;
-
-  // /**
-  //  * @desc 加载外部规则库文件/模板规则
-  //  */
-  // abstract loadRemoteRules(): void;
 }
 
 export default RuleBase;

@@ -1,4 +1,4 @@
-import { ILink } from '@/ts/core/thing/link';
+import { ITransfer } from '@/ts/core';
 import { Basecoat, Graph, Path, Platform } from '@antv/x6';
 import { Selection } from '@antv/x6-plugin-selection';
 import { register } from '@antv/x6-react-shape';
@@ -155,9 +155,9 @@ const using = (graph: Graph) => {
 /** 临时存储插件 */
 export class LinkStore extends Basecoat<{}> implements Graph.Plugin {
   name: string;
-  link: ILink;
+  link: ITransfer;
 
-  constructor(link: ILink) {
+  constructor(link: ITransfer) {
     super();
     this.name = 'LinkStore';
     this.link = link;

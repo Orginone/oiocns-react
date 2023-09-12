@@ -1,12 +1,12 @@
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import { model } from '@/ts/base';
+import { ITransfer } from '@/ts/core';
 import {
-  ILink,
   getDefaultLinkNode,
   getDefaultMappingNode,
   getDefaultRequestNode,
   getDefaultStoreNode,
-} from '@/ts/core/thing/link';
+} from '@/ts/core/thing/standard/transfer';
 import { Graph } from '@antv/x6';
 import { Dnd } from '@antv/x6-plugin-dnd';
 import { Space } from 'antd';
@@ -15,7 +15,7 @@ import { createNode } from '../../graph/widgets/node';
 import cls from './../../index.module.less';
 
 interface IProps {
-  current: ILink;
+  current: ITransfer;
 }
 
 const Nodes: React.FC<IProps> = ({ current }) => {

@@ -1,4 +1,4 @@
-import { ILink } from '@/ts/core/thing/link';
+import { ITransfer } from '@/ts/core';
 import React from 'react';
 import GraphTools from './widgets/graphTools';
 import Nodes from './widgets/nodes';
@@ -8,7 +8,7 @@ import Settings from './widgets/settings';
 import Editable from './widgets/editable';
 
 interface IProps {
-  current: ILink;
+  current: ITransfer;
 }
 
 export const ToolBar: React.FC<IProps> = ({ current }) => {

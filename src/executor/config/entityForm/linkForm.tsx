@@ -1,24 +1,24 @@
 import SchemaForm from '@/components/SchemaForm';
-import { Link } from '@/ts/base/model';
+import { Transfer } from '@/ts/base/model';
 import { IDirectory } from '@/ts/core';
-import { ILink } from '@/ts/core/';
+import { ITransfer } from '@/ts/core/';
 import { ProFormColumnsType } from '@ant-design/pro-components';
 import React from 'react';
 
 interface IProps {
   formType: string;
-  current: IDirectory | ILink;
-  finished: (link?: ILink) => void;
+  current: IDirectory | ITransfer;
+  finished: (link?: ITransfer) => void;
 }
 
-const LinkModal: React.FC<IProps> = ({ formType, current, finished }) => {
+const TransferForm: React.FC<IProps> = ({ formType, current, finished }) => {
   let initialValue = {};
   switch (formType) {
-    case 'updateLink':
+    case 'updateTransferConfig':
       initialValue = current.metadata;
       break;
   }
-  const columns: ProFormColumnsType<Link>[] = [
+  const columns: ProFormColumnsType<Transfer>[] = [
     {
       title: '名称',
       dataIndex: 'name',
@@ -44,7 +44,7 @@ const LinkModal: React.FC<IProps> = ({ formType, current, finished }) => {
     },
   ];
   return (
-    <SchemaForm<Link>
+    <SchemaForm<Transfer>
       open
       title="链接定义"
       width={640}
@@ -61,15 +61,15 @@ const LinkModal: React.FC<IProps> = ({ formType, current, finished }) => {
       }}
       onFinish={async (values) => {
         switch (formType) {
-          case 'newLink': {
-            values.typeName = '链接';
+          case 'newTransferConfig': {
+            values.typeName = '迁移配置';
             let directory = current as IDirectory;
-            let request = await directory.createLink(values);
-            finished(request as ILink);
+            let request = await directory.createTransfer(values);
+            finished(request as ITransfer);
             break;
           }
-          case 'updateLink': {
-            let link = current as ILink;
+          case 'updateTransferConfig': {
+            let link = current as ITransfer;
             link.refresh({ ...initialValue, ...values });
             finished(link);
             break;
@@ -80,4 +80,4 @@ const LinkModal: React.FC<IProps> = ({ formType, current, finished }) => {
   );
 };
 
-export default LinkModal;
+export default TransferForm;

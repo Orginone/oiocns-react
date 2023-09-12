@@ -2,14 +2,13 @@ import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import { model } from '@/ts/base';
 import { XAttribute, XSpeciesItem } from '@/ts/base/schema';
 import { IDirectory, IForm, ISpecies } from '@/ts/core';
-import { ShareSet } from '@/ts/core/public/entity';
-import { ILink } from '@/ts/core/thing/link';
+import { ITransfer } from '@/ts/core';
 import { Button, Col, Modal, Row, Space, Tag, TreeSelect, message } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import { defaultGenLabel, expand } from '../..';
 import cls from './../index.module.less';
 interface IProps {
-  link: ILink;
+  link: ITransfer;
   current: model.MappingNode;
 }
 

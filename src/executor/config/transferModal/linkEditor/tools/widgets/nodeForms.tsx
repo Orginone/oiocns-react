@@ -1,4 +1,4 @@
-import { ILink } from '@/ts/core/thing/link';
+import { ITransfer } from '@/ts/core';
 import { Modal } from 'antd';
 import React from 'react';
 import { useState, useEffect } from 'react';
@@ -6,7 +6,7 @@ import * as forms from '../../forms';
 import { generateUuid } from '@/ts/base/common';
 
 interface IProps {
-  current: ILink;
+  current: ITransfer;
 }
 
 const NodeForms: React.FC<IProps> = ({ current }) => {
@@ -104,8 +104,6 @@ const NodeForms: React.FC<IProps> = ({ current }) => {
                 }}
               />
             );
-          default:
-            return <></>;
         }
       })}
     </>

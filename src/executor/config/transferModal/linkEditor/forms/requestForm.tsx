@@ -1,16 +1,16 @@
 import SchemaForm from '@/components/SchemaForm';
-import { ILink } from '@/ts/core/thing/link';
+import { ITransfer } from '@/ts/core';
 import { ProFormColumnsType } from '@ant-design/pro-components';
 import React from 'react';
 import { model } from '../../../../../ts/base';
 
 interface IProps {
-  link: ILink;
+  link: ITransfer;
   current: model.RequestNode;
   finished: () => void;
 }
 
-const RequestForm: React.FC<IProps> = ({ link, current, finished }) => {
+export const RequestForm: React.FC<IProps> = ({ link, current, finished }) => {
   const columns: ProFormColumnsType<model.RequestNode>[] = [
     {
       title: '名称',
@@ -18,6 +18,16 @@ const RequestForm: React.FC<IProps> = ({ link, current, finished }) => {
       formItemProps: {
         rules: [{ required: true, message: '名称为必填项' }],
       },
+    },
+    {
+      title: '前置脚本',
+      dataIndex: 'preScripts',
+      valueType: 'select',
+    },
+    {
+      title: '后置脚本',
+      dataIndex: 'postScripts',
+      valueType: 'select',
     },
     {
       title: '备注',
@@ -46,11 +56,8 @@ const RequestForm: React.FC<IProps> = ({ link, current, finished }) => {
       onFinish={async (values) => {
         const node = { ...current, ...values };
         await link.updNode(node);
-        link.command.emitter('node', 'update', node);
         finished();
       }}
     />
   );
 };
-
-export default RequestForm;
