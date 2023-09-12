@@ -50,21 +50,23 @@ const HotTableView: React.FC<IProps> = ({
     }
   };
   const hotRef: any = useRef(null);
-  let mergeCells = selectItem?.data?.setting?.mergeCells || [];
+  let sheetList = current.metadata?.rule ? JSON.parse(current.metadata?.rule) : [];
+  let sheetIndex = sheetList.findIndex((it: any) => it.code === selectItem.code);
+  let mergeCells = sheetList[sheetIndex]?.data?.setting?.mergeCells || [];
 
   useEffect(() => {
     const hot = hotRef.current.hotInstance;
-    setCells(selectItem?.data?.setting?.cells || []);
-    setStyleList(selectItem?.data?.setting?.styleList || []);
-    setClassList(selectItem?.data?.setting?.classList || []);
-    setRowHeights(selectItem?.data?.setting?.row_h || []);
-    setColWidths(selectItem?.data?.setting?.col_w || []);
+    setCells(sheetList[sheetIndex]?.data?.setting?.cells || []);
+    setStyleList(sheetList[sheetIndex]?.data?.setting?.styleList || []);
+    setClassList(sheetList[sheetIndex]?.data?.setting?.classList || []);
+    setRowHeights(sheetList[sheetIndex]?.data?.setting?.row_h || []);
+    setColWidths(sheetList[sheetIndex]?.data?.setting?.col_w || []);
     hot.updateSettings({
-      data: selectItem?.data?.data,
+      data: sheetList[sheetIndex]?.data?.data,
       cell: cells,
       mergeCells: mergeCells,
     });
-  }, [selectItem]);
+  }, []);
 
   styleList?.forEach((item: any) => {
     hotRef.current.hotInstance.getCellMeta(item.row, item.col).renderer =
@@ -219,10 +221,10 @@ const HotTableView: React.FC<IProps> = ({
         // cellList:cellData
       },
     };
-    selectItem.data = json;
+    sheetList[sheetIndex].data = json;
     await current.update({
       ...current.metadata,
-      rule: JSON.stringify(selectItem),
+      rule: JSON.stringify(sheetList),
     });
   };
 

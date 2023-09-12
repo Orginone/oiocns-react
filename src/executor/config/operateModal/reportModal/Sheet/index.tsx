@@ -4,7 +4,6 @@ import useObjectUpdate from '@/hooks/useObjectUpdate';
 import { ProColumns } from '@ant-design/pro-components';
 import SchemaForm from '@/components/SchemaForm';
 import ReportView from '@/components/Common/ReportDesign';
-import { schema } from '@/ts/base';
 import { IForm } from '@/ts/core';
 
 interface IProps {
@@ -24,9 +23,7 @@ const Sheet = ({ current, modalType, setModalType }: IProps) => {
   const [selectedItem, setSelectedItem] = useState<any>();
   let newRules = current.metadata?.rule ? JSON.parse(current.metadata?.rule) : {};
   delete newRules?.list;
-  let sheetList: any = []
-  sheetList.push(newRules)
-  // let sheetList: any = Object.values(newRules);
+  let sheetList: any = Object.values(newRules);
 
   // 操作内容渲染函数
   const renderOperate = (item: any) => {
@@ -48,11 +45,9 @@ const Sheet = ({ current, modalType, setModalType }: IProps) => {
           });
           sheetList.splice(index, 1);
           await current.update({
-            id: current.id,
-            name: current.name,
-            code: current.code,
+            ...current.metadata,
             rule: JSON.stringify(sheetList),
-          } as schema.XForm);
+          });
           tforceUpdate();
         },
       },
@@ -126,11 +121,9 @@ const Sheet = ({ current, modalType, setModalType }: IProps) => {
           onFinish={async (values) => {
             sheetList = [...sheetList, values];
             await current.update({
-              id: current.id,
-              name: current.name,
-              code: current.code,
+              ...current.metadata,
               rule: JSON.stringify(sheetList),
-            } as schema.XForm);
+            });
             setModalType('');
             tforceUpdate();
           }}></SchemaForm>

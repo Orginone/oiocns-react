@@ -61,16 +61,14 @@ const ReportModal: React.FC<IProps> = ({ current, finished }: IProps) => {
         />
       );
     }
-    if (tabKey === 'rules') {
-      return (
-        <FormRules
-          current={current}
-          setModalType={setModalType}
-          modalType={modalType}
-          recursionOrg={false}
-        />
-      )
-    }
+    return (
+      <FormRules
+        current={current}
+        setModalType={setModalType}
+        modalType={modalType}
+        recursionOrg={false}
+      />
+    )
   };
 
   return (

@@ -40,11 +40,9 @@ const ReportForms: React.FC<IProps> = (props) => {
   );
   const [readOnly, setReadOnly] = useState<boolean>(false);
   const hotRef: any = useRef(null);
-  // let sheetList: any = reportData?.rule
-  //   ? Object.values(JSON.parse(reportData?.rule))
-  //   : [];
-  let sheetList: any = [] //数据结构有点出错 还再修改 先这样代替
-  sheetList.push(JSON.parse(reportData?.rule))
+  let sheetList: any = reportData?.rule
+    ? Object.values(JSON.parse(reportData?.rule))
+    : [];
   let datas = sheetList[sheetIndex]?.data?.data || [[]];
   let setting = sheetList[sheetIndex]?.data?.setting || {};
   let mergeCells = setting?.mergeCells || [];
