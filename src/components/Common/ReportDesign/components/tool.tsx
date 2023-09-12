@@ -524,7 +524,7 @@ const ToolBar: React.FC<IProps> = ({ handClick }: IProps) => {
             </div>
           </div>
           <div className={cls['column-divider']}></div>
-          <div className={cls['column-three']}>
+          {/* <div className={cls['column-three']}>
             <div className={cls['row-one']}>
               <a className={cls['icon-action']} title="合并居中" onClick={mergeAndCenter}>
                 <span>合并居中</span>
@@ -538,11 +538,11 @@ const ToolBar: React.FC<IProps> = ({ handClick }: IProps) => {
                 <span>拆分单元格</span>
               </a>
             </div>
-          </div>
+          </div> */}
         </div>
         <div className={cls['flex-box-title']}>对齐方式</div>
       </div>
-      <div className={cls['flex-box']}>
+      {/* <div className={cls['flex-box']}>
         <div className={cls['row-one']}>
           <Select defaultValue="求和" style={{ width: 100 }} onChange={handleChange}>
             {formulasTypes.map((item: any) => {
@@ -556,7 +556,7 @@ const ToolBar: React.FC<IProps> = ({ handClick }: IProps) => {
         </div>
         <div className={cls['row-two']}></div>
         <div className={cls['flex-box-title']}>公式</div>
-      </div>
+      </div> */}
     </div>
   );
 };

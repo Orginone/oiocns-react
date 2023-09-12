@@ -4,6 +4,7 @@ import SchemaForm from '@/components/SchemaForm';
 import { IDirectory, valueTypes, IProperty } from '@/ts/core';
 import { EntityColumns } from './entityColumns';
 import { schema } from '@/ts/base';
+import { Input, Modal, Form } from 'antd';
 
 interface Iprops {
   formType: string;
@@ -145,23 +146,27 @@ const PropertyForm = (props: Iprops) => {
     return columns;
   };
   return (
-    <SchemaForm<schema.XProperty>
-      open
-      title={title}
-      width={640}
-      formRef={formRef}
-      columns={getFromColumns()}
-      initialValues={initialValue}
-      rowProps={{
-        gutter: [24, 0],
-      }}
-      layoutType="ModalForm"
-      onOpenChange={(open: boolean) => {
-        if (!open) {
-          props.finished();
-        }
-      }}
-      ></SchemaForm>
+    <div>
+      <SchemaForm<schema.XProperty>
+        open
+        title={title}
+        width={640}
+        formRef={formRef}
+        columns={getFromColumns()}
+        initialValues={initialValue}
+        rowProps={{
+          gutter: [24, 0],
+        }}
+        layoutType="ModalForm"
+        onOpenChange={(open: boolean) => {
+          if (!open) {
+            props.finished();
+          }
+        }}
+        onFinish={() => {
+          
+        }}
+        ></SchemaForm>
       {isModalOpen && (
         <Modal
           open

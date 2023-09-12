@@ -1,5 +1,5 @@
 .dept-content-box {
-  background-color: #eff4f9;
+  background-color: #ffffff;
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -36,6 +36,7 @@
 }
 .pages-wrap {
   flex: 1;
+  height: calc(100% - 260px);
   .page-content-table {
     :global {
       .ogo-card.ogo-card-bordered.ogo-card-contain-tabs {
@@ -65,5 +66,12 @@
     display: flex;
     flex-direction: column;
     height: 100%;
+  }
+  .pages-wrap-left{
+    width: 60%;
+    border-right: 1px solid #eff4f9;
+  }
+  .pages-wrap-right{
+    width: 40%;
   }
 }

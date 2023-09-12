@@ -24,7 +24,9 @@ const Sheet = ({ current, modalType, setModalType }: IProps) => {
   const [selectedItem, setSelectedItem] = useState<any>();
   let newRules = current.metadata?.rule ? JSON.parse(current.metadata?.rule) : {};
   delete newRules?.list;
-  let sheetList: any = Object.values(newRules);
+  let sheetList: any = []
+  sheetList.push(newRules)
+  // let sheetList: any = Object.values(newRules);
 
   // 操作内容渲染函数
   const renderOperate = (item: any) => {

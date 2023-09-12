@@ -29,8 +29,6 @@ const OperateModal: React.FC<IProps> = ({ cmd, entity, finished }) => {
         case '事项配置':
         case '实体配置':
           return <LabelsModal finished={finished} current={entity as any} />;
-        case '报表':
-          return <ReportModal finished={finished} current={entity as any} />;
         case '办事':
           return <WorkModal finished={finished} current={entity as any} />;
         case '字典':

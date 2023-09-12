@@ -12,12 +12,10 @@ interface IProps {
 }
 
 const ReportView: React.FC<IProps> = ({ current, selectItem, finished }) => {
-  console.log(selectItem, 'selectItem');
   const [reportChange, setReportChange] = useState<any>();
   const [changeType, setChangeType] = useState<string>('');
   const [classType, setClassType] = useState<string>('');
   const handClick = (value: any, type: string, classType: string) => {
-    // console.log(value, type, classType)
     setReportChange(value);
     setChangeType(type);
     setClassType(classType);

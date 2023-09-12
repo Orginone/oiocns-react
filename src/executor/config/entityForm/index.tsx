@@ -9,7 +9,6 @@ import SpeciesForm from './speciesForm';
 import PropertyForm from './propertyForm';
 import TargetForm from './targetForm';
 import LabelsForm from './labelsForm';
-import LabelsReport from './labelsReport';
 import RenameForm from './renameForm';
 import LinkForm from './linkForm';
 interface IProps {
@@ -75,18 +74,13 @@ const EntityForm: React.FC<IProps> = ({ cmd, entity, finished }) => {
     case 'newThingConfig':
     case 'updateThingConfig':
     case 'remarkThingConfig':
+    case 'newReport':
+    case 'updateReport':
+    case 'remarkReport':
       return (
         <LabelsForm
-          formType={cmd.replace('WorkConfig', '').replace('ThingConfig', '')}
-          typeName={cmd.includes('WorkConfig') ? '事项配置' : '实体配置'}
-          current={entity as any}
-          finished={reloadFinish}
-        />
-      );
-    case 'newReport':
-      return (
-        <LabelsReport
-          formType={cmd.replace('Report', '')}
+          formType={cmd.replace('WorkConfig', '').replace('ThingConfig', '').replace('Report','')}
+          typeName={cmd.includes('WorkConfig') ? '事项配置' : cmd.includes('ThingConfig') ? '实体配置' : '报表'}
           current={entity as any}
           finished={reloadFinish}
         />

@@ -40,9 +40,11 @@ const ReportForms: React.FC<IProps> = (props) => {
   );
   const [readOnly, setReadOnly] = useState<boolean>(false);
   const hotRef: any = useRef(null);
-  let sheetList: any = reportData?.rule
-    ? Object.values(JSON.parse(reportData?.rule))
-    : [];
+  // let sheetList: any = reportData?.rule
+  //   ? Object.values(JSON.parse(reportData?.rule))
+  //   : [];
+  let sheetList: any = [] //数据结构有点出错 还再修改 先这样代替
+  sheetList.push(JSON.parse(reportData?.rule))
   let datas = sheetList[sheetIndex]?.data?.data || [[]];
   let setting = sheetList[sheetIndex]?.data?.setting || {};
   let mergeCells = setting?.mergeCells || [];
@@ -184,11 +186,13 @@ const ReportForms: React.FC<IProps> = (props) => {
   });
 
   cells?.forEach((item: any) => {
-    Object.keys(serviceData).map((k) => {
-      if (item.prop.id === k) {
-        hotRef.current.hotInstance.setDataAtCell([[item.row, item.col, serviceData[k]]]);
-      }
-    });
+    if (serviceData) {
+      Object.keys(serviceData).map((k) => {
+        if (item.prop.id === k) {
+          hotRef.current.hotInstance.setDataAtCell([[item.row, item.col, serviceData[k]]]);
+        }
+      });
+    }
     //渲染单元格颜色
     hotRef.current.hotInstance.getCellMeta(item.row, item.col).renderer =
       'customStylesRenderer';

@@ -11,12 +11,11 @@ import 'handsontable/dist/handsontable.min.css';
 import SelectPropertys from '../../SelectPropertys';
 import AttributeConfig from '../../FormDesign/attributeConfig';
 import { AttributeModel } from '@/ts/base/model';
-import { IReport } from '@/ts/core';
+import { IForm } from '@/ts/core';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import { XAttribute } from '@/ts/base/schema';
-import { model } from '@/ts/base';
 interface IProps {
-  current: IReport;
+  current: IForm;
   selectItem: any;
   reportChange: any;
   changeType: string;
@@ -222,11 +221,9 @@ const HotTableView: React.FC<IProps> = ({
     };
     selectItem.data = json;
     await current.update({
-      id: current.id,
-      name: current.name,
-      code: current.code,
+      ...current.metadata,
       rule: JSON.stringify(selectItem),
-    } as model.FormModel);
+    });
   };
 
   if (changeType == 'onSave') {
@@ -330,7 +327,7 @@ const HotTableView: React.FC<IProps> = ({
         colWidths={colWidths}
         rowHeights={rowHeights}
         dropdownMenu={true}
-        height="700px"
+        height="680px"
         language={zhCN.languageCode}
         stretchH="all"
         manualColumnResize={true}

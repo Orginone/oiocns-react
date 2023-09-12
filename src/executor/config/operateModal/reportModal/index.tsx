@@ -2,7 +2,7 @@ import { Button } from 'antd';
 import React, { useState } from 'react';
 import cls from './index.module.less';
 import PageCard from '@/components/PageCard';
-import Attribute from './Attritube';
+import Attribute from '../labelsModal/Attritube';
 import Sheet from './Sheet';
 import FormRules from '../labelsModal/formRules';
 import { IForm } from '@/ts/core';
@@ -43,7 +43,7 @@ const ReportModal: React.FC<IProps> = ({ current, finished }: IProps) => {
     if (tabKey === 'attr') {
       return (
         <Attribute
-          current={current} // IReport 目前不适用特性属性
+          current={current}
           modalType={modalType}
           recursionOrg={true}
           setModalType={setModalType}
@@ -61,14 +61,16 @@ const ReportModal: React.FC<IProps> = ({ current, finished }: IProps) => {
         />
       );
     }
-    return (
-      <FormRules
-        current={current}
-        setModalType={setModalType}
-        modalType={modalType}
-        recursionOrg={false}
-      />
-    );
+    if (tabKey === 'rules') {
+      return (
+        <FormRules
+          current={current}
+          setModalType={setModalType}
+          modalType={modalType}
+          recursionOrg={false}
+        />
+      )
+    }
   };
 
   return (
