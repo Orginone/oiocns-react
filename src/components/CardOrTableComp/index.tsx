@@ -61,7 +61,6 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
   request,
   ...rest
 }) => {
-  const [segment, setSegment] = useStorage('segment', 'list');
   const [defaultHeight, setDefaultHeight] = useState<number | 'auto'>('auto'); //计算高度
 
   // 监听父级高度
@@ -105,41 +104,6 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
     return result;
   }, [columns, operation]);
 
-  /**
-   * @desc: 自定义表格 底部区域
-   * @return {底部组件}
-   */
-  const TableFooter = (
-    <div className={cls['common-table-footer']} key="pagetype">
-      {/* 切换展示形式 */}
-      {showChangeBtn && (
-        <Segmented
-          value={segment}
-          onChange={(value) => setSegment(value as 'Kanban' | 'List')}
-          options={[
-            {
-              value: 'List',
-              icon: (
-                <fa.FaTable
-                  fontSize={20}
-                  color={segment === 'List' ? 'blue' : '#9498df'}
-                />
-              ),
-            },
-            {
-              value: 'Kanban',
-              icon: (
-                <fa.FaTh
-                  fontSize={20}
-                  color={segment === 'Kanban' ? 'blue' : '#9498df'}
-                />
-              ),
-            },
-          ]}
-        />
-      )}
-    </div>
-  );
 
   // 表格主体 卡片与表格切换功能--增加缓存
   const renderTable = useMemo(() => {
@@ -197,41 +161,7 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
           }
         }}
         tableRender={(props: any, defaultDom, { toolbar }) => {
-          return segment === 'List' ? (
-            !showChangeBtn ||
-            !props.action.dataSource ||
-            props.action.dataSource.length === 0 ? (
-              defaultDom
-            ) : (
-              <div>
-                {defaultDom}
-                {TableFooter}
-              </div>
-            )
-          ) : (
-            <>
-              {toolbar}
-              <div
-                className={cls['common-card']}
-                style={{
-                  minHeight: 150,
-                  height:
-                    defaultHeight !== 'auto' ? defaultHeight + 40 + 'px' : defaultHeight,
-                }}>
-                {renderCardContent ? (
-                  renderCardContent(props.action.dataSource)
-                ) : (
-                  <Result subTitle="暂无卡片配置"></Result>
-                )}
-              </div>
-              <div style={{ height: 64 }}></div>
-              {TableFooter}
-              <Pagination
-                {...props.pagination}
-                style={{ float: 'right', marginTop: -28 }}
-              />
-            </>
-          );
+          return <div>{defaultDom}</div>;
         }}
         rowClassName={
           stripe
@@ -243,7 +173,7 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
         {...rest}
       />
     );
-  }, [segment, dataSource, resetColumns, defaultHeight]);
+  }, [dataSource, resetColumns, defaultHeight]);
 
   return (
     <div className={cls['common-table-wrap']} style={style}>
