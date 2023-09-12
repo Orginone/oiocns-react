@@ -288,7 +288,7 @@ const HotTableView: React.FC<IProps> = ({
   };
 
   const afterOnCellMouseDown = (event: any, coords: any, TD: any) => {
-    // console.log(event, coords, TD)
+    // 点击单元格
     cells?.forEach((item: any) => {
       if (item.row === coords.row && item.col === coords.col) {
         setModalType('配置特性');
