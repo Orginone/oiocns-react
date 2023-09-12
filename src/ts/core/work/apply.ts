@@ -29,7 +29,7 @@ export class WorkApply implements IWorkApply {
     this.metadata = _metadata;
     this.instanceData = _data;
     this.belong = _belong;
-    WorkFormRules.initFormRules(_forms, _belong);
+    WorkFormRules.initRules(_forms, _belong);
     this.ruleService = WorkFormRules as any;
     //TODO:尝试在此处，执行规则初始化操作 修改instanceData
   }
@@ -44,9 +44,7 @@ export class WorkApply implements IWorkApply {
   ): Promise<boolean> {
     fromData.forEach((data, k) => {
       const { after, before, createTime, creator, nodeId } = data;
-      const params = { after, before, createTime, creator, nodeId };
-
-      this.instanceData.data[k] = [params];
+      this.instanceData.data[k] = [{ after, before, createTime, creator, nodeId }];
     });
 
     const res = await kernel.createWorkInstance({
