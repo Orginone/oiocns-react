@@ -5,6 +5,7 @@ import cls from './index.module.less';
 const BasicTitle: React.FC<{
   title: string;
   more?: string;
+  left?: React.ReactNode;
   onClick?: Function;
 }> = (props) => {
   return (
@@ -15,6 +16,7 @@ const BasicTitle: React.FC<{
           更多
         </Typography.Link>
       )}
+      {props.left}
     </div>
   );
 };
