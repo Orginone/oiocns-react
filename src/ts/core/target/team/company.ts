@@ -233,7 +233,7 @@ export class Company extends Belong implements ICompany {
       await this.loadDepartments(reload),
       await this.loadMembers(reload),
       await this.loadSuperAuth(reload),
-      await this.directory.loadDirectoryResource(),
+      await this.directory.loadDirectoryResource(reload),
     ]);
     await Promise.all(
       this.groups.map(async (group) => {

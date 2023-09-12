@@ -133,7 +133,8 @@ export class Message implements IMessage {
     if (this._chat.metadata.typeName === TargetType.Person) {
       return ids.length === 1 ? '已读' : '未读';
     }
-    const mCount = this._chat.members.filter((i) => i.id != this.user.id).length || 1;
+    const mCount =
+      this._chat.members.filter((i) => i.id != this.metadata.fromId).length || 1;
     if (ids.length === mCount) {
       return '全部已读';
     }

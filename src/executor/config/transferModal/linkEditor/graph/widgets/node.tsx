@@ -1,6 +1,5 @@
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import { model } from '@/ts/base';
-import { ShareIdSet } from '@/ts/core/public/entity';
 import {
   CheckCircleOutlined,
   CloseCircleOutlined,
@@ -14,6 +13,7 @@ import { MenuItemType } from 'typings/globelType';
 import cls from './../../index.module.less';
 import { generateEdge } from './edge';
 import { LinkStore } from './graph';
+import { XTarget } from '@/ts/base/schema';
 
 /**
  * 根据起点初始下游节点的位置信息
@@ -116,9 +116,9 @@ export const createDownstream = (graph: Graph, node: Node, data: model.Node<any>
 
 const menus: { [key: string]: MenuItemType } = {
   open: {
-    key: 'open',
-    label: '编辑',
-    itemType: '编辑',
+    key: 'edit',
+    label: '打开',
+    itemType: '打开',
     children: [],
   },
   update: {
@@ -274,7 +274,7 @@ export const ProcessingNode: React.FC<Info> = ({ node, graph }) => {
           {entity.typeName}
         </div>
         <div className={`${cls['tag-item']} ${cls['text-overflow']}`}>
-          {ShareIdSet.get(link?.metadata.belongId ?? '')?.name ?? '归属'}
+          {link?.findMetadata<XTarget>(link?.metadata.belongId ?? '')?.name ?? '归属'}
         </div>
       </div>
     );
@@ -299,7 +299,7 @@ export const ProcessingNode: React.FC<Info> = ({ node, graph }) => {
                 className={`${cls['item']}`}
                 onClick={(e) => {
                   e.stopPropagation();
-                  link?.command.emitter('entity', item.key, { entity });
+                  link?.command.emitter('tools', item.key, entity);
                   setVisibleMenu(false);
                 }}>
                 {item.label}

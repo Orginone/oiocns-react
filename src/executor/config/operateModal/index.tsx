@@ -8,6 +8,7 @@ import WorkModal from './workModal';
 import orgCtrl from '@/ts/controller';
 import LabelsModal from './labelsModal';
 import ReportModal from './reportModal';
+import LinkModal from '../transferModal/linkEditor';
 interface IProps {
   cmd: string;
   entity: IEntity<schema.XEntity>;
@@ -31,6 +32,8 @@ const OperateModal: React.FC<IProps> = ({ cmd, entity, finished }) => {
           return <LabelsModal finished={finished} current={entity as any} />;
         case '报表':
           return <ReportModal finished={finished} current={entity as any} />;
+        case '迁移配置':
+          return <LinkModal finished={finished} current={entity as any} />;
         case '办事':
           return <WorkModal finished={finished} current={entity as any} />;
         case '字典':

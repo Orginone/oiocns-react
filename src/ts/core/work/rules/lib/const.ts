@@ -8,5 +8,10 @@ const FixedCharacters = [
   '「系统时间」',
   '「」',
 ];
+// 定义规则类型常量
+const RuleType = {
+  FORMULA: 'formula',
+  METHOD: 'method',
+};
 
-export { FixedCharacters };
+export { FixedCharacters, RuleType };

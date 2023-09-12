@@ -64,12 +64,12 @@ const PropertyConfig = (props: IProps) => {
           onClick={async () => {
             if (props.modalType === '复制属性') {
               if (props.attr.property) {
-                const property = await (selectedItem as IDirectory).createProperty({
+                const data = await (selectedItem as IDirectory).createProperty({
                   ...props.attr.property,
                   sourceId: props.attr.belongId,
                 });
-                if (property) {
-                  await props.form.updateAttribute(props.attr, property.metadata);
+                if (data) {
+                  await props.form.updateAttribute(props.attr, data);
                 }
               }
             } else {

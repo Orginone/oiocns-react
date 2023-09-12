@@ -150,7 +150,6 @@ const OioFormItem = ({
     switch (fileType) {
       case '.pdf':
         return defaultFilsUrl[0];
-
       case '.doc':
       case '.docx':
         return defaultFilsUrl[1];

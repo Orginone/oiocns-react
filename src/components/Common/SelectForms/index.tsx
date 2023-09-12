@@ -53,9 +53,7 @@ const SelectForms: React.FC<IProps> = ({ belong, typeName, selected, setSelected
 
   const buildTargetWorkThingTree = (targets: ITarget[]): any[] => {
     const result: any[] = [];
-    for (const target of targets.filter(
-      (a) => a.belongId == belong.id && a.id != belong.id,
-    )) {
+    for (const target of targets.filter((a) => a.belongId == belong.id)) {
       result.push({
         key: target.directory.id,
         title: target.directory.name,
@@ -105,19 +103,7 @@ const SelectForms: React.FC<IProps> = ({ belong, typeName, selected, setSelected
               checkable={false}
               autoExpandParent={true}
               onSelect={onSelect}
-              treeData={[
-                {
-                  key: belong.directory.id,
-                  title: belong.directory.name,
-                  value: belong.directory.id,
-                  item: belong.directory,
-                  children: [
-                    ...buildTargetWorkThingTree(belong.shareTarget),
-                    ...buildTargetWorkThingTree(belong.subTarget),
-                    ...buildWorkThingTree(belong.directory.children),
-                  ],
-                },
-              ]}
+              treeData={buildTargetWorkThingTree(belong.shareTarget)}
             />
           </div>
         </div>

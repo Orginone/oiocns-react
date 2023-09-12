@@ -656,20 +656,6 @@ export default class KernelApi {
     });
   }
   /**
-   * 查询审批记录
-   * @param {model.IdPageModel} params 请求参数
-   * @returns {model.ResultType<model.PageResult<schema.XWorkRecord>>} 请求结果
-   */
-  public async queryWorkRecord(
-    params: model.IdPageModel,
-  ): Promise<model.ResultType<model.PageResult<schema.XWorkRecord>>> {
-    return await this.request({
-      module: 'work',
-      action: 'QueryWorkRecord',
-      params: params,
-    });
-  }
-  /**
    * 办事节点审批
    * @param {model.ApprovalTaskReq} params 请求参数
    * @returns {model.ResultType<boolean>} 请求结果
@@ -680,34 +666,6 @@ export default class KernelApi {
     return await this.request({
       module: 'work',
       action: 'ApprovalTask',
-      params: params,
-    });
-  }
-  /**
-   * 查询办事实例
-   * @param {model.IdModel} params 请求参数
-   * @returns {model.ResultType<schema.XWorkInstance>} 请求结果
-   */
-  public async queryWorkInstanceById(
-    params: model.IdModel,
-  ): Promise<model.ResultType<schema.XWorkInstance>> {
-    return await this.request({
-      module: 'work',
-      action: 'QueryWorkInstanceById',
-      params: params,
-    });
-  }
-  /**
-   * 查询我的申请
-   * @param {model.IdPageModel} params 请求参数
-   * @returns {model.ResultType<model.PageResult<schema.XWorkTask>>} 请求结果
-   */
-  public async queryMyApply(
-    params: model.IdPageModel,
-  ): Promise<model.ResultType<model.PageResult<schema.XWorkTask>>> {
-    return await this.request({
-      module: 'work',
-      action: 'QueryMyApply',
       params: params,
     });
   }

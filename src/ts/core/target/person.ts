@@ -108,9 +108,9 @@ export class Person extends Belong implements IPerson {
     data.public = false;
     data.teamCode = data.teamCode || data.code;
     data.teamName = data.teamName || data.name;
-    const res = await kernel.createTarget(data);
-    if (res.success && res.data?.id) {
-      const company = createCompany(res.data, this);
+    const res = await this.create(data);
+    if (res && res.id) {
+      const company = createCompany(res, this);
       await company.deepLoad();
       this.companys.push(company);
       await company.pullMembers([this.metadata]);
@@ -238,7 +238,7 @@ export class Person extends Belong implements IPerson {
       await this.loadMembers(reload),
       await this.loadSuperAuth(reload),
       await this.loadGivedIdentitys(reload),
-      await this.directory.loadDirectoryResource(),
+      await this.directory.loadDirectoryResource(reload),
     ]);
     await Promise.all(
       this.companys.map(async (company) => {

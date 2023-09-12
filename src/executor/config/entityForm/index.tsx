@@ -88,8 +88,8 @@ const EntityForm: React.FC<IProps> = ({ cmd, entity, finished }) => {
       return (
         <PropertyForm formType={cmd} current={entity as any} finished={reloadFinish} />
       );
-    case 'newLink':
-    case 'updateLink':
+    case 'newTransferConfig':
+    case 'updateTransferConfig':
       return <LinkForm formType={cmd} current={entity as any} finished={reloadFinish} />;
     default: {
       var target = entity as ITarget;

@@ -5,6 +5,7 @@ import { FileItemShare } from '../../base/model';
 import { IDirectory } from './directory';
 import { Entity, IEntity, entityOperates } from '../public';
 import { fileOperates } from '../public';
+import { XCollection } from '../public/collection';
 /** 文件类接口 */
 export interface IFileInfo<T extends schema.XEntity> extends IEntity<T> {
   /** 空间ID */
@@ -78,15 +79,19 @@ export abstract class FileInfo<T extends schema.XEntity>
   }
   operates(mode: number = 0): model.OperateModel[] {
     const operates = super.operates(mode);
-    if (mode % 2 === 0 && this.directory.target.hasRelationAuth()) {
-      operates.unshift(
-        fileOperates.Copy,
-        fileOperates.Move,
-        fileOperates.Rename,
-        fileOperates.Download,
-        entityOperates.Update,
-        entityOperates.Delete,
-      );
+    if (mode % 2 === 0) {
+      if (this.directory.target.space.hasRelationAuth()) {
+        operates.unshift(fileOperates.Copy);
+      }
+      if (this.directory.target.hasRelationAuth()) {
+        operates.unshift(
+          fileOperates.Move,
+          fileOperates.Rename,
+          fileOperates.Download,
+          entityOperates.Update,
+          entityOperates.Delete,
+        );
+      }
     }
     return operates;
   }
@@ -135,8 +140,7 @@ export class SysFileInfo extends FileInfo<schema.XEntity> implements ISysFileInf
       name: this.filedata.name,
       extension: this.filedata.extension,
       contentType: this.filedata.contentType,
-      shareLink:
-        location.origin + '/orginone/anydata/bucket/load/' + this.filedata.shareLink,
+      shareLink: this.filedata.shareLink,
       thumbnail: this.filedata.thumbnail,
     };
   }
@@ -200,5 +204,137 @@ export class SysFileInfo extends FileInfo<schema.XEntity> implements ISysFileInf
   }
   content(_mode?: number | undefined): IFileInfo<schema.XEntity>[] {
     return [];
+  }
+}
+export interface IStandardFileInfo<T extends schema.XStandard> extends IFileInfo<T> {
+  /** 当前操作集合 */
+  coll: XCollection<T>;
+  /**
+   * 拷贝文件系统项（目录）
+   * @param {IDirectory} destination 目标文件系统
+   */
+  copy(destination: IDirectory, coll?: XCollection<T>): Promise<boolean>;
+  /** 更新 */
+  update(data: T): Promise<boolean>;
+}
+export class StandardFileInfo<T extends schema.XStandard>
+  extends FileInfo<T>
+  implements IStandardFileInfo<T>
+{
+  coll: XCollection<T>;
+  constructor(_metadata: T, _directory: IDirectory, _coll: XCollection<T>) {
+    super(_metadata, _directory);
+    this.coll = _coll;
+    this.subscribeOperations();
+  }
+  async update(data: T): Promise<boolean> {
+    const res = await this.coll.replace({
+      ...this.metadata,
+      data,
+      directoryId: this.metadata.directoryId,
+      typeName: this.metadata.typeName,
+    });
+    if (res) {
+      await this.notify('replace', [this.metadata]);
+      return true;
+    }
+    return false;
+  }
+  async delete(): Promise<boolean> {
+    if (this.directory) {
+      const data = await this.coll.delete(this.metadata);
+      if (data) {
+        await this.notify('delete', [this.metadata]);
+        return true;
+      }
+    }
+    return false;
+  }
+  async rename(name: string): Promise<boolean> {
+    return await this.update({ ...this.metadata, name });
+  }
+  async copy(
+    destination: IDirectory,
+    coll: XCollection<T> = this.coll,
+  ): Promise<boolean> {
+    if (this.directory.target.belongId != destination.target.belongId) {
+      const data = await coll.copy(
+        {
+          ...this.metadata,
+          shareId: destination.target.id,
+          directoryId: destination.id,
+        },
+        destination.target.belongId,
+      );
+      if (data) {
+        return await coll.notity(
+          {
+            data: [data],
+            operate: 'insert',
+          },
+          false,
+          destination.target.id,
+          true,
+          true,
+        );
+      }
+    }
+    return false;
+  }
+  async move(destination: IDirectory): Promise<boolean> {
+    if (
+      destination.id != this.directory.id &&
+      destination.target.belongId == this.directory.target.belongId
+    ) {
+      const data = await this.coll.copy(
+        {
+          ...this.metadata,
+          shareId: destination.target.id,
+          directoryId: destination.id,
+        },
+        destination.target.belongId,
+      );
+      if (data) {
+        return (
+          (await this.notify('delete', [this.metadata])) &&
+          (await this.notify('insert', [data]))
+        );
+      }
+    }
+    return false;
+  }
+  async subscribeOperations(): Promise<void> {
+    this.coll.subscribe((res: { operate: string; data: T[] }) => {
+      res.data.map((item) => this.receiveMessage(res.operate, item));
+    });
+  }
+
+  protected receiveMessage(operate: string, data: T): void {
+    if (data.id == this.metadata.id) {
+      switch (operate) {
+        case 'replace':
+          this.setMetadata(data);
+          this.changCallback();
+        default:
+          break;
+      }
+    }
+  }
+
+  async notify(
+    operate: string,
+    data: schema.XEntity[],
+    onlineOnly: boolean = true,
+  ): Promise<boolean> {
+    return await this.coll.notity(
+      {
+        data,
+        operate,
+      },
+      false,
+      this.directory.target.id,
+      true,
+      onlineOnly,
+    );
   }
 }
