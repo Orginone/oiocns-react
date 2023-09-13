@@ -110,11 +110,6 @@ const Routers: IRouteConfig[] = [
       ...StoreRouter,
       ...SettingRouter,
       {
-        path: '/online',
-        title: '第三方应用',
-        component: React.lazy(() => import('@/pages/Online')),
-      },
-      {
         path: '*',
         title: '页面不存在',
         component: React.lazy(() => import('@/pages/NoFond')),
