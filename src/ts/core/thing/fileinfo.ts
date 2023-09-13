@@ -230,7 +230,7 @@ export class StandardFileInfo<T extends schema.XStandard>
   async update(data: T): Promise<boolean> {
     const res = await this.coll.replace({
       ...this.metadata,
-      data,
+      ...data,
       directoryId: this.metadata.directoryId,
       typeName: this.metadata.typeName,
     });
@@ -315,8 +315,6 @@ export class StandardFileInfo<T extends schema.XStandard>
         case 'replace':
           this.setMetadata(data);
           this.changCallback();
-        default:
-          break;
       }
     }
   }

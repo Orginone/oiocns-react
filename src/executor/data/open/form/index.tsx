@@ -46,7 +46,11 @@ const FormView: React.FC<IProps> = ({ form, finished }) => {
               const item = selectMenu.item?.value ?? selectMenu.item?.code;
               loadOptions.userData = item ? [item] : [];
               let request: any = { ...loadOptions };
-              const result = await kernel.loadThing<any>(form.belongId, request);
+              const result = await kernel.loadThing<any>(
+                form.belongId,
+                [form.belongId],
+                request,
+              );
               if (result.success) {
                 return result.data;
               }

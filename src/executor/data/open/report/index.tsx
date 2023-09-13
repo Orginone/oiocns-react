@@ -34,7 +34,11 @@ const ReportView: React.FC<IProps> = ({ current, finished }) => {
       take: 1,
       userData: [],
     };
-    const result = await kernel.loadThing<any>(current.belongId, [], request);
+    const result = await kernel.loadThing<any>(
+      current.belongId,
+      [current.belongId],
+      request,
+    );
     if (result.success) {
       setTotal(result.data?.totalCount);
       setInfo(result.data?.data[0]);
