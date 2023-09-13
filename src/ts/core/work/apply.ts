@@ -31,7 +31,6 @@ export class WorkApply implements IWorkApply {
     this.belong = _belong;
     WorkFormRules.initRules(_forms, _belong);
     this.ruleService = WorkFormRules as any;
-    //TODO:尝试在此处，执行规则初始化操作 修改instanceData
   }
   belong: IBelong;
   metadata: model.WorkInstanceModel;

@@ -70,6 +70,7 @@ export class WorkProvider implements IWorkProvider {
   async loadDones(req: model.IdPageModel): Promise<model.PageResult<IWorkTask>> {
     const res = await kernel.collectionPageRequest<schema.XWorkTask>(
       this.userId,
+      [this.userId],
       storeCollName.WorkTask,
       {
         match: {
@@ -97,6 +98,7 @@ export class WorkProvider implements IWorkProvider {
   async loadApply(req: model.IdPageModel): Promise<model.PageResult<IWorkTask>> {
     const res = await kernel.collectionPageRequest<schema.XWorkTask>(
       this.userId,
+      [this.userId],
       storeCollName.WorkTask,
       {
         match: {
@@ -121,18 +123,23 @@ export class WorkProvider implements IWorkProvider {
     id: string,
     belongId: string,
   ): Promise<schema.XWorkInstance | undefined> {
-    const res = await kernel.collectionAggregate(belongId, storeCollName.WorkInstance, {
-      match: {
-        id: id,
+    const res = await kernel.collectionAggregate(
+      belongId,
+      [belongId],
+      storeCollName.WorkInstance,
+      {
+        match: {
+          id: id,
+        },
+        limit: 1,
+        lookup: {
+          from: storeCollName.WorkTask,
+          localField: 'id',
+          foreignField: 'instanceId',
+          as: 'tasks',
+        },
       },
-      limit: 1,
-      lookup: {
-        from: storeCollName.WorkTask,
-        localField: 'id',
-        foreignField: 'instanceId',
-        as: 'tasks',
-      },
-    });
+    );
     if (res.data && res.data.length > 0) {
       return res.data[0];
     }

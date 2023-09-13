@@ -87,6 +87,7 @@ export class WorkTask implements IWorkTask {
     if (this.instanceData !== undefined && !reload) return true;
     const res = await kernel.collectionAggregate(
       this.metadata.belongId,
+      [this.metadata.belongId],
       storeCollName.WorkInstance,
       {
         match: {
@@ -173,6 +174,7 @@ export class WorkTask implements IWorkTask {
           } as model.WorkInstanceModel,
           data,
           define.application.directory.target.space,
+          [...define.primaryForms, ...define.detailForms],
         );
       }
     }
