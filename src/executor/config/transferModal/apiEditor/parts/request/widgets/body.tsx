@@ -1,10 +1,10 @@
 import React from 'react';
 import MonacoEditor from './../../monacor';
 import { model } from '@/ts/base';
-import { ILink } from '@/ts/core/thing/link';
+import { ITransfer } from '@/ts/core';
 
 export interface IProps {
-  current: ILink;
+  current: ITransfer;
   node: model.RequestNode;
 }
 

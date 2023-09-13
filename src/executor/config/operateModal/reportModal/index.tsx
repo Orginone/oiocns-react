@@ -51,6 +51,7 @@ const ReportModal: React.FC<IProps> = ({ current, finished }: IProps) => {
       );
     }
     if (tabKey === 'sheet') {
+      console.log(current, 'current');
       return (
         <Sheet
           current={current}
@@ -68,7 +69,7 @@ const ReportModal: React.FC<IProps> = ({ current, finished }: IProps) => {
         modalType={modalType}
         recursionOrg={false}
       />
-    )
+    );
   };
 
   return (

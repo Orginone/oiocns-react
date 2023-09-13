@@ -16,7 +16,7 @@ const IconMode = ({
   contextMenu: (file?: IFileInfo<schema.XEntity>) => MenuProps;
 }) => {
   const FileCard = (item: IFileInfo<schema.XEntity>) => (
-    <Dropdown menu={contextMenu(item)} trigger={['contextMenu']}>
+    <Dropdown key={item.id} menu={contextMenu(item)} trigger={['contextMenu']}>
       <Card
         size="small"
         className={cls.fileCard}

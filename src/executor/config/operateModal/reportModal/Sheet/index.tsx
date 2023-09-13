@@ -21,7 +21,8 @@ interface IProps {
 const Sheet = ({ current, modalType, setModalType }: IProps) => {
   const [tkey, tforceUpdate] = useObjectUpdate('');
   const [selectedItem, setSelectedItem] = useState<any>();
-  let newRules = current.metadata?.rule ? JSON.parse(current.metadata?.rule) : {};
+  let data: any = current.metadata;
+  let newRules = data?.data?.rule ? JSON.parse(data?.data?.rule) : {};
   delete newRules?.list;
   let sheetList: any = Object.values(newRules);
 

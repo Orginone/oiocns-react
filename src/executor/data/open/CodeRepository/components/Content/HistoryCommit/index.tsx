@@ -8,7 +8,7 @@ const { Search } = Input;
 
 function HistoryCommit() {
   const onSearch = (value: string) => console.log(value);
-  const arrs = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
+  const arrs = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
   return (
     <div className="history_commit">
       <div className="flex_align_center search_header">
@@ -20,7 +20,7 @@ function HistoryCommit() {
           enterButton
         />
       </div>
-      {arrs.map((item, index) => (
+      {arrs.map((_item, index) => (
         <div className="flex_align_center commit_info" key={index}>
           <div className="flex_align_center">
             <Avatar style={{ backgroundColor: '#87d068' }} icon={<UserOutlined />} />

@@ -79,8 +79,17 @@ const EntityForm: React.FC<IProps> = ({ cmd, entity, finished }) => {
     case 'remarkReport':
       return (
         <LabelsForm
-          formType={cmd.replace('WorkConfig', '').replace('ThingConfig', '').replace('Report','')}
-          typeName={cmd.includes('WorkConfig') ? '事项配置' : cmd.includes('ThingConfig') ? '实体配置' : '报表'}
+          formType={cmd
+            .replace('WorkConfig', '')
+            .replace('ThingConfig', '')
+            .replace('Report', '')}
+          typeName={
+            cmd.includes('WorkConfig')
+              ? '事项配置'
+              : cmd.includes('ThingConfig')
+              ? '实体配置'
+              : '报表'
+          }
           current={entity as any}
           finished={reloadFinish}
         />
@@ -94,8 +103,8 @@ const EntityForm: React.FC<IProps> = ({ cmd, entity, finished }) => {
       return (
         <PropertyForm formType={cmd} current={entity as any} finished={reloadFinish} />
       );
-    case 'newLink':
-    case 'updateLink':
+    case 'newTransferConfig':
+    case 'updateTransferConfig':
       return <LinkForm formType={cmd} current={entity as any} finished={reloadFinish} />;
     default: {
       var target = entity as ITarget;

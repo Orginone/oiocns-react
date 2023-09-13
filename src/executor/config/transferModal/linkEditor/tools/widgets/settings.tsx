@@ -2,10 +2,10 @@ import { Table } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
 import React, { useEffect, useState } from 'react';
 import cls from './../../index.module.less';
-import { ILink } from '@/ts/core/thing/link';
+import { ITransfer } from '@/ts/core';
 
 interface IProps {
-  current: ILink;
+  current: ITransfer;
 }
 
 interface Kv {
@@ -13,7 +13,7 @@ interface Kv {
   v?: string;
 }
 
-export const getKvs = (current: ILink): Kv[] => {
+export const getKvs = (current: ITransfer): Kv[] => {
   const kvs: Kv[] = [];
   const metadata = current.metadata;
   if (metadata.curEnv) {
@@ -40,16 +40,25 @@ const Settings: React.FC<IProps> = ({ current }) => {
       dataIndex: 'v',
       key: 'v',
       render: (value) => {
+        let show = '';
+        switch (typeof value) {
+          case 'object':
+            show = JSON.stringify(value);
+            break;
+          default:
+            show = value + '';
+            break;
+        }
         return (
           <div style={{ width: 200 }} className={cls['text-overflow']}>
-            {JSON.stringify(value)}
+            {show}
           </div>
         );
       },
     },
   ];
   useEffect(() => {
-    const id = current.command.subscribe((type, cmd, args) => {
+    const id = current.command.subscribe((type, cmd) => {
       if (type != 'environments') return;
       switch (cmd) {
         case 'refresh':
@@ -63,7 +72,7 @@ const Settings: React.FC<IProps> = ({ current }) => {
   });
   return (
     <div style={{ position: 'absolute', right: 20, top: 64 }}>
-      <Table key={'key'} columns={columns} dataSource={kvs} />
+      <Table rowKey={'index'} columns={columns} dataSource={kvs} />
     </div>
   );
 };

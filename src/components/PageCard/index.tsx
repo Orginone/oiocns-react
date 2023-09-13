@@ -3,7 +3,6 @@ import { Card, CardProps } from 'antd';
 import styles from './index.module.less';
 
 const PageCard: React.FC<CardProps> = (props: CardProps) => {
-  
   const { children, className = '', tabList = [], ...otherProps } = props;
   return (
     <Card

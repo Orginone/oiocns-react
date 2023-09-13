@@ -9,13 +9,10 @@ interface IProps {
 
 const ImageView: React.FC<IProps> = ({ share, finished }) => {
   if (share.shareLink) {
-    if (!share.shareLink.includes('/orginone/anydata/bucket/load')) {
-      share.shareLink = `/orginone/anydata/bucket/load/${share.shareLink}`;
-    }
     return (
       <Image
         style={{ display: 'none' }}
-        src={share.shareLink}
+        src={`/orginone/kernel/load/${share.shareLink}`}
         preview={{
           visible: true,
           destroyOnClose: true,

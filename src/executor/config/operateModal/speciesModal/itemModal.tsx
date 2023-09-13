@@ -34,7 +34,7 @@ const SpeciesItemModal = ({
         : `新增${typeName}项`
       : `编辑[${data?.name}]${typeName}项`;
   const initialValue = operateType === '编辑' ? data : {};
-  const columns: ProFormColumnsType<SpeciesItemModel>[] = [
+  const columns: ProFormColumnsType<schema.XSpeciesItem>[] = [
     {
       title: '图标',
       dataIndex: 'icon',
@@ -75,7 +75,7 @@ const SpeciesItemModal = ({
   ];
 
   return (
-    <SchemaForm<SpeciesItemModel>
+    <SchemaForm<schema.XSpeciesItem>
       title={title}
       open={open}
       width={640}

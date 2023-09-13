@@ -1,4 +1,6 @@
+import React, { useState } from 'react';
 import { loadRegexpOpts, loadWidgetsOpts } from '../rule';
+import SliderNumber from '../../widgets/SliderNumber';
 const BoolEnum = {
   true: { text: '是' },
   false: { text: '否' },
@@ -32,6 +34,19 @@ const columns: any = (type: string) => {
       initialValue: 120,
       valueType: 'digit',
       tooltip: '',
+    },
+    {
+      colProps: {
+        xs: 20,
+        md: 20,
+      },
+      title: '元素宽度',
+      dataIndex: 'width',
+      initialValue: '100%',
+      valueType: 'text',
+      renderFormItem: () => {
+        return <SliderNumber />;
+      },
     },
     {
       colProps: {

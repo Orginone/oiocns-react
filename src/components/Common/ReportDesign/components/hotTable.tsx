@@ -49,9 +49,10 @@ const HotTableView: React.FC<IProps> = ({
       current.updateAttribute({ ...selectedItem, ...rule, rule: JSON.stringify(rule) });
     }
   };
-  const hotRef: any = useRef(null);
-  let sheetList = current.metadata?.rule ? JSON.parse(current.metadata?.rule) : [];
-  let sheetIndex = sheetList.findIndex((it: any) => it.code === selectItem.code);
+  const hotRef: any = useRef(null); // ref
+  const data: any = current.metadata;
+  const sheetList = data?.data?.rule ? JSON.parse(data?.data?.rule) : []; // 获取当前报表所有sheet数据
+  let sheetIndex = sheetList.findIndex((it: any) => it.code === selectItem.code); // 获取当前sheet页下标
   let mergeCells = sheetList[sheetIndex]?.data?.setting?.mergeCells || [];
 
   useEffect(() => {
@@ -203,9 +204,8 @@ const HotTableView: React.FC<IProps> = ({
     for (var k = 0; k < count_row; k++) {
       row_h.push(hotRef.current.hotInstance.getRowHeight(i));
     }
-    let newData = hotRef.current.hotInstance.getData();
     let json = {
-      data: newData,
+      data: hotRef.current.hotInstance.getData(),
       setting: {
         mergeCells:
           hotRef.current.hotInstance.getPlugin('mergeCells').mergedCellsCollection
@@ -215,10 +215,8 @@ const HotTableView: React.FC<IProps> = ({
         classList: classList,
         row_h: row_h,
         col_w: col_w,
-        // columns:columns,
         // cellMeta:cellMeta,
         // columnSummary:columnSummary,
-        // cellList:cellData
       },
     };
     sheetList[sheetIndex].data = json;
@@ -401,6 +399,7 @@ const HotTableView: React.FC<IProps> = ({
       {/** 编辑特性模态框 */}
       {modalType.includes('配置特性') && selectedItem && (
         <AttributeConfig
+          key={tkey}
           attr={selectedItem}
           onChanged={formValuesChange}
           onClose={() => {

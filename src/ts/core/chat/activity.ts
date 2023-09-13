@@ -71,7 +71,7 @@ export class Activity extends Entity<schema.XTarget> implements IActivity {
     var newData: model.ActivityType | undefined;
     if (data.likes.find((i) => i === this.userId)) {
       newData = await this.coll.update(data.id, {
-        _pullAll_: { likes: this.userId },
+        _pull_: { likes: this.userId },
       });
     } else {
       newData = await this.coll.update(data.id, {

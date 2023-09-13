@@ -1,17 +1,14 @@
 import OioForm from '@/components/Common/FormDesign/OioFormNext';
 import GenerateThingTable from '@/executor/tools/generate/thingTable';
-import { model } from '@/ts/base';
-import { IBelong, IForm } from '@/ts/core';
-import { ShareSet } from '@/ts/core/public/entity';
-import { ILink } from '@/ts/core/thing/link';
+import { model, schema } from '@/ts/base';
+import { IBelong, IForm, ITransfer } from '@/ts/core';
 import { ProTable } from '@ant-design/pro-components';
-import { Button, Modal } from 'antd';
-import { Item, Toolbar } from 'devextreme-react/data-grid';
+import { Modal } from 'antd';
 import CustomStore from 'devextreme/data/custom_store';
-import React, { useState, ReactNode, useRef, useEffect } from 'react';
+import React, { ReactNode, useEffect, useRef, useState } from 'react';
 
 interface IProps {
-  current: ILink;
+  current: ITransfer;
 }
 
 type Call = (type: string, data?: any, message?: string) => void;
@@ -44,7 +41,7 @@ const Operate: React.FC<IProps> = ({ current }) => {
   useEffect(() => {
     const id = current.command.subscribe(async (type, cmd, args) => {
       const loadForm = async (formId: string, call: Call): Promise<IForm | undefined> => {
-        const form = ShareSet.get(formId) as IForm;
+        const form = current.findMetadata<IForm>(formId + '*');
         if (!form) {
           call('错误', undefined, '未获取到表单信息！');
           return;
@@ -123,30 +120,13 @@ const Operate: React.FC<IProps> = ({ current }) => {
             case 'open':
               const storeArgs = args as StoreArgs;
               const formId = storeArgs.formId;
-              if (!ShareSet.has(formId)) return;
-              const form = ShareSet.get(formId) as IForm;
+              const form = current.findMetadata<IForm>(formId + '*');
+              if (!form) return;
               await form.loadContent();
               setCenter(
                 <GenerateThingTable
                   fields={form.fields}
                   height={'70vh'}
-                  customToolBar={() => {
-                    const [saving, setSaving] = useState<boolean>(false);
-                    return (
-                      <Toolbar>
-                        <Item location="after">
-                          <Button loading={saving} onClick={async () => {}}>
-                            转储至目录
-                          </Button>
-                        </Item>
-                        <Item location="after">
-                          <Button loading={saving} onClick={async () => {}}>
-                            存储至实体库
-                          </Button>
-                        </Item>
-                      </Toolbar>
-                    );
-                  }}
                   selection={{
                     mode: 'multiple',
                     allowSelectAll: true,

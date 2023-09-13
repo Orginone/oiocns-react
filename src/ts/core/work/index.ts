@@ -4,6 +4,8 @@ import { IForm, Form } from '../thing/standard/form';
 import { FileInfo, IFileInfo } from '../thing/fileinfo';
 import { IDirectory } from '../thing/directory';
 import { IWorkApply, WorkApply } from './apply';
+import { fileOperates } from '../public';
+
 export interface IWork extends IFileInfo<schema.XWorkDefine> {
   /** 主表 */
   primaryForms: IForm[];
@@ -114,9 +116,17 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
     return false;
   }
   content(_mode: number = 0): IFileInfo<schema.XEntity>[] {
-    return this.forms;
+    if (this.node) {
+      return this.forms.filter(
+        (a) =>
+          this.node?.primaryFormIds?.includes(a.id) ||
+          this.node?.detailFormIds?.includes(a.id),
+      );
+    }
+    return [];
   }
   async loadContent(_reload: boolean = false): Promise<boolean> {
+    await this.loadWorkNode();
     return this.forms.length > 0;
   }
   async update(data: model.WorkDefineModel): Promise<boolean> {
@@ -170,6 +180,13 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
         this.forms,
       );
     }
+  }
+  override operates(mode?: number): model.OperateModel[] {
+    return super
+      .operates(mode)
+      .filter(
+        (a) => ![fileOperates.Copy, fileOperates.Move, fileOperates.Download].includes(a),
+      );
   }
   private async recursionForms(node: model.WorkNodeModel) {
     node.detailForms = await this.directory.resource.formColl.find(node.detailFormIds);

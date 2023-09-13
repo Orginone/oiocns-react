@@ -27,9 +27,9 @@ import { Modal, UploadProps } from 'antd';
 import { FileItemShare } from '@/ts/base/model';
 import { downloadByUrl } from '@/utils/tools';
 import { model } from '@/ts/base';
-import PDF from '@/assets/img/pdf.png';
-import word from '@/assets/img/word.png';
-import file from '@/assets/img/file.png';
+import PDF from '@/assets/img/flow.png';
+import word from '@/assets/img/flow.png';
+import file from '@/assets/img/flow.png';
 import EntityIcon from '../../GlobalComps/entityIcon';
 
 interface IProps {
@@ -150,7 +150,6 @@ const OioFormItem = ({
     switch (fileType) {
       case '.pdf':
         return defaultFilsUrl[0];
-
       case '.doc':
       case '.docx':
         return defaultFilsUrl[1];

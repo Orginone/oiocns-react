@@ -12,13 +12,13 @@ interface IProps {
   finished: () => void;
 }
 const ReportModal: React.FC<IProps> = ({ current, finished }: IProps) => {
-  console.log(current,'current')
-  const [modalType, setModalType] = useState<string>(''); 
+  console.log(current, 'current');
+  const [modalType, setModalType] = useState<string>('');
   const [selectedItem, setSelectedItem] = useState<any>(); // 当前选中
   const [sheetIndex, setSheetIndex] = useState<string>('0'); // tabs页签
-  let sheetList: any = []
-  console.log(JSON.parse(current.metadata?.rule), '1234')
-  sheetList.push(JSON.parse(current.metadata?.rule))
+  let sheetList: any = [];
+  console.log(JSON.parse(current.metadata?.rule), '1234');
+  sheetList.push(JSON.parse(current.metadata?.rule));
   // const sheetList: any = current.metadata?.rule
   //   ? Object.values(JSON.parse(current.metadata?.rule))
   //   : [];
@@ -41,14 +41,9 @@ const ReportModal: React.FC<IProps> = ({ current, finished }: IProps) => {
       <div className={cls[`dept-content-box`]}>
         <div className={cls['pages-wrap']}>
           <div className={cls['pages-wrap-left']}>
-            <ReportView
-              current={current}
-              selectItem={sheetList[sheetIndex]}
-              ></ReportView>
+            <ReportView current={current} selectItem={sheetList[sheetIndex]}></ReportView>
           </div>
-          <div className={cls['pages-wrap-right']}>
-            
-          </div>
+          <div className={cls['pages-wrap-right']}></div>
         </div>
         <div>
           <Tabs

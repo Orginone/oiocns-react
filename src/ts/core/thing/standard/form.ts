@@ -1,18 +1,15 @@
 import { schema, model } from '../../../base';
 import { orgAuth } from '../../../core/public';
+import { XCollection } from '../../public/collection';
 import { IDirectory } from '../directory';
-import { FileInfo, IFileInfo } from '../fileinfo';
+import { IStandardFileInfo, StandardFileInfo } from '../fileinfo';
 
 /** 表单类接口 */
-export interface IForm extends IFileInfo<schema.XForm> {
+export interface IForm extends IStandardFileInfo<schema.XForm> {
   /** 表单特性 */
   attributes: schema.XAttribute[];
   /** 表单字段 */
   fields: model.FieldModel[];
-  /** 更新表单 */
-  update(data: schema.XForm): Promise<boolean>;
-  /** 删除表单 */
-  delete(): Promise<boolean>;
   /** 新建表单特性 */
   createAttribute(
     data: model.AttributeModel,
@@ -27,9 +24,10 @@ export interface IForm extends IFileInfo<schema.XForm> {
   deleteAttribute(data: schema.XAttribute): Promise<boolean>;
 }
 
-export class Form extends FileInfo<schema.XForm> implements IForm {
+export class Form extends StandardFileInfo<schema.XForm> implements IForm {
   constructor(_metadata: schema.XForm, _directory: IDirectory) {
-    super(_metadata, _directory);
+    super(_metadata, _directory, _directory.resource.formColl);
+    this.setEntity();
   }
   private _fieldsLoaded: boolean = false;
   fields: model.FieldModel[] = [];
@@ -38,57 +36,6 @@ export class Form extends FileInfo<schema.XForm> implements IForm {
   }
   get id(): string {
     return this._metadata.id.replace('_', '');
-  }
-  async rename(name: string): Promise<boolean> {
-    return await this.update({ ...this.metadata, name: name });
-  }
-  async copy(destination: IDirectory): Promise<boolean> {
-    if (destination.id != this.directory.id) {
-      const res = await destination.createForm({
-        ...this.metadata,
-        directoryId: destination.id,
-      });
-      return res != undefined;
-    }
-    return false;
-  }
-  async move(destination: IDirectory): Promise<boolean> {
-    if (
-      destination.id != this.directory.id &&
-      destination.metadata.belongId === this.directory.metadata.belongId
-    ) {
-      this.setMetadata({ ...this.metadata, directoryId: destination.id });
-      const success = await this.update(this.metadata);
-      if (success) {
-        this.directory.forms = this.directory.forms.filter((i) => i.key != this.key);
-        this.directory = destination;
-        destination.forms.push(this);
-      } else {
-        this.setMetadata({ ...this.metadata, directoryId: this.directory.id });
-      }
-      return success;
-    }
-    return false;
-  }
-  async update(data: schema.XForm): Promise<boolean> {
-    const res = await this.directory.resource.formColl.replace({
-      ...this.metadata,
-      ...data,
-      directoryId: this.metadata.directoryId,
-      typeName: this.metadata.typeName,
-    });
-    if (res) {
-      this.setMetadata(res);
-      return true;
-    }
-    return false;
-  }
-  async delete(): Promise<boolean> {
-    const res = await this.directory.resource.formColl.delete(this.metadata);
-    if (res) {
-      this.directory.forms = this.directory.forms.filter((i) => i.key != this.key);
-    }
-    return res;
   }
   async loadContent(reload: boolean = false): Promise<boolean> {
     await this.loadFields(reload);
@@ -182,5 +129,11 @@ export class Form extends FileInfo<schema.XForm> implements IForm {
       return res;
     }
     return false;
+  }
+  override copy(
+    destination: IDirectory,
+    _coll?: XCollection<schema.XForm>,
+  ): Promise<boolean> {
+    return super.copy(destination, destination.resource.formColl);
   }
 }

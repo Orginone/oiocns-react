@@ -35,9 +35,13 @@ export type XEntity = {
 } & Xbase;
 
 //应用定义
-export type XApplication = {
+export type XStandard = {
   // 目录ID
   directoryId: string;
+} & XEntity;
+
+//应用定义
+export type XApplication = {
   // 父ID
   parentId: string;
   // 应用资源
@@ -50,7 +54,7 @@ export type XApplication = {
   nodes: XApplication[] | undefined;
   // 应用的目录
   directory: XDirectory | undefined;
-} & XEntity;
+} & XStandard;
 
 //特性和属性的关系
 export type XAttrLinkProp = {
@@ -132,28 +136,19 @@ export type XDirectory = {
   parent: XDirectory | undefined;
   // 目录的结构
   nodes: XDirectory[] | undefined;
-} & XEntity;
-export type schemaType = {
-  displayType: 'row' | 'column';
-  type: 'object';
-  labelWidth: number | string;
-  properties: Record<string, object>;
-  column: 1 | 2 | 3;
-};
+} & XStandard;
+
 //单定义
 export type XForm = {
   // 单布局
   rule: string;
-  // 目录ID
-  directoryId: string;
   // 单的特性
   attributes: XAttribute[];
   // 使用单的流程节点
   bindNodes: XWorkNode[] | undefined;
   // 单的目录
   directory: XDirectory | undefined;
-  schema: schemaType;
-} & XEntity;
+} & XStandard;
 
 /* 表单规则类型 */
 export type XFormRule = {
@@ -265,8 +260,6 @@ export type XProperty = {
   info: string;
   // 计量单位
   unit: string;
-  // 目录ID
-  directoryId: string;
   // 标签ID
   speciesId: string;
   // 来源用户ID
@@ -285,7 +278,7 @@ export type XProperty = {
   directory: XDirectory | undefined;
   // 字典类型
   species: XSpecies | undefined;
-} & XEntity;
+} & XStandard;
 
 //用户关系
 export type XRelation = {
@@ -301,8 +294,6 @@ export type XRelation = {
 
 //分类标签
 export type XSpecies = {
-  // 目录ID
-  directoryId: string;
   // 来源用户ID
   sourceId: string;
   // 分类的类目
@@ -311,7 +302,7 @@ export type XSpecies = {
   speciesProps: XProperty[] | undefined;
   // 分类的目录
   directory: XDirectory | undefined;
-} & XEntity;
+} & XStandard;
 
 //分类类目
 export type XSpeciesItem = {

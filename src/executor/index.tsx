@@ -5,6 +5,7 @@ import React, { useEffect, useState } from 'react';
 import { executeCmd, FileTaskList } from './action';
 import { useHistory } from 'react-router-dom';
 import AudioPlayer from '@/executor/audio';
+import CodeRepository from './data/open/codeRepository';
 const audioExt = ['.mp3', '.wav', '.ogg'];
 
 const Executor = () => {
@@ -20,11 +21,11 @@ const Executor = () => {
   useEffect(() => {
     const id = command.subscribe((type, cmd, ...args: any[]) => {
       if (cmd === 'link') return history.push(args[0]);
-      if (cmd === 'taskList') return setContent(<FileTaskList directory={args[0]} />);
       if (args[0].name.includes('.git')) {
-        return setContent(<CodeRepository finished={resetContent} args={args[0]}/>)
+        return setContent(<CodeRepository finished={resetContent} args={args[0]} />);
       }
-      if (executeCmd(cmd, args[0], args.slice(1)) === false) {
+      if (cmd === 'taskList') return setContent(<FileTaskList directory={args[0]} />);
+      if (executeCmd(cmd, args[0], args.slice(1), type) === false) {
         if (['open', 'remark'].includes(cmd) && 'filedata' in args[0]) {
           type = 'data';
         }

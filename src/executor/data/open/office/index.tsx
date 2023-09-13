@@ -10,15 +10,12 @@ interface IProps {
 
 const OfficeView: React.FC<IProps> = ({ share, finished }) => {
   if (share.shareLink) {
-    if (!share.shareLink.includes('/orginone/anydata/bucket/load')) {
-      share.shareLink = `/orginone/anydata/bucket/load/${share.shareLink}`;
-    }
     const LoadViewer = () => {
       const config = {
         locale: 'zh',
         timeout: 5000,
         fileName: share.name,
-        file: share.shareLink,
+        file: `/orginone/kernel/load/${share.shareLink}`,
       };
       switch (share.extension) {
         case '.xls':

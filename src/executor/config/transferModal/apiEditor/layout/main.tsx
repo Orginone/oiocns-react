@@ -6,26 +6,26 @@ import React, { useRef } from 'react';
 import InputBox from '../parts/inputBox';
 import RequestPart from '../parts/request';
 import ResponsePart from '../parts/response/responsePart';
-import { ILink } from '@/ts/core/thing/link';
+import { ITransfer } from '@/ts/core';
 
 interface IProps {
-  current: ILink;
-  node: model.RequestNode;
+  transfer: ITransfer;
+  current: model.RequestNode;
   finished?: () => void;
 }
 
-const RequestLayout: React.FC<IProps> = ({ current, node }) => {
+const RequestLayout: React.FC<IProps> = ({ transfer, current }) => {
   const cmd = useRef(new Command());
   return (
-    <Layout key={current.key} style={{ height: '100%' }}>
+    <Layout key={transfer.key} style={{ height: '100%' }}>
       <Content style={{ height: '100%' }}>
         <Row>
           <InputBox
+            transfer={transfer}
             current={current}
-            node={node}
             send={async () => {
               try {
-                let res = await current.request(node);
+                let res = await transfer.request(current);
                 cmd.current.emitter('request', 'onValueChange', res);
               } catch (error) {
                 if (error instanceof AxiosError) {
@@ -33,7 +33,6 @@ const RequestLayout: React.FC<IProps> = ({ current, node }) => {
                   if (axiosError.response) {
                     cmd.current.emitter('request', 'onValueChange', axiosError.response);
                   } else {
-                    console.log(axiosError);
                     cmd.current.emitter('request', 'onValueChange', axiosError.message);
                   }
                 } else if (error instanceof Error) {
@@ -45,10 +44,10 @@ const RequestLayout: React.FC<IProps> = ({ current, node }) => {
         </Row>
         <Row style={{ marginTop: 10, height: '100%' }}>
           <Col span={12}>
-            <RequestPart current={current} node={node} />
+            <RequestPart transfer={transfer} current={current} />
           </Col>
           <Col span={12}>
-            <ResponsePart current={current} />
+            <ResponsePart transfer={transfer} />
           </Col>
         </Row>
       </Content>

@@ -17,6 +17,7 @@ const ActivityPublisher: React.FC<{
       props.finish();
     }
   };
+  return (
     <FullScreenModal
       {...props}
       destroyOnClose

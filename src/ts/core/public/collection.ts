@@ -23,8 +23,8 @@ export class XCollection<T extends schema.Xbase> {
     return this._collName;
   }
 
-  async all(): Promise<T[]> {
-    if (!this._loaded) {
+  async all(reload: boolean = false): Promise<T[]> {
+    if (!this._loaded || reload) {
       this._cache = await this.load({});
       this._loaded = true;
     }
@@ -72,6 +72,39 @@ export class XCollection<T extends schema.Xbase> {
     return await this.loadSpace(options);
   }
 
+  async copy(data: T, copyId?: string): Promise<T | undefined> {
+    const success = await kernel.collectionRemove(
+      this._target.belongId,
+      this._relations,
+      this.collName,
+      {
+        _id: data.id,
+      },
+      copyId,
+    );
+    if (success) {
+      return await this.insert(data);
+    }
+  }
+
+  async copys(data: T[], copyId?: string): Promise<T[]> {
+    const res = await kernel.collectionRemove(
+      this._target.belongId,
+      this._relations,
+      this.collName,
+      {
+        _id: {
+          _in_: data.map((i) => i.id),
+        },
+      },
+      copyId,
+    );
+    if (res.success) {
+      return await this.insertMany(data);
+    }
+    return [];
+  }
+
   async insert(data: T, copyId?: string): Promise<T | undefined> {
     data.id = data.id || 'snowId()';
     data.shareId = this._target.id;
@@ -106,6 +139,9 @@ export class XCollection<T extends schema.Xbase> {
       copyId,
     );
     if (res.success) {
+      if (!Array.isArray(res.data)) {
+        res.data = [res.data as unknown as T];
+      }
       if (res.data && res.data.length > 0 && this._loaded) {
         this._cache.push(...res.data);
       }
@@ -180,6 +216,7 @@ export class XCollection<T extends schema.Xbase> {
       return res.data;
     }
   }
+
   async updateMany(ids: string[], update: any, copyId?: string): Promise<T[]> {
     const res = await kernel.collectionSetFields<T[]>(
       this._target.belongId,
@@ -196,6 +233,7 @@ export class XCollection<T extends schema.Xbase> {
     }
     return [];
   }
+
   async delete(data: T, copyId?: string): Promise<boolean> {
     const res = await kernel.collectionUpdate(
       this._target.belongId,
@@ -307,6 +345,10 @@ export class XCollection<T extends schema.Xbase> {
       return res.data?.MatchedCount > 0;
     }
     return false;
+  }
+
+  async removeCache(id: string): Promise<void> {
+    this._cache = this._cache.filter((a) => a.id !== id);
   }
 
   async notity(
