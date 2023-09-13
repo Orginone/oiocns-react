@@ -100,10 +100,10 @@ export function mixin(destination: any, source: any, overwrite: boolean = true):
           } else {
             destination[key] = source[key];
           }
+        }else {
+          destination[key] = source[key];
         }
-      } else {
-        destination[key] = source[key];
-      }
+      } 
     });
   }
   return destination;
