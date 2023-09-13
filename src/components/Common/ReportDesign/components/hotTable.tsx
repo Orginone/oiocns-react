@@ -200,7 +200,7 @@ const HotTableView: React.FC<IProps> = ({
     for (var i = 0; i < count_col; i++) {
       col_w.push(hotRef.current.hotInstance.getColWidth(i));
     }
-    for (var i = 0; i < count_row; i++) {
+    for (var k = 0; k < count_row; k++) {
       row_h.push(hotRef.current.hotInstance.getRowHeight(i));
     }
     let newData = hotRef.current.hotInstance.getData();
