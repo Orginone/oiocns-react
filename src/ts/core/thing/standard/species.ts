@@ -31,12 +31,13 @@ export class Species extends StandardFileInfo<schema.XSpecies> implements ISpeci
   private _itemLoaded: boolean = false;
   override async delete(): Promise<boolean> {
     if (this.directory) {
-      const success = await this.directory.resource.speciesItemColl.deleteMatch({
-        speciesId: this.id,
-      });
-      if (success) {
-        return super.delete();
+      let success = true;
+      if (this.items.length > 0) {
+        success = await this.directory.resource.speciesItemColl.deleteMatch({
+          speciesId: this.id,
+        });
       }
+      return success && super.delete();
     }
     return false;
   }
@@ -60,29 +61,43 @@ export class Species extends StandardFileInfo<schema.XSpecies> implements ISpeci
       speciesId: this.id,
     });
     if (res) {
-      this.items.push(res);
-      return res;
-    }
-  }
-  async deleteItem(item: schema.XSpeciesItem): Promise<boolean> {
-    const res = await this.directory.resource.speciesItemColl.delete(item);
-    if (res) {
-      this.items = this.items.filter((i) => i.id != item.id);
+      await this.itemNotify('insert', [res]);
     }
     return res;
+  }
+  async deleteItem(item: schema.XSpeciesItem): Promise<boolean> {
+    const success = await this.directory.resource.speciesItemColl.delete(item);
+    if (success) {
+      await this.itemNotify('delete', [item]);
+    }
+    return success;
   }
   async updateItem(data: schema.XSpeciesItem): Promise<boolean> {
     const res = await this.directory.resource.speciesItemColl.replace({
       ...data,
       speciesId: this.id,
     });
-    data.speciesId = this.id;
     if (res) {
-      this.items = this.items.filter((i) => i.id != data.id);
-      this.items.push(res);
+      await this.itemNotify('replase', [res]);
       return true;
     }
     return false;
+  }
+  async itemNotify(
+    operate: string,
+    data: schema.XSpeciesItem[],
+    onlineOnly: boolean = true,
+  ): Promise<boolean> {
+    return await this.itemColl.notity(
+      {
+        data,
+        operate,
+      },
+      false,
+      this.directory.target.id,
+      true,
+      onlineOnly,
+    );
   }
   receiveItems(operate: string, data: schema.XSpeciesItem): void {
     if (data.speciesId == this.id) {

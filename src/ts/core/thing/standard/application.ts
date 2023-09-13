@@ -143,30 +143,11 @@ export class Application
     }
   }
   private getChildren(application: IApplication): schema.XApplication[] {
-    const applications: schema.XApplication[] = [];
+    const applications: schema.XApplication[] = [application.metadata];
     for (const child of application.children) {
       applications.push(child.metadata);
       applications.push(...this.getChildren(child));
     }
     return applications;
-  }
-  protected override receiveMessage(operate: string, data: schema.XApplication): void {
-    super.receiveMessage(operate, data);
-    if (data.parentId == this.id) {
-      switch (operate) {
-        case 'delete':
-          this.children = this.children.filter((a) => a.id != data.id);
-          this.coll.removeCache(data.id);
-          this.changCallback();
-          break;
-        case 'insert':
-          this.children.push(new Application(data, this.directory, this));
-          this.coll.cache.push(data);
-          this.changCallback();
-          break;
-        default:
-          break;
-      }
-    }
   }
 }
