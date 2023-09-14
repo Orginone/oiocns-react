@@ -32,15 +32,11 @@ const OioForm: React.FC<IProps> = ({
   disabled,
   noRule,
 }) => {
-  const [attributes, setAttributes] = useState<XAttribute[]>([]);
   let config: any = form.rule ? JSON.parse(form.rule) : { col: 8, layout: 'horizontal' };
   useEffect(() => {
-    orgCtrl.work.loadAttributes(form.id, belong.id).then((value) => {
-      setAttributes(value);
-      if (fieldsValue) {
-        formRef?.current?.setFieldsValue(fieldsValue);
-      }
-    });
+    if (fieldsValue) {
+      formRef?.current?.setFieldsValue(fieldsValue);
+    }
   }, []);
   return (
     <>
@@ -84,7 +80,7 @@ const OioForm: React.FC<IProps> = ({
           sm: { span: 10 },
         }}>
         <Row gutter={24}>
-          {attributes.map((item) => (
+          {form.attributes.map((item) => (
             <Col span={config.col} key={item.id}>
               <OioFormItem item={item} disabled belong={belong} noRule={noRule} />
             </Col>
