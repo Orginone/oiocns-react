@@ -49,7 +49,7 @@ export class DirectoryOperate implements IDirectoryOperate {
           return new Application(s, this.directory);
         } else {
           this.loadResource(true);
-          this.directory.reload();
+          this.directory.changCallback();
         }
       });
       this.subscribe(_resource.directoryColl, (s) => {
@@ -65,7 +65,7 @@ export class DirectoryOperate implements IDirectoryOperate {
     return this.standardFiles.length == 0;
   }
   async loadResource(reload: boolean = false): Promise<void> {
-    if (!this.directory.parent) {
+    if (!this.directory.parent || reload) {
       await this.resource.preLoad(reload);
     }
     this.standardFiles = [];
@@ -92,10 +92,10 @@ export class DirectoryOperate implements IDirectoryOperate {
         .map((a) => new Application(a, this.directory, undefined, apps)),
     );
     for (const child of this.resource.directoryColl.cache.filter(
-      (i) => i.parentId === this.directory.id,
+      (i) => i.directoryId === this.directory.id || i.parentId === this.directory.id,
     )) {
       const subDir = new Directory(child, this.directory.target, this.directory);
-      await subDir.loadDirectoryResource(reload);
+      await subDir.loadDirectoryResource();
       this.standardFiles.push(subDir);
     }
   }
@@ -106,41 +106,41 @@ export class DirectoryOperate implements IDirectoryOperate {
     coll: XCollection<T>,
     create: (mData: T) => StandardFileInfo<T> | undefined,
   ): Promise<boolean> {
-    if (data.directoryId.replace('_', '') == this.directory.id.replace('_', '')) {
+    if (data.directoryId == this.directory.id) {
       switch (operate) {
         case 'insert':
           coll.cache.push(data);
-          let standard = create(data);
-          if (standard) this.standardFiles.push(standard);
+          {
+            let standard = create(data);
+            if (standard) this.standardFiles.push(standard);
+          }
           break;
         case 'replace':
-          const index = coll.cache.findIndex((a) => a.id == data.id);
-          coll.cache[index] = data;
-          this.directory.updateMetadata(data);
+          {
+            const index = coll.cache.findIndex((a) => a.id == data.id);
+            coll.cache[index] = data;
+            this.directory.updateMetadata(data);
+          }
           break;
         case 'delete':
           await coll.removeCache(data.id);
           this.standardFiles = this.standardFiles.filter((a) => a.id != data.id);
           break;
-        default:
+        case 'refresh':
+          this.directory.structCallback();
           break;
       }
-      this.directory.reload();
+      this.directory.changCallback();
       return true;
     } else {
       for (const child of this.standardFiles) {
         if (child.typeName == '目录') {
-          if (
-            await (child as unknown as IDirectory).operater.receiveMessage(
-              operate,
-              data,
-              coll,
-              create,
-            )
-          ) {
-            this.directory.reload();
-            return true;
-          }
+          await (child as unknown as IDirectory).operater.receiveMessage(
+            operate,
+            data,
+            coll,
+            create,
+          );
         }
       }
     }
@@ -152,11 +152,6 @@ export class DirectoryOperate implements IDirectoryOperate {
     create: (data: T) => StandardFileInfo<T> | undefined,
   ) {
     coll.subscribe(async (a: { operate: string; data: T[] }) => {
-      if (a.operate == 'refresh') {
-        await this.loadResource(true);
-        this.directory.reload();
-        return;
-      }
       a.data.forEach((s) => {
         this.receiveMessage<T>(a.operate, s, coll, create);
       });

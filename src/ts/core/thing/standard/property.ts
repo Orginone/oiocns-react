@@ -1,5 +1,4 @@
 import { schema } from '../../../base';
-import { XCollection } from '../../public/collection';
 import { IDirectory } from '../directory';
 import { IStandardFileInfo, StandardFileInfo } from '../fileinfo';
 export interface IProperty extends IStandardFileInfo<schema.XProperty> {
@@ -18,10 +17,16 @@ export class Property extends StandardFileInfo<schema.XProperty> implements IPro
     );
   }
   attributes: schema.XAttribute[] = [];
-  override copy(
-    destination: IDirectory,
-    _coll?: XCollection<schema.XProperty>,
-  ): Promise<boolean> {
-    return super.copy(destination, destination.resource.propertyColl);
+  override async copy(destination: IDirectory): Promise<boolean> {
+    if (this.allowCopy(destination)) {
+      return await super.copyTo(destination.id, destination.resource.propertyColl);
+    }
+    return false;
+  }
+  override async move(destination: IDirectory): Promise<boolean> {
+    if (this.allowMove(destination)) {
+      return await super.moveTo(destination.id, destination.resource.propertyColl);
+    }
+    return false;
   }
 }

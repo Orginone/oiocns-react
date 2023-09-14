@@ -1,4 +1,4 @@
-import { common, model, schema } from '../../base';
+import { command, common, model, schema } from '../../base';
 import {
   directoryNew,
   directoryOperates,
@@ -44,8 +44,8 @@ export interface IDirectory extends IStandardFileInfo<schema.XDirectory> {
   taskList: model.TaskModel[];
   /** 任务发射器 */
   taskEmitter: common.Emitter;
-  /** 重载 */
-  reload(): void;
+  /** 目录结构变更 */
+  structCallback(): void;
   /** 目录下的内容 */
   content(mode?: number): IFileInfo<schema.XEntity>[];
   /** 创建子目录 */
@@ -96,7 +96,7 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
       {
         ..._metadata,
         typeName: _metadata.typeName || '目录',
-        directoryId: _parent?.id || '',
+        directoryId: _parent?.id || _target.id,
       },
       _parent ?? (_target as unknown as IDirectory),
       _target.resource.directoryColl,
@@ -117,7 +117,7 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
     return this.operater.getContent(this.formTypes) as Form[];
   }
   get transfers(): ITransfer[] {
-    return this.operater.getContent<ITransfer>(['链接']);
+    return this.operater.getContent<ITransfer>(['迁移配置']);
   }
   get specieses(): ISpecies[] {
     return this.operater.getContent<ISpecies>(['分类', '字典']);
@@ -145,6 +145,10 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
   }
   get resource(): DataResource {
     return this.target.resource;
+  }
+  structCallback(): void {
+    console.log(this.metadata);
+    command.emitter('-', 'refresh', this);
   }
   content(mode: number = 0): IFileInfo<schema.XEntity>[] {
     const cnt: IFileInfo<schema.XEntity>[] = [...this.children];
@@ -174,34 +178,46 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
     }
     return false;
   }
-  override copy(_destination: IDirectory): Promise<boolean> {
-    throw new Error('暂不支持.');
+  override async copy(destination: IDirectory): Promise<boolean> {
+    if (this.allowCopy(destination)) {
+      const data = await destination.resource.directoryColl.replace({
+        ...this.metadata,
+        directoryId: destination.id,
+      });
+      if (data) {
+        await this.operateDirectoryResource(this, destination.resource, 'replaceMany');
+        await destination.notify('refresh', [data]);
+      }
+    }
+    return false;
   }
   override async move(destination: IDirectory): Promise<boolean> {
-    if (this.parent) {
-      if (
-        destination.id != this.directory.id &&
-        destination.target.belongId == this.directory.target.belongId
-      ) {
-        const data = await destination.resource.directoryColl.replace({
-          ...this.metadata,
-          parentId: destination.id,
-          directoryId: destination.id,
-        });
-        if (data) {
-          return await destination.resource.directoryColl.notity(
-            {
-              data: [data],
-              operate: 'refresh',
-            },
-            false,
-            destination.target.id,
-            true,
-            true,
-          );
+    if (this.parent && this.allowMove(destination)) {
+      const data = await destination.resource.directoryColl.replace({
+        ...this.metadata,
+        directoryId: destination.id,
+      });
+      if (data) {
+        await this.operateDirectoryResource(
+          this,
+          destination.resource,
+          'replaceMany',
+          true,
+        );
+        if (this.target.id != destination.target.id) {
+          await this.notify('refresh', [this.parent.metadata]);
+          console.log(this.parent.metadata);
         }
+        await destination.notify('refresh', [data]);
       }
-      return false;
+    }
+    return false;
+  }
+  override async delete(): Promise<boolean> {
+    if (this.parent) {
+      await this.resource.directoryColl.delete(this.metadata);
+      await this.operateDirectoryResource(this, this.resource, 'deleteMany');
+      await this.notify('refresh', [this.metadata]);
     }
     return false;
   }
@@ -209,32 +225,11 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
     const res = await this.resource.directoryColl.insert({
       ...data,
       directoryId: this.id,
-      parentId: this.id,
     });
     if (res) {
       await this.notify('insert', [res]);
       return res;
     }
-  }
-  override async delete(): Promise<boolean> {
-    if (this.parent) {
-      const data: model.DirectoryContent = {
-        forms: [],
-        specieses: [],
-        propertys: [],
-        applications: [],
-        directorys: [],
-      };
-      this.getAllConent(this, data);
-      await this.resource.formColl.deleteMany(data.forms);
-      await this.resource.speciesColl.deleteMany(data.specieses);
-      await this.resource.propertyColl.deleteMany(data.propertys);
-      await this.resource.directoryColl.deleteMany([...data.directorys, this.metadata]);
-      await this.resource.applicationColl.deleteMany(data.applications);
-      await this.notify('refresh', [this.metadata]);
-      return true;
-    }
-    return false;
   }
   async loadFiles(reload: boolean = false): Promise<ISysFileInfo[]> {
     if (this.files.length < 1 || reload) {
@@ -384,19 +379,37 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
     return operates;
   }
   public async loadDirectoryResource(reload: boolean = false) {
-    this.operater.loadResource(reload);
+    await this.operater.loadResource(reload);
   }
-  private getAllConent(directory: IDirectory, content: model.DirectoryContent) {
+  /** 对目录下所有资源进行操作 */
+  private async operateDirectoryResource(
+    directory: IDirectory,
+    resource: DataResource,
+    action: 'replaceMany' | 'deleteMany',
+    move?: boolean,
+  ) {
     for (const child of directory.children) {
-      content.directorys.push(child.metadata);
-      this.getAllConent(child, content);
+      await this.operateDirectoryResource(child, resource, action);
     }
-    content.forms.push(...directory.forms.map((a) => a.metadata));
-    content.specieses.push(...directory.specieses.map((a) => a.metadata));
-    content.propertys.push(...directory.propertys.map((a) => a.metadata));
-    content.applications.push(...directory.applications.map((a) => a.metadata));
-  }
-  reload(): void {
-    this.changCallback();
+    await resource.directoryColl[action](directory.children.map((a) => a.metadata));
+    await resource.formColl[action](directory.forms.map((a) => a.metadata));
+    await resource.speciesColl[action](directory.specieses.map((a) => a.metadata));
+    await resource.propertyColl[action](directory.propertys.map((a) => a.metadata));
+    if (action == 'deleteMany') {
+      await resource.speciesItemColl.deleteMatch({
+        speciesId: {
+          _in_: directory.specieses.map((a) => a.id),
+        },
+      });
+      await resource.applicationColl.deleteMatch({
+        directoryId: directory.id,
+      });
+    }
+    if (action == 'replaceMany' && move) {
+      var apps = directory.resource.applicationColl.cache.filter(
+        (i) => i.directoryId === directory.id,
+      );
+      await resource.applicationColl.replaceMany(apps);
+    }
   }
 }

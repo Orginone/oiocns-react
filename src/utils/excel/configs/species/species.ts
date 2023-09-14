@@ -82,36 +82,21 @@ class CommonReadConfig<
    * @param context 上下文
    */
   async operating(context: Context, onItemCompleted: () => void): Promise<void> {
-    let insertSpecies: { index: number; species: XSpecies }[] = [];
-    let replaceSpecies: { index: number; species: XSpecies }[] = [];
+    let speciesMap: { index: number; species: XSpecies }[] = [];
     for (let index = 0; index < this.sheetConfig.data.length; index++) {
       let row = this.sheetConfig.data[index];
       let dir = context.directoryMap.get(row.directoryCode)!;
       row.directoryId = dir.id;
-      if (row.id) {
-        replaceSpecies.push({ index, species: row });
-      } else {
-        insertSpecies.push({ index, species: row });
-      }
+      speciesMap.push({ index, species: row });
       onItemCompleted();
     }
-    if (insertSpecies.length > 0) {
-      let insertRes = await this.sheetConfig.directory.resource.speciesColl.insertMany(
-        insertSpecies.map((item) => item.species),
-      );
-      for (let index = 0; index < insertRes.length; index++) {
-        let species = insertRes[index] as Species;
-        this.sheetConfig.data[insertSpecies[index].index] = species;
-        context.speciesMap.set(species.code, species);
-      }
-    }
-    if (replaceSpecies.length > 0) {
+    if (speciesMap.length > 0) {
       let replaceRes = await this.sheetConfig.directory.resource.speciesColl.replaceMany(
-        replaceSpecies.map((item) => item.species),
+        speciesMap.map((item) => item.species),
       );
       for (let index = 0; index < replaceRes.length; index++) {
         let species = replaceRes[index] as Species;
-        this.sheetConfig.data[replaceSpecies[index].index] = species;
+        this.sheetConfig.data[speciesMap[index].index] = species;
         context.speciesMap.set(species.code, species);
       }
     }

@@ -1,6 +1,5 @@
 import { schema, model } from '../../../base';
 import { orgAuth } from '../../../core/public';
-import { XCollection } from '../../public/collection';
 import { IDirectory } from '../directory';
 import { IStandardFileInfo, StandardFileInfo } from '../fileinfo';
 
@@ -130,10 +129,16 @@ export class Form extends StandardFileInfo<schema.XForm> implements IForm {
     }
     return false;
   }
-  override copy(
-    destination: IDirectory,
-    _coll?: XCollection<schema.XForm>,
-  ): Promise<boolean> {
-    return super.copy(destination, destination.resource.formColl);
+  override async copy(destination: IDirectory): Promise<boolean> {
+    if (this.allowCopy(destination)) {
+      return await super.copyTo(destination.id, destination.resource.formColl);
+    }
+    return false;
+  }
+  override async move(destination: IDirectory): Promise<boolean> {
+    if (this.allowMove(destination)) {
+      return await super.moveTo(destination.id, destination.resource.formColl);
+    }
+    return false;
   }
 }

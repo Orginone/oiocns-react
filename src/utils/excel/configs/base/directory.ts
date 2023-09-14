@@ -54,7 +54,7 @@ export class DirectoryReadConfig extends ReadConfigImpl<
     c.directoryMap.forEach((item) => {
       c.directoryMap.set(item.code, {
         ...item,
-        parentCode: c.directoryMap.get(item.parentId)?.code,
+        parentCode: c.directoryMap.get(item.directoryId)?.code,
       });
     });
 
@@ -150,9 +150,9 @@ export class DirectoryReadConfig extends ReadConfigImpl<
       let item = this.sheetConfig.data[index];
       item.shareId = this.sheetConfig.directory.metadata.shareId;
       if (item.parentCode) {
-        item.parentId = context.directoryMap.get(item.parentCode)!.id;
+        item.directoryId = context.directoryMap.get(item.parentCode)!.id;
       } else {
-        item.parentId = this.sheetConfig.directory.target.directory.id;
+        item.directoryId = this.sheetConfig.directory.target.directory.id;
       }
       let res: any;
       if (item.id) {

@@ -43,7 +43,7 @@ export const executeCmd = (cmd: string, entity: any, args: any[], type: string) 
     case 'newFile':
       return uploadFile(entity, (file) => {
         if (file) {
-          orgCtrl.changCallback();
+          entity.changCallback();
         }
       });
     case 'open':

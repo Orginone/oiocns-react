@@ -1,5 +1,5 @@
 import { XProperty } from '@/ts/base/schema';
-import { IDirectory, orgAuth } from '@/ts/core';
+import { IDirectory } from '@/ts/core';
 import { assignment } from '../..';
 import { Context, ReadConfigImpl, SheetConfigImpl, SheetName } from '../../types';
 
@@ -108,7 +108,7 @@ export class PropReadConfig extends ReadConfigImpl<Property, Context, PropSheetC
       if (row.id) {
         replaceProperties.push({ index, row: row });
       } else {
-        row.code = "TsnowId()";
+        row.code = 'TsnowId()';
         insertProperties.push({ index, row: row });
       }
       onItemCompleted();
