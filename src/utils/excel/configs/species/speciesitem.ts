@@ -101,7 +101,7 @@ export class DictItemReadConfig extends ReadConfigImpl<
       if (row.id) {
         replaceSpeciesItems.push({ index, row: row });
       } else {
-        row.code = "TsnowId()";
+        row.code = 'SsnowId()';
         insertSpeciesItems.push({ index, row: row });
       }
       onItemCompleted();

@@ -72,39 +72,6 @@ export class XCollection<T extends schema.Xbase> {
     return await this.loadSpace(options);
   }
 
-  async copy(data: T, copyId?: string): Promise<T | undefined> {
-    const success = await kernel.collectionRemove(
-      this._target.belongId,
-      this._relations,
-      this.collName,
-      {
-        _id: data.id,
-      },
-      copyId,
-    );
-    if (success) {
-      return await this.insert(data);
-    }
-  }
-
-  async copys(data: T[], copyId?: string): Promise<T[]> {
-    const res = await kernel.collectionRemove(
-      this._target.belongId,
-      this._relations,
-      this.collName,
-      {
-        _id: {
-          _in_: data.map((i) => i.id),
-        },
-      },
-      copyId,
-    );
-    if (res.success) {
-      return await this.insertMany(data);
-    }
-    return [];
-  }
-
   async insert(data: T, copyId?: string): Promise<T | undefined> {
     data.id = data.id || 'snowId()';
     data.shareId = this._target.id;
@@ -125,6 +92,7 @@ export class XCollection<T extends schema.Xbase> {
   }
 
   async insertMany(data: T[], copyId?: string): Promise<T[]> {
+    if (data.length < 1) return data;
     data = data.map((a) => {
       a.id = a.id || 'snowId()';
       a.shareId = this._target.id;
@@ -151,6 +119,7 @@ export class XCollection<T extends schema.Xbase> {
   }
 
   async replace(data: T, copyId?: string): Promise<T | undefined> {
+    data.id = data.id || 'snowId()';
     data.shareId = this._target.id;
     data.belongId = data.belongId || this._target.belongId;
     const res = await kernel.collectionReplace<T>(
@@ -162,19 +131,21 @@ export class XCollection<T extends schema.Xbase> {
     );
     if (res.success) {
       if (res.data && this._loaded) {
-        this._cache = this._cache.map((i) => {
-          if (i.id == res.data.id) {
-            return res.data;
-          }
-          return i;
-        });
+        const index = this._cache.findIndex((i) => i.id === res.data.id);
+        if (index > -1) {
+          this._cache[index] = res.data;
+        } else {
+          this._cache.push(res.data);
+        }
       }
       return res.data;
     }
   }
 
   async replaceMany(data: T[], copyId?: string): Promise<T[]> {
+    if (data.length < 1) return data;
     data = data.map((a) => {
+      a.id = a.id || 'snowId()';
       a.shareId = this._target.id;
       a.belongId = a.belongId || this._target.belongId;
       return a;
@@ -188,13 +159,13 @@ export class XCollection<T extends schema.Xbase> {
     );
     if (res.success) {
       if (res.data && res.data.length > 0 && this._loaded) {
-        this._cache = this._cache.map((i) => {
-          for (const item of res.data) {
-            if (item.id === i.id) {
-              return item;
-            }
+        res.data.forEach((item) => {
+          const index = this._cache.findIndex((i) => i.id === item.id);
+          if (index > -1) {
+            this._cache[index] = item;
+          } else {
+            this._cache.push(item);
           }
-          return i;
         });
       }
       return res.data || [];
@@ -259,6 +230,7 @@ export class XCollection<T extends schema.Xbase> {
   }
 
   async deleteMany(data: T[], copyId?: string): Promise<boolean> {
+    if (data.length < 1) return true;
     const res = await kernel.collectionUpdate(
       this._target.belongId,
       this._relations,

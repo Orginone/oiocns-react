@@ -14,7 +14,6 @@ import { ProTable } from '@ant-design/pro-components';
 import { Button, Modal, Spin, Tabs, Tag, Upload, message } from 'antd';
 import TabPane from 'antd/lib/tabs/TabPane';
 import React, { useState } from 'react';
-import orgCtrl from '@/ts/controller';
 
 /** 上传导入模板 */
 export const uploadTemplate = (dir: IDirectory) => {
@@ -166,7 +165,7 @@ const generate = async (
         },
         '生成数据模板',
       );
-      dir.resource.directoryColl.notity({ operate: 'refresh', data: dir.metadata });
+      dir.notify('refresh', [dir.metadata]);
     },
     onReadError: (errors) => {
       showErrors(errors);

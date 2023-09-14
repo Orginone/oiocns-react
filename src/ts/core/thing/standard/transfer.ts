@@ -134,48 +134,15 @@ export class Transfer extends StandardFileInfo<model.Transfer> implements ITrans
     return !!(await this.directory.resource.transferColl.replace(this.metadata));
   }
 
-  async delete(): Promise<boolean> {
-    if (await this.directory.resource.transferColl.delete(this.metadata)) {
-      this.directory.transfers = this.directory.transfers.filter(
-        (item) => item.key != this.key,
-      );
-      return true;
+  override async copy(destination: IDirectory): Promise<boolean> {
+    if (this.allowCopy(destination)) {
+      return await super.copyTo(destination.id, destination.resource.transferColl);
     }
     return false;
   }
-
-  async rename(name: string): Promise<boolean> {
-    if (
-      await this.directory.resource.transferColl.update(this.id, {
-        _set_: { name: name },
-      })
-    ) {
-      this.setMetadata({ ...this._metadata, name: name });
-      this.directory.transfers = this.directory.transfers.filter(
-        (item) => item.key != this.key,
-      );
-      return true;
-    }
-    return false;
-  }
-
-  async copy(destination: IDirectory): Promise<boolean> {
-    let res = await destination.createTransfer(this.metadata);
-    return !!res;
-  }
-
-  async move(destination: IDirectory): Promise<boolean> {
-    if (
-      await this.directory.resource.transferColl.update(this.id, {
-        _set_: { directoryId: destination.id },
-      })
-    ) {
-      this.setMetadata({ ...this._metadata, directoryId: destination.id });
-      destination.transfers.push(this);
-      this.directory.transfers = this.directory.transfers.filter(
-        (item) => item.key != this.key,
-      );
-      return true;
+  override async move(destination: IDirectory): Promise<boolean> {
+    if (this.allowMove(destination)) {
+      return await super.moveTo(destination.id, destination.resource.transferColl);
     }
     return false;
   }

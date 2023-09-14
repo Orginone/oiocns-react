@@ -88,6 +88,7 @@ export class AttrReadConfig extends ReadConfigImpl<Attribute, Context, AttrSheet
           attr.formId = form.id;
           let prop = context.propertyMap.get(attr.propInfo);
           if (prop) {
+            attr.code = prop.code;
             attr.property = prop;
             attr.propId = prop.id;
           }

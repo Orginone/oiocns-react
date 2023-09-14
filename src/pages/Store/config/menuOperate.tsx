@@ -96,7 +96,7 @@ const getTeamMenu = () => {
       createMenu(company, [
         ...buildDirectoryTree(company.directory.children),
         ...company.targets
-          .filter((i) => i.isMyChat && i.id != company.id)
+          .filter((i) => i.session.isMyChat && i.id != company.id)
           .map((i) => createMenu(i, buildDirectoryTree(i.directory.children))),
         ...buildGroupTree(company.groups),
       ]),

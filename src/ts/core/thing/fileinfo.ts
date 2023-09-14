@@ -207,15 +207,12 @@ export class SysFileInfo extends FileInfo<schema.XEntity> implements ISysFileInf
   }
 }
 export interface IStandardFileInfo<T extends schema.XStandard> extends IFileInfo<T> {
-  /**
-   * 拷贝文件系统项（目录）
-   * @param {IDirectory} destination 目标文件系统
-   */
-  copy(destination: IDirectory, coll?: XCollection<T>): Promise<boolean>;
+  /** 变更通知 */
+  notify(operate: string, data: schema.XEntity[]): Promise<boolean>;
   /** 更新 */
   update(data: T): Promise<boolean>;
 }
-export class StandardFileInfo<T extends schema.XStandard>
+export abstract class StandardFileInfo<T extends schema.XStandard>
   extends FileInfo<T>
   implements IStandardFileInfo<T>
 {
@@ -223,6 +220,17 @@ export class StandardFileInfo<T extends schema.XStandard>
   constructor(_metadata: T, _directory: IDirectory, _coll: XCollection<T>) {
     super(_metadata, _directory);
     this.coll = _coll;
+  }
+  abstract copy(destination: IDirectory): Promise<boolean>;
+  abstract move(destination: IDirectory): Promise<boolean>;
+  allowCopy(destination: IDirectory): boolean {
+    return this.directory.target.belongId != destination.target.belongId;
+  }
+  allowMove(destination: IDirectory): boolean {
+    return (
+      destination.id != this.directory.id &&
+      destination.target.belongId == this.directory.target.belongId
+    );
   }
   async update(data: T): Promise<boolean> {
     const res = await this.coll.replace({
@@ -233,7 +241,6 @@ export class StandardFileInfo<T extends schema.XStandard>
     });
     if (res) {
       await this.notify('replace', [res]);
-      return true;
     }
     return false;
   }
@@ -242,7 +249,6 @@ export class StandardFileInfo<T extends schema.XStandard>
       const data = await this.coll.delete(this.metadata);
       if (data) {
         await this.notify('delete', [this.metadata]);
-        return true;
       }
     }
     return false;
@@ -250,69 +256,34 @@ export class StandardFileInfo<T extends schema.XStandard>
   async rename(name: string): Promise<boolean> {
     return await this.update({ ...this.metadata, name });
   }
-  async copy(
-    destination: IDirectory,
-    coll: XCollection<T> = this.coll,
-  ): Promise<boolean> {
-    if (this.directory.target.belongId != destination.target.belongId) {
-      const data = await coll.copy(
-        {
-          ...this.metadata,
-          shareId: destination.target.id,
-          directoryId: destination.id,
-        },
-        destination.target.belongId,
-      );
-      if (data) {
-        return await coll.notity(
-          {
-            data: [data],
-            operate: 'insert',
-          },
-          false,
-          destination.target.id,
-          true,
-          true,
-        );
-      }
+  async copyTo(directoryId: string, coll: XCollection<T> = this.coll): Promise<boolean> {
+    const data = await coll.replace({
+      ...this.metadata,
+      directoryId: directoryId,
+    });
+    if (data) {
+      return await coll.notity({
+        data: [data],
+        operate: 'insert',
+      });
     }
     return false;
   }
-  async move(destination: IDirectory): Promise<boolean> {
-    if (
-      destination.id != this.directory.id &&
-      destination.target.belongId == this.directory.target.belongId
-    ) {
-      const data = await this.coll.copy(
-        {
-          ...this.metadata,
-          shareId: destination.target.id,
-          directoryId: destination.id,
-        },
-        destination.target.belongId,
-      );
-      if (data) {
-        await this.notify('delete', [this.metadata]);
-        await this.notify('insert', [data]);
-        return true;
-      }
+  async moveTo(directoryId: string, coll: XCollection<T> = this.coll): Promise<boolean> {
+    const data = await coll.replace({
+      ...this.metadata,
+      directoryId: directoryId,
+    });
+    if (data) {
+      await this.notify('delete', [this.metadata]);
+      return await coll.notity({
+        data: [data],
+        operate: 'insert',
+      });
     }
     return false;
   }
-  async notify(
-    operate: string,
-    data: schema.XEntity[],
-    onlineOnly: boolean = true,
-  ): Promise<boolean> {
-    return await this.coll.notity(
-      {
-        data,
-        operate,
-      },
-      false,
-      this.directory.target.id,
-      true,
-      onlineOnly,
-    );
+  async notify(operate: string, data: schema.XEntity[]): Promise<boolean> {
+    return await this.coll.notity({ data, operate });
   }
 }
