@@ -20,7 +20,7 @@ export interface IDirectoryOperate {
     operate: string,
     data: T,
     coll: XCollection<T>,
-    create: (data: T) => StandardFileInfo<T> | undefined,
+    create: (data: T, dir: IDirectory) => StandardFileInfo<T> | undefined,
   ): Promise<boolean>;
 }
 
@@ -32,28 +32,25 @@ export class DirectoryOperate implements IDirectoryOperate {
     this.resource = _resource;
     this.directory = _directory;
     if (!_directory.parent) {
-      this.subscribe(_resource.formColl, (s) => {
-        return new Form(s, this.directory);
+      this.subscribe(_resource.formColl, (s, l) => {
+        return new Form(s, l);
       });
-      this.subscribe(_resource.propertyColl, (s) => {
-        return new Property(s, this.directory);
+      this.subscribe(_resource.propertyColl, (s, l) => {
+        return new Property(s, l);
       });
-      this.subscribe(_resource.speciesColl, (s) => {
-        return new Species(s, this.directory);
+      this.subscribe(_resource.speciesColl, (s, l) => {
+        return new Species(s, l);
       });
-      this.subscribe(_resource.transferColl, (s) => {
-        return new Transfer(s, this.directory);
+      this.subscribe(_resource.transferColl, (s, l) => {
+        return new Transfer(s, l);
       });
-      this.subscribe(_resource.applicationColl, (s) => {
+      this.subscribe(_resource.applicationColl, (s, l) => {
         if (s.parentId.length < 1) {
-          return new Application(s, this.directory);
-        } else {
-          this.loadResource(true);
-          this.directory.changCallback();
+          return new Application(s, l);
         }
       });
-      this.subscribe(_resource.directoryColl, (s) => {
-        return new Directory(s, this.directory.target, this.directory);
+      this.subscribe(_resource.directoryColl, (s, l) => {
+        return new Directory(s, this.directory.target, l);
       });
     }
   }
@@ -104,15 +101,17 @@ export class DirectoryOperate implements IDirectoryOperate {
     operate: string,
     data: T,
     coll: XCollection<T>,
-    create: (mData: T) => StandardFileInfo<T> | undefined,
+    create: (mData: T, dir: IDirectory) => StandardFileInfo<T> | undefined,
   ): Promise<boolean> {
     if (data.directoryId == this.directory.id) {
       switch (operate) {
         case 'insert':
           coll.cache.push(data);
           {
-            let standard = create(data);
-            if (standard) this.standardFiles.push(standard);
+            let standard = create(data, this.directory);
+            if (standard) {
+              this.standardFiles.push(standard);
+            }
           }
           break;
         case 'replace':
@@ -149,7 +148,7 @@ export class DirectoryOperate implements IDirectoryOperate {
 
   private subscribe<T extends schema.XStandard>(
     coll: XCollection<T>,
-    create: (data: T) => StandardFileInfo<T> | undefined,
+    create: (data: T, dir: IDirectory) => StandardFileInfo<T> | undefined,
   ) {
     coll.subscribe(async (a: { operate: string; data: T[] }) => {
       a.data.forEach((s) => {
