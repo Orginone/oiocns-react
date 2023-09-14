@@ -67,6 +67,15 @@ export default class KernelApi {
     });
     this._storeHub.start();
   }
+
+  /**
+   * 实时获取连接状态
+   * @param callback
+   */
+  public async getConnectStatus(callback: (res: boolean) => void) {
+    this._storeHub.onDisconnected(() => callback(false))
+    this._storeHub.onConnected(() => callback(true))
+  }
   /**
    * 获取单例
    * @param {string} url 集线器地址，默认为 "/orginone/kernel/hub"
