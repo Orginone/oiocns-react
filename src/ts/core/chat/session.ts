@@ -70,7 +70,10 @@ export class Session extends Entity<schema.XEntity> implements ISession {
     this.sessionId = id;
     this.target = target;
     if (tags === undefined) {
-      tags = [_metadata.belong!.name, _metadata.typeName];
+      tags = [_metadata.typeName];
+      if (_metadata.belong) {
+        tags.unshift(_metadata.belong.name);
+      }
     }
     this.chatdata = {
       fullId: `${target.id}_${id}`,

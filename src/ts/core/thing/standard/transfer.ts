@@ -2,11 +2,11 @@ import { XForm } from '@/ts/base/schema';
 import { Command, kernel, model, schema, common } from '../../../base';
 import { storeCollName } from '../../public';
 import { IDirectory } from '../directory';
-import { FileInfo, IFileInfo } from '../fileinfo';
+import { IStandardFileInfo, StandardFileInfo } from '../fileinfo';
 
 export type GraphData = () => any;
 
-export interface ITransfer extends IFileInfo<model.Transfer> {
+export interface ITransfer extends IStandardFileInfo<model.Transfer> {
   /** 集合名称 */
   collName: string;
   /** 触发器 */
@@ -75,7 +75,7 @@ export interface ITransfer extends IFileInfo<model.Transfer> {
   execute(link?: ITransfer): void;
 }
 
-export class Transfer extends FileInfo<model.Transfer> implements ITransfer {
+export class Transfer extends StandardFileInfo<model.Transfer> implements ITransfer {
   collName: string;
   command: Command;
   taskList: model.Environment[];
@@ -87,7 +87,7 @@ export class Transfer extends FileInfo<model.Transfer> implements ITransfer {
   getData?: GraphData;
 
   constructor(metadata: model.Transfer, dir: IDirectory) {
-    super(metadata, dir);
+    super(metadata, dir, dir.resource.transferColl);
     this.collName = storeCollName.Transfer;
     this.command = new Command();
     this.taskList = [];

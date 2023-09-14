@@ -207,8 +207,6 @@ export class SysFileInfo extends FileInfo<schema.XEntity> implements ISysFileInf
   }
 }
 export interface IStandardFileInfo<T extends schema.XStandard> extends IFileInfo<T> {
-  /** 当前操作集合 */
-  coll: XCollection<T>;
   /**
    * 拷贝文件系统项（目录）
    * @param {IDirectory} destination 目标文件系统
@@ -225,7 +223,6 @@ export class StandardFileInfo<T extends schema.XStandard>
   constructor(_metadata: T, _directory: IDirectory, _coll: XCollection<T>) {
     super(_metadata, _directory);
     this.coll = _coll;
-    this.subscribeOperations();
   }
   async update(data: T): Promise<boolean> {
     const res = await this.coll.replace({
@@ -235,7 +232,7 @@ export class StandardFileInfo<T extends schema.XStandard>
       typeName: this.metadata.typeName,
     });
     if (res) {
-      await this.notify('replace', [this.metadata]);
+      await this.notify('replace', [res]);
       return true;
     }
     return false;
@@ -295,30 +292,13 @@ export class StandardFileInfo<T extends schema.XStandard>
         destination.target.belongId,
       );
       if (data) {
-        return (
-          (await this.notify('delete', [this.metadata])) &&
-          (await this.notify('insert', [data]))
-        );
+        await this.notify('delete', [this.metadata]);
+        await this.notify('insert', [data]);
+        return true;
       }
     }
     return false;
   }
-  async subscribeOperations(): Promise<void> {
-    this.coll.subscribe((res: { operate: string; data: T[] }) => {
-      res.data.map((item) => this.receiveMessage(res.operate, item));
-    });
-  }
-
-  protected receiveMessage(operate: string, data: T): void {
-    if (data.id == this.metadata.id) {
-      switch (operate) {
-        case 'replace':
-          this.setMetadata(data);
-          this.changCallback();
-      }
-    }
-  }
-
   async notify(
     operate: string,
     data: schema.XEntity[],
