@@ -29,7 +29,10 @@ export const executeCmd = (cmd: string, entity: any, args: any[], type: string) 
     case 'openChat':
       return openChat(entity);
     case 'download':
-      window.open((entity as ISysFileInfo).shareInfo().shareLink, '_black');
+      if ('shareInfo' in entity) {
+        const link = (entity as ISysFileInfo).shareInfo().shareLink;
+        window.open(`/orginone/kernel/load/${link}?download=1`, '_black');
+      }
       return;
     case 'copy':
     case 'move':
