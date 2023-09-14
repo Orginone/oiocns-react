@@ -1,3 +1,4 @@
+@import '@cfg/theme/variables';
 :global {
   .ogo-popover-content {
     .ogo-popover-arrow {
@@ -7,6 +8,7 @@
       .ogo-popover-inner-content {
         display: flex;
         flex-direction: column;
+        padding: 8px 10px;
       }
     }
   }
@@ -225,4 +227,18 @@
     color: #666;
     font-size: 10px;
   }
+}
+
+.msgAction {
+  display: flex;
+}
+
+.actionIconStyl {
+  color: #666;
+  cursor: pointer;
+  margin: 0 4px;
+}
+
+.actionIconStyl:hover {
+  color: @primary-color;
 }
