@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import { Button, Popover, Spin, Badge } from 'antd';
+import { Button, message, Popover, Spin, Badge, Tooltip } from 'antd';
 import moment from 'moment';
 import React, { useEffect, useRef, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
@@ -43,7 +43,7 @@ const GroupContent = (props: Iprops) => {
   const [beforescrollHeight, setBeforescrollHeight] = useState(0);
   const [forwardOpen, setForwardOpen] = useState(false); // 设置转发打开窗口
   const [formwardCode, setFormwardCode] = useState<IMessage>(); // 转发时用户
-
+  const [ismousewheel, setIsMousewheel] = useState(false)
   useEffect(() => {
     props.chat.onMessage((ms) => {
       setMessages([...ms]);
@@ -63,6 +63,20 @@ const GroupContent = (props: Iprops) => {
       }
     }
   }, [messages]);
+  function createWheelStopListener(callback: () => void, timeout?: number) {
+    var handle: ReturnType<typeof setTimeout>;
+    setIsMousewheel(true)
+    var onScroll = function() {
+        if (handle) {
+            clearTimeout(handle);
+        }
+        handle = setTimeout(callback, timeout || 200); // default 200 ms
+    };
+    body.current?.addEventListener('wheel', onScroll);
+    return function() {
+      body.current?.removeEventListener('wheel', onScroll);
+    };
+  }
 
   const isShowTime = (curDate: string, beforeDate: string) => {
     if (beforeDate === '') return true;
@@ -76,6 +90,9 @@ const GroupContent = (props: Iprops) => {
       await props.chat.moreMessage();
       setMessages([...props.chat.messages]);
     }
+    createWheelStopListener(() => {
+      setIsMousewheel(false)
+    })
   };
 
   /** 转发消息 */
@@ -188,9 +205,9 @@ const GroupContent = (props: Iprops) => {
           <Tooltip title="撤回">
             <AiOutlineRollback
               className={css.actionIconStyl}
-            onClick={async () => {
-              await props.chat.recallMessage(item.id);
-              onClose();
+              onClick={async () => {
+                await props.chat.recallMessage(item.id);
+                onClose();
               }}
             />
           </Tooltip>
@@ -208,10 +225,10 @@ const GroupContent = (props: Iprops) => {
           <Tooltip title="下载">
             <AiOutlineDownload
               className={css.actionIconStyl}
-            onClick={() => {
-              const url = parseAvatar(item.msgBody).shareLink;
-              downloadByUrl(url);
-            }}
+              onClick={() => {
+                const url = parseAvatar(item.msgBody).shareLink;
+                downloadByUrl(url);
+              }}
             />
           </Tooltip>
         )}
