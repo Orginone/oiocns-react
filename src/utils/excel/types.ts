@@ -49,7 +49,7 @@ export interface RequestIndex {
 /**
  * Sheet 表
  */
-export interface SheetConfig<T> {
+export interface ISheet<T> {
   sheetName: string;
   headerRows: number;
   metaColumns: MetaColumn[];
@@ -59,7 +59,7 @@ export interface SheetConfig<T> {
 /**
  * Sheet 表抽象的默认实现
  */
-export class SheetConfigImpl<T> implements SheetConfig<T> {
+export class Sheet<T> implements ISheet<T> {
   sheetName: string;
   headerRows: number;
   metaColumns: MetaColumn[];
@@ -97,35 +97,35 @@ export interface MetaColumn {
 /**
  * 读取 Excel Sheet 配置
  */
-export interface ReadConfig<T, C, S extends SheetConfig<T>> {
-  sheetConfig: S;
+export interface ISheetRead<T, C, S extends ISheet<T>> {
+  sheet: S;
   errors: ErrorMessage[];
 
   initContext?(context: C): Promise<void>;
   pushError(index: number, error: string): void;
   checkData(context?: C): ErrorMessage[];
   operating(context: C, onItemCompleted: () => void): Promise<void>;
-  completed?(sheets: ReadConfig<any, any, SheetConfig<any>>[], context: C): void;
+  completed?(sheets: ISheetRead<any, any, ISheet<any>>[], context: C): void;
 }
 
 /**
  * 读取 Excel Sheet 配置默认实现
  */
-export abstract class ReadConfigImpl<T, C, S extends SheetConfig<T>>
-  implements ReadConfig<T, C, S>
+export abstract class SheetRead<T, C, S extends ISheet<T>>
+  implements ISheetRead<T, C, S>
 {
-  sheetConfig: S;
+  sheet: S;
   errors: ErrorMessage[];
 
   constructor(sheetConfig: S) {
-    this.sheetConfig = sheetConfig;
+    this.sheet = sheetConfig;
     this.errors = [];
   }
 
   pushError(index: number, error: string): void {
     this.errors.push({
-      sheetName: this.sheetConfig.sheetName,
-      row: this.sheetConfig.headerRows + 1 + index,
+      sheetName: this.sheet.sheetName,
+      row: this.sheet.headerRows + 1 + index,
       message: error,
     });
   }
@@ -133,5 +133,5 @@ export abstract class ReadConfigImpl<T, C, S extends SheetConfig<T>>
   initContext?(context: C): Promise<void>;
   abstract checkData(context: C): ErrorMessage[];
   abstract operating(context: C, onItemCompleted: () => void): Promise<void>;
-  completed?(sheets: ReadConfig<any, any, SheetConfig<any>>[], context: C): void;
+  completed?(sheets: ISheetRead<any, any, ISheet<any>>[], context: C): void;
 }

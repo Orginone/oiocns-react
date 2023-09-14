@@ -999,6 +999,7 @@ export type Script = {
   id: string;
   name: string;
   code: string;
+  coder: string;
 };
 
 // 图状态
@@ -1011,15 +1012,17 @@ export type NodeStatus = 'Completed' | 'Error' | GraphStatus;
 export type NodeType = '请求' | '链接' | '映射' | '存储';
 
 // 事件
-export type Event = 'Edit' | 'View' | 'Run';
+export type Event = 'Edit' | 'View' | 'Run' | 'Completed' | 'Error';
 
 // 脚本位置
-export type ScriptPos = 'pre' | 'post'
+export type Pos = 'pre' | 'post';
 
 // 节点
 export type Node<T> = {
   // 主键
   id: string;
+  // 编码
+  code: string;
   // 名称
   name: string;
   // 类型

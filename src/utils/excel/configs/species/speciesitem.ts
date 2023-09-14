@@ -2,13 +2,7 @@ import { List } from '@/ts/base';
 import { XSpeciesItem } from '@/ts/base/schema';
 import { IDirectory } from '@/ts/core';
 import { assignment } from '../..';
-import {
-  Context,
-  ErrorMessage,
-  ReadConfigImpl,
-  SheetConfigImpl,
-  SheetName,
-} from '../../types';
+import { Context, ErrorMessage, SheetRead, Sheet, SheetName } from '../../types';
 
 export interface SpeciesItem extends XSpeciesItem {
   speciesCode: string;
@@ -16,7 +10,7 @@ export interface SpeciesItem extends XSpeciesItem {
   index: number;
 }
 
-export class DictItemSheetConfig extends SheetConfigImpl<SpeciesItem> {
+export class DictItemSheet extends Sheet<SpeciesItem> {
   directory: IDirectory;
 
   constructor(directory: IDirectory) {
@@ -32,7 +26,7 @@ export class DictItemSheetConfig extends SheetConfigImpl<SpeciesItem> {
   }
 }
 
-export class ClassifyItemSheetConfig extends SheetConfigImpl<SpeciesItem> {
+export class ClassifyItemSheet extends Sheet<SpeciesItem> {
   directory: IDirectory;
 
   constructor(directory: IDirectory) {
@@ -51,13 +45,9 @@ export class ClassifyItemSheetConfig extends SheetConfigImpl<SpeciesItem> {
   }
 }
 
-export class DictItemReadConfig extends ReadConfigImpl<
-  SpeciesItem,
-  Context,
-  DictItemSheetConfig
-> {
+export class DictItemSheetRead extends SheetRead<SpeciesItem, Context, DictItemSheet> {
   async initContext(c: Context): Promise<void> {
-    for (let item of this.sheetConfig.data) {
+    for (let item of this.sheet.data) {
       if (c.speciesItemMap.has(item.speciesCode)) {
         let itemMap = c.speciesItemMap.get(item.speciesCode)!;
         if (itemMap.has(item.info)) {
@@ -75,8 +65,8 @@ export class DictItemReadConfig extends ReadConfigImpl<
    * @returns 错误信息
    */
   checkData(context: Context): ErrorMessage[] {
-    for (let index = 0; index < this.sheetConfig.data.length; index++) {
-      let item = this.sheetConfig.data[index];
+    for (let index = 0; index < this.sheet.data.length; index++) {
+      let item = this.sheet.data[index];
       if (!item.speciesCode || !item.name || !item.info) {
         this.pushError(index, `存在未填写的字典代码、字典项名称、附加信息！`);
       }
@@ -93,48 +83,28 @@ export class DictItemReadConfig extends ReadConfigImpl<
    * @param context 上下文
    */
   async operating(context: Context, onItemCompleted: () => void): Promise<void> {
-    let insertSpeciesItems: { index: number; row: XSpeciesItem }[] = [];
-    let replaceSpeciesItems: { index: number; row: XSpeciesItem }[] = [];
-    for (let index = 0; index < this.sheetConfig.data.length; index++) {
-      let row = this.sheetConfig.data[index];
+    const data = this.sheet.data;
+    for (let index = 0; index < data.length; index++) {
+      let row = data[index];
       row.speciesId = context.speciesMap.get(row.speciesCode)!.id;
-      if (row.id) {
-        replaceSpeciesItems.push({ index, row: row });
-      } else {
-        row.code = 'SsnowId()';
-        insertSpeciesItems.push({ index, row: row });
+      if (!row.id) {
+        row.code = 'TsnowId()';
       }
       onItemCompleted();
     }
-    if (insertSpeciesItems.length > 0) {
-      let insertRes =
-        await this.sheetConfig.directory.resource.speciesItemColl.insertMany(
-          insertSpeciesItems.map((item) => item.row),
-        );
-      for (let index = 0; index < insertRes.length; index++) {
-        let newItem = insertRes[index] as SpeciesItem;
-        this.sheetConfig.data[insertSpeciesItems[index].index] = newItem;
-        context.speciesItemMap.get(newItem.speciesCode)?.set(newItem.info, newItem);
-      }
-    }
-    if (replaceSpeciesItems.length > 0) {
-      let replaceRes =
-        await this.sheetConfig.directory.resource.speciesItemColl.replaceMany(
-          replaceSpeciesItems.map((item) => item.row),
-        );
-      for (let index = 0; index < replaceRes.length; index++) {
-        let newItem = replaceRes[index] as SpeciesItem;
-        this.sheetConfig.data[replaceSpeciesItems[index].index] = newItem;
-        context.speciesItemMap.get(newItem.speciesCode)?.set(newItem.info, newItem);
-      }
-    }
+    (await this.sheet.directory.resource.speciesItemColl.replaceMany(data))
+      .map((item) => item as SpeciesItem)
+      .forEach((item, index) => {
+        data[index] = item;
+        context.speciesItemMap.get(item.speciesCode)?.set(item.info, item);
+      });
   }
 }
 
-export class ClassifyItemReadConfig extends ReadConfigImpl<
+export class ClassifyItemSheetRead extends SheetRead<
   SpeciesItem,
   Context,
-  DictItemSheetConfig
+  ClassifyItemSheet
 > {
   /**
    * 初始化数据
@@ -142,7 +112,7 @@ export class ClassifyItemReadConfig extends ReadConfigImpl<
    */
   async initContext(context: Context): Promise<void> {
     let speciesItemCodeMap = context.speciesItemMap;
-    for (let item of this.sheetConfig.data) {
+    for (let item of this.sheet.data) {
       if (!speciesItemCodeMap.has(item.speciesCode)) {
         speciesItemCodeMap.set(item.speciesCode, new Map());
       }
@@ -160,8 +130,8 @@ export class ClassifyItemReadConfig extends ReadConfigImpl<
    * @returns
    */
   checkData(context: Context): ErrorMessage[] {
-    for (let index = 0; index < this.sheetConfig.data.length; index++) {
-      let item = this.sheetConfig.data[index];
+    for (let index = 0; index < this.sheet.data.length; index++) {
+      let item = this.sheet.data[index];
       if (!item.speciesCode || !item.name || !item.info) {
         this.pushError(index, `存在未填写的分类代码、分类项名称、附加信息！`);
       }
@@ -183,8 +153,8 @@ export class ClassifyItemReadConfig extends ReadConfigImpl<
    * @param context 上下文
    */
   async operating(context: Context, onItemCompleted: () => void): Promise<void> {
-    this.sheetConfig.data.forEach((item, index) => (item.index = index));
-    let groups = new List(this.sheetConfig.data).GroupBy((item) => item.speciesCode);
+    this.sheet.data.forEach((item, index) => (item.index = index));
+    let groups = new List(this.sheet.data).GroupBy((item) => item.speciesCode);
     for (let key of Object.keys(groups)) {
       let tree = new Tree<SpeciesItem>(groups[key], 'info', 'parentInfo');
       await this.recursion(tree.root, context, onItemCompleted);
@@ -199,46 +169,26 @@ export class ClassifyItemReadConfig extends ReadConfigImpl<
     context: Context,
     onItemCompleted: () => void,
   ) {
-    let insertItems: SpeciesItem[] = [];
-    let replaceItems: SpeciesItem[] = [];
-    for (let node of root.children) {
-      let row = node.data;
+    const data = root.children.map((item) => item.data);
+    for (let row of data) {
       row.speciesId = context.speciesMap.get(row.speciesCode)!.id;
       if (row.parentInfo) {
         row.parentId = context.speciesItemMap
           .get(row.speciesCode)!
           .get(row.parentInfo)!.id;
       }
-      if (row.id) {
-        replaceItems.push(row);
-      } else {
+      if (!row.id) {
         row.code = 'TsnowId()';
-        insertItems.push(row);
       }
       onItemCompleted();
     }
-    if (replaceItems.length > 0) {
-      let replaceRes =
-        await this.sheetConfig.directory.resource.speciesItemColl.replaceMany(
-          replaceItems,
-        );
-      for (let index = 0; index < replaceItems.length; index++) {
-        let oldItem = replaceItems[index];
-        let newItem = replaceRes[index] as SpeciesItem;
-        Object.assign(this.sheetConfig.data[oldItem.index], newItem);
-        context.speciesItemMap.get(newItem.speciesCode)?.set(newItem.info, newItem);
-      }
-    }
-    if (insertItems.length > 0) {
-      let insertRes =
-        await this.sheetConfig.directory.resource.speciesItemColl.insertMany(insertItems);
-      for (let index = 0; index < insertRes.length; index++) {
-        let oldItem = insertItems[index];
-        let newItem = insertRes[index] as SpeciesItem;
-        Object.assign(this.sheetConfig.data[oldItem.index], newItem);
-        context.speciesItemMap.get(newItem.speciesCode)?.set(newItem.info, newItem);
-      }
-    }
+    (await this.sheet.directory.resource.speciesItemColl.replaceMany(data))
+      .map((item) => item as SpeciesItem)
+      .forEach((item) => {
+        let oldItem = this.sheet.data[item.index];
+        Object.assign(oldItem, item);
+        context.speciesItemMap.get(item.speciesCode)?.set(item.info, item);
+      });
     for (let item of root.children) {
       await this.recursion(item, context, onItemCompleted);
     }

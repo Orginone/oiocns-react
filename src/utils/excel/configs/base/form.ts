@@ -1,13 +1,13 @@
 import { XForm } from '@/ts/base/schema';
 import { IDirectory } from '@/ts/core';
 import { assignment } from '../..';
-import { Context, ReadConfigImpl, SheetConfigImpl, SheetName } from '../../types';
+import { Context, SheetRead, Sheet, SheetName } from '../../types';
 
 export interface Form extends XForm {
   directoryCode: string;
 }
 
-export class FormSheetConfig extends SheetConfigImpl<Form> {
+export class FormSheet extends Sheet<Form> {
   directory: IDirectory;
 
   constructor(directory: IDirectory) {
@@ -24,13 +24,13 @@ export class FormSheetConfig extends SheetConfigImpl<Form> {
   }
 }
 
-export class FormReadConfig extends ReadConfigImpl<Form, Context, FormSheetConfig> {
+export class FormSheetRead extends SheetRead<Form, Context, FormSheet> {
   /**
    * 初始化
    * @param c 上下文
    */
   async initContext(c: Context): Promise<void> {
-    for (let item of this.sheetConfig.data) {
+    for (let item of this.sheet.data) {
       if (c.formMap.has(item.code)) {
         let old = c.formMap.get(item.code)!;
         assignment(old, item);
@@ -43,8 +43,8 @@ export class FormReadConfig extends ReadConfigImpl<Form, Context, FormSheetConfi
    * @param data 数据
    */
   checkData(context: Context) {
-    for (let index = 0; index < this.sheetConfig.data.length; index++) {
-      let item = this.sheetConfig.data[index];
+    for (let index = 0; index < this.sheet.data.length; index++) {
+      let item = this.sheet.data[index];
       if (!item.directoryCode || !item.typeName || !item.name || !item.code) {
         this.pushError(index, `存在未填写的目录代码，表单类型、表单名称、表单代码`);
       }
@@ -64,38 +64,18 @@ export class FormReadConfig extends ReadConfigImpl<Form, Context, FormSheetConfi
    * @param context 上下文
    */
   async operating(context: Context, onItemCompleted: () => void): Promise<void> {
-    let insertForms: { index: number; form: XForm }[] = [];
-    let replaceForms: { index: number; form: XForm }[] = [];
-    for (let index = 0; index < this.sheetConfig.data.length; index++) {
-      let row = this.sheetConfig.data[index];
+    const data = this.sheet.data;
+    for (let index = 0; index < data.length; index++) {
+      let row = data[index];
       let dir = context.directoryMap.get(row.directoryCode)!;
       row.directoryId = dir.id;
-      if (row.id) {
-        replaceForms.push({ index: index, form: row });
-      } else {
-        insertForms.push({ index: index, form: row });
-      }
       onItemCompleted();
     }
-    if (insertForms.length > 0) {
-      let insertRes = await this.sheetConfig.directory.resource.formColl.insertMany(
-        insertForms.map((item) => item.form),
-      );
-      for (let index = 0; index < insertForms.length; index++) {
-        const form = insertRes[index] as Form;
-        this.sheetConfig.data[insertForms[index].index] = form;
-        context.formMap.set(form.code, form);
-      }
-    }
-    if (replaceForms.length > 0) {
-      let replaceRes = await this.sheetConfig.directory.resource.formColl.replaceMany(
-        replaceForms.map((item) => item.form),
-      );
-      for (let index = 0; index < replaceForms.length; index++) {
-        const form = replaceRes[index] as Form;
-        this.sheetConfig.data[replaceForms[index].index] = form;
-        context.formMap.set(form.code, form);
-      }
-    }
+    (await this.sheet.directory.resource.formColl.replaceMany(data))
+      .map((item) => item as Form)
+      .forEach((item, index) => {
+        data[index] = item;
+        context.formMap.set(item.code, item);
+      });
   }
 }

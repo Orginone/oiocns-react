@@ -241,6 +241,7 @@ export abstract class StandardFileInfo<T extends schema.XStandard>
     });
     if (res) {
       await this.notify('replace', [res]);
+      return true;
     }
     return false;
   }

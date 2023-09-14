@@ -2,7 +2,7 @@ import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import { model } from '@/ts/base';
 import { ITransfer } from '@/ts/core';
 import {
-  getDefaultLinkNode,
+  getDefaultTransferNode,
   getDefaultMappingNode,
   getDefaultRequestNode,
   getDefaultStoreNode,
@@ -58,7 +58,7 @@ const Nodes: React.FC<IProps> = ({ current }) => {
         data = getDefaultMappingNode();
         break;
       case '链接':
-        data = getDefaultLinkNode();
+        data = getDefaultTransferNode();
         break;
     }
     const node = graph.current?.createNode(createNode(data));
