@@ -8,7 +8,7 @@ import { ITransfer } from '@/ts/core';
 
 interface IProps {
   formType: string;
-  link: ITransfer;
+  transfer: ITransfer;
   current?: model.Environment;
   finished: () => void;
 }
@@ -19,9 +19,9 @@ interface Kv {
   v?: string;
 }
 
-const EnvironmentForm: React.FC<IProps> = ({ formType, link, current, finished }) => {
+const EnvironmentForm: React.FC<IProps> = ({ formType, transfer, current, finished }) => {
   const [kvs, setKvs] = useState<readonly Kv[]>([
-    ...Object.entries(current?.params ?? []).map((value) => {
+    ...Object.entries(current?.params ?? {}).map((value) => {
       return {
         id: generateUuid(),
         k: value[0],
@@ -93,13 +93,14 @@ const EnvironmentForm: React.FC<IProps> = ({ formType, link, current, finished }
         }
       }}
       onFinish={async (values) => {
-        kvs.filter((item) => item.k).forEach((item) => (values.params[item.k!] = item.v));
+        let params: model.KeyValue = {};
+        kvs.filter((item) => item.k).forEach((item) => (params[item.k!] = item.v));
         switch (formType) {
           case 'newEnvironment':
-            await link.addEnv(values);
+            await transfer.addEnv({ ...values, params: params });
             break;
           case 'updateEnvironment':
-            await link.updEnv({ ...current, ...values });
+            await transfer.updEnv({ ...current, ...values, params: params });
             break;
         }
         finished();

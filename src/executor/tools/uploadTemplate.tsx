@@ -2,14 +2,14 @@ import { command, model } from '@/ts/base';
 import { IDirectory } from '@/ts/core';
 import { formatDate } from '@/utils';
 import { dataHandling, generateXlsx, readXlsx } from '@/utils/excel';
+import { getConfigs, getReadConfigs } from '@/utils/excel/configs/index';
 import {
   Context,
   DataHandler,
   ErrorMessage,
-  ReadConfig,
-  SheetConfig,
+  ISheetRead,
+  ISheet,
 } from '@/utils/excel/types';
-import { getConfigs, getReadConfigs } from '@/utils/excel/configs/index';
 import { ProTable } from '@ant-design/pro-components';
 import { Button, Modal, Spin, Tabs, Tag, Upload, message } from 'antd';
 import TabPane from 'antd/lib/tabs/TabPane';
@@ -72,7 +72,7 @@ export const uploadTemplate = (dir: IDirectory) => {
 
 /** 展示数据 */
 const showData = (
-  configs: ReadConfig<any, any, SheetConfig<any>>[],
+  configs: ISheetRead<any, any, ISheet<any>>[],
   confirm: (modal: any) => void,
   okText: string,
 ) => {
@@ -86,11 +86,10 @@ const showData = (
     content: (
       <Tabs>
         {configs.map((item) => {
-          let sheetConfig = item.sheetConfig;
           return (
-            <TabPane tab={sheetConfig.sheetName} key={sheetConfig.sheetName}>
+            <TabPane tab={item.sheet.sheetName} key={item.sheet.sheetName}>
               <ProTable
-                dataSource={sheetConfig.data}
+                dataSource={item.sheet.data}
                 cardProps={{ bodyStyle: { padding: 0 } }}
                 scroll={{ y: 400 }}
                 options={false}
@@ -111,7 +110,7 @@ const showData = (
                       );
                     },
                   },
-                  ...sheetConfig.metaColumns,
+                  ...item.sheet.metaColumns,
                 ]}
               />
             </TabPane>
@@ -126,10 +125,10 @@ const showData = (
 const generate = async (
   dir: IDirectory,
   name: string,
-  configs: ReadConfig<any, any, SheetConfig<any>>[],
+  reads: ISheetRead<any, any, ISheet<any>>[],
   context: Context,
 ) => {
-  let errors = configs.flatMap((item) => item.checkData(context));
+  let errors = reads.flatMap((item) => item.checkData(context));
   if (errors.length > 0) {
     showErrors(errors);
     return;
@@ -156,10 +155,10 @@ const generate = async (
       dir.taskEmitter.changCallback();
       message.success(`模板导入成功！`);
       showData(
-        configs,
+        reads,
         (modal) => {
           modal.destroy();
-          let sheets = configs.map((item) => item.sheetConfig);
+          let sheets = reads.map((item) => item.sheet);
           let fileName = `数据导入模板(${formatDate(new Date(), 'yyyy-MM-dd HH:mm')})`;
           generateXlsx(sheets, fileName);
         },
@@ -171,7 +170,7 @@ const generate = async (
       showErrors(errors);
     },
   };
-  dataHandling(context, handler, configs);
+  dataHandling(context, handler, reads);
 };
 
 /** 错误数据 */

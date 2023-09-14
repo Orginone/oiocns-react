@@ -1,6 +1,6 @@
-import { IDirectory } from '@/ts/core';
-import { ITransfer } from '@/ts/core';
+import { IDirectory, ITransfer } from '@/ts/core';
 import { Graph } from '@antv/x6';
+import { message } from 'antd';
 import React, { createRef, useEffect, useState } from 'react';
 import cls from './../index.module.less';
 import { LinkStore, createGraph } from './widgets/graph';
@@ -21,7 +21,7 @@ const loadProps = async (current: IDirectory) => {
  * 返回一个请求编辑器
  * @returns
  */
-const LinkEditor: React.FC<IProps> = ({ current }) => {
+const TransferEditor: React.FC<IProps> = ({ current }) => {
   const ref = createRef<HTMLDivElement>();
   const [initializing, setInitializing] = useState<boolean>(true);
   useEffect(() => {
@@ -39,28 +39,28 @@ const LinkEditor: React.FC<IProps> = ({ current }) => {
         graph.on('node:added', async (args) => {
           await current.addNode(args.cell.getData());
         });
-        graph.on('node:moved', () => current.refresh(current.metadata));
+        graph.on('node:moved', () => current.update(current.metadata));
         graph.on('node:removed', async (args) => {
           await current.delNode(args.cell.getData().id);
         });
-        graph.on('node:selected', (a) => current.command.emitter('node', 'selected', a));
-        graph.on('node:unselected', (a) =>
-          current.command.emitter('node', 'unselected', a),
-        );
         graph.on('node:contextmenu', (a) =>
           current.command.emitter('node', 'contextmenu', a),
         );
         graph.on('node:click', (a) => current.command.emitter('node', 'click', a));
         graph.on('edge:change:target', async (args) => {
           if ((args.current as any)?.cell) {
-            await current.addEdge({
+            let success: boolean = await current.addEdge({
               id: args.edge.id,
               start: args.edge.getSourceCellId(),
               end: args.edge.getTargetCellId(),
             });
+            if (!success) {
+              message.error('检测到存在环状结构，自动删除！');
+              graph.removeEdge(args.cell.id);
+            }
           }
         });
-        graph.on('edge:moved', () => current.refresh(current.metadata));
+        graph.on('edge:moved', () => current.update(current.metadata));
         graph.on('edge:removed', async (args) => {
           await current.delEdge(args.cell.id);
         });
@@ -126,7 +126,10 @@ const handler = (current: ITransfer, graph: Graph, cmd: string, args: any) => {
     case 'center':
       graph.centerContent();
       break;
+    case 'refresh':
+      // graph.fromJSON(current.metadata.graph);
+      break;
   }
 };
 
-export default LinkEditor;
+export default TransferEditor;

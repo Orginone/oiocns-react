@@ -70,8 +70,8 @@ const MonacoEditor: React.FC<IProps> = (props: IProps) => {
 
   // 监听函数
   useEffect(() => {
-    const id = props.cmd?.subscribe((_, cmd, args) => {
-      if (cmd == 'onValueChange') {
+    const id = props.cmd?.subscribe((type, cmd, args) => {
+      if (type == 'request' && cmd == 'onValueChange') {
         setValue(args);
       }
     });
