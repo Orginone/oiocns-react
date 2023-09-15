@@ -82,7 +82,16 @@ export class Species extends StandardFileInfo<schema.XSpecies> implements ISpeci
   }
   override async copy(destination: IDirectory): Promise<boolean> {
     if (this.allowCopy(destination)) {
-      return await super.copyTo(destination.id, destination.resource.speciesColl);
+      await super.copyTo(destination.id, destination.resource.speciesColl);
+      const items = await this.directory.resource.speciesItemColl.loadSpace({
+        options: {
+          match: {
+            speciesId: this.id,
+          },
+        },
+      });
+      await destination.resource.speciesItemColl.replaceMany(items);
+      return true;
     }
     return false;
   }
