@@ -45,10 +45,10 @@ const SelectPropertys: React.FC<IProps> = (props) => {
       props.selected.push(property);
       props.onAdded(property);
     } else {
-      props.selected.splice(
-        props.selected.findIndex((i) => i.id == property.id),
-        1,
-      );
+      let selectedIndex = props.selected.findIndex((i) => i.id == property.id);
+      if (selectedIndex > 0) {
+        props.selected.splice(selectedIndex, 1);
+      }
       props.onDeleted(property.id);
     }
   };
