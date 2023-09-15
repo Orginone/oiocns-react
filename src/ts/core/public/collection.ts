@@ -84,9 +84,6 @@ export class XCollection<T extends schema.Xbase> {
       copyId,
     );
     if (res.success) {
-      if (res.data && this._loaded) {
-        this._cache.push(res.data);
-      }
       return res.data;
     }
   }
@@ -110,9 +107,6 @@ export class XCollection<T extends schema.Xbase> {
       if (!Array.isArray(res.data)) {
         res.data = [res.data as unknown as T];
       }
-      if (res.data && res.data.length > 0 && this._loaded) {
-        this._cache.push(...res.data);
-      }
       return res.data || [];
     }
     return [];
@@ -130,14 +124,6 @@ export class XCollection<T extends schema.Xbase> {
       copyId,
     );
     if (res.success) {
-      if (res.data && this._loaded) {
-        const index = this._cache.findIndex((i) => i.id === res.data.id);
-        if (index > -1) {
-          this._cache[index] = res.data;
-        } else {
-          this._cache.push(res.data);
-        }
-      }
       return res.data;
     }
   }
@@ -158,16 +144,6 @@ export class XCollection<T extends schema.Xbase> {
       copyId,
     );
     if (res.success) {
-      if (res.data && res.data.length > 0 && this._loaded) {
-        res.data.forEach((item) => {
-          const index = this._cache.findIndex((i) => i.id === item.id);
-          if (index > -1) {
-            this._cache[index] = item;
-          } else {
-            this._cache.push(item);
-          }
-        });
-      }
       return res.data || [];
     }
     return [];
@@ -221,9 +197,6 @@ export class XCollection<T extends schema.Xbase> {
       copyId,
     );
     if (res.success) {
-      if (res.data?.MatchedCount > 0 && this._loaded) {
-        this._cache = this._cache.filter((i) => i.id != data.id);
-      }
       return res.data?.MatchedCount > 0;
     }
     return false;
@@ -250,9 +223,6 @@ export class XCollection<T extends schema.Xbase> {
       copyId,
     );
     if (res.success) {
-      if (res.data?.MatchedCount > 0 && this._loaded) {
-        this._cache = this._cache.filter((i) => data.every((a) => a.id != i.id));
-      }
       return res.data?.MatchedCount > 0;
     }
     return false;
@@ -290,9 +260,6 @@ export class XCollection<T extends schema.Xbase> {
       copyId,
     );
     if (res.success) {
-      if (res.data?.MatchedCount > 0 && this._loaded) {
-        this._cache = this._cache.filter((i) => i.id != data.id);
-      }
       return res.data?.MatchedCount > 0;
     }
     return false;
@@ -311,9 +278,6 @@ export class XCollection<T extends schema.Xbase> {
       copyId,
     );
     if (res.success) {
-      if (res.data?.MatchedCount > 0 && this._loaded) {
-        this._cache = this._cache.filter((i) => data.every((a) => a.id != i.id));
-      }
       return res.data?.MatchedCount > 0;
     }
     return false;
