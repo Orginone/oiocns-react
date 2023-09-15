@@ -8,16 +8,16 @@ import SchemaForm from '@/components/SchemaForm';
 
 interface IProps {
   formType: string;
-  link: ITransfer;
+  transfer: ITransfer;
   node: model.Node<any>;
-  pos: model.ScriptPos;
+  pos: model.Pos;
   current?: model.Script;
-  finished: (code?: string) => void;
+  finished: () => void;
 }
 
 export const ScriptForm: React.FC<IProps> = ({
   formType,
-  link,
+  transfer,
   pos,
   node,
   current,
@@ -32,8 +32,15 @@ export const ScriptForm: React.FC<IProps> = ({
       },
     },
     {
-      title: '脚本',
+      title: '编码',
       dataIndex: 'code',
+      formItemProps: {
+        rules: [{ required: true, message: '编码为必填项' }],
+      },
+    },
+    {
+      title: '脚本',
+      dataIndex: 'coder',
       colProps: { span: 24 },
       renderFormItem: (_, __, form) => {
         return (
@@ -82,10 +89,10 @@ export const ScriptForm: React.FC<IProps> = ({
       onFinish={async (values) => {
         switch (formType) {
           case 'newScript':
-            await link.addNodeScript(pos, node, values);
+            await transfer.addNodeScript(pos, node, values);
             break;
           case 'updateScript':
-            await link.updNodeScript(pos, node, { ...current, ...values });
+            await transfer.updNodeScript(pos, node, { ...current, ...values });
             break;
         }
         finished();

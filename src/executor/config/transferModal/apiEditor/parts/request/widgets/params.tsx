@@ -16,7 +16,7 @@ export interface Param {
   description?: string;
 }
 
-const toUrlParams = (url: string = '', params: readonly Param[]): string => {
+export const toUrlParams = (url: string = '', params: readonly Param[]): string => {
   let parts = url.split('?');
   let ans = params.map((item) => `${item.key ?? ''}=${item.value ?? ''}`).join('&');
   return parts[0] + '?' + ans;
@@ -48,8 +48,15 @@ const Params: React.FC<IProps> = ({ transfer, current }) => {
 
   useEffect(() => {
     const id = transfer.command.subscribe((type, cmd, args) => {
-      if (type == 'node' && cmd == 'update') {
-        setParams(toParams(args.data.uri));
+      if (type == 'node') {
+        switch (cmd) {
+          case 'uri':
+            setParams(toParams(args));
+            break;
+          case 'params':
+            setParams(args);
+            break;
+        }
       }
     });
     return () => {
@@ -58,9 +65,9 @@ const Params: React.FC<IProps> = ({ transfer, current }) => {
   });
 
   const onChange = (params: readonly Param[]) => {
-    const url = toUrlParams(current.data.uri, params);
-    current.data.uri = url;
+    current.data.uri = toUrlParams(current.data.uri, params);
     transfer.updNode(current);
+    transfer.command.emitter('node', 'params', params);
   };
 
   return (

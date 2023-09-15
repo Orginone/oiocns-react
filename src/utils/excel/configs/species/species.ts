@@ -1,13 +1,13 @@
 import { XSpecies } from '@/ts/base/schema';
 import { IDirectory } from '@/ts/core';
 import { assignment } from '../..';
-import { Context, ReadConfigImpl, SheetConfigImpl, SheetName } from '../../types';
+import { Context, SheetRead, Sheet, SheetName } from '../../types';
 
 export interface Species extends XSpecies {
   directoryCode: string;
 }
 
-export class DictSheetConfig extends SheetConfigImpl<Species> {
+export class DictSheet extends Sheet<Species> {
   directory: IDirectory;
 
   constructor(directory: IDirectory) {
@@ -23,7 +23,7 @@ export class DictSheetConfig extends SheetConfigImpl<Species> {
   }
 }
 
-export class ClassifySheetConfig extends SheetConfigImpl<Species> {
+export class ClassifySheet extends Sheet<Species> {
   directory: IDirectory;
 
   constructor(directory: IDirectory) {
@@ -39,15 +39,17 @@ export class ClassifySheetConfig extends SheetConfigImpl<Species> {
   }
 }
 
-class CommonReadConfig<
-  S extends DictSheetConfig | ClassifySheetConfig,
-> extends ReadConfigImpl<Species, Context, S> {
+class CommonRead<S extends DictSheet | ClassifySheet> extends SheetRead<
+  Species,
+  Context,
+  S
+> {
   /**
    * 初始化
    * @param c 上下文
    */
   async initContext(c: Context): Promise<void> {
-    for (let item of this.sheetConfig.data) {
+    for (let item of this.sheet.data) {
       if (c.speciesMap.has(item.code)) {
         let old = c.speciesMap.get(item.code)!;
         assignment(old, item);
@@ -60,8 +62,8 @@ class CommonReadConfig<
    * @param data 数据
    */
   checkData(context: Context) {
-    for (let index = 0; index < this.sheetConfig.data.length; index++) {
-      let item = this.sheetConfig.data[index];
+    for (let index = 0; index < this.sheet.data.length; index++) {
+      let item = this.sheet.data[index];
       if (!item.directoryCode || !item.name || !item.code) {
         if (item.typeName == '分类') {
           this.pushError(index, `存在未填写的目录代码、分类名称、分类代码！`);
@@ -82,37 +84,32 @@ class CommonReadConfig<
    * @param context 上下文
    */
   async operating(context: Context, onItemCompleted: () => void): Promise<void> {
-    let speciesMap: { index: number; species: XSpecies }[] = [];
-    for (let index = 0; index < this.sheetConfig.data.length; index++) {
-      let row = this.sheetConfig.data[index];
+    const data = this.sheet.data;
+    for (let index = 0; index < data.length; index++) {
+      let row = data[index];
       let dir = context.directoryMap.get(row.directoryCode)!;
       row.directoryId = dir.id;
-      speciesMap.push({ index, species: row });
       onItemCompleted();
     }
-    if (speciesMap.length > 0) {
-      let replaceRes = await this.sheetConfig.directory.resource.speciesColl.replaceMany(
-        speciesMap.map((item) => item.species),
-      );
-      for (let index = 0; index < replaceRes.length; index++) {
-        let species = replaceRes[index] as Species;
-        this.sheetConfig.data[speciesMap[index].index] = species;
-        context.speciesMap.set(species.code, species);
-      }
-    }
+    (await this.sheet.directory.resource.speciesColl.replaceMany(data))
+      .map((item) => item as Species)
+      .forEach((item, index) => {
+        data[index] = item;
+        context.speciesMap.set(item.code, item);
+      });
   }
 }
 
-export class DictReadConfig extends CommonReadConfig<DictSheetConfig> {
+export class DictSheetRead extends CommonRead<DictSheet> {
   async operating(context: Context, onItemCompleted: () => void): Promise<void> {
-    this.sheetConfig.data.forEach((row) => (row.typeName = '字典'));
+    this.sheet.data.forEach((row) => (row.typeName = '字典'));
     await super.operating(context, onItemCompleted);
   }
 }
 
-export class ClassifyReadConfig extends CommonReadConfig<ClassifySheetConfig> {
+export class ClassifySheetRead extends CommonRead<ClassifySheet> {
   async operating(context: Context, onItemCompleted: () => void): Promise<void> {
-    this.sheetConfig.data.forEach((row) => (row.typeName = '分类'));
+    this.sheet.data.forEach((row) => (row.typeName = '分类'));
     await super.operating(context, onItemCompleted);
   }
 }

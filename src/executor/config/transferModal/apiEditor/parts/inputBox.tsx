@@ -2,6 +2,8 @@ import { model } from '@/ts/base';
 import { ITransfer } from '@/ts/core';
 import { Button, Input, Select, Space } from 'antd';
 import React, { useEffect, useState } from 'react';
+import { toUrlParams } from './request/widgets/params';
+import { EnvSelector } from '../../linkEditor/tools/widgets/graphTools';
 
 interface IProps {
   transfer: ITransfer;
@@ -13,10 +15,19 @@ const InputBox: React.FC<IProps> = ({ transfer, current, send }) => {
   const [method, setMethod] = useState(current.data.method);
   const [uri, setUri] = useState(current.data.uri);
   useEffect(() => {
-    const id = transfer.command.subscribe((type, cmd) => {
-      if (type == 'node' && cmd == 'update') {
-        setMethod(current.data.method);
-        setUri(current.data.uri);
+    const id = transfer.command.subscribe((type, cmd, args) => {
+      if (type == 'node') {
+        switch (cmd) {
+          case 'method':
+            setMethod(args);
+            break;
+          case 'uri':
+            setUri(args);
+            break;
+          case 'params':
+            setUri(toUrlParams(uri, args));
+            break;
+        }
       }
     });
     return () => {
@@ -39,6 +50,7 @@ const InputBox: React.FC<IProps> = ({ transfer, current, send }) => {
             onChange={(value) => {
               current.data.method = value;
               transfer.updNode(current);
+              transfer.command.emitter('node', 'method', value);
             }}
           />
         }
@@ -48,18 +60,10 @@ const InputBox: React.FC<IProps> = ({ transfer, current, send }) => {
         onChange={(event) => {
           current.data.uri = event.target.value;
           transfer.updNode(current);
+          transfer.command.emitter('node', 'uri', event.target.value);
         }}
       />
-      <Select
-        disabled
-        value={transfer.metadata.curEnv}
-        options={transfer.metadata.envs.map((item) => {
-          return {
-            value: item.id,
-            label: item.name,
-          };
-        })}
-      />
+      <EnvSelector current={transfer} />
       <Button onClick={() => send()}>Send</Button>
     </Space.Compact>
   );

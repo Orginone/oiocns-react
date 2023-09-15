@@ -88,7 +88,7 @@ const NodeForms: React.FC<IProps> = ({ current }) => {
               <forms.EnvironmentForm
                 key={generateUuid()}
                 formType={commands[entry[0]]}
-                link={current}
+                transfer={current}
                 current={entry[1]}
                 finished={() => finished(entry[0])}
               />
@@ -97,7 +97,17 @@ const NodeForms: React.FC<IProps> = ({ current }) => {
             return (
               <forms.RequestForm
                 key={generateUuid()}
-                link={current}
+                transfer={current}
+                current={entry[1]}
+                finished={() => {
+                  finished(entry[0]);
+                }}
+              />
+            );
+          case 'updateMapping':
+            return (
+              <forms.MappingForm
+                transfer={current}
                 current={entry[1]}
                 finished={() => {
                   finished(entry[0]);

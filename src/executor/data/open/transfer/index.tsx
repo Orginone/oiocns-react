@@ -1,16 +1,16 @@
+import TransferEditor from '@/executor/config/transferModal/linkEditor/graph';
+import { ToolBar } from '@/executor/config/transferModal/linkEditor/tools';
 import FullScreenModal from '@/executor/tools/fullScreen';
 import { ITransfer } from '@/ts/core';
 import React, { useEffect } from 'react';
-import TransferEditor from './graph';
-import { ToolBar } from './tools';
 
 interface IProps {
   current: ITransfer;
   finished: () => void;
 }
 
-const TransferModal: React.FC<IProps> = ({ current, finished }) => {
-  useEffect(() => current.machine('Edit'));
+const TransferView: React.FC<IProps> = ({ current, finished }) => {
+  useEffect(() => current.machine('View'));
   return (
     <FullScreenModal
       open
@@ -27,4 +27,4 @@ const TransferModal: React.FC<IProps> = ({ current, finished }) => {
   );
 };
 
-export default TransferModal;
+export default TransferView;
