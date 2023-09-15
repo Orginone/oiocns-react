@@ -120,8 +120,6 @@ export type XAuthority = {
 
 //目录定义
 export type XDirectory = {
-  // 父目录ID
-  parentId: string;
   // 共享用户ID
   shareId: string;
   // 目录下的属性
