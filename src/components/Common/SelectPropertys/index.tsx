@@ -46,7 +46,7 @@ const SelectPropertys: React.FC<IProps> = (props) => {
       props.onAdded(property);
     } else {
       let selectedIndex = props.selected.findIndex((i) => i.id == property.id);
-      if (selectedIndex > 0) {
+      if (selectedIndex > -1) {
         props.selected.splice(selectedIndex, 1);
       }
       props.onDeleted(property.id);
@@ -69,10 +69,10 @@ const SelectPropertys: React.FC<IProps> = (props) => {
 
   const handelDel = (id: string) => {
     setCenterCheckedKeys(centerCheckedKeys.filter((data) => data != id));
-    props.selected.splice(
-      props.selected.findIndex((i) => i.id == id),
-      1,
-    );
+    let selectedIndex = props.selected.findIndex((i) => i.id == id);
+    if (selectedIndex > -1) {
+      props.selected.splice(selectedIndex, 1);
+    }
     props.onDeleted(id);
   };
 
