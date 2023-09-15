@@ -185,7 +185,13 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
         directoryId: destination.id,
       });
       if (data) {
-        await this.operateDirectoryResource(this, destination.resource, 'replaceMany');
+        await this.operateDirectoryResource(
+          this,
+          destination.resource,
+          'replaceMany',
+          false,
+          this.directory.target.space.id != destination.target.space.id,
+        );
         await destination.notify('refresh', [data]);
       }
     }
@@ -384,9 +390,10 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
     resource: DataResource,
     action: 'replaceMany' | 'deleteMany',
     move?: boolean,
+    isCrossSpace?: boolean,
   ) {
     for (const child of directory.children) {
-      await this.operateDirectoryResource(child, resource, action);
+      await this.operateDirectoryResource(child, resource, action, move, isCrossSpace);
     }
     await resource.directoryColl[action](directory.children.map((a) => a.metadata));
     await resource.formColl[action](directory.forms.map((a) => a.metadata));
@@ -402,11 +409,26 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
         directoryId: directory.id,
       });
     }
-    if (action == 'replaceMany' && move) {
-      var apps = directory.resource.applicationColl.cache.filter(
-        (i) => i.directoryId === directory.id,
-      );
-      await resource.applicationColl.replaceMany(apps);
+    if (action == 'replaceMany') {
+      if (move) {
+        var apps = directory.resource.applicationColl.cache.filter(
+          (i) => i.directoryId === directory.id,
+        );
+        await resource.applicationColl.replaceMany(apps);
+      } else {
+        if (isCrossSpace) {
+          const items = await this.directory.resource.speciesItemColl.loadSpace({
+            options: {
+              match: {
+                speciesId: {
+                  _in_: directory.specieses.map((a) => a.id),
+                },
+              },
+            },
+          });
+          await resource.speciesItemColl.replaceMany(items);
+        }
+      }
     }
   }
 }
