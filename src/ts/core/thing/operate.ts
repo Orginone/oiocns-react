@@ -119,7 +119,7 @@ export class DirectoryOperate implements IDirectoryOperate {
           {
             const index = coll.cache.findIndex((a) => a.id == data.id);
             coll.cache[index] = data;
-            this.standardFiles.find((i) => i.id === data.id)?.updateMetadata(data);
+            this.standardFiles.find((i) => i.id === data.id)?.setMetadata(data);
           }
           break;
         case 'delete':
