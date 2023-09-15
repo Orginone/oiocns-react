@@ -96,7 +96,7 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
       {
         ..._metadata,
         typeName: _metadata.typeName || '目录',
-        directoryId: _parent?.id || _target.id,
+        directoryId: _metadata.directoryId || _target.id,
       },
       _parent ?? (_target as unknown as IDirectory),
       _target.resource.directoryColl,

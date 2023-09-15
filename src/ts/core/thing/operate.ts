@@ -92,7 +92,7 @@ export class DirectoryOperate implements IDirectoryOperate {
         .map((a) => new Application(a, this.directory, undefined, apps)),
     );
     for (const child of this.resource.directoryColl.cache.filter(
-      (i) => i.directoryId === this.directory.id || i.parentId === this.directory.id,
+      (i) => i.directoryId === this.directory.id,
     )) {
       const subDir = new Directory(child, this.directory.target, this.directory);
       await subDir.loadDirectoryResource();

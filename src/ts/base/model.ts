@@ -2,7 +2,6 @@ import {
   XApplication,
   Xbase,
   XDirectory,
-  XEntity,
   XForm,
   XIdentity,
   XProperty,
