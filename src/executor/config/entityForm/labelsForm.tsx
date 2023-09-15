@@ -75,6 +75,24 @@ const LabelsForm = (props: Iprops) => {
         rules: [{ required: true, message: '分类代码为必填项' }],
       },
     },
+    {
+      title: '类型',
+      dataIndex: 'typeName',
+      valueType: 'select',
+      initialValue: '实体配置',
+      readonly: readonly,
+      fieldProps: {
+        options: ['实体配置', '事项配置', '报表'].map((i) => {
+          return {
+            value: i,
+            label: i,
+          };
+        }),
+      },
+      formItemProps: {
+        rules: [{ required: true, message: '类型为必填项' }],
+      },
+    },
   ];
   if (readonly) {
     columns.push(...EntityColumns(props.current!.metadata));
@@ -106,7 +124,6 @@ const LabelsForm = (props: Iprops) => {
         }
       }}
       onFinish={async (values) => {
-        values.typeName = props.typeName;
         switch (props.formType) {
           case 'update':
             await form!.update(values);

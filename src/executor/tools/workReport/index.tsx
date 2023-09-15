@@ -38,17 +38,21 @@ const ReportForms: React.FC<IProps> = (props) => {
   const [reallyData, setReallyData] = useState(
     formData.after.length > 0 ? formData.after[0] : undefined,
   );
-  const [readOnly, setReadOnly] = useState<boolean>(false);
+  const [readOnly, setReadOnly] = useState<boolean>(false); // 是否只读
   const hotRef: any = useRef(null);
-  let sheetList: any = reportData?.rule
-    ? Object.values(JSON.parse(reportData?.rule))
-    : [];
-  let datas = sheetList[sheetIndex]?.data?.data || [[]];
-  let setting = sheetList[sheetIndex]?.data?.setting || {};
-  let mergeCells = setting?.mergeCells || [];
+  let sheetList: any = reportData?.rule ? JSON.parse(reportData?.rule) : {}; // 当前报表所有数据
+  delete sheetList?.list;
+  sheetList = Object.values(sheetList);
+  const [selectItem, setSelectedItem] = useState<any>(sheetList[0]);
+  const datas = selectItem?.data?.data || [[]]; // 当前sheet页数据
+  const setting = selectItem?.data?.setting || {}; // 报表设置数据
+  const mergeCells = setting?.mergeCells || []; // 合并单元格数据
 
   useEffect(() => {
     const hot = hotRef.current.hotInstance;
+    hot.updateSettings({
+      data: [[]],
+    });
     Handsontable.editors.registerEditor('SelectEditor', selectEditor); // 还未完成同步组件
     setStyleList(setting?.styleList || []);
     setClassList(setting?.classList || []);
@@ -60,12 +64,19 @@ const ReportForms: React.FC<IProps> = (props) => {
       mergeCells: mergeCells,
     });
     if (props.allowEdit) {
-      props?.ruleService?.setFormChangeCallback(reportData.id, (data: any) => {
-        if (data) {
-          console.log(data);
-          setServiceData(data);
-        }
-      });
+      props?.ruleService && (props.ruleService.currentMainFormId = reportData.id);
+      //初始化数据
+      props?.ruleService?.collectData<{ formId: string; callback: (data: any) => void }>(
+        'formCallBack',
+        {
+          formId: reportData.id,
+          callback: (data: any) => {
+            if (data) {
+              setServiceData(data);
+            }
+          },
+        },
+      );
       kernel.createThing(props.belong.userId, [], '').then((res) => {
         if (res.success && res.data) {
           setReallyData(res.data);
@@ -83,7 +94,7 @@ const ReportForms: React.FC<IProps> = (props) => {
         });
       }
     }
-  }, []);
+  }, [sheetIndex]);
 
   const setValidator = (item: any, rules: any) => {
     // 设置单元格规则
@@ -187,7 +198,9 @@ const ReportForms: React.FC<IProps> = (props) => {
     if (serviceData) {
       Object.keys(serviceData).map((k) => {
         if (item.prop.id === k) {
-          hotRef.current.hotInstance.setDataAtCell([[item.row, item.col, serviceData[k]]]);
+          hotRef.current.hotInstance.setDataAtCell([
+            [item.row, item.col, serviceData[k]],
+          ]);
         }
       });
     }
@@ -300,6 +313,7 @@ const ReportForms: React.FC<IProps> = (props) => {
   };
 
   const onChange = (key: string) => {
+    setSelectedItem(sheetList[key]);
     setSheetIndex(key);
   };
 
@@ -357,19 +371,17 @@ const ReportForms: React.FC<IProps> = (props) => {
         licenseKey="non-commercial-and-evaluation" // for non-commercial use only
         afterChange={afterChange}
       />
-      <div>
-        <Tabs
-          tabPosition={'bottom'}
-          type="card"
-          onChange={onChange}
-          items={sheetList.map((it: any, index: number) => {
-            return {
-              label: it.name,
-              key: index,
-            };
-          })}
-        />
-      </div>
+      <Tabs
+        tabPosition={'bottom'}
+        type="card"
+        onChange={onChange}
+        items={sheetList.map((it: any, index: number) => {
+          return {
+            label: it.name,
+            key: index,
+          };
+        })}
+      />
     </div>
   );
 };

@@ -10,12 +10,12 @@ registerAllModules();
 import 'handsontable/dist/handsontable.min.css';
 import SelectPropertys from '../../SelectPropertys';
 import AttributeConfig from '../../FormDesign/attributeConfig';
-import { AttributeModel } from '@/ts/base/model';
 import { IForm } from '@/ts/core';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
-import { XAttribute } from '@/ts/base/schema';
+import { schema } from '@/ts/base';
 interface IProps {
   current: IForm;
+  sheetList: any;
   selectItem: any;
   reportChange: any;
   changeType: string;
@@ -24,6 +24,7 @@ interface IProps {
 
 const HotTableView: React.FC<IProps> = ({
   current,
+  sheetList,
   selectItem,
   reportChange,
   changeType,
@@ -31,7 +32,8 @@ const HotTableView: React.FC<IProps> = ({
 }) => {
   const [modalType, setModalType] = useState<string>('');
   const [tkey, tforceUpdate] = useObjectUpdate('');
-  const [selectedItem, setSelectedItem] = useState<XAttribute>();
+  const [sheetIndex, setSheetIndex] = useState<any>(0); // tabs页签
+  const [selectedItem, setSelectedItem] = useState<schema.XAttribute>();
   const [cells, setCells] = useState<any>([]);
   const [styleList, setStyleList] = useState<any>([]);
   const [classList, setClassList] = useState<any>([]);
@@ -50,24 +52,26 @@ const HotTableView: React.FC<IProps> = ({
     }
   };
   const hotRef: any = useRef(null); // ref
-  const data: any = current.metadata;
-  const sheetList = data?.data?.rule ? JSON.parse(data?.data?.rule) : []; // 获取当前报表所有sheet数据
-  let sheetIndex = sheetList.findIndex((it: any) => it.code === selectItem.code); // 获取当前sheet页下标
-  let mergeCells = sheetList[sheetIndex]?.data?.setting?.mergeCells || [];
 
   useEffect(() => {
     const hot = hotRef.current.hotInstance;
-    setCells(sheetList[sheetIndex]?.data?.setting?.cells || []);
-    setStyleList(sheetList[sheetIndex]?.data?.setting?.styleList || []);
-    setClassList(sheetList[sheetIndex]?.data?.setting?.classList || []);
-    setRowHeights(sheetList[sheetIndex]?.data?.setting?.row_h || []);
-    setColWidths(sheetList[sheetIndex]?.data?.setting?.col_w || []);
     hot.updateSettings({
-      data: sheetList[sheetIndex]?.data?.data,
+      data: [[]],
+    });
+    const index = sheetList.findIndex((it: any) => it.code === selectItem.code); // 获取当前sheet页下标
+    setSheetIndex(index);
+    const mergeCells = sheetList[index]?.data?.setting?.mergeCells || [];
+    setCells(sheetList[index]?.data?.setting?.cells || []);
+    setStyleList(sheetList[index]?.data?.setting?.styleList || []);
+    setClassList(sheetList[index]?.data?.setting?.classList || []);
+    setRowHeights(sheetList[index]?.data?.setting?.row_h || []);
+    setColWidths(sheetList[index]?.data?.setting?.col_w || []);
+    hot.updateSettings({
+      data: sheetList[index]?.data?.data,
       cell: cells,
       mergeCells: mergeCells,
     });
-  }, []);
+  }, [selectItem]);
 
   styleList?.forEach((item: any) => {
     hotRef.current.hotInstance.getCellMeta(item.row, item.col).renderer =
@@ -220,9 +224,10 @@ const HotTableView: React.FC<IProps> = ({
       },
     };
     sheetList[sheetIndex].data = json;
+    const newData = Object.assign({}, sheetList);
     await current.update({
       ...current.metadata,
-      rule: JSON.stringify(sheetList),
+      rule: JSON.stringify(newData),
     });
   };
 
@@ -234,7 +239,7 @@ const HotTableView: React.FC<IProps> = ({
     licenseKey: 'internal-use-in-handsontable',
   });
 
-  const saveSpeciality = (prop: XAttribute) => {
+  const saveSpeciality = (prop: schema.XAttribute) => {
     //插入特性
     const selected = hotRef.current.hotInstance.getSelected() || [];
     for (let index = 0; index < selected.length; index += 1) {
@@ -264,6 +269,7 @@ const HotTableView: React.FC<IProps> = ({
   };
 
   const upDataCell = () => {
+    console.log('123', current);
     // 更新特性rules 但单元格只有只读属性 readOnly
     cells.forEach((item: any) => {
       current.attributes.forEach((items: any) => {
@@ -289,8 +295,8 @@ const HotTableView: React.FC<IProps> = ({
     // 点击单元格
     cells?.forEach((item: any) => {
       if (item.row === coords.row && item.col === coords.col) {
-        setModalType('配置特性');
         setSelectedItem(item.prop);
+        setModalType('配置特性');
       }
     });
   };
@@ -327,7 +333,7 @@ const HotTableView: React.FC<IProps> = ({
         colWidths={colWidths}
         rowHeights={rowHeights}
         dropdownMenu={true}
-        height="680px"
+        height="610px"
         language={zhCN.languageCode}
         stretchH="all"
         manualColumnResize={true}
@@ -376,20 +382,20 @@ const HotTableView: React.FC<IProps> = ({
                   code: prop.code,
                   rule: '{}',
                   remark: prop.remark,
-                } as AttributeModel,
+                } as schema.XAttribute,
                 prop,
               );
               tforceUpdate();
-              const attr = current.attributes.find((i: any) => i.propId === prop.id);
+              console.log(current);
+              const attr = current.attributes.find((i) => i.propId === prop.id);
               if (attr) {
                 saveSpeciality(attr);
               }
             }}
             onDeleted={async (id: any) => {
-              const attr = current.attributes.find((i: any) => i.propId === id);
+              const attr = current.attributes.find((i) => i.propId === id);
               if (attr) {
                 await current.deleteAttribute(attr);
-                tforceUpdate();
               }
             }}
           />

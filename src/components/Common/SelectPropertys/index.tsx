@@ -45,7 +45,11 @@ const SelectPropertys: React.FC<IProps> = (props) => {
       props.selected.push(property);
       props.onAdded(property);
     } else {
-      props.selected = props.selected.filter((i) => i.id != property.id);
+      // delFromSelected(property.id);
+      let selectedIndex = props.selected.findIndex((i) => i.id == property.id);
+      if (selectedIndex > -1) {
+        props.selected.splice(selectedIndex, 1);
+      }
       props.onDeleted(property.id);
     }
   };
@@ -66,6 +70,10 @@ const SelectPropertys: React.FC<IProps> = (props) => {
 
   const handelDel = (id: string) => {
     setCenterCheckedKeys(centerCheckedKeys.filter((data) => data != id));
+    let selectedIndex = props.selected.findIndex((i) => i.id == id);
+    if (selectedIndex > -1) {
+      props.selected.splice(selectedIndex, 1);
+    }
     props.onDeleted(id);
   };
 

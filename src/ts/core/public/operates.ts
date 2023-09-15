@@ -139,77 +139,17 @@ export const directoryOperates = {
     label: '新建模块',
     iconType: '模块',
   },
-  NewThingConfig: {
+  NewForm: {
     sort: 8,
-    cmd: 'newThingConfig',
-    label: '新建实体配置',
-    iconType: '实体配置',
-  },
-  NewWorkConfig: {
-    sort: 9,
-    cmd: 'newWorkConfig',
-    label: '新建事项配置',
+    cmd: 'newForm',
+    label: '新建表单',
     iconType: '事项配置',
   },
-  NewReport: {
-    sort: 7,
-    cmd: 'newReport',
-    label: '新建报表',
-    iconType: 'newDir',
-  },
-  NewRequest: {
-    sort: 10,
-    cmd: 'newRequest',
-    label: '新建请求配置',
-    iconType: '请求配置',
-  },
-  BatchRequest: {
-    sort: 10,
-    cmd: 'batchRequest',
-    label: '批量请求配置',
-    iconType: '批量请求配置',
-  },
-  NewLink: {
+  NewTransferConfig: {
     sort: 9,
-    cmd: 'newLink',
-    label: '新建链接配置',
-    iconType: '链接配置',
-  },
-  NewMapping: {
-    sort: 12,
-    cmd: 'newMapping',
-    label: '新建映射配置',
-    iconType: '映射配置',
-  },
-  BatchMapping: {
-    sort: 12,
-    cmd: 'batchMapping',
-    label: '批量映射配置',
-    iconType: '批量映射配置',
-  },
-  NewExecutable: {
-    sort: 13,
-    cmd: 'newExecutable',
-    label: '新建脚本配置',
-    iconType: '脚本配置',
-  },
-  NewEnvironment: {
-    sort: 14,
-    cmd: 'newEnvironment',
-    label: '新建环境配置',
-    iconType: '环境配置',
-  },
-  NewSelection: {
-    sort: 15,
-    cmd: 'newSelection',
-    label: '新建选择配置',
-    iconType: '选择配置',
-  },
-  NewStore: {
-    sort: 15,
-    cmd: 'newStore',
-    label: '新建存储配置',
-    iconType: '存储配置',
+    cmd: 'newTransferConfig',
+    label: '新建迁移配置',
+    iconType: '迁移配置',
   },
 };
 
@@ -226,10 +166,24 @@ export const directoryNew = {
     directoryOperates.NewSpecies,
     directoryOperates.NewProperty,
     directoryOperates.NewApp,
-    directoryOperates.NewThingConfig,
-    directoryOperates.NewWorkConfig,
-    directoryOperates.NewReport,
-    directoryOperates.NewLink,
+    directoryOperates.NewForm,
+    directoryOperates.NewTransferConfig,
+  ],
+};
+
+/** 新建仓库 */
+export const newWarehouse = {
+  sort: 0,
+  cmd: 'newWarehouses',
+  label: '仓库管理',
+  iconType: 'newWarehouses',
+  menus: [
+    {
+      sort: -1,
+      cmd: 'newWarehouse',
+      label: '新建仓库',
+      iconType: 'newWarehouse',
+    },
   ],
 };
 

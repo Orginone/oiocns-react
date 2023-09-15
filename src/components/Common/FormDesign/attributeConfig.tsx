@@ -11,6 +11,7 @@ interface IProps {
 }
 
 const AttributeConfig = ({ attr, onChanged, superAuth, onClose }: IProps) => {
+  console.log(attr, '1234');
   const [form] = Form.useForm();
   useEffect(() => {
     const rule = JSON.parse(attr.rule || '{}');
