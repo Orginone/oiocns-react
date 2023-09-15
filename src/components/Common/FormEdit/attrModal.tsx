@@ -17,6 +17,7 @@ interface IProps {
  */
 const AttrModal = ({ current, isOpen, setIsOpen, updateSchema }: IProps) => {
   const onFinished = () => {
+    current.fields = current.attributes.map((a) => a.property!);
     updateSchema();
     setIsOpen(false);
   };
