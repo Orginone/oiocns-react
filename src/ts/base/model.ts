@@ -704,14 +704,19 @@ export type WorkNodeModel = {
   belongId: string;
   // 节点归属定义Id
   defineId: string;
-  // 主表Id集合
-  primaryFormIds: string[] | undefined;
-  // 子表Id集合
-  detailFormIds: string[] | undefined;
+  // 关联表单信息
+  forms: FormInfo[];
   // 主表
-  primaryForms: XForm[] | undefined;
+  primaryForms: XForm[];
   // 子表
-  detailForms: XForm[] | undefined;
+  detailForms: XForm[];
+};
+
+type FormInfo = {
+  // 表单Id
+  id: string;
+  // 类型
+  typeName: string;
 };
 
 export type Branche = {

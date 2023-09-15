@@ -61,9 +61,6 @@ const RootNode: React.FC<IProps> = (props) => {
               deleteFuc={(id: string) => {
                 props.current.primaryForms = primaryForms?.filter((a) => a.id != id);
                 setPrimaryForms(props.current.primaryForms);
-                props.current.primaryFormIds = props.current.primaryFormIds?.filter(
-                  (a) => a != id,
-                );
               }}
             />
           </span>
@@ -88,9 +85,6 @@ const RootNode: React.FC<IProps> = (props) => {
               }}
               deleteFuc={(id: string) => {
                 props.current.detailForms = detailForms?.filter((a) => a.id != id);
-                props.current.detailFormIds = props.current.detailFormIds?.filter(
-                  (a) => a != id,
-                );
                 setDetailForms(props.current.detailForms);
               }}
             />
@@ -115,11 +109,9 @@ const RootNode: React.FC<IProps> = (props) => {
               setSelected={(forms) => {
                 if (formModel === '子表') {
                   props.current.detailForms = forms;
-                  props.current.detailFormIds = forms.map((a) => a.id);
                   setDetailForms(forms);
                 } else {
                   props.current.primaryForms = forms;
-                  props.current.primaryFormIds = forms.map((a) => a.id);
                   setPrimaryForms(forms);
                 }
               }}
