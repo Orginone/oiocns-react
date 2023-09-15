@@ -72,9 +72,10 @@ export default class KernelApi {
    * 实时获取连接状态
    * @param callback
    */
-  public async getConnectStatus(callback: (res: boolean) => void) {
-    this._storeHub.onDisconnected(() => callback(false))
-    this._storeHub.onConnected(() => callback(true))
+  public async onConnectedChanged(callback: (res: boolean) => void) {
+    callback.apply(this, [this._storeHub.isConnected]);
+    this._storeHub.onDisconnected(() => callback.apply(this, [false]));
+    this._storeHub.onConnected(() => callback.apply(this, [true]));
   }
   /**
    * 获取单例

@@ -10,14 +10,14 @@ import { IMessage, ISession, MessageType } from '@/ts/core';
 import { parseAvatar } from '@/ts/base';
 import css from './index.module.less';
 import { parseCiteMsg, parseMsg } from '@/pages/Chats/components/parseMsg';
-import { RiShareForwardFill } from '@/icons/ri'
+import { RiShareForwardFill } from '@/icons/ri';
 import {
   AiOutlineCopy,
   AiOutlineRollback,
   AiOutlineMessage,
   AiOutlineDelete,
-  AiOutlineDownload
-} from '@/icons/ai'
+  AiOutlineDownload,
+} from '@/icons/ai';
 /**
  * @description: 聊天区域
  * @return {*}
@@ -43,7 +43,7 @@ const GroupContent = (props: Iprops) => {
   const [beforescrollHeight, setBeforescrollHeight] = useState(0);
   const [forwardOpen, setForwardOpen] = useState(false); // 设置转发打开窗口
   const [formwardCode, setFormwardCode] = useState<IMessage>(); // 转发时用户
-  const [ismousewheel, setIsMousewheel] = useState(false)
+  const [ismousewheel, setIsMousewheel] = useState(false);
   useEffect(() => {
     props.chat.onMessage((ms) => {
       setMessages([...ms]);
@@ -65,15 +65,15 @@ const GroupContent = (props: Iprops) => {
   }, [messages]);
   function createWheelStopListener(callback: () => void, timeout?: number) {
     var handle: ReturnType<typeof setTimeout>;
-    setIsMousewheel(true)
-    var onScroll = function() {
-        if (handle) {
-            clearTimeout(handle);
-        }
-        handle = setTimeout(callback, timeout || 200); // default 200 ms
+    setIsMousewheel(true);
+    var onScroll = function () {
+      if (handle) {
+        clearTimeout(handle);
+      }
+      handle = setTimeout(callback, timeout || 200); // default 200 ms
     };
     body.current?.addEventListener('wheel', onScroll);
-    return function() {
+    return function () {
       body.current?.removeEventListener('wheel', onScroll);
     };
   }
@@ -91,8 +91,8 @@ const GroupContent = (props: Iprops) => {
       setMessages([...props.chat.messages]);
     }
     createWheelStopListener(() => {
-      setIsMousewheel(false)
-    })
+      setIsMousewheel(false);
+    });
   };
 
   /** 转发消息 */
@@ -164,7 +164,7 @@ const GroupContent = (props: Iprops) => {
           setSelectId('');
         }}
         getPopupContainer={(triggerNode: HTMLElement) => {
-          return triggerNode.parentElement || document.body
+          return triggerNode.parentElement || document.body;
         }}
         content={msgAction(item)}>
         <div
@@ -183,14 +183,14 @@ const GroupContent = (props: Iprops) => {
   const msgAction = (item: IMessage) => {
     const onClose = () => {
       setSelectId('');
-      message.success('复制成功')
+      message.success('复制成功');
     };
     return (
       <div className={css.msgAction}>
         <CopyToClipboard text={item.msgBody}>
-        <Tooltip title="复制">
-          <AiOutlineCopy className={css.actionIconStyl} onClick={onClose} />
-        </Tooltip>
+          <Tooltip title="复制">
+            <AiOutlineCopy className={css.actionIconStyl} onClick={onClose} />
+          </Tooltip>
         </CopyToClipboard>
         <Tooltip title="引用">
           <AiOutlineMessage
@@ -199,7 +199,10 @@ const GroupContent = (props: Iprops) => {
           />
         </Tooltip>
         <Tooltip title="转发">
-          <RiShareForwardFill className={css.actionIconStyl} onClick={() => forward(item)} />
+          <RiShareForwardFill
+            className={css.actionIconStyl}
+            onClick={() => forward(item)}
+          />
         </Tooltip>
         {item.isMySend && item.allowRecall && (
           <Tooltip title="撤回">
@@ -221,7 +224,7 @@ const GroupContent = (props: Iprops) => {
             }}
           />
         </Tooltip>
-        { ['文件', '视频', '图片'].includes(item.msgType) && (
+        {['文件', '视频', '图片'].includes(item.msgType) && (
           <Tooltip title="下载">
             <AiOutlineDownload
               className={css.actionIconStyl}
