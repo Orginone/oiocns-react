@@ -59,14 +59,13 @@ const WorkStartDo: React.FC<IProps> = ({ current, finished }) => {
           <Button
             type="primary"
             onClick={async () => {
-              apply.ruleService.handleSubmit(formData).then(({ values, success }) => {
-                if (success) {
-                  apply.createApply(apply.belong.id, info.content, values);
-                  finished();
-                } else {
-                  message.warning('表单提交规则验证失败，请检查');
-                }
-              });
+              const data = await apply.ruleService.handleSubmit(formData);
+              if (data.success) {
+                apply.createApply(apply.belong.id, info.content, data.values);
+                finished();
+              } else {
+                message.warning('表单提交规则验证失败，请检查');
+              }
             }}>
             提交
           </Button>

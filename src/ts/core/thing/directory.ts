@@ -1,4 +1,4 @@
-import { common, model, schema } from '../../base';
+import { command, common, model, schema } from '../../base';
 import {
   directoryNew,
   directoryOperates,
@@ -15,23 +15,24 @@ import {
   SysFileInfo,
   ISysFileInfo,
   IFileInfo,
-  StandardFileInfo,
   IStandardFileInfo,
+  StandardFileInfo,
 } from './fileinfo';
-import { Species, ISpecies } from './standard/species';
+import { ISpecies } from './standard/species';
 import { Member } from './member';
-import { Property, IProperty } from './standard/property';
-import { Application, IApplication } from './standard/application';
+import { IProperty } from './standard/property';
+import { IApplication } from './standard/application';
 import { BucketOpreates, FileItemModel } from '@/ts/base/model';
 import { encodeKey } from '@/ts/base/common';
 import { DataResource } from './resource';
-
-import { XCollection } from '../public/collection';
+import { DirectoryOperate, IDirectoryOperate } from './operate';
 /** 可为空的进度回调 */
 export type OnProgress = (p: number) => void;
 
 /** 目录接口类 */
 export interface IDirectory extends IStandardFileInfo<schema.XDirectory> {
+  /** 目录操作类 */
+  operater: IDirectoryOperate;
   /** 当前加载目录的用户 */
   target: ITarget;
   /** 资源类 */
@@ -44,6 +45,8 @@ export interface IDirectory extends IStandardFileInfo<schema.XDirectory> {
   taskList: model.TaskModel[];
   /** 任务发射器 */
   taskEmitter: common.Emitter;
+  /** 目录结构变更 */
+  structCallback(): void;
   /** 目录下的内容 */
   content(mode?: number): IFileInfo<schema.XEntity>[];
   /** 创建子目录 */
@@ -94,6 +97,7 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
       {
         ..._metadata,
         typeName: _metadata.typeName || '目录',
+        directoryId: _parent?.id || _target.id,
       },
       _parent ?? (_target as unknown as IDirectory),
       _target.resource.directoryColl,
@@ -101,28 +105,33 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
     this.target = _target;
     this.parent = _parent;
     this.taskEmitter = new common.Emitter();
-    if (!_parent) {
-      this.resource.formColl.subscribe((a) => this.receiveContent(a));
-      this.resource.speciesColl.subscribe((a) => this.receiveContent(a));
-      this.resource.transferColl.subscribe((a) => this.receiveContent(a));
-      this.resource.propertyColl.subscribe((a) => this.receiveContent(a));
-      this.resource.applicationColl.subscribe((a) => this.receiveContent(a));
-    }
+    this.operater = new DirectoryOperate(this, _target.resource);
   }
   target: ITarget;
+  operater: IDirectoryOperate;
   taskEmitter: common.Emitter;
   parent: IDirectory | undefined;
-  children: IDirectory[] = [];
   taskList: model.TaskModel[] = [];
-  forms: IForm[] = [];
-  transfers: ITransfer[] = [];
   files: ISysFileInfo[] = [];
-  specieses: ISpecies[] = [];
-  propertys: IProperty[] = [];
-  applications: IApplication[] = [];
-  links: ILink[] = [];
-  private _linkLoaded: boolean = false;
-  private _contentLoaded: boolean = false;
+  formTypes: string[] = ['表单', '报表', '事项配置', '实体配置'];
+  get forms(): IForm[] {
+    return this.operater.getContent(this.formTypes) as Form[];
+  }
+  get transfers(): ITransfer[] {
+    return this.operater.getContent<ITransfer>(['迁移配置']);
+  }
+  get specieses(): ISpecies[] {
+    return this.operater.getContent<ISpecies>(['分类', '字典']);
+  }
+  get propertys(): IProperty[] {
+    return this.operater.getContent<IProperty>(['属性']);
+  }
+  get applications(): IApplication[] {
+    return this.operater.getContent<IApplication>(['应用']);
+  }
+  get children(): IDirectory[] {
+    return this.operater.getContent<IDirectory>(['目录']);
+  }
   get id(): string {
     if (!this.parent) {
       return this.target.id;
@@ -138,14 +147,9 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
   get resource(): DataResource {
     return this.target.resource;
   }
-  get isEmpty() {
-    return (
-      this.children.length == 0 &&
-      this.forms.length == 0 &&
-      this.propertys.length == 0 &&
-      this.specieses.length == 0 &&
-      this.applications.length == 0
-    );
+  structCallback(): void {
+    console.log(this.metadata);
+    command.emitter('-', 'refresh', this);
   }
   content(mode: number = 0): IFileInfo<schema.XEntity>[] {
     const cnt: IFileInfo<schema.XEntity>[] = [...this.children];
@@ -176,68 +180,55 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
     }
     return false;
   }
-  override copy(_destination: IDirectory): Promise<boolean> {
-    throw new Error('暂不支持.');
+  override async copy(destination: IDirectory): Promise<boolean> {
+    if (this.allowCopy(destination)) {
+      const data = await destination.resource.directoryColl.replace({
+        ...this.metadata,
+        directoryId: destination.id,
+      });
+      if (data) {
+        await this.operateDirectoryResource(this, destination.resource, 'replaceMany');
+        await destination.notify('refresh', [data]);
+      }
+    }
+    return false;
   }
   override async move(destination: IDirectory): Promise<boolean> {
-    if (this.parent) {
-      if (
-        destination.id != this.directory.id &&
-        destination.target.belongId == this.directory.target.belongId
-      ) {
-        const data = await destination.coll.replace({
-          ...this.metadata,
-          parentId: destination.id,
-          directoryId: destination.id,
-        });
-        if (data) {
-          if (this.isEmpty) {
-            return (
-              (await this.notify('delete', [this.metadata])) &&
-              (await this.notify('insert', [data]))
-            );
-          } else {
-            return this.notify('reflash', [data, destination.metadata]);
-          }
-        }
+    if (this.parent && this.allowMove(destination)) {
+      const data = await destination.resource.directoryColl.replace({
+        ...this.metadata,
+        directoryId: destination.id,
+      });
+      if (data) {
+        await this.operateDirectoryResource(
+          this,
+          destination.resource,
+          'replaceMany',
+          true,
+        );
+        await this.notify('refresh', [this.parent.metadata]);
+        await destination.notify('refresh', [data]);
       }
-      return false;
+    }
+    return false;
+  }
+  override async delete(): Promise<boolean> {
+    if (this.parent) {
+      await this.resource.directoryColl.delete(this.metadata);
+      await this.operateDirectoryResource(this, this.resource, 'deleteMany');
+      await this.notify('refresh', [this.metadata]);
     }
     return false;
   }
   async create(data: schema.XDirectory): Promise<schema.XDirectory | undefined> {
     const res = await this.resource.directoryColl.insert({
       ...data,
-      parentId: this.id,
+      directoryId: this.id,
     });
     if (res) {
       await this.notify('insert', [res]);
       return res;
     }
-  }
-  override async delete(): Promise<boolean> {
-    if (this.parent) {
-      const data: model.DirectoryContent = {
-        forms: [],
-        specieses: [],
-        propertys: [],
-        applications: [],
-        directorys: [],
-      };
-      this.getXConent(this, data);
-      await this.resource.formColl.deleteMany(data.forms);
-      await this.resource.speciesColl.deleteMany(data.specieses);
-      await this.resource.propertyColl.deleteMany(data.propertys);
-      await this.resource.directoryColl.deleteMany([...data.directorys, this.metadata]);
-      await this.resource.applicationColl.deleteMany(data.applications);
-      if (this.isEmpty) {
-        await this.notify('delete', [this.metadata]);
-      } else {
-        await this.notify('reflash', [this.metadata]);
-      }
-      return true;
-    }
-    return false;
   }
   async loadFiles(reload: boolean = false): Promise<ISysFileInfo[]> {
     if (this.files.length < 1 || reload) {
@@ -281,7 +272,7 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
       directoryId: this.id,
     });
     if (res) {
-      await this.notityConetnt(this.resource.formColl, 'insert', [res]);
+      await this.resource.formColl.notity({ data: [res], operate: 'insert' });
       return res;
     }
   }
@@ -291,7 +282,7 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
       directoryId: this.id,
     });
     if (res) {
-      await this.notityConetnt(this.resource.speciesColl, 'insert', [res]);
+      await this.resource.speciesColl.notity({ data: [res], operate: 'insert' });
       return res;
     }
   }
@@ -302,7 +293,7 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
       directoryId: this.id,
     });
     if (res) {
-      await this.notityConetnt(this.resource.propertyColl, 'insert', [res]);
+      await this.resource.propertyColl.notity({ data: [res], operate: 'insert' });
       return res;
     }
   }
@@ -314,7 +305,7 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
       directoryId: this.id,
     });
     if (res) {
-      await this.notityConetnt(this.resource.applicationColl, 'insert', [res]);
+      await this.resource.applicationColl.notity({ data: [res], operate: 'insert' });
       return res;
     }
   }
@@ -329,7 +320,7 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
     if (res) {
       const link = new Transfer(res, this);
       this.transfers.push(link);
-      await this.notityConetnt(this.resource.transferColl, 'insert', [res]);
+      await this.resource.transferColl.notity({ data: [res], operate: 'insert' });
       return link;
     }
   }
@@ -386,218 +377,38 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
     }
     return operates;
   }
-  protected override receiveMessage(operate: string, data: schema.XDirectory): void {
-    let id = this.metadata.id.replace('_', '');
-    switch (operate) {
-      case 'replace':
-        if (data.id == id) {
-          this.setMetadata(data);
-          this.changCallback();
-        }
-        break;
-      case 'delete':
-        if (data.parentId == id) {
-          this.coll.removeCache(data.id);
-          this.children = this.children.filter((a) => a.metadata.id !== data.id);
-          this.changCallback();
-        }
-        break;
-      case 'insert':
-        if (data.parentId == id) {
-          this.resource.directoryColl.cache.push(data);
-          this.children.push(new Directory(data, this.target, this));
-          this.loadDirectoryResource(true).then(() => {
-            this.changCallback();
-          });
-        }
-        break;
-      case 'refresh':
-        if (data.id == id || data.parentId == id) {
-          this.loadDirectoryResource(true).then(() => {
-            this.changCallback();
-          });
-        }
-        break;
-    }
-  }
   public async loadDirectoryResource(reload: boolean = false) {
-    if (this.id.replace('_', '') === this.target.id) {
-      await this.resource.preLoad(reload);
-    }
-    this.transfers = this.resource.transferColl.cache
-      .filter((i) => i.directoryId === this.id)
-      .map((l) => new Transfer(l, this));
-    this.forms = this.resource.formColl.cache
-      .filter((i) => i.directoryId === this.id)
-      .map((f) => new Form(f, this));
-    this.specieses = this.resource.speciesColl.cache
-      .filter((i) => i.directoryId === this.id)
-      .map((s) => new Species(s, this));
-    this.propertys = this.resource.propertyColl.cache
-      .filter((i) => i.directoryId === this.id)
-      .map((p) => new Property(p, this));
-    var apps = this.resource.applicationColl.cache.filter(
-      (i) => i.directoryId === this.id,
-    );
-    this.applications = apps
-      .filter((a) => !a.parentId || a.parentId.length < 1)
-      .map((a) => new Application(a, this, undefined, apps));
-    this.children = this.resource.directoryColl.cache
-      .filter((i) => i.parentId === this.id)
-      .map((i) => {
-        const subDir = new Directory(i, this.target, this);
-        subDir.loadDirectoryResource(reload);
-        return subDir;
-      });
+    await this.operater.loadResource(reload);
   }
-  private getXConent(directory: IDirectory, content: model.DirectoryContent) {
-    for (const child of directory.children) {
-      content.directorys.push(child.metadata);
-      this.getXConent(child, content);
-    }
-    content.forms.push(...directory.forms.map((a) => a.metadata));
-    content.specieses.push(...directory.specieses.map((a) => a.metadata));
-    content.propertys.push(...directory.propertys.map((a) => a.metadata));
-    content.applications.push(...directory.applications.map((a) => a.metadata));
-  }
-  private receiveContent({
-    operate,
-    data,
-  }: {
-    operate: string;
-    data: schema.XStandard[];
-  }) {
-    data = data.filter((a) => a.directoryId == this.metadata.id.replace('_', ''));
-    if (data.length > 0) {
-      data.forEach((a) => {
-        switch (operate) {
-          case 'insert':
-            switch (a.typeName) {
-              case '链接':
-                this.resource.transferColl.cache.push(a as model.Transfer);
-                this.transfers.push(new Transfer(a as model.Transfer, this));
-                break;
-              case '表单':
-              case '报表':
-              case '事项配置':
-              case '实体配置':
-                this.resource.formColl.cache.push(a as schema.XForm);
-                this.forms.push(new Form(a as schema.XForm, this));
-                break;
-              case '分类':
-                this.resource.speciesColl.cache.push(a as schema.XSpecies);
-                this.specieses.push(new Species(a as schema.XSpecies, this));
-                break;
-              case '应用':
-              case '模块':
-                this.resource.applicationColl.cache.push(a as schema.XApplication);
-                if ((a as schema.XApplication).parentId == undefined) {
-                  this.applications.push(new Application(a as schema.XApplication, this));
-                }
-                break;
-              case '属性':
-                this.resource.propertyColl.cache.push(a as schema.XProperty);
-                this.propertys.push(new Property(a as schema.XProperty, this));
-                break;
-              default:
-                break;
-            }
-            break;
-          case 'replace':
-            {
-              let index = -1;
-              switch (a.typeName) {
-                case '链接':
-                  index = this.resource.transferColl.cache.findIndex((s) => s.id == a.id);
-                  if (index > -1) {
-                    this.resource.transferColl.cache[index] = a as model.Transfer;
-                  }
-                  break;
-                case '表单':
-                case '报表':
-                case '事项配置':
-                case '实体配置':
-                  index = this.resource.formColl.cache.findIndex((s) => s.id == a.id);
-                  if (index > -1) {
-                    this.resource.formColl.cache[index] = a as schema.XForm;
-                  }
-                  break;
-                case '分类':
-                  index = this.resource.speciesColl.cache.findIndex((s) => s.id == a.id);
-                  if (index > -1) {
-                    this.resource.speciesColl.cache[index] = a as schema.XSpecies;
-                  }
-                  break;
-                case '应用':
-                  index = this.resource.applicationColl.cache.findIndex(
-                    (s) => s.id == a.id,
-                  );
-                  if (index > -1) {
-                    this.resource.applicationColl.cache[index] = a as schema.XApplication;
-                  }
-                  break;
-                case '属性':
-                  index = this.resource.propertyColl.cache.findIndex((s) => s.id == a.id);
-                  if (index > -1) {
-                    this.resource.propertyColl.cache[index] = a as schema.XProperty;
-                  }
-                  break;
-                default:
-                  break;
-              }
-              this.updateMetadata(a);
-            }
-            break;
-          case 'delete':
-            switch (a.typeName) {
-              case '链接':
-                this.transfers = this.transfers.filter((s) => s.id != a.id);
-                this.resource.transferColl.removeCache(a.id);
-                break;
-              case '表单':
-              case '报表':
-              case '事项配置':
-              case '实体配置':
-                this.forms = this.forms.filter((s) => s.metadata.id != a.id);
-                this.resource.formColl.removeCache(a.id);
-                break;
-              case '分类':
-                this.specieses = this.specieses.filter((s) => s.metadata.id != a.id);
-                this.resource.speciesColl.removeCache(a.id);
-                break;
-              case '应用':
-                this.applications = this.applications.filter(
-                  (s) => s.metadata.id != a.id,
-                );
-                this.resource.applicationColl.removeCache(a.id);
-                break;
-              case '属性':
-                this.propertys = this.propertys.filter((s) => s.metadata.id != a.id);
-                this.resource.propertyColl.removeCache(a.id);
-                break;
-              default:
-                break;
-            }
-            break;
-          default:
-            break;
-        }
-      });
-      this.changCallback();
-    }
-  }
-  private async notityConetnt(
-    coll: XCollection<schema.XStandard>,
-    operate: string,
-    data: schema.XEntity[],
-    onlineOnly: boolean = true,
+  /** 对目录下所有资源进行操作 */
+  private async operateDirectoryResource(
+    directory: IDirectory,
+    resource: DataResource,
+    action: 'replaceMany' | 'deleteMany',
+    move?: boolean,
   ) {
-    await coll.notity(
-      {
-        data,
-        operate,
-      },
-      onlineOnly,
-    );
+    for (const child of directory.children) {
+      await this.operateDirectoryResource(child, resource, action);
+    }
+    await resource.directoryColl[action](directory.children.map((a) => a.metadata));
+    await resource.formColl[action](directory.forms.map((a) => a.metadata));
+    await resource.speciesColl[action](directory.specieses.map((a) => a.metadata));
+    await resource.propertyColl[action](directory.propertys.map((a) => a.metadata));
+    if (action == 'deleteMany') {
+      await resource.speciesItemColl.deleteMatch({
+        speciesId: {
+          _in_: directory.specieses.map((a) => a.id),
+        },
+      });
+      await resource.applicationColl.deleteMatch({
+        directoryId: directory.id,
+      });
+    }
+    if (action == 'replaceMany' && move) {
+      var apps = directory.resource.applicationColl.cache.filter(
+        (i) => i.directoryId === directory.id,
+      );
+      await resource.applicationColl.replaceMany(apps);
+    }
   }
 }

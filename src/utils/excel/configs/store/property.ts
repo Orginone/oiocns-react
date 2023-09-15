@@ -1,14 +1,14 @@
 import { XProperty } from '@/ts/base/schema';
-import { IDirectory, orgAuth } from '@/ts/core';
+import { IDirectory, ValueType } from '@/ts/core';
 import { assignment } from '../..';
-import { Context, ReadConfigImpl, SheetConfigImpl, SheetName } from '../../types';
+import { Context, SheetRead, Sheet, SheetName } from '../../types';
 
 export interface Property extends XProperty {
   directoryCode: string;
   speciesCode: string;
 }
 
-export class PropSheetConfig extends SheetConfigImpl<Property> {
+export class PropSheet extends Sheet<Property> {
   directory: IDirectory;
 
   constructor(directory: IDirectory) {
@@ -34,24 +34,13 @@ export class PropSheetConfig extends SheetConfigImpl<Property> {
   }
 }
 
-const types = [
-  '数值型',
-  '描述型',
-  '选择型',
-  '分类型',
-  '附件型',
-  '日期型',
-  '时间型',
-  '用户型',
-];
-
-export class PropReadConfig extends ReadConfigImpl<Property, Context, PropSheetConfig> {
+export class PropSheetRead extends SheetRead<Property, Context, PropSheet> {
   /**
    * 数据初始化
    * @param context 上下文
    */
   async initContext(c: Context): Promise<void> {
-    for (let item of this.sheetConfig.data) {
+    for (let item of this.sheet.data) {
       if (c.propertyMap.has(item.info)) {
         let old = c.propertyMap.get(item.info)!;
         c.propertyMap.set(item.info, { ...old, ...item });
@@ -66,8 +55,9 @@ export class PropReadConfig extends ReadConfigImpl<Property, Context, PropSheetC
    * @param data 数据
    */
   checkData(context: Context) {
-    for (let index = 0; index < this.sheetConfig.data.length; index++) {
-      let item = this.sheetConfig.data[index];
+    const types: string[] = Object.entries(ValueType).map((value) => value[1]);
+    for (let index = 0; index < this.sheet.data.length; index++) {
+      let item = this.sheet.data[index];
       if (!item.directoryCode || !item.name || !item.valueType || !item.info) {
         this.pushError(index, '存在未填写的目录代码、属性名称、属性类型、附加信息！');
       }
@@ -97,41 +87,23 @@ export class PropReadConfig extends ReadConfigImpl<Property, Context, PropSheetC
    * @param context 上下文
    */
   async operating(context: Context, onItemCompleted: () => void): Promise<void> {
-    let insertProperties: { index: number; row: Property }[] = [];
-    let replaceProperties: { index: number; row: Property }[] = [];
-    for (let index = 0; index < this.sheetConfig.data.length; index++) {
-      let row = this.sheetConfig.data[index];
+    const data = this.sheet.data;
+    for (let index = 0; index < data.length; index++) {
+      let row = data[index];
       row.directoryId = context.directoryMap.get(row.directoryCode)!.id;
       if (row.speciesCode) {
         row.speciesId = context.speciesMap.get(row.speciesCode)!.id;
       }
-      if (row.id) {
-        replaceProperties.push({ index, row: row });
-      } else {
-        row.code = "TsnowId()";
-        insertProperties.push({ index, row: row });
+      if (!row.id) {
+        row.code = 'TsnowId()';
       }
       onItemCompleted();
     }
-    if (insertProperties.length > 0) {
-      let insertRes = await this.sheetConfig.directory.resource.propertyColl.insertMany(
-        insertProperties.map((item) => item.row),
-      );
-      for (let index = 0; index < insertRes.length; index++) {
-        const newProperty = insertRes[index] as Property;
-        this.sheetConfig.data[insertProperties[index].index] = newProperty;
-        context.propertyMap.set(newProperty.code, newProperty);
-      }
-    }
-    if (replaceProperties.length > 0) {
-      let replaceRes = await this.sheetConfig.directory.resource.propertyColl.replaceMany(
-        replaceProperties.map((item) => item.row),
-      );
-      for (let index = 0; index < replaceRes.length; index++) {
-        const newProperty = replaceRes[index] as Property;
-        this.sheetConfig.data[replaceProperties[index].index] = newProperty;
-        context.propertyMap.set(newProperty.code, newProperty);
-      }
-    }
+    (await this.sheet.directory.resource.propertyColl.replaceMany(data))
+      .map((i) => i as Property)
+      .forEach((item, index) => {
+        data[index] = item;
+        context.propertyMap.set(item.code, item);
+      });
   }
 }

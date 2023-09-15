@@ -1,12 +1,12 @@
-import { Command, model } from '@/ts/base';
+import { model } from '@/ts/base';
+import { ITransfer } from '@/ts/core';
 import { Col, Layout, Row, message } from 'antd';
 import { Content } from 'antd/lib/layout/layout';
 import { AxiosError } from 'axios';
-import React, { useRef } from 'react';
+import React from 'react';
 import InputBox from '../parts/inputBox';
 import RequestPart from '../parts/request';
 import ResponsePart from '../parts/response/responsePart';
-import { ITransfer } from '@/ts/core';
 
 interface IProps {
   transfer: ITransfer;
@@ -15,7 +15,6 @@ interface IProps {
 }
 
 const RequestLayout: React.FC<IProps> = ({ transfer, current }) => {
-  const cmd = useRef(new Command());
   return (
     <Layout key={transfer.key} style={{ height: '100%' }}>
       <Content style={{ height: '100%' }}>
@@ -26,14 +25,22 @@ const RequestLayout: React.FC<IProps> = ({ transfer, current }) => {
             send={async () => {
               try {
                 let res = await transfer.request(current);
-                cmd.current.emitter('request', 'onValueChange', res);
+                transfer.command.emitter('request', 'onValueChange', res);
               } catch (error) {
                 if (error instanceof AxiosError) {
                   const axiosError = error as AxiosError;
                   if (axiosError.response) {
-                    cmd.current.emitter('request', 'onValueChange', axiosError.response);
+                    transfer.command.emitter(
+                      'request',
+                      'onValueChange',
+                      axiosError.response,
+                    );
                   } else {
-                    cmd.current.emitter('request', 'onValueChange', axiosError.message);
+                    transfer.command.emitter(
+                      'request',
+                      'onValueChange',
+                      axiosError.message,
+                    );
                   }
                 } else if (error instanceof Error) {
                   message.error('请求异常，异常信息' + error.message);

@@ -1,6 +1,6 @@
 import { XAttribute } from '@/ts/base/schema';
 import { IDirectory, orgAuth } from '@/ts/core';
-import { Context, ReadConfigImpl, SheetConfigImpl, SheetName } from '../../types';
+import { Context, SheetRead, Sheet, SheetName } from '../../types';
 import { assignment } from '../..';
 import { List } from '@/ts/base';
 
@@ -12,7 +12,7 @@ export interface Attribute extends XAttribute {
   index?: number;
 }
 
-export class AttrSheetConfig extends SheetConfigImpl<Attribute> {
+export class AttrSheet extends Sheet<Attribute> {
   directory: IDirectory;
 
   constructor(directory: IDirectory) {
@@ -29,13 +29,13 @@ export class AttrSheetConfig extends SheetConfigImpl<Attribute> {
   }
 }
 
-export class AttrReadConfig extends ReadConfigImpl<Attribute, Context, AttrSheetConfig> {
+export class AttrSheetRead extends SheetRead<Attribute, Context, AttrSheet> {
   /**
    * 初始化
    * @param context 上下文
    */
   async initContext(c: Context): Promise<void> {
-    for (let item of this.sheetConfig.data) {
+    for (let item of this.sheet.data) {
       if (c.formAttrMap.has(item.formCode)) {
         let attrMap = c.formAttrMap.get(item.formCode)!;
         if (attrMap.has(item.propInfo)) {
@@ -52,8 +52,8 @@ export class AttrReadConfig extends ReadConfigImpl<Attribute, Context, AttrSheet
    * @param data 数据
    */
   checkData(context: Context) {
-    for (let index = 0; index < this.sheetConfig.data.length; index++) {
-      let item = this.sheetConfig.data[index];
+    for (let index = 0; index < this.sheet.data.length; index++) {
+      let item = this.sheet.data[index];
       if (!item.formCode || !item.name || !item.info || !item.propInfo) {
         this.pushError(index, `存在未填写的表单代码、特性名称、特性代码、关联属性代码！`);
       }
@@ -73,8 +73,8 @@ export class AttrReadConfig extends ReadConfigImpl<Attribute, Context, AttrSheet
    * @param _context 上下文
    */
   async operating(context: Context, onItemCompleted: () => void): Promise<void> {
-    this.sheetConfig.data.forEach((item, index) => (item.index = index));
-    let groups = new List(this.sheetConfig.data).GroupBy((item) => item.formCode);
+    this.sheet.data.forEach((item, index) => (item.index = index));
+    let groups = new List(this.sheet.data).GroupBy((item) => item.formCode);
     for (const key in groups) {
       if (context.formMap.has(key)) {
         const form = context.formMap.get(key)!;
@@ -88,18 +88,17 @@ export class AttrReadConfig extends ReadConfigImpl<Attribute, Context, AttrSheet
           attr.formId = form.id;
           let prop = context.propertyMap.get(attr.propInfo);
           if (prop) {
+            attr.code = prop.code;
             attr.property = prop;
             attr.propId = prop.id;
           }
           onItemCompleted();
         });
         form.attributes = attrs;
-        let result = await this.sheetConfig.directory.resource.formColl.replace(form);
+        let result = await this.sheet.directory.resource.formColl.replace(form);
         result?.attributes.forEach((item) => {
           let attr = item as Attribute;
-          if (attr.index) {
-            this.sheetConfig.data[attr.index] = item as Attribute;
-          }
+          this.sheet.data[attr.index!] = item as Attribute;
         });
       }
     }

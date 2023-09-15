@@ -376,7 +376,7 @@ const HotTableView: React.FC<IProps> = ({
             target={current.directory.target}
             selected={current.attributes.map((a: any) => a.property!)}
             onAdded={async (prop: any) => {
-              await current.createAttribute(
+              let res = await current.createAttribute(
                 {
                   name: prop.name,
                   code: prop.code,
@@ -385,11 +385,8 @@ const HotTableView: React.FC<IProps> = ({
                 } as schema.XAttribute,
                 prop,
               );
-              tforceUpdate();
-              console.log(current);
-              const attr = current.attributes.find((i) => i.propId === prop.id);
-              if (attr) {
-                saveSpeciality(attr);
+              if (res) {
+                saveSpeciality(res);
               }
             }}
             onDeleted={async (id: any) => {

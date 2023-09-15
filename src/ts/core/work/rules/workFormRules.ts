@@ -184,7 +184,8 @@ class WorkFormRules extends Emitter implements WorkFormRulesType {
 
   handleSubmit = async (formData: Map<string, model.FormEditData>) => {
     let _Results = [];
-    for (const item of this._FormsTypeMap.get('主表')!) {
+    let forms = this._FormsTypeMap.get('主表') || [];
+    for (const item of forms) {
       const params: any = { id: item, data: this._hotData.get(item)?.after?.[0] };
       _Results.push(await this.waitingTask(RuleTriggers.Submit, params));
     }
@@ -201,10 +202,12 @@ class WorkFormRules extends Emitter implements WorkFormRulesType {
       }
     });
     const changedForm = formData.get(this.currentMainFormId);
-    formData.set(this.currentMainFormId!, {
-      ...changedForm,
-      after: [{ ...changedForm!.after[0]!, ...subValues }],
-    } as any);
+    if (changedForm) {
+      formData.set(this.currentMainFormId!, {
+        ...changedForm,
+        after: [{ ...changedForm!.after[0]!, ...subValues }],
+      } as any);
+    }
     return {
       values: formData,
       success: boolArr.length > 0 ? boolArr.some((v) => v == false) : true,

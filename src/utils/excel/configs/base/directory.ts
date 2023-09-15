@@ -1,13 +1,13 @@
 import { XDirectory, XProperty, XSpecies, XSpeciesItem } from '@/ts/base/schema';
 import { IDirectory } from '@/ts/core';
 import { assignment } from '../..';
-import { Context, ReadConfigImpl, SheetConfigImpl, SheetName } from '../../types';
+import { Context, SheetRead, Sheet, SheetName } from '../../types';
 
 export interface Directory extends XDirectory {
   parentCode?: string;
 }
 
-export class DirectorySheetConfig extends SheetConfigImpl<Directory> {
+export class DirectorySheet extends Sheet<Directory> {
   directory: IDirectory;
 
   constructor(directory: IDirectory) {
@@ -23,12 +23,8 @@ export class DirectorySheetConfig extends SheetConfigImpl<Directory> {
   }
 }
 
-export class DirectoryReadConfig extends ReadConfigImpl<
-  Directory,
-  Context,
-  DirectorySheetConfig
-> {
-  constructor(sheetConfig: DirectorySheetConfig) {
+export class DirectorySheetRead extends SheetRead<Directory, Context, DirectorySheet> {
+  constructor(sheetConfig: DirectorySheet) {
     super(sheetConfig);
   }
   /**
@@ -36,8 +32,8 @@ export class DirectoryReadConfig extends ReadConfigImpl<
    * @param c
    */
   async initContext(c: Context): Promise<void> {
-    await this.deepLoad(this.sheetConfig.directory, c);
-    for (let item of this.sheetConfig.data) {
+    await this.deepLoad(this.sheet.directory, c);
+    for (let item of this.sheet.data) {
       if (c.directoryMap.has(item.code)) {
         let old = c.directoryMap.get(item.code)!;
         assignment(old, item);
@@ -126,8 +122,8 @@ export class DirectoryReadConfig extends ReadConfigImpl<
    * @param data 数据
    */
   checkData(context: Context) {
-    for (let index = 0; index < this.sheetConfig.data.length; index++) {
-      let item = this.sheetConfig.data[index];
+    for (let index = 0; index < this.sheet.data.length; index++) {
+      let item = this.sheet.data[index];
       if (!item.name || !item.code) {
         this.pushError(index, '目录名称、目录代码不能为空！');
       }
@@ -146,22 +142,22 @@ export class DirectoryReadConfig extends ReadConfigImpl<
    * @param context 上下文
    */
   async operating(context: Context): Promise<void> {
-    for (let index = 0; index < this.sheetConfig.data.length; index++) {
-      let item = this.sheetConfig.data[index];
-      item.shareId = this.sheetConfig.directory.metadata.shareId;
+    for (let index = 0; index < this.sheet.data.length; index++) {
+      let item = this.sheet.data[index];
+      item.shareId = this.sheet.directory.metadata.shareId;
       if (item.parentCode) {
         item.parentId = context.directoryMap.get(item.parentCode)!.id;
       } else {
-        item.parentId = this.sheetConfig.directory.target.directory.id;
+        item.parentId = this.sheet.directory.target.directory.id;
       }
       let res: any;
       if (item.id) {
-        res = await this.sheetConfig.directory.resource.directoryColl.replace(item);
+        res = await this.sheet.directory.resource.directoryColl.replace(item);
       } else {
-        res = await this.sheetConfig.directory.resource.directoryColl.insert(item);
+        res = await this.sheet.directory.resource.directoryColl.insert(item);
       }
       if (res) {
-        this.sheetConfig.data[index] = res;
+        this.sheet.data[index] = res;
         context.directoryMap.set(item.code, res);
       } else {
         this.pushError(index, '生成失败！');

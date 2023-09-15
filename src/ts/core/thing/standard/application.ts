@@ -47,26 +47,20 @@ export class Application
       a.metadata.updateTime < b.metadata.updateTime ? 1 : -1,
     );
   }
-  async copy(destination: IDirectory): Promise<boolean> {
-    if (destination.id != this.directory.id) {
-      const res = await destination.createApplication({
-        ...this.metadata,
-        directoryId: destination.id,
-      });
-      return res != undefined;
-    }
+  async copy(_: IDirectory): Promise<boolean> {
     return false;
   }
   override async move(destination: IDirectory): Promise<boolean> {
-    if (!this.parent) {
+    if (!this.parent && this.allowMove(destination)) {
       const applications = this.getChildren(this);
-      const res = await destination.resource.applicationColl.replaceMany(
+      const data = await destination.resource.applicationColl.replaceMany(
         applications.map((a) => {
           return { ...a, directoryId: destination.id };
         }),
       );
-      if (res.length > 0) {
-        return await super.move(destination);
+      if (data && data.length > 0) {
+        await this.notify('refresh', [this.directory.metadata]);
+        await destination.notify('refresh', [destination.metadata]);
       }
     }
     return false;
@@ -143,30 +137,11 @@ export class Application
     }
   }
   private getChildren(application: IApplication): schema.XApplication[] {
-    const applications: schema.XApplication[] = [];
+    const applications: schema.XApplication[] = [application.metadata];
     for (const child of application.children) {
       applications.push(child.metadata);
       applications.push(...this.getChildren(child));
     }
     return applications;
-  }
-  protected override receiveMessage(operate: string, data: schema.XApplication): void {
-    super.receiveMessage(operate, data);
-    if (data.parentId == this.id) {
-      switch (operate) {
-        case 'delete':
-          this.children = this.children.filter((a) => a.id != data.id);
-          this.coll.removeCache(data.id);
-          this.changCallback();
-          break;
-        case 'insert':
-          this.children.push(new Application(data, this.directory, this));
-          this.coll.cache.push(data);
-          this.changCallback();
-          break;
-        default:
-          break;
-      }
-    }
   }
 }

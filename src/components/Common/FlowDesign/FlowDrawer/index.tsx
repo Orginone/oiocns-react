@@ -29,9 +29,7 @@ const FlowDrawer: React.FC<IProps> = (props) => {
     if (props.define && props.current.type == AddNodeType.CONDITION) {
       const fields: model.FieldModel[] = [];
       props.define.primaryForms.forEach((f) => {
-        if (f.typeName === '主表') {
-          fields.push(...f.fields);
-        }
+        fields.push(...f.fields);
       });
       setConditions(fields);
     }

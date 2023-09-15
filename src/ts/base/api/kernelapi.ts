@@ -74,6 +74,16 @@ export default class KernelApi {
     });
     this._storeHub.start();
   }
+
+  /**
+   * 实时获取连接状态
+   * @param callback
+   */
+  public async onConnectedChanged(callback: (res: boolean) => void) {
+    callback.apply(this, [this._storeHub.isConnected]);
+    this._storeHub.onDisconnected(() => callback.apply(this, [false]));
+    this._storeHub.onConnected(() => callback.apply(this, [true]));
+  }
   /**
    * 获取单例
    * @param {string} url 集线器地址，默认为 "/orginone/kernel/hub"
@@ -585,7 +595,6 @@ export default class KernelApi {
   public async createWorkInstance(
     params: model.WorkInstanceModel,
   ): Promise<model.ResultType<schema.XWorkInstance>> {
-    console.log(params);
     return await this.request({
       module: 'work',
       action: 'CreateWorkInstance',

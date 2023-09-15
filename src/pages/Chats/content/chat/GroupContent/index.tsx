@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import { Button, Popover, Spin, Badge } from 'antd';
+import { Button, message, Popover, Spin, Badge, Tooltip } from 'antd';
 import moment from 'moment';
 import React, { useEffect, useRef, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
@@ -10,7 +10,14 @@ import { IMessage, ISession, MessageType } from '@/ts/core';
 import { parseAvatar } from '@/ts/base';
 import css from './index.module.less';
 import { parseCiteMsg, parseMsg } from '@/pages/Chats/components/parseMsg';
-
+import { RiShareForwardFill } from '@/icons/ri';
+import {
+  AiOutlineCopy,
+  AiOutlineRollback,
+  AiOutlineMessage,
+  AiOutlineDelete,
+  AiOutlineDownload,
+} from '@/icons/ai';
 /**
  * @description: 聊天区域
  * @return {*}
@@ -36,7 +43,7 @@ const GroupContent = (props: Iprops) => {
   const [beforescrollHeight, setBeforescrollHeight] = useState(0);
   const [forwardOpen, setForwardOpen] = useState(false); // 设置转发打开窗口
   const [formwardCode, setFormwardCode] = useState<IMessage>(); // 转发时用户
-
+  const [ismousewheel, setIsMousewheel] = useState(false);
   useEffect(() => {
     props.chat.onMessage((ms) => {
       setMessages([...ms]);
@@ -56,6 +63,20 @@ const GroupContent = (props: Iprops) => {
       }
     }
   }, [messages]);
+  function createWheelStopListener(callback: () => void, timeout?: number) {
+    var handle: ReturnType<typeof setTimeout>;
+    setIsMousewheel(true);
+    var onScroll = function () {
+      if (handle) {
+        clearTimeout(handle);
+      }
+      handle = setTimeout(callback, timeout || 200); // default 200 ms
+    };
+    body.current?.addEventListener('wheel', onScroll);
+    return function () {
+      body.current?.removeEventListener('wheel', onScroll);
+    };
+  }
 
   const isShowTime = (curDate: string, beforeDate: string) => {
     if (beforeDate === '') return true;
@@ -69,6 +90,9 @@ const GroupContent = (props: Iprops) => {
       await props.chat.moreMessage();
       setMessages([...props.chat.messages]);
     }
+    createWheelStopListener(() => {
+      setIsMousewheel(false);
+    });
   };
 
   /** 转发消息 */
@@ -135,9 +159,12 @@ const GroupContent = (props: Iprops) => {
         trigger="hover"
         open={selectId == item.id}
         key={item.id}
-        placement="bottomRight"
+        placement="rightTop"
         onOpenChange={() => {
           setSelectId('');
+        }}
+        getPopupContainer={(triggerNode: HTMLElement) => {
+          return triggerNode.parentElement || document.body;
         }}
         content={msgAction(item)}>
         <div
@@ -156,55 +183,59 @@ const GroupContent = (props: Iprops) => {
   const msgAction = (item: IMessage) => {
     const onClose = () => {
       setSelectId('');
+      message.success('复制成功');
     };
     return (
-      <>
+      <div className={css.msgAction}>
         <CopyToClipboard text={item.msgBody}>
-          <Button type="text" style={{ color: '#3e5ed8' }} onClick={onClose}>
-            复制
-          </Button>
+          <Tooltip title="复制">
+            <AiOutlineCopy className={css.actionIconStyl} onClick={onClose} />
+          </Tooltip>
         </CopyToClipboard>
-        <Button type="text" style={{ color: '#3e5ed8' }} onClick={() => forward(item)}>
-          转发
-        </Button>
+        <Tooltip title="引用">
+          <AiOutlineMessage
+            className={css.actionIconStyl}
+            onClick={() => props.citeText(item)}
+          />
+        </Tooltip>
+        <Tooltip title="转发">
+          <RiShareForwardFill
+            className={css.actionIconStyl}
+            onClick={() => forward(item)}
+          />
+        </Tooltip>
         {item.isMySend && item.allowRecall && (
-          <Button
-            type="text"
-            style={{ color: '#3e5ed8' }}
+          <Tooltip title="撤回">
+            <AiOutlineRollback
+              className={css.actionIconStyl}
+              onClick={async () => {
+                await props.chat.recallMessage(item.id);
+                onClose();
+              }}
+            />
+          </Tooltip>
+        )}
+        <Tooltip title="删除">
+          <AiOutlineDelete
+            className={css.actionIconStyl}
             onClick={async () => {
-              await props.chat.recallMessage(item.id);
+              await props.chat.deleteMessage(item.id);
               onClose();
-            }}>
-            撤回
-          </Button>
-        )}
-        <Button
-          type="text"
-          style={{ color: '#3e5ed8' }}
-          onClick={() => props.citeText(item)}>
-          引用
-        </Button>
-        {['文件', '视频', '图片'].includes(item.msgType) && (
-          <Button
-            type="text"
-            onClick={() => {
-              const url = parseAvatar(item.msgBody).shareLink;
-              downloadByUrl(url);
             }}
-            style={{ color: '#3e5ed8' }}>
-            下载
-          </Button>
+          />
+        </Tooltip>
+        {['文件', '视频', '图片'].includes(item.msgType) && (
+          <Tooltip title="下载">
+            <AiOutlineDownload
+              className={css.actionIconStyl}
+              onClick={() => {
+                const url = parseAvatar(item.msgBody).shareLink;
+                downloadByUrl(url);
+              }}
+            />
+          </Tooltip>
         )}
-        <Button
-          type="text"
-          danger
-          onClick={async () => {
-            await props.chat.deleteMessage(item.id);
-            onClose();
-          }}>
-          删除
-        </Button>
-      </>
+      </div>
     );
   };
 

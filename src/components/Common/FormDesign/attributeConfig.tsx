@@ -11,13 +11,12 @@ interface IProps {
 }
 
 const AttributeConfig = ({ attr, onChanged, superAuth, onClose }: IProps) => {
-  console.log(attr, '1234');
   const [form] = Form.useForm();
   useEffect(() => {
     const rule = JSON.parse(attr.rule || '{}');
-    // if (!rule.widget) {
-    //   rule.widget = loadWidgetsOpts(attr.property!.valueType)[0];
-    // }
+    if (!rule.widget) {
+      rule.widget = loadWidgetsOpts(attr.property!.valueType)[0];
+    }
     form.setFieldsValue({ ...attr, ...rule });
   }, [attr]);
   return (

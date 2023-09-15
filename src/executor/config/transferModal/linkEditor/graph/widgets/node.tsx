@@ -77,7 +77,6 @@ export const createNode = (data: model.Node<any>): Node.Metadata => {
       },
     ],
   };
-  console.log(data);
   return node;
 };
 
@@ -129,24 +128,6 @@ const menus: { [key: string]: MenuItemType } = {
   },
 };
 
-/** 拉出节点可以创建的下一步节点 */
-const getNextMenu = (typeName: string): MenuItemType[] => {
-  switch (typeName) {
-    case '请求':
-    case '脚本':
-      return [menus.script, menus.request, menus.mapping, menus.store, menus.selection];
-    case '映射':
-      return [menus.script, menus.mapping, menus.store];
-    case '实体配置':
-    case '事项配置':
-      return [menus.script];
-    case '选择':
-      return [menus.script, menus.request];
-    default:
-      return [];
-  }
-};
-
 interface Info {
   node: Node;
   graph: Graph;
@@ -155,10 +136,10 @@ interface Info {
 export const ProcessingNode: React.FC<Info> = ({ node, graph }) => {
   const link = graph.getPlugin<LinkStore>('LinkStore')?.link;
   const status = link?.status ?? 'Editable';
-  const [entity, setEntity] = useState(node.getData() as model.Node<any>);
+  const movedNode = node.getData() as model.Node<any>;
+  const [entity, setEntity] = useState(link?.getNode(node.id) ?? movedNode);
   const [nodeStatus, setNodeStatus] = useState<model.NodeStatus>(status);
-  const [visibleOperate, setVisibleOperate] = useState<boolean>(false);
-  const [visibleClosing, setVisibleClosing] = useState<boolean>(true);
+  const [visibleClosing, setVisibleClosing] = useState<boolean>(false);
   const [visibleMenu, setVisibleMenu] = useState<boolean>(false);
   const [menuPosition, setMenuPosition] = useState<{ x: number; y: number }>();
 
@@ -179,6 +160,10 @@ export const ProcessingNode: React.FC<Info> = ({ node, graph }) => {
     return <></>;
   };
 
+  if (!entity) {
+    return <Remove />;
+  }
+
   useEffect(() => {
     const id = link?.command.subscribe(async (type, cmd, args) => {
       switch (type) {
@@ -191,18 +176,24 @@ export const ProcessingNode: React.FC<Info> = ({ node, graph }) => {
           }
           break;
         }
+        case 'running':
+          const nodeRes = args[0];
+          if (nodeRes.id == node.id) {
+            switch (cmd) {
+              case 'start':
+                setNodeStatus('Running');
+                break;
+              case 'completed':
+                setNodeStatus('Completed');
+                break;
+              case 'error':
+                setNodeStatus('Error');
+                break;
+            }
+          }
+          break;
         case 'node':
           switch (cmd) {
-            case 'selected':
-              break;
-            case 'unselected':
-              if (args.node.id == node.id) {
-                setVisibleOperate(false);
-              }
-              break;
-            case 'clearStatus':
-              setNodeStatus(link.status);
-              break;
             case 'contextmenu':
               if (args.node.id == node.id) {
                 const position = node.getPosition();
@@ -219,6 +210,10 @@ export const ProcessingNode: React.FC<Info> = ({ node, graph }) => {
               if (args.id == node.id) {
                 node.remove();
               }
+              break;
+            case 'refresh':
+              setNodeStatus(link.preStatus);
+              break;
           }
           break;
       }

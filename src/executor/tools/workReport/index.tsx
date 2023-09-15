@@ -118,6 +118,7 @@ const ReportForms: React.FC<IProps> = (props) => {
   };
 
   const setEditor = (item: any) => {
+    console.log(item, 'item');
     let valueType: string = JSON.parse(item.prop.rule).widget;
     let newType: string = '';
     switch (valueType) {
