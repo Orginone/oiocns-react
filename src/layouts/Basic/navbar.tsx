@@ -18,7 +18,7 @@ const Navbar: React.FC = () => {
   useEffect(() => {
     const id = msgChatNotify.subscribe(() => {
       let noReadCount = 0;
-      for (const item of orgCtrl.chat.chats) {
+      for (const item of orgCtrl.chats) {
         noReadCount += item.chatdata.noReadCount;
       }
       setMsgCount(noReadCount);
@@ -26,7 +26,7 @@ const Navbar: React.FC = () => {
     const workId = orgCtrl.work.notity.subscribe(async () => {
       setWorkCount(orgCtrl.work.todos.length);
     });
-    kernel.onlineNotity.subscribe(() => {
+    kernel.onlineNotify.subscribe(() => {
       setOnline(kernel.onlineIds.length);
     });
     return () => {
@@ -35,6 +35,12 @@ const Navbar: React.FC = () => {
     };
   }, []);
   const actions = [
+    {
+      text: '首页',
+      icon: 'home',
+      path: '/home',
+      count: 0,
+    },
     {
       text: '沟通',
       icon: 'chat',
@@ -46,12 +52,6 @@ const Navbar: React.FC = () => {
       icon: 'work',
       path: '/work',
       count: workCount,
-    },
-    {
-      text: '首页',
-      icon: 'home',
-      path: '/home',
-      count: 0,
     },
     {
       text: '存储',
@@ -120,26 +120,45 @@ const Navbar: React.FC = () => {
 
 const OnlineInfo: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const [key, setKey] = useState('1');
-  const [onlines, setOnlines] = useState<model.OnlineInfo[]>([]);
+  const [onlines, setOnlines] = useState<model.OnlineSet>();
   useEffect(() => {
-    const id = kernel.onlineNotity.subscribe((key) => {
+    const id = kernel.onlineNotify.subscribe((key) => {
       kernel.onlines().then((value) => {
         setOnlines(value);
         setKey(key);
       });
     });
     return () => {
-      kernel.onlineNotity.unsubscribe(id);
+      kernel.onlineNotify.unsubscribe(id);
     };
   }, []);
+  if (!onlines) return <></>;
 
   const loadOnlineInfo = (onlines: model.OnlineInfo[]) => {
+    var unAuth: model.OnlineInfo[] = [];
+    onlines
+      .filter((i) => i.userId === '0')
+      .forEach((item) => {
+        var index = unAuth.findIndex((i) => i.remoteAddr === item.remoteAddr);
+        if (index === -1) {
+          item.requestCount = 1;
+          unAuth.push(item);
+        } else {
+          unAuth[index].requestCount = unAuth[index].requestCount + 1;
+        }
+      });
     return (
       <List
         itemLayout="horizontal"
-        dataSource={onlines.sort(
-          (a, b) => new Date(b.onlineTime).getTime() - new Date(a.onlineTime).getTime(),
-        )}
+        dataSource={[
+          ...unAuth,
+          ...onlines
+            .filter((i) => i.userId != '0')
+            .sort(
+              (a, b) =>
+                new Date(b.onlineTime).getTime() - new Date(a.onlineTime).getTime(),
+            ),
+        ]}
         renderItem={(item) => <OnlineItem data={item} />}
       />
     );
@@ -153,13 +172,13 @@ const OnlineInfo: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         items={[
           {
             key: 'online_user',
-            label: `在线用户(${onlines.filter((i) => i.userId != '0').length})`,
-            children: loadOnlineInfo(onlines.filter((i) => i.userId != '0')),
+            label: `在线用户(${onlines.users.length})`,
+            children: loadOnlineInfo(onlines.users),
           },
           {
             key: 'online_connection',
-            label: `在线连接(${onlines.filter((i) => i.userId === '0').length})`,
-            children: loadOnlineInfo(onlines.filter((i) => i.userId == '0')),
+            label: `在线数据核(${onlines.storages.length})`,
+            children: loadOnlineInfo(onlines.storages),
           },
         ]}
       />
@@ -168,6 +187,7 @@ const OnlineInfo: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 };
 
 const OnlineItem: React.FC<{ data: model.OnlineInfo }> = ({ data }) => {
+  data.remoteAddr = data.remoteAddr === '[' ? '127.0.0.1' : data.remoteAddr;
   const [target, setTarget] = useState<schema.XEntity>();
   useEffect(() => {
     if (data.userId != '0') {

@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
-// import CardOrTable from '@/components/CardOrTableComp';
+import CardOrTable from '@/components/CardOrTableComp';
 import { XAttribute } from '@/ts/base/schema';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import { IForm } from '@/ts/core';
 import PropertyConfig from './propConfig';
 import AttributeConfig from '@/components/Common/FormDesign/attributeConfig';
-import SelectPropertys from './SelectPropertys';
+import SelectPropertys from '@/components/Common/SelectPropertys';
 import { Modal } from 'antd';
-import { AttributeModel } from '@/ts/base/model';
-// import { AttributeColumn } from '@/config/column';
+import { AttributeColumn } from '@/config/column';
+import { schema } from '@/ts/base';
 
 interface IProps {
   current: IForm;
@@ -37,67 +37,67 @@ const Attritube = ({ current, modalType, setModalType }: IProps) => {
     }
   };
   // 操作内容渲染函数
-  // const renderOperate = (item: XAttribute) => {
-  //   if (!current.directory.isInherited) {
-  //     return [
-  //       {
-  //         key: '编辑特性',
-  //         label: '编辑特性',
-  //         onClick: () => {
-  //           setSelectedItem(item);
-  //           setModalType('编辑特性');
-  //         },
-  //       },
-  //       {
-  //         key: '配置特性',
-  //         label: '配置特性',
-  //         onClick: () => {
-  //           setSelectedItem(item);
-  //           setModalType('配置特性');
-  //         },
-  //       },
-  //       {
-  //         key: '删除特性',
-  //         label: <span style={{ color: 'red' }}>删除特性</span>,
-  //         onClick: async () => {
-  //           if (await current.deleteAttribute(item)) {
-  //             tforceUpdate();
-  //           }
-  //         },
-  //       },
-  //     ];
-  //   } else {
-  //     return [
-  //       {
-  //         key: '关联属性',
-  //         label: '关联属性',
-  //         onClick: () => {
-  //           setSelectedItem(item);
-  //           setModalType('关联属性');
-  //         },
-  //       },
-  //       {
-  //         key: '复制属性',
-  //         label: '复制属性',
-  //         onClick: async () => {
-  //           setSelectedItem(item);
-  //           setModalType('复制属性');
-  //         },
-  //       },
-  //     ];
-  //   }
-  // };
+  const renderOperate = (item: XAttribute) => {
+    if (!current.directory.isInherited) {
+      return [
+        {
+          key: '编辑特性',
+          label: '编辑特性',
+          onClick: () => {
+            setSelectedItem(item);
+            setModalType('编辑特性');
+          },
+        },
+        {
+          key: '配置特性',
+          label: '配置特性',
+          onClick: () => {
+            setSelectedItem(item);
+            setModalType('配置特性');
+          },
+        },
+        {
+          key: '删除特性',
+          label: <span style={{ color: 'red' }}>删除特性</span>,
+          onClick: async () => {
+            if (await current.deleteAttribute(item)) {
+              tforceUpdate();
+            }
+          },
+        },
+      ];
+    } else {
+      return [
+        {
+          key: '关联属性',
+          label: '关联属性',
+          onClick: () => {
+            setSelectedItem(item);
+            setModalType('关联属性');
+          },
+        },
+        {
+          key: '复制属性',
+          label: '复制属性',
+          onClick: async () => {
+            setSelectedItem(item);
+            setModalType('复制属性');
+          },
+        },
+      ];
+    }
+  };
 
   return (
     <>
-      {/* <CardOrTable<XAttribute>
+      <CardOrTable<XAttribute>
         key={tkey}
         rowKey={'id'}
         params={tkey}
         operation={renderOperate}
         columns={AttributeColumn}
         dataSource={current.attributes}
-      /> */}
+      />
       {/** 新增特性模态框 */}
       {['新增特性', '编辑特性'].includes(modalType) && (
         <Modal
@@ -118,7 +118,7 @@ const Attritube = ({ current, modalType, setModalType }: IProps) => {
                   code: prop.code,
                   rule: '{}',
                   remark: prop.remark,
-                } as AttributeModel,
+                } as schema.XAttribute,
                 prop,
               );
               tforceUpdate();

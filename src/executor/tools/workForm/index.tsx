@@ -1,22 +1,16 @@
 import React from 'react';
 import { model } from '../../../ts/base';
 import { IBelong } from '@/ts/core';
-
-import DetailForms from './detail';
 import PrimaryForms from './primary';
-import FormRenders from './formPreview';
-
+import DetailForms from './detail';
 import { formatDate } from '@/utils';
-import { DataType } from 'typings/globelType';
-import { WorkFormRulesType } from '@/ts/core/work/rules/workFormRules';
 
 interface IWorkFormProps {
   allowEdit: boolean;
   belong: IBelong;
   nodeId: string;
   data: model.InstanceDataModel;
-  ruleService?: WorkFormRulesType;
-  onChanged?: (id: string, data: model.FormEditData, changedData?: DataType) => void;
+  onChanged?: (id: string, data: model.FormEditData) => void;
 }
 
 const getNodeByNodeId = (
@@ -37,7 +31,7 @@ const getNodeByNodeId = (
 /** 流程节点表单 */
 const WorkForm: React.FC<IWorkFormProps> = (props) => {
   const node = getNodeByNodeId(props.nodeId, props.data.node);
-  if (!node || !node?.forms || node?.forms.length < 1) return <></>;
+  if (!node) return <></>;
   /** 根据需求获取数据 */
   const getFormData = (id: string): model.FormEditData => {
     const source: model.AnyThingModel[] = [];
@@ -62,13 +56,14 @@ const WorkForm: React.FC<IWorkFormProps> = (props) => {
       createTime: formatDate(new Date(), 'yyyy-MM-dd hh:mm:ss.S'),
     };
   };
-  const primaryForms = node.forms.filter((f) => f.typeName === '主表');
-  const detailForms = node.forms.filter((f) => f.typeName === '子表');
   return (
     <div style={{ padding: 10 }}>
-      <FormRenders {...props} forms={primaryForms} getFormData={getFormData} />
-      <PrimaryForms {...props} forms={primaryForms} getFormData={getFormData} />
-      <DetailForms {...props} forms={detailForms} getFormData={getFormData} />
+      {node.primaryForms && node.primaryForms.length > 0 && (
+        <PrimaryForms {...props} forms={node.primaryForms} getFormData={getFormData} />
+      )}
+      {node.detailForms && node.detailForms.length > 0 && (
+        <DetailForms {...props} forms={node.detailForms} getFormData={getFormData} />
+      )}
     </div>
   );
 };

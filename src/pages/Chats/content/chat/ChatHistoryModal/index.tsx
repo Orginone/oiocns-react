@@ -3,7 +3,7 @@ import { Modal, Spin, Empty } from 'antd';
 import { animateScroll } from 'react-scroll';
 import SearchInput from '@/components/SearchInput';
 import TeamIcon from '@/components/Common/GlobalComps/entityIcon';
-import { IMsgChat } from '@/ts/core';
+import { ISession } from '@/ts/core';
 import { showChatTime } from '@/utils/tools';
 import { parseMsg } from '@/pages/Chats/components/parseMsg';
 import ChatHistoryStyle from './index.module.less';
@@ -12,7 +12,7 @@ interface Iprops {
   open: boolean;
   title?: JSX.Element;
   onCancel: () => void;
-  chat: IMsgChat;
+  chat: ISession;
 }
 
 const ChatHistoryModal: React.FC<Iprops> = ({ open, title, onCancel, chat }) => {

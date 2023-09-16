@@ -1,23 +1,16 @@
 import { List } from '@/ts/base';
-import { SpeciesItemModel } from '@/ts/base/model';
+import { XSpeciesItem } from '@/ts/base/schema';
 import { IDirectory } from '@/ts/core';
-import { assignment, batchRequests } from '../..';
-import {
-  Context,
-  ErrorMessage,
-  ReadConfigImpl,
-  RequestIndex,
-  SheetConfigImpl,
-  SheetName,
-} from '../../types';
+import { assignment } from '../..';
+import { Context, ErrorMessage, SheetRead, Sheet, SheetName } from '../../types';
 
-export interface SpeciesItem extends SpeciesItemModel {
+export interface SpeciesItem extends XSpeciesItem {
   speciesCode: string;
   parentInfo?: string;
   index: number;
 }
 
-export class DictItemSheetConfig extends SheetConfigImpl<SpeciesItem> {
+export class DictItemSheet extends Sheet<SpeciesItem> {
   directory: IDirectory;
 
   constructor(directory: IDirectory) {
@@ -33,7 +26,7 @@ export class DictItemSheetConfig extends SheetConfigImpl<SpeciesItem> {
   }
 }
 
-export class ClassifyItemSheetConfig extends SheetConfigImpl<SpeciesItem> {
+export class ClassifyItemSheet extends Sheet<SpeciesItem> {
   directory: IDirectory;
 
   constructor(directory: IDirectory) {
@@ -52,20 +45,17 @@ export class ClassifyItemSheetConfig extends SheetConfigImpl<SpeciesItem> {
   }
 }
 
-export class DictItemReadConfig extends ReadConfigImpl<
-  SpeciesItem,
-  Context,
-  DictItemSheetConfig
-> {
+export class DictItemSheetRead extends SheetRead<SpeciesItem, Context, DictItemSheet> {
   async initContext(c: Context): Promise<void> {
-    for (let item of this.sheetConfig.data) {
-      if (c.speciesItemCodeMap.has(item.speciesCode)) {
-        let itemCodeMap = c.speciesItemCodeMap.get(item.speciesCode)!;
-        if (itemCodeMap.has(item.info)) {
-          let old = itemCodeMap.get(item.info)!;
+    for (let item of this.sheet.data) {
+      if (c.speciesItemMap.has(item.speciesCode)) {
+        let itemMap = c.speciesItemMap.get(item.speciesCode)!;
+        if (itemMap.has(item.info)) {
+          let old = itemMap.get(item.info)!;
           assignment(old, item);
+          item.code = old.code;
         }
-        itemCodeMap.set(item.code, item);
+        itemMap.set(item.code, item);
       }
     }
   }
@@ -75,73 +65,54 @@ export class DictItemReadConfig extends ReadConfigImpl<
    * @returns 错误信息
    */
   checkData(context: Context): ErrorMessage[] {
-    for (let index = 0; index < this.sheetConfig.data.length; index++) {
-      let item = this.sheetConfig.data[index];
+    for (let index = 0; index < this.sheet.data.length; index++) {
+      let item = this.sheet.data[index];
       if (!item.speciesCode || !item.name || !item.info) {
         this.pushError(index, `存在未填写的字典代码、字典项名称、附加信息！`);
       }
-      if (!context.speciesCodeMap.has(item.speciesCode)) {
+      if (!context.speciesMap.has(item.speciesCode)) {
         this.pushError(index, `未找到字典代码：${item.speciesCode}！`);
       }
     }
     return this.errors;
   }
   /**
-   * 更新/创建属性
+   * 更新/创建分类项
    * @param index 行索引
    * @param row 行数据
    * @param context 上下文
    */
   async operating(context: Context, onItemCompleted: () => void): Promise<void> {
-    let requests: RequestIndex[] = [];
-    for (let index = 0; index < this.sheetConfig.data.length; index++) {
-      let row = this.sheetConfig.data[index];
-      row.speciesId = context.speciesCodeMap.get(row.speciesCode)!.id;
-      requests.push({
-        rowNumber: index,
-        request: {
-          module: 'thing',
-          action: row.id ? 'UpdateSpeciesItem' : 'CreateSpeciesItem',
-          params: row,
-        },
-      });
-    }
-    while (requests.length > 0) {
-      await this.requests(requests.splice(0, 100), context, onItemCompleted);
-    }
-  }
-  /**
-   *
-   * @param requests 批量请求
-   */
-  private async requests(
-    requests: RequestIndex[],
-    _context: Context,
-    onItemCompleted: () => void,
-  ) {
-    await batchRequests(requests, (request, result) => {
-      if (result.success) {
-        assignment(result.data, this.sheetConfig.data[request.rowNumber]);
-      } else {
-        this.pushError(request.rowNumber, result.msg);
+    const data = this.sheet.data;
+    for (let index = 0; index < data.length; index++) {
+      let row = data[index];
+      row.speciesId = context.speciesMap.get(row.speciesCode)!.id;
+      if (!row.id) {
+        row.code = 'TsnowId()';
       }
       onItemCompleted();
-    });
+    }
+    (await this.sheet.directory.resource.speciesItemColl.replaceMany(data))
+      .map((item) => item as SpeciesItem)
+      .forEach((item, index) => {
+        data[index] = item;
+        context.speciesItemMap.get(item.speciesCode)?.set(item.info, item);
+      });
   }
 }
 
-export class ClassifyItemReadConfig extends ReadConfigImpl<
+export class ClassifyItemSheetRead extends SheetRead<
   SpeciesItem,
   Context,
-  DictItemSheetConfig
+  ClassifyItemSheet
 > {
   /**
    * 初始化数据
    * @param context 上下文
    */
   async initContext(context: Context): Promise<void> {
-    let speciesItemCodeMap = context.speciesItemCodeMap;
-    for (let item of this.sheetConfig.data) {
+    let speciesItemCodeMap = context.speciesItemMap;
+    for (let item of this.sheet.data) {
       if (!speciesItemCodeMap.has(item.speciesCode)) {
         speciesItemCodeMap.set(item.speciesCode, new Map());
       }
@@ -159,16 +130,16 @@ export class ClassifyItemReadConfig extends ReadConfigImpl<
    * @returns
    */
   checkData(context: Context): ErrorMessage[] {
-    for (let index = 0; index < this.sheetConfig.data.length; index++) {
-      let item = this.sheetConfig.data[index];
+    for (let index = 0; index < this.sheet.data.length; index++) {
+      let item = this.sheet.data[index];
       if (!item.speciesCode || !item.name || !item.info) {
         this.pushError(index, `存在未填写的分类代码、分类项名称、附加信息！`);
       }
-      if (!context.speciesCodeMap.has(item.speciesCode)) {
+      if (!context.speciesMap.has(item.speciesCode)) {
         this.pushError(index, `未找到分类代码：${item.speciesCode}！`);
       }
       if (item.parentInfo) {
-        if (!context.speciesItemCodeMap.get(item.speciesCode)?.get(item.parentInfo)) {
+        if (!context.speciesItemMap.get(item.speciesCode)?.get(item.parentInfo)) {
           this.pushError(index, `未找到上级分类项代码：${item.parentInfo}！`);
         }
       }
@@ -182,8 +153,8 @@ export class ClassifyItemReadConfig extends ReadConfigImpl<
    * @param context 上下文
    */
   async operating(context: Context, onItemCompleted: () => void): Promise<void> {
-    this.sheetConfig.data.forEach((item, index) => (item.index = index));
-    let groups = new List(this.sheetConfig.data).GroupBy((item) => item.speciesCode);
+    this.sheet.data.forEach((item, index) => (item.index = index));
+    let groups = new List(this.sheet.data).GroupBy((item) => item.speciesCode);
     for (let key of Object.keys(groups)) {
       let tree = new Tree<SpeciesItem>(groups[key], 'info', 'parentInfo');
       await this.recursion(tree.root, context, onItemCompleted);
@@ -198,56 +169,36 @@ export class ClassifyItemReadConfig extends ReadConfigImpl<
     context: Context,
     onItemCompleted: () => void,
   ) {
-    let requests = [];
-    for (let node of root.children) {
-      let row = node.data;
-      row.speciesId = context.speciesCodeMap.get(row.speciesCode)!.id;
+    const data = root.children.map((item) => item.data);
+    for (let row of data) {
+      row.speciesId = context.speciesMap.get(row.speciesCode)!.id;
       if (row.parentInfo) {
-        row.parentId = context.speciesItemCodeMap
+        row.parentId = context.speciesItemMap
           .get(row.speciesCode)!
           .get(row.parentInfo)!.id;
       }
-      requests.push({
-        rowNumber: row.index,
-        request: {
-          module: 'thing',
-          action: row.id ? 'UpdateSpeciesItem' : 'CreateSpeciesItem',
-          params: row,
-        },
-      });
+      if (!row.id) {
+        row.code = 'TsnowId()';
+      }
+      onItemCompleted();
     }
-    await this.requests(requests, context, onItemCompleted);
+    (await this.sheet.directory.resource.speciesItemColl.replaceMany(data))
+      .map((item) => item as SpeciesItem)
+      .forEach((item) => {
+        let oldItem = this.sheet.data[item.index];
+        Object.assign(oldItem, item);
+        context.speciesItemMap.get(item.speciesCode)?.set(item.info, item);
+      });
     for (let item of root.children) {
       await this.recursion(item, context, onItemCompleted);
     }
-  }
-  /**
-   * 批量请求
-   * @param requests 请求
-   * @param context 上下文
-   * @param onItemCompleted 回调
-   */
-  private async requests(
-    requests: RequestIndex[],
-    context: Context,
-    onItemCompleted: () => void,
-  ) {
-    await batchRequests(requests, (request, result) => {
-      if (result.success) {
-        let data = result.data;
-        assignment(data, this.sheetConfig.data[request.rowNumber]);
-        context.speciesItemCodeMap.get(data.speciesCode)?.set(data.code, data);
-      } else {
-        this.pushError(request.rowNumber, result.msg);
-      }
-      onItemCompleted();
-    });
   }
 }
 
 /**
  * 节点
- */ class Node<T extends { [key: string]: any }> {
+ */
+class Node<T extends { [key: string]: any }> {
   readonly id: string;
   readonly parentId?: string;
   readonly children: Node<T>[];

@@ -1,96 +1,78 @@
-import React, { useEffect, useState, useRef } from 'react';
+import { Button } from 'antd';
+import React, { useState } from 'react';
+import FormDesign from '@/components/Common/FormDesign';
+import cls from './index.module.less';
+import PageCard from '@/components/PageCard';
+import Attribute from './Attritube';
+import FormRules from './formRules';
 import { IForm } from '@/ts/core';
 import FullScreenModal from '@/executor/tools/fullScreen';
-import FormEditModal, { onSave } from './FormEdit';
-import { schemaType } from '@/ts/base/schema';
-import { loadWidgetsOpts } from '@/components/Common/FormDesign/schemaRule';
+import EntityInfo from '@/components/Common/EntityInfo';
 
 interface IProps {
   current: IForm;
   finished: () => void;
 }
 const LabelModl: React.FC<IProps> = ({ current, finished }: IProps) => {
-  const [defaultSchema, setDefaultSchema] = useState<schemaType>({
-    displayType: 'row',
-    type: 'object',
-    labelWidth: 120,
-    properties: {},
-    column: 1,
-  });
-  // let {
-  //   metadata: { rule },
-  // } = current;
-  //const rules = rule ? JSON.parse(rule) : {};
-  let onSave = useRef({} as onSave);
-  const onFinished = () => {
-    // setEditFormOpen(false);
+  const [modalType, setModalType] = useState<string>('');
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [tabKey, setTabKey] = useState<string>('attr');
+  /** 操作按钮 */
+  const renderButton = () => {
+    if (!current.isInherited && tabKey === 'attr') {
+      return (
+        <Button
+          key="edit"
+          type="link"
+          onClick={() => {
+            setModalType('表单设计');
+            setIsOpen(true);
+          }}>
+          表单设计
+        </Button>
+      );
+    } else if (!current.isInherited && tabKey === 'rule') {
+      return (
+        <Button
+          key="rules"
+          type="link"
+          onClick={() => {
+            setModalType('新增规则');
+          }}>
+          新增规则
+        </Button>
+      );
+    }
+    return <></>;
   };
-  const currentToSchemaFun = () => {
-    //如果配置过
-    // if (rules && JSON.stringify(rules) !== '{}') {
-    //   return rules.schema;
-    // } else {
-    //没有配置过
-    const schema: schemaType = {
-      displayType: 'row',
-      type: 'object',
-      properties: {},
-      labelWidth: 120,
-      column: 1,
-    };
-    let result = current.fields.reduce((result, item: any) => {
-      const { valueType } = item;
-      let title, type, widget, format, enums, enumNames;
-      title = item.name;
-      type = loadWidgetsOpts(valueType)[0].value;
-      widget = loadWidgetsOpts(valueType)[0].value;
-      if (widget === 'textarea') {
-        format = 'textarea';
-        widget = '';
-      }
-      if (widget === 'string') {
-        format = '';
-        widget = '';
-      }
-      if (valueType === '时间型') {
-        format = 'dateTime';
-        widget = null;
-      }
-      if (valueType === '附件型') {
-        widget = 'upload';
-        format = null;
-      }
-      if (valueType === '选择型' || valueType === '分类型') {
-        enums = item.lookups.map((item: { value: any }) => {
-          return item.value;
-        });
-        enumNames = item.lookups.map((item: { text: any }) => {
-          return item.text;
-        });
-      }
-      return {
-        ...result,
-        [item!.id]: {
-          title,
-          type,
-          widget,
-          enum: enums,
-          enumNames,
-          format,
-          valueType,
-        },
-      };
-    }, {});
-    schema.properties = {
-      ...result,
-    };
-    return schema;
-    // }
+
+  const content = () => {
+    if (tabKey === 'attr') {
+      return (
+        <>
+          <Attribute
+            current={current}
+            modalType={modalType}
+            recursionOrg={true}
+            setModalType={setModalType}
+          />
+
+          <FormDesign current={current} isOpen={isOpen} setIsOpen={setIsOpen} />
+        </>
+      );
+    }
+    if (tabKey === 'rule') {
+      return (
+        <FormRules
+          current={current}
+          setModalType={setModalType}
+          modalType={modalType}
+          recursionOrg={false}
+        />
+      );
+    }
   };
-  useEffect(() => {
-    const schema = currentToSchemaFun();
-    setDefaultSchema(schema);
-  }, []);
+
   return (
     <FullScreenModal
       open
@@ -100,17 +82,36 @@ const LabelModl: React.FC<IProps> = ({ current, finished }: IProps) => {
       destroyOnClose
       title={current.typeName + '管理'}
       footer={[]}
-      onCancel={() => {
-        finished();
-        onSave.current.saveSchema();
-      }}>
-      <FormEditModal
-        current={current}
-        defaultSchema={defaultSchema}
-        finished={onFinished}
-        editFormOpen={true}
-        onSave={onSave}
-      />
+      onCancel={finished}>
+      <div className={cls[`dept-content-box`]}>
+        <div className={cls['pages-wrap']}>
+          <EntityInfo entity={current}></EntityInfo>
+          <PageCard
+            bordered={false}
+            tabList={[
+              {
+                tab: current.typeName + '特性',
+                key: 'attr',
+              },
+              // {
+              //   tab: current.typeName + '设计',
+              //   key: 'form',
+              //   disabled: current.directory.isInherited,
+              // },
+              {
+                tab: current.typeName + '规则',
+                key: 'rule',
+                // disabled: current.directory.isInherited,
+              },
+            ]}
+            activeTabKey={tabKey}
+            onTabChange={(key) => setTabKey(key)}
+            tabBarExtraContent={renderButton()}
+            bodyStyle={{ paddingTop: 16 }}>
+            <div className={cls['page-content-table']}>{content()}</div>
+          </PageCard>
+        </div>
+      </div>
     </FullScreenModal>
   );
 };

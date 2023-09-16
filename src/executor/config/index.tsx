@@ -1,6 +1,7 @@
 import { TargetType } from '@/ts/core';
 import { message } from 'antd';
 import React from 'react';
+
 import EntityForm from './entityForm';
 import OperateModal from './operateModal';
 import SettingAuth from './settingModal/settingAuth';
@@ -19,6 +20,7 @@ const entityMap: any = {
   办事: 'Work',
   事项配置: 'WorkConfig',
   实体配置: 'ThingConfig',
+  迁移配置: 'TransferConfig',
   报表: 'Report',
 };
 
@@ -28,7 +30,6 @@ interface IProps {
   finished: () => void;
 }
 const ConfigExecutor: React.FC<IProps> = ({ cmd, args, finished }) => {
-  console.log(cmd,'cmd')
   switch (cmd) {
     case 'open':
       if (Object.keys(entityMap).includes(args[0].typeName)) {

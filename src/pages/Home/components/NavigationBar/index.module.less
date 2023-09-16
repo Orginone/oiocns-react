@@ -12,6 +12,7 @@
   align-items: center;
   padding-left: 50px;
   padding-right: 20px;
+  transition: 0.2s;
   &Content {
     display: flex;
     justify-content: center;
@@ -33,5 +34,39 @@
     color: @text-color-inverse;
     font-size: 30px;
     cursor: pointer;
+  }
+
+  &Open {
+    height: auto;
+    padding: 30px 20px 40px;
+    background-color: @component-background;
+    z-index: 1;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.15);
+  }
+
+
+  &Config {
+    width: 100%;
+    &Header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+
+    &Section {
+      margin-bottom: 20px;
+    }
+
+    &PageCard {
+      padding: 8px 24px;
+      color: #424A57;
+      background-color: #F7F8FA;
+      border-radius: 27px;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
   }
 }

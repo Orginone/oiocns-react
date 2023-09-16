@@ -1,65 +1,60 @@
 import { IDirectory } from '@/ts/core';
-import { ReadConfig, SheetConfig, SheetName } from '../types';
-import { AttrSheetConfig, AttrReadConfig } from './base/attribute';
-import { DirectoryReadConfig, DirectorySheetConfig } from './base/directory';
-import { FormReadConfig, FormSheetConfig } from './base/form';
+import { ISheetRead, ISheet, SheetName } from '../types';
+import { AttrSheetRead, AttrSheet } from './base/attribute';
+import { DirectorySheetRead, DirectorySheet } from './base/directory';
+import { FormSheetRead, FormSheet } from './base/form';
+import { ClassifySheetRead, ClassifySheet, DictSheetRead, DictSheet } from './species/species';
 import {
-  ClassifyReadConfig,
-  ClassifySheetConfig,
-  DictReadConfig,
-  DictSheetConfig,
-} from './species/species';
-import {
-  ClassifyItemReadConfig,
-  ClassifyItemSheetConfig,
-  DictItemReadConfig,
-  DictItemSheetConfig,
+  ClassifyItemSheetRead,
+  ClassifyItemSheet,
+  DictItemSheetRead,
+  DictItemSheet,
 } from './species/speciesitem';
-import { PropReadConfig, PropSheetConfig } from './store/property';
+import { PropSheetRead, PropSheet } from './store/property';
 
 export const getConfigs = (directory: IDirectory) => {
-  let configs: SheetConfig<any>[] = [
-    new DirectorySheetConfig(directory),
-    new DictSheetConfig(directory),
-    new DictItemSheetConfig(directory),
-    new ClassifySheetConfig(directory),
-    new ClassifyItemSheetConfig(directory),
-    new PropSheetConfig(directory),
-    new FormSheetConfig(directory),
-    new AttrSheetConfig(directory),
+  let sheets: ISheet<any>[] = [
+    new DirectorySheet(directory),
+    new DictSheet(directory),
+    new DictItemSheet(directory),
+    new ClassifySheet(directory),
+    new ClassifyItemSheet(directory),
+    new PropSheet(directory),
+    new FormSheet(directory),
+    new AttrSheet(directory),
   ];
-  return configs;
+  return sheets;
 };
 
 export const getReadConfigs = (directory: IDirectory) => {
-  let readConfigs: ReadConfig<any, any, SheetConfig<any>>[] = [];
+  let readSheets: ISheetRead<any, any, ISheet<any>>[] = [];
   for (let config of getConfigs(directory)) {
     switch (config.sheetName) {
       case SheetName.Directory:
-        readConfigs.push(new DirectoryReadConfig(config as DirectorySheetConfig));
+        readSheets.push(new DirectorySheetRead(config as DirectorySheet));
         break;
       case SheetName.Dict:
-        readConfigs.push(new DictReadConfig(config as DictSheetConfig));
+        readSheets.push(new DictSheetRead(config as DictSheet));
         break;
       case SheetName.DictItem:
-        readConfigs.push(new DictItemReadConfig(config as DictItemSheetConfig));
+        readSheets.push(new DictItemSheetRead(config as DictItemSheet));
         break;
       case SheetName.Species:
-        readConfigs.push(new ClassifyReadConfig(config as ClassifySheetConfig));
+        readSheets.push(new ClassifySheetRead(config as ClassifySheet));
         break;
       case SheetName.SpeciesItem:
-        readConfigs.push(new ClassifyItemReadConfig(config as ClassifyItemSheetConfig));
+        readSheets.push(new ClassifyItemSheetRead(config as ClassifyItemSheet));
         break;
       case SheetName.Property:
-        readConfigs.push(new PropReadConfig(config as PropSheetConfig));
+        readSheets.push(new PropSheetRead(config as PropSheet));
         break;
       case SheetName.Form:
-        readConfigs.push(new FormReadConfig(config as FormSheetConfig));
+        readSheets.push(new FormSheetRead(config as FormSheet));
         break;
       case SheetName.FormAttr:
-        readConfigs.push(new AttrReadConfig(config as AttrSheetConfig));
+        readSheets.push(new AttrSheetRead(config as AttrSheet));
         break;
     }
   }
-  return readConfigs;
+  return readSheets;
 };

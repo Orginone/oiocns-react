@@ -1,7 +1,7 @@
 import { generateUuid } from './uuid';
 export type cmdType = (type: string, cmd: string, ...args: any) => any;
 /** 日志 */
-class Command {
+export class Command {
   private callbacks: { [id: string]: cmdType };
   constructor() {
     this.callbacks = {};

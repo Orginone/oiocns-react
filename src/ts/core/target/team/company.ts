@@ -1,16 +1,18 @@
 import { kernel, model, schema } from '@/ts/base';
 import { IBelong, Belong } from '../base/belong';
-import { ICohort, Cohort } from '../outTeam/cohort';
 import { IGroup, Group } from '../outTeam/group';
 import { IDepartment, Department } from '../innerTeam/department';
 import { IStation, Station } from '../innerTeam/station';
 import { IPerson } from '../person';
 import { PageAll } from '../../public/consts';
 import { TargetType } from '../../public/enums';
-import { IMsgChat } from '../../chat/message/msgchat';
 import { ITarget } from '../base/target';
 import { ITeam } from '../base/team';
 import { targetOperates } from '../../public';
+import { Storage } from '../outTeam/storage';
+import { companyJoins } from '../../public/operates';
+import { Cohort } from '../outTeam/cohort';
+import { ISession } from '../../chat/session';
 
 /** 单位类型接口 */
 export interface ICompany extends IBelong {
@@ -26,8 +28,6 @@ export interface ICompany extends IBelong {
   exit(): Promise<boolean>;
   /** 加载组织集群 */
   loadGroups(reload?: boolean): Promise<IGroup[]>;
-  /** 加载创建的群 */
-  loadStations(reload?: boolean): Promise<IStation[]>;
   /** 加载单位的部门 */
   loadDepartments(reload?: boolean): Promise<IDepartment[]>;
   /** 设立岗位 */
@@ -41,7 +41,7 @@ export interface ICompany extends IBelong {
 /** 单位类型实现 */
 export class Company extends Belong implements ICompany {
   constructor(_metadata: schema.XTarget, _user: IPerson) {
-    super(_metadata, ['全员群'], _user);
+    super(_metadata, [_metadata.id], _user);
     this.departmentTypes = [
       TargetType.Department,
       TargetType.Office,
@@ -55,61 +55,55 @@ export class Company extends Belong implements ICompany {
   departments: IDepartment[] = [];
   departmentTypes: string[] = [];
   private _groupLoaded: boolean = false;
-  private _cohortLoaded: boolean = false;
-  private _stationLoaded: boolean = false;
   private _departmentLoaded: boolean = false;
   async loadGroups(reload: boolean = false): Promise<IGroup[]> {
     if (!this._groupLoaded || reload) {
       const res = await kernel.queryJoinedTargetById({
         id: this.id,
-        typeNames: [TargetType.Group],
+        typeNames: [TargetType.Group, TargetType.Storage],
         page: PageAll,
       });
       if (res.success) {
         this._groupLoaded = true;
-        this.groups = (res.data.result || []).map((i) => new Group(i, this));
+        this.storages = [];
+        this.groups = [];
+        (res.data.result || []).forEach((i) => {
+          switch (i.typeName) {
+            case TargetType.Storage:
+              this.storages.push(new Storage(i, [this.id], this));
+              break;
+            default:
+              this.groups.push(new Group(i, [this.id], this));
+          }
+        });
       }
     }
     return this.groups;
-  }
-  async loadCohorts(reload?: boolean | undefined): Promise<ICohort[]> {
-    if (!this._cohortLoaded || reload) {
-      const res = await kernel.querySubTargetById({
-        id: this.id,
-        subTypeNames: [TargetType.Cohort],
-        page: PageAll,
-      });
-      if (res.success) {
-        this._cohortLoaded = true;
-        this.cohorts = (res.data.result || []).map((i) => new Cohort(i, this));
-      }
-    }
-    return this.cohorts;
-  }
-  async loadStations(reload?: boolean | undefined): Promise<IStation[]> {
-    if (!this._stationLoaded || reload) {
-      const res = await kernel.querySubTargetById({
-        id: this.id,
-        subTypeNames: [TargetType.Station],
-        page: PageAll,
-      });
-      if (res.success) {
-        this._stationLoaded = true;
-        this.stations = (res.data.result || []).map((i) => new Station(i, this));
-      }
-    }
-    return this.stations;
   }
   async loadDepartments(reload?: boolean | undefined): Promise<IDepartment[]> {
     if (!this._departmentLoaded || reload) {
       const res = await kernel.querySubTargetById({
         id: this.id,
-        subTypeNames: this.departmentTypes,
+        subTypeNames: [...this.departmentTypes, TargetType.Cohort, TargetType.Station],
         page: PageAll,
       });
       if (res.success) {
         this._departmentLoaded = true;
-        this.departments = (res.data.result || []).map((i) => new Department(i, this));
+        this.departments = [];
+        this.stations = [];
+        this.cohorts = [];
+        (res.data.result || []).forEach((i) => {
+          switch (i.typeName) {
+            case TargetType.Cohort:
+              this.cohorts.push(new Cohort(i, this, this.id));
+              break;
+            case TargetType.Station:
+              this.stations.push(new Station(i, this));
+              break;
+            default:
+              this.departments.push(new Department(i, this));
+          }
+        });
       }
     }
     return this.departments;
@@ -118,7 +112,7 @@ export class Company extends Belong implements ICompany {
     data.typeName = TargetType.Group;
     const metadata = await this.create(data);
     if (metadata) {
-      const group = new Group(metadata, this);
+      const group = new Group(metadata, [this.id], this);
       await group.deepLoad();
       this.groups.push(group);
       await group.pullMembers([this.metadata]);
@@ -166,7 +160,10 @@ export class Company extends Belong implements ICompany {
   }
   async applyJoin(members: schema.XTarget[]): Promise<boolean> {
     for (const member of members) {
-      if (member.typeName === TargetType.Group) {
+      if (
+        member.typeName === TargetType.Group ||
+        member.typeName === TargetType.Storage
+      ) {
         await kernel.applyJoinTeam({
           id: member.id,
           subId: this.id,
@@ -198,25 +195,19 @@ export class Company extends Belong implements ICompany {
   get parentTarget(): ITarget[] {
     return this.groups;
   }
-  get chats(): IMsgChat[] {
-    const chats: IMsgChat[] = [this];
+  get chats(): ISession[] {
+    const chats: ISession[] = [this.session];
     chats.push(...this.cohortChats);
     chats.push(...this.memberChats);
     return chats;
   }
-  get cohortChats(): IMsgChat[] {
-    const chats: IMsgChat[] = [];
+  get cohortChats(): ISession[] {
+    const chats: ISession[] = [];
     for (const item of this.departments) {
-      chats.push(...item.chats);
-    }
-    for (const item of this.stations) {
       chats.push(...item.chats);
     }
     for (const item of this.cohorts) {
       chats.push(...item.chats);
-    }
-    if (this.superAuth) {
-      chats.push(...this.superAuth.chats);
     }
     return chats;
   }
@@ -231,17 +222,18 @@ export class Company extends Belong implements ICompany {
     for (const item of this.cohorts) {
       targets.push(...item.targets);
     }
+    for (const item of this.storages) {
+      targets.push(...item.targets);
+    }
     return targets;
   }
   async deepLoad(reload: boolean = false): Promise<void> {
     await Promise.all([
-      await this.directory.loadSubDirectory(),
       await this.loadGroups(reload),
       await this.loadDepartments(reload),
-      await this.loadStations(reload),
-      await this.loadCohorts(reload),
       await this.loadMembers(reload),
       await this.loadSuperAuth(reload),
+      await this.directory.loadDirectoryResource(reload),
     ]);
     await Promise.all(
       this.groups.map(async (group) => {
@@ -271,18 +263,13 @@ export class Company extends Belong implements ICompany {
     if (this.hasRelationAuth()) {
       operates.unshift(
         {
-          sort: 3,
+          sort: 2,
           cmd: 'setNew',
           label: '设立更多',
           iconType: 'setNew',
           menus: [targetOperates.NewGroup, targetOperates.NewDepartment],
         },
-        {
-          sort: 13,
-          cmd: 'joinGroup',
-          label: '加入集群',
-          iconType: 'joinGroup',
-        },
+        companyJoins,
       );
     }
     return operates;
@@ -305,7 +292,7 @@ export class Company extends Belong implements ICompany {
         return this.pullMembers([target], true);
       case TargetType.Group:
         if (this.groups.every((i) => i.id != target.id)) {
-          const group = new Group(target, this);
+          const group = new Group(target, [this.id], this);
           await group.deepLoad();
           this.groups.push(group);
           return true;
@@ -321,9 +308,17 @@ export class Company extends Belong implements ICompany {
         break;
       case TargetType.Cohort:
         if (this.cohorts.every((i) => i.id != target.id)) {
-          const cohort = new Cohort(target, this);
+          const cohort = new Cohort(target, this, this.id);
           await cohort.deepLoad();
           this.cohorts.push(cohort);
+          return true;
+        }
+        break;
+      case TargetType.Storage:
+        if (this.storages.every((i) => i.id != target.id)) {
+          const storage = new Storage(target, [this.id], this);
+          await storage.deepLoad();
+          this.storages.push(storage);
           return true;
         }
         break;

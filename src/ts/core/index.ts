@@ -1,8 +1,9 @@
-export { ChatMessage } from './chat/message/chatmsg';
-export type { IMessage, IMessageLabel } from './chat/message/message';
-export type { IMsgChat } from './chat/message/msgchat';
-export { msgChatNotify } from './chat/message/msgchat';
+export type { IActivity } from './chat/activity';
+export type { IMessage, IMessageLabel } from './chat/message';
+export type { ISession } from './chat/session';
+export { msgChatNotify } from './chat/session';
 export type { IEntity } from './public';
+export type { XCollection } from './public/collection';
 export { companyTypes, departmentTypes, orgAuth, valueTypes } from './public/consts';
 export {
   MessageType,
@@ -11,6 +12,7 @@ export {
   TaskStatus,
   ValueType,
 } from './public/enums';
+export type { XObject } from './public/object';
 export type { IAuthority } from './target/authority/authority';
 export type { IBelong } from './target/base/belong';
 export type { ITarget } from './target/base/target';
@@ -22,13 +24,14 @@ export type { ICohort } from './target/outTeam/cohort';
 export type { IGroup } from './target/outTeam/group';
 export type { IPerson } from './target/person';
 export type { ICompany } from './target/team/company';
-export type { IApplication } from './thing/application';
 export type { IDirectory } from './thing/directory';
 export type { IFileInfo, ISysFileInfo } from './thing/fileinfo';
-export type { IForm } from './thing/form';
 export type { IMemeber } from './thing/member';
-export type { IProperty } from './thing/property';
-export type { ISpecies } from './thing/species';
+export type { IApplication } from './thing/standard/application';
+export type { IForm } from './thing/standard/form';
+export type { IProperty } from './thing/standard/property';
+export type { ISpecies } from './thing/standard/species';
+export type { ITransfer } from './thing/standard/transfer';
 export { UserProvider } from './user';
 export type { IWork } from './work';
 export type { IReport, IReportView } from './thing/report';

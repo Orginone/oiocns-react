@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import CardOrTable from '@/components/CardOrTableComp';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
-import { IReport } from '@/ts/core';
 import { ProColumns } from '@ant-design/pro-components';
 import SchemaForm from '@/components/SchemaForm';
 import ReportView from '@/components/Common/ReportDesign';
-import { model } from '@/ts/base';
+import { schema } from '@/ts/base';
+import { IForm } from '@/ts/core';
 
 interface IProps {
-  current: IReport;
+  current: IForm;
   modalType: string;
   recursionOrg: boolean;
   setModalType: (modalType: string) => void;
@@ -22,7 +22,9 @@ interface IProps {
 const Sheet = ({ current, modalType, setModalType }: IProps) => {
   const [tkey, tforceUpdate] = useObjectUpdate('');
   const [selectedItem, setSelectedItem] = useState<any>();
-  let sheetList = current.metadata?.rule ? JSON.parse(current.metadata?.rule) : [];
+  let newRules = current.metadata?.rule ? JSON.parse(current.metadata?.rule) : {};
+  delete newRules?.list;
+  let sheetList: any = Object.values(newRules);
 
   // 操作内容渲染函数
   const renderOperate = (item: any) => {
@@ -48,7 +50,7 @@ const Sheet = ({ current, modalType, setModalType }: IProps) => {
             name: current.name,
             code: current.code,
             rule: JSON.stringify(sheetList),
-          } as model.FormModel);
+          } as schema.XForm);
           tforceUpdate();
         },
       },
@@ -126,11 +128,10 @@ const Sheet = ({ current, modalType, setModalType }: IProps) => {
               name: current.name,
               code: current.code,
               rule: JSON.stringify(sheetList),
-            } as model.FormModel);
+            } as schema.XForm);
             setModalType('');
             tforceUpdate();
-          }}
-        ></SchemaForm>
+          }}></SchemaForm>
       )}
 
       {['配置sheet页'].includes(modalType) && (
@@ -139,8 +140,7 @@ const Sheet = ({ current, modalType, setModalType }: IProps) => {
           selectItem={selectedItem}
           finished={async () => {
             setModalType('');
-          }}
-        ></ReportView>
+          }}></ReportView>
       )}
     </>
   );

@@ -10,7 +10,7 @@ import PropertyForm from './propertyForm';
 import TargetForm from './targetForm';
 import LabelsForm from './labelsForm';
 import RenameForm from './renameForm';
-import LabelsReport from './labelsReport';
+import LinkForm from './linkForm';
 interface IProps {
   cmd: string;
   entity: IEntity<schema.XEntity>;
@@ -82,24 +82,20 @@ const EntityForm: React.FC<IProps> = ({ cmd, entity, finished }) => {
           finished={reloadFinish}
         />
       );
-    case 'newReport':
-      return (
-        <LabelsReport
-          formType={cmd.replace('Report', '')}
-          current={entity as any}
-          finished={reloadFinish}
-        />
-      );
     case 'newProperty':
     case 'updateProperty':
     case 'remarkProperty':
       return (
         <PropertyForm formType={cmd} current={entity as any} finished={reloadFinish} />
       );
+    case 'newTransferConfig':
+    case 'updateTransferConfig':
+      return <LinkForm formType={cmd} current={entity as any} finished={reloadFinish} />;
     default: {
-      const target = cmd.startsWith('new')
-        ? (entity as IDirectory).target
-        : (entity as ITarget);
+      var target = entity as ITarget;
+      if (entity.typeName === '目录') {
+        target = (entity as IDirectory).target;
+      }
       return <TargetForm formType={cmd} target={target} finished={reloadFinish} />;
     }
   }

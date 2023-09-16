@@ -1,4 +1,4 @@
-import { AiOutlineLock, AiOutlineUser } from 'react-icons/ai';
+import { AiOutlineLock, AiOutlineUser } from '@/icons/ai';
 import { Button, Checkbox, Form, Input, message, Tabs } from 'antd';
 import React, { useState } from 'react';
 import { Link, RouteComponentProps } from 'react-router-dom';

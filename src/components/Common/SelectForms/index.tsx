@@ -1,10 +1,10 @@
-import { AiOutlineSearch } from 'react-icons/ai';
+import { AiOutlineSearch } from '@/icons/ai';
 import { Input, TreeProps } from 'antd';
 import React, { useState, Key } from 'react';
 import ShareShowComp from '@/components/Common/ShareShowComp';
 import cls from './index.module.less';
 import CustomTree from '@/components/CustomTree';
-import { IBelong } from '@/ts/core';
+import { IBelong, ITarget } from '@/ts/core';
 import { XForm } from '@/ts/base/schema';
 import { IDirectory } from '@/ts/core/thing/directory';
 
@@ -24,9 +24,8 @@ const SelectForms: React.FC<IProps> = ({ belong, typeName, selected, setSelected
 
   const onSelect: TreeProps['onSelect'] = async (_, info: any) => {
     const directory: IDirectory = info.node.item;
-    let forms = await directory.loadForms();
     setCenterTreeData(
-      forms.map((item) => {
+      directory.forms.map((item) => {
         return {
           key: item.id,
           title: item.name,
@@ -52,16 +51,35 @@ const SelectForms: React.FC<IProps> = ({ belong, typeName, selected, setSelected
     setSelected([...selected]);
   };
 
+  const buildTargetWorkThingTree = (targets: ITarget[]): any[] => {
+    const result: any[] = [];
+    for (const target of targets.filter((a) => a.belongId == belong.id)) {
+      result.push({
+        key: target.directory.id,
+        title: target.directory.name,
+        value: target.directory.id,
+        item: target.directory,
+        children: [
+          ...buildTargetWorkThingTree(target.subTarget),
+          ...buildWorkThingTree(target.directory.children),
+        ],
+      });
+    }
+    return result;
+  };
+
   const buildWorkThingTree = (directory: IDirectory[]): any[] => {
     const result: any[] = [];
     for (const item of directory) {
-      result.push({
-        key: item.id,
-        title: item.name,
-        value: item.id,
-        item: item,
-        children: buildWorkThingTree(item.children),
-      });
+      if (item.id) {
+        result.push({
+          key: item.id,
+          title: item.name,
+          value: item.id,
+          item: item,
+          children: [...buildWorkThingTree(item.children)],
+        });
+      }
     }
     return result;
   };
@@ -85,7 +103,7 @@ const SelectForms: React.FC<IProps> = ({ belong, typeName, selected, setSelected
               checkable={false}
               autoExpandParent={true}
               onSelect={onSelect}
-              treeData={buildWorkThingTree(belong.shareTarget.map((i) => i.directory))}
+              treeData={buildTargetWorkThingTree(belong.shareTarget)}
             />
           </div>
         </div>

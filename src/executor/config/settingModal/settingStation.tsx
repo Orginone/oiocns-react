@@ -4,7 +4,7 @@ import { ICompany, IStation } from '@/ts/core';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import MainLayout from '@/components/MainLayout';
 import useMenuUpdate from '@/hooks/useMenuUpdate';
-import * as im from 'react-icons/im';
+import * as im from '@/icons/im';
 import { MenuItemType, OperateMenuType } from 'typings/globelType';
 import StationForm from './subModal/stationForm';
 import SelectMember from '@/components/Common/SelectMember';
@@ -46,7 +46,7 @@ const SettingStation: React.FC<IProps> = ({ company, finished }) => {
               okText: '确认',
               cancelText: '取消',
               onOk: async () => {
-                if ('shareId' in item) {
+                if ('authId' in item) {
                   await station?.removeIdentitys([item]);
                 } else {
                   await station?.removeMembers([item]);
@@ -184,7 +184,7 @@ const loadSettingMenu = (company: ICompany): MenuItemType => {
 const loadMenus = (item: ICompany | IStation) => {
   const items: OperateMenuType[] = [];
   if ('company' in item) {
-    if (item.company.hasRelationAuth()) {
+    if (item.space.hasRelationAuth()) {
       items.push(
         {
           key: '添加角色',

@@ -23,19 +23,22 @@ export namespace RuleTypes {
     | '用户型';
   /* 规则触发方式 初始化-运行中-提交时-子表变动时*/
   type TriggerType = 'Start' | 'Running' | 'Submit' | 'ThingsChanged';
-/* 规则执行 */
-type ResType = '赋值'|'修改设置'|''
 
   /* 规则运行返回结果类型 */
   type ResultType = {
     /* 规则运行是否异常 */
     success: boolean;
     /* 规则运行结果 */
-    data: { [key: string]: any };
+    data: any;
     /* 规则运行错误提示 */
     errMsg: string;
   };
   type DataType = {
     [key: string]: any;
+  };
+/* 表单变化时，返回类型 */
+  type callBackType = {
+    formId: string;
+    callback: (data: any) => void;
   };
 }

@@ -4,9 +4,10 @@ import {
   IEntity,
   IFileInfo,
   IMemeber,
-  IMsgChat,
+  ISession,
   ISysFileInfo,
   ITarget,
+  IWork,
   TargetType,
 } from '@/ts/core';
 import orgCtrl from '@/ts/controller';
@@ -19,7 +20,7 @@ import TypeIcon from '@/components/Common/GlobalComps/typeIcon';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import { TaskModel } from '@/ts/base/model';
 /** 执行非页面命令 */
-export const executeCmd = (cmd: string, entity: any, args: any[]) => {
+export const executeCmd = (cmd: string, entity: any, args: any[], type: string) => {
   switch (cmd) {
     case 'qrcode':
       return entityQrCode(entity);
@@ -28,7 +29,10 @@ export const executeCmd = (cmd: string, entity: any, args: any[]) => {
     case 'openChat':
       return openChat(entity);
     case 'download':
-      window.open((entity as ISysFileInfo).shareInfo().shareLink, '_black');
+      if ('shareInfo' in entity) {
+        const link = (entity as ISysFileInfo).shareInfo().shareLink;
+        window.open(`/orginone/kernel/load/${link}?download=1`, '_black');
+      }
       return;
     case 'copy':
     case 'move':
@@ -42,11 +46,11 @@ export const executeCmd = (cmd: string, entity: any, args: any[]) => {
     case 'newFile':
       return uploadFile(entity, (file) => {
         if (file) {
-          orgCtrl.changCallback();
+          entity.changCallback();
         }
       });
     case 'open':
-      return openDirectory(entity);
+      return openDirectory(entity, type);
     case 'standard':
       return uploadTemplate(entity);
     case 'online':
@@ -65,12 +69,22 @@ const directoryRefresh = (dir: IDirectory | IApplication) => {
 
 /** 进入目录 */
 const openDirectory = (
-  entity: IDirectory | IApplication | ITarget | IEntity<schema.XEntity>,
+  entity: IDirectory | IApplication | ITarget | IWork | IEntity<schema.XEntity>,
+  type: string,
 ) => {
   if ('identitys' in entity && entity.typeName != TargetType.Station) {
+    if (entity.typeName === TargetType.Storage) {
+      return false;
+    }
     entity = entity.directory;
   }
-  if ('files' in entity || 'works' in entity) {
+  if (
+    'files' in entity ||
+    'works' in entity ||
+    (type == 'config' &&
+      'node' in entity &&
+      entity.directory.target.space.belongId != entity.belongId)
+  ) {
     entity.loadContent().then(() => {
       orgCtrl.currentKey = entity.key;
       orgCtrl.changCallback();
@@ -161,9 +175,9 @@ const copyBoard = (dir: IDirectory) => {
 };
 
 /** 打开会话 */
-const openChat = (chat: IDirectory | IMemeber | IMsgChat) => {
+const openChat = (chat: IDirectory | IMemeber | ISession) => {
   if ('taskList' in chat) {
-    orgCtrl.currentKey = chat.target.chatdata.fullId;
+    orgCtrl.currentKey = chat.target.session.chatdata.fullId;
   } else if ('fullId' in chat) {
     orgCtrl.currentKey = chat.fullId;
   } else {
@@ -244,19 +258,7 @@ const entityQrCode = (entity: IEntity<schema.XEntity>) => {
 
 /** 上下线提醒 */
 const onlineChanged = (cmd: string, info: model.OnlineInfo) => {
-  if (info.userId === '0') {
-    if (cmd === 'online') {
-      message.success({
-        duration: 1,
-        content: `终端${info.remoteAddr}[${info.connectionId}]建立连接`,
-      });
-    } else {
-      message.error({
-        duration: 1,
-        content: `终端${info.remoteAddr}[${info.connectionId}]断开连接`,
-      });
-    }
-  } else {
+  if (info.userId != '0') {
     orgCtrl.user.findEntityAsync(info.userId).then((target) => {
       if (target) {
         if (cmd === 'online') {

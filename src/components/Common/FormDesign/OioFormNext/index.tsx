@@ -1,12 +1,13 @@
 import { ProForm } from '@ant-design/pro-components';
 import { Descriptions } from 'antd';
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import OioFormItem from './FormItems';
 import { IBelong } from '@/ts/core';
 import cls from './index.module.less';
 import { model, schema } from '@/ts/base';
-import { ImInfo } from 'react-icons/im';
-import { RuleTriggers } from '@/ts/base/model';
+import { ImInfo } from '@/icons/im';
+import { RuleTriggers } from '@/ts/core/public';
+import { WorkFormRulesType } from '@/ts/core/work/rules/workFormRules';
 type IProps = {
   form: schema.XForm;
   fields: model.FieldModel[];
@@ -18,7 +19,7 @@ type IProps = {
   formRef?: any;
   disabled?: boolean;
   showTitle?: boolean;
-  ruleService?: any;
+  ruleService?: WorkFormRulesType;
 };
 /**
  * 资产共享云表单
@@ -45,14 +46,20 @@ const OioForm: React.FC<IProps> = ({
   if (fieldsValue) {
     formRef?.current?.setFieldsValue(fieldsValue);
   }
-  // useEffect(() => {
-  //   /* 向规则服务里，加入修改表单数值的回调方法 */
-  //   ruleService?.setFormChangeCallback(form.id, (data: any) => {
-  //     onValuesChange &&
-  //       onValuesChange(data, { ...formRef?.current?.getFieldsValue(), ...data });
-  //     formRef?.current?.setFieldsValue(data);
-  //   });
-  // }, [form.id]);
+  useEffect(() => {
+    /* 向规则服务里，加入修改表单数值的回调方法 */
+    ruleService?.collectData<{ formId: string; callback: (data: any) => void }>(
+      'formCallBack',
+      {
+        formId: form.id,
+        callback: (data: any) => {
+          onValuesChange &&
+            onValuesChange(data, { ...formRef?.current?.getFieldsValue(), ...data });
+          formRef?.current?.setFieldsValue(data);
+        },
+      },
+    );
+  }, [form.id]);
   return (
     <>
       {showTitle && (
@@ -90,7 +97,7 @@ const OioForm: React.FC<IProps> = ({
           onFinished?.call(this, values);
         }}
         onValuesChange={(val, vals) => {
-          ruleService?.resloveFormRule(
+          ruleService?.waitingTask(
             RuleTriggers.Running,
             { id: form.id, data: vals },
             val,
@@ -107,8 +114,9 @@ const OioForm: React.FC<IProps> = ({
           labelStyle={{ minWidth: '200px', textAlign: 'right' }}>
           {fields.map((field) => {
             //增加对必填，隐藏的展示响应
+
             const { required = false, hidden = false } = JSON.parse(field.rule ?? '{}');
-            if (hidden) {
+            if (hidden === true || hidden === 'true') {
               return <></>;
             }
             return (
@@ -120,7 +128,9 @@ const OioForm: React.FC<IProps> = ({
                   <div
                     style={{ cursor: 'pointer' }}
                     title={field.remark}
-                    className={required ? cls.Required : ''}>
+                    className={
+                      required === true || required == 'true' ? cls.Required : ''
+                    }>
                     <span style={{ marginRight: 6 }}>{field.name}</span>
                     {field.remark && field.remark.length > 0 && <ImInfo />}
                   </div>
@@ -131,6 +141,9 @@ const OioForm: React.FC<IProps> = ({
                   belong={belong}
                   disabled={disabled === true}
                   value={fieldsValue ? fieldsValue[field.id] : undefined}
+                  onFilesValueChange={(key, value) => {
+                    fieldsValue[key] = JSON.stringify(value);
+                  }}
                 />
               </Descriptions.Item>
             );

@@ -1,19 +1,13 @@
-import { FormModel } from '@/ts/base/model';
+import { XForm } from '@/ts/base/schema';
 import { IDirectory } from '@/ts/core';
-import { assignment, batchRequests } from '../..';
-import {
-  Context,
-  ReadConfigImpl,
-  RequestIndex,
-  SheetConfigImpl,
-  SheetName,
-} from '../../types';
+import { assignment } from '../..';
+import { Context, SheetRead, Sheet, SheetName } from '../../types';
 
-export interface Form extends FormModel {
+export interface Form extends XForm {
   directoryCode: string;
 }
 
-export class FormSheetConfig extends SheetConfigImpl<Form> {
+export class FormSheet extends Sheet<Form> {
   directory: IDirectory;
 
   constructor(directory: IDirectory) {
@@ -30,18 +24,18 @@ export class FormSheetConfig extends SheetConfigImpl<Form> {
   }
 }
 
-export class FormReadConfig extends ReadConfigImpl<Form, Context, FormSheetConfig> {
+export class FormSheetRead extends SheetRead<Form, Context, FormSheet> {
   /**
    * 初始化
    * @param c 上下文
    */
   async initContext(c: Context): Promise<void> {
-    for (let item of this.sheetConfig.data) {
-      if (c.formCodeMap.has(item.code)) {
-        let old = c.formCodeMap.get(item.code)!;
+    for (let item of this.sheet.data) {
+      if (c.formMap.has(item.code)) {
+        let old = c.formMap.get(item.code)!;
         assignment(old, item);
       }
-      c.formCodeMap.set(item.code, item);
+      c.formMap.set(item.code, item);
     }
   }
   /**
@@ -49,12 +43,12 @@ export class FormReadConfig extends ReadConfigImpl<Form, Context, FormSheetConfi
    * @param data 数据
    */
   checkData(context: Context) {
-    for (let index = 0; index < this.sheetConfig.data.length; index++) {
-      let item = this.sheetConfig.data[index];
+    for (let index = 0; index < this.sheet.data.length; index++) {
+      let item = this.sheet.data[index];
       if (!item.directoryCode || !item.typeName || !item.name || !item.code) {
         this.pushError(index, `存在未填写的目录代码，表单类型、表单名称、表单代码`);
       }
-      if (!context.directoryCodeMap.has(item.directoryCode)) {
+      if (!context.directoryMap.has(item.directoryCode)) {
         this.pushError(index, `未获取到目录代码：${item.directoryCode}`);
       }
       if (['实体配置', '事项配置'].indexOf(item.typeName) == -1) {
@@ -70,40 +64,18 @@ export class FormReadConfig extends ReadConfigImpl<Form, Context, FormSheetConfi
    * @param context 上下文
    */
   async operating(context: Context, onItemCompleted: () => void): Promise<void> {
-    let requests: RequestIndex[] = [];
-    for (let index = 0; index < this.sheetConfig.data.length; index++) {
-      let row = this.sheetConfig.data[index];
-      let dir = context.directoryCodeMap.get(row.directoryCode)!;
+    const data = this.sheet.data;
+    for (let index = 0; index < data.length; index++) {
+      let row = data[index];
+      let dir = context.directoryMap.get(row.directoryCode)!;
       row.directoryId = dir.id;
-      requests.push({
-        rowNumber: index,
-        request: {
-          module: 'thing',
-          action: row.id ? 'UpdateForm' : 'CreateForm',
-          params: row,
-        },
-      });
-    }
-    while (requests.length > 0) {
-      await this.requests(requests.splice(0, 20), context, onItemCompleted);
-    }
-  }
-  /**
-   * @param requests 批量请求
-   */
-  private async requests(
-    requests: RequestIndex[],
-    context: Context,
-    onItemCompleted: () => void,
-  ) {
-    await batchRequests(requests, (request, result) => {
-      if (result.success) {
-        assignment(result.data, this.sheetConfig.data[request.rowNumber]);
-        context.formCodeMap.set(result.data.code, result.data);
-      } else {
-        this.pushError(request.rowNumber, result.msg);
-      }
       onItemCompleted();
-    });
+    }
+    (await this.sheet.directory.resource.formColl.replaceMany(data))
+      .map((item) => item as Form)
+      .forEach((item, index) => {
+        data[index] = item;
+        context.formMap.set(item.code, item);
+      });
   }
 }

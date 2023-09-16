@@ -1,15 +1,13 @@
-import { kernel, model } from '@/ts/base';
-import { DirectoryModel } from '@/ts/base/model';
+import { XDirectory, XProperty, XSpecies, XSpeciesItem } from '@/ts/base/schema';
 import { IDirectory } from '@/ts/core';
-import { Context, ReadConfigImpl, SheetConfigImpl, SheetName } from '../../types';
-import { XProperty, XSpecies, XSpeciesItem } from '@/ts/base/schema';
 import { assignment } from '../..';
+import { Context, SheetRead, Sheet, SheetName } from '../../types';
 
-export interface Directory extends DirectoryModel {
+export interface Directory extends XDirectory {
   parentCode?: string;
 }
 
-export class DirectorySheetConfig extends SheetConfigImpl<Directory> {
+export class DirectorySheet extends Sheet<Directory> {
   directory: IDirectory;
 
   constructor(directory: IDirectory) {
@@ -25,12 +23,8 @@ export class DirectorySheetConfig extends SheetConfigImpl<Directory> {
   }
 }
 
-export class DirectoryReadConfig extends ReadConfigImpl<
-  Directory,
-  Context,
-  DirectorySheetConfig
-> {
-  constructor(sheetConfig: DirectorySheetConfig) {
+export class DirectorySheetRead extends SheetRead<Directory, Context, DirectorySheet> {
+  constructor(sheetConfig: DirectorySheet) {
     super(sheetConfig);
   }
   /**
@@ -38,50 +32,45 @@ export class DirectoryReadConfig extends ReadConfigImpl<
    * @param c
    */
   async initContext(c: Context): Promise<void> {
-    await this.deepLoad(this.sheetConfig.directory, c);
-    for (let item of this.sheetConfig.data) {
-      if (c.directoryCodeMap.has(item.code)) {
-        let old = c.directoryCodeMap.get(item.code)!;
+    await this.deepLoad(this.sheet.directory, c);
+    for (let item of this.sheet.data) {
+      if (c.directoryMap.has(item.code)) {
+        let old = c.directoryMap.get(item.code)!;
         assignment(old, item);
       }
-      c.directoryCodeMap.set(item.code, item);
+      c.directoryMap.set(item.code, item);
     }
   }
+
   async deepLoad(root: IDirectory, c: Context): Promise<void> {
-    let queue = [root];
-    let allDirs = [root];
     // 加载目录
-    while (queue.length > 0) {
-      let first = queue.shift();
-      if (!first) continue;
-      await first.loadContent();
-      c.directoryCodeMap.set(first.code, {
-        ...first.metadata,
-        parentCode: first.parent?.metadata.code,
-      });
-      if (first?.children) {
-        queue.push(...first.children);
-        allDirs.push(...first.children);
-      }
-      if (queue.length == 0) {
-        break;
-      }
+    for (const dir of root.target.directory.resource.directoryColl.cache) {
+      c.directoryMap.set(dir.id, { ...dir });
     }
+    c.directoryMap.forEach((item) => {
+      c.directoryMap.set(item.code, {
+        ...item,
+        parentCode: c.directoryMap.get(item.directoryId)?.code,
+      });
+    });
+
     // 加载分类
     let speciesMap: { [key: string]: XSpecies } = {};
-    for (let dir of allDirs) {
-      for (let species of dir.specieses) {
-        speciesMap[species.id] = species.metadata;
-        c.speciesCodeMap.set(species.code, {
-          ...species.metadata,
-          directoryCode: dir.code,
+    for (const species of root.target.resource.speciesColl.cache) {
+      if (c.directoryMap.has(species.directoryId)) {
+        speciesMap[species.id] = species;
+        c.speciesMap.set(species.code, {
+          ...species,
+          directoryCode: c.directoryMap.get(species.directoryId)!.code,
         });
-        await species.loadItems();
-        c.speciesItemCodeMap.set(species.code, new Map());
+        c.speciesItemMap.set(species.code, new Map());
         let parentMap: { [id: string]: XSpeciesItem } = {};
-        species.items.forEach((item) => (parentMap[item.id] = item));
-        for (let speciesItem of species.items) {
-          c.speciesItemCodeMap.get(species.code)?.set(speciesItem.info, {
+        let items = await root.resource.speciesItemColl.load({
+          options: { match: { speciesId: species.id } },
+        });
+        items.forEach((item) => (parentMap[item.id] = item));
+        for (let speciesItem of items) {
+          c.speciesItemMap.get(species.code)?.set(speciesItem.info, {
             ...speciesItem,
             parentInfo: parentMap[speciesItem.parentId]?.info,
             speciesCode: species.code,
@@ -90,34 +79,39 @@ export class DirectoryReadConfig extends ReadConfigImpl<
         }
       }
     }
+
     // 加载属性
     let propMap: { [id: string]: XProperty } = {};
-    for (let dir of allDirs) {
-      for (let property of dir.propertys) {
-        propMap[property.id] = property.metadata;
-        c.propertyMap.set(property.metadata.info, {
-          ...property.metadata,
-          directoryCode: dir.code,
-          speciesCode: speciesMap[property.metadata.speciesId]?.code,
+    for (const property of root.target.resource.propertyColl.cache) {
+      if (c.directoryMap.has(property.directoryId)) {
+        propMap[property.id] = { ...property };
+        c.propertyMap.set(property.info, {
+          ...property,
+          directoryCode: c.directoryMap.get(property.directoryId)!.code,
+          speciesCode: speciesMap[property.speciesId]?.code,
         });
       }
     }
+
     // 加载表单
-    for (let dir of allDirs) {
-      for (let form of dir.forms) {
-        c.formCodeMap.set(form.code, {
-          ...form.metadata,
-          directoryCode: dir.code,
+    for (const form of root.target.resource.formColl.cache) {
+      if (c.directoryMap.has(form.directoryId)) {
+        c.formMap.set(form.code, {
+          ...form,
+          directoryCode: c.directoryMap.get(form.directoryId)!.code,
         });
-        await form.loadAttributes();
-        c.formAttrCodeMap.set(form.code, new Map());
-        for (let attribute of form.attributes) {
-          c.formAttrCodeMap.get(form.code)?.set(attribute.code, {
-            ...attribute,
-            directoryId: dir.id,
-            formCode: form.code,
-            propInfo: propMap[attribute.propId]?.info,
-          });
+        c.formAttrMap.set(form.code, new Map());
+        if (form.attributes) {
+          for (let attribute of form.attributes) {
+            if (attribute.property?.info) {
+              c.formAttrMap.get(form.code)?.set(attribute.property?.info, {
+                ...attribute,
+                directoryId: form.directoryId,
+                formCode: form.code,
+                propInfo: attribute.property?.info,
+              });
+            }
+          }
         }
       }
     }
@@ -128,18 +122,19 @@ export class DirectoryReadConfig extends ReadConfigImpl<
    * @param data 数据
    */
   checkData(context: Context) {
-    for (let index = 0; index < this.sheetConfig.data.length; index++) {
-      let item = this.sheetConfig.data[index];
+    for (let index = 0; index < this.sheet.data.length; index++) {
+      let item = this.sheet.data[index];
       if (!item.name || !item.code) {
         this.pushError(index, '目录名称、目录代码不能为空！');
       }
-      if (item.parentCode && !context.directoryCodeMap.has(item.parentCode)) {
+      if (item.parentCode && !context.directoryMap.has(item.parentCode)) {
         let error = `表格中未获取到上级目录代码：${item.parentCode}，上级目录代码需定义在子目录前！`;
         this.pushError(index, error);
       }
     }
     return this.errors;
   }
+
   /**
    * 更新/创建属性
    * @param _index 行索引
@@ -147,26 +142,25 @@ export class DirectoryReadConfig extends ReadConfigImpl<
    * @param context 上下文
    */
   async operating(context: Context): Promise<void> {
-    let data = this.sheetConfig.data;
-    for (let index = 0; index < data.length; index++) {
-      let item = data[index];
-      item.shareId = this.sheetConfig.directory.metadata.shareId;
+    for (let index = 0; index < this.sheet.data.length; index++) {
+      let item = this.sheet.data[index];
+      item.shareId = this.sheet.directory.metadata.shareId;
       if (item.parentCode) {
-        let parent = context.directoryCodeMap.get(item.parentCode)!;
-        item.parentId = parent.id.replace('_', '');
+        item.directoryId = context.directoryMap.get(item.parentCode)!.id;
       } else {
-        item.parentId = this.sheetConfig.directory.id;
+        item.directoryId = this.sheet.directory.target.directory.id;
       }
-      let res: model.ResultType<Directory> = await kernel.request({
-        module: 'thing',
-        action: item.id ? 'UpdateDirectory' : 'CreateDirectory',
-        params: item,
-      });
-      if (res.success) {
-        assignment(res.data, item);
-        context.directoryCodeMap.set(item.code, res.data);
+      let res: any;
+      if (item.id) {
+        res = await this.sheet.directory.resource.directoryColl.replace(item);
       } else {
-        this.pushError(index, res.msg);
+        res = await this.sheet.directory.resource.directoryColl.insert(item);
+      }
+      if (res) {
+        this.sheet.data[index] = res;
+        context.directoryMap.set(item.code, res);
+      } else {
+        this.pushError(index, '生成失败！');
       }
     }
   }

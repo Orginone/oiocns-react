@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AiOutlineSetting, AiOutlineUser } from 'react-icons/ai';
+import { AiOutlineSetting, AiOutlineUser } from '@/icons/ai';
 import { Row, Button, Divider, Col, Radio, Space, Form, InputNumber } from 'antd';
 import cls from './index.module.less';
 import { NodeModel } from '@/components/Common/FlowDesign/processType';

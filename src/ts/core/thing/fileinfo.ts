@@ -1,10 +1,11 @@
 import { encodeKey, sleep } from '../../base/common';
 import { BucketOpreates, FileItemModel } from '../../base/model';
-import { model, kernel, schema } from '../../base';
+import { model, schema } from '../../base';
 import { FileItemShare } from '../../base/model';
 import { IDirectory } from './directory';
 import { Entity, IEntity, entityOperates } from '../public';
 import { fileOperates } from '../public';
+import { XCollection } from '../public/collection';
 /** 文件类接口 */
 export interface IFileInfo<T extends schema.XEntity> extends IEntity<T> {
   /** 空间ID */
@@ -78,15 +79,19 @@ export abstract class FileInfo<T extends schema.XEntity>
   }
   operates(mode: number = 0): model.OperateModel[] {
     const operates = super.operates(mode);
-    if (mode % 2 === 0 && this.directory.target.hasRelationAuth()) {
-      operates.unshift(
-        fileOperates.Copy,
-        fileOperates.Move,
-        fileOperates.Rename,
-        fileOperates.Download,
-        entityOperates.Update,
-        entityOperates.Delete,
-      );
+    if (mode % 2 === 0) {
+      if (this.directory.target.space.hasRelationAuth()) {
+        operates.unshift(fileOperates.Copy);
+      }
+      if (this.directory.target.hasRelationAuth()) {
+        operates.unshift(
+          fileOperates.Move,
+          fileOperates.Rename,
+          fileOperates.Download,
+          entityOperates.Update,
+          entityOperates.Delete,
+        );
+      }
     }
     return operates;
   }
@@ -135,14 +140,13 @@ export class SysFileInfo extends FileInfo<schema.XEntity> implements ISysFileInf
       name: this.filedata.name,
       extension: this.filedata.extension,
       contentType: this.filedata.contentType,
-      shareLink:
-        location.origin + '/orginone/anydata/bucket/load/' + this.filedata.shareLink,
+      shareLink: this.filedata.shareLink,
       thumbnail: this.filedata.thumbnail,
     };
   }
   async rename(name: string): Promise<boolean> {
     if (this.filedata.name != name) {
-      const res = await kernel.anystore.bucketOpreate<FileItemModel>(this.belongId, {
+      const res = await this.directory.resource.bucketOpreate<FileItemModel>({
         name: name,
         key: encodeKey(this.filedata.key),
         operate: BucketOpreates.Rename,
@@ -155,7 +159,7 @@ export class SysFileInfo extends FileInfo<schema.XEntity> implements ISysFileInf
     return false;
   }
   async delete(): Promise<boolean> {
-    const res = await kernel.anystore.bucketOpreate<FileItemModel[]>(this.belongId, {
+    const res = await this.directory.resource.bucketOpreate<FileItemModel[]>({
       key: encodeKey(this.filedata.key),
       operate: BucketOpreates.Delete,
     });
@@ -166,7 +170,7 @@ export class SysFileInfo extends FileInfo<schema.XEntity> implements ISysFileInf
   }
   async copy(destination: IDirectory): Promise<boolean> {
     if (destination.id != this.directory.id) {
-      const res = await kernel.anystore.bucketOpreate<FileItemModel[]>(this.belongId, {
+      const res = await this.directory.resource.bucketOpreate<FileItemModel[]>({
         key: encodeKey(this.filedata.key),
         destination: destination.id,
         operate: BucketOpreates.Copy,
@@ -180,7 +184,7 @@ export class SysFileInfo extends FileInfo<schema.XEntity> implements ISysFileInf
   }
   async move(destination: IDirectory): Promise<boolean> {
     if (destination.id != this.directory.id) {
-      const res = await kernel.anystore.bucketOpreate<FileItemModel[]>(this.belongId, {
+      const res = await this.directory.resource.bucketOpreate<FileItemModel[]>({
         key: encodeKey(this.filedata.key),
         destination: destination.id,
         operate: BucketOpreates.Move,
@@ -200,5 +204,90 @@ export class SysFileInfo extends FileInfo<schema.XEntity> implements ISysFileInf
   }
   content(_mode?: number | undefined): IFileInfo<schema.XEntity>[] {
     return [];
+  }
+}
+export interface IStandardFileInfo<T extends schema.XStandard> extends IFileInfo<T> {
+  /** 变更通知 */
+  notify(operate: string, data: schema.XEntity[]): Promise<boolean>;
+  /** 更新 */
+  update(data: T): Promise<boolean>;
+}
+export abstract class StandardFileInfo<T extends schema.XStandard>
+  extends FileInfo<T>
+  implements IStandardFileInfo<T>
+{
+  coll: XCollection<T>;
+  constructor(_metadata: T, _directory: IDirectory, _coll: XCollection<T>) {
+    super(_metadata, _directory);
+    this.coll = _coll;
+  }
+  abstract copy(destination: IDirectory): Promise<boolean>;
+  abstract move(destination: IDirectory): Promise<boolean>;
+  override get metadata(): T {
+    return this._metadata;
+  }
+  allowCopy(destination: IDirectory): boolean {
+    return this.directory.target.belongId != destination.target.belongId;
+  }
+  allowMove(destination: IDirectory): boolean {
+    return (
+      destination.id != this.directory.id &&
+      destination.target.belongId == this.directory.target.belongId
+    );
+  }
+  async update(data: T): Promise<boolean> {
+    const res = await this.coll.replace({
+      ...this.metadata,
+      ...data,
+      directoryId: this.metadata.directoryId,
+      typeName: this.metadata.typeName,
+    });
+    if (res) {
+      await this.notify('replace', [res]);
+      return true;
+    }
+    return false;
+  }
+  async delete(): Promise<boolean> {
+    if (this.directory) {
+      const data = await this.coll.delete(this.metadata);
+      if (data) {
+        await this.notify('delete', [this.metadata]);
+      }
+    }
+    return false;
+  }
+  async rename(name: string): Promise<boolean> {
+    return await this.update({ ...this.metadata, name });
+  }
+  async copyTo(directoryId: string, coll: XCollection<T> = this.coll): Promise<boolean> {
+    const data = await coll.replace({
+      ...this.metadata,
+      directoryId: directoryId,
+    });
+    if (data) {
+      return await coll.notity({
+        data: [data],
+        operate: 'insert',
+      });
+    }
+    return false;
+  }
+  async moveTo(directoryId: string, coll: XCollection<T> = this.coll): Promise<boolean> {
+    const data = await coll.replace({
+      ...this.metadata,
+      directoryId: directoryId,
+    });
+    if (data) {
+      await this.notify('delete', [this.metadata]);
+      return await coll.notity({
+        data: [data],
+        operate: 'insert',
+      });
+    }
+    return false;
+  }
+  async notify(operate: string, data: schema.XEntity[]): Promise<boolean> {
+    return await this.coll.notity({ data, operate });
   }
 }

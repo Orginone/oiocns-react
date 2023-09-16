@@ -10,9 +10,6 @@ interface IProps {
 
 const VideoView: React.FC<IProps> = ({ share, finished }) => {
   if (share.shareLink) {
-    if (!share.shareLink.includes('/orginone/anydata/bucket/load')) {
-      share.shareLink = `/orginone/anydata/bucket/load/${share.shareLink}`;
-    }
     return (
       <FullScreenModal
         centered
@@ -25,7 +22,7 @@ const VideoView: React.FC<IProps> = ({ share, finished }) => {
         onCancel={() => finished()}>
         <JolPlayer
           option={{
-            videoSrc: share.shareLink,
+            videoSrc: `/orginone/kernel/load/${share.shareLink}`,
             width: 830,
             height: 480,
             language: 'zh',

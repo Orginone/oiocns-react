@@ -5,7 +5,7 @@ import useObjectUpdate from '@/hooks/useObjectUpdate';
 import { IForm } from '@/ts/core';
 import PropertyConfig from './propConfig';
 import AttributeConfig from '@/components/Common/FormDesign/attributeConfig';
-import SelectPropertys from './SelectPropertys';
+import SelectPropertys from '@/components/Common/SelectPropertys';
 import { Modal } from 'antd';
 import { AttributeModel } from '@/ts/base/model';
 import { ProColumns } from '@ant-design/pro-components';
@@ -128,7 +128,7 @@ const Attritube = ({ current, modalType, setModalType }: IProps) => {
 
   return (
     <>
-      {/* <CardOrTable<XAttribute>
+      <CardOrTable<XAttribute>
         key={tkey}
         rowKey={'id'}
         params={tkey}
@@ -136,7 +136,7 @@ const Attritube = ({ current, modalType, setModalType }: IProps) => {
         columns={AttributeColumns()}
         showChangeBtn={false}
         dataSource={current.attributes}
-      /> */}
+      />
       {/** 新增特性模态框 */}
       {['新增特性', '编辑特性'].includes(modalType) && (
         <Modal

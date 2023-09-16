@@ -220,6 +220,7 @@ const OioFormItem = ({ item, belong, disabled, noRule }: IProps) => {
           label={item.name}
           rules={rules}
           tooltip={item.remark}
+          belong={belong}
           labelAlign="right"
           props={rule}
         />

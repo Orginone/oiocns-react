@@ -27,6 +27,10 @@ const JoinTarget: React.FC<IProps> = ({ cmd, current, finished }) => {
       modalTitle = '申请加入群组';
       selectTargetType = TargetType.Cohort;
       break;
+    case 'joinStorage':
+      modalTitle = '申请加入存储资源群';
+      selectTargetType = TargetType.Storage;
+      break;
     case 'joinCompany':
       modalTitle = '申请加入单位';
       selectTargetType = TargetType.Company;

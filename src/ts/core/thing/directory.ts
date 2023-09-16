@@ -1,31 +1,41 @@
-import { common, kernel, model, schema } from '../../base';
+import { command, common, model, schema } from '../../base';
 import {
-  PageAll,
-  TargetType,
   directoryNew,
   directoryOperates,
   fileOperates,
   memberOperates,
   teamOperates,
+  newWarehouse,
 } from '../public';
 import { ITarget } from '../target/base/target';
-import { Form, IForm } from './form';
-import { Report, IReport } from './report';
-import { SysFileInfo, ISysFileInfo, IFileInfo, FileInfo } from './fileinfo'; 
-
-import { Species, ISpecies } from './species';
+import { Form, IForm } from './standard/form';
+import { Transfer, ITransfer } from './standard/transfer';
+import {
+  SysFileInfo,
+  ISysFileInfo,
+  IFileInfo,
+  IStandardFileInfo,
+  StandardFileInfo,
+} from './fileinfo';
+import { ISpecies } from './standard/species';
 import { Member } from './member';
-import { Property, IProperty } from './property';
-import { Application, IApplication } from './application';
-import { BucketOpreates, DirectoryModel } from '@/ts/base/model';
+import { IProperty } from './standard/property';
+import { IApplication } from './standard/application';
+import { BucketOpreates, FileItemModel } from '@/ts/base/model';
 import { encodeKey } from '@/ts/base/common';
+import { DataResource } from './resource';
+import { DirectoryOperate, IDirectoryOperate } from './operate';
 /** 可为空的进度回调 */
 export type OnProgress = (p: number) => void;
 
 /** 目录接口类 */
-export interface IDirectory extends IFileInfo<schema.XDirectory> {
+export interface IDirectory extends IStandardFileInfo<schema.XDirectory> {
+  /** 目录操作类 */
+  operater: IDirectoryOperate;
   /** 当前加载目录的用户 */
   target: ITarget;
+  /** 资源类 */
+  resource: DataResource;
   /** 上级目录 */
   parent: IDirectory | undefined;
   /** 下级文件系统项数组 */
@@ -34,60 +44,48 @@ export interface IDirectory extends IFileInfo<schema.XDirectory> {
   taskList: model.TaskModel[];
   /** 任务发射器 */
   taskEmitter: common.Emitter;
+  /** 目录结构变更 */
+  structCallback(): void;
   /** 目录下的内容 */
   content(mode?: number): IFileInfo<schema.XEntity>[];
   /** 创建子目录 */
-  create(data: DirectoryModel): Promise<IDirectory | undefined>;
-  /** 更新目录 */
-  update(data: DirectoryModel): Promise<boolean>;
-  /** 删除目录 */
-  delete(): Promise<boolean>;
+  create(data: schema.XDirectory): Promise<schema.XDirectory | undefined>;
   /** 目录下的文件 */
   files: ISysFileInfo[];
+  /** 目录下的表单 */
+  forms: IForm[];
+  /** 目录下的分类 */
+  specieses: ISpecies[];
+  /** 目录下的属性 */
+  propertys: IProperty[];
+  /** 目录下的应用 */
+  applications: IApplication[];
+  /** 目录下的链接 */
+  transfers: ITransfer[];
+  /** 新建迁移配置 */
+  createTransfer(data: model.Transfer): Promise<ITransfer | undefined>;
+  /** 加载迁移配置 */
+  loadAllTransfer(reload?: boolean): Promise<ITransfer[]>;
   /** 加载文件 */
   loadFiles(reload?: boolean): Promise<ISysFileInfo[]>;
   /** 上传文件 */
   createFile(file: Blob, p?: OnProgress): Promise<ISysFileInfo | undefined>;
-  /** 目录下的表单 */
-  forms: IForm[];
-  /** 加载表单 */
-  loadForms(reload?: boolean): Promise<IForm[]>;
   /** 新建表单 */
-  createForm(data: model.FormModel): Promise<IForm | undefined>;
-  /** 目录下的分类 */
-  specieses: ISpecies[];
-  /** 加载分类 */
-  loadSpecieses(reload?: boolean): Promise<ISpecies[]>;
+  createForm(data: schema.XForm): Promise<schema.XForm | undefined>;
   /** 新建分类 */
-  createSpecies(data: model.SpeciesModel): Promise<ISpecies | undefined>;
-  /** 目录下的属性 */
-  propertys: IProperty[];
-  /** 加载属性 */
-  loadPropertys(reload?: boolean): Promise<IProperty[]>;
+  createSpecies(data: schema.XSpecies): Promise<schema.XSpecies | undefined>;
   /** 新建属性 */
-  createProperty(data: model.PropertyModel): Promise<IProperty | undefined>;
-  /** 目录下的应用 */
-  applications: IApplication[];
-  /** 加载应用 */
-  loadApplications(reload?: boolean): Promise<IApplication[]>;
+  createProperty(data: schema.XProperty): Promise<schema.XProperty | undefined>;
   /** 新建应用 */
-  createApplication(data: model.ApplicationModel): Promise<IApplication | undefined>;
-  /** 创建文件任务 */
-  createTask(task: model.TaskModel): () => void;
-  /** 目录下的报表 */
-  reports: IReport[];
-  /** 加载报表 */
-  loadReports(reload?: boolean): Promise<IReport[]>;
-  /** 新建报表 */
-  createReport(data: model.FormModel): Promise<IReport | undefined>;
+  createApplication(data: schema.XApplication): Promise<schema.XApplication | undefined>;
   /** 加载全部应用 */
   loadAllApplication(reload?: boolean): Promise<IApplication[]>;
-  /** 加载目录树 */
-  loadSubDirectory(): void;
+  /** 加载目录资源 */
+  loadDirectoryResource(reload?: boolean): Promise<void>;
 }
 
 /** 目录实现类 */
-export class Directory extends FileInfo<schema.XDirectory> implements IDirectory {
+export class Directory extends StandardFileInfo<schema.XDirectory> implements IDirectory {
   constructor(
     _metadata: schema.XDirectory,
     _target: ITarget,
@@ -98,25 +96,41 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
       {
         ..._metadata,
         typeName: _metadata.typeName || '目录',
+        directoryId: _metadata.directoryId || _target.id,
       },
       _parent ?? (_target as unknown as IDirectory),
+      _target.resource.directoryColl,
     );
     this.target = _target;
     this.parent = _parent;
     this.taskEmitter = new common.Emitter();
+    this.operater = new DirectoryOperate(this, _target.resource);
   }
   target: ITarget;
+  operater: IDirectoryOperate;
   taskEmitter: common.Emitter;
   parent: IDirectory | undefined;
-  children: IDirectory[] = [];
   taskList: model.TaskModel[] = [];
-  forms: IForm[] = [];
   files: ISysFileInfo[] = [];
-  specieses: ISpecies[] = [];
-  propertys: IProperty[] = [];
-  applications: IApplication[] = [];
-  reports: IReport[] = [];
-  private _contentLoaded: boolean = false;
+  formTypes: string[] = ['表单', '报表', '事项配置', '实体配置'];
+  get forms(): IForm[] {
+    return this.operater.getContent(this.formTypes) as Form[];
+  }
+  get transfers(): ITransfer[] {
+    return this.operater.getContent<ITransfer>(['迁移配置']);
+  }
+  get specieses(): ISpecies[] {
+    return this.operater.getContent<ISpecies>(['分类', '字典']);
+  }
+  get propertys(): IProperty[] {
+    return this.operater.getContent<IProperty>(['属性']);
+  }
+  get applications(): IApplication[] {
+    return this.operater.getContent<IApplication>(['应用']);
+  }
+  get children(): IDirectory[] {
+    return this.operater.getContent<IDirectory>(['目录']);
+  }
   get id(): string {
     if (!this.parent) {
       return this.target.id;
@@ -129,12 +143,19 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
   get locationKey(): string {
     return this.key;
   }
+  get resource(): DataResource {
+    return this.target.resource;
+  }
+  structCallback(): void {
+    console.log(this.metadata);
+    command.emitter('-', 'refresh', this);
+  }
   content(mode: number = 0): IFileInfo<schema.XEntity>[] {
     const cnt: IFileInfo<schema.XEntity>[] = [...this.children];
     if (this.typeName === '成员目录') {
       cnt.push(...this.target.members.map((i) => new Member(i, this)));
     } else {
-      cnt.push(...this.forms, ...this.applications, ...this.files);
+      cnt.push(...this.forms, ...this.applications, ...this.files, ...this.transfers);
       if (mode != 1) {
         cnt.push(...this.propertys);
         cnt.push(...this.specieses);
@@ -152,85 +173,73 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
       if (this.typeName === '成员目录') {
         await this.target.loadContent(reload);
       } else {
-        await Promise.all([
-          await this.loadSubDirectory(),
-          await this.loadForms(reload),
-          await this.loadPropertys(reload),
-          await this.loadSpecieses(reload),
-          await this.loadApplications(reload),
-          await this.loadReports(reload)
-        ]);
+        await this.loadDirectoryResource(reload);
       }
     }
     return false;
   }
-  async rename(name: string): Promise<boolean> {
-    return await this.update({ ...this.metadata, name: name });
-  }
-  copy(_destination: IDirectory): Promise<boolean> {
-    throw new Error('暂不支持.');
-  }
-  async move(destination: IDirectory): Promise<boolean> {
-    if (
-      this.parent &&
-      destination.id != this.parent.id &&
-      destination.metadata.belongId === this.directory.metadata.belongId
-    ) {
-      this.setMetadata({ ...this.metadata, parentId: destination.id });
-      const success = await this.update(this.metadata);
-      if (success) {
-        this.directory.children = this.directory.children.filter(
-          (i) => i.key != this.key,
+  override async copy(destination: IDirectory): Promise<boolean> {
+    if (this.allowCopy(destination)) {
+      const data = await destination.resource.directoryColl.replace({
+        ...this.metadata,
+        directoryId: destination.id,
+      });
+      if (data) {
+        await this.operateDirectoryResource(
+          this,
+          destination.resource,
+          'replaceMany',
+          false,
+          this.directory.target.space.id != destination.target.space.id,
         );
-        this.parent = destination;
-        this.directory = destination;
-        destination.children.push(this);
-      } else {
-        this.setMetadata({ ...this.metadata, parentId: this.directory.id });
+        await destination.notify('refresh', [data]);
       }
-      return success;
     }
     return false;
   }
-  async create(data: DirectoryModel): Promise<IDirectory | undefined> {
-    data.parentId = this.id;
-    data.shareId = this.metadata.shareId;
-    const res = await kernel.createDirectory(data);
-    if (res.success && res.data.id) {
-      const directory = new Directory(res.data, this.target, this);
-      this.children.push(directory);
-      return directory;
+  override async move(destination: IDirectory): Promise<boolean> {
+    if (this.parent && this.allowMove(destination)) {
+      const data = await destination.resource.directoryColl.replace({
+        ...this.metadata,
+        directoryId: destination.id,
+      });
+      if (data) {
+        await this.operateDirectoryResource(
+          this,
+          destination.resource,
+          'replaceMany',
+          true,
+        );
+        await this.notify('refresh', [this.parent.metadata]);
+        await destination.notify('refresh', [data]);
+      }
     }
+    return false;
   }
-  async update(data: model.DirectoryModel): Promise<boolean> {
-    data.id = this.id;
-    data.parentId = this.metadata.parentId;
-    data.shareId = this.metadata.shareId;
-    const res = await kernel.updateDirectory(data);
-    if (res.success && res.data.id) {
-      this.setMetadata({ ...res.data, typeName: '目录' });
-    }
-    return res.success;
-  }
-  async delete(): Promise<boolean> {
+  override async delete(): Promise<boolean> {
     if (this.parent) {
-      const res = await kernel.deleteDirectory({ id: this.id });
-      if (res.success) {
-        this.parent.children = this.parent.children.filter((i) => i.key != this.key);
-      }
-      return res.success;
+      await this.resource.directoryColl.delete(this.metadata);
+      await this.operateDirectoryResource(this, this.resource, 'deleteMany');
+      await this.notify('refresh', [this.metadata]);
     }
     return false;
+  }
+  async create(data: schema.XDirectory): Promise<schema.XDirectory | undefined> {
+    const res = await this.resource.directoryColl.insert({
+      ...data,
+      directoryId: this.id,
+    });
+    if (res) {
+      await this.notify('insert', [res]);
+      return res;
+    }
   }
   async loadFiles(reload: boolean = false): Promise<ISysFileInfo[]> {
     if (this.files.length < 1 || reload) {
-      const res = await kernel.anystore.bucketOpreate<model.FileItemModel[]>(
-        this.metadata.belongId,
-        {
-          key: encodeKey(this.id),
-          operate: BucketOpreates.List,
-        },
-      );
+      const res = await this.resource.bucketOpreate<FileItemModel[]>({
+        key: encodeKey(this.id),
+        operate: BucketOpreates.List,
+      });
       if (res.success && res.data.length > 0) {
         this.files = res.data
           .filter((i) => !i.isDirectory)
@@ -250,124 +259,94 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
       createTime: new Date(),
     };
     this.taskList.push(task);
-    const data = await kernel.anystore.fileUpdate(
-      this.metadata.belongId,
-      file,
-      `${this.id}/${file.name}`,
-      (pn) => {
-        task.finished = pn;
-        p?.apply(this, [pn]);
-        this.taskEmitter.changCallback();
-      },
-    );
+    const data = await this.resource.fileUpdate(file, `${this.id}/${file.name}`, (pn) => {
+      task.finished = pn;
+      p?.apply(this, [pn]);
+      this.taskEmitter.changCallback();
+    });
     if (data) {
       const file = new SysFileInfo(data, this);
       this.files.push(file);
       return file;
     }
   }
-  async loadForms(reload: boolean = false): Promise<IForm[]> {
-    if (reload) {
-      const res = await kernel.queryForms({
-        id: this.id,
-        page: PageAll,
-      });
-      if (res.success) {
-        this.forms = (res.data.result || []).map((i) => new Form(i, this));
-      }
+  async createForm(data: schema.XForm): Promise<schema.XForm | undefined> {
+    const res = await this.resource.formColl.insert({
+      ...data,
+      directoryId: this.id,
+    });
+    if (res) {
+      await this.resource.formColl.notity({ data: [res], operate: 'insert' });
+      return res;
     }
-    return this.forms;
   }
-  async createForm(data: model.FormModel): Promise<IForm | undefined> {
+  async createSpecies(data: schema.XSpecies): Promise<schema.XSpecies | undefined> {
+    const res = await this.resource.speciesColl.insert({
+      ...data,
+      directoryId: this.id,
+    });
+    if (res) {
+      await this.resource.speciesColl.notity({ data: [res], operate: 'insert' });
+      return res;
+    }
+  }
+  async createProperty(data: schema.XProperty): Promise<schema.XProperty | undefined> {
     data.directoryId = this.id;
-    const res = await kernel.createForm(data);
-    if (res.success && res.data.id) {
-      const form = new Form(res.data, this);
-      this.forms.push(form);
-      return form;
+    const res = await this.resource.propertyColl.insert({
+      ...data,
+      directoryId: this.id,
+    });
+    if (res) {
+      await this.resource.propertyColl.notity({ data: [res], operate: 'insert' });
+      return res;
     }
-  }
-  async loadSpecieses(reload: boolean = false): Promise<ISpecies[]> {
-    if (reload) {
-      const res = await kernel.querySpecies({
-        id: this.id,
-        page: PageAll,
-      });
-      if (res.success) {
-        this.specieses = (res.data.result || []).map((i) => new Species(i, this));
-      }
-    }
-    return this.specieses;
-  }
-  async createSpecies(data: model.SpeciesModel): Promise<ISpecies | undefined> {
-    data.directoryId = this.id;
-    const res = await kernel.createSpecies(data);
-    if (res.success && res.data.id) {
-      const species = new Species(res.data, this);
-      this.specieses.push(species);
-      return species;
-    }
-  }
-  async loadPropertys(reload: boolean = false): Promise<IProperty[]> {
-    if (reload) {
-      const res = await kernel.queryPropertys({
-        id: this.id,
-        page: PageAll,
-      });
-      if (res.success) {
-        this.propertys = (res.data.result || []).map((i) => new Property(i, this));
-      }
-    }
-    return this.propertys;
-  }
-  async createProperty(data: model.PropertyModel): Promise<IProperty | undefined> {
-    data.directoryId = this.id;
-    const res = await kernel.createProperty(data);
-    if (res.success && res.data.id) {
-      const property = new Property(res.data, this);
-      this.propertys.push(property);
-      return property;
-    }
-  }
-  async loadApplications(reload: boolean = false): Promise<IApplication[]> {
-    if (reload) {
-      const res = await kernel.queryApplications({
-        id: this.id,
-        page: PageAll,
-      });
-      if (res.success) {
-        const data = res.data.result || [];
-        this.applications = data
-          .filter((i) => !i.parentId || i.parentId.length < 1)
-          .map((i) => new Application(i, this, undefined, data));
-      }
-    }
-    return this.applications;
   }
   async createApplication(
-    data: model.ApplicationModel,
-  ): Promise<IApplication | undefined> {
-    data.directoryId = this.id;
-    const res = await kernel.createApplication(data);
-    if (res.success && res.data.id) {
-      const application = new Application(res.data, this);
-      this.applications.push(application);
-      return application;
+    data: schema.XApplication,
+  ): Promise<schema.XApplication | undefined> {
+    const res = await this.resource.applicationColl.insert({
+      ...data,
+      directoryId: this.id,
+    });
+    if (res) {
+      await this.resource.applicationColl.notity({ data: [res], operate: 'insert' });
+      return res;
+    }
+  }
+  async createTransfer(data: model.Transfer): Promise<ITransfer | undefined> {
+    const res = await this.resource.transferColl.insert({
+      ...data,
+      envs: [],
+      nodes: [],
+      edges: [],
+      directoryId: this.id,
+    });
+    if (res) {
+      const link = new Transfer(res, this);
+      this.transfers.push(link);
+      await this.resource.transferColl.notity({ data: [res], operate: 'insert' });
+      return link;
     }
   }
   async loadAllApplication(reload: boolean = false): Promise<IApplication[]> {
-    const applications: IApplication[] = [];
-    applications.push(...(await this.loadApplications(reload)));
+    const applications: IApplication[] = [...this.applications];
     for (const subDirectory of this.children) {
       applications.push(...(await subDirectory.loadAllApplication(reload)));
     }
     return applications;
   }
+  async loadAllTransfer(reload: boolean = false): Promise<ITransfer[]> {
+    const links: ITransfer[] = [...this.transfers];
+    for (const subDirectory of this.children) {
+      links.push(...(await subDirectory.loadAllTransfer(reload)));
+    }
+    return links;
+  }
   override operates(mode: number = 0): model.OperateModel[] {
     const operates: model.OperateModel[] = [];
     if (this.typeName === '成员目录') {
       if (this.target.hasRelationAuth()) {
-        if (this.target.space.user.copyFiles.size > 0) {
+        if (this.target.user.copyFiles.size > 0) {
           operates.push(fileOperates.Parse);
         }
         operates.push(teamOperates.Pull, memberOperates.SettingIdentity);
@@ -387,7 +366,8 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
       );
       if (mode === 2 && this.target.hasRelationAuth()) {
         operates.push(directoryNew);
-        if (this.target.space.user.copyFiles.size > 0) {
+        operates.push(newWarehouse);
+        if (this.target.user.copyFiles.size > 0) {
           operates.push(fileOperates.Parse);
         }
       }
@@ -401,62 +381,54 @@ export class Directory extends FileInfo<schema.XDirectory> implements IDirectory
     }
     return operates;
   }
-  public async loadSubDirectory() {
-    if (!this.parent && this.children.length < 1) {
-      const res = await kernel.queryDirectorys({
-        id: this.target.id,
-        page: PageAll,
-        upTeam: this.target.typeName === TargetType.Group,
+  public async loadDirectoryResource(reload: boolean = false) {
+    await this.operater.loadResource(reload);
+  }
+  /** 对目录下所有资源进行操作 */
+  private async operateDirectoryResource(
+    directory: IDirectory,
+    resource: DataResource,
+    action: 'replaceMany' | 'deleteMany',
+    move?: boolean,
+    isCrossSpace?: boolean,
+  ) {
+    for (const child of directory.children) {
+      await this.operateDirectoryResource(child, resource, action, move, isCrossSpace);
+    }
+    await resource.directoryColl[action](directory.children.map((a) => a.metadata));
+    await resource.formColl[action](directory.forms.map((a) => a.metadata));
+    await resource.speciesColl[action](directory.specieses.map((a) => a.metadata));
+    await resource.propertyColl[action](directory.propertys.map((a) => a.metadata));
+    if (action == 'deleteMany') {
+      await resource.speciesItemColl.deleteMatch({
+        speciesId: {
+          _in_: directory.specieses.map((a) => a.id),
+        },
       });
-      if (res.success && res.data) {
-        this.children = [];
-        if (res.data.result && res.data.result.length > 0) {
-          const data = res.data.result.find((i) => i.id === this.id);
-          if (data) {
-            this.loadChildren(data, res.data.result);
-          }
+      await resource.applicationColl.deleteMatch({
+        directoryId: directory.id,
+      });
+    }
+    if (action == 'replaceMany') {
+      if (move) {
+        var apps = directory.resource.applicationColl.cache.filter(
+          (i) => i.directoryId === directory.id,
+        );
+        await resource.applicationColl.replaceMany(apps);
+      } else {
+        if (isCrossSpace) {
+          const items = await this.directory.resource.speciesItemColl.loadSpace({
+            options: {
+              match: {
+                speciesId: {
+                  _in_: directory.specieses.map((a) => a.id),
+                },
+              },
+            },
+          });
+          await resource.speciesItemColl.replaceMany(items);
         }
       }
-    }
-  }
-  private loadChildren(data: schema.XDirectory, directorys: schema.XDirectory[]) {
-    this.forms = (data.forms || []).map((f) => new Form(f, this));
-    this.specieses = (data.species || []).map((s) => new Species(s, this));
-    this.propertys = (data.propertys || []).map((p) => new Property(p, this));
-    this.applications = (data.applications || [])
-      .filter((a) => !a.parentId || a.parentId.length < 1)
-      .map((a) => new Application(a, this, undefined, data.applications));
-    directorys
-      .filter((i) => i.parentId === data.id)
-      .forEach((i) => {
-        const subDirectory = new Directory(i, this.target, this, directorys);
-        subDirectory.loadChildren(i, directorys);
-        this.children.push(subDirectory);
-      });
-  }
-  createTask(task: model.TaskModel): () => void {
-    this.taskList.push(task);
-    return () => this.taskEmitter.changCallback();
-  }
-  async loadReports(reload: boolean = false): Promise<IReport[]> {
-    if (this.reports.length < 1 || reload) {
-      const res = await kernel.queryForms({
-        id: this.id,
-        page: PageAll,
-      });
-      if (res.success) {
-        this.reports = (res.data.result || []).map((i) => new Report(i, this));
-      }
-    }
-    return this.reports;
-  }
-  async createReport(data: model.FormModel): Promise<IReport | undefined> {
-    data.directoryId = this.id;
-    const res = await kernel.createForm(data);
-    if (res.success && res.data.id) {
-      const report = new Report(res.data, this);
-      this.reports.push(report);
-      return report;
     }
   }
 }

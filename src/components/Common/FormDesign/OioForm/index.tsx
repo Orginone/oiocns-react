@@ -1,10 +1,9 @@
 import { ProForm } from '@ant-design/pro-components';
 import { Col, Row } from 'antd';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import OioFormItem from './FormItems';
 import { IBelong } from '@/ts/core';
-import { XAttribute, XForm } from '@/ts/base/schema';
-import orgCtrl from '@/ts/controller';
+import { XForm } from '@/ts/base/schema';
 
 type IProps = {
   form: XForm;
@@ -32,15 +31,11 @@ const OioForm: React.FC<IProps> = ({
   disabled,
   noRule,
 }) => {
-  const [attributes, setAttributes] = useState<XAttribute[]>([]);
   let config: any = form.rule ? JSON.parse(form.rule) : { col: 8, layout: 'horizontal' };
   useEffect(() => {
-    orgCtrl.work.loadAttributes(form.id, belong.id).then((value) => {
-      setAttributes(value);
-      if (fieldsValue) {
-        formRef?.current?.setFieldsValue(fieldsValue);
-      }
-    });
+    if (fieldsValue) {
+      formRef?.current?.setFieldsValue(fieldsValue);
+    }
   }, []);
   return (
     <>
@@ -84,7 +79,7 @@ const OioForm: React.FC<IProps> = ({
           sm: { span: 10 },
         }}>
         <Row gutter={24}>
-          {attributes.map((item) => (
+          {form.attributes.map((item) => (
             <Col span={config.col} key={item.id}>
               <OioFormItem item={item} disabled belong={belong} noRule={noRule} />
             </Col>

@@ -13,6 +13,10 @@ export type Xbase = {
   createTime: string;
   // 更新时间
   updateTime: string;
+  // 共享用户ID
+  shareId: string;
+  // 归属用户ID
+  belongId: string;
 };
 
 export type XEntity = {
@@ -24,8 +28,6 @@ export type XEntity = {
   remark: string;
   // 图标
   icon: string;
-  // 归属用户
-  belongId: string;
   // 类型
   typeName: string;
   // 创建类别标准的用户
@@ -33,9 +35,13 @@ export type XEntity = {
 } & Xbase;
 
 //应用定义
-export type XApplication = {
+export type XStandard = {
   // 目录ID
   directoryId: string;
+} & XEntity;
+
+//应用定义
+export type XApplication = {
   // 父ID
   parentId: string;
   // 应用资源
@@ -48,7 +54,7 @@ export type XApplication = {
   nodes: XApplication[] | undefined;
   // 应用的目录
   directory: XDirectory | undefined;
-} & XEntity;
+} & XStandard;
 
 //特性和属性的关系
 export type XAttrLinkProp = {
@@ -82,8 +88,6 @@ export type XAttribute = {
   formId: string;
   // 归属用户ID
   belongId: string;
-  // 关联的各组织属性
-  linkPropertys: XProperty[] | undefined;
   // 属性关系
   links: XAttrLinkProp[] | undefined;
   // 关联属性
@@ -116,8 +120,6 @@ export type XAuthority = {
 
 //目录定义
 export type XDirectory = {
-  // 父目录ID
-  parentId: string;
   // 共享用户ID
   shareId: string;
   // 目录下的属性
@@ -132,28 +134,87 @@ export type XDirectory = {
   parent: XDirectory | undefined;
   // 目录的结构
   nodes: XDirectory[] | undefined;
-} & XEntity;
-export type schemaType = {
-  displayType: 'row' | 'column';
-  type: 'object';
-  labelWidth: number | string;
-  properties: Record<string, object>;
-  column: 1 | 2 | 3;
-};
+} & XStandard;
+
 //单定义
 export type XForm = {
   // 单布局
   rule: string;
-  // 目录ID
-  directoryId: string;
   // 单的特性
-  attributes: XAttribute[] | undefined;
+  attributes: XAttribute[];
   // 使用单的流程节点
   bindNodes: XWorkNode[] | undefined;
   // 单的目录
   directory: XDirectory | undefined;
-  schema:schemaType
-} & XEntity;
+} & XStandard;
+
+/* 表单规则类型 */
+export type XFormRule = {
+  id: string;
+  /* 规则名称 */
+  name: string;
+  /* 规则类型 */
+  ruleType: 'method' | 'formula';
+  /* 触发方式 初始化-修改时-提交时 */
+  trigger: 'Start' | 'Running' | 'Submit';
+  /* 规则支持的数据类型 */
+  accept: string[];
+  /* 规则关联特性 */
+  linkAttrs: any[];
+  /* 关联项最大数量 */
+  max?: number;
+  /* 规则是否可扩展关联项 */
+  isExtend: boolean;
+  /* 错误提示 */
+  errorMsg: string;
+  /* 规则执行函数构造器 */
+  creatFun?: string;
+  /* 规则执行函数 */
+  content: Function;
+  /* 备注 */
+  remark: string;
+};
+/* 表单规则类型 */
+export type FormRuleType = {
+  /* 规则数据 */
+  list: XFormRule[];
+  /* 设计展示数据 */
+  schema: any;
+};
+/* 表单特性规则类型 */
+export type AttrRuleType = {
+  /* 标题 */
+  name: string;
+  /* 编号 */
+  code: string;
+  /* 字段是否显示在输入区域 */
+  hidden?: boolean;
+  /* 字段是否只读 */
+  readonly?: boolean;
+  /*是否必填 */
+  required?: boolean;
+  allowClear?: boolean;
+  maxLength?: number;
+  minLength?: number;
+  /* 数值类型 最小值 */
+  min?: number;
+  /* 数值类型 最大值 */
+  max?: number;
+  /* 展示组件类型 */
+  widget?: string;
+  /* 输入提示 */
+  placeholder?: string;
+  /* 管理权限 */
+  authId?: string;
+  /* 特性定义 */
+  remark?: string;
+  /* 正则校验 */
+  rules: string;
+  /* 规则数据 */
+  list?: XFormRule[];
+  /*  设计展示数据 */
+  schema: any;
+};
 
 //身份证明
 export type XIdProof = {
@@ -197,8 +258,6 @@ export type XProperty = {
   info: string;
   // 计量单位
   unit: string;
-  // 目录ID
-  directoryId: string;
   // 标签ID
   speciesId: string;
   // 来源用户ID
@@ -217,7 +276,7 @@ export type XProperty = {
   directory: XDirectory | undefined;
   // 字典类型
   species: XSpecies | undefined;
-} & XEntity;
+} & XStandard;
 
 //用户关系
 export type XRelation = {
@@ -233,8 +292,6 @@ export type XRelation = {
 
 //分类标签
 export type XSpecies = {
-  // 目录ID
-  directoryId: string;
   // 来源用户ID
   sourceId: string;
   // 分类的类目
@@ -243,7 +300,7 @@ export type XSpecies = {
   speciesProps: XProperty[] | undefined;
   // 分类的目录
   directory: XDirectory | undefined;
-} & XEntity;
+} & XStandard;
 
 //分类类目
 export type XSpeciesItem = {
@@ -528,42 +585,3 @@ export type XWorkTask = {
   // 办事的定义
   instance: XWorkInstance | undefined;
 } & Xbase;
-
-export type XFormRule = {
-  id: string;
-  /* 规则名称 */
-  name: string;
-  /* 规则类型 */
-  ruleType: 'method' | 'formula';
-  /* 触发方式 初始化-修改时-提交时 */
-  trigger: 'Start' | 'Running' | 'Submit';
-  /* 规则支持的数据类型 */
-  accept: string[];
-  /* 规则关联特性 */
-  linkAttrs: any[];
-  /* 关联项最大数量 */
-  max?: number;
-  /* 规则是否可扩展关联项 */
-  isExtend: boolean;
-  /* 错误提示 */
-  errorMsg: string;
-  /* 规则执行函数构造器 */
-  creatFun?: string;
-  /* 规则执行函数 */
-  content: Function;
-  /* 备注 */
-  remark: string;
-};
-//报表定义
-export type XReport = {
-  // 报表布局
-  rule: string;
-  // 目录ID
-  directoryId: string;
-  // 报表的特性
-  attributes: XAttribute[] | undefined;
-  // 使用报表的流程节点
-  bindNodes: XWorkNode[] | undefined;
-  // 报表的目录
-  directory: XDirectory | undefined;
-} & XEntity;

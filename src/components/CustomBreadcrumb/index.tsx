@@ -1,4 +1,4 @@
-import { AiOutlineCaretRight } from 'react-icons/ai';
+import { AiOutlineCaretRight } from '@/icons/ai';
 import { Breadcrumb, Divider, Space, Tag } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { MenuItemType } from 'typings/globelType';

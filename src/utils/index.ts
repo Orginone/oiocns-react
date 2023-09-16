@@ -298,6 +298,26 @@ function getJsonText(fileUrl: string): Promise<string> {
 const ellipsisText = (text: string, length: number) => {
   return text.substring(0, length) + '...';
 };
+
+/**
+ * 根据传入keys顺序，对传入obj对象键值对排序
+ * @param obj
+ * @param sortedKeys
+ */
+function sortObjByKeys<T extends object>(obj: T, sortedKeys: string[]): T {
+  const sortedObj: Partial<T> = {};
+  sortedKeys.forEach((key) => {
+    if (obj?.hasOwnProperty(key)) {
+      sortedObj[key as keyof T] = obj[key as keyof T];
+    }
+  });
+  // 将原对象的其他键值对复制到排序后的对象中
+  for (const key in obj) {
+    if (!sortedObj.hasOwnProperty(key)) sortedObj[key] = obj[key];
+  }
+  return sortedObj as T;
+}
+
 export {
   ellipsisText,
   filterEmptyPropObj,
@@ -308,5 +328,6 @@ export {
   getScrollX,
   isEmoji,
   isSpecialChar,
+  sortObjByKeys,
   visitTree,
 };

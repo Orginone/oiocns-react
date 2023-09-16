@@ -9,6 +9,7 @@ const audioExt = ['.mp3', '.wav', '.ogg'];
 
 const Executor = () => {
   const history = useHistory();
+  const [audio, setAudio] = useState(<></>);
   const [content, setContent] = useState(<></>);
   const [audio, setAudio] = useState(<></>);
   const resetContent = () => {
@@ -21,7 +22,7 @@ const Executor = () => {
     const id = command.subscribe((type, cmd, ...args: any[]) => {
       if (cmd === 'link') return history.push(args[0]);
       if (cmd === 'taskList') return setContent(<FileTaskList directory={args[0]} />);
-      if (executeCmd(cmd, args[0], args.slice(1)) === false) {
+      if (executeCmd(cmd, args[0], args.slice(1), type) === false) {
         if (['open', 'remark'].includes(cmd) && 'filedata' in args[0]) {
           type = 'data';
         }
@@ -33,6 +34,21 @@ const Executor = () => {
             setContent(<ConfigExecutor cmd={cmd} args={args} finished={resetContent} />);
             break;
           default:
+            if (type === 'config' || type === 'data') {
+              if (
+                args[0].filedata?.contentType?.startsWith('audio') ||
+                audioExt.includes(args[0].filedata?.extension ?? '-')
+              ) {
+                console.log(args);
+                setAudio(
+                  <AudioPlayer
+                    finished={resetAudio}
+                    directory={args[0].directory}
+                    share={args[0].filedata}
+                  />,
+                );
+              }
+            }
             setContent(<></>);
             break;
         }

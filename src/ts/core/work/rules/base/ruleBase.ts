@@ -1,5 +1,5 @@
 import { RuleTypes } from '../type.d';
-
+import { EffectEnum } from './enum';
 /* 基础规则数据类型 */
 export interface IRuleBase {
   /* 规则主键 */
@@ -8,14 +8,14 @@ export interface IRuleBase {
   name: string;
   /* 规则类型 */
   ruleType: RuleTypes.RuleType;
-  /* 触发方式 初始化-修改时-提交时 */
+  /* 触发方式 初始化-修改时-提交时-子表变动后 */
   trigger: RuleTypes.TriggerType;
   /* 规则支持的数据类型 */
   accept?: RuleTypes.AcceptedType[];
   /* 规则关联特性 */
   linkAttrs: RuleTypes.AttrType[];
-  /* 返回结果类型 */
-  resType: RuleTypes.ResType;
+  /** 规则执行结果的使用方式 */
+  effect?: keyof typeof EffectEnum;
   /* 关联项最大数量 */
   max?: number;
   /* 规则是否可扩展关联项 即增加关联数量*/
@@ -43,7 +43,7 @@ abstract class RuleBase implements IRuleBase {
   /* 规则支持的数据类型 */
   accept: RuleTypes.AcceptedType[] = [];
   /* 返回值效果 */
-  resType: RuleTypes.ResType = '赋值';
+  effect?: keyof typeof EffectEnum;
   /* 规则关联特性 */
   linkAttrs: any[] = [];
   /* 关联项最大数量 */
@@ -69,11 +69,6 @@ abstract class RuleBase implements IRuleBase {
    * @return {} 返回处理结果 {【表单key】：value}
    */
   abstract dealRule(formData: { [key: string]: any }): Promise<any>;
-
-  // /**
-  //  * @desc 加载外部规则库文件/模板规则
-  //  */
-  // abstract loadRemoteRules(): void;
 }
 
 export default RuleBase;

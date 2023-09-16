@@ -1,9 +1,10 @@
 import React from 'react';
 import { ProFormColumnsType } from '@ant-design/pro-components';
 
-import CodeEdit from '@/components/ReactCodeEdit';
+import CodeEdit from '@/components/Common/ReactCodeEdit';
 import { XAttribute, XFormRule } from '@/ts/base/schema';
 import { Input } from 'antd';
+import { EffectEnum } from '@/ts/core/work/rules/base/enum';
 
 /** 规则运行类型 */
 export const trigger: { [key: string]: string } = {
@@ -16,6 +17,11 @@ export const FormRuleType: { [key: string]: string } = {
   formula: '公式', //计算相关
   method: '函数体', //依赖项变更时触发
 };
+
+const GoalsOpt = Object.keys(EffectEnum).map((v) => {
+  return { label: v, value: EffectEnum?.[v] };
+});
+
 const getColumns: (
   attrs: XAttribute[],
   sysRules?: any[],
@@ -52,7 +58,6 @@ const getColumns: (
       rules: [{ required: true, message: '规则名称为必填项' }],
     },
   },
-
   {
     title: '触发类型',
     dataIndex: 'trigger',
@@ -85,6 +90,23 @@ const getColumns: (
     },
     formItemProps: {
       rules: [{ required: true, message: '目标属性为必填项' }],
+    },
+  },
+  {
+    title: '规则效果类别',
+    tooltip: '规则执行后的作用效果',
+    dataIndex: 'effect',
+    valueType: 'select',
+    initialValue: '0',
+    colProps: {
+      span: 12,
+    },
+    fieldProps: {
+      // fieldNames: { label: 'name', value: 'id' },
+      options: GoalsOpt,
+    },
+    formItemProps: {
+      rules: [{ required: true, message: '效果类别为必填项' }],
     },
   },
   {
@@ -138,7 +160,7 @@ const getColumns: (
                       renderFormItem: (_schema, _config, _form) => {
                         return (
                           <CodeEdit
-                            defaultVal={_config}
+                            defaultVal={_config as any}
                             onCodeChange={(code: string) =>
                               _form.setFieldValue('content', code)
                             }

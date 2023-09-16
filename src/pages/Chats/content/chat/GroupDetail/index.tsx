@@ -2,18 +2,18 @@ import { Button, Col, Image, Modal, Row, Typography } from 'antd';
 import React, { useState } from 'react';
 import TeamIcon from '@/components/Common/GlobalComps/entityIcon';
 import detailStyle from './index.module.less';
-import { IMsgChat, ITarget } from '@/ts/core';
+import { ISession } from '@/ts/core';
 import ChatHistoryModal from '../ChatHistoryModal';
-import { AiOutlineRight } from 'react-icons/ai';
+import { AiOutlineRight } from '@/icons/ai';
 import { useHistory } from 'react-router-dom';
 import orgCtrl from '@/ts/controller';
 import { ellipsisText } from '@/utils';
 import GroupMember from '@/pages/Chats/content/chat/GroupMember';
 
-const GroupDetail: React.FC<any> = ({ chat }: { chat: IMsgChat }) => {
+import Activity from '@/components/Activity';
+const GroupDetail: React.FC<any> = ({ chat }: { chat: ISession }) => {
   const [historyOpen, setHistoryOpen] = useState<boolean>(false); // 历史消息搜索
   const history = useHistory();
-
   /**
    * @description: 历史消息搜索弹窗
    * @return {*}
@@ -91,11 +91,9 @@ const GroupDetail: React.FC<any> = ({ chat }: { chat: IMsgChat }) => {
           className={`${detailStyle.find_history_button}`}
           type="ghost"
           onClick={async () => {
-            if ('directory' in chat) {
-              await (chat as ITarget).directory.loadContent();
-              orgCtrl.currentKey = chat.key;
-              history.push('/store');
-            }
+            await chat.target.directory.loadContent();
+            orgCtrl.currentKey = chat.key;
+            history.push('/store');
           }}>
           共享目录 <AiOutlineRight />
         </Button>
@@ -130,9 +128,12 @@ const GroupDetail: React.FC<any> = ({ chat }: { chat: IMsgChat }) => {
       <div className={detailStyle.groupDetail}>
         {header}
         <GroupMember members={chat.members}></GroupMember>
-        <div className={detailStyle.user_list}>
-          <div className={`${detailStyle.img_list} ${detailStyle.con}`}></div>
-          {operaButton}
+        <div className={detailStyle.groupDetailContent}>
+          <Activity activity={chat.activity}></Activity>
+          <div className={detailStyle.user_list}>
+            <div className={`${detailStyle.img_list} ${detailStyle.con}`}></div>
+            {operaButton}
+          </div>
         </div>
       </div>
 

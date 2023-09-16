@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { AiFillHome } from 'react-icons/ai';
+import { AiFillHome } from '@/icons/ai';
 import { IRouteConfig } from '../../typings/globelType.d';
 
 import PassportLayout from '@/layouts/Passport';
@@ -109,11 +109,6 @@ const Routers: IRouteConfig[] = [
       ...TodoRouter,
       ...StoreRouter,
       ...SettingRouter,
-      {
-        path: '/online',
-        title: '第三方应用',
-        component: React.lazy(() => import('@/pages/Online')),
-      },
       {
         path: '*',
         title: '页面不存在',

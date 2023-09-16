@@ -9,7 +9,7 @@ import ConditionNode from './Components/ConditionNode';
 import { AddNodeType, NodeModel } from '../processType';
 import orgCtrl from '@/ts/controller';
 import { IBelong, IWork } from '@/ts/core';
-import { model, schema } from '@/ts/base';
+import { model } from '@/ts/base';
 /**
  * @description: 流程设置抽屉
  * @return {*}
@@ -20,7 +20,6 @@ interface IProps {
   isOpen: boolean;
   current: NodeModel;
   onClose: () => void;
-  forms: schema.XForm[];
 }
 
 const FlowDrawer: React.FC<IProps> = (props) => {
@@ -28,15 +27,11 @@ const FlowDrawer: React.FC<IProps> = (props) => {
 
   useEffect(() => {
     if (props.define && props.current.type == AddNodeType.CONDITION) {
-      props.define.loadWorkForms(true).then((forms) => {
-        const fields: model.FieldModel[] = [];
-        forms.forEach((f) => {
-          if (f.typeName === '主表') {
-            fields.push(...f.fields);
-          }
-        });
-        setConditions(fields);
+      const fields: model.FieldModel[] = [];
+      props.define.primaryForms.forEach((f) => {
+        fields.push(...f.fields);
       });
+      setConditions(fields);
     }
   }, []);
 

@@ -4,6 +4,7 @@ import orgCtrl from '@/ts/controller';
 import { Rule } from 'antd/lib/form';
 import { FormLabelAlign } from 'antd/lib/form/interface';
 import { LabelTooltipType } from 'antd/es/form/FormItemLabel';
+import { IBelong } from '@/ts/core';
 
 interface IProps {
   dictId: string;
@@ -12,6 +13,7 @@ interface IProps {
   label: React.ReactNode;
   labelAlign: FormLabelAlign;
   tooltip: LabelTooltipType;
+  belong: IBelong;
   props: any;
 }
 /**
@@ -28,13 +30,17 @@ const ProFormDict = (props: IProps) => {
       .localeCompare(((optionB?.label ?? '') as string).toLowerCase());
 
   useEffect(() => {
-    orgCtrl.work.loadItems(props.dictId).then((value) => {
-      setOptions(
-        value.map((item) => {
-          return { label: item.name, value: item.id };
-        }),
-      );
-    });
+    props.belong.resource.speciesItemColl
+      .loadSpace({
+        options: { match: { speciesId: props.dictId } },
+      })
+      .then((value) => {
+        setOptions(
+          value.map((item) => {
+            return { label: item.name, value: item.id };
+          }),
+        );
+      });
   }, []);
   return (
     <ProFormSelect
