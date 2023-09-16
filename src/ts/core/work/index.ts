@@ -188,10 +188,10 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
   }
   private async recursionForms(node: model.WorkNodeModel) {
     node.detailForms = await this.directory.resource.formColl.find(
-      node.forms.filter((a) => a.typeName == '子表').map((s) => s.id),
+      node.forms?.filter((a) => a.typeName == '子表').map((s) => s.id),
     );
     node.primaryForms = await this.directory.resource.formColl.find(
-      node.forms.filter((a) => a.typeName == '主表').map((s) => s.id),
+      node.forms?.filter((a) => a.typeName == '主表').map((s) => s.id),
     );
     node.primaryForms.forEach(async (a) => {
       const form = new Form({ ...a, id: a.id + '_' }, this.directory);
