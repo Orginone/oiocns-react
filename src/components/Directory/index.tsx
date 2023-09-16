@@ -25,6 +25,7 @@ const Directory: React.FC<IProps> = ({ mode, current }: IProps) => {
   const [key] = useCtrlUpdate(dircetory);
   const cmdType = mode === 1 ? 'data' : 'config';
   const [segmented, setSegmented] = useStorage('segmented', 'list');
+  let content: IFileInfo<schema.XEntity>[] = [];
   const contextMenu = (file?: IFileInfo<schema.XEntity>, clicked?: Function) => {
     var entity = file || dircetory;
     if ('targets' in entity) {
@@ -42,12 +43,12 @@ const Directory: React.FC<IProps> = ({ mode, current }: IProps) => {
     await file.loadContent();
     command.emitter(cmdType, 'open', file);
   };
-  const content = () => {
-    if (current === 'disk') {
-      return [orgCtrl.user, ...orgCtrl.user.companys];
-    }
-    return current.content(mode);
-  };
+
+  if (current === 'disk') {
+    content = [orgCtrl.user, ...orgCtrl.user.companys];
+  } else {
+    content = current.content(mode);
+  }
 
   return (
     <SegmentContent
@@ -56,11 +57,11 @@ const Directory: React.FC<IProps> = ({ mode, current }: IProps) => {
       description={`${content.length}个项目`}
       content={
         segmented === 'table' ? (
-          <TableMode content={content()} fileOpen={fileOpen} contextMenu={contextMenu} />
+          <TableMode content={content} fileOpen={fileOpen} contextMenu={contextMenu} />
         ) : segmented === 'icon' ? (
-          <IconMode content={content()} fileOpen={fileOpen} contextMenu={contextMenu} />
+          <IconMode content={content} fileOpen={fileOpen} contextMenu={contextMenu} />
         ) : (
-          <ListMode content={content()} fileOpen={fileOpen} contextMenu={contextMenu} />
+          <ListMode content={content} fileOpen={fileOpen} contextMenu={contextMenu} />
         )
       }
     />

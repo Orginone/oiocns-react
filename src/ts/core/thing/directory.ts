@@ -96,7 +96,6 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
       {
         ..._metadata,
         typeName: _metadata.typeName || '目录',
-        directoryId: _metadata.directoryId || _target.id,
       },
       _parent ?? (_target as unknown as IDirectory),
       _target.resource.directoryColl,
@@ -190,7 +189,6 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
           destination.resource,
           'replaceMany',
           false,
-          this.directory.target.space.id != destination.target.space.id,
         );
         await destination.notify('refresh', [data]);
       }
@@ -390,10 +388,9 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
     resource: DataResource,
     action: 'replaceMany' | 'deleteMany',
     move?: boolean,
-    isCrossSpace?: boolean,
   ) {
     for (const child of directory.children) {
-      await this.operateDirectoryResource(child, resource, action, move, isCrossSpace);
+      await this.operateDirectoryResource(child, resource, action, move);
     }
     await resource.directoryColl[action](directory.children.map((a) => a.metadata));
     await resource.formColl[action](directory.forms.map((a) => a.metadata));
@@ -416,7 +413,7 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
         );
         await resource.applicationColl.replaceMany(apps);
       } else {
-        if (isCrossSpace) {
+        if (this.resource.belongId != resource.belongId) {
           const items = await this.directory.resource.speciesItemColl.loadSpace({
             options: {
               match: {
