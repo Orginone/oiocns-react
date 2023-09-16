@@ -413,7 +413,7 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
         );
         await resource.applicationColl.replaceMany(apps);
       } else {
-        if (this.resource.belongId != resource.belongId) {
+        if (this.resource.targetMetadata.belongId != resource.targetMetadata.belongId) {
           const items = await this.directory.resource.speciesItemColl.loadSpace({
             options: {
               match: {

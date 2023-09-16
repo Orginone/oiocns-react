@@ -46,9 +46,9 @@ export class DataResource {
   messageColl: XCollection<ChatMessageType>;
   /** 数据传输配置集合 */
   transferColl: XCollection<Transfer>;
-  /** 获取归属单位Id */
-  get belongId() {
-    return this.target.belongId;
+  /** 资源对应的用户信息 */
+  get targetMetadata() {
+    return this.target;
   }
   /** 资源预加载 */
   async preLoad(reload: boolean = false): Promise<void> {

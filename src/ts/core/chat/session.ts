@@ -364,7 +364,12 @@ export class Session extends Entity<schema.XEntity> implements ISession {
       },
     );
     if (success && notify) {
-      await this.target.user.cacheObj.notity(this.chatdata.fullId, this.chatdata, true);
+      await this.target.user.cacheObj.notity(
+        this.chatdata.fullId,
+        this.chatdata,
+        true,
+        true,
+      );
     }
     return success;
   }
