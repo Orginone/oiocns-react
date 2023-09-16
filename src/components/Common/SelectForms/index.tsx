@@ -16,7 +16,6 @@ interface IProps {
 }
 
 const SelectForms: React.FC<IProps> = ({ belong, typeName, selected, setSelected }) => {
-  const [filter, setFilter] = useState<string>('');
   const [centerTreeData, setCenterTreeData] = useState<any>([]);
   const [centerCheckedKeys, setCenterCheckedKeys] = useState<Key[]>(
     (selected || []).map((i) => i.id),
@@ -93,15 +92,10 @@ const SelectForms: React.FC<IProps> = ({ belong, typeName, selected, setSelected
     <div className={cls.layout}>
       <div className={cls.content}>
         <div style={{ width: '33%' }} className={cls.left}>
-          <Input
-            className={cls.leftInput}
-            prefix={<AiOutlineSearch />}
-            placeholder="请设置关键字"
-          />
           <div className={cls.leftContent}>
             <CustomTree
-              checkable={false}
-              autoExpandParent={true}
+              isDirectoryTree
+              searchable
               onSelect={onSelect}
               treeData={buildTargetWorkThingTree(belong.shareTarget)}
             />
@@ -109,21 +103,14 @@ const SelectForms: React.FC<IProps> = ({ belong, typeName, selected, setSelected
         </div>
 
         <div className={cls.center}>
-          <Input
-            className={cls.centerInput}
-            prefix={<AiOutlineSearch />}
-            placeholder="搜索"
-            onChange={(e) => {
-              setFilter(e.target.value);
-            }}
-          />
           <div className={cls.centerContent}>
             <CustomTree
               checkable
+              searchable
               checkedKeys={centerCheckedKeys}
               autoExpandParent={true}
               onCheck={onCheck}
-              treeData={centerTreeData.filter((i: any) => i.title.includes(filter))}
+              treeData={centerTreeData}
             />
           </div>
         </div>
