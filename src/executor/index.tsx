@@ -9,7 +9,6 @@ const audioExt = ['.mp3', '.wav', '.ogg'];
 
 const Executor = () => {
   const history = useHistory();
-  const [audio, setAudio] = useState(<></>);
   const [content, setContent] = useState(<></>);
   const [audio, setAudio] = useState(<></>);
   const resetContent = () => {
