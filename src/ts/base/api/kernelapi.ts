@@ -1060,6 +1060,9 @@ export default class KernelApi {
    * @returns 异步结果
    */
   public async dataNotify(req: model.DataNotityType): Promise<model.ResultType<boolean>> {
+    if (req.ignoreSelf) {
+      req.ignoreConnectionId = this._storeHub.connectionId;
+    }
     if (this._storeHub.isConnected) {
       return await this._storeHub.invoke('DataNotify', req);
     } else {
@@ -1121,6 +1124,9 @@ export default class KernelApi {
     var onlineOnly: boolean = true;
     if (res.target === 'DataNotify') {
       const data: model.DataNotityType = res.data;
+      if (data.ignoreConnectionId === this._storeHub.connectionId) {
+        return;
+      }
       res.target = `${data.belongId}-${data.targetId}-${data.flag}`;
       res.data = data.data;
       onlineOnly = data.onlineOnly;

@@ -54,7 +54,7 @@ export interface ISession extends IEntity<schema.XEntity> {
   /** 清空历史记录 */
   clearMessage(): Promise<boolean>;
   /** 缓存会话数据 */
-  cacheChatData(): Promise<boolean>;
+  cacheChatData(notify?: boolean): Promise<boolean>;
 }
 
 /** 会话实现 */
@@ -173,8 +173,10 @@ export class Session extends Entity<schema.XEntity> implements ISession {
         this.tagMessage(ids, '已读');
       }
       this.chatdata.mentionMe = false;
-      this.chatdata.noReadCount = 0;
-      this.cacheChatData();
+      if (this.chatdata.noReadCount > 0) {
+        this.chatdata.noReadCount = 0;
+        this.cacheChatData(true);
+      }
       msgChatNotify.changCallback();
       this.messageNotify?.apply(this, [this.messages]);
     });
@@ -307,7 +309,7 @@ export class Session extends Entity<schema.XEntity> implements ISession {
       }
       this.chatdata.lastMsgTime = new Date().getTime();
       this.chatdata.lastMessage = data;
-      this.cacheChatData();
+      this.cacheChatData(this.messageNotify != undefined && !imsg.isMySend);
     } else {
       const index = this.messages.findIndex((i) => i.id === data.id);
       if (index > -1) {
@@ -342,11 +344,28 @@ export class Session extends Entity<schema.XEntity> implements ISession {
       this.chatdata = data;
       msgChatNotify.changCallback();
     }
+    this.target.user.cacheObj.subscribe(
+      this.chatdata.fullId,
+      (data: model.MsgChatData) => {
+        if (data && data.fullId === this.chatdata.fullId) {
+          this.chatdata = data;
+          msgChatNotify.changCallback();
+        }
+      },
+    );
   }
-  async cacheChatData(): Promise<boolean> {
-    return this.target.user.cacheObj.set(`session.${this.chatdata.fullId}`, {
-      operation: 'replaceAll',
-      data: this.chatdata,
-    });
+
+  async cacheChatData(notify: boolean = false): Promise<boolean> {
+    const success = await this.target.user.cacheObj.set(
+      `session.${this.chatdata.fullId}`,
+      {
+        operation: 'replaceAll',
+        data: this.chatdata,
+      },
+    );
+    if (success && notify) {
+      await this.target.user.cacheObj.notity(this.chatdata.fullId, this.chatdata, true);
+    }
+    return success;
   }
 }

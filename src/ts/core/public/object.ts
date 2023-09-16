@@ -74,14 +74,18 @@ export class XObject<T extends schema.Xbase> {
   }
 
   async notity(
+    flag: string,
     data: any,
+    onlyTarget?: boolean,
     ignoreSelf?: boolean,
     targetId?: string,
-    onlyTarget?: boolean,
     onlineOnly: boolean = true,
   ): Promise<boolean> {
     const res = await kernel.dataNotify({
-      data: data,
+      data: {
+        flag,
+        data,
+      },
       flag: this.objName,
       onlineOnly: onlineOnly,
       belongId: this._target.belongId,
@@ -93,11 +97,13 @@ export class XObject<T extends schema.Xbase> {
     return res.success;
   }
 
-  subscribe(callback: (data: any) => void, id?: string): void {
+  subscribe(flag: string, callback: (data: any) => void, id?: string): void {
     kernel.on(
       `${this._target.belongId}-${id || this._target.id}-${this._objName}`,
-      (data) => {
-        callback.apply(this, [data]);
+      (res: { flag: string; data: any }) => {
+        if (res.flag === flag) {
+          callback.apply(this, [res.data]);
+        }
       },
     );
   }
