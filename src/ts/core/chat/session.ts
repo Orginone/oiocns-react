@@ -140,6 +140,9 @@ export class Session extends Entity<schema.XEntity> implements ISession {
     }
     return this.metadata.remark.substring(0, 60);
   }
+  get cachePath(): string {
+    return `session.${this.chatdata.fullId}`;
+  }
   async moreMessage(): Promise<number> {
     const data = await this.coll.loadSpace({
       take: 30,
@@ -337,9 +340,7 @@ export class Session extends Entity<schema.XEntity> implements ISession {
   }
 
   async loadCacheChatData(): Promise<void> {
-    const data = await this.target.user.cacheObj.get<model.MsgChatData>(
-      `session.${this.chatdata.fullId}`,
-    );
+    const data = await this.target.user.cacheObj.get<model.MsgChatData>(this.cachePath);
     if (data && data.fullId === this.chatdata.fullId) {
       this.chatdata = data;
       msgChatNotify.changCallback();
@@ -349,6 +350,7 @@ export class Session extends Entity<schema.XEntity> implements ISession {
       (data: model.MsgChatData) => {
         if (data && data.fullId === this.chatdata.fullId) {
           this.chatdata = data;
+          this.target.user.cacheObj.setValue(this.cachePath, data);
           msgChatNotify.changCallback();
         }
       },
@@ -356,13 +358,7 @@ export class Session extends Entity<schema.XEntity> implements ISession {
   }
 
   async cacheChatData(notify: boolean = false): Promise<boolean> {
-    const success = await this.target.user.cacheObj.set(
-      `session.${this.chatdata.fullId}`,
-      {
-        operation: 'replaceAll',
-        data: this.chatdata,
-      },
-    );
+    const success = await this.target.user.cacheObj.set(this.cachePath, this.chatdata);
     if (success && notify) {
       await this.target.user.cacheObj.notity(
         this.chatdata.fullId,

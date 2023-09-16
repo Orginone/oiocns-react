@@ -53,7 +53,6 @@ export class DataResource {
   /** 资源预加载 */
   async preLoad(reload: boolean = false): Promise<void> {
     if (this._proLoaded === false || reload) {
-      console.log(this.target);
       await Promise.all([
         this.formColl.all(reload),
         this.speciesColl.all(reload),
