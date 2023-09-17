@@ -134,7 +134,7 @@ export class DirectoryOperate implements IDirectoryOperate {
           break;
         case 'refresh':
           this.directory.structCallback();
-          break;
+          return true;
       }
       this.directory.changCallback();
       return true;
