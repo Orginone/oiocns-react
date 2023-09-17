@@ -32,6 +32,8 @@ export interface ISession extends IEntity<schema.XEntity> {
   members: schema.XTarget[];
   /** 会话动态 */
   activity: IActivity;
+  /** 是否可以删除消息 */
+  canDeleteMessage: boolean;
   /** 加载更多历史消息 */
   moreMessage(): Promise<number>;
   /** 禁用通知 */
@@ -143,6 +145,9 @@ export class Session extends Entity<schema.XEntity> implements ISession {
   get cachePath(): string {
     return `session.${this.chatdata.fullId}`;
   }
+  get canDeleteMessage(): boolean {
+    return this.target.id === this.userId || this.target.hasRelationAuth();
+  }
   async moreMessage(): Promise<number> {
     const data = await this.coll.loadSpace({
       take: 30,
@@ -246,7 +251,7 @@ export class Session extends Entity<schema.XEntity> implements ISession {
     }
   }
   async deleteMessage(id: string): Promise<boolean> {
-    if (this.target.id === this.userId) {
+    if (this.canDeleteMessage) {
       for (const item of this.messages) {
         if (item.id === id) {
           if (await this.coll.delete(item.metadata)) {

@@ -159,7 +159,7 @@ const GroupContent = (props: Iprops) => {
         trigger="hover"
         open={selectId == item.id}
         key={item.id}
-        placement="rightTop"
+        placement="bottom"
         onOpenChange={() => {
           setSelectId('');
         }}
@@ -181,25 +181,30 @@ const GroupContent = (props: Iprops) => {
   };
 
   const msgAction = (item: IMessage) => {
-    const onClose = () => {
-      setSelectId('');
-      message.success('复制成功');
-    };
     return (
       <div className={css.msgAction}>
         <CopyToClipboard text={item.msgBody}>
           <Tooltip title="复制">
-            <AiOutlineCopy className={css.actionIconStyl} onClick={onClose} />
+            <AiOutlineCopy
+              size={22}
+              className={css.actionIconStyl}
+              onClick={() => {
+                setSelectId('');
+                message.success('复制成功');
+              }}
+            />
           </Tooltip>
         </CopyToClipboard>
         <Tooltip title="引用">
           <AiOutlineMessage
+            size={22}
             className={css.actionIconStyl}
             onClick={() => props.citeText(item)}
           />
         </Tooltip>
         <Tooltip title="转发">
           <RiShareForwardFill
+            size={22}
             className={css.actionIconStyl}
             onClick={() => forward(item)}
           />
@@ -207,30 +212,36 @@ const GroupContent = (props: Iprops) => {
         {item.isMySend && item.allowRecall && (
           <Tooltip title="撤回">
             <AiOutlineRollback
+              size={22}
               className={css.actionIconStyl}
               onClick={async () => {
                 await props.chat.recallMessage(item.id);
-                onClose();
+                setSelectId('');
               }}
             />
           </Tooltip>
         )}
-        <Tooltip title="删除">
-          <AiOutlineDelete
-            className={css.actionIconStyl}
-            onClick={async () => {
-              await props.chat.deleteMessage(item.id);
-              onClose();
-            }}
-          />
-        </Tooltip>
+        {props.chat.canDeleteMessage && (
+          <Tooltip title="删除">
+            <AiOutlineDelete
+              size={22}
+              className={css.actionIconStyl}
+              onClick={async () => {
+                if (await props.chat.deleteMessage(item.id)) {
+                  message.success('删除成功');
+                }
+                setSelectId('');
+              }}
+            />
+          </Tooltip>
+        )}
         {['文件', '视频', '图片'].includes(item.msgType) && (
           <Tooltip title="下载">
             <AiOutlineDownload
               className={css.actionIconStyl}
               onClick={() => {
                 const url = parseAvatar(item.msgBody).shareLink;
-                downloadByUrl(url);
+                downloadByUrl(`/orginone/kernel/load/${url}?download=1`);
               }}
             />
           </Tooltip>
