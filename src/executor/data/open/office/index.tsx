@@ -2,6 +2,7 @@ import React from 'react';
 import FullScreenModal from '@/executor/tools/fullScreen';
 import { SheetViewer, DocxViewer } from 'react-office-viewer';
 import { FileItemShare } from '@/ts/base/model';
+import Markdown from './markdown';
 
 interface IProps {
   share: FileItemShare;
@@ -28,9 +29,13 @@ const OfficeView: React.FC<IProps> = ({ share, finished }) => {
             <iframe
               width={'100%'}
               height={'100%'}
+              loading="eager"
+              name={share.name}
               src={`/orginone/kernel/load/${share.shareLink}`}
             />
           );
+        case '.md':
+          return <Markdown share={share} />;
       }
       return <></>;
     };
