@@ -181,6 +181,16 @@ export default class KernelApi {
     }
     return res;
   }
+  /** 激活存储 */
+  public async activateStorage(
+    params: model.GainModel,
+  ): Promise<model.ResultType<schema.XEntity>> {
+    return await this.request({
+      module: 'target',
+      action: 'ActivateStorage',
+      params: params,
+    });
+  }
   /**
    * 根据ID查询实体信息
    * @param {model.IdModel} params 请求参数

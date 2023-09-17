@@ -324,6 +324,8 @@ export type XTarget = {
   public: boolean;
   // 元数据
   thingId: string;
+  // 存储
+  storeId: string;
   // 身份证明
   idProofs: XIdProof[] | undefined;
   // 组织的身份

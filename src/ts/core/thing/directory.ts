@@ -160,7 +160,7 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
         cnt.push(...this.specieses);
         if (!this.parent) {
           cnt.unshift(this.target.memberDirectory);
-          cnt.push(...this.target.targets.filter((i) => i.id != this.target.id));
+          cnt.push(...this.target.content(mode));
         }
       }
     }

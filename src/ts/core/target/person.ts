@@ -292,6 +292,9 @@ export class Person extends Belong implements IPerson {
     operates.unshift(personJoins, targetOperates.NewCompany, targetOperates.NewStorage);
     return operates;
   }
+  content(_mode?: number | undefined): ITarget[] {
+    return [...this.cohorts, ...this.storages];
+  }
   async findEntityAsync(id: string): Promise<schema.XEntity | undefined> {
     const metadata = this.findMetadata<schema.XEntity>(id);
     if (metadata) {
