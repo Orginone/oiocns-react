@@ -208,9 +208,7 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
           'replaceMany',
           true,
         );
-        await this.notify('refresh', [
-          { ...this.parent.metadata, directoryId: this.parent.id },
-        ]);
+        await this.notify('refresh', [this._metadata]);
         await destination.notify('refresh', [data]);
       }
     }
