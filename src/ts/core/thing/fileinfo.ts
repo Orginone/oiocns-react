@@ -287,7 +287,7 @@ export abstract class StandardFileInfo<T extends schema.XStandard>
     }
     return false;
   }
-  async notify(operate: string, data: schema.XEntity[]): Promise<boolean> {
+  async notify(operate: string, data: schema.XStandard[]): Promise<boolean> {
     return await this.coll.notity({ data, operate });
   }
 }
