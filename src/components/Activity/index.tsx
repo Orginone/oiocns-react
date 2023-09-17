@@ -44,7 +44,11 @@ const Activity: React.FC<{ activity: IActivity }> = ({ activity }) => {
           {item.resource.map((item, index) => {
             return (
               <Col span={8} key={index}>
-                <Image src={item.thumbnail} preview={false}></Image>
+                <Image
+                  src={item.thumbnail}
+                  preview={{
+                    src: `/orginone/kernel/load/${item.shareLink}`,
+                  }}></Image>
               </Col>
             );
           })}

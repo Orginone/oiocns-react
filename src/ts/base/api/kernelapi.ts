@@ -41,7 +41,7 @@ export default class KernelApi {
   private constructor(url: string) {
     this._methods = {};
     this._subscribeCallbacks = {};
-    this._storeHub = new StoreHub(url, 'json');
+    this._storeHub = new StoreHub(url, 'txt');
     this._storeHub.on('Receive', (res) => this._receive(res));
     this._storeHub.on('Updated', (belongId, key, data) => {
       this._updated(belongId, key, data);

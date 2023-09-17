@@ -38,7 +38,6 @@ const GroupContent = (props: Iprops) => {
   const [infoMsg, setInfoMsg] = useState<IMessage>();
   const [messages, setMessages] = useState(props.chat.messages);
   const { handleReWrites } = props;
-  const [selectId, setSelectId] = useState<string>('');
   const body = useRef<HTMLDivElement>(null);
   const [beforescrollHeight, setBeforescrollHeight] = useState(0);
   const [forwardOpen, setForwardOpen] = useState(false); // 设置转发打开窗口
@@ -157,12 +156,8 @@ const GroupContent = (props: Iprops) => {
     return (
       <Popover
         trigger="hover"
-        open={selectId == item.id}
         key={item.id}
         placement="bottom"
-        onOpenChange={() => {
-          setSelectId('');
-        }}
         getPopupContainer={(triggerNode: HTMLElement) => {
           return triggerNode.parentElement || document.body;
         }}
@@ -172,7 +167,6 @@ const GroupContent = (props: Iprops) => {
           onContextMenu={(e) => {
             e.preventDefault();
             e.stopPropagation();
-            setSelectId(item.id);
           }}>
           {viewMsg(item)}
         </div>
@@ -189,7 +183,6 @@ const GroupContent = (props: Iprops) => {
               size={22}
               className={css.actionIconStyl}
               onClick={() => {
-                setSelectId('');
                 message.success('复制成功');
               }}
             />
@@ -216,7 +209,6 @@ const GroupContent = (props: Iprops) => {
               className={css.actionIconStyl}
               onClick={async () => {
                 await props.chat.recallMessage(item.id);
-                setSelectId('');
               }}
             />
           </Tooltip>
@@ -230,7 +222,6 @@ const GroupContent = (props: Iprops) => {
                 if (await props.chat.deleteMessage(item.id)) {
                   message.success('删除成功');
                 }
-                setSelectId('');
               }}
             />
           </Tooltip>
@@ -238,6 +229,7 @@ const GroupContent = (props: Iprops) => {
         {['文件', '视频', '图片'].includes(item.msgType) && (
           <Tooltip title="下载">
             <AiOutlineDownload
+              size={22}
               className={css.actionIconStyl}
               onClick={() => {
                 const url = parseAvatar(item.msgBody).shareLink;
