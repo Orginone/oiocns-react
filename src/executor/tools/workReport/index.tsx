@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Tabs } from 'antd';
 import { HotTable } from '@handsontable/react';
-import { HyperFormula } from 'hyperformula';
 import { textRenderer, registerRenderer } from 'handsontable/renderers';
 import { registerLanguageDictionary, zhCN } from 'handsontable/i18n';
 import Handsontable from 'handsontable';
@@ -72,6 +71,7 @@ const ReportForms: React.FC<IProps> = (props) => {
           formId: reportData.id,
           callback: (data: any) => {
             if (data) {
+              console.log(data, '规则返回参数');
               setServiceData(data);
             }
           },
@@ -318,10 +318,6 @@ const ReportForms: React.FC<IProps> = (props) => {
     setSheetIndex(key);
   };
 
-  const hyperformulaInstance = HyperFormula.buildEmpty({
-    licenseKey: 'internal-use-in-handsontable',
-  });
-
   const afterChange = (change: any, source: any) => {
     // 修改后
     if (source === 'edit') {
@@ -351,9 +347,6 @@ const ReportForms: React.FC<IProps> = (props) => {
     <div>
       <HotTable
         ref={hotRef}
-        formulas={{
-          engine: hyperformulaInstance,
-        }}
         minCols={8}
         minRows={60}
         rowHeaders={true}

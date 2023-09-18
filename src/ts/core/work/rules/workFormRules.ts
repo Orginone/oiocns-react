@@ -87,6 +87,7 @@ class WorkFormRules extends Emitter implements WorkFormRulesType {
     type: 'formsType' | 'hotData' | 'formCallBack',
     data: T,
   ) => {
+    console.log(type, 'type');
     switch (type) {
       /* 收集主子表信息 */
       case 'formsType':
