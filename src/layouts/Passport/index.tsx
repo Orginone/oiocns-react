@@ -21,7 +21,7 @@ const PassportLayout: React.FC<{ route: IRouteConfig }> = ({ route }) => {
       </div>
       <img className={cls.wave} src="/img/passport_bg.png" alt="" />
       <div className={cls.img}>
-        <img src="/img/passport_img.png" alt="" />
+        <img src="/img/passport_img1.png" alt="" />
         {text}
       </div>
       <div className={cls.box}>
