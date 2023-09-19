@@ -98,6 +98,9 @@ export class Group extends Target implements IGroup {
     }
     return targets;
   }
+  content(_mode?: number | undefined): ITarget[] {
+    return [...this.children];
+  }
   async deepLoad(reload: boolean = false): Promise<void> {
     await Promise.all([
       await this.loadMembers(reload),

@@ -129,9 +129,6 @@ export abstract class Target extends Team implements ITarget {
     await this.loadIdentitys(reload);
     return true;
   }
-  content(_mode?: number | undefined): IFileInfo<schema.XEntity>[] {
-    return [];
-  }
   async rename(name: string): Promise<boolean> {
     return this.update({
       ...this.metadata,
@@ -150,6 +147,7 @@ export abstract class Target extends Team implements ITarget {
   abstract get chats(): ISession[];
   abstract get targets(): ITarget[];
   abstract get subTarget(): ITarget[];
+  abstract content(_mode?: number | undefined): IFileInfo<schema.XEntity>[];
   createTarget(_data: model.TargetModel): Promise<ITeam | undefined> {
     return new Promise((resolve) => {
       resolve(undefined);

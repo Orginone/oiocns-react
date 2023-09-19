@@ -11,6 +11,7 @@ import { ellipsisText } from '@/utils';
 import GroupMember from '@/pages/Chats/content/chat/GroupMember';
 
 import Activity from '@/components/Activity';
+import { command } from '@/ts/base';
 const GroupDetail: React.FC<any> = ({ chat }: { chat: ISession }) => {
   const [historyOpen, setHistoryOpen] = useState<boolean>(false); // 历史消息搜索
   const history = useHistory();
@@ -73,6 +74,9 @@ const GroupDetail: React.FC<any> = ({ chat }: { chat: ISession }) => {
             preview={false}
             height={18}
             width={18}
+            onClick={() => {
+              command.emitter('data', 'qrcode', chat);
+            }}
             src={`/svg/qrcode.svg`}
           />
         </div>
@@ -127,7 +131,7 @@ const GroupDetail: React.FC<any> = ({ chat }: { chat: ISession }) => {
     <>
       <div className={detailStyle.groupDetail}>
         {header}
-        <GroupMember members={chat.members}></GroupMember>
+        {chat.members.length ? <GroupMember members={chat.members}></GroupMember> : <></>}
         <div className={detailStyle.groupDetailContent}>
           <Activity activity={chat.activity}></Activity>
           <div className={detailStyle.user_list}>

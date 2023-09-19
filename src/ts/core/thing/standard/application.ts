@@ -1,4 +1,4 @@
-import { kernel, model, schema } from '../../../base';
+import { command, kernel, model, schema } from '../../../base';
 import { PageAll, directoryOperates, fileOperates } from '../../public';
 import { IDirectory } from '../directory';
 import { IFileInfo, IStandardFileInfo, StandardFileInfo } from '../fileinfo';
@@ -18,6 +18,8 @@ export interface IApplication extends IStandardFileInfo<schema.XApplication> {
   createWork(data: model.WorkDefineModel): Promise<IWork | undefined>;
   /** 新建模块 */
   createModule(data: schema.XApplication): Promise<schema.XApplication | undefined>;
+  /** 接收模块变更消息 */
+  receiveMessage(operate: string, data: schema.XApplication): Promise<boolean>;
 }
 
 /** 应用实现类 */
@@ -46,6 +48,10 @@ export class Application
     return [...this.children, ...this.works].sort((a, b) =>
       a.metadata.updateTime < b.metadata.updateTime ? 1 : -1,
     );
+  }
+  structCallback(): void {
+    console.log(this.metadata);
+    command.emitter('-', 'refresh', this);
   }
   async copy(_: IDirectory): Promise<boolean> {
     return false;
@@ -143,5 +149,35 @@ export class Application
       applications.push(...this.getChildren(child));
     }
     return applications;
+  }
+
+  async receiveMessage(operate: string, data: schema.XApplication): Promise<boolean> {
+    if (data.parentId == this.id) {
+      switch (operate) {
+        case 'insert':
+          this.coll.cache.push(data);
+          this.children.push(new Application(data, this.directory, this));
+          break;
+        case 'replace':
+          {
+            const index = this.coll.cache.findIndex((a) => a.id == data.id);
+            this.coll.cache[index] = data;
+            const childIndex = this.children.findIndex((a) => a.id == data.id);
+            (this.children[childIndex] as Application).setMetadata(data);
+          }
+          break;
+        case 'delete':
+          await this.coll.removeCache(data.id);
+          this.children = this.children.filter((a) => a.id != data.id);
+          break;
+      }
+      this.structCallback();
+      return true;
+    } else {
+      for (const child of this.children) {
+        await child.receiveMessage(operate, data);
+      }
+    }
+    return false;
   }
 }

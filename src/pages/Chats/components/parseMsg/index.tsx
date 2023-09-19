@@ -29,7 +29,11 @@ export const parseMsg = (item: IMessage): any => {
               onClick={() => {
                 command.emitter('data', 'open', img);
               }}>
-              <Image width={300} src={img.shareLink} preview={false} />
+              <Image
+                width={300}
+                src={`/orginone/kernel/load/${img.shareLink}`}
+                preview={false}
+              />
             </div>
           </>
         );
@@ -123,7 +127,10 @@ export const parseCiteMsg = (item: IMessage): any => {
           <>
             <div className={`${css.con_content_cite_txt}`}>
               <span>{item.from.name}:</span>
-              <Image src={img.thumbnail} preview={{ src: img.shareLink }} />
+              <Image
+                src={img.thumbnail}
+                preview={{ src: `/orginone/kernel/load/${img.shareLink}` }}
+              />
             </div>
           </>
         );
@@ -135,7 +142,7 @@ export const parseCiteMsg = (item: IMessage): any => {
       return (
         <div className={`${css.con_content_cite_txt}`}>
           <span>{item.from.name}:</span>
-          <a href={file.shareLink} title="点击下载">
+          <a href={`/orginone/kernel/load/${file.shareLink}?download=1`} title="点击下载">
             <div>
               <b>{file.name}</b>
             </div>

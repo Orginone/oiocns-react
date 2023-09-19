@@ -41,6 +41,8 @@ export type DataNotityType = {
   targetId: string;
   // 是否忽略自己
   ignoreSelf: boolean;
+  // 忽略的连接ID
+  ignoreConnectionId?: string;
   // 标签
   flag: string;
   // 关系举证(用户鉴权[user=>relations=>target],最大支持2级关系)
@@ -383,6 +385,9 @@ export type CommentType = {
   userId: string;
   // 时间
   time: string;
+
+  // 回复某个人
+  replyTo?: string;
 };
 
 export type PropertyModel = {

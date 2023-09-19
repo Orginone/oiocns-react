@@ -70,7 +70,7 @@ const PropertyConfig = (props: IProps) => {
                   sourceId: props.attr.belongId,
                 });
                 if (property) {
-                  await props.form.updateAttribute(props.attr, property.metadata);
+                  await props.form.updateAttribute(props.attr, property);
                 }
               }
             } else {

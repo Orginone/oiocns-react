@@ -3,7 +3,7 @@ import { XCollection } from '../public/collection';
 import { Directory, IDirectory } from './directory';
 import { StandardFileInfo } from './fileinfo';
 import { DataResource } from './resource';
-import { Application } from './standard/application';
+import { Application, IApplication } from './standard/application';
 import { Form } from './standard/form';
 import { Property } from './standard/property';
 import { Species } from './standard/species';
@@ -104,6 +104,13 @@ export class DirectoryOperate implements IDirectoryOperate {
     create: (mData: T, dir: IDirectory) => StandardFileInfo<T> | undefined,
   ): Promise<boolean> {
     if (data.directoryId == this.directory.id) {
+      if (data.typeName == '模块') {
+        for (const app of this.getContent<IApplication>(['应用'])) {
+          if (await app.receiveMessage(operate, data as unknown as schema.XApplication)) {
+            return true;
+          }
+        }
+      }
       switch (operate) {
         case 'insert':
           coll.cache.push(data);
@@ -127,19 +134,22 @@ export class DirectoryOperate implements IDirectoryOperate {
           break;
         case 'refresh':
           this.directory.structCallback();
-          break;
+          return true;
       }
       this.directory.changCallback();
       return true;
     } else {
       for (const child of this.standardFiles) {
-        if (child.typeName == '目录') {
-          await (child as unknown as IDirectory).operater.receiveMessage(
+        if (
+          child.typeName == '目录' &&
+          (await (child as unknown as IDirectory).operater.receiveMessage(
             operate,
             data,
             coll,
             create,
-          );
+          ))
+        ) {
+          return true;
         }
       }
     }

@@ -140,6 +140,7 @@ const ApplicationForm = (props: Iprops) => {
       onFinish={async (values) => {
         switch (props.formType) {
           case 'updateApp':
+          case 'updateModule':
             await (props.current as IApplication).update(values);
             break;
           case 'newApp':
