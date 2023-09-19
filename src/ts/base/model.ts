@@ -385,7 +385,9 @@ export type CommentType = {
   userId: string;
   // 时间
   time: string;
-  comments: CommentType []
+
+  // 回复某个人
+  replyTo?: string;
 };
 
 export type PropertyModel = {
