@@ -14,9 +14,9 @@ const PassportLayout: React.FC<{ route: IRouteConfig }> = ({ route }) => {
     <div className={cls.contaner}>
       <div className={cls.logo}>
         <img src="/img/logo/logo3.jpg" alt="" />
-        <div className={cls.text}>
-          <div className={cls.title_zh}>奥集能</div>
-          <div className={cls.title_en}>Orginone </div>
+        <div className={cls.logoTitle}>
+          <div className={cls.logoTitleZh}>奥集能</div>
+          <div className={cls.logoTitleEn}>Orginone </div>
         </div>
       </div>
       <img className={cls.wave} src="/img/passport_bg.png" alt="" />
