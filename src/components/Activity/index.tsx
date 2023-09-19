@@ -27,6 +27,7 @@ import ActivityPublisher from '@/components/Activity/ActivityPublisher';
 import orgCtrl from '@/ts/controller';
 import { ActivityType } from '@/ts/base/model';
 import ActivityComment from '@/components/Activity/ActivityComment';
+import { XEntity } from '@/ts/base/schema';
 
 const Activity: React.FC<{ activity: IActivity }> = ({ activity }) => {
   const [actionList, setActivityList] = useState(activity.activityList);
@@ -34,9 +35,23 @@ const Activity: React.FC<{ activity: IActivity }> = ({ activity }) => {
   const ActivityItem: React.FC<{ item: model.ActivityType }> = ({ item }) => {
     const [commenting, setCommenting] = useState(false);
     const [comment, setComment] = useState('');
-    const handleComment = async (currentActivity: ActivityType, data: string) => {
-      if (!data) return;
-      await activity.comment(currentActivity, data);
+    const [replyTo, setReplyTo] = useState<XEntity | null>(null);
+    const handleComment = async (currentActivity: ActivityType, content: string) => {
+      if (!content) return;
+      let reply;
+      if (replyTo) {
+        reply = replyTo.id;
+      }
+      await activity.comment(currentActivity, content, reply);
+    };
+
+    const handleReply = async (userId: string = '') => {
+      setReplyTo(null);
+      if (userId) {
+        const user = await orgCtrl.user.findEntityAsync(userId);
+        user && setReplyTo(user);
+      }
+      setCommenting(true);
     };
     return (
       <div className={cls.activityItem}>
@@ -93,10 +108,7 @@ const Activity: React.FC<{ activity: IActivity }> = ({ activity }) => {
                     </>
                   )}
                 </Button>
-                <Button
-                  type="text"
-                  size="small"
-                  onClick={() => setCommenting(!commenting)}>
+                <Button type="text" size="small" onClick={() => handleReply()}>
                   <MessageOutlined /> 评论
                 </Button>
               </Space>
@@ -112,7 +124,12 @@ const Activity: React.FC<{ activity: IActivity }> = ({ activity }) => {
           <>
             <div className={cls.activityItemCommentList}>
               {item.comments.map((item, index) => {
-                return <ActivityComment comment={item} key={index}></ActivityComment>;
+                return (
+                  <ActivityComment
+                    comment={item}
+                    key={index}
+                    onClick={(comment) => handleReply(comment.userId)}></ActivityComment>
+                );
               })}
             </div>
           </>
@@ -124,6 +141,7 @@ const Activity: React.FC<{ activity: IActivity }> = ({ activity }) => {
           style={{ display: commenting ? 'flex' : 'none' }}
           className={cls.activityItemCommentInputBox}>
           <Input.TextArea
+            placeholder={replyTo ? `回复${replyTo.name} :` : ''}
             style={{ height: 12 }}
             onChange={(e) => setComment(e.currentTarget.value)}></Input.TextArea>
           <Button
