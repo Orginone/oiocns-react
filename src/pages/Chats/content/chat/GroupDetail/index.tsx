@@ -131,7 +131,7 @@ const GroupDetail: React.FC<any> = ({ chat }: { chat: ISession }) => {
     <>
       <div className={detailStyle.groupDetail}>
         {header}
-        <GroupMember members={chat.members}></GroupMember>
+        {chat.members.length ? <GroupMember members={chat.members}></GroupMember> : <></>}
         <div className={detailStyle.groupDetailContent}>
           <Activity activity={chat.activity}></Activity>
           <div className={detailStyle.user_list}>
