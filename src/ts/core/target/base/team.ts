@@ -4,10 +4,11 @@ import { PageAll, orgAuth } from '../../public/consts';
 import { IBelong } from './belong';
 import { Entity, IEntity, entityOperates } from '../../public';
 import { IDirectory } from '../../thing/directory';
-import { ISession } from '../../chat/session';
+import { ISession, msgChatNotify } from '../../chat/session';
 import { IPerson } from '../person';
 import { ChangeNotity, IChangeNotity } from '../change';
 import { ITarget } from './target';
+import { logger } from '@/ts/base/common';
 
 /** 团队抽象接口类 */
 export interface ITeam extends IEntity<schema.XTarget> {
@@ -45,7 +46,7 @@ export interface ITeam extends IEntity<schema.XTarget> {
   hasAuthoritys(authIds: string[]): boolean;
   /** 接收相关用户增加变更 */
   teamChangedNotity(target: schema.XTarget): Promise<boolean>;
-  createTargetMsg(operate: OperateType, sub?: schema.XTarget): Promise<void>;
+  createTargetMsg(operate: OperateType, subs?: schema.XTarget[]): Promise<void>;
 }
 
 /** 团队基类实现 */
@@ -103,9 +104,7 @@ export abstract class Team extends Entity<schema.XTarget> implements ITeam {
           subIds: members.map((i) => i.id),
         });
         if (res.success) {
-          members.forEach((a) => {
-            this.createTargetMsg(OperateType.Add, a);
-          });
+          this.createTargetMsg(OperateType.Add, members);
         }
         notity = res.success;
       }
@@ -212,17 +211,12 @@ export abstract class Team extends Entity<schema.XTarget> implements ITeam {
     const orgIds = [this.metadata.belongId, this.id];
     return this.user.authenticate(orgIds, authIds);
   }
-  async createTargetMsg(operate: OperateType, sub?: schema.XTarget): Promise<void> {
-    await kernel.createTargetMsg({
-      targetId: sub && this.userId === this.id ? sub.id : this.id,
-      excludeOperater: false,
-      group: this.typeName === TargetType.Group,
-      data: JSON.stringify({
-        operate,
-        target: this.metadata,
-        subTarget: sub,
-        operater: this.user.metadata,
-      }),
+  async createTargetMsg(operate: OperateType, subs?: schema.XTarget[]): Promise<void> {
+    await this.targetChange.notity({
+      operate,
+      target: this.metadata,
+      subTarget: sub,
+      operater: this.user.metadata,
     });
   }
 
