@@ -22,7 +22,7 @@ export interface IStation extends ITeam {
 
 export class Station extends Team implements IStation {
   constructor(_metadata: schema.XTarget, _space: ICompany) {
-    super(_metadata);
+    super(_metadata, [_space.id]);
     this.space = _space;
     this.user = _space.user;
     this.directory = _space.directory;

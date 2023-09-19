@@ -6,6 +6,8 @@ import { Entity, IEntity, entityOperates } from '../../public';
 import { IDirectory } from '../../thing/directory';
 import { ISession } from '../../chat/session';
 import { IPerson } from '../person';
+import { ChangeNotity, IChangeNotity } from '../change';
+import { ITarget } from './target';
 
 /** 团队抽象接口类 */
 export interface ITeam extends IEntity<schema.XTarget> {
@@ -21,6 +23,8 @@ export interface ITeam extends IEntity<schema.XTarget> {
   memberTypes: TargetType[];
   /** 成员会话 */
   memberChats: ISession[];
+  /** 组织变更 */
+  targetChange: IChangeNotity;
   /** 深加载 */
   deepLoad(reload?: boolean): Promise<void>;
   /** 加载成员 */
@@ -48,14 +52,22 @@ export interface ITeam extends IEntity<schema.XTarget> {
 export abstract class Team extends Entity<schema.XTarget> implements ITeam {
   constructor(
     _metadata: schema.XTarget,
+    _relations: string[],
     _memberTypes: TargetType[] = [TargetType.Person],
   ) {
     super(_metadata);
     this.memberTypes = _memberTypes;
+    this.targetChange = new ChangeNotity(
+      _metadata,
+      _relations,
+      'target',
+      this._receiveTarget,
+    );
   }
   memberTypes: TargetType[];
   members: schema.XTarget[] = [];
   memberChats: ISession[] = [];
+  targetChange: IChangeNotity;
   abstract directory: IDirectory;
   private _memberLoaded: boolean = false;
   get isInherited(): boolean {
@@ -212,5 +224,51 @@ export abstract class Team extends Entity<schema.XTarget> implements ITeam {
         operater: this.user.metadata,
       }),
     });
+  }
+
+  async _receiveTarget(data: model.TargetOperateModel) {
+    let message = '';
+    switch (data.operate) {
+      case OperateType.Delete:
+        this.delete(true);
+        break;
+      case OperateType.Update:
+        message = `${data.operater?.name}将${data.target.name}信息更新.`;
+        this.setMetadata(data.target);
+        break;
+      case OperateType.Remove:
+        if (data.subTarget) {
+          if (this.id == data.subTarget.id && 'parentTarget' in this) {
+            message = `${this.id === this.user.id ? '您' : this.name}已被${
+              data.operater?.name
+            }从${data.target.name}移除.`;
+            (this.parentTarget as ITarget[])
+              .filter((i) => i.id === data.target.id)
+              .forEach((i) => {
+                i.delete(true);
+              });
+          } else if (this.id == data.target.id) {
+            message = `${data.operater?.name}把${data.subTarget.name}从${data.target.name}移除.`;
+            this.removeMembers([data.subTarget!], true);
+          }
+        }
+        break;
+      case OperateType.Add:
+        if (data.subTarget) {
+          message = `${data.operater?.name}把${data.subTarget.name}与${data.target.name}建立关系.`;
+          if (this.id === data.subTarget.id) {
+            await this.teamChangedNotity(data.target);
+          } else if (this.id === data.target.id) {
+            await this.teamChangedNotity(data.subTarget);
+          }
+        }
+    }
+    if (message.length > 0) {
+      if (data.operater?.id != this.user.id) {
+        logger.info(message);
+      }
+      msgChatNotify.changCallback();
+      this.changCallback();
+    }
   }
 }

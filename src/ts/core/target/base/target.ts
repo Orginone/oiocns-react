@@ -42,7 +42,7 @@ export abstract class Target extends Team implements ITarget {
     _user?: IPerson,
     _memberTypes: TargetType[] = [TargetType.Person],
   ) {
-    super(_metadata, _memberTypes);
+    super(_metadata, _relations, _memberTypes);
     this.user = _user || (this as unknown as IPerson);
     this.resource = new DataResource(_metadata, _relations);
     this.directory = new Directory(
@@ -120,7 +120,15 @@ export abstract class Target extends Team implements ITarget {
       subIds: [team.id],
     });
     if (res.success) {
-      this.createTargetMsg(OperateType.Add, team.metadata);
+      this.targetChange.notity(
+        {
+          operate: OperateType.Add,
+          target: this.metadata,
+          subTarget: team.metadata,
+          operater: this.user.metadata,
+        },
+        true,
+      );
     }
     return res.success;
   }
