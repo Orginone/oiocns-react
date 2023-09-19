@@ -184,12 +184,17 @@ export class Person extends Belong implements IPerson {
   async exit(): Promise<boolean> {
     return false;
   }
-  override async delete(): Promise<boolean> {
-    await this.createTargetMsg(OperateType.Remove, this.metadata);
-    const res = await kernel.deleteTarget({
-      id: this.id,
-    });
-    return res.success;
+  override async delete(notity: boolean = false): Promise<boolean> {
+    if (notity) {
+      // TODO 退出
+    } else {
+      await this.sendTargetNotity(OperateType.Remove, this.metadata, true, this.id, true);
+      const res = await kernel.deleteTarget({
+        id: this.id,
+      });
+      return res.success;
+    }
+    return true;
   }
   get subTarget(): ITarget[] {
     return [];

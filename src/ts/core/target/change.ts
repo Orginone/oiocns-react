@@ -10,7 +10,7 @@ export interface IChangeNotity {
   ): Promise<boolean>;
 }
 
-export class ChangeNotity {
+export class ChangeNotity implements IChangeNotity {
   flag: string;
   target: schema.XTarget;
   relations: string[];
@@ -23,7 +23,7 @@ export class ChangeNotity {
     this.flag = _flag;
     this.target = _target;
     this.relations = _relations;
-    kernel.on(`${this.target.belongId}-${this.target.id}`, _callBack);
+    kernel.on(`${_target.belongId}-${_target.id}-${_flag}`, _callBack);
   }
   async notity(
     data: any,

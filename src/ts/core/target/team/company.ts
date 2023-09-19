@@ -180,11 +180,11 @@ export class Company extends Belong implements ICompany {
     return false;
   }
   override async delete(notity: boolean = false): Promise<boolean> {
-    notity = await super.delete(notity);
+    const success = await super.delete(notity);
     if (notity) {
       this.user.companys = this.user.companys.filter((i) => i.key != this.key);
     }
-    return notity;
+    return success;
   }
   get subTarget(): ITarget[] {
     return [...this.departments, ...this.cohorts];

@@ -46,7 +46,15 @@ export interface ITeam extends IEntity<schema.XTarget> {
   hasAuthoritys(authIds: string[]): boolean;
   /** 接收相关用户增加变更 */
   teamChangedNotity(target: schema.XTarget): Promise<boolean>;
-  createTargetMsg(operate: OperateType, subs?: schema.XTarget[]): Promise<void>;
+  /** 发送组织变更消息 */
+  sendTargetNotity(
+    operate: OperateType,
+    sub?: schema.XTarget,
+    ignoreSelf?: boolean,
+    targetId?: string,
+    onlyTarget?: boolean,
+    onlineOnly?: boolean,
+  ): Promise<void>;
 }
 
 /** 团队基类实现 */
@@ -62,7 +70,7 @@ export abstract class Team extends Entity<schema.XTarget> implements ITeam {
       _metadata,
       _relations,
       'target',
-      this._receiveTarget,
+      (data: model.TargetOperateModel) => this._receiveTarget(data),
     );
   }
   memberTypes: TargetType[];
@@ -104,15 +112,16 @@ export abstract class Team extends Entity<schema.XTarget> implements ITeam {
           subIds: members.map((i) => i.id),
         });
         if (res.success) {
-          this.createTargetMsg(OperateType.Add, members);
+          members.forEach((a) => {
+            this.sendTargetNotity(OperateType.Add, a);
+            this.sendTargetNotity(OperateType.Add, a, false, a.id, true);
+          });
         }
-        notity = res.success;
-      }
-      if (notity) {
+        return res.success;
+      } else {
         this.members.push(...members);
         this.loadMemberChats(members, true);
       }
-      return notity;
     }
     return true;
   }
@@ -127,16 +136,21 @@ export abstract class Team extends Entity<schema.XTarget> implements ITeam {
       if (this.memberTypes.includes(member.typeName as TargetType)) {
         if (!notity) {
           if (member.id === this.userId || this.hasRelationAuth()) {
-            await this.createTargetMsg(OperateType.Remove, member);
+            await this.sendTargetNotity(OperateType.Remove, member);
+            await this.sendTargetNotity(
+              OperateType.Remove,
+              member,
+              false,
+              member.id,
+              true,
+            );
           }
           const res = await kernel.removeOrExitOfTeam({
             id: this.id,
             subId: member.id,
           });
           if (!res.success) return false;
-          notity = res.success;
-        }
-        if (notity) {
+        } else {
           this.members = this.members.filter((i) => i.id != member.id);
           this.loadMemberChats([member], false);
         }
@@ -167,14 +181,14 @@ export abstract class Team extends Entity<schema.XTarget> implements ITeam {
     const res = await kernel.updateTarget(data);
     if (res.success && res.data?.id) {
       this.setMetadata(res.data);
-      this.createTargetMsg(OperateType.Update);
+      this.sendTargetNotity(OperateType.Update);
     }
     return res.success;
   }
   async delete(notity: boolean = false): Promise<boolean> {
     if (!notity) {
       if (this.hasRelationAuth()) {
-        await this.createTargetMsg(OperateType.Delete);
+        await this.sendTargetNotity(OperateType.Delete);
       }
       const res = await kernel.deleteTarget({
         id: this.id,
@@ -211,13 +225,26 @@ export abstract class Team extends Entity<schema.XTarget> implements ITeam {
     const orgIds = [this.metadata.belongId, this.id];
     return this.user.authenticate(orgIds, authIds);
   }
-  async createTargetMsg(operate: OperateType, subs?: schema.XTarget[]): Promise<void> {
-    await this.targetChange.notity({
-      operate,
-      target: this.metadata,
-      subTarget: sub,
-      operater: this.user.metadata,
-    });
+  async sendTargetNotity(
+    operate: OperateType,
+    sub?: schema.XTarget,
+    ignoreSelf?: boolean,
+    targetId?: string,
+    onlyTarget?: boolean,
+    onlineOnly: boolean = true,
+  ): Promise<void> {
+    await this.targetChange.notity(
+      {
+        operate,
+        target: this.metadata,
+        subTarget: sub,
+        operater: this.user.metadata,
+      },
+      ignoreSelf,
+      targetId,
+      onlyTarget,
+      onlineOnly,
+    );
   }
 
   async _receiveTarget(data: model.TargetOperateModel) {
@@ -243,7 +270,7 @@ export abstract class Team extends Entity<schema.XTarget> implements ITeam {
               });
           } else if (this.id == data.target.id) {
             message = `${data.operater?.name}把${data.subTarget.name}从${data.target.name}移除.`;
-            this.removeMembers([data.subTarget!], true);
+            this.removeMembers([data.subTarget], true);
           }
         }
         break;

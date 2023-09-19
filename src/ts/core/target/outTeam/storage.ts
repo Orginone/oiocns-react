@@ -32,11 +32,11 @@ export class Storage extends Target implements IStorage {
     return false;
   }
   override async delete(notity: boolean = false): Promise<boolean> {
-    notity = await super.delete(notity);
+    const success = await super.delete(notity);
     if (notity) {
       this.space.storages = this.space.storages.filter((i) => i.key != this.key);
     }
-    return notity;
+    return success;
   }
   override operates(): OperateModel[] {
     const operates = [...super.operates()];
@@ -65,7 +65,7 @@ export class Storage extends Target implements IStorage {
       });
       if (res.success) {
         this.space.updateMetadata(res.data);
-        this.space.createTargetMsg(OperateType.Update);
+        this.space.sendTargetNotity(OperateType.Update);
       }
       return res.success;
     }

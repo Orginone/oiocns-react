@@ -88,7 +88,7 @@ export class Station extends Team implements IStation {
     return true;
   }
   override async delete(notity: boolean = false): Promise<boolean> {
-    notity = await super.delete(notity);
+    const success = await super.delete(notity);
     if (notity) {
       this.space.stations = this.space.stations.filter((i) => i.key != this.key);
     }
@@ -96,7 +96,7 @@ export class Station extends Team implements IStation {
       this.identitys.map((a) => a.id),
       this.id,
     );
-    return notity;
+    return success;
   }
   async deepLoad(reload: boolean = false): Promise<void> {
     await this.loadIdentitys(reload);

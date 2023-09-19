@@ -20,11 +20,11 @@ export class Cohort extends Target implements ICohort {
     return false;
   }
   override async delete(notity: boolean = false): Promise<boolean> {
-    notity = await super.delete(notity);
+    const success = await super.delete(notity);
     if (notity) {
       this.space.cohorts = this.space.cohorts.filter((i) => i.key != this.key);
     }
-    return notity;
+    return success;
   }
   get subTarget(): ITarget[] {
     return [];

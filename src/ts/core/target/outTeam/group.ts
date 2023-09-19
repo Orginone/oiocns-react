@@ -75,7 +75,7 @@ export class Group extends Target implements IGroup {
     return false;
   }
   override async delete(notity: boolean = false): Promise<boolean> {
-    notity = await super.delete(notity);
+    const success = await super.delete(notity);
     if (notity) {
       if (this.parent) {
         this.parent.children = this.parent.children.filter((i) => i.key != this.key);
@@ -83,7 +83,7 @@ export class Group extends Target implements IGroup {
         this.space.groups = this.space.groups.filter((i) => i.key != this.key);
       }
     }
-    return notity;
+    return success;
   }
   get subTarget(): ITarget[] {
     return this.children;
