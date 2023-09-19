@@ -21,7 +21,7 @@ export interface IActivity extends IEntity<schema.XTarget> {
   like(data: model.ActivityType): Promise<boolean>;
 
   /** 评论 */
-  comment(data: model.ActivityType, txt: string): Promise<boolean>;
+  comment(data: model.ActivityType, txt: string, replyTo?: string): Promise<boolean>;
   /** 加载动态 */
   load(take: number, beforeTime?: string): Promise<model.ActivityType[]>;
 }
@@ -88,14 +88,18 @@ export class Activity extends Entity<schema.XTarget> implements IActivity {
     }
     return false;
   }
-  async comment(data: model.ActivityType, label: string): Promise<boolean> {
+  async comment(
+    data: model.ActivityType,
+    label: string,
+    replyTo?: string,
+  ): Promise<boolean> {
     const newData = await this.coll.update(data.id, {
       _push_: {
         comments: {
           label,
           userId: this.userId,
           time: 'sysdate()',
-          comments: [],
+          replyTo,
         } as CommentType,
       },
     });
