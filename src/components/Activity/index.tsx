@@ -66,20 +66,23 @@ const Activity: React.FC<{ activity: IActivity }> = ({ activity }) => {
             );
           })}
         </div>
-        <Typography.Paragraph>{item.content}</Typography.Paragraph>
-        <Row gutter={[6, 6]} className={cls.activityItemImageList}>
-          {item.resource.map((item, index) => {
-            return (
-              <Col span={8} key={index}>
-                <Image
-                  src={item.thumbnail}
-                  preview={{
-                    src: `/orginone/kernel/load/${item.shareLink}`,
-                  }}></Image>
-              </Col>
-            );
-          })}
-        </Row>
+        <div onClick={() => setCommenting(false)}>
+          <Typography.Paragraph>{item.content}</Typography.Paragraph>
+          <Row gutter={[6, 6]} className={cls.activityItemImageList}>
+            {item.resource.map((item, index) => {
+              return (
+                <Col span={8} key={index}>
+                  <Image
+                    src={item.thumbnail}
+                    preview={{
+                      src: `/orginone/kernel/load/${item.shareLink}`,
+                    }}></Image>
+                </Col>
+              );
+            })}
+          </Row>
+        </div>
+
         <div className={cls.activityItemFooter}>
           <div
             className={cls.activityItemFooterLikes}
