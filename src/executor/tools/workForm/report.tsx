@@ -126,18 +126,19 @@ const ReportForms: React.FC<IProps> = (props) => {
         'customStylesRenderer';
       /** 更新特性rules 但单元格只有只读属性 readOnly */
       let newAttributes: any = [];
-      for (var key in props.data.fields) {
-        newAttributes = props.data.fields[key];
-      }
+      Object.keys(props.data.fields).map((k) => {
+        newAttributes = props.data.fields[k];
+      });
+      /** 解析特性rule */
       newAttributes.forEach((items: any) => {
         if (item.prop.id === items.id) {
           item.prop = items;
-          let newRule = JSON.parse(item.prop.rule);
+          const newRule = JSON.parse(item.prop.rule);
           if (newRule) {
             if (newRule.widget) {
               setEditor(item);
             }
-            for (var key in newRule) {
+            Object.keys(newRule).map((key) => {
               if (key === 'rules' && newRule['rules'].length > 0) {
                 setValidator(item, newRule['rules']);
               } else if (key === 'min' || key === 'max') {
@@ -163,7 +164,7 @@ const ReportForms: React.FC<IProps> = (props) => {
                   newRule[key],
                 );
               }
-            }
+            });
           }
         }
       });
@@ -254,6 +255,7 @@ const ReportForms: React.FC<IProps> = (props) => {
     const data = hotRef.current.hotInstance.getData();
     const belong = props.belong;
     let localData: any = [];
+    /** 获取特性数据集合，坐标，类型，id，数据 */
     cells?.forEach((item: any) => {
       let json = { col: item.col, row: item.row, id: item.prop.id, data: '', type: '' };
       let newData: any = data[item.row][item.col];
@@ -291,6 +293,7 @@ const ReportForms: React.FC<IProps> = (props) => {
       }
       localData.push(json);
     });
+    /** 获取除了特性之外的数据 */
     data?.forEach((it: any, index: number) => {
       it?.forEach((its: any, ids: number) => {
         if (its) {
@@ -314,7 +317,7 @@ const ReportForms: React.FC<IProps> = (props) => {
 
   /** 修改后 */
   const afterChange = (change: any, source: any) => {
-    if (source === 'edit') {
+    if (source === 'edit' && change) {
       saveData();
     }
   };

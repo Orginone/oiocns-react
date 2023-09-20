@@ -291,14 +291,16 @@ const HotTableView: React.FC<IProps> = ({
     });
   };
 
-  const afterOnCellMouseDown = (event: any, coords: any, TD: any) => {
-    // 点击单元格
-    cells?.forEach((item: any) => {
-      if (item.row === coords.row && item.col === coords.col) {
-        setSelectedItem(item.prop);
-        setModalType('配置特性');
-      }
-    });
+  /** 点击单元格展示编辑特性 */
+  const afterOnCellMouseDown = (event: any, coords: any) => {
+    if (event) {
+      cells?.forEach((item: any) => {
+        if (item.row === coords.row && item.col === coords.col) {
+          setSelectedItem(item.prop);
+          setModalType('配置特性');
+        }
+      });
+    }
   };
 
   registerRenderer('customStylesRenderer', (hotInstance: any, TD: any, ...rest) => {
