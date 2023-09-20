@@ -549,34 +549,6 @@ export default class KernelApi {
     });
   }
   /**
-   * 创建组织变更消息
-   * @param {model.TargetMessageModel} params 请求参数
-   * @returns {model.ResultType<boolean>} 请求结果
-   */
-  public async createTargetMsg(
-    params: model.TargetMessageModel,
-  ): Promise<model.ResultType<boolean>> {
-    return await this.request({
-      module: 'chat',
-      action: 'CreateTargetMsg',
-      params: params,
-    });
-  }
-  /**
-   * 创建组织变更消息
-   * @param {model.IdentityMessageModel} params 请求参数
-   * @returns {model.ResultType<boolean>} 请求结果
-   */
-  public async createIdentityMsg(
-    params: model.IdentityMessageModel,
-  ): Promise<model.ResultType<boolean>> {
-    return await this.request({
-      module: 'chat',
-      action: 'CreateIdentityMsg',
-      params: params,
-    });
-  }
-  /**
    * 创建办事定义
    * @param {model.WorkDefineModel} params 请求参数
    * @returns {model.ResultType<schema.XWorkDefine>} 请求结果

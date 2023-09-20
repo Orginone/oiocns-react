@@ -222,7 +222,7 @@ export abstract class Target extends Team implements ITarget {
       if (data.operater?.id != this.user.id) {
         logger.info(message);
       }
-      this.directory.structCallback();
+      this.changCallback();
     }
   }
 }

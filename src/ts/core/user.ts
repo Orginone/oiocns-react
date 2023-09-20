@@ -1,10 +1,6 @@
 import { IPerson, Person } from './target/person';
 import { common, kernel, model, schema } from '../base';
 import { IWorkProvider, WorkProvider } from './work/provider';
-import { OperateType } from './public/enums';
-import { logger } from '../base/common';
-import { IIdentity, Identity } from './target/identity/identity';
-import { IStation } from './target/innerTeam/station';
 import { ITarget } from './target/base/target';
 
 const sessionUserName = 'sessionUser';
