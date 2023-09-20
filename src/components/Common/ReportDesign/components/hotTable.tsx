@@ -55,17 +55,19 @@ const HotTableView: React.FC<IProps> = ({
 
   useEffect(() => {
     const hot = hotRef.current.hotInstance;
+    /** hot.clear之后会全选报表所有用的update */
     hot.updateSettings({
       data: [[]],
     });
     const index = sheetList.findIndex((it: any) => it.code === selectItem.code); // 获取当前sheet页下标
     setSheetIndex(index);
-    const mergeCells = sheetList[index]?.data?.setting?.mergeCells || [];
-    setCells(sheetList[index]?.data?.setting?.cells || []);
-    setStyleList(sheetList[index]?.data?.setting?.styleList || []);
-    setClassList(sheetList[index]?.data?.setting?.classList || []);
-    setRowHeights(sheetList[index]?.data?.setting?.row_h || []);
-    setColWidths(sheetList[index]?.data?.setting?.col_w || []);
+    const setting = sheetList[index]?.data?.setting;
+    const mergeCells = setting?.mergeCells || [];
+    setCells(setting?.cells || []);
+    setStyleList(setting?.styleList || []);
+    setClassList(setting?.classList || []);
+    setRowHeights(setting?.row_h || []);
+    setColWidths(setting?.col_w || []);
     hot.updateSettings({
       data: sheetList[index]?.data?.data,
       cell: cells,
@@ -91,14 +93,14 @@ const HotTableView: React.FC<IProps> = ({
     );
   });
 
+  /** 渲染单元格颜色 */
   cells?.forEach((item: any) => {
-    //渲染单元格颜色
     hotRef.current.hotInstance.getCellMeta(item.row, item.col).renderer =
       'customStylesRenderer';
   });
 
+  /** 工具栏按钮点击 */
   const buttonClickCallback = () => {
-    // 工具栏按钮点击
     const selected = hotRef.current.hotInstance.getSelected() || [];
     hotRef.current.hotInstance.suspendRender();
     if (changeType === 'border') {
@@ -196,10 +198,8 @@ const HotTableView: React.FC<IProps> = ({
 
   const saveClickCallback = async () => {
     // 保存 保存数据结构---还未更新完
-    let setRowHeightInstance = hotRef.current.hotInstance.getPlugin('ManualRowResize');
-    console.log(setRowHeightInstance, '12345');
-    let count_col = hotRef.current.hotInstance.countCols(); //获取列数
-    let count_row = hotRef.current.hotInstance.countRows(); //获取行数
+    const count_col = hotRef.current.hotInstance.countCols(); //获取列数
+    const count_row = hotRef.current.hotInstance.countRows(); //获取行数
     let row_h: any = [];
     let col_w: any = [];
     for (var i = 0; i < count_col; i++) {
@@ -219,8 +219,6 @@ const HotTableView: React.FC<IProps> = ({
         classList: classList,
         row_h: row_h,
         col_w: col_w,
-        // cellMeta:cellMeta,
-        // columnSummary:columnSummary,
       },
     };
     sheetList[sheetIndex].data = json;
@@ -269,22 +267,21 @@ const HotTableView: React.FC<IProps> = ({
   };
 
   const upDataCell = () => {
-    console.log('123', current);
     // 更新特性rules 但单元格只有只读属性 readOnly
     cells.forEach((item: any) => {
       current.attributes.forEach((items: any) => {
         if (item.prop.propId === items.propId) {
           item.prop = items;
-          let newRule = JSON.parse(item.prop.rule);
+          const newRule = JSON.parse(item.prop.rule);
           if (newRule) {
-            for (var key in newRule) {
+            Object.keys(newRule).map((key) => {
               hotRef.current.hotInstance.setCellMeta(
                 item.row,
                 item.col,
                 key,
                 newRule[key],
               );
-            }
+            });
           }
         }
       });

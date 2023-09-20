@@ -44,7 +44,7 @@ const ReportForms: React.FC<IProps> = (props) => {
 
   useEffect(() => {
     const hot = hotRef.current.hotInstance;
-    /** hot.clear之后会全选报表所有用的update */
+    /** hot.clear之后会全选报表所以用的update */
     hot.updateSettings({
       data: [[]],
     });
