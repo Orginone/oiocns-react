@@ -80,9 +80,10 @@ export class Identity extends Entity<schema.XIdentity> implements IIdentity {
           subIds: members.map((i) => i.id),
         });
         if (!res.success) return false;
-        members.forEach((a) => this.createIdentityMsg(OperateType.Add, a));
+        members.forEach((a) => this._sendIdentityChangeMsg(OperateType.Add, a));
+      } else {
+        this.members.push(...members);
       }
-      this.members.push(...members);
     }
     return true;
   }
@@ -98,12 +99,13 @@ export class Identity extends Entity<schema.XIdentity> implements IIdentity {
           subIds: members.map((i) => i.id),
         });
         if (!res.success) return false;
-        members.forEach((a) => this.createIdentityMsg(OperateType.Remove, a));
+        members.forEach((a) => this._sendIdentityChangeMsg(OperateType.Remove, a));
+      } else {
+        if (members.some((a) => a.id === this.current.user.id)) {
+          this.current.user.removeGivedIdentity([this.metadata.id]);
+        }
+        this.members = this.members.filter((i) => members.every((s) => s.id !== i.id));
       }
-      if (members.some((a) => a.id === this.current.user.id)) {
-        this.current.user.removeGivedIdentity([this.metadata.id]);
-      }
-      this.members = this.members.filter((i) => members.every((s) => s.id !== i.id));
     }
     return true;
   }
@@ -118,22 +120,23 @@ export class Identity extends Entity<schema.XIdentity> implements IIdentity {
     if (res.success && res.data?.id) {
       res.data.typeName = '角色';
       this.setMetadata(res.data);
-      this.createIdentityMsg(OperateType.Update);
+      this._sendIdentityChangeMsg(OperateType.Update);
     }
     return res.success;
   }
   async delete(notity: boolean = false): Promise<boolean> {
     if (!notity) {
       if (this.current.hasRelationAuth()) {
-        this.createIdentityMsg(OperateType.Delete);
+        this._sendIdentityChangeMsg(OperateType.Delete);
       }
       const res = await kernel.deleteIdentity({
         id: this.id,
       });
       if (!res.success) return false;
+    } else {
+      this.current.user.removeGivedIdentity([this.metadata.id]);
+      this.current.identitys = this.current.identitys.filter((i) => i.key != this.key);
     }
-    this.current.user.removeGivedIdentity([this.metadata.id]);
-    this.current.identitys = this.current.identitys.filter((i) => i.key != this.key);
     return true;
   }
   override operates(mode: number = 0): model.OperateModel[] {
@@ -147,21 +150,15 @@ export class Identity extends Entity<schema.XIdentity> implements IIdentity {
   content(_mode?: number | undefined): IFileInfo<schema.XEntity>[] {
     return [];
   }
-  async createIdentityMsg(
+  async _sendIdentityChangeMsg(
     operate: OperateType,
     subTarget?: schema.XTarget,
   ): Promise<void> {
-    await kernel.createIdentityMsg({
-      stationId: '0',
-      identityId: this.id,
-      excludeOperater: false,
-      group: this.current.typeName == TargetType.Group,
-      data: JSON.stringify({
-        operate,
-        subTarget,
-        identity: this.metadata,
-        operater: this.current.user.metadata,
-      }),
+    await this.current.sendIdentityChangeMsg({
+      operate,
+      subTarget,
+      identity: this.metadata,
+      operater: this.current.user.metadata,
     });
   }
 }

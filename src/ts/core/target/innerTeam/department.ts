@@ -152,7 +152,7 @@ export class Department extends Target implements IDepartment {
   async teamChangedNotity(target: schema.XTarget): Promise<boolean> {
     if (this.childrenTypes.includes(target.typeName as TargetType)) {
       if (this.children.every((i) => i.id != target.id)) {
-        const department = new Department(target, this.space);
+        const department = new Department(target, this.space, this);
         await department.deepLoad();
         this.children.push(department);
         return true;

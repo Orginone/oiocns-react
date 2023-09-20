@@ -21,9 +21,15 @@ export interface IGroup extends ITarget {
 
 /** 组织集群实现 */
 export class Group extends Target implements IGroup {
-  constructor(_metadata: schema.XTarget, _relations: string[], _company: ICompany) {
+  constructor(
+    _metadata: schema.XTarget,
+    _relations: string[],
+    _company: ICompany,
+    _parent?: IGroup,
+  ) {
     super(_metadata, [..._relations, _metadata.id], _company.user, companyTypes);
     this.space = _company;
+    this.parent = _parent;
     this.relations = [..._relations, _metadata.id];
   }
   space: ICompany;
@@ -41,7 +47,7 @@ export class Group extends Target implements IGroup {
       if (res.success) {
         this._childrenLoaded = true;
         this.children = (res.data.result || []).map(
-          (i) => new Group(i, this.relations, this.space),
+          (i) => new Group(i, this.relations, this.space, this),
         );
       }
     }
@@ -51,7 +57,7 @@ export class Group extends Target implements IGroup {
     data.typeName = TargetType.Group;
     const metadata = await this.create(data);
     if (metadata) {
-      const group = new Group(metadata, this.relations, this.space);
+      const group = new Group(metadata, this.relations, this.space, this);
       if (await this.pullSubTarget(group)) {
         this.children.push(group);
         return group;
@@ -124,7 +130,7 @@ export class Group extends Target implements IGroup {
     switch (target.typeName) {
       case TargetType.Group:
         if (this.children.every((i) => i.id != target.id)) {
-          const group = new Group(target, this.relations, this.space);
+          const group = new Group(target, this.relations, this.space, this);
           await group.deepLoad();
           this.children.push(group);
           return true;

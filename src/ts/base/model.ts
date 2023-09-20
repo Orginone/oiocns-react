@@ -789,7 +789,6 @@ export type IdentityOperateModel = {
   operate: string;
   operater: XTarget;
   identity: XIdentity;
-  station?: XTarget;
   subTarget?: XTarget;
 };
 /**

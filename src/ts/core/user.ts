@@ -21,11 +21,6 @@ export class UserProvider {
     if (userJson && userJson.length > 0) {
       this._loadUser(JSON.parse(userJson));
     }
-    kernel.on('RecvIdentity', (data) => {
-      if (this._inited) {
-        this._updateIdentity(data);
-      }
-    });
   }
   /** 当前用户 */
   get user(): IPerson | undefined {
@@ -102,74 +97,5 @@ export class UserProvider {
     await this.work?.loadTodos(true);
     this._inited = true;
     this._emiter.changCallback();
-  }
-
-  /** 接受身份变更 */
-  async _updateIdentity(recvData: string) {
-    const data: model.IdentityOperateModel = JSON.parse(recvData);
-    if (!this.user || !data) return;
-    let targets = this.user.targets;
-    this.user.companys.forEach((a) => {
-      targets.push(...a.cohorts);
-    });
-    let identitys: IIdentity[] = [];
-    let stations: IStation[] = [];
-    targets
-      .filter((i) => i.id === data.identity.shareId)
-      .forEach((a) => {
-        identitys.push(...(a.identitys.filter((s) => s.id == data.identity.id) || []));
-      });
-    this.user.companys.forEach((a) => stations.push(...a.stations));
-    let message = '';
-    switch (data.operate) {
-      case OperateType.Create:
-        message = `${data.operater?.name}新增身份【${data.identity.name}】.`;
-        targets.forEach((a) => {
-          if (a.identitys.every((q) => q.id !== data.identity.id)) {
-            a.identitys.push(new Identity(data.identity, a));
-          }
-        });
-        break;
-      case OperateType.Delete:
-        message = `${data.operater?.name}将身份【${data.identity.name}】删除.`;
-        identitys.forEach((a) => a.delete(true));
-        stations.forEach((i) => i.removeIdentitys([data.identity], true));
-        break;
-      case OperateType.Update:
-        message = `${data.operater?.name}将身份【${data.identity.name}】信息更新.`;
-        this.user.updateMetadata(data.identity);
-        break;
-      case OperateType.Remove:
-        if (data.station) {
-          message = `${data.operater?.name}移除岗位【${data.station.name}】中的身份【${data.identity.name}】.`;
-          stations
-            .find((s) => s.id === data.station!.id)
-            ?.removeIdentitys([data.identity], true);
-        } else {
-          message = `${data.operater?.name}移除赋予【${data.subTarget!.name}】的身份【${
-            data.identity.name
-          }】.`;
-          identitys.forEach((i) => i.removeMembers([data.subTarget!], true));
-        }
-        break;
-      case OperateType.Add:
-        if (data.station) {
-          message = `${data.operater?.name}向岗位【${data.station.name}】添加身份【${data.identity.name}】.`;
-          stations
-            .find((s) => s.id === data.station?.id)
-            ?.pullIdentitys([data.identity], true);
-        } else {
-          message = `${data.operater?.name}赋予{${data.subTarget!.name}身份【${
-            data.identity.name
-          }】.`;
-          identitys.forEach((i) => i.pullMembers([data.subTarget!], true));
-        }
-    }
-    if (message.length > 0) {
-      if (data.operater?.id != this.user.id) {
-        logger.info(message);
-      }
-      this._emiter.changCallback();
-    }
   }
 }

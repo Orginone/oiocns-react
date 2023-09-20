@@ -6,7 +6,6 @@ import { Entity, IEntity, entityOperates } from '../../public';
 import { IDirectory } from '../../thing/directory';
 import { ISession, msgChatNotify } from '../../chat/session';
 import { IPerson } from '../person';
-import { ChangeNotity, IChangeNotity } from '../change';
 import { ITarget } from './target';
 import { logger } from '@/ts/base/common';
 
@@ -24,8 +23,6 @@ export interface ITeam extends IEntity<schema.XTarget> {
   memberTypes: TargetType[];
   /** 成员会话 */
   memberChats: ISession[];
-  /** 组织变更 */
-  targetChange: IChangeNotity;
   /** 深加载 */
   deepLoad(reload?: boolean): Promise<void>;
   /** 加载成员 */
@@ -50,11 +47,11 @@ export interface ITeam extends IEntity<schema.XTarget> {
   sendTargetNotity(
     operate: OperateType,
     sub?: schema.XTarget,
-    ignoreSelf?: boolean,
     targetId?: string,
+    ignoreSelf?: boolean,
     onlyTarget?: boolean,
     onlineOnly?: boolean,
-  ): Promise<void>;
+  ): Promise<boolean>;
 }
 
 /** 团队基类实现 */
@@ -66,17 +63,15 @@ export abstract class Team extends Entity<schema.XTarget> implements ITeam {
   ) {
     super(_metadata);
     this.memberTypes = _memberTypes;
-    this.targetChange = new ChangeNotity(
-      _metadata,
-      _relations,
-      'target',
-      (data: model.TargetOperateModel) => this._receiveTarget(data),
+    this.relations = _relations;
+    kernel.on(`${_metadata.belongId}-${_metadata.id}-target`, (data) =>
+      this._receiveTarget(data),
     );
   }
   memberTypes: TargetType[];
   members: schema.XTarget[] = [];
   memberChats: ISession[] = [];
-  targetChange: IChangeNotity;
+  relations: string[];
   abstract directory: IDirectory;
   private _memberLoaded: boolean = false;
   get isInherited(): boolean {
@@ -114,7 +109,7 @@ export abstract class Team extends Entity<schema.XTarget> implements ITeam {
         if (res.success) {
           members.forEach((a) => {
             this.sendTargetNotity(OperateType.Add, a);
-            this.sendTargetNotity(OperateType.Add, a, false, a.id, true);
+            this.sendTargetNotity(OperateType.Add, a, a.id);
           });
         }
         return res.success;
@@ -137,13 +132,7 @@ export abstract class Team extends Entity<schema.XTarget> implements ITeam {
         if (!notity) {
           if (member.id === this.userId || this.hasRelationAuth()) {
             await this.sendTargetNotity(OperateType.Remove, member);
-            await this.sendTargetNotity(
-              OperateType.Remove,
-              member,
-              false,
-              member.id,
-              true,
-            );
+            await this.sendTargetNotity(OperateType.Remove, member, member.id);
           }
           const res = await kernel.removeOrExitOfTeam({
             id: this.id,
@@ -228,29 +217,34 @@ export abstract class Team extends Entity<schema.XTarget> implements ITeam {
   async sendTargetNotity(
     operate: OperateType,
     sub?: schema.XTarget,
-    ignoreSelf?: boolean,
     targetId?: string,
+    ignoreSelf?: boolean,
     onlyTarget?: boolean,
     onlineOnly: boolean = true,
-  ): Promise<void> {
-    await this.targetChange.notity(
-      {
+  ): Promise<boolean> {
+    const res = await kernel.dataNotify({
+      data: {
         operate,
         target: this.metadata,
         subTarget: sub,
         operater: this.user.metadata,
       },
-      ignoreSelf,
-      targetId,
-      onlyTarget,
-      onlineOnly,
-    );
+      flag: 'target',
+      onlineOnly: onlineOnly,
+      belongId: this.belongId,
+      relations: this.relations,
+      onlyTarget: onlyTarget === true,
+      ignoreSelf: ignoreSelf === true,
+      targetId: targetId ?? this.id,
+    });
+    return res.success;
   }
 
   async _receiveTarget(data: model.TargetOperateModel) {
     let message = '';
     switch (data.operate) {
       case OperateType.Delete:
+        message = `${data.operater?.name}将${data.target.name}删除.`;
         this.delete(true);
         break;
       case OperateType.Update:
@@ -289,7 +283,7 @@ export abstract class Team extends Entity<schema.XTarget> implements ITeam {
         logger.info(message);
       }
       msgChatNotify.changCallback();
-      this.changCallback();
+      this.directory.structCallback();
     }
   }
 }

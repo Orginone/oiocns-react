@@ -188,7 +188,7 @@ export class Person extends Belong implements IPerson {
     if (notity) {
       // TODO 退出
     } else {
-      await this.sendTargetNotity(OperateType.Remove, this.metadata, true, this.id, true);
+      await this.sendTargetNotity(OperateType.Remove, this.metadata, this.id, true, true);
       const res = await kernel.deleteTarget({
         id: this.id,
       });

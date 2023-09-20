@@ -1,3 +1,4 @@
+import { logger } from '@/ts/base/common';
 import { kernel, model, schema } from '../../../base';
 import { OperateType, teamOperates } from '../../public';
 import { PageAll } from '../../public/consts';
@@ -15,7 +16,7 @@ export interface IStation extends ITeam {
   /** 加载用户设立的身份(角色)对象 */
   loadIdentitys(reload?: boolean): Promise<schema.XIdentity[]>;
   /** 用户拉入新身份(角色) */
-  pullIdentitys(identitys: schema.XIdentity[], notity?: boolean): Promise<boolean>;
+  pullIdentitys(identitys: schema.XIdentity[]): Promise<boolean>;
   /** 用户移除身份(角色) */
   removeIdentitys(identitys: schema.XIdentity[], notity?: boolean): Promise<boolean>;
 }
@@ -26,6 +27,9 @@ export class Station extends Team implements IStation {
     this.space = _space;
     this.user = _space.user;
     this.directory = _space.directory;
+    kernel.on(`${_metadata.belongId}-${_metadata.id}-identity`, (data: any) =>
+      this._receiveIdentity(data),
+    );
   }
   user: IPerson;
   space: ICompany;
@@ -45,21 +49,15 @@ export class Station extends Team implements IStation {
     }
     return this.identitys;
   }
-  async pullIdentitys(
-    identitys: schema.XIdentity[],
-    notity: boolean = false,
-  ): Promise<boolean> {
+  async pullIdentitys(identitys: schema.XIdentity[]): Promise<boolean> {
     identitys = identitys.filter((i) => this.identitys.every((a) => a.id !== i.id));
     if (identitys.length > 0) {
-      if (!notity) {
-        const res = await kernel.pullAnyToTeam({
-          id: this.id,
-          subIds: identitys.map((i) => i.id),
-        });
-        if (!res.success) return false;
-        identitys.forEach((a) => this.createIdentityMsg(OperateType.Add, a));
-      }
-      this.identitys.push(...identitys);
+      const res = await kernel.pullAnyToTeam({
+        id: this.id,
+        subIds: identitys.map((i) => i.id),
+      });
+      if (!res.success) return false;
+      identitys.forEach((a) => this._sendTargetNotity(OperateType.Add, a));
     }
     return true;
   }
@@ -76,13 +74,14 @@ export class Station extends Team implements IStation {
             subId: identity.id,
           });
           if (!res.success) return false;
-          this.createIdentityMsg(OperateType.Remove, identity);
+          this._sendTargetNotity(OperateType.Remove, identity);
+        } else {
+          this.space.user.removeGivedIdentity(
+            identitys.map((a) => a.id),
+            this.id,
+          );
+          this.identitys = this.identitys.filter((i) => i.id != identity.id);
         }
-        this.space.user.removeGivedIdentity(
-          identitys.map((a) => a.id),
-          this.id,
-        );
-        this.identitys = this.identitys.filter((i) => i.id != identity.id);
       }
     }
     return true;
@@ -117,21 +116,62 @@ export class Station extends Team implements IStation {
     }
     return operates;
   }
-  async createIdentityMsg(
+
+  private async _sendTargetNotity(
     operate: OperateType,
     identity: schema.XIdentity,
-  ): Promise<void> {
-    await kernel.createIdentityMsg({
-      group: false,
-      stationId: this.id,
-      identityId: identity.id,
-      excludeOperater: true,
-      data: JSON.stringify({
-        operate,
+    targetId?: string,
+    ignoreSelf?: boolean,
+    onlyTarget?: boolean,
+    onlineOnly: boolean = true,
+  ): Promise<boolean> {
+    const res = await kernel.dataNotify({
+      data: {
+        operate: operate as string,
         station: this.metadata,
         identity: identity,
         operater: this.user.metadata,
-      }),
+      },
+      flag: 'identity',
+      onlineOnly: onlineOnly,
+      belongId: this.belongId,
+      relations: this.relations,
+      onlyTarget: onlyTarget === true,
+      ignoreSelf: ignoreSelf === true,
+      targetId: targetId ?? this.id,
     });
+    return res.success;
+  }
+  private async _receiveIdentity(data: model.IdentityOperateModel) {
+    let message = '';
+    switch (data.operate) {
+      case OperateType.Delete:
+        message = `${data.operater?.name}将身份【${data.identity.name}】删除.`;
+        this.removeIdentitys([data.identity], true);
+        break;
+      case OperateType.Update:
+        message = `${data.operater?.name}将身份【${data.identity.name}】信息更新.`;
+        const index = this.identitys.findIndex((a) => a.id == data.identity.id);
+        this.identitys[index] = data.identity;
+        break;
+      case OperateType.Remove:
+        message = `${data.operater?.name}移除岗位【${this.name}】中的身份【${data.identity.name}】.`;
+        this.removeIdentitys([data.identity], true);
+        break;
+      case OperateType.Add:
+        if (this.identitys.every((a) => a.id == data.identity.id)) {
+          message = `${data.operater?.name}向岗位【${this.name}】添加身份【${data.identity.name}】.`;
+          this.identitys.push(data.identity);
+        }
+        break;
+      default:
+        return;
+    }
+    if (message.length > 0) {
+      if (data.operater?.id != this.user.id) {
+        logger.info(message);
+      }
+      this.directory.structCallback();
+    }
   }
 }
