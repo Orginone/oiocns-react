@@ -1,4 +1,8 @@
-.contaner {
+/* 每次点击按钮 重置当前焦点按钮的样式 */
+input[type='radio']:checked ~ .count label {
+  background: #4e99ff;
+}
+.container {
   width: 100%;
   height: 100%;
   display: grid;
@@ -31,10 +35,57 @@
     }
   }
 }
-.carousel {
-  z-index: 1;
+
+input[type='radio'] {
+  display: none;
 }
-.img {
+li {
+  list-style-type: none;
+}
+.count {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: calc(30vw - 88px);
+  height: 10%;
+}
+.count > ul {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  width: 35%;
+  height: 30%;
+}
+.count li {
+  float: left;
+  width: 1vmax;
+  height: 1vmax;
+  border-radius: 50%;
+}
+.count li label {
+  display: block;
+  width: 14px;
+  height: 14px;
+  background: #5e99ff;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: 0.8s;
+}
+
+.slider {
+  z-index: 1;
+  width: calc(75vw - 220px);
+  overflow: hidden;
+  .slides {
+    display: -webkit-box;
+    transition: margin 0.8s;
+  }
+}
+
+.slide {
   display: flex;
   align-items: center;
   z-index: 1;
@@ -58,7 +109,7 @@
   top: 28%;
 }
 
-.right {
+.copyright {
   position: absolute;
   color: #8a8a8a;
   bottom: 10px;
@@ -66,7 +117,11 @@
 }
 
 @media (max-width: 1380px) {
-  .img {
+  .count li label {
+    width: 12px;
+    height: 12px;
+  }
+  .slide {
     div {
       width: 200px;
     }
@@ -74,7 +129,10 @@
 }
 
 @media (max-width: 1250px) {
-  .img {
+  .count > ul {
+    width: 50%;
+  }
+  .slide {
     div {
       display: none;
     }
@@ -85,10 +143,13 @@
 }
 
 @media (max-width: 800px) {
+  .count {
+    display: none;
+  }
   .logo {
     display: none;
   }
-  .img {
+  .slide {
     display: none;
   }
   .wave {
@@ -103,7 +164,7 @@
     right: auto;
     top: auto;
   }
-  .right {
+  .copyright {
     width: 100%;
     display: flex;
     justify-content: center;
