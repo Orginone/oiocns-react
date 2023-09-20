@@ -5,6 +5,7 @@ import {
   IFileInfo,
   IMemeber,
   ISession,
+  IStorage,
   ISysFileInfo,
   ITarget,
   IWork,
@@ -56,6 +57,8 @@ export const executeCmd = (cmd: string, entity: any, args: any[], type: string) 
     case 'online':
     case 'outline':
       return onlineChanged(cmd, entity);
+    case 'activate':
+      return activateStorage(entity);
   }
   return false;
 };
@@ -65,6 +68,13 @@ const directoryRefresh = (dir: IDirectory | IApplication) => {
   dir.loadContent(true).then(() => {
     orgCtrl.changCallback();
   });
+};
+
+/** 激活存储 */
+const activateStorage = (store: IStorage) => {
+  if ('activateStorage' in store) {
+    store.activateStorage();
+  }
 };
 
 /** 进入目录 */

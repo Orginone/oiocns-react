@@ -22,6 +22,7 @@ export type { IDepartment } from './target/innerTeam/department';
 export type { IStation } from './target/innerTeam/station';
 export type { ICohort } from './target/outTeam/cohort';
 export type { IGroup } from './target/outTeam/group';
+export type { IStorage } from './target/outTeam/storage';
 export type { IPerson } from './target/person';
 export type { ICompany } from './target/team/company';
 export type { IDirectory } from './thing/directory';

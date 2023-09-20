@@ -1,3 +1,4 @@
+import { logger } from '@/ts/base/common';
 import { kernel, schema } from '../../base';
 
 /** 对象工具类 */
@@ -7,11 +8,14 @@ export class XObject<T extends schema.Xbase> {
   private _objName: string;
   private _target: schema.XTarget;
   private _relations: string[];
+  private _methods: { [name: string]: ((...args: any[]) => void)[] };
   constructor(target: schema.XTarget, name: string, relations: string[]) {
     this._loaded = false;
     this._target = target;
     this._relations = relations;
     this._objName = name;
+    this._methods = {};
+    kernel.on(this.subMethodName, (res) => this._objectCallback(res));
   }
 
   get cache(): any {
@@ -20,6 +24,10 @@ export class XObject<T extends schema.Xbase> {
 
   get objName(): string {
     return this._objName;
+  }
+
+  get subMethodName(): string {
+    return `${this._target.belongId}-${this._target.id}-${this._objName}`;
   }
 
   fullPath(path: string): string {
@@ -53,7 +61,10 @@ export class XObject<T extends schema.Xbase> {
       this._target.belongId,
       this._relations,
       this.fullPath(path),
-      data,
+      {
+        data: data,
+        operation: 'replaceAll',
+      },
     );
     if (res.success) {
       if (this._cache === undefined) {
@@ -74,15 +85,19 @@ export class XObject<T extends schema.Xbase> {
   }
 
   async notity(
+    flag: string,
     data: any,
+    onlyTarget?: boolean,
     ignoreSelf?: boolean,
     targetId?: string,
-    onlyTarget?: boolean,
     onlineOnly: boolean = true,
   ): Promise<boolean> {
     const res = await kernel.dataNotify({
-      data: data,
-      flag: this.objName,
+      data: {
+        flag,
+        data,
+      },
+      flag: this._objName,
       onlineOnly: onlineOnly,
       belongId: this._target.belongId,
       relations: this._relations,
@@ -93,16 +108,20 @@ export class XObject<T extends schema.Xbase> {
     return res.success;
   }
 
-  subscribe(callback: (data: any) => void, id?: string): void {
-    kernel.on(
-      `${this._target.belongId}-${id || this._target.id}-${this._objName}`,
-      (data) => {
-        callback.apply(this, [data]);
-      },
-    );
+  subscribe(flag: string, callback: (data: any) => void, id?: string): void {
+    if (!flag || !callback) {
+      return;
+    }
+    if (!this._methods[flag]) {
+      this._methods[flag] = [];
+    }
+    if (this._methods[flag].indexOf(callback) !== -1) {
+      return;
+    }
+    this._methods[flag].push(callback);
   }
 
-  private getValue<R>(path: string): R | undefined {
+  getValue<R>(path: string): R | undefined {
     if (path === '') return this.cache;
     var paths = path.split('.');
     var prop = paths.shift(),
@@ -114,7 +133,7 @@ export class XObject<T extends schema.Xbase> {
     return value;
   }
 
-  private setValue(path: string, data: any) {
+  setValue(path: string, data: any) {
     if (this.cache) {
       if (path === '') return this.cache;
       var paths = path.split('.');
@@ -125,6 +144,18 @@ export class XObject<T extends schema.Xbase> {
         if (paths.length === 0) {
           value[path] = data;
         }
+      }
+    }
+  }
+
+  private _objectCallback(res: { flag: string; data: any }) {
+    console.log(res);
+    const methods = this._methods[res.flag];
+    if (methods) {
+      try {
+        methods.forEach((m) => m.apply(this, [res.data]));
+      } catch (e) {
+        logger.error(e as Error);
       }
     }
   }

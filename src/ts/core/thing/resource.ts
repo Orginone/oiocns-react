@@ -46,10 +46,13 @@ export class DataResource {
   messageColl: XCollection<ChatMessageType>;
   /** 数据传输配置集合 */
   transferColl: XCollection<Transfer>;
+  /** 资源对应的用户信息 */
+  get targetMetadata() {
+    return this.target;
+  }
   /** 资源预加载 */
   async preLoad(reload: boolean = false): Promise<void> {
     if (this._proLoaded === false || reload) {
-      console.log(this.target);
       await Promise.all([
         this.formColl.all(reload),
         this.speciesColl.all(reload),

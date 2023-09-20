@@ -33,7 +33,7 @@ export const loadChatOperation = (item: ISession) => {
         title="标记为未读"
         onClick={async () => {
           item.chatdata.noReadCount += 1;
-          item.cacheChatData();
+          item.cacheChatData(true);
           msgChatNotify.changCallback();
         }}>
         标记为未读
@@ -48,7 +48,7 @@ export const loadChatOperation = (item: ISession) => {
         onClick={async () => {
           item.chatdata.labels = item.chatdata.labels.filter((i) => i != '置顶');
           item.chatdata.isToping = false;
-          item.cacheChatData();
+          item.cacheChatData(true);
           msgChatNotify.changCallback();
         }}>
         取消置顶
@@ -64,7 +64,7 @@ export const loadChatOperation = (item: ISession) => {
           if (item.chatdata.labels.every((i) => i != '置顶')) {
             item.chatdata.labels.push('置顶');
           }
-          item.cacheChatData();
+          item.cacheChatData(true);
           msgChatNotify.changCallback();
         }}>
         置顶会话

@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import React from 'react';
 import { WorkFormRulesType } from '@/ts/core/work/rules/workFormRules';
 import { Tabs } from 'antd';
-import ReportForms from '../workReport';
+import ReportForms from './report';
 
 interface IProps {
   allowEdit: boolean;

@@ -107,8 +107,6 @@ const Design: React.FC<IProps> = ({ current, isOpen, setIsOpen }) => {
       }
     });
     schema.properties = useProperties as Record<string, object>;
-    console.log('current', current);
-    // console.log('schema', schema);
     return schema;
   };
   // 根据schema

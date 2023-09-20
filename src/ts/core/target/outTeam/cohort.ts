@@ -35,6 +35,9 @@ export class Cohort extends Target implements ICohort {
   get targets(): ITarget[] {
     return [this];
   }
+  content(_mode?: number | undefined): ITarget[] {
+    return [];
+  }
   async deepLoad(reload: boolean = false): Promise<void> {
     await Promise.all([
       await this.loadMembers(reload),

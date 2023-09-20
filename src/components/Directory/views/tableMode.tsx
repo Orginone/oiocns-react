@@ -83,6 +83,7 @@ const TableMode = ({
             dataField="name"
             caption="名称"
             cellRender={(e) => {
+              console.log(e);
               return <EntityIcon entity={e.data} showName size={20} />;
             }}
           />

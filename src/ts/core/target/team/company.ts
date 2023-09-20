@@ -275,6 +275,10 @@ export class Company extends Belong implements ICompany {
     return operates;
   }
 
+  content(_mode?: number | undefined): ITarget[] {
+    return [...this.groups, ...this.departments, ...this.cohorts, ...this.storages];
+  }
+
   override async removeMembers(
     members: schema.XTarget[],
     notity: boolean = false,

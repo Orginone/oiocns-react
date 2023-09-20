@@ -11,7 +11,7 @@ interface IProps {
   finished: () => void;
 }
 
-const ReportView: React.FC<IProps> = ({ current }) => {
+const ReportDesign: React.FC<IProps> = ({ current }) => {
   const [tkey, tforceUpdate] = useObjectUpdate('');
   const [sheetIndex, setSheetIndex] = useState<any>(0); // tabs页签
   const [reportChange, setReportChange] = useState<any>();
@@ -125,4 +125,4 @@ const ReportView: React.FC<IProps> = ({ current }) => {
     </div>
   );
 };
-export default ReportView;
+export default ReportDesign;

@@ -52,6 +52,10 @@ export default class StoreHub implements IDisposable {
       }
     });
   }
+  /** 连接ID */
+  public get connectionId(): string {
+    return this._connection.connectionId || '';
+  }
   /**
    * 是否处于连接着的状态
    * @return {boolean} 状态

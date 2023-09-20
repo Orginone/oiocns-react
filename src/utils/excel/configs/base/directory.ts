@@ -50,7 +50,7 @@ export class DirectorySheetRead extends SheetRead<Directory, Context, DirectoryS
     c.directoryMap.forEach((item) => {
       c.directoryMap.set(item.code, {
         ...item,
-        parentCode: c.directoryMap.get(item.parentId)?.code,
+        parentCode: c.directoryMap.get(item.directoryId)?.code,
       });
     });
 
@@ -146,9 +146,9 @@ export class DirectorySheetRead extends SheetRead<Directory, Context, DirectoryS
       let item = this.sheet.data[index];
       item.shareId = this.sheet.directory.metadata.shareId;
       if (item.parentCode) {
-        item.parentId = context.directoryMap.get(item.parentCode)!.id;
+        item.directoryId = context.directoryMap.get(item.parentCode)!.id;
       } else {
-        item.parentId = this.sheet.directory.target.directory.id;
+        item.directoryId = this.sheet.directory.target.directory.id;
       }
       let res: any;
       if (item.id) {

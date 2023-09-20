@@ -6,7 +6,7 @@ import FullScreenModal from '@/executor/tools/fullScreen';
 import { RightBarIcon } from '@/components/Common/GlobalComps/customIcon';
 import { Resizable } from 'devextreme-react';
 import useStorage from '@/hooks/useStorage';
-import ReportView from '@/components/Common/ReportDesign';
+import ReportDesign from '@/components/Common/ReportDesign';
 import RuleSetting from '@/components/Common/FormEdit/Settings/RuleSetting/index';
 const { Content, Sider } = Layout;
 
@@ -50,7 +50,7 @@ const ReportModal: React.FC<IProps> = ({ current, finished }: IProps) => {
                 width={mainWidth}
                 onResize={(e) => setMainWidth(e.width)}>
                 <Sider className={cls.content} width={'100%'}>
-                  <ReportView current={current} finished={finished}></ReportView>
+                  <ReportDesign current={current} finished={finished}></ReportDesign>
                 </Sider>
               </Resizable>
               <Content className={cls.content}>
@@ -59,7 +59,7 @@ const ReportModal: React.FC<IProps> = ({ current, finished }: IProps) => {
             </>
           ) : (
             <Content className={cls.content}>
-              <ReportView current={current} finished={finished}></ReportView>
+              <ReportDesign current={current} finished={finished}></ReportDesign>
             </Content>
           )}
         </Layout>

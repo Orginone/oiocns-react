@@ -134,8 +134,7 @@ export const loadResource = (resource: any, parentCode: string): any => {
       destId: resource.destId,
       destName: resource.destName,
       num: resource.num || 1,
-      primaryFormIds: resource.primaryFormIds,
-      detailFormIds: resource.detailFormIds,
+      forms: resource.forms,
       primaryForms: resource.primaryForms,
       detailForms: resource.detailForms,
       belongId: resource.belongId,
@@ -187,12 +186,17 @@ export const convertNode = (resource: NodeModel | undefined, errors: any[]): any
     if (resource.type == AddNodeType.EMPTY) {
       return convertNode(resource.children, errors);
     }
+    const bandingForms = [
+      ...(resource.primaryForms || []).map((a) => {
+        return { id: a.id, typeName: '主表' };
+      }),
+      ...(resource.detailForms || []).map((a) => {
+        return { id: a.id, typeName: '子表' };
+      }),
+    ];
     switch (resource.type) {
       case AddNodeType.ROOT:
-        if (
-          (!resource.primaryFormIds || resource.primaryFormIds.length == 0) &&
-          (!resource.detailFormIds || resource.detailFormIds.length == 0)
-        ) {
+        if (bandingForms.length == 0) {
           errors.push('ROOT节点未绑定表单');
         }
         break;
@@ -240,13 +244,12 @@ export const convertNode = (resource: NodeModel | undefined, errors: any[]): any
     }
     return {
       id: resource.id,
+      forms: bandingForms,
       code: resource.code,
       type: resource.type,
       name: resource.name,
       num: resource.num || 1,
       destType: resource.destType || '身份',
-      primaryFormIds: resource.primaryFormIds,
-      detailFormIds: resource.detailFormIds,
       primaryForms:
         resource.primaryForms?.map((a) => {
           return { id: a.id, code: a.code, name: a.name };

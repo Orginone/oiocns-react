@@ -223,6 +223,9 @@ export abstract class StandardFileInfo<T extends schema.XStandard>
   }
   abstract copy(destination: IDirectory): Promise<boolean>;
   abstract move(destination: IDirectory): Promise<boolean>;
+  override get metadata(): T {
+    return this._metadata;
+  }
   allowCopy(destination: IDirectory): boolean {
     return this.directory.target.belongId != destination.target.belongId;
   }
@@ -284,7 +287,7 @@ export abstract class StandardFileInfo<T extends schema.XStandard>
     }
     return false;
   }
-  async notify(operate: string, data: schema.XEntity[]): Promise<boolean> {
+  async notify(operate: string, data: schema.XStandard[]): Promise<boolean> {
     return await this.coll.notity({ data, operate });
   }
 }

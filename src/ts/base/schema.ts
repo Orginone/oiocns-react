@@ -120,8 +120,6 @@ export type XAuthority = {
 
 //目录定义
 export type XDirectory = {
-  // 父目录ID
-  parentId: string;
   // 共享用户ID
   shareId: string;
   // 目录下的属性
@@ -326,6 +324,8 @@ export type XTarget = {
   public: boolean;
   // 元数据
   thingId: string;
+  // 存储
+  storeId: string;
   // 身份证明
   idProofs: XIdProof[] | undefined;
   // 组织的身份

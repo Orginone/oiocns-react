@@ -3,7 +3,7 @@ import { XCollection } from '../public/collection';
 import { Directory, IDirectory } from './directory';
 import { StandardFileInfo } from './fileinfo';
 import { DataResource } from './resource';
-import { Application } from './standard/application';
+import { Application, IApplication } from './standard/application';
 import { Form } from './standard/form';
 import { Property } from './standard/property';
 import { Species } from './standard/species';
@@ -20,7 +20,7 @@ export interface IDirectoryOperate {
     operate: string,
     data: T,
     coll: XCollection<T>,
-    create: (data: T) => StandardFileInfo<T> | undefined,
+    create: (data: T, dir: IDirectory) => StandardFileInfo<T> | undefined,
   ): Promise<boolean>;
 }
 
@@ -32,28 +32,25 @@ export class DirectoryOperate implements IDirectoryOperate {
     this.resource = _resource;
     this.directory = _directory;
     if (!_directory.parent) {
-      this.subscribe(_resource.formColl, (s) => {
-        return new Form(s, this.directory);
+      this.subscribe(_resource.formColl, (s, l) => {
+        return new Form(s, l);
       });
-      this.subscribe(_resource.propertyColl, (s) => {
-        return new Property(s, this.directory);
+      this.subscribe(_resource.propertyColl, (s, l) => {
+        return new Property(s, l);
       });
-      this.subscribe(_resource.speciesColl, (s) => {
-        return new Species(s, this.directory);
+      this.subscribe(_resource.speciesColl, (s, l) => {
+        return new Species(s, l);
       });
-      this.subscribe(_resource.transferColl, (s) => {
-        return new Transfer(s, this.directory);
+      this.subscribe(_resource.transferColl, (s, l) => {
+        return new Transfer(s, l);
       });
-      this.subscribe(_resource.applicationColl, (s) => {
+      this.subscribe(_resource.applicationColl, (s, l) => {
         if (s.parentId.length < 1) {
-          return new Application(s, this.directory);
-        } else {
-          this.loadResource(true);
-          this.directory.changCallback();
+          return new Application(s, l);
         }
       });
-      this.subscribe(_resource.directoryColl, (s) => {
-        return new Directory(s, this.directory.target, this.directory);
+      this.subscribe(_resource.directoryColl, (s, l) => {
+        return new Directory(s, this.directory.target, l);
       });
     }
   }
@@ -92,7 +89,7 @@ export class DirectoryOperate implements IDirectoryOperate {
         .map((a) => new Application(a, this.directory, undefined, apps)),
     );
     for (const child of this.resource.directoryColl.cache.filter(
-      (i) => i.directoryId === this.directory.id || i.parentId === this.directory.id,
+      (i) => i.directoryId === this.directory.id,
     )) {
       const subDir = new Directory(child, this.directory.target, this.directory);
       await subDir.loadDirectoryResource();
@@ -104,22 +101,31 @@ export class DirectoryOperate implements IDirectoryOperate {
     operate: string,
     data: T,
     coll: XCollection<T>,
-    create: (mData: T) => StandardFileInfo<T> | undefined,
+    create: (mData: T, dir: IDirectory) => StandardFileInfo<T> | undefined,
   ): Promise<boolean> {
     if (data.directoryId == this.directory.id) {
+      if (data.typeName == '模块') {
+        for (const app of this.getContent<IApplication>(['应用'])) {
+          if (await app.receiveMessage(operate, data as unknown as schema.XApplication)) {
+            return true;
+          }
+        }
+      }
       switch (operate) {
         case 'insert':
           coll.cache.push(data);
           {
-            let standard = create(data);
-            if (standard) this.standardFiles.push(standard);
+            let standard = create(data, this.directory);
+            if (standard) {
+              this.standardFiles.push(standard);
+            }
           }
           break;
         case 'replace':
           {
             const index = coll.cache.findIndex((a) => a.id == data.id);
             coll.cache[index] = data;
-            this.standardFiles.find((i) => i.id === data.id)?.updateMetadata(data);
+            this.standardFiles.find((i) => i.id === data.id)?.setMetadata(data);
           }
           break;
         case 'delete':
@@ -128,19 +134,22 @@ export class DirectoryOperate implements IDirectoryOperate {
           break;
         case 'refresh':
           this.directory.structCallback();
-          break;
+          return true;
       }
       this.directory.changCallback();
       return true;
     } else {
       for (const child of this.standardFiles) {
-        if (child.typeName == '目录') {
-          await (child as unknown as IDirectory).operater.receiveMessage(
+        if (
+          child.typeName == '目录' &&
+          (await (child as unknown as IDirectory).operater.receiveMessage(
             operate,
             data,
             coll,
             create,
-          );
+          ))
+        ) {
+          return true;
         }
       }
     }
@@ -149,7 +158,7 @@ export class DirectoryOperate implements IDirectoryOperate {
 
   private subscribe<T extends schema.XStandard>(
     coll: XCollection<T>,
-    create: (data: T) => StandardFileInfo<T> | undefined,
+    create: (data: T, dir: IDirectory) => StandardFileInfo<T> | undefined,
   ) {
     coll.subscribe(async (a: { operate: string; data: T[] }) => {
       a.data.forEach((s) => {

@@ -97,7 +97,6 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
       {
         ..._metadata,
         typeName: _metadata.typeName || '目录',
-        directoryId: _parent?.id || _target.id,
       },
       _parent ?? (_target as unknown as IDirectory),
       _target.resource.directoryColl,
@@ -162,7 +161,7 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
         cnt.push(...this.specieses);
         if (!this.parent) {
           cnt.unshift(this.target.memberDirectory);
-          cnt.push(...this.target.targets.filter((i) => i.id != this.target.id));
+          cnt.push(...this.target.content(mode));
         }
       }
     }
@@ -187,7 +186,12 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
         directoryId: destination.id,
       });
       if (data) {
-        await this.operateDirectoryResource(this, destination.resource, 'replaceMany');
+        await this.operateDirectoryResource(
+          this,
+          destination.resource,
+          'replaceMany',
+          false,
+        );
         await destination.notify('refresh', [data]);
       }
     }
@@ -206,7 +210,7 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
           'replaceMany',
           true,
         );
-        await this.notify('refresh', [this.parent.metadata]);
+        await this.notify('refresh', [this._metadata]);
         await destination.notify('refresh', [data]);
       }
     }
@@ -388,7 +392,7 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
     move?: boolean,
   ) {
     for (const child of directory.children) {
-      await this.operateDirectoryResource(child, resource, action);
+      await this.operateDirectoryResource(child, resource, action, move);
     }
     await resource.directoryColl[action](directory.children.map((a) => a.metadata));
     await resource.formColl[action](directory.forms.map((a) => a.metadata));
@@ -404,11 +408,26 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
         directoryId: directory.id,
       });
     }
-    if (action == 'replaceMany' && move) {
-      var apps = directory.resource.applicationColl.cache.filter(
-        (i) => i.directoryId === directory.id,
-      );
-      await resource.applicationColl.replaceMany(apps);
+    if (action == 'replaceMany') {
+      if (move) {
+        var apps = directory.resource.applicationColl.cache.filter(
+          (i) => i.directoryId === directory.id,
+        );
+        await resource.applicationColl.replaceMany(apps);
+      } else {
+        if (this.resource.targetMetadata.belongId != resource.targetMetadata.belongId) {
+          const items = await this.directory.resource.speciesItemColl.loadSpace({
+            options: {
+              match: {
+                speciesId: {
+                  _in_: directory.specieses.map((a) => a.id),
+                },
+              },
+            },
+          });
+          await resource.speciesItemColl.replaceMany(items);
+        }
+      }
     }
   }
 }

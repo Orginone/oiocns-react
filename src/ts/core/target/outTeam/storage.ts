@@ -1,12 +1,17 @@
 import { OperateModel } from '@/ts/base/model';
-import { schema } from '../../../base';
-import { TargetType, companyTypes, targetOperates } from '../../public';
+import { kernel, schema } from '../../../base';
+import { OperateType, TargetType, companyTypes, targetOperates } from '../../public';
 import { IBelong } from '../base/belong';
 import { ITarget, Target } from '../base/target';
 import { ISession } from '../../chat/session';
 
 /** 存储资源接口 */
-export interface IStorage extends ITarget {}
+export interface IStorage extends ITarget {
+  /** 是否处于激活状态 */
+  isActivate: boolean;
+  /** 激活存储 */
+  activateStorage(): Promise<boolean>;
+}
 
 export class Storage extends Target implements IStorage {
   constructor(_metadata: schema.XTarget, _relations: string[], _space: IBelong) {
@@ -34,7 +39,11 @@ export class Storage extends Target implements IStorage {
     return notity;
   }
   override operates(): OperateModel[] {
-    return [...super.operates(), targetOperates.Activate];
+    const operates = [...super.operates()];
+    if (!this.isActivate) {
+      operates.push(targetOperates.Activate);
+    }
+    return operates;
   }
   get subTarget(): ITarget[] {
     return [];
@@ -44,6 +53,26 @@ export class Storage extends Target implements IStorage {
   }
   get targets(): ITarget[] {
     return [this];
+  }
+  get isActivate(): boolean {
+    return this.id === this.space.metadata.storeId;
+  }
+  async activateStorage(): Promise<boolean> {
+    if (!this.isActivate) {
+      const res = await kernel.activateStorage({
+        id: this.id,
+        subId: this.space.id,
+      });
+      if (res.success) {
+        this.space.updateMetadata(res.data);
+        this.space.createTargetMsg(OperateType.Update);
+      }
+      return res.success;
+    }
+    return false;
+  }
+  content(_mode?: number | undefined): ITarget[] {
+    return [];
   }
   async deepLoad(reload: boolean = false): Promise<void> {
     if (this.metadata.belongId === this.userId) {

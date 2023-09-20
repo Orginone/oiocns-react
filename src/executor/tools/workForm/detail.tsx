@@ -7,7 +7,7 @@ import { EditModal } from '../editModal';
 import GenerateThingTable from '../generate/thingTable';
 import { WorkFormRulesType } from '@/ts/core/work/rules/workFormRules';
 import { RuleTriggers } from '@/ts/core/public';
-import ReportForms from '../workReport';
+import ReportForms from './report';
 interface IProps {
   allowEdit: boolean;
   belong: IBelong;

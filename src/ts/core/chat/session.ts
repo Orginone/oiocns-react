@@ -32,6 +32,8 @@ export interface ISession extends IEntity<schema.XEntity> {
   members: schema.XTarget[];
   /** 会话动态 */
   activity: IActivity;
+  /** 是否可以删除消息 */
+  canDeleteMessage: boolean;
   /** 加载更多历史消息 */
   moreMessage(): Promise<number>;
   /** 禁用通知 */
@@ -54,7 +56,7 @@ export interface ISession extends IEntity<schema.XEntity> {
   /** 清空历史记录 */
   clearMessage(): Promise<boolean>;
   /** 缓存会话数据 */
-  cacheChatData(): Promise<boolean>;
+  cacheChatData(notify?: boolean): Promise<boolean>;
 }
 
 /** 会话实现 */
@@ -140,6 +142,12 @@ export class Session extends Entity<schema.XEntity> implements ISession {
     }
     return this.metadata.remark.substring(0, 60);
   }
+  get cachePath(): string {
+    return `session.${this.chatdata.fullId}`;
+  }
+  get canDeleteMessage(): boolean {
+    return this.target.id === this.userId || this.target.hasRelationAuth();
+  }
   async moreMessage(): Promise<number> {
     const data = await this.coll.loadSpace({
       take: 30,
@@ -173,8 +181,10 @@ export class Session extends Entity<schema.XEntity> implements ISession {
         this.tagMessage(ids, '已读');
       }
       this.chatdata.mentionMe = false;
-      this.chatdata.noReadCount = 0;
-      this.cacheChatData();
+      if (this.chatdata.noReadCount > 0) {
+        this.chatdata.noReadCount = 0;
+        this.cacheChatData(true);
+      }
       msgChatNotify.changCallback();
       this.messageNotify?.apply(this, [this.messages]);
     });
@@ -241,7 +251,7 @@ export class Session extends Entity<schema.XEntity> implements ISession {
     }
   }
   async deleteMessage(id: string): Promise<boolean> {
-    if (this.target.id === this.userId) {
+    if (this.canDeleteMessage) {
       for (const item of this.messages) {
         if (item.id === id) {
           if (await this.coll.delete(item.metadata)) {
@@ -307,7 +317,7 @@ export class Session extends Entity<schema.XEntity> implements ISession {
       }
       this.chatdata.lastMsgTime = new Date().getTime();
       this.chatdata.lastMessage = data;
-      this.cacheChatData();
+      this.cacheChatData(this.messageNotify != undefined && !imsg.isMySend);
     } else {
       const index = this.messages.findIndex((i) => i.id === data.id);
       if (index > -1) {
@@ -335,18 +345,33 @@ export class Session extends Entity<schema.XEntity> implements ISession {
   }
 
   async loadCacheChatData(): Promise<void> {
-    const data = await this.target.user.cacheObj.get<model.MsgChatData>(
-      `session.${this.chatdata.fullId}`,
-    );
+    const data = await this.target.user.cacheObj.get<model.MsgChatData>(this.cachePath);
     if (data && data.fullId === this.chatdata.fullId) {
       this.chatdata = data;
       msgChatNotify.changCallback();
     }
+    this.target.user.cacheObj.subscribe(
+      this.chatdata.fullId,
+      (data: model.MsgChatData) => {
+        if (data && data.fullId === this.chatdata.fullId) {
+          this.chatdata = data;
+          this.target.user.cacheObj.setValue(this.cachePath, data);
+          msgChatNotify.changCallback();
+        }
+      },
+    );
   }
-  async cacheChatData(): Promise<boolean> {
-    return this.target.user.cacheObj.set(`session.${this.chatdata.fullId}`, {
-      operation: 'replaceAll',
-      data: this.chatdata,
-    });
+
+  async cacheChatData(notify: boolean = false): Promise<boolean> {
+    const success = await this.target.user.cacheObj.set(this.cachePath, this.chatdata);
+    if (success && notify) {
+      await this.target.user.cacheObj.notity(
+        this.chatdata.fullId,
+        this.chatdata,
+        true,
+        true,
+      );
+    }
+    return success;
   }
 }

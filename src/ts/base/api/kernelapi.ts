@@ -48,7 +48,7 @@ export default class KernelApi {
   private constructor(url: string) {
     this._methods = {};
     this._subscribeCallbacks = {};
-    this._storeHub = new StoreHub(url, 'json');
+    this._storeHub = new StoreHub(url, 'txt');
     this._storeHub.on('Receive', (res) => this._receive(res));
     this._storeHub.on('Updated', (belongId, key, data) => {
       this._updated(belongId, key, data);
@@ -187,6 +187,16 @@ export default class KernelApi {
       this.accessToken = res.data.accessToken;
     }
     return res;
+  }
+  /** 激活存储 */
+  public async activateStorage(
+    params: model.GainModel,
+  ): Promise<model.ResultType<schema.XEntity>> {
+    return await this.request({
+      module: 'target',
+      action: 'ActivateStorage',
+      params: params,
+    });
   }
   /**
    * 根据ID查询实体信息
@@ -1066,6 +1076,9 @@ export default class KernelApi {
    * @returns 异步结果
    */
   public async dataNotify(req: model.DataNotityType): Promise<model.ResultType<boolean>> {
+    if (req.ignoreSelf) {
+      req.ignoreConnectionId = this._storeHub.connectionId;
+    }
     if (this._storeHub.isConnected) {
       return await this._storeHub.invoke('DataNotify', req);
     } else {
@@ -1127,6 +1140,9 @@ export default class KernelApi {
     var onlineOnly: boolean = true;
     if (res.target === 'DataNotify') {
       const data: model.DataNotityType = res.data;
+      if (data.ignoreConnectionId === this._storeHub.connectionId) {
+        return;
+      }
       res.target = `${data.belongId}-${data.targetId}-${data.flag}`;
       res.data = data.data;
       onlineOnly = data.onlineOnly;

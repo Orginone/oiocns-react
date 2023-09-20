@@ -14,8 +14,6 @@ import { IPerson } from '../person';
 export interface ITarget extends ITeam, IFileInfo<schema.XTarget> {
   /** 会话 */
   session: ISession;
-  /** 用户资源 */
-  resource: DataResource;
   /** 用户设立的身份(角色) */
   identitys: IIdentity[];
   /** 用户资源 */
@@ -131,9 +129,6 @@ export abstract class Target extends Team implements ITarget {
     await this.loadIdentitys(reload);
     return true;
   }
-  content(_mode?: number | undefined): IFileInfo<schema.XEntity>[] {
-    return [];
-  }
   async rename(name: string): Promise<boolean> {
     return this.update({
       ...this.metadata,
@@ -152,6 +147,7 @@ export abstract class Target extends Team implements ITarget {
   abstract get chats(): ISession[];
   abstract get targets(): ITarget[];
   abstract get subTarget(): ITarget[];
+  abstract content(_mode?: number | undefined): IFileInfo<schema.XEntity>[];
   createTarget(_data: model.TargetModel): Promise<ITeam | undefined> {
     return new Promise((resolve) => {
       resolve(undefined);

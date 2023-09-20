@@ -41,6 +41,7 @@ export interface ITeam extends IEntity<schema.XTarget> {
   hasAuthoritys(authIds: string[]): boolean;
   /** 接收相关用户增加变更 */
   teamChangedNotity(target: schema.XTarget): Promise<boolean>;
+  createTargetMsg(operate: OperateType, sub?: schema.XTarget): Promise<void>;
 }
 
 /** 团队基类实现 */
@@ -139,22 +140,6 @@ export abstract class Team extends Entity<schema.XTarget> implements ITeam {
     const res = await kernel.createTarget(data);
     if (res.success && res.data?.id) {
       this.space.user.loadGivedIdentitys(true);
-      // await this.space.resource.directoryColl.insert({
-      //   id: res.data.id,
-      //   name: res.data.name,
-      //   code: res.data.code,
-      //   remark: res.data.remark,
-      //   icon: res.data.icon,
-      //   typeName: '目录',
-      //   shareId: res.data!.id,
-      //   status: res.data.status,
-      //   createUser: res.data.createUser,
-      //   updateUser: res.data.updateUser,
-      //   version: res.data.version,
-      //   createTime: res.data.createTime,
-      //   updateTime: res.data.updateTime,
-      //   belongId: res.data.belongId,
-      // } as schema.XDirectory);
       return res.data;
     }
   }
