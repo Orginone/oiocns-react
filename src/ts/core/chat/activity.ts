@@ -2,6 +2,7 @@ import { model, schema } from '../../base';
 import { Entity, IEntity, MessageType } from '../public';
 import { XCollection } from '../public/collection';
 import { ISession } from './session';
+import { CommentType } from '@/ts/base/model';
 /** 动态接口类 */
 export interface IActivity extends IEntity<schema.XTarget> {
   /** 会话对象 */
@@ -17,9 +18,10 @@ export interface IActivity extends IEntity<schema.XTarget> {
     tags: string[],
   ): Promise<boolean>;
   /** 点赞 */
-  links(data: model.ActivityType): Promise<boolean>;
+  like(data: model.ActivityType): Promise<boolean>;
+
   /** 评论 */
-  comment(data: model.ActivityType, txt: string): Promise<boolean>;
+  comment(data: model.ActivityType, txt: string, replyTo?: string): Promise<boolean>;
   /** 加载动态 */
   load(take: number, beforeTime?: string): Promise<model.ActivityType[]>;
 }
@@ -67,7 +69,7 @@ export class Activity extends Entity<schema.XTarget> implements IActivity {
     this.activityList.push(...data);
     return data;
   }
-  async links(data: model.ActivityType): Promise<boolean> {
+  async like(data: model.ActivityType): Promise<boolean> {
     var newData: model.ActivityType | undefined;
     if (data.likes.find((i) => i === this.userId)) {
       newData = await this.coll.update(data.id, {
@@ -86,14 +88,19 @@ export class Activity extends Entity<schema.XTarget> implements IActivity {
     }
     return false;
   }
-  async comment(data: model.ActivityType, label: string): Promise<boolean> {
+  async comment(
+    data: model.ActivityType,
+    label: string,
+    replyTo?: string,
+  ): Promise<boolean> {
     const newData = await this.coll.update(data.id, {
       _push_: {
         comments: {
           label,
           userId: this.userId,
           time: 'sysdate()',
-        },
+          replyTo,
+        } as CommentType,
       },
     });
     if (newData) {

@@ -10,7 +10,7 @@ import ReportView from './report';
 import CodeEditor from './codeeditor';
 import TransferView from './transfer';
 
-const officeExt = ['.pdf', '.xls', '.xlsx', '.doc', '.docx', '.ppt', '.pptx'];
+const officeExt = ['.md', '.pdf', '.xls', '.xlsx', '.doc', '.docx', '.ppt', '.pptx'];
 const videoExt = ['.mp4', '.avi', '.mov', '.mpg', '.swf', '.flv', '.mpeg'];
 
 interface IOpenProps {

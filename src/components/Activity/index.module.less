@@ -18,7 +18,44 @@
     width: 325px;
   }
   &Footer {
+    display: flex;
+    align-items: center;
     margin-top: 8px;
+    justify-content: flex-end;
+    &Likes {
+      flex: 1;
+      background-color: #f2f2f2;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      padding: 4px;
+      gap: 16px;
+      font-size: 12px;
+      flex-wrap: wrap;
+      color: rgba(0,0,0,0.65);
+    }
+  }
 
+  &CommentInputBox {
+    transition: 0.2s;
+    margin-top: 16px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    &SendBtn {
+      color: @primary-color;
+    }
+  }
+
+  &CommentList {
+    margin-top: 8px;
+    width: 100%;
+    padding: 4px;
+    border-radius: 4px;
+    background-color: #f2f2f2;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
   }
 }
