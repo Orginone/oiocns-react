@@ -97,7 +97,6 @@ export class Identity extends Entity<schema.XIdentity> implements IIdentity {
         members.forEach((a) => this._sendIdentityChangeMsg(OperateType.Remove, a));
       }
       if (members.some((a) => a.id === this.userId)) {
-        console.log(11111111);
         this.current.user.removeGivedIdentity([this.id]);
       }
       this.members = this.members.filter((i) => members.every((s) => s.id !== i.id));
