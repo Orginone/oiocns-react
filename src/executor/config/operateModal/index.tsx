@@ -44,13 +44,11 @@ const OperateModal: React.FC<IProps> = ({ cmd, entity, finished }) => {
       }
     default:
       if (cmd.startsWith('join')) {
-        return (
-          <JoinTarget
-            cmd={cmd}
-            current={(entity as IDirectory).target as IBelong}
-            finished={finished}
-          />
-        );
+        var target = entity as IBelong;
+        if (entity.typeName === '目录') {
+          target = (entity as IDirectory).target as IBelong;
+        }
+        return <JoinTarget cmd={cmd} current={target} finished={finished} />;
       }
       return <></>;
   }

@@ -1,4 +1,4 @@
-import React, { JSX, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { renderRoutes } from 'react-router-config';
 
 import type { IRouteConfig } from 'typings/globelType';
