@@ -67,10 +67,12 @@ export abstract class Target extends Team implements ITarget {
       this,
       this.directory,
     );
+    this.isContainer = true;
     this.session = new Session(this.id, this, _metadata);
   }
   user: IPerson;
   session: ISession;
+  isContainer: boolean;
   directory: IDirectory;
   resource: DataResource;
   identitys: IIdentity[] = [];

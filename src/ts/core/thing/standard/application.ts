@@ -35,6 +35,7 @@ export class Application
   ) {
     super(_metadata, _directory, _directory.resource.applicationColl);
     this.parent = _parent;
+    this.isContainer = true;
     this.loadChildren(_applications);
   }
   works: IWork[] = [];

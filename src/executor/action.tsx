@@ -79,16 +79,19 @@ const activateStorage = (store: IStorage) => {
 
 /** 进入目录 */
 const openDirectory = (
-  entity: IDirectory | IApplication | ITarget | IWork | IEntity<schema.XEntity>,
+  entity: IEntity<schema.XEntity> | IFileInfo<schema.XEntity> | ITarget | IWork,
   type: string,
 ) => {
+  if (type === 'data' && 'node' in entity) {
+    return false;
+  }
   if ('identitys' in entity && entity.typeName != TargetType.Station) {
     if (entity.typeName === TargetType.Storage) {
       return false;
     }
     entity = entity.directory;
   }
-  if (type == 'config' && 'isInheritedWork' in entity && entity.isInheritedWork) {
+  if ('isContainer' in entity && entity.isContainer) {
     entity.loadContent().then(() => {
       orgCtrl.currentKey = entity.key;
       orgCtrl.changCallback();

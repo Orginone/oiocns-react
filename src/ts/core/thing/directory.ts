@@ -102,6 +102,7 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
     );
     this.target = _target;
     this.parent = _parent;
+    this.isContainer = true;
     this.taskEmitter = new common.Emitter();
     this.operater = new DirectoryOperate(this, _target.resource);
   }
