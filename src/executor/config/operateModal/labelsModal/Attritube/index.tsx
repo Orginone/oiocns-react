@@ -38,7 +38,7 @@ const Attritube = ({ current, modalType, setModalType }: IProps) => {
   };
   // 操作内容渲染函数
   const renderOperate = (item: XAttribute) => {
-    if (!current.directory.isInherited) {
+    if (item.belongId === current.directory.target.space.id) {
       return [
         {
           key: '编辑特性',

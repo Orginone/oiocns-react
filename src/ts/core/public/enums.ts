@@ -44,6 +44,7 @@ export enum MessageType {
   Video = '视频',
   Voice = '语音',
   Recall = '撤回',
+  Notify = '通知',
 }
 
 /** 任务状态 */

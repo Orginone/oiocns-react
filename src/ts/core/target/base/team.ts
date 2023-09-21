@@ -4,8 +4,9 @@ import { PageAll, orgAuth } from '../../public/consts';
 import { IBelong } from './belong';
 import { Entity, IEntity, entityOperates } from '../../public';
 import { IDirectory } from '../../thing/directory';
-import { ISession } from '../../chat/session';
+import { ISession, msgChatNotify } from '../../chat/session';
 import { IPerson } from '../person';
+import { logger, sleep } from '@/ts/base/common';
 
 /** 团队抽象接口类 */
 export interface ITeam extends IEntity<schema.XTarget> {
@@ -39,23 +40,35 @@ export interface ITeam extends IEntity<schema.XTarget> {
   hasRelationAuth(): boolean;
   /** 判断是否拥有某些权限 */
   hasAuthoritys(authIds: string[]): boolean;
-  /** 接收相关用户增加变更 */
-  teamChangedNotity(target: schema.XTarget): Promise<boolean>;
-  createTargetMsg(operate: OperateType, sub?: schema.XTarget): Promise<void>;
+  /** 发送组织变更消息 */
+  sendTargetNotity(
+    operate: OperateType,
+    sub?: schema.XTarget,
+    subTargetId?: string,
+  ): Promise<boolean>;
 }
 
 /** 团队基类实现 */
 export abstract class Team extends Entity<schema.XTarget> implements ITeam {
   constructor(
+    _keys: string[],
     _metadata: schema.XTarget,
+    _relations: string[],
     _memberTypes: TargetType[] = [TargetType.Person],
   ) {
     super(_metadata);
     this.memberTypes = _memberTypes;
+    this.relations = _relations;
+    kernel.subscribe(
+      `${_metadata.belongId}-${_metadata.id}-target`,
+      [..._keys, this.key],
+      (data) => this._receiveTarget(data),
+    );
   }
   memberTypes: TargetType[];
   members: schema.XTarget[] = [];
   memberChats: ISession[] = [];
+  relations: string[];
   abstract directory: IDirectory;
   private _memberLoaded: boolean = false;
   get isInherited(): boolean {
@@ -90,18 +103,14 @@ export abstract class Team extends Entity<schema.XTarget> implements ITeam {
           id: this.id,
           subIds: members.map((i) => i.id),
         });
-        if (res.success) {
-          members.forEach((a) => {
-            this.createTargetMsg(OperateType.Add, a);
-          });
-        }
-        notity = res.success;
+        if (!res.success) return false;
+        members.forEach((a) => {
+          this.sendTargetNotity(OperateType.Add, a, a.id);
+        });
+        this.notifySession(true, members);
       }
-      if (notity) {
-        this.members.push(...members);
-        this.loadMemberChats(members, true);
-      }
-      return notity;
+      this.members.push(...members);
+      this.loadMemberChats(members, true);
     }
     return true;
   }
@@ -115,20 +124,16 @@ export abstract class Team extends Entity<schema.XTarget> implements ITeam {
     for (const member of members) {
       if (this.memberTypes.includes(member.typeName as TargetType)) {
         if (!notity) {
-          if (member.id === this.userId || this.hasRelationAuth()) {
-            await this.createTargetMsg(OperateType.Remove, member);
-          }
           const res = await kernel.removeOrExitOfTeam({
             id: this.id,
             subId: member.id,
           });
           if (!res.success) return false;
-          notity = res.success;
+          this.sendTargetNotity(OperateType.Remove, member, member.id);
+          this.notifySession(false, [member]);
         }
-        if (notity) {
-          this.members = this.members.filter((i) => i.id != member.id);
-          this.loadMemberChats([member], false);
-        }
+        this.members = this.members.filter((i) => i.id != member.id);
+        this.loadMemberChats([member], false);
       }
     }
     return true;
@@ -156,19 +161,22 @@ export abstract class Team extends Entity<schema.XTarget> implements ITeam {
     const res = await kernel.updateTarget(data);
     if (res.success && res.data?.id) {
       this.setMetadata(res.data);
-      this.createTargetMsg(OperateType.Update);
+      this.sendTargetNotity(OperateType.Update);
     }
     return res.success;
   }
   async delete(notity: boolean = false): Promise<boolean> {
     if (!notity) {
       if (this.hasRelationAuth()) {
-        await this.createTargetMsg(OperateType.Delete);
+        await this.sendTargetNotity(OperateType.Delete);
       }
       const res = await kernel.deleteTarget({
         id: this.id,
       });
       notity = res.success;
+    }
+    if (notity) {
+      kernel.unSubscribe(this.key);
     }
     return notity;
   }
@@ -188,7 +196,6 @@ export abstract class Team extends Entity<schema.XTarget> implements ITeam {
   abstract user: IPerson;
   abstract deepLoad(reload?: boolean): Promise<void>;
   abstract createTarget(data: model.TargetModel): Promise<ITeam | undefined>;
-  abstract teamChangedNotity(target: schema.XTarget): Promise<boolean>;
   loadMemberChats(_newMembers: schema.XTarget[], _isAdd: boolean): void {
     this.memberChats = [];
   }
@@ -200,17 +207,88 @@ export abstract class Team extends Entity<schema.XTarget> implements ITeam {
     const orgIds = [this.metadata.belongId, this.id];
     return this.user.authenticate(orgIds, authIds);
   }
-  async createTargetMsg(operate: OperateType, sub?: schema.XTarget): Promise<void> {
-    await kernel.createTargetMsg({
-      targetId: sub && this.userId === this.id ? sub.id : this.id,
-      excludeOperater: false,
-      group: this.typeName === TargetType.Group,
-      data: JSON.stringify({
+  async sendTargetNotity(
+    operate: OperateType,
+    sub?: schema.XTarget,
+    subTargetId?: string,
+  ): Promise<boolean> {
+    const res = await kernel.dataNotify({
+      data: {
         operate,
         target: this.metadata,
         subTarget: sub,
         operater: this.user.metadata,
-      }),
+      },
+      flag: 'target',
+      onlineOnly: true,
+      belongId: this.belongId,
+      relations: this.relations,
+      onlyTarget: false,
+      ignoreSelf: false,
+      subTargetId: subTargetId,
+      targetId: this.id,
     });
+    return res.success;
+  }
+
+  async _receiveTarget(data: model.TargetOperateModel) {
+    let message = '';
+    switch (data.operate) {
+      case OperateType.Delete:
+        message = `${data.operater.name}将${data.target.name}删除.`;
+        this.delete(true);
+        break;
+      case OperateType.Update:
+        message = `${data.operater.name}将${data.target.name}信息更新.`;
+        this.setMetadata(data.target);
+        break;
+      case OperateType.Remove:
+        if (data.subTarget) {
+          if (this.id == data.target.id && data.subTarget.id != this.space.id) {
+            if (this.memberTypes.includes(data.subTarget.typeName as TargetType)) {
+              message = `${data.operater.name}把${data.subTarget.name}从${data.target.name}移除.`;
+              await this.removeMembers([data.subTarget], true);
+            }
+          } else {
+            message = await this._removeJoinTarget(data.target);
+          }
+        }
+        break;
+      case OperateType.Add:
+        if (data.subTarget) {
+          if (this.id == data.target.id) {
+            if (this.memberTypes.includes(data.subTarget.typeName as TargetType)) {
+              message = `${data.operater.name}把${data.subTarget.name}与${data.target.name}建立关系.`;
+              await this.pullMembers([data.subTarget], true);
+            } else {
+              message = await this._addSubTarget(data.subTarget);
+            }
+          } else {
+            message = await this._addJoinTarget(data.target);
+          }
+        }
+    }
+    if (message.length > 0) {
+      if (data.operater.id != this.user.id) {
+        logger.info(message);
+      }
+      msgChatNotify.changCallback();
+      this.directory.structCallback();
+    }
+  }
+  async _removeJoinTarget(_: schema.XTarget): Promise<string> {
+    await sleep(0);
+    return '';
+  }
+  async _addSubTarget(_: schema.XTarget): Promise<string> {
+    await sleep(0);
+    return '';
+  }
+  async _addJoinTarget(_: schema.XTarget): Promise<string> {
+    await sleep(0);
+    return '';
+  }
+  async notifySession(_: boolean, __: schema.XTarget[]): Promise<void> {
+    await sleep(0);
   }
 }
