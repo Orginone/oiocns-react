@@ -19,7 +19,7 @@ const LabelModl: React.FC<IProps> = ({ current, finished }: IProps) => {
   const [tabKey, setTabKey] = useState<string>('attr');
   /** 操作按钮 */
   const renderButton = () => {
-    if (!current.isInherited && tabKey === 'attr') {
+    if (tabKey === 'attr') {
       return (
         <Button
           key="edit"
@@ -31,7 +31,7 @@ const LabelModl: React.FC<IProps> = ({ current, finished }: IProps) => {
           表单设计
         </Button>
       );
-    } else if (!current.isInherited && tabKey === 'rule') {
+    } else if (tabKey === 'rule') {
       return (
         <Button
           key="rules"

@@ -38,9 +38,12 @@ export class Activity extends Entity<schema.XTarget> implements IActivity {
     if (this.session.target.id === this.session.sessionId) {
       this.coll = session.target.resource.genColl('resource-activity');
     } else {
-      this.coll = new XCollection<model.ActivityType>(_metadata, 'resource-activity', [
-        _metadata.id,
-      ]);
+      this.coll = new XCollection<model.ActivityType>(
+        _metadata,
+        'resource-activity',
+        [_metadata.id],
+        [this.key],
+      );
     }
     this.subscribeNotify();
   }
@@ -139,17 +142,20 @@ export class Activity extends Entity<schema.XTarget> implements IActivity {
   }
 
   subscribeNotify() {
-    this.coll.subscribe((res: { update: boolean; data: model.ActivityType }) => {
-      if (res.update) {
-        const index = this.activityList.findIndex((i) => i.id === res.data.id);
-        if (index > -1) {
-          this.activityList[index] = res.data;
+    this.coll.subscribe(
+      [this.key],
+      (res: { update: boolean; data: model.ActivityType }) => {
+        if (res.update) {
+          const index = this.activityList.findIndex((i) => i.id === res.data.id);
+          if (index > -1) {
+            this.activityList[index] = res.data;
+            this.changCallback();
+          }
+        } else {
+          this.activityList = [res.data, ...this.activityList];
           this.changCallback();
         }
-      } else {
-        this.activityList = [res.data, ...this.activityList];
-        this.changCallback();
-      }
-    });
+      },
+    );
   }
 }

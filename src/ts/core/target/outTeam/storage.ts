@@ -15,7 +15,7 @@ export interface IStorage extends ITarget {
 
 export class Storage extends Target implements IStorage {
   constructor(_metadata: schema.XTarget, _relations: string[], _space: IBelong) {
-    super(_metadata, [..._relations, _metadata.id], _space.user, [
+    super([_space.key], _metadata, [..._relations, _metadata.id], _space.user, [
       ...companyTypes,
       TargetType.Person,
     ]);
@@ -32,11 +32,11 @@ export class Storage extends Target implements IStorage {
     return false;
   }
   override async delete(notity: boolean = false): Promise<boolean> {
-    notity = await super.delete(notity);
-    if (notity) {
+    const success = await super.delete(notity);
+    if (success) {
       this.space.storages = this.space.storages.filter((i) => i.key != this.key);
     }
-    return notity;
+    return success;
   }
   override operates(): OperateModel[] {
     const operates = [...super.operates()];
@@ -65,7 +65,7 @@ export class Storage extends Target implements IStorage {
       });
       if (res.success) {
         this.space.updateMetadata(res.data);
-        this.space.createTargetMsg(OperateType.Update);
+        this.space.sendTargetNotity(OperateType.Update);
       }
       return res.success;
     }
@@ -78,8 +78,5 @@ export class Storage extends Target implements IStorage {
     if (this.metadata.belongId === this.userId) {
       await this.loadMembers(reload);
     }
-  }
-  async teamChangedNotity(target: schema.XTarget): Promise<boolean> {
-    return await this.pullMembers([target], true);
   }
 }
