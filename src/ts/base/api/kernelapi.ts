@@ -2,14 +2,7 @@ import StoreHub from './storehub';
 import * as model from '../model';
 import type * as schema from '../schema';
 import axios from 'axios';
-import {
-  Emitter,
-  blobToDataUrl,
-  encodeKey,
-  generateUuid,
-  logger,
-  sliceFile,
-} from '../common';
+import { Emitter, logger } from '../common';
 import { command } from '../common/command';
 /**
  * 资产共享云内核api
@@ -605,6 +598,7 @@ export default class KernelApi {
   public async createWorkInstance(
     params: model.WorkInstanceModel,
   ): Promise<model.ResultType<schema.XWorkInstance>> {
+    console.log(params);
     return await this.request({
       module: 'work',
       action: 'CreateWorkInstance',

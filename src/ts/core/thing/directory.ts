@@ -4,7 +4,6 @@ import {
   directoryOperates,
   fileOperates,
   memberOperates,
-  storeCollName,
   teamOperates,
   newWarehouse,
 } from '../public';
@@ -170,7 +169,6 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
   }
   async loadContent(reload: boolean = false): Promise<boolean> {
     await this.loadFiles(reload);
-    // await this.loadAllLink(reload);
     if (reload) {
       if (this.typeName === '成员目录') {
         await this.target.loadContent(reload);
@@ -367,7 +365,7 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
       );
       if (mode === 2 && this.target.hasRelationAuth()) {
         operates.push(directoryNew);
-        // operates.push(newWarehouse);
+        operates.push(newWarehouse);
         if (this.target.user.copyFiles.size > 0) {
           operates.push(fileOperates.Parse);
         }
@@ -430,5 +428,9 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
         }
       }
     }
+  }
+  createTask(task: model.TaskModel): () => void {
+    this.taskList.push(task);
+    return () => this.taskEmitter.changCallback();
   }
 }

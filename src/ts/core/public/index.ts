@@ -19,11 +19,10 @@ export {
 export {
   directoryNew,
   directoryOperates,
-  // transferNew,
   entityOperates,
   fileOperates,
   memberOperates,
-  // newWarehouse,
+  newWarehouse,
   personJoins,
   targetOperates,
   teamOperates,

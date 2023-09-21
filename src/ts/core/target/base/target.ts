@@ -14,10 +14,10 @@ import { IPerson } from '../person';
 export interface ITarget extends ITeam, IFileInfo<schema.XTarget> {
   /** 会话 */
   session: ISession;
-  /** 用户设立的身份(角色) */
-  identitys: IIdentity[];
   /** 用户资源 */
   resource: DataResource;
+  /** 用户设立的身份(角色) */
+  identitys: IIdentity[];
   /** 子用户 */
   subTarget: ITarget[];
   /** 所有相关用户 */

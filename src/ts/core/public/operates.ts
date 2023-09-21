@@ -139,20 +139,14 @@ export const directoryOperates = {
     label: '新建模块',
     iconType: '模块',
   },
-  NewThingConfig: {
+  NewForm: {
     sort: 8,
-    cmd: 'newThingConfig',
-    label: '新建实体配置',
-    iconType: '实体配置',
-  },
-  NewWorkConfig: {
-    sort: 9,
-    cmd: 'newWorkConfig',
-    label: '新建事项配置',
+    cmd: 'newForm',
+    label: '新建表单',
     iconType: '事项配置',
   },
   NewTransferConfig: {
-    sort: 10,
+    sort: 9,
     cmd: 'newTransferConfig',
     label: '新建迁移配置',
     iconType: '迁移配置',
@@ -172,12 +166,7 @@ export const directoryNew = {
     directoryOperates.NewSpecies,
     directoryOperates.NewProperty,
     directoryOperates.NewApp,
-    directoryOperates.NewThingConfig,
-    directoryOperates.NewWorkConfig,
-<<<<<<< HEAD
-    directoryOperates.NewReport,
-    directoryOperates.Standard,
-=======
+    directoryOperates.NewForm,
     directoryOperates.NewTransferConfig,
   ],
 };
@@ -195,7 +184,6 @@ export const newWarehouse = {
       label: '新建仓库',
       iconType: 'newWarehouse',
     },
->>>>>>> ae637f3c45596e3c787421ee147808603aacdea2
   ],
 };
 
