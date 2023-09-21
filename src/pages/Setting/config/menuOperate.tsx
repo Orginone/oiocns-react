@@ -69,21 +69,23 @@ const buildDirectoryTree = (directorys: IDirectory[]): MenuItemType[] => {
 };
 
 const buildWorks = (works: IWork[]): MenuItemType[] => {
-  return works.map((work) => {
-    return {
-      key: work.key,
-      item: work,
-      label: work.name,
-      tag: [work.typeName],
-      icon: <EntityIcon entityId={work.id} typeName={work.typeName} size={18} />,
-      itemType: work.typeName,
-      menus: loadFileMenus(work),
-      children: buildForms(work),
-      beforeLoad: async () => {
-        await work.loadContent();
-      },
-    };
-  });
+  return works
+    .filter((i) => i.isInheritedWork)
+    .map((work) => {
+      return {
+        key: work.key,
+        item: work,
+        label: work.name,
+        tag: [work.typeName],
+        icon: <EntityIcon entityId={work.id} typeName={work.typeName} size={18} />,
+        itemType: work.typeName,
+        menus: loadFileMenus(work),
+        children: buildForms(work),
+        beforeLoad: async () => {
+          await work.loadContent();
+        },
+      };
+    });
 };
 
 const buildForms = (work: IWork): MenuItemType[] => {
