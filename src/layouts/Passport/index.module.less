@@ -1,6 +1,9 @@
 /* 每次点击按钮 重置当前焦点按钮的样式 */
 input[type='radio']:checked ~ .count label {
-  background: #4e99ff;
+  background: #e6edfe;
+}
+div {
+  font-family: 'PingFang SC';
 }
 .container {
   width: 100%;
@@ -12,7 +15,7 @@ input[type='radio']:checked ~ .count label {
 .wave {
   position: fixed;
   height: 105%;
-  width: calc(100vw - 200px);
+  width: calc(75vw);
   left: -25%;
   bottom: -5%;
 }
@@ -48,7 +51,7 @@ li {
   justify-content: center;
   position: absolute;
   bottom: 0;
-  left: 0;
+  left: calc(30vw);
   width: calc(30vw - 88px);
   height: 10%;
 }
@@ -66,40 +69,57 @@ li {
   border-radius: 50%;
 }
 .count li label {
-  display: block;
+  display: flex;
   width: 14px;
   height: 14px;
-  background: #5e99ff;
-  border-radius: 50%;
+  background: #e6edfe;
+  border-radius: 7px;
   cursor: pointer;
-  transition: 0.8s;
+  transition: 0.4s;
 }
 
 .slider {
   z-index: 1;
-  width: calc(75vw - 220px);
+  width: calc(50vw);
   overflow: hidden;
-  .slides {
+  &Slides {
     display: -webkit-box;
     transition: margin 0.8s;
+    &Item {
+      display: flex;
+      z-index: 1;
+      width: 50vw;
+      flex-direction: column;
+      color: white;
+      font-size: 15px;
+      justify-content: center;
+      &Img {
+        position: relative;
+        float: right;
+        object-fit: contain;
+        height: 55vh;
+      }
+      &Title {
+        margin-left: 3vw;
+        font-size: 32px;
+        font-weight: 500;
+      }
+      &Content {
+        margin-left: 3vw;
+        font-size: 16px;
+        font-weight: 400;
+        width: 20vw;
+      }
+    }
   }
 }
 
-.slide {
-  display: flex;
-  align-items: center;
-  z-index: 1;
-  width: calc(75vw - 220px);
-  justify-content: space-around;
-  color: white;
-  font-size: 15px;
-  img {
-    width: 500px;
-  }
-  div {
-    font-family: PingFangSC;
-    width: 300px;
-  }
+.higher_img {
+  height: 65vh;
+}
+.higher_text {
+  position: relative;
+  bottom: 5vh;
 }
 
 .box {
@@ -122,24 +142,35 @@ li {
     width: 12px;
     height: 12px;
   }
-  .slide {
-    div {
-      width: 200px;
-    }
+  .sliderSlidesItemImg {
+    height: 45vh;
+  }
+  .higher_img {
+    height: 55vh;
   }
 }
 
-@media (max-width: 1250px) {
+@media (max-width: 1200px) {
   .count > ul {
     width: 50%;
   }
-  .slide {
-    div {
+}
+
+@media (max-width: 1000px) {
+  .sliderSlidesItem {
+    &Img {
       display: none;
     }
-    img {
-      width: 70%;
+    &Content {
+      width: 40vw;
     }
+  }
+  .higher_text {
+    position: static;
+    bottom: 0;
+  }
+  .count > ul {
+    width: 70%;
   }
 }
 
@@ -150,7 +181,7 @@ li {
   .logo {
     display: none;
   }
-  .slide {
+  .slider {
     display: none;
   }
   .wave {
