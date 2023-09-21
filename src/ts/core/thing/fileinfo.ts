@@ -14,6 +14,8 @@ export interface IFileInfo<T extends schema.XEntity> extends IEntity<T> {
   belongId: string;
   /** 是否为继承的类别 */
   isInherited: boolean;
+  /** 是否为容器 */
+  isContainer: boolean;
   /** 目录 */
   directory: IDirectory;
   /** 路径Key */
@@ -53,7 +55,9 @@ export abstract class FileInfo<T extends schema.XEntity>
     } else {
       this.directory = this as unknown as IDirectory;
     }
+    this.isContainer = false;
   }
+  isContainer: boolean;
   directory: IDirectory;
   get isInherited(): boolean {
     return this.directory.isInherited;

@@ -70,7 +70,7 @@ const buildDirectoryTree = (directorys: IDirectory[]): MenuItemType[] => {
 
 const buildWorks = (works: IWork[]): MenuItemType[] => {
   return works
-    .filter((i) => i.isInheritedWork)
+    .filter((i) => i.isContainer)
     .map((work) => {
       return {
         key: work.key,

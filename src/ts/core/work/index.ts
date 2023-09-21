@@ -7,8 +7,6 @@ import { IWorkApply, WorkApply } from './apply';
 import { fileOperates } from '../public';
 
 export interface IWork extends IFileInfo<schema.XWorkDefine> {
-  /** 是否为继承的办事 */
-  isInheritedWork: boolean;
   /** 主表 */
   primaryForms: IForm[];
   /** 子表 */
@@ -43,14 +41,12 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
   constructor(_metadata: schema.XWorkDefine, _application: IApplication) {
     super(fullDefineRule(_metadata), _application.directory);
     this.application = _application;
+    this.isContainer = _application.isInherited;
   }
   primaryForms: IForm[] = [];
   detailForms: IForm[] = [];
   application: IApplication;
   node: model.WorkNodeModel | undefined;
-  get isInheritedWork(): boolean {
-    return this.application.directory.isInherited;
-  }
   get locationKey(): string {
     return this.application.key;
   }
