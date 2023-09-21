@@ -10,6 +10,11 @@ const PassportLogin: React.FC<RouteComponentProps> = (props) => {
   const [loading, setLoading] = useState(false);
   return (
     <div>
+      <div className={cls.header}>
+        <img src="/img/logo/logo3.jpg" alt="" />
+        <div>使用奥集能登录</div>
+      </div>
+      <div className={cls.DivideLine}></div>
       <Tabs
         size="large"
         items={[
