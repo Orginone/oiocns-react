@@ -7,8 +7,10 @@ export class XCollection<T extends schema.Xbase> {
   private _collName: string;
   private _target: schema.XTarget;
   private _relations: string[];
-  constructor(target: schema.XTarget, name: string, relations: string[]) {
+  private _keys: string[];
+  constructor(target: schema.XTarget, name: string, relations: string[], keys: string[]) {
     this._cache = [];
+    this._keys = keys;
     this._loaded = false;
     this._collName = name;
     this._target = target;
@@ -21,6 +23,10 @@ export class XCollection<T extends schema.Xbase> {
 
   get collName(): string {
     return this._collName;
+  }
+
+  subMethodName(id?: string): string {
+    return `${this._target.belongId}-${id || this._target.id}-${this._collName}`;
   }
 
   async all(reload: boolean = false): Promise<T[]> {
@@ -307,12 +313,9 @@ export class XCollection<T extends schema.Xbase> {
     return res.success;
   }
 
-  subscribe(callback: (data: any) => void, id?: string): void {
-    kernel.on(
-      `${this._target.belongId}-${id || this._target.id}-${this._collName}`,
-      (data) => {
-        callback.apply(this, [data]);
-      },
-    );
+  subscribe(keys: string[], callback: (data: any) => void, id?: string): void {
+    kernel.subscribe(this.subMethodName(id), [...this._keys, ...keys], (data) => {
+      callback.apply(this, [data]);
+    });
   }
 }

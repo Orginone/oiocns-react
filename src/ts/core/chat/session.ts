@@ -285,20 +285,27 @@ export class Session extends Entity<schema.XEntity> implements ISession {
 
   async subscribeOperations(): Promise<void> {
     if (this.isGroup) {
-      this.coll.subscribe((res: { operate: string; data: model.ChatMessageType[] }) => {
-        res.data.map((item) => this.receiveMessage(res.operate, item));
-      });
+      this.coll.subscribe(
+        [this.key],
+        (res: { operate: string; data: model.ChatMessageType[] }) => {
+          res.data.map((item) => this.receiveMessage(res.operate, item));
+        },
+      );
     } else {
-      this.coll.subscribe((res: { operate: string; data: model.ChatMessageType[] }) => {
-        res.data.forEach((item) => {
-          if (
-            [item.fromId, item.toId].includes(this.sessionId) &&
-            [item.fromId, item.toId].includes(this.userId)
-          ) {
-            this.receiveMessage(res.operate, item);
-          }
-        });
-      }, this.sessionId);
+      this.coll.subscribe(
+        [this.key],
+        (res: { operate: string; data: model.ChatMessageType[] }) => {
+          res.data.forEach((item) => {
+            if (
+              [item.fromId, item.toId].includes(this.sessionId) &&
+              [item.fromId, item.toId].includes(this.userId)
+            ) {
+              this.receiveMessage(res.operate, item);
+            }
+          });
+        },
+        this.sessionId,
+      );
     }
   }
 

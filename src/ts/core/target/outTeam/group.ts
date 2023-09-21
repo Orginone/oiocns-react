@@ -22,19 +22,22 @@ export interface IGroup extends ITarget {
 /** 组织集群实现 */
 export class Group extends Target implements IGroup {
   constructor(
+    _keys: string[],
     _metadata: schema.XTarget,
     _relations: string[],
     _company: ICompany,
     _parent?: IGroup,
   ) {
-    super(_metadata, [..._relations, _metadata.id], _company.user, companyTypes);
+    super(_keys, _metadata, [..._relations, _metadata.id], _company.user, companyTypes);
     this.space = _company;
     this.parent = _parent;
+    this.keys = [..._keys, this.key];
     this.relations = [..._relations, _metadata.id];
   }
   space: ICompany;
   parent?: IGroup | undefined;
   children: IGroup[] = [];
+  keys: string[];
   relations: string[];
   private _childrenLoaded: boolean = false;
   async loadChildren(reload?: boolean | undefined): Promise<IGroup[]> {
@@ -47,7 +50,7 @@ export class Group extends Target implements IGroup {
       if (res.success) {
         this._childrenLoaded = true;
         this.children = (res.data.result || []).map(
-          (i) => new Group(i, this.relations, this.space, this),
+          (i) => new Group(this.keys, i, this.relations, this.space, this),
         );
       }
     }
@@ -57,7 +60,7 @@ export class Group extends Target implements IGroup {
     data.typeName = TargetType.Group;
     const metadata = await this.create(data);
     if (metadata) {
-      const group = new Group(metadata, this.relations, this.space, this);
+      const group = new Group(this.keys, metadata, this.relations, this.space, this);
       if (await this.pullSubTarget(group)) {
         this.children.push(group);
         return group;
@@ -82,10 +85,12 @@ export class Group extends Target implements IGroup {
   }
   override async delete(notity: boolean = false): Promise<boolean> {
     const success = await super.delete(notity);
-    if (this.parent) {
-      this.parent.children = this.parent.children.filter((i) => i.key != this.key);
-    } else {
-      this.space.groups = this.space.groups.filter((i) => i.key != this.key);
+    if (success) {
+      if (this.parent) {
+        this.parent.children = this.parent.children.filter((i) => i.key != this.key);
+      } else {
+        this.space.groups = this.space.groups.filter((i) => i.key != this.key);
+      }
     }
     return success;
   }
@@ -128,7 +133,7 @@ export class Group extends Target implements IGroup {
     switch (target.typeName) {
       case TargetType.Group:
         if (this.children.every((i) => i.id != target.id)) {
-          const group = new Group(target, this.relations, this.space, this);
+          const group = new Group(this.keys, target, this.relations, this.space, this);
           await group.deepLoad();
           this.children.push(group);
           return `${this.name}创建了${target.name}.`;

@@ -160,7 +160,7 @@ export class DirectoryOperate implements IDirectoryOperate {
     coll: XCollection<T>,
     create: (data: T, dir: IDirectory) => StandardFileInfo<T> | undefined,
   ) {
-    coll.subscribe(async (a: { operate: string; data: T[] }) => {
+    coll.subscribe([this.directory.key], async (a: { operate: string; data: T[] }) => {
       a.data.forEach((s) => {
         this.receiveMessage<T>(a.operate, s, coll, create);
       });

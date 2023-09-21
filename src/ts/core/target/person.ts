@@ -46,7 +46,7 @@ export class Person extends Belong implements IPerson {
   constructor(_metadata: schema.XTarget) {
     super(_metadata, []);
     this.copyFiles = new Map();
-    this.cacheObj = new XObject(_metadata, 'target-cache', []);
+    this.cacheObj = new XObject(_metadata, 'target-cache', [], [this.key]);
   }
   companys: ICompany[] = [];
   cacheObj: XObject<schema.Xbase>;

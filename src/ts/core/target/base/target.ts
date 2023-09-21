@@ -40,14 +40,15 @@ export interface ITarget extends ITeam, IFileInfo<schema.XTarget> {
 /** 用户基类实现 */
 export abstract class Target extends Team implements ITarget {
   constructor(
+    _keys: string[],
     _metadata: schema.XTarget,
     _relations: string[],
     _user?: IPerson,
     _memberTypes: TargetType[] = [TargetType.Person],
   ) {
-    super(_metadata, _relations, _memberTypes);
+    super(_keys, _metadata, _relations, _memberTypes);
     this.user = _user || (this as unknown as IPerson);
-    this.resource = new DataResource(_metadata, _relations);
+    this.resource = new DataResource(_metadata, _relations, [this.key]);
     this.directory = new Directory(
       {
         ..._metadata,
@@ -71,8 +72,10 @@ export abstract class Target extends Team implements ITarget {
       this.directory,
     );
     this.session = new Session(this.id, this, _metadata);
-    kernel.on(`${_metadata.belongId}-${_metadata.id}-identity`, (data: any) =>
-      this._receiveIdentity(data),
+    kernel.subscribe(
+      `${_metadata.belongId}-${_metadata.id}-identity`,
+      [..._keys, this.key],
+      (data: any) => this._receiveIdentity(data),
     );
   }
   user: IPerson;

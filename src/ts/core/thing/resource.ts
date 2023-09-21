@@ -15,10 +15,12 @@ import { blobToDataUrl, encodeKey, generateUuid, sliceFile } from '@/ts/base/com
 
 /** 数据核资源（前端开发） */
 export class DataResource {
+  private _keys: string[];
   private target: XTarget;
   private relations: string[];
   private _proLoaded: boolean = false;
-  constructor(target: XTarget, relations: string[]) {
+  constructor(target: XTarget, relations: string[], keys: string[]) {
+    this._keys = keys;
     this.target = target;
     this.relations = relations;
     this.formColl = this.genTargetColl<XForm>('standard-form');
@@ -66,11 +68,16 @@ export class DataResource {
   }
   /** 生成集合 */
   genColl<T extends Xbase>(collName: string, relations?: string[]): XCollection<T> {
-    return new XCollection<T>(this.target, collName, relations || this.relations);
+    return new XCollection<T>(
+      this.target,
+      collName,
+      relations || this.relations,
+      this._keys,
+    );
   }
   /** 生成用户类型的集合 */
   genTargetColl<T extends Xbase>(collName: string): XCollection<T> {
-    return new XCollection<T>(this.target, collName, this.relations);
+    return new XCollection<T>(this.target, collName, this.relations, this._keys);
   }
   /** 文件桶操作 */
   async bucketOpreate<R>(data: model.BucketOpreateModel): Promise<model.ResultType<R>> {

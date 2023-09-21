@@ -51,6 +51,7 @@ export interface ITeam extends IEntity<schema.XTarget> {
 /** 团队基类实现 */
 export abstract class Team extends Entity<schema.XTarget> implements ITeam {
   constructor(
+    _keys: string[],
     _metadata: schema.XTarget,
     _relations: string[],
     _memberTypes: TargetType[] = [TargetType.Person],
@@ -58,8 +59,10 @@ export abstract class Team extends Entity<schema.XTarget> implements ITeam {
     super(_metadata);
     this.memberTypes = _memberTypes;
     this.relations = _relations;
-    kernel.on(`${_metadata.belongId}-${_metadata.id}-target`, (data) =>
-      this._receiveTarget(data),
+    kernel.subscribe(
+      `${_metadata.belongId}-${_metadata.id}-target`,
+      [..._keys, this.key],
+      (data) => this._receiveTarget(data),
     );
   }
   memberTypes: TargetType[];
@@ -170,6 +173,9 @@ export abstract class Team extends Entity<schema.XTarget> implements ITeam {
       });
       notity = res.success;
     }
+    if (notity) {
+      kernel.unSubscribe(this.key);
+    }
     return notity;
   }
   async loadContent(reload: boolean = false): Promise<boolean> {
@@ -236,7 +242,7 @@ export abstract class Team extends Entity<schema.XTarget> implements ITeam {
         break;
       case OperateType.Remove:
         if (data.subTarget) {
-          if (this.id == data.target.id) {
+          if (this.id == data.target.id && data.subTarget.id != this.space.id) {
             if (this.memberTypes.includes(data.subTarget.typeName as TargetType)) {
               message = `${data.operater.name}把${data.subTarget.name}从${data.target.name}移除.`;
               await this.removeMembers([data.subTarget], true);

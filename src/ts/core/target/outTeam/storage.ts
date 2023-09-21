@@ -15,7 +15,7 @@ export interface IStorage extends ITarget {
 
 export class Storage extends Target implements IStorage {
   constructor(_metadata: schema.XTarget, _relations: string[], _space: IBelong) {
-    super(_metadata, [..._relations, _metadata.id], _space.user, [
+    super([_space.key], _metadata, [..._relations, _metadata.id], _space.user, [
       ...companyTypes,
       TargetType.Person,
     ]);
@@ -33,7 +33,9 @@ export class Storage extends Target implements IStorage {
   }
   override async delete(notity: boolean = false): Promise<boolean> {
     const success = await super.delete(notity);
-    this.space.storages = this.space.storages.filter((i) => i.key != this.key);
+    if (success) {
+      this.space.storages = this.space.storages.filter((i) => i.key != this.key);
+    }
     return success;
   }
   override operates(): OperateModel[] {

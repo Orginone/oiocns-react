@@ -73,7 +73,7 @@ export class Company extends Belong implements ICompany {
               this.storages.push(new Storage(i, [this.id], this));
               break;
             default:
-              this.groups.push(new Group(i, [this.id], this));
+              this.groups.push(new Group([this.key], i, [this.id], this));
           }
         });
       }
@@ -101,7 +101,7 @@ export class Company extends Belong implements ICompany {
               this.stations.push(new Station(i, this));
               break;
             default:
-              this.departments.push(new Department(i, this));
+              this.departments.push(new Department([this.key], i, this));
           }
         });
       }
@@ -112,7 +112,7 @@ export class Company extends Belong implements ICompany {
     data.typeName = TargetType.Group;
     const metadata = await this.create(data);
     if (metadata) {
-      const group = new Group(metadata, [this.id], this);
+      const group = new Group([this.key], metadata, [this.id], this);
       await group.deepLoad();
       this.groups.push(group);
       await group.pullMembers([this.metadata]);
@@ -126,7 +126,7 @@ export class Company extends Belong implements ICompany {
     data.public = false;
     const metadata = await this.create(data);
     if (metadata) {
-      const department = new Department(metadata, this);
+      const department = new Department([this.key], metadata, this);
       await department.deepLoad();
       if (await this.pullSubTarget(department)) {
         this.departments.push(department);
@@ -181,7 +181,7 @@ export class Company extends Belong implements ICompany {
   }
   override async delete(notity: boolean = false): Promise<boolean> {
     const success = await super.delete(notity);
-    if (notity) {
+    if (success) {
       this.user.companys = this.user.companys.filter((i) => i.key != this.key);
     }
     return success;
@@ -303,7 +303,7 @@ export class Company extends Belong implements ICompany {
     switch (target.typeName) {
       case TargetType.Group:
         if (this.groups.every((i) => i.id != target.id)) {
-          const group = new Group(target, [this.id], this);
+          const group = new Group([this.key], target, [this.id], this);
           await group.deepLoad();
           this.groups.push(group);
           return `${this.name}已成功加入到${target.name}.`;
@@ -342,7 +342,7 @@ export class Company extends Belong implements ICompany {
       default:
         if (this.departmentTypes.includes(target.typeName as TargetType)) {
           if (this.departments.every((i) => i.id != target.id)) {
-            const department = new Department(target, this);
+            const department = new Department([this.key], target, this);
             await department.deepLoad();
             this.departments.push(department);
             return `${this.name}创建了${target.name}.`;

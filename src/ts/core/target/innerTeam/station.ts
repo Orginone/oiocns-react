@@ -23,12 +23,14 @@ export interface IStation extends ITeam {
 
 export class Station extends Team implements IStation {
   constructor(_metadata: schema.XTarget, _space: ICompany) {
-    super(_metadata, [_space.id]);
+    super([_space.key], _metadata, [_space.id]);
     this.space = _space;
     this.user = _space.user;
     this.directory = _space.directory;
-    kernel.on(`${_metadata.belongId}-${_metadata.id}-identity`, (data: any) =>
-      this._receiveIdentity(data),
+    kernel.subscribe(
+      `${_metadata.belongId}-${_metadata.id}-identity`,
+      [this.key, _space.key],
+      (data: any) => this._receiveIdentity(data),
     );
   }
   user: IPerson;
@@ -97,11 +99,13 @@ export class Station extends Team implements IStation {
   }
   override async delete(notity: boolean = false): Promise<boolean> {
     const success = await super.delete(notity);
-    this.space.stations = this.space.stations.filter((i) => i.key != this.key);
-    this.space.user.removeGivedIdentity(
-      this.identitys.map((a) => a.id),
-      this.id,
-    );
+    if (success) {
+      this.space.stations = this.space.stations.filter((i) => i.key != this.key);
+      this.space.user.removeGivedIdentity(
+        this.identitys.map((a) => a.id),
+        this.id,
+      );
+    }
     return success;
   }
   async deepLoad(reload: boolean = false): Promise<void> {

@@ -23,10 +23,16 @@ export interface IDepartment extends ITarget {
 
 /** 单位内部机构（部门）实现 */
 export class Department extends Target implements IDepartment {
-  constructor(_metadata: schema.XTarget, _company: ICompany, parent?: IDepartment) {
-    super(_metadata, [_company.id], _company.user);
+  constructor(
+    _keys: string[],
+    _metadata: schema.XTarget,
+    _company: ICompany,
+    parent?: IDepartment,
+  ) {
+    super(_keys, _metadata, [_company.id], _company.user);
     this.space = _company;
     this.parent = parent;
+    this.keys = [..._keys, this.key];
     switch (_metadata.typeName as TargetType) {
       case TargetType.College:
         this.childrenTypes = [
@@ -54,6 +60,7 @@ export class Department extends Target implements IDepartment {
     }
   }
   space: ICompany;
+  keys: string[];
   parent: IDepartment | undefined;
   children: IDepartment[] = [];
   childrenTypes: string[] = [];
@@ -68,7 +75,7 @@ export class Department extends Target implements IDepartment {
       if (res.success) {
         this._childrenLoaded = true;
         this.children = (res.data.result || []).map(
-          (i) => new Department(i, this.space, this),
+          (i) => new Department(this.keys, i, this.space, this),
         );
       }
     }
@@ -81,7 +88,7 @@ export class Department extends Target implements IDepartment {
     data.public = false;
     const metadata = await this.create(data);
     if (metadata) {
-      const department = new Department(metadata, this.space, this);
+      const department = new Department(this.keys, metadata, this.space, this);
       await department.deepLoad();
       if (await this.pullSubTarget(department)) {
         this.children.push(department);
@@ -105,10 +112,12 @@ export class Department extends Target implements IDepartment {
   }
   override async delete(notity: boolean = false): Promise<boolean> {
     const success = await super.delete(notity);
-    if (this.parent) {
-      this.parent.children = this.parent.children.filter((i) => i.key != this.key);
-    } else {
-      this.space.departments = this.space.departments.filter((i) => i.key != this.key);
+    if (success) {
+      if (this.parent) {
+        this.parent.children = this.parent.children.filter((i) => i.key != this.key);
+      } else {
+        this.space.departments = this.space.departments.filter((i) => i.key != this.key);
+      }
     }
     return success;
   }
@@ -150,7 +159,7 @@ export class Department extends Target implements IDepartment {
   override async _addSubTarget(target: schema.XTarget): Promise<string> {
     if (this.childrenTypes.includes(target.typeName as TargetType)) {
       if (this.children.every((i) => i.id != target.id)) {
-        const department = new Department(target, this.space, this);
+        const department = new Department(this.keys, target, this.space, this);
         await department.deepLoad();
         this.children.push(department);
         return `${this.name}创建了${target.name}.`;

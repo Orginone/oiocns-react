@@ -41,10 +41,12 @@ export abstract class Belong extends Target implements IBelong {
     _user?: IPerson,
     _memberTypes: TargetType[] = [TargetType.Person],
   ) {
-    super(_metadata, _relations, _user, _memberTypes);
+    super([], _metadata, _relations, _user, _memberTypes);
     this.space = this;
-    kernel.on(`${_metadata.belongId}-${_metadata.id}-authority`, (data: any) =>
-      this.superAuth?.receiveAuthority(data),
+    kernel.subscribe(
+      `${_metadata.belongId}-${_metadata.id}-authority`,
+      [this.key],
+      (data: any) => this.superAuth?.receiveAuthority(data),
     );
   }
   space: IBelong;
