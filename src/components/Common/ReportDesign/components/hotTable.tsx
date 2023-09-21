@@ -75,6 +75,14 @@ const HotTableView: React.FC<IProps> = ({
     });
   }, [selectItem]);
 
+  useEffect(() => {
+    if (changeType !== '' && changeType !== 'onSave') {
+      buttonClickCallback();
+    } else if (changeType == 'onSave') {
+      saveClickCallback();
+    }
+  }, [reportChange]);
+
   styleList?.forEach((item: any) => {
     hotRef.current.hotInstance.getCellMeta(item.row, item.col).renderer =
       'cellStylesRenderer';
@@ -192,10 +200,6 @@ const HotTableView: React.FC<IProps> = ({
     hotRef.current.hotInstance.resumeRender();
   };
 
-  if (changeType !== '' && changeType !== 'onSave') {
-    buttonClickCallback();
-  }
-
   const saveClickCallback = async () => {
     // 保存 保存数据结构---还未更新完
     const count_col = hotRef.current.hotInstance.countCols(); //获取列数
@@ -228,10 +232,6 @@ const HotTableView: React.FC<IProps> = ({
       rule: JSON.stringify(newData),
     });
   };
-
-  if (changeType == 'onSave') {
-    saveClickCallback();
-  }
 
   const hyperformulaInstance = HyperFormula.buildEmpty({
     licenseKey: 'internal-use-in-handsontable',
