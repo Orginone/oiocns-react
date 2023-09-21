@@ -1090,25 +1090,27 @@ export default class KernelApi {
   /** 接收服务端消息 */
   private _receive(res: model.ReceiveType) {
     switch (res.target) {
-      case 'DataNotify': {
-        console.log(res);
-        const data: model.DataNotityType = res.data;
-        if (data.ignoreConnectionId === this._storeHub.connectionId) {
-          return;
-        }
-        const flag = `${data.belongId}-${data.targetId}-${data.flag}`.toLowerCase();
-        const methods = this._subMethods[flag];
-        if (methods) {
-          try {
-            methods.forEach((m) => m.operation.apply(this, [data.data]));
-          } catch (e) {
-            logger.error(e as Error);
+      case 'DataNotify':
+        {
+          console.log(res);
+          const data: model.DataNotityType = res.data;
+          if (data.ignoreConnectionId === this._storeHub.connectionId) {
+            return;
           }
-        } else if (!data.onlineOnly) {
-          const data = this._cacheData[flag] || [];
-          this._cacheData[flag] = [...data, data.data];
+          const flag = `${data.belongId}-${data.targetId}-${data.flag}`.toLowerCase();
+          const methods = this._subMethods[flag];
+          if (methods) {
+            try {
+              methods.forEach((m) => m.operation.apply(this, [data.data]));
+            } catch (e) {
+              logger.error(e as Error);
+            }
+          } else if (!data.onlineOnly) {
+            const data = this._cacheData[flag] || [];
+            this._cacheData[flag] = [...data, data.data];
+          }
         }
-      }
+        break;
       case 'Online':
       case 'Outline':
         {

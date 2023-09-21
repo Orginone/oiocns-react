@@ -185,9 +185,13 @@ export class Station extends Team implements IStation {
         this.removeIdentitys([data.identity], true);
         break;
       case OperateType.Update:
-        message = `${data.operater?.name}将身份【${data.identity.name}】信息更新.`;
-        const index = this.identitys.findIndex((a) => a.id == data.identity.id);
-        this.identitys[index] = data.identity;
+        {
+          message = `${data.operater?.name}将身份【${data.identity.name}】信息更新.`;
+          const index = this.identitys.findIndex((a) => a.id == data.identity.id);
+          if (index > -1) {
+            this.identitys[index] = data.identity;
+          }
+        }
         break;
       case OperateType.Remove:
         message = `${data.operater?.name}移除岗位【${this.name}】中的身份【${data.identity.name}】.`;

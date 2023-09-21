@@ -1,9 +1,9 @@
 import { schema, model, kernel } from '../../../base';
 import { IIdentity, Identity } from '../identity/identity';
-import { OperateType, TargetType } from '../../public/enums';
+import { MessageType, OperateType, TargetType } from '../../public/enums';
 import { PageAll } from '../../public/consts';
 import { ITeam, Team } from './team';
-import { memberOperates, targetOperates } from '../../public';
+import { targetOperates } from '../../public';
 import { Directory, IDirectory } from '../../thing/directory';
 import { IFileInfo } from '../../thing/fileinfo';
 import { DataResource } from '../../thing/resource';
@@ -166,6 +166,27 @@ export abstract class Target extends Team implements ITarget {
     return new Promise((resolve) => {
       resolve(undefined);
     });
+  }
+  override async notifySession(pull: boolean, members: schema.XTarget[]): Promise<void> {
+    if (this.id != this.userId) {
+      for (const member of members) {
+        if (member.typeName === TargetType.Person) {
+          if (pull) {
+            await this.session.sendMessage(
+              MessageType.Notify,
+              `${this.user.name}邀请${member.name}加入群聊`,
+              [],
+            );
+          } else {
+            await this.session.sendMessage(
+              MessageType.Notify,
+              `${this.user.name}将${member.name}移出群聊`,
+              [],
+            );
+          }
+        }
+      }
+    }
   }
   async sendIdentityChangeMsg(data: any): Promise<boolean> {
     const res = await kernel.dataNotify({

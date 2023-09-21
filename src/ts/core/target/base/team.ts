@@ -107,6 +107,7 @@ export abstract class Team extends Entity<schema.XTarget> implements ITeam {
         members.forEach((a) => {
           this.sendTargetNotity(OperateType.Add, a, a.id);
         });
+        this.notifySession(true, members);
       }
       this.members.push(...members);
       this.loadMemberChats(members, true);
@@ -129,6 +130,7 @@ export abstract class Team extends Entity<schema.XTarget> implements ITeam {
           });
           if (!res.success) return false;
           this.sendTargetNotity(OperateType.Remove, member, member.id);
+          this.notifySession(false, [member]);
         }
         this.members = this.members.filter((i) => i.id != member.id);
         this.loadMemberChats([member], false);
@@ -285,5 +287,8 @@ export abstract class Team extends Entity<schema.XTarget> implements ITeam {
   async _addJoinTarget(_: schema.XTarget): Promise<string> {
     await sleep(0);
     return '';
+  }
+  async notifySession(_: boolean, __: schema.XTarget[]): Promise<void> {
+    await sleep(0);
   }
 }
