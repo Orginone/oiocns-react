@@ -1,15 +1,105 @@
-.contaner {
+/* 每次点击按钮 重置当前焦点按钮的样式 */
+input[type='radio']:checked ~ .count label {
+  background: #4e99ff;
+}
+.container {
   width: 100%;
   height: 100%;
+  display: grid;
+  align-items: center;
 }
 
-.bg {
+.wave {
+  position: fixed;
+  height: 105%;
+  width: calc(100vw - 200px);
+  left: -25%;
+  bottom: -5%;
+}
+.logo {
+  color: white;
   position: absolute;
-  left: 40px;
+  top: 30px;
+  left: 30px;
+  height: 50px;
+  z-index: 1;
+  display: flex;
+  &Title {
+    margin-left: 10px;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    &Zh {
+      font-size: 20px;
+      font-weight: 800;
+    }
+  }
+}
+
+input[type='radio'] {
+  display: none;
+}
+li {
+  list-style-type: none;
+}
+.count {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
   bottom: 0;
-  width: 50%;
-  height: 80%;
-  background-size: 100% 100%;
+  left: 0;
+  width: calc(30vw - 88px);
+  height: 10%;
+}
+.count > ul {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  width: 35%;
+  height: 30%;
+}
+.count li {
+  float: left;
+  width: 1vmax;
+  height: 1vmax;
+  border-radius: 50%;
+}
+.count li label {
+  display: block;
+  width: 14px;
+  height: 14px;
+  background: #5e99ff;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: 0.8s;
+}
+
+.slider {
+  z-index: 1;
+  width: calc(75vw - 220px);
+  overflow: hidden;
+  .slides {
+    display: -webkit-box;
+    transition: margin 0.8s;
+  }
+}
+
+.slide {
+  display: flex;
+  align-items: center;
+  z-index: 1;
+  width: calc(75vw - 220px);
+  justify-content: space-around;
+  color: white;
+  font-size: 15px;
+  img {
+    width: 500px;
+  }
+  div {
+    font-family: PingFangSC;
+    width: 300px;
+  }
 }
 
 .box {
@@ -18,4 +108,67 @@
   position: absolute;
   right: 10%;
   top: 28%;
+}
+
+.copyright {
+  position: absolute;
+  color: #8a8a8a;
+  bottom: 10px;
+  right: 20px;
+}
+
+@media (max-width: 1380px) {
+  .count li label {
+    width: 12px;
+    height: 12px;
+  }
+  .slide {
+    div {
+      width: 200px;
+    }
+  }
+}
+
+@media (max-width: 1250px) {
+  .count > ul {
+    width: 50%;
+  }
+  .slide {
+    div {
+      display: none;
+    }
+    img {
+      width: 70%;
+    }
+  }
+}
+
+@media (max-width: 800px) {
+  .count {
+    display: none;
+  }
+  .logo {
+    display: none;
+  }
+  .slide {
+    display: none;
+  }
+  .wave {
+    display: none;
+  }
+  .box {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    right: auto;
+    top: auto;
+  }
+  .copyright {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    right: 0;
+  }
 }
