@@ -146,7 +146,6 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
     return this.target.resource;
   }
   structCallback(): void {
-    console.log(this.metadata);
     command.emitter('-', 'refresh', this);
   }
   content(mode: number = 0): IFileInfo<schema.XEntity>[] {

@@ -290,16 +290,45 @@ export class Company extends Belong implements ICompany {
     return notity;
   }
 
-  async teamChangedNotity(target: schema.XTarget): Promise<boolean> {
+  override async _removeJoinTarget(target: schema.XTarget): Promise<string> {
+    var find = [...this.groups, ...this.storages].find((i) => i.id === target.id);
+    if (find) {
+      await find.delete(true);
+      return `${this.name}已被从${target.name}移除.`;
+    }
+    return '';
+  }
+
+  override async _addJoinTarget(target: schema.XTarget): Promise<string> {
     switch (target.typeName) {
-      case TargetType.Person:
-        return this.pullMembers([target], true);
       case TargetType.Group:
         if (this.groups.every((i) => i.id != target.id)) {
           const group = new Group(target, [this.id], this);
           await group.deepLoad();
           this.groups.push(group);
-          return true;
+          return `${this.name}已成功加入到${target.name}.`;
+        }
+        break;
+      case TargetType.Storage:
+        if (this.storages.every((i) => i.id != target.id)) {
+          const storage = new Storage(target, [], this);
+          await storage.deepLoad();
+          this.storages.push(storage);
+          return `${this.name}已成功加入到${target.name}.`;
+        }
+        break;
+    }
+    return '';
+  }
+
+  override async _addSubTarget(target: schema.XTarget): Promise<string> {
+    switch (target.typeName) {
+      case TargetType.Cohort:
+        if (this.cohorts.every((i) => i.id != target.id)) {
+          const cohort = new Cohort(target, this, this.id);
+          await cohort.deepLoad();
+          this.cohorts.push(cohort);
+          return `${this.name}创建了${target.name}.`;
         }
         break;
       case TargetType.Station:
@@ -307,23 +336,7 @@ export class Company extends Belong implements ICompany {
           const station = new Station(target, this);
           await station.deepLoad();
           this.stations.push(station);
-          return true;
-        }
-        break;
-      case TargetType.Cohort:
-        if (this.cohorts.every((i) => i.id != target.id)) {
-          const cohort = new Cohort(target, this, this.id);
-          await cohort.deepLoad();
-          this.cohorts.push(cohort);
-          return true;
-        }
-        break;
-      case TargetType.Storage:
-        if (this.storages.every((i) => i.id != target.id)) {
-          const storage = new Storage(target, [this.id], this);
-          await storage.deepLoad();
-          this.storages.push(storage);
-          return true;
+          return `${this.name}创建了${target.name}.`;
         }
         break;
       default:
@@ -332,10 +345,11 @@ export class Company extends Belong implements ICompany {
             const department = new Department(target, this);
             await department.deepLoad();
             this.departments.push(department);
-            return true;
+            return `${this.name}创建了${target.name}.`;
           }
         }
+        break;
     }
-    return false;
+    return '';
   }
 }

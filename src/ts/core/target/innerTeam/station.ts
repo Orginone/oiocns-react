@@ -49,15 +49,25 @@ export class Station extends Team implements IStation {
     }
     return this.identitys;
   }
-  async pullIdentitys(identitys: schema.XIdentity[]): Promise<boolean> {
+  async pullIdentitys(
+    identitys: schema.XIdentity[],
+    notity: boolean = false,
+  ): Promise<boolean> {
     identitys = identitys.filter((i) => this.identitys.every((a) => a.id !== i.id));
     if (identitys.length > 0) {
-      const res = await kernel.pullAnyToTeam({
-        id: this.id,
-        subIds: identitys.map((i) => i.id),
-      });
-      if (!res.success) return false;
-      identitys.forEach((a) => this._sendTargetNotity(OperateType.Add, a));
+      if (!notity) {
+        const res = await kernel.pullAnyToTeam({
+          id: this.id,
+          subIds: identitys.map((i) => i.id),
+        });
+        if (!res.success) return false;
+        identitys = identitys.filter((a) => res.data.includes(a.id));
+        identitys.forEach(async (a) => await this._sendTargetNotity(OperateType.Add, a));
+      }
+      if (this.members.some((a) => a.id === this.userId)) {
+        this.user.giveIdentity(identitys, this.id);
+      }
+      this.identitys.push(...identitys);
     }
     return true;
   }
@@ -75,22 +85,19 @@ export class Station extends Team implements IStation {
           });
           if (!res.success) return false;
           this._sendTargetNotity(OperateType.Remove, identity);
-        } else {
-          this.space.user.removeGivedIdentity(
-            identitys.map((a) => a.id),
-            this.id,
-          );
-          this.identitys = this.identitys.filter((i) => i.id != identity.id);
         }
+        this.space.user.removeGivedIdentity(
+          identitys.map((a) => a.id),
+          this.id,
+        );
+        this.identitys = this.identitys.filter((i) => i.id != identity.id);
       }
     }
     return true;
   }
   override async delete(notity: boolean = false): Promise<boolean> {
     const success = await super.delete(notity);
-    if (notity) {
-      this.space.stations = this.space.stations.filter((i) => i.key != this.key);
-    }
+    this.space.stations = this.space.stations.filter((i) => i.key != this.key);
     this.space.user.removeGivedIdentity(
       this.identitys.map((a) => a.id),
       this.id,
@@ -106,15 +113,39 @@ export class Station extends Team implements IStation {
       resolve(undefined);
     });
   }
-  async teamChangedNotity(target: schema.XTarget): Promise<boolean> {
-    return await this.pullMembers([target], true);
-  }
   override operates(): model.OperateModel[] {
     const operates = super.operates();
     if (this.hasRelationAuth()) {
       operates.unshift(teamOperates.pullIdentity);
     }
     return operates;
+  }
+  override async pullMembers(
+    members: schema.XTarget[],
+    notity?: boolean,
+  ): Promise<boolean> {
+    if (await super.pullMembers(members, notity)) {
+      if (members.find((a) => a.id == this.userId)) {
+        this.user.giveIdentity(this.identitys, this.id);
+      }
+      return true;
+    }
+    return false;
+  }
+  override async removeMembers(
+    members: schema.XTarget[],
+    notity?: boolean,
+  ): Promise<boolean> {
+    if (await super.removeMembers(members, notity)) {
+      if (members.find((a) => a.id == this.userId)) {
+        this.user.removeGivedIdentity(
+          this.identitys.map((a) => a.id),
+          this.id,
+        );
+      }
+      return true;
+    }
+    return false;
   }
 
   private async _sendTargetNotity(
@@ -161,7 +192,7 @@ export class Station extends Team implements IStation {
       case OperateType.Add:
         if (this.identitys.every((a) => a.id == data.identity.id)) {
           message = `${data.operater?.name}向岗位【${this.name}】添加身份【${data.identity.name}】.`;
-          this.identitys.push(data.identity);
+          await this.pullIdentitys([data.identity], true);
         }
         break;
       default:

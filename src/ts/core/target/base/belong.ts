@@ -29,6 +29,8 @@ export interface IBelong extends ITarget {
   applyJoin(members: schema.XTarget[]): Promise<boolean>;
   /** 设立人员群 */
   createCohort(data: model.TargetModel): Promise<ICohort | undefined>;
+  /** 发送职权变更消息 */
+  sendAuthorityChangeMsg(operate: string, authority: schema.XAuthority): Promise<boolean>;
 }
 
 /** 自归属用户基类实现 */
@@ -41,6 +43,9 @@ export abstract class Belong extends Target implements IBelong {
   ) {
     super(_metadata, _relations, _user, _memberTypes);
     this.space = this;
+    kernel.on(`${_metadata.belongId}-${_metadata.id}-authority`, (data: any) =>
+      this.superAuth?.receiveAuthority(data),
+    );
   }
   space: IBelong;
   cohorts: ICohort[] = [];
@@ -105,4 +110,24 @@ export abstract class Belong extends Target implements IBelong {
   abstract cohortChats: ISession[];
   abstract get parentTarget(): ITarget[];
   abstract applyJoin(members: schema.XTarget[]): Promise<boolean>;
+  async sendAuthorityChangeMsg(
+    operate: string,
+    authority: schema.XAuthority,
+  ): Promise<boolean> {
+    const res = await kernel.dataNotify({
+      data: {
+        operate,
+        authority,
+        operater: this.user.metadata,
+      },
+      flag: 'authority',
+      onlineOnly: true,
+      belongId: this.metadata.belongId,
+      relations: this.relations,
+      onlyTarget: true,
+      ignoreSelf: true,
+      targetId: this.metadata.id,
+    });
+    return res.success;
+  }
 }

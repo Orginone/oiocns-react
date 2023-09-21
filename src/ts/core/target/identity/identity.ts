@@ -1,12 +1,5 @@
 import { kernel, model, schema } from '../../../base';
-import {
-  Entity,
-  IEntity,
-  OperateType,
-  TargetType,
-  entityOperates,
-  fileOperates,
-} from '../../public';
+import { Entity, IEntity, OperateType, entityOperates, fileOperates } from '../../public';
 import { PageAll } from '../../public/consts';
 import { IDirectory } from '../../thing/directory';
 import { IFileInfo } from '../../thing/fileinfo';
@@ -81,8 +74,10 @@ export class Identity extends Entity<schema.XIdentity> implements IIdentity {
         });
         if (!res.success) return false;
         members.forEach((a) => this._sendIdentityChangeMsg(OperateType.Add, a));
-      } else {
-        this.members.push(...members);
+      }
+      this.members.push(...members);
+      if (members.find((a) => a.id === this.userId)) {
+        this.current.user.giveIdentity([this.metadata]);
       }
     }
     return true;
@@ -100,12 +95,12 @@ export class Identity extends Entity<schema.XIdentity> implements IIdentity {
         });
         if (!res.success) return false;
         members.forEach((a) => this._sendIdentityChangeMsg(OperateType.Remove, a));
-      } else {
-        if (members.some((a) => a.id === this.current.user.id)) {
-          this.current.user.removeGivedIdentity([this.metadata.id]);
-        }
-        this.members = this.members.filter((i) => members.every((s) => s.id !== i.id));
       }
+      if (members.some((a) => a.id === this.userId)) {
+        console.log(11111111);
+        this.current.user.removeGivedIdentity([this.id]);
+      }
+      this.members = this.members.filter((i) => members.every((s) => s.id !== i.id));
     }
     return true;
   }
@@ -133,10 +128,9 @@ export class Identity extends Entity<schema.XIdentity> implements IIdentity {
         id: this.id,
       });
       if (!res.success) return false;
-    } else {
-      this.current.user.removeGivedIdentity([this.metadata.id]);
-      this.current.identitys = this.current.identitys.filter((i) => i.key != this.key);
     }
+    this.current.user.removeGivedIdentity([this.metadata.id]);
+    this.current.identitys = this.current.identitys.filter((i) => i.key != this.key);
     return true;
   }
   override operates(mode: number = 0): model.OperateModel[] {

@@ -82,12 +82,10 @@ export class Group extends Target implements IGroup {
   }
   override async delete(notity: boolean = false): Promise<boolean> {
     const success = await super.delete(notity);
-    if (notity) {
-      if (this.parent) {
-        this.parent.children = this.parent.children.filter((i) => i.key != this.key);
-      } else {
-        this.space.groups = this.space.groups.filter((i) => i.key != this.key);
-      }
+    if (this.parent) {
+      this.parent.children = this.parent.children.filter((i) => i.key != this.key);
+    } else {
+      this.space.groups = this.space.groups.filter((i) => i.key != this.key);
     }
     return success;
   }
@@ -126,18 +124,17 @@ export class Group extends Target implements IGroup {
     }
     return operates;
   }
-  async teamChangedNotity(target: schema.XTarget): Promise<boolean> {
+  override async _addSubTarget(target: schema.XTarget): Promise<string> {
     switch (target.typeName) {
       case TargetType.Group:
         if (this.children.every((i) => i.id != target.id)) {
           const group = new Group(target, this.relations, this.space, this);
           await group.deepLoad();
           this.children.push(group);
-          return true;
+          return `${this.name}创建了${target.name}.`;
         }
-        return false;
-      default:
-        return await this.pullMembers([target], true);
+        break;
     }
+    return '';
   }
 }

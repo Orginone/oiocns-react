@@ -33,9 +33,7 @@ export class Storage extends Target implements IStorage {
   }
   override async delete(notity: boolean = false): Promise<boolean> {
     const success = await super.delete(notity);
-    if (notity) {
-      this.space.storages = this.space.storages.filter((i) => i.key != this.key);
-    }
+    this.space.storages = this.space.storages.filter((i) => i.key != this.key);
     return success;
   }
   override operates(): OperateModel[] {
@@ -78,8 +76,5 @@ export class Storage extends Target implements IStorage {
     if (this.metadata.belongId === this.userId) {
       await this.loadMembers(reload);
     }
-  }
-  async teamChangedNotity(target: schema.XTarget): Promise<boolean> {
-    return await this.pullMembers([target], true);
   }
 }

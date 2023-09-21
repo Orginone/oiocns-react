@@ -105,12 +105,10 @@ export class Department extends Target implements IDepartment {
   }
   override async delete(notity: boolean = false): Promise<boolean> {
     const success = await super.delete(notity);
-    if (notity) {
-      if (this.parent) {
-        this.parent.children = this.parent.children.filter((i) => i.key != this.key);
-      } else {
-        this.space.departments = this.space.departments.filter((i) => i.key != this.key);
-      }
+    if (this.parent) {
+      this.parent.children = this.parent.children.filter((i) => i.key != this.key);
+    } else {
+      this.space.departments = this.space.departments.filter((i) => i.key != this.key);
     }
     return success;
   }
@@ -149,16 +147,15 @@ export class Department extends Target implements IDepartment {
     }
     return operates;
   }
-  async teamChangedNotity(target: schema.XTarget): Promise<boolean> {
+  override async _addSubTarget(target: schema.XTarget): Promise<string> {
     if (this.childrenTypes.includes(target.typeName as TargetType)) {
       if (this.children.every((i) => i.id != target.id)) {
         const department = new Department(target, this.space, this);
         await department.deepLoad();
         this.children.push(department);
-        return true;
+        return `${this.name}创建了${target.name}.`;
       }
-      return false;
     }
-    return await this.pullMembers([target], true);
+    return '';
   }
 }

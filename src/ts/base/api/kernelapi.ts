@@ -374,7 +374,7 @@ export default class KernelApi {
    */
   public async pullAnyToTeam(
     params: model.GiveModel,
-  ): Promise<model.ResultType<boolean>> {
+  ): Promise<model.ResultType<string[]>> {
     return await this.request({
       module: 'target',
       action: 'PullAnyToTeam',
@@ -1045,6 +1045,7 @@ export default class KernelApi {
     if (req.ignoreSelf) {
       req.ignoreConnectionId = this._storeHub.connectionId;
     }
+    console.log(req);
     if (this._storeHub.isConnected) {
       return await this._storeHub.invoke('DataNotify', req);
     } else {
@@ -1104,6 +1105,7 @@ export default class KernelApi {
   /** 接收服务端消息 */
   private _receive(res: model.ReceiveType) {
     var onlineOnly: boolean = true;
+    console.log(res);
     if (res.target === 'DataNotify') {
       const data: model.DataNotityType = res.data;
       if (data.ignoreConnectionId === this._storeHub.connectionId) {

@@ -21,9 +21,7 @@ export class Cohort extends Target implements ICohort {
   }
   override async delete(notity: boolean = false): Promise<boolean> {
     const success = await super.delete(notity);
-    if (notity) {
-      this.space.cohorts = this.space.cohorts.filter((i) => i.key != this.key);
-    }
+    this.space.cohorts = this.space.cohorts.filter((i) => i.key != this.key);
     return success;
   }
   get subTarget(): ITarget[] {
@@ -43,8 +41,5 @@ export class Cohort extends Target implements ICohort {
       await this.loadMembers(reload),
       await this.directory.loadDirectoryResource(reload),
     ]);
-  }
-  async teamChangedNotity(target: schema.XTarget): Promise<boolean> {
-    return await this.pullMembers([target], true);
   }
 }

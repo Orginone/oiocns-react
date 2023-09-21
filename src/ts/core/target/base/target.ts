@@ -3,7 +3,7 @@ import { IIdentity, Identity } from '../identity/identity';
 import { OperateType, TargetType } from '../../public/enums';
 import { PageAll } from '../../public/consts';
 import { ITeam, Team } from './team';
-import { targetOperates } from '../../public';
+import { memberOperates, targetOperates } from '../../public';
 import { Directory, IDirectory } from '../../thing/directory';
 import { IFileInfo } from '../../thing/fileinfo';
 import { DataResource } from '../../thing/resource';
@@ -34,13 +34,7 @@ export interface ITarget extends ITeam, IFileInfo<schema.XTarget> {
   /** 为用户设立身份 */
   createIdentity(data: model.IdentityModel): Promise<IIdentity | undefined>;
   /** 发送身份变更通知 */
-  sendIdentityChangeMsg(
-    data: any,
-    ignoreSelf?: boolean,
-    targetId?: string,
-    onlyTarget?: boolean,
-    onlineOnly?: boolean,
-  ): Promise<boolean>;
+  sendIdentityChangeMsg(data: any): Promise<boolean>;
 }
 
 /** 用户基类实现 */
@@ -124,6 +118,9 @@ export abstract class Target extends Team implements ITarget {
     if (this.session.isMyChat) {
       operates.unshift(targetOperates.Chat);
     }
+    if (this.members.some((i) => i.id === this.userId)) {
+      // operates.unshift(memberOperates.Exit);
+    }
     return operates;
   }
   protected async pullSubTarget(team: ITeam): Promise<boolean> {
@@ -165,22 +162,16 @@ export abstract class Target extends Team implements ITarget {
       resolve(undefined);
     });
   }
-  async sendIdentityChangeMsg(
-    data: any,
-    ignoreSelf?: boolean,
-    targetId?: string,
-    onlyTarget?: boolean,
-    onlineOnly: boolean = true,
-  ): Promise<boolean> {
+  async sendIdentityChangeMsg(data: any): Promise<boolean> {
     const res = await kernel.dataNotify({
       data: data,
       flag: 'identity',
-      onlineOnly: onlineOnly,
+      onlineOnly: true,
       belongId: this.metadata.belongId,
       relations: this.relations,
-      onlyTarget: onlyTarget === true,
-      ignoreSelf: ignoreSelf === true,
-      targetId: targetId ?? this.metadata.id,
+      onlyTarget: false,
+      ignoreSelf: true,
+      targetId: this.metadata.id,
     });
     return res.success;
   }
@@ -188,41 +179,45 @@ export abstract class Target extends Team implements ITarget {
     let message = '';
     switch (data.operate) {
       case OperateType.Create:
-        message = `${data.operater?.name}新增身份【${data.identity.name}】.`;
+        message = `${data.operater.name}新增身份【${data.identity.name}】.`;
         if (this.identitys.every((q) => q.id !== data.identity.id)) {
           this.identitys.push(new Identity(data.identity, this));
         }
         break;
       case OperateType.Delete:
-        message = `${data.operater?.name}将身份【${data.identity.name}】删除.`;
+        message = `${data.operater.name}将身份【${data.identity.name}】删除.`;
         this.identitys.find((a) => a.id == data.identity.id)?.delete(true);
         break;
       case OperateType.Update:
-        message = `${data.operater?.name}将身份【${data.identity.name}】信息更新.`;
+        message = `${data.operater.name}将身份【${data.identity.name}】信息更新.`;
         this.updateMetadata(data.identity);
         break;
       case OperateType.Remove:
-        message = `${data.operater?.name}移除赋予【${data.subTarget!.name}】的身份【${
-          data.identity.name
-        }】.`;
-        this.identitys
-          .find((a) => a.id == data.identity.id)
-          ?.removeMembers([data.subTarget!], true);
+        if (data.subTarget) {
+          message = `${data.operater.name}移除赋予【${data.subTarget!.name}】的身份【${
+            data.identity.name
+          }】.`;
+          this.identitys
+            .find((a) => a.id == data.identity.id)
+            ?.removeMembers([data.subTarget], true);
+        }
         break;
       case OperateType.Add:
-        message = `${data.operater?.name}赋予{${data.subTarget!.name}身份【${
-          data.identity.name
-        }】.`;
-        this.identitys
-          .find((a) => a.id == data.identity.id)
-          ?.pullMembers([data.subTarget!], true);
+        if (data.subTarget) {
+          message = `${data.operater.name}赋予{${data.subTarget!.name}身份【${
+            data.identity.name
+          }】.`;
+          this.identitys
+            .find((a) => a.id == data.identity.id)
+            ?.pullMembers([data.subTarget], true);
+        }
         break;
     }
     if (message.length > 0) {
       if (data.operater?.id != this.user.id) {
         logger.info(message);
       }
-      this.changCallback();
+      this.memberDirectory.changCallback();
     }
   }
 }

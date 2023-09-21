@@ -120,7 +120,7 @@ export class Session extends Entity<schema.XEntity> implements ISession {
   get isMyChat(): boolean {
     return (
       this.metadata.typeName === TargetType.Person ||
-      this.members.filter((i) => i.id === this.userId).length > 0
+      this.members.some((i) => i.id === this.userId)
     );
   }
   get isFriend(): boolean {
