@@ -3,12 +3,13 @@ import { IIdentity, Identity } from '../identity/identity';
 import { OperateType, TargetType } from '../../public/enums';
 import { PageAll } from '../../public/consts';
 import { ITeam, Team } from './team';
-import { targetOperates } from '../../public';
+import { memberOperates, targetOperates } from '../../public';
 import { Directory, IDirectory } from '../../thing/directory';
 import { IFileInfo } from '../../thing/fileinfo';
 import { DataResource } from '../../thing/resource';
 import { ISession, Session } from '../../chat/session';
 import { IPerson } from '../person';
+import { logger } from '@/ts/base/common';
 
 /** 用户抽象接口类 */
 export interface ITarget extends ITeam, IFileInfo<schema.XTarget> {
@@ -32,19 +33,22 @@ export interface ITarget extends ITeam, IFileInfo<schema.XTarget> {
   loadIdentitys(reload?: boolean): Promise<IIdentity[]>;
   /** 为用户设立身份 */
   createIdentity(data: model.IdentityModel): Promise<IIdentity | undefined>;
+  /** 发送身份变更通知 */
+  sendIdentityChangeMsg(data: any): Promise<boolean>;
 }
 
 /** 用户基类实现 */
 export abstract class Target extends Team implements ITarget {
   constructor(
+    _keys: string[],
     _metadata: schema.XTarget,
     _relations: string[],
     _user?: IPerson,
     _memberTypes: TargetType[] = [TargetType.Person],
   ) {
-    super(_metadata, _memberTypes);
+    super(_keys, _metadata, _relations, _memberTypes);
     this.user = _user || (this as unknown as IPerson);
-    this.resource = new DataResource(_metadata, _relations);
+    this.resource = new DataResource(_metadata, _relations, [this.key]);
     this.directory = new Directory(
       {
         ..._metadata,
@@ -69,6 +73,11 @@ export abstract class Target extends Team implements ITarget {
     );
     this.isContainer = true;
     this.session = new Session(this.id, this, _metadata);
+    kernel.subscribe(
+      `${_metadata.belongId}-${_metadata.id}-identity`,
+      [..._keys, this.key],
+      (data: any) => this._receiveIdentity(data),
+    );
   }
   user: IPerson;
   session: ISession;
@@ -105,7 +114,7 @@ export abstract class Target extends Team implements ITarget {
     if (res.success && res.data?.id) {
       const identity = new Identity(res.data, this);
       this.identitys.push(identity);
-      identity.createIdentityMsg(OperateType.Create, this.metadata);
+      identity._sendIdentityChangeMsg(OperateType.Create, this.metadata);
       return identity;
     }
   }
@@ -113,6 +122,9 @@ export abstract class Target extends Team implements ITarget {
     const operates = super.operates();
     if (this.session.isMyChat) {
       operates.unshift(targetOperates.Chat);
+    }
+    if (this.members.some((i) => i.id === this.userId)) {
+      // operates.unshift(memberOperates.Exit);
     }
     return operates;
   }
@@ -122,7 +134,7 @@ export abstract class Target extends Team implements ITarget {
       subIds: [team.id],
     });
     if (res.success) {
-      this.createTargetMsg(OperateType.Add, team.metadata);
+      await this.sendTargetNotity(OperateType.Add, team.metadata);
     }
     return res.success;
   }
@@ -154,5 +166,63 @@ export abstract class Target extends Team implements ITarget {
     return new Promise((resolve) => {
       resolve(undefined);
     });
+  }
+  async sendIdentityChangeMsg(data: any): Promise<boolean> {
+    const res = await kernel.dataNotify({
+      data: data,
+      flag: 'identity',
+      onlineOnly: true,
+      belongId: this.metadata.belongId,
+      relations: this.relations,
+      onlyTarget: false,
+      ignoreSelf: true,
+      targetId: this.metadata.id,
+    });
+    return res.success;
+  }
+  private async _receiveIdentity(data: model.IdentityOperateModel) {
+    let message = '';
+    switch (data.operate) {
+      case OperateType.Create:
+        message = `${data.operater.name}新增身份【${data.identity.name}】.`;
+        if (this.identitys.every((q) => q.id !== data.identity.id)) {
+          this.identitys.push(new Identity(data.identity, this));
+        }
+        break;
+      case OperateType.Delete:
+        message = `${data.operater.name}将身份【${data.identity.name}】删除.`;
+        this.identitys.find((a) => a.id == data.identity.id)?.delete(true);
+        break;
+      case OperateType.Update:
+        message = `${data.operater.name}将身份【${data.identity.name}】信息更新.`;
+        this.updateMetadata(data.identity);
+        break;
+      case OperateType.Remove:
+        if (data.subTarget) {
+          message = `${data.operater.name}移除赋予【${data.subTarget!.name}】的身份【${
+            data.identity.name
+          }】.`;
+          this.identitys
+            .find((a) => a.id == data.identity.id)
+            ?.removeMembers([data.subTarget], true);
+        }
+        break;
+      case OperateType.Add:
+        if (data.subTarget) {
+          message = `${data.operater.name}赋予{${data.subTarget!.name}身份【${
+            data.identity.name
+          }】.`;
+          this.identitys
+            .find((a) => a.id == data.identity.id)
+            ?.pullMembers([data.subTarget], true);
+        }
+        break;
+    }
+    if (message.length > 0) {
+      if (data.operater?.id != this.user.id) {
+        logger.info(message);
+      }
+      this.memberDirectory.changCallback();
+    }
   }
 }

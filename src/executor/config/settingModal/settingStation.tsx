@@ -75,7 +75,7 @@ const SettingStation: React.FC<IProps> = ({ company, finished }) => {
         notExitIcon
         selectMenu={selectMenu}
         onSelect={async (data) => {
-          if ('company' in data.item) {
+          if (data.itemType === '岗位') {
             const station: IStation = data.item;
             await station.loadIdentitys();
             await station.loadMembers();
@@ -184,7 +184,7 @@ const loadSettingMenu = (company: ICompany): MenuItemType => {
 /** 加载右侧菜单 */
 const loadMenus = (item: ICompany | IStation) => {
   const items: OperateMenuType[] = [];
-  if ('company' in item) {
+  if (!('stations' in item)) {
     if (item.space.hasRelationAuth()) {
       items.push(
         {

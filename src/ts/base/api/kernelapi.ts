@@ -18,10 +18,15 @@ export default class KernelApi {
   private static _instance: KernelApi;
   // 必达消息缓存
   private _cacheData: any = {};
-  // 订阅方法
+  // 监听方法
   private _methods: { [name: string]: ((...args: any[]) => void)[] };
-  // 订阅回调字典
-  private _subscribeCallbacks: Record<string, (data: any) => void>;
+  // 订阅方法
+  private _subMethods: {
+    [name: string]: {
+      keys: string[];
+      operation: (...args: any[]) => void;
+    }[];
+  };
   // 上下线提醒
   onlineNotify = new Emitter();
   // 在线的连接
@@ -40,12 +45,9 @@ export default class KernelApi {
    */
   private constructor(url: string) {
     this._methods = {};
-    this._subscribeCallbacks = {};
+    this._subMethods = {};
     this._storeHub = new StoreHub(url, 'txt');
     this._storeHub.on('Receive', (res) => this._receive(res));
-    this._storeHub.on('Updated', (belongId, key, data) => {
-      this._updated(belongId, key, data);
-    });
     this._storeHub.onConnected(() => {
       if (this.accessToken.length > 0) {
         this._storeHub
@@ -53,11 +55,6 @@ export default class KernelApi {
           .then((res: model.ResultType<any>) => {
             if (res.success) {
               logger.info('连接到内核成功!');
-              Object.keys(this._subscribeCallbacks).forEach(async (fullKey) => {
-                const key = fullKey.split('|')[0];
-                const belongId = fullKey.split('|')[1];
-                this.subscribed(belongId, key, this._subscribeCallbacks[fullKey]);
-              });
             }
           })
           .catch((err) => {
@@ -374,7 +371,7 @@ export default class KernelApi {
    */
   public async pullAnyToTeam(
     params: model.GiveModel,
-  ): Promise<model.ResultType<boolean>> {
+  ): Promise<model.ResultType<string[]>> {
     return await this.request({
       module: 'target',
       action: 'PullAnyToTeam',
@@ -545,34 +542,6 @@ export default class KernelApi {
     return await this.request({
       module: 'target',
       action: 'QueryTeamIdentitys',
-      params: params,
-    });
-  }
-  /**
-   * 创建组织变更消息
-   * @param {model.TargetMessageModel} params 请求参数
-   * @returns {model.ResultType<boolean>} 请求结果
-   */
-  public async createTargetMsg(
-    params: model.TargetMessageModel,
-  ): Promise<model.ResultType<boolean>> {
-    return await this.request({
-      module: 'chat',
-      action: 'CreateTargetMsg',
-      params: params,
-    });
-  }
-  /**
-   * 创建组织变更消息
-   * @param {model.IdentityMessageModel} params 请求参数
-   * @returns {model.ResultType<boolean>} 请求结果
-   */
-  public async createIdentityMsg(
-    params: model.IdentityMessageModel,
-  ): Promise<model.ResultType<boolean>> {
-    return await this.request({
-      module: 'chat',
-      action: 'CreateIdentityMsg',
       params: params,
     });
   }
@@ -994,51 +963,6 @@ export default class KernelApi {
     });
   }
   /**
-   * 订阅对象变更
-   * @param {string} key 对象名称（eg: rootName.person.name）
-   * @param {string} belongId 对象所在域, 个人域(user),单位域(company),开放域(all)
-   * @param {(data:any)=>void} callback 变更回调，默认回调一次
-   * @returns {void} 无返回值
-   */
-  public subscribed<T>(belongId: string, key: string, callback: (data: T) => void): void {
-    if (callback) {
-      const fullKey = key + '|' + belongId;
-      this._subscribeCallbacks[fullKey] = callback;
-      if (this._storeHub.isConnected) {
-        this._storeHub
-          .invoke('Subscribed', belongId, key)
-          .then((res: model.ResultType<T>) => {
-            if (res.success && res.data) {
-              callback.apply(this, [res.data]);
-            }
-          })
-          .catch((err) => {
-            logger.error(err);
-          });
-      }
-    }
-  }
-  /**
-   * 取消订阅对象变更
-   * @param {string} key 对象名称（eg: rootName.person.name）
-   * @param {string} belongId 对象所在域, 个人域(user),单位域(company),开放域(all)
-   * @returns {void} 无返回值
-   */
-  public unSubscribed(belongId: string, key: string): void {
-    const fullKey = key + '|' + belongId;
-    if (this._subscribeCallbacks[fullKey] && this._storeHub.isConnected) {
-      this._storeHub
-        .invoke('UnSubscribed', belongId, key)
-        .then(() => {
-          console.debug(`${key}取消订阅成功.`);
-        })
-        .catch((err) => {
-          logger.error(err);
-        });
-    }
-    delete this._subscribeCallbacks[fullKey];
-  }
-  /**
    * 由内核代理一个http请求
    * @param {model.HttpRequestType} reqs 请求体
    * @returns 异步结果
@@ -1073,6 +997,7 @@ export default class KernelApi {
     if (req.ignoreSelf) {
       req.ignoreConnectionId = this._storeHub.connectionId;
     }
+    console.log(req);
     if (this._storeHub.isConnected) {
       return await this._storeHub.invoke('DataNotify', req);
     } else {
@@ -1104,6 +1029,47 @@ export default class KernelApi {
     }
   }
   /**
+   * 订阅变更
+   * @param flag 标识
+   * @param keys 唯一标志
+   * @param operation 操作
+   */
+  public subscribe(
+    flag: string,
+    keys: string[],
+    operation: (...args: any[]) => any,
+  ): void {
+    if (!flag || !operation || keys.length < 1) {
+      return;
+    }
+    flag = flag.toLowerCase();
+    if (!this._subMethods[flag]) {
+      this._subMethods[flag] = [];
+    }
+    this._subMethods[flag].push({
+      keys,
+      operation,
+    });
+    const data = this._cacheData[flag] || [];
+    data.forEach((item: any) => {
+      operation.apply(this, [item]);
+    });
+    this._cacheData[flag] = [];
+  }
+  /**
+   * 取消订阅变更
+   * @param flag 标识
+   * @param keys 唯一标志
+   * @param operation 操作
+   */
+  public unSubscribe(key: string): void {
+    Object.keys(this._subMethods).forEach((flag) => {
+      this._subMethods[flag] = this._subMethods[flag].filter(
+        (i) => !i.keys.includes(key),
+      );
+    });
+  }
+  /**
    * 监听服务端方法
    * @param {string} methodName 方法名
    * @returns {void} 无返回值
@@ -1112,36 +1078,37 @@ export default class KernelApi {
     if (!methodName || !newOperation) {
       return;
     }
-
     methodName = methodName.toLowerCase();
     if (!this._methods[methodName]) {
       this._methods[methodName] = [];
     }
-
     if (this._methods[methodName].indexOf(newOperation) !== -1) {
       return;
     }
-
     this._methods[methodName].push(newOperation);
-    const data = this._cacheData[methodName] || [];
-    data.forEach((item: any) => {
-      newOperation.apply(this, [item]);
-    });
-    this._cacheData[methodName] = [];
   }
   /** 接收服务端消息 */
   private _receive(res: model.ReceiveType) {
-    var onlineOnly: boolean = true;
-    if (res.target === 'DataNotify') {
-      const data: model.DataNotityType = res.data;
-      if (data.ignoreConnectionId === this._storeHub.connectionId) {
-        return;
-      }
-      res.target = `${data.belongId}-${data.targetId}-${data.flag}`;
-      res.data = data.data;
-      onlineOnly = data.onlineOnly;
-    }
     switch (res.target) {
+      case 'DataNotify': {
+        console.log(res);
+        const data: model.DataNotityType = res.data;
+        if (data.ignoreConnectionId === this._storeHub.connectionId) {
+          return;
+        }
+        const flag = `${data.belongId}-${data.targetId}-${data.flag}`.toLowerCase();
+        const methods = this._subMethods[flag];
+        if (methods) {
+          try {
+            methods.forEach((m) => m.operation.apply(this, [data.data]));
+          } catch (e) {
+            logger.error(e as Error);
+          }
+        } else if (!data.onlineOnly) {
+          const data = this._cacheData[flag] || [];
+          this._cacheData[flag] = [...data, data.data];
+        }
+      }
       case 'Online':
       case 'Outline':
         {
@@ -1172,29 +1139,9 @@ export default class KernelApi {
           } catch (e) {
             logger.error(e as Error);
           }
-        } else if (!onlineOnly) {
-          const data = this._cacheData[res.target.toLowerCase()] || [];
-          this._cacheData[res.target.toLowerCase()] = [...data, res.data];
         }
       }
     }
-  }
-  /**
-   * 对象变更通知
-   * @param key 主键
-   * @param data 数据
-   * @returns {void} 无返回值
-   */
-  private _updated(belongId: string, key: string, data: any): void {
-    const lfullkey = key + '|' + belongId;
-    Object.keys(this._subscribeCallbacks).forEach((fullKey) => {
-      if (fullKey === lfullkey) {
-        const callback: (data: any) => void = this._subscribeCallbacks[fullKey];
-        if (callback) {
-          callback.call(callback, data);
-        }
-      }
-    });
   }
   /**
    * 使用rest请求后端
