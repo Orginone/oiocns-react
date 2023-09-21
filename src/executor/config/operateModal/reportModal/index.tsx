@@ -1,75 +1,22 @@
-import { Button } from 'antd';
-import React, { useState } from 'react';
+import React from 'react';
+import { Col, Divider, Layout, Row, Space, Typography } from 'antd';
 import cls from './index.module.less';
-import PageCard from '@/components/PageCard';
-import Attribute from './Attritube';
-import Sheet from './Sheet';
-import FormRules from '../labelsModal/formRules';
 import { IForm } from '@/ts/core';
 import FullScreenModal from '@/executor/tools/fullScreen';
-import EntityInfo from '@/components/Common/EntityInfo';
+import { RightBarIcon } from '@/components/Common/GlobalComps/customIcon';
+import { Resizable } from 'devextreme-react';
+import useStorage from '@/hooks/useStorage';
+import ReportDesign from '@/components/Common/ReportDesign';
+import RuleSetting from '@/components/Common/FormEdit/Settings/RuleSetting/index';
+const { Content, Sider } = Layout;
 
 interface IProps {
   current: IForm;
   finished: () => void;
 }
 const ReportModal: React.FC<IProps> = ({ current, finished }: IProps) => {
-  const [modalType, setModalType] = useState<string>('');
-  const [tabKey, setTabKey] = useState<string>('attr');
-  /** 操作按钮 */
-  const renderButton = () => {
-    if (!current.isInherited) {
-      return (
-        <Button
-          key="edit"
-          type="link"
-          onClick={() => {
-            setModalType(
-              tabKey == 'attr'
-                ? '新增特性'
-                : tabKey == 'sheet'
-                ? '新增sheet页'
-                : '新增规则',
-            );
-          }}>
-          {tabKey == 'attr' ? '新增特性' : tabKey == 'sheet' ? '新增sheet页' : '新增规则'}
-        </Button>
-      );
-    }
-    return <></>;
-  };
-
-  const content = () => {
-    if (tabKey === 'attr') {
-      return (
-        <Attribute
-          current={current} // IReport 目前不适用特性属性
-          modalType={modalType}
-          recursionOrg={true}
-          setModalType={setModalType}
-        />
-      );
-    }
-    if (tabKey === 'sheet') {
-      return (
-        <Sheet
-          current={current}
-          modalType={modalType}
-          recursionOrg={true}
-          setModalType={setModalType}
-          finished={finished}
-        />
-      );
-    }
-    return (
-      <FormRules
-        current={current}
-        setModalType={setModalType}
-        modalType={modalType}
-        recursionOrg={false}
-      />
-    );
-  };
+  const [rightSider, setRightSider] = useStorage<boolean>('rightSider', false);
+  const [mainWidth, setMainWidth] = useStorage<string | number>('mainWidth', '70%');
 
   return (
     <FullScreenModal
@@ -81,33 +28,42 @@ const ReportModal: React.FC<IProps> = ({ current, finished }: IProps) => {
       title={current.typeName + '管理'}
       footer={[]}
       onCancel={finished}>
-      <div className={cls[`dept-content-box`]}>
-        <div className={cls['pages-wrap']}>
-          <EntityInfo entity={current}></EntityInfo>
-          <PageCard
-            bordered={false}
-            tabList={[
-              {
-                tab: current.typeName + '特性',
-                key: 'attr',
-              },
-              {
-                tab: current.typeName + 'sheet页',
-                key: 'sheet',
-              },
-              {
-                tab: current.typeName + '规则',
-                key: 'rules',
-              },
-            ]}
-            activeTabKey={tabKey}
-            onTabChange={(key) => setTabKey(key)}
-            tabBarExtraContent={renderButton()}
-            bodyStyle={{ paddingTop: 16 }}>
-            <div className={cls['page-content-table']}>{content()}</div>
-          </PageCard>
-        </div>
-      </div>
+      <Layout className={cls.layout}>
+        <Row className={cls[`content-top`]}>
+          <Col className={cls.rightstyle}>
+            <Space wrap split={<Divider type="vertical" />} size={2}>
+              <Typography.Link
+                title={'切换辅助侧栏'}
+                style={{ fontSize: 18 }}
+                onClick={() => setRightSider(!rightSider)}>
+                <RightBarIcon size={18} width={8} selected={rightSider} />
+              </Typography.Link>
+            </Space>
+          </Col>
+        </Row>
+        <Layout>
+          {rightSider}
+          {rightSider ? (
+            <>
+              <Resizable
+                handles={'right'}
+                width={mainWidth}
+                onResize={(e) => setMainWidth(e.width)}>
+                <Sider className={cls.content} width={'100%'}>
+                  <ReportDesign current={current} finished={finished}></ReportDesign>
+                </Sider>
+              </Resizable>
+              <Content className={cls.content}>
+                <RuleSetting current={current} activeKey={'3'}></RuleSetting>
+              </Content>
+            </>
+          ) : (
+            <Content className={cls.content}>
+              <ReportDesign current={current} finished={finished}></ReportDesign>
+            </Content>
+          )}
+        </Layout>
+      </Layout>
     </FullScreenModal>
   );
 };

@@ -68,16 +68,21 @@ const EntityForm: React.FC<IProps> = ({ cmd, entity, finished }) => {
           finished={reloadFinish}
         />
       );
-    case 'newWorkConfig':
-    case 'updateWorkConfig':
-    case 'remarkWorkConfig':
-    case 'newThingConfig':
+    case 'newForm':
+    case 'updateReport':
+    case 'remarkReport':
     case 'updateThingConfig':
     case 'remarkThingConfig':
+    case 'updateWorkConfig':
+    case 'remarkWorkConfig':
       return (
         <LabelsForm
-          formType={cmd.replace('WorkConfig', '').replace('ThingConfig', '')}
-          typeName={cmd.includes('WorkConfig') ? '事项配置' : '实体配置'}
+          formType={cmd
+            .replace('Form', '')
+            .replace('Report', '')
+            .replace('WorkConfig', '')
+            .replace('ThingConfig', '')}
+          typeName={'表单'}
           current={entity as any}
           finished={reloadFinish}
         />

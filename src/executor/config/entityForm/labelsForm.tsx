@@ -79,10 +79,10 @@ const LabelsForm = (props: Iprops) => {
       title: '类型',
       dataIndex: 'typeName',
       valueType: 'select',
-      initialValue: '表单',
+      initialValue: '实体配置',
       readonly: readonly,
       fieldProps: {
-        options: ['表单', '报表'].map((i) => {
+        options: ['实体配置', '事项配置', '报表'].map((i) => {
           return {
             value: i,
             label: i,
@@ -124,7 +124,6 @@ const LabelsForm = (props: Iprops) => {
         }
       }}
       onFinish={async (values) => {
-        values.typeName = props.typeName;
         switch (props.formType) {
           case 'update':
             await form!.update(values);
