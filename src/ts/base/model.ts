@@ -368,8 +368,6 @@ export type ChatMessageType = {
   fromId: string;
   // 接收方Id
   toId: string;
-  // 接收会话Id
-  sessionId: string;
   // 类型
   typeName: string;
   // 内容

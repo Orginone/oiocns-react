@@ -88,13 +88,7 @@ const openDirectory = (
     }
     entity = entity.directory;
   }
-  if (
-    'files' in entity ||
-    'works' in entity ||
-    (type == 'config' &&
-      'node' in entity &&
-      entity.directory.target.space.belongId != entity.belongId)
-  ) {
+  if (type == 'config' && 'isInheritedWork' in entity && entity.isInheritedWork) {
     entity.loadContent().then(() => {
       orgCtrl.currentKey = entity.key;
       orgCtrl.changCallback();
