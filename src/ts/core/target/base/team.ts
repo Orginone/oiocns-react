@@ -273,7 +273,7 @@ export abstract class Team extends Entity<schema.XTarget> implements ITeam {
         logger.info(message);
       }
       msgChatNotify.changCallback();
-      this.directory.structCallback();
+      this.space.directory.structCallback();
     }
   }
   async _removeJoinTarget(_: schema.XTarget): Promise<string> {

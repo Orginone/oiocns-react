@@ -272,12 +272,13 @@ export class Session extends Entity<schema.XEntity> implements ISession {
     return false;
   }
   async clearMessage(): Promise<boolean> {
-    if (this.target.id === this.userId) {
+    if (this.canDeleteMessage) {
       const success = await this.coll.deleteMatch(this.sessionMatch);
       if (success) {
         this.messages = [];
         this.chatdata.lastMsgTime = new Date().getTime();
         this.messageNotify?.apply(this, [this.messages]);
+        this.sendMessage(MessageType.Notify, `${this.target.user.name} 清空了消息`, []);
         return true;
       }
     }

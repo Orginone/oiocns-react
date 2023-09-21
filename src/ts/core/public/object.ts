@@ -149,7 +149,6 @@ export class XObject<T extends schema.Xbase> {
   }
 
   private _objectCallback(res: { flag: string; data: any }) {
-    console.log(res);
     const methods = this._methods[res.flag];
     if (methods) {
       try {
