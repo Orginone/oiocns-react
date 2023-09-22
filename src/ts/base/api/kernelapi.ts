@@ -567,7 +567,6 @@ export default class KernelApi {
   public async createWorkInstance(
     params: model.WorkInstanceModel,
   ): Promise<model.ResultType<schema.XWorkInstance>> {
-    console.log(params);
     return await this.request({
       module: 'work',
       action: 'CreateWorkInstance',
@@ -997,7 +996,6 @@ export default class KernelApi {
     if (req.ignoreSelf) {
       req.ignoreConnectionId = this._storeHub.connectionId;
     }
-    console.log(req);
     if (this._storeHub.isConnected) {
       return await this._storeHub.invoke('DataNotify', req);
     } else {
@@ -1092,7 +1090,6 @@ export default class KernelApi {
     switch (res.target) {
       case 'DataNotify':
         {
-          console.log(res);
           const data: model.DataNotityType = res.data;
           if (data.ignoreConnectionId === this._storeHub.connectionId) {
             return;

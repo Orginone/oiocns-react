@@ -1,10 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Tabs } from 'antd';
 import { HotTable } from '@handsontable/react';
-import { HyperFormula } from 'hyperformula';
 import { textRenderer, registerRenderer } from 'handsontable/renderers';
 import { registerLanguageDictionary, zhCN } from 'handsontable/i18n';
-import Handsontable from 'handsontable';
 registerLanguageDictionary(zhCN);
 import { registerAllModules } from 'handsontable/registry';
 registerAllModules();
@@ -12,7 +10,6 @@ import 'handsontable/dist/handsontable.min.css';
 import { kernel, model, schema } from '@/ts/base';
 import { IBelong } from '@/ts/core';
 import { WorkFormRulesType } from '@/ts/core/work/rules/workFormRules';
-import { selectEditor } from './editor/select';
 
 interface IProps {
   allowEdit: boolean;
@@ -28,8 +25,6 @@ interface IProps {
 const ReportForms: React.FC<IProps> = (props) => {
   const [cells, setCells] = useState<any>([]);
   const [styleList, setStyleList] = useState<any>([]);
-  const [classList, setClassList] = useState<any>([]);
-  const [sheetIndex, setSheetIndex] = useState<string>('0');
   const [rowHeights, setRowHeights] = useState<any>([]);
   const [colWidths, setColWidths] = useState<any>([]);
   const [serviceData, setServiceData] = useState<any>();
@@ -38,34 +33,47 @@ const ReportForms: React.FC<IProps> = (props) => {
   const [reallyData, setReallyData] = useState(
     formData.after.length > 0 ? formData.after[0] : undefined,
   );
-  const [readOnly, setReadOnly] = useState<boolean>(false);
+  const [readOnly, setReadOnly] = useState<boolean>(false); /** 是否只读 */
   const hotRef: any = useRef(null);
   let sheetList: any = reportData?.rule
-    ? Object.values(JSON.parse(reportData?.rule))
-    : [];
-  let datas = sheetList[sheetIndex]?.data?.data || [[]];
-  let setting = sheetList[sheetIndex]?.data?.setting || {};
-  let mergeCells = setting?.mergeCells || [];
+    ? JSON.parse(reportData?.rule)
+    : {}; /** 当前报表所有数据 */
+  delete sheetList?.list;
+  sheetList = Object.values(sheetList);
+  const [selectItem, setSelectedItem] = useState<any>(sheetList[0]);
 
   useEffect(() => {
     const hot = hotRef.current.hotInstance;
-    Handsontable.editors.registerEditor('SelectEditor', selectEditor); // 还未完成同步组件
+    /** hot.clear之后会全选报表所以用的update */
+    hot.updateSettings({
+      data: [[]],
+    });
+    const setting = selectItem?.data?.setting || {}; /** 报表设置数据 */
+    const mergeCells = setting?.mergeCells || []; /** 合并单元格数据 */
+    // Handsontable.editors.registerEditor('SelectEditor', selectEditor); // 还未完成同步组件
     setStyleList(setting?.styleList || []);
-    setClassList(setting?.classList || []);
     setRowHeights(setting?.row_h || []);
     setColWidths(setting?.col_w || []);
     hot.updateSettings({
-      data: datas,
+      data: selectItem?.data?.data || [[]],
       cell: cells,
       mergeCells: mergeCells,
     });
     if (props.allowEdit) {
-      props?.ruleService?.setFormChangeCallback(reportData.id, (data: any) => {
-        if (data) {
-          console.log(data);
-          setServiceData(data);
-        }
-      });
+      props?.ruleService && (props.ruleService.currentMainFormId = reportData.id);
+      /** 初始化数据 */
+      props?.ruleService?.collectData<{ formId: string; callback: (data: any) => void }>(
+        'formCallBack',
+        {
+          formId: reportData.id,
+          callback: (data: any) => {
+            if (data) {
+              console.log(data, '规则返回参数');
+              setServiceData(data);
+            }
+          },
+        },
+      );
       kernel.createThing(props.belong.userId, [], '').then((res) => {
         if (res.success && res.data) {
           setReallyData(res.data);
@@ -74,7 +82,7 @@ const ReportForms: React.FC<IProps> = (props) => {
       setCells(setting?.cells || []);
     } else {
       setReadOnly(true);
-      if (reallyData) {
+      if (reallyData && selectItem?.data?.data) {
         Object.keys(reallyData).forEach((k) => {
           if (k.indexOf(',') != -1) {
             let arr = k.split(',');
@@ -83,7 +91,85 @@ const ReportForms: React.FC<IProps> = (props) => {
         });
       }
     }
-  }, []);
+    /** 单元格样式处理处理 */
+    setting?.styleList?.forEach((item: any) => {
+      hotRef.current.hotInstance.getCellMeta(item.row, item.col).renderer =
+        'cellStylesRenderer';
+    });
+    /** 单元格样式处理处理 */
+    setting?.classList?.forEach((item: any) => {
+      let arr = [];
+      let items: any = item.class;
+      for (let k in items) {
+        arr.push(items[k]);
+      }
+      hotRef.current.hotInstance.setCellMeta(
+        item.row,
+        item.col,
+        'className',
+        arr.join(' '),
+      );
+    });
+    /** 单元格特性处理 */
+    setting.cells?.forEach((item: any) => {
+      if (serviceData) {
+        Object.keys(serviceData).map((k) => {
+          if (item.prop.id === k) {
+            hotRef.current.hotInstance.setDataAtCell([
+              [item.row, item.col, serviceData[k]],
+            ]);
+          }
+        });
+      }
+      /** 渲染单元格颜色 */
+      hotRef.current.hotInstance.getCellMeta(item.row, item.col).renderer =
+        'customStylesRenderer';
+      /** 更新特性rules 但单元格只有只读属性 readOnly */
+      let newAttributes: any = [];
+      Object.keys(props.data.fields).map((k) => {
+        newAttributes = props.data.fields[k];
+      });
+      /** 解析特性rule */
+      newAttributes.forEach((items: any) => {
+        if (item.prop.id === items.id) {
+          item.prop = items;
+          const newRule = JSON.parse(item.prop.rule);
+          if (newRule) {
+            if (newRule.widget) {
+              setEditor(item);
+            }
+            Object.keys(newRule).map((key) => {
+              if (key === 'rules' && newRule['rules'].length > 0) {
+                setValidator(item, newRule['rules']);
+              } else if (key === 'min' || key === 'max') {
+                hotRef.current.hotInstance.setCellMeta(
+                  item.row,
+                  item.col,
+                  'validator',
+                  function (value: any, callback: any) {
+                    setTimeout(() => {
+                      if (value >= newRule['min'] && value <= newRule['max']) {
+                        callback(true);
+                      } else {
+                        callback(false);
+                      }
+                    }, 100);
+                  },
+                );
+              } else {
+                hotRef.current.hotInstance.setCellMeta(
+                  item.row,
+                  item.col,
+                  key,
+                  newRule[key],
+                );
+              }
+            });
+          }
+        }
+      });
+    });
+  }, [selectItem]);
 
   const setValidator = (item: any, rules: any) => {
     // 设置单元格规则
@@ -106,6 +192,7 @@ const ReportForms: React.FC<IProps> = (props) => {
     );
   };
 
+  /** 插入单元格编辑器 */
   const setEditor = (item: any) => {
     let valueType: string = JSON.parse(item.prop.rule).widget;
     let newType: string = '';
@@ -119,7 +206,11 @@ const ReportForms: React.FC<IProps> = (props) => {
         break;
       case 'myself':
         newType = item.type;
-        setData(item);
+        hotRef.current.hotInstance.setDataAtCell(
+          item.row,
+          item.col,
+          props.belong?.user.name,
+        );
         break;
       default:
         newType = item.type;
@@ -128,8 +219,8 @@ const ReportForms: React.FC<IProps> = (props) => {
     hotRef.current.hotInstance.setCellMeta(item.row, item.col, 'editor', newType);
   };
 
+  /** 给下拉框插入数据 */
   const setSelectOptions = (item: any, valueType: string) => {
-    //给下拉框插入数据
     const belong = props.belong;
     let arr: any = [];
     switch (valueType) {
@@ -159,90 +250,12 @@ const ReportForms: React.FC<IProps> = (props) => {
     hotRef.current.hotInstance.setCellMeta(item.row, item.col, 'selectOptions', arr);
   };
 
-  const setData = (item: any) => {
-    const belong = props.belong;
-    hotRef.current.hotInstance.setDataAtCell(item.row, item.col, belong?.user.name);
-  };
-
-  styleList?.forEach((item: any) => {
-    hotRef.current.hotInstance.getCellMeta(item.row, item.col).renderer =
-      'cellStylesRenderer';
-  });
-
-  classList?.forEach((item: any) => {
-    let arr = [];
-    let items: any = item.class;
-    for (let k in items) {
-      arr.push(items[k]);
-    }
-    hotRef.current.hotInstance.setCellMeta(
-      item.row,
-      item.col,
-      'className',
-      arr.join(' '),
-    );
-  });
-
-  cells?.forEach((item: any) => {
-    Object.keys(serviceData).map((k) => {
-      if (item.prop.id === k) {
-        hotRef.current.hotInstance.setDataAtCell([[item.row, item.col, serviceData[k]]]);
-      }
-    });
-    //渲染单元格颜色
-    hotRef.current.hotInstance.getCellMeta(item.row, item.col).renderer =
-      'customStylesRenderer';
-
-    // 更新特性rules 但单元格只有只读属性 readOnly
-    let newAttributes: any = [];
-    for (var key in props.data.fields) {
-      newAttributes = props.data.fields[key];
-    }
-    newAttributes.forEach((items: any) => {
-      if (item.prop.id === items.id) {
-        item.prop = items;
-        let newRule = JSON.parse(item.prop.rule);
-        if (newRule) {
-          if (newRule.widget) {
-            setEditor(item);
-          }
-          for (var key in newRule) {
-            if (key === 'rules' && newRule['rules'].length > 0) {
-              setValidator(item, newRule['rules']);
-            } else if (key === 'min' || key === 'max') {
-              hotRef.current.hotInstance.setCellMeta(
-                item.row,
-                item.col,
-                'validator',
-                function (value: any, callback: any) {
-                  setTimeout(() => {
-                    if (value >= newRule['min'] && value <= newRule['max']) {
-                      callback(true);
-                    } else {
-                      callback(false);
-                    }
-                  }, 100);
-                },
-              );
-            } else {
-              hotRef.current.hotInstance.setCellMeta(
-                item.row,
-                item.col,
-                key,
-                newRule[key],
-              );
-            }
-          }
-        }
-      }
-    });
-  });
-
+  /** 提交数据 创建办事 */
   const saveData = () => {
-    // 提交数据 创建办事
     const data = hotRef.current.hotInstance.getData();
     const belong = props.belong;
     let localData: any = [];
+    /** 获取特性数据集合，坐标，类型，id，数据 */
     cells?.forEach((item: any) => {
       let json = { col: item.col, row: item.row, id: item.prop.id, data: '', type: '' };
       let newData: any = data[item.row][item.col];
@@ -280,6 +293,7 @@ const ReportForms: React.FC<IProps> = (props) => {
       }
       localData.push(json);
     });
+    /** 获取除了特性之外的数据 */
     data?.forEach((it: any, index: number) => {
       it?.forEach((its: any, ids: number) => {
         if (its) {
@@ -298,28 +312,24 @@ const ReportForms: React.FC<IProps> = (props) => {
   };
 
   const onChange = (key: string) => {
-    setSheetIndex(key);
+    setSelectedItem(sheetList[key]);
   };
 
-  const hyperformulaInstance = HyperFormula.buildEmpty({
-    licenseKey: 'internal-use-in-handsontable',
-  });
-
+  /** 修改后 */
   const afterChange = (change: any, source: any) => {
-    // 修改后
-    if (source === 'edit') {
+    if (source === 'edit' && change) {
       saveData();
     }
   };
 
+  /** 渲染特性背景色 */
   registerRenderer('customStylesRenderer', (hotInstance: any, TD: any, ...rest) => {
-    //渲染特性背景色
     textRenderer(hotInstance, TD, ...rest);
     TD.style.background = '#e1f3d8';
   });
 
+  /** 渲染样式 */
   registerRenderer('cellStylesRenderer', (hotInstance: any, TD: any, ...rest) => {
-    //渲染样式
     textRenderer(hotInstance, TD, ...rest);
     let items = styleList.find((it: any) => it.row === rest[0] && it.col === rest[1]);
     let td: any = TD.style;
@@ -334,9 +344,6 @@ const ReportForms: React.FC<IProps> = (props) => {
     <div>
       <HotTable
         ref={hotRef}
-        formulas={{
-          engine: hyperformulaInstance,
-        }}
         minCols={8}
         minRows={60}
         rowHeaders={true}
@@ -355,19 +362,17 @@ const ReportForms: React.FC<IProps> = (props) => {
         licenseKey="non-commercial-and-evaluation" // for non-commercial use only
         afterChange={afterChange}
       />
-      <div>
-        <Tabs
-          tabPosition={'bottom'}
-          type="card"
-          onChange={onChange}
-          items={sheetList.map((it: any, index: number) => {
-            return {
-              label: it.name,
-              key: index,
-            };
-          })}
-        />
-      </div>
+      <Tabs
+        tabPosition={'bottom'}
+        type="card"
+        onChange={onChange}
+        items={sheetList.map((it: any, index: number) => {
+          return {
+            label: it.name,
+            key: index,
+          };
+        })}
+      />
     </div>
   );
 };
