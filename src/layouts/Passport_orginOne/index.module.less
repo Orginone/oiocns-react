@@ -1,0 +1,205 @@
+/* 每次点击按钮 重置当前焦点按钮的样式 */
+input[type='radio']:checked ~ .count label {
+  background: #e6edfe;
+}
+div {
+  font-family: 'PingFang SC';
+}
+.container {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  align-items: center;
+}
+
+.wave {
+  position: fixed;
+  height: 105%;
+  width: calc(75vw);
+  left: -25%;
+  bottom: -5%;
+}
+.logo {
+  color: white;
+  position: absolute;
+  top: 30px;
+  left: 30px;
+  height: 50px;
+  z-index: 1;
+  display: flex;
+  &Title {
+    margin-left: 10px;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    &Zh {
+      font-size: 20px;
+      font-weight: 800;
+    }
+  }
+}
+
+input[type='radio'] {
+  display: none;
+}
+li {
+  list-style-type: none;
+}
+.count {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  bottom: 0;
+  left: calc(30vw);
+  width: calc(30vw - 88px);
+  height: 10%;
+}
+.count > ul {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  width: 35%;
+  height: 30%;
+}
+.count li {
+  float: left;
+  width: 1vmax;
+  height: 1vmax;
+  border-radius: 50%;
+}
+.count li label {
+  display: flex;
+  width: 14px;
+  height: 14px;
+  background: #e6edfe;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: 0.4s;
+}
+
+.slider {
+  z-index: 1;
+  width: calc(50vw);
+  overflow: hidden;
+  &Slides {
+    display: -webkit-box;
+    transition: margin 0.8s;
+    &Item {
+      display: flex;
+      z-index: 1;
+      width: 50vw;
+      flex-direction: column;
+      color: white;
+      font-size: 15px;
+      justify-content: center;
+      &Img {
+        position: relative;
+        float: right;
+        object-fit: contain;
+        height: 55vh;
+      }
+      &Title {
+        margin-left: 3vw;
+        font-size: 32px;
+        font-weight: 500;
+      }
+      &Content {
+        margin-left: 3vw;
+        font-size: 16px;
+        font-weight: 400;
+        width: 20vw;
+      }
+    }
+  }
+}
+
+.higher_img {
+  height: 65vh;
+}
+.higher_text {
+  position: relative;
+  bottom: 5vh;
+}
+
+.box {
+  width: 25%;
+  height: 65%;
+  position: absolute;
+  right: 10%;
+  top: 28%;
+}
+
+.copyright {
+  position: absolute;
+  color: #8a8a8a;
+  bottom: 10px;
+  right: 20px;
+}
+
+@media (max-width: 1380px) {
+  .count li label {
+    width: 12px;
+    height: 12px;
+  }
+  .sliderSlidesItemImg {
+    height: 45vh;
+  }
+  .higher_img {
+    height: 55vh;
+  }
+}
+
+@media (max-width: 1200px) {
+  .count > ul {
+    width: 50%;
+  }
+}
+
+@media (max-width: 1000px) {
+  .sliderSlidesItem {
+    &Img {
+      display: none;
+    }
+    &Content {
+      width: 40vw;
+    }
+  }
+  .higher_text {
+    position: static;
+    bottom: 0;
+  }
+  .count > ul {
+    width: 70%;
+  }
+}
+
+@media (max-width: 800px) {
+  .count {
+    display: none;
+  }
+  .logo {
+    display: none;
+  }
+  .slider {
+    display: none;
+  }
+  .wave {
+    display: none;
+  }
+  .box {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    right: auto;
+    top: auto;
+  }
+  .copyright {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    right: 0;
+  }
+}
