@@ -8,20 +8,20 @@ const PassportLayout: React.FC<{ route: IRouteConfig }> = ({ route }) => {
   const [index, setIndex] = useState(1);
   const [slidesMargin, setSlidesMargin] = useState('0');
 
-  // useEffect(() => {
-  //   const timer = setInterval(() => {
-  //     setIndex((prevIndex) => {
-  //       let nextIndex = prevIndex + 1;
-  //       // 如果滚动到最后一张图片，立即跳转到第二张图片
-  //       if (nextIndex === 6) {
-  //         nextIndex = 1;
-  //       }
-  //       setSlidesMargin(`${(nextIndex - 1) * -100}%`);
-  //       return nextIndex;
-  //     });
-  //   }, 5000);
-  //   return () => clearInterval(timer);
-  // }, [index]);
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setIndex((prevIndex) => {
+        let nextIndex = prevIndex + 1;
+        // 如果滚动到最后一张图片，立即跳转到第二张图片
+        if (nextIndex === 6) {
+          nextIndex = 1;
+        }
+        setSlidesMargin(`${(nextIndex - 1) * -100}%`);
+        return nextIndex;
+      });
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [index]);
 
   const choosePic = (e: React.MouseEvent<HTMLDivElement>) => {
     const chooseIndex = parseInt(e.currentTarget.id.charAt(3));

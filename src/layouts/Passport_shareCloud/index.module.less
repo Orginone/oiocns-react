@@ -28,18 +28,15 @@ div {
 input[type='radio'] {
   display: none;
 }
-li {
-  list-style-type: none;
-}
 .count {
   display: flex;
   align-items: center;
   justify-content: center;
   position: absolute;
-  width: 72px;
+  width: 5vw;
   height: 6px;
   top: 92vh;
-  left: 414px;
+  left: 28.75vw;
   gap: 6px;
   label {
     display: block;
@@ -72,17 +69,15 @@ li {
       }
       &Title {
         color: #15181d;
-        font-family: PingFang SC;
         font-size: 36px;
         font-weight: bold;
         line-height: 44px;
-        letter-spacing: 0em;
+        letter-spacing: 0;
         text-align: center;
       }
       &Content {
         margin-top: 23px;
         color: #424a57;
-        font-family: PingFang SC;
         font-size: 16px;
         font-weight: 400;
         line-height: 24px;
@@ -119,40 +114,9 @@ li {
   gap: 7px;
 }
 
-@media (max-width: 1380px) {
-  .count li label {
-    width: 12px;
-    height: 12px;
-  }
-  .sliderSlidesItemImg {
-    height: 45vh;
-  }
-  .higher_img {
-    height: 55vh;
-  }
-}
-
 @media (max-width: 1200px) {
-  .count > ul {
-    width: 50%;
-  }
-}
-
-@media (max-width: 1000px) {
-  .sliderSlidesItem {
-    &Img {
-      display: none;
-    }
-    &Content {
-      width: 40vw;
-    }
-  }
-  .higher_text {
-    position: static;
-    bottom: 0;
-  }
-  .count > ul {
-    width: 70%;
+  .sliderSlidesItemContent {
+    width: 300px;
   }
 }
 
@@ -160,13 +124,10 @@ li {
   .count {
     display: none;
   }
-  .logo {
-    display: none;
-  }
   .slider {
     display: none;
   }
-  .backgroud {
+  .background {
     display: none;
   }
   .box {
@@ -175,8 +136,8 @@ li {
     display: flex;
     align-items: center;
     justify-content: center;
-    right: auto;
     top: auto;
+    left: auto;
   }
   .copyright {
     width: 100%;
