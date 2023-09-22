@@ -41,7 +41,6 @@ const NodeForms: React.FC<IProps> = ({ current }) => {
           break;
         }
         case 'copy': {
-          const { entity } = args;
           Modal.confirm({
             title: '确认复制吗',
             onOk: async () => {
@@ -53,7 +52,6 @@ const NodeForms: React.FC<IProps> = ({ current }) => {
           break;
         }
         case 'delete': {
-          const { entity } = args;
           Modal.confirm({
             title: '确认删除吗',
             onOk: async () => {

@@ -1,5 +1,6 @@
 import {
   XApplication,
+  XAuthority,
   Xbase,
   XDirectory,
   XForm,
@@ -39,6 +40,8 @@ export type DataNotityType = {
   data: any;
   // 通知的用户
   targetId: string;
+  // 被操作方Id
+  subTargetId?: string;
   // 是否忽略自己
   ignoreSelf: boolean;
   // 忽略的连接ID
@@ -777,18 +780,34 @@ export type IdentityMessageModel = {
 };
 
 export type TargetOperateModel = {
+  // 操作方式
   operate: string;
+  // 操作对象
   target: XTarget;
+  // 被操作对象
   subTarget?: XTarget;
+  // 操作人
   operater: XTarget;
 };
 
 export type IdentityOperateModel = {
+  // 操作方式
   operate: string;
+  // 操作人
   operater: XTarget;
+  // 操作的身份
   identity: XIdentity;
-  station?: XTarget;
+  // 操作的组织对象
   subTarget?: XTarget;
+};
+
+export type AuthorityOperateModel = {
+  // 操作方式
+  operate: string;
+  // 操作人
+  operater: XTarget;
+  // 操作的职权
+  authority: XAuthority;
 };
 /**
  * 文件系统项分享数据

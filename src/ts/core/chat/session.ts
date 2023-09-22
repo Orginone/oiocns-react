@@ -120,7 +120,8 @@ export class Session extends Entity<schema.XEntity> implements ISession {
   get isMyChat(): boolean {
     return (
       this.metadata.typeName === TargetType.Person ||
-      this.members.filter((i) => i.id === this.userId).length > 0
+      this.members.some((i) => i.id === this.userId) ||
+      this.chatdata.noReadCount > 0
     );
   }
   get isFriend(): boolean {
@@ -271,12 +272,13 @@ export class Session extends Entity<schema.XEntity> implements ISession {
     return false;
   }
   async clearMessage(): Promise<boolean> {
-    if (this.target.id === this.userId) {
+    if (this.canDeleteMessage) {
       const success = await this.coll.deleteMatch(this.sessionMatch);
       if (success) {
         this.messages = [];
         this.chatdata.lastMsgTime = new Date().getTime();
         this.messageNotify?.apply(this, [this.messages]);
+        this.sendMessage(MessageType.Notify, `${this.target.user.name} 清空了消息`, []);
         return true;
       }
     }
@@ -285,20 +287,27 @@ export class Session extends Entity<schema.XEntity> implements ISession {
 
   async subscribeOperations(): Promise<void> {
     if (this.isGroup) {
-      this.coll.subscribe((res: { operate: string; data: model.ChatMessageType[] }) => {
-        res.data.map((item) => this.receiveMessage(res.operate, item));
-      });
+      this.coll.subscribe(
+        [this.key],
+        (res: { operate: string; data: model.ChatMessageType[] }) => {
+          res.data.map((item) => this.receiveMessage(res.operate, item));
+        },
+      );
     } else {
-      this.coll.subscribe((res: { operate: string; data: model.ChatMessageType[] }) => {
-        res.data.forEach((item) => {
-          if (
-            [item.fromId, item.toId].includes(this.sessionId) &&
-            [item.fromId, item.toId].includes(this.userId)
-          ) {
-            this.receiveMessage(res.operate, item);
-          }
-        });
-      }, this.sessionId);
+      this.coll.subscribe(
+        [this.key],
+        (res: { operate: string; data: model.ChatMessageType[] }) => {
+          res.data.forEach((item) => {
+            if (
+              [item.fromId, item.toId].includes(this.sessionId) &&
+              [item.fromId, item.toId].includes(this.userId)
+            ) {
+              this.receiveMessage(res.operate, item);
+            }
+          });
+        },
+        this.sessionId,
+      );
     }
   }
 

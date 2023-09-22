@@ -31,6 +31,8 @@ export interface IPerson extends IBelong {
   authenticate(orgIds: string[], authIds: string[]): boolean;
   /** 加载赋予人的身份(角色)实体 */
   loadGivedIdentitys(reload?: boolean): Promise<schema.XIdProof[]>;
+  /** 赋予身份 */
+  giveIdentity(identitys: schema.XIdentity[], teamId?: string): void;
   /** 移除赋予人的身份(角色) */
   removeGivedIdentity(identityIds: string[], teamId?: string): void;
   /** 创建单位 */
@@ -44,7 +46,7 @@ export class Person extends Belong implements IPerson {
   constructor(_metadata: schema.XTarget) {
     super(_metadata, []);
     this.copyFiles = new Map();
-    this.cacheObj = new XObject(_metadata, 'target-cache', []);
+    this.cacheObj = new XObject(_metadata, 'target-cache', [], [this.key]);
   }
   companys: ICompany[] = [];
   cacheObj: XObject<schema.Xbase>;
@@ -62,15 +64,33 @@ export class Person extends Belong implements IPerson {
     }
     return this.givedIdentitys;
   }
+  giveIdentity(identitys: schema.XIdentity[], teamId: string = ''): void {
+    for (const identity of identitys) {
+      if (
+        !this.givedIdentitys.some(
+          (a) => a.identityId == identity.id && a.teamId == teamId,
+        )
+      ) {
+        this.givedIdentitys.push({
+          ...identity,
+          identity: identity,
+          teamId: teamId || '',
+          identityId: identity.id,
+          targetId: this.id,
+          target: this.metadata,
+        });
+      }
+    }
+  }
   removeGivedIdentity(identityIds: string[], teamId?: string): void {
     let idProofs = this.givedIdentitys.filter((a) => identityIds.includes(a.identityId));
     if (teamId) {
       idProofs = idProofs.filter((a) => a.teamId == teamId);
     } else {
-      idProofs = idProofs.filter((a) => a.teamId == undefined);
+      idProofs = idProofs.filter((a) => (a.teamId?.length ?? 0) < 10);
     }
     this.givedIdentitys = this.givedIdentitys.filter((a) =>
-      idProofs.every((i) => i.id !== a.identity?.id),
+      idProofs.every((i) => i.identityId !== a.identityId),
     );
   }
   async loadCohorts(reload?: boolean | undefined): Promise<ICohort[]> {
@@ -184,12 +204,17 @@ export class Person extends Belong implements IPerson {
   async exit(): Promise<boolean> {
     return false;
   }
-  override async delete(): Promise<boolean> {
-    await this.createTargetMsg(OperateType.Remove, this.metadata);
-    const res = await kernel.deleteTarget({
-      id: this.id,
-    });
-    return res.success;
+  override async delete(notity: boolean = false): Promise<boolean> {
+    if (notity) {
+      // TODO 退出
+    } else {
+      await this.sendTargetNotity(OperateType.Remove, this.metadata, this.id);
+      const res = await kernel.deleteTarget({
+        id: this.id,
+      });
+      return res.success;
+    }
+    return true;
   }
   get subTarget(): ITarget[] {
     return [];
@@ -257,36 +282,7 @@ export class Person extends Belong implements IPerson {
     );
     this.superAuth?.deepLoad(reload);
   }
-  async teamChangedNotity(target: schema.XTarget): Promise<boolean> {
-    switch (target.typeName) {
-      case TargetType.Cohort:
-        if (this.cohorts.every((i) => i.id != target.id)) {
-          const cohort = new Cohort(target, this, target.id);
-          await cohort.deepLoad();
-          this.cohorts.push(cohort);
-          return true;
-        }
-        break;
-      case TargetType.Storage:
-        if (this.storages.every((i) => i.id != target.id)) {
-          const storage = new Storage(target, [], this);
-          await storage.deepLoad();
-          this.storages.push(storage);
-          return true;
-        }
-        break;
-      default:
-        if (companyTypes.includes(target.typeName as TargetType)) {
-          if (this.companys.every((i) => i.id != target.id)) {
-            const company = createCompany(target, this);
-            await company.deepLoad();
-            this.companys.push(company);
-            return true;
-          }
-        }
-    }
-    return false;
-  }
+
   override operates(): model.OperateModel[] {
     const operates = super.operates();
     operates.unshift(personJoins, targetOperates.NewCompany, targetOperates.NewStorage);
@@ -316,5 +312,47 @@ export class Person extends Belong implements IPerson {
       typeName: metadata?.typeName ?? '未知',
       avatar: parseAvatar(metadata?.icon),
     };
+  }
+  override async _removeJoinTarget(target: schema.XTarget): Promise<string> {
+    var find = [...this.cohorts, ...this.companys, ...this.storages].find(
+      (i) => i.id === target.id,
+    );
+    if (find) {
+      await find.delete(true);
+      return `您已被从${target.name}移除.`;
+    }
+    return '';
+  }
+
+  override async _addJoinTarget(target: schema.XTarget): Promise<string> {
+    switch (target.typeName) {
+      case TargetType.Cohort:
+        if (this.cohorts.every((i) => i.id != target.id)) {
+          const cohort = new Cohort(target, this, target.id);
+          await cohort.deepLoad();
+          this.cohorts.push(cohort);
+          return `您已成功加入到${target.name}.`;
+        }
+        break;
+      case TargetType.Storage:
+        if (this.storages.every((i) => i.id != target.id)) {
+          const storage = new Storage(target, [], this);
+          await storage.deepLoad();
+          this.storages.push(storage);
+          return `您已成功加入到${target.name}.`;
+        }
+        break;
+      default:
+        if (companyTypes.includes(target.typeName as TargetType)) {
+          if (this.companys.every((i) => i.id != target.id)) {
+            const company = createCompany(target, this);
+            await company.deepLoad();
+            this.companys.push(company);
+            return `您已成功加入到${target.name}.`;
+          }
+        }
+        break;
+    }
+    return '';
   }
 }
