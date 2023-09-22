@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Modal } from 'antd';
 import { schema } from '@/ts/base';
 import { IBelong, ITarget } from '@/ts/core';
@@ -21,8 +21,11 @@ const SelectIdentity: React.FC<IProps> = ({
   exclude,
   finished,
 }) => {
-  const [selected, setSelected] = useState<schema.XIdentity[]>(exclude);
+  const [selected, setSelected] = useState<schema.XIdentity[]>([]);
   const [identitys, setIdentitys] = useState<any[]>([]);
+  useEffect(() => {
+    setSelected(exclude);
+  }, [exclude]);
   /** 加载组织树 */
   const buildTargetTree = (targets: ITarget[]) => {
     const result: any[] = [];
