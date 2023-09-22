@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import FullScreenModal from '@/executor/tools/fullScreen';
 import HotTableView from './components/hotTable';
 import MainLayout from '@/components/MainLayout';
@@ -16,13 +16,17 @@ interface IProps {
 
 const ReportView: React.FC<IProps> = ({ current, finished }) => {
   const [total, setTotal] = useState<number>(1);
-  const [info, setInfo] = useState<any>();
+  const [selectItem, setSelectedItem] = useState<any>();
   const [key, rootMenu, selectMenu, setSelectMenu] = useMenuUpdate(() =>
     config.loadSpeciesItemMenu(current),
-  );
-  if (!selectMenu || !rootMenu) return <></>;
+  ); /** 渲染左侧树状结构 */
+  let sheetList: any = current.metadata?.rule ? JSON.parse(current.metadata?.rule) : {};
+  delete sheetList?.list; /** 删除规则list */
+  sheetList = Object.values(sheetList);
 
+  /** 获取分页数据 */
   const getData = async (page: number) => {
+    const item = selectMenu?.item?.value ?? selectMenu?.item?.code;
     let request: any = {
       filter: undefined,
       group: null,
@@ -32,22 +36,25 @@ const ReportView: React.FC<IProps> = ({ current, finished }) => {
       searchValue: null,
       skip: page,
       take: 1,
-      userData: [],
+      userData: item ? [item] : [],
     };
     const result = await kernel.loadThing<any>(
       current.belongId,
       [current.belongId],
       request,
     );
+    console.log('加载物接口返回===>', result);
     if (result.success) {
       setTotal(result.data?.totalCount);
-      setInfo(result.data?.data[0]);
+      setSelectedItem(result.data?.data[0]);
     }
   };
 
-  const onChange = (page: number) => {
-    getData(page);
-  };
+  useEffect(() => {
+    getData(1);
+  }, [selectMenu]);
+
+  if (!selectMenu || !rootMenu) return <></>;
 
   const loadContent = () => {
     return (
@@ -64,13 +71,17 @@ const ReportView: React.FC<IProps> = ({ current, finished }) => {
             </Form.Item>
           </Form>
         </div>
-        <HotTableView key={key} info={info} current={current}></HotTableView>
+        <HotTableView
+          key={key}
+          selectItem={selectItem}
+          sheetList={sheetList}
+          current={current}></HotTableView>
         <div className={cls['report-pagination-box']}>
           <Pagination
             hideOnSinglePage={true}
             defaultCurrent={1}
             defaultPageSize={1}
-            onChange={onChange}
+            onChange={getData}
             total={total}
           />
         </div>

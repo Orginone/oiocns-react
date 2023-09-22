@@ -167,7 +167,7 @@ export abstract class Team extends Entity<schema.XTarget> implements ITeam {
   }
   async delete(notity: boolean = false): Promise<boolean> {
     if (!notity) {
-      if (this.hasRelationAuth()) {
+      if (this.hasRelationAuth() && this.id != this.belongId) {
         await this.sendTargetNotity(OperateType.Delete);
       }
       const res = await kernel.deleteTarget({
@@ -181,7 +181,6 @@ export abstract class Team extends Entity<schema.XTarget> implements ITeam {
     return notity;
   }
   async loadContent(reload: boolean = false): Promise<boolean> {
-    await this.directory.loadContent(reload);
     await this.loadMembers(reload);
     return true;
   }
@@ -273,7 +272,7 @@ export abstract class Team extends Entity<schema.XTarget> implements ITeam {
         logger.info(message);
       }
       msgChatNotify.changCallback();
-      this.directory.structCallback();
+      this.space.directory.structCallback();
     }
   }
   async _removeJoinTarget(_: schema.XTarget): Promise<string> {

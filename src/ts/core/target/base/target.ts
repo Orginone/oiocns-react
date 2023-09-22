@@ -174,13 +174,13 @@ export abstract class Target extends Team implements ITarget {
           if (pull) {
             await this.session.sendMessage(
               MessageType.Notify,
-              `${this.user.name}邀请${member.name}加入群聊`,
+              `${this.user.name} 邀请 ${member.name} 加入群聊`,
               [],
             );
           } else {
             await this.session.sendMessage(
               MessageType.Notify,
-              `${this.user.name}将${member.name}移出群聊`,
+              `${this.user.name} 将 ${member.name} 移出群聊`,
               [],
             );
           }

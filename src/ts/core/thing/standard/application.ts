@@ -51,7 +51,6 @@ export class Application
     );
   }
   structCallback(): void {
-    console.log(this.metadata);
     command.emitter('-', 'refresh', this);
   }
   async copy(_: IDirectory): Promise<boolean> {
