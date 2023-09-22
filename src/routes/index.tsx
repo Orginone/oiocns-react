@@ -3,7 +3,7 @@ import React from 'react';
 import { AiFillHome } from '@/icons/ai';
 import { IRouteConfig } from '../../typings/globelType.d';
 
-import PassportLayout from '@/layouts/Passport';
+import PassportLayout from '@/layouts/Passport_shareCloud';
 import PassportForget from '@/pages/Passport/Forget';
 import PassportLogin from '@/pages/Passport/Login';
 import PassportRegister from '@/pages/Passport/Register';

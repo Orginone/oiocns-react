@@ -62,7 +62,7 @@
     "@microsoft/signalr": "^6.0.10",
     "@monaco-editor/react": "^4.5.1",
     "@msgpack/msgpack": "^2.8.0",
-    "react-office-viewer": "^1.0.5",
+    "react-office-viewer": "^1.0.4",
     "@react-icons/all-files": "^4.1.0",
     "@types/crypto-js": "^4.1.2",
     "@types/react-scroll": "^1.8.7",
