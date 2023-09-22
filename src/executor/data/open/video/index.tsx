@@ -22,12 +22,13 @@ const VideoView: React.FC<IProps> = ({ share, finished }) => {
         onCancel={() => finished()}>
         <JolPlayer
           option={{
-            videoSrc: `/orginone/kernel/load/${share.shareLink}`,
             width: 830,
             height: 480,
             language: 'zh',
             pausePlacement: 'center',
             isShowScreenshot: false,
+            videoSrc: `/orginone/kernel/load/${share.shareLink}`,
+            videoType: share.contentType === 'video/stream' ? 'hls' : 'h264',
           }}
         />
       </FullScreenModal>
