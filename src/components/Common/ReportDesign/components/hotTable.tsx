@@ -289,7 +289,8 @@ const HotTableView: React.FC<IProps> = ({
   };
 
   /** 点击单元格展示编辑特性 */
-  const afterOnCellMouseDown = (event: any, coords: any) => {
+  const afterOnCellMouseDown = (event: any, coords: any, TD: any) => {
+    console.log(event, '1234');
     if (event) {
       cells?.forEach((item: any) => {
         if (item.row === coords.row && item.col === coords.col) {
@@ -334,6 +335,7 @@ const HotTableView: React.FC<IProps> = ({
         dropdownMenu={true}
         height="610px"
         language={zhCN.languageCode}
+        persistentState={true}
         stretchH="all"
         manualColumnResize={true}
         manualRowResize={true}
