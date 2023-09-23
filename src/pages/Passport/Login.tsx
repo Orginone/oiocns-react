@@ -14,7 +14,7 @@ const PassportLogin: React.FC<RouteComponentProps> = (props) => {
         <img src="/img/logo/logo3.jpg" alt="" />
         <div>使用奥集能登录</div>
       </div>
-      <div className={cls.DivideLine}></div>
+      {/*<div className={cls.DivideLine}></div>*/}
       <Tabs
         size="large"
         items={[
