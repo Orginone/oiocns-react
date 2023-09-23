@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import HotTableView from './components/hotTable';
 import ToolBar from './components/tool';
 import cls from './index.module.less';
@@ -16,18 +16,20 @@ const ReportDesign: React.FC<IProps> = ({ current }) => {
   const [sheetIndex, setSheetIndex] = useState<any>(0); // tabs页签
   const [reportChange, setReportChange] = useState<any>();
   const [changeType, setChangeType] = useState<string>('');
-  const [classType, setClassType] = useState<string>('');
+  const [classType, setClassType] = useState<string | undefined>('');
   const [modalType, setModalType] = useState<string>('');
-  let sheetList: any = current.metadata?.rule ? JSON.parse(current.metadata?.rule) : {};
-  delete sheetList?.list;
-  sheetList = Object.values(sheetList);
-  const [selectItem, setSelectedItem] = useState<any>(sheetList[0]);
+  const [sheetList, setSheetList] = useState<any>([]);
+  const [selectItem, setSelectedItem] = useState<any>();
+  const [cellStyle, setCellStyle] = useState<any>();
 
-  const handClick = (value: any, type: string, classType: string) => {
-    setReportChange(value);
-    setChangeType(type);
-    setClassType(classType);
-  };
+  useEffect(() => {
+    let sheetListData: any = current.metadata?.rule
+      ? JSON.parse(current.metadata?.rule)
+      : {};
+    delete sheetListData?.list;
+    setSheetList(Object.values(sheetListData));
+    setSelectedItem(sheetListData[0]);
+  }, []);
 
   /** tabs切换 */
   const onChange = (key: string) => {
@@ -41,6 +43,7 @@ const ReportDesign: React.FC<IProps> = ({ current }) => {
       setModalType('新增sheet页');
     } else {
       sheetList.splice(targetKey, 1);
+      setSheetList(sheetList);
       const newData = Object.assign({}, sheetList);
       await current.update({
         ...current.metadata,
@@ -71,10 +74,21 @@ const ReportDesign: React.FC<IProps> = ({ current }) => {
   return (
     <div className={cls['report-content-box']}>
       <div className={cls['report-tool-box']}>
-        <ToolBar handClick={handClick}></ToolBar>
+        <ToolBar
+          cellStyle={cellStyle}
+          handClick={(value: string | any, type: string, classType?: any) => {
+            setReportChange(value);
+            setChangeType(type);
+            setClassType(classType);
+          }}></ToolBar>
       </div>
       <HotTableView
         current={current}
+        handEcho={(cellStyle: any) => {
+          /** 单元格样式回显到工具栏 */
+          console.log(cellStyle, 'cellStyle');
+          setCellStyle(cellStyle);
+        }}
         selectItem={selectItem}
         sheetList={sheetList}
         reportChange={reportChange}
@@ -112,7 +126,7 @@ const ReportDesign: React.FC<IProps> = ({ current }) => {
             }
           }}
           onFinish={async (values) => {
-            sheetList = [...sheetList, values];
+            setSheetList([...sheetList, values]);
             const newData = Object.assign({}, sheetList);
             await current.update({
               ...current.metadata,

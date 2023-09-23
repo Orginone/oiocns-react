@@ -5,10 +5,11 @@ import { SketchPicker } from '@hello-pangea/color-picker';
 import cls from './tool.module.less';
 const { Option } = Select;
 interface IProps {
-  handClick: any;
+  cellStyle: any;
+  handClick: (value: string | any, type: string, classType?: string) => void;
 }
 
-const classDefault: string = 'htMiddle htLeft';
+const classDefault: string = '';
 const alignHorizontal: any = [
   {
     label: '左对齐',
@@ -366,7 +367,9 @@ const ToolBar: React.FC<IProps> = ({ handClick }: IProps) => {
         <div className={cls['row-two']}>
           <a
             className={
-              fontWeight === defaultFontWeight ? cls['icon-action'] : cls['icon-action']
+              fontWeight === defaultFontWeight
+                ? cls['icon-action']
+                : `${cls['icon-action']} ${cls['active']}`
             }
             title="加粗"
             onClick={setFontWeight}>
@@ -379,7 +382,9 @@ const ToolBar: React.FC<IProps> = ({ handClick }: IProps) => {
           </a>
           <a
             className={
-              fontStyle === defaultFontStyle ? cls['icon-action'] : cls['icon-action']
+              fontStyle === defaultFontStyle
+                ? cls['icon-action']
+                : `${cls['icon-action']} ${cls['active']}`
             }
             title="倾斜"
             onClick={setFontStyle}>
@@ -394,7 +399,7 @@ const ToolBar: React.FC<IProps> = ({ handClick }: IProps) => {
             className={
               textDecoration === defaultTextDecoration
                 ? cls['icon-action']
-                : cls['icon-action']
+                : `${cls['icon-action']} ${cls['active']}`
             }
             title="下划线"
             onClick={setTextDecoration}>
@@ -410,7 +415,7 @@ const ToolBar: React.FC<IProps> = ({ handClick }: IProps) => {
               className={
                 textDecoration === defaultTextDecoration
                   ? cls['icon-action']
-                  : cls['icon-action']
+                  : `${cls['icon-action']} ${cls['active']}`
               }
               title="边框">
               <img
@@ -467,7 +472,7 @@ const ToolBar: React.FC<IProps> = ({ handClick }: IProps) => {
                     key={align.value}
                     className={
                       classDefault.includes(align.className)
-                        ? cls['icon-action']
+                        ? `${cls['icon-action']} ${cls['active']}`
                         : cls['icon-action']
                     }
                     title={align.label}
@@ -484,7 +489,7 @@ const ToolBar: React.FC<IProps> = ({ handClick }: IProps) => {
                     key={align.value}
                     className={
                       classDefault.includes(align.className)
-                        ? cls['icon-action']
+                        ? `${cls['icon-action']} ${cls['active']}`
                         : cls['icon-action']
                     }
                     title={align.label}

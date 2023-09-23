@@ -8,7 +8,6 @@ const PassportLayout: React.FC<{ route: IRouteConfig }> = ({ route }) => {
   const [index, setIndex] = useState(1);
   const [slidesMargin, setSlidesMargin] = useState('0');
 
-  // 每隔一段时间更改图片
   useEffect(() => {
     const timer = setInterval(() => {
       setIndex((prevIndex) => {
@@ -39,40 +38,65 @@ const PassportLayout: React.FC<{ route: IRouteConfig }> = ({ route }) => {
         </div>
       </div>
       <div className={cls.slider}>
-        <div className={cls.slides} style={{ marginLeft: slidesMargin }}>
-          <div className={cls.slide}>
-            <img src="/img/passport_img1.png" alt="" />
-            <div>
-              奥集能是面向下一代互联网发展趋势，基于动态演化的复杂系统多主体建模方法，以所有权作为第一优先级，运用零信任安全机制，按自组织分形理念提炼和抽象“沟通、办事、存储、流通和设置”等基础功能，为b端和c端融合的全场景业务的提供新一代分布式应用架构。
+        <div className={cls.sliderSlides} style={{ marginLeft: slidesMargin }}>
+          <div className={cls.sliderSlidesItem}>
+            <img
+              className={`${cls.sliderSlidesItemImg} ${cls.higher_img} `}
+              src="/img/passport/orginOne/passport_img1.png"
+              alt=""
+            />
+            <div className={`${cls.sliderSlidesItemTitle} ${cls.higher_text}`}>门户</div>
+            <div className={`${cls.sliderSlidesItemContent}  ${cls.higher_text}`}>
+              这里是文字介绍这里是文字介绍这里是文字介绍这里是文字介绍这里是文字介绍这里是文字介绍这里是文字介绍这里是文字介绍
             </div>
           </div>
-          <div className={cls.slide}>
-            <img src="/img/passport_img2.png" alt="" />
-            <div>
-              奥集能是面向下一代互联网发展趋势，基于动态演化的复杂系统多主体建模方法，以所有权作为第一优先级，运用零信任安全机制，按自组织分形理念提炼和抽象“沟通、办事、存储、流通和设置”等基础功能，为b端和c端融合的全场景业务的提供新一代分布式应用架构。
+          <div className={cls.sliderSlidesItem}>
+            <img
+              className={cls.sliderSlidesItemImg}
+              src="/img/passport/orginOne/passport_img2.png"
+              alt=""
+            />
+            <div className={cls.sliderSlidesItemTitle}>沟通</div>
+            <div className={cls.sliderSlidesItemContent}>
+              这里是文字介绍这里是文字介绍这里是文字介绍这里是文字介绍这里是文字介绍这里是文字介绍这里是文字介绍这里是文字介绍
             </div>
           </div>
-          <div className={cls.slide}>
-            <img src="/img/passport_img3.png" alt="" />
-            <div>
-              奥集能是面向下一代互联网发展趋势，基于动态演化的复杂系统多主体建模方法，以所有权作为第一优先级，运用零信任安全机制，按自组织分形理念提炼和抽象“沟通、办事、存储、流通和设置”等基础功能，为b端和c端融合的全场景业务的提供新一代分布式应用架构。
+          <div className={cls.sliderSlidesItem}>
+            <img
+              className={cls.sliderSlidesItemImg}
+              src="/img/passport/orginOne/passport_img3.png"
+              alt=""
+            />
+            <div className={cls.sliderSlidesItemTitle}>办事</div>
+            <div className={cls.sliderSlidesItemContent}>
+              这里是文字介绍这里是文字介绍这里是文字介绍这里是文字介绍这里是文字介绍这里是文字介绍这里是文字介绍这里是文字介绍
             </div>
           </div>
-          <div className={cls.slide}>
-            <img src="/img/passport_img4.png" alt="" />
-            <div>
-              奥集能是面向下一代互联网发展趋势，基于动态演化的复杂系统多主体建模方法，以所有权作为第一优先级，运用零信任安全机制，按自组织分形理念提炼和抽象“沟通、办事、存储、流通和设置”等基础功能，为b端和c端融合的全场景业务的提供新一代分布式应用架构。
+          <div className={cls.sliderSlidesItem}>
+            <img
+              className={cls.sliderSlidesItemImg}
+              src="/img/passport/orginOne/passport_img4.png"
+              alt=""
+            />
+            <div className={cls.sliderSlidesItemTitle}>存储</div>
+            <div className={cls.sliderSlidesItemContent}>
+              这里是文字介绍这里是文字介绍这里是文字介绍这里是文字介绍这里是文字介绍这里是文字介绍这里是文字介绍这里是文字介绍
             </div>
           </div>
-          <div className={cls.slide}>
-            <img src="/img/passport_img5.png" alt="" />
-            <div>
-              奥集能是面向下一代互联网发展趋势，基于动态演化的复杂系统多主体建模方法，以所有权作为第一优先级，运用零信任安全机制，按自组织分形理念提炼和抽象“沟通、办事、存储、流通和设置”等基础功能，为b端和c端融合的全场景业务的提供新一代分布式应用架构。
+          <div className={cls.sliderSlidesItem}>
+            <img
+              className={cls.sliderSlidesItemImg}
+              src="/img/passport/orginOne/passport_img5.png"
+              alt=""
+            />
+            <div className={cls.sliderSlidesItemTitle}>设置</div>
+            <div className={cls.sliderSlidesItemContent}>
+              这里是文字介绍这里是文字介绍这里是文字介绍这里是文字介绍这里是文字介绍这里是文字介绍这里是文字介绍这里是文字介绍
             </div>
           </div>
         </div>
       </div>
-      <img className={cls.wave} src="/img/passport_bg.png" alt="" />
+      <img className={cls.wave} src="/img/passport/orginOne/passport_bg.png" alt="" />
       <div className={cls.box}>
         <div>{renderRoutes(route.routes)}</div>
       </div>
@@ -88,33 +112,52 @@ const PassportLayout: React.FC<{ route: IRouteConfig }> = ({ route }) => {
       <input id="btn5" className={cls.btn5} type="radio" onClick={choosePic} />
       <div className={cls.count}>
         <ul>
-          <li className={cls.current}>
+          <li>
             <label
-              style={{ background: index === 1 ? 'white' : '#5e99ff' }}
+              style={{
+                background: index === 1 ? '#5e99ff' : '#e6edfe',
+                width: index === 1 ? '50px' : '',
+              }}
               htmlFor="btn1"></label>
           </li>
           <li>
             <label
               className={cls.btn_2}
-              style={{ background: index === 2 ? 'white' : '#5e99ff' }}
+              style={{
+                background: index === 2 ? '#5e99ff' : '#e6edfe',
+                width: index === 2 ? '50px' : '',
+                marginLeft: index <= 1 ? '36px' : '0px',
+              }}
               htmlFor="btn2"></label>
           </li>
           <li>
             <label
               className={cls.btn_3}
-              style={{ background: index === 3 ? 'white' : '#5e99ff' }}
+              style={{
+                background: index === 3 ? '#5e99ff' : '#e6edfe',
+                width: index === 3 ? '50px' : '',
+                marginLeft: index <= 2 ? '36px' : '0px',
+              }}
               htmlFor="btn3"></label>
           </li>
           <li>
             <label
               className={cls.btn_4}
-              style={{ background: index === 4 ? 'white' : '#5e99ff' }}
+              style={{
+                background: index === 4 ? '#5e99ff' : '#e6edfe',
+                width: index === 4 ? '50px' : '',
+                marginLeft: index <= 3 ? '36px' : '0px',
+              }}
               htmlFor="btn4"></label>
           </li>
           <li>
             <label
               className={cls.btn_5}
-              style={{ background: index === 5 ? 'white' : '#5e99ff' }}
+              style={{
+                background: index === 5 ? '#5e99ff' : '#e6edfe',
+                width: index === 5 ? '50px' : '',
+                marginLeft: index <= 4 ? '36px' : '0px',
+              }}
               htmlFor="btn5"></label>
           </li>
         </ul>

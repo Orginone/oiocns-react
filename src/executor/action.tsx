@@ -182,13 +182,15 @@ const copyBoard = (dir: IDirectory) => {
 };
 
 /** 打开会话 */
-const openChat = (chat: IDirectory | IMemeber | ISession) => {
-  if ('taskList' in chat) {
-    orgCtrl.currentKey = chat.target.session.chatdata.fullId;
-  } else if ('fullId' in chat) {
-    orgCtrl.currentKey = chat.fullId;
+const openChat = (entity: IDirectory | IMemeber | ISession | ITarget) => {
+  if ('taskList' in entity) {
+    orgCtrl.currentKey = entity.target.session.chatdata.fullId;
+  } else if ('fullId' in entity) {
+    orgCtrl.currentKey = entity.fullId;
+  } else if ('session' in entity) {
+    orgCtrl.currentKey = entity.session.chatdata.fullId;
   } else {
-    orgCtrl.currentKey = chat.chatdata.fullId;
+    orgCtrl.currentKey = entity.chatdata.fullId;
   }
   command.emitter('_', 'link', '/chat');
 };

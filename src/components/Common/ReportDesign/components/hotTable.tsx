@@ -19,7 +19,8 @@ interface IProps {
   selectItem: any;
   reportChange: any;
   changeType: string;
-  classType: string;
+  classType: any | undefined;
+  handEcho: (cellStyle: any) => void;
 }
 
 const HotTableView: React.FC<IProps> = ({
@@ -29,6 +30,7 @@ const HotTableView: React.FC<IProps> = ({
   reportChange,
   changeType,
   classType,
+  handEcho,
 }) => {
   const [modalType, setModalType] = useState<string>('');
   const [tkey, tforceUpdate] = useObjectUpdate('');
@@ -289,11 +291,14 @@ const HotTableView: React.FC<IProps> = ({
   };
 
   /** 点击单元格展示编辑特性 */
-  const afterOnCellMouseDown = (event: any, coords: any, TD: any) => {
-    console.log(event, '1234');
+  const afterOnCellMouseDown = (event: any, coords: any) => {
     if (event) {
+      console.log(coords, '1234');
+      console.log(styleList, '1234');
+      console.log(classList, '1234');
       cells?.forEach((item: any) => {
         if (item.row === coords.row && item.col === coords.col) {
+          handEcho(item);
           setSelectedItem(item.prop);
           setModalType('配置特性');
         }
@@ -310,8 +315,9 @@ const HotTableView: React.FC<IProps> = ({
   registerRenderer('cellStylesRenderer', (hotInstance: any, TD: any, ...rest) => {
     //渲染样式
     textRenderer(hotInstance, TD, ...rest);
-    let items = styleList.find((it: any) => it.row === rest[0] && it.col === rest[1]);
-    let td: any = TD.style;
+    const items = styleList.find((it: any) => it.row === rest[0] && it.col === rest[1]);
+    const td: any = TD.style;
+    console.log(td, '123456');
     if (items) {
       for (let key in items.styles) {
         td[key] = items.styles[key];

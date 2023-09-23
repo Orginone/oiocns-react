@@ -1,5 +1,6 @@
+import { logger } from '@/ts/base/common';
 import { kernel, model, schema } from '../../../base';
-import { Entity, IEntity } from '../../public';
+import { Entity, IEntity, OperateType } from '../../public';
 import { IDirectory } from '../../thing/directory';
 import { IBelong } from '../base/belong';
 
@@ -18,17 +19,19 @@ export interface IAuthority extends IEntity<schema.XAuthority> {
   /** 加载成员用户实体 */
   loadMembers(reload?: boolean): Promise<schema.XTarget[]>;
   /** 创建权限 */
-  create(data: model.AuthorityModel): Promise<IAuthority | undefined>;
+  create(data: schema.XAuthority, notity?: boolean): Promise<IAuthority | undefined>;
   /** 更新权限 */
-  update(data: model.AuthorityModel): Promise<boolean>;
+  update(data: schema.XAuthority): Promise<boolean>;
   /** 删除权限 */
-  delete(): Promise<boolean>;
+  delete(notity?: boolean): Promise<boolean>;
   /** 根据权限id查找权限实例 */
   findAuthById(authId: string, auth?: IAuthority): IAuthority | undefined;
   /** 根据权限获取所有父级权限Id */
   loadParentAuthIds(authIds: string[]): string[];
   /** 判断是否拥有某些权限 */
   hasAuthoritys(authIds: string[]): boolean;
+  /** 接受职权变更消息 */
+  receiveAuthority(data: model.AuthorityOperateModel): Promise<boolean>;
 }
 
 /** 权限实现类 */
@@ -61,16 +64,21 @@ export class Authority extends Entity<schema.XAuthority> implements IAuthority {
     }
     return this.members;
   }
-  async create(data: model.AuthorityModel): Promise<IAuthority | undefined> {
-    data.parentId = this.id;
-    const res = await kernel.createAuthority(data);
-    if (res.success && res.data?.id) {
-      const authority = new Authority(res.data, this.space, this);
-      this.children.push(authority);
-      return authority;
+  async create(
+    data: schema.XAuthority,
+    notity: boolean = false,
+  ): Promise<IAuthority | undefined> {
+    if (!notity) {
+      const res = await kernel.createAuthority({ ...data, parentId: this.id });
+      if (!res.success) return;
+      data = res.data;
+      await this.space.sendAuthorityChangeMsg(OperateType.Create, res.data);
     }
+    const authority = new Authority(data, this.space, this);
+    this.children.push(authority);
+    return authority;
   }
-  async update(data: model.AuthorityModel): Promise<boolean> {
+  async update(data: schema.XAuthority): Promise<boolean> {
     data.id = this.id;
     data.shareId = this.metadata.shareId;
     data.parentId = this.metadata.parentId;
@@ -82,17 +90,22 @@ export class Authority extends Entity<schema.XAuthority> implements IAuthority {
     if (res.success && res.data?.id) {
       res.data.typeName = '权限';
       this.setMetadata(res.data);
+      await this.space.sendAuthorityChangeMsg(OperateType.Update, res.data);
     }
     return res.success;
   }
-  async delete(): Promise<boolean> {
-    const res = await kernel.deleteAuthority({
-      id: this.id,
-    });
-    if (res.success && this.parent) {
+  async delete(notity: boolean = false): Promise<boolean> {
+    if (!notity) {
+      const res = await kernel.deleteAuthority({
+        id: this.id,
+      });
+      if (!res.success) return false;
+      await this.space.sendAuthorityChangeMsg(OperateType.Delete, this.metadata);
+    }
+    if (this.parent) {
       this.parent.children = this.parent.children.filter((i) => i.key != this.key);
     }
-    return res.success;
+    return true;
   }
   loadParentAuthIds(authIds: string[]): string[] {
     const result: string[] = [];
@@ -140,5 +153,38 @@ export class Authority extends Entity<schema.XAuthority> implements IAuthority {
     if (auth.parent) {
       this._appendParentId(auth.parent, authIds);
     }
+  }
+  async receiveAuthority(data: model.AuthorityOperateModel): Promise<boolean> {
+    let message = '';
+    if (this.id == data.authority.parentId && data.operate == OperateType.Create) {
+      message = `${data.operater?.name}新增权限【${data.authority.name}】.`;
+      await this.create(data.authority, true);
+    } else if (this.id == data.authority.id) {
+      switch (data.operate) {
+        case OperateType.Delete:
+          message = `${data.operater?.name}将权限【${data.authority.name}】删除.`;
+          await this.delete(true);
+          break;
+        case OperateType.Update:
+          message = `${data.operater?.name}将权限【${data.authority.name}】信息更新.`;
+          this.updateMetadata(data.authority);
+          break;
+        default:
+          break;
+      }
+    } else {
+      for (const child of this.children) {
+        if (await child.receiveAuthority(data)) {
+          return true;
+        }
+      }
+    }
+    if (message.length > 0) {
+      if (data.operater?.id != this.space.user.id) {
+        logger.info(message);
+      }
+      return true;
+    }
+    return false;
   }
 }

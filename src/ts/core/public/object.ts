@@ -9,13 +9,13 @@ export class XObject<T extends schema.Xbase> {
   private _target: schema.XTarget;
   private _relations: string[];
   private _methods: { [name: string]: ((...args: any[]) => void)[] };
-  constructor(target: schema.XTarget, name: string, relations: string[]) {
+  constructor(target: schema.XTarget, name: string, relations: string[], keys: string[]) {
     this._loaded = false;
     this._target = target;
     this._relations = relations;
     this._objName = name;
     this._methods = {};
-    kernel.on(this.subMethodName, (res) => this._objectCallback(res));
+    kernel.subscribe(this.subMethodName, keys, (res) => this._objectCallback(res));
   }
 
   get cache(): any {
@@ -149,7 +149,6 @@ export class XObject<T extends schema.Xbase> {
   }
 
   private _objectCallback(res: { flag: string; data: any }) {
-    console.log(res);
     const methods = this._methods[res.flag];
     if (methods) {
       try {
