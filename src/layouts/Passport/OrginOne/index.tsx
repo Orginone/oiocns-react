@@ -114,8 +114,8 @@ const PassportLayout: React.FC<{ route: IRouteConfig }> = ({ route }) => {
         <div>{renderRoutes(route.routes)}</div>
       </div>
       <div className={cls.copyright}>
-        <div>Powered by Orginone </div>
         <div>© 2023 资产云开放协同创新中心 主办单位：浙江省财政厅</div>
+        <div>Powered by Orginone </div>
       </div>
       {/*轮播图按钮*/}
       <input id="btn1" className={cls.btn1} type="radio" onClick={choosePic} />

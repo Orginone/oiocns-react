@@ -99,8 +99,33 @@ const PassportLayout: React.FC<{ route: IRouteConfig }> = ({ route }) => {
         <div>{renderRoutes(route.routes)}</div>
       </div>
       <div className={cls.copyright}>
-        <div>Powered by Orginone </div>
-        <div>© 2023 资产云开放协同创新中心 主办单位：浙江省财政厅</div>
+        <div className={cls.copyrightZh}>
+          主办单位：
+          <a
+            href="https://czt.zj.gov.cn"
+            target="_blank"
+            style={{ color: '#8a8a8a' }}
+            rel="noopener noreferrer">
+            浙江省财政厅
+          </a>
+          &nbsp; 技术支持：
+          <a
+            href="https://assetcloud.org.cn"
+            target="_blank"
+            style={{ color: '#8a8a8a' }}
+            rel="noopener noreferrer">
+            资产云开放协同创新中心
+          </a>
+        </div>
+        <div className={cls.copyrightEn}>
+          <a
+            href="https://orginone.cn"
+            target="_blank"
+            style={{ color: '#8a8a8a' }}
+            rel="noopener noreferrer">
+            Powered by Orginone{' '}
+          </a>
+        </div>
       </div>
 
       {/*轮播图按钮*/}
