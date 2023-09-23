@@ -212,7 +212,7 @@ export abstract class Target extends Team implements ITarget {
         break;
       case OperateType.Delete:
         message = `${data.operater.name}将身份【${data.identity.name}】删除.`;
-        this.identitys.find((a) => a.id == data.identity.id)?.delete(true);
+        await this.identitys.find((a) => a.id == data.identity.id)?.delete(true);
         break;
       case OperateType.Update:
         message = `${data.operater.name}将身份【${data.identity.name}】信息更新.`;
@@ -223,7 +223,7 @@ export abstract class Target extends Team implements ITarget {
           message = `${data.operater.name}移除赋予【${data.subTarget!.name}】的身份【${
             data.identity.name
           }】.`;
-          this.identitys
+          await this.identitys
             .find((a) => a.id == data.identity.id)
             ?.removeMembers([data.subTarget], true);
         }
@@ -233,7 +233,7 @@ export abstract class Target extends Team implements ITarget {
           message = `${data.operater.name}赋予{${data.subTarget!.name}身份【${
             data.identity.name
           }】.`;
-          this.identitys
+          await this.identitys
             .find((a) => a.id == data.identity.id)
             ?.pullMembers([data.subTarget], true);
         }
@@ -243,7 +243,7 @@ export abstract class Target extends Team implements ITarget {
       if (data.operater?.id != this.user.id) {
         logger.info(message);
       }
-      this.memberDirectory.changCallback();
+      this.directory.structCallback();
     }
   }
 }

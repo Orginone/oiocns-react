@@ -22,7 +22,7 @@ import {
 } from '@ant-design/icons';
 import { model } from '@/ts/base';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
-import { showChatTime } from '@/utils/tools';
+import { shareOpenLink, showChatTime } from '@/utils/tools';
 import ActivityPublisher from '@/components/Activity/ActivityPublisher';
 import orgCtrl from '@/ts/controller';
 import { ActivityType } from '@/ts/base/model';
@@ -75,7 +75,7 @@ const Activity: React.FC<{ activity: IActivity }> = ({ activity }) => {
                   <Image
                     src={item.thumbnail}
                     preview={{
-                      src: `/orginone/kernel/load/${item.shareLink}`,
+                      src: shareOpenLink(item.shareLink),
                     }}></Image>
                 </Col>
               );
