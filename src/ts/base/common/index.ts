@@ -1,6 +1,7 @@
 export { CharCode } from './charCode';
 export { Emitter } from './emitter';
 export { decrypt, encrypt } from './encryption';
+export { readXlsx, generateXlsx } from './excel';
 export {
   blobToDataUrl,
   blobToNumberArray,
