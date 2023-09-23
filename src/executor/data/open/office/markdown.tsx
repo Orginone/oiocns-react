@@ -3,6 +3,7 @@ import MdEditor from 'for-editor';
 import axios from 'axios';
 import { FileItemShare } from '@/ts/base/model';
 import { Spin } from 'antd';
+import { shareOpenLink } from '@/utils/tools';
 
 interface IProps {
   share: FileItemShare;
@@ -12,7 +13,7 @@ const Markdown: React.FC<IProps> = ({ share }) => {
   const [loaded, setLoaded] = useState(false);
   const [mdContent, setMdContent] = useState('');
   useEffect(() => {
-    axios.get(`/orginone/kernel/load/${share.shareLink}`).then((res) => {
+    axios.get(shareOpenLink(share.shareLink)).then((res) => {
       setLoaded(true);
       if (res.status === 200) {
         setMdContent(res.data);

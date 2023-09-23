@@ -21,7 +21,7 @@ interface IOpenProps {
 const ExecutorOpen: React.FC<IOpenProps> = (props: IOpenProps) => {
   if ('size' in props.entity || 'filedata' in props.entity) {
     const data = 'size' in props.entity ? props.entity : props.entity.filedata;
-    if (data.contentType?.startsWith('image') || data.thumbnail) {
+    if (data.contentType?.startsWith('image')) {
       return <ImageView share={data} finished={props.finished} />;
     }
     if (

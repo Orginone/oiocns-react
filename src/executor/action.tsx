@@ -20,6 +20,7 @@ import { uploadTemplate } from './tools/uploadTemplate';
 import TypeIcon from '@/components/Common/GlobalComps/typeIcon';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import { TaskModel } from '@/ts/base/model';
+import { shareOpenLink } from '@/utils/tools';
 /** 执行非页面命令 */
 export const executeCmd = (cmd: string, entity: any, args: any[], type: string) => {
   switch (cmd) {
@@ -32,7 +33,7 @@ export const executeCmd = (cmd: string, entity: any, args: any[], type: string) 
     case 'download':
       if ('shareInfo' in entity) {
         const link = (entity as ISysFileInfo).shareInfo().shareLink;
-        window.open(`/orginone/kernel/load/${link}?download=1`, '_black');
+        window.open(shareOpenLink(link, true), '_black');
       }
       return;
     case 'copy':

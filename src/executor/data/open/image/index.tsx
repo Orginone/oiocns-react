@@ -1,6 +1,7 @@
 import React from 'react';
 import { Image } from 'antd';
 import { FileItemShare } from '@/ts/base/model';
+import { shareOpenLink } from '@/utils/tools';
 
 interface IProps {
   share: FileItemShare;
@@ -12,7 +13,7 @@ const ImageView: React.FC<IProps> = ({ share, finished }) => {
     return (
       <Image
         style={{ display: 'none' }}
-        src={`/orginone/kernel/load/${share.shareLink}`}
+        src={shareOpenLink(share.shareLink)}
         preview={{
           visible: true,
           destroyOnClose: true,
