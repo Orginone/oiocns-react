@@ -182,7 +182,7 @@ export class Station extends Team implements IStation {
     switch (data.operate) {
       case OperateType.Delete:
         message = `${data.operater?.name}将身份【${data.identity.name}】删除.`;
-        this.removeIdentitys([data.identity], true);
+        await this.removeIdentitys([data.identity], true);
         break;
       case OperateType.Update:
         {
@@ -195,7 +195,7 @@ export class Station extends Team implements IStation {
         break;
       case OperateType.Remove:
         message = `${data.operater?.name}移除岗位【${this.name}】中的身份【${data.identity.name}】.`;
-        this.removeIdentitys([data.identity], true);
+        await this.removeIdentitys([data.identity], true);
         break;
       case OperateType.Add:
         if (this.identitys.every((a) => a.id == data.identity.id)) {
