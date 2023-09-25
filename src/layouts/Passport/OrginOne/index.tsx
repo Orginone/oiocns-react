@@ -8,9 +8,6 @@ const orginOneLayout: React.FC<{ route: IRouteConfig }> = ({ route }) => {
   const [index, setIndex] = useState(1);
   const [slidesMargin, setSlidesMargin] = useState('0');
 
-  const currentUrl = window.location.href;
-  console.log(currentUrl);
-
   useEffect(() => {
     const timer = setInterval(() => {
       setIndex((prevIndex) => {
