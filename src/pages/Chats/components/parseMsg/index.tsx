@@ -5,7 +5,7 @@ import { FileItemShare } from '@/ts/base/model';
 import { command, parseAvatar } from '@/ts/base';
 import { formatSize } from '@/ts/base/common';
 import css from '../../content/chat/GroupContent/index.module.less';
-import { truncateString } from '@/utils/tools';
+import { shareOpenLink, truncateString } from '@/utils/tools';
 
 /** 将链接转化为超链接 */
 const linkText = (val: string) => {
@@ -29,11 +29,7 @@ export const parseMsg = (item: IMessage): any => {
               onClick={() => {
                 command.emitter('data', 'open', img);
               }}>
-              <Image
-                width={300}
-                src={`/orginone/kernel/load/${img.shareLink}`}
-                preview={false}
-              />
+              <Image width={300} src={shareOpenLink(img.shareLink)} preview={false} />
             </div>
           </>
         );
@@ -129,7 +125,7 @@ export const parseCiteMsg = (item: IMessage): any => {
               <span>{item.from.name}:</span>
               <Image
                 src={img.thumbnail}
-                preview={{ src: `/orginone/kernel/load/${img.shareLink}` }}
+                preview={{ src: shareOpenLink(img.shareLink) }}
               />
             </div>
           </>
@@ -142,7 +138,7 @@ export const parseCiteMsg = (item: IMessage): any => {
       return (
         <div className={`${css.con_content_cite_txt}`}>
           <span>{item.from.name}:</span>
-          <a href={`/orginone/kernel/load/${file.shareLink}?download=1`} title="点击下载">
+          <a href={shareOpenLink(file.shareLink, true)} title="点击下载">
             <div>
               <b>{file.name}</b>
             </div>

@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import TeamIcon from '@/components/Common/GlobalComps/entityIcon';
 import Information from './information';
-import { showChatTime, downloadByUrl } from '@/utils/tools';
+import { showChatTime, downloadByUrl, shareOpenLink } from '@/utils/tools';
 import { IMessage, ISession, MessageType } from '@/ts/core';
 import { parseAvatar } from '@/ts/base';
 import css from './index.module.less';
@@ -231,8 +231,7 @@ const GroupContent = (props: Iprops) => {
               size={22}
               className={css.actionIconStyl}
               onClick={() => {
-                const url = parseAvatar(item.msgBody).shareLink;
-                downloadByUrl(`/orginone/kernel/load/${url}?download=1`);
+                downloadByUrl(shareOpenLink(parseAvatar(item.msgBody).shareLink, true));
               }}
             />
           </Tooltip>
