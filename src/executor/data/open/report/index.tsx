@@ -43,7 +43,6 @@ const ReportView: React.FC<IProps> = ({ current, finished }) => {
       [current.belongId],
       request,
     );
-    console.log('加载物接口返回===>', result);
     if (result.success) {
       setTotal(result.data?.totalCount);
       setSelectedItem(result.data?.data[0]);

@@ -18,8 +18,6 @@ const __APP_INFO__ = {
 export default ({ command, mode }: ConfigEnv): UserConfig => {
   const isBuild = command === 'build';
 
-  console.log({ command, mode });
-
   return {
     base: VITE_BASE_PATH,
     plugins: createVitePlugins(mode, isBuild),

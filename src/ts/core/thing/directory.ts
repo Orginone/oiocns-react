@@ -22,7 +22,7 @@ import { Member } from './member';
 import { IProperty } from './standard/property';
 import { IApplication } from './standard/application';
 import { BucketOpreates, FileItemModel } from '@/ts/base/model';
-import { encodeKey } from '@/ts/base/common';
+import { encodeKey, sleep } from '@/ts/base/common';
 import { DataResource } from './resource';
 import { DirectoryOperate, IDirectoryOperate } from './operate';
 /** 可为空的进度回调 */
@@ -249,6 +249,9 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
     return this.files;
   }
   async createFile(file: Blob, p?: OnProgress): Promise<ISysFileInfo | undefined> {
+    while (this.taskList.filter((i) => i.finished < i.size).length > 10) {
+      await sleep(1000);
+    }
     p?.apply(this, [0]);
     const task: model.TaskModel = {
       name: file.name,

@@ -73,7 +73,6 @@ const FormRenders: React.FC<IProps> = (props) => {
   const watch = {
     // # 为全局
     '#': (val: any) => {
-      console.log('表单的实时数据为：', val);
       Object.keys(val).forEach((k) => {
         data[k] = val[k];
         props.data.primary[k] = val[k];
@@ -89,7 +88,6 @@ const FormRenders: React.FC<IProps> = (props) => {
 
   const handleSchemaData: any = (schema: any) => {
     //TODO:；待优化此部分功能---根据组件类型区别传入的参数
-    // console.log(schema, props);
     const properties = schema.properties;
     const buildDepartments = (departments: IDepartment[]) => {
       const data: any[] = [];

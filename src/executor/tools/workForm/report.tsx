@@ -68,7 +68,6 @@ const ReportForms: React.FC<IProps> = (props) => {
           formId: reportData.id,
           callback: (data: any) => {
             if (data) {
-              console.log(data, '规则返回参数');
               setServiceData(data);
             }
           },

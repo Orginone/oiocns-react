@@ -39,7 +39,6 @@ const Design: React.FC<IProps> = ({ current, isOpen, setIsOpen }) => {
     const preProperties = rules?.schema?.properties || {};
     const prePropertySortIds = Object.keys(preProperties);
     // 为兼容之前可能在表单schema配置有布局等非特性组件，特定义此变量使用
-    // console.log(current.fields);
     const useFields = [
       ...current.fields,
       ...prePropertySortIds.filter((id) => isNaN(+id)).map((item) => ({ id: item })),
