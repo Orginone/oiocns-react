@@ -69,6 +69,8 @@
     "@uiw/codemirror-extensions-langs": "^4.21.3",
     "@uiw/codemirror-theme-vscode": "^4.21.3",
     "@uiw/react-codemirror": "^4.21.7",
+    "@wangeditor/editor": "^5.1.23",
+    "@wangeditor/editor-for-react": "^1.0.6",
     "antd": "^4.24.4",
     "axios": "^1.1.2",
     "codemirror": "^6.0.1",
