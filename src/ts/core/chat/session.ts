@@ -46,7 +46,7 @@ export interface ISession extends IEntity<schema.XEntity> {
     text: string,
     mentions: string[],
     cite?: IMessage,
-    forward?: IMessage[]
+    forward?: IMessage[],
   ): Promise<boolean>;
   /** 撤回消息 */
   recallMessage(id: string): Promise<void>;
@@ -197,16 +197,16 @@ export class Session extends Entity<schema.XEntity> implements ISession {
     text: string,
     mentions: string[],
     cite?: IMessage | undefined,
-    forward?:  IMessage[] | undefined,
+    forward?: IMessage[] | undefined,
   ): Promise<boolean> {
     if (cite) {
       cite.metadata.comments = [];
     }
     if (forward) {
       forward = forward.map((item: IMessage) => {
-        item.metadata.comments = []
-        return item
-      })
+        item.metadata.comments = [];
+        return item;
+      });
     }
     const data = await this.coll.insert(
       {
@@ -220,7 +220,7 @@ export class Session extends Entity<schema.XEntity> implements ISession {
               body: text,
               mentions: mentions,
               cite: cite?.metadata,
-              forward: forward?.map(item => item.metadata)
+              forward: forward?.map((item) => item.metadata),
             }),
         ),
       } as unknown as model.ChatMessageType,

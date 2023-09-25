@@ -3,15 +3,12 @@ import ShareCloudLayout from './ShareCloud';
 import OrginOneLayout from './OrginOne';
 import { IRouteConfig } from '../../../typings/globelType';
 const PassportLayout: React.FC<{ route: IRouteConfig }> = ({ route }) => {
-  let currentUrl = window.location.href;
-  const host = currentUrl.substring(currentUrl.indexOf('://') + 3);
-  if (host.startsWith('orginone.cn')) {
-    return <OrginOneLayout route={route} />;
-  } else if (host.startsWith('asset.orginone.cn')) {
-    return <ShareCloudLayout route={route} />;
-  } else {
+  if (window.location.href.includes('asset')) {
+    // return <ShareCloudLayout route={route} />;
     return <OrginOneLayout route={route} />;
   }
+  // return <OrginOneLayout route={route} />;
+  return <ShareCloudLayout route={route} />;
 };
 
 export default PassportLayout;
