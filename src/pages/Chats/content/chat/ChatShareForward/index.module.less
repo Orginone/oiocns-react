@@ -1,0 +1,116 @@
+
+.chatShareForwardModal {
+    position: relative;
+    :global {
+        .ogo-checkbox-wrapper {
+            width: 100%;
+        }
+        .ogo-list-item-meta {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .ogo-list-items {
+            position: relative;
+        }
+    }
+    .listItem {
+        min-width: 240px;
+    }
+    .chartMember {
+        position: relative;
+        margin-top: 5px;
+        padding-top: 40px;
+    }
+}
+.departLine {
+    border-right: 1px solid #ebeef5;
+    height: 400px;
+    position: fixed;
+    z-index: 99;
+    left: 50%;
+    background-color: rgba(0, 0, 0, 0);
+}
+.searchAndChosen {
+    position: absolute;
+    top: 0;
+    height: 36px;
+    padding: 8px;
+    background-color: #fff;
+    z-index: 9;
+    width: 100%;
+    .chatMemberInput, .chosenNum {
+        height: 36px;
+        font-size: 15px;
+        vertical-align: middle;
+    }
+    .chosenNum {
+        padding-left: 10px;
+        vertical-align: middle;
+        line-height: 36px;
+    }
+}
+
+.chatMemlistRow {
+    padding-left: 5px;
+    padding-right: 5px;
+    margin-left: 5px;
+}
+.chatMemlistRow:hover {
+    background-color: rgb(248, 245, 245);
+}
+.chosenListRow {
+    margin-left: 10px;
+}
+.chatMember {
+    position: relative;
+    padding-top: 40px;
+    margin-top: 5px;
+    padding-bottom: 10px;
+    height: calc(400px);
+}
+.chosenMember {
+    position: relative;
+    margin-top: 5px;
+    padding-top: 40px;
+    height: calc(400px - 86px);
+    // height: calc(100vh - 50vh - 76px);
+}
+.memberWrap {
+    height: calc(400px);
+    overflow-y: scroll;
+    padding-bottom: 20px;
+}
+.chosenMemberWrap {
+    // height: calc(100vh - 50vh - 76px);
+    height: calc(400px - 86px);
+    overflow-y: scroll;
+    padding-bottom: 20px;
+}
+
+
+.forwardTextWrap {
+    position: absolute;
+    width: 100%;
+    top: calc(400px - 60px);
+    left: 5px;
+    z-index: 999;
+    background-color: #fff;
+}
+.forwardText {
+    padding: 10px 10px;
+    margin-left: 5px;
+    height: 40px;
+    overflow: hidden;
+    background-color: rgb(226, 224, 224);
+    border-radius: 5px;
+    width: calc(100% - 15px);
+}
+:global {
+    .ogo-modal-header + .ogo-modal-body {
+        position: relative;
+        overflow: hidden;
+        margin: 0px 12px;
+        padding: 0;
+    }
+}
