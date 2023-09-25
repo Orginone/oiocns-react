@@ -146,7 +146,31 @@ export type XForm = {
   bindNodes: XWorkNode[] | undefined;
   // 单的目录
   directory: XDirectory | undefined;
+  // 展示配置
+  setting: XFormSetting;
+  // 子项
+  items: XFormItem[];
 } & XStandard;
+
+export type XFormItem = {
+  // 名称
+  name: string;
+  // 类型
+  typeName: string;
+  // 子项
+  children: XFormItem[];
+  // 特性
+  attribute: XAttribute | undefined;
+} & Xbase;
+
+export type XFormSetting = {
+  // 列数
+  colCount: number;
+  // 标签位置
+  labelLocation: 'top' | 'left';
+  // 标签显示模式
+  labelMode: 'static' | 'outside';
+};
 
 /* 表单规则类型 */
 export type XFormRule = {
