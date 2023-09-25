@@ -116,7 +116,7 @@ export const fileToEntity = (
   belong: schema.XTarget | undefined,
 ): schema.XEntity => {
   return {
-    id: 'orginone/anydata/bucket/load/' + data.shareLink,
+    id: data.shareLink?.substring(1),
     name: data.name,
     code: data.key,
     icon: JSON.stringify(data),
