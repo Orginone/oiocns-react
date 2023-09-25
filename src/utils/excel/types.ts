@@ -1,10 +1,10 @@
 import { model } from '@/ts/base';
+import { Attribute } from './configs/base/attribute';
 import { Directory } from './configs/base/directory';
 import { Form } from './configs/base/form';
 import { Species } from './configs/species/species';
 import { SpeciesItem } from './configs/species/speciesitem';
 import { Property } from './configs/store/property';
-import { Attribute } from './configs/base/attribute';
 
 export enum SheetName {
   'Directory' = '目录',
@@ -39,36 +39,18 @@ export interface ErrorMessage {
 }
 
 /**
- * 请求
- */
-export interface RequestIndex {
-  rowNumber: number;
-  request: model.ReqestType;
-}
-
-/**
- * Sheet 表
- */
-export interface ISheet<T> {
-  sheetName: string;
-  headerRows: number;
-  metaColumns: MetaColumn[];
-  data: T[];
-}
-
-/**
  * Sheet 表抽象的默认实现
  */
-export class Sheet<T> implements ISheet<T> {
-  sheetName: string;
-  headerRows: number;
-  metaColumns: MetaColumn[];
+export class Sheet<T> implements model.Sheet<T> {
+  name: string;
+  headers: number;
+  columns: model.Column[];
   data: T[];
 
-  constructor(sheetName: string, headersRows: number, metaColumns: MetaColumn[]) {
-    this.sheetName = sheetName;
-    this.headerRows = headersRows;
-    this.metaColumns = metaColumns;
+  constructor(sheetName: string, headersRows: number, metaColumns: model.Column[]) {
+    this.name = sheetName;
+    this.headers = headersRows;
+    this.columns = metaColumns;
     this.data = [];
   }
 }
@@ -85,19 +67,9 @@ export interface DataHandler {
 }
 
 /**
- * 元字段
- */
-export interface MetaColumn {
-  title: string;
-  dataIndex: string;
-  valueType: string;
-  hide?: boolean;
-}
-
-/**
  * 读取 Excel Sheet 配置
  */
-export interface ISheetRead<T, C, S extends ISheet<T>> {
+export interface ISheetHandler<T, C, S extends model.Sheet<T>> {
   sheet: S;
   errors: ErrorMessage[];
 
@@ -105,14 +77,14 @@ export interface ISheetRead<T, C, S extends ISheet<T>> {
   pushError(index: number, error: string): void;
   checkData(context?: C): ErrorMessage[];
   operating(context: C, onItemCompleted: () => void): Promise<void>;
-  completed?(sheets: ISheetRead<any, any, ISheet<any>>[], context: C): void;
+  completed?(sheets: ISheetHandler<any, any, model.Sheet<any>>[], context: C): void;
 }
 
 /**
  * 读取 Excel Sheet 配置默认实现
  */
-export abstract class SheetRead<T, C, S extends ISheet<T>>
-  implements ISheetRead<T, C, S>
+export abstract class SheetHandler<T, C, S extends model.Sheet<T>>
+  implements ISheetHandler<T, C, S>
 {
   sheet: S;
   errors: ErrorMessage[];
@@ -124,8 +96,8 @@ export abstract class SheetRead<T, C, S extends ISheet<T>>
 
   pushError(index: number, error: string): void {
     this.errors.push({
-      sheetName: this.sheet.sheetName,
-      row: this.sheet.headerRows + 1 + index,
+      sheetName: this.sheet.name,
+      row: this.sheet.headers + 1 + index,
       message: error,
     });
   }
@@ -133,5 +105,5 @@ export abstract class SheetRead<T, C, S extends ISheet<T>>
   initContext?(context: C): Promise<void>;
   abstract checkData(context: C): ErrorMessage[];
   abstract operating(context: C, onItemCompleted: () => void): Promise<void>;
-  completed?(sheets: ISheetRead<any, any, ISheet<any>>[], context: C): void;
+  completed?(sheets: ISheetHandler<any, any, model.Sheet<any>>[], context: C): void;
 }
