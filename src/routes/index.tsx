@@ -2,8 +2,10 @@ import React from 'react';
 
 import { AiFillHome } from '@/icons/ai';
 import { IRouteConfig } from '../../typings/globelType.d';
-
-import PassportLayout from '@/layouts/Passport';
+// 资产共享云登录页
+import PassportLayout from '@/layouts/Passport/ShareCloud';
+// 奥集能登录页
+// import PassportLayout from '@/layouts/Passport/OrginOne';
 import PassportForget from '@/pages/Passport/Forget';
 import PassportLogin from '@/pages/Passport/Login';
 import PassportRegister from '@/pages/Passport/Register';

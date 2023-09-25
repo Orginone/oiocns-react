@@ -2,6 +2,7 @@ import React from 'react';
 import FullScreenModal from '@/executor/tools/fullScreen';
 import { JolPlayer } from 'jol-player';
 import { FileItemShare } from '@/ts/base/model';
+import { shareOpenLink } from '@/utils/tools';
 
 interface IProps {
   share: FileItemShare;
@@ -10,6 +11,7 @@ interface IProps {
 
 const VideoView: React.FC<IProps> = ({ share, finished }) => {
   if (share.shareLink) {
+    console.log(share);
     return (
       <FullScreenModal
         centered
@@ -22,12 +24,13 @@ const VideoView: React.FC<IProps> = ({ share, finished }) => {
         onCancel={() => finished()}>
         <JolPlayer
           option={{
-            videoSrc: `/orginone/kernel/load/${share.shareLink}`,
             width: 830,
             height: 480,
             language: 'zh',
             pausePlacement: 'center',
             isShowScreenshot: false,
+            videoSrc: shareOpenLink(share.shareLink),
+            videoType: share.contentType === 'video/stream' ? 'hls' : 'h264',
           }}
         />
       </FullScreenModal>

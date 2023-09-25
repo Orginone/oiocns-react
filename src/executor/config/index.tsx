@@ -19,6 +19,9 @@ const entityMap: any = {
   岗位: 'Station',
   办事: 'Work',
   迁移配置: 'TransferConfig',
+  事项配置: 'WorkConfig',
+  实体配置: 'ThingConfig',
+  报表: 'Report',
 };
 
 interface IProps {

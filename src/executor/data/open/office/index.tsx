@@ -3,6 +3,7 @@ import FullScreenModal from '@/executor/tools/fullScreen';
 import { SheetViewer, DocxViewer } from 'react-office-viewer';
 import { FileItemShare } from '@/ts/base/model';
 import Markdown from './markdown';
+import { shareOpenLink } from '@/utils/tools';
 
 interface IProps {
   share: FileItemShare;
@@ -16,7 +17,7 @@ const OfficeView: React.FC<IProps> = ({ share, finished }) => {
         locale: 'zh',
         timeout: 5000,
         fileName: share.name,
-        file: `/orginone/kernel/load/${share.shareLink}`,
+        file: shareOpenLink(share.shareLink),
       };
       switch (share.extension) {
         case '.xls':
@@ -31,7 +32,7 @@ const OfficeView: React.FC<IProps> = ({ share, finished }) => {
               height={'100%'}
               loading="eager"
               name={share.name}
-              src={`/orginone/kernel/load/${share.shareLink}`}
+              src={shareOpenLink(share.shareLink)}
             />
           );
         case '.md':

@@ -297,6 +297,14 @@ const truncateString = (str: string, maxLength: number) => {
   return str;
 };
 
+/** 获取文件的实际地址 */
+const shareOpenLink = (link: string | undefined, download: boolean = false) => {
+  if (link?.startsWith('/orginone/kernel/load/')) {
+    return download ? `${link}?download=1` : link;
+  }
+  return `/orginone/kernel/load/${link}${download ? '?download=1' : ''}`;
+};
+
 export {
   dateFormat,
   debounce,
@@ -311,6 +319,7 @@ export {
   pySegSortObj,
   renderNum,
   resetParams,
+  shareOpenLink,
   showChatTime,
   showMessage,
   truncateString,
