@@ -3,6 +3,7 @@ import { Entity, IEntity, MessageType } from '../public';
 import { XCollection } from '../public/collection';
 import { ISession } from './session';
 import { CommentType } from '@/ts/base/model';
+
 /** 动态接口类 */
 export interface IActivity extends IEntity<schema.XTarget> {
   /** 会话对象 */
@@ -157,5 +158,23 @@ export class Activity extends Entity<schema.XTarget> implements IActivity {
         }
       },
     );
+  }
+}
+
+export class GroupActivity extends Activity {
+  constructor(
+    _metadata: schema.XTarget,
+    session: ISession,
+    targetIds: string[],
+    keys: string[],
+  ) {
+    super(_metadata, session);
+    this.coll = new XCollection<model.ActivityType>(
+      _metadata,
+      'resource-activity',
+      targetIds,
+      keys,
+    );
+    this.load(20);
   }
 }

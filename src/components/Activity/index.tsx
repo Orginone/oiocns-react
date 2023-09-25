@@ -22,16 +22,46 @@ import {
 } from '@ant-design/icons';
 import { model } from '@/ts/base';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
-import { shareOpenLink, showChatTime } from '@/utils/tools';
+import { showChatTime } from '@/utils/tools';
 import ActivityPublisher from '@/components/Activity/ActivityPublisher';
 import orgCtrl from '@/ts/controller';
-import { ActivityType } from '@/ts/base/model';
+import { ActivityType, FileItemShare } from '@/ts/base/model';
 import ActivityComment from '@/components/Activity/ActivityComment';
 import { XEntity } from '@/ts/base/schema';
 
-const Activity: React.FC<{ activity: IActivity }> = ({ activity }) => {
+const Activity: React.FC<{ activity: IActivity; title?: string }> = ({
+  activity,
+  title,
+}) => {
   const [actionList, setActivityList] = useState(activity.activityList);
 
+  const ActivityResponsiveImage: React.FC<{
+    item: FileItemShare;
+    number: number;
+  }> = ({ item, number }) => {
+    const [computedHeight, setComputedHeight] = useState(100);
+    const id = String(new Date().getTime() + Math.floor(Math.random() * 100));
+    useEffect(() => {
+      const ele = document.querySelector(`.file-${id}`);
+      ele && setComputedHeight(ele.clientWidth);
+    }, []);
+    return (
+      <div
+        className={`file-${id}`}
+        style={{
+          width: computedWidth(number),
+          height: computedHeight,
+        }}>
+        <Image
+          width={'100%'}
+          height={'100%'}
+          src={`${item.shareLink}`}
+          preview={{
+            src: `${item.shareLink}`,
+          }}></Image>
+      </div>
+    );
+  };
   const ActivityItem: React.FC<{ item: model.ActivityType }> = ({ item }) => {
     const [commenting, setCommenting] = useState(false);
     const [comment, setComment] = useState('');
@@ -68,19 +98,18 @@ const Activity: React.FC<{ activity: IActivity }> = ({ activity }) => {
         </div>
         <div onClick={() => setCommenting(false)}>
           <Typography.Paragraph>{item.content}</Typography.Paragraph>
-          <Row gutter={[6, 6]} className={cls.activityItemImageList}>
-            {item.resource.map((item, index) => {
-              return (
-                <Col span={8} key={index}>
-                  <Image
-                    src={item.thumbnail}
-                    preview={{
-                      src: shareOpenLink(item.shareLink),
-                    }}></Image>
-                </Col>
-              );
-            })}
-          </Row>
+          <div className={cls.activityItemImageList}>
+            <Image.PreviewGroup>
+              {item.resource.map((perItem, index) => {
+                return (
+                  <ActivityResponsiveImage
+                    item={perItem}
+                    number={item.resource.length}
+                    key={index}></ActivityResponsiveImage>
+                );
+              })}
+            </Image.PreviewGroup>
+          </div>
         </div>
 
         <div className={cls.activityItemFooter}>
@@ -173,10 +202,22 @@ const Activity: React.FC<{ activity: IActivity }> = ({ activity }) => {
   }, []);
   const [activityPublisherOpen, setActivityPublisherOpen] = useState(false);
 
+  const computedWidth = (number: number) => {
+    if (number === 1) {
+      return '100%';
+    }
+    if (number % 2 === 0) {
+      return '49%';
+    }
+    if (number % 3 === 0) {
+      return '32%';
+    }
+    return '100%';
+  };
   return (
     <div className={cls.activityList}>
       <BasicTitle
-        title="动态"
+        title={title || '动态'}
         onClick={() => activity.load(10)}
         left={
           <Button
