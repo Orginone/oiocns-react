@@ -166,7 +166,7 @@ export default class StoreHub implements IDisposable {
             if (!res.success) {
               if (res.code === 401) {
                 logger.unauth();
-              } else {
+              } else if (res.msg != '' && !res.msg.includes('的成员')) {
                 logger.warn('操作失败,' + res.msg);
               }
             }

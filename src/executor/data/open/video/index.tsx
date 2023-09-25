@@ -11,7 +11,6 @@ interface IProps {
 
 const VideoView: React.FC<IProps> = ({ share, finished }) => {
   if (share.shareLink) {
-    console.log(share);
     return (
       <FullScreenModal
         centered

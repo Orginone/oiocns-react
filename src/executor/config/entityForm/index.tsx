@@ -10,7 +10,7 @@ import PropertyForm from './propertyForm';
 import TargetForm from './targetForm';
 import LabelsForm from './labelsForm';
 import RenameForm from './renameForm';
-import LinkForm from './linkForm';
+import TransferForm from './transferForm';
 interface IProps {
   cmd: string;
   entity: IEntity<schema.XEntity>;
@@ -87,7 +87,7 @@ const EntityForm: React.FC<IProps> = ({ cmd, entity, finished }) => {
       );
     case 'newTransferConfig':
     case 'updateTransferConfig':
-      return <LinkForm formType={cmd} current={entity as any} finished={reloadFinish} />;
+      return <TransferForm formType={cmd} current={entity as any} finished={reloadFinish} />;
     default: {
       var target = entity as ITarget;
       if (entity.typeName === '目录') {

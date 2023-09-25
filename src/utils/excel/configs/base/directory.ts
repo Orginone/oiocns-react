@@ -1,7 +1,7 @@
 import { XDirectory, XProperty, XSpecies, XSpeciesItem } from '@/ts/base/schema';
 import { IDirectory } from '@/ts/core';
 import { assignment } from '../..';
-import { Context, SheetRead, Sheet, SheetName } from '../../types';
+import { Context, SheetHandler, Sheet, SheetName } from '../../types';
 
 export interface Directory extends XDirectory {
   parentCode?: string;
@@ -23,10 +23,7 @@ export class DirectorySheet extends Sheet<Directory> {
   }
 }
 
-export class DirectorySheetRead extends SheetRead<Directory, Context, DirectorySheet> {
-  constructor(sheetConfig: DirectorySheet) {
-    super(sheetConfig);
-  }
+export class DirectoryHandler extends SheetHandler<Directory, Context, DirectorySheet> {
   /**
    * 输出读取完成后进行一些初始化
    * @param c

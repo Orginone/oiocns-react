@@ -3,7 +3,7 @@ import { Entity, IEntity, MessageType, TargetType } from '../public';
 import { ITarget } from '../target/base/target';
 import { XCollection } from '../public/collection';
 import { IMessage, Message } from './message';
-import { IActivity, Activity } from './activity';
+import { Activity, IActivity } from './activity';
 // 空时间
 const nullTime = new Date('2022-07-01').getTime();
 // 消息变更推送
@@ -149,6 +149,7 @@ export class Session extends Entity<schema.XEntity> implements ISession {
   get canDeleteMessage(): boolean {
     return this.target.id === this.userId || this.target.hasRelationAuth();
   }
+
   async moreMessage(): Promise<number> {
     const data = await this.coll.loadSpace({
       take: 30,
