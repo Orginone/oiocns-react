@@ -12,6 +12,7 @@ import { personJoins, targetOperates } from '../public';
 import { IFileInfo } from '../thing/fileinfo';
 import { ISession } from '../chat/session';
 import { XObject } from '../public/object';
+import { FriendsActivity, IActivity } from '../chat/activity';
 
 /** 人员类型接口 */
 export interface IPerson extends IBelong {
@@ -23,6 +24,8 @@ export interface IPerson extends IBelong {
   cacheObj: XObject<schema.Xbase>;
   /** 拷贝的文件 */
   copyFiles: Map<string, IFileInfo<schema.XEntity>>;
+  /** 朋友圈动态 */
+  friendsActivity: IActivity;
   /** 根据ID查询共享信息 */
   findShareById(id: string): model.ShareIcon;
   /** 根据Id查询共享信息 */
@@ -47,8 +50,10 @@ export class Person extends Belong implements IPerson {
     super(_metadata, []);
     this.copyFiles = new Map();
     this.cacheObj = new XObject(_metadata, 'target-cache', [], [this.key]);
+    this.friendsActivity = new FriendsActivity(this);
   }
   companys: ICompany[] = [];
+  friendsActivity: IActivity;
   cacheObj: XObject<schema.Xbase>;
   givedIdentitys: schema.XIdProof[] = [];
   copyFiles: Map<string, IFileInfo<schema.XEntity>>;
@@ -243,9 +248,6 @@ export class Person extends Belong implements IPerson {
       if (!companyChatIds.includes(item.session.chatdata.fullId)) {
         chats.push(...item.chats);
       }
-    }
-    for (const item of this.storages) {
-      chats.push(...item.chats);
     }
     return chats;
   }

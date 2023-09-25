@@ -2,7 +2,7 @@ import { List } from '@/ts/base';
 import { XSpeciesItem } from '@/ts/base/schema';
 import { IDirectory } from '@/ts/core';
 import { assignment } from '../..';
-import { Context, ErrorMessage, SheetRead, Sheet, SheetName } from '../../types';
+import { Context, ErrorMessage, SheetHandler, Sheet, SheetName } from '../../types';
 
 export interface SpeciesItem extends XSpeciesItem {
   speciesCode: string;
@@ -45,7 +45,11 @@ export class ClassifyItemSheet extends Sheet<SpeciesItem> {
   }
 }
 
-export class DictItemSheetRead extends SheetRead<SpeciesItem, Context, DictItemSheet> {
+export class DictItemHandler extends SheetHandler<SpeciesItem, Context, DictItemSheet> {
+  /**
+   * 初始化
+   * @param c 上下文 
+   */
   async initContext(c: Context): Promise<void> {
     for (let item of this.sheet.data) {
       if (c.speciesItemMap.has(item.speciesCode)) {
@@ -101,7 +105,7 @@ export class DictItemSheetRead extends SheetRead<SpeciesItem, Context, DictItemS
   }
 }
 
-export class ClassifyItemSheetRead extends SheetRead<
+export class ClassifyItemHandler extends SheetHandler<
   SpeciesItem,
   Context,
   ClassifyItemSheet

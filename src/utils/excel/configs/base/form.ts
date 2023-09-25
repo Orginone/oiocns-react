@@ -1,7 +1,7 @@
 import { XForm } from '@/ts/base/schema';
 import { IDirectory } from '@/ts/core';
 import { assignment } from '../..';
-import { Context, SheetRead, Sheet, SheetName } from '../../types';
+import { Context, SheetHandler, Sheet, SheetName } from '../../types';
 
 export interface Form extends XForm {
   directoryCode: string;
@@ -24,7 +24,7 @@ export class FormSheet extends Sheet<Form> {
   }
 }
 
-export class FormSheetRead extends SheetRead<Form, Context, FormSheet> {
+export class FormHandler extends SheetHandler<Form, Context, FormSheet> {
   /**
    * 初始化
    * @param c 上下文

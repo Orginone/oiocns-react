@@ -31,7 +31,6 @@ const ImageUploader: React.FC<{
       const file = options.file as File;
       if (file) {
         const result = await directory.createFile(file);
-        console.log(result);
         result && fileList.push(result);
         setFileList(fileList);
         props.onChange(fileList);

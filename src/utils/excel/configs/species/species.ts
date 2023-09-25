@@ -1,7 +1,7 @@
 import { XSpecies } from '@/ts/base/schema';
 import { IDirectory } from '@/ts/core';
 import { assignment } from '../..';
-import { Context, SheetRead, Sheet, SheetName } from '../../types';
+import { Context, SheetHandler, Sheet, SheetName } from '../../types';
 
 export interface Species extends XSpecies {
   directoryCode: string;
@@ -39,7 +39,7 @@ export class ClassifySheet extends Sheet<Species> {
   }
 }
 
-class CommonRead<S extends DictSheet | ClassifySheet> extends SheetRead<
+class CommonHandler<S extends DictSheet | ClassifySheet> extends SheetHandler<
   Species,
   Context,
   S
@@ -100,14 +100,14 @@ class CommonRead<S extends DictSheet | ClassifySheet> extends SheetRead<
   }
 }
 
-export class DictSheetRead extends CommonRead<DictSheet> {
+export class DictHandler extends CommonHandler<DictSheet> {
   async operating(context: Context, onItemCompleted: () => void): Promise<void> {
     this.sheet.data.forEach((row) => (row.typeName = '字典'));
     await super.operating(context, onItemCompleted);
   }
 }
 
-export class ClassifySheetRead extends CommonRead<ClassifySheet> {
+export class ClassifyHandler extends CommonHandler<ClassifySheet> {
   async operating(context: Context, onItemCompleted: () => void): Promise<void> {
     this.sheet.data.forEach((row) => (row.typeName = '分类'));
     await super.operating(context, onItemCompleted);

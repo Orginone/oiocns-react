@@ -13,37 +13,68 @@ import {
   Tag,
   Typography,
 } from 'antd';
-import { IActivity } from '@/ts/core';
+import { IActivity, IActivityMessage } from '@/ts/core';
 import {
   EllipsisOutlined,
   HeartFilled,
   HeartOutlined,
   MessageOutlined,
 } from '@ant-design/icons';
-import { model } from '@/ts/base';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import { shareOpenLink, showChatTime } from '@/utils/tools';
 import ActivityPublisher from '@/components/Activity/ActivityPublisher';
 import orgCtrl from '@/ts/controller';
-import { ActivityType } from '@/ts/base/model';
+import { FileItemShare } from '@/ts/base/model';
 import ActivityComment from '@/components/Activity/ActivityComment';
 import { XEntity } from '@/ts/base/schema';
 
-const Activity: React.FC<{ activity: IActivity }> = ({ activity }) => {
+const Activity: React.FC<{ activity: IActivity; title?: string }> = ({
+  activity,
+  title,
+}) => {
   const [actionList, setActivityList] = useState(activity.activityList);
 
-  const ActivityItem: React.FC<{ item: model.ActivityType }> = ({ item }) => {
+  const ActivityResponsiveImage: React.FC<{
+    item: FileItemShare;
+    number: number;
+  }> = ({ item, number }) => {
+    const [computedHeight, setComputedHeight] = useState(100);
+    const id = String(new Date().getTime() + Math.floor(Math.random() * 100));
+    useEffect(() => {
+      const ele = document.querySelector(`.file-${id}`);
+      ele && setComputedHeight(ele.clientWidth);
+    }, []);
+    return (
+      <div
+        className={`file-${id}`}
+        style={{
+          width: computedWidth(number),
+          height: computedHeight,
+        }}>
+        <Image
+          width={'100%'}
+          height={'100%'}
+          src={shareOpenLink(item.shareLink)}
+          preview={{
+            src: shareOpenLink(item.shareLink),
+          }}></Image>
+      </div>
+    );
+  };
+  const ActivityItem: React.FC<{ item: IActivityMessage }> = ({ item }) => {
     const [commenting, setCommenting] = useState(false);
     const [comment, setComment] = useState('');
     const [replyTo, setReplyTo] = useState<XEntity | null>(null);
-    const handleComment = async (currentActivity: ActivityType, content: string) => {
-      if (!content) return;
-      let reply;
-      if (replyTo) {
-        reply = replyTo.id;
-      }
-      await activity.comment(currentActivity, content, reply);
-    };
+    const [metadata, setMetadata] = useState(item.metadata);
+
+    useEffect(() => {
+      const id = item.subscribe(() => {
+        setMetadata(item.metadata);
+      });
+      return () => {
+        item.unsubscribe(id);
+      };
+    }, []);
 
     const handleReply = async (userId: string = '') => {
       setReplyTo(null);
@@ -56,9 +87,9 @@ const Activity: React.FC<{ activity: IActivity }> = ({ activity }) => {
     return (
       <div className={cls.activityItem}>
         <div className={cls.activityItemHeader}>
-          <EntityIcon entityId={item.createUser} showName />
-          <span style={{ fontSize: 14 }}>{showChatTime(item.createTime)}</span>
-          {item.tags.map((tag, index) => {
+          <EntityIcon entityId={metadata.createUser} showName />
+          <span style={{ fontSize: 14 }}>{showChatTime(metadata.createTime)}</span>
+          {metadata.tags.map((tag, index) => {
             return (
               <Tag color="processing" key={index}>
                 {tag}
@@ -67,41 +98,45 @@ const Activity: React.FC<{ activity: IActivity }> = ({ activity }) => {
           })}
         </div>
         <div onClick={() => setCommenting(false)}>
-          <Typography.Paragraph>{item.content}</Typography.Paragraph>
-          <Row gutter={[6, 6]} className={cls.activityItemImageList}>
-            {item.resource.map((item, index) => {
-              return (
-                <Col span={8} key={index}>
-                  <Image
-                    src={item.thumbnail}
-                    preview={{
-                      src: shareOpenLink(item.shareLink),
-                    }}></Image>
-                </Col>
-              );
-            })}
-          </Row>
+          <Typography.Paragraph>{metadata.content}</Typography.Paragraph>
+          <div className={cls.activityItemImageList}>
+            <Image.PreviewGroup>
+              {metadata.resource.map((perItem, index) => {
+                return (
+                  <ActivityResponsiveImage
+                    item={perItem}
+                    number={metadata.resource.length}
+                    key={index}></ActivityResponsiveImage>
+                );
+              })}
+            </Image.PreviewGroup>
+          </div>
         </div>
 
         <div className={cls.activityItemFooter}>
           <div
             className={cls.activityItemFooterLikes}
-            style={{ display: item.likes.length ? 'flex' : 'none' }}>
-            {item.likes.map((userId, index) => {
+            style={{ display: metadata.likes.length ? 'flex' : 'none' }}>
+            {metadata.likes.map((userId, index) => {
               return (
                 <div key={index} style={{ alignItems: 'center', display: 'flex' }}>
                   <EntityIcon entityId={userId} showName></EntityIcon>
                 </div>
               );
             })}
-            等{item.likes.length}人认为很不错
+            等{metadata.likes.length}人认为很不错
           </div>
           <Popover
             placement="left"
             content={
               <Space split={<Divider type="vertical" />} size="small">
-                <Button type="text" size="small" onClick={() => activity.like(item)}>
-                  {item.likes.includes(orgCtrl.user.id) ? (
+                <Button
+                  type="text"
+                  size="small"
+                  onClick={async () => {
+                    await item.like();
+                  }}>
+                  {metadata.likes.includes(orgCtrl.user.id) ? (
                     <>
                       <HeartFilled style={{ color: 'red' }} /> 取消
                     </>
@@ -123,10 +158,10 @@ const Activity: React.FC<{ activity: IActivity }> = ({ activity }) => {
           </Popover>
         </div>
 
-        {item.comments.length ? (
+        {metadata.comments.length ? (
           <>
             <div className={cls.activityItemCommentList}>
-              {item.comments.map((item, index) => {
+              {metadata.comments.map((item, index) => {
                 return (
                   <ActivityComment
                     comment={item}
@@ -150,7 +185,9 @@ const Activity: React.FC<{ activity: IActivity }> = ({ activity }) => {
           <Button
             type="primary"
             size="small"
-            onClick={() => handleComment(item, comment)}>
+            onClick={async () => {
+              await item.comment(comment, replyTo?.id);
+            }}>
             发送
           </Button>
         </div>
@@ -173,10 +210,22 @@ const Activity: React.FC<{ activity: IActivity }> = ({ activity }) => {
   }, []);
   const [activityPublisherOpen, setActivityPublisherOpen] = useState(false);
 
+  const computedWidth = (number: number) => {
+    if (number === 1) {
+      return '100%';
+    }
+    if (number % 2 === 0) {
+      return '49%';
+    }
+    if (number % 3 === 0) {
+      return '32%';
+    }
+    return '100%';
+  };
   return (
     <div className={cls.activityList}>
       <BasicTitle
-        title="动态"
+        title={title || '动态'}
         onClick={() => activity.load(10)}
         left={
           <Button
