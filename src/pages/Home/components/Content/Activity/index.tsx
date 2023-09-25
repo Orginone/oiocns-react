@@ -13,13 +13,17 @@ const Index: React.FC = () => {
       gutter={[24, 24]}
       className={cls.content}
       style={{ height: '900px', overflowY: 'auto' }}>
-      <Col span={24}>
-        <div style={{ overflowY: 'auto', height: '100%' }}>
-          <Activity
-            activity={orgCtrl.user.session.circleActivity}
-            title="群动态"></Activity>
-        </div>
-      </Col>
+      {orgCtrl.chats
+        .filter((i) => i.isMyChat && i.isGroup)
+        .map((i) => {
+          return (
+            <Col span={24} key={i.key}>
+              <div style={{ overflowY: 'auto', height: '100%' }}>
+                <Activity activity={i.activity} title={i.name + '群动态'}></Activity>
+              </div>
+            </Col>
+          );
+        })}
     </Row>
   );
 };

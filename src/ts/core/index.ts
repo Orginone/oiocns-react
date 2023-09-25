@@ -1,4 +1,4 @@
-export type { IActivity } from './chat/activity';
+export type { IActivity, IActivityMessage } from './chat/activity';
 export type { IMessage, IMessageLabel } from './chat/message';
 export type { ISession } from './chat/session';
 export { msgChatNotify } from './chat/session';

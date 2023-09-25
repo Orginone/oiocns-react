@@ -12,9 +12,7 @@ const Circle: React.FC = () => {
       style={{ height: '900px', overflowY: 'auto' }}>
       <Col span={24}>
         <div style={{ overflowY: 'auto', height: '100%' }}>
-          <Activity
-            activity={orgCtrl.user.session.circleActivity}
-            title="好友圈"></Activity>
+          <Activity activity={orgCtrl.user.friendsActivity} title="好友圈"></Activity>
         </div>
       </Col>
     </Row>

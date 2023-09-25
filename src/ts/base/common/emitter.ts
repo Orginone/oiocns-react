@@ -4,9 +4,10 @@ export class Emitter {
   private _refreshCallback: { [name: string]: (key: string, ...args: any) => void } = {};
   private _partRefreshCallback: {
     [name: string]: { [p: string]: (key: string) => void };
-  } = {};
+  };
   constructor() {
     this._refreshCallback = {};
+    this._partRefreshCallback = {};
   }
   /**
    * @desc 订阅变更
@@ -45,5 +46,11 @@ export class Emitter {
     Object.keys(this._refreshCallback).forEach((key) => {
       this._refreshCallback[key].apply(this, [generateUuid(), ...args]);
     });
+  }
+
+  /** 清空所有订阅 */
+  public cleanAll(): void {
+    this._refreshCallback = {};
+    this._partRefreshCallback = {};
   }
 }

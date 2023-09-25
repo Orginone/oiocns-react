@@ -4,7 +4,7 @@ import { renderRoutes } from 'react-router-config';
 import type { IRouteConfig } from 'typings/globelType';
 
 import cls from './index.module.less';
-const PassportLayout: React.FC<{ route: IRouteConfig }> = ({ route }) => {
+const ShareCloudLayout: React.FC<{ route: IRouteConfig }> = ({ route }) => {
   const [index, setIndex] = useState(1);
   const [slidesMargin, setSlidesMargin] = useState('0');
 
@@ -145,7 +145,6 @@ const PassportLayout: React.FC<{ route: IRouteConfig }> = ({ route }) => {
         </div>
         <div className={cls.countItem}>
           <label
-            className={cls.btn_2}
             style={{
               background: index === 2 ? '#ffffff' : '#eff5ff',
               width: index === 2 ? '32px' : '',
@@ -154,7 +153,6 @@ const PassportLayout: React.FC<{ route: IRouteConfig }> = ({ route }) => {
         </div>
         <div className={cls.countItem}>
           <label
-            className={cls.btn_3}
             style={{
               background: index === 3 ? '#ffffff' : '#eff5ff',
               width: index === 3 ? '32px' : '',
@@ -163,7 +161,6 @@ const PassportLayout: React.FC<{ route: IRouteConfig }> = ({ route }) => {
         </div>
         <div className={cls.countItem}>
           <label
-            className={cls.btn_4}
             style={{
               background: index === 4 ? '#ffffff' : '#eff5ff',
               width: index === 4 ? '32px' : '',
@@ -172,7 +169,6 @@ const PassportLayout: React.FC<{ route: IRouteConfig }> = ({ route }) => {
         </div>
         <div className={cls.countItem}>
           <label
-            className={cls.btn_5}
             style={{
               background: index === 5 ? '#ffffff' : '#eff5ff',
               width: index === 5 ? '32px' : '',
@@ -183,4 +179,4 @@ const PassportLayout: React.FC<{ route: IRouteConfig }> = ({ route }) => {
     </div>
   );
 };
-export default PassportLayout;
+export default ShareCloudLayout;
