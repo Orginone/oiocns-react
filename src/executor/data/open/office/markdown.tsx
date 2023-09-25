@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import MdEditor from 'for-editor';
 import axios from 'axios';
 import { FileItemShare } from '@/ts/base/model';
 import { Spin } from 'antd';
 import { shareOpenLink } from '@/utils/tools';
+import '@wangeditor/editor/dist/css/style.css'; // 引入 css
+import { Editor, Toolbar } from '@wangeditor/editor-for-react';
+import { IDomEditor } from '@wangeditor/editor';
 
 interface IProps {
   share: FileItemShare;
@@ -11,15 +13,29 @@ interface IProps {
 
 const Markdown: React.FC<IProps> = ({ share }) => {
   const [loaded, setLoaded] = useState(false);
-  const [mdContent, setMdContent] = useState('');
+  const [editor, setEditor] = useState<IDomEditor | null>(null); // 存储 editor 实例
+  const [html, setHtml] = useState('<p></p>');
   useEffect(() => {
     axios.get(shareOpenLink(share.shareLink)).then((res) => {
       setLoaded(true);
       if (res.status === 200) {
-        setMdContent(res.data);
+        setHtml(res.data);
       }
     });
   }, []);
+  //编辑器功能列表配置，目前是默认配置
+  const toolbarConfig = {};
+  const editorConfig = {
+    placeholder: '请输入内容...',
+  };
+  // 及时销毁 editor
+  useEffect(() => {
+    return () => {
+      if (editor == null) return;
+      editor.destroy();
+      setEditor(null);
+    };
+  }, [editor]);
   if (!loaded) {
     return (
       <Spin
@@ -29,17 +45,24 @@ const Markdown: React.FC<IProps> = ({ share }) => {
     );
   }
   return (
-    <MdEditor
-      preview
-      height="100%"
-      placeholder="请输入Markdown文本"
-      lineNum={0}
-      toolbar={{
-        preview: true,
-        save: false,
-      }}
-      value={mdContent}
-    />
+    <>
+      <div style={{ border: '1px solid #ccc', zIndex: 100, marginTop: '15px' }}>
+        <Toolbar
+          editor={editor}
+          defaultConfig={toolbarConfig}
+          mode="default"
+          style={{ borderBottom: '1px solid #ccc' }}
+        />
+        <Editor
+          defaultConfig={editorConfig}
+          value={html}
+          onCreated={setEditor}
+          onChange={(editor) => setHtml(editor.getHtml())}
+          mode="default"
+          style={{ height: '500px' }}
+        />
+      </div>
+    </>
   );
 };
 
