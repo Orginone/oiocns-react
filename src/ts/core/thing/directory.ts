@@ -249,7 +249,7 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
     return this.files;
   }
   async createFile(file: Blob, p?: OnProgress): Promise<ISysFileInfo | undefined> {
-    while (this.taskList.filter((i) => i.finished < i.size).length > 10) {
+    while (this.taskList.filter((i) => i.finished < i.size).length > 2) {
       await sleep(1000);
     }
     p?.apply(this, [0]);

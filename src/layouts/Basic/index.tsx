@@ -23,7 +23,7 @@ const BasicLayout: React.FC<BasicLayoutProps> = (props) => {
     }
     setTimeout(() => {
       setInited(true);
-    }, 500);
+    }, 1500);
     kernel.onConnectedChanged((res: boolean) => {
       setConnectStatus(res);
     });

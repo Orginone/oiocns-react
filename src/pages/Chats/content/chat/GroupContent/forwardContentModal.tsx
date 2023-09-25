@@ -1,5 +1,5 @@
-import React , { FC } from 'react'
-import { Modal, Popover, Badge } from 'antd'
+import React, { FC } from 'react';
+import { Modal, Popover, Badge } from 'antd';
 import moment from 'moment';
 import { showChatTime } from '@/utils/tools';
 
@@ -12,11 +12,11 @@ interface IForwardContentModalProps {
   messages: IMessage[];
   title: string;
   isBelongPerson?: boolean;
-  handleClose: () => void
+  handleClose: () => void;
 }
 
-const ForwardContentModal:FC<IForwardContentModalProps> = (props) => {
-  const { open, title, isBelongPerson, messages, handleClose } = props
+const ForwardContentModal: FC<IForwardContentModalProps> = (props) => {
+  const { open, title, isBelongPerson, messages, handleClose } = props;
   const isShowTime = (curDate: string, beforeDate: string) => {
     if (beforeDate === '') return true;
     return moment(curDate).diff(beforeDate, 'minute') > 3;
@@ -27,8 +27,8 @@ const ForwardContentModal:FC<IForwardContentModalProps> = (props) => {
         {parseMsg(item)}
         {item.cite && parseCiteMsg(item.cite)}
       </React.Fragment>
-    )
-  }
+    );
+  };
   const viewMsg = (item: IMessage) => {
     if (item.isMySend) {
       return (
@@ -81,14 +81,14 @@ const ForwardContentModal:FC<IForwardContentModalProps> = (props) => {
           return triggerNode.parentElement || document.body;
         }}
         // content={msgAction(item)}
-        >
+      >
         <div
           className={css.con_body}
           onContextMenu={(e) => {
             e.preventDefault();
             e.stopPropagation();
           }}>
-            {viewMsg(item)}
+          {viewMsg(item)}
         </div>
       </Popover>
     );
@@ -100,44 +100,42 @@ const ForwardContentModal:FC<IForwardContentModalProps> = (props) => {
       open={open}
       footer={null}
       closable={false}
-      onCancel={handleClose}
-    >
+      onCancel={handleClose}>
       <div className={css.chart_content}>
-          <div className={css.group_content_wrap}>
-            {messages
-              .map((item, index: any) => {
-                return (
-                  <React.Fragment key={item.metadata.fromId + index}>
-                    {/* 聊天间隔时间3分钟则 显示时间 */}
-                    {isShowTime(
-                      item.createTime,
-                      index > 0 ? messages[index - 1].createTime : '',
-                    ) ? (
-                      <div className={css.chats_space_Time}>
-                        <span>{showChatTime(item.createTime)}</span>
-                      </div>
-                    ) : (
-                      ''
-                    )}
-                    {/* 左侧聊天内容显示 */}
-                    {!item.isMySend && item.msgType != MessageType.Recall && (
-                      <div className={`${css.group_content_left} ${css.con}`}>
-                        {loadMsgItem(item)}
-                      </div>
-                    )}
-                    {/* 右侧聊天内容显示 */}
-                    {item.isMySend && item.msgType != MessageType.Recall && (
-                      <div className={`${css.group_content_right} ${css.con}`}>
-                        {loadMsgItem(item)}
-                      </div>
-                    )}
-                  </React.Fragment>
-                );
-              })}
-          </div>
+        <div className={css.group_content_wrap}>
+          {messages.map((item, index: any) => {
+            return (
+              <React.Fragment key={item.metadata.fromId + index}>
+                {/* 聊天间隔时间3分钟则 显示时间 */}
+                {isShowTime(
+                  item.createTime,
+                  index > 0 ? messages[index - 1].createTime : '',
+                ) ? (
+                  <div className={css.chats_space_Time}>
+                    <span>{showChatTime(item.createTime)}</span>
+                  </div>
+                ) : (
+                  ''
+                )}
+                {/* 左侧聊天内容显示 */}
+                {!item.isMySend && item.msgType != MessageType.Recall && (
+                  <div className={`${css.group_content_left} ${css.con}`}>
+                    {loadMsgItem(item)}
+                  </div>
+                )}
+                {/* 右侧聊天内容显示 */}
+                {item.isMySend && item.msgType != MessageType.Recall && (
+                  <div className={`${css.group_content_right} ${css.con}`}>
+                    {loadMsgItem(item)}
+                  </div>
+                )}
+              </React.Fragment>
+            );
+          })}
+        </div>
       </div>
     </Modal>
-  )
-}
+  );
+};
 
-export default ForwardContentModal
+export default ForwardContentModal;

@@ -216,8 +216,8 @@ export class FriendsActivity extends Entity<schema.XTarget> implements IActivity
     this.activitys.forEach((activity) => list.push(...activity.activityList));
     return list.sort((a, b) => {
       return (
-        new Date(a.metadata.createTime).getTime() -
-        new Date(b.metadata.createTime).getTime()
+        new Date(b.metadata.createTime).getTime() -
+        new Date(a.metadata.createTime).getTime()
       );
     });
   }

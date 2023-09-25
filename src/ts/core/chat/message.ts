@@ -91,9 +91,9 @@ export class Message implements IMessage {
         this.cite = new Message(content.cite, _chat);
       }
       if (content.forward) {
-        content.forward.map((item: IMessage & model.ChatMessageType) => {
-          this.forward.push(new Message(item, _chat))
-        })
+        content.forward.map((item: model.ChatMessageType) => {
+          this.forward.push(new Message(item, _chat));
+        });
       }
     } else {
       this._msgBody = txt;
@@ -193,6 +193,14 @@ export class Message implements IMessage {
       case MessageType.Text:
       case MessageType.Notify:
       case MessageType.Recall:
+        if (
+          header == '' &&
+          this.msgBody == '' &&
+          this.forward &&
+          this.forward.length > 0
+        ) {
+          return `收到${this.forward.length}条转发消息`;
+        }
         return `${header}${this.msgBody.substring(0, 50)}`;
       case MessageType.Voice:
         return `${header}[${MessageType.Voice}]`;
