@@ -35,7 +35,6 @@ const AttributeConfig = ({ current, schemaRef, selectedFiled }: IProps) => {
       ...rule,
       title: selectedFiled.title ?? selectedFiled.name,
     };
-    // console.log(values);
     formRef?.current?.setFieldsValue(values);
   }, [selectedFiled]);
 

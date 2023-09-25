@@ -38,7 +38,6 @@ const Executor = () => {
                 args[0].filedata?.contentType?.startsWith('audio') ||
                 audioExt.includes(args[0].filedata?.extension ?? '-')
               ) {
-                console.log(args);
                 setAudio(
                   <AudioPlayer
                     finished={resetAudio}

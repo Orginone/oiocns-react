@@ -1,3 +1,4 @@
+import { logger } from '@/ts/base/common';
 import { IWork } from '.';
 import { schema, model, kernel } from '../../base';
 import { TaskStatus, storeCollName } from '../public';
@@ -67,7 +68,7 @@ export class WorkTask implements IWorkTask {
       try {
         return JSON.parse(this.metadata.content) || [];
       } catch (ex) {
-        console.log(ex);
+        logger.error(ex as Error);
       }
     }
     return [];
@@ -108,7 +109,7 @@ export class WorkTask implements IWorkTask {
         this.instanceData = this.instance ? JSON.parse(this.instance.data) : undefined;
         return this.instanceData !== undefined;
       } catch (ex) {
-        console.log(ex);
+        logger.error(ex as Error);
       }
     }
     return false;

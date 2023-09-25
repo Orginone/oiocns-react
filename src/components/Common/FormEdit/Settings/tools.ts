@@ -16,8 +16,6 @@ const updateSchemaById = (
     if (i < idList.length - 1) properties = (properties?.[curId] as any)?.properties;
     property = properties?.[curId];
   }
-  // console.log('properties----', properties);
-  // console.log('property---------', property);
   properties[id] = updateProperty(property, updateValues);
   return schema;
 };
@@ -53,9 +51,6 @@ const updateProperty = (property: object, updateValues: Record<string, any>) => 
         break;
     }
   });
-  if (newObj.title === '单位名称') {
-    console.log('key', newObj);
-  }
   return newObj;
 };
 

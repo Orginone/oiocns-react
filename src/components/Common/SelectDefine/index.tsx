@@ -120,7 +120,6 @@ const SelectDefine = (props: Iprops) => {
             showIcon
             autoExpandParent={true}
             onSelect={(_: any, info: any) => {
-              console.log(info.node.item);
               props.onChecked.apply(this, [info.node.item]);
             }}
             treeData={defines}

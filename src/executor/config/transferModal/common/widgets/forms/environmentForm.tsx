@@ -20,7 +20,6 @@ interface Kv {
 }
 
 const EnvironmentForm: React.FC<IProps> = ({ formType, transfer, current, finished }) => {
-  console.log(current);
   const [kvs, setKvs] = useState<readonly Kv[]>([
     ...Object.entries(current?.params ?? {}).map((value) => {
       return {

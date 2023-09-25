@@ -148,7 +148,6 @@ const ExcelForm: React.FC<IProps> = ({ transfer, current, finished }) => {
         rules: [{ required: true, message: '表格文件为必填项' }],
       },
       renderFormItem: (_, __, form) => {
-        console.log(form.getFieldValue('file'));
         return (
           <Uploader
             transfer={transfer}
