@@ -1,0 +1,77 @@
+.self-app {
+  width: 100%;
+  min-height: 190px;
+  padding-left: 40px;
+  .app-title {
+    color: #000000;
+    font-weight: 500;
+    font-size: 24px;
+    line-height: 32px;
+    font-family: PingFang SC;
+    margin-bottom: 24px;
+    margin-top: 46px;
+  }
+
+  .app-content {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    gap: 20px;
+  }
+
+  .app-box {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 24px 20px;
+    cursor: pointer;
+    border-radius: 6px;
+    width: 282px;
+    &:hover {
+      background-color: #ededed;
+    }
+
+    &-img {
+      width: 60px;
+      height: 60px;
+      transition: all 0.5s ease 0.1s;
+
+      &:hover {
+        transform: scale(1.2);
+      }
+    }
+
+    .app-info {
+      display: flex;
+      align-items: center;
+      margin-left: 20px;
+      &-name {
+        font-size: 15px;
+        font-weight: bold;
+      }
+
+      &-desc {
+        font-size: 12px;
+        color: #ccc;
+      }
+    }
+  }
+  .icon-wrap {
+    display: flex;
+    width: 140px;
+    height: 40px;
+    line-height: 40px;
+    background-color: #f4f5fc;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    font-weight: bold;
+    color: #292d32;
+    cursor: pointer;
+    .app-icon {
+      width: 20px;
+      height: 20px;
+      margin-right: 6px;
+    }
+  }
+}

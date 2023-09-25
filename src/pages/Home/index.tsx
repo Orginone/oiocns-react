@@ -12,9 +12,9 @@ export interface NavigationItem {
 const navigationList: NavigationItem[] = [
   {
     key: 'app',
-    label: '应用',
+    label: '工作台',
     backgroundImageUrl: '/img/banner/digital-asset-bg.png',
-    component: React.lazy(() => import('@/pages/Home/components/Content/SelfAppCom')),
+    component: React.lazy(() => import('@/pages/Home/components/Content/WorkBench')),
   },
   {
     key: 'activity',

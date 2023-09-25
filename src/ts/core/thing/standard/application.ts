@@ -1,6 +1,7 @@
 import { command, kernel, model, schema } from '../../../base';
 import { PageAll, directoryOperates, fileOperates } from '../../public';
 import { IDirectory } from '../directory';
+import orgCtrl from '@/ts/controller';
 import { IFileInfo, IStandardFileInfo, StandardFileInfo } from '../fileinfo';
 import { IWork, Work } from '../../work';
 
@@ -20,6 +21,8 @@ export interface IApplication extends IStandardFileInfo<schema.XApplication> {
   createModule(data: schema.XApplication): Promise<schema.XApplication | undefined>;
   /** 接收模块变更消息 */
   receiveMessage(operate: string, data: schema.XApplication): Promise<boolean>;
+  /** 缓存应用数据 */
+  cacheCommonApplications(data?: IApplication): Promise<boolean>;
 }
 
 /** 应用实现类 */
@@ -35,7 +38,6 @@ export class Application
   ) {
     super(_metadata, _directory, _directory.resource.applicationColl);
     this.parent = _parent;
-    this.isContainer = true;
     this.loadChildren(_applications);
   }
   works: IWork[] = [];
@@ -51,6 +53,7 @@ export class Application
     );
   }
   structCallback(): void {
+    console.log(this.metadata);
     command.emitter('-', 'refresh', this);
   }
   async copy(_: IDirectory): Promise<boolean> {
@@ -152,6 +155,8 @@ export class Application
   }
 
   async receiveMessage(operate: string, data: schema.XApplication): Promise<boolean> {
+    console.log('operate', operate);
+    console.log('this.coll.cache', this.coll.cache);
     if (data.parentId == this.id) {
       switch (operate) {
         case 'insert':
@@ -179,5 +184,31 @@ export class Application
       }
     }
     return false;
+  }
+  unique(data: []) {
+    let result = {};
+    let finalResult = [];
+    for (let i = 0; i < data.length; i++) {
+      result[data[i].id] = data[i];
+    }
+    for (let item in result) {
+      finalResult.push(result[item]);
+    }
+    return finalResult;
+  }
+
+  async cacheCommonApplications(data: IApplication): Promise<boolean> {
+    const applications = orgCtrl.user.cacheObj.cache.commonApplications || [];
+    applications.push(data);
+    // 根据id去重
+    let commonApplications = this.unique(applications);
+
+    console.log('commonApplications', commonApplications);
+    const success = await orgCtrl.user.cacheObj.set(
+      'commonApplications',
+      commonApplications,
+    );
+    // console.log('success', success);
+    return success;
   }
 }

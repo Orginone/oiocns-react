@@ -35,7 +35,7 @@ const allPages: NavigationItem[] = [
     key: 'dashboard',
     label: '工作台',
     backgroundImageUrl: '/img/banner/digital-asset-bg.png',
-    component: React.lazy(() => import('@/pages/Home/components/Content/DigitalAsset')),
+    component: React.lazy(() => import('@/pages/Home/components/Content/WorkBench')),
   },
 ];
 const NavigationBar: React.FC<{

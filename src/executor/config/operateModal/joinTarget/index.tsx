@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { XTarget } from '@/ts/base/schema';
 import { IBelong, TargetType } from '@/ts/core';
 import SearchTarget from '@/components/Common/SearchTarget';
+import orgCtrl from '@/ts/controller';
 import { Modal } from 'antd';
 import { schema } from '@/ts/base';
 
@@ -16,6 +17,7 @@ type IProps = {
   弹出框申请计入
 */
 const JoinTarget: React.FC<IProps> = ({ cmd, current, finished }) => {
+  const currentUser = current ? current : orgCtrl.user;
   const [selectMembers, setSelectMembers] = useState<XTarget[]>([]); // 选中的要拉的人
   let modalTitle = '';
   let selectTargetType: TargetType = TargetType.Person;
@@ -49,7 +51,7 @@ const JoinTarget: React.FC<IProps> = ({ cmd, current, finished }) => {
       okButtonProps={{ disabled: !selectMembers }}
       open={true}
       onOk={async () => {
-        if (await current.applyJoin(selectMembers)) {
+        if (await currentUser.applyJoin(selectMembers)) {
           finished();
         }
       }}
