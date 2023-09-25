@@ -20,6 +20,7 @@ import { uploadTemplate } from './tools/uploadTemplate';
 import TypeIcon from '@/components/Common/GlobalComps/typeIcon';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import { TaskModel } from '@/ts/base/model';
+import { shareOpenLink } from '@/utils/tools';
 /** 执行非页面命令 */
 export const executeCmd = (cmd: string, entity: any, args: any[], type: string) => {
   switch (cmd) {
@@ -32,7 +33,7 @@ export const executeCmd = (cmd: string, entity: any, args: any[], type: string) 
     case 'download':
       if ('shareInfo' in entity) {
         const link = (entity as ISysFileInfo).shareInfo().shareLink;
-        window.open(`/orginone/kernel/load/${link}?download=1`, '_black');
+        window.open(shareOpenLink(link, true), '_black');
       }
       return;
     case 'copy':
@@ -79,22 +80,19 @@ const activateStorage = (store: IStorage) => {
 
 /** 进入目录 */
 const openDirectory = (
-  entity: IDirectory | IApplication | ITarget | IWork | IEntity<schema.XEntity>,
+  entity: IEntity<schema.XEntity> | IFileInfo<schema.XEntity> | ITarget | IWork,
   type: string,
 ) => {
+  if (type === 'data' && 'node' in entity) {
+    return false;
+  }
   if ('identitys' in entity && entity.typeName != TargetType.Station) {
     if (entity.typeName === TargetType.Storage) {
       return false;
     }
     entity = entity.directory;
   }
-  if (
-    'files' in entity ||
-    'works' in entity ||
-    (type == 'config' &&
-      'node' in entity &&
-      entity.directory.target.space.belongId != entity.belongId)
-  ) {
+  if ('isContainer' in entity && entity.isContainer) {
     entity.loadContent().then(() => {
       orgCtrl.currentKey = entity.key;
       orgCtrl.changCallback();
@@ -185,13 +183,15 @@ const copyBoard = (dir: IDirectory) => {
 };
 
 /** 打开会话 */
-const openChat = (chat: IDirectory | IMemeber | ISession) => {
-  if ('taskList' in chat) {
-    orgCtrl.currentKey = chat.target.session.chatdata.fullId;
-  } else if ('fullId' in chat) {
-    orgCtrl.currentKey = chat.fullId;
+const openChat = (entity: IDirectory | IMemeber | ISession | ITarget) => {
+  if ('taskList' in entity) {
+    orgCtrl.currentKey = entity.target.session.chatdata.fullId;
+  } else if ('fullId' in entity) {
+    orgCtrl.currentKey = entity.fullId;
+  } else if ('session' in entity) {
+    orgCtrl.currentKey = entity.session.chatdata.fullId;
   } else {
-    orgCtrl.currentKey = chat.chatdata.fullId;
+    orgCtrl.currentKey = entity.chatdata.fullId;
   }
   command.emitter('_', 'link', '/chat');
 };

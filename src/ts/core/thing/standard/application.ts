@@ -35,6 +35,7 @@ export class Application
   ) {
     super(_metadata, _directory, _directory.resource.applicationColl);
     this.parent = _parent;
+    this.isContainer = true;
     this.loadChildren(_applications);
   }
   works: IWork[] = [];
@@ -50,7 +51,6 @@ export class Application
     );
   }
   structCallback(): void {
-    console.log(this.metadata);
     command.emitter('-', 'refresh', this);
   }
   async copy(_: IDirectory): Promise<boolean> {

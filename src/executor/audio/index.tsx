@@ -8,6 +8,7 @@ import Menus from '@/executor/audio/menus';
 import AudioProgress from '@/executor/audio/progress';
 import { Directory } from '@/ts/core/thing/directory';
 import AudioController from '@/executor/audio/controller';
+import { shareOpenLink } from '@/utils/tools';
 interface IProps {
   share: FileItemModel;
   finished: () => void;
@@ -60,7 +61,7 @@ const AudioPlayer: React.FC<IProps> = ({ share, finished, directory }) => {
         </div>
         <audio
           autoPlay
-          src={`/orginone/kernel/load/${audioData.shareLink}`}
+          src={shareOpenLink(audioData.shareLink)}
           ref={audioRef}
           onTimeUpdate={updateProgress}></audio>
       </Draggable>

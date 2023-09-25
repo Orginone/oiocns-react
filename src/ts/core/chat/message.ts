@@ -191,6 +191,7 @@ export class Message implements IMessage {
     }
     switch (this.msgType) {
       case MessageType.Text:
+      case MessageType.Notify:
       case MessageType.Recall:
         return `${header}${this.msgBody.substring(0, 50)}`;
       case MessageType.Voice:

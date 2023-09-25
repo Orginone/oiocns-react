@@ -1,7 +1,7 @@
 import { XProperty } from '@/ts/base/schema';
 import { IDirectory, ValueType } from '@/ts/core';
 import { assignment } from '../..';
-import { Context, SheetRead, Sheet, SheetName } from '../../types';
+import { Context, SheetHandler, Sheet, SheetName } from '../../types';
 
 export interface Property extends XProperty {
   directoryCode: string;
@@ -34,7 +34,7 @@ export class PropSheet extends Sheet<Property> {
   }
 }
 
-export class PropSheetRead extends SheetRead<Property, Context, PropSheet> {
+export class PropHandler extends SheetHandler<Property, Context, PropSheet> {
   /**
    * 数据初始化
    * @param context 上下文

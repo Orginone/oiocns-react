@@ -19,7 +19,9 @@ const Navbar: React.FC = () => {
     const id = msgChatNotify.subscribe(() => {
       let noReadCount = 0;
       for (const item of orgCtrl.chats) {
-        noReadCount += item.chatdata.noReadCount;
+        if (item.isMyChat) {
+          noReadCount += item.chatdata.noReadCount;
+        }
       }
       setMsgCount(noReadCount);
     });

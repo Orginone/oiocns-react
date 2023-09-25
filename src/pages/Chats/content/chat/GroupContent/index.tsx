@@ -6,7 +6,7 @@ import { CopyToClipboard } from 'react-copy-to-clipboard';
 import TeamIcon from '@/components/Common/GlobalComps/entityIcon';
 import Information from './information';
 import ForwardContentModal from './forwardContentModal';
-import { showChatTime, downloadByUrl } from '@/utils/tools';
+import { showChatTime, downloadByUrl, shareOpenLink } from '@/utils/tools';
 import { IMessage, ISession, MessageType } from '@/ts/core';
 import { parseAvatar } from '@/ts/base';
 import css from './index.module.less';
@@ -77,7 +77,7 @@ const GroupContent = (props: Iprops) => {
   }, [messages]);
   function createWheelStopListener(callback: () => void, timeout?: number) {
     var handle: ReturnType<typeof setTimeout>;
-    setIsMousewheel(true);
+    // setIsMousewheel(true);
     var onScroll = function () {
       if (handle) {
         clearTimeout(handle);
@@ -103,7 +103,7 @@ const GroupContent = (props: Iprops) => {
       setMessages([...props.chat.messages]);
     }
     createWheelStopListener(() => {
-      setIsMousewheel(false);
+      // setIsMousewheel(false);
     });
   };
 
@@ -116,7 +116,16 @@ const GroupContent = (props: Iprops) => {
     setForwardMessages(item)
   }
 
+
   const batchForwardMsg = (item: IMessage) => {
+    // TODO 需要优化
+    if (item.forward.length === 1 && item.forward[0].forward && item.forward[0].forward.length > 1 ) {
+      return (
+        <React.Fragment>
+          {parseForwardMsg(item.forward[0].forward, viewForward)}
+        </React.Fragment>
+      )
+    }
     return (
       <React.Fragment>
         {parseForwardMsg(item.forward, viewForward)}
@@ -343,6 +352,47 @@ const GroupContent = (props: Iprops) => {
       </div>
     );
   };
+
+  const renderMessage = (item: IMessage) => {
+    switch (item.msgType) {
+      case MessageType.Recall:
+        return (
+          <div className={`${css.group_content_left} ${css.con} ${css.recall}`}>
+            {item.msgBody}
+            {item.allowEdit && (
+              <span
+                className={css.reWrite}
+                onClick={() => {
+                  handleReWrites(item.msgSource);
+                }}>
+                重新编辑
+              </span>
+            )}
+          </div>
+        );
+      case MessageType.Notify:
+        return (
+          <div className={`${css.group_content_left} ${css.con} ${css.recall}`}>
+            {item.msgBody}
+          </div>
+        );
+      default:
+        if (item.isMySend) {
+          return (
+            <div className={`${css.group_content_right} ${css.con}`}>
+              {loadMsgItem(item)}
+            </div>
+          );
+        } else {
+          return (
+            <div className={`${css.group_content_left} ${css.con}`}>
+              {loadMsgItem(item)}
+            </div>
+          );
+        }
+    }
+  };
+
   return (
     <div className={css.chart_content} ref={body} onScroll={onScroll}>
       <Spin tip="加载中..." spinning={loading}>
@@ -363,33 +413,7 @@ const GroupContent = (props: Iprops) => {
                   ) : (
                     ''
                   )}
-                  {/* 重新编辑 */}
-                  {item.msgType === MessageType.Recall && (
-                    <div className={`${css.group_content_left} ${css.con} ${css.recall}`}>
-                      {item.msgBody}
-                      {item.allowEdit && (
-                        <span
-                          className={css.reWrite}
-                          onClick={() => {
-                            handleReWrites(item.msgSource);
-                          }}>
-                          重新编辑
-                        </span>
-                      )}
-                    </div>
-                  )}
-                  {/* 左侧聊天内容显示 */}
-                  {!item.isMySend && item.msgType != MessageType.Recall && (
-                    <div className={`${css.group_content_left} ${css.con}`}>
-                      {loadMsgItem(item)}
-                    </div>
-                  )}
-                  {/* 右侧聊天内容显示 */}
-                  {item.isMySend && item.msgType != MessageType.Recall && (
-                    <div className={`${css.group_content_right} ${css.con}`}>
-                      {loadMsgItem(item)}
-                    </div>
-                  )}
+                  {renderMessage(item)}
                 </React.Fragment>
               );
             })}

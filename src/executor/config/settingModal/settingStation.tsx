@@ -60,6 +60,52 @@ const SettingStation: React.FC<IProps> = ({ company, finished }) => {
     }
     return [];
   };
+
+  const loadModal = () => {
+    switch (operateKey) {
+      case '添加角色':
+        return (
+          <SelectIdentity
+            multiple
+            space={company}
+            open={operateKey === '添加角色'}
+            exclude={station!.identitys}
+            finished={async (selected) => {
+              let delIdentitys = station!.identitys.filter((a) =>
+                selected.every((s) => s.id != a.id),
+              );
+              if (delIdentitys.length > 0) {
+                await station!.removeIdentitys(delIdentitys);
+              }
+              if (selected.length > 0) {
+                if (await station!.pullIdentitys(selected)) {
+                  message.success('添加角色成功');
+                }
+              }
+              refreshTable();
+              setOperateKey('');
+            }}
+          />
+        );
+      case '分配成员':
+        <SelectMember
+          open={operateKey === '分配成员'}
+          members={company.space.members}
+          exclude={station!.members}
+          finished={async (selected) => {
+            if (selected.length > 0) {
+              if (await station!.pullMembers(selected)) {
+                message.success('分配成员成功');
+              }
+            }
+            refreshTable();
+            setOperateKey('');
+          }}
+        />;
+      default:
+        return <></>;
+    }
+  };
   return (
     <FullScreenModal
       centered
@@ -75,7 +121,7 @@ const SettingStation: React.FC<IProps> = ({ company, finished }) => {
         notExitIcon
         selectMenu={selectMenu}
         onSelect={async (data) => {
-          if ('company' in data.item) {
+          if (data.itemType === '岗位') {
             const station: IStation = data.item;
             await station.loadIdentitys();
             await station.loadMembers();
@@ -109,35 +155,7 @@ const SettingStation: React.FC<IProps> = ({ company, finished }) => {
                 operation={readerOperation}
               />
             </div>
-            <SelectIdentity
-              multiple
-              space={company}
-              open={operateKey === '添加角色'}
-              exclude={station.identitys}
-              finished={async (selected) => {
-                if (selected.length > 0) {
-                  if (await station.pullIdentitys(selected)) {
-                    message.success('添加角色成功');
-                  }
-                }
-                refreshTable();
-                setOperateKey('');
-              }}
-            />
-            <SelectMember
-              open={operateKey === '分配成员'}
-              members={company.space.members}
-              exclude={station.members}
-              finished={async (selected) => {
-                if (selected.length > 0) {
-                  if (await station.pullMembers(selected)) {
-                    message.success('分配成员成功');
-                  }
-                }
-                refreshTable();
-                setOperateKey('');
-              }}
-            />
+            {loadModal()}
           </>
         ) : (
           <EntityInfo key={key} entity={selectMenu.item} />
@@ -184,7 +202,7 @@ const loadSettingMenu = (company: ICompany): MenuItemType => {
 /** 加载右侧菜单 */
 const loadMenus = (item: ICompany | IStation) => {
   const items: OperateMenuType[] = [];
-  if ('company' in item) {
+  if (!('stations' in item)) {
     if (item.space.hasRelationAuth()) {
       items.push(
         {

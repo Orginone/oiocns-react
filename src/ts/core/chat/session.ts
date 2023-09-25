@@ -3,7 +3,7 @@ import { Entity, IEntity, MessageType, TargetType } from '../public';
 import { ITarget } from '../target/base/target';
 import { XCollection } from '../public/collection';
 import { IMessage, Message } from './message';
-import { IActivity, Activity } from './activity';
+import { Activity, GroupActivity, IActivity } from './activity';
 // 空时间
 const nullTime = new Date('2022-07-01').getTime();
 // 消息变更推送
@@ -32,6 +32,8 @@ export interface ISession extends IEntity<schema.XEntity> {
   members: schema.XTarget[];
   /** 会话动态 */
   activity: IActivity;
+
+  circleActivity: IActivity;
   /** 是否可以删除消息 */
   canDeleteMessage: boolean;
   /** 加载更多历史消息 */
@@ -67,6 +69,7 @@ export class Session extends Entity<schema.XEntity> implements ISession {
   activity: IActivity;
   chatdata: model.MsgChatData;
   messages: IMessage[] = [];
+  circleActivity: IActivity;
   private messageNotify?: (messages: IMessage[]) => void;
   constructor(id: string, target: ITarget, _metadata: schema.XTarget, tags?: string[]) {
     super(_metadata);
@@ -89,6 +92,7 @@ export class Session extends Entity<schema.XEntity> implements ISession {
       labels: id === this.userId ? ['本人'] : tags,
     };
     this.activity = new Activity(_metadata, this);
+    this.circleActivity = this.buildCircleActivity(_metadata);
     this.subscribeOperations();
     if (this.id != this.userId) {
       this.loadCacheChatData();
@@ -121,7 +125,8 @@ export class Session extends Entity<schema.XEntity> implements ISession {
   get isMyChat(): boolean {
     return (
       this.metadata.typeName === TargetType.Person ||
-      this.members.filter((i) => i.id === this.userId).length > 0
+      this.members.some((i) => i.id === this.userId) ||
+      this.chatdata.noReadCount > 0
     );
   }
   get isFriend(): boolean {
@@ -148,6 +153,15 @@ export class Session extends Entity<schema.XEntity> implements ISession {
   }
   get canDeleteMessage(): boolean {
     return this.target.id === this.userId || this.target.hasRelationAuth();
+  }
+
+  buildCircleActivity(_metadata: schema.XTarget): IActivity {
+    let targetIds: string[] = [];
+    let keys: string[] = [];
+    targetIds.push(_metadata.id);
+    keys.push(this.key);
+
+    return new GroupActivity(_metadata, this, targetIds, keys);
   }
   async moreMessage(): Promise<number> {
     const data = await this.coll.loadSpace({
@@ -280,12 +294,13 @@ export class Session extends Entity<schema.XEntity> implements ISession {
     return false;
   }
   async clearMessage(): Promise<boolean> {
-    if (this.target.id === this.userId) {
+    if (this.canDeleteMessage) {
       const success = await this.coll.deleteMatch(this.sessionMatch);
       if (success) {
         this.messages = [];
         this.chatdata.lastMsgTime = new Date().getTime();
         this.messageNotify?.apply(this, [this.messages]);
+        this.sendMessage(MessageType.Notify, `${this.target.user.name} 清空了消息`, []);
         return true;
       }
     }
@@ -294,20 +309,27 @@ export class Session extends Entity<schema.XEntity> implements ISession {
 
   async subscribeOperations(): Promise<void> {
     if (this.isGroup) {
-      this.coll.subscribe((res: { operate: string; data: model.ChatMessageType[] }) => {
-        res.data.map((item) => this.receiveMessage(res.operate, item));
-      });
+      this.coll.subscribe(
+        [this.key],
+        (res: { operate: string; data: model.ChatMessageType[] }) => {
+          res.data.map((item) => this.receiveMessage(res.operate, item));
+        },
+      );
     } else {
-      this.coll.subscribe((res: { operate: string; data: model.ChatMessageType[] }) => {
-        res.data.forEach((item) => {
-          if (
-            [item.fromId, item.toId].includes(this.sessionId) &&
-            [item.fromId, item.toId].includes(this.userId)
-          ) {
-            this.receiveMessage(res.operate, item);
-          }
-        });
-      }, this.sessionId);
+      this.coll.subscribe(
+        [this.key],
+        (res: { operate: string; data: model.ChatMessageType[] }) => {
+          res.data.forEach((item) => {
+            if (
+              [item.fromId, item.toId].includes(this.sessionId) &&
+              [item.fromId, item.toId].includes(this.userId)
+            ) {
+              this.receiveMessage(res.operate, item);
+            }
+          });
+        },
+        this.sessionId,
+      );
     }
   }
 

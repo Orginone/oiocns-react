@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Select, Dropdown, Button, Popover } from 'antd';
 import type { MenuProps } from 'antd';
-// import { SketchPicker } from '@hello-pangea/color-picker';
+import { SketchPicker } from '@hello-pangea/color-picker';
 import cls from './tool.module.less';
 const { Option } = Select;
 interface IProps {
@@ -90,38 +90,38 @@ const fonts: any = [
   },
 ];
 const fontSizes: any = [...Array(100).keys()].slice(9);
-const formulasTypes: any = [
-  {
-    label: '求和',
-    value: 'text',
-    renderer: 'text',
-    editor: 'text',
-  },
-  {
-    label: '平均值',
-    value: 'numeric',
-    renderer: 'numeric',
-    editor: 'numeric',
-  },
-  {
-    label: '技数',
-    value: 'date',
-    renderer: 'date',
-    editor: 'date',
-  },
-  {
-    label: '最大值',
-    value: 'date',
-    renderer: 'date',
-    editor: 'date',
-  },
-  {
-    label: '最小值',
-    value: 'date',
-    renderer: 'date',
-    editor: 'date',
-  },
-];
+// const formulasTypes: any = [
+//   {
+//     label: '求和',
+//     value: 'text',
+//     renderer: 'text',
+//     editor: 'text',
+//   },
+//   {
+//     label: '平均值',
+//     value: 'numeric',
+//     renderer: 'numeric',
+//     editor: 'numeric',
+//   },
+//   {
+//     label: '技数',
+//     value: 'date',
+//     renderer: 'date',
+//     editor: 'date',
+//   },
+//   {
+//     label: '最大值',
+//     value: 'date',
+//     renderer: 'date',
+//     editor: 'date',
+//   },
+//   {
+//     label: '最小值',
+//     value: 'date',
+//     renderer: 'date',
+//     editor: 'date',
+//   },
+// ];
 
 const ToolBar: React.FC<IProps> = ({ handClick }: IProps) => {
   const [background, setBackground] = useState<string>();
@@ -139,10 +139,9 @@ const ToolBar: React.FC<IProps> = ({ handClick }: IProps) => {
   let paddingLeft: number = 4;
 
   const onSave = () => {
+    // 保存
     handClick('onSave', 'onSave');
   };
-
-  const onPublish = () => {};
 
   const setFontWeight = () => {
     if (fontWeight === 'bold') {
@@ -207,9 +206,9 @@ const ToolBar: React.FC<IProps> = ({ handClick }: IProps) => {
     handClick(paddingLeft, 'paddingLeft');
   };
 
-  const mergeAndCenter = () => {
-    handClick('', 'mergeAndCenter');
-  };
+  // const mergeAndCenter = () => {
+  //   handClick('', 'mergeAndCenter');
+  // };
 
   const handleChange = (value: any, type: any) => {
     handClick(value, type);
@@ -332,9 +331,9 @@ const ToolBar: React.FC<IProps> = ({ handClick }: IProps) => {
         <div className={cls['row-one']}>
           <Button onClick={onSave}>保存</Button>
         </div>
-        <div className={cls['row-two']}>
+        {/* <div className={cls['row-two']}>
           <Button onClick={onPublish}>发布</Button>
-        </div>
+        </div> */}
       </div>
 
       <div className={cls['flex-box']}>
@@ -524,7 +523,7 @@ const ToolBar: React.FC<IProps> = ({ handClick }: IProps) => {
             </div>
           </div>
           <div className={cls['column-divider']}></div>
-          <div className={cls['column-three']}>
+          {/* <div className={cls['column-three']}>
             <div className={cls['row-one']}>
               <a className={cls['icon-action']} title="合并居中" onClick={mergeAndCenter}>
                 <span>合并居中</span>
@@ -538,11 +537,11 @@ const ToolBar: React.FC<IProps> = ({ handClick }: IProps) => {
                 <span>拆分单元格</span>
               </a>
             </div>
-          </div>
+          </div> */}
         </div>
         <div className={cls['flex-box-title']}>对齐方式</div>
       </div>
-      <div className={cls['flex-box']}>
+      {/* <div className={cls['flex-box']}>
         <div className={cls['row-one']}>
           <Select defaultValue="求和" style={{ width: 100 }} onChange={handleChange}>
             {formulasTypes.map((item: any) => {
@@ -556,7 +555,7 @@ const ToolBar: React.FC<IProps> = ({ handClick }: IProps) => {
         </div>
         <div className={cls['row-two']}></div>
         <div className={cls['flex-box-title']}>公式</div>
-      </div>
+      </div> */}
     </div>
   );
 };

@@ -41,6 +41,7 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
   constructor(_metadata: schema.XWorkDefine, _application: IApplication) {
     super(fullDefineRule(_metadata), _application.directory);
     this.application = _application;
+    this.isContainer = _application.isInherited;
   }
   primaryForms: IForm[] = [];
   detailForms: IForm[] = [];

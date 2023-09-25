@@ -15,10 +15,56 @@
     gap: 6px;
   }
   &ImageList {
-    width: 325px;
+    max-width: 400px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px 0;
+    img {
+      object-fit: cover; /* 这会保持图像的纵横比并居中截取部分内容 */
+      object-position: center center; /* 图像在容器中水平和垂直居中 */
+    }
   }
   &Footer {
+    display: flex;
+    align-items: center;
     margin-top: 8px;
+    justify-content: flex-end;
+    &Likes {
+      flex: 1;
+      background-color: #f2f2f2;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      padding: 4px;
+      gap: 16px;
+      font-size: 12px;
+      flex-wrap: wrap;
+      color: rgba(0,0,0,0.65);
+    }
+  }
 
+  &CommentInputBox {
+    transition: 0.2s;
+    margin-top: 16px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    &SendBtn {
+      color: @primary-color;
+    }
+  }
+
+  &CommentList {
+    margin-top: 8px;
+    width: 100%;
+    padding: 4px;
+    border-radius: 4px;
+    background-color: #f2f2f2;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
   }
 }

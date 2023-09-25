@@ -8,7 +8,7 @@ import WorkModal from './workModal';
 import orgCtrl from '@/ts/controller';
 import LabelsModal from './labelsModal';
 import ReportModal from './reportModal';
-import TransferModal from '../transferModal/linkEditor';
+import { TransferModal } from '../transferModal';
 interface IProps {
   cmd: string;
   entity: IEntity<schema.XEntity>;
@@ -44,13 +44,11 @@ const OperateModal: React.FC<IProps> = ({ cmd, entity, finished }) => {
       }
     default:
       if (cmd.startsWith('join')) {
-        return (
-          <JoinTarget
-            cmd={cmd}
-            current={(entity as IDirectory).target as IBelong}
-            finished={finished}
-          />
-        );
+        var target = entity as IBelong;
+        if (entity.typeName === '目录') {
+          target = (entity as IDirectory).target as IBelong;
+        }
+        return <JoinTarget cmd={cmd} current={target} finished={finished} />;
       }
       return <></>;
   }

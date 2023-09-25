@@ -10,7 +10,7 @@ import ReportView from './report';
 import CodeEditor from './codeeditor';
 import TransferView from './transfer';
 
-const officeExt = ['.pdf', '.xls', '.xlsx', '.doc', '.docx', '.ppt', '.pptx'];
+const officeExt = ['.md', '.pdf', '.xls', '.xlsx', '.doc', '.docx', '.ppt', '.pptx'];
 const videoExt = ['.mp4', '.avi', '.mov', '.mpg', '.swf', '.flv', '.mpeg'];
 
 interface IOpenProps {
@@ -21,7 +21,7 @@ interface IOpenProps {
 const ExecutorOpen: React.FC<IOpenProps> = (props: IOpenProps) => {
   if ('size' in props.entity || 'filedata' in props.entity) {
     const data = 'size' in props.entity ? props.entity : props.entity.filedata;
-    if (data.contentType?.startsWith('image') || data.thumbnail) {
+    if (data.contentType?.startsWith('image')) {
       return <ImageView share={data} finished={props.finished} />;
     }
     if (

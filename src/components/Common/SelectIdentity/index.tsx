@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { Modal } from 'antd';
+import { Modal, TreeProps } from 'antd';
 import { schema } from '@/ts/base';
 import { IBelong, ITarget } from '@/ts/core';
 import cls from './index.module.less';
 import CustomTree from '@/components/CustomTree';
 import EntityIcon from '../GlobalComps/entityIcon';
+import ShareShowComp from '../ShareShowComp';
 
 interface IProps {
   open: boolean;
@@ -21,8 +22,40 @@ const SelectIdentity: React.FC<IProps> = ({
   exclude,
   finished,
 }) => {
-  const [selected, setSelected] = useState<schema.XIdentity[]>(exclude);
   const [identitys, setIdentitys] = useState<any[]>([]);
+  const [selected, setSelected] = useState<schema.XIdentity[]>(exclude);
+
+  const onSelect: TreeProps['onSelect'] = async (_, info: any) => {
+    const target: ITarget = info.node.item;
+    if (target) {
+      await target.loadIdentitys();
+      setIdentitys(
+        target.identitys.map((item) => {
+          return {
+            title: `[${target.name}]` + item.name,
+            key: item.id,
+            data: item,
+          };
+        }),
+      );
+    }
+  };
+  const onCheck: TreeProps['onCheck'] = (_, info) => {
+    const item = identitys.find((i) => i.key === info.node.key)?.data;
+    if (item) {
+      if (multiple) {
+        if (info.checked) {
+          if (selected.every((a) => a.id != item.metadata.id)) {
+            setSelected([item.metadata, ...selected]);
+          }
+        } else {
+          setSelected(selected.filter((i) => i.id != item.id));
+        }
+      } else {
+        setSelected(info.checked ? [item.metadata] : []);
+      }
+    }
+  };
   /** 加载组织树 */
   const buildTargetTree = (targets: ITarget[]) => {
     const result: any[] = [];
@@ -62,64 +95,50 @@ const SelectIdentity: React.FC<IProps> = ({
         <div className={cls.content}>
           <div className={cls.leftContent}>
             <CustomTree
-              className={cls.docTree}
-              isDirectoryTree
-              searchable
               showIcon
+              searchable
+              isDirectoryTree
+              onSelect={onSelect}
+              className={cls.docTree}
               treeData={buildTargetTree(space.shareTarget)}
-              onSelect={async (_, info: any) => {
-                const target: ITarget = info.node.item;
-                if (target) {
-                  await target.loadIdentitys();
-                  setIdentitys(
-                    target.identitys.map((item) => {
-                      return {
-                        title: `[${target.name}]` + item.name,
-                        key: item.id,
-                        data: item,
-                      };
-                    }),
-                  );
-                }
-              }}
             />
           </div>
-          <div className={cls.center}>
+          <div className={cls.centerContent}>
             <CustomTree
-              className={cls.docTree}
               searchable
               showIcon
+              onCheck={onCheck}
+              treeData={identitys}
               checkable={multiple}
-              multiple={multiple}
+              className={cls.docTree}
               autoExpandParent={true}
-              onCheck={(_, info) => {
-                const item = identitys.find((i) => i.key === info.node.key)?.data;
-                if (item) {
-                  if (multiple) {
-                    if (info.checked) {
-                      setSelected([item.metadata, ...selected]);
-                    } else {
-                      setSelected(selected.filter((i) => i.id != item.id));
-                    }
-                  } else {
-                    setSelected(info.checked ? [item.metadata] : []);
-                  }
-                }
-              }}
+              checkedKeys={selected.map((i) => i.id)}
               onSelect={(_, info) => {
                 const item = identitys.find((i) => i.key === info.node.key)?.data;
                 if (item) {
                   if (multiple) {
-                    setSelected([item.metadata, ...selected]);
+                    if (selected.every((a) => a.id != item.metadata.id)) {
+                      setSelected([item.metadata, ...selected]);
+                    }
                   } else {
                     setSelected([item.metadata]);
                   }
                 }
               }}
-              treeData={identitys}
-              checkedKeys={selected.map((i) => i.id)}
             />
           </div>
+          {multiple ? (
+            <div className={cls.rightContent}>
+              <ShareShowComp
+                departData={selected}
+                deleteFuc={(id) => {
+                  setSelected(selected.filter((a) => a.id != id));
+                }}
+              />
+            </div>
+          ) : (
+            <></>
+          )}
         </div>
       </div>
     </Modal>
