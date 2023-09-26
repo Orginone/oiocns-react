@@ -47,7 +47,7 @@ export interface IPerson extends IBelong {
   /** 获取常用应用 */
   getCommonApplications(reload?: boolean): Promise<string[]>;
   /** 设为常用 */
-  setCommonApplication(appId: string, isCommon: boolean): Promise<void>;
+  setCommonApplication(appId: string, isCommon: boolean, notity?: boolean): Promise<void>;
 }
 
 /** 人员类型实现 */
@@ -57,10 +57,13 @@ export class Person extends Belong implements IPerson {
     this.copyFiles = new Map();
     this.cacheObj = new XObject(_metadata, 'target-cache', [], [this.key]);
     this.friendsActivity = new FriendsActivity(this);
-    this.cacheObj.subscribe('common-application', (data: string[]) => {
-      this.cacheObj.setValue('common-application', data);
-      this.changCallback();
-    });
+    this.cacheObj.subscribe(
+      'common-application',
+      ({ isCommon, appId }: { isCommon: boolean; appId: string }) => {
+        this.setCommonApplication(appId, isCommon, true);
+        this.changCallback();
+      },
+    );
   }
   companys: ICompany[] = [];
   friendsActivity: IActivity;
@@ -376,13 +379,17 @@ export class Person extends Belong implements IPerson {
     }
     return this.commonAppIds;
   }
-  async setCommonApplication(appId: string, isCommon: boolean) {
+  async setCommonApplication(appId: string, isCommon: boolean, notity: boolean = false) {
     if (isCommon) {
       if (!this.commonAppIds.includes(appId)) this.commonAppIds.push(appId);
     } else {
       this.commonAppIds = this.commonAppIds.filter((a) => a != appId);
     }
-    await this.cacheObj.set('common-application', this.commonAppIds);
-    this.changCallback();
+    if (!notity) {
+      await this.cacheObj.notity('common-application', { isCommon, appId });
+      await this.cacheObj.set('common-application', this.commonAppIds);
+    } else {
+      await this.cacheObj.setValue('common-application', this.commonAppIds);
+    }
   }
 }

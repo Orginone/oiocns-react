@@ -43,7 +43,7 @@ class IndexController extends Controller {
   async loadApplications(): Promise<IApplication[]> {
     const apps: IApplication[] = [];
     for (const directory of this.targets.map((a) => a.directory)) {
-      const allApps = await directory.loadAllApplication(true);
+      const allApps = await directory.loadAllApplication();
       apps.push(...allApps.filter((a) => apps.every((s) => s.id !== a.id)));
     }
     return apps;
