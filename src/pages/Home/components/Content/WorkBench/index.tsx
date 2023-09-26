@@ -76,7 +76,11 @@ const BannerCom: React.FC<WorkBenchType> = () => {
   const loadAppCard = (title: string, dataSource: IApplication[]) => {
     const contextMenu = (app: IApplication) => {
       const menus: OperateMenuType[] = [];
-      if (orgCtrl.user.commonAppIds.includes(app.id)) {
+      if (
+        orgCtrl.user.commonApplicattions.findIndex(
+          (a) => a.id == app.id && a.spaceId == app.directory.target.spaceId,
+        ) > -1
+      ) {
         menus.push({
           key: 'unsetCommon',
           label: '取消常用',
@@ -96,17 +100,23 @@ const BannerCom: React.FC<WorkBenchType> = () => {
         onClick: async ({ key }: { key: string }) => {
           switch (key) {
             case 'setCommon':
-              await orgCtrl.user.setCommonApplication(app.id, true);
+              await orgCtrl.user.setCommonApplication(
+                { id: app.id, spaceId: app.directory.target.space.id },
+                true,
+              );
               break;
             default:
-              await orgCtrl.user.setCommonApplication(app.id, false);
+              await orgCtrl.user.setCommonApplication(
+                { id: app.id, spaceId: app.directory.target.space.id },
+                false,
+              );
               break;
           }
         },
       };
     };
     const loadAppCard = (item: IApplication) => (
-      <Dropdown key={item.id} menu={contextMenu(item)} trigger={['contextMenu']}>
+      <Dropdown key={item.key} menu={contextMenu(item)} trigger={['contextMenu']}>
         <Card
           size="small"
           className={'fileCard'}
@@ -129,7 +139,12 @@ const BannerCom: React.FC<WorkBenchType> = () => {
           </div>
           <div className={'fileName'} title={item.typeName}>
             <Typography.Text style={{ fontSize: 12, color: '#888' }} ellipsis>
-              {orgCtrl.user.findShareById(item.belongId)?.name}
+              {item.directory.target.name}
+            </Typography.Text>
+          </div>
+          <div className={'fileName'} title={item.typeName}>
+            <Typography.Text style={{ fontSize: 12, color: '#888' }} ellipsis>
+              {item.directory.target.space.name}
             </Typography.Text>
           </div>
         </Card>
@@ -153,11 +168,18 @@ const BannerCom: React.FC<WorkBenchType> = () => {
     let apps = await orgCtrl.loadApplications();
     await orgCtrl.user.getCommonApplications();
     //加载常用应用
-    setCommonApplications(apps.filter((a) => orgCtrl.user.commonAppIds.includes(a.id)));
+    setCommonApplications(
+      apps.filter(
+        (a) =>
+          orgCtrl.user.commonApplicattions.findIndex(
+            (s) => s.id == a.id && s.spaceId == a.directory.target.spaceId,
+          ) > -1,
+      ),
+    );
     //加载我的应用
-    setMyApplications(apps.filter((a) => a.belongId == orgCtrl.user.id));
+    setMyApplications(apps.filter((a) => a.belongId == a.directory.target.spaceId));
     //加载共享应用
-    setShareApplications(apps.filter((a) => a.belongId != orgCtrl.user.id));
+    setShareApplications(apps.filter((a) => a.belongId != a.directory.target.spaceId));
   };
   useEffect(() => {
     const id = orgCtrl.user.subscribe(reload);

@@ -1202,3 +1202,10 @@ export type SchemaType = {
   properties: Record<string, object>;
   column: 1 | 2 | 3;
 };
+
+export type CommonAppplication = {
+  // 应用Id
+  id: string;
+  // 展示归属组织
+  spaceId: string;
+};
