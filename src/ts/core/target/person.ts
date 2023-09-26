@@ -18,6 +18,8 @@ import { FriendsActivity, IActivity } from '../chat/activity';
 export interface IPerson extends IBelong {
   /** 加入/管理的单位 */
   companys: ICompany[];
+  /** 常用应用Id集合 */
+  commonAppIds: string[];
   /** 赋予人的身份(角色)实体 */
   givedIdentitys: schema.XIdProof[];
   /** 用户缓存对象 */
@@ -42,6 +44,10 @@ export interface IPerson extends IBelong {
   createCompany(data: model.TargetModel): Promise<ICompany | undefined>;
   /** 搜索用户 */
   searchTargets(filter: string, typeNames: string[]): Promise<schema.XTarget[]>;
+  /** 获取常用应用 */
+  getCommonApplications(reload?: boolean): Promise<string[]>;
+  /** 设为常用 */
+  setCommonApplication(appId: string, isCommon: boolean): Promise<void>;
 }
 
 /** 人员类型实现 */
@@ -51,13 +57,19 @@ export class Person extends Belong implements IPerson {
     this.copyFiles = new Map();
     this.cacheObj = new XObject(_metadata, 'target-cache', [], [this.key]);
     this.friendsActivity = new FriendsActivity(this);
+    this.cacheObj.subscribe('common-application', (data: string[]) => {
+      this.cacheObj.setValue('common-application', data);
+      this.changCallback();
+    });
   }
   companys: ICompany[] = [];
   friendsActivity: IActivity;
   cacheObj: XObject<schema.Xbase>;
+  commonAppIds: string[] = [];
   givedIdentitys: schema.XIdProof[] = [];
   copyFiles: Map<string, IFileInfo<schema.XEntity>>;
   private _cohortLoaded: boolean = false;
+  private _comomAppsLoaded: boolean = false;
   private _givedIdentityLoaded: boolean = false;
   async loadGivedIdentitys(reload: boolean = false): Promise<schema.XIdProof[]> {
     if (!this._givedIdentityLoaded || reload) {
@@ -356,5 +368,21 @@ export class Person extends Belong implements IPerson {
         break;
     }
     return '';
+  }
+  async getCommonApplications(reload: boolean = false): Promise<string[]> {
+    if (reload || !this._comomAppsLoaded) {
+      this._comomAppsLoaded = true;
+      this.commonAppIds = (await this.cacheObj.get<string[]>('common-application')) || [];
+    }
+    return this.commonAppIds;
+  }
+  async setCommonApplication(appId: string, isCommon: boolean) {
+    if (isCommon) {
+      if (!this.commonAppIds.includes(appId)) this.commonAppIds.push(appId);
+    } else {
+      this.commonAppIds = this.commonAppIds.filter((a) => a != appId);
+    }
+    await this.cacheObj.set('common-application', this.commonAppIds);
+    this.changCallback();
   }
 }
