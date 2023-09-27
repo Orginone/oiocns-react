@@ -23,9 +23,10 @@ const ReportDesign: React.FC<IProps> = ({ current }) => {
   const [cellStyle, setCellStyle] = useState<any>();
 
   useEffect(() => {
+    /** 获取报表数据，没有数据默认给个sheet页 */
     let sheetListData: any = current.metadata?.rule
       ? JSON.parse(current.metadata?.rule)
-      : {};
+      : { 0: { name: 'sheet1', code: 'test1' } };
     delete sheetListData?.list;
     setSheetList(Object.values(sheetListData));
     setSelectedItem(sheetListData[0]);
@@ -86,7 +87,6 @@ const ReportDesign: React.FC<IProps> = ({ current }) => {
         current={current}
         handEcho={(cellStyle: any) => {
           /** 单元格样式回显到工具栏 */
-          console.log(cellStyle, 'cellStyle');
           setCellStyle(cellStyle);
         }}
         selectItem={selectItem}
