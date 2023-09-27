@@ -1,136 +1,44 @@
-import { Avatar, Card, Col, List, Row } from 'antd';
-import React from 'react';
-
-// @ts-ignore
+import { Col, Row } from 'antd';
+import React, { useState } from 'react';
+import Activity from '@/components/Activity';
+import orgCtrl from '@/ts/controller';
 import cls from './index.module.less';
+import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 
-const data = Array.from({ length: 23 }).map((_, i) => ({
-  href: '#',
-  title: `名字名字${i}`,
-  avatar: 'https://joeschmoe.io/api/v1/random',
-  content:
-    '动态内容动态内容动态内容动态内容动态内容动态内容动态内容动态内容动态内容动态内容动态内容动态内容动态内容动态内容...',
-}));
 const Index: React.FC = () => {
-  return (
-    <Row gutter={[24, 24]} className={cls.content}>
-      <Col span={12}>
-        <Card title="经常浏览">
-          <List
-            itemLayout="vertical"
-            size="large"
-            dataSource={data}
-            footer={
-              <div>
-                <b>ant design</b> footer part
-              </div>
-            }
-            renderItem={(item) => (
-              <List.Item
-                key={item.title}
-                extra={
-                  <img
-                    width={272}
-                    alt="logo"
-                    src="https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png"
-                  />
-                }>
-                <List.Item.Meta
-                  avatar={<Avatar src={item.avatar} />}
-                  title={<a href={item.href}>{item.title}</a>}
-                />
-                {item.content}
-              </List.Item>
-            )}
-          />
-        </Card>
-      </Col>
-      <Col span={12}>
-        <List
-          itemLayout="vertical"
-          size="large"
-          dataSource={data}
-          footer={
-            <div>
-              <b>ant design</b> footer part
-            </div>
-          }
-          renderItem={(item) => (
-            <List.Item key={item.title}>
-              <List.Item.Meta
-                avatar={<Avatar src={item.avatar} />}
-                title={<a href={item.href}>{item.title}</a>}
-              />
-              {item.content}
+  const [current, setCurrent] = useState(0);
 
-              <Row gutter={[16, 16]}>
-                <Col span={8}>
-                  <img
-                    width="100%"
-                    alt="logo"
-                    src="https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png"
-                  />
-                </Col>
-                <Col span={8}>
-                  <img
-                    width="100%"
-                    alt="logo"
-                    src="https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png"
-                  />
-                </Col>
-                <Col span={8}>
-                  <img
-                    width="100%"
-                    alt="logo"
-                    src="https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png"
-                  />
-                </Col>
-                <Col span={8}>
-                  <img
-                    width="100%"
-                    alt="logo"
-                    src="https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png"
-                  />
-                </Col>
-                <Col span={8}>
-                  <img
-                    width="100%"
-                    alt="logo"
-                    src="https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png"
-                  />
-                </Col>
-                <Col span={8}>
-                  <img
-                    width="100%"
-                    alt="logo"
-                    src="https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png"
-                  />
-                </Col>
-                <Col span={8}>
-                  <img
-                    width="100%"
-                    alt="logo"
-                    src="https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png"
-                  />
-                </Col>
-                <Col span={8}>
-                  <img
-                    width="100%"
-                    alt="logo"
-                    src="https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png"
-                  />
-                </Col>
-                <Col span={8}>
-                  <img
-                    width="100%"
-                    alt="logo"
-                    src="https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png"
-                  />
-                </Col>
-              </Row>
-            </List.Item>
-          )}
-        />
+  return (
+    <Row className={cls.content}>
+      <Col span={8} style={{ height: '100%' }}>
+        <div className={cls.groupList}>
+          {orgCtrl.chats
+            .filter((i) => i.isMyChat && i.isGroup)
+            .map((i, index) => {
+              return (
+                <div
+                  className={cls.groupListItem}
+                  key={i.key}
+                  onClick={() => setCurrent(index)}>
+                  <EntityIcon entityId={i.id} showName size={50}></EntityIcon>
+                </div>
+              );
+            })}
+        </div>
+      </Col>
+      <Col span={16} style={{ height: '100%' }}>
+        {orgCtrl.chats
+          .filter((i) => i.isMyChat && i.isGroup)
+          .map((i, index) => {
+            return index === current ? (
+              <Activity
+                key={i.key}
+                activity={i.activity}
+                title={i.name + '群动态'}></Activity>
+            ) : (
+              <></>
+            );
+          })}
       </Col>
     </Row>
   );

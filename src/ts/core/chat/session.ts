@@ -1,13 +1,11 @@
-import { common, model, schema } from '../../base';
+import { command, common, model, schema } from '../../base';
 import { Entity, IEntity, MessageType, TargetType } from '../public';
 import { ITarget } from '../target/base/target';
 import { XCollection } from '../public/collection';
 import { IMessage, Message } from './message';
-import { IActivity, Activity } from './activity';
+import { Activity, IActivity } from './activity';
 // 空时间
 const nullTime = new Date('2022-07-01').getTime();
-// 消息变更推送
-export const msgChatNotify = new common.Emitter();
 /** 会话接口类 */
 export interface ISession extends IEntity<schema.XEntity> {
   /** 是否归属人员 */
@@ -46,6 +44,7 @@ export interface ISession extends IEntity<schema.XEntity> {
     text: string,
     mentions: string[],
     cite?: IMessage,
+    forward?: IMessage[],
   ): Promise<boolean>;
   /** 撤回消息 */
   recallMessage(id: string): Promise<void>;
@@ -88,10 +87,12 @@ export class Session extends Entity<schema.XEntity> implements ISession {
       labels: id === this.userId ? ['本人'] : tags,
     };
     this.activity = new Activity(_metadata, this);
-    this.subscribeOperations();
-    if (this.id != this.userId) {
-      this.loadCacheChatData();
-    }
+    setTimeout(
+      async () => {
+        await this.loadCacheChatData();
+      },
+      this.id === this.userId ? 100 : 0,
+    );
   }
   get coll(): XCollection<model.ChatMessageType> {
     return this.target.resource.messageColl;
@@ -121,6 +122,7 @@ export class Session extends Entity<schema.XEntity> implements ISession {
     return (
       this.metadata.typeName === TargetType.Person ||
       this.members.some((i) => i.id === this.userId) ||
+      this.metadata.typeName == TargetType.Group ||
       this.chatdata.noReadCount > 0
     );
   }
@@ -149,6 +151,7 @@ export class Session extends Entity<schema.XEntity> implements ISession {
   get canDeleteMessage(): boolean {
     return this.target.id === this.userId || this.target.hasRelationAuth();
   }
+
   async moreMessage(): Promise<number> {
     const data = await this.coll.loadSpace({
       take: 30,
@@ -186,7 +189,7 @@ export class Session extends Entity<schema.XEntity> implements ISession {
         this.chatdata.noReadCount = 0;
         this.cacheChatData(true);
       }
-      msgChatNotify.changCallback();
+      command.emitterFlag('session');
       this.messageNotify?.apply(this, [this.messages]);
     });
   }
@@ -195,9 +198,16 @@ export class Session extends Entity<schema.XEntity> implements ISession {
     text: string,
     mentions: string[],
     cite?: IMessage | undefined,
+    forward?: IMessage[] | undefined,
   ): Promise<boolean> {
     if (cite) {
       cite.metadata.comments = [];
+    }
+    if (forward) {
+      forward = forward.map((item: IMessage) => {
+        item.metadata.comments = [];
+        return item;
+      });
     }
     const data = await this.coll.insert(
       {
@@ -211,6 +221,7 @@ export class Session extends Entity<schema.XEntity> implements ISession {
               body: text,
               mentions: mentions,
               cite: cite?.metadata,
+              forward: forward?.map((item) => item.metadata),
             }),
         ),
       } as unknown as model.ChatMessageType,
@@ -285,32 +296,6 @@ export class Session extends Entity<schema.XEntity> implements ISession {
     return false;
   }
 
-  async subscribeOperations(): Promise<void> {
-    if (this.isGroup) {
-      this.coll.subscribe(
-        [this.key],
-        (res: { operate: string; data: model.ChatMessageType[] }) => {
-          res.data.map((item) => this.receiveMessage(res.operate, item));
-        },
-      );
-    } else {
-      this.coll.subscribe(
-        [this.key],
-        (res: { operate: string; data: model.ChatMessageType[] }) => {
-          res.data.forEach((item) => {
-            if (
-              [item.fromId, item.toId].includes(this.sessionId) &&
-              [item.fromId, item.toId].includes(this.userId)
-            ) {
-              this.receiveMessage(res.operate, item);
-            }
-          });
-        },
-        this.sessionId,
-      );
-    }
-  }
-
   receiveMessage(operate: string, data: model.ChatMessageType): void {
     const imsg = new Message(data, this);
     if (operate === 'insert') {
@@ -320,7 +305,7 @@ export class Session extends Entity<schema.XEntity> implements ISession {
         if (!this.chatdata.mentionMe) {
           this.chatdata.mentionMe = imsg.mentions.includes(this.userId);
         }
-        msgChatNotify.changCallback();
+        command.emitterFlag('session');
       } else if (!imsg.isReaded) {
         this.tagMessage([imsg.id], '已读');
       }
@@ -354,10 +339,32 @@ export class Session extends Entity<schema.XEntity> implements ISession {
   }
 
   async loadCacheChatData(): Promise<void> {
+    if (this.isGroup) {
+      this.coll.subscribe(
+        [this.key],
+        (res: { operate: string; data: model.ChatMessageType[] }) => {
+          res.data.map((item) => this.receiveMessage(res.operate, item));
+        },
+      );
+    } else {
+      this.coll.subscribe(
+        [this.key],
+        (res: { operate: string; data: model.ChatMessageType[] }) => {
+          res.data.forEach((item) => {
+            if (
+              [item.fromId, item.toId].includes(this.sessionId) &&
+              [item.fromId, item.toId].includes(this.userId)
+            ) {
+              this.receiveMessage(res.operate, item);
+            }
+          });
+        },
+        this.sessionId,
+      );
+    }
     const data = await this.target.user.cacheObj.get<model.MsgChatData>(this.cachePath);
     if (data && data.fullId === this.chatdata.fullId) {
       this.chatdata = data;
-      msgChatNotify.changCallback();
     }
     this.target.user.cacheObj.subscribe(
       this.chatdata.fullId,
@@ -365,7 +372,7 @@ export class Session extends Entity<schema.XEntity> implements ISession {
         if (data && data.fullId === this.chatdata.fullId) {
           this.chatdata = data;
           this.target.user.cacheObj.setValue(this.cachePath, data);
-          msgChatNotify.changCallback();
+          command.emitterFlag('session');
         }
       },
     );

@@ -29,7 +29,7 @@ export class Department extends Target implements IDepartment {
     _company: ICompany,
     parent?: IDepartment,
   ) {
-    super(_keys, _metadata, [_company.id], _company.user);
+    super(_keys, _metadata, [_company.id], _company, _company.user);
     this.space = _company;
     this.parent = parent;
     this.keys = [..._keys, this.key];

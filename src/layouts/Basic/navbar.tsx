@@ -1,13 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Badge, Drawer, Layout, List, Space, Tabs, Tag } from 'antd';
-import { msgChatNotify } from '@/ts/core';
 import orgCtrl from '@/ts/controller';
 import styles from './index.module.less';
 import { Link } from 'react-router-dom';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import OrgIcons from '@/components/Common/GlobalComps/orgIcons';
 import React from 'react';
-import { kernel, model, schema } from '@/ts/base';
+import { command, kernel, model, schema } from '@/ts/base';
 import { showChatTime } from '@/utils/tools';
 
 const Navbar: React.FC = () => {
@@ -16,7 +15,7 @@ const Navbar: React.FC = () => {
   const [online, setOnline] = useState(0);
   const [onlineVisible, setOnlineVisible] = useState(false);
   useEffect(() => {
-    const id = msgChatNotify.subscribe(() => {
+    const id = command.subscribeByFlag('session', () => {
       let noReadCount = 0;
       for (const item of orgCtrl.chats) {
         if (item.isMyChat) {
@@ -32,7 +31,7 @@ const Navbar: React.FC = () => {
       setOnline(kernel.onlineIds.length);
     });
     return () => {
-      msgChatNotify.unsubscribe(id);
+      command.unsubscribeByFlag(id);
       orgCtrl.work.notity.unsubscribe(workId);
     };
   }, []);

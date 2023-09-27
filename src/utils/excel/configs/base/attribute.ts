@@ -1,6 +1,6 @@
 import { XAttribute } from '@/ts/base/schema';
 import { IDirectory, orgAuth } from '@/ts/core';
-import { Context, SheetRead, Sheet, SheetName } from '../../types';
+import { Context, SheetHandler, Sheet, SheetName } from '../../types';
 import { assignment } from '../..';
 import { List } from '@/ts/base';
 
@@ -19,7 +19,7 @@ export class AttrSheet extends Sheet<Attribute> {
     super(SheetName.FormAttr, 1, [
       { title: '表单代码', dataIndex: 'formCode', valueType: '描述型' },
       { title: '特性名称', dataIndex: 'name', valueType: '描述型' },
-      { title: '特性代码', dataIndex: 'info', valueType: '描述型' },
+      { title: '特性代码', dataIndex: 'code', valueType: '描述型' },
       { title: '关联属性代码/id', dataIndex: 'propInfo', valueType: '描述型' },
       { title: '主键', dataIndex: 'id', valueType: '描述型', hide: true },
       { title: '表单主键', dataIndex: 'formId', valueType: '描述型', hide: true },
@@ -29,7 +29,7 @@ export class AttrSheet extends Sheet<Attribute> {
   }
 }
 
-export class AttrSheetRead extends SheetRead<Attribute, Context, AttrSheet> {
+export class AttrHandler extends SheetHandler<Attribute, Context, AttrSheet> {
   /**
    * 初始化
    * @param context 上下文
@@ -54,7 +54,7 @@ export class AttrSheetRead extends SheetRead<Attribute, Context, AttrSheet> {
   checkData(context: Context) {
     for (let index = 0; index < this.sheet.data.length; index++) {
       let item = this.sheet.data[index];
-      if (!item.formCode || !item.name || !item.info || !item.propInfo) {
+      if (!item.formCode || !item.name || !item.code || !item.propInfo) {
         this.pushError(index, `存在未填写的表单代码、特性名称、特性代码、关联属性代码！`);
       }
       if (!context.formMap.has(item.formCode)) {
@@ -83,7 +83,7 @@ export class AttrSheetRead extends SheetRead<Attribute, Context, AttrSheet> {
           if (!attr.id) {
             attr.id = 'snowId()';
             attr.authId = orgAuth.SuperAuthId;
-            attr.code = 'SsnowId()';
+            attr.code = attr.code ?? 'SsnowId()';
           }
           attr.formId = form.id;
           let prop = context.propertyMap.get(attr.propInfo);

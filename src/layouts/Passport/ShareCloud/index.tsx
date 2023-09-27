@@ -4,7 +4,7 @@ import { renderRoutes } from 'react-router-config';
 import type { IRouteConfig } from 'typings/globelType';
 
 import cls from './index.module.less';
-const PassportLayout: React.FC<{ route: IRouteConfig }> = ({ route }) => {
+const ShareCloudLayout: React.FC<{ route: IRouteConfig }> = ({ route }) => {
   const [index, setIndex] = useState(1);
   const [slidesMargin, setSlidesMargin] = useState('0');
 
@@ -99,8 +99,33 @@ const PassportLayout: React.FC<{ route: IRouteConfig }> = ({ route }) => {
         <div>{renderRoutes(route.routes)}</div>
       </div>
       <div className={cls.copyright}>
-        <div>Powered by Orginone </div>
-        <div>© 2023 资产云开放协同创新中心 主办单位：浙江省财政厅</div>
+        <div className={cls.copyrightZh}>
+          主办单位：
+          <a
+            href="https://czt.zj.gov.cn"
+            target="_blank"
+            style={{ color: '#8a8a8a' }}
+            rel="noopener noreferrer">
+            浙江省财政厅
+          </a>
+          &nbsp; 技术支持：
+          <a
+            href="https://assetcloud.org.cn"
+            target="_blank"
+            style={{ color: '#8a8a8a' }}
+            rel="noopener noreferrer">
+            资产云开放协同创新中心
+          </a>
+        </div>
+        <div className={cls.copyrightEn}>
+          <a
+            href="https://orginone.cn"
+            target="_blank"
+            style={{ color: '#8a8a8a' }}
+            rel="noopener noreferrer">
+            Powered by Orginone{' '}
+          </a>
+        </div>
       </div>
 
       {/*轮播图按钮*/}
@@ -120,7 +145,6 @@ const PassportLayout: React.FC<{ route: IRouteConfig }> = ({ route }) => {
         </div>
         <div className={cls.countItem}>
           <label
-            className={cls.btn_2}
             style={{
               background: index === 2 ? '#ffffff' : '#eff5ff',
               width: index === 2 ? '32px' : '',
@@ -129,7 +153,6 @@ const PassportLayout: React.FC<{ route: IRouteConfig }> = ({ route }) => {
         </div>
         <div className={cls.countItem}>
           <label
-            className={cls.btn_3}
             style={{
               background: index === 3 ? '#ffffff' : '#eff5ff',
               width: index === 3 ? '32px' : '',
@@ -138,7 +161,6 @@ const PassportLayout: React.FC<{ route: IRouteConfig }> = ({ route }) => {
         </div>
         <div className={cls.countItem}>
           <label
-            className={cls.btn_4}
             style={{
               background: index === 4 ? '#ffffff' : '#eff5ff',
               width: index === 4 ? '32px' : '',
@@ -147,7 +169,6 @@ const PassportLayout: React.FC<{ route: IRouteConfig }> = ({ route }) => {
         </div>
         <div className={cls.countItem}>
           <label
-            className={cls.btn_5}
             style={{
               background: index === 5 ? '#ffffff' : '#eff5ff',
               width: index === 5 ? '32px' : '',
@@ -158,4 +179,4 @@ const PassportLayout: React.FC<{ route: IRouteConfig }> = ({ route }) => {
     </div>
   );
 };
-export default PassportLayout;
+export default ShareCloudLayout;

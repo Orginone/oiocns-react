@@ -17,6 +17,9 @@ export class Property extends StandardFileInfo<schema.XProperty> implements IPro
     );
   }
   attributes: schema.XAttribute[] = [];
+  get cacheFlag(): string {
+    return 'propertys';
+  }
   override async copy(destination: IDirectory): Promise<boolean> {
     if (this.allowCopy(destination)) {
       return await super.copyTo(destination.id, destination.resource.propertyColl);

@@ -5,7 +5,8 @@ import MainLayout from '@/components/MainLayout';
 import useMenuUpdate from '@/hooks/useMenuUpdate';
 import { Input } from 'antd';
 import { ImSearch } from '@/icons/im';
-import { ISession, msgChatNotify } from '@/ts/core';
+import { ISession } from '@/ts/core';
+import { command } from '@/ts/base';
 
 const Setting: React.FC<any> = () => {
   const [filter, setFilter] = useState('');
@@ -42,7 +43,7 @@ const Setting: React.FC<any> = () => {
           case '标记为未读':
             setSelectMenu(rootMenu);
             chat.chatdata.noReadCount += 1;
-            msgChatNotify.changCallback();
+            command.emitterFlag('session');
             break;
         }
       }}

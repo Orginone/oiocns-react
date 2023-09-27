@@ -22,7 +22,7 @@ import { Member } from './member';
 import { IProperty } from './standard/property';
 import { IApplication } from './standard/application';
 import { BucketOpreates, FileItemModel } from '@/ts/base/model';
-import { encodeKey } from '@/ts/base/common';
+import { encodeKey, sleep } from '@/ts/base/common';
 import { DataResource } from './resource';
 import { DirectoryOperate, IDirectoryOperate } from './operate';
 /** 可为空的进度回调 */
@@ -100,19 +100,20 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
       _parent ?? (_target as unknown as IDirectory),
       _target.resource.directoryColl,
     );
-    this.target = _target;
     this.parent = _parent;
     this.isContainer = true;
     this.taskEmitter = new common.Emitter();
     this.operater = new DirectoryOperate(this, _target.resource);
   }
-  target: ITarget;
   operater: IDirectoryOperate;
   taskEmitter: common.Emitter;
   parent: IDirectory | undefined;
   taskList: model.TaskModel[] = [];
   files: ISysFileInfo[] = [];
   formTypes: string[] = ['表单', '报表', '事项配置', '实体配置'];
+  get cacheFlag(): string {
+    return 'directorys';
+  }
   get forms(): IForm[] {
     return this.operater.getContent(this.formTypes) as Form[];
   }
@@ -249,6 +250,9 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
     return this.files;
   }
   async createFile(file: Blob, p?: OnProgress): Promise<ISysFileInfo | undefined> {
+    while (this.taskList.filter((i) => i.finished < i.size).length > 2) {
+      await sleep(1000);
+    }
     p?.apply(this, [0]);
     const task: model.TaskModel = {
       name: file.name,

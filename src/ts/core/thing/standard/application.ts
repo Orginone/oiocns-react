@@ -45,6 +45,9 @@ export class Application
   get locationKey(): string {
     return this.key;
   }
+  get cacheFlag(): string {
+    return 'applications';
+  }
   content(_mode: number = 0): IFileInfo<schema.XEntity>[] {
     return [...this.children, ...this.works].sort((a, b) =>
       a.metadata.updateTime < b.metadata.updateTime ? 1 : -1,

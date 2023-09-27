@@ -1,21 +1,30 @@
-import { message, Popover, Spin, Badge, Tooltip } from 'antd';
+/* eslint-disable no-unused-vars */
+import { Button, Checkbox, message, Popover, Spin, Badge, Tooltip, Affix } from 'antd';
 import moment from 'moment';
 import React, { useEffect, useRef, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import TeamIcon from '@/components/Common/GlobalComps/entityIcon';
 import Information from './information';
+import ForwardContentModal from './forwardContentModal';
 import { showChatTime, downloadByUrl, shareOpenLink } from '@/utils/tools';
 import { IMessage, ISession, MessageType } from '@/ts/core';
 import { parseAvatar } from '@/ts/base';
 import css from './index.module.less';
-import { parseCiteMsg, parseMsg } from '@/pages/Chats/components/parseMsg';
+import {
+  parseCiteMsg,
+  parseMsg,
+  parseForwardMsg,
+} from '@/pages/Chats/components/parseMsg';
 import { RiShareForwardFill } from '@/icons/ri';
+import { BsListCheck } from '@/icons/bs';
+import type { CheckboxChangeEvent } from 'antd/es/checkbox';
 import {
   AiOutlineCopy,
   AiOutlineRollback,
   AiOutlineMessage,
   AiOutlineDelete,
   AiOutlineDownload,
+  AiOutlineEllipsis,
 } from '@/icons/ai';
 /**
  * @description: 聊天区域
@@ -28,20 +37,25 @@ interface Iprops {
   handleReWrites: Function;
   /** 返回值，引用 */
   citeText: any;
+  forward: any;
   /** 回车设置引用消息 */
   enterCiteMsg: IMessage;
+  multiSelectShow: boolean;
+  multiSelectMsg: (item: IMessage, checked: boolean) => void;
+  multiSelectFn: (multi: boolean) => void;
 }
 
 const GroupContent = (props: Iprops) => {
   const [loading, setLoading] = useState(false);
   const [infoMsg, setInfoMsg] = useState<IMessage>();
   const [messages, setMessages] = useState(props.chat.messages);
-  const { handleReWrites } = props;
+  const { handleReWrites, multiSelectShow } = props;
   const body = useRef<HTMLDivElement>(null);
   const [beforescrollHeight, setBeforescrollHeight] = useState(0);
-  // const [forwardOpen, setForwardOpen] = useState(false); // 设置转发打开窗口
-  // const [formwardCode, setFormwardCode] = useState<IMessage>(); // 转发时用户
-  // const [ismousewheel, setIsMousewheel] = useState(false);
+  const [forwardModalOpen, setForwardModalOpen] = useState<boolean>(false); // 转发时用户
+  const [forwardMessages, setForwardMessages] = useState<IMessage[]>([]);
+  const [ismousewheel, setIsMousewheel] = useState(false);
+  const [multiSelect, setMultiSelect] = useState(multiSelectShow);
   useEffect(() => {
     props.chat.onMessage((ms) => {
       setMessages([...ms]);
@@ -49,7 +63,11 @@ const GroupContent = (props: Iprops) => {
     return () => {
       props.chat.unMessage();
     };
-  }, [props]);
+  }, [props.chat]);
+
+  useEffect(() => {
+    setMultiSelect(multiSelectShow);
+  }, [multiSelectShow]);
 
   useEffect(() => {
     if (body && body.current) {
@@ -93,58 +111,112 @@ const GroupContent = (props: Iprops) => {
     });
   };
 
-  /** 转发消息 */
-  const forward = (item: IMessage) => {
-    // setForwardOpen(true);
-    // setFormwardCode(item);
+  const handleForwadModalClose = () => {
+    setForwardModalOpen(false);
+    setForwardMessages([]);
+  };
+  const viewForward = (item: IMessage[]) => {
+    setForwardModalOpen(true);
+    setForwardMessages(item);
   };
 
+  const batchForwardMsg = (item: IMessage) => {
+    // TODO 需要优化
+    if (
+      item.forward.length === 1 &&
+      item.forward[0].forward &&
+      item.forward[0].forward.length > 1
+    ) {
+      return (
+        <React.Fragment>
+          {parseForwardMsg(item.forward[0].forward, viewForward)}
+        </React.Fragment>
+      );
+    }
+    return <React.Fragment>{parseForwardMsg(item.forward, viewForward)}</React.Fragment>;
+  };
+  const defaultMsg = (item: IMessage) => {
+    return (
+      <React.Fragment>
+        {parseMsg(item)}
+        {item.cite && parseCiteMsg(item.cite)}
+      </React.Fragment>
+    );
+  };
+
+  const showMsg = (item: IMessage) => {
+    if (item.forward && item.forward.length) return batchForwardMsg(item);
+    else return defaultMsg(item);
+  };
   const viewMsg = (item: IMessage) => {
     if (item.isMySend) {
       return (
         <>
-          <div className={`${css.con_content}`}>
-            {props.chat.isBelongPerson ? (
-              <React.Fragment>
-                {parseMsg(item)}
-                {item.cite && parseCiteMsg(item.cite)}
-              </React.Fragment>
-            ) : (
-              <>
-                <Badge
-                  key={item.id}
-                  count={item.comments}
-                  size="small"
-                  style={{ zIndex: 2 }}
-                  offset={[-15, -12]}>
-                  {parseMsg(item)}
-                  {item.cite && parseCiteMsg(item.cite)}
-                </Badge>
-                <div
-                  className={`${css.information} ${
-                    item.readedinfo.includes('已读') ? css.readed : ''
-                  }`}
-                  onClick={() => setInfoMsg(item)}>
-                  {item.readedinfo}
-                </div>
-              </>
-            )}
-          </div>
-          <div style={{ color: '#888' }}>
-            <TeamIcon entityId={item.metadata.fromId} size={36} />
-          </div>
+          <Popover
+            autoAdjustOverflow={false}
+            trigger="hover"
+            key={item.id}
+            placement="leftTop"
+            getPopupContainer={(triggerNode: HTMLElement) => {
+              return triggerNode.parentElement || document.body;
+            }}
+            overlayInnerStyle={{ marginRight: '-16px', padding: '3px' }}
+            content={msgAction(item)}>
+            <div style={{ display: 'flex' }}>
+              <div className={`${css.con_content}`}>
+                {props.chat.isBelongPerson ? (
+                  showMsg(item)
+                ) : (
+                  <>
+                    <Badge
+                      key={item.id}
+                      count={item.comments}
+                      size="small"
+                      style={{ zIndex: 2 }}
+                      offset={[-15, -12]}>
+                      {showMsg(item)}
+                      {item.cite && parseCiteMsg(item.cite)}
+                    </Badge>
+                    <div
+                      className={`${css.information} ${
+                        item.readedinfo.includes('已读') ? css.readed : ''
+                      }`}
+                      onClick={() => setInfoMsg(item)}>
+                      {item.readedinfo}
+                    </div>
+                  </>
+                )}
+              </div>
+              <div style={{ color: '#888' }}>
+                <TeamIcon entityId={item.metadata.fromId} size={36} />
+              </div>
+            </div>
+          </Popover>
         </>
       );
     } else {
       return (
         <>
-          <div style={{ color: '#888', paddingRight: 10 }}>
-            <TeamIcon entityId={item.metadata.fromId} size={36} />
-          </div>
-          <div className={`${css.con_content}`}>
-            <div className={`${css.name}`}>{item.from.name}</div>
-            {parseMsg(item)}
-            {item.cite && parseCiteMsg(item.cite)}
+          <div style={{ display: 'flex' }}>
+            <div>
+              <TeamIcon entityId={item.metadata.fromId} size={36} />
+            </div>
+            <div className={`${css.con_content}`}>
+              <div className={`${css.name}`}>{item.from.name}</div>
+              <Popover
+                autoAdjustOverflow={false}
+                trigger="hover"
+                key={item.id}
+                placement="rightTop"
+                getPopupContainer={(triggerNode: HTMLElement) => {
+                  return triggerNode.parentElement || document.body;
+                }}
+                overlayInnerStyle={{ marginLeft: '-18px', padding: '3px' }}
+                content={msgAction(item)}>
+                {parseMsg(item)}
+              </Popover>
+              {item.cite && parseCiteMsg(item.cite)}
+            </div>
           </div>
         </>
       );
@@ -153,23 +225,64 @@ const GroupContent = (props: Iprops) => {
 
   const loadMsgItem = (item: IMessage) => {
     return (
-      <Popover
-        trigger="hover"
-        key={item.id}
-        placement="bottom"
-        getPopupContainer={(triggerNode: HTMLElement) => {
-          return triggerNode.parentElement || document.body;
-        }}
-        content={msgAction(item)}>
-        <div
-          className={css.con_body}
-          onContextMenu={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-          }}>
-          {viewMsg(item)}
-        </div>
-      </Popover>
+      <div
+        className={css.con_body}
+        onContextMenu={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+        }}>
+        {multiSelect && (
+          <Checkbox
+            className={css.multiSelectStyl}
+            onClick={(e) => {
+              props.multiSelectMsg(
+                item,
+                (e as unknown as CheckboxChangeEvent).target.checked,
+              );
+            }}
+          />
+        )}
+        {viewMsg(item)}
+      </div>
+    );
+  };
+  const handleMore = () => {
+    setMultiSelect(true);
+    props.multiSelectFn(true);
+  };
+  const moreAction = (item: IMessage) => {
+    return (
+      <div className={css.moreActionWrap}>
+        {props.chat.canDeleteMessage && (
+          <Button
+            type="text"
+            className={css.multiBtn}
+            onClick={async () => {
+              if (await props.chat.deleteMessage(item.id)) {
+                message.success('删除成功');
+              }
+            }}>
+            <AiOutlineDelete size={14} className={css.actionIconStyl} />
+            <span className={css.moreActionTxt}>删除</span>
+          </Button>
+        )}
+        <Button className={css.multiBtn} type="text" onClick={handleMore}>
+          <BsListCheck size={14} className={css.actionIconStyl} />
+          <span className={css.moreActionTxt}>多选</span>
+        </Button>
+        {['文件', '视频', '图片'].includes(item.msgType) && item.forward?.length < 1 && (
+          <Button
+            type="text"
+            className={css.multiBtn}
+            onClick={() => {
+              const url = parseAvatar(item.msgBody).shareLink;
+              downloadByUrl(shareOpenLink(url, true));
+            }}>
+            <AiOutlineDownload size={14} className={css.actionIconStyl} />
+            <span className={css.moreActionTxt}>下载</span>
+          </Button>
+        )}
+      </div>
     );
   };
 
@@ -198,7 +311,7 @@ const GroupContent = (props: Iprops) => {
           <RiShareForwardFill
             size={22}
             className={css.actionIconStyl}
-            onClick={() => forward(item)}
+            onClick={() => props.forward(item)}
           />
         </Tooltip>
         {item.isMySend && item.allowRecall && (
@@ -212,30 +325,18 @@ const GroupContent = (props: Iprops) => {
             />
           </Tooltip>
         )}
-        {props.chat.canDeleteMessage && (
-          <Tooltip title="删除">
-            <AiOutlineDelete
-              size={22}
-              className={css.actionIconStyl}
-              onClick={async () => {
-                if (await props.chat.deleteMessage(item.id)) {
-                  message.success('删除成功');
-                }
-              }}
-            />
+        {
+          <Tooltip title="更多">
+            <Popover
+              placement="bottomRight"
+              content={moreAction(item)}
+              title=""
+              trigger="click"
+              overlayInnerStyle={{ marginTop: '-12px' }}>
+              <AiOutlineEllipsis size={22} className={css.actionIconStyl} />
+            </Popover>
           </Tooltip>
-        )}
-        {['文件', '视频', '图片'].includes(item.msgType) && (
-          <Tooltip title="下载">
-            <AiOutlineDownload
-              size={22}
-              className={css.actionIconStyl}
-              onClick={() => {
-                downloadByUrl(shareOpenLink(parseAvatar(item.msgBody).shareLink, true));
-              }}
-            />
-          </Tooltip>
-        )}
+        }
       </div>
     );
   };
@@ -307,6 +408,13 @@ const GroupContent = (props: Iprops) => {
         </div>
         {infoMsg && <Information msg={infoMsg} onClose={() => setInfoMsg(undefined)} />}
       </Spin>
+      <ForwardContentModal
+        handleClose={handleForwadModalClose}
+        open={forwardModalOpen}
+        messages={forwardMessages}
+        isBelongPerson={true}
+        title={''}
+      />
     </div>
   );
 };

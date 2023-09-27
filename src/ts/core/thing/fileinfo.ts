@@ -1,13 +1,16 @@
 import { encodeKey, sleep } from '../../base/common';
 import { BucketOpreates, FileItemModel } from '../../base/model';
-import { model, schema } from '../../base';
+import { command, model, schema } from '../../base';
 import { FileItemShare } from '../../base/model';
 import { IDirectory } from './directory';
 import { Entity, IEntity, entityOperates } from '../public';
 import { fileOperates } from '../public';
 import { XCollection } from '../public/collection';
+import { ITarget } from '../target/base/target';
 /** 文件类接口 */
 export interface IFileInfo<T extends schema.XEntity> extends IEntity<T> {
+  /** 缓存 */
+  cache: schema.XCache;
   /** 空间ID */
   spaceId: string;
   /** 归属ID */
@@ -41,6 +44,8 @@ export interface IFileInfo<T extends schema.XEntity> extends IEntity<T> {
   loadContent(reload?: boolean): Promise<boolean>;
   /** 目录下的内容 */
   content(mode?: number): IFileInfo<schema.XEntity>[];
+  /** 缓存用户数据 */
+  cacheUserData(notify?: boolean): Promise<boolean>;
 }
 
 /** 文件类抽象实现 */
@@ -50,31 +55,69 @@ export abstract class FileInfo<T extends schema.XEntity>
 {
   constructor(_metadata: T, _directory: IDirectory) {
     super(_metadata);
-    if ('target' in _directory) {
-      this.directory = _directory;
-    } else {
-      this.directory = this as unknown as IDirectory;
-    }
+    this.directory = _directory;
     this.isContainer = false;
+    this.cache = { fullId: `${this.spaceId}_${_metadata.id}` };
+    setTimeout(
+      async () => {
+        await this.loadUserData();
+      },
+      this.id === this.userId ? 100 : 0,
+    );
   }
+  cache: schema.XCache;
   isContainer: boolean;
   directory: IDirectory;
   get isInherited(): boolean {
     return this.directory.isInherited;
   }
+  get target(): ITarget {
+    if (this.directory.typeName === '目录') {
+      return this.directory.target;
+    } else {
+      return this.directory as unknown as ITarget;
+    }
+  }
   get belongId(): string {
-    return this.directory.metadata.belongId;
+    return this.target.belongId;
   }
   get spaceId(): string {
-    return this.directory.target.space.id;
+    return this.target.spaceId;
   }
   get locationKey(): string {
     return this.directory.key;
   }
+  get cachePath(): string {
+    return `${this.cacheFlag}.${this.cache.fullId}`;
+  }
+  abstract cacheFlag: string;
   abstract delete(): Promise<boolean>;
   abstract rename(name: string): Promise<boolean>;
   abstract copy(destination: IDirectory): Promise<boolean>;
   abstract move(destination: IDirectory): Promise<boolean>;
+  async loadUserData(): Promise<void> {
+    const data = await this.target.user.cacheObj.get<schema.XCache>(this.cachePath);
+    if (data && data.fullId === this.cache.fullId) {
+      this.cache = data;
+    }
+    this.target.user.cacheObj.subscribe(this.cachePath, (data: schema.XCache) => {
+      if (data && data.fullId === this.cache.fullId) {
+        this.cache = data;
+        this.target.user.cacheObj.setValue(this.cachePath, data);
+        this.directory.changCallback();
+        command.emitterFlag(this.cacheFlag);
+      }
+    });
+  }
+
+  async cacheUserData(notify: boolean = true): Promise<boolean> {
+    const success = await this.target.user.cacheObj.set(this.cachePath, this.cache);
+    if (success && notify) {
+      await this.target.user.cacheObj.notity(this.cachePath, this.cache, true, false);
+    }
+    return success;
+  }
+
   async loadContent(reload: boolean = false): Promise<boolean> {
     return await sleep(reload ? 10 : 0);
   }
@@ -84,10 +127,10 @@ export abstract class FileInfo<T extends schema.XEntity>
   operates(mode: number = 0): model.OperateModel[] {
     const operates = super.operates(mode);
     if (mode % 2 === 0) {
-      if (this.directory.target.space.hasRelationAuth()) {
+      if (this.target.space.hasRelationAuth()) {
         operates.unshift(fileOperates.Copy);
       }
-      if (this.directory.target.hasRelationAuth()) {
+      if (this.target.hasRelationAuth()) {
         operates.unshift(
           fileOperates.Move,
           fileOperates.Rename,
@@ -116,7 +159,7 @@ export const fileToEntity = (
   belong: schema.XTarget | undefined,
 ): schema.XEntity => {
   return {
-    id: 'orginone/anydata/bucket/load/' + data.shareLink,
+    id: data.shareLink?.substring(1),
     name: data.name,
     code: data.key,
     icon: JSON.stringify(data),
@@ -136,6 +179,9 @@ export class SysFileInfo extends FileInfo<schema.XEntity> implements ISysFileInf
       _directory,
     );
     this.filedata = _metadata;
+  }
+  get cacheFlag(): string {
+    return 'files';
   }
   filedata: FileItemModel;
   shareInfo(): model.FileItemShare {
@@ -231,12 +277,12 @@ export abstract class StandardFileInfo<T extends schema.XStandard>
     return this._metadata;
   }
   allowCopy(destination: IDirectory): boolean {
-    return this.directory.target.belongId != destination.target.belongId;
+    return this.target.belongId != destination.target.belongId;
   }
   allowMove(destination: IDirectory): boolean {
     return (
       destination.id != this.directory.id &&
-      destination.target.belongId == this.directory.target.belongId
+      destination.target.belongId == this.target.belongId
     );
   }
   async update(data: T): Promise<boolean> {

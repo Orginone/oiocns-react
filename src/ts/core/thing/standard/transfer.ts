@@ -1,8 +1,10 @@
+import { sleep } from '@/ts/base/common';
 import { XForm } from '@/ts/base/schema';
+import { formatDate } from 'devextreme/localization';
 import { Command, common, kernel, model, schema } from '../../../base';
 import { IDirectory } from '../directory';
 import { IStandardFileInfo, StandardFileInfo } from '../fileinfo';
-import { sleep } from '@/ts/base/common';
+import { IForm } from './form';
 
 export type GraphData = () => any;
 
@@ -10,43 +12,27 @@ export interface ITransfer extends IStandardFileInfo<model.Transfer> {
   /** 触发器 */
   command: Command;
   /** 任务记录 */
-  taskList: model.Environment[];
+  taskList: ITask[];
   /** 当前任务 */
-  curTask?: model.Environment;
-  /** 已遍历点（返回数据） */
-  curVisitedNodes?: Map<string, { code: string; data: any }>;
-  /** 已遍历边 */
-  curVisitedEdges?: Set<string>;
-  /** 前置链接 */
-  curPreLink?: ITransfer;
-  /** 前置状态 */
-  preStatus: model.GraphStatus;
-  /** 状态 */
-  status: model.GraphStatus;
-  /** 状态转移 */
-  machine(event: model.Event): void;
+  curTask?: ITask;
+  /** 获取实体 */
+  getTransfer(id: string): ITransfer | undefined;
   /** 取图数据 */
   getData?: GraphData;
   /** 绑定图 */
   binding(getData: GraphData): void;
+  /** 取消绑定 */
+  unbinding(): void;
   /** 是否有环 */
   hasLoop(): boolean;
   /** 获取节点 */
-  getNode(id: string): model.Node<any> | undefined;
+  getNode(id: string): model.Node | undefined;
   /** 增加节点 */
-  addNode(node: model.Node<any>): Promise<void>;
+  addNode(node: model.Node): Promise<void>;
   /** 更新节点 */
-  updNode(node: model.Node<any>): Promise<void>;
+  updNode(node: model.Node): Promise<void>;
   /** 删除节点 */
   delNode(id: string): Promise<void>;
-  /** 节点添加脚本 */
-  addNodeScript(p: model.Pos, n: model.Node<any>, s: model.Script): Promise<void>;
-  /** 节点更新脚本 */
-  updNodeScript(p: model.Pos, n: model.Node<any>, s: model.Script): Promise<void>;
-  /** 节点删除脚本 */
-  delNodeScript(p: model.Pos, n: model.Node<any>, id: string): Promise<void>;
-  /** 遍历节点 */
-  visitNode(node: model.Node<any>, preData?: any): Promise<void>;
   /** 获取边 */
   getEdge(id: string): model.Edge | undefined;
   /** 增加边 */
@@ -61,43 +47,57 @@ export interface ITransfer extends IStandardFileInfo<model.Transfer> {
   updEnv(env: model.Environment): Promise<void>;
   /** 删除环境 */
   delEnv(id: string): Promise<void>;
+  /** 当前环境 */
+  getCurEnv(): model.Environment | undefined;
   /** 变更环境 */
   changeEnv(id: string): Promise<void>;
   /** 请求 */
-  request(node: model.Node<any>): Promise<model.HttpResponseType>;
+  request(node: model.Node, env?: model.KeyValue): Promise<model.HttpResponseType>;
   /** 脚本 */
-  running(code: string, args: any): any;
+  running(code: string, args: any, env?: model.KeyValue): any;
   /** 映射 */
-  mapping(node: model.Node<any>, array: any[]): Promise<any[]>;
-  /** 开始执行 */
-  execute(link?: ITransfer): void;
+  mapping(node: model.Node, array: any[]): Promise<any[]>;
+  /** 写入 */
+  writing(node: model.Node, array: any[]): Promise<any[]>;
+  /** 模板 */
+  template<T>(node: model.Node): Promise<model.Sheet<T>[]>;
+  /** 读取 */
+  reading(node: model.Node): Promise<any>;
+  /** 创建任务 */
+  execute(status: model.GStatus, event: model.GEvent): Promise<void>;
+  /** 创建任务 */
+  nextExecute(preTask: ITask): Promise<void>;
 }
 
 export class Transfer extends StandardFileInfo<model.Transfer> implements ITransfer {
   command: Command;
-  taskList: model.Environment[];
-  preStatus: model.GraphStatus;
-  status: model.GraphStatus;
-  curTask?: model.Environment;
-  curVisitedNodes?: Map<string, { code: string; data: any }>;
-  curVisitedEdges?: Set<string>;
-  curPreLink?: ITransfer;
+  taskList: ITask[];
+  curTask?: ITask;
   getData?: GraphData;
 
   constructor(metadata: model.Transfer, dir: IDirectory) {
     super(metadata, dir, dir.resource.transferColl);
-    this.command = new Command();
     this.taskList = [];
-    this.preStatus = 'Editable';
-    this.status = 'Editable';
-    this.command.subscribe((type, cmd, args) => {
-      switch (type) {
-        case 'main':
-          this.handing(cmd, args);
-          break;
-      }
-    });
+    this.command = new Command();
     this.setEntity();
+  }
+  get cacheFlag(): string {
+    return 'transfers';
+  }
+  async execute(status: model.GStatus, event: model.GEvent): Promise<void> {
+    this.curTask = new Task(this, event, status);
+    this.taskList.push(this.curTask);
+    await this.curTask.starting();
+  }
+
+  async nextExecute(preTask: ITask): Promise<void> {
+    this.curTask = new Task(this, preTask.initEvent, preTask.initStatus, preTask);
+    this.taskList.push(this.curTask);
+    await this.curTask.starting();
+  }
+
+  getTransfer(id: string): ITransfer | undefined {
+    return this.getEntity(id);
   }
 
   async copy(destination: IDirectory): Promise<boolean> {
@@ -115,7 +115,7 @@ export class Transfer extends StandardFileInfo<model.Transfer> implements ITrans
   }
 
   hasLoop(): boolean {
-    const hasLoop = (node: model.Node<any>, chain: Set<string>) => {
+    const hasLoop = (node: model.Node, chain: Set<string>) => {
       for (const edge of this.metadata.edges) {
         if (edge.start == node.id) {
           for (const next of this.metadata.nodes) {
@@ -142,101 +142,38 @@ export class Transfer extends StandardFileInfo<model.Transfer> implements ITrans
     return false;
   }
 
-  machine(event: model.Event): void {
-    switch (event) {
-      case 'Edit':
-        if (this.status == 'Running') {
-          return;
-        }
-        this.status = 'Editable';
-        break;
-      case 'View':
-        if (this.status == 'Running') {
-          return;
-        }
-        this.status = 'Viewable';
-        break;
-      case 'Run':
-        if (this.status == 'Running') {
-          return;
-        }
-        this.preStatus = this.status;
-        this.status = 'Running';
-        break;
-      case 'Completed':
-        if (this.status != 'Running') {
-          return;
-        }
-        if (this.metadata.nodes.length != this.curVisitedNodes?.size) {
-          return;
-        }
-        this.status = this.preStatus;
-        break;
-      case 'Error':
-        if (this.status != 'Running') {
-          return;
-        }
-        this.status = this.preStatus;
-        break;
-    }
-    this.command.emitter('graph', 'status', this.status);
-  }
-
   binding(getData: GraphData): void {
     this.getData = getData;
   }
 
+  unbinding(): void {
+    this.getData = undefined;
+  }
+
   async update(data: model.Transfer): Promise<boolean> {
-    data.graph = this.getData?.();
+    if (this.getData) {
+      data.graph = this.getData();
+    }
     return await super.update(data);
   }
 
-  execute(link?: ITransfer) {
-    this.machine('Run');
-    this.curVisitedNodes = new Map();
-    this.curVisitedEdges = new Set();
-    const env = this.metadata.envs.find((item) => item.id == this.metadata.curEnv);
-    if (env) {
-      this.curTask = common.deepClone(env);
-      this.taskList.push(this.curTask);
-    }
-    this.curPreLink = link;
-    this.command.emitter('node', 'refresh');
-    this.command.emitter('main', 'roots');
-  }
-
-  async request(node: model.Node<any>): Promise<model.HttpResponseType> {
-    let request = common.deepClone(node.data as model.HttpRequestType);
-    let json = JSON.stringify(request);
+  async request(node: model.Node, env?: model.KeyValue): Promise<model.HttpResponseType> {
+    let request = common.deepClone(node as model.Request);
+    let json = JSON.stringify(request.data);
     for (const match of json.matchAll(/\{\{[^{}]*\}\}/g)) {
       for (let index = 0; index < match.length; index++) {
         let matcher = match[index];
         let varName = matcher.substring(2, matcher.length - 2);
-        switch (this.status) {
-          case 'Running':
-            json = json.replaceAll(matcher, this.curTask?.params[varName] ?? '');
-            break;
-          default:
-            if (this.metadata.curEnv) {
-              for (const env of this.metadata.envs) {
-                if (env.id == this.metadata.curEnv) {
-                  json = json.replaceAll(matcher, env.params[varName] ?? '');
-                }
-              }
-            } else {
-              json = json.replaceAll(matcher, '');
-            }
-            break;
-        }
+        json = json.replaceAll(matcher, env?.[varName] ?? '');
       }
     }
     let res = await kernel.httpForward(JSON.parse(json));
     return res.data?.content ? JSON.parse(res.data.content) : res;
   }
 
-  running(code: string, args: { [key: string]: any }): any {
+  running(code: string, args: any, env?: model.KeyValue): any {
     const runtime = {
-      environment: this.curTask,
+      environment: env ?? {},
       preData: args,
       nextData: {},
       decrypt: common.decrypt,
@@ -249,9 +186,44 @@ export class Transfer extends StandardFileInfo<model.Transfer> implements ITrans
     return runtime.nextData;
   }
 
-  async mapping(node: model.Node<any>, array: any[]): Promise<any[]> {
+  async writing(node: model.Node, array: any[]): Promise<any[]> {
+    const write = node as model.Store;
+    if (write.directIs) {
+      for (const app of await this.directory.target.directory.loadAllApplication()) {
+        const works = await app.loadWorks();
+        const work = works.find((item) => item.id == write.workId);
+        await work?.loadWorkNode();
+        if (work && work.primaryForms.length > 0 && work.node) {
+          const apply = await work.createApply();
+          if (apply) {
+            const map = new Map<string, model.FormEditData>();
+            const editForm: model.FormEditData = {
+              before: [],
+              after: [],
+              nodeId: work.node.id,
+              creator: apply.belong.userId,
+              createTime: formatDate(new Date(), 'yyyy-MM-dd hh:mm:ss.S'),
+            };
+            const belongId = this.directory.belongId;
+            for (const item of array) {
+              const res = await kernel.createThing(belongId, [], '资产卡片');
+              if (res.success) {
+                const one: model.AnyThingModel = { ...item, ...res.data };
+                editForm.after.push(one);
+              }
+            }
+            map.set(work.primaryForms[0].id, editForm);
+            await apply.createApply(belongId, '自动写入', map);
+          }
+        }
+      }
+    }
+    return [];
+  }
+
+  async mapping(node: model.Node, array: any[]): Promise<any[]> {
+    const data = node as model.Mapping;
     const ans: any[] = [];
-    const data = node.data as model.Mapping;
     const form = this.findMetadata<XForm>(data.source);
     if (form) {
       const sourceMap = new Map<string, schema.XAttribute>();
@@ -280,7 +252,39 @@ export class Transfer extends StandardFileInfo<model.Transfer> implements ITrans
     return ans;
   }
 
-  getNode(id: string): model.Node<any> | undefined {
+  async template<T>(node: model.Node): Promise<model.Sheet<T>[]> {
+    const tables = node as model.Tables;
+    const ans: model.Sheet<T>[] = [];
+    for (const formId of tables.formIds) {
+      const form = this.getEntity<IForm>(formId);
+      if (form) {
+        await form.loadContent();
+        const columns: model.Column[] = [];
+        for (const field of form.fields) {
+          columns.push({
+            title: field.name,
+            dataIndex: field.id,
+            valueType: field.valueType,
+          });
+        }
+        ans.push({
+          name: form.name,
+          headers: 1,
+          columns: columns,
+          data: [],
+        });
+      }
+    }
+    return ans;
+  }
+
+  async reading(node: model.Node): Promise<boolean> {
+    // const table = node as model.Tables;
+    // if (table.file) { }
+    return false;
+  }
+
+  getNode(id: string): model.Node | undefined {
     for (const node of this.metadata.nodes) {
       if (node.id == id) {
         return node;
@@ -288,9 +292,7 @@ export class Transfer extends StandardFileInfo<model.Transfer> implements ITrans
     }
   }
 
-  async addNode(node: model.Node<any>): Promise<void> {
-    node.preScripts = [];
-    node.postScripts = [];
+  async addNode(node: model.Node): Promise<void> {
     let index = this.metadata.nodes.findIndex((item) => item.id == node.id);
     if (index == -1) {
       this.metadata.nodes.push(node);
@@ -300,13 +302,11 @@ export class Transfer extends StandardFileInfo<model.Transfer> implements ITrans
     }
   }
 
-  async updNode(node: model.Node<any>): Promise<void> {
+  async updNode(node: model.Node): Promise<void> {
     let index = this.metadata.nodes.findIndex((item) => item.id == node.id);
     if (index != -1) {
       this.metadata.nodes[index] = node;
-      const success = await this.update(this.metadata);
-      console.log(success, node);
-      if (success) {
+      if (await this.update(this.metadata)) {
         this.command.emitter('node', 'update', node);
       }
     }
@@ -320,99 +320,6 @@ export class Transfer extends StandardFileInfo<model.Transfer> implements ITrans
       if (await this.update(this.metadata)) {
         this.command.emitter('node', 'delete', node);
       }
-    }
-  }
-
-  async addNodeScript(p: model.Pos, n: model.Node<any>, s: model.Script): Promise<void> {
-    s.id = common.generateUuid();
-    switch (p) {
-      case 'pre':
-        n.preScripts.push(s);
-        break;
-      case 'post':
-        n.postScripts.push(s);
-        break;
-    }
-    await this.updNode(n);
-  }
-
-  async updNodeScript(p: model.Pos, n: model.Node<any>, s: model.Script): Promise<void> {
-    switch (p) {
-      case 'pre': {
-        let index = n.preScripts.findIndex((item) => item.id == s.id);
-        if (index != -1) {
-          n.preScripts[index] = s;
-        }
-        break;
-      }
-      case 'post': {
-        let index = n.postScripts.findIndex((item) => item.id == s.id);
-        if (index != -1) {
-          n.postScripts[index] = s;
-        }
-        break;
-      }
-    }
-    await this.updNode(n);
-  }
-
-  async delNodeScript(pos: model.Pos, node: model.Node<any>, id: string): Promise<void> {
-    switch (pos) {
-      case 'pre': {
-        let index = node.preScripts.findIndex((item) => item.id == id);
-        node.preScripts.splice(index, 1);
-        break;
-      }
-      case 'post': {
-        let index = node.postScripts.findIndex((item) => item.id == id);
-        node.postScripts.splice(index, 1);
-        break;
-      }
-    }
-    await this.updNode(node);
-  }
-
-  async visitNode(node: model.Node<any>, preData?: any): Promise<void> {
-    this.command.emitter('running', 'start', [node]);
-    try {
-      console.log(preData);
-      await sleep(500);
-      if (preData) {
-        for (const key of Object.keys(preData)) {
-          const data = preData[key];
-          if (data instanceof Error) {
-            throw data;
-          }
-        }
-      }
-      for (const script of node.preScripts ?? []) {
-        preData = this.running(script.coder, preData);
-      }
-      let nextData: any;
-      switch (node.typeName) {
-        case '请求':
-          nextData = await this.request(node);
-          break;
-        case '链接':
-          // TODO 替换其它方案
-          this.getEntity<ITransfer>((node.data as model.Transfer).id)?.execute(this);
-          break;
-        case '映射':
-          nextData = await this.mapping(node, preData.array);
-          break;
-        case '存储':
-          break;
-      }
-      for (const script of node.postScripts ?? []) {
-        nextData = this.running(script.coder, nextData);
-      }
-      this.curVisitedNodes?.set(node.id, { code: node.code, data: nextData });
-      this.command.emitter('running', 'completed', [node]);
-      this.command.emitter('main', 'next', [node]);
-    } catch (error) {
-      this.curVisitedNodes?.set(node.id, { code: node.code, data: error });
-      this.command.emitter('running', 'error', [node]);
-      this.command.emitter('main', 'next', [node]);
     }
   }
 
@@ -455,7 +362,6 @@ export class Transfer extends StandardFileInfo<model.Transfer> implements ITrans
       this.metadata.edges.splice(index, 1);
       if (await this.update(this.metadata)) {
         this.command.emitter('edge', 'delete', id);
-        console.log(JSON.stringify(this.metadata.edges));
       }
     }
   }
@@ -501,6 +407,14 @@ export class Transfer extends StandardFileInfo<model.Transfer> implements ITrans
     }
   }
 
+  getCurEnv(): model.Environment | undefined {
+    for (const env of this.metadata.envs) {
+      if (env.id == this.metadata.curEnv) {
+        return env;
+      }
+    }
+  }
+
   async changeEnv(id: string): Promise<void> {
     for (const item of this.metadata.envs) {
       if (item.id == id) {
@@ -511,72 +425,269 @@ export class Transfer extends StandardFileInfo<model.Transfer> implements ITrans
       }
     }
   }
+}
 
-  private preCheck(node: model.Node<any>): { s: boolean; d: { [key: string]: any } } {
+const Machine: model.Shift<model.GEvent, model.GStatus>[] = [
+  { start: 'Editable', event: 'EditRun', end: 'Running' },
+  { start: 'Viewable', event: 'ViewRun', end: 'Running' },
+  { start: 'Running', event: 'Completed', end: 'Completed' },
+  { start: 'Running', event: 'Throw', end: 'Error' },
+];
+
+export interface ITask {
+  /** 触发器 */
+  command: Command;
+  /** 迁移配置 */
+  transfer: ITransfer;
+  /** 元数据 */
+  metadata: model.Task;
+  /** 已遍历点（存储数据） */
+  visitedNodes: Map<string, { code: string; data: any }>;
+  /** 已遍历边 */
+  visitedEdges: Set<string>;
+  /** 前置任务 */
+  preTask?: ITask;
+  /** 启动事件 */
+  initEvent: model.GEvent;
+  /** 启动状态 */
+  initStatus: model.GStatus;
+  /** 开始执行 */
+  starting(): Promise<void>;
+}
+
+export class Task implements ITask {
+  command: Command;
+  transfer: ITransfer;
+  metadata: model.Task;
+  visitedNodes: Map<string, { code: string; data: any }>;
+  visitedEdges: Set<string>;
+  initEvent: model.GEvent;
+  initStatus: model.GStatus;
+  preTask?: ITask;
+
+  constructor(
+    transfer: ITransfer,
+    initEvent: model.GEvent,
+    initStatus: model.GStatus,
+    task?: ITask,
+  ) {
+    this.transfer = transfer;
+    this.initEvent = initEvent;
+    this.initStatus = initStatus;
+    if (task) {
+      this.metadata = common.deepClone(task.metadata);
+    } else {
+      this.metadata = common.deepClone({
+        id: common.generateUuid(),
+        status: initStatus,
+        nodes: transfer.metadata.nodes.map((item) => {
+          return {
+            ...item,
+            status: initStatus,
+          };
+        }),
+        env: transfer.getCurEnv(),
+        edges: transfer.metadata.edges,
+        graph: transfer.metadata.graph,
+        startTime: new Date(),
+      });
+    }
+    this.visitedNodes = new Map();
+    this.visitedEdges = new Set();
+    this.preTask = task;
+    this.command = transfer.command;
+  }
+
+  async starting(): Promise<void> {
+    this.machine(this.initEvent);
+    this.refreshEnvs();
+    this.refreshTasks();
+    await this.iterateRoots();
+  }
+
+  refreshEnvs() {
+    this.command.emitter('environments', 'refresh');
+  }
+
+  refreshTasks() {
+    this.command.emitter('tasks', 'refresh');
+  }
+
+  machine(event: model.GEvent): void {
+    if (this.metadata.status == 'Error') {
+      return;
+    }
+    for (const shift of Machine) {
+      if (shift.start == this.metadata.status && event == shift.event) {
+        this.metadata.status = shift.end;
+        this.command.emitter('graph', 'status', this.metadata.status);
+      }
+    }
+  }
+
+  private dataCheck(preData?: any) {
+    if (preData) {
+      if (preData instanceof Error) {
+        throw preData;
+      }
+      for (const key of Object.keys(preData)) {
+        const data = preData[key];
+        if (data instanceof Error) {
+          throw data;
+        }
+      }
+    }
+  }
+
+  async visitNode(node: model.Node, preData?: any): Promise<void> {
+    node.status = 'Running';
+    this.command.emitter('running', 'start', [node]);
+    let nextData: any;
+    try {
+      this.dataCheck(preData);
+      await sleep(500);
+      let env = this.metadata.env?.params;
+      if (node.preScripts) {
+        preData = this.transfer.running(node.preScripts, preData, env);
+      }
+      const isArray = (array: any[]) => {
+        if (!Array.isArray(array)) {
+          throw new Error('输入必须是一个数组！');
+        }
+      };
+      switch (node.typeName) {
+        case '请求':
+          nextData = await this.transfer.request(node, env);
+          break;
+        case '子图':
+          {
+            // TODO 替换其它方案
+            const nextId = (node as model.SubTransfer).nextId;
+            await this.transfer
+              .getTransfer(nextId)
+              ?.execute(this.initStatus, this.initEvent);
+          }
+          break;
+        case '映射':
+          isArray(preData.array);
+          nextData = await this.transfer.mapping(node, preData.array);
+          break;
+        case '存储':
+          isArray(preData);
+          await this.transfer.writing(node, preData);
+          nextData = preData;
+          break;
+        case '表格':
+          await this.transfer.reading(node);
+          break;
+      }
+      if (node.postScripts) {
+        nextData = this.transfer.running(node.postScripts, nextData, env);
+      }
+      this.visitedNodes.set(node.id, { code: node.code, data: nextData });
+      node.status = 'Completed';
+      this.command.emitter('running', 'completed', [node]);
+    } catch (error) {
+      this.visitedNodes.set(node.id, { code: node.code, data: error });
+      this.machine('Throw');
+      node.status = 'Error';
+      this.command.emitter('running', 'error', [node, error]);
+    }
+    this.refreshEnvs();
+    if (await this.tryRunning(nextData)) {
+      await this.next(node);
+    }
+  }
+
+  private preCheck(node: model.Node): { s: boolean; d: { [key: string]: any } } {
     let data: { [key: string]: any } = {};
     for (const edge of this.metadata.edges) {
       if (node.id == edge.end) {
-        if (!this.curVisitedEdges?.has(edge.id)) {
+        if (!this.visitedEdges.has(edge.id)) {
           return { s: false, d: {} };
         }
-        if (this.curVisitedNodes?.has(edge.start)) {
-          const nodeData = this.curVisitedNodes.get(edge.start)!;
+        if (this.visitedNodes.has(edge.start)) {
+          const nodeData = this.visitedNodes.get(edge.start)!;
           data[nodeData.code] = nodeData.data;
         }
       }
     }
+    if (Object.keys(data).length == 1) {
+      return { s: true, d: data[Object.keys(data)[0]] };
+    }
     return { s: true, d: data };
   }
 
-  private async handing(cmd: string, args: any) {
-    switch (cmd) {
-      case 'roots': {
-        const not = this.metadata.edges.map((item) => item.end);
-        const roots = this.metadata.nodes.filter((item) => not.indexOf(item.id) == -1);
-        for (const root of roots) {
-          this.visitNode(root);
-        }
-        break;
-      }
-      case 'visitNode': {
-        const next = this.preCheck(args[0]);
-        if (next.s) {
-          await this.visitNode(args[0], next.d);
-        }
-        break;
-      }
-      case 'next': {
-        if (
-          this.curVisitedNodes &&
-          this.curVisitedNodes.size == this.metadata.nodes.length
-        ) {
-          this.machine('Completed');
-          return;
-        }
-        for (const edge of this.metadata.edges) {
-          if (args[0].id == edge.start) {
-            this.curVisitedEdges?.add(edge.id);
-            for (const node of this.metadata.nodes) {
-              if (node.id == edge.end) {
-                this.command.emitter('main', 'visitNode', [node]);
-              }
+  async iterateRoots(): Promise<void> {
+    if (await this.tryRunning()) {
+      const not = this.metadata.edges.map((item) => item.end);
+      const roots = this.metadata.nodes.filter((item) => not.indexOf(item.id) == -1);
+      await Promise.all(roots.map((root) => this.visitNode(root)));
+    }
+  }
+
+  async next(preNode: model.Node): Promise<void> {
+    for (const edge of this.metadata.edges) {
+      if (preNode.id == edge.start) {
+        this.visitedEdges.add(edge.id);
+        for (const node of this.metadata.nodes) {
+          if (node.id == edge.end) {
+            const next = this.preCheck(node);
+            if (next.s) {
+              await this.visitNode(node, next.d);
             }
           }
         }
-        break;
+      }
+    }
+  }
+
+  async tryRunning(nextData?: any): Promise<boolean> {
+    if (this.visitedNodes.size == this.metadata.nodes.length) {
+      this.metadata.endTime = new Date();
+      this.machine('Completed');
+      this.refreshTasks();
+      if (this.initStatus == 'Editable') {
+        this.command.emitter('graph', 'status', 'Editable');
+      } else if (this.initStatus == 'Viewable') {
+        this.command.emitter('graph', 'status', 'Viewable');
+      }
+      await this.selfCircle(nextData);
+      return false;
+    }
+    return true;
+  }
+
+  async selfCircle(nextData?: any) {
+    if (this.transfer.metadata.isSelfCirculation) {
+      let judge = this.transfer.metadata.judge;
+      if (judge) {
+        let params = this.metadata.env?.params;
+        const res = this.transfer.running(judge, nextData, params);
+        if (res.success) {
+          await this.transfer.nextExecute(this);
+        }
       }
     }
   }
 }
 
-export const getDefaultRequestNode = (): model.RequestNode => {
+export const getDefaultTableNode = (): model.Tables => {
+  return {
+    id: common.generateUuid(),
+    code: 'table',
+    name: '表格',
+    typeName: '表格',
+    formIds: [],
+  };
+};
+
+export const getDefaultRequestNode = (): model.Request => {
   return {
     id: common.generateUuid(),
     code: 'request',
     name: '请求',
     typeName: '请求',
-    preScripts: [],
-    postScripts: [],
     data: {
       uri: '',
       method: 'GET',
@@ -588,45 +699,37 @@ export const getDefaultRequestNode = (): model.RequestNode => {
   };
 };
 
-export const getDefaultMappingNode = (): model.MappingNode => {
+export const getDefaultMappingNode = (): model.Mapping => {
   return {
     id: common.generateUuid(),
     code: 'mapping',
     name: '映射',
     typeName: '映射',
-    preScripts: [],
-    postScripts: [],
-    data: {
-      source: '',
-      target: '',
-      mappings: [],
-    },
+    source: '',
+    target: '',
+    mappings: [],
   };
 };
 
-export const getDefaultStoreNode = (): model.StoreNode => {
+export const getDefaultStoreNode = (): model.Store => {
   return {
     id: common.generateUuid(),
     code: 'store',
     name: '存储',
     typeName: '存储',
-    preScripts: [],
-    postScripts: [],
-    data: {
-      formId: '',
-      directoryId: '',
-    },
+    directoryId: '',
+    workId: '',
+    formIds: [],
+    directIs: false,
   };
 };
 
-export const getDefaultTransferNode = (): model.LinkNode => {
+export const getDefaultTransferNode = (): model.SubTransfer => {
   return {
     id: common.generateUuid(),
     code: 'transfer',
-    name: '链接',
-    typeName: '链接',
-    preScripts: [],
-    postScripts: [],
-    data: '',
+    name: '子图',
+    typeName: '子图',
+    nextId: '',
   };
 };

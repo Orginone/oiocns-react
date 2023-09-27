@@ -1,7 +1,3 @@
-/* 每次点击按钮 重置当前焦点按钮的样式 */
-input[type='radio']:checked ~ .count label {
-  background: #e6edfe;
-}
 div {
   font-family: 'PingFang SC';
 }
@@ -14,73 +10,55 @@ div {
 
 .background {
   position: fixed;
-  height: 105%;
-  width: calc(75vw);
-  left: -25%;
-  bottom: -5%;
+  height: 100%;
+  width: 62.5vw;
+  background-color: #011736;
+  img {
+    position: absolute;
+    width: 100%;
+    bottom: 0;
+  }
 }
 .logo {
-  color: white;
   position: absolute;
-  top: 30px;
-  left: 30px;
-  height: 50px;
+  top: 43px;
+  left: 55.14px;
   z-index: 1;
-  display: flex;
-  &Title {
-    margin-left: 10px;
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-    &Zh {
-      font-size: 20px;
-      font-weight: 800;
-    }
-  }
+  height: 24px;
+  font-family: Figtree;
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 44px;
+  letter-spacing: 0em;
+  text-align: center;
+  color: white;
 }
 
 input[type='radio'] {
   display: none;
-}
-li {
-  list-style-type: none;
 }
 .count {
   display: flex;
   align-items: center;
   justify-content: center;
   position: absolute;
-  bottom: 0;
-  left: calc(30vw);
-  width: calc(30vw - 88px);
-  height: 10%;
-}
-.count > ul {
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  width: 35%;
-  height: 30%;
-}
-.count li {
-  float: left;
-  width: 1vmax;
-  height: 1vmax;
-  border-radius: 50%;
-}
-.count li label {
-  display: flex;
-  width: 14px;
-  height: 14px;
-  background: #e6edfe;
-  border-radius: 7px;
-  cursor: pointer;
-  transition: 0.4s;
+  width: 5vw;
+  height: 6px;
+  top: 92vh;
+  left: 28.75vw;
+  gap: 6px;
+  label {
+    display: block;
+    width: 6px;
+    height: 6px;
+    border-radius: 3px;
+    transition: width 0.5s;
+  }
 }
 
 .slider {
   z-index: 1;
-  width: calc(50vw);
+  width: 62.5vw;
   overflow: hidden;
   &Slides {
     display: -webkit-box;
@@ -88,27 +66,33 @@ li {
     &Item {
       display: flex;
       z-index: 1;
-      width: 50vw;
+      width: 62.5vw;
       flex-direction: column;
-      color: white;
-      font-size: 15px;
       justify-content: center;
+      align-items: center;
       &Img {
         position: relative;
         float: right;
         object-fit: contain;
-        height: 55vh;
+        height: 300px;
       }
       &Title {
-        margin-left: 3vw;
-        font-size: 32px;
-        font-weight: 500;
+        color: #ffffff;
+        font-size: 36px;
+        font-weight: bold;
+        line-height: 44px;
+        letter-spacing: 0;
+        text-align: center;
       }
       &Content {
-        margin-left: 3vw;
+        margin-top: 23px;
+        color: #ffffff;
         font-size: 16px;
         font-weight: 400;
-        width: 20vw;
+        line-height: 24px;
+        letter-spacing: 0;
+        text-align: center;
+        width: 500px;
       }
     }
   }
@@ -123,62 +107,40 @@ li {
 }
 
 .box {
-  width: 25%;
+  width: 25vw;
   height: 65%;
   position: absolute;
-  right: 10%;
+  left: 68.75vw;
   top: 28%;
 }
-
 .copyright {
-  position: absolute;
   color: #8a8a8a;
-  bottom: 10px;
-  right: 20px;
-}
-
-@media (max-width: 1380px) {
-  .count li label {
-    width: 12px;
-    height: 12px;
+  width: 100%;
+  &Zh {
+    position: absolute;
+    bottom: 10px;
+    align-items: center;
+    left: 31.25%;
+    transform: translate(-50%, 0);
   }
-  .sliderSlidesItemImg {
-    height: 45vh;
-  }
-  .higher_img {
-    height: 55vh;
+  &En {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
   }
 }
 
 @media (max-width: 1200px) {
-  .count > ul {
-    width: 50%;
-  }
-}
-
-@media (max-width: 1000px) {
-  .sliderSlidesItem {
-    &Img {
-      display: none;
-    }
-    &Content {
-      width: 40vw;
-    }
-  }
-  .higher_text {
-    position: static;
-    bottom: 0;
-  }
-  .count > ul {
-    width: 70%;
+  .sliderSlidesItemContent {
+    width: 300px;
   }
 }
 
 @media (max-width: 800px) {
-  .count {
-    display: none;
-  }
   .logo {
+    color: black;
+  }
+  .count {
     display: none;
   }
   .slider {
@@ -193,13 +155,23 @@ li {
     display: flex;
     align-items: center;
     justify-content: center;
-    right: auto;
     top: auto;
+    left: auto;
   }
   .copyright {
     width: 100%;
     display: flex;
     justify-content: center;
     right: 0;
+    &Zh {
+      justify-content: center;
+      display: inline-flex;
+      left: auto;
+      transform: translate(0, 0);
+      width: 100%;
+    }
+    &En {
+      display: none;
+    }
   }
 }

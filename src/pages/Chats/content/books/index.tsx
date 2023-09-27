@@ -1,13 +1,14 @@
 import { Empty } from 'antd';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import orgCtrl from '@/ts/controller';
-import useCtrlUpdate from '@/hooks/useCtrlUpdate';
-import { msgChatNotify, ICompany, ISession } from '@/ts/core';
+import { ICompany, ISession } from '@/ts/core';
 import useStorage from '@/hooks/useStorage';
 import IconMode from './views/iconMode';
 import ListMode from './views/listMode';
 import TableMode from './views/tableMode';
 import SegmentContent from '@/components/Common/SegmentContent';
+import { command } from '@/ts/base';
+import { generateUuid } from '@/ts/base/common';
 
 /**
  * @description: 通讯录
@@ -23,7 +24,15 @@ const Book: React.FC<any> = ({
   belong: ICompany;
 }) => {
   const [segmented, setSegmented] = useStorage('segmented', 'list');
-  const [msgKey] = useCtrlUpdate(msgChatNotify);
+  const [msgKey, setKey] = useState(generateUuid());
+  useEffect(() => {
+    const id = command.subscribeByFlag('session', () => {
+      setKey(generateUuid());
+    });
+    return () => {
+      command.unsubscribeByFlag(id);
+    };
+  }, []);
   if (chats === undefined) {
     chats = orgCtrl.chats.filter((i) => i.isMyChat);
   }

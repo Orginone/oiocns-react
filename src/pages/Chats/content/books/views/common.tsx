@@ -1,7 +1,8 @@
 import { CheckboxChangeEvent } from 'antd/lib/checkbox';
-import { ISession, msgChatNotify } from '@/ts/core';
+import { ISession } from '@/ts/core';
 import React from 'react';
 import { XTarget } from '@/ts/base/schema';
+import { command } from '@/ts/base';
 
 export const selectChange = (
   e: CheckboxChangeEvent,
@@ -34,7 +35,7 @@ export const loadChatOperation = (item: ISession) => {
         onClick={async () => {
           item.chatdata.noReadCount += 1;
           item.cacheChatData(true);
-          msgChatNotify.changCallback();
+          command.emitterFlag('session');
         }}>
         标记为未读
       </a>,
@@ -49,7 +50,7 @@ export const loadChatOperation = (item: ISession) => {
           item.chatdata.labels = item.chatdata.labels.filter((i) => i != '置顶');
           item.chatdata.isToping = false;
           item.cacheChatData(true);
-          msgChatNotify.changCallback();
+          command.emitterFlag('session');
         }}>
         取消置顶
       </a>,
@@ -65,7 +66,7 @@ export const loadChatOperation = (item: ISession) => {
             item.chatdata.labels.push('置顶');
           }
           item.cacheChatData(true);
-          msgChatNotify.changCallback();
+          command.emitterFlag('session');
         }}>
         置顶会话
       </a>,
@@ -78,7 +79,7 @@ export const loadChatOperation = (item: ISession) => {
         title="加好友"
         onClick={async () => {
           if (await item.target.user.pullMembers([item.metadata as XTarget])) {
-            msgChatNotify.changCallback();
+            command.emitterFlag('session');
           }
         }}>
         加好友

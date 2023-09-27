@@ -33,8 +33,6 @@ const Settings: React.FC<SettingsType> = ({
     return attr.id === id;
   });
 
-  console.log('已选择组件', selectedFiled, '=======', selectedAttr);
-
   /* 计算拖动宽度设置 */
   const renderWidth = () => {
     if (canvasWidth) {

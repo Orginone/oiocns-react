@@ -29,7 +29,6 @@ const FormRuleList = ({ current, modalType, setModalType }: IProps) => {
   const getFormRulesList = async (list?: any[]) => {
     const oriRuleInfo = JSON.parse(current.metadata.rule || '{}');
     let RuleList = list ?? oriRuleInfo.list ?? [];
-    // console.log('获取当前表单关联规则', oriRuleInfo, RuleList);
     setDataSource([...RuleList]);
   };
   async function submitRule(type: 'updata' | 'create' | 'delete', ruleInfo: any) {

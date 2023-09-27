@@ -22,7 +22,7 @@ div {
   top: 43px;
   left: 55.14px;
   z-index: 1;
-  height: 24px;
+  height: 40px;
 }
 
 input[type='radio'] {
@@ -104,14 +104,21 @@ input[type='radio'] {
   left: 68.75vw;
   top: 28%;
 }
-
 .copyright {
-  position: absolute;
   color: #8a8a8a;
-  bottom: 10px;
-  right: 20px;
-  display: flex;
-  gap: 7px;
+  width: 100%;
+  &Zh {
+    position: absolute;
+    bottom: 10px;
+    align-items: center;
+    left: 31.25%;
+    transform: translate(-50%, 0);
+  }
+  &En {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+  }
 }
 
 @media (max-width: 1200px) {
@@ -144,5 +151,15 @@ input[type='radio'] {
     display: flex;
     justify-content: center;
     right: 0;
+    &Zh {
+      justify-content: center;
+      display: inline-flex;
+      left: auto;
+      transform: translate(0, 0);
+      width: 100%;
+    }
+    &En {
+      display: none;
+    }
   }
 }

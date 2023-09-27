@@ -28,7 +28,14 @@ export class Group extends Target implements IGroup {
     _company: ICompany,
     _parent?: IGroup,
   ) {
-    super(_keys, _metadata, [..._relations, _metadata.id], _company.user, companyTypes);
+    super(
+      _keys,
+      _metadata,
+      [..._relations, _metadata.id],
+      _company,
+      _company.user,
+      companyTypes,
+    );
     this.space = _company;
     this.parent = _parent;
     this.keys = [..._keys, this.key];

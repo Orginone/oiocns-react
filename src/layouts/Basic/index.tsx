@@ -18,12 +18,12 @@ const BasicLayout: React.FC<BasicLayoutProps> = (props) => {
   const [inited, setInited] = useState(false);
   const [connectStatus, setConnectStatus] = useState(false);
   useEffect(() => {
-    if (!orgCtrl.logined) {
-      return history.push('/passport/login');
-    }
     setTimeout(() => {
       setInited(true);
-    }, 500);
+      if (!orgCtrl.logined) {
+        return history.push('/passport/login');
+      }
+    }, 1500);
     kernel.onConnectedChanged((res: boolean) => {
       setConnectStatus(res);
     });

@@ -203,3 +203,91 @@ export const parseCiteMsg = (item: IMessage): any => {
     }
   }
 };
+
+/**
+ * 解析转发消息
+ * @param item 消息体
+ * @returns 内容
+ */
+export const parseForwardMsg = (
+  item: IMessage[],
+  viewForward?: (item: IMessage[]) => void,
+) => {
+  let formName = Array.from(
+    new Set(item.map((msg: IMessage) => msg.from.name).filter((name: string) => name)),
+  );
+  let showName =
+    formName && formName.length > 2
+      ? '群聊'
+      : `${formName[0]}${formName[1] ? '和' + formName[1] : ''}的`;
+  return (
+    <div
+      className={`${css.con_content_forward_txt}`}
+      onClick={() => viewForward && viewForward(item)}>
+      <div className={`${css.con_content_forward_session}`}>{`${showName}会话消息`}</div>
+      {item.map((msg: IMessage, idx: number) => {
+        if (idx > 2) return;
+        switch (msg.msgType) {
+          case MessageType.Image: {
+            const img: FileItemShare = parseAvatar(msg.msgBody);
+            if (img)
+              return (
+                <div className={css.con_content_forward_msg}>
+                  {msg.from.name}:{img.name}
+                </div>
+              );
+            return <div className={css.con_content_forward_msg}>消息异常</div>;
+          }
+          case MessageType.File: {
+            const file: FileItemShare = parseAvatar(msg.msgBody);
+            return (
+              <div className={css.con_content_forward_msg}>
+                {msg.from.name}:{file.name}
+              </div>
+            );
+          }
+          case MessageType.Voice: {
+            const bytes = JSON.parse(msg.msgBody).bytes;
+            const blob = new Blob([new Uint8Array(bytes)], { type: 'audio/mpeg' });
+            const url = URL.createObjectURL(blob);
+            return (
+              <div className={css.con_content_forward_msg}>
+                {msg.from.name}:{url}
+              </div>
+            );
+          }
+          default: {
+            // 优化截图展示问题
+            if (msg.msgBody.includes('$IMG')) {
+              let str = msg.msgBody;
+              const matches = [...str.matchAll(/\$IMG\[([^\]]*)\]/g)];
+              // 获取消息包含的图片地址
+              // const imgUrls = matches.map((match) => match[1]);
+              // 替换消息里 图片信息特殊字符
+              const willReplaceStr = matches.map((match) => match[0]);
+              willReplaceStr.forEach((strItem) => {
+                str = str.replace(strItem, ' ');
+              });
+              // 垂直展示截图信息。把文字消息统一放在底部
+              return (
+                <div className={css.con_content_forward_msg}>
+                  {msg.from.name}:【图片】{str.trim()}
+                </div>
+              );
+            }
+            // 默认文本展示
+            return (
+              <div className={css.con_content_forward_msg}>
+                <span>{msg.from.name}：</span>
+                <span
+                  dangerouslySetInnerHTML={{
+                    __html: truncateString(linkText(msg.msgBody), 80),
+                  }}></span>
+              </div>
+            );
+          }
+        }
+      })}
+    </div>
+  );
+};

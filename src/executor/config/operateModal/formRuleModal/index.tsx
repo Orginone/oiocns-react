@@ -63,7 +63,6 @@ const FormRuleModal = (props: Iprops) => {
   };
   const handleSubt = (values: { [key: string]: any }) => {
     const { templateId, linkAttrs } = values;
-    console.log('hahahahha', linkAttrs);
 
     try {
       const info = DefaultRules.find((v) => v.id === templateId)!;
@@ -101,10 +100,8 @@ const FormRuleModal = (props: Iprops) => {
         }
       }}
       onFinish={async (values) => {
-        // console.log('提交数据',values, handleSubt(values));
         if (current) {
           values = { ...current, ...handleSubt(values) };
-          console.log('提交结果2', values);
           handleOk({ success: true, type: 'updata', data: values });
         } else {
           handleOk({ success: true, type: 'create', data: handleSubt(values) });

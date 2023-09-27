@@ -36,7 +36,6 @@ const FormEditModal: React.FC<IProps> = ({
 }) => {
   const [selectedItem, setSelectedItem] = useState<any>({});
   const [mainWidth, setMainWidth] = useState<string | number>('40%');
-  // console.log('@@@', current, current.fields, commonSettings);
 
   // 创建ref
   const myComponentRef: any = useRef(null);

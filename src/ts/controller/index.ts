@@ -1,4 +1,4 @@
-import { IPerson, ISession, ITarget, UserProvider } from '@/ts/core';
+import { IApplication, IPerson, ISession, ITarget, UserProvider } from '@/ts/core';
 import { common } from '@/ts/base';
 import { IWorkProvider } from '../core/work/provider';
 /** 控制器基类 */
@@ -39,6 +39,15 @@ class IndexController extends Controller {
   /** 所有相关的用户 */
   get targets(): ITarget[] {
     return this.provider.targets;
+  }
+  async loadApplications(): Promise<IApplication[]> {
+    const apps: IApplication[] = [];
+    for (const directory of this.targets
+      .filter((i) => i.session.isMyChat)
+      .map((a) => a.directory)) {
+      apps.push(...(await directory.loadAllApplication()));
+    }
+    return apps;
   }
   /** 所有相关会话 */
   get chats(): ISession[] {

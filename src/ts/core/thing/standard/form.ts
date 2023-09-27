@@ -36,6 +36,9 @@ export class Form extends StandardFileInfo<schema.XForm> implements IForm {
   get id(): string {
     return this._metadata.id.replace('_', '');
   }
+  get cacheFlag(): string {
+    return 'forms';
+  }
   async loadContent(reload: boolean = false): Promise<boolean> {
     await this.loadFields(reload);
     return true;

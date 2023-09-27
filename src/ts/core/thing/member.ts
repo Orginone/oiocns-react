@@ -18,6 +18,9 @@ export class Member extends FileInfo<schema.XTarget> implements IMemeber {
     super(_metadata, _directory);
   }
   isMember: boolean = true;
+  get cacheFlag(): string {
+    return 'members';
+  }
   get fullId(): string {
     return `${this.directory.belongId}-${this._metadata.id}`;
   }

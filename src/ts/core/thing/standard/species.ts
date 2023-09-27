@@ -23,6 +23,9 @@ export class Species extends StandardFileInfo<schema.XSpecies> implements ISpeci
   }
   items: schema.XSpeciesItem[] = [];
   private _itemLoaded: boolean = false;
+  get cacheFlag(): string {
+    return 'species';
+  }
   override async delete(): Promise<boolean> {
     if (this.directory) {
       let success = true;
