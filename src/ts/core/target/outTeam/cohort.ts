@@ -6,10 +6,8 @@ export interface ICohort extends ITarget {}
 
 export class Cohort extends Target implements ICohort {
   constructor(_metadata: schema.XTarget, _space: IBelong, relationId: string) {
-    super([_space.key], _metadata, [relationId], _space.user);
-    this.space = _space;
+    super([_space.key], _metadata, [relationId], _space, _space.user);
   }
-  space: IBelong;
   async exit(): Promise<boolean> {
     if (this.metadata.belongId !== this.space.id) {
       if (await this.removeMembers([this.user.metadata])) {

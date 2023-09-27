@@ -81,7 +81,9 @@ export class Transfer extends StandardFileInfo<model.Transfer> implements ITrans
     this.command = new Command();
     this.setEntity();
   }
-
+  get cacheFlag(): string {
+    return 'transfers';
+  }
   async execute(status: model.GStatus, event: model.GEvent): Promise<void> {
     this.curTask = new Task(this, event, status);
     this.taskList.push(this.curTask);
@@ -277,9 +279,8 @@ export class Transfer extends StandardFileInfo<model.Transfer> implements ITrans
   }
 
   async reading(node: model.Node): Promise<boolean> {
-    const table = node as model.Tables;
-    if (table.file) {
-    }
+    // const table = node as model.Tables;
+    // if (table.file) { }
     return false;
   }
 
@@ -559,11 +560,13 @@ export class Task implements ITask {
           nextData = await this.transfer.request(node, env);
           break;
         case '子图':
-          // TODO 替换其它方案
-          const nextId = (node as model.SubTransfer).nextId;
-          await this.transfer
-            .getTransfer(nextId)
-            ?.execute(this.initStatus, this.initEvent);
+          {
+            // TODO 替换其它方案
+            const nextId = (node as model.SubTransfer).nextId;
+            await this.transfer
+              .getTransfer(nextId)
+              ?.execute(this.initStatus, this.initEvent);
+          }
           break;
         case '映射':
           isArray(preData.array);

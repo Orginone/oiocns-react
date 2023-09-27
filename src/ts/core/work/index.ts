@@ -50,6 +50,9 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
   get locationKey(): string {
     return this.application.key;
   }
+  get cacheFlag(): string {
+    return 'works';
+  }
   get forms(): IForm[] {
     return [...this.primaryForms, ...this.detailForms];
   }

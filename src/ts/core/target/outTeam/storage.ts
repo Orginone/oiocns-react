@@ -15,13 +15,11 @@ export interface IStorage extends ITarget {
 
 export class Storage extends Target implements IStorage {
   constructor(_metadata: schema.XTarget, _relations: string[], _space: IBelong) {
-    super([_space.key], _metadata, [..._relations, _metadata.id], _space.user, [
+    super([_space.key], _metadata, [..._relations, _metadata.id], _space, _space.user, [
       ...companyTypes,
       TargetType.Person,
     ]);
-    this.space = _space;
   }
-  space: IBelong;
   async exit(): Promise<boolean> {
     if (this.metadata.belongId !== this.space.id) {
       if (await this.removeMembers([this.user.metadata])) {

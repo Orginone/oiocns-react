@@ -1,13 +1,11 @@
 import { Col, Row } from 'antd';
-import React, { useEffect } from 'react';
+import React from 'react';
 
 import cls from './index.module.less';
 import Activity from '@/components/Activity';
 import orgCtrl from '@/ts/controller';
 
 const Index: React.FC = () => {
-  useEffect(() => {}, []);
-
   return (
     <Row
       gutter={[24, 24]}

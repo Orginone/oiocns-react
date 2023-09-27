@@ -10,6 +10,7 @@ import { DataResource } from '../../thing/resource';
 import { ISession, Session } from '../../chat/session';
 import { IPerson } from '../person';
 import { logger } from '@/ts/base/common';
+import { IBelong } from './belong';
 
 /** 用户抽象接口类 */
 export interface ITarget extends ITeam, IFileInfo<schema.XTarget> {
@@ -43,11 +44,22 @@ export abstract class Target extends Team implements ITarget {
     _keys: string[],
     _metadata: schema.XTarget,
     _relations: string[],
+    _space?: IBelong,
     _user?: IPerson,
     _memberTypes: TargetType[] = [TargetType.Person],
   ) {
     super(_keys, _metadata, _relations, _memberTypes);
-    this.user = _user || (this as unknown as IPerson);
+    if (_space) {
+      this.space = _space;
+    } else {
+      this.space = this as unknown as IBelong;
+    }
+    if (_user) {
+      this.user = _user;
+    } else {
+      this.user = this as unknown as IPerson;
+    }
+    this.cache = { fullId: `${_metadata.belongId}_${_metadata.id}` };
     this.resource = new DataResource(_metadata, _relations, [this.key]);
     this.directory = new Directory(
       {
@@ -73,17 +85,20 @@ export abstract class Target extends Team implements ITarget {
     );
     this.isContainer = true;
     this.session = new Session(this.id, this, _metadata);
-    kernel.subscribe(
-      `${_metadata.belongId}-${_metadata.id}-identity`,
-      [..._keys, this.key],
-      (data: any) => this._receiveIdentity(data),
+    setTimeout(
+      async () => {
+        await this.loadUserData(_keys, _metadata);
+      },
+      this.id === this.userId ? 100 : 0,
     );
   }
   user: IPerson;
+  space: IBelong;
   session: ISession;
   isContainer: boolean;
   directory: IDirectory;
   resource: DataResource;
+  cache: schema.XCache;
   identitys: IIdentity[] = [];
   memberDirectory: IDirectory;
   get spaceId(): string {
@@ -92,7 +107,38 @@ export abstract class Target extends Team implements ITarget {
   get locationKey(): string {
     return this.id;
   }
+  get cachePath(): string {
+    return `targets.${this.cache.fullId}`;
+  }
   private _identityLoaded: boolean = false;
+
+  async loadUserData(keys: string[], _metadata: schema.XTarget): Promise<void> {
+    kernel.subscribe(
+      `${_metadata.belongId}-${_metadata.id}-identity`,
+      keys,
+      (data: any) => this._receiveIdentity(data),
+    );
+    const data = await this.user.cacheObj.get<schema.XCache>(this.cachePath);
+    if (data && data.fullId === this.cache.fullId) {
+      this.cache = data;
+    }
+    this.user.cacheObj.subscribe(this.cachePath, (data: schema.XCache) => {
+      if (data && data.fullId === this.cache.fullId) {
+        this.cache = data;
+        this.user.cacheObj.setValue(this.cachePath, data);
+        this.directory.changCallback();
+      }
+    });
+  }
+
+  async cacheUserData(notify: boolean = true): Promise<boolean> {
+    const success = await this.user.cacheObj.set(this.cachePath, this.cache);
+    if (success && notify) {
+      await this.user.cacheObj.notity(this.cachePath, this.cache, true, true);
+    }
+    return success;
+  }
+
   async loadIdentitys(reload?: boolean | undefined): Promise<IIdentity[]> {
     if (!this._identityLoaded || reload) {
       const res = await kernel.queryTargetIdentitys({

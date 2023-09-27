@@ -1,5 +1,5 @@
 import { IPerson, Person } from './target/person';
-import { common, kernel, model, schema } from '../base';
+import { command, common, kernel, model, schema } from '../base';
 import { IWorkProvider, WorkProvider } from './work/provider';
 import { ITarget } from './target/base/target';
 
@@ -79,7 +79,7 @@ export class UserProvider {
     return await kernel.resetPassword(account, password, privateKey);
   }
   /** 加载用户 */
-  private _loadUser(person: schema.XTarget) {
+  private async _loadUser(person: schema.XTarget) {
     sessionStorage.setItem(sessionUserName, JSON.stringify(person));
     kernel.userId = person.id;
     this._user = new Person(person);
@@ -93,5 +93,6 @@ export class UserProvider {
     await this.work?.loadTodos(true);
     this._inited = true;
     this._emiter.changCallback();
+    command.emitterFlag();
   }
 }

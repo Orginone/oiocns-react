@@ -100,19 +100,20 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
       _parent ?? (_target as unknown as IDirectory),
       _target.resource.directoryColl,
     );
-    this.target = _target;
     this.parent = _parent;
     this.isContainer = true;
     this.taskEmitter = new common.Emitter();
     this.operater = new DirectoryOperate(this, _target.resource);
   }
-  target: ITarget;
   operater: IDirectoryOperate;
   taskEmitter: common.Emitter;
   parent: IDirectory | undefined;
   taskList: model.TaskModel[] = [];
   files: ISysFileInfo[] = [];
   formTypes: string[] = ['表单', '报表', '事项配置', '实体配置'];
+  get cacheFlag(): string {
+    return 'directorys';
+  }
   get forms(): IForm[] {
     return this.operater.getContent(this.formTypes) as Form[];
   }
