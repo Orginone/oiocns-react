@@ -1209,3 +1209,8 @@ export type CommonAppplication = {
   // 展示归属组织
   spaceId: string;
 };
+
+/** 新建文档 */
+export type documentType = {
+  name: string;
+};

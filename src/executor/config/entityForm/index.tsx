@@ -11,6 +11,7 @@ import TargetForm from './targetForm';
 import LabelsForm from './labelsForm';
 import RenameForm from './renameForm';
 import TransferForm from './transferForm';
+import DocumentForm from './documentForm';
 interface IProps {
   cmd: string;
   entity: IEntity<schema.XEntity>;
@@ -84,6 +85,10 @@ const EntityForm: React.FC<IProps> = ({ cmd, entity, finished }) => {
     case 'remarkProperty':
       return (
         <PropertyForm formType={cmd} current={entity as any} finished={reloadFinish} />
+      );
+    case 'newMdText':
+      return (
+        <DocumentForm formType={cmd} current={entity as any} finished={reloadFinish} />
       );
     case 'newTransferConfig':
     case 'updateTransferConfig':
