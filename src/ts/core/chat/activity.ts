@@ -146,6 +146,7 @@ export class Activity extends Entity<schema.XTarget> implements IActivity {
     });
     const messages = data.map((i) => new ActivityMessage(i, this));
     this.activityList.push(...messages);
+    console.log('thisactivity', messages);
     return messages;
   }
 

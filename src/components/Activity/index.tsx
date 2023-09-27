@@ -5,11 +5,13 @@ import {
   Button,
   Col,
   Divider,
+  Empty,
   Image,
   Input,
   Popover,
   Row,
   Space,
+  Spin,
   Tag,
   Typography,
 } from 'antd';
@@ -27,6 +29,7 @@ import orgCtrl from '@/ts/controller';
 import { FileItemShare } from '@/ts/base/model';
 import ActivityComment from '@/components/Activity/ActivityComment';
 import { XEntity } from '@/ts/base/schema';
+import { generateUuid } from '@/ts/base/common';
 
 const Activity: React.FC<{ activity: IActivity; title?: string }> = ({
   activity,
@@ -199,16 +202,29 @@ const Activity: React.FC<{ activity: IActivity; title?: string }> = ({
     const id = activity.subscribe(() => {
       setActivityList([...activity.activityList]);
     });
-    if (activity.activityList.length < 1) {
+    if (activity.activityList.length < 1 && !loading) {
       activity.load(10).then(() => {
         setActivityList([...activity.activityList]);
       });
+      setLoading(false);
     }
     return () => {
       activity.unsubscribe(id);
     };
   }, []);
   const [activityPublisherOpen, setActivityPublisherOpen] = useState(false);
+  const [containerHeight, setContainerHeight] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(1);
+
+  useEffect(() => {
+    const element = document.querySelector('#' + containerId);
+    if (!element) return;
+    const height = element.scrollHeight;
+    height && setContainerHeight(height);
+  }, [activity.activityList]);
+
+  const containerId = 'activity-' + generateUuid();
 
   const computedWidth = (number: number) => {
     if (number === 1) {
@@ -223,36 +239,67 @@ const Activity: React.FC<{ activity: IActivity; title?: string }> = ({
     return '100%';
   };
   return (
-    <div className={cls.activityList}>
-      <BasicTitle
-        title={title || '动态'}
-        onClick={() => activity.load(10)}
-        left={
-          <Button
-            type="link"
-            onClick={() => {
-              activity.allPublish && setActivityPublisherOpen(true);
-            }}>
-            发布动态
-          </Button>
-        }></BasicTitle>
-      <Row gutter={[16, 0]}>
-        {actionList.map((item, index) => {
-          return (
-            <Col key={index} span={24}>
-              <ActivityItem item={item}></ActivityItem>
-            </Col>
-          );
-        })}
-      </Row>
-      {activity.allPublish && (
-        <ActivityPublisher
-          open={activityPublisherOpen}
-          activity={activity}
-          finish={() => {
-            setActivityPublisherOpen(false);
-          }}></ActivityPublisher>
-      )}
+    <div
+      className={cls.activityList}
+      id={containerId}
+      onScroll={(e) => {
+        const scrollTop = (e.target as HTMLElement).scrollTop;
+        console.log((e.target as HTMLElement).scrollTop, containerHeight);
+        console.log(page * 10);
+        if (
+          scrollTop >= containerHeight &&
+          !loading &&
+          page * 10 < activity.activityList.length
+        ) {
+          setLoading(true);
+          activity.load(10);
+          setPage(page + 1);
+        }
+      }}>
+      <div>
+        <BasicTitle
+          title={title || '动态'}
+          onClick={() => activity.load(10)}
+          left={
+            <Button
+              type="link"
+              onClick={() => {
+                activity.allPublish && setActivityPublisherOpen(true);
+              }}>
+              发布动态
+            </Button>
+          }></BasicTitle>
+        <Row gutter={[16, 0]}>
+          {actionList.map((item, index) => {
+            return (
+              <Col key={index} span={24}>
+                <ActivityItem item={item}></ActivityItem>
+              </Col>
+            );
+          })}
+          {actionList.length === 0 && (
+            <div
+              style={{
+                width: '100%',
+                height: '300px',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
+              <Empty description={false}></Empty>
+            </div>
+          )}
+        </Row>
+        {activity.allPublish && (
+          <ActivityPublisher
+            open={activityPublisherOpen}
+            activity={activity}
+            finish={() => {
+              setActivityPublisherOpen(false);
+            }}></ActivityPublisher>
+        )}
+        {loading && <Spin></Spin>}
+      </div>
     </div>
   );
 };
