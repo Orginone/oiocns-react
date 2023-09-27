@@ -6,14 +6,9 @@ import orgCtrl from '@/ts/controller';
 
 const Circle: React.FC = () => {
   return (
-    <Row
-      gutter={[24, 24]}
-      className={cls.content}
-      style={{ height: '900px', overflowY: 'auto' }}>
-      <Col span={24}>
-        <div style={{ overflowY: 'auto', height: '100%' }}>
-          <Activity activity={orgCtrl.user.friendsActivity} title="好友圈"></Activity>
-        </div>
+    <Row gutter={[24, 24]} style={{ padding: '0 36px' }}>
+      <Col span={24} className={cls.content}>
+        <Activity activity={orgCtrl.user.friendsActivity} title="好友圈"></Activity>
       </Col>
     </Row>
   );
