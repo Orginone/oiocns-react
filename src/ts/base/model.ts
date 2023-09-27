@@ -1209,3 +1209,11 @@ export type CommonAppplication = {
   // 展示归属组织
   spaceId: string;
 };
+
+/** 代码构建 */
+export type codeBuildType = {
+  git: string;
+  dockerfile: string;
+  image: string;
+  registry_tokencreateTime: string;
+};
