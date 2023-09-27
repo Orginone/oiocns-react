@@ -276,7 +276,7 @@ const GroupContent = (props: Iprops) => {
             className={css.multiBtn}
             onClick={() => {
               const url = parseAvatar(item.msgBody).shareLink;
-              downloadByUrl(`/orginone/kernel/load/${url}?download=1`);
+              downloadByUrl(shareOpenLink(url, true));
             }}>
             <AiOutlineDownload size={14} className={css.actionIconStyl} />
             <span className={css.moreActionTxt}>下载</span>
