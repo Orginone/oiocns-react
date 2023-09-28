@@ -1203,9 +1203,25 @@ export type SchemaType = {
   column: 1 | 2 | 3;
 };
 
-export type CommonAppplication = {
-  // 应用Id
-  id: string;
-  // 展示归属组织
-  spaceId: string;
-};
+export type DiskInfoType = {
+  // 状态
+  ok: number;
+  // 文件数量
+  files: number;
+  // 对象数量
+  objects: number;
+  // 集合数量
+  collections: number;
+  // 文件的总大小
+  fileSize: number;
+  // 数据的总大小
+  dataSize: number;
+  // 数据占用磁盘的总大小
+  totalSize: number;
+  // 文件系统挂载磁盘已使用大小
+  fsUsedSize: number;
+  // 文件系统挂载磁盘的总大小
+  fsTotalSize: number;
+  // 查询时间
+  getTime: string;
+}
