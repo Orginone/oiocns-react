@@ -4,7 +4,7 @@ import moment from 'moment';
 import { showChatTime } from '@/utils/tools';
 
 import { IMessage, MessageType } from '@/ts/core';
-import { parseCiteMsg, parseMsg } from '@/pages/Chats/components/parseMsg';
+import { parseCiteMsg, parseMsg, parseForwardMsg } from '@/pages/Chats/components/parseMsg';
 import TeamIcon from '@/components/Common/GlobalComps/entityIcon';
 import css from './index.module.less';
 interface IForwardContentModalProps {
@@ -13,21 +13,41 @@ interface IForwardContentModalProps {
   title: string;
   isBelongPerson?: boolean;
   handleClose: () => void;
+  viewForward?: (item: IMessage[]) => void
 }
 
 const ForwardContentModal: FC<IForwardContentModalProps> = (props) => {
-  const { open, title, isBelongPerson, messages, handleClose } = props;
+  const { open, title, isBelongPerson, messages, handleClose, viewForward } = props;
   const isShowTime = (curDate: string, beforeDate: string) => {
     if (beforeDate === '') return true;
     return moment(curDate).diff(beforeDate, 'minute') > 3;
   };
-  const showMsg = (item: IMessage) => {
+  const batchForwardMsg = (item: IMessage) => {
+    // TODO 需要优化
+    if (
+      item.forward.length === 1 &&
+      item.forward[0].forward &&
+      item.forward[0].forward.length > 1
+    ) {
+      return (
+        <React.Fragment>
+          {parseForwardMsg(item.forward[0].forward, viewForward)}
+        </React.Fragment>
+      );
+    }
+    return <React.Fragment>{parseForwardMsg(item.forward, viewForward)}</React.Fragment>;
+  };
+  const defaultMsg = (item: IMessage) => {
     return (
       <React.Fragment>
         {parseMsg(item)}
         {item.cite && parseCiteMsg(item.cite)}
       </React.Fragment>
     );
+  };
+  const showMsg = (item: IMessage) => {
+    if (item.forward && item.forward.length) return batchForwardMsg(item);
+    else return defaultMsg(item);
   };
   const viewMsg = (item: IMessage) => {
     if (item.isMySend) {
@@ -44,7 +64,7 @@ const ForwardContentModal: FC<IForwardContentModalProps> = (props) => {
                   size="small"
                   style={{ zIndex: 2 }}
                   offset={[-15, -12]}>
-                  {parseMsg(item)}
+                  {showMsg(item)}
                   {item.cite && parseCiteMsg(item.cite)}
                 </Badge>
               </>

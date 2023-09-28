@@ -126,8 +126,6 @@ const Chat: React.FC<any> = ({
           setShowShareForward(val);
           setMultiSelectShow(false);
           setForwardMessage([]);
-          setShowShareForward;
-          setMultiSelectShow;
         }}
       />
     </div>

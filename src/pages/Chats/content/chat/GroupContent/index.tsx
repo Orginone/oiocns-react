@@ -213,7 +213,7 @@ const GroupContent = (props: Iprops) => {
                 }}
                 overlayInnerStyle={{ marginLeft: '-18px', padding: '3px' }}
                 content={msgAction(item)}>
-                {parseMsg(item)}
+                {showMsg(item)}
               </Popover>
               {item.cite && parseCiteMsg(item.cite)}
             </div>
@@ -262,12 +262,12 @@ const GroupContent = (props: Iprops) => {
                 message.success('删除成功');
               }
             }}>
-            <AiOutlineDelete size={14} className={css.actionIconStyl} />
+            <AiOutlineDelete size={19} className={css.actionIconStyl} />
             <span className={css.moreActionTxt}>删除</span>
           </Button>
         )}
         <Button className={css.multiBtn} type="text" onClick={handleMore}>
-          <BsListCheck size={14} className={css.actionIconStyl} />
+          <BsListCheck size={19} className={css.actionIconStyl} />
           <span className={css.moreActionTxt}>多选</span>
         </Button>
         {['文件', '视频', '图片'].includes(item.msgType) && item.forward?.length < 1 && (
@@ -276,9 +276,9 @@ const GroupContent = (props: Iprops) => {
             className={css.multiBtn}
             onClick={() => {
               const url = parseAvatar(item.msgBody).shareLink;
-              downloadByUrl(`/orginone/kernel/load/${url}?download=1`);
+              downloadByUrl(shareOpenLink(url, true));
             }}>
-            <AiOutlineDownload size={14} className={css.actionIconStyl} />
+            <AiOutlineDownload size={19} className={css.actionIconStyl} />
             <span className={css.moreActionTxt}>下载</span>
           </Button>
         )}
@@ -292,7 +292,7 @@ const GroupContent = (props: Iprops) => {
         <CopyToClipboard text={item.msgBody}>
           <Tooltip title="复制">
             <AiOutlineCopy
-              size={22}
+              size={19}
               className={css.actionIconStyl}
               onClick={() => {
                 message.success('复制成功');
@@ -302,14 +302,14 @@ const GroupContent = (props: Iprops) => {
         </CopyToClipboard>
         <Tooltip title="引用">
           <AiOutlineMessage
-            size={22}
+            size={19}
             className={css.actionIconStyl}
             onClick={() => props.citeText(item)}
           />
         </Tooltip>
         <Tooltip title="转发">
           <RiShareForwardFill
-            size={22}
+            size={19}
             className={css.actionIconStyl}
             onClick={() => props.forward(item)}
           />
@@ -317,7 +317,7 @@ const GroupContent = (props: Iprops) => {
         {item.isMySend && item.allowRecall && (
           <Tooltip title="撤回">
             <AiOutlineRollback
-              size={22}
+              size={19}
               className={css.actionIconStyl}
               onClick={async () => {
                 await props.chat.recallMessage(item.id);
@@ -333,7 +333,7 @@ const GroupContent = (props: Iprops) => {
               title=""
               trigger="click"
               overlayInnerStyle={{ marginTop: '-12px' }}>
-              <AiOutlineEllipsis size={22} className={css.actionIconStyl} />
+              <AiOutlineEllipsis size={19} className={css.actionIconStyl} />
             </Popover>
           </Tooltip>
         }
@@ -414,6 +414,7 @@ const GroupContent = (props: Iprops) => {
         messages={forwardMessages}
         isBelongPerson={true}
         title={''}
+        viewForward={viewForward}
       />
     </div>
   );

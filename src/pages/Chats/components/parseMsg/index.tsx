@@ -226,7 +226,11 @@ export const parseForwardMsg = (
       onClick={() => viewForward && viewForward(item)}>
       <div className={`${css.con_content_forward_session}`}>{`${showName}会话消息`}</div>
       {item.map((msg: IMessage, idx: number) => {
+        // 默认只展示3条记录
         if (idx > 2) return;
+        if (!msg.msgBody && msg.forward?.length) {
+          msg = msg.forward[0]
+        }
         switch (msg.msgType) {
           case MessageType.Image: {
             const img: FileItemShare = parseAvatar(msg.msgBody);
