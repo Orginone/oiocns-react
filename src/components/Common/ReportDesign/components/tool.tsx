@@ -1,173 +1,163 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Select, Dropdown, Button, Popover } from 'antd';
 import type { MenuProps } from 'antd';
 import { SketchPicker } from '@hello-pangea/color-picker';
 import cls from './tool.module.less';
+import useObjectUpdate from '@/hooks/useObjectUpdate';
 const { Option } = Select;
 interface IProps {
-  handClick: any;
+  cellStyle: any;
+  handClick: (value: string | any, type: string, classType?: string) => void;
 }
 
-const classDefault: string = 'htMiddle htLeft';
-const alignHorizontal: any = [
-  {
-    label: '左对齐',
-    icon: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTE2LjkgNUgzLjFhLjEuMSAwIDAgMC0uMS4xdjEuOGEuMS4xIDAgMCAwIC4xLjFoMTMuOGEuMS4xIDAgMCAwIC4xLS4xVjUuMWEuMS4xIDAgMCAwLS4xLS4xek0zLjEgMTFoNy44YS4xLjEgMCAwIDAgLjEtLjFWOS4xYS4xLjEgMCAwIDAtLjEtLjFIMy4xYS4xLjEgMCAwIDAtLjEuMXYxLjhhLjEuMSAwIDAgMCAuMS4xem0wIDRoMTEuOGEuMS4xIDAgMCAwIC4xLS4xdi0xLjhhLjEuMSAwIDAgMC0uMS0uMUgzLjFhLjEuMSAwIDAgMC0uMS4xdjEuOGEuMS4xIDAgMCAwIC4xLjF6bTEzLjggMkgzLjFhLjEuMSAwIDAgMC0uMS4xdjEuOGEuMS4xIDAgMCAwIC4xLjFoMTMuOGEuMS4xIDAgMCAwIC4xLS4xdi0xLjhhLjEuMSAwIDAgMC0uMS0uMXoiLz48L3N2Zz4=',
-    value: 'left',
-    className: 'htLeft',
-    type: 'horizontal',
-  },
-  {
-    label: '居中',
-    icon: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTcgNS4xdjEuOGEuMS4xIDAgMCAwIC4xLjFoMTMuOGEuMS4xIDAgMCAwIC4xLS4xVjUuMWEuMS4xIDAgMCAwLS4xLS4xSDcuMWEuMS4xIDAgMCAwLS4xLjF6bTYuMSA1LjloNy44YS4xLjEgMCAwIDAgLjEtLjFWOS4xYS4xLjEgMCAwIDAtLjEtLjFoLTcuOGEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMXptLTQgNGgxMS44YS4xLjEgMCAwIDAgLjEtLjF2LTEuOGEuMS4xIDAgMCAwLS4xLS4xSDkuMWEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMXptLTIgNGgxMy44YS4xLjEgMCAwIDAgLjEtLjF2LTEuOGEuMS4xIDAgMCAwLS4xLS4xSDcuMWEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMXoiLz48L3N2Zz4=',
-    value: 'center',
-    className: 'htCenter',
-    type: 'horizontal',
-  },
-  {
-    label: '右对齐',
-    icon: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTcgNS4xdjEuOGEuMS4xIDAgMCAwIC4xLjFoMTMuOGEuMS4xIDAgMCAwIC4xLS4xVjUuMWEuMS4xIDAgMCAwLS4xLS4xSDcuMWEuMS4xIDAgMCAwLS4xLjF6bTYuMSA1LjloNy44YS4xLjEgMCAwIDAgLjEtLjFWOS4xYS4xLjEgMCAwIDAtLjEtLjFoLTcuOGEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMXptLTQgNGgxMS44YS4xLjEgMCAwIDAgLjEtLjF2LTEuOGEuMS4xIDAgMCAwLS4xLS4xSDkuMWEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMXptLTIgNGgxMy44YS4xLjEgMCAwIDAgLjEtLjF2LTEuOGEuMS4xIDAgMCAwLS4xLS4xSDcuMWEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMXoiLz48L3N2Zz4=',
-    value: 'right',
-    className: 'htRight',
-    type: 'horizontal',
-  },
-];
-const alignVertical: any = [
-  {
-    label: '顶端对齐',
-    icon: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTEyLjA3IDcuMDdhLjEuMSAwIDAgMC0uMTQxIDBsLTMuNzYgMy43NmEuMS4xIDAgMCAwIC4wNy4xN2gyLjY2YS4xLjEgMCAwIDEgLjEuMXY3LjhhLjEuMSAwIDAgMCAuMS4xaDEuOGEuMS4xIDAgMCAwIC4xLS4xdi03LjhhLjEuMSAwIDAgMSAuMS0uMWgyLjY2Yy4wOSAwIC4xMzQtLjEwOC4wNy0uMTdMMTIuMDcgNy4wN3pNMTguOSAzSDUuMWEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMWgxMy44YS4xLjEgMCAwIDAgLjEtLjFWMy4xYS4xLjEgMCAwIDAtLjEtLjF6Ii8+PC9zdmc+',
-    value: 'top',
-    className: 'htTop',
-    type: 'vertical',
-  },
-  {
-    label: '垂直居中',
-    icon: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTE5IDEyLjl2LTEuOGEuMS4xIDAgMCAwLS4xLS4xSDUuMWEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMWgxMy44YS4xLjEgMCAwIDAgLjEtLjF6bS03LjA3IDIuMTdsLTMuNzYgMy43NmEuMS4xIDAgMCAwIC4wNzEuMTdoMi42NmEuMS4xIDAgMCAxIC4xLjF2Mi44YS4xLjEgMCAwIDAgLjEuMWgxLjhhLjEuMSAwIDAgMCAuMS0uMXYtMi44YS4xLjEgMCAwIDEgLjEtLjFoMi42NmMuMSAwIC4xMzQtLjEwOC4wNy0uMTdsLTMuNzYtMy43NmMtLjA0LS4wMzgtLjEwMy0uMDM4LS4xNDIuMDAxem0uMTQtNi4xNGwzLjc2LTMuNzZhLjEuMSAwIDAgMC0uMDcxLS4xN0gxMy4xYS4xLjEgMCAwIDEtLjEtLjFWMi4xYS4xLjEgMCAwIDAtLjEtLjFoLTEuOGEuMS4xIDAgMCAwLS4xLjF2Mi44YS4xLjEgMCAwIDEtLjEuMUg4LjI0YS4xLjEgMCAwIDAtLjA3LjE3MWwzLjc2IDMuNzZjLjAzOC4wMzguMTAyLjAzOC4xNC0uMDAxeiIvPjwvc3ZnPg==',
-    value: 'middle',
-    className: 'htMiddle',
-    type: 'vertical',
-  },
-  {
-    label: '底端对齐',
-    icon: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTExLjkzIDE1LjkzYS4xLjEgMCAwIDAgLjE0IDBsMy43Ni0zLjc2YS4xLjEgMCAwIDAtLjA3LS4xN0gxMy4xYS4wOS4wOSAwIDAgMS0uMS0uMVY0LjFhLjA5LjA5IDAgMCAwLS4xLS4xaC0xLjhhLjA5LjA5IDAgMCAwLS4xLjF2Ny44YS4wOS4wOSAwIDAgMS0uMS4xSDguMjRhLjEuMSAwIDAgMC0uMDcuMTd6bTcgMi4wN0g1LjFhLjA5LjA5IDAgMCAwLS4xLjF2MS44YS4wOS4wOSAwIDAgMCAuMS4xaDEzLjhhLjA5LjA5IDAgMCAwIC4xLS4xdi0xLjhhLjA5LjA5IDAgMCAwLS4xLS4xeiIvPjwvc3ZnPg==',
-    value: 'bottom',
-    className: 'htBottom',
-    type: 'vertical',
-  },
-];
-const fonts: any = [
-  {
-    label: '宋体',
-    value: '宋体',
-  },
-  {
-    label: '微软雅黑',
-    value: '微软雅黑',
-  },
-  {
-    label: '黑体',
-    value: '黑体',
-  },
-  {
-    label: '仿宋',
-    value: '仿宋',
-  },
-  {
-    label: '新宋体',
-    value: '新宋体',
-  },
-  {
-    label: '隶书',
-    value: '隶书',
-  },
-  {
-    label: '楷体',
-    value: '楷体',
-  },
-  {
-    label: '幼圆',
-    value: '幼圆',
-  },
-];
-const fontSizes: any = [...Array(100).keys()].slice(9);
-// const formulasTypes: any = [
-//   {
-//     label: '求和',
-//     value: 'text',
-//     renderer: 'text',
-//     editor: 'text',
-//   },
-//   {
-//     label: '平均值',
-//     value: 'numeric',
-//     renderer: 'numeric',
-//     editor: 'numeric',
-//   },
-//   {
-//     label: '技数',
-//     value: 'date',
-//     renderer: 'date',
-//     editor: 'date',
-//   },
-//   {
-//     label: '最大值',
-//     value: 'date',
-//     renderer: 'date',
-//     editor: 'date',
-//   },
-//   {
-//     label: '最小值',
-//     value: 'date',
-//     renderer: 'date',
-//     editor: 'date',
-//   },
-// ];
-
-const ToolBar: React.FC<IProps> = ({ handClick }: IProps) => {
+const ToolBar: React.FC<IProps> = ({ cellStyle, handClick }: IProps) => {
+  const [tkey, tforceUpdate] = useObjectUpdate('');
   const [background, setBackground] = useState<string>();
   const [color, setColor] = useState<string>();
   const [openColor, setOpenColor] = useState(false);
   const [openBackground, setOpenBackground] = useState(false);
-  let defaultFontWeight: string = 'normal';
-  let fontWeight: string = 'normal';
-  let defaultFontStyle: string = 'normal';
-  let fontStyle: string = 'normal';
-  let defaultTextDecoration: string = 'none';
-  let textDecoration: string = 'none';
-  // 缩进
+  /** 字体样式 */
+  const defaultFontWeight: string = 'normal';
+  const [fontWeight, setFontWeight] = useState<string>('normal');
+  const defaultFontStyle: string = 'normal';
+  const [fontStyle, setFontStyle] = useState<string>('normal');
+  const defaultTextDecoration: string = 'none';
+  const [textDecoration, setTextDecoration] = useState<string>('none');
+  const fontSizes: any = [...Array(100).keys()].slice(9);
+  const [fontSize, setFontSize] = useState<string>('11');
+  const [fontFamily, setFontFamily] = useState<string>('宋体');
+  /** 单元格样式 */
+  const [defaultClass, setDefaultClass] = useState<string>(' htMiddle htLeft');
+  /** 缩进 */
   let defaultPaddingLeft: number = 4;
   let paddingLeft: number = 4;
 
+  useEffect(() => {
+    const styles = cellStyle?.styles || {};
+    const cellClass = cellStyle?.class || '';
+    setDefaultClass(
+      Object.values(cellClass).length > 0 ? Object.values(cellClass).join(' ') : '',
+    );
+    setFontWeight(styles?.fontWeight || defaultFontWeight);
+    setFontStyle(styles?.fontStyle ? styles?.fontStyle : 'normal');
+    setTextDecoration(styles?.textDecoration ? styles?.textDecoration : 'none');
+    setBackground(styles?.backgroundColor ? styles.backgroundColor : '#000');
+    setColor(styles?.color ? styles.color : '#000');
+    setFontSize(styles?.fontSize ? styles?.fontSize?.slice(0, -2) : '11');
+    setFontFamily(styles?.fontFamily ? styles.fontFamily : '宋体');
+    tforceUpdate();
+  }, [cellStyle]);
+
+  /** 水平对齐 */
+  const alignHorizontal: any = [
+    {
+      label: '左对齐',
+      icon: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTE2LjkgNUgzLjFhLjEuMSAwIDAgMC0uMS4xdjEuOGEuMS4xIDAgMCAwIC4xLjFoMTMuOGEuMS4xIDAgMCAwIC4xLS4xVjUuMWEuMS4xIDAgMCAwLS4xLS4xek0zLjEgMTFoNy44YS4xLjEgMCAwIDAgLjEtLjFWOS4xYS4xLjEgMCAwIDAtLjEtLjFIMy4xYS4xLjEgMCAwIDAtLjEuMXYxLjhhLjEuMSAwIDAgMCAuMS4xem0wIDRoMTEuOGEuMS4xIDAgMCAwIC4xLS4xdi0xLjhhLjEuMSAwIDAgMC0uMS0uMUgzLjFhLjEuMSAwIDAgMC0uMS4xdjEuOGEuMS4xIDAgMCAwIC4xLjF6bTEzLjggMkgzLjFhLjEuMSAwIDAgMC0uMS4xdjEuOGEuMS4xIDAgMCAwIC4xLjFoMTMuOGEuMS4xIDAgMCAwIC4xLS4xdi0xLjhhLjEuMSAwIDAgMC0uMS0uMXoiLz48L3N2Zz4=',
+      value: 'left',
+      className: 'htLeft',
+      type: 'horizontal',
+    },
+    {
+      label: '居中',
+      icon: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTcgNS4xdjEuOGEuMS4xIDAgMCAwIC4xLjFoMTMuOGEuMS4xIDAgMCAwIC4xLS4xVjUuMWEuMS4xIDAgMCAwLS4xLS4xSDcuMWEuMS4xIDAgMCAwLS4xLjF6bTYuMSA1LjloNy44YS4xLjEgMCAwIDAgLjEtLjFWOS4xYS4xLjEgMCAwIDAtLjEtLjFoLTcuOGEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMXptLTQgNGgxMS44YS4xLjEgMCAwIDAgLjEtLjF2LTEuOGEuMS4xIDAgMCAwLS4xLS4xSDkuMWEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMXptLTIgNGgxMy44YS4xLjEgMCAwIDAgLjEtLjF2LTEuOGEuMS4xIDAgMCAwLS4xLS4xSDcuMWEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMXoiLz48L3N2Zz4=',
+      value: 'center',
+      className: 'htCenter',
+      type: 'horizontal',
+    },
+    {
+      label: '右对齐',
+      icon: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTcgNS4xdjEuOGEuMS4xIDAgMCAwIC4xLjFoMTMuOGEuMS4xIDAgMCAwIC4xLS4xVjUuMWEuMS4xIDAgMCAwLS4xLS4xSDcuMWEuMS4xIDAgMCAwLS4xLjF6bTYuMSA1LjloNy44YS4xLjEgMCAwIDAgLjEtLjFWOS4xYS4xLjEgMCAwIDAtLjEtLjFoLTcuOGEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMXptLTQgNGgxMS44YS4xLjEgMCAwIDAgLjEtLjF2LTEuOGEuMS4xIDAgMCAwLS4xLS4xSDkuMWEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMXptLTIgNGgxMy44YS4xLjEgMCAwIDAgLjEtLjF2LTEuOGEuMS4xIDAgMCAwLS4xLS4xSDcuMWEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMXoiLz48L3N2Zz4=',
+      value: 'right',
+      className: 'htRight',
+      type: 'horizontal',
+    },
+  ];
+
+  /** 垂直对齐 */
+  const alignVertical: any = [
+    {
+      label: '顶端对齐',
+      icon: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTEyLjA3IDcuMDdhLjEuMSAwIDAgMC0uMTQxIDBsLTMuNzYgMy43NmEuMS4xIDAgMCAwIC4wNy4xN2gyLjY2YS4xLjEgMCAwIDEgLjEuMXY3LjhhLjEuMSAwIDAgMCAuMS4xaDEuOGEuMS4xIDAgMCAwIC4xLS4xdi03LjhhLjEuMSAwIDAgMSAuMS0uMWgyLjY2Yy4wOSAwIC4xMzQtLjEwOC4wNy0uMTdMMTIuMDcgNy4wN3pNMTguOSAzSDUuMWEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMWgxMy44YS4xLjEgMCAwIDAgLjEtLjFWMy4xYS4xLjEgMCAwIDAtLjEtLjF6Ii8+PC9zdmc+',
+      value: 'top',
+      className: 'htTop',
+      type: 'vertical',
+    },
+    {
+      label: '垂直居中',
+      icon: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTE5IDEyLjl2LTEuOGEuMS4xIDAgMCAwLS4xLS4xSDUuMWEuMS4xIDAgMCAwLS4xLjF2MS44YS4xLjEgMCAwIDAgLjEuMWgxMy44YS4xLjEgMCAwIDAgLjEtLjF6bS03LjA3IDIuMTdsLTMuNzYgMy43NmEuMS4xIDAgMCAwIC4wNzEuMTdoMi42NmEuMS4xIDAgMCAxIC4xLjF2Mi44YS4xLjEgMCAwIDAgLjEuMWgxLjhhLjEuMSAwIDAgMCAuMS0uMXYtMi44YS4xLjEgMCAwIDEgLjEtLjFoMi42NmMuMSAwIC4xMzQtLjEwOC4wNy0uMTdsLTMuNzYtMy43NmMtLjA0LS4wMzgtLjEwMy0uMDM4LS4xNDIuMDAxem0uMTQtNi4xNGwzLjc2LTMuNzZhLjEuMSAwIDAgMC0uMDcxLS4xN0gxMy4xYS4xLjEgMCAwIDEtLjEtLjFWMi4xYS4xLjEgMCAwIDAtLjEtLjFoLTEuOGEuMS4xIDAgMCAwLS4xLjF2Mi44YS4xLjEgMCAwIDEtLjEuMUg4LjI0YS4xLjEgMCAwIDAtLjA3LjE3MWwzLjc2IDMuNzZjLjAzOC4wMzguMTAyLjAzOC4xNC0uMDAxeiIvPjwvc3ZnPg==',
+      value: 'middle',
+      className: 'htMiddle',
+      type: 'vertical',
+    },
+    {
+      label: '底端对齐',
+      icon: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTExLjkzIDE1LjkzYS4xLjEgMCAwIDAgLjE0IDBsMy43Ni0zLjc2YS4xLjEgMCAwIDAtLjA3LS4xN0gxMy4xYS4wOS4wOSAwIDAgMS0uMS0uMVY0LjFhLjA5LjA5IDAgMCAwLS4xLS4xaC0xLjhhLjA5LjA5IDAgMCAwLS4xLjF2Ny44YS4wOS4wOSAwIDAgMS0uMS4xSDguMjRhLjEuMSAwIDAgMC0uMDcuMTd6bTcgMi4wN0g1LjFhLjA5LjA5IDAgMCAwLS4xLjF2MS44YS4wOS4wOSAwIDAgMCAuMS4xaDEzLjhhLjA5LjA5IDAgMCAwIC4xLS4xdi0xLjhhLjA5LjA5IDAgMCAwLS4xLS4xeiIvPjwvc3ZnPg==',
+      value: 'bottom',
+      className: 'htBottom',
+      type: 'vertical',
+    },
+  ];
+
+  /** 字体 */
+  const fonts: any = [
+    {
+      label: '宋体',
+      value: '宋体',
+    },
+    {
+      label: '微软雅黑',
+      value: '微软雅黑',
+    },
+    {
+      label: '黑体',
+      value: '黑体',
+    },
+    {
+      label: '仿宋',
+      value: '仿宋',
+    },
+    {
+      label: '新宋体',
+      value: '新宋体',
+    },
+    {
+      label: '隶书',
+      value: '隶书',
+    },
+    {
+      label: '楷体',
+      value: '楷体',
+    },
+    {
+      label: '幼圆',
+      value: '幼圆',
+    },
+  ];
+
+  /** 保存 */
   const onSave = () => {
-    // 保存
     handClick('onSave', 'onSave');
   };
 
-  const setFontWeight = () => {
-    if (fontWeight === 'bold') {
-      fontWeight = defaultFontWeight;
-    } else {
-      fontWeight = 'bold';
-    }
-    handClick(fontWeight, 'fontWeight');
+  /** 字体设置 */
+  const setUpFontWeight = () => {
+    setFontWeight(fontWeight === 'bold' ? defaultFontWeight : 'bold');
+    handClick(fontWeight === 'bold' ? defaultFontWeight : 'bold', 'fontWeight');
   };
 
-  const setFontStyle = () => {
-    if (fontStyle === 'italic') {
-      fontStyle = defaultFontStyle;
-    } else {
-      fontStyle = 'italic';
-    }
-    handClick(fontStyle, 'fontStyle');
+  const setUpFontStyle = () => {
+    setFontStyle(fontStyle === 'italic' ? defaultFontStyle : 'italic');
+    handClick(fontStyle === 'italic' ? defaultFontStyle : 'italic', 'fontStyle');
   };
 
-  const setTextDecoration = () => {
-    if (textDecoration === 'underline') {
-      textDecoration = defaultTextDecoration;
-    } else {
-      textDecoration = 'underline';
-    }
-    handClick(textDecoration, 'setTextDecoration');
+  const setUpTextDecoration = () => {
+    setTextDecoration(
+      textDecoration === 'underline' ? defaultTextDecoration : 'underline',
+    );
+    handClick(
+      textDecoration === 'underline' ? defaultTextDecoration : 'underline',
+      'textDecoration',
+    );
   };
 
   const borderThis = (type: string) => {
@@ -188,8 +178,25 @@ const ToolBar: React.FC<IProps> = ({ handClick }: IProps) => {
     handClick(color, 'color');
   };
 
+  /** 字体样式设置 */
   const setClassName = (className: string, classType: string) => {
+    let classData: string = '';
+    if (classType === 'horizontal') {
+      if (/htCenter|htLeft|htRight/.test(defaultClass)) {
+        classData = defaultClass.replace(/htCenter|htLeft|htRight/, className);
+      } else {
+        classData = defaultClass + ' ' + className;
+      }
+    } else {
+      if (/htMiddle|htTop|htBottom/.test(defaultClass)) {
+        classData = defaultClass.replace(/htMiddle|htTop|htBottom/, className);
+      } else {
+        classData = defaultClass + ' ' + className;
+      }
+    }
+    setDefaultClass(classData);
     handClick(className, 'className', classType);
+    tforceUpdate();
   };
 
   const reducePaddingLeft = () => {
@@ -326,20 +333,17 @@ const ToolBar: React.FC<IProps> = ({ handClick }: IProps) => {
   };
 
   return (
-    <div className={cls['toolbar-start-tab']}>
+    <div className={cls['toolbar-start-tab']} key={tkey}>
       <div className={cls['flex-box']}>
         <div className={cls['row-one']}>
           <Button onClick={onSave}>保存</Button>
         </div>
-        {/* <div className={cls['row-two']}>
-          <Button onClick={onPublish}>发布</Button>
-        </div> */}
       </div>
 
       <div className={cls['flex-box']}>
         <div className={cls['row-one']}>
           <Select
-            defaultValue="宋体"
+            defaultValue={fontFamily}
             style={{ width: 170 }}
             onChange={(value) => handleChange(value, 'fontFamily')}>
             {fonts.map((item: any) => {
@@ -351,7 +355,7 @@ const ToolBar: React.FC<IProps> = ({ handClick }: IProps) => {
             })}
           </Select>
           <Select
-            defaultValue="12"
+            defaultValue={fontSize}
             style={{ width: 80, marginLeft: 4 }}
             onChange={(value) => handleChange(value + 'px', 'fontSize')}>
             {fontSizes.map((item: any) => {
@@ -366,10 +370,12 @@ const ToolBar: React.FC<IProps> = ({ handClick }: IProps) => {
         <div className={cls['row-two']}>
           <a
             className={
-              fontWeight === defaultFontWeight ? cls['icon-action'] : cls['icon-action']
+              fontWeight === defaultFontWeight
+                ? cls['icon-action']
+                : `${cls['icon-action']} ${cls['active']}`
             }
             title="加粗"
-            onClick={setFontWeight}>
+            onClick={setUpFontWeight}>
             <img
               className={cls['spreadsheet-icon']}
               src={
@@ -379,10 +385,12 @@ const ToolBar: React.FC<IProps> = ({ handClick }: IProps) => {
           </a>
           <a
             className={
-              fontStyle === defaultFontStyle ? cls['icon-action'] : cls['icon-action']
+              fontStyle === defaultFontStyle
+                ? cls['icon-action']
+                : `${cls['icon-action']} ${cls['active']}`
             }
             title="倾斜"
-            onClick={setFontStyle}>
+            onClick={setUpFontStyle}>
             <img
               className={cls['spreadsheet-icon']}
               src={
@@ -394,10 +402,10 @@ const ToolBar: React.FC<IProps> = ({ handClick }: IProps) => {
             className={
               textDecoration === defaultTextDecoration
                 ? cls['icon-action']
-                : cls['icon-action']
+                : `${cls['icon-action']} ${cls['active']}`
             }
             title="下划线"
-            onClick={setTextDecoration}>
+            onClick={setUpTextDecoration}>
             <img
               className={cls['spreadsheet-icon']}
               src={
@@ -466,8 +474,8 @@ const ToolBar: React.FC<IProps> = ({ handClick }: IProps) => {
                   <a
                     key={align.value}
                     className={
-                      classDefault.includes(align.className)
-                        ? cls['icon-action']
+                      defaultClass.includes(align.className)
+                        ? `${cls['icon-action']} ${cls['active']}`
                         : cls['icon-action']
                     }
                     title={align.label}
@@ -483,8 +491,8 @@ const ToolBar: React.FC<IProps> = ({ handClick }: IProps) => {
                   <a
                     key={align.value}
                     className={
-                      classDefault.includes(align.className)
-                        ? cls['icon-action']
+                      defaultClass.includes(align.className)
+                        ? `${cls['icon-action']} ${cls['active']}`
                         : cls['icon-action']
                     }
                     title={align.label}
