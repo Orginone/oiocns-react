@@ -1,24 +1,32 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { IFileInfo, ISysFileInfo } from '@/ts/core';
 import { schema } from '@/ts/base';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import { showChatTime } from '@/utils/tools';
 import { formatSize } from '@/ts/base/common';
 import DataGrid, { Column, Scrolling } from 'devextreme-react/data-grid';
-import { Dropdown, MenuProps, Modal } from 'antd';
+import { Dropdown, MenuProps } from 'antd';
 
 const TableMode = ({
+  select,
   content,
   fileOpen,
   contextMenu,
 }: {
+  select: IFileInfo<schema.XEntity> | undefined;
   content: IFileInfo<schema.XEntity>[];
-  fileOpen: (file: IFileInfo<schema.XEntity>) => Promise<void>;
+  fileOpen: (
+    file: IFileInfo<schema.XEntity> | undefined,
+    dblclick: boolean,
+  ) => Promise<void>;
   contextMenu: (file?: IFileInfo<schema.XEntity>, clicked?: Function) => MenuProps;
 }) => {
+  const [cxtItem, setCxtItem] = useState<IFileInfo<schema.XEntity>>();
   return (
-    <Dropdown menu={contextMenu()} trigger={['contextMenu']} destroyPopupOnHide>
-      <div style={{ width: '100%', height: '100%' }}>
+    <Dropdown menu={contextMenu(cxtItem)} trigger={['contextMenu']} destroyPopupOnHide>
+      <div
+        style={{ width: '100%', height: '100%' }}
+        onContextMenu={(e) => e.stopPropagation()}>
         <DataGrid<IFileInfo<schema.XEntity>, string>
           id="grid"
           width="100%"
@@ -27,63 +35,29 @@ const TableMode = ({
           columnAutoWidth
           allowColumnResizing
           hoverStateEnabled
-          activeStateEnabled
+          selectedRowKeys={select ? [select.id] : []}
+          selection={{ mode: 'single' }}
           columnResizingMode={'nextColumn'}
           showColumnLines={false}
-          selection={{
-            mode: 'single',
+          onRowClick={async (e) => {
+            await fileOpen(e.data, false);
           }}
           onRowDblClick={async (e) => {
-            await fileOpen(e.data);
+            await fileOpen(e.data, true);
           }}
           headerFilter={{
             visible: true,
             allowSearch: true,
           }}
-          dataSource={content}
-          onContextMenuPreparing={(e: any) => {
-            if (e.row?.data) {
-              e.component.selectRowsByIndexes([e.rowIndex]);
-              const modal = Modal.info({
-                mask: false,
-                icon: <></>,
-                width: 1,
-                style: {
-                  position: 'fixed',
-                  left: e.event.pageX,
-                  top: e.event.pageY,
-                  padding: 0,
-                },
-                bodyStyle: {
-                  padding: 0,
-                  height: 1,
-                },
-                maskClosable: true,
-                okButtonProps: {
-                  style: {
-                    display: 'none',
-                  },
-                },
-                content: (
-                  <Dropdown
-                    menu={contextMenu(e.row.data, () => {
-                      modal.destroy();
-                    })}
-                    open>
-                    <div style={{ width: 1 }}></div>
-                  </Dropdown>
-                ),
-              });
-              e.items = [];
-            }
-          }}>
+          onContextMenuPreparing={(e) => setCxtItem(e.row?.data)}
+          dataSource={content}>
           <Scrolling mode="virtual" />
           <Column
             width={250}
             dataField="name"
             caption="名称"
             cellRender={(e) => {
-              return <EntityIcon entity={e.data} showName size={20} />;
+              return <EntityIcon entity={e.data.metadata} showName size={20} />;
             }}
           />
           <Column dataField="code" caption="代码" width={200} />

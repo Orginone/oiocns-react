@@ -25,6 +25,7 @@ const Directory: React.FC<IProps> = ({ mode, current }: IProps) => {
   const [key] = useCtrlUpdate(dircetory);
   const cmdType = mode === 1 ? 'data' : 'config';
   const [segmented, setSegmented] = useStorage('segmented', 'list');
+  const [select, setSelect] = useState<IFileInfo<schema.XEntity>>();
   let content: IFileInfo<schema.XEntity>[] = [];
   const contextMenu = (file?: IFileInfo<schema.XEntity>, clicked?: Function) => {
     var entity = file || dircetory;
@@ -39,9 +40,22 @@ const Directory: React.FC<IProps> = ({ mode, current }: IProps) => {
       },
     };
   };
-  const fileOpen = async (file: IFileInfo<schema.XEntity>) => {
-    await file.loadContent();
-    command.emitter(cmdType, 'open', file);
+  const fileOpen = async (
+    file: IFileInfo<schema.XEntity> | undefined,
+    dblclick: boolean,
+  ) => {
+    if (dblclick && file) {
+      await file.loadContent();
+      command.emitter(cmdType, 'open', file);
+    } else if (!dblclick) {
+      if (file?.id === select?.id) {
+        setSelect(undefined);
+        command.emitter('preview', 'open');
+      } else {
+        setSelect(file);
+        command.emitter('preview', 'open', file);
+      }
+    }
   };
 
   if (current === 'disk') {
@@ -57,11 +71,26 @@ const Directory: React.FC<IProps> = ({ mode, current }: IProps) => {
       description={`${content.length}个项目`}
       content={
         segmented === 'table' ? (
-          <TableMode content={content} fileOpen={fileOpen} contextMenu={contextMenu} />
+          <TableMode
+            select={select}
+            content={content}
+            fileOpen={fileOpen}
+            contextMenu={contextMenu}
+          />
         ) : segmented === 'icon' ? (
-          <IconMode content={content} fileOpen={fileOpen} contextMenu={contextMenu} />
+          <IconMode
+            select={select}
+            content={content}
+            fileOpen={fileOpen}
+            contextMenu={contextMenu}
+          />
         ) : (
-          <ListMode content={content} fileOpen={fileOpen} contextMenu={contextMenu} />
+          <ListMode
+            select={select}
+            content={content}
+            fileOpen={fileOpen}
+            contextMenu={contextMenu}
+          />
         )
       }
     />

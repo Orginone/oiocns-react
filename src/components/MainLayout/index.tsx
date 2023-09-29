@@ -1,5 +1,5 @@
 import { Col, Divider, Dropdown, Layout, Row, Space, Typography, Button } from 'antd';
-import React, { CSSProperties } from 'react';
+import React, { CSSProperties, useEffect, useState } from 'react';
 import cls from './index.module.less';
 import CustomMenu from '@/components/CustomMenu';
 import CustomBreadcrumb from '@/components/CustomBreadcrumb';
@@ -9,6 +9,8 @@ import { RiMore2Fill } from '@/icons/ri';
 import { Resizable } from 'devextreme-react';
 import { LeftBarIcon, RightBarIcon } from '@/components/Common/GlobalComps/customIcon';
 import useStorage from '@/hooks/useStorage';
+import EntityPreview from './preview';
+import { command } from '@/ts/base';
 const { Content, Sider } = Layout;
 
 /**
@@ -33,9 +35,23 @@ type MainLayoutType = {
  * @returns
  */
 const MainLayout: React.FC<MainLayoutType> = (props) => {
+  const [preview, setPreview] = useState<any>();
   const [leftSider, setLeftSider] = useStorage<boolean>('leftSider', false);
   const [rightSider, setRightSider] = useStorage<boolean>('rightSider', false);
   const [mainWidth, setMainWidth] = useStorage<string | number>('mainWidth', '40%');
+  useEffect(() => {
+    const id = command.subscribe((type, _, ...args: any[]) => {
+      if (type != 'preview') return;
+      if (args && args.length > 0) {
+        setPreview(args[0]);
+      } else {
+        setPreview(undefined);
+      }
+    });
+    return () => {
+      command.unsubscribe(id);
+    };
+  }, []);
   const parentMenu = props.selectMenu.parentMenu ?? props.siderMenuData;
   const outside =
     props.selectMenu.menus?.filter((item) => item.model === 'outside') ?? [];
@@ -178,7 +194,9 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
                 {props.children}
               </Sider>
             </Resizable>
-            <Content className={cls.content}></Content>
+            <Content className={cls.content}>
+              {preview && <EntityPreview entity={preview} />}
+            </Content>
           </>
         ) : (
           <Content className={cls.content}>{props.children}</Content>

@@ -72,7 +72,7 @@ export abstract class FileInfo<T extends schema.XEntity>
     return this.directory.isInherited;
   }
   get target(): ITarget {
-    if (this.directory.typeName === '目录') {
+    if (this.directory.typeName.includes('目录')) {
       return this.directory.target;
     } else {
       return this.directory as unknown as ITarget;

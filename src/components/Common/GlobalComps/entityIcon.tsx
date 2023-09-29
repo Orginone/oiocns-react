@@ -15,11 +15,25 @@ interface teamTypeInfo {
   showName?: boolean;
 }
 
-/** 组织图标 */
+interface shareIconInfo extends teamTypeInfo {
+  share?: ShareIcon;
+}
+
+/** 实体图标 */
 const EntityIcon = (info: teamTypeInfo) => {
+  if (info.entity) {
+    return (
+      <ShareIconItem
+        {...info}
+        share={{
+          name: info.entity.name,
+          typeName: info.entity.typeName,
+          avatar: parseAvatar(info.entity.icon),
+        }}
+      />
+    );
+  }
   const [share, setShare] = useState<ShareIcon>();
-  const size = info.size ?? 22;
-  const fontSize = size > 14 ? 14 : size;
   useEffect(() => {
     if (info.entityId && info.entityId.length > 10) {
       orgCtrl.user.findEntityAsync(info.entityId).then((value) => {
@@ -32,21 +46,23 @@ const EntityIcon = (info: teamTypeInfo) => {
         }
       });
     }
-    if (info.entity) {
-      setShare({
-        name: info.entity.name,
-        typeName: info.entity.typeName,
-        avatar: parseAvatar(info.entity.icon),
-      });
-    }
   }, []);
-  if (share) {
-    if (share.avatar?.thumbnail) {
+  return <ShareIconItem {...info} share={share} />;
+};
+
+/** 实体图标 */
+const ShareIconItem = (info: shareIconInfo) => {
+  const size = info.size ?? 22;
+  const fontSize = size > 14 ? 14 : size;
+  if (info.share) {
+    if (info.share.avatar?.thumbnail) {
       return (
         <div style={{ cursor: 'pointer', display: 'contents' }} title={info.title ?? ''}>
-          <Avatar size={size} src={share.avatar.thumbnail} />
+          <Avatar size={size} src={info.share.avatar.thumbnail} />
           {info.showName && (
-            <strong style={{ marginLeft: 6, fontSize: fontSize }}>{share.name}</strong>
+            <strong style={{ marginLeft: 6, fontSize: fontSize }}>
+              {info.share.name}
+            </strong>
           )}
         </div>
       );
@@ -54,7 +70,7 @@ const EntityIcon = (info: teamTypeInfo) => {
       const icon = (
         <TypeIcon
           avatar
-          iconType={share.typeName || info.typeName || '其它'}
+          iconType={info.share.typeName || info.typeName || '其它'}
           size={size}
         />
       );
@@ -69,7 +85,7 @@ const EntityIcon = (info: teamTypeInfo) => {
             style={{ background: 'transparent', color: '#606060' }}
           />
           {info.showName && (
-            <b style={{ marginLeft: 6, fontSize: fontSize }}>{share.name}</b>
+            <b style={{ marginLeft: 6, fontSize: fontSize }}>{info.share.name}</b>
           )}
         </div>
       );
@@ -83,7 +99,7 @@ const EntityIcon = (info: teamTypeInfo) => {
         style={{ background: 'transparent', color: '#606060' }}
       />
       {info.showName && (
-        <strong style={{ marginLeft: 6, fontSize: fontSize }}>{info.entityId}</strong>
+        <strong style={{ marginLeft: 6, fontSize: fontSize }}>{info.entity?.id}</strong>
       )}
     </div>
   );

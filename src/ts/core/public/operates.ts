@@ -1,11 +1,5 @@
 /** 实体的操作 */
 export const entityOperates = {
-  Open: {
-    sort: 10,
-    cmd: 'open',
-    label: '打开',
-    iconType: 'open',
-  },
   Update: {
     sort: 11,
     cmd: 'update',

@@ -98,7 +98,7 @@ export interface IActivity extends IEntity<schema.XTarget> {
     tags: string[],
   ): Promise<boolean>;
   /** 加载动态 */
-  load(take: number, beforeTime?: string): Promise<IActivityMessage[]>;
+  load(take: number): Promise<IActivityMessage[]>;
 }
 
 /** 动态实现 */
@@ -128,17 +128,11 @@ export class Activity extends Entity<schema.XTarget> implements IActivity {
       this.session.target.hasRelationAuth()
     );
   }
-  async load(take: number, beforeTime?: string): Promise<IActivityMessage[]> {
+  async load(take: number): Promise<IActivityMessage[]> {
     const data = await this.coll.load({
+      skip: this.activityList.length,
       take: take,
       options: {
-        match: beforeTime
-          ? {
-              createTime: {
-                _lt_: beforeTime,
-              },
-            }
-          : {},
         sort: {
           createTime: -1,
         },
@@ -224,8 +218,8 @@ export class FriendsActivity extends Entity<schema.XTarget> implements IActivity
   get activitys(): IActivity[] {
     return [this.session.activity, ...this.user.memberChats.map((i) => i.activity)];
   }
-  async load(take: number, beforeTime?: string | undefined): Promise<IActivityMessage[]> {
-    await Promise.all(this.activitys.map((i) => i.load(take, beforeTime)));
+  async load(take: number): Promise<IActivityMessage[]> {
+    await Promise.all(this.activitys.map((i) => i.load(take)));
     return this.activityList;
   }
   send(

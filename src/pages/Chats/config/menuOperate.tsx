@@ -84,12 +84,6 @@ const loadBookMenu = () => {
 const loadChatMoreMenus = (allowDelete: boolean, isChat: boolean = false) => {
   const items = [];
   if (isChat) {
-    items.push({
-      key: '会话详情',
-      label: '会话详情',
-      icon: <im.ImProfile />,
-      model: 'outside',
-    });
     if (allowDelete) {
       items.push({
         key: '清空消息',

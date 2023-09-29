@@ -296,7 +296,10 @@ function getJsonText(fileUrl: string): Promise<string> {
 }
 
 const ellipsisText = (text: string, length: number) => {
-  return text.substring(0, length) + '...';
+  if (text.length > length) {
+    return text.substring(0, length) + '...';
+  }
+  return text;
 };
 
 /**

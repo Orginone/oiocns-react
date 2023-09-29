@@ -87,7 +87,9 @@ const EntityForm: React.FC<IProps> = ({ cmd, entity, finished }) => {
       );
     case 'newTransferConfig':
     case 'updateTransferConfig':
-      return <TransferForm formType={cmd} current={entity as any} finished={reloadFinish} />;
+      return (
+        <TransferForm formType={cmd} current={entity as any} finished={reloadFinish} />
+      );
     default: {
       var target = entity as ITarget;
       if (entity.typeName === '目录') {

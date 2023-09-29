@@ -54,11 +54,6 @@ const BannerCom: React.FC<WorkBenchType> = () => {
       iconType: 'joinCompany',
       cmd: 'joinCompany',
     },
-    {
-      label: '定标准',
-      iconType: 'buildStander',
-      cmd: 'standard',
-    },
   ];
 
   const EntrysCard = ({ className, menu }: { className: string; menu: IMune }) => {
@@ -68,7 +63,6 @@ const BannerCom: React.FC<WorkBenchType> = () => {
         onClick={() => {
           command.emitter('config', menu.cmd, orgCtrl.user);
         }}>
-        {/* <img className="app-icon" src={`/img/icon/${menu.iconType}.png`} alt="" /> */}
         <div className="app-info">
           <span className="app-info-name">{menu.label}</span>
         </div>

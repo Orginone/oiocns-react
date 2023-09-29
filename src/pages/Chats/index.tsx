@@ -10,7 +10,6 @@ import { command } from '@/ts/base';
 
 const Setting: React.FC<any> = () => {
   const [filter, setFilter] = useState('');
-  const [openDetail, setOpenDetail] = useState<boolean>(false);
   const [key, rootMenu, selectMenu, setSelectMenu] = useMenuUpdate(config.loadChatMenu);
 
   if (!selectMenu || !rootMenu) return <></>;
@@ -37,9 +36,6 @@ const Setting: React.FC<any> = () => {
           case '清空消息':
             await chat.clearMessage();
             break;
-          case '会话详情':
-            setOpenDetail(!openDetail);
-            break;
           case '标记为未读':
             setSelectMenu(rootMenu);
             chat.chatdata.noReadCount += 1;
@@ -52,7 +48,6 @@ const Setting: React.FC<any> = () => {
         key={key}
         belong={selectMenu.company!}
         selectMenu={selectMenu}
-        openDetail={openDetail}
         filter={filter}
       />
     </MainLayout>

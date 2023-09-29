@@ -1,6 +1,6 @@
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import orgCtrl from '@/ts/controller';
-import { IApplication, IDirectory, IGroup, ITarget } from '@/ts/core';
+import { IApplication, IDirectory, IGroup, ITarget, TargetType } from '@/ts/core';
 import React from 'react';
 import { MenuItemType } from 'typings/globelType';
 import { loadFileMenus } from '@/executor/fileOperate';
@@ -96,6 +96,7 @@ const getTeamMenu = () => {
       createMenu(company, [
         ...buildDirectoryTree(company.directory.children),
         ...company.targets
+          .filter((i) => i.typeName !== TargetType.Group)
           .filter((i) => i.session.isMyChat && i.id != company.id)
           .map((i) => createMenu(i, buildDirectoryTree(i.directory.children))),
         ...buildGroupTree(company.groups),

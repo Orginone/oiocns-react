@@ -16,9 +16,11 @@ interface IProps {
 }
 
 const OperateModal: React.FC<IProps> = ({ cmd, entity, finished }) => {
-  const reloadFinish = () => {
+  const reloadFinish = (ok: boolean) => {
     finished();
-    orgCtrl.changCallback();
+    if (ok) {
+      orgCtrl.changCallback();
+    }
   };
   switch (cmd) {
     case 'pull':

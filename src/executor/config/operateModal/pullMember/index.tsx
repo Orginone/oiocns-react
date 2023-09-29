@@ -8,7 +8,7 @@ import SelectMember from '@/components/Common/SelectMember';
 
 type IProps = {
   current: ITarget;
-  finished: () => void;
+  finished: (ok: boolean) => void;
 };
 
 /*
@@ -28,7 +28,7 @@ const PullMember: React.FC<IProps> = ({ current, finished }) => {
         exclude={current.members}
         finished={async (selected) => {
           if (await current.pullMembers(selected)) {
-            finished();
+            finished(true);
           }
         }}
       />
@@ -41,10 +41,10 @@ const PullMember: React.FC<IProps> = ({ current, finished }) => {
       width={900}
       destroyOnClose
       open={true}
-      onCancel={() => finished()}
+      onCancel={() => finished(false)}
       onOk={async () => {
         if (await current.pullMembers(selectMember)) {
-          finished();
+          finished(true);
         }
       }}>
       <SearchTarget

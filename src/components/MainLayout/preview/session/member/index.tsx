@@ -1,38 +1,31 @@
-import { Dropdown, Card, Typography, MenuProps } from 'antd';
+import { Dropdown, Card, Typography } from 'antd';
 
 import React from 'react';
-import cls from './less/icon.module.less';
-import { IFileInfo } from '@/ts/core';
-import { schema } from '@/ts/base';
+import cls from './index.module.less';
+import { IDirectory, IFileInfo } from '@/ts/core';
+import { command, schema } from '@/ts/base';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
+import { loadFileMenus } from '@/executor/fileOperate';
 
-const IconMode = ({
-  select,
-  content,
-  fileOpen,
-  contextMenu,
-}: {
-  select: IFileInfo<schema.XEntity> | undefined;
-  content: IFileInfo<schema.XEntity>[];
-  fileOpen: (
-    file: IFileInfo<schema.XEntity> | undefined,
-    dblclick: boolean,
-  ) => Promise<void>;
-  contextMenu: (file?: IFileInfo<schema.XEntity>) => MenuProps;
-}) => {
+const IconMode = ({ dircetory }: { dircetory: IDirectory }) => {
+  const contextMenu = (file?: IFileInfo<schema.XEntity>) => {
+    var entity = file || dircetory;
+    return {
+      items: loadFileMenus(entity, 0).filter(
+        (i) => !['openChat', 'copy', 'parse'].includes(i.key),
+      ),
+      onClick: ({ key }: { key: string }) => {
+        command.emitter('config', key, file || dircetory, dircetory.key);
+      },
+    };
+  };
   const FileCard = (item: IFileInfo<schema.XEntity>) => (
     <Dropdown key={item.id} menu={contextMenu(item)} trigger={['contextMenu']}>
       <Card
         size="small"
-        className={select?.id === item.id ? cls.fileCard_select : cls.fileCard}
         bordered={false}
         key={item.key}
-        onClick={async () => {
-          await fileOpen(item, false);
-        }}
-        onDoubleClick={async () => {
-          await fileOpen(item, true);
-        }}
+        className={cls.fileCard}
         onContextMenu={(e) => {
           e.stopPropagation();
         }}>
@@ -62,7 +55,7 @@ const IconMode = ({
         onContextMenu={(e) => {
           e.stopPropagation();
         }}>
-        {content.map((el) => FileCard(el))}
+        {dircetory.content(0).map((el) => FileCard(el))}
       </div>
     </Dropdown>
   );

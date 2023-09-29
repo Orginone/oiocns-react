@@ -8,15 +8,14 @@ import { ICompany } from '@/ts/core';
 interface IProps {
   key: string;
   filter: string;
-  openDetail: boolean;
   selectMenu: MenuItemType;
   belong: ICompany;
 }
 
-const TypeChat = ({ filter, selectMenu, openDetail, belong }: IProps) => {
+const TypeChat = ({ filter, selectMenu, belong }: IProps) => {
   switch (selectMenu.itemType.split('-')[0]) {
     case MenuType.Chat:
-      return <Chat chat={selectMenu.item} openDetail={openDetail} filter={filter} />;
+      return <Chat chat={selectMenu.item} filter={filter} />;
     default:
       return <Book chats={selectMenu.item} filter={filter} belong={belong} />;
   }

@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import GroupContent from './GroupContent';
 import GroupInputBox from './GroupInputBox';
-import GroupDetail from './GroupDetail';
 import charsStyle from './index.module.less';
 import ChatShareForward from './ChatShareForward';
 import { ISession, IMessage } from '@/ts/core';
@@ -11,15 +10,7 @@ import { AiOutlineClose } from '@/icons/ai';
  * @description: 沟通聊天
  * @return {*}
  */
-const Chat: React.FC<any> = ({
-  openDetail,
-  chat,
-  filter,
-}: {
-  openDetail: boolean;
-  chat: ISession;
-  filter: string;
-}) => {
+const Chat: React.FC<any> = ({ chat, filter }: { chat: ISession; filter: string }) => {
   const [writeContent, setWriteContent] = useState<any>(null); // 重新编辑
   const [citeText, setCiteText] = useState<string>(''); // 引用值
   const [enterCiteMsg, setEnterCiteMsg] = useState<string | any>(); // 回车赋值
@@ -115,8 +106,6 @@ const Chat: React.FC<any> = ({
           </div>
         )}
       </div>
-      {/**回话详情 */}
-      {openDetail && <GroupDetail chat={chat} />}
       {/** 转发 */}
       <ChatShareForward
         message={forwardMessage}

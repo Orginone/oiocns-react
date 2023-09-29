@@ -23,6 +23,7 @@ const Book: React.FC<any> = ({
   filter: string;
   belong: ICompany;
 }) => {
+  const [select, setSelect] = useState<ISession>();
   const [segmented, setSegmented] = useStorage('segmented', 'list');
   const [msgKey, setKey] = useState(generateUuid());
   useEffect(() => {
@@ -54,7 +55,21 @@ const Book: React.FC<any> = ({
       }
       return num;
     });
-
+  const sessionOpen = async (session: ISession | undefined, dblclick: boolean) => {
+    if (dblclick && session) {
+      command.emitter('preview', 'open', session);
+      orgCtrl.currentKey = session.chatdata.fullId;
+      orgCtrl.changCallback();
+    } else if (!dblclick) {
+      if (session?.id === select?.id) {
+        setSelect(undefined);
+        command.emitter('preview', 'open');
+      } else {
+        setSelect(session);
+        command.emitter('preview', 'open', session);
+      }
+    }
+  };
   return (
     <SegmentContent
       key={msgKey}
@@ -63,11 +78,11 @@ const Book: React.FC<any> = ({
       content={
         <>
           {segmented === 'table' ? (
-            <TableMode chats={chats} />
+            <TableMode chats={chats} select={select} sessionOpen={sessionOpen} />
           ) : segmented === 'icon' ? (
-            <IconMode chats={chats} />
+            <IconMode chats={chats} select={select} sessionOpen={sessionOpen} />
           ) : (
-            <ListMode chats={chats} />
+            <ListMode chats={chats} select={select} sessionOpen={sessionOpen} />
           )}
           {chats.length == 0 && <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />}
         </>
