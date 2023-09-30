@@ -1,8 +1,7 @@
 import { command, model } from '@/ts/base';
-import { generateXlsx, readXlsx } from '@/ts/base/common';
 import { IDirectory } from '@/ts/core';
 import { formatDate } from '@/utils';
-import { Error, IExcel, Excel, getSheets } from '@/utils/excel';
+import { Error, IExcel, Excel, getSheets, generateXlsx, readXlsx } from '@/utils/excel';
 import { ProTable } from '@ant-design/pro-components';
 import { Button, Modal, Spin, Tabs, Upload, message } from 'antd';
 import React, { useState } from 'react';

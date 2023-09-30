@@ -22,3 +22,5 @@ export const getSheets = (directory: IDirectory) => {
     new AttrHandler(new AttrSheet(directory)),
   ];
 };
+
+export { AnySheet, AnyHandler } from './anything';
