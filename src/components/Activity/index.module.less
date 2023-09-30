@@ -1,13 +1,18 @@
-
-.activityList {
-  padding: 18px;
-  height: 100%;
+.emptyList {
   width: 100%;
-  overflow-y: scroll;
+  height: 300px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.actionList {
+  width: 100%;
+  display: inline-block;
 }
 
 .activityItem {
-  padding: 16px 0;
+  padding: 8px 0;
   border-bottom: 1px solid @border-color-base;
 
   &Header {
@@ -18,12 +23,12 @@
     gap: 6px;
   }
   &ImageList {
-    max-width: 400px;
+    max-width: 600px;
     display: flex;
     flex-wrap: wrap;
     align-items: flex-start;
-    justify-content: space-between;
-    gap: 8px 0;
+    justify-content: flex-start;
+    gap: 8px;
     img {
       object-fit: cover; /* 这会保持图像的纵横比并居中截取部分内容 */
       object-position: center center; /* 图像在容器中水平和垂直居中 */
@@ -32,8 +37,8 @@
   &Footer {
     display: flex;
     align-items: center;
-    margin-top: 8px;
-    justify-content: flex-end;
+    margin: 8px 0;
+    justify-content: space-between;
     &Likes {
       flex: 1;
       background-color: #f2f2f2;
@@ -70,4 +75,9 @@
     flex-direction: column;
     gap: 4px;
   }
+}
+.activityTime {
+  font-weight: bold;
+  margin-left: 6px;
+  font-size: 12px;
 }

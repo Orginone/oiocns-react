@@ -3,7 +3,10 @@ import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 import { Image, message, Upload, UploadProps } from 'antd';
 import { IDirectory, ISysFileInfo } from '@/ts/core';
 import cls from './index.module.less';
+import { shareOpenLink } from '@/utils/tools';
 const ImageUploader: React.FC<{
+  maxCount: number;
+  types: string[];
   directory: IDirectory;
   onChange: (fileList: ISysFileInfo[]) => void;
 }> = (props) => {
@@ -13,19 +16,21 @@ const ImageUploader: React.FC<{
   const uploadButton = (
     <div>
       {loading ? <LoadingOutlined /> : <PlusOutlined />}
-      <div style={{ marginTop: 8 }}>{loading ? '正在上传' : '选择图片'}</div>
+      <div style={{ marginTop: 8 }}>{loading ? '正在上传' : '选择文件'}</div>
     </div>
   );
 
   const uploadProps: UploadProps = {
+    multiple: true,
+    maxCount: props.maxCount,
     showUploadList: false,
     beforeUpload: (file) => {
       setLoading(true);
-      const isImage = file.type.startsWith('image');
-      if (!isImage) {
-        message.error(`${file.name} 不是一个图片文件`);
+      if (!props.types.some((i) => file.type.startsWith(i))) {
+        message.error(`${file.name} 是不支持的格式`);
+        return false;
       }
-      return isImage;
+      return true;
     },
     async customRequest(options) {
       const file = options.file as File;
@@ -40,16 +45,19 @@ const ImageUploader: React.FC<{
   };
   return (
     <div className={cls.imageUploader}>
-      {fileList.map((item, index) => {
+      {fileList.map((item) => {
         return (
           <Image
-            style={{ width: '104px', height: '104px' }}
-            src={item.filedata.thumbnail}
-            key={index}></Image>
+            style={{ width: '200px', height: '200px' }}
+            src={shareOpenLink(item.filedata.shareLink)}
+            key={item.key}
+            preview={{
+              src: shareOpenLink(item.filedata.shareLink),
+            }}></Image>
         );
       })}
       <Upload listType="picture-card" {...uploadProps}>
-        {fileList.length >= 8 ? null : uploadButton}
+        {fileList.length >= props.maxCount ? null : uploadButton}
       </Upload>
     </div>
   );

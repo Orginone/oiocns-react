@@ -4,6 +4,7 @@ import React from 'react';
 
 import EntityForm from './entityForm';
 import OperateModal from './operateModal';
+import ActivityPublisher from './pubActivity';
 import SettingAuth from './settingModal/settingAuth';
 import SettingStation from './settingModal/settingStation';
 import SettingIdentity from './settingModal/settingIdentity';
@@ -49,6 +50,8 @@ const ConfigExecutor: React.FC<IProps> = ({ cmd, args, finished }) => {
       return <SettingIdentity target={args[0].target} finished={finished} />;
     case 'settingStation':
       return <SettingStation company={args[0].target} finished={finished} />;
+    case 'pubActivity':
+      return <ActivityPublisher activity={args[0]} finish={finished} />;
     case 'update':
     case 'remark':
       if ('attributes' in args[0]) {

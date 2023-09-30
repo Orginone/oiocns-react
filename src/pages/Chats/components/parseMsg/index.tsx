@@ -229,7 +229,7 @@ export const parseForwardMsg = (
         // 默认只展示3条记录
         if (idx > 2) return;
         if (!msg.msgBody && msg.forward?.length) {
-          msg = msg.forward[0]
+          msg = msg.forward[0];
         }
         switch (msg.msgType) {
           case MessageType.Image: {

@@ -197,7 +197,7 @@ export class Message implements IMessage {
       case MessageType.Voice:
         return `${header}[${MessageType.Voice}]`;
       case MessageType.Forward:
-        return `${this.forward.length}条转发信息`
+        return `${this.forward.length}条转发信息`;
     }
     const file: model.FileItemShare = parseAvatar(this.msgBody);
     if (file) {

@@ -1,10 +1,8 @@
-import { Button, Col, List, Modal, Row } from 'antd';
+import { List, Modal } from 'antd';
 import React, { useState } from 'react';
 import TeamIcon from '@/components/Common/GlobalComps/entityIcon';
 import css from './index.module.less';
 import { ISession } from '@/ts/core';
-import ChatHistoryModal from '../../../../pages/Chats/content/chat/ChatHistoryModal';
-import { AiOutlineRight } from '@/icons/ai';
 import { useHistory } from 'react-router-dom';
 import orgCtrl from '@/ts/controller';
 import { ellipsisText } from '@/utils';
@@ -12,103 +10,88 @@ import { command } from '@/ts/base';
 import Activity from '@/components/Activity';
 import MemberContent from './member';
 import { ImQrcode } from '@react-icons/all-files/im/ImQrcode';
+import { ImFolder } from '@react-icons/all-files/im/ImFolder';
+import { ImAddressBook, ImBin } from '@/icons/im';
 const SessionBody = ({ chat }: { chat: ISession }) => {
-  const [historyOpen, setHistoryOpen] = useState<boolean>(false); // 历史消息搜索
+  const [memberShow, setMemberShow] = useState(false);
   const history = useHistory();
-  /**
-   * @description: 历史消息搜索弹窗
-   * @return {*}
-   */
-  const onHistoryCancel = () => {
-    setHistoryOpen(false);
-  };
-
-  /**
-   * @description: 历史记录头像
-   * @return {*}
-   */
-  const historyheard = (
-    <Row style={{ paddingBottom: '12px' }}>
-      <Col>
-        <div style={{ color: '#888', width: 42 }}>
-          <TeamIcon typeName={chat.typeName} entityId={chat.id} size={32} />
-        </div>
-      </Col>
-      <Col>
-        <h4 className={css.title}>
-          {chat.chatdata.chatName}
-          {chat.members.length > 0 ? (
-            <span className={css.number}>({chat.members.length})</span>
-          ) : (
-            ''
-          )}
-        </h4>
-      </Col>
-    </Row>
-  );
-
-  /**
-   * @description: 操作按钮
-   * @return {*}
-   */
-  const operaButton = (
-    <>
-      {chat.isGroup && (
-        <div className={`${css.find_history}`}>
-          <Button
-            className={`${css.find_history_button}`}
-            type="ghost"
-            onClick={async () => {
-              await chat.target.directory.loadContent();
+  const sessionActions = () => {
+    const actions = [
+      <ImQrcode
+        key="qrcode"
+        size={26}
+        title="二维码"
+        onClick={() => {
+          command.emitter('data', 'qrcode', chat);
+        }}
+      />,
+    ];
+    if (chat.members.length > 0) {
+      actions.push(
+        <ImAddressBook
+          key="setting"
+          size={26}
+          title="成员"
+          onClick={() => {
+            setMemberShow(!memberShow);
+          }}
+        />,
+      );
+    }
+    if (chat.sessionId === chat.target.id) {
+      actions.push(
+        <ImFolder
+          key="share"
+          size={26}
+          title="存储"
+          onClick={() => {
+            chat.target.directory.loadContent().then(() => {
               orgCtrl.currentKey = chat.target.directory.key;
               history.push('/store');
-            }}>
-            共享目录 <AiOutlineRight />
-          </Button>
-        </div>
-      )}
-      <div className={`${css.find_history}`}>
-        <Button
-          className={`${css.find_history_button}`}
-          type="ghost"
+            });
+          }}
+        />,
+      );
+    }
+    if (chat.canDeleteMessage) {
+      actions.push(
+        <ImBin
+          key="clean"
+          size={26}
+          title="清空消息"
           onClick={() => {
-            setHistoryOpen(true);
-          }}>
-          查找聊天记录 <AiOutlineRight />
-        </Button>
-      </div>
-      {chat.canDeleteMessage && (
-        <Button
-          block
-          onClick={() =>
-            Modal.confirm({
-              title: '确认清除当前会话聊天记录？',
-              onOk: () => {
-                chat.clearMessage();
+            const confirm = Modal.confirm({
+              okText: '确认',
+              cancelText: '取消',
+              title: '清空询问框',
+              content: (
+                <div style={{ fontSize: 16 }}>
+                  确认要清空{chat.chatdata.chatName}的所有消息吗?
+                </div>
+              ),
+              onCancel: () => {
+                confirm.destroy();
               },
-            })
-          }>
-          清除聊天记录
-        </Button>
-      )}
-    </>
-  );
+              onOk: () => {
+                confirm.destroy();
+                chat.clearMessage().then((ok) => {
+                  if (ok) {
+                    chat.changCallback();
+                  }
+                });
+              },
+            });
+          }}
+        />,
+      );
+    }
+    return actions;
+  };
 
   return (
     <>
       <div className={css.groupDetail}>
-        <List.Item
-          className={css.header}
-          actions={[
-            <ImQrcode
-              key="qrcode"
-              size={40}
-              color="#9498df"
-              onClick={() => {
-                command.emitter('data', 'qrcode', chat);
-              }}
-            />,
-          ]}>
+        <List.Item className={css.header} actions={sessionActions()}>
           <List.Item.Meta
             title={
               <>
@@ -118,31 +101,19 @@ const SessionBody = ({ chat }: { chat: ISession }) => {
                 )}
               </>
             }
-            avatar={<TeamIcon typeName={chat.typeName} entityId={chat.id} size={50} />}
+            avatar={<TeamIcon entity={chat.metadata} size={50} />}
             description={ellipsisText(chat.chatdata.chatRemark, 200)}
           />
         </List.Item>
-        {chat.members.length > 0 && (
-          <div style={{ height: '40vh' }}>
+        {memberShow && chat.members.length > 0 && (
+          <div className={css.member_content}>
             <MemberContent dircetory={chat.target.memberDirectory} />
           </div>
         )}
         <div className={css.groupDetailContent}>
-          <Activity activity={chat.activity}></Activity>
-          <div className={css.user_list}>
-            <div className={`${css.img_list} ${css.con}`}></div>
-            {operaButton}
-          </div>
+          <Activity height={800} activity={chat.activity}></Activity>
         </div>
       </div>
-
-      {/* 历史记录搜索弹窗 */}
-      <ChatHistoryModal
-        open={historyOpen}
-        title={historyheard}
-        onCancel={onHistoryCancel}
-        chat={chat}
-      />
     </>
   );
 };

@@ -54,7 +54,6 @@ const GroupContent = (props: Iprops) => {
   const [beforescrollHeight, setBeforescrollHeight] = useState(0);
   const [forwardModalOpen, setForwardModalOpen] = useState<boolean>(false); // 转发时用户
   const [forwardMessages, setForwardMessages] = useState<IMessage[]>([]);
-  const [ismousewheel, setIsMousewheel] = useState(false);
   const [multiSelect, setMultiSelect] = useState(multiSelectShow);
   useEffect(() => {
     props.chat.onMessage((ms) => {
@@ -79,20 +78,6 @@ const GroupContent = (props: Iprops) => {
       }
     }
   }, [messages]);
-  function createWheelStopListener(callback: () => void, timeout?: number) {
-    var handle: ReturnType<typeof setTimeout>;
-    // setIsMousewheel(true);
-    var onScroll = function () {
-      if (handle) {
-        clearTimeout(handle);
-      }
-      handle = setTimeout(callback, timeout || 200); // default 200 ms
-    };
-    body.current?.addEventListener('wheel', onScroll);
-    return function () {
-      body.current?.removeEventListener('wheel', onScroll);
-    };
-  }
 
   const isShowTime = (curDate: string, beforeDate: string) => {
     if (beforeDate === '') return true;
@@ -106,9 +91,6 @@ const GroupContent = (props: Iprops) => {
       await props.chat.moreMessage();
       setMessages([...props.chat.messages]);
     }
-    createWheelStopListener(() => {
-      // setIsMousewheel(false);
-    });
   };
 
   const handleForwadModalClose = () => {
@@ -135,18 +117,10 @@ const GroupContent = (props: Iprops) => {
     }
     return <React.Fragment>{parseForwardMsg(item.forward, viewForward)}</React.Fragment>;
   };
-  const defaultMsg = (item: IMessage) => {
-    return (
-      <React.Fragment>
-        {parseMsg(item)}
-        {item.cite && parseCiteMsg(item.cite)}
-      </React.Fragment>
-    );
-  };
 
   const showMsg = (item: IMessage) => {
     if (item.forward && item.forward.length) return batchForwardMsg(item);
-    else return defaultMsg(item);
+    else return <React.Fragment>{parseMsg(item)}</React.Fragment>;
   };
   const viewMsg = (item: IMessage) => {
     if (item.isMySend) {
@@ -389,7 +363,7 @@ const GroupContent = (props: Iprops) => {
             .filter((i) => i.msgBody.includes(props.filter))
             .map((item, index: any) => {
               return (
-                <React.Fragment key={item.metadata.fromId + index}>
+                <React.Fragment key={item.id}>
                   {/* 聊天间隔时间3分钟则 显示时间 */}
                   {isShowTime(
                     item.createTime,

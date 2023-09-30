@@ -36,6 +36,8 @@ const TypeIcon = ({ avatar, iconType, size }: TypeIconInfo) => {
   };
   const loadIcon = () => {
     switch (iconType) {
+      case '动态':
+        return <im.ImSafari {...config} />;
       case '目录':
         return <im.ImFolder {...config} />;
       case '成员目录':

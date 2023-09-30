@@ -12,12 +12,18 @@ export class Emitter {
   /**
    * @desc 订阅变更
    * @param callback 变更回调
+   * @param target 订阅时是否触发，默认为true
    * @returns 订阅ID
    */
-  public subscribe(callback: (key: string, ...args: any) => void): string {
+  public subscribe(
+    callback: (key: string, ...args: any) => void,
+    target: boolean = true,
+  ): string {
     const id = generateUuid();
     if (callback) {
-      callback(id);
+      if (target === true) {
+        callback.apply(this, [id]);
+      }
       this._refreshCallback[id] = callback;
     }
     return id;

@@ -305,6 +305,14 @@ const shareOpenLink = (link: string | undefined, download: boolean = false) => {
   return `/orginone/kernel/load/${link}${download ? '?download=1' : ''}`;
 };
 
+/** 获取html文本中的字符串 */
+const parseHtmlToText = (html: string) => {
+  var text = html.replace(/\s*/g, ''); //去掉空格
+  text = text.replace(/<[^>]+>/g, ''); //去掉所有的html标记
+  text = text.replace(/↵/g, ''); //去掉所有的↵符号
+  return text.replace(/[\r\n]/g, ''); //去掉回车换行
+};
+
 export {
   dateFormat,
   debounce,
@@ -315,6 +323,7 @@ export {
   getNewKeyWithString,
   getUuid,
   handleFormatDate,
+  parseHtmlToText,
   pySegSort,
   pySegSortObj,
   renderNum,
