@@ -1015,8 +1015,6 @@ export type Tables = { formIds: string[]; file?: FileItemModel } & Node;
 export type Sheet<T> = {
   // 名称
   name: string;
-  // 表头行数
-  headers: number;
   // 列信息
   columns: Column[];
   // 数据
@@ -1033,8 +1031,6 @@ export interface Column {
   dataIndex: string;
   // 类型
   valueType: string;
-  // 是否隐藏
-  hide?: boolean;
 }
 
 // 映射
