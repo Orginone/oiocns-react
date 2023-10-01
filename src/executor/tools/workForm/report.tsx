@@ -25,8 +25,6 @@ interface IProps {
 const ReportForms: React.FC<IProps> = (props) => {
   const [cells, setCells] = useState<any>([]);
   const [styleList, setStyleList] = useState<any>([]);
-  const [rowHeights, setRowHeights] = useState<any>([]);
-  const [colWidths, setColWidths] = useState<any>([]);
   const [serviceData, setServiceData] = useState<any>();
   const reportData = props.forms[0];
   const formData = props.getFormData(reportData.id);
@@ -52,12 +50,12 @@ const ReportForms: React.FC<IProps> = (props) => {
     const mergeCells = setting?.mergeCells || []; /** 合并单元格数据 */
     // Handsontable.editors.registerEditor('SelectEditor', selectEditor); // 还未完成同步组件
     setStyleList(setting?.styleList || []);
-    setRowHeights(setting?.row_h || []);
-    setColWidths(setting?.col_w || []);
     hot.updateSettings({
       data: selectItem?.data?.data || [[]],
       cell: cells,
       mergeCells: mergeCells,
+      rowHeights: setting?.row_h,
+      colWidths: setting?.col_w,
     });
     if (props.allowEdit) {
       props?.ruleService && (props.ruleService.currentMainFormId = reportData.id);
@@ -348,8 +346,6 @@ const ReportForms: React.FC<IProps> = (props) => {
         rowHeaders={true}
         colHeaders={true}
         dropdownMenu={true}
-        colWidths={colWidths}
-        rowHeights={rowHeights}
         readOnly={readOnly}
         height="580px"
         language={zhCN.languageCode}

@@ -157,6 +157,12 @@ export const directoryOperates = {
     label: '新建文档',
     iconType: '文档',
   },
+  NewPageTemplate: {
+    sort: 11,
+    cmd: 'newPageTemplate',
+    label: '新建页面模板',
+    iconType: '页面模板',
+  },
 };
 
 /** 目录下新增 */
@@ -175,6 +181,7 @@ export const directoryNew = {
     directoryOperates.NewForm,
     directoryOperates.NewTransferConfig,
     directoryOperates.NewMdText,
+    directoryOperates.NewPageTemplate
   ],
 };
 

@@ -9,6 +9,7 @@ import OfficeView from './office';
 import ReportView from './report';
 import CodeEditor from './codeeditor';
 import TransferView from './transfer';
+import TemplateView from './page';
 
 const officeExt = ['.md', '.pdf', '.xls', '.xlsx', '.doc', '.docx', '.ppt', '.pptx'];
 const videoExt = ['.mp4', '.avi', '.mov', '.mpg', '.swf', '.flv', '.mpeg'];
@@ -46,6 +47,8 @@ const ExecutorOpen: React.FC<IOpenProps> = (props: IOpenProps) => {
         return <FormView form={props.entity as any} finished={props.finished} />;
       case '迁移配置':
         return <TransferView current={props.entity as any} finished={props.finished} />;
+      case '页面模板':
+        return <TemplateView current={props.entity as any} finished={props.finished} />;
       case '办事':
         return <WorkStart current={props.entity as any} finished={props.finished} />;
       case '报表':

@@ -5,6 +5,7 @@ import { StandardFileInfo } from './fileinfo';
 import { DataResource } from './resource';
 import { Application, IApplication } from './standard/application';
 import { Form } from './standard/form';
+import { PageTemplate } from './standard/page';
 import { Property } from './standard/property';
 import { Species } from './standard/species';
 import { Transfer } from './standard/transfer';
@@ -44,6 +45,9 @@ export class DirectoryOperate implements IDirectoryOperate {
       this.subscribe(_resource.transferColl, (s, l) => {
         return new Transfer(s, l);
       });
+      this.subscribe(_resource.templateColl, (s, l) => {
+        return new PageTemplate(s, l);
+      });
       this.subscribe(_resource.applicationColl, (s, l) => {
         if (s.parentId.length < 1) {
           return new Application(s, l);
@@ -67,6 +71,9 @@ export class DirectoryOperate implements IDirectoryOperate {
     }
     this.standardFiles = [];
     this.standardFiles.push(
+      ...this.resource.templateColl.cache
+        .filter((i) => i.directoryId === this.directory.id)
+        .map((l) => new PageTemplate(l, this.directory)),
       ...this.resource.transferColl.cache
         .filter((i) => i.directoryId === this.directory.id)
         .map((l) => new Transfer(l, this.directory)),

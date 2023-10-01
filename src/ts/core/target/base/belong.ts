@@ -23,6 +23,8 @@ export interface IBelong extends ITarget {
   cohortChats: ISession[];
   /** 共享组织 */
   shareTarget: ITarget[];
+  /** 获取存储占用情况 */
+  getDiskInfo(): Promise<model.DiskInfoType>;
   /** 加载超管权限 */
   loadSuperAuth(reload?: boolean): Promise<IAuthority | undefined>;
   /** 申请加用户 */
@@ -78,6 +80,10 @@ export abstract class Belong extends Target implements IBelong {
       await cohort.pullMembers([this.user.metadata]);
       return cohort;
     }
+  }
+  async getDiskInfo(): Promise<model.DiskInfoType> {
+    const data = await kernel.diskInfo(this.id, this.relations);
+    return data.data;
   }
   override loadMemberChats(_newMembers: schema.XTarget[], _isAdd: boolean): void {
     _newMembers = _newMembers.filter((i) => i.id != this.userId);
