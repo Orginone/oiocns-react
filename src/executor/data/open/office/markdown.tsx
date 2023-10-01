@@ -9,12 +9,14 @@ import { IDomEditor } from '@wangeditor/editor';
 
 interface IProps {
   share: FileItemShare;
+  getHtml: (html: any) => void;
 }
 
-const Markdown: React.FC<IProps> = ({ share }) => {
+const Markdown: React.FC<IProps> = ({ share,getHtml }) => {
   const [loaded, setLoaded] = useState(false);
   const [editor, setEditor] = useState<IDomEditor | null>(null); // 存储 editor 实例
   const [html, setHtml] = useState('<p></p>');
+  getHtml(html);
   useEffect(() => {
     axios.get(shareOpenLink(share.shareLink)).then((res) => {
       setLoaded(true);

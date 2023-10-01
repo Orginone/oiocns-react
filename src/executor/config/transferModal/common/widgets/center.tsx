@@ -48,7 +48,9 @@ const Editable: React.FC<IProps> = ({ current }) => {
             case '表格':
               const tables = args as model.Tables;
               if (tables.file) {
-                setCenter(<OfficeView share={tables.file} finished={setEmpty} />);
+                setCenter(
+                  <OfficeView share={tables.file} finished={setEmpty} current={args} />,
+                );
               } else {
                 message.error('未上传文件');
               }

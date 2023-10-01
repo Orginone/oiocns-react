@@ -1,6 +1,6 @@
 import ImageView from './image';
 import VideoView from './video';
-import { IEntity, ISysFileInfo } from '@/ts/core';
+import { IEntity, ISysFileInfo, IDirectory } from '@/ts/core';
 import { command, model, schema } from '@/ts/base';
 import React from 'react';
 import FormView from './form';
@@ -32,7 +32,13 @@ const ExecutorOpen: React.FC<IOpenProps> = (props: IOpenProps) => {
       return <VideoView share={data} finished={props.finished} />;
     }
     if (officeExt.includes(data.extension ?? '-')) {
-      return <OfficeView share={data} finished={props.finished} />;
+      return (
+        <OfficeView
+          share={data}
+          finished={props.finished}
+          current={props.entity as unknown as IDirectory}
+        />
+      );
     }
   } else {
     switch (props.entity.typeName) {
