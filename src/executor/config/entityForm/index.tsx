@@ -12,6 +12,9 @@ import LabelsForm from './labelsForm';
 import RenameForm from './renameForm';
 import TransferForm from './transferForm';
 import CodeBuildForm from './codeBuildForm';
+import DocumentForm from './documentForm';
+import PageTemplateForm from './templateForm';
+
 interface IProps {
   cmd: string;
   entity: IEntity<schema.XEntity>;
@@ -86,6 +89,10 @@ const EntityForm: React.FC<IProps> = ({ cmd, entity, finished }) => {
       return (
         <PropertyForm formType={cmd} current={entity as any} finished={reloadFinish} />
       );
+    case 'newMdText':
+      return (
+        <DocumentForm formType={cmd} current={entity as any} finished={reloadFinish} />
+      );
     case 'newTransferConfig':
     case 'updateTransferConfig':
       return <TransferForm formType={cmd} current={entity as any} finished={reloadFinish} />;
@@ -93,6 +100,9 @@ const EntityForm: React.FC<IProps> = ({ cmd, entity, finished }) => {
       return (
         <CodeBuildForm formType={cmd} current={entity as any} finished={reloadFinish} />
       );
+    case "newPageTemplate":
+    case 'updatePageTemplate':
+      return <PageTemplateForm formType={cmd} current={entity as any} finished={reloadFinish} />;
     default: {
       var target = entity as ITarget;
       if (entity.typeName === '目录') {

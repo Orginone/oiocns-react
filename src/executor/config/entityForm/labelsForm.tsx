@@ -124,6 +124,7 @@ const LabelsForm = (props: Iprops) => {
         }
       }}
       onFinish={async (values) => {
+        console.log(values, 'values');
         switch (props.formType) {
           case 'update':
             await form!.update(values);

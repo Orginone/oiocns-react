@@ -1015,8 +1015,6 @@ export type Tables = { formIds: string[]; file?: FileItemModel } & Node;
 export type Sheet<T> = {
   // 名称
   name: string;
-  // 表头行数
-  headers: number;
   // 列信息
   columns: Column[];
   // 数据
@@ -1033,8 +1031,6 @@ export interface Column {
   dataIndex: string;
   // 类型
   valueType: string;
-  // 是否隐藏
-  hide?: boolean;
 }
 
 // 映射
@@ -1217,3 +1213,61 @@ export type codeBuildType = {
   image: string;
   registry_tokencreateTime: string;
 };
+/** 新建文档 */
+export type documentType = {
+  name: string;
+};
+// 页面设计
+export interface IPageTemplate<T extends string> {
+  kind: T;
+  // 其他属性通过模块补充增加
+}
+
+export interface ShopTemplate extends IPageTemplate<"shop"> {
+
+}
+
+export interface NewsTemplate extends IPageTemplate<"news"> {
+
+}
+
+export interface PageTemplatePresetMap {
+  "shop": ShopTemplate;
+  "news": NewsTemplate;
+}
+
+export type PageTemplatePreset = PageTemplatePresetMap[keyof PageTemplatePresetMap];
+
+/** 类型保护，判断一个模板是不是内置模板 */
+export function isPageTemplatePreset(template: PageTemplate): template is PageTemplatePreset {
+  return ["shop", "news"].includes(template.kind);
+}
+
+export type PageTemplate<T extends string = string> =  T extends keyof PageTemplatePresetMap
+  ? PageTemplatePresetMap[T]
+  : IPageTemplate<T>;
+
+export type XPageTemplate<T extends string = string> = XStandard & PageTemplate<T>;
+
+export type DiskInfoType = {
+  // 状态
+  ok: number;
+  // 文件数量
+  files: number;
+  // 对象数量
+  objects: number;
+  // 集合数量
+  collections: number;
+  // 文件的总大小
+  fileSize: number;
+  // 数据的总大小
+  dataSize: number;
+  // 数据占用磁盘的总大小
+  totalSize: number;
+  // 文件系统挂载磁盘已使用大小
+  fsUsedSize: number;
+  // 文件系统挂载磁盘的总大小
+  fsTotalSize: number;
+  // 查询时间
+  getTime: string;
+}

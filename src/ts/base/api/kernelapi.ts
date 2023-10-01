@@ -663,6 +663,24 @@ export default class KernelApi {
    * @param {string} key 对象名称（eg: rootName.person.name）
    * @returns {model.ResultType<T>} 对象异步结果
    */
+  public async diskInfo(
+    belongId: string,
+    relations: string[],
+  ): Promise<model.ResultType<model.DiskInfoType>> {
+    return await this.dataProxy({
+      module: 'Disk',
+      action: 'Info',
+      belongId,
+      relations,
+      params: {},
+    });
+  }
+  /**
+   * 获取对象数据
+   * @param {string} belongId 对象所在的归属用户ID
+   * @param {string} key 对象名称（eg: rootName.person.name）
+   * @returns {model.ResultType<T>} 对象异步结果
+   */
   public async objectGet<T>(
     belongId: string,
     relations: string[],

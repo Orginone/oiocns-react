@@ -6,7 +6,7 @@ import css from './index.module.less';
 import type { CheckboxChangeEvent } from 'antd/es/checkbox';
 import orgCtrl from '@/ts/controller';
 import TeamIcon from '@/components/Common/GlobalComps/entityIcon';
-import { IMessage, ISession } from '@/ts/core';
+import { IMessage, ISession, MessageType } from '@/ts/core';
 import { AiOutlineClose } from '@/icons/ai';
 interface IChatShareForward {
   open: boolean;
@@ -62,7 +62,7 @@ const ChatShareForward: FC<IChatShareForward> = (props) => {
     }
     if (btachType === 'merge') {
       selectedData.map(async (chat: ISession) => {
-        await chat.sendMessage(message[0].msgType, '', [], undefined, message);
+        await chat.sendMessage(MessageType.Forward, '', [], undefined, message);
       });
     }
     handleCancel();

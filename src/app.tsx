@@ -14,6 +14,7 @@ import config from 'devextreme/core/config';
 import { loadMessages, locale } from 'devextreme/localization';
 import zhMessage from 'devextreme/localization/messages/zh.json';
 import { LoggerLevel, logger } from '@/ts/base/common';
+import './components/PageBuilder';
 
 moment.locale('cn');
 config({ defaultCurrency: 'zh' });
