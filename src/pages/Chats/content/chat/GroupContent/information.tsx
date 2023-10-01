@@ -51,12 +51,12 @@ const Information = ({ msg, onClose }: { msg: IMessage; onClose: Function }) => 
   };
 
   const items: TabsProps['items'] = [
-    { key: 'read', label: `已读(${msg.readedIds.length})`, children: readList() },
     {
       key: 'unRead',
       label: `未读(${unreadInfo.length})`,
       children: unRead(),
     },
+    { key: 'read', label: `已读(${msg.readedIds.length})`, children: readList() },
   ];
 
   return (
@@ -64,7 +64,7 @@ const Information = ({ msg, onClose }: { msg: IMessage; onClose: Function }) => 
       <Tabs
         centered
         items={items}
-        defaultActiveKey={'read'}
+        defaultActiveKey={'unRead'}
         activeKey={tabsKey}
         onChange={(e) => setTabsKey(e)}
       />
