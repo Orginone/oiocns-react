@@ -41,7 +41,7 @@ const GroupActivityItem: React.FC<{ activity: IActivity }> = ({ activity }) => {
       </Resizable>
       <div style={{ height: '100%', width: '100%' }}>
         <Activity
-          height={'calc(100vh - 420px)'}
+          height={'calc(100vh - 355px)'}
           activity={current}
           title={current.name + '动态'}></Activity>
       </div>

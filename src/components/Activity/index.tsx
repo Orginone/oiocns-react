@@ -122,6 +122,82 @@ export const ActivityItem: React.FC<ActivityItemProps> = ({
         }
     }
   };
+  const renderCtxMore = () => {
+    if (hideResource === true) {
+      const userId =
+        metadata.likes.length > 0 ? metadata.likes[metadata.likes.length - 1] : '';
+      return (
+        <>
+          <div
+            className={cls.activityItemFooterLikes}
+            style={{ display: metadata.likes.length ? 'flex' : 'none' }}>
+            {metadata.likes.length > 0 && (
+              <span style={{ fontSize: 18, color: '#888' }}>
+                <HeartFilled style={{ color: '#cb4747', fontSize: 18 }} />
+                <b style={{ marginLeft: 6 }}>{metadata.likes.length}</b>
+              </span>
+            )}
+            {userId.length > 0 && (
+              <div key={userId} style={{ alignItems: 'center', display: 'flex' }}>
+                <EntityIcon entityId={userId} showName></EntityIcon>
+              </div>
+            )}
+            {metadata.comments.length > 0 && (
+              <span style={{ fontSize: 18, color: '#888' }}>
+                <MessageOutlined style={{ color: '#4747cb', fontSize: 18 }} />
+                <b style={{ marginLeft: 6 }}>{metadata.comments.length}</b>
+              </span>
+            )}
+          </div>
+        </>
+      );
+    }
+    return (
+      <>
+        <div
+          className={cls.activityItemFooterLikes}
+          style={{ display: metadata.likes.length ? 'flex' : 'none' }}>
+          <HeartFilled style={{ color: '#cb4747', fontSize: 18 }} />
+          {metadata.likes.map((userId) => {
+            return (
+              <div key={userId} style={{ alignItems: 'center', display: 'flex' }}>
+                <EntityIcon entityId={userId} showName></EntityIcon>
+              </div>
+            );
+          })}
+        </div>
+        {metadata.comments?.length > 0 && (
+          <div className={cls.activityItemCommentList}>
+            {metadata.comments.map((item) => {
+              return (
+                <ActivityComment
+                  comment={item}
+                  key={item.time}
+                  onClick={(comment) => handleReply(comment.userId)}></ActivityComment>
+              );
+            })}
+          </div>
+        )}
+        <div
+          style={{ display: commenting ? 'flex' : 'none' }}
+          className={cls.activityItemCommentInputBox}>
+          <Input.TextArea
+            placeholder={replyTo ? `回复${replyTo.name} :` : ''}
+            style={{ height: 12 }}
+            onChange={(e) => setComment(e.currentTarget.value)}></Input.TextArea>
+          <Button
+            type="primary"
+            size="small"
+            onClick={async () => {
+              await item.comment(comment, replyTo?.id);
+            }}>
+            发送
+          </Button>
+        </div>
+      </>
+    );
+  };
+
   return (
     <List.Item>
       <List.Item.Meta
@@ -209,48 +285,7 @@ export const ActivityItem: React.FC<ActivityItemProps> = ({
                 </Popover>
               </div>
             </div>
-            <div
-              className={cls.activityItemFooterLikes}
-              style={{ display: metadata.likes.length ? 'flex' : 'none' }}>
-              <HeartFilled style={{ color: '#cb4747', fontSize: 18 }} />
-              {metadata.likes.map((userId) => {
-                return (
-                  <div key={userId} style={{ alignItems: 'center', display: 'flex' }}>
-                    <EntityIcon entityId={userId} showName></EntityIcon>
-                  </div>
-                );
-              })}
-            </div>
-            {metadata.comments?.length > 0 && (
-              <div className={cls.activityItemCommentList}>
-                {metadata.comments.map((item) => {
-                  return (
-                    <ActivityComment
-                      comment={item}
-                      key={item.time}
-                      onClick={(comment) =>
-                        handleReply(comment.userId)
-                      }></ActivityComment>
-                  );
-                })}
-              </div>
-            )}
-            <div
-              style={{ display: commenting ? 'flex' : 'none' }}
-              className={cls.activityItemCommentInputBox}>
-              <Input.TextArea
-                placeholder={replyTo ? `回复${replyTo.name} :` : ''}
-                style={{ height: 12 }}
-                onChange={(e) => setComment(e.currentTarget.value)}></Input.TextArea>
-              <Button
-                type="primary"
-                size="small"
-                onClick={async () => {
-                  await item.comment(comment, replyTo?.id);
-                }}>
-                发送
-              </Button>
-            </div>
+            {renderCtxMore()}
           </div>
         }
       />

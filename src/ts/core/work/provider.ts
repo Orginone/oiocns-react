@@ -12,6 +12,10 @@ export interface IWorkProvider {
   todos: IWorkTask[];
   /** 变更通知 */
   notity: common.Emitter;
+  /** 加载已办数量 */
+  loadCompletedCount(): Promise<number>;
+  /** 加载已完结数量 */
+  loadFinishedCount(): Promise<number>;
   /** 加载待办任务 */
   loadTodos(reload?: boolean): Promise<IWorkTask[]>;
   /** 加载已办任务 */
@@ -70,7 +74,7 @@ export class WorkProvider implements IWorkProvider {
   async loadDones(req: model.IdPageModel): Promise<model.PageResult<IWorkTask>> {
     const res = await kernel.collectionPageRequest<schema.XWorkTask>(
       this.userId,
-      [this.userId],
+      [],
       storeCollName.WorkTask,
       {
         match: {
@@ -118,6 +122,30 @@ export class WorkProvider implements IWorkProvider {
       ...res.data,
       result: (res.data.result || []).map((task) => new WorkTask(task, this.user)),
     };
+  }
+  async loadCompletedCount(): Promise<number> {
+    const res = await kernel.collectionAggregate(
+      this.userId,
+      [],
+      storeCollName.WorkTask,
+      {
+        match: {
+          status: {
+            _gte_: 100,
+          },
+          records: {
+            _exists_: true,
+          },
+        },
+      },
+    );
+    if (res.success && Array.isArray(res.data) && res.data[0].count) {
+      return res.data[0].count;
+    }
+    return 0;
+  }
+  async loadFinishedCount(): Promise<number> {
+    return await this.loadCompletedCount();
   }
   async loadInstanceDetail(
     id: string,

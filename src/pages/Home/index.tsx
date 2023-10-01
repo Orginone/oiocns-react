@@ -1,7 +1,8 @@
 import cls from './index.module.less';
 import React, { useState } from 'react';
-import HeadBanner from './components/HeadBanner';
 import NavigationBar from './components/NavigationBar';
+import { Input } from 'antd';
+import { SearchOutlined } from '@ant-design/icons';
 
 export interface NavigationItem {
   key: string;
@@ -28,20 +29,9 @@ const navigationList: NavigationItem[] = [
     backgroundImageUrl: '/img/banner/circle-bg.jpeg',
     component: React.lazy(() => import('./components/Content/Activity/friends')),
   },
-  {
-    key: 'warehouse',
-    label: '公物仓',
-    backgroundImageUrl: '/img/banner/activity-bg.png',
-    component: React.lazy(() => import('./components/Content/Warehouse')),
-  },
-  {
-    key: 'digital-asset',
-    label: '数据资产',
-    backgroundImageUrl: '/img/banner/digital-asset-bg.png',
-    component: React.lazy(() => import('./components/Content/DigitalAsset')),
-  },
 ];
 const Home: React.FC = () => {
+  const [searchValue, setSearchValue] = useState('');
   const [current, setCurrent] = useState(navigationList[0]);
 
   return (
@@ -51,9 +41,19 @@ const Home: React.FC = () => {
         onChange={(item) => {
           setCurrent(item);
         }}></NavigationBar>
-      <HeadBanner
-        backgroundImageUrl={current.backgroundImageUrl}
-        title={current.label}></HeadBanner>
+      <div
+        className={cls.headBanner}
+        style={{ backgroundImage: `url(${current.backgroundImageUrl})` }}>
+        <Input.Search
+          className={cls.search}
+          placeholder="请输入你要搜索的内容"
+          allowClear
+          enterButton={<SearchOutlined />}
+          size="large"
+          value={searchValue}
+          onSearch={(value) => setSearchValue(value)}
+        />
+      </div>
       {React.createElement(current.component)}
     </div>
   );

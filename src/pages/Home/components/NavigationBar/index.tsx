@@ -8,6 +8,12 @@ import { Badge, Button, message, Space, Typography } from 'antd';
 
 const allPages: NavigationItem[] = [
   {
+    key: 'dashboard',
+    label: '工作台',
+    backgroundImageUrl: '/img/banner/1.png',
+    component: React.lazy(() => import('../Content/WorkBench')),
+  },
+  {
     key: 'activity',
     label: '群动态',
     backgroundImageUrl: '/img/banner/activity-bg.png',
@@ -18,24 +24,6 @@ const allPages: NavigationItem[] = [
     label: '好友圈',
     backgroundImageUrl: '/img/banner/circle-bg.jpeg',
     component: React.lazy(() => import('../Content/Activity/friends')),
-  },
-  {
-    key: 'warehouse',
-    label: '公物仓',
-    backgroundImageUrl: '/img/banner/activity-bg.png',
-    component: React.lazy(() => import('../Content/Warehouse')),
-  },
-  {
-    key: 'digital-asset',
-    label: '数据资产',
-    backgroundImageUrl: '/img/banner/digital-asset-bg.png',
-    component: React.lazy(() => import('../Content/DigitalAsset')),
-  },
-  {
-    key: 'dashboard',
-    label: '工作台',
-    backgroundImageUrl: '/img/banner/digital-asset-bg.png',
-    component: React.lazy(() => import('../Content/WorkBench')),
   },
 ];
 const NavigationBar: React.FC<{
