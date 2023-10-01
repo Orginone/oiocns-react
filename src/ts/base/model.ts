@@ -1206,6 +1206,13 @@ export type CommonAppplication = {
   spaceId: string;
 };
 
+/** 代码构建 */
+export type codeBuildType = {
+  git: string;
+  dockerfile: string;
+  image: string;
+  registry_tokencreateTime: string;
+};
 /** 新建文档 */
 export type documentType = {
   name: string;

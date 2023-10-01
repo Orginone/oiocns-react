@@ -198,6 +198,12 @@ export const newWarehouse = {
       label: '新建仓库',
       iconType: 'newWarehouse',
     },
+    {
+      sort: 201,
+      cmd: 'codeBuild',
+      label: '代码构建',
+      iconType: 'codeBuild',
+    },
   ],
 };
 

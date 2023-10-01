@@ -23,6 +23,11 @@ export function createProxy() {
       changeOrigin: true, // 是否允许跨域
       ws: true,
     },
+    '/api': {
+      target: 'http://k3sapi.jx868.com', // 后台接口
+      changeOrigin: true, // 是否允许跨域
+      ws: true,
+    },
   };
   return ProxyList;
 }

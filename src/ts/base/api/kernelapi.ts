@@ -1193,4 +1193,34 @@ export default class KernelApi {
     }
     return model.badRequest();
   }
+  /**
+   * 请求一个代码构建方法
+   * @param {ReqestType} reqs 请求体
+   * @returns 结果
+   */
+  public async codeBuild(req: model.codeBuildType): Promise<model.ResultType<any>> {
+    var res: model.ResultType<any>;
+    res = await this._restBuildRequest('v1/build', req);
+    return res;
+  }
+  private async _restBuildRequest(
+    methodName: string,
+    args: any,
+    timeout: number = 2,
+  ): Promise<model.ResultType<any>> {
+    const res = await this._axiosInstance({
+      method: 'post',
+      timeout: timeout * 1000,
+      url: '/api/' + methodName,
+      data: args,
+    });
+    if (res.data && (res.data as model.ResultType<any>)) {
+      const result = res.data as model.ResultType<any>;
+      if (result.status !== 201) {
+        logger.warn('操作失败,' + result.msg);
+      }
+      return result;
+    }
+    return model.badRequest();
+  }
 }
