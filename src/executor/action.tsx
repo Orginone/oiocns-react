@@ -93,10 +93,8 @@ const openDirectory = (
     entity = entity.directory;
   }
   if ('isContainer' in entity && entity.isContainer) {
-    entity.loadContent().then(() => {
-      orgCtrl.currentKey = entity.key;
-      orgCtrl.changCallback();
-    });
+    orgCtrl.currentKey = entity.key;
+    orgCtrl.changCallback();
     return;
   }
   return false;

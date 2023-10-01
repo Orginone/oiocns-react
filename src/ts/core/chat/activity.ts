@@ -123,7 +123,7 @@ export interface IActivity extends IEntity<schema.XTarget> {
     tags: string[],
   ): Promise<boolean>;
   /** 加载动态 */
-  load(take: number): Promise<IActivityMessage[]>;
+  load(take?: number): Promise<IActivityMessage[]>;
 }
 
 /** 动态实现 */
@@ -131,6 +131,7 @@ export class Activity extends Entity<schema.XTarget> implements IActivity {
   session: ISession;
   activityList: IActivityMessage[];
   coll: XCollection<model.ActivityType>;
+  private finished: boolean = false;
   constructor(_metadata: schema.XTarget, session: ISession) {
     super(_metadata);
     this.session = session;
@@ -156,19 +157,23 @@ export class Activity extends Entity<schema.XTarget> implements IActivity {
   get activitys(): IActivity[] {
     return [this];
   }
-  async load(take: number): Promise<IActivityMessage[]> {
-    const data = await this.coll.load({
-      skip: this.activityList.length,
-      take: take,
-      options: {
-        sort: {
-          createTime: -1,
+  async load(take: number = 10): Promise<IActivityMessage[]> {
+    if (!this.finished) {
+      const data = await this.coll.load({
+        skip: this.activityList.length,
+        take: take,
+        options: {
+          sort: {
+            createTime: -1,
+          },
         },
-      },
-    });
-    const messages = data.map((i) => new ActivityMessage(i, this));
-    this.activityList.push(...messages);
-    return messages;
+      });
+      const messages = data.map((i) => new ActivityMessage(i, this));
+      this.finished = messages.length < take;
+      this.activityList.push(...messages);
+      return messages;
+    }
+    return [];
   }
 
   async send(
@@ -263,7 +268,8 @@ export class GroupActivity extends Entity<schema.XTarget> implements IActivity {
     }
     return more.sort((a, b) => b.createTime - a.createTime);
   }
-  async load(take: number): Promise<IActivityMessage[]> {
+  async load(take: number = 10): Promise<IActivityMessage[]> {
+    console.log(new Date().getTime(), take);
     await Promise.all(this.subActivitys.map((i) => i.load(take)));
     const more: IActivityMessage[] = [];
     for (const activity of this.subActivitys) {
@@ -283,7 +289,7 @@ export class GroupActivity extends Entity<schema.XTarget> implements IActivity {
   ): Promise<boolean> {
     return this.session.activity.send(content, typeName, resources, tags);
   }
-  override subscribe(callback: (key: string, ...args: any) => void): string {
+  override subscribe(callback: (key: string, ...args: any[]) => void): string {
     this.subActivitys.forEach((activity) => {
       this.subscribeIds.push(activity.subscribe(callback, false));
     });

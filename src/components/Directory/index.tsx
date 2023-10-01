@@ -9,6 +9,8 @@ import { IDirectory, IFileInfo } from '@/ts/core';
 import { loadFileMenus } from '@/executor/fileOperate';
 import { command, schema } from '@/ts/base';
 import orgCtrl from '@/ts/controller';
+import useAsyncLoad from '@/hooks/useAsyncLoad';
+import { Spin } from 'antd';
 
 interface IProps {
   mode: number;
@@ -24,9 +26,9 @@ const Directory: React.FC<IProps> = ({ mode, current }: IProps) => {
   );
   const [key] = useCtrlUpdate(dircetory);
   const cmdType = mode === 1 ? 'data' : 'config';
+  const [loaded] = useAsyncLoad(() => dircetory.loadContent());
   const [segmented, setSegmented] = useStorage('segmented', 'list');
   const [select, setSelect] = useState<IFileInfo<schema.XEntity>>();
-  let content: IFileInfo<schema.XEntity>[] = [];
   const contextMenu = (file?: IFileInfo<schema.XEntity>, clicked?: Function) => {
     var entity = file || dircetory;
     if ('targets' in entity) {
@@ -40,12 +42,12 @@ const Directory: React.FC<IProps> = ({ mode, current }: IProps) => {
       },
     };
   };
+
   const fileOpen = async (
     file: IFileInfo<schema.XEntity> | undefined,
     dblclick: boolean,
   ) => {
     if (dblclick && file) {
-      await file.loadContent();
       command.emitter(cmdType, 'open', file);
     } else if (!dblclick) {
       if (file?.id === select?.id) {
@@ -58,40 +60,44 @@ const Directory: React.FC<IProps> = ({ mode, current }: IProps) => {
     }
   };
 
-  if (current === 'disk') {
-    content = [orgCtrl.user, ...orgCtrl.user.companys];
-  } else {
-    content = current.content(mode);
-  }
+  const getContent = () => {
+    if (current === 'disk') {
+      return [orgCtrl.user, ...orgCtrl.user.companys];
+    } else {
+      return current.content(mode);
+    }
+  };
 
   return (
     <SegmentContent
       key={key}
       onSegmentChanged={setSegmented}
-      description={`${content.length}个项目`}
+      description={`${getContent().length}个项目`}
       content={
-        segmented === 'table' ? (
-          <TableMode
-            select={select}
-            content={content}
-            fileOpen={fileOpen}
-            contextMenu={contextMenu}
-          />
-        ) : segmented === 'icon' ? (
-          <IconMode
-            select={select}
-            content={content}
-            fileOpen={fileOpen}
-            contextMenu={contextMenu}
-          />
-        ) : (
-          <ListMode
-            select={select}
-            content={content}
-            fileOpen={fileOpen}
-            contextMenu={contextMenu}
-          />
-        )
+        <Spin spinning={!loaded} delay={10} tip={'加载中...'}>
+          {segmented === 'table' ? (
+            <TableMode
+              select={select}
+              content={getContent()}
+              fileOpen={fileOpen}
+              contextMenu={contextMenu}
+            />
+          ) : segmented === 'icon' ? (
+            <IconMode
+              select={select}
+              content={getContent()}
+              fileOpen={fileOpen}
+              contextMenu={contextMenu}
+            />
+          ) : (
+            <ListMode
+              select={select}
+              content={getContent()}
+              fileOpen={fileOpen}
+              contextMenu={contextMenu}
+            />
+          )}
+        </Spin>
       }
     />
   );

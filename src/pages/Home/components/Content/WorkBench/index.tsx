@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import cls from './index.module.less';
-import { Badge, Button, Calendar, Divider, Dropdown, Space } from 'antd';
+import { Badge, Button, Calendar, Divider, Dropdown, Space, Spin } from 'antd';
 import { ImDropbox, ImPlus, ImPriceTags } from '@/icons/im';
 import { useHistory } from 'react-router-dom';
 import { command, model } from '@/ts/base';
@@ -128,9 +128,11 @@ const WorkBench: React.FC = () => {
   // 渲染应用信息
   const RendeAppInfo: React.FC = () => {
     const [allAppShow, setAllAppShow] = useState(false);
+    const [loaded, setLoaded] = useState(false);
     const [applications, setApplications] = useState<IApplication[]>([]);
     useEffect(() => {
       const id = command.subscribeByFlag('applications', async () => {
+        setLoaded(true);
         setApplications(await orgCtrl.loadApplications());
       });
       return () => {
@@ -169,10 +171,8 @@ const WorkBench: React.FC = () => {
         <div
           className={cls.appCard}
           onClick={() => {
-            item.loadContent().then(() => {
-              orgCtrl.currentKey = item.key;
-              history.push('/store');
-            });
+            orgCtrl.currentKey = item.key;
+            history.push('/store');
           }}>
           {item.cache.tags?.includes('常用') ? (
             <Badge dot>
@@ -237,15 +237,17 @@ const WorkBench: React.FC = () => {
             </Button>
           </span>
         </div>
-        <div className={cls.cardItemViewer}>
-          <Space wrap split={<Divider type="vertical" />} size={2}>
-            {applications
-              .filter((i) => i.cache.tags?.includes('常用'))
-              .map((app) => {
-                return loadAppCard(app);
-              })}
-          </Space>
-        </div>
+        <Spin spinning={!loaded} tip={'加载中...'}>
+          <div className={cls.cardItemViewer}>
+            <Space wrap split={<Divider type="vertical" />} size={2}>
+              {applications
+                .filter((i) => i.cache.tags?.includes('常用'))
+                .map((app) => {
+                  return loadAppCard(app);
+                })}
+            </Space>
+          </div>
+        </Spin>
         {allAppShow && renderAllApps()}
       </>
     );

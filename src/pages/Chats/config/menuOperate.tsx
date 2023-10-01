@@ -17,9 +17,7 @@ const createChatMenu = (chat: ISession, children: MenuItemType[]) => {
     tag: chat.chatdata.labels,
     itemType: MenuType.Chat,
     menus: loadChatMoreMenus(false, true),
-    icon: (
-      <TeamIcon notAvatar={true} typeName={chat.typeName} entityId={chat.id} size={18} />
-    ),
+    icon: <TeamIcon notAvatar={true} entity={chat.metadata} size={18} />,
     children: children,
   };
 };
@@ -36,7 +34,7 @@ const loadBookMenu = () => {
       label: company.name,
       item: company.chats.filter((i) => i.isMyChat),
       itemType: MenuType.Books,
-      icon: <TeamIcon entityId={company.id} size={18} />,
+      icon: <TeamIcon entity={company.metadata} size={18} />,
       company,
       menus: company.hasAuthoritys([orgAuth.SuperAuthId])
         ? [
@@ -74,7 +72,7 @@ const loadBookMenu = () => {
           .filter((i) => i.isMyChat)
           .map((item) => createChatMenu(item, [])),
       ],
-      icon: <TeamIcon entityId={orgCtrl.user.id} size={18} />,
+      icon: <TeamIcon entity={orgCtrl.user.metadata} size={18} />,
     },
     ...companyItems,
   ];

@@ -15,9 +15,6 @@ export const loadFileMenus = (file: IFileInfo<schema.XEntity>, mode: number = 0)
         label: o.label,
         icon: o.menus ? <></> : <TypeIcon iconType={o.iconType} size={16} />,
         beforeLoad: async () => {
-          if (o.cmd === 'open') {
-            await file.loadContent();
-          }
           command.emitter('config', o.cmd, file);
           return true;
         },
@@ -29,9 +26,6 @@ export const loadFileMenus = (file: IFileInfo<schema.XEntity>, mode: number = 0)
               label: s.label,
               icon: <TypeIcon iconType={s.iconType} size={16} />,
               beforeLoad: async () => {
-                if (s.cmd === 'open') {
-                  await file.loadContent();
-                }
                 command.emitter('config', s.cmd, file);
                 return true;
               },

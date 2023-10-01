@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import { Avatar } from 'antd';
+import React from 'react';
+import { Avatar, Spin } from 'antd';
 import orgCtrl from '@/ts/controller';
 import { ShareIcon } from '@/ts/base/model';
 import { parseAvatar, schema } from '@/ts/base';
 import TypeIcon from './typeIcon';
+import useAsyncLoad from '@/hooks/useAsyncLoad';
 
 interface teamTypeInfo {
   size?: number;
@@ -33,21 +34,27 @@ const EntityIcon = (info: teamTypeInfo) => {
       />
     );
   }
-  const [share, setShare] = useState<ShareIcon>();
-  useEffect(() => {
-    if (info.entityId && info.entityId.length > 10) {
-      orgCtrl.user.findEntityAsync(info.entityId).then((value) => {
-        if (value) {
-          setShare({
-            name: value.name,
-            typeName: value.typeName,
-            avatar: parseAvatar(value.icon),
-          });
-        }
-      });
+  if (info.entityId) {
+    const [loaded, entity] = useAsyncLoad(() =>
+      orgCtrl.user.findEntityAsync(info.entityId!),
+    );
+    if (!loaded) {
+      return <Spin size="small" delay={10} />;
     }
-  }, []);
-  return <ShareIconItem {...info} share={share} />;
+    if (entity) {
+      return (
+        <ShareIconItem
+          {...info}
+          share={{
+            name: entity.name,
+            typeName: entity.typeName,
+            avatar: parseAvatar(entity.icon),
+          }}
+        />
+      );
+    }
+  }
+  return <ShareIconItem {...info} />;
 };
 
 /** 实体图标 */

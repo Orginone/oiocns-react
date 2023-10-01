@@ -17,11 +17,6 @@ const createMenu = (team: ITarget, children: MenuItemType[]) => {
     tag: [team.typeName],
     icon: <EntityIcon notAvatar={true} entityId={team.id} size={18} />,
     children: children,
-    beforeLoad: async () => {
-      if ('directory' in team) {
-        await (team as ITarget).directory.loadContent();
-      }
-    },
   };
 };
 /** 编译组织集群树 */
@@ -51,9 +46,6 @@ const buildDirectoryTree = (directorys: IDirectory[]): MenuItemType[] => {
         ...buildDirectoryTree(directory.children),
         ...buildApplicationTree(directory.applications),
       ],
-      beforeLoad: async () => {
-        await directory.loadContent();
-      },
     };
   });
 };
@@ -72,9 +64,6 @@ const buildApplicationTree = (applications: IApplication[]): MenuItemType[] => {
       itemType: application.typeName,
       menus: loadFileMenus(application),
       children: buildApplicationTree(application.children),
-      beforeLoad: async () => {
-        await application.loadContent();
-      },
     };
   });
 };

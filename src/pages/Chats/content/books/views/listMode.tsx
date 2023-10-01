@@ -51,11 +51,7 @@ const ListMode = ({
                 <List.Item.Meta
                   avatar={
                     <Badge count={item.chatdata.noReadCount} size="small">
-                      <TeamIcon
-                        typeName={item.metadata.typeName}
-                        entityId={item.sessionId}
-                        size={40}
-                      />
+                      <TeamIcon entity={item.metadata} size={40} />
                     </Badge>
                   }
                   title={

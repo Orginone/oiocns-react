@@ -45,10 +45,8 @@ const SessionBody = ({ chat }: { chat: ISession }) => {
           size={26}
           title="存储"
           onClick={() => {
-            chat.target.directory.loadContent().then(() => {
-              orgCtrl.currentKey = chat.target.directory.key;
-              history.push('/store');
-            });
+            orgCtrl.currentKey = chat.target.directory.key;
+            history.push('/store');
           }}
         />,
       );

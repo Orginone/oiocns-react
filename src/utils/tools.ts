@@ -17,7 +17,7 @@ const showMessage = (response: any) => {
 const debounce = (fun: any, delay?: number) => {
   let timer: any = '';
   let that = this;
-  return (...args: any) => {
+  return (...args: any[]) => {
     clearTimeout(timer);
     timer = setTimeout(function () {
       fun.call(that, ...args);
