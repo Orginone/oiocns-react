@@ -124,8 +124,6 @@ export const ActivityItem: React.FC<ActivityItemProps> = ({
   };
   const renderCtxMore = () => {
     if (hideResource === true) {
-      const userId =
-        metadata.likes.length > 0 ? metadata.likes[metadata.likes.length - 1] : '';
       return (
         <>
           <div
@@ -136,11 +134,6 @@ export const ActivityItem: React.FC<ActivityItemProps> = ({
                 <HeartFilled style={{ color: '#cb4747', fontSize: 18 }} />
                 <b style={{ marginLeft: 6 }}>{metadata.likes.length}</b>
               </span>
-            )}
-            {userId.length > 0 && (
-              <div key={userId} style={{ alignItems: 'center', display: 'flex' }}>
-                <EntityIcon entityId={userId} showName></EntityIcon>
-              </div>
             )}
             {metadata.comments.length > 0 && (
               <span style={{ fontSize: 18, color: '#888' }}>

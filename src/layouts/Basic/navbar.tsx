@@ -37,7 +37,7 @@ const Navbar: React.FC = () => {
   }, []);
   const actions = [
     {
-      text: '首页',
+      text: '门户',
       icon: 'home',
       path: '/home',
       count: 0,

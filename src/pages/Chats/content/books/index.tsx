@@ -64,8 +64,9 @@ const Book: React.FC<any> = ({
       }
     }
   };
-  const getChats = () => {
-    return chats.filter((i) => currentTag === '全部' || i.groupTags.includes(currentTag));
+  const getChats = (tag?: string) => {
+    const filter = tag ?? currentTag;
+    return chats.filter((i) => filter === '全部' || i.groupTags.includes(filter));
   };
   return (
     <>
@@ -73,6 +74,13 @@ const Book: React.FC<any> = ({
         select={currentTag}
         initTags={['全部', '@我', '未读', '单聊', '群聊']}
         entitys={chats}
+        badgeCount={(tag) => {
+          let count = 0;
+          getChats(tag).forEach((i) => {
+            count += i.chatdata.noReadCount;
+          });
+          return count;
+        }}
         onChanged={(t) => setCurrentTag(t)}></TagsBar>
       <SegmentContent
         key={msgKey}

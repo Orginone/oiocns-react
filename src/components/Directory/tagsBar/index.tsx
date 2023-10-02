@@ -7,6 +7,7 @@ import { IEntity } from '@/ts/core';
 interface IProps {
   select: string;
   initTags: string[];
+  badgeCount?: (tag: string) => number;
   entitys: IEntity<schema.XEntity>[];
   onChanged: (tag: string) => void;
 }
@@ -38,19 +39,18 @@ const TagsBar: React.FC<IProps> = (props) => {
         type="text"
         onClick={() => props.onChanged(tag)}>
         {tag}
+        {count > 0 && <span className={cls.item_count}>{count}</span>}
       </Button>
     );
-    if (count > 0) {
-      return (
-        <Badge
-          key={tag + '_bdg'}
-          count={count}
-          size="small"
-          offset={[2, 8]}
-          status="success">
-          {barItem}
-        </Badge>
-      );
+    if (props.badgeCount) {
+      const badge = props.badgeCount(tag);
+      if (badge > 0) {
+        return (
+          <Badge key={tag + '_bdg'} count={badge} size="small" offset={[-7, 7]}>
+            {barItem}
+          </Badge>
+        );
+      }
     }
     return barItem;
   };
