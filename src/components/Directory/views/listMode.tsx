@@ -63,6 +63,10 @@ const ListMode = ({
             );
           }}
         />
+        <div
+          style={{ height: `calc(100% - ${content.length * 75}px)` }}
+          className={css.blank_area}
+          onContextMenu={() => setCxtItem(undefined)}></div>
       </div>
     </Dropdown>
   );

@@ -85,7 +85,7 @@ const Book: React.FC<any> = ({
       <SegmentContent
         key={msgKey}
         onSegmentChanged={setSegmented}
-        description={`${chats.length}个会话`}
+        description={`${getChats().length}个会话`}
         content={
           <Spin spinning={!loaded} tip={'加载中...'} delay={200}>
             {segmented === 'table' ? (

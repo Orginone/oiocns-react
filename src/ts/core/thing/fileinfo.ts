@@ -185,6 +185,9 @@ export class SysFileInfo extends FileInfo<schema.XEntity> implements ISysFileInf
   }
   get groupTags(): string[] {
     const gtags: string[] = [];
+    if (this.cache.tags) {
+      gtags.push(...this.cache.tags);
+    }
     if (this.typeName.startsWith('image')) {
       gtags.push('图片');
     }

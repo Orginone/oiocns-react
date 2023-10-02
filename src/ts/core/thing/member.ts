@@ -21,6 +21,9 @@ export class Member extends FileInfo<schema.XTarget> implements IMemeber {
   get cacheFlag(): string {
     return 'members';
   }
+  get groupTags(): string[] {
+    return ['成员'];
+  }
   get fullId(): string {
     return `${this.directory.belongId}-${this._metadata.id}`;
   }

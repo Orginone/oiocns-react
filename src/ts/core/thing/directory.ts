@@ -5,7 +5,6 @@ import {
   fileOperates,
   memberOperates,
   teamOperates,
-  newWarehouse,
 } from '../public';
 import { ITarget } from '../target/base/target';
 import { Form, IForm } from './standard/form';
@@ -367,11 +366,11 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
         directoryOperates.NewFile,
         directoryOperates.TaskList,
         directoryOperates.Refesh,
-        directoryOperates.OpenFolderWithEditor,
+        // directoryOperates.OpenFolderWithEditor,
       );
       if (mode === 2 && this.target.hasRelationAuth()) {
         operates.push(directoryNew);
-        operates.push(newWarehouse);
+        // operates.push(newWarehouse);
         if (this.target.user.copyFiles.size > 0) {
           operates.push(fileOperates.Parse);
         }

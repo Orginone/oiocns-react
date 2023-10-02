@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import cls from './index.module.less';
 import { Badge, Button, Calendar, Divider, Dropdown, Space, Spin } from 'antd';
-import { ImDropbox, ImPlus, ImPriceTags } from '@/icons/im';
+import { ImDropbox, ImPriceTags } from '@/icons/im';
 import { useHistory } from 'react-router-dom';
 import { command, model } from '@/ts/base';
 import orgCtrl from '@/ts/controller';
@@ -249,11 +249,11 @@ const WorkBench: React.FC = () => {
       <div className={cls.cardItem}>
         <div className={cls.cardItemHeader}>
           <span className={cls.title}>日历</span>
-          <span className={cls.extraBtn}>
+          {/* <span className={cls.extraBtn}>
             <Button type="text" size="small">
               <ImPlus /> <span>创建日程</span>
             </Button>
-          </span>
+          </span> */}
         </div>
         <Calendar />
       </div>
@@ -296,9 +296,10 @@ const WorkBench: React.FC = () => {
               </Button>
             </span>
           </div>
-          <div style={{ maxWidth: 490 }} className={cls.cardItemViewer}>
+          <div style={{ maxWidth: 500 }} className={cls.cardItemViewer}>
             <Space wrap split={<Divider type="vertical" />} size={2}>
               {renderCmdBtn('joinFriend', '添加好友')}
+              {renderCmdBtn('joinStorage', '申请存储')}
               {renderCmdBtn('newCohort', '创建群组')}
               {renderCmdBtn('joinCohort', '加入群聊')}
               {renderCmdBtn('newCompany', '设立单位')}
