@@ -46,7 +46,7 @@ const TagsBar: React.FC<IProps> = (props) => {
           key={tag + '_bdg'}
           count={count}
           size="small"
-          offset={[2, 6]}
+          offset={[2, 8]}
           status="success">
           {barItem}
         </Badge>
