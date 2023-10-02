@@ -93,6 +93,6 @@ export class UserProvider {
     await this.work?.loadTodos(true);
     this._inited = true;
     this._emiter.changCallback();
-    command.emitterFlag();
+    command.emitterFlag('', true);
   }
 }

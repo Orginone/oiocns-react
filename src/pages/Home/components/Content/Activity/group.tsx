@@ -44,7 +44,7 @@ const GroupActivityItem: React.FC<{ activity: IActivity }> = ({ activity }) => {
           <div style={{ height: '100%', width: '100%' }}>
             {loaded && (
               <Activity
-                height={'calc(100vh - 355px)'}
+                height={'calc(100vh - 335px)'}
                 activity={current}
                 title={current.name + '动态'}></Activity>
             )}

@@ -1,0 +1,23 @@
+.tags_bar {
+  width: 100%;
+  height: 45px;
+  overflow-y: hidden;
+  overflow-x: scroll;
+  padding: 2px;
+  border-bottom: 1px solid #efefef;
+  .tags_item {
+    word-break: keep-all;
+    padding: 2px 16px;
+    &:hover {
+      border-radius: 30px;
+      background-color:rgba(139, 153, 255, 0.5);
+    }
+    &_active {
+      cursor: not-allowed;
+      border-radius: 30px;
+      padding: 2px 16px;
+      color: @text-color-inverse;
+      background-color:#3838b9;
+    }
+  }
+}

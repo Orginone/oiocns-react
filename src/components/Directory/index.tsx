@@ -11,6 +11,7 @@ import { command, schema } from '@/ts/base';
 import orgCtrl from '@/ts/controller';
 import useAsyncLoad from '@/hooks/useAsyncLoad';
 import { Spin } from 'antd';
+import TagsBar from './tagsBar';
 
 interface IProps {
   mode: number;
@@ -26,6 +27,7 @@ const Directory: React.FC<IProps> = ({ mode, current }: IProps) => {
   );
   const [key] = useCtrlUpdate(dircetory);
   const cmdType = mode === 1 ? 'data' : 'config';
+  const [currentTag, setCurrentTag] = useState('全部');
   const [loaded] = useAsyncLoad(() => dircetory.loadContent());
   const [segmented, setSegmented] = useStorage('segmented', 'list');
   const [select, setSelect] = useState<IFileInfo<schema.XEntity>>();
@@ -60,46 +62,58 @@ const Directory: React.FC<IProps> = ({ mode, current }: IProps) => {
     }
   };
 
-  const getContent = () => {
+  const getContent = (filter: boolean = true) => {
+    const contents: IFileInfo<schema.XEntity>[] = [];
     if (current === 'disk') {
-      return [orgCtrl.user, ...orgCtrl.user.companys];
+      contents.push(orgCtrl.user, ...orgCtrl.user.companys);
     } else {
-      return current.content(mode);
+      contents.push(...current.content(mode));
     }
+    if (filter && currentTag !== '全部') {
+      return contents.filter((i) => i.groupTags.includes(currentTag));
+    }
+    return contents;
   };
 
   return (
-    <SegmentContent
-      key={key}
-      onSegmentChanged={setSegmented}
-      description={`${getContent().length}个项目`}
-      content={
-        <Spin spinning={!loaded} delay={10} tip={'加载中...'}>
-          {segmented === 'table' ? (
-            <TableMode
-              select={select}
-              content={getContent()}
-              fileOpen={fileOpen}
-              contextMenu={contextMenu}
-            />
-          ) : segmented === 'icon' ? (
-            <IconMode
-              select={select}
-              content={getContent()}
-              fileOpen={fileOpen}
-              contextMenu={contextMenu}
-            />
-          ) : (
-            <ListMode
-              select={select}
-              content={getContent()}
-              fileOpen={fileOpen}
-              contextMenu={contextMenu}
-            />
-          )}
-        </Spin>
-      }
-    />
+    <>
+      <TagsBar
+        select={currentTag}
+        initTags={['全部']}
+        entitys={getContent(false)}
+        onChanged={(t) => setCurrentTag(t)}></TagsBar>
+      <SegmentContent
+        key={key}
+        onSegmentChanged={setSegmented}
+        description={`${getContent().length}个项目`}
+        content={
+          <Spin spinning={!loaded} delay={10} tip={'加载中...'}>
+            {segmented === 'table' ? (
+              <TableMode
+                select={select}
+                content={getContent()}
+                fileOpen={fileOpen}
+                contextMenu={contextMenu}
+              />
+            ) : segmented === 'icon' ? (
+              <IconMode
+                select={select}
+                content={getContent()}
+                fileOpen={fileOpen}
+                contextMenu={contextMenu}
+              />
+            ) : (
+              <ListMode
+                select={select}
+                content={getContent()}
+                fileOpen={fileOpen}
+                contextMenu={contextMenu}
+              />
+            )}
+          </Spin>
+        }
+      />
+    </>
   );
 };
 export default Directory;

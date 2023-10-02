@@ -320,7 +320,6 @@ const Activity: React.FC<ActivityProps> = ({ height, activity, title }) => {
   };
 
   const loadMoreActivity = async (component: dxScrollView | undefined) => {
-    console.log('loadMoreActivity');
     const news = await activity.load(10);
     if (news.length > 0) {
       activity.changCallback();

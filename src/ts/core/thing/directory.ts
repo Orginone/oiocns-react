@@ -114,6 +114,9 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
   get cacheFlag(): string {
     return 'directorys';
   }
+  get groupTags(): string[] {
+    return ['目录'];
+  }
   get forms(): IForm[] {
     return this.operater.getContent(this.formTypes) as Form[];
   }

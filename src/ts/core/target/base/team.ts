@@ -56,7 +56,7 @@ export abstract class Team extends Entity<schema.XTarget> implements ITeam {
     _relations: string[],
     _memberTypes: TargetType[] = [TargetType.Person],
   ) {
-    super(_metadata);
+    super(_metadata, ['用户']);
     this.memberTypes = _memberTypes;
     this.relations = _relations;
     kernel.subscribe(

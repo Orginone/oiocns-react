@@ -34,6 +34,8 @@ export interface IEntity<T> extends Emitter {
   updater: model.ShareIcon;
   /** 归属 */
   belong: model.ShareIcon;
+  /** 分组标签 */
+  groupTags: string[];
   /** 查找元数据 */
   findMetadata<U>(id: string): U | undefined;
   /** 更新元数据 */
@@ -50,14 +52,16 @@ export abstract class Entity<T extends schema.XEntity>
   extends Emitter
   implements IEntity<T>
 {
-  constructor(_metadata: T) {
+  constructor(_metadata: T, gtags: string[]) {
     super();
+    this._gtags = gtags;
     this.key = generateUuid();
     this._metadata = _metadata;
     ShareIdSet.set(_metadata.id, _metadata);
   }
   _metadata: T;
   key: string;
+  _gtags: string[];
   get id(): string {
     return this._metadata.id;
   }
@@ -96,6 +100,9 @@ export abstract class Entity<T extends schema.XEntity>
   }
   get belong(): model.ShareIcon {
     return this.findShare(this.metadata.belongId);
+  }
+  get groupTags(): string[] {
+    return this._gtags;
   }
   setMetadata(_metadata: T): void {
     if (_metadata.id === this.id) {

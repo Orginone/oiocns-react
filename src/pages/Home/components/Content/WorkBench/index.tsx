@@ -10,6 +10,7 @@ import { IApplication } from '@/ts/core';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import { OperateMenuType } from 'typings/globelType';
 import FullScreenModal from '@/executor/tools/fullScreen';
+import { useFlagCmdEmitter } from '@/hooks/useCtrlUpdate';
 
 // 工作台
 const WorkBench: React.FC = () => {
@@ -26,20 +27,15 @@ const WorkBench: React.FC = () => {
   // 渲染沟通信息
   const RenderChat: React.FC = () => {
     const [msgCount, setMsgCount] = useState(0);
-    useEffect(() => {
-      const id = command.subscribeByFlag('session', () => {
-        let noReadCount = 0;
-        for (const item of orgCtrl.chats) {
-          if (item.isMyChat) {
-            noReadCount += item.chatdata.noReadCount;
-          }
+    const [loaded] = useFlagCmdEmitter('session', () => {
+      let noReadCount = 0;
+      for (const item of orgCtrl.chats) {
+        if (item.isMyChat) {
+          noReadCount += item.chatdata.noReadCount;
         }
-        setMsgCount(noReadCount);
-      });
-      return () => {
-        command.unsubscribeByFlag(id);
-      };
-    }, []);
+      }
+      setMsgCount(noReadCount);
+    });
     return (
       <>
         <div className={cls.cardItemHeader}>
@@ -47,14 +43,16 @@ const WorkBench: React.FC = () => {
           {msgCount > 0 && <span className={cls.remind}>未读消息·{msgCount}条</span>}
         </div>
         <div className={cls.cardItemViewer}>
-          <Space wrap split={<Divider type="vertical" />} size={2}>
-            {renderDataItem('好友(人)', orgCtrl.user.members.length)}
-            {renderDataItem(
-              '群聊(个)',
-              orgCtrl.chats.filter((i) => i.isMyChat && i.isGroup).length,
-            )}
-            {renderDataItem('单位(家)', orgCtrl.user.companys.length)}
-          </Space>
+          <Spin spinning={!loaded}>
+            <Space wrap split={<Divider type="vertical" />} size={2}>
+              {renderDataItem('好友(人)', orgCtrl.user.members.length)}
+              {renderDataItem(
+                '群聊(个)',
+                orgCtrl.chats.filter((i) => i.isMyChat && i.isGroup).length,
+              )}
+              {renderDataItem('单位(家)', orgCtrl.user.companys.length)}
+            </Space>
+          </Spin>
         </div>
       </>
     );
@@ -128,17 +126,10 @@ const WorkBench: React.FC = () => {
   // 渲染应用信息
   const RendeAppInfo: React.FC = () => {
     const [allAppShow, setAllAppShow] = useState(false);
-    const [loaded, setLoaded] = useState(false);
     const [applications, setApplications] = useState<IApplication[]>([]);
-    useEffect(() => {
-      const id = command.subscribeByFlag('applications', async () => {
-        setLoaded(true);
-        setApplications(await orgCtrl.loadApplications());
-      });
-      return () => {
-        command.unsubscribeByFlag(id);
-      };
-    }, []);
+    const [loaded] = useFlagCmdEmitter('applications', async () => {
+      setApplications(await orgCtrl.loadApplications());
+    });
     const contextMenu = (app: IApplication) => {
       const useAlays = app.cache.tags?.includes('常用');
       const menus: OperateMenuType[] = [

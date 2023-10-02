@@ -54,7 +54,7 @@ export abstract class FileInfo<T extends schema.XEntity>
   implements IFileInfo<T>
 {
   constructor(_metadata: T, _directory: IDirectory) {
-    super(_metadata);
+    super(_metadata, ['资源']);
     this.directory = _directory;
     this.isContainer = false;
     this.cache = { fullId: `${this.spaceId}_${_metadata.id}` };
@@ -183,6 +183,25 @@ export class SysFileInfo extends FileInfo<schema.XEntity> implements ISysFileInf
   get cacheFlag(): string {
     return 'files';
   }
+  get groupTags(): string[] {
+    const gtags: string[] = [];
+    if (this.typeName.startsWith('image')) {
+      gtags.push('图片');
+    }
+    if (this.typeName.startsWith('video')) {
+      gtags.push('视频');
+    }
+    if (this.typeName.startsWith('text')) {
+      gtags.push('文本');
+    }
+    if (this.typeName.includes('pdf')) {
+      gtags.push('PDF');
+    }
+    if (this.typeName.includes('office')) {
+      gtags.push('Office');
+    }
+    return [...gtags, '文件', ...super.groupTags];
+  }
   filedata: FileItemModel;
   shareInfo(): model.FileItemShare {
     return {
@@ -270,6 +289,9 @@ export abstract class StandardFileInfo<T extends schema.XStandard>
   constructor(_metadata: T, _directory: IDirectory, _coll: XCollection<T>) {
     super(_metadata, _directory);
     this.coll = _coll;
+  }
+  get groupTags(): string[] {
+    return ['标准', ...super.groupTags];
   }
   abstract copy(destination: IDirectory): Promise<boolean>;
   abstract move(destination: IDirectory): Promise<boolean>;

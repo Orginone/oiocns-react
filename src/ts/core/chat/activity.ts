@@ -133,7 +133,7 @@ export class Activity extends Entity<schema.XTarget> implements IActivity {
   coll: XCollection<model.ActivityType>;
   private finished: boolean = false;
   constructor(_metadata: schema.XTarget, session: ISession) {
-    super(_metadata);
+    super(_metadata, ['动态']);
     this.session = session;
     this.activityList = [];
     if (this.session.target.id === this.session.sessionId) {
@@ -244,13 +244,16 @@ export class GroupActivity extends Entity<schema.XTarget> implements IActivity {
   private subActivitys: IActivity[];
   lastTime: number = new Date().getTime();
   constructor(_user: IPerson, _activitys: IActivity[], userPublish: boolean) {
-    super({
-      ..._user.metadata,
-      name: '全部',
-      typeName: '动态',
-      icon: '',
-      id: _user.id + 'xxx',
-    });
+    super(
+      {
+        ..._user.metadata,
+        name: '全部',
+        typeName: '动态',
+        icon: '',
+        id: _user.id + 'xxx',
+      },
+      ['全部动态'],
+    );
     this.allPublish = userPublish;
     this.session = _user.session;
     this.subActivitys = _activitys;
@@ -269,7 +272,6 @@ export class GroupActivity extends Entity<schema.XTarget> implements IActivity {
     return more.sort((a, b) => b.createTime - a.createTime);
   }
   async load(take: number = 10): Promise<IActivityMessage[]> {
-    console.log(new Date().getTime(), take);
     await Promise.all(this.subActivitys.map((i) => i.load(take)));
     const more: IActivityMessage[] = [];
     for (const activity of this.subActivitys) {

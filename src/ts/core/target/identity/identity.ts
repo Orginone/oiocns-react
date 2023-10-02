@@ -26,10 +26,13 @@ export interface IIdentity extends IEntity<schema.XIdentity> {
 /** 身份（角色）实现类 */
 export class Identity extends Entity<schema.XIdentity> implements IIdentity {
   constructor(_metadata: schema.XIdentity, current: ITarget) {
-    super({
-      ..._metadata,
-      typeName: '角色',
-    });
+    super(
+      {
+        ..._metadata,
+        typeName: '角色',
+      },
+      [],
+    );
     this.current = current;
     this.isInherited = false;
     this.directory = current.directory;
