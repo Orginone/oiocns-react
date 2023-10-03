@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
-import { Image, message, Upload, UploadProps } from 'antd';
-import { IDirectory, ISysFileInfo } from '@/ts/core';
 import cls from './index.module.less';
-import { shareOpenLink } from '@/utils/tools';
+import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
+import { message, Upload, UploadProps } from 'antd';
+import { IDirectory, ISysFileInfo } from '@/ts/core';
+import ActivityResource from '@/components/Activity/ActivityResource';
 const ImageUploader: React.FC<{
   maxCount: number;
   types: string[];
@@ -44,18 +44,11 @@ const ImageUploader: React.FC<{
     },
   };
   return (
-    <div className={cls.imageUploader}>
-      {fileList.map((item) => {
-        return (
-          <Image
-            style={{ width: '200px', height: '200px' }}
-            src={shareOpenLink(item.filedata.shareLink)}
-            key={item.key}
-            preview={{
-              src: shareOpenLink(item.filedata.shareLink),
-            }}></Image>
-        );
-      })}
+    <div style={{ width: 650 }} className={cls.imageUploader}>
+      {ActivityResource(
+        fileList.map((i) => i.shareInfo()),
+        600,
+      )}
       <Upload listType="picture-card" {...uploadProps}>
         {fileList.length >= props.maxCount ? null : uploadButton}
       </Upload>

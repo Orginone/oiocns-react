@@ -8,28 +8,26 @@ import {
   Image,
   Input,
   List,
-  Popover,
   Space,
   Tag,
   Typography,
 } from 'antd';
 import { IActivity, IActivityMessage, MessageType } from '@/ts/core';
 import {
-  EllipsisOutlined,
+  DeleteOutlined,
   HeartFilled,
   HeartOutlined,
   MessageOutlined,
 } from '@ant-design/icons';
-import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
-import { parseHtmlToText, shareOpenLink, showChatTime } from '@/utils/tools';
+import { parseHtmlToText, showChatTime } from '@/utils/tools';
 import orgCtrl from '@/ts/controller';
-import { FileItemShare } from '@/ts/base/model';
-import ActivityComment from '@/components/Activity/ActivityComment';
 import { XEntity } from '@/ts/base/schema';
 import { ScrollView } from 'devextreme-react';
 import dxScrollView from 'devextreme/ui/scroll_view';
-import { ImBin } from '@/icons/im';
 import { command } from '@/ts/base';
+import ActivityResource from './ActivityResource';
+import EntityIcon from '../Common/GlobalComps/entityIcon';
+import ActivityComment from '../Activity/ActivityComment';
 
 interface ActivityProps {
   height: number | string;
@@ -66,36 +64,6 @@ export const ActivityItem: React.FC<ActivityItemProps> = ({
       user && setReplyTo(user);
     }
     setCommenting(true);
-  };
-  const ActivityResponsiveImage: React.FC<{
-    item: FileItemShare;
-    number: number;
-  }> = ({ item, number }) => {
-    const computedWidth = (number: number) => {
-      if (number > 2) return 'calc(33.3% - 8px)';
-      if (number > 1) return 'calc(50% - 8px)';
-      return '100%';
-    };
-    const computedHeight = (number: number) => {
-      if (number > 2) return 200;
-      if (number > 1) return 300;
-      return 500;
-    };
-    return (
-      <div
-        style={{
-          width: computedWidth(number),
-          height: computedHeight(number),
-        }}>
-        <Image
-          width={'100%'}
-          height={'100%'}
-          src={shareOpenLink(item.shareLink)}
-          preview={{
-            src: shareOpenLink(item.shareLink),
-          }}></Image>
-      </div>
-    );
   };
   const renderContent = () => {
     switch (metadata.typeName) {
@@ -177,12 +145,15 @@ export const ActivityItem: React.FC<ActivityItemProps> = ({
           <Input.TextArea
             placeholder={replyTo ? `回复${replyTo.name} :` : ''}
             style={{ height: 12 }}
+            value={comment}
             onChange={(e) => setComment(e.currentTarget.value)}></Input.TextArea>
           <Button
             type="primary"
             size="small"
             onClick={async () => {
               await item.comment(comment, replyTo?.id);
+              setCommenting(false);
+              setComment('');
             }}>
             发送
           </Button>
@@ -190,7 +161,36 @@ export const ActivityItem: React.FC<ActivityItemProps> = ({
       </>
     );
   };
-
+  const renderOperate = () => {
+    return (
+      <Space split={<Divider type="vertical" />} wrap size={2}>
+        <Button
+          type="text"
+          size="small"
+          onClick={async () => {
+            await item.like();
+          }}>
+          {metadata.likes.includes(orgCtrl.user.id) ? (
+            <>
+              <HeartFilled style={{ color: '#cb4747' }} /> <span>取消</span>
+            </>
+          ) : (
+            <>
+              <HeartOutlined /> <span>点赞</span>
+            </>
+          )}
+        </Button>
+        <Button type="text" size="small" onClick={() => handleReply()}>
+          <MessageOutlined /> <span>评论</span>
+        </Button>
+        {item.canDelete && (
+          <Button type="text" size="small" onClick={() => item.delete()}>
+            <DeleteOutlined /> <span>删除</span>
+          </Button>
+        )}
+      </Space>
+    );
+  };
   return (
     <List.Item>
       <List.Item.Meta
@@ -216,14 +216,7 @@ export const ActivityItem: React.FC<ActivityItemProps> = ({
               {hideResource !== true && (
                 <div className={cls.activityItemImageList}>
                   <Image.PreviewGroup>
-                    {metadata.resource.map((perItem, index) => {
-                      return (
-                        <ActivityResponsiveImage
-                          item={perItem}
-                          number={metadata.resource.length}
-                          key={index}></ActivityResponsiveImage>
-                      );
-                    })}
+                    {ActivityResource(metadata.resource, 600)}
                   </Image.PreviewGroup>
                 </div>
               )}
@@ -235,48 +228,7 @@ export const ActivityItem: React.FC<ActivityItemProps> = ({
                   发布于{showChatTime(item.metadata.createTime)}
                 </span>
               </div>
-              <div>
-                <ImBin
-                  color="#888"
-                  key="clean"
-                  size={16}
-                  title="删除动态"
-                  style={{ cursor: 'pointer' }}
-                  onClick={async () => {
-                    await item.delete();
-                  }}
-                />
-                <Popover
-                  placement="left"
-                  content={
-                    <Space split={<Divider type="vertical" />} size="small">
-                      <Button
-                        type="text"
-                        size="small"
-                        onClick={async () => {
-                          await item.like();
-                        }}>
-                        {metadata.likes.includes(orgCtrl.user.id) ? (
-                          <>
-                            <HeartFilled style={{ color: '#cb4747' }} /> 取消
-                          </>
-                        ) : (
-                          <>
-                            <HeartOutlined /> 赞
-                          </>
-                        )}
-                      </Button>
-                      <Button type="text" size="small" onClick={() => handleReply()}>
-                        <MessageOutlined /> 评论
-                      </Button>
-                    </Space>
-                  }
-                  trigger="click">
-                  <Button type="text" size="middle">
-                    <EllipsisOutlined style={{ fontSize: 22 }} />
-                  </Button>
-                </Popover>
-              </div>
+              <div>{renderOperate()}</div>
             </div>
             {renderCtxMore()}
           </div>
