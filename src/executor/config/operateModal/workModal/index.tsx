@@ -34,7 +34,7 @@ const ApplicationModal: React.FC<IProps> = ({ current, finished }) => {
         onSave={isSave}
         onSaveFinished={(success) => {
           if (success) {
-            message.info('保存成功');
+            message.info('保存成功', 0.5);
             finished();
           }
           setIsSave(false);

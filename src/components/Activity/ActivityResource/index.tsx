@@ -4,12 +4,19 @@ import { JolPlayer } from 'jol-player';
 import { FileItemShare } from '@/ts/base/model';
 import { shareOpenLink } from '@/utils/tools';
 import { FileUnknownOutlined } from '@ant-design/icons';
-const ActivityResource = (fileList: FileItemShare[], maxWidth: number) => {
+const ActivityResource = (
+  fileList: FileItemShare[],
+  maxWidth: number,
+  columns: number = 3,
+) => {
   if (fileList.length < 1) return <></>;
   const computedSize = () => {
-    if (fileList.length > 2) return maxWidth / 3 - 8;
-    if (fileList.length > 1) return maxWidth / 2 - 8;
-    return maxWidth;
+    if (fileList.length >= columns) {
+      return maxWidth / columns - 8;
+    } else if (fileList.length > 1) {
+      return maxWidth / fileList.length - 8;
+    }
+    return maxWidth - 8;
   };
   const renderResource = (item: FileItemShare) => {
     if (item.contentType?.startsWith('image')) {

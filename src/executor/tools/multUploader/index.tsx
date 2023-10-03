@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import cls from './index.module.less';
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 import { message, Upload, UploadProps } from 'antd';
 import { IDirectory, ISysFileInfo } from '@/ts/core';
 import ActivityResource from '@/components/Activity/ActivityResource';
+import orgCtrl from '@/ts/controller';
 const ImageUploader: React.FC<{
   maxCount: number;
   types: string[];
@@ -12,6 +13,19 @@ const ImageUploader: React.FC<{
 }> = (props) => {
   const [loading, setLoading] = useState(false);
   const [fileList, setFileList] = useState<ISysFileInfo[]>([]);
+  useEffect(() => {
+    const files: ISysFileInfo[] = [];
+    orgCtrl.user.copyFiles.forEach((item) => {
+      if ('filedata' in item) {
+        const file = item as ISysFileInfo;
+        if (props.types.some((i) => file.filedata.contentType?.startsWith(i))) {
+          files.push(file);
+        }
+      }
+    });
+    setFileList(files);
+    props.onChange(files);
+  }, []);
   const directory = props.directory;
   const uploadButton = (
     <div>
@@ -44,10 +58,11 @@ const ImageUploader: React.FC<{
     },
   };
   return (
-    <div style={{ width: 650 }} className={cls.imageUploader}>
+    <div className={cls.imageUploader}>
       {ActivityResource(
         fileList.map((i) => i.shareInfo()),
-        600,
+        200,
+        1,
       )}
       <Upload listType="picture-card" {...uploadProps}>
         {fileList.length >= props.maxCount ? null : uploadButton}

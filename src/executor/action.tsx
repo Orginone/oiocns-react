@@ -109,7 +109,7 @@ const setCopyFiles = (cmd: string, file: IFileInfo<schema.XEntity>) => {
     }
   }
   orgCtrl.user.copyFiles.set(key, file);
-  message.info(`${file.name}已放入剪切板`);
+  message.info(`${file.name}已放入剪切板`, 0.5);
 };
 
 /** 剪贴板操作 */
