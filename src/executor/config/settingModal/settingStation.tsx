@@ -102,9 +102,8 @@ const SettingStation: React.FC<IProps> = ({ company, finished }) => {
             setOperateKey('');
           }}
         />;
-      default:
-        return <></>;
     }
+    return <></>;
   };
   return (
     <FullScreenModal

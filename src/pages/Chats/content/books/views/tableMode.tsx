@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { IFileInfo, ISession } from '@/ts/core';
-import { schema } from '@/ts/base';
+import { IFile, ISession } from '@/ts/core';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import { showChatTime } from '@/utils/tools';
 import DataGrid, { Column, Scrolling } from 'devextreme-react/data-grid';
@@ -104,7 +103,7 @@ const TableMode = ({
                 </Text>
               );
             }}
-            calculateDisplayValue={(e: IFileInfo<schema.XEntity>) => {
+            calculateDisplayValue={(e: IFile) => {
               return showChatTime(e.metadata.updateTime);
             }}
           />

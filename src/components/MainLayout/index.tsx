@@ -1,5 +1,5 @@
 import { Col, Divider, Dropdown, Layout, Row, Space, Typography, Button } from 'antd';
-import React, { CSSProperties, useEffect, useState } from 'react';
+import React, { CSSProperties } from 'react';
 import cls from './index.module.less';
 import CustomMenu from '@/components/CustomMenu';
 import CustomBreadcrumb from '@/components/CustomBreadcrumb';
@@ -10,7 +10,6 @@ import { Resizable } from 'devextreme-react';
 import { LeftBarIcon, RightBarIcon } from '@/components/Common/GlobalComps/customIcon';
 import useStorage from '@/hooks/useStorage';
 import EntityPreview from './preview';
-import { command } from '@/ts/base';
 const { Content, Sider } = Layout;
 
 /**
@@ -18,7 +17,7 @@ const { Content, Sider } = Layout;
  */
 type MainLayoutType = {
   style?: CSSProperties;
-  menusHeight?: number | string;
+  leftShow?: boolean;
   children?: React.ReactNode; // 子组件
   siderMenuData: MenuItemType;
   rightBar?: React.ReactNode;
@@ -35,23 +34,9 @@ type MainLayoutType = {
  * @returns
  */
 const MainLayout: React.FC<MainLayoutType> = (props) => {
-  const [preview, setPreview] = useState<any>();
   const [leftSider, setLeftSider] = useStorage<boolean>('leftSider', false);
   const [rightSider, setRightSider] = useStorage<boolean>('rightSider', false);
   const [mainWidth, setMainWidth] = useStorage<string | number>('mainWidth', '40%');
-  useEffect(() => {
-    const id = command.subscribe((type, _, ...args: any[]) => {
-      if (type != 'preview') return;
-      if (args && args.length > 0) {
-        setPreview(args[0]);
-      } else {
-        setPreview(undefined);
-      }
-    });
-    return () => {
-      command.unsubscribe(id);
-    };
-  }, []);
   const parentMenu = props.selectMenu.parentMenu ?? props.siderMenuData;
   const outside =
     props.selectMenu.menus?.filter((item) => item.model === 'outside') ?? [];
@@ -86,7 +71,7 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
   };
   return (
     <Layout className={cls.layout} style={props.style}>
-      <Row className={cls[`content-top`]} justify="space-between">
+      <Row className={cls.contenttop} justify="space-between">
         <Col>
           <CustomBreadcrumb
             selectKey={props.selectMenu.key}
@@ -144,7 +129,7 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
         </Col>
       </Row>
       <Layout>
-        {leftSider && (
+        {(props.leftShow ?? leftSider) && (
           <Sider className={cls.sider} width={250}>
             <div className={cls.menuBar}>
               <Typography.Link
@@ -168,10 +153,7 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
               <span style={{ fontSize: 20, margin: '0 6px' }}>{parentMenu.icon}</span>
               <strong>{parentMenu.label}</strong>
             </div>
-            <div
-              className={cls.container}
-              id="templateMenu"
-              style={{ height: props.menusHeight }}>
+            <div className={cls.container} id="templateMenu">
               <CustomMenu
                 item={parentMenu}
                 collapsed={false}
@@ -195,7 +177,7 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
               </Sider>
             </Resizable>
             <Content className={cls.content}>
-              {preview && <EntityPreview entity={preview} />}
+              <EntityPreview entity={props.selectMenu.item} />
             </Content>
           </>
         ) : (

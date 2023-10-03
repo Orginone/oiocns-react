@@ -1,7 +1,7 @@
 import { kernel, model, schema } from '../../base';
 import { IApplication } from '../thing/standard/application';
 import { IForm, Form } from '../thing/standard/form';
-import { FileInfo, IFileInfo } from '../thing/fileinfo';
+import { FileInfo, IFile, IFileInfo } from '../thing/fileinfo';
 import { IDirectory } from '../thing/directory';
 import { IWorkApply, WorkApply } from './apply';
 import { fileOperates } from '../public';
@@ -119,7 +119,7 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
     }
     return false;
   }
-  content(_mode: number = 0): IFileInfo<schema.XEntity>[] {
+  content(_mode: number = 0): IFile[] {
     if (this.node) {
       return this.forms.filter(
         (a) => this.node!.forms.findIndex((s) => s.id == a.id) > -1,

@@ -39,6 +39,9 @@ export class Form extends StandardFileInfo<schema.XForm> implements IForm {
   get cacheFlag(): string {
     return 'forms';
   }
+  get groupTags(): string[] {
+    return ['表单', ...super.groupTags];
+  }
   async loadContent(reload: boolean = false): Promise<boolean> {
     await this.loadFields(reload);
     return true;

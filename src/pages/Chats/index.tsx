@@ -15,7 +15,6 @@ const Setting: React.FC<any> = () => {
   if (!selectMenu || !rootMenu) return <></>;
   return (
     <MainLayout
-      menusHeight={'calc(100vh - 168px)'}
       selectMenu={selectMenu}
       onSelect={async (data) => {
         setSelectMenu(data);
@@ -44,12 +43,7 @@ const Setting: React.FC<any> = () => {
         }
       }}
       siderMenuData={rootMenu}>
-      <Content
-        key={key}
-        belong={selectMenu.company!}
-        selectMenu={selectMenu}
-        filter={filter}
-      />
+      <Content key={key} selectMenu={selectMenu} filter={filter} />
     </MainLayout>
   );
 };

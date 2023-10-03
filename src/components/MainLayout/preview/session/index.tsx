@@ -109,7 +109,7 @@ const SessionBody = ({ chat }: { chat: ISession }) => {
           </div>
         )}
         <div className={css.groupDetailContent}>
-          <Activity height={800} activity={chat.activity}></Activity>
+          <Activity height={680} activity={chat.activity}></Activity>
         </div>
       </div>
     </>

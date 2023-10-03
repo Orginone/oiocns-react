@@ -2,13 +2,13 @@ import { Dropdown, Card, Typography } from 'antd';
 
 import React from 'react';
 import cls from './index.module.less';
-import { IDirectory, IFileInfo } from '@/ts/core';
-import { command, schema } from '@/ts/base';
+import { IDirectory, IFile } from '@/ts/core';
+import { command } from '@/ts/base';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import { loadFileMenus } from '@/executor/fileOperate';
 
 const IconMode = ({ dircetory }: { dircetory: IDirectory }) => {
-  const contextMenu = (file?: IFileInfo<schema.XEntity>) => {
+  const contextMenu = (file?: IFile) => {
     var entity = file || dircetory;
     return {
       items: loadFileMenus(entity, 0).filter(
@@ -19,7 +19,7 @@ const IconMode = ({ dircetory }: { dircetory: IDirectory }) => {
       },
     };
   };
-  const FileCard = (item: IFileInfo<schema.XEntity>) => (
+  const FileCard = (item: IFile) => (
     <Dropdown key={item.id} menu={contextMenu(item)} trigger={['contextMenu']}>
       <Card
         size="small"

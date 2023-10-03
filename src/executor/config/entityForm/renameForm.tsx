@@ -1,11 +1,10 @@
-import { schema } from '@/ts/base';
-import { IFileInfo } from '@/ts/core';
+import { IFile } from '@/ts/core';
 import { Modal } from 'antd';
 import React, { useState } from 'react';
 
 interface Iprops {
   finished: () => void;
-  file: IFileInfo<schema.XEntity>;
+  file: IFile;
 }
 
 const RenameForm = (props: Iprops) => {

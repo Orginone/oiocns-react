@@ -25,7 +25,7 @@ const ListMode = ({
       renderItem={(item: ISession) => {
         const style: any = {};
         if (select?.id === item.id) {
-          style.backgroundColor = '#e6e6e6';
+          style.backgroundColor = '#e6f1ff';
         }
         return (
           <div className={css.book_ul} style={style}>

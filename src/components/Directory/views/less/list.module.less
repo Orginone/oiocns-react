@@ -1,7 +1,13 @@
 .list_item {
   cursor: pointer;
   padding: 0 10px;
+  border-radius: 10px;
   border-bottom: 1px solid #ebeef5;
+}
+
+.item_title {
+  display: inline;
+  margin-right: 10px;
 }
 
 .list_item:hover {
@@ -11,8 +17,9 @@
 .list_item_select {
   cursor: pointer;
   padding: 0 10px;
-  background-color: #e6e6e6;
+  border-radius: 10px;
   border-bottom: 1px solid #ebeef5;
+  background-color: @active-background;
 }
 
 .blank_area {

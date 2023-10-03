@@ -7,6 +7,8 @@ import { Entity, IEntity, entityOperates } from '../public';
 import { fileOperates } from '../public';
 import { XCollection } from '../public/collection';
 import { ITarget } from '../target/base/target';
+/** 默认文件接口 */
+export interface IFile extends IFileInfo<schema.XEntity> {}
 /** 文件类接口 */
 export interface IFileInfo<T extends schema.XEntity> extends IEntity<T> {
   /** 缓存 */
@@ -43,7 +45,7 @@ export interface IFileInfo<T extends schema.XEntity> extends IEntity<T> {
   /** 加载文件内容 */
   loadContent(reload?: boolean): Promise<boolean>;
   /** 目录下的内容 */
-  content(mode?: number): IFileInfo<schema.XEntity>[];
+  content(mode?: number): IFile[];
   /** 缓存用户数据 */
   cacheUserData(notify?: boolean): Promise<boolean>;
 }
@@ -54,7 +56,7 @@ export abstract class FileInfo<T extends schema.XEntity>
   implements IFileInfo<T>
 {
   constructor(_metadata: T, _directory: IDirectory) {
-    super(_metadata, ['资源']);
+    super(_metadata, [_metadata.typeName]);
     this.directory = _directory;
     this.isContainer = false;
     this.cache = { fullId: `${this.spaceId}_${_metadata.id}` };
@@ -121,7 +123,7 @@ export abstract class FileInfo<T extends schema.XEntity>
   async loadContent(reload: boolean = false): Promise<boolean> {
     return await sleep(reload ? 10 : 0);
   }
-  content(_mode: number = 0): IFileInfo<schema.XEntity>[] {
+  content(_mode: number = 0): IFile[] {
     return [];
   }
   operates(mode: number = 0): model.OperateModel[] {
@@ -185,25 +187,18 @@ export class SysFileInfo extends FileInfo<schema.XEntity> implements ISysFileInf
   }
   get groupTags(): string[] {
     const gtags: string[] = [];
-    if (this.cache.tags) {
-      gtags.push(...this.cache.tags);
-    }
     if (this.typeName.startsWith('image')) {
       gtags.push('图片');
-    }
-    if (this.typeName.startsWith('video')) {
+    } else if (this.typeName.startsWith('video')) {
       gtags.push('视频');
-    }
-    if (this.typeName.startsWith('text')) {
+    } else if (this.typeName.startsWith('text')) {
       gtags.push('文本');
-    }
-    if (this.typeName.includes('pdf')) {
+    } else if (this.typeName.includes('pdf')) {
       gtags.push('PDF');
-    }
-    if (this.typeName.includes('office')) {
+    } else if (this.typeName.includes('office')) {
       gtags.push('Office');
     }
-    return [...gtags, '文件', ...super.groupTags];
+    return [...gtags, '文件'];
   }
   filedata: FileItemModel;
   shareInfo(): model.FileItemShare {
@@ -274,7 +269,7 @@ export class SysFileInfo extends FileInfo<schema.XEntity> implements ISysFileInf
     const operates = super.operates();
     return operates.filter((i) => i.cmd != 'update');
   }
-  content(_mode?: number | undefined): IFileInfo<schema.XEntity>[] {
+  content(_mode?: number | undefined): IFile[] {
     return [];
   }
 }
@@ -292,9 +287,6 @@ export abstract class StandardFileInfo<T extends schema.XStandard>
   constructor(_metadata: T, _directory: IDirectory, _coll: XCollection<T>) {
     super(_metadata, _directory);
     this.coll = _coll;
-  }
-  get groupTags(): string[] {
-    return ['标准', ...super.groupTags];
   }
   abstract copy(destination: IDirectory): Promise<boolean>;
   abstract move(destination: IDirectory): Promise<boolean>;

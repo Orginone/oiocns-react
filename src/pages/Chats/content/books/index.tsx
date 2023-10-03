@@ -1,7 +1,7 @@
 import { Empty, Spin } from 'antd';
 import React, { useState } from 'react';
 import orgCtrl from '@/ts/controller';
-import { ICompany, ISession } from '@/ts/core';
+import { ISession } from '@/ts/core';
 import useStorage from '@/hooks/useStorage';
 import IconMode from './views/iconMode';
 import ListMode from './views/listMode';
@@ -22,7 +22,6 @@ const Book: React.FC<any> = ({
 }: {
   chats: ISession[];
   filter: string;
-  belong: ICompany;
 }) => {
   const [currentTag, setCurrentTag] = useState('全部');
   const [select, setSelect] = useState<ISession>();
@@ -85,7 +84,7 @@ const Book: React.FC<any> = ({
       <SegmentContent
         key={msgKey}
         onSegmentChanged={setSegmented}
-        description={`${getChats().length}个会话`}
+        descriptions={[`${getChats().length}个会话`]}
         content={
           <Spin spinning={!loaded} tip={'加载中...'} delay={200}>
             {segmented === 'table' ? (

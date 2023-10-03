@@ -1,26 +1,30 @@
 import React, { useState } from 'react';
-import { IFileInfo } from '@/ts/core';
-import { schema } from '@/ts/base';
+import { IFile } from '@/ts/core';
 import { Dropdown, List, MenuProps, Tag } from 'antd';
 import { showChatTime } from '@/utils/tools';
 import css from './less/list.module.less';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 
 const ListMode = ({
-  select,
+  focusFile,
   content,
   fileOpen,
   contextMenu,
+  selectFiles,
 }: {
-  select: IFileInfo<schema.XEntity> | undefined;
-  content: IFileInfo<schema.XEntity>[];
-  fileOpen: (
-    file: IFileInfo<schema.XEntity> | undefined,
-    dblclick: boolean,
-  ) => Promise<void>;
-  contextMenu: (file?: IFileInfo<schema.XEntity>) => MenuProps;
+  content: IFile[];
+  selectFiles: IFile[];
+  focusFile: IFile | undefined;
+  fileOpen: (file: IFile | undefined, dblclick: boolean) => Promise<void>;
+  contextMenu: (file?: IFile) => MenuProps;
 }) => {
-  const [cxtItem, setCxtItem] = useState<IFileInfo<schema.XEntity>>();
+  const [cxtItem, setCxtItem] = useState<IFile>();
+  const getItemClassName = (item: IFile) => {
+    if (focusFile?.id === item.id || selectFiles.some((i) => i.id === item.id)) {
+      return css.list_item_select;
+    }
+    return css.list_item;
+  };
   return (
     <Dropdown menu={contextMenu(cxtItem)} trigger={['contextMenu']} destroyPopupOnHide>
       <div
@@ -31,8 +35,7 @@ const ListMode = ({
           dataSource={content}
           renderItem={(item) => {
             return (
-              <div
-                className={select?.id === item.id ? css.list_item_select : css.list_item}>
+              <div className={getItemClassName(item)}>
                 <List.Item
                   onClick={async () => {
                     await fileOpen(item, false);
@@ -49,7 +52,7 @@ const ListMode = ({
                   <List.Item.Meta
                     title={
                       <>
-                        <span style={{ marginRight: 10 }}>{item.name}</span>
+                        <div className={css.item_title}>{item.name}</div>
                         <Tag color="green" title={'文件类型'}>
                           {item.typeName}
                         </Tag>

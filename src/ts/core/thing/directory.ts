@@ -12,9 +12,9 @@ import { Transfer, ITransfer } from './standard/transfer';
 import {
   SysFileInfo,
   ISysFileInfo,
-  IFileInfo,
   IStandardFileInfo,
   StandardFileInfo,
+  IFile,
 } from './fileinfo';
 import { ISpecies } from './standard/species';
 import { Member } from './member';
@@ -46,7 +46,7 @@ export interface IDirectory extends IStandardFileInfo<schema.XDirectory> {
   /** 目录结构变更 */
   structCallback(): void;
   /** 目录下的内容 */
-  content(mode?: number): IFileInfo<schema.XEntity>[];
+  content(mode?: number): IFile[];
   /** 创建子目录 */
   create(data: schema.XDirectory): Promise<schema.XDirectory | undefined>;
   /** 目录下的文件 */
@@ -152,18 +152,20 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
   structCallback(): void {
     command.emitter('-', 'refresh', this);
   }
-  content(mode: number = 0): IFileInfo<schema.XEntity>[] {
-    const cnt: IFileInfo<schema.XEntity>[] = [...this.children];
-    if (this.typeName === '成员目录') {
-      cnt.push(...this.target.members.map((i) => new Member(i, this)));
-    } else {
-      cnt.push(...this.forms, ...this.applications, ...this.files, ...this.transfers);
-      if (mode != 1) {
-        cnt.push(...this.propertys);
-        cnt.push(...this.specieses);
-        if (!this.parent) {
-          cnt.unshift(this.target.memberDirectory);
-          cnt.push(...this.target.content(mode));
+  content(mode: number = 0): IFile[] {
+    const cnt: IFile[] = [...this.children];
+    if (this.target.session.isMyChat && this.target.hasRelationAuth()) {
+      if (this.typeName === '成员目录') {
+        cnt.push(...this.target.members.map((i) => new Member(i, this)));
+      } else {
+        cnt.push(...this.forms, ...this.applications, ...this.files, ...this.transfers);
+        if (mode != 1) {
+          cnt.push(...this.propertys);
+          cnt.push(...this.specieses);
+          if (!this.parent) {
+            cnt.unshift(this.target.memberDirectory);
+            cnt.push(...this.target.content(mode));
+          }
         }
       }
     }

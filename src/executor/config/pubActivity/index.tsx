@@ -72,8 +72,7 @@ const ActivityPublisher: React.FC<{
         <Form.Item>
           <MultImageUploader
             maxCount={9}
-            types={['image', 'video']}
-            directory={props.activity.session.target.directory}
+            types={['图片', '视频']}
             onChange={(fileList) => {
               setResource(fileList.map((item) => item.shareInfo()) || []);
             }}></MultImageUploader>

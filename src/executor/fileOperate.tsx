@@ -1,11 +1,11 @@
 import TypeIcon from '@/components/Common/GlobalComps/typeIcon';
-import { command, schema } from '@/ts/base';
-import { IFileInfo } from '@/ts/core';
+import { command } from '@/ts/base';
+import { IFile } from '@/ts/core';
 import React from 'react';
 import { OperateMenuType } from 'typings/globelType';
 
 /** 加载文件菜单 */
-export const loadFileMenus = (file: IFileInfo<schema.XEntity>, mode: number = 0) => {
+export const loadFileMenus = (file: IFile, mode: number = 0) => {
   return file
     .operates(mode)
     .sort((a, b) => a.sort - b.sort)

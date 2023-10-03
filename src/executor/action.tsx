@@ -2,7 +2,7 @@ import {
   IApplication,
   IDirectory,
   IEntity,
-  IFileInfo,
+  IFile,
   IMemeber,
   ISession,
   IStorage,
@@ -80,7 +80,7 @@ const activateStorage = (store: IStorage) => {
 
 /** 进入目录 */
 const openDirectory = (
-  entity: IEntity<schema.XEntity> | IFileInfo<schema.XEntity> | ITarget | IWork,
+  entity: IEntity<schema.XEntity> | IFile | ITarget | IWork,
   type: string,
 ) => {
   if (type === 'data' && 'node' in entity) {
@@ -101,7 +101,7 @@ const openDirectory = (
 };
 
 /** 拷贝/剪切文件 */
-const setCopyFiles = (cmd: string, file: IFileInfo<schema.XEntity>) => {
+const setCopyFiles = (cmd: string, file: IFile) => {
   const key = cmd + '_' + file.id;
   for (const k of orgCtrl.user.copyFiles.keys()) {
     if (k.endsWith(file.id)) {
@@ -195,7 +195,7 @@ const openChat = (entity: IDirectory | IMemeber | ISession | ITarget) => {
 };
 
 /** 删除实体 */
-const deleteEntity = (entity: IFileInfo<schema.XEntity>) => {
+const deleteEntity = (entity: IFile) => {
   Modal.confirm({
     okText: '确认',
     cancelText: '取消',
@@ -294,10 +294,7 @@ const onlineChanged = (cmd: string, info: model.OnlineInfo) => {
 };
 
 /** 文件上传 */
-const uploadFile = (
-  dir: IDirectory,
-  uploaded?: (file: IFileInfo<schema.XEntity> | undefined) => void,
-) => {
+const uploadFile = (dir: IDirectory, uploaded?: (file: IFile | undefined) => void) => {
   const modal = Modal.info({
     icon: <></>,
     okText: '关闭',

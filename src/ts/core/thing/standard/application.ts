@@ -1,7 +1,7 @@
 import { command, kernel, model, schema } from '../../../base';
 import { PageAll, directoryOperates, fileOperates } from '../../public';
 import { IDirectory } from '../directory';
-import { IFileInfo, IStandardFileInfo, StandardFileInfo } from '../fileinfo';
+import { IFile, IStandardFileInfo, StandardFileInfo } from '../fileinfo';
 import { IWork, Work } from '../../work';
 
 /** 应用/模块接口类 */
@@ -48,7 +48,7 @@ export class Application
   get cacheFlag(): string {
     return 'applications';
   }
-  content(_mode: number = 0): IFileInfo<schema.XEntity>[] {
+  content(_mode: number = 0): IFile[] {
     return [...this.children, ...this.works].sort((a, b) =>
       a.metadata.updateTime < b.metadata.updateTime ? 1 : -1,
     );

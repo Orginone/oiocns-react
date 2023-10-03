@@ -9,7 +9,7 @@ import { ITarget } from './base/target';
 import { ITeam } from './base/team';
 import { IStorage, Storage } from './outTeam/storage';
 import { personJoins, targetOperates } from '../public';
-import { IFileInfo } from '../thing/fileinfo';
+import { IFile } from '../thing/fileinfo';
 import { ISession } from '../chat/session';
 import { XObject } from '../public/object';
 
@@ -22,7 +22,7 @@ export interface IPerson extends IBelong {
   /** 用户缓存对象 */
   cacheObj: XObject<schema.Xbase>;
   /** 拷贝的文件 */
-  copyFiles: Map<string, IFileInfo<schema.XEntity>>;
+  copyFiles: Map<string, IFile>;
   /** 根据ID查询共享信息 */
   findShareById(id: string): model.ShareIcon;
   /** 根据Id查询共享信息 */
@@ -51,7 +51,7 @@ export class Person extends Belong implements IPerson {
   companys: ICompany[] = [];
   cacheObj: XObject<schema.Xbase>;
   givedIdentitys: schema.XIdProof[] = [];
-  copyFiles: Map<string, IFileInfo<schema.XEntity>>;
+  copyFiles: Map<string, IFile>;
   private _cohortLoaded: boolean = false;
   private _givedIdentityLoaded: boolean = false;
   async loadGivedIdentitys(reload: boolean = false): Promise<schema.XIdProof[]> {

@@ -10,23 +10,23 @@
     overflow: hidden;
   }
 }
-.fileCard {
+.list_item {
   width: 160px;
   max-width: 160px;
   min-width: 160px;
   cursor: pointer;
-  border-radius: 6px;
+  border-radius: 10px;
   &:hover {
     background-color: #efefef;
   }
 }
-.fileCard_select {
+.list_item_select {
   width: 160px;
   max-width: 160px;
   min-width: 160px;
   cursor: pointer;
-  border-radius: 6px;
-  background-color: #e6e6e6;
+  border-radius: 10px;
+  background-color: @active-background !important;
 }
 .file {
   width: 100%;
@@ -45,6 +45,7 @@
   flex-wrap: wrap;
   align-content: flex-start;
   gap: 16px;
+  padding: 16px;
 }
 
 .fileImage {

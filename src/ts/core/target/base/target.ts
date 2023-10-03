@@ -5,7 +5,7 @@ import { PageAll } from '../../public/consts';
 import { ITeam, Team } from './team';
 import { targetOperates } from '../../public';
 import { Directory, IDirectory } from '../../thing/directory';
-import { IFileInfo } from '../../thing/fileinfo';
+import { IFile, IFileInfo } from '../../thing/fileinfo';
 import { DataResource } from '../../thing/resource';
 import { ISession, Session } from '../../chat/session';
 import { IPerson } from '../person';
@@ -207,7 +207,7 @@ export abstract class Target extends Team implements ITarget {
   abstract get chats(): ISession[];
   abstract get targets(): ITarget[];
   abstract get subTarget(): ITarget[];
-  abstract content(_mode?: number | undefined): IFileInfo<schema.XEntity>[];
+  abstract content(_mode?: number | undefined): IFile[];
   createTarget(_data: model.TargetModel): Promise<ITeam | undefined> {
     return new Promise((resolve) => {
       resolve(undefined);

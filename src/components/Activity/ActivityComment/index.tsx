@@ -11,7 +11,7 @@ const ActivityComment: React.FC<{
   return (
     <div className={cls.comment} onClick={() => onClick(comment)}>
       <div className={cls.commentAvatar}>
-        <EntityIcon entityId={comment.userId} showName></EntityIcon>:
+        <EntityIcon entityId={comment.userId} showName></EntityIcon>
       </div>
       <div className={cls.commentContent}>
         {comment.replyTo ? (
