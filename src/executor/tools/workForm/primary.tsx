@@ -1,5 +1,4 @@
 import OioForm from '@/components/Common/FormDesign/OioFormNext';
-import FormRenders from './form';
 import { kernel, model, schema } from '../../../ts/base';
 import { IBelong } from '@/ts/core';
 import { useEffect, useState } from 'react';

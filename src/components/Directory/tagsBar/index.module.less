@@ -5,8 +5,9 @@
   overflow-x: scroll;
   border-bottom: 1px solid #efefef;
   .tags_item {
+    cursor: pointer;
     word-break: keep-all;
-    padding: 2px 16px;
+    padding: 4px 16px;
     font-size: 12px;
     height: 26px;
     .item_count {
@@ -16,12 +17,12 @@
     }
     &:hover {
       border-radius: 30px;
-      background-color:rgba(139, 153, 255, 0.5);
+      background-color:@active-background;
     }
     &_active {
       cursor: not-allowed;
       border-radius: 30px;
-      padding: 2px 16px;
+      padding: 4px 16px;
       font-size: 12px;
       height: 26px;
       .item_count {
@@ -29,7 +30,7 @@
         transform: scale(0.9);
       }
       color: @text-color-inverse;
-      background-color:#3838b9;
+      background-color:@focus-background;
     }
   }
 }

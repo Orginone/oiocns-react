@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import MainLayout from '../MainLayout';
 import Directory from '../Directory';
 import useMenuUpdate from '@/hooks/useMenuUpdate';
-import * as config from './config/menuOperate';
+import { loadSettingMenu } from './config';
 import FullScreenModal from '../Common/fullScreen';
 import { Button, Divider, Space } from 'antd';
 import { IFile } from '@/ts/core';
@@ -11,14 +11,15 @@ interface IFileDialogProps {
   accepts: string[];
   multiple?: boolean;
   maxCount?: number;
+  rootKey: string;
   onOk: (files: IFile[]) => void;
   onCancel: () => void;
 }
 
 const OpenFileDialog: React.FC<IFileDialogProps> = (props) => {
   const [selectedFiles, setSelectedFiles] = useState<IFile[]>([]);
-  const [key, rootMenu, selectMenu, setSelectMenu] = useMenuUpdate(
-    config.loadSettingMenu,
+  const [key, rootMenu, selectMenu, setSelectMenu] = useMenuUpdate(() =>
+    loadSettingMenu(props.rootKey),
   );
   if (!selectMenu || !rootMenu) return <></>;
   return (

@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import cls from './index.module.less';
 import { PlusOutlined } from '@ant-design/icons';
-import { ISysFileInfo } from '@/ts/core';
+import { IDirectory, ISysFileInfo } from '@/ts/core';
 import OpenFileDialog from '@/components/OpenFileDialog';
 import ActivityResource from '@/components/Activity/ActivityResource';
 const ImageUploader: React.FC<{
   maxCount: number;
   types: string[];
+  directory: IDirectory;
   onChange: (fileList: ISysFileInfo[]) => void;
 }> = (props) => {
   const [open, setOpen] = useState(false);
@@ -18,6 +19,10 @@ const ImageUploader: React.FC<{
     </div>
   );
 
+  useEffect(() => {
+    props.onChange(fileList);
+  }, [fileList]);
+
   return (
     <div className={cls.imageUploader}>
       {ActivityResource(
@@ -27,6 +32,7 @@ const ImageUploader: React.FC<{
       )}
       {open && (
         <OpenFileDialog
+          rootKey={props.directory.key}
           maxCount={props.maxCount}
           accepts={props.types}
           onCancel={() => setOpen(false)}

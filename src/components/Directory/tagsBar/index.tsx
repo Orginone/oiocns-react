@@ -1,5 +1,5 @@
 import React from 'react';
-import { Badge, Button, Divider, Space } from 'antd';
+import { Badge, Divider, Space } from 'antd';
 import cls from './index.module.less';
 import { schema } from '@/ts/base';
 import { IEntity } from '@/ts/core';
@@ -33,14 +33,10 @@ const TagsBar: React.FC<IProps> = (props) => {
   const loadBarItem = (tag: string, count: number) => {
     const className = tag === props.select ? cls.tags_item_active : cls.tags_item;
     const barItem = (
-      <Button
-        key={tag}
-        className={className}
-        type="text"
-        onClick={() => props.onChanged(tag)}>
+      <div key={tag} className={className} onClick={() => props.onChanged(tag)}>
         {tag}
         {count > 0 && <span className={cls.item_count}>{count}</span>}
-      </Button>
+      </div>
     );
     if (props.badgeCount) {
       const badge = props.badgeCount(tag);

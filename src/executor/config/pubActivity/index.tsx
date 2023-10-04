@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import FullScreenModal from '@/executor/tools/fullScreen';
 import { Button, Form } from 'antd';
-import MultImageUploader from '../../tools/multUploader';
+import MultImageUploader from '@/components/MultImageUploader';
 import { IActivity, MessageType } from '@/ts/core';
 import { model } from '@/ts/base';
 import { Editor, Toolbar } from '@wangeditor/editor-for-react';
@@ -72,9 +72,10 @@ const ActivityPublisher: React.FC<{
         <Form.Item>
           <MultImageUploader
             maxCount={9}
+            directory={props.activity.session.target.directory}
             types={['图片', '视频']}
             onChange={(fileList) => {
-              setResource(fileList.map((item) => item.shareInfo()) || []);
+              setResource(fileList.map((item) => item.shareInfo()));
             }}></MultImageUploader>
         </Form.Item>
       </Form>

@@ -4,6 +4,7 @@ import React from 'react';
 import { loadFileMenus } from '@/executor/fileOperate';
 import { MenuItemType } from 'typings/globelType';
 import { IDepartment, IGroup, ITarget, IDirectory, IApplication, IWork } from '@/ts/core';
+import { findMenuItemByKey } from '@/utils/tools';
 
 /** 创建团队菜单 */
 const createMenu = (target: ITarget, children: MenuItemType[]) => {
@@ -145,13 +146,19 @@ const getTeamMenu = () => {
 };
 
 /** 加载设置模块菜单 */
-export const loadSettingMenu = () => {
-  return {
-    key: '设置',
-    label: '设置',
+export const loadSettingMenu = (rootKey: string) => {
+  const rootMenu = {
+    key: '根目录',
+    label: '根目录',
     itemType: 'Tab',
     item: 'disk',
     children: [getUserMenu(), ...getTeamMenu()],
     icon: <EntityIcon notAvatar={true} entityId={orgCtrl.user.id} size={18} />,
   };
+  const findMenu = findMenuItemByKey(rootMenu, rootKey);
+  if (findMenu) {
+    findMenu.parentMenu = undefined;
+    return findMenu;
+  }
+  return rootMenu;
 };
