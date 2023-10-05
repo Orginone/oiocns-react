@@ -7,7 +7,7 @@ export enum EffectEnum {
   'changeMain' = '修改主表展示方案', //修改主表展示方案
   'limitEdit' = '限制子表编辑功能', //限制子表编辑功能
 }
-export const EffectEnumOption = {
+export const EffectEnumOption: any = {
   mainVals: "设置主表数据", //设置主表数据
   detailVals: "设置子表数据", //设置子表数据
   verifyMain: "校验主表", //校验主表

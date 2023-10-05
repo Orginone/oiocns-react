@@ -1,4 +1,4 @@
-import FullScreenModal from '@/executor/tools/fullScreen';
+import FullScreenModal from '@/components/Common/fullScreen';
 import React from 'react';
 
 interface IProps {
@@ -17,9 +17,9 @@ const FullModal: React.FC<IProps> = ({ title, finished, children }) => {
       bodyHeight={'80vh'}
       destroyOnClose
       title={title}
-      onCancel={() => finished()}
-      children={children}
-    />
+      onCancel={() => finished()}>
+      {children}
+    </FullScreenModal>
   );
 };
 

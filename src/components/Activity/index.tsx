@@ -228,7 +228,7 @@ export const ActivityItem: React.FC<ActivityItemProps> = ({
                   发布于{showChatTime(item.metadata.createTime)}
                 </span>
               </div>
-              <div>{renderOperate()}</div>
+              {!hideResource && <div>{renderOperate()}</div>}
             </div>
             {renderCtxMore()}
           </div>

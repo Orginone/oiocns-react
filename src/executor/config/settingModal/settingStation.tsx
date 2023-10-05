@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import FullScreenModal from '@/executor/tools/fullScreen';
+import FullScreenModal from '@/components/Common/fullScreen';
 import { ICompany, IStation } from '@/ts/core';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import MainLayout from '@/components/MainLayout';

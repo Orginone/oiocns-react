@@ -1,5 +1,5 @@
 import React from 'react';
-import FullScreenModal from '@/executor/tools/fullScreen';
+import FullScreenModal from '@/components/Common/fullScreen';
 import { JolPlayer } from 'jol-player';
 import { FileItemShare } from '@/ts/base/model';
 import { shareOpenLink } from '@/utils/tools';

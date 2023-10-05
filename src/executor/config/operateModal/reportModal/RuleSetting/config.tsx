@@ -1,7 +1,7 @@
 import React from 'react';
 import { ProFormColumnsType } from '@ant-design/pro-components';
 
-import CodeEdit from '../../../ReactCodeEdit';
+import CodeEdit from '@/components/Common/ReactCodeEdit';
 import { XAttribute, XFormRule } from '@/ts/base/schema';
 import { Input } from 'antd';
 import { EffectEnum, EffectEnumOption } from '@/ts/core/work/rules/base/enum';
@@ -283,11 +283,10 @@ const getColumns: (
               columns: ({ templateId, trigger }) => {
                 const def = { accept: undefined, isExtend: false };
                 const _selectedRule = sysRules.find((v) => v.id == templateId);
-                const {
-                  accept = [],
-                  attrs: items = [],
-                  isExtend = false,
-                } = { ...def, ..._selectedRule };
+                const { attrs: items = [], isExtend = false } = {
+                  ...def,
+                  ..._selectedRule,
+                };
                 const maxlength = isExtend ? 20 : items.length || 2;
 
                 return [

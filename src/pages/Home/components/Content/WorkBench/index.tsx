@@ -9,7 +9,7 @@ import { formatSize } from '@/ts/base/common';
 import { IApplication } from '@/ts/core';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import { OperateMenuType } from 'typings/globelType';
-import FullScreenModal from '@/executor/tools/fullScreen';
+import FullScreenModal from '@/components/Common/fullScreen';
 import { useFlagCmdEmitter } from '@/hooks/useCtrlUpdate';
 
 // 工作台

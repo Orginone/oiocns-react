@@ -2,7 +2,7 @@ import { IWork, IWorkTask } from '@/ts/core';
 import { Button, Input, message } from 'antd';
 import React, { useEffect, useState } from 'react';
 import WorkForm from '@/executor/tools/workForm';
-import FullScreenModal from '@/executor/tools/fullScreen';
+import FullScreenModal from '@/components/Common/fullScreen';
 import { IWorkApply } from '@/ts/core';
 import { model } from '@/ts/base';
 // 卡片渲染

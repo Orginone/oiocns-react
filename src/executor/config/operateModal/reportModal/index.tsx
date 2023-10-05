@@ -2,12 +2,12 @@ import React from 'react';
 import { Col, Divider, Layout, Row, Space, Typography } from 'antd';
 import cls from './index.module.less';
 import { IForm } from '@/ts/core';
-import FullScreenModal from '@/executor/tools/fullScreen';
+import FullScreenModal from '@/components/Common/fullScreen';
 import { RightBarIcon } from '@/components/Common/GlobalComps/customIcon';
 import { Resizable } from 'devextreme-react';
 import useStorage from '@/hooks/useStorage';
 import ReportDesign from '@/components/Common/ReportDesign';
-import RuleSetting from '@/components/Common/FormEdit/Settings/RuleSetting/index';
+import RuleSetting from './RuleSetting/index';
 const { Content, Sider } = Layout;
 
 interface IProps {

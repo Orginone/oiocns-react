@@ -4,7 +4,7 @@ import { useState } from 'react';
 import CodeMirror from '@uiw/react-codemirror';
 import { vscodeDark } from '@uiw/codemirror-theme-vscode';
 import { langs } from '@uiw/codemirror-extensions-langs';
-import FullScreenModal from '@/executor/tools/fullScreen';
+import FullScreenModal from '@/components/Common/fullScreen';
 import { getJsonText } from '@/utils';
 import axios from 'axios';
 import orgCtrl from '@/ts/controller';

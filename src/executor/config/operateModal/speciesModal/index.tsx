@@ -8,7 +8,7 @@ import cls from './index.module.less';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import SpeciesItemModal from './itemModal';
 import EntityInfo from '@/components/Common/EntityInfo';
-import FullScreenModal from '@/executor/tools/fullScreen';
+import FullScreenModal from '@/components/Common/fullScreen';
 import { SpeciesItemColumn } from '@/config/column';
 
 type IProps = {

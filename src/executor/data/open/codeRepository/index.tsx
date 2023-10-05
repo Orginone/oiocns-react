@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import FullScreenModal from '@/executor/tools/fullScreen';
+import FullScreenModal from '@/components/Common/fullScreen';
 import { ProConfigProvider } from '@ant-design/pro-components';
 import './index.less';
 import {

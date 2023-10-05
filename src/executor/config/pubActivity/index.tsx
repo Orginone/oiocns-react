@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import FullScreenModal from '@/executor/tools/fullScreen';
+import FullScreenModal from '@/components/Common/fullScreen';
 import { Button, Form } from 'antd';
 import MultImageUploader from '@/components/MultImageUploader';
 import { IActivity, MessageType } from '@/ts/core';

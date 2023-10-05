@@ -1,5 +1,5 @@
 import React from 'react';
-import FullScreenModal from '@/executor/tools/fullScreen';
+import FullScreenModal from '@/components/Common/fullScreen';
 import { SheetViewer, DocxViewer } from 'react-office-viewer';
 import { FileItemShare } from '@/ts/base/model';
 import Markdown from './markdown';

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import FullScreenModal from '@/executor/tools/fullScreen';
+import FullScreenModal from '@/components/Common/fullScreen';
 import { IForm } from '@/ts/core';
 import * as config from './config';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';

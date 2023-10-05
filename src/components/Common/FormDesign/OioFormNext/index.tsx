@@ -8,6 +8,7 @@ import { model, schema } from '@/ts/base';
 import { ImInfo } from '@/icons/im';
 import { RuleTriggers } from '@/ts/core/public';
 import { WorkFormRulesType } from '@/ts/core/work/rules/workFormRules';
+import { generateUuid } from '@/ts/base/common';
 type IProps = {
   form: schema.XForm;
   fields: model.FieldModel[];
@@ -121,7 +122,7 @@ const OioForm: React.FC<IProps> = ({
             }
             return (
               <Descriptions.Item
-                key={field.id}
+                key={generateUuid()}
                 span={1}
                 style={{ padding: '2px 10px' }}
                 label={

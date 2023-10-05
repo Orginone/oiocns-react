@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { IWork } from '@/ts/core';
 import { message } from 'antd';
 import FlowDesign from '@/components/Common/FlowDesign';
-import FullScreenModal from '@/executor/tools/fullScreen';
+import FullScreenModal from '@/components/Common/fullScreen';
 
 type IProps = {
   current: IWork;
