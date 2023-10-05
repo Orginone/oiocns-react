@@ -141,7 +141,7 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
     return super.id;
   }
   get isInherited(): boolean {
-    return this.metadata.belongId != this.target.space.id;
+    return this.target.isInherited;
   }
   get locationKey(): string {
     return this.key;

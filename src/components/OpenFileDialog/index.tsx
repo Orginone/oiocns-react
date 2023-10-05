@@ -13,7 +13,8 @@ interface IFileDialogProps {
   multiple?: boolean;
   maxCount?: number;
   rootKey: string;
-  excludeKeys?: string[];
+  excludeIds?: string[];
+  allowInherited?: boolean;
   onOk: (files: IFile[]) => void;
   onCancel: () => void;
 }
@@ -21,7 +22,7 @@ interface IFileDialogProps {
 const OpenFileDialog: React.FC<IFileDialogProps> = (props) => {
   const [selectedFiles, setSelectedFiles] = useState<IFile[]>([]);
   const [key, rootMenu, selectMenu, setSelectMenu] = useMenuUpdate(() =>
-    loadSettingMenu(props.rootKey),
+    loadSettingMenu(props.rootKey, props.allowInherited || false),
   );
   if (!selectMenu || !rootMenu) return <></>;
   return (
@@ -59,7 +60,7 @@ const OpenFileDialog: React.FC<IFileDialogProps> = (props) => {
           accepts={props.accepts}
           selects={selectedFiles}
           current={selectMenu.item}
-          excludeKeys={props.excludeKeys}
+          excludeIds={props.excludeIds}
           onFocused={(file) => {
             if (!props.multiple) {
               if (file) {

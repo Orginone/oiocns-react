@@ -118,24 +118,24 @@ const buildApplicationTree = (applications: IApplication[]): MenuItemType[] => {
 };
 
 /** 获取个人菜单 */
-const getUserMenu = () => {
+const getUserMenu = (allowInherited: boolean) => {
   return createMenu(orgCtrl.user, [
     ...buildDirectoryTree(orgCtrl.user.directory.children),
-    ...orgCtrl.user.cohorts.map((i) =>
-      createMenu(i, buildDirectoryTree(i.directory.children)),
-    ),
+    ...orgCtrl.user.cohorts
+      .filter((i) => !i.isInherited || allowInherited)
+      .map((i) => createMenu(i, buildDirectoryTree(i.directory.children))),
   ]);
 };
 
 /** 获取组织菜单 */
-const getTeamMenu = () => {
+const getTeamMenu = (allowInherited: boolean) => {
   const children: MenuItemType[] = [];
   for (const company of orgCtrl.user.companys) {
     children.push(
       createMenu(company, [
         ...buildDirectoryTree(company.directory.children),
         ...buildDepartmentTree(company.departments),
-        ...buildGroupTree(company.groups),
+        ...buildGroupTree(company.groups.filter((i) => !i.isInherited || allowInherited)),
         ...company.cohorts.map((i) =>
           createMenu(i, buildDirectoryTree(i.directory.children)),
         ),
@@ -146,13 +146,13 @@ const getTeamMenu = () => {
 };
 
 /** 加载设置模块菜单 */
-export const loadSettingMenu = (rootKey: string) => {
+export const loadSettingMenu = (rootKey: string, allowInherited: boolean) => {
   const rootMenu = {
     key: '根目录',
     label: '根目录',
     itemType: 'Tab',
     item: 'disk',
-    children: [getUserMenu(), ...getTeamMenu()],
+    children: [getUserMenu(allowInherited), ...getTeamMenu(allowInherited)],
     icon: <EntityIcon notAvatar={true} entityId={orgCtrl.user.id} size={18} />,
   };
   const findMenu = findMenuItemByKey(rootMenu, rootKey);

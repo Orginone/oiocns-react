@@ -17,7 +17,7 @@ interface IProps {
   mode: number;
   accepts?: string[];
   selects?: IFile[];
-  excludeKeys?: string[];
+  excludeIds?: string[];
   onFocused?: (file: IFile | undefined) => void;
   onSelected?: (files: IFile[]) => void;
   current: IDirectory | undefined | 'disk';
@@ -83,8 +83,8 @@ const Directory: React.FC<IProps> = (props) => {
     }
     const tagFilter = (file: IFile) => {
       let success = true;
-      if (props.excludeKeys && props.excludeKeys.length > 0) {
-        success = !props.excludeKeys.includes(file.key);
+      if (props.excludeIds && props.excludeIds.length > 0) {
+        success = !props.excludeIds.includes(file.id);
       }
       if (filter && currentTag !== '全部') {
         success = file.groupTags.includes(currentTag);

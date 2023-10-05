@@ -58,9 +58,10 @@ const WorkFlowNode: React.FC<IProps> = (props) => {
       {isOpen && (
         <OpenFileDialog
           title={'选中其它办事'}
-          rootKey={props.belong.directory.key}
+          rootKey={'disk'}
           accepts={['办事']}
-          excludeKeys={[props.define.key]}
+          allowInherited
+          excludeIds={[props.define.id]}
           onCancel={() => setIsOpen(false)}
           onOk={(files) => {
             if (files.length > 0) {

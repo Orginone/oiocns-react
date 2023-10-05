@@ -71,9 +71,6 @@ export abstract class Team extends Entity<schema.XTarget> implements ITeam {
   relations: string[];
   abstract directory: IDirectory;
   private _memberLoaded: boolean = false;
-  get isInherited(): boolean {
-    return this.metadata.belongId != this.space.id;
-  }
   async loadMembers(reload: boolean = false): Promise<schema.XTarget[]> {
     if (!this._memberLoaded || reload) {
       const res = await kernel.querySubTargetById({

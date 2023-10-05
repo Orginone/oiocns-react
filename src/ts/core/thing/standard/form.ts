@@ -10,10 +10,7 @@ export interface IForm extends IStandardFileInfo<schema.XForm> {
   /** 表单字段 */
   fields: model.FieldModel[];
   /** 新建表单特性 */
-  createAttribute(
-    data: model.AttributeModel,
-    property?: schema.XProperty,
-  ): Promise<schema.XAttribute | undefined>;
+  createAttribute(propertys: schema.XProperty[]): Promise<schema.XAttribute[]>;
   /** 更新表单特性 */
   updateAttribute(
     data: model.AttributeModel,
@@ -85,25 +82,24 @@ export class Form extends StandardFileInfo<schema.XForm> implements IForm {
     }
     return this.fields;
   }
-  async createAttribute(
-    data: schema.XAttribute,
-    property?: schema.XProperty,
-  ): Promise<schema.XAttribute | undefined> {
-    if (property) {
-      data.property = property;
-      data.propId = property.id;
-    }
-    if (!data.authId || data.authId.length < 5) {
-      data.authId = orgAuth.SuperAuthId;
-    }
-    data.id = 'snowId()';
-    const res = await this.update({
-      ...this.metadata,
-      attributes: [...(this.metadata.attributes || []), data],
+  async createAttribute(propertys: schema.XProperty[]): Promise<schema.XAttribute[]> {
+    const data = propertys.map((prop) => {
+      return {
+        id: 'snowId()',
+        propId: prop.id,
+        name: prop.name,
+        code: prop.code,
+        rule: '{}',
+        remark: prop.remark,
+        property: prop,
+        authId: orgAuth.SuperAuthId,
+      } as schema.XAttribute;
     });
-    if (res) {
-      return data;
-    }
+    await this.update({
+      ...this.metadata,
+      attributes: [...(this.metadata.attributes || []), ...data],
+    });
+    return data;
   }
   async updateAttribute(
     data: schema.XAttribute,

@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
 import CardOrTable from '@/components/CardOrTableComp';
 import { XAttribute } from '@/ts/base/schema';
-import useObjectUpdate from '@/hooks/useObjectUpdate';
-import { IForm } from '@/ts/core';
+import { IForm, IProperty } from '@/ts/core';
 import PropertyConfig from './propConfig';
 import AttributeConfig from '@/components/Common/FormDesign/attributeConfig';
-import SelectPropertys from '@/components/Common/SelectPropertys';
-import { Modal } from 'antd';
+import OpenFileDialog from '@/components/OpenFileDialog';
 import { AttributeColumn } from '@/config/column';
-import { schema } from '@/ts/base';
+import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 
 interface IProps {
   current: IForm;
@@ -22,7 +20,8 @@ interface IProps {
  * @return {*}
  */
 const Attritube = ({ current, modalType, setModalType }: IProps) => {
-  const [tkey, tforceUpdate] = useObjectUpdate('');
+  const space = current.directory.target.space;
+  const [tkey] = useCtrlUpdate(current);
   const [selectedItem, setSelectedItem] = useState<XAttribute>();
   // 项配置改变
   const formValuesChange = (changedValues: any) => {
@@ -38,7 +37,26 @@ const Attritube = ({ current, modalType, setModalType }: IProps) => {
   };
   // 操作内容渲染函数
   const renderOperate = (item: XAttribute) => {
-    if (item.belongId === current.directory.target.space.id) {
+    if (current.isInherited) {
+      return [
+        {
+          key: '关联属性',
+          label: '关联属性',
+          onClick: () => {
+            setSelectedItem(item);
+            setModalType('关联属性');
+          },
+        },
+        {
+          key: '复制属性',
+          label: '复制属性',
+          onClick: async () => {
+            setSelectedItem(item);
+            setModalType('复制属性');
+          },
+        },
+      ];
+    } else {
       return [
         {
           key: '编辑特性',
@@ -60,28 +78,7 @@ const Attritube = ({ current, modalType, setModalType }: IProps) => {
           key: '删除特性',
           label: <span style={{ color: 'red' }}>删除特性</span>,
           onClick: async () => {
-            if (await current.deleteAttribute(item)) {
-              tforceUpdate();
-            }
-          },
-        },
-      ];
-    } else {
-      return [
-        {
-          key: '关联属性',
-          label: '关联属性',
-          onClick: () => {
-            setSelectedItem(item);
-            setModalType('关联属性');
-          },
-        },
-        {
-          key: '复制属性',
-          label: '复制属性',
-          onClick: async () => {
-            setSelectedItem(item);
-            setModalType('复制属性');
+            await current.deleteAttribute(item);
           },
         },
       ];
@@ -100,38 +97,20 @@ const Attritube = ({ current, modalType, setModalType }: IProps) => {
       />
       {/** 新增特性模态框 */}
       {['新增特性', '编辑特性'].includes(modalType) && (
-        <Modal
-          open
-          width={800}
-          title="选择属性"
-          destroyOnClose
-          okText="确定"
-          onOk={() => setModalType('')}
-          onCancel={() => setModalType('')}>
-          <SelectPropertys
-            target={current.directory.target}
-            selected={current.attributes.map((a) => a.property!)}
-            onAdded={async (prop) => {
-              await current.createAttribute(
-                {
-                  name: prop.name,
-                  code: prop.code,
-                  rule: '{}',
-                  remark: prop.remark,
-                } as schema.XAttribute,
-                prop,
-              );
-              tforceUpdate();
-            }}
-            onDeleted={async (id) => {
-              const attr = current.attributes.find((i) => i.propId === id);
-              if (attr) {
-                await current.deleteAttribute(attr);
-                tforceUpdate();
-              }
-            }}
-          />
-        </Modal>
+        <OpenFileDialog
+          multiple
+          title={`选择属性`}
+          rootKey={space.directory.key}
+          accepts={['属性']}
+          excludeIds={current.attributes.filter((i) => i.propId).map((a) => a.propId)}
+          onCancel={() => setModalType('')}
+          onOk={(files) => {
+            if (files.length > 0) {
+              current.createAttribute((files as IProperty[]).map((i) => i.metadata));
+            }
+            setModalType('');
+          }}
+        />
       )}
       {/** 编辑特性模态框 */}
       {modalType.includes('配置特性') && selectedItem && (
@@ -141,7 +120,6 @@ const Attritube = ({ current, modalType, setModalType }: IProps) => {
           onClose={() => {
             setSelectedItem(undefined);
             setModalType('');
-            tforceUpdate();
           }}
           superAuth={current.directory.target.space.superAuth!.metadata}
         />
@@ -153,7 +131,6 @@ const Attritube = ({ current, modalType, setModalType }: IProps) => {
           onFinish={() => {
             setSelectedItem(undefined);
             setModalType('');
-            tforceUpdate();
           }}
           attr={selectedItem}
           modalType={modalType}

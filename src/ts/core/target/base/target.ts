@@ -110,8 +110,10 @@ export abstract class Target extends Team implements ITarget {
   get cachePath(): string {
     return `targets.${this.cache.fullId}`;
   }
+  get isInherited(): boolean {
+    return this.metadata.belongId !== this.spaceId;
+  }
   private _identityLoaded: boolean = false;
-
   async loadUserData(keys: string[], _metadata: schema.XTarget): Promise<void> {
     kernel.subscribe(
       `${_metadata.belongId}-${_metadata.id}-identity`,

@@ -36,6 +36,7 @@ const ImageUploader: React.FC<{
           rootKey={props.directory.key}
           maxCount={props.maxCount}
           accepts={props.types}
+          allowInherited
           onCancel={() => setOpen(false)}
           onOk={(files) => {
             setFileList([...fileList, ...files.map((i) => i as ISysFileInfo)]);
