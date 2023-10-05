@@ -19,24 +19,27 @@ import React from 'react';
 import ProFormAuth from './widgets/ProFormAuth';
 import ProFormDept from './widgets/ProFormDept';
 import ProFormDict from './widgets/ProFormDict';
+import ProFormSpecies from './widgets/ProFormSpecies';
 import ProFormGroup from './widgets/ProFormGroup';
 import ProFormPerson from './widgets/ProFormPerson';
 import ProFormIdentity from './widgets/ProFormIdentity';
 import { XAttribute } from '@/ts/base/schema';
 import { IBelong } from '@/ts/core';
 import { loadWidgetsOpts } from '../rule';
+import { SettingOutlined } from '@ant-design/icons';
 
 interface IProps {
   disabled?: boolean;
   item: XAttribute;
   belong: IBelong;
   noRule?: boolean;
+  onClick?: () => void;
 }
 
 /**
  * 表单项渲染
  */
-const OioFormItem = ({ item, belong, disabled, noRule }: IProps) => {
+const OioFormItem = ({ item, belong, disabled, noRule, onClick }: IProps) => {
   const rule = JSON.parse(item.rule || '{}');
   // 规则校验
   let rules: Rule[] = [];
@@ -58,6 +61,17 @@ const OioFormItem = ({ item, belong, disabled, noRule }: IProps) => {
   if (!rule.widget) {
     rule.widget = loadWidgetsOpts(item.property!.valueType)[0].value;
   }
+  const label = () => {
+    if (onClick) {
+      return (
+        <span style={{ display: 'inherit', wordBreak: 'keep-all' }}>
+          <span style={{ marginRight: 2 }}>{item.name}</span>
+          <SettingOutlined onClick={() => onClick()} />
+        </span>
+      );
+    }
+    return item.name;
+  };
   switch (rule.widget) {
     case 'input':
     case 'string':
@@ -66,7 +80,7 @@ const OioFormItem = ({ item, belong, disabled, noRule }: IProps) => {
         <ProFormText
           disabled={disabled}
           name={item.id}
-          label={item.name}
+          label={label()}
           required={rule.required}
           fieldProps={rule}
           rules={rules}
@@ -81,7 +95,7 @@ const OioFormItem = ({ item, belong, disabled, noRule }: IProps) => {
         <ProFormDigit
           disabled={disabled}
           name={item.id}
-          label={item.name}
+          label={label()}
           fieldProps={rule}
           rules={rules}
           width={200}
@@ -94,7 +108,7 @@ const OioFormItem = ({ item, belong, disabled, noRule }: IProps) => {
         <ProFormSelect
           disabled={disabled}
           name={item.id}
-          label={item.name}
+          label={label()}
           fieldProps={rule}
           rules={rules}
           width={200}
@@ -107,7 +121,7 @@ const OioFormItem = ({ item, belong, disabled, noRule }: IProps) => {
         <ProFormTreeSelect
           disabled={disabled}
           name={item.id}
-          label={item.name}
+          label={label()}
           rules={rules}
           width={200}
           tooltip={item.remark}
@@ -120,7 +134,7 @@ const OioFormItem = ({ item, belong, disabled, noRule }: IProps) => {
         <ProFormUploadButton
           disabled={disabled}
           name={item.id}
-          label={item.name}
+          label={label()}
           fieldProps={rule}
           rules={rules}
           width={200}
@@ -133,7 +147,7 @@ const OioFormItem = ({ item, belong, disabled, noRule }: IProps) => {
         <ProFormDatePicker
           disabled={disabled}
           name={item.id}
-          label={item.name}
+          label={label()}
           rules={rules}
           width={200}
           tooltip={item.remark}
@@ -145,7 +159,7 @@ const OioFormItem = ({ item, belong, disabled, noRule }: IProps) => {
         <ProFormDateTimePicker
           disabled={disabled}
           name={item.id}
-          label={item.name}
+          label={label()}
           rules={rules}
           width={200}
           tooltip={item.remark}
@@ -157,7 +171,7 @@ const OioFormItem = ({ item, belong, disabled, noRule }: IProps) => {
         <ProFormDateRangePicker
           disabled={disabled}
           name={item.id}
-          label={item.name}
+          label={label()}
           rules={rules}
           width={200}
           tooltip={item.remark}
@@ -169,7 +183,7 @@ const OioFormItem = ({ item, belong, disabled, noRule }: IProps) => {
         <ProFormDateTimeRangePicker
           disabled={disabled}
           name={item.id}
-          label={item.name}
+          label={label()}
           rules={rules}
           width={200}
           tooltip={item.remark}
@@ -181,7 +195,7 @@ const OioFormItem = ({ item, belong, disabled, noRule }: IProps) => {
         <ProFormCheckbox
           disabled={disabled}
           name={item.id}
-          label={item.name}
+          label={label()}
           rules={rules}
           width={200}
           tooltip={item.remark}
@@ -193,7 +207,7 @@ const OioFormItem = ({ item, belong, disabled, noRule }: IProps) => {
         <ProFormRadio
           disabled={disabled}
           name={item.id}
-          label={item.name}
+          label={label()}
           rules={rules}
           width={200}
           tooltip={item.remark}
@@ -205,7 +219,7 @@ const OioFormItem = ({ item, belong, disabled, noRule }: IProps) => {
         <ProFormMoney
           disabled={disabled}
           name={item.id}
-          label={item.name}
+          label={label()}
           rules={rules}
           width={200}
           tooltip={item.remark}
@@ -217,7 +231,20 @@ const OioFormItem = ({ item, belong, disabled, noRule }: IProps) => {
         <ProFormDict
           dictId={item.property!.speciesId}
           name={item.id}
-          label={item.name}
+          label={label()}
+          rules={rules}
+          tooltip={item.remark}
+          belong={belong}
+          labelAlign="right"
+          props={rule}
+        />
+      );
+    case 'species':
+      return (
+        <ProFormSpecies
+          dictId={item.property!.speciesId}
+          name={item.id}
+          label={label()}
           rules={rules}
           tooltip={item.remark}
           belong={belong}
@@ -231,7 +258,7 @@ const OioFormItem = ({ item, belong, disabled, noRule }: IProps) => {
         <ProFormDept
           belong={belong}
           name={item.id}
-          label={item.name}
+          label={label()}
           rules={rules}
           tooltip={item.remark}
           labelAlign="right"
@@ -242,7 +269,7 @@ const OioFormItem = ({ item, belong, disabled, noRule }: IProps) => {
         <ProFormPerson
           belong={belong}
           name={item.id}
-          label={item.name}
+          label={label()}
           rules={rules}
           tooltip={item.remark}
           labelAlign="right"
@@ -253,7 +280,7 @@ const OioFormItem = ({ item, belong, disabled, noRule }: IProps) => {
         <ProFormGroup
           belong={belong}
           name={item.id}
-          label={item.name}
+          label={label()}
           rules={rules}
           tooltip={item.remark}
           labelAlign="right"
@@ -264,7 +291,7 @@ const OioFormItem = ({ item, belong, disabled, noRule }: IProps) => {
         <ProFormAuth
           belong={belong}
           name={item.id}
-          label={item.name}
+          label={label()}
           rules={rules}
           tooltip={item.remark}
           labelAlign="right"
@@ -275,7 +302,7 @@ const OioFormItem = ({ item, belong, disabled, noRule }: IProps) => {
         <ProFormIdentity
           belong={belong}
           name={item.id}
-          label={item.name}
+          label={label()}
           rules={rules}
           tooltip={item.remark}
           labelAlign="right"
@@ -285,7 +312,7 @@ const OioFormItem = ({ item, belong, disabled, noRule }: IProps) => {
       return (
         <ProFormText
           name={item.id}
-          label={item.name}
+          label={label()}
           fieldProps={rule}
           rules={rules}
           tooltip={item.remark}

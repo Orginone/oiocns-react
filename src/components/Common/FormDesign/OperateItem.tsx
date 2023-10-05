@@ -20,14 +20,12 @@ const OperateItem = (props: IProps) => {
   };
 
   return (
-    <div
-      style={styles}
-      ref={setNodeRef}
-      {...listeners}
-      onClick={() => {
-        props.onClick();
-      }}>
-      {<OioFormItem item={props.item} belong={props.belong} />}
+    <div style={styles} ref={setNodeRef} {...listeners}>
+      <OioFormItem
+        item={props.item}
+        belong={props.belong}
+        onClick={() => props.onClick()}
+      />
     </div>
   );
 };

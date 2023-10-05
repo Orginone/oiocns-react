@@ -31,7 +31,6 @@ export const loadWidgetsOpts = (valueType: string = '描述型') => {
         },
       ];
     case '选择型':
-    case '分类型':
       return [
         {
           label: '字典',
@@ -64,6 +63,13 @@ export const loadWidgetsOpts = (valueType: string = '描述型') => {
         {
           label: '开关',
           value: 'switch',
+        },
+      ];
+    case '分类型':
+      return [
+        {
+          label: '分类',
+          value: 'species',
         },
       ];
     case '日期型':
