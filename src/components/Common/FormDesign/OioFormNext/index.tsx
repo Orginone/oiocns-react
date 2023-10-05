@@ -114,8 +114,6 @@ const OioForm: React.FC<IProps> = ({
           column={colNum}
           labelStyle={{ minWidth: '200px', textAlign: 'right' }}>
           {fields.map((field) => {
-            //增加对必填，隐藏的展示响应
-
             const { required = false, hidden = false } = JSON.parse(field.rule ?? '{}');
             if (hidden === true || hidden === 'true') {
               return <></>;

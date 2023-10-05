@@ -17,6 +17,8 @@ interface IProps {
   mode: number;
   accepts?: string[];
   selects?: IFile[];
+  excludeKeys?: string[];
+  onFocused?: (file: IFile | undefined) => void;
   onSelected?: (files: IFile[]) => void;
   current: IDirectory | undefined | 'disk';
 }
@@ -25,7 +27,6 @@ interface IProps {
  */
 const Directory: React.FC<IProps> = (props) => {
   if (!props.current) return <></>;
-  const selects = props.selects ?? [];
   const [dircetory] = useState<IDirectory>(
     props.current === 'disk' ? orgCtrl.user.directory : props.current,
   );
@@ -55,14 +56,19 @@ const Directory: React.FC<IProps> = (props) => {
     } else if (!dblclick) {
       if (file?.id === focusFile?.id) {
         setFocusFile(undefined);
-        props.onSelected?.apply(this, [selects.filter((i) => i.id !== file?.id)]);
+        props.onFocused?.apply(this, [undefined]);
+        if (props.selects && props.selects.length > 0 && file) {
+          props.onSelected?.apply(this, [props.selects.filter((i) => i.id !== file.id)]);
+        }
         command.emitter('preview', 'open');
       } else {
         setFocusFile(file);
-        if (file && selects.every((i) => i.id !== file.id)) {
-          selects.push(file);
+        props.onFocused?.apply(this, [file]);
+        if (props.selects && file) {
+          if (file && props.selects.every((i) => i.id !== file.id)) {
+            props.onSelected?.apply(this, [[...props.selects, file]]);
+          }
         }
-        props.onSelected?.apply(this, [selects]);
         command.emitter('preview', 'open', file);
       }
     }
@@ -77,6 +83,9 @@ const Directory: React.FC<IProps> = (props) => {
     }
     const tagFilter = (file: IFile) => {
       let success = true;
+      if (props.excludeKeys && props.excludeKeys.length > 0) {
+        success = !props.excludeKeys.includes(file.key);
+      }
       if (filter && currentTag !== '全部') {
         success = file.groupTags.includes(currentTag);
       }
@@ -100,13 +109,13 @@ const Directory: React.FC<IProps> = (props) => {
         onSegmentChanged={setSegmented}
         descriptions={[
           `${getContent().length}个项目`,
-          selects.length > 0 ? `选中${selects.length}个项目` : '',
+          props.selects ? `选中${props.selects.length}个项目` : '',
         ]}
         content={
           <Spin spinning={!loaded} delay={10} tip={'加载中...'}>
             {segmented === 'table' ? (
               <TableMode
-                selectFiles={selects}
+                selectFiles={props.selects || []}
                 focusFile={focusFile}
                 content={getContent()}
                 fileOpen={fileOpen}
@@ -114,7 +123,7 @@ const Directory: React.FC<IProps> = (props) => {
               />
             ) : segmented === 'icon' ? (
               <IconMode
-                selectFiles={selects}
+                selectFiles={props.selects || []}
                 focusFile={focusFile}
                 content={getContent()}
                 fileOpen={fileOpen}
@@ -122,7 +131,7 @@ const Directory: React.FC<IProps> = (props) => {
               />
             ) : (
               <ListMode
-                selectFiles={selects}
+                selectFiles={props.selects || []}
                 focusFile={focusFile}
                 content={getContent()}
                 fileOpen={fileOpen}

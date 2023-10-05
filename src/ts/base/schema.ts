@@ -143,15 +143,15 @@ export type XDirectory = {
   nodes: XDirectory[] | undefined;
 } & XStandard;
 
-//单定义
+//表单定义
 export type XForm = {
-  // 单布局
+  // 表单布局
   rule: string;
-  // 单的特性
+  // 表单的特性
   attributes: XAttribute[];
-  // 使用单的流程节点
+  // 使用表单的流程节点
   bindNodes: XWorkNode[] | undefined;
-  // 单的目录
+  // 表单的目录
   directory: XDirectory | undefined;
   // 展示配置
   setting: XFormSetting;

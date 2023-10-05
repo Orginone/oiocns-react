@@ -8,10 +8,12 @@ import { Button, Divider, Space } from 'antd';
 import { IFile } from '@/ts/core';
 
 interface IFileDialogProps {
+  title?: string;
   accepts: string[];
   multiple?: boolean;
   maxCount?: number;
   rootKey: string;
+  excludeKeys?: string[];
   onOk: (files: IFile[]) => void;
   onCancel: () => void;
 }
@@ -25,7 +27,7 @@ const OpenFileDialog: React.FC<IFileDialogProps> = (props) => {
   return (
     <FullScreenModal
       open
-      title={'选择文件'}
+      title={props.title ?? '选择文件'}
       onCancel={() => {
         props.onCancel();
         setSelectedFiles([]);
@@ -38,7 +40,7 @@ const OpenFileDialog: React.FC<IFileDialogProps> = (props) => {
           <Button
             type="primary"
             onClick={() => {
-              props.onOk(selectedFiles.slice(0, props.maxCount ?? 1000));
+              props.onOk(selectedFiles);
               setSelectedFiles([]);
             }}>
             确认
@@ -55,9 +57,27 @@ const OpenFileDialog: React.FC<IFileDialogProps> = (props) => {
         <Directory
           key={key}
           accepts={props.accepts}
-          current={selectMenu.item}
           selects={selectedFiles}
-          onSelected={(files) => setSelectedFiles(files)}
+          current={selectMenu.item}
+          excludeKeys={props.excludeKeys}
+          onFocused={(file) => {
+            if (!props.multiple) {
+              if (file) {
+                setSelectedFiles([file]);
+              } else {
+                setSelectedFiles([]);
+              }
+            }
+          }}
+          onSelected={(files) => {
+            if (props.multiple) {
+              if (props.maxCount && files.length > props.maxCount) {
+                setSelectedFiles(files.slice(-props.maxCount));
+              } else {
+                setSelectedFiles(files);
+              }
+            }
+          }}
           mode={10}
         />
       </MainLayout>

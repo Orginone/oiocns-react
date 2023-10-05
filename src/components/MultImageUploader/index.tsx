@@ -32,6 +32,7 @@ const ImageUploader: React.FC<{
       )}
       {open && (
         <OpenFileDialog
+          multiple
           rootKey={props.directory.key}
           maxCount={props.maxCount}
           accepts={props.types}
