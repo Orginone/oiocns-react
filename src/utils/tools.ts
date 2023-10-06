@@ -165,20 +165,20 @@ const getUuid = () => {
 
 const findAimObj = (isParent = false, id: string, topParentData?: any[]) => {
   let aimObjet: any = undefined;
-  function findItem(_id: string, parent: any) {
+  function findItem(id: string, parent: any) {
     const data = parent.children;
     if (aimObjet) {
       return aimObjet;
     }
     const AimObj = data.find((v: any) => {
-      return v.id == _id;
+      return v.id == id;
     });
     if (AimObj) {
       aimObjet = isParent ? parent : AimObj;
       return;
     } else {
       data.forEach((child: any) => {
-        return findItem(_id, child);
+        return findItem(id, child);
       });
     }
   }

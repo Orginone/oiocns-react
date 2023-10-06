@@ -2,7 +2,6 @@ import GenerateThingTable from '@/executor/tools/generate/thingTable';
 import { model } from '@/ts/base';
 import { ITransfer, IForm } from '@/ts/core';
 import { Tabs } from 'antd';
-import CustomStore from 'devextreme/data/custom_store';
 import React, { useState, useEffect } from 'react';
 
 interface IProps {
@@ -57,17 +56,7 @@ const DataTables: React.FC<IProps> = ({ transfer, current }) => {
                 showCheckBoxesMode: 'always',
               }}
               dataIndex="attribute"
-              dataSource={
-                new CustomStore({
-                  key: 'Id',
-                  async load(_) {
-                    return {
-                      data: data ?? [],
-                      totalCount: data?.length ?? 0,
-                    };
-                  },
-                })
-              }
+              dataSource={data}
               remoteOperations={true}
             />
           ),

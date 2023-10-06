@@ -10,11 +10,11 @@ interface IFormSelectProps {
   form: schema.XForm;
   fields: model.FieldModel[];
   belong: IBelong;
-  onSave: (values: model.AnyThingModel[]) => void;
+  onSave: (values: schema.XThing[]) => void;
 }
 
 const FormSelectModal = ({ form, fields, belong, onSave }: IFormSelectProps) => {
-  const editData: { rows: model.AnyThingModel[] } = { rows: [] };
+  const editData: { rows: schema.XThing[] } = { rows: [] };
   const modal = Modal.confirm({
     icon: <EntityIcon entityId={form.id} showName />,
     width: '80vw',
@@ -37,18 +37,11 @@ const FormSelectModal = ({ form, fields, belong, onSave }: IFormSelectProps) => 
         }}
         dataSource={
           new CustomStore({
-            key: 'Id',
+            key: 'id',
             async load(loadOptions) {
               loadOptions.userData = [];
               let request: any = { ...loadOptions };
-              const result = await kernel.loadThing<any>(belong.id, [belong.id], request);
-              if (result.success) {
-                return result.data;
-              }
-              return {
-                data: [],
-                totalCount: 0,
-              };
+              return await kernel.loadThing(belong.id, [belong.id], request);
             },
           })
         }

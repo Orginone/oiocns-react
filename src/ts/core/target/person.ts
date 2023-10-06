@@ -259,6 +259,7 @@ export class Person extends Belong implements IPerson {
       await this.loadCohorts(reload),
       await this.loadMembers(reload),
       await this.loadSuperAuth(reload),
+      await this.loadIdentitys(reload),
       await this.loadGivedIdentitys(reload),
       await this.directory.loadDirectoryResource(reload),
     ]);

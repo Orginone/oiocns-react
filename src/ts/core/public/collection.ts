@@ -42,7 +42,7 @@ export class XCollection<T extends schema.Xbase> {
       return await this.loadSpace({
         options: {
           match: {
-            _id: {
+            id: {
               _in_: ids,
             },
           },
@@ -193,7 +193,7 @@ export class XCollection<T extends schema.Xbase> {
       this._relations,
       this._collName,
       {
-        match: { _id: data.id },
+        match: { id: data.id },
         update: {
           _set_: {
             isDeleted: true,
@@ -216,7 +216,7 @@ export class XCollection<T extends schema.Xbase> {
       this._collName,
       {
         match: {
-          _id: {
+          id: {
             _in_: data.map((i) => i.id),
           },
         },
@@ -261,7 +261,7 @@ export class XCollection<T extends schema.Xbase> {
       this._relations,
       this._collName,
       {
-        _id: data.id,
+        id: data.id,
       },
       copyId,
     );
@@ -277,7 +277,7 @@ export class XCollection<T extends schema.Xbase> {
       this._relations,
       this._collName,
       {
-        _id: {
+        id: {
           _in_: data.map((i) => i.id),
         },
       },

@@ -86,20 +86,22 @@ export class WorkTask implements IWorkTask {
   }
   async loadInstance(reload: boolean = false): Promise<boolean> {
     if (this.instanceData !== undefined && !reload) return true;
-    const res = await kernel.collectionAggregate(
+    const res = await kernel.collectionLoad<schema.XWorkInstance[]>(
       this.metadata.belongId,
-      [this.metadata.belongId],
-      storeCollName.WorkInstance,
+      [],
       {
-        match: {
-          id: this.metadata.instanceId,
-        },
-        limit: 1,
-        lookup: {
-          from: storeCollName.WorkTask,
-          localField: 'id',
-          foreignField: 'instanceId',
-          as: 'tasks',
+        collName: storeCollName.WorkInstance,
+        options: {
+          match: {
+            id: this.metadata.instanceId,
+          },
+          limit: 1,
+          lookup: {
+            from: storeCollName.WorkTask,
+            localField: 'id',
+            foreignField: 'instanceId',
+            as: 'tasks',
+          },
         },
       },
     );

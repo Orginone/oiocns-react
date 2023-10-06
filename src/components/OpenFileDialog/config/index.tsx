@@ -91,7 +91,6 @@ const buildForms = (work: IWork): MenuItemType[] => {
       itemType: form.typeName,
       menus: loadFileMenus(form),
       children: [],
-      beforeLoad: async () => {},
     };
   });
 };

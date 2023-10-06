@@ -1,5 +1,5 @@
 import { common, kernel, model, schema } from '../../base';
-import { PageAll, storeCollName } from '../public/consts';
+import { storeCollName } from '../public/consts';
 import { TaskStatus } from '../public/enums';
 import { UserProvider } from '../user';
 import { IWorkTask, WorkTask } from './task';
@@ -72,11 +72,9 @@ export class WorkProvider implements IWorkProvider {
     return this.todos;
   }
   async loadDones(req: model.IdPageModel): Promise<model.PageResult<IWorkTask>> {
-    const res = await kernel.collectionPageRequest<schema.XWorkTask>(
-      this.userId,
-      [],
-      storeCollName.WorkTask,
-      {
+    const res = await kernel.collectionLoad<schema.XWorkTask[]>(this.userId, [], {
+      collName: storeCollName.WorkTask,
+      options: {
         match: {
           belongId: req.id,
           status: {
@@ -90,21 +88,23 @@ export class WorkProvider implements IWorkProvider {
           createTime: -1,
         },
       },
-      req.page || PageAll,
-    );
+      skip: req.page?.offset ?? 0,
+      take: req.page?.limit ?? 30,
+      requireTotalCount: true,
+    });
     return {
-      ...res.data,
-      result: (res.data.result || [])
-        .filter((i) => i.records && i.records.length > 0)
-        .map((i) => new WorkTask(i, this.user)),
+      offset: req.page?.offset || 0,
+      limit: req.page?.limit || 30,
+      result: (res.data || [])
+        .filter((task) => task.records && task.records.length > 0)
+        .map((task) => new WorkTask(task, this.user)),
+      total: res.totalCount,
     };
   }
   async loadApply(req: model.IdPageModel): Promise<model.PageResult<IWorkTask>> {
-    const res = await kernel.collectionPageRequest<schema.XWorkTask>(
-      this.userId,
-      [this.userId],
-      storeCollName.WorkTask,
-      {
+    const res = await kernel.collectionLoad<schema.XWorkTask[]>(this.userId, [], {
+      collName: storeCollName.WorkTask,
+      options: {
         match: {
           belongId: req.id,
           createUser: this.userId,
@@ -116,19 +116,21 @@ export class WorkProvider implements IWorkProvider {
           createTime: -1,
         },
       },
-      req.page || PageAll,
-    );
+      skip: req.page?.offset ?? 0,
+      take: req.page?.limit ?? 30,
+      requireTotalCount: true,
+    });
     return {
-      ...res.data,
-      result: (res.data.result || []).map((task) => new WorkTask(task, this.user)),
+      offset: req.page?.offset || 0,
+      limit: req.page?.limit || 30,
+      result: (res.data || []).map((task) => new WorkTask(task, this.user)),
+      total: res.totalCount,
     };
   }
   async loadCompletedCount(): Promise<number> {
-    const res = await kernel.collectionAggregate(
-      this.userId,
-      [],
-      storeCollName.WorkTask,
-      {
+    const res = await kernel.collectionLoad(this.userId, [], {
+      collName: storeCollName.WorkTask,
+      options: {
         match: {
           status: {
             _gte_: 100,
@@ -138,9 +140,10 @@ export class WorkProvider implements IWorkProvider {
           },
         },
       },
-    );
-    if (res.success && Array.isArray(res.data) && res.data[0].count) {
-      return res.data[0].count;
+      isCountQuery: true,
+    });
+    if (res.success) {
+      return res.totalCount;
     }
     return 0;
   }

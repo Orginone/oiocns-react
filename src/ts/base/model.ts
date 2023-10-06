@@ -9,6 +9,7 @@ import {
   XSpecies,
   XStandard,
   XTarget,
+  XThing,
 } from './schema';
 // 请求类型定义
 export type ReqestType = {
@@ -559,23 +560,6 @@ export type GetDirectoryModel = {
   page: PageModel | undefined;
 };
 
-export type AnyThingModel = {
-  /** 唯一ID */
-  Id: string;
-  /** 名称 */
-  Name: string;
-  /** 状态 */
-  Status: string;
-  /** 创建人 */
-  Creater: string;
-  /** 创建时间 */
-  CreateTime: string;
-  /** 变更时间 */
-  ModifiedTime: string;
-  /** 其它信息 */
-  [field: string]: any;
-};
-
 export type WorkDefineModel = {
   // 流程ID
   id: string;
@@ -674,11 +658,13 @@ export type FiledLookup = {
 
 export type FormEditData = {
   /** 操作前数据体 */
-  before: AnyThingModel[];
+  before: XThing[];
   /** 操作后数据体 */
-  after: AnyThingModel[];
+  after: XThing[];
   /** 流程节点Id */
   nodeId: string;
+  /** 表单名称 */
+  formName: string;
   /** 操作人 */
   creator: string;
   /** 操作时间 */
@@ -907,6 +893,7 @@ export type OperateModel = {
   sort: number;
   label: string;
   iconType: string;
+  model?: string;
   menus?: OperateModel[];
 };
 

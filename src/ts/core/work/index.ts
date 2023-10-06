@@ -164,12 +164,9 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
         allowEdit: this.metadata.allowEdit,
         allowSelect: this.metadata.allowSelect,
       };
-      await Promise.all(
-        this.forms.map(async (form) => {
-          await form.loadContent();
-          data.fields[form.id] = form.fields;
-        }),
-      );
+      this.forms.map(async (form) => {
+        data.fields[form.id] = form.fields;
+      });
       return new WorkApply(
         {
           hook: '',

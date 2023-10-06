@@ -13,6 +13,7 @@ export const loadFileMenus = (file: IFile, mode: number = 0) => {
       return {
         key: o.cmd,
         label: o.label,
+        model: o.model ?? 'inside',
         icon: o.menus ? <></> : <TypeIcon iconType={o.iconType} size={16} />,
         beforeLoad: async () => {
           command.emitter('config', o.cmd, file);

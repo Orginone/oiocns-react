@@ -445,6 +445,12 @@ export type XThing = {
   belongId: string;
   // 备注
   remark: string;
+  /** 标签集 */
+  [property: string]: any;
+  /** 归档集 */
+  archives: {
+    [time: string]: any;
+  };
   // 物的属性集
   thingPropValues: XThingProp[] | undefined;
   // 物作为管理对象的映射

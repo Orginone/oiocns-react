@@ -1,14 +1,14 @@
 import React from 'react';
-import { model } from '@/ts/base';
+import { model, schema } from '@/ts/base';
 import { Dropdown } from 'antd';
 import { AiOutlineEllipsis } from '@/icons/ai';
 import { GenerateColumn } from './columns';
 import { Column, DataGrid, IDataGridOptions } from 'devextreme-react/data-grid';
-import { AnyThingColumns } from '@/config/column';
+import { FullThingColumns } from '@/config/column';
 import { ItemType } from 'antd/lib/menu/hooks/useItems';
 
 interface IProps extends IDataGridOptions {
-  beforeSource?: model.AnyThingModel[];
+  beforeSource?: schema.XThing[];
   fields: model.FieldModel[];
   dataIndex?: 'attribute' | 'property';
   hideColumns?: string[];
@@ -20,10 +20,10 @@ interface IProps extends IDataGridOptions {
 
 /** 使用form生成表单 */
 const GenerateThingTable = (props: IProps) => {
-  const fields = [...AnyThingColumns, ...props.fields];
+  const fields = FullThingColumns(props.fields);
   return (
-    <DataGrid<model.AnyThingModel, string>
-      keyExpr="Id"
+    <DataGrid<schema.XThing, string>
+      keyExpr="id"
       columnMinWidth={props.columnMinWidth ?? 80}
       focusedRowEnabled={true}
       allowColumnReordering={true}

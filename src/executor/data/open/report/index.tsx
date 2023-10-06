@@ -38,14 +38,10 @@ const ReportView: React.FC<IProps> = ({ current, finished }) => {
       take: 1,
       userData: item ? [item] : [],
     };
-    const result = await kernel.loadThing<any>(
-      current.belongId,
-      [current.belongId],
-      request,
-    );
-    if (result.success) {
-      setTotal(result.data?.totalCount);
-      setSelectedItem(result.data?.data[0]);
+    const result = await kernel.loadThing(current.belongId, [current.belongId], request);
+    if (result.success && result.data.length > 0) {
+      setTotal(result.totalCount);
+      setSelectedItem(result.data[0]);
     }
   };
 

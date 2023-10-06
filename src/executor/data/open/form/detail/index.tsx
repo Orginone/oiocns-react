@@ -4,10 +4,11 @@ import { ImUndo2 } from '@/icons/im';
 import ThingArchive from './archive';
 import { IForm } from '@/ts/core';
 import OioForm from '@/components/Common/FormDesign/OioFormNext';
+import { schema } from '@/ts/base';
 
 interface IProps {
   form: IForm;
-  thingData: any;
+  thingData: schema.XThing;
   onBack: () => void;
 }
 
@@ -34,7 +35,7 @@ const ThingView: React.FC<IProps> = (props) => {
             key: '1',
             label: `归档痕迹`,
             children: (
-              <ThingArchive instances={Object.values(props.thingData.Archives)} />
+              <ThingArchive instances={Object.values(props.thingData.archives)} />
             ),
           },
           {

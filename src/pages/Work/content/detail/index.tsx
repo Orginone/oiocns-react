@@ -25,7 +25,7 @@ const Detail: React.FC<TaskDetailType> = ({ task, onBack }) => {
     if (task.instance) {
       return (
         <Timeline>
-          <Timeline.Item key={'begin'} color={'green'}>
+          <Timeline.Item color={'green'}>
             <Card>
               <div style={{ display: 'flex' }}>
                 <div style={{ paddingRight: '24px' }}>起始</div>
@@ -50,13 +50,13 @@ const Detail: React.FC<TaskDetailType> = ({ task, onBack }) => {
               )}
             </Card>
           </Timeline.Item>
-          {task.instance.tasks?.map((item, _index) => {
+          {task.instance.tasks?.map((item, index) => {
             return (
-              <div key={item.id}>
+              <div key={`${item.id}_${index}`}>
                 {item.status >= 100 ? (
                   item.records?.map((record) => {
                     return (
-                      <Timeline.Item key={record.id} color={'green'}>
+                      <Timeline.Item key={`${record.id}_${index}`} color={'green'}>
                         <Card>
                           <div style={{ display: 'flex' }}>
                             <div style={{ paddingRight: '24px' }}>

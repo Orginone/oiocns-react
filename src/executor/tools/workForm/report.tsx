@@ -17,7 +17,7 @@ interface IProps {
   forms: schema.XForm[];
   data: model.InstanceDataModel;
   useformRule?: boolean;
-  getFormData: (id: string) => model.FormEditData;
+  getFormData: (form: schema.XForm) => model.FormEditData;
   onChanged?: (id: string, data: model.FormEditData, changedData?: Object) => void;
   ruleService?: WorkFormRulesType;
 }
@@ -27,7 +27,7 @@ const ReportForms: React.FC<IProps> = (props) => {
   const [styleList, setStyleList] = useState<any>([]);
   const [serviceData, setServiceData] = useState<any>();
   const reportData = props.forms[0];
-  const formData = props.getFormData(reportData.id);
+  const formData = props.getFormData(reportData);
   const [reallyData, setReallyData] = useState(
     formData.after.length > 0 ? formData.after[0] : undefined,
   );
@@ -71,7 +71,7 @@ const ReportForms: React.FC<IProps> = (props) => {
           },
         },
       );
-      kernel.createThing(props.belong.userId, [], '').then((res) => {
+      kernel.createThing(props.belong.id, [], '').then((res) => {
         if (res.success && res.data) {
           setReallyData(res.data);
         }

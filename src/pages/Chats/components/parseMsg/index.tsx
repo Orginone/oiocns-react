@@ -36,6 +36,23 @@ export const parseMsg = (item: IMessage): any => {
       }
       return <div className={`${css.con_content_txt}`}>消息异常</div>;
     }
+    case MessageType.Video: {
+      const img: FileItemShare = parseAvatar(item.msgBody);
+      if (img && img.shareLink) {
+        return (
+          <>
+            <div
+              className={`${css.con_content_txt}`}
+              onClick={() => {
+                command.emitter('data', 'open', img);
+              }}>
+              <Image width={300} src={img.thumbnail} preview={false} />
+            </div>
+          </>
+        );
+      }
+      return <div className={`${css.con_content_txt}`}>消息异常</div>;
+    }
     case MessageType.File: {
       const file: FileItemShare = parseAvatar(item.msgBody);
       if (!file) {

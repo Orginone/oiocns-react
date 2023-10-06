@@ -22,7 +22,7 @@ const WorkStartDo: React.FC<IProps> = ({ current, finished }) => {
         setApply(value);
       }
     });
-  }, [current]);
+  }, []);
   if (!apply) return <></>;
   return (
     <>

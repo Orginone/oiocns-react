@@ -18,8 +18,8 @@ const ThingArchive: React.FC<IProps> = ({ instances }) => {
   return (
     <Card bordered={false}>
       <Timeline reverse>
-        {instances.map((a) => (
-          <ArchiveItem instance={a}></ArchiveItem>
+        {instances.map((a, index) => (
+          <ArchiveItem key={`${a.id}_${index}`} instance={a}></ArchiveItem>
         ))}
       </Timeline>
     </Card>

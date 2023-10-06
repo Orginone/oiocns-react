@@ -65,6 +65,7 @@ export const directoryOperates = {
     sort: 4,
     cmd: 'refresh',
     label: '刷新目录',
+    model: 'outside',
     iconType: 'refresh',
   },
   OpenFolderWithEditor: {
@@ -77,12 +78,14 @@ export const directoryOperates = {
     sort: 5,
     cmd: 'newFile',
     label: '上传文件',
+    model: 'outside',
     iconType: 'newFile',
   },
   TaskList: {
     sort: 6,
     cmd: 'taskList',
     label: '上传列表',
+    model: 'outside',
     iconType: 'taskList',
   },
   NewDir: {

@@ -54,7 +54,10 @@ const EntityIcon = (info: teamTypeInfo) => {
       );
     }
   }
-  return <ShareIconItem {...info} />;
+  if (info.typeName) {
+    return <ShareIconItem {...info} />;
+  }
+  return <></>;
 };
 
 /** 实体图标 */
