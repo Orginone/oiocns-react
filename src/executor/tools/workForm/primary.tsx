@@ -29,7 +29,6 @@ const PrimaryForm: React.FC<IProps> = (props) => {
   useEffect(() => {
     if (!data) {
       kernel.createThing(props.belong.id, [], form.name).then((res) => {
-        console.log(res);
         if (res.success && res.data) {
           setData(res.data);
         }

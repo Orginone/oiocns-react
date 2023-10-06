@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ISpecies } from '@/ts/core';
-import { Button, message } from 'antd';
+import { Button, Spin, message } from 'antd';
 import { schema } from '@/ts/base';
 import PageCard from '@/components/PageCard';
 import CardOrTable from '@/components/CardOrTableComp';
@@ -10,6 +10,7 @@ import SpeciesItemModal from './itemModal';
 import EntityInfo from '@/components/Common/EntityInfo';
 import FullScreenModal from '@/components/Common/fullScreen';
 import { SpeciesItemColumn } from '@/config/column';
+import useAsyncLoad from '@/hooks/useAsyncLoad';
 
 type IProps = {
   current: ISpecies;
@@ -23,7 +24,10 @@ const SpeciesModal: React.FC<IProps> = ({ current, finished }) => {
   const [activeModel, setActiveModel] = useState<string>('');
   const [item, setItem] = useState<schema.XSpeciesItem>();
   const [tkey, tforceUpdate] = useObjectUpdate(current);
-
+  const [loaded] = useAsyncLoad(async () => {
+    await current.loadItems(true);
+    tforceUpdate();
+  });
   const renderBtns = () => {
     return (
       <Button type="link" onClick={() => setActiveModel('新增')}>
@@ -113,13 +117,15 @@ const SpeciesModal: React.FC<IProps> = ({ current, finished }) => {
         tabList={TitleItems}
         onTabChange={(_: any) => {}}
         tabBarExtraContent={renderBtns()}>
-        <CardOrTable<schema.XSpeciesItem>
-          key={tkey}
-          rowKey={'id'}
-          dataSource={current.items}
-          operation={renderOperate}
-          columns={SpeciesItemColumn}
-        />
+        <Spin spinning={!loaded}>
+          <CardOrTable<schema.XSpeciesItem>
+            key={tkey}
+            rowKey={'id'}
+            dataSource={current.items}
+            operation={renderOperate}
+            columns={SpeciesItemColumn}
+          />
+        </Spin>
       </PageCard>
       {loadSpeciesItemModal()}
     </FullScreenModal>
