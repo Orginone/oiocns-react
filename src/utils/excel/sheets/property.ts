@@ -34,7 +34,7 @@ export class PropHandler extends i.SheetHandler<PropSheet> {
    */
   checkData(excel: t.IExcel) {
     const allErrors: t.Error[] = [];
-    const species: string[] = ['字典型', '分类型'];
+    const species: string[] = ['选择型', '分类型'];
     const types: string[] = ['数值型', '描述型', '时间型', '日期型', '用户型', '附件型'];
     const all: string[] = [...species, ...types];
     const dirHandler = excel.handlers.find((item) => item.sheet.name == '目录');
@@ -55,7 +55,7 @@ export class PropHandler extends i.SheetHandler<PropSheet> {
       ]);
       if (hasSpecies) {
         let searched;
-        if (item.valueType == '字典型') {
+        if (item.valueType == '选择型') {
           const find = (dict: any) => dict.code == item.speciesCode;
           searched = dictHandler?.sheet.data.find(find);
         } else {
@@ -80,7 +80,7 @@ export class PropHandler extends i.SheetHandler<PropSheet> {
    * @param excel 上下文
    */
   async operating(excel: t.IExcel, onItemCompleted: () => void): Promise<void> {
-    const species: string[] = ['字典型', '分类型'];
+    const species: string[] = ['选择型', '分类型'];
     for (const row of this.sheet.data) {
       const dir = excel.context[row.directoryCode];
       row.directoryId = dir.meta.id;
