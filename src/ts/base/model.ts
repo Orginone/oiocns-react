@@ -1002,8 +1002,6 @@ export type Tables = { formIds: string[]; file?: FileItemModel } & Node;
 export type Sheet<T> = {
   // 名称
   name: string;
-  // 表头行数
-  headers: number;
   // 列信息
   columns: Column[];
   // 数据

@@ -321,7 +321,20 @@ function sortObjByKeys<T extends object>(obj: T, sortedKeys: string[]): T {
   return sortedObj as T;
 }
 
+/**
+ * 赋给新对象中没有的老对象的值
+ * @param old
+ */
+function assignment(oldObj: { [key: string]: any }, newObj: { [key: string]: any }) {
+  Object.keys(oldObj).forEach((key) => {
+    if (!(key in newObj)) {
+      newObj[key] = oldObj[key];
+    }
+  });
+}
+
 export {
+  assignment,
   ellipsisText,
   filterEmptyPropObj,
   formatDate,

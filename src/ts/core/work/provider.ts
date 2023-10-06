@@ -37,7 +37,7 @@ export class WorkProvider implements IWorkProvider {
     this.userId = _user.user!.id;
     this.notity = new common.Emitter();
     kernel.on('RecvTask', (data: schema.XWorkTask) => {
-      if (this._todoLoaded) {
+      if (this._todoLoaded && data.approveType != '抄送') {
         this.updateTask(data);
       }
     });

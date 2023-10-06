@@ -1,13 +1,13 @@
 import SchemaForm from '@/components/SchemaForm';
-import {model, schema} from '@/ts/base';
-import {IDirectory, ITransfer} from '@/ts/core';
-import {ProFormColumnsType} from '@ant-design/pro-components';
-import {javascript} from '@codemirror/lang-javascript';
+import { model, schema } from '@/ts/base';
+import { IDirectory, ITransfer } from '@/ts/core';
+import { AnyHandler, Excel, generateXlsx } from '@/utils/excel';
+import { ProFormColumnsType } from '@ant-design/pro-components';
+import { javascript } from '@codemirror/lang-javascript';
 import CodeMirror from '@uiw/react-codemirror';
-import React, {useState} from 'react';
-import {expand, loadFormsMenu, MenuItem} from '../menus';
-import {Button, message, Space, Spin, TreeSelect, Upload} from 'antd';
-import { generateXlsx } from '@/utils/excel';
+import { Button, Space, Spin, TreeSelect, Upload, message } from 'antd';
+import React, { useState } from 'react';
+import { MenuItem, expand, loadFormsMenu } from '../menus';
 
 interface IProps {
   transfer: ITransfer;
@@ -68,9 +68,9 @@ const Uploader: React.FC<UploaderProps> = ({ transfer, file, onChange }) => {
             }
             setLoading(false);
           }
-        }}
-        children={<Children />}
-      />
+        }}>
+        <Children />
+      </Upload>
     </Spin>
   );
 };
@@ -132,8 +132,11 @@ const ExcelForm: React.FC<IProps> = ({ transfer, current, finished }) => {
             <Button
               size="small"
               onClick={async () => {
-                const sheets = await transfer.template(current);
-                generateXlsx(sheets, '表单模板');
+                let sheets = await transfer.template<schema.XThing>(current);
+                let root = transfer.directory.target.directory;
+                let map = (sheet: any) => new AnyHandler({ ...sheet, dir: root });
+                let handlers = sheets.map(map);
+                generateXlsx(new Excel(handlers), '表单模板');
               }}>
               下载模板
             </Button>

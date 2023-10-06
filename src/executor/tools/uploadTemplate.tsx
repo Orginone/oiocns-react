@@ -1,21 +1,34 @@
 import { command, model } from '@/ts/base';
 import { IDirectory } from '@/ts/core';
 import { formatDate } from '@/utils';
-import { dataHandling, generateXlsx, readXlsx } from '@/utils/excel';
-import { getSheets, getSheetsHandler } from '@/utils/excel/configs/index';
-import { Context, DataHandler, ErrorMessage, ISheetHandler } from '@/utils/excel/types';
+import { Error, IExcel, Excel, getSheets, generateXlsx, readXlsx } from '@/utils/excel';
 import { ProTable } from '@ant-design/pro-components';
-import { Button, Modal, Spin, Tabs, Tag, Upload, message } from 'antd';
+import { Button, Modal, Spin, Tabs, Upload, message } from 'antd';
 import React, { useState } from 'react';
 
 /** 上传导入模板 */
 export const uploadTemplate = (dir: IDirectory) => {
+  // 默认在根目录导入
+  dir = dir.target.directory;
+  const show = (excel: IExcel, name: string) => {
+    showData(
+      excel,
+      (modal) => {
+        modal.destroy();
+        generate(dir, name, excel);
+      },
+      '开始导入',
+    );
+  };
   function Content() {
     const [loading, setLoading] = useState(false);
     return (
       <>
         <div style={{ marginTop: 20 }}>
-          <Button onClick={async () => generateXlsx(getSheets(dir), '导入模板')}>
+          <Button
+            onClick={async () => {
+              generateXlsx(new Excel(getSheets(dir)), '导入模板');
+            }}>
             导入模板下载
           </Button>
           {loading && <span style={{ marginLeft: 20 }}>正在加载数据中，请稍后...</span>}
@@ -27,25 +40,12 @@ export const uploadTemplate = (dir: IDirectory) => {
             accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             style={{ width: 550, height: 300, marginTop: 20 }}
             customRequest={async (options) => {
+              const file = options.file as Blob;
               setLoading(true);
-              let excelFile = options.file as Blob;
-              let handler = getSheetsHandler(dir);
-              let sheets = handler.map((item) => item.sheet);
-              await readXlsx(excelFile, sheets);
-              let context = new Context();
-              for (let config of handler) {
-                await config.initContext?.apply(config, [context]);
-              }
+              let excel = await readXlsx(file, new Excel(getSheets(dir)));
               setLoading(false);
               modal.destroy();
-              showData(
-                handler,
-                (modal) => {
-                  modal.destroy();
-                  generate(dir, excelFile.name, handler, context);
-                },
-                '开始导入',
-              );
+              show(excel, file.name);
             }}>
             <div style={{ color: 'limegreen', fontSize: 22 }}>点击或拖拽至此处上传</div>
           </Upload>
@@ -64,11 +64,7 @@ export const uploadTemplate = (dir: IDirectory) => {
 };
 
 /** 展示数据 */
-const showData = (
-  sheet: ISheetHandler<any, any, model.Sheet<any>>[],
-  confirm: (modal: any) => void,
-  okText: string,
-) => {
+const showData = (excel: IExcel, confirm: (modal: any) => void, okText: string) => {
   const modal = Modal.info({
     icon: <></>,
     okText: okText,
@@ -78,7 +74,7 @@ const showData = (
     maskClosable: true,
     content: (
       <Tabs
-        items={sheet.map((item) => {
+        items={excel.handlers.map((item) => {
           return {
             label: item.sheet.name,
             key: item.sheet.name,
@@ -96,16 +92,6 @@ const showData = (
                     valueType: 'index',
                     width: 50,
                   },
-                  {
-                    title: '新增 / 覆盖',
-                    renderText(_text, record, _index, _action) {
-                      return record.id ? (
-                        <Tag color="orange">覆盖</Tag>
-                      ) : (
-                        <Tag color="green">新增</Tag>
-                      );
-                    },
-                  },
                   ...item.sheet.columns,
                 ]}
               />
@@ -118,13 +104,8 @@ const showData = (
 };
 
 /** 开始导入 */
-const generate = async (
-  dir: IDirectory,
-  name: string,
-  reads: ISheetHandler<any, any, model.Sheet<any>>[],
-  context: Context,
-) => {
-  let errors = reads.flatMap((item) => item.checkData(context));
+const generate = async (dir: IDirectory, name: string, excel: IExcel) => {
+  let errors = excel.handlers.flatMap((item) => item.checkData(excel));
   if (errors.length > 0) {
     showErrors(errors);
     return;
@@ -137,13 +118,21 @@ const generate = async (
     createTime: new Date(),
   };
   dir.taskList.push(task);
-  let handler: DataHandler = {
+  const counting = (dir: IDirectory) => {
+    let count = dir.forms.length + dir.specieses.length;
+    for (let child of dir.children) {
+      count += counting(child);
+    }
+    return count;
+  };
+  excel.dataHandler = {
     initialize: (totalRows) => {
       task.size = totalRows;
+      task.size += counting(dir) * 50;
       dir.taskEmitter.changCallback();
     },
-    onItemCompleted: () => {
-      task.finished += 1;
+    onItemCompleted: (count?: number) => {
+      task.finished += count ?? 1;
       dir.taskEmitter.changCallback();
     },
     onCompleted: () => {
@@ -151,16 +140,15 @@ const generate = async (
       dir.taskEmitter.changCallback();
       message.success(`模板导入成功！`);
       showData(
-        reads,
+        excel,
         (modal) => {
           modal.destroy();
-          let sheets = reads.map((item) => item.sheet);
           let fileName = `数据导入模板(${formatDate(new Date(), 'yyyy-MM-dd HH:mm')})`;
-          generateXlsx(sheets, fileName);
+          generateXlsx(excel, fileName);
         },
         '生成数据模板',
       );
-      const dirSheet = reads.find((item) => item.sheet.name == '目录');
+      const dirSheet = excel.handlers.find((item) => item.sheet.name == '目录');
       if (dirSheet) {
         dir.notify('refresh', dirSheet.sheet.data);
       }
@@ -169,11 +157,11 @@ const generate = async (
       showErrors(errors);
     },
   };
-  dataHandling(context, handler, reads);
+  excel.handling();
 };
 
 /** 错误数据 */
-const showErrors = (errors: ErrorMessage[]) => {
+const showErrors = (errors: Error[]) => {
   Modal.info({
     icon: <></>,
     okText: '关闭',
@@ -195,7 +183,7 @@ const showErrors = (errors: ErrorMessage[]) => {
           },
           {
             title: '表名',
-            dataIndex: 'sheetName',
+            dataIndex: 'name',
           },
           {
             title: '行数',
