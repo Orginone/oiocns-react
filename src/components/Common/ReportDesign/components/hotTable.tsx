@@ -30,7 +30,6 @@ const HotTableView: React.FC<IProps> = ({
   classType,
   handEcho,
 }) => {
-  const space = current.directory.target.space;
   const [modalType, setModalType] = useState<string>('');
   const [tkey] = useCtrlUpdate(current);
   const [sheetIndex, setSheetIndex] = useState<any>(0); // tabs页签
@@ -351,7 +350,7 @@ const HotTableView: React.FC<IProps> = ({
         <OpenFileDialog
           multiple
           title={`选择属性`}
-          rootKey={space.directory.key}
+          rootKey={current.spaceKey}
           accepts={['属性']}
           excludeIds={current.attributes.filter((i) => i.propId).map((a) => a.propId)}
           onCancel={() => setModalType('')}

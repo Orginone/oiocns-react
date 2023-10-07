@@ -1,9 +1,11 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components';
 import SchemaForm from '@/components/SchemaForm';
 import { IDirectory, valueTypes, IProperty } from '@/ts/core';
 import { EntityColumns } from './entityColumns';
 import { schema } from '@/ts/base';
+import OpenFileDialog from '@/components/OpenFileDialog';
+import { Input } from 'antd';
 
 interface Iprops {
   formType: string;
@@ -15,6 +17,7 @@ interface Iprops {
 */
 const PropertyForm = (props: Iprops) => {
   const formRef = useRef<ProFormInstance>();
+  const [needType, setNeedType] = useState('');
   const [selectType, setSelectType] = useState<string>(
     (props.current as IProperty).metadata.valueType,
   );
@@ -42,6 +45,17 @@ const PropertyForm = (props: Iprops) => {
     default:
       return <></>;
   }
+  const findSpecies = () => {
+    if (property?.metadata.speciesId) {
+      return directory.target.user.findMetadata<schema.XEntity>(
+        property.metadata.speciesId,
+      );
+    }
+  };
+  const [species, setSpecies] = useState(findSpecies());
+  useEffect(() => {
+    formRef.current?.setFieldValue('speciesId', species?.id);
+  }, [species]);
   const getFromColumns = () => {
     const columns: ProFormColumnsType<schema.XProperty>[] = [
       {
@@ -89,16 +103,19 @@ const PropertyForm = (props: Iprops) => {
         dataIndex: 'speciesId',
         valueType: 'select',
         formItemProps: { rules: [{ required: true, message: `${typeName}为必填项` }] },
-        fieldProps: {
-          showSearch: true,
-          options: directory.specieses
-            .filter((i) => i.typeName === typeName)
-            .map((i) => {
-              return {
-                value: i.id,
-                label: i.name,
-              };
-            }),
+        renderFormItem() {
+          if (readonly) {
+            return <div>{species?.name ?? ''}</div>;
+          }
+          return (
+            <Input
+              placeholder={`点击选择${typeName}`}
+              readOnly
+              value={species?.name ?? ''}
+              style={{ cursor: 'pointer' }}
+              onClick={() => setNeedType(typeName)}
+            />
+          );
         },
       });
     }
@@ -132,34 +149,52 @@ const PropertyForm = (props: Iprops) => {
     return columns;
   };
   return (
-    <SchemaForm<schema.XProperty>
-      open
-      title={title}
-      width={640}
-      formRef={formRef}
-      columns={getFromColumns()}
-      initialValues={initialValue}
-      rowProps={{
-        gutter: [24, 0],
-      }}
-      layoutType="ModalForm"
-      onOpenChange={(open: boolean) => {
-        if (!open) {
+    <>
+      <SchemaForm<schema.XProperty>
+        open
+        title={title}
+        width={640}
+        formRef={formRef}
+        columns={getFromColumns()}
+        initialValues={initialValue}
+        rowProps={{
+          gutter: [24, 0],
+        }}
+        layoutType="ModalForm"
+        onOpenChange={(open: boolean) => {
+          if (!open) {
+            props.finished();
+          }
+        }}
+        onFinish={async (values) => {
+          switch (props.formType) {
+            case 'updateProperty':
+              await property!.update(values);
+              break;
+            case 'newProperty':
+              await directory.createProperty(values);
+              break;
+          }
           props.finished();
-        }
-      }}
-      onFinish={async (values) => {
-        switch (props.formType) {
-          case 'updateProperty':
-            await property!.update(values);
-            break;
-          case 'newProperty':
-            await directory.createProperty(values);
-            break;
-        }
-        props.finished();
-      }}
-    />
+        }}
+      />
+      {needType !== '' && (
+        <OpenFileDialog
+          title={`选择属性`}
+          rootKey={directory.spaceKey}
+          accepts={[needType]}
+          onCancel={() => setNeedType('')}
+          onOk={(files) => {
+            if (files.length > 0) {
+              setSpecies(files[0].metadata);
+            } else {
+              setSpecies(undefined);
+            }
+            setNeedType('');
+          }}
+        />
+      )}
+    </>
   );
 };
 

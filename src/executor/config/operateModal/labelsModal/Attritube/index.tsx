@@ -20,7 +20,6 @@ interface IProps {
  * @return {*}
  */
 const Attritube = ({ current, modalType, setModalType }: IProps) => {
-  const space = current.directory.target.space;
   const [tkey] = useCtrlUpdate(current);
   const [selectedItem, setSelectedItem] = useState<XAttribute>();
   // 项配置改变
@@ -100,8 +99,8 @@ const Attritube = ({ current, modalType, setModalType }: IProps) => {
         <OpenFileDialog
           multiple
           title={`选择属性`}
-          rootKey={space.directory.key}
           accepts={['属性']}
+          rootKey={current.spaceKey}
           excludeIds={current.attributes.filter((i) => i.propId).map((a) => a.propId)}
           onCancel={() => setModalType('')}
           onOk={(files) => {

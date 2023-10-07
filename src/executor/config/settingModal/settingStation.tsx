@@ -118,6 +118,8 @@ const SettingStation: React.FC<IProps> = ({ company, finished }) => {
       onCancel={() => finished()}>
       <MainLayout
         notExitIcon
+        leftShow
+        rightShow={false}
         selectMenu={selectMenu}
         onSelect={async (data) => {
           if (data.itemType === '岗位') {

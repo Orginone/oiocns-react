@@ -116,6 +116,9 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
   get groupTags(): string[] {
     return ['目录'];
   }
+  get spaceKey(): string {
+    return this.target.space.directory.key;
+  }
   get forms(): IForm[] {
     return this.operater.getContent(this.formTypes) as Form[];
   }

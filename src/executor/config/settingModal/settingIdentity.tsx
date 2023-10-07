@@ -64,11 +64,13 @@ const SettingIdentity: React.FC<IProps> = ({ target, finished }) => {
       width={'80vw'}
       title={target.name}
       bodyHeight={'80vh'}
-      icon={<EntityIcon entityId={target.id} />}
+      icon={<EntityIcon entity={target.metadata} />}
       destroyOnClose
       onCancel={() => finished()}>
       <MainLayout
         notExitIcon
+        leftShow
+        rightShow={false}
         selectMenu={selectMenu}
         onSelect={async (data) => {
           if ('current' in data.item) {
@@ -148,11 +150,11 @@ const loadSettingMenu = (target: ITarget): MenuItemType => {
         label: item.name,
         itemType: '角色',
         menus: loadMenus(item),
-        icon: <EntityIcon notAvatar={true} entityId={item.id} size={18} />,
+        icon: <EntityIcon notAvatar={true} entity={item.metadata} size={18} />,
         children: [],
       };
     }),
-    icon: <EntityIcon typeName={'角色'} entityId={'0'} size={18} />,
+    icon: <EntityIcon entity={target.metadata} size={18} />,
   };
 };
 

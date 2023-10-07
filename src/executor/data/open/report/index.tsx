@@ -95,6 +95,8 @@ const ReportView: React.FC<IProps> = ({ current, finished }) => {
       footer={[]}
       onCancel={finished}>
       <MainLayout
+        leftShow
+        rightShow={false}
         selectMenu={selectMenu}
         onSelect={(data) => {
           setSelectMenu(data);

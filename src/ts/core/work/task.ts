@@ -143,6 +143,7 @@ export class WorkTask implements IWorkTask {
             for (const item of this.user.targets) {
               if (item.id === this.targets[1].id) {
                 item.pullMembers([this.targets[0]]);
+                break;
               }
             }
           }

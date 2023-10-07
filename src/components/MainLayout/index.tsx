@@ -18,6 +18,7 @@ const { Content, Sider } = Layout;
 type MainLayoutType = {
   style?: CSSProperties;
   leftShow?: boolean;
+  rightShow?: boolean;
   children?: React.ReactNode; // 子组件
   siderMenuData: MenuItemType;
   rightBar?: React.ReactNode;
@@ -82,18 +83,22 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
         </Col>
         <Col className={cls.rightstyle}>
           <Space wrap split={<Divider type="vertical" />} size={2}>
-            <Typography.Link
-              title={'切换主测栏'}
-              style={{ fontSize: 18 }}
-              onClick={() => setLeftSider(!leftSider)}>
-              <LeftBarIcon size={18} width={4} selected={leftSider} />
-            </Typography.Link>
-            <Typography.Link
-              title={'切换辅助侧栏'}
-              style={{ fontSize: 18 }}
-              onClick={() => setRightSider(!rightSider)}>
-              <RightBarIcon size={18} width={8} selected={rightSider} />
-            </Typography.Link>
+            {props.leftShow === undefined && (
+              <Typography.Link
+                title={'切换主测栏'}
+                style={{ fontSize: 18 }}
+                onClick={() => setLeftSider(!leftSider)}>
+                <LeftBarIcon size={18} width={4} selected={leftSider} />
+              </Typography.Link>
+            )}
+            {props.rightShow === undefined && (
+              <Typography.Link
+                title={'切换辅助侧栏'}
+                style={{ fontSize: 18 }}
+                onClick={() => setRightSider(!rightSider)}>
+                <RightBarIcon size={18} width={8} selected={rightSider} />
+              </Typography.Link>
+            )}
             {props.rightBar}
             {outside.length > 0 &&
               outside.map((item) => {
@@ -166,7 +171,7 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
             </div>
           </Sider>
         )}
-        {rightSider ? (
+        {props.rightShow === true || rightSider ? (
           <>
             <Resizable
               handles={'right'}

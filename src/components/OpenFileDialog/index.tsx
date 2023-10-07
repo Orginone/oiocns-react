@@ -6,6 +6,7 @@ import { loadSettingMenu } from './config';
 import FullScreenModal from '../Common/fullScreen';
 import { Button, Divider, Space } from 'antd';
 import { IFile } from '@/ts/core';
+import orgCtrl, { Controller } from '@/ts/controller';
 
 interface IFileDialogProps {
   title?: string;
@@ -21,8 +22,9 @@ interface IFileDialogProps {
 
 const OpenFileDialog: React.FC<IFileDialogProps> = (props) => {
   const [selectedFiles, setSelectedFiles] = useState<IFile[]>([]);
-  const [key, rootMenu, selectMenu, setSelectMenu] = useMenuUpdate(() =>
-    loadSettingMenu(props.rootKey, props.allowInherited || false),
+  const [key, rootMenu, selectMenu, setSelectMenu] = useMenuUpdate(
+    () => loadSettingMenu(props.rootKey, props.allowInherited || false),
+    new Controller(orgCtrl.currentKey),
   );
   if (!selectMenu || !rootMenu) return <></>;
   return (

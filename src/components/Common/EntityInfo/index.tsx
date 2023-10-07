@@ -41,7 +41,7 @@ const EntityInfo: React.FC<IProps> = ({ entity, other, extra, column }: IProps) 
               text: entity.id,
               tooltips: [entity.id, '复制成功'],
             }}>
-            <EntityIcon entityId={entity.id} showName />
+            <EntityIcon entity={entity.metadata} showName />
           </Typography.Paragraph>
         </Descriptions.Item>
         <Descriptions.Item label="代码">

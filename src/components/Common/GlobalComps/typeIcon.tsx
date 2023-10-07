@@ -58,8 +58,9 @@ const TypeIcon = ({ avatar, iconType, size }: TypeIconInfo) => {
         return <im.ImDelicious {...config} />;
       case '办事':
         return <im.ImShuffle {...config} />;
+      case '表单':
+      case '报表':
       case '事项配置':
-        return <im.ImInsertTemplate {...config} />;
       case '实体配置':
         return <im.ImPaste {...config} />;
       case '角色':

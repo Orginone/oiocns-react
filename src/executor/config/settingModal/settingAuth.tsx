@@ -32,11 +32,13 @@ const SettingAuth: React.FC<IProps> = ({ space, finished }) => {
       width={'80vw'}
       title={space.name}
       bodyHeight={'80vh'}
-      icon={<EntityIcon entityId={space.id} />}
+      icon={<EntityIcon entity={space.metadata} />}
       destroyOnClose
       onCancel={() => finished()}>
       <MainLayout
         notExitIcon
+        leftShow
+        rightShow={false}
         selectMenu={selectMenu}
         onSelect={(data) => {
           setSelectMenu(data);
@@ -93,7 +95,7 @@ const loadSettingMenu = (authority: IAuthority): MenuItemType => {
     item: authority,
     menus: loadAuthorityMenus(authority),
     children: createMenu(authority.children),
-    icon: <EntityIcon notAvatar={true} entityId={authority.metadata.id} size={18} />,
+    icon: <EntityIcon notAvatar={true} entity={authority.metadata} size={18} />,
   };
 };
 
@@ -107,7 +109,7 @@ const createMenu = (authoritys: IAuthority[]): MenuItemType[] => {
       label: auth.name,
       itemType: '权限',
       menus: loadAuthorityMenus(auth),
-      icon: <EntityIcon notAvatar={true} entityId={auth.id} size={18} />,
+      icon: <EntityIcon notAvatar={true} entity={auth.metadata} size={18} />,
       children: createMenu(auth.children),
     });
   }

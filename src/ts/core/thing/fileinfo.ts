@@ -274,6 +274,8 @@ export class SysFileInfo extends FileInfo<schema.XEntity> implements ISysFileInf
   }
 }
 export interface IStandardFileInfo<T extends schema.XStandard> extends IFileInfo<T> {
+  /** 归属组织key */
+  spaceKey: string;
   /** 变更通知 */
   notify(operate: string, data: schema.XEntity[]): Promise<boolean>;
   /** 更新 */
@@ -287,6 +289,9 @@ export abstract class StandardFileInfo<T extends schema.XStandard>
   constructor(_metadata: T, _directory: IDirectory, _coll: XCollection<T>) {
     super(_metadata, _directory);
     this.coll = _coll;
+  }
+  get spaceKey(): string {
+    return this.directory.target.space.directory.key;
   }
   abstract copy(destination: IDirectory): Promise<boolean>;
   abstract move(destination: IDirectory): Promise<boolean>;
