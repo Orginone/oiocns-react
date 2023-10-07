@@ -1,4 +1,4 @@
-import { TargetType } from '@/ts/core';
+import { IEntity, TargetType } from '@/ts/core';
 import { message } from 'antd';
 import React from 'react';
 
@@ -8,6 +8,7 @@ import ActivityPublisher from './pubActivity';
 import SettingAuth from './settingModal/settingAuth';
 import SettingStation from './settingModal/settingStation';
 import SettingIdentity from './settingModal/settingIdentity';
+import { schema } from '@/ts/base';
 
 const entityMap: any = {
   目录: 'Dir',
@@ -54,20 +55,23 @@ const ConfigExecutor: React.FC<IProps> = ({ cmd, args, finished }) => {
       return <ActivityPublisher activity={args[0]} finish={finished} />;
     case 'update':
     case 'remark':
-      if ('attributes' in args[0]) {
-        return <EntityForm cmd={cmd + 'Form'} entity={args[0]} finished={finished} />;
-      }
-      if (Object.keys(entityMap).includes(args[0].typeName)) {
-        return (
-          <EntityForm
-            cmd={cmd + entityMap[args[0].typeName]}
-            entity={args[0]}
-            finished={finished}
-          />
-        );
-      }
-      if (Object.values(TargetType).includes(args[0].typeName as TargetType)) {
-        return <EntityForm cmd={cmd} entity={args[0]} finished={finished} />;
+      {
+        const entity: IEntity<schema.XEntity> = args[0];
+        if (entity.groupTags && entity.groupTags.includes('表单')) {
+          return <EntityForm cmd={cmd + 'Form'} entity={args[0]} finished={finished} />;
+        }
+        if (Object.keys(entityMap).includes(args[0].typeName)) {
+          return (
+            <EntityForm
+              cmd={cmd + entityMap[args[0].typeName]}
+              entity={args[0]}
+              finished={finished}
+            />
+          );
+        }
+        if (Object.values(TargetType).includes(args[0].typeName as TargetType)) {
+          return <EntityForm cmd={cmd} entity={args[0]} finished={finished} />;
+        }
       }
       break;
     default:

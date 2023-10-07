@@ -115,9 +115,6 @@ const PropertyForm = (props: Iprops) => {
       valueType: 'textarea',
       readonly: readonly,
       colProps: { span: 24 },
-      formItemProps: {
-        rules: [{ required: true, message: '属性定义为必填项' }],
-      },
     });
     if (readonly) {
       columns.push(...EntityColumns(props.current!.metadata));
