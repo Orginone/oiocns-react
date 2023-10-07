@@ -135,8 +135,13 @@ export abstract class Team extends Entity<schema.XTarget> implements ITeam {
     }
     return true;
   }
-  protected async create(data: model.TargetModel): Promise<schema.XTarget | undefined> {
-    data.belongId = this.space.id;
+  protected async create(
+    data: model.TargetModel,
+    belong: boolean = false,
+  ): Promise<schema.XTarget | undefined> {
+    if (belong === false) {
+      data.belongId = this.space.id;
+    }
     data.teamCode = data.teamCode || data.code;
     data.teamName = data.teamName || data.name;
     const res = await kernel.createTarget(data);

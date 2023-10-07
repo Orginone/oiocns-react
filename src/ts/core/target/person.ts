@@ -128,7 +128,7 @@ export class Person extends Belong implements IPerson {
     data.public = false;
     data.teamCode = data.teamCode || data.code;
     data.teamName = data.teamName || data.name;
-    const res = await this.create(data);
+    const res = await this.create(data, true);
     if (res && res.id) {
       const company = createCompany(res, this);
       await company.deepLoad();

@@ -14,6 +14,7 @@ interface IProps {
   finished: () => void;
 }
 const LabelModl: React.FC<IProps> = ({ current, finished }: IProps) => {
+  console.log(current.directory.target);
   const [modalType, setModalType] = useState<string>('');
   const [tabKey, setTabKey] = useState<string>('attr');
   /** 操作按钮 */
