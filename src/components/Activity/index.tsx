@@ -45,9 +45,6 @@ export const ActivityItem: React.FC<ActivityItemProps> = ({
   activity,
   hideResource,
 }) => {
-  const [commenting, setCommenting] = useState(false);
-  const [comment, setComment] = useState('');
-  const [replyTo, setReplyTo] = useState<XEntity | null>(null);
   const [metadata, setMetadata] = useState(item.metadata);
   useEffect(() => {
     const id = item.subscribe(() => {
@@ -57,14 +54,6 @@ export const ActivityItem: React.FC<ActivityItemProps> = ({
       item.unsubscribe(id);
     };
   }, [item]);
-  const handleReply = async (userId: string = '') => {
-    setReplyTo(null);
-    if (userId) {
-      const user = await orgCtrl.user.findEntityAsync(userId);
-      user && setReplyTo(user);
-    }
-    setCommenting(true);
-  };
   const renderContent = () => {
     switch (metadata.typeName) {
       case MessageType.Text:
@@ -90,10 +79,59 @@ export const ActivityItem: React.FC<ActivityItemProps> = ({
         }
     }
   };
-  const renderCtxMore = () => {
+  const RenderCtxMore: React.FC<ActivityItemProps> = ({ item, hideResource }) => {
+    const [commenting, setCommenting] = useState(false);
+    const [comment, setComment] = useState('');
+    const [replyTo, setReplyTo] = useState<XEntity | null>(null);
+    const handleReply = async (userId: string = '') => {
+      setReplyTo(null);
+      if (userId) {
+        const user = await orgCtrl.user.findEntityAsync(userId);
+        user && setReplyTo(user);
+      }
+      setCommenting(true);
+    };
+    const renderOperate = () => {
+      return (
+        <Space split={<Divider type="vertical" />} wrap size={2}>
+          <Button
+            type="text"
+            size="small"
+            onClick={async () => {
+              await item.like();
+            }}>
+            {metadata.likes.includes(orgCtrl.user.id) ? (
+              <>
+                <HeartFilled style={{ color: '#cb4747' }} /> <span>取消</span>
+              </>
+            ) : (
+              <>
+                <HeartOutlined /> <span>点赞</span>
+              </>
+            )}
+          </Button>
+          <Button type="text" size="small" onClick={() => handleReply()}>
+            <MessageOutlined /> <span>评论</span>
+          </Button>
+          {item.canDelete && (
+            <Button type="text" size="small" onClick={() => item.delete()}>
+              <DeleteOutlined /> <span>删除</span>
+            </Button>
+          )}
+        </Space>
+      );
+    };
     if (hideResource === true) {
       return (
         <>
+          <div className={cls.activityItemFooter}>
+            <div>
+              <EntityIcon entityId={metadata.createUser} showName />
+              <span className={cls.activityTime}>
+                发布于{showChatTime(item.metadata.createTime)}
+              </span>
+            </div>
+          </div>
           <div
             className={cls.activityItemFooterLikes}
             style={{ display: metadata.likes.length ? 'flex' : 'none' }}>
@@ -115,6 +153,15 @@ export const ActivityItem: React.FC<ActivityItemProps> = ({
     }
     return (
       <>
+        <div className={cls.activityItemFooter}>
+          <div>
+            <EntityIcon entityId={metadata.createUser} showName />
+            <span className={cls.activityTime}>
+              发布于{showChatTime(item.metadata.createTime)}
+            </span>
+          </div>
+          {!hideResource && <div>{renderOperate()}</div>}
+        </div>
         <div
           className={cls.activityItemFooterLikes}
           style={{ display: metadata.likes.length ? 'flex' : 'none' }}>
@@ -161,36 +208,6 @@ export const ActivityItem: React.FC<ActivityItemProps> = ({
       </>
     );
   };
-  const renderOperate = () => {
-    return (
-      <Space split={<Divider type="vertical" />} wrap size={2}>
-        <Button
-          type="text"
-          size="small"
-          onClick={async () => {
-            await item.like();
-          }}>
-          {metadata.likes.includes(orgCtrl.user.id) ? (
-            <>
-              <HeartFilled style={{ color: '#cb4747' }} /> <span>取消</span>
-            </>
-          ) : (
-            <>
-              <HeartOutlined /> <span>点赞</span>
-            </>
-          )}
-        </Button>
-        <Button type="text" size="small" onClick={() => handleReply()}>
-          <MessageOutlined /> <span>评论</span>
-        </Button>
-        {item.canDelete && (
-          <Button type="text" size="small" onClick={() => item.delete()}>
-            <DeleteOutlined /> <span>删除</span>
-          </Button>
-        )}
-      </Space>
-    );
-  };
   return (
     <List.Item>
       <List.Item.Meta
@@ -211,7 +228,7 @@ export const ActivityItem: React.FC<ActivityItemProps> = ({
         avatar={<EntityIcon entity={activity.metadata} size={50} />}
         description={
           <div className={cls.activityItem}>
-            <div onClick={() => setCommenting(false)}>
+            <div>
               {renderContent()}
               {hideResource !== true && (
                 <div className={cls.activityItemImageList}>
@@ -221,16 +238,7 @@ export const ActivityItem: React.FC<ActivityItemProps> = ({
                 </div>
               )}
             </div>
-            <div className={cls.activityItemFooter}>
-              <div>
-                <EntityIcon entityId={metadata.createUser} showName />
-                <span className={cls.activityTime}>
-                  发布于{showChatTime(item.metadata.createTime)}
-                </span>
-              </div>
-              {!hideResource && <div>{renderOperate()}</div>}
-            </div>
-            {renderCtxMore()}
+            <RenderCtxMore item={item} hideResource={hideResource} activity={activity} />
           </div>
         }
       />

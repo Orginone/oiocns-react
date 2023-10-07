@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import FullScreenModal from '@/components/Common/fullScreen';
 import { Button, Form } from 'antd';
-import MultImageUploader from '@/components/MultImageUploader';
+import SelectMultFiles from '@/components/Activity/SelectMultFiles';
 import { IActivity, MessageType } from '@/ts/core';
 import { model } from '@/ts/base';
 import { Editor, Toolbar } from '@wangeditor/editor-for-react';
@@ -31,7 +31,8 @@ const ActivityPublisher: React.FC<{
     <FullScreenModal
       open
       {...props}
-      width={'50vw'}
+      width={'60vw'}
+      bodyHeight={'60vh'}
       destroyOnClose
       title="发布动态"
       footer={
@@ -70,13 +71,12 @@ const ActivityPublisher: React.FC<{
           />
         </Form.Item>
         <Form.Item>
-          <MultImageUploader
+          <SelectMultFiles
             maxCount={9}
-            directory={props.activity.session.target.directory}
             types={['图片', '视频']}
             onChange={(fileList) => {
               setResource(fileList.map((item) => item.shareInfo()));
-            }}></MultImageUploader>
+            }}></SelectMultFiles>
         </Form.Item>
       </Form>
     </FullScreenModal>

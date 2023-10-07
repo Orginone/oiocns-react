@@ -73,6 +73,7 @@ const Book: React.FC<any> = ({
         select={currentTag}
         initTags={['全部', '@我', '未读', '单聊', '群聊']}
         entitys={chats}
+        selectFiles={[]}
         badgeCount={(tag) => {
           let count = 0;
           getChats(tag).forEach((i) => {
@@ -84,7 +85,7 @@ const Book: React.FC<any> = ({
       <SegmentContent
         key={msgKey}
         onSegmentChanged={setSegmented}
-        descriptions={[`${getChats().length}个会话`]}
+        descriptions={`${getChats().length}个会话`}
         content={
           <Spin spinning={!loaded} tip={'加载中...'} delay={200}>
             {segmented === 'table' ? (

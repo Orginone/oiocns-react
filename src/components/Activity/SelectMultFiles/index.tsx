@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import cls from './index.module.less';
 import { PlusOutlined } from '@ant-design/icons';
-import { IDirectory, ISysFileInfo } from '@/ts/core';
+import { ISysFileInfo } from '@/ts/core';
 import OpenFileDialog from '@/components/OpenFileDialog';
 import ActivityResource from '@/components/Activity/ActivityResource';
-const ImageUploader: React.FC<{
+const SelectMultFiles: React.FC<{
   maxCount: number;
   types: string[];
-  directory: IDirectory;
   onChange: (fileList: ISysFileInfo[]) => void;
 }> = (props) => {
   const [open, setOpen] = useState(false);
@@ -33,7 +32,7 @@ const ImageUploader: React.FC<{
       {open && (
         <OpenFileDialog
           multiple
-          rootKey={props.directory.key}
+          rootKey={'disk'}
           maxCount={props.maxCount}
           accepts={props.types}
           allowInherited
@@ -49,4 +48,4 @@ const ImageUploader: React.FC<{
   );
 };
 
-export default ImageUploader;
+export default SelectMultFiles;

@@ -7,7 +7,7 @@ import * as fa from '@/icons/fa';
 type segmentedTypes = 'icon' | 'table' | 'list';
 
 interface IProps {
-  descriptions: string[];
+  descriptions: string;
   content: React.ReactNode;
   onSegmentChanged: (type: segmentedTypes) => void;
 }
@@ -67,9 +67,7 @@ const SegmentContent: React.FC<IProps> = ({
       </Affix>
       <Affix style={{ position: 'absolute', left: 10, bottom: 0 }}>
         <Space split={<Divider type="vertical" />}>
-          {descriptions.map((item, index) => (
-            <Typography.Link key={index}>{item}</Typography.Link>
-          ))}
+          <Typography.Link>{descriptions}</Typography.Link>
         </Space>
       </Affix>
     </Card>

@@ -7,6 +7,7 @@ import { IEntity } from '@/ts/core';
 interface IProps {
   select: string;
   initTags: string[];
+  selectFiles: IEntity<schema.XEntity>[];
   badgeCount?: (tag: string) => number;
   entitys: IEntity<schema.XEntity>[];
   onChanged: (tag: string) => void;
@@ -18,6 +19,9 @@ const TagsBar: React.FC<IProps> = (props) => {
     const tags = props.initTags.map((tag) => {
       return { tag, count: 0 };
     });
+    if (props.selectFiles.length > 0) {
+      tags.push({ tag: '已选中', count: props.selectFiles.length });
+    }
     props.entitys.forEach((entity) => {
       entity.groupTags.forEach((tag) => {
         const index = tags.findIndex((i) => i.tag === tag);

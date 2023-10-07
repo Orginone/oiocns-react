@@ -75,6 +75,9 @@ const Directory: React.FC<IProps> = (props) => {
   };
 
   const getContent = (filter: boolean = true) => {
+    if (filter && currentTag == '已选中') {
+      return props.selects || [];
+    }
     const contents: IFile[] = [];
     if (props.current === 'disk') {
       contents.push(orgCtrl.user, ...orgCtrl.user.companys);
@@ -102,15 +105,13 @@ const Directory: React.FC<IProps> = (props) => {
       <TagsBar
         select={currentTag}
         initTags={['全部']}
+        selectFiles={props.selects || []}
         entitys={getContent(false)}
         onChanged={(t) => setCurrentTag(t)}></TagsBar>
       <SegmentContent
         key={key}
         onSegmentChanged={setSegmented}
-        descriptions={[
-          `${getContent().length}个项目`,
-          props.selects ? `选中${props.selects.length}个项目` : '',
-        ]}
+        descriptions={`${getContent().length}个项目`}
         content={
           <Spin spinning={!loaded} delay={10} tip={'加载中...'}>
             {segmented === 'table' ? (

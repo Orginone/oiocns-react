@@ -4,6 +4,7 @@ import { JolPlayer } from 'jol-player';
 import { FileItemShare } from '@/ts/base/model';
 import { shareOpenLink } from '@/utils/tools';
 import { FileUnknownOutlined } from '@ant-design/icons';
+import { command } from '@/ts/base';
 const ActivityResource = (
   fileList: FileItemShare[],
   maxWidth: number,
@@ -44,7 +45,19 @@ const ActivityResource = (
           style={{
             width: maxWidth,
             height: maxWidth,
+            cursor: 'pointer',
+          }}
+          onClick={(e) => {
+            e.stopPropagation();
+            command.emitter('data', 'open', item);
           }}>
+          <div
+            style={{
+              height: maxWidth,
+              width: maxWidth,
+              zIndex: 101,
+              position: 'absolute',
+            }}></div>
           <JolPlayer
             option={{
               width: maxWidth,
