@@ -21,8 +21,10 @@ interface IProps {
 const RootNode: React.FC<IProps> = (props) => {
   const [viewForm, setViewForm] = useState<XForm>();
   const [formModel, setFormModel] = useState<string>('');
-  const [primaryForms, setPrimaryForms] = useState(props.current.primaryForms || []);
-  const [detailForms, setDetailForms] = useState(props.current.detailForms || []);
+  props.current.primaryForms = props.current.primaryForms || [];
+  props.current.detailForms = props.current.detailForms || [];
+  const [primaryForms, setPrimaryForms] = useState(props.current.primaryForms);
+  const [detailForms, setDetailForms] = useState(props.current.detailForms);
   const [selectAuthValue, setSelectAuthValue] = useState<any>(props.current.destId);
   return (
     <div className={cls[`app-roval-node`]}>

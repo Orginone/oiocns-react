@@ -60,13 +60,13 @@ const WorkBench: React.FC = () => {
   // 渲染办事信息
   const RenderWork: React.FC = () => {
     const [todoCount, setTodoCount] = useState(0);
-    const [FinishedCount, setFinishedCount] = useState(0);
+    const [ApplyCount, setApplyCount] = useState(0);
     const [CompletedCount, setCompletedCount] = useState(0);
     useEffect(() => {
       const id = orgCtrl.subscribe(() => {
         setTodoCount(orgCtrl.work.todos.length);
-        orgCtrl.work.loadFinishedCount().then((v) => {
-          setFinishedCount(v);
+        orgCtrl.work.loadApplyCount().then((v) => {
+          setApplyCount(v);
         });
         orgCtrl.work.loadCompletedCount().then((v) => {
           setCompletedCount(v);
@@ -85,7 +85,7 @@ const WorkBench: React.FC = () => {
           <Space wrap split={<Divider type="vertical" />} size={2}>
             {renderDataItem('待办(件)', todoCount)}
             {renderDataItem('已办(件)', CompletedCount)}
-            {renderDataItem('已完结(件)', FinishedCount)}
+            {renderDataItem('我的(件)', ApplyCount)}
           </Space>
         </div>
       </>

@@ -15,7 +15,7 @@ export interface IWorkProvider {
   /** 加载已办数量 */
   loadCompletedCount(): Promise<number>;
   /** 加载已完结数量 */
-  loadFinishedCount(): Promise<number>;
+  loadApplyCount(): Promise<number>;
   /** 加载待办任务 */
   loadTodos(reload?: boolean): Promise<IWorkTask[]>;
   /** 加载已办任务 */
@@ -147,8 +147,23 @@ export class WorkProvider implements IWorkProvider {
     }
     return 0;
   }
-  async loadFinishedCount(): Promise<number> {
-    return await this.loadCompletedCount();
+  async loadApplyCount(): Promise<number> {
+    const res = await kernel.collectionLoad(this.userId, [], {
+      collName: storeCollName.WorkTask,
+      options: {
+        match: {
+          createUser: this.userId,
+          nodeId: {
+            _exists_: false,
+          },
+        },
+      },
+      isCountQuery: true,
+    });
+    if (res.success) {
+      return res.totalCount;
+    }
+    return 0;
   }
   async loadInstanceDetail(
     id: string,
