@@ -25,7 +25,7 @@ const FormSelectModal = ({ form, fields, belong, onSave }: IFormSelectProps) => 
       <GenerateThingTable
         fields={fields}
         height={'70vh'}
-        toolbar={{ visible: false }}
+        columnChooser={{ enabled: true }}
         selection={{
           mode: 'multiple',
           allowSelectAll: true,

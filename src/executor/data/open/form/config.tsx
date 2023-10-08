@@ -69,7 +69,7 @@ const buildSpeciesItemsTree = (
 
 /** 加载表单分类菜单 */
 export const loadSpeciesItemMenu = (form: IForm): MenuItemType => {
-  const SpeciesFields = form.fields.filter((i) => i.lookups && i.lookups.length > 0);
+  const SpeciesFields = form.fields.filter((i) => i.valueType === '分类型');
   return {
     key: form.key,
     label: form.name,

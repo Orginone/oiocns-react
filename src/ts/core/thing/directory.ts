@@ -95,7 +95,6 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
   parent: IDirectory | undefined;
   taskList: model.TaskModel[] = [];
   files: ISysFileInfo[] = [];
-  formTypes: string[] = ['表单', '报表', '事项配置', '实体配置'];
   get cacheFlag(): string {
     return 'directorys';
   }

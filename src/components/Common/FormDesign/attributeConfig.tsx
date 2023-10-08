@@ -28,9 +28,6 @@ const AttributeConfig = ({ attr, onChanged, superAuth, onClose }: IProps) => {
         <Form.Item label="编号" name="code">
           <Input />
         </Form.Item>
-        <Form.Item label="组件" name="widget">
-          <Select options={loadWidgetsOpts(attr.property!.valueType)} />
-        </Form.Item>
         <Form.Item label="必填" name="required">
           <Radio.Group buttonStyle="solid">
             <Radio.Button value={true}>是</Radio.Button>

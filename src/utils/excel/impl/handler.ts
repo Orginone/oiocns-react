@@ -12,13 +12,23 @@ export abstract class SheetHandler<S extends t.model.Sheet<any>>
     this.sheet = sheet;
   }
 
-  assert(index: number, asserts: { res: boolean; error: string }[]): t.Error[] {
+  assert(
+    index: number | number[],
+    asserts: { res: boolean; error: string }[],
+  ): t.Error[] {
     let errors: t.Error[] = [];
     asserts.forEach((item) => {
       if (item.res) {
+        if (typeof index == 'number') {
+          index += 2;
+        } else {
+          for (let i = 0; i < index.length; i++) {
+            index[i] += 2;
+          }
+        }
         errors.push({
           name: this.sheet.name,
-          row: index + 2,
+          row: index,
           message: item.error,
         });
       }

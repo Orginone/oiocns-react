@@ -44,7 +44,7 @@ export type FormData = {
  */
 export interface Error {
   name: string;
-  row: number;
+  row: number | number[];
   message: string;
 }
 
@@ -98,7 +98,7 @@ export interface DataHandler {
 export interface ISheetHandler<S extends model.Sheet<any>> {
   sheet: S;
 
-  assert(index: number, asserts: { res: boolean; error: string }[]): Error[];
+  assert(index: number | number[], asserts: { res: boolean; error: string }[]): Error[];
   checkData(excel: IExcel): Error[];
   operating(excel: IExcel, onItemCompleted: () => void): Promise<void>;
   completed?(excel: IExcel): void;
