@@ -165,7 +165,7 @@ export class WorkTask implements IWorkTask {
   private async findWorkById(wrokId: string): Promise<IWork | undefined> {
     for (var target of this.user.targets) {
       for (var app of await target.directory.loadAllApplication()) {
-        const work = app.findWork(wrokId);
+        const work = await app.findWork(wrokId);
         if (work) {
           return work;
         }

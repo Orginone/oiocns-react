@@ -49,16 +49,19 @@ export class WorkProvider implements IWorkProvider {
   private _todoLoaded: boolean = false;
   updateTask(task: schema.XWorkTask): void {
     const index = this.todos.findIndex((i) => i.metadata.id === task.id);
-    if (task.status < TaskStatus.ApprovalStart) {
-      if (index < 0) {
-        this.todos.unshift(new WorkTask(task, this.user));
-      } else {
+    if (index > -1) {
+      if (task.status < TaskStatus.ApprovalStart) {
         this.todos[index].updated(task);
+      } else {
+        this.todos.splice(index, 1);
       }
-    } else if (index > -1) {
-      this.todos.splice(index, 1);
+      this.notity.changCallback();
+    } else {
+      if (task.status < TaskStatus.ApprovalStart) {
+        this.todos.unshift(new WorkTask(task, this.user));
+        this.notity.changCallback();
+      }
     }
-    this.notity.changCallback();
   }
   async loadTodos(reload?: boolean): Promise<IWorkTask[]> {
     if (!this._todoLoaded || reload) {
