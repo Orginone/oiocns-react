@@ -188,6 +188,12 @@ const showErrors = (errors: Error[]) => {
           {
             title: '行数',
             dataIndex: 'row',
+            render: (_, data) => {
+              if (typeof data.row == 'number') {
+                return <>{data.row}</>;
+              }
+              return <>{data.row.join(',')}</>;
+            },
           },
           {
             title: '错误信息',
