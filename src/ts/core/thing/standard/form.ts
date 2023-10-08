@@ -28,7 +28,15 @@ export class Form extends StandardFileInfo<schema.XForm> implements IForm {
   private _fieldsLoaded: boolean = false;
   fields: model.FieldModel[] = [];
   get attributes(): schema.XAttribute[] {
-    return this.metadata.attributes || [];
+    const attrs: schema.XAttribute[] = [];
+    const prodIds: string[] = [];
+    for (const item of this.metadata.attributes || []) {
+      if (item.propId && item.propId.length > 0 && !prodIds.includes(item.propId)) {
+        attrs.push(item);
+        prodIds.push(item.propId);
+      }
+    }
+    return attrs;
   }
   get id(): string {
     return this._metadata.id.replace('_', '');
