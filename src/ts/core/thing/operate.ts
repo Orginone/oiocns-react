@@ -45,7 +45,7 @@ export class DirectoryOperate implements IDirectoryOperate {
         return new Transfer(s, l);
       });
       this.subscribe(_resource.applicationColl, (s, l) => {
-        if (s.parentId.length < 1) {
+        if (!(s.parentId && s.parentId.length > 5)) {
           return new Application(s, l);
         }
       });
@@ -109,6 +109,7 @@ export class DirectoryOperate implements IDirectoryOperate {
             }
           }
           break;
+        case 'delete':
         case 'replace':
           {
             const index = coll.cache.findIndex((a) => a.id == data.id);
@@ -116,7 +117,7 @@ export class DirectoryOperate implements IDirectoryOperate {
             this.standardFiles.find((i) => i.id === data.id)?.setMetadata(data);
           }
           break;
-        case 'delete':
+        case 'remove':
           await coll.removeCache(data.id);
           this.standardFiles = this.standardFiles.filter((a) => a.id != data.id);
           break;
@@ -148,8 +149,8 @@ export class DirectoryOperate implements IDirectoryOperate {
     coll: XCollection<T>,
     create: (data: T, dir: IDirectory) => StandardFileInfo<T> | undefined,
   ) {
-    coll.subscribe([this.directory.key], async (a: { operate: string; data: T[] }) => {
-      a.data.forEach((s) => {
+    coll.subscribe([this.directory.key], (a: { operate: string; data: T[] }) => {
+      a?.data?.forEach((s) => {
         this.receiveMessage<T>(a.operate, s, coll, create);
       });
     });

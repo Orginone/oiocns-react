@@ -32,7 +32,11 @@ const TagsBar: React.FC<IProps> = (props) => {
         }
       });
     });
-    return tags;
+    return tags.sort((a, b) => {
+      const aqz = a.tag === '已删除' ? 10 : 0;
+      const bqz = b.tag === '已删除' ? 10 : 0;
+      return aqz - bqz;
+    });
   };
   const loadBarItem = (tag: string, count: number) => {
     const className = tag === props.select ? cls.tags_item_active : cls.tags_item;

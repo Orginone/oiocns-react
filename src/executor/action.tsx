@@ -42,7 +42,11 @@ export const executeCmd = (cmd: string, entity: any, args: any[], type: string) 
     case 'parse':
       return copyBoard(entity);
     case 'delete':
-      return deleteEntity(entity);
+      return deleteEntity(entity, false);
+    case 'hardDelete':
+      return deleteEntity(entity, true);
+    case 'restore':
+      return restoreEntity(entity);
     case 'remove':
       return removeMember(entity);
     case 'newFile':
@@ -194,23 +198,40 @@ const openChat = (entity: IDirectory | IMemeber | ISession | ITarget) => {
   command.emitter('_', 'link', '/chat');
 };
 
+/** 恢复实体 */
+const restoreEntity = (entity: IFile) => {
+  entity.restore().then((success: boolean) => {
+    if (success) {
+      orgCtrl.changCallback();
+    }
+  });
+};
+
 /** 删除实体 */
-const deleteEntity = (entity: IFile) => {
+const deleteEntity = (entity: IFile, hardDelete: boolean) => {
   Modal.confirm({
     okText: '确认',
     cancelText: '取消',
     title: '删除询问框',
     content: (
       <div style={{ fontSize: 16 }}>
-        确认要删除{entity.typeName}[{entity.name}]吗?
+        确认要{hardDelete ? '彻底' : ''}删除{entity.typeName}[{entity.name}]吗?
       </div>
     ),
     onOk: () => {
-      entity.delete().then((success: boolean) => {
-        if (success) {
-          orgCtrl.changCallback();
-        }
-      });
+      if (hardDelete) {
+        entity.hardDelete().then((success: boolean) => {
+          if (success) {
+            orgCtrl.changCallback();
+          }
+        });
+      } else {
+        entity.delete().then((success: boolean) => {
+          if (success) {
+            orgCtrl.changCallback();
+          }
+        });
+      }
     },
   });
 };

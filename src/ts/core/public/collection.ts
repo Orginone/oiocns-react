@@ -74,7 +74,6 @@ export class XCollection<T extends schema.Xbase> {
     options.collName = this._collName;
     options.options = options.options || {};
     options.options.match = options.options.match || {};
-    options.options.match.isDeleted = false;
     return await kernel.collectionLoad<T[]>(
       this._target.belongId,
       this._relations,
@@ -301,6 +300,20 @@ export class XCollection<T extends schema.Xbase> {
           _in_: data.map((i) => i.id),
         },
       },
+      copyId,
+    );
+    if (res.success) {
+      return res.data?.MatchedCount > 0;
+    }
+    return false;
+  }
+
+  async removeMatch(match: any, copyId?: string): Promise<boolean> {
+    const res = await kernel.collectionRemove(
+      this._target.belongId,
+      this._relations,
+      this._collName,
+      match,
       copyId,
     );
     if (res.success) {

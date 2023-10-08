@@ -31,23 +31,25 @@ const buildGroupTree = (groups: IGroup[]): MenuItemType[] => {
 
 /** 编译目录树 */
 const buildDirectoryTree = (directorys: IDirectory[]): MenuItemType[] => {
-  return directorys.map((directory) => {
-    return {
-      key: directory.key,
-      item: directory,
-      label: directory.name,
-      tag: [directory.typeName],
-      icon: (
-        <EntityIcon entityId={directory.id} typeName={directory.typeName} size={18} />
-      ),
-      itemType: directory.typeName,
-      menus: loadFileMenus(directory, 1),
-      children: [
-        ...buildDirectoryTree(directory.children),
-        ...buildApplicationTree(directory.applications),
-      ],
-    };
-  });
+  return directorys
+    .filter((i) => !i.groupTags.includes('已删除'))
+    .map((directory) => {
+      return {
+        key: directory.key,
+        item: directory,
+        label: directory.name,
+        tag: [directory.typeName],
+        icon: (
+          <EntityIcon entityId={directory.id} typeName={directory.typeName} size={18} />
+        ),
+        itemType: directory.typeName,
+        menus: loadFileMenus(directory, 1),
+        children: [
+          ...buildDirectoryTree(directory.children),
+          ...buildApplicationTree(directory.applications),
+        ],
+      };
+    });
 };
 
 /** 编译目录树 */

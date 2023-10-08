@@ -41,10 +41,10 @@ const WorkForm: React.FC<IWorkFormProps> = (props) => {
         if (!props.allowEdit) {
           const nodeData = beforeData.filter((i) => i.nodeId === node.id);
           if (nodeData && nodeData.length > 0) {
-            return nodeData.slice(-1)[0];
+            return nodeData.at(-1)!;
           }
         } else {
-          source.push(...beforeData.slice(-1)[0].after);
+          source.push(...beforeData.at(-1)!.after);
         }
       }
     }

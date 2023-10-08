@@ -130,16 +130,16 @@ export class StandardFiles {
   }
   async operateStandradFile(
     to: DataResource,
-    action: 'replaceMany' | 'deleteMany',
+    action: 'replaceMany' | 'removeMany',
     move?: boolean,
   ): Promise<void> {
-    await this.loadSpecieses();
+    await this.loadStandardFiles();
     await to.formColl[action](this.forms.map((a) => a.metadata));
     await to.transferColl[action](this.transfers.map((a) => a.metadata));
     await to.speciesColl[action](this.specieses.map((a) => a.metadata));
     await to.propertyColl[action](this.propertys.map((a) => a.metadata));
-    if (action == 'deleteMany') {
-      await to.speciesItemColl.deleteMatch({
+    if (action == 'removeMany') {
+      await to.speciesItemColl.removeMatch({
         speciesId: {
           _in_: this.specieses.map((a) => a.id),
         },

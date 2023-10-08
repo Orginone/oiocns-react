@@ -9,6 +9,18 @@ export const entityOperates = {
   Delete: {
     sort: 24,
     cmd: 'delete',
+    label: '标记删除',
+    iconType: 'delete',
+  },
+  Restore: {
+    sort: 25,
+    cmd: 'restore',
+    label: '放回原处',
+    iconType: 'restore',
+  },
+  HardDelete: {
+    sort: 26,
+    cmd: 'hardDelete',
     label: '彻底删除',
     iconType: 'delete',
   },

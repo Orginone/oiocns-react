@@ -98,9 +98,6 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
   get cacheFlag(): string {
     return 'directorys';
   }
-  get groupTags(): string[] {
-    return ['目录'];
-  }
   get spaceKey(): string {
     return this.target.space.directory.key;
   }
@@ -204,7 +201,14 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
   override async delete(): Promise<boolean> {
     if (this.parent) {
       await this.resource.directoryColl.delete(this.metadata);
-      await this.operateDirectoryResource(this, this.resource, 'deleteMany');
+      await this.notify('refresh', [this.metadata]);
+    }
+    return false;
+  }
+  override async hardDelete(): Promise<boolean> {
+    if (this.parent) {
+      await this.resource.directoryColl.remove(this.metadata);
+      await this.operateDirectoryResource(this, this.resource, 'removeMany');
       await this.notify('refresh', [this.metadata]);
     }
     return false;
@@ -304,11 +308,9 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
         directoryOperates.NewFile,
         directoryOperates.TaskList,
         directoryOperates.Refesh,
-        // directoryOperates.OpenFolderWithEditor,
       );
       if (mode === 2 && this.target.hasRelationAuth()) {
         operates.push(directoryNew);
-        // operates.push(newWarehouse);
         if (this.target.user.copyFiles.size > 0) {
           operates.push(fileOperates.Parse);
         }
@@ -330,16 +332,19 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
   private async operateDirectoryResource(
     directory: IDirectory,
     resource: DataResource,
-    action: 'replaceMany' | 'deleteMany',
+    action: 'replaceMany' | 'removeMany',
     move?: boolean,
   ) {
+    if (action === 'removeMany') {
+      this.resource.deleteDirectory(directory.id);
+    }
     for (const child of directory.children) {
       await this.operateDirectoryResource(child, resource, action, move);
     }
     await resource.directoryColl[action](directory.children.map((a) => a.metadata));
     await directory.standard.operateStandradFile(resource, action, move);
-    if (action == 'deleteMany') {
-      await resource.applicationColl.deleteMatch({
+    if (action == 'removeMany') {
+      await resource.applicationColl.removeMatch({
         directoryId: directory.id,
       });
     }

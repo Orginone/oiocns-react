@@ -71,6 +71,9 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
     }
     return false;
   }
+  hardDelete(_notity: boolean = false): Promise<boolean> {
+    return this.delete(_notity);
+  }
   async rename(_name: string): Promise<boolean> {
     const node = await this.loadWorkNode();
     return await this.update({
@@ -173,7 +176,10 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
       this.forms.forEach((form) => {
         data.fields[form.id] = form.fields;
         if (pdata && pdata.data[form.id]) {
-          data.data[form.id] = pdata.data[form.id];
+          const after = pdata.data[form.id]?.at(-1);
+          if (after) {
+            data.data[form.id] = [{ ...after, nodeId: this.node!.id }];
+          }
         }
       });
       return new WorkApply(

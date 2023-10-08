@@ -163,6 +163,9 @@ export class Activity extends Entity<schema.XTarget> implements IActivity {
         skip: this.activityList.length,
         take: take,
         options: {
+          match: {
+            isDeleted: false,
+          },
           sort: {
             createTime: -1,
           },

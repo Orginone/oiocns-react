@@ -102,12 +102,19 @@ export abstract class Entity<T extends schema.XEntity>
     return this.findShare(this.metadata.belongId);
   }
   get groupTags(): string[] {
+    if (
+      ('isDeleted' in this._metadata && this._metadata.isDeleted === true) ||
+      ('isDeleted' in this.metadata && this.metadata.isDeleted === true)
+    ) {
+      return ['已删除'];
+    }
     return this._gtags;
   }
   setMetadata(_metadata: T): void {
     if (_metadata.id === this.id) {
       this._metadata = _metadata;
       ShareIdSet.set(this.id, _metadata);
+
       this.changCallback();
     }
   }

@@ -105,12 +105,13 @@ export class Session extends Entity<schema.XEntity> implements ISession {
   }
   get sessionMatch(): any {
     return this.isGroup
-      ? { toId: this.sessionId }
+      ? { toId: this.sessionId, isDeleted: false }
       : {
           _or_: [
             { fromId: this.sessionId, toId: this.userId },
             { fromId: this.userId, toId: this.sessionId },
           ],
+          isDeleted: false,
         };
   }
   get isBelongPerson(): boolean {
@@ -365,14 +366,14 @@ export class Session extends Entity<schema.XEntity> implements ISession {
       this.coll.subscribe(
         [this.key],
         (res: { operate: string; data: model.ChatMessageType[] }) => {
-          res.data.map((item) => this.receiveMessage(res.operate, item));
+          res?.data?.map((item) => this.receiveMessage(res.operate, item));
         },
       );
     } else {
       this.coll.subscribe(
         [this.key],
         (res: { operate: string; data: model.ChatMessageType[] }) => {
-          res.data.forEach((item) => {
+          res?.data?.forEach((item) => {
             if (
               [item.fromId, item.toId].includes(this.sessionId) &&
               [item.fromId, item.toId].includes(this.userId)

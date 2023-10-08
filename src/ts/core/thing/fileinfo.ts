@@ -25,8 +25,12 @@ export interface IFileInfo<T extends schema.XEntity> extends IEntity<T> {
   directory: IDirectory;
   /** 路径Key */
   locationKey: string;
+  /** 撤回已删除 */
+  restore(): Promise<boolean>;
   /** 删除文件系统项 */
   delete(notity?: boolean): Promise<boolean>;
+  /** 彻底删除文件系统项 */
+  hardDelete(notity?: boolean): Promise<boolean>;
   /**
    * 重命名
    * @param {string} name 新名称
@@ -49,7 +53,6 @@ export interface IFileInfo<T extends schema.XEntity> extends IEntity<T> {
   /** 缓存用户数据 */
   cacheUserData(notify?: boolean): Promise<boolean>;
 }
-
 /** 文件类抽象实现 */
 export abstract class FileInfo<T extends schema.XEntity>
   extends Entity<T>
@@ -94,9 +97,14 @@ export abstract class FileInfo<T extends schema.XEntity>
   }
   abstract cacheFlag: string;
   abstract delete(): Promise<boolean>;
+  abstract hardDelete(notity?: boolean | undefined): Promise<boolean>;
   abstract rename(name: string): Promise<boolean>;
   abstract copy(destination: IDirectory): Promise<boolean>;
   abstract move(destination: IDirectory): Promise<boolean>;
+  async restore(): Promise<boolean> {
+    await sleep(0);
+    return true;
+  }
   async loadUserData(): Promise<void> {
     const data = await this.target.user.cacheObj.get<schema.XCache>(this.cachePath);
     if (data && data.fullId === this.cache.fullId) {
@@ -145,7 +153,6 @@ export abstract class FileInfo<T extends schema.XEntity>
     return operates;
   }
 }
-
 /** 系统文件接口 */
 export interface ISysFileInfo extends IFileInfo<schema.XEntity> {
   /** 文件系统项对应的目标 */
@@ -153,7 +160,6 @@ export interface ISysFileInfo extends IFileInfo<schema.XEntity> {
   /** 分享信息 */
   shareInfo(): FileItemShare;
 }
-
 /** 文件转实体 */
 export const fileToEntity = (
   data: model.FileItemModel,
@@ -172,7 +178,6 @@ export const fileToEntity = (
     belong: belong,
   } as schema.XEntity;
 };
-
 /** 文件类实现 */
 export class SysFileInfo extends FileInfo<schema.XEntity> implements ISysFileInfo {
   constructor(_metadata: model.FileItemModel, _directory: IDirectory) {
@@ -234,6 +239,9 @@ export class SysFileInfo extends FileInfo<schema.XEntity> implements ISysFileInf
       this.directory.files = this.directory.files.filter((i) => i.key != this.key);
     }
     return res.success;
+  }
+  async hardDelete(): Promise<boolean> {
+    return await this.delete();
   }
   async copy(destination: IDirectory): Promise<boolean> {
     if (destination.id != this.directory.id) {
@@ -311,6 +319,7 @@ export abstract class StandardFileInfo<T extends schema.XStandard>
     );
   }
   async update(data: T): Promise<boolean> {
+    console.log(data);
     const res = await this.coll.replace({
       ...this.metadata,
       ...data,
@@ -331,6 +340,18 @@ export abstract class StandardFileInfo<T extends schema.XStandard>
       }
     }
     return false;
+  }
+  async hardDelete(): Promise<boolean> {
+    if (this.directory) {
+      const data = await this.coll.remove(this.metadata);
+      if (data) {
+        await this.notify('remove', [this.metadata]);
+      }
+    }
+    return false;
+  }
+  async restore(): Promise<boolean> {
+    return this.update({ ...this.metadata, isDeleted: false });
   }
   async rename(name: string): Promise<boolean> {
     return await this.update({ ...this.metadata, name });

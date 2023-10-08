@@ -1,13 +1,23 @@
 import TypeIcon from '@/components/Common/GlobalComps/typeIcon';
 import { command } from '@/ts/base';
+import { OperateModel } from '@/ts/base/model';
 import { IFile } from '@/ts/core';
+import { entityOperates } from '@/ts/core/public';
 import React from 'react';
 import { OperateMenuType } from 'typings/globelType';
 
 /** 加载文件菜单 */
 export const loadFileMenus = (file: IFile, mode: number = 0) => {
-  return file
-    .operates(mode)
+  const operates: OperateModel[] = [];
+  if (file.groupTags.includes('已删除')) {
+    if (file.directory.target.hasRelationAuth()) {
+      operates.push(entityOperates.Restore, entityOperates.HardDelete);
+    }
+    operates.push(entityOperates.Remark);
+  } else {
+    operates.push(...file.operates(mode));
+  }
+  return operates
     .sort((a, b) => a.sort - b.sort)
     .map((o) => {
       return {

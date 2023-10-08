@@ -52,7 +52,9 @@ const Directory: React.FC<IProps> = (props) => {
 
   const fileOpen = async (file: IFile | undefined, dblclick: boolean) => {
     if (dblclick && file && props.mode < 10) {
-      command.emitter(cmdType, 'open', file);
+      if (!file.groupTags.includes('已删除')) {
+        command.emitter(cmdType, 'open', file);
+      }
     } else if (!dblclick) {
       if (file?.id === focusFile?.id) {
         setFocusFile(undefined);
@@ -89,8 +91,12 @@ const Directory: React.FC<IProps> = (props) => {
       if (props.excludeIds && props.excludeIds.length > 0) {
         success = !props.excludeIds.includes(file.id);
       }
-      if (filter && currentTag !== '全部') {
-        success = file.groupTags.includes(currentTag);
+      if (filter) {
+        if (currentTag !== '全部') {
+          success = file.groupTags.includes(currentTag);
+        } else {
+          success = !file.groupTags.includes('已删除');
+        }
       }
       if (success && props.accepts && props.accepts.length > 0) {
         success = file.groupTags.some((i) => props.accepts!.includes(i));

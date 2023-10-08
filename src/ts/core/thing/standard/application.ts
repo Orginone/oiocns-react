@@ -85,6 +85,15 @@ export class Application
     }
     return success;
   }
+  async hardDelete(): Promise<boolean> {
+    const success = await this.directory.resource.applicationColl.removeMany(
+      this.getChildren(this),
+    );
+    if (success) {
+      return await super.hardDelete();
+    }
+    return success;
+  }
   async findWork(id: string): Promise<IWork | undefined> {
     await this.loadWorks();
     const find = this.works.find((i) => i.id === id);
