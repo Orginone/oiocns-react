@@ -30,7 +30,7 @@ const PropertyConfig = (props: IProps) => {
         prop.children.map((i) => i as IDirectory),
       );
       if (props.modalType === '关联属性') {
-        prop.propertys.forEach((item) => {
+        prop.standard.propertys.forEach((item) => {
           children.push({
             key: item.id,
             title: item.name,
@@ -65,7 +65,9 @@ const PropertyConfig = (props: IProps) => {
           onClick={async () => {
             if (props.modalType === '复制属性') {
               if (props.attr.property) {
-                const property = await (selectedItem as IDirectory).createProperty({
+                const property = await (
+                  selectedItem as IDirectory
+                ).standard.createProperty({
                   ...props.attr.property,
                   sourceId: props.attr.belongId,
                 });
@@ -89,7 +91,7 @@ const PropertyConfig = (props: IProps) => {
           defaultExpandAll={true}
           onSelect={(_, info) => {
             const data = (info.node as any).item;
-            if ('propertys' in data) {
+            if ('standard' in data) {
               if ('复制属性' === props.modalType) {
                 setSelectedItem(data);
               } else {

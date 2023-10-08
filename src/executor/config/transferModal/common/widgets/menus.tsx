@@ -21,14 +21,14 @@ const loadFiles = (current: IDirectory, typeNames: string[], genLabel?: GenLabel
       case '事项配置':
       case '实体配置':
         items.push(
-          ...current.forms
+          ...current.standard.forms
             .filter((item) => item.typeName == typeName)
             .map((entity) => loadEntity(entity, genLabel)),
         );
         break;
       case '迁移配置':
         items.push(
-          ...current.transfers
+          ...current.standard.transfers
             .filter((item) => item.typeName == typeName)
             .map((entity) => loadEntity(entity, genLabel)),
         );
@@ -36,7 +36,7 @@ const loadFiles = (current: IDirectory, typeNames: string[], genLabel?: GenLabel
       case '字典':
       case '分类':
         items.push(
-          ...current.specieses
+          ...current.standard.specieses
             .filter((item) => item.typeName == typeName)
             .map((entity) => loadEntity(entity, genLabel)),
         );

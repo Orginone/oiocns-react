@@ -106,7 +106,7 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
           resource: node,
         });
         if (success) {
-          this.directory.propertys = this.directory.propertys.filter(
+          this.directory.standard.propertys = this.directory.standard.propertys.filter(
             (i) => i.key != this.key,
           );
           this.application = app;
@@ -164,7 +164,7 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
         allowEdit: this.metadata.allowEdit,
         allowSelect: this.metadata.allowSelect,
       };
-      this.forms.map(async (form) => {
+      this.forms.forEach((form) => {
         data.fields[form.id] = form.fields;
       });
       return new WorkApply(
@@ -194,23 +194,23 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
     node.primaryForms = await this.directory.resource.formColl.find(
       node.forms?.filter((a) => a.typeName == '主表').map((s) => s.id),
     );
-    node.primaryForms.forEach(async (a) => {
+    for (const a of node.primaryForms) {
       const form = new Form({ ...a, id: a.id + '_' }, this.directory);
+      await form.loadFields();
       this.primaryForms.push(form);
-      await form.loadFields();
-    });
-    node.detailForms.forEach(async (a) => {
+    }
+    for (const a of node.detailForms) {
       const form = new Form({ ...a, id: a.id + '_' }, this.directory);
-      this.detailForms.push(form);
       await form.loadFields();
-    });
+      this.detailForms.push(form);
+    }
     if (node.children) {
       await this.recursionForms(node.children);
     }
     if (node.branches) {
       for (const branch of node.branches) {
         if (branch.children) {
-          this.recursionForms(branch.children);
+          await this.recursionForms(branch.children);
         }
       }
     }

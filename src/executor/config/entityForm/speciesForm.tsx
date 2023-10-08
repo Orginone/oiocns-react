@@ -113,7 +113,7 @@ const SpeciesForm = (props: Iprops) => {
             await species!.update(values);
             break;
           case 'new':
-            await directory.createSpecies(values);
+            await directory.standard.createSpecies(values);
             break;
         }
         props.finished();

@@ -172,7 +172,7 @@ const PropertyForm = (props: Iprops) => {
               await property!.update(values);
               break;
             case 'newProperty':
-              await directory.createProperty(values);
+              await directory.standard.createProperty(values);
               break;
           }
           props.finished();

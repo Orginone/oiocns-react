@@ -43,7 +43,7 @@ const MappingForm: React.FC<IProps> = ({ transfer, current, finished }) => {
         showSearch: true,
         loadData: async (node: MenuItem): Promise<void> => {
           if (!node.isLeaf) {
-            let forms = await (node.item as IDirectory).forms;
+            let forms = await (node.item as IDirectory).standard.forms;
             if (forms.length > 0) {
               setTreeData([loadFormsMenu(transfer.directory)]);
             }

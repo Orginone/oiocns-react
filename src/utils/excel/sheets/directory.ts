@@ -139,7 +139,7 @@ export class DirectoryHandler extends SheetHandler<DirectorySheet> {
         props: {},
         forms: {},
       };
-      for (const species of dir.specieses) {
+      for (const species of dir.standard.specieses) {
         const speciesData: SpeciesData = {
           meta: { ...species.metadata, directoryCode: dir.code },
           items: {},
@@ -156,7 +156,7 @@ export class DirectoryHandler extends SheetHandler<DirectorySheet> {
         dirData.species[species.code] = speciesData;
         onItemCompleted(50);
       }
-      for (const property of dir.propertys) {
+      for (const property of dir.standard.propertys) {
         if (property.metadata.code) {
           dirData.props[property.metadata.code] = {
             ...property.metadata,
@@ -164,7 +164,7 @@ export class DirectoryHandler extends SheetHandler<DirectorySheet> {
           };
         }
       }
-      for (const form of dir.forms) {
+      for (const form of dir.standard.forms) {
         const formData: FormData = {
           meta: { ...form.metadata, directoryCode: dir.code },
           attrs: {},

@@ -54,38 +54,39 @@ export class Form extends StandardFileInfo<schema.XForm> implements IForm {
   async loadFields(reload: boolean = false): Promise<model.FieldModel[]> {
     if (!this._fieldsLoaded || reload) {
       this.fields = [];
-      await Promise.all(
-        this.attributes.map(async (attr) => {
-          if (attr.property) {
-            const field: model.FieldModel = {
-              id: attr.id,
-              rule: attr.rule,
-              name: attr.name,
-              code: 'T' + attr.property.id,
-              remark: attr.remark,
-              lookups: [],
-              valueType: attr.property.valueType,
-            };
-            if (attr.property.speciesId && attr.property.speciesId.length > 0) {
-              const data = await this.directory.resource.speciesItemColl.loadSpace({
-                options: { match: { speciesId: attr.property.speciesId } },
+      const speciesIds = this.attributes
+        .map((i) => i.property?.speciesId)
+        .filter((i) => i && i.length > 0);
+      const data = await this.directory.resource.speciesItemColl.loadSpace({
+        options: { match: { speciesId: { _in_: speciesIds } } },
+      });
+      this.attributes.forEach(async (attr) => {
+        if (attr.property) {
+          const field: model.FieldModel = {
+            id: attr.id,
+            rule: attr.rule,
+            name: attr.name,
+            code: 'T' + attr.property.id,
+            remark: attr.remark,
+            lookups: [],
+            valueType: attr.property.valueType,
+          };
+          if (attr.property.speciesId && attr.property.speciesId.length > 0) {
+            field.lookups = data
+              .filter((i) => i.speciesId === attr.property!.speciesId)
+              .map((i) => {
+                return {
+                  id: i.id,
+                  text: i.name,
+                  value: i.code || `S${i.id}`,
+                  icon: i.icon,
+                  parentId: i.parentId,
+                };
               });
-              if (data.length > 0) {
-                field.lookups = data.map((i) => {
-                  return {
-                    id: i.id,
-                    text: i.name,
-                    value: i.code || `S${i.id}`,
-                    icon: i.icon,
-                    parentId: i.parentId,
-                  };
-                });
-              }
-            }
-            this.fields.push(field);
           }
-        }),
-      );
+          this.fields.push(field);
+        }
+      });
       this._fieldsLoaded = true;
     }
     return this.fields;

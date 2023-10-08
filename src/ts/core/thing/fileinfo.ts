@@ -276,11 +276,14 @@ export class SysFileInfo extends FileInfo<schema.XEntity> implements ISysFileInf
 export interface IStandardFileInfo<T extends schema.XStandard> extends IFileInfo<T> {
   /** 归属组织key */
   spaceKey: string;
+  /** 设置当前元数据 */
+  setMetadata(_metadata: schema.XStandard): void;
   /** 变更通知 */
   notify(operate: string, data: schema.XEntity[]): Promise<boolean>;
   /** 更新 */
   update(data: T): Promise<boolean>;
 }
+export interface IStandard extends IStandardFileInfo<schema.XStandard> {}
 export abstract class StandardFileInfo<T extends schema.XStandard>
   extends FileInfo<T>
   implements IStandardFileInfo<T>

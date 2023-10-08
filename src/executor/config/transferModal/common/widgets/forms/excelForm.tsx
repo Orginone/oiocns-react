@@ -122,7 +122,7 @@ const ExcelForm: React.FC<IProps> = ({ transfer, current, finished }) => {
               treeData={treeData}
               loadData={async (node) => {
                 if (!node.isLeaf) {
-                  let forms = (node.item as IDirectory).forms;
+                  let forms = (node.item as IDirectory).standard.forms;
                   if (forms.length > 0) {
                     setTreeData([loadFormsMenu(transfer.directory)]);
                   }

@@ -130,7 +130,7 @@ const LabelsForm = (props: Iprops) => {
             await form!.update(values);
             break;
           case 'new':
-            await directory.createForm(values);
+            await directory.standard.createForm(values);
             break;
         }
         props.finished();
