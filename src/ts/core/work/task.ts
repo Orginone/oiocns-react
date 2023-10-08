@@ -4,7 +4,7 @@ import { schema, model, kernel } from '../../base';
 import { TaskStatus, storeCollName } from '../public';
 import { IBelong } from '../target/base/belong';
 import { UserProvider } from '../user';
-import { IWorkApply, WorkApply } from './apply';
+import { IWorkApply } from './apply';
 
 export interface IWorkTask {
   /** 唯一标识 */
@@ -154,32 +154,10 @@ export class WorkTask implements IWorkTask {
   }
   async createApply(): Promise<IWorkApply | undefined> {
     if (this.metadata.approveType == '子流程') {
+      await this.loadInstance();
       var define = await this.findWorkById(this.metadata.defineId);
-      if (define && (await define.loadWorkNode())) {
-        const data: model.InstanceDataModel = {
-          data: this.instanceData?.data!,
-          fields: {},
-          primary: {},
-          node: define.node!,
-          allowAdd: define.metadata.allowAdd,
-          allowEdit: define.metadata.allowEdit,
-          allowSelect: define.metadata.allowSelect,
-        };
-        define.primaryForms.forEach((form) => {
-          data.fields[form.id] = form.fields;
-        });
-        return new WorkApply(
-          {
-            hook: '',
-            taskId: this.id,
-            title: define.name,
-            defineId: define.id,
-            applyId: this.instance!.shareId,
-          } as model.WorkInstanceModel,
-          data,
-          define.application.directory.target.space,
-          [...define.primaryForms, ...define.detailForms],
-        );
+      if (define) {
+        return await define.createApply(this.id, this.instanceData);
       }
     }
   }
@@ -187,8 +165,7 @@ export class WorkTask implements IWorkTask {
   private async findWorkById(wrokId: string): Promise<IWork | undefined> {
     for (var target of this.user.targets) {
       for (var app of await target.directory.loadAllApplication()) {
-        const works = await app.loadWorks();
-        const work = works.find((a) => a.metadata.id === wrokId);
+        const work = app.findWork(wrokId);
         if (work) {
           return work;
         }

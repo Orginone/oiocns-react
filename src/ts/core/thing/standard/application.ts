@@ -12,6 +12,8 @@ export interface IApplication extends IStandardFileInfo<schema.XApplication> {
   children: IApplication[];
   /** 流程定义 */
   works: IWork[];
+  /** 根据id查找办事 */
+  findWork(id: string): Promise<IWork | undefined>;
   /** 加载办事 */
   loadWorks(reload?: boolean): Promise<IWork[]>;
   /** 新建办事 */
@@ -82,6 +84,19 @@ export class Application
       return await super.delete();
     }
     return success;
+  }
+  async findWork(id: string): Promise<IWork | undefined> {
+    await this.loadWorks();
+    const find = this.works.find((i) => i.id === id);
+    if (find) {
+      return find;
+    }
+    for (const item of this.children) {
+      const find = await item.findWork(id);
+      if (find) {
+        return find;
+      }
+    }
   }
   async loadWorks(reload?: boolean | undefined): Promise<IWork[]> {
     if (!this._worksLoaded || reload) {

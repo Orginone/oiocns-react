@@ -20,7 +20,10 @@ export interface IWork extends IFileInfo<schema.XWorkDefine> {
   /** 加载事项定义节点 */
   loadWorkNode(reload?: boolean): Promise<model.WorkNodeModel | undefined>;
   /** 生成办事申请单 */
-  createApply(): Promise<IWorkApply | undefined>;
+  createApply(
+    taskId?: string,
+    pdata?: model.InstanceDataModel,
+  ): Promise<IWorkApply | undefined>;
 }
 
 export const fullDefineRule = (data: schema.XWorkDefine) => {
@@ -152,7 +155,10 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
     }
     return this.node;
   }
-  async createApply(): Promise<IWorkApply | undefined> {
+  async createApply(
+    taskId: string = '0',
+    pdata?: model.InstanceDataModel,
+  ): Promise<IWorkApply | undefined> {
     await this.loadWorkNode();
     if (this.node && this.forms.length > 0) {
       const data: model.InstanceDataModel = {
@@ -166,11 +172,14 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
       };
       this.forms.forEach((form) => {
         data.fields[form.id] = form.fields;
+        if (pdata && pdata.data[form.id]) {
+          data.data[form.id] = pdata.data[form.id];
+        }
       });
       return new WorkApply(
         {
           hook: '',
-          taskId: '0',
+          taskId: taskId,
           title: this.name,
           defineId: this.id,
         } as model.WorkInstanceModel,
