@@ -19,6 +19,8 @@ export interface IFileInfo<T extends schema.XEntity> extends IEntity<T> {
   belongId: string;
   /** 是否为继承的类别 */
   isInherited: boolean;
+  /** 是否允许设计 */
+  canDesign: boolean;
   /** 是否为容器 */
   isContainer: boolean;
   /** 目录 */

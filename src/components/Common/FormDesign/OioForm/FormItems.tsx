@@ -116,18 +116,6 @@ const OioFormItem = ({ item, belong, disabled, noRule, onClick }: IProps) => {
           labelAlign="right"
         />
       );
-    case 'treeSelect':
-      return (
-        <ProFormTreeSelect
-          disabled={disabled}
-          name={item.id}
-          label={label()}
-          rules={rules}
-          width={200}
-          tooltip={item.remark}
-          labelAlign="right"
-        />
-      );
     case 'file':
     case 'upload':
       return (

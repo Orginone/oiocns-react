@@ -65,10 +65,11 @@ const WorkFlowNode: React.FC<IProps> = (props) => {
           onCancel={() => setIsOpen(false)}
           onOk={(files) => {
             if (files.length > 0) {
-              let name = `${files[0].name} [${props.belong.name}]`;
-              props.current.destId = files[0].id;
+              const work = files[0] as IWork;
+              let name = `${work.name} [${work.directory.target.name}]`;
+              props.current.destId = work.id;
               props.current.destName = name;
-              setCurrentData({ id: files[0].id, name: name });
+              setCurrentData({ id: work.id, name: name });
             } else {
               setCurrentData({
                 id: '',

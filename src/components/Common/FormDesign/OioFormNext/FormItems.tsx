@@ -223,17 +223,6 @@ const OioFormItem = ({
           labelAlign="right"
         />
       );
-    case 'treeSelect':
-      return (
-        <ProFormTreeSelect
-          disabled={disabled}
-          name={field.id}
-          required={rule.required === true || rule.required === 'true'}
-          rules={rules}
-          tooltip={field.remark}
-          labelAlign="right"
-        />
-      );
     case 'file':
     case 'upload': {
       return (

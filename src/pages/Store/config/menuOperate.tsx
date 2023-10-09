@@ -1,23 +1,35 @@
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import orgCtrl from '@/ts/controller';
-import { IApplication, IDirectory, IGroup, ITarget, TargetType } from '@/ts/core';
 import React from 'react';
-import { MenuItemType } from 'typings/globelType';
 import { loadFileMenus } from '@/executor/fileOperate';
+import { MenuItemType } from 'typings/globelType';
+import { IDepartment, IGroup, ITarget, IDirectory, IApplication, IWork } from '@/ts/core';
 
 /** 创建团队菜单 */
-const createMenu = (team: ITarget, children: MenuItemType[]) => {
-  children.unshift(...buildApplicationTree(team.directory.applications));
+const createMenu = (target: ITarget, children: MenuItemType[]) => {
+  children.unshift(
+    ...buildDirectoryTree([target.memberDirectory]),
+    ...buildApplicationTree(target.directory.applications),
+  );
   return {
-    key: team.directory.key,
-    item: team.directory,
-    label: team.name,
-    itemType: team.directory.typeName,
-    menus: loadFileMenus(team.directory, 1),
-    tag: [team.typeName],
-    icon: <EntityIcon notAvatar={true} entityId={team.id} size={18} />,
+    key: target.directory.key,
+    item: target.directory,
+    label: target.name,
+    itemType: target.directory.typeName,
+    menus: loadFileMenus(target.directory, 2),
+    tag: [target.typeName],
+    icon: <EntityIcon entity={target.metadata} size={18} />,
     children: children,
   };
+};
+/** 编译部门树 */
+const buildDepartmentTree = (departments: IDepartment[]): MenuItemType[] => {
+  return departments.map((item) =>
+    createMenu(item, [
+      ...buildDirectoryTree(item.directory.children),
+      ...buildDepartmentTree(item.children),
+    ]),
+  );
 };
 /** 编译组织集群树 */
 const buildGroupTree = (groups: IGroup[]): MenuItemType[] => {
@@ -39,15 +51,30 @@ const buildDirectoryTree = (directorys: IDirectory[]): MenuItemType[] => {
         item: directory,
         label: directory.name,
         tag: [directory.typeName],
-        icon: (
-          <EntityIcon entityId={directory.id} typeName={directory.typeName} size={18} />
-        ),
         itemType: directory.typeName,
-        menus: loadFileMenus(directory, 1),
+        menus: loadFileMenus(directory),
         children: [
           ...buildDirectoryTree(directory.children),
           ...buildApplicationTree(directory.applications),
         ],
+        icon: <EntityIcon entity={directory.metadata} size={18} />,
+      };
+    });
+};
+
+const buildWorks = (works: IWork[]): MenuItemType[] => {
+  return works
+    .filter((i) => i.isInherited)
+    .map((work) => {
+      return {
+        key: work.key,
+        item: work,
+        label: work.name,
+        tag: [work.typeName],
+        itemType: work.typeName,
+        menus: loadFileMenus(work),
+        children: [],
+        icon: <EntityIcon entity={work.metadata} size={18} />,
       };
     });
 };
@@ -60,15 +87,17 @@ const buildApplicationTree = (applications: IApplication[]): MenuItemType[] => {
       item: application,
       label: application.name,
       tag: [application.typeName],
-      icon: (
-        <EntityIcon entityId={application.id} typeName={application.typeName} size={18} />
-      ),
       itemType: application.typeName,
       menus: loadFileMenus(application),
-      children: buildApplicationTree(application.children),
+      children: [
+        ...buildApplicationTree(application.children),
+        ...buildWorks(application.works),
+      ],
+      icon: <EntityIcon entity={application.metadata} size={18} />,
     };
   });
 };
+
 /** 获取个人菜单 */
 const getUserMenu = () => {
   return createMenu(orgCtrl.user, [
@@ -86,11 +115,11 @@ const getTeamMenu = () => {
     children.push(
       createMenu(company, [
         ...buildDirectoryTree(company.directory.children),
-        ...company.targets
-          .filter((i) => i.typeName !== TargetType.Group)
-          .filter((i) => i.session.isMyChat && i.id != company.id)
-          .map((i) => createMenu(i, buildDirectoryTree(i.directory.children))),
+        ...buildDepartmentTree(company.departments),
         ...buildGroupTree(company.groups),
+        ...company.cohorts.map((i) =>
+          createMenu(i, buildDirectoryTree(i.directory.children)),
+        ),
       ]),
     );
   }
@@ -98,13 +127,13 @@ const getTeamMenu = () => {
 };
 
 /** 加载设置模块菜单 */
-export const loadStoreMenu = () => {
+export const loadBrowserMenu = () => {
   return {
-    key: '存储',
-    label: '存储',
-    itemType: 'group',
+    key: '设置',
+    label: '设置',
+    itemType: 'Tab',
     item: 'disk',
     children: [getUserMenu(), ...getTeamMenu()],
-    icon: <EntityIcon notAvatar={true} entityId={orgCtrl.user.id} size={18} />,
+    icon: <EntityIcon entity={orgCtrl.user.metadata} size={18} />,
   };
 };

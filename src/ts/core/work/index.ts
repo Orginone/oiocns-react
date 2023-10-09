@@ -44,7 +44,6 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
   constructor(_metadata: schema.XWorkDefine, _application: IApplication) {
     super(fullDefineRule(_metadata), _application.directory);
     this.application = _application;
-    this.isContainer = _application.isInherited;
   }
   canDesign: boolean = true;
   primaryForms: IForm[] = [];
@@ -128,9 +127,8 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
   }
   content(_mode: number = 0): IFile[] {
     if (this.node) {
-      return this.forms.filter(
-        (a) => this.node!.forms.findIndex((s) => s.id == a.id) > -1,
-      );
+      const ids = this.node.forms?.map((i) => i.id) ?? [];
+      return this.forms.filter((a) => ids.includes(a.id));
     }
     return [];
   }
@@ -197,11 +195,13 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
     }
   }
   override operates(mode?: number): model.OperateModel[] {
-    return super
-      .operates(mode)
-      .filter(
-        (a) => ![fileOperates.Copy, fileOperates.Move, fileOperates.Download].includes(a),
-      );
+    const operates = super.operates(mode);
+    if (this.isInherited) {
+      operates.push({ sort: 3, cmd: 'workForm', label: '查看表单', iconType: '表单' });
+    }
+    return operates.filter(
+      (a) => ![fileOperates.Copy, fileOperates.Move, fileOperates.Download].includes(a),
+    );
   }
   private async recursionForms(node: model.WorkNodeModel) {
     node.detailForms = await this.directory.resource.formColl.find(

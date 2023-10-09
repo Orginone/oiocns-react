@@ -9,12 +9,14 @@ import TransferView from './transfer';
 import AudioPlayer from './audio';
 import CodeEditor from './codeeditor';
 import EntityForm from '../operate/entityForm';
-import { IEntity, ISysFileInfo, TargetType } from '@/ts/core';
+import { IEntity, IForm, ISysFileInfo, TargetType } from '@/ts/core';
 import { model, schema } from '@/ts/base';
+import LabelModal from '../design/labelsModal';
 const audioExt = ['.mp3', '.wav', '.ogg'];
 
 const officeExt = ['.md', '.pdf', '.xls', '.xlsx', '.doc', '.docx', '.ppt', '.pptx'];
 const videoExt = ['.mp4', '.avi', '.mov', '.mpg', '.swf', '.flv', '.mpeg'];
+const remarkTypes: any = { 分类: 'Species', 字典: 'Dict', 属性: 'Property' };
 
 interface IOpenProps {
   cmd: string;
@@ -49,8 +51,13 @@ const ExecutorOpen: React.FC<IOpenProps> = (props: IOpenProps) => {
   } else {
     switch (props.entity.typeName) {
       case '事项配置':
-      case '实体配置':
-        return <FormView form={props.entity as any} finished={props.finished} />;
+      case '实体配置': {
+        const form = props.entity as IForm;
+        if (form.canDesign && props.cmd === 'open') {
+          return <FormView form={form} finished={props.finished} />;
+        }
+        return <LabelModal current={form} finished={props.finished} />;
+      }
       case '迁移配置':
         return <TransferView current={props.entity as any} finished={props.finished} />;
       case '办事':
@@ -58,6 +65,15 @@ const ExecutorOpen: React.FC<IOpenProps> = (props: IOpenProps) => {
       case '报表':
         return <ReportView current={props.entity as any} finished={props.finished} />;
       default:
+        if (remarkTypes[props.entity.typeName]) {
+          return (
+            <EntityForm
+              cmd={`remark${remarkTypes[props.entity.typeName]}`}
+              entity={props.entity}
+              finished={props.finished}
+            />
+          );
+        }
         if (Object.values(TargetType).includes(props.entity.typeName as TargetType)) {
           return (
             <EntityForm cmd="remark" entity={props.entity} finished={props.finished} />

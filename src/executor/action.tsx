@@ -9,6 +9,7 @@ import {
   IStorage,
   ISysFileInfo,
   ITarget,
+  IWork,
   TargetType,
 } from '@/ts/core';
 import orgCtrl from '@/ts/controller';
@@ -55,6 +56,8 @@ export const executeCmd = (cmd: string, entity: any) => {
       });
     case 'open':
       return openDirectory(entity);
+    case 'workForm':
+      return openWork(entity);
     case 'standard':
       return uploadTemplate(entity);
     case 'online':
@@ -78,6 +81,12 @@ const activateStorage = (store: IStorage) => {
   if ('activateStorage' in store) {
     store.activateStorage();
   }
+};
+
+/** 进入办事 */
+const openWork = (entity: IWork) => {
+  orgCtrl.currentKey = entity.key;
+  orgCtrl.changCallback();
 };
 
 /** 进入目录 */

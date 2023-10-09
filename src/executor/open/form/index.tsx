@@ -114,6 +114,7 @@ const FormView: React.FC<IProps> = ({ form, finished }) => {
     return (
       <MainLayout
         notExitIcon
+        leftShow
         rightShow={false}
         selectMenu={selectMenu}
         onSelect={(data) => {

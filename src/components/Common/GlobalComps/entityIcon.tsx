@@ -34,9 +34,15 @@ const EntityIcon = (info: teamTypeInfo) => {
       />
     );
   }
+  return <ShareIconById {...info} />;
+};
+
+/** 实体ID查找 */
+const ShareIconById = (info: shareIconInfo) => {
   if (info.entityId) {
-    const [loaded, entity] = useAsyncLoad(() =>
-      orgCtrl.user.findEntityAsync(info.entityId!),
+    const [loaded, entity] = useAsyncLoad(
+      () => orgCtrl.user.findEntityAsync(info.entityId!),
+      [info.entityId],
     );
     if (!loaded) {
       return <Spin size="small" delay={10} />;

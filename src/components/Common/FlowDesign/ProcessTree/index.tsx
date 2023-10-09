@@ -6,6 +6,7 @@ import { ITarget } from '@/ts/core';
 import React, { useState } from 'react';
 import { isBranchNode, getNodeName, getNodeCode } from '../processType';
 import { AiOutlineMinus, AiOutlinePlus } from '@/icons/ai';
+import { generateUuid } from '@/ts/base/common';
 
 type IProps = {
   target?: ITarget;
@@ -42,7 +43,7 @@ const ProcessTree: React.FC<IProps> = ({ target, resource, onSelectedNode, isEdi
           );
         });
         return [
-          <div>
+          <div key={generateUuid()}>
             <div className={cls['branch-node']}>
               <div className={cls['add-branch-btn']}>
                 {isEdit && (
@@ -60,7 +61,7 @@ const ProcessTree: React.FC<IProps> = ({ target, resource, onSelectedNode, isEdi
         ];
       }
       return [
-        <div className={cls['primary-node']}>
+        <div key={generateUuid()} className={cls['primary-node']}>
           {loadNodeDom(node)}
           {getDomTree(node.children)}
         </div>,

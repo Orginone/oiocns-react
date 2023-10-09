@@ -18,7 +18,7 @@ const createMenu = (target: ITarget, children: MenuItemType[]) => {
     itemType: target.directory.typeName,
     menus: loadFileMenus(target.directory, 2),
     tag: [target.typeName],
-    icon: <EntityIcon notAvatar={true} entityId={target.id} size={18} />,
+    icon: <EntityIcon entity={target.metadata} size={18} />,
     children: children,
   };
 };
@@ -51,15 +51,13 @@ const buildDirectoryTree = (directorys: IDirectory[]): MenuItemType[] => {
         item: directory,
         label: directory.name,
         tag: [directory.typeName],
-        icon: (
-          <EntityIcon entityId={directory.id} typeName={directory.typeName} size={18} />
-        ),
         itemType: directory.typeName,
         menus: loadFileMenus(directory),
         children: [
           ...buildDirectoryTree(directory.children),
           ...buildApplicationTree(directory.applications),
         ],
+        icon: <EntityIcon entity={directory.metadata} size={18} />,
       };
     });
 };
@@ -73,27 +71,12 @@ const buildWorks = (works: IWork[]): MenuItemType[] => {
         item: work,
         label: work.name,
         tag: [work.typeName],
-        icon: <EntityIcon entityId={work.id} typeName={work.typeName} size={18} />,
         itemType: work.typeName,
         menus: loadFileMenus(work),
-        children: buildForms(work),
+        children: [],
+        icon: <EntityIcon entity={work.metadata} size={18} />,
       };
     });
-};
-
-const buildForms = (work: IWork): MenuItemType[] => {
-  return work.content().map((form) => {
-    return {
-      key: form.key,
-      item: form,
-      label: form.name,
-      tag: [form.typeName],
-      icon: <EntityIcon entityId={form.id} typeName={form.typeName} size={18} />,
-      itemType: form.typeName,
-      menus: loadFileMenus(form),
-      children: [],
-    };
-  });
 };
 
 /** 编译目录树 */
@@ -104,15 +87,13 @@ const buildApplicationTree = (applications: IApplication[]): MenuItemType[] => {
       item: application,
       label: application.name,
       tag: [application.typeName],
-      icon: (
-        <EntityIcon entityId={application.id} typeName={application.typeName} size={18} />
-      ),
       itemType: application.typeName,
       menus: loadFileMenus(application),
       children: [
         ...buildApplicationTree(application.children),
         ...buildWorks(application.works),
       ],
+      icon: <EntityIcon entity={application.metadata} size={18} />,
     };
   });
 };
@@ -146,13 +127,13 @@ const getTeamMenu = () => {
 };
 
 /** 加载设置模块菜单 */
-export const loadSettingMenu = () => {
+export const loadBrowserMenu = () => {
   return {
     key: '设置',
     label: '设置',
     itemType: 'Tab',
     item: 'disk',
     children: [getUserMenu(), ...getTeamMenu()],
-    icon: <EntityIcon notAvatar={true} entityId={orgCtrl.user.id} size={18} />,
+    icon: <EntityIcon entity={orgCtrl.user.metadata} size={18} />,
   };
 };

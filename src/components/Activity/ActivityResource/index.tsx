@@ -1,6 +1,5 @@
 import React from 'react';
 import { Image } from 'antd';
-import { JolPlayer } from 'jol-player';
 import { FileItemShare } from '@/ts/base/model';
 import { shareOpenLink } from '@/utils/tools';
 import { FileUnknownOutlined } from '@ant-design/icons';
@@ -42,32 +41,20 @@ const ActivityResource = (
       return (
         <div
           key={item.shareLink}
+          title={`点击播放${item.name}`}
           style={{
-            width: maxWidth,
-            height: maxWidth,
             cursor: 'pointer',
-          }}
-          onClick={(e) => {
-            e.stopPropagation();
-            command.emitter('executor', 'open', item);
+            width: computedSize(),
+            height: computedSize(),
           }}>
-          <div
-            style={{
-              height: maxWidth,
-              width: maxWidth,
-              zIndex: 101,
-              position: 'absolute',
-            }}></div>
-          <JolPlayer
-            option={{
-              width: maxWidth,
-              height: maxWidth,
-              language: 'zh',
-              pausePlacement: 'center',
-              isShowScreenshot: false,
-              videoSrc: shareOpenLink(item.shareLink),
-              videoType: item.contentType === 'video/stream' ? 'hls' : 'h264',
+          <Image
+            width={'100%'}
+            height={'100%'}
+            onClick={() => {
+              command.emitter('executor', 'open', item);
             }}
+            preview={false}
+            src={item.thumbnail}
           />
         </div>
       );

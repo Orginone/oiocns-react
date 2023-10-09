@@ -1,5 +1,5 @@
 import { schema, model } from '../../../base';
-import { orgAuth } from '../../../core/public';
+import { entityOperates, fileOperates, orgAuth } from '../../../core/public';
 import { IDirectory } from '../directory';
 import { IStandardFileInfo, StandardFileInfo } from '../fileinfo';
 
@@ -23,9 +23,10 @@ export interface IForm extends IStandardFileInfo<schema.XForm> {
 export class Form extends StandardFileInfo<schema.XForm> implements IForm {
   constructor(_metadata: schema.XForm, _directory: IDirectory) {
     super(_metadata, _directory, _directory.resource.formColl);
+    this.canDesign = !_metadata.id.includes('_');
     this.setEntity();
   }
-  canDesign: boolean = true;
+  canDesign: boolean;
   private _fieldsLoaded: boolean = false;
   fields: model.FieldModel[] = [];
   get attributes(): schema.XAttribute[] {
@@ -152,5 +153,11 @@ export class Form extends StandardFileInfo<schema.XForm> implements IForm {
       return await super.moveTo(destination.id, destination.resource.formColl);
     }
     return false;
+  }
+  override operates(mode?: number): model.OperateModel[] {
+    if (this.canDesign) {
+      return super.operates(mode);
+    }
+    return [fileOperates.Copy, entityOperates.Remark];
   }
 }

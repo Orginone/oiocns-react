@@ -90,7 +90,7 @@ const Directory: React.FC<IProps> = (props) => {
       if (props.excludeIds && props.excludeIds.length > 0) {
         success = !props.excludeIds.includes(file.id);
       }
-      if (filter) {
+      if (filter && success) {
         if (currentTag !== '全部') {
           success = file.groupTags.includes(currentTag);
         } else {

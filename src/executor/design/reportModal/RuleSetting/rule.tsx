@@ -50,10 +50,6 @@ export const loadWidgetsOpts = (valueType: string = '描述型') => {
           value: 'multiSelect',
         },
         {
-          label: '树型选择',
-          value: 'treeSelect',
-        },
-        {
           label: '单选',
           value: 'radio',
         },

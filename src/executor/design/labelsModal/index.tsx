@@ -13,7 +13,7 @@ interface IProps {
   current: IForm;
   finished: () => void;
 }
-const LabelModl: React.FC<IProps> = ({ current, finished }: IProps) => {
+const LabelModal: React.FC<IProps> = ({ current, finished }: IProps) => {
   const [modalType, setModalType] = useState<string>('');
   const [tabKey, setTabKey] = useState<string>('attr');
   /** 操作按钮 */
@@ -114,4 +114,4 @@ const LabelModl: React.FC<IProps> = ({ current, finished }: IProps) => {
   );
 };
 
-export default LabelModl;
+export default LabelModal;
