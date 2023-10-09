@@ -73,6 +73,7 @@ export abstract class FileInfo<T extends schema.XEntity>
   cache: schema.XCache;
   isContainer: boolean;
   directory: IDirectory;
+  canDesign: boolean = false;
   get isInherited(): boolean {
     return this.directory.isInherited;
   }
@@ -97,11 +98,14 @@ export abstract class FileInfo<T extends schema.XEntity>
   }
   abstract cacheFlag: string;
   abstract delete(): Promise<boolean>;
-  abstract hardDelete(notity?: boolean | undefined): Promise<boolean>;
   abstract rename(name: string): Promise<boolean>;
   abstract copy(destination: IDirectory): Promise<boolean>;
   abstract move(destination: IDirectory): Promise<boolean>;
   async restore(): Promise<boolean> {
+    await sleep(0);
+    return true;
+  }
+  async hardDelete(): Promise<boolean> {
     await sleep(0);
     return true;
   }
@@ -148,6 +152,9 @@ export abstract class FileInfo<T extends schema.XEntity>
           entityOperates.Update,
           entityOperates.Delete,
         );
+        if (this.canDesign) {
+          operates.unshift(entityOperates.Design);
+        }
       }
     }
     return operates;

@@ -142,6 +142,6 @@ export abstract class Entity<T extends schema.XEntity>
     };
   }
   operates(mode?: number | undefined): model.OperateModel[] {
-    return [entityOperates.Remark, entityOperates.QrCode];
+    return [entityOperates.Open, entityOperates.Remark, entityOperates.QrCode];
   }
 }

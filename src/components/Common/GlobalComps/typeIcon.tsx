@@ -104,6 +104,8 @@ const TypeIcon = ({ avatar, iconType, size }: TypeIconInfo) => {
         return <im.ImWrench {...config} />;
       case 'open':
         return <im.ImDelicious {...config} />;
+      case 'design':
+        return <im.ImEqualizer {...config} />;
       case 'copy':
         return <im.ImCopy {...config} />;
       case 'move':

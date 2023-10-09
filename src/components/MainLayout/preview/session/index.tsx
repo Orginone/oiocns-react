@@ -22,7 +22,7 @@ const SessionBody = ({ chat }: { chat: ISession }) => {
         size={26}
         title="二维码"
         onClick={() => {
-          command.emitter('data', 'qrcode', chat);
+          command.emitter('executor', 'qrcode', chat);
         }}
       />,
     ];

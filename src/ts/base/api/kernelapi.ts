@@ -1145,7 +1145,7 @@ export default class KernelApi {
               }
               this.onlineNotify.changCallback();
             }
-            command.emitter('_', res.target.toLowerCase(), res.data);
+            command.emitter('executor', res.target.toLowerCase(), res.data);
           }
         }
         break;

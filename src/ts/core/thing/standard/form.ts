@@ -25,6 +25,7 @@ export class Form extends StandardFileInfo<schema.XForm> implements IForm {
     super(_metadata, _directory, _directory.resource.formColl);
     this.setEntity();
   }
+  canDesign: boolean = true;
   private _fieldsLoaded: boolean = false;
   fields: model.FieldModel[] = [];
   get attributes(): schema.XAttribute[] {

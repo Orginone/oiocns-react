@@ -291,7 +291,7 @@ const Activity: React.FC<ActivityProps> = ({ height, activity, title }) => {
           <Button
             type="link"
             onClick={() => {
-              command.emitter('config', 'pubActivity', activity);
+              command.emitter('executor', 'pubActivity', activity);
             }}>
             发布动态
           </Button>

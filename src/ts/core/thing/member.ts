@@ -40,6 +40,9 @@ export class Member extends FileInfo<schema.XTarget> implements IMemeber {
   async delete(): Promise<boolean> {
     throw new Error('暂不支持.');
   }
+  async hardDelete(): Promise<boolean> {
+    throw new Error('暂不支持.');
+  }
   override operates(): OperateModel[] {
     const operates = super.operates(1);
     if (

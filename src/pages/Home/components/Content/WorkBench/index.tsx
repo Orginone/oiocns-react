@@ -85,7 +85,7 @@ const WorkBench: React.FC = () => {
           <Space wrap split={<Divider type="vertical" />} size={2}>
             {renderDataItem('待办(件)', todoCount)}
             {renderDataItem('已办(件)', CompletedCount)}
-            {renderDataItem('我的(件)', ApplyCount)}
+            {renderDataItem('发起(件)', ApplyCount)}
           </Space>
         </div>
       </>
@@ -266,7 +266,7 @@ const WorkBench: React.FC = () => {
         className={cls.linkBtn}
         type="text"
         onClick={() => {
-          command.emitter('config', cmd, orgCtrl.user);
+          command.emitter('executor', cmd, orgCtrl.user);
         }}>
         {title}
       </Button>

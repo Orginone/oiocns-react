@@ -15,7 +15,7 @@ const IconMode = ({ dircetory }: { dircetory: IDirectory }) => {
         (i) => !['openChat', 'copy', 'parse'].includes(i.key),
       ),
       onClick: ({ key }: { key: string }) => {
-        command.emitter('config', key, file || dircetory, dircetory.key);
+        command.emitter('executor', key, file || dircetory, dircetory.key);
       },
     };
   };

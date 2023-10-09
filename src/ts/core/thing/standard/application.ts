@@ -56,7 +56,7 @@ export class Application
     );
   }
   structCallback(): void {
-    command.emitter('-', 'refresh', this);
+    command.emitter('executor', 'refresh', this);
   }
   async copy(_: IDirectory): Promise<boolean> {
     return false;

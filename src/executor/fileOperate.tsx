@@ -17,16 +17,22 @@ export const loadFileMenus = (file: IFile, mode: number = 0) => {
   } else {
     operates.push(...file.operates(mode));
   }
+  const parseLabel = (label: string) => {
+    if ('filedata' in file) {
+      return label.replaceAll('{0}', '文件');
+    }
+    return label.replaceAll('{0}', file.typeName);
+  };
   return operates
     .sort((a, b) => a.sort - b.sort)
     .map((o) => {
       return {
         key: o.cmd,
-        label: o.label,
+        label: parseLabel(o.label),
         model: o.model ?? 'inside',
         icon: o.menus ? <></> : <TypeIcon iconType={o.iconType} size={16} />,
         beforeLoad: async () => {
-          command.emitter('config', o.cmd, file);
+          command.emitter('executor', o.cmd, file);
           return true;
         },
         children: o.menus
@@ -34,10 +40,10 @@ export const loadFileMenus = (file: IFile, mode: number = 0) => {
           .map((s) => {
             return {
               key: s.cmd,
-              label: s.label,
+              label: parseLabel(s.label),
               icon: <TypeIcon iconType={s.iconType} size={16} />,
               beforeLoad: async () => {
-                command.emitter('config', s.cmd, file);
+                command.emitter('executor', s.cmd, file);
                 return true;
               },
             };

@@ -49,7 +49,7 @@ const ActivityResource = (
           }}
           onClick={(e) => {
             e.stopPropagation();
-            command.emitter('data', 'open', item);
+            command.emitter('executor', 'open', item);
           }}>
           <div
             style={{

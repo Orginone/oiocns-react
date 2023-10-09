@@ -74,7 +74,7 @@ export class Transfer extends StandardFileInfo<model.Transfer> implements ITrans
   taskList: ITask[];
   curTask?: ITask;
   getData?: GraphData;
-
+  canDesign: boolean = true;
   constructor(metadata: model.Transfer, dir: IDirectory) {
     super(metadata, dir, dir.resource.transferColl);
     this.taskList = [];

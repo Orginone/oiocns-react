@@ -31,7 +31,6 @@ const Directory: React.FC<IProps> = (props) => {
     props.current === 'disk' ? orgCtrl.user.directory : props.current,
   );
   const [key] = useCtrlUpdate(dircetory);
-  const cmdType = props.mode === 1 ? 'data' : 'config';
   const [currentTag, setCurrentTag] = useState('全部');
   const [loaded] = useAsyncLoad(() => dircetory.loadContent());
   const [segmented, setSegmented] = useStorage('segmented', 'list');
@@ -44,7 +43,7 @@ const Directory: React.FC<IProps> = (props) => {
     return {
       items: loadFileMenus(entity, props.mode),
       onClick: ({ key }: { key: string }) => {
-        command.emitter(cmdType, key, file || dircetory, dircetory.key);
+        command.emitter('executor', key, file || dircetory, dircetory.key);
         clicked?.apply(this, []);
       },
     };
@@ -53,7 +52,7 @@ const Directory: React.FC<IProps> = (props) => {
   const fileOpen = async (file: IFile | undefined, dblclick: boolean) => {
     if (dblclick && file && props.mode < 10) {
       if (!file.groupTags.includes('已删除')) {
-        command.emitter(cmdType, 'open', file);
+        command.emitter('executor', 'open', file);
       }
     } else if (!dblclick) {
       if (file?.id === focusFile?.id) {

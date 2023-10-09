@@ -123,7 +123,7 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
     return this.target.resource;
   }
   structCallback(): void {
-    command.emitter('-', 'refresh', this);
+    command.emitter('executor', 'refresh', this);
   }
   content(mode: number = 0): IFile[] {
     const cnt: IFile[] = [...this.children];

@@ -27,7 +27,7 @@ export const parseMsg = (item: IMessage): any => {
             <div
               className={`${css.con_content_txt}`}
               onClick={() => {
-                command.emitter('data', 'open', img);
+                command.emitter('executor', 'open', img);
               }}>
               <Image width={300} src={shareOpenLink(img.shareLink)} preview={false} />
             </div>
@@ -44,7 +44,7 @@ export const parseMsg = (item: IMessage): any => {
             <div
               className={`${css.con_content_txt}`}
               onClick={() => {
-                command.emitter('data', 'open', img);
+                command.emitter('executor', 'open', img);
               }}>
               <Image width={300} src={img.thumbnail} preview={false} />
             </div>
@@ -67,7 +67,7 @@ export const parseMsg = (item: IMessage): any => {
           <div
             className={`${css.con_content_txt}`}
             onClick={() => {
-              command.emitter('data', 'open', file);
+              command.emitter('executor', 'open', file);
             }}>
             <div>{file.name}</div>
             <div>{formatSize(file.size)}</div>

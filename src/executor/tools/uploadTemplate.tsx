@@ -110,7 +110,7 @@ const generate = async (dir: IDirectory, name: string, excel: IExcel) => {
     showErrors(errors);
     return;
   }
-  command.emitter('-', 'taskList', dir);
+  command.emitter('executor', 'taskList', dir);
   const task: model.TaskModel = {
     name: name,
     size: 0,

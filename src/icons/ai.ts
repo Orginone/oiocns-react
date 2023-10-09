@@ -40,9 +40,9 @@ import { AiOutlineShareAlt } from '@react-icons/all-files/ai/AiOutlineShareAlt';
 import { AiOutlineCluster } from '@react-icons/all-files/ai/AiOutlineCluster';
 import { AiOutlineFork } from '@react-icons/all-files/ai/AiOutlineFork';
 import { AiOutlineApartment } from '@react-icons/all-files/ai/AiOutlineApartment';
-import { AiOutlineCopy } from '@react-icons/all-files/ai/AiOutlineCopy'
-import { AiOutlineRollback } from '@react-icons/all-files/ai/AiOutlineRollback'
-import { AiOutlineDownload } from '@react-icons/all-files/ai/AiOutlineDownload'
+import { AiOutlineCopy } from '@react-icons/all-files/ai/AiOutlineCopy';
+import { AiOutlineRollback } from '@react-icons/all-files/ai/AiOutlineRollback';
+import { AiOutlineDownload } from '@react-icons/all-files/ai/AiOutlineDownload';
 
 export {
   AiFillCloseCircle,
@@ -58,8 +58,10 @@ export {
   AiOutlineClose,
   AiOutlineCloseCircle,
   AiOutlineCluster,
+  AiOutlineCopy,
   AiOutlineDelete,
   AiOutlineDown,
+  AiOutlineDownload,
   AiOutlineEdit,
   AiOutlineEllipsis,
   AiOutlineFork,
@@ -77,6 +79,7 @@ export {
   AiOutlinePlus,
   AiOutlinePlusCircle,
   AiOutlineRight,
+  AiOutlineRollback,
   AiOutlineSave,
   AiOutlineSearch,
   AiOutlineSelect,
@@ -87,7 +90,4 @@ export {
   AiOutlineStar,
   AiOutlineTeam,
   AiOutlineUser,
-  AiOutlineCopy,
-  AiOutlineRollback,
-  AiOutlineDownload
 };

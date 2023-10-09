@@ -46,6 +46,7 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
     this.application = _application;
     this.isContainer = _application.isInherited;
   }
+  canDesign: boolean = true;
   primaryForms: IForm[] = [];
   detailForms: IForm[] = [];
   application: IApplication;
