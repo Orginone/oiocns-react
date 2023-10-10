@@ -1,7 +1,7 @@
 import React from 'react';
 import { IBelong } from '@/ts/core';
 import { MenuItemType } from 'typings/globelType';
-import TeamIcon from '@/components/Common/GlobalComps/entityIcon';
+import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import orgCtrl from '@/ts/controller';
 import { GroupMenuType } from './menuType';
 import OrgIcons from '@/components/Common/GlobalComps/orgIcons';
@@ -13,7 +13,7 @@ const createSpaceMenu = (team: IBelong) => {
     label: team.name,
     itemType: team.typeName,
     menus: [],
-    icon: <TeamIcon notAvatar={true} entityId={team.id} size={18} />,
+    icon: <EntityIcon notAvatar={true} entity={team.metadata} size={18} />,
     children: [
       {
         key: team.key + GroupMenuType.Todo,

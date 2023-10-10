@@ -9,18 +9,18 @@ interface CustomMenuType {
   collapsed: boolean;
   selectMenu: MenuItemType;
   item: MenuItemType;
-  className?: string;
   onSelect?: (item: MenuItemType) => void;
   onMenuClick?: (item: MenuItemType, menuKey: string) => void;
 }
 const CustomMenu = (props: CustomMenuType) => {
+  if (props.item === undefined) return <></>;
   const [filter, setFilter] = useState<string>('');
   const [selectedKeys, setSelectedKeys] = useState<string[]>([props.selectMenu.key]);
   const [openKeys, setOpenKeys] = useState<string[]>([]);
   const [visibleMenu, setVisibleMenu] = useState<boolean>();
-  const [data, setData] = useState<MenuProps['items']>([]);
+  const [data, setData] = useState<MenuProps['items']>(props.item.children);
   useEffect(() => {
-    reloadData(loadOpenKeys(props.item?.children, props.selectMenu.key));
+    reloadData(loadOpenKeys(props.item.children, props.selectMenu.key));
   }, [props]);
 
   useEffect(() => {
@@ -160,7 +160,7 @@ const CustomMenu = (props: CustomMenuType) => {
       </span>
 
       <Menu
-        className={`${style.customMenu} ${props.className ?? ''}`}
+        className={style.customMenu}
         mode="inline"
         inlineIndent={10}
         items={data}
