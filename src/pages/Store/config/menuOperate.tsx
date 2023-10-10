@@ -16,7 +16,7 @@ const createMenu = (target: ITarget, children: MenuItemType[]) => {
     item: target.directory,
     label: target.name,
     itemType: target.directory.typeName,
-    menus: loadFileMenus(target.directory, 2),
+    menus: loadFileMenus(target.directory),
     tag: [target.typeName],
     icon: <EntityIcon entity={target.metadata} size={18} />,
     children: children,
@@ -129,8 +129,8 @@ const getTeamMenu = () => {
 /** 加载设置模块菜单 */
 export const loadBrowserMenu = () => {
   return {
-    key: '设置',
-    label: '设置',
+    key: '存储',
+    label: '存储',
     itemType: 'Tab',
     item: 'disk',
     children: [getUserMenu(), ...getTeamMenu()],

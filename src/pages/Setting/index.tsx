@@ -11,6 +11,7 @@ const FileBrowser: React.FC = () => {
   if (!selectMenu || !rootMenu) return <></>;
   return (
     <MainLayout
+      rightShow={false}
       selectMenu={selectMenu}
       onSelect={async (data) => {
         setSelectMenu(data);

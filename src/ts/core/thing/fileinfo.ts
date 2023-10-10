@@ -282,7 +282,12 @@ export class SysFileInfo extends FileInfo<schema.XEntity> implements ISysFileInf
   }
   override operates(): model.OperateModel[] {
     const operates = super.operates();
-    return operates.filter((i) => i.cmd != 'update');
+    if (operates.includes(entityOperates.Delete)) {
+      operates.push(entityOperates.HardDelete);
+    }
+    return operates
+      .filter((i) => i != entityOperates.Delete)
+      .filter((i) => i != entityOperates.Update);
   }
   content(): IFile[] {
     return [];

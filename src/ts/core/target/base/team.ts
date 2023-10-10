@@ -32,6 +32,8 @@ export interface ITeam extends IEntity<schema.XTarget> {
   update(data: model.TargetModel): Promise<boolean>;
   /** 删除(注销)团队 */
   delete(notity?: boolean): Promise<boolean>;
+  /** 删除(注销)团队 */
+  hardDelete(notity?: boolean): Promise<boolean>;
   /** 用户拉入新成员 */
   pullMembers(members: schema.XTarget[], notity?: boolean): Promise<boolean>;
   /** 用户移除成员 */
@@ -182,6 +184,9 @@ export abstract class Team extends Entity<schema.XTarget> implements ITeam {
     }
     return notity;
   }
+  async hardDelete(notity: boolean = false): Promise<boolean> {
+    return await this.delete(notity);
+  }
   async loadContent(reload: boolean = false): Promise<boolean> {
     await this.loadMembers(reload);
     return true;
@@ -189,7 +194,7 @@ export abstract class Team extends Entity<schema.XTarget> implements ITeam {
   operates(): model.OperateModel[] {
     const operates = super.operates();
     if (this.hasRelationAuth()) {
-      operates.unshift(entityOperates.Update, entityOperates.Delete);
+      operates.unshift(entityOperates.Update, entityOperates.HardDelete);
     }
     return operates;
   }

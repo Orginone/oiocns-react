@@ -291,7 +291,7 @@ const WorkBench: React.FC = () => {
           <div className={cls.cardItemHeader}>
             <span className={cls.title}>快捷操作</span>
             <span className={cls.extraBtn}>
-              <Button type="text" size="small" onClick={() => history.push('setting')}>
+              <Button type="text" size="small" onClick={() => history.push('store')}>
                 <ImPriceTags /> <span>更多操作</span>
               </Button>
             </span>

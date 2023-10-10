@@ -119,10 +119,6 @@ export abstract class Target extends Team implements ITarget {
     await sleep(0);
     return true;
   }
-  async hardDelete(): Promise<boolean> {
-    await sleep(0);
-    return true;
-  }
   async loadUserData(keys: string[], _metadata: schema.XTarget): Promise<void> {
     kernel.subscribe(
       `${_metadata.belongId}-${_metadata.id}-identity`,

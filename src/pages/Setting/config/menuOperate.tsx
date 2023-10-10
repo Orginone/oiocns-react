@@ -1,7 +1,6 @@
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import orgCtrl from '@/ts/controller';
 import React from 'react';
-import { loadFileMenus } from '@/executor/fileOperate';
 import { ITarget, orgAuth } from '@/ts/core';
 
 /** 创建团队菜单 */
@@ -11,7 +10,7 @@ const createMenu = (target: ITarget) => {
     item: target.directory,
     label: target.name,
     itemType: target.directory.typeName,
-    menus: loadFileMenus(target.directory, 2),
+    menus: [],
     tag: [target.typeName],
     icon: <EntityIcon entity={target.metadata} size={18} />,
     children: [],
