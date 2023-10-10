@@ -9,7 +9,7 @@ import { IDepartment, IGroup, ITarget, IDirectory, IApplication, IWork } from '@
 const createMenu = (target: ITarget, children: MenuItemType[]) => {
   children.unshift(
     ...buildDirectoryTree([target.memberDirectory]),
-    ...buildApplicationTree(target.directory.applications),
+    ...buildApplicationTree(target.directory.standard.applications),
   );
   return {
     key: target.directory.key,
@@ -55,7 +55,7 @@ const buildDirectoryTree = (directorys: IDirectory[]): MenuItemType[] => {
         menus: loadFileMenus(directory),
         children: [
           ...buildDirectoryTree(directory.children),
-          ...buildApplicationTree(directory.applications),
+          ...buildApplicationTree(directory.standard.applications),
         ],
         icon: <EntityIcon entity={directory.metadata} size={18} />,
       };

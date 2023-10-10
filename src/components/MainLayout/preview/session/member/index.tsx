@@ -11,7 +11,7 @@ const IconMode = ({ dircetory }: { dircetory: IDirectory }) => {
   const contextMenu = (file?: IFile) => {
     var entity = file || dircetory;
     return {
-      items: loadFileMenus(entity, 0).filter(
+      items: loadFileMenus(entity).filter(
         (i) => !['openChat', 'copy', 'parse'].includes(i.key),
       ),
       onClick: ({ key }: { key: string }) => {
@@ -55,7 +55,7 @@ const IconMode = ({ dircetory }: { dircetory: IDirectory }) => {
         onContextMenu={(e) => {
           e.stopPropagation();
         }}>
-        {dircetory.content(0).map((el) => FileCard(el))}
+        {dircetory.content().map((el) => FileCard(el))}
       </div>
     </Dropdown>
   );

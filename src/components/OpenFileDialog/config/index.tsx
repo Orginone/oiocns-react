@@ -10,14 +10,14 @@ import { findMenuItemByKey } from '@/utils/tools';
 const createMenu = (target: ITarget, children: MenuItemType[]) => {
   children.unshift(
     ...buildDirectoryTree([target.memberDirectory]),
-    ...buildApplicationTree(target.directory.applications),
+    ...buildApplicationTree(target.directory.standard.applications),
   );
   return {
     key: target.directory.key,
     item: target.directory,
     label: target.name,
     itemType: target.directory.typeName,
-    menus: loadFileMenus(target.directory, 2),
+    menus: loadFileMenus(target.directory),
     tag: [target.typeName],
     icon: <EntityIcon notAvatar={true} entityId={target.id} size={18} />,
     children: children,
@@ -57,7 +57,7 @@ const buildDirectoryTree = (directorys: IDirectory[]): MenuItemType[] => {
       menus: loadFileMenus(directory),
       children: [
         ...buildDirectoryTree(directory.children),
-        ...buildApplicationTree(directory.applications),
+        ...buildApplicationTree(directory.standard.applications),
       ],
     };
   });

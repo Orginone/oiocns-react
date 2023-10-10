@@ -16,7 +16,7 @@ const FileBrowser: React.FC = () => {
         setSelectMenu(data);
       }}
       siderMenuData={rootMenu}>
-      <Directory key={key} current={selectMenu.item} mode={2} />
+      <Directory key={key} current={selectMenu.item} />
     </MainLayout>
   );
 };

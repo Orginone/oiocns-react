@@ -43,7 +43,7 @@ const loadFiles = (current: IDirectory, typeNames: string[], genLabel?: GenLabel
         break;
       case '应用':
         items.push(
-          ...current.applications
+          ...current.standard.applications
             .filter((item) => item.typeName == typeName)
             .map((entity) => {
               const loaded = loadEntity(entity, genLabel);

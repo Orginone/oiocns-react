@@ -29,18 +29,21 @@ const FormEditModal = ({
     cancelText: '关闭',
     onCancel: () => modal.destroy(),
     content: (
-      <OioForm
-        showTitle
-        form={form}
-        fields={fields}
-        belong={belong}
-        fieldsValue={initialValues || {}}
-        onValuesChange={(_, values) => {
-          Object.keys(values).forEach((k) => {
-            editData[k] = values[k];
-          });
-        }}
-      />
+      <div
+        style={{ maxHeight: '70vh', width: '100%', overflowY: 'scroll', minHeight: 600 }}>
+        <OioForm
+          showTitle
+          form={form}
+          fields={fields}
+          belong={belong}
+          fieldsValue={initialValues || {}}
+          onValuesChange={(_, values) => {
+            Object.keys(values).forEach((k) => {
+              editData[k] = values[k];
+            });
+          }}
+        />
+      </div>
     ),
     onOk: () => {
       if (create) {

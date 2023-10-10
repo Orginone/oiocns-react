@@ -114,7 +114,7 @@ export class Group extends Target implements IGroup {
     }
     return targets;
   }
-  content(_mode?: number | undefined): ITarget[] {
+  content(): ITarget[] {
     return [...this.children];
   }
   async deepLoad(reload: boolean = false): Promise<void> {

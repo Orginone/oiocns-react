@@ -44,7 +44,7 @@ export interface IEntity<T> extends Emitter {
    * 对实体可进行的操作
    * @param mode 模式,默认为配置模式
    */
-  operates(mode?: number): model.OperateModel[];
+  operates(): model.OperateModel[];
 }
 
 /** 实体类实现 */
@@ -141,7 +141,7 @@ export abstract class Entity<T extends schema.XEntity>
       avatar: parseAvatar(metadata?.icon),
     };
   }
-  operates(mode?: number | undefined): model.OperateModel[] {
+  operates(): model.OperateModel[] {
     return [entityOperates.Open, entityOperates.Remark, entityOperates.QrCode];
   }
 }

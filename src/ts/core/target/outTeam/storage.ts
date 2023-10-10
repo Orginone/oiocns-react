@@ -69,9 +69,6 @@ export class Storage extends Target implements IStorage {
     }
     return false;
   }
-  content(_mode?: number | undefined): ITarget[] {
-    return [];
-  }
   async deepLoad(reload: boolean = false): Promise<void> {
     if (this.metadata.belongId === this.userId) {
       await this.loadMembers(reload);

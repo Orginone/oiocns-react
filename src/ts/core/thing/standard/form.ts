@@ -154,9 +154,9 @@ export class Form extends StandardFileInfo<schema.XForm> implements IForm {
     }
     return false;
   }
-  override operates(mode?: number): model.OperateModel[] {
+  override operates(): model.OperateModel[] {
     if (this.canDesign) {
-      return super.operates(mode);
+      return super.operates();
     }
     return [fileOperates.Copy, entityOperates.Remark];
   }

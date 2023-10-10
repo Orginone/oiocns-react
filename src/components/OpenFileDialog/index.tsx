@@ -59,6 +59,7 @@ const OpenFileDialog: React.FC<IFileDialogProps> = (props) => {
         siderMenuData={rootMenu}>
         <Directory
           key={key}
+          dialog
           accepts={props.accepts}
           selects={selectedFiles}
           current={selectMenu.item}
@@ -81,7 +82,6 @@ const OpenFileDialog: React.FC<IFileDialogProps> = (props) => {
               }
             }
           }}
-          mode={10}
         />
       </MainLayout>
     </FullScreenModal>

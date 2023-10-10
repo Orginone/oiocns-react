@@ -7,7 +7,7 @@ import React from 'react';
 import { OperateMenuType } from 'typings/globelType';
 
 /** 加载文件菜单 */
-export const loadFileMenus = (file: IFile, mode: number = 0) => {
+export const loadFileMenus = (file: IFile) => {
   const operates: OperateModel[] = [];
   if (file.groupTags.includes('已删除')) {
     if (file.directory.target.hasRelationAuth()) {
@@ -15,7 +15,7 @@ export const loadFileMenus = (file: IFile, mode: number = 0) => {
     }
     operates.push(entityOperates.Remark);
   } else {
-    operates.push(...file.operates(mode));
+    operates.push(...file.operates());
   }
   const parseLabel = (label: string) => {
     if ('filedata' in file) {

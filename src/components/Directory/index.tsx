@@ -14,7 +14,7 @@ import { Spin } from 'antd';
 import TagsBar from './tagsBar';
 
 interface IProps {
-  mode: number;
+  dialog?: boolean;
   accepts?: string[];
   selects?: IFile[];
   excludeIds?: string[];
@@ -41,7 +41,7 @@ const Directory: React.FC<IProps> = (props) => {
       entity = entity.directory;
     }
     return {
-      items: loadFileMenus(entity, props.mode),
+      items: loadFileMenus(entity),
       onClick: ({ key }: { key: string }) => {
         command.emitter('executor', key, file || dircetory, dircetory.key);
         clicked?.apply(this, []);
@@ -50,7 +50,7 @@ const Directory: React.FC<IProps> = (props) => {
   };
 
   const fileOpen = async (file: IFile | undefined, dblclick: boolean) => {
-    if (dblclick && file && props.mode < 10) {
+    if (dblclick && file && props.dialog !== true) {
       if (!file.groupTags.includes('已删除')) {
         command.emitter('executor', 'open', file);
       }
@@ -83,7 +83,7 @@ const Directory: React.FC<IProps> = (props) => {
     if (props.current === 'disk') {
       contents.push(orgCtrl.user, ...orgCtrl.user.companys);
     } else {
-      contents.push(...props.current!.content(props.mode));
+      contents.push(...props.current!.content());
     }
     const tagFilter = (file: IFile) => {
       let success = true;

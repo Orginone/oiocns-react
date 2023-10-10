@@ -2,7 +2,7 @@ import React from 'react';
 import MainLayout from '@/components/MainLayout';
 import * as config from './config/menuOperate';
 import useMenuUpdate from '@/hooks/useMenuUpdate';
-import Directory from '@/components/Directory';
+import { Empty } from 'antd';
 /** 文件浏览器 */
 const FileBrowser: React.FC = () => {
   const [key, rootMenu, selectMenu, setSelectMenu] = useMenuUpdate(
@@ -16,7 +16,9 @@ const FileBrowser: React.FC = () => {
         setSelectMenu(data);
       }}
       siderMenuData={rootMenu}>
-      <Directory key={key} current={selectMenu.item} mode={2} />
+      <div style={{ height: '100%', width: '100%' }}>
+        <Empty style={{ marginTop: 150 }} key={key} />
+      </div>
     </MainLayout>
   );
 };

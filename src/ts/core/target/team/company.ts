@@ -276,7 +276,7 @@ export class Company extends Belong implements ICompany {
     return operates;
   }
 
-  content(_mode?: number | undefined): ITarget[] {
+  content(): ITarget[] {
     return [...this.groups, ...this.departments, ...this.cohorts, ...this.storages];
   }
 

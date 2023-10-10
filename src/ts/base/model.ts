@@ -1006,6 +1006,8 @@ export type Sheet<T> = {
   columns: Column[];
   // 数据
   data: T[];
+  // 其它
+  headers: number;
 };
 
 /**

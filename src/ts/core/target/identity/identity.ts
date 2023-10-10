@@ -133,12 +133,12 @@ export class Identity extends Entity<schema.XIdentity> implements IIdentity {
     this.current.identitys = this.current.identitys.filter((i) => i.key != this.key);
     return true;
   }
-  override operates(mode: number = 0): model.OperateModel[] {
+  override operates(): model.OperateModel[] {
     const operates: model.OperateModel[] = [];
-    if (mode % 2 === 0 && this.current.hasRelationAuth()) {
+    if (this.current.hasRelationAuth()) {
       operates.push(entityOperates.Update, fileOperates.Rename);
     }
-    operates.push(...super.operates(1));
+    operates.push(...super.operates());
     return operates.sort((a, b) => (a.menus ? -10 : b.menus ? 10 : 0));
   }
   content(_mode?: number | undefined): IFile[] {

@@ -218,7 +218,9 @@ export abstract class Target extends Team implements ITarget {
   abstract get chats(): ISession[];
   abstract get targets(): ITarget[];
   abstract get subTarget(): ITarget[];
-  abstract content(_mode?: number | undefined): IFile[];
+  content(): IFile[] {
+    return [];
+  }
   createTarget(_data: model.TargetModel): Promise<ITeam | undefined> {
     return new Promise((resolve) => {
       resolve(undefined);

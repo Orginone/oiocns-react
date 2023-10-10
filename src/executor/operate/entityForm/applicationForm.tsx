@@ -144,7 +144,7 @@ const ApplicationForm = (props: Iprops) => {
             await (props.current as IApplication).update(values);
             break;
           case 'newApp':
-            await directory.createApplication(values);
+            await directory.standard.createApplication(values);
             break;
           case 'newModule':
             await parentApp.createModule(values);

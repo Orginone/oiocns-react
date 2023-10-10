@@ -134,7 +134,7 @@ export class Department extends Target implements IDepartment {
     }
     return targets;
   }
-  content(_mode?: number | undefined): ITarget[] {
+  content(): ITarget[] {
     return [...this.children];
   }
   async deepLoad(reload: boolean = false): Promise<void> {

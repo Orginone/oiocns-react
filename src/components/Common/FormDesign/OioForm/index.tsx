@@ -79,7 +79,7 @@ const OioForm: React.FC<IProps> = ({
           sm: { span: 10 },
         }}>
         <Row gutter={24}>
-          {form.attributes.map((item) => (
+          {form.attributes?.map((item) => (
             <Col span={config.col} key={item.id}>
               <OioFormItem item={item} disabled belong={belong} noRule={noRule} />
             </Col>

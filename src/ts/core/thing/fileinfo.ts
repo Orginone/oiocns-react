@@ -51,7 +51,7 @@ export interface IFileInfo<T extends schema.XEntity> extends IEntity<T> {
   /** 加载文件内容 */
   loadContent(reload?: boolean): Promise<boolean>;
   /** 目录下的内容 */
-  content(mode?: number): IFile[];
+  content(): IFile[];
   /** 缓存用户数据 */
   cacheUserData(notify?: boolean): Promise<boolean>;
 }
@@ -137,26 +137,24 @@ export abstract class FileInfo<T extends schema.XEntity>
   async loadContent(reload: boolean = false): Promise<boolean> {
     return await sleep(reload ? 10 : 0);
   }
-  content(_mode: number = 0): IFile[] {
+  content(): IFile[] {
     return [];
   }
-  operates(mode: number = 0): model.OperateModel[] {
-    const operates = super.operates(mode);
-    if (mode % 2 === 0) {
-      if (this.target.space.hasRelationAuth()) {
-        operates.unshift(fileOperates.Copy);
-      }
-      if (this.target.hasRelationAuth()) {
-        operates.unshift(
-          fileOperates.Move,
-          fileOperates.Rename,
-          fileOperates.Download,
-          entityOperates.Update,
-          entityOperates.Delete,
-        );
-        if (this.canDesign) {
-          operates.unshift(entityOperates.Design);
-        }
+  operates(): model.OperateModel[] {
+    const operates = super.operates();
+    if (this.target.space.hasRelationAuth()) {
+      operates.unshift(fileOperates.Copy);
+    }
+    if (this.target.hasRelationAuth()) {
+      operates.unshift(
+        fileOperates.Move,
+        fileOperates.Rename,
+        fileOperates.Download,
+        entityOperates.Update,
+        entityOperates.Delete,
+      );
+      if (this.canDesign) {
+        operates.unshift(entityOperates.Design);
       }
     }
     return operates;
@@ -282,11 +280,11 @@ export class SysFileInfo extends FileInfo<schema.XEntity> implements ISysFileInf
     }
     return false;
   }
-  override operates(_mode?: number): model.OperateModel[] {
+  override operates(): model.OperateModel[] {
     const operates = super.operates();
     return operates.filter((i) => i.cmd != 'update');
   }
-  content(_mode?: number | undefined): IFile[] {
+  content(): IFile[] {
     return [];
   }
 }
@@ -296,9 +294,11 @@ export interface IStandardFileInfo<T extends schema.XStandard> extends IFileInfo
   /** 设置当前元数据 */
   setMetadata(_metadata: schema.XStandard): void;
   /** 变更通知 */
-  notify(operate: string, data: schema.XEntity[]): Promise<boolean>;
+  notify(operate: string, data: T): Promise<boolean>;
   /** 更新 */
   update(data: T): Promise<boolean>;
+  /** 接收通知 */
+  receive(operate: string, data: schema.XStandard): boolean;
 }
 export interface IStandard extends IStandardFileInfo<schema.XStandard> {}
 export abstract class StandardFileInfo<T extends schema.XStandard>
@@ -328,15 +328,14 @@ export abstract class StandardFileInfo<T extends schema.XStandard>
     );
   }
   async update(data: T): Promise<boolean> {
-    console.log(data);
-    const res = await this.coll.replace({
+    const result = await this.coll.replace({
       ...this.metadata,
       ...data,
       directoryId: this.metadata.directoryId,
       typeName: this.metadata.typeName,
     });
-    if (res) {
-      await this.notify('replace', [res]);
+    if (result) {
+      await this.notify('replace', result);
       return true;
     }
     return false;
@@ -345,7 +344,7 @@ export abstract class StandardFileInfo<T extends schema.XStandard>
     if (this.directory) {
       const data = await this.coll.delete(this.metadata);
       if (data) {
-        await this.notify('delete', [this.metadata]);
+        await this.notify('delete', this.metadata);
       }
     }
     return false;
@@ -354,7 +353,7 @@ export abstract class StandardFileInfo<T extends schema.XStandard>
     if (this.directory) {
       const data = await this.coll.remove(this.metadata);
       if (data) {
-        await this.notify('remove', [this.metadata]);
+        await this.notify('remove', this.metadata);
       }
     }
     return false;
@@ -372,7 +371,7 @@ export abstract class StandardFileInfo<T extends schema.XStandard>
     });
     if (data) {
       return await coll.notity({
-        data: [data],
+        data: data,
         operate: 'insert',
       });
     }
@@ -384,7 +383,7 @@ export abstract class StandardFileInfo<T extends schema.XStandard>
       directoryId: directoryId,
     });
     if (data) {
-      await this.notify('delete', [this.metadata]);
+      await this.notify('remove', this.metadata);
       return await coll.notity({
         data: [data],
         operate: 'insert',
@@ -392,7 +391,20 @@ export abstract class StandardFileInfo<T extends schema.XStandard>
     }
     return false;
   }
-  async notify(operate: string, data: schema.XStandard[]): Promise<boolean> {
+  async notify(operate: string, data: T): Promise<boolean> {
     return await this.coll.notity({ data, operate });
+  }
+  receive(operate: string, data: schema.XStandard): boolean {
+    switch (operate) {
+      case 'delete':
+      case 'replace':
+        if (data) {
+          if (operate === 'delete') {
+            data = { ...data, isDeleted: true } as unknown as T;
+          }
+          this.setMetadata(data as T);
+        }
+    }
+    return true;
   }
 }
