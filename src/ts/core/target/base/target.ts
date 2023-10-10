@@ -101,6 +101,7 @@ export abstract class Target extends Team implements ITarget {
   cache: schema.XCache;
   identitys: IIdentity[] = [];
   memberDirectory: IDirectory;
+  canDesign: boolean = false;
   get spaceId(): string {
     return this.space.id;
   }
