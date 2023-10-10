@@ -22,6 +22,8 @@ export type ReqestType = {
 };
 // 请求数据核类型定义
 export type DataProxyType = {
+  // 标签
+  flag: string;
   // 模块
   module: string;
   // 方法

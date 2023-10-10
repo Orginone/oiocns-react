@@ -673,6 +673,7 @@ export default class KernelApi {
       belongId,
       relations,
       params: {},
+      flag: 'diskInfo',
     });
   }
   /**
@@ -689,6 +690,7 @@ export default class KernelApi {
     return await this.dataProxy({
       module: 'Object',
       action: 'Get',
+      flag: key,
       belongId,
       relations,
       params: key,
@@ -710,6 +712,7 @@ export default class KernelApi {
     return await this.dataProxy({
       module: 'Object',
       action: 'Set',
+      flag: key,
       belongId,
       relations,
       params: {
@@ -732,6 +735,7 @@ export default class KernelApi {
     return await this.dataProxy({
       module: 'Object',
       action: 'Delete',
+      flag: key,
       belongId,
       relations,
       params: key,
@@ -757,6 +761,7 @@ export default class KernelApi {
       belongId,
       copyId,
       relations,
+      flag: collName,
       params: { collName, data },
     });
   }
@@ -780,6 +785,7 @@ export default class KernelApi {
       belongId,
       copyId,
       relations,
+      flag: collName,
       params: { collName, collSet },
     });
   }
@@ -803,6 +809,7 @@ export default class KernelApi {
       belongId,
       copyId,
       relations,
+      flag: collName,
       params: { collName, replace },
     });
   }
@@ -826,6 +833,7 @@ export default class KernelApi {
       belongId,
       copyId,
       relations,
+      flag: collName,
       params: { collName, update },
     });
   }
@@ -849,6 +857,7 @@ export default class KernelApi {
       belongId,
       copyId,
       relations,
+      flag: collName,
       params: { collName, match },
     });
   }
@@ -860,6 +869,7 @@ export default class KernelApi {
   public async collectionLoad<T>(
     belongId: string,
     relations: string[],
+    collName: string,
     options: any,
   ): Promise<model.LoadResult<T>> {
     options.belongId = belongId;
@@ -867,8 +877,12 @@ export default class KernelApi {
       module: 'Collection',
       action: 'Load',
       belongId,
-      params: options,
+      params: {
+        ...options,
+        collName: collName,
+      },
       relations,
+      flag: collName,
     });
     return { ...res, ...res.data };
   }
@@ -888,41 +902,11 @@ export default class KernelApi {
     return await this.dataProxy({
       module: 'Collection',
       action: 'Aggregate',
+      flag: collName,
       belongId,
       relations,
       params: { collName, options },
     });
-  }
-  /**
-   * 从数据集查询数据
-   * @param {string} collName 数据集名称（eg: history-message）
-   * @param {any} options 聚合管道(eg: {match:{a:1},skip:10,limit:10})
-   * @param {string} belongId 对象所在的归属用户ID
-   * @returns {model.ResultType<T>} 对象异步结果
-   */
-  public async collectionPageRequest<T>(
-    belongId: string,
-    relations: string[],
-    collName: string,
-    options: any,
-    page: model.PageModel,
-  ): Promise<model.ResultType<model.PageResult<T>>> {
-    const total = await this.collectionAggregate(belongId, relations, collName, options);
-    if (total.data && Array.isArray(total.data) && total.data.length > 0) {
-      options.skip = page.offset;
-      options.limit = page.limit;
-      const res = await this.collectionAggregate(belongId, relations, collName, options);
-      return {
-        ...res,
-        data: {
-          offset: page.offset,
-          limit: page.limit,
-          total: total.data[0].count,
-          result: res.data,
-        },
-      };
-    }
-    return total;
   }
   /**
    * 桶操作
@@ -939,6 +923,7 @@ export default class KernelApi {
       action: 'Operate',
       belongId,
       relations,
+      flag: 'bucketOpreate',
       params: data,
     });
   }
@@ -958,6 +943,7 @@ export default class KernelApi {
       action: 'Load',
       belongId,
       relations,
+      flag: 'loadThing',
       params: options,
     });
     return { ...res, ...res.data };
@@ -975,6 +961,7 @@ export default class KernelApi {
     return await this.dataProxy({
       module: 'Thing',
       action: 'Create',
+      flag: 'createThing',
       belongId,
       relations,
       params: name,

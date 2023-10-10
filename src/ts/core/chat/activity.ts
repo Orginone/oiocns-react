@@ -5,6 +5,8 @@ import { XCollection } from '../public/collection';
 import { IPerson } from '../target/person';
 import { ISession } from './session';
 import { CommentType } from '@/ts/base/model';
+/** 动态集合名 */
+const ActivityCollName = '-resource-activity';
 
 /** 动态消息接口 */
 export interface IActivityMessage extends Emitter {
@@ -137,11 +139,11 @@ export class Activity extends Entity<schema.XTarget> implements IActivity {
     this.session = session;
     this.activityList = [];
     if (this.session.target.id === this.session.sessionId) {
-      this.coll = session.target.resource.genColl('resource-activity');
+      this.coll = session.target.resource.genColl(ActivityCollName);
     } else {
       this.coll = new XCollection<model.ActivityType>(
         _metadata,
-        'resource-activity',
+        ActivityCollName,
         [_metadata.id],
         [this.key],
       );

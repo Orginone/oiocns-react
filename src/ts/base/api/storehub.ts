@@ -168,7 +168,7 @@ export default class StoreHub implements IDisposable {
                 logger.unauth();
               } else if (
                 res.msg != '' &&
-                !res.msg.includes('的成员') &&
+                // !res.msg.includes('的成员') &&
                 !res.msg.includes('不在线')
               ) {
                 logger.warn('操作失败,' + res.msg);

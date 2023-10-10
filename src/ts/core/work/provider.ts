@@ -75,26 +75,30 @@ export class WorkProvider implements IWorkProvider {
     return this.todos;
   }
   async loadDones(req: model.IdPageModel): Promise<model.PageResult<IWorkTask>> {
-    const res = await kernel.collectionLoad<schema.XWorkTask[]>(this.userId, [], {
-      collName: storeCollName.WorkTask,
-      options: {
-        match: {
-          belongId: req.id,
-          status: {
-            _gte_: 100,
+    const res = await kernel.collectionLoad<schema.XWorkTask[]>(
+      this.userId,
+      [],
+      storeCollName.WorkTask,
+      {
+        options: {
+          match: {
+            belongId: req.id,
+            status: {
+              _gte_: 100,
+            },
+            records: {
+              _exists_: true,
+            },
           },
-          records: {
-            _exists_: true,
+          sort: {
+            createTime: -1,
           },
         },
-        sort: {
-          createTime: -1,
-        },
+        skip: req.page?.offset ?? 0,
+        take: req.page?.limit ?? 30,
+        requireTotalCount: true,
       },
-      skip: req.page?.offset ?? 0,
-      take: req.page?.limit ?? 30,
-      requireTotalCount: true,
-    });
+    );
     return {
       offset: req.page?.offset || 0,
       limit: req.page?.limit || 30,
@@ -105,24 +109,28 @@ export class WorkProvider implements IWorkProvider {
     };
   }
   async loadApply(req: model.IdPageModel): Promise<model.PageResult<IWorkTask>> {
-    const res = await kernel.collectionLoad<schema.XWorkTask[]>(this.userId, [], {
-      collName: storeCollName.WorkTask,
-      options: {
-        match: {
-          belongId: req.id,
-          createUser: this.userId,
-          nodeId: {
-            _exists_: false,
+    const res = await kernel.collectionLoad<schema.XWorkTask[]>(
+      this.userId,
+      [],
+      storeCollName.WorkTask,
+      {
+        options: {
+          match: {
+            belongId: req.id,
+            createUser: this.userId,
+            nodeId: {
+              _exists_: false,
+            },
+          },
+          sort: {
+            createTime: -1,
           },
         },
-        sort: {
-          createTime: -1,
-        },
+        skip: req.page?.offset ?? 0,
+        take: req.page?.limit ?? 30,
+        requireTotalCount: true,
       },
-      skip: req.page?.offset ?? 0,
-      take: req.page?.limit ?? 30,
-      requireTotalCount: true,
-    });
+    );
     return {
       offset: req.page?.offset || 0,
       limit: req.page?.limit || 30,
@@ -131,8 +139,7 @@ export class WorkProvider implements IWorkProvider {
     };
   }
   async loadCompletedCount(): Promise<number> {
-    const res = await kernel.collectionLoad(this.userId, [], {
-      collName: storeCollName.WorkTask,
+    const res = await kernel.collectionLoad(this.userId, [], storeCollName.WorkTask, {
       options: {
         match: {
           status: {
@@ -151,8 +158,7 @@ export class WorkProvider implements IWorkProvider {
     return 0;
   }
   async loadApplyCount(): Promise<number> {
-    const res = await kernel.collectionLoad(this.userId, [], {
-      collName: storeCollName.WorkTask,
+    const res = await kernel.collectionLoad(this.userId, [], storeCollName.WorkTask, {
       options: {
         match: {
           createUser: this.userId,

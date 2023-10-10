@@ -89,8 +89,8 @@ export class WorkTask implements IWorkTask {
     const res = await kernel.collectionLoad<schema.XWorkInstance[]>(
       this.metadata.belongId,
       [],
+      storeCollName.WorkInstance,
       {
-        collName: storeCollName.WorkInstance,
         options: {
           match: {
             id: this.metadata.instanceId,

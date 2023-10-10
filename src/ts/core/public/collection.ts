@@ -71,12 +71,12 @@ export class XCollection<T extends schema.Xbase> {
   async loadResult(options: any): Promise<LoadResult<T[]>> {
     options = options || {};
     options.userData = options.userData || [];
-    options.collName = this._collName;
     options.options = options.options || {};
     options.options.match = options.options.match || {};
     return await kernel.collectionLoad<T[]>(
       this._target.belongId,
       this._relations,
+      this._collName,
       options,
     );
   }
