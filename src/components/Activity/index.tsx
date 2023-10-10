@@ -13,12 +13,7 @@ import {
   Typography,
 } from 'antd';
 import { IActivity, IActivityMessage, MessageType } from '@/ts/core';
-import {
-  DeleteOutlined,
-  HeartFilled,
-  HeartOutlined,
-  MessageOutlined,
-} from '@ant-design/icons';
+import { DeleteOutlined, LikeOutlined, MessageOutlined } from '@ant-design/icons';
 import { parseHtmlToText, showChatTime } from '@/utils/tools';
 import orgCtrl from '@/ts/controller';
 import { XEntity } from '@/ts/base/schema';
@@ -102,11 +97,11 @@ export const ActivityItem: React.FC<ActivityItemProps> = ({
             }}>
             {metadata.likes.includes(orgCtrl.user.id) ? (
               <>
-                <HeartFilled style={{ color: '#cb4747' }} /> <span>取消</span>
+                <LikeOutlined style={{ color: '#cb4747' }} /> <span>取消</span>
               </>
             ) : (
               <>
-                <HeartOutlined /> <span>点赞</span>
+                <LikeOutlined /> <span>点赞</span>
               </>
             )}
           </Button>
@@ -137,7 +132,7 @@ export const ActivityItem: React.FC<ActivityItemProps> = ({
             style={{ display: metadata.likes.length ? 'flex' : 'none' }}>
             {metadata.likes.length > 0 && (
               <span style={{ fontSize: 18, color: '#888' }}>
-                <HeartFilled style={{ color: '#cb4747', fontSize: 18 }} />
+                <LikeOutlined style={{ color: '#cb4747', fontSize: 18 }} />
                 <b style={{ marginLeft: 6 }}>{metadata.likes.length}</b>
               </span>
             )}
@@ -165,7 +160,7 @@ export const ActivityItem: React.FC<ActivityItemProps> = ({
         <div
           className={cls.activityItemFooterLikes}
           style={{ display: metadata.likes.length ? 'flex' : 'none' }}>
-          <HeartFilled style={{ color: '#cb4747', fontSize: 18 }} />
+          <LikeOutlined style={{ color: '#cb4747', fontSize: 18 }} />
           {metadata.likes.map((userId) => {
             return (
               <div key={userId} style={{ alignItems: 'center', display: 'flex' }}>
