@@ -1,11 +1,4 @@
-export {
-  companyTypes,
-  departmentTypes,
-  formModalType,
-  orgAuth,
-  PageAll,
-  storeCollName,
-} from './consts';
+export { companyTypes, departmentTypes, formModalType, orgAuth, PageAll } from './consts';
 export type { IEntity } from './entity';
 export { Entity } from './entity';
 export {

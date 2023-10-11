@@ -44,6 +44,12 @@ const GenerateThingTable = (props: IProps) => {
         showScrollbar: 'onHover',
         mode: 'standard',
       }}
+      columnChooser={{
+        enabled: true,
+        allowSearch: true,
+        mode: 'select',
+        height: 500,
+      }}
       paging={{ pageSize: 20, enabled: true }}
       pager={{
         visible: true,

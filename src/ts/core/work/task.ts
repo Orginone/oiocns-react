@@ -1,7 +1,7 @@
 import { logger } from '@/ts/base/common';
 import { IWork } from '.';
 import { schema, model, kernel } from '../../base';
-import { TaskStatus, entityOperates, storeCollName } from '../public';
+import { TaskStatus, entityOperates } from '../public';
 import { IBelong } from '../target/base/belong';
 import { UserProvider } from '../user';
 import { IWorkApply } from './apply';
@@ -127,28 +127,13 @@ export class WorkTask extends FileInfo<schema.XEntity> implements IWorkTask {
   }
   async loadInstance(reload: boolean = false): Promise<boolean> {
     if (this.instanceData !== undefined && !reload) return true;
-    const res = await kernel.collectionLoad<schema.XWorkInstance[]>(
+    const data = await kernel.findInstance(
       this.taskdata.belongId,
-      [],
-      storeCollName.WorkInstance,
-      {
-        options: {
-          match: {
-            id: this.taskdata.instanceId,
-          },
-          limit: 1,
-          lookup: {
-            from: storeCollName.WorkTask,
-            localField: 'id',
-            foreignField: 'instanceId',
-            as: 'tasks',
-          },
-        },
-      },
+      this.taskdata.instanceId,
     );
-    if (res.data && res.data.length > 0) {
+    if (data) {
       try {
-        this.instance = res.data[0];
+        this.instance = data;
         this.instanceData = this.instance ? JSON.parse(this.instance.data) : undefined;
         return this.instanceData !== undefined;
       } catch (ex) {

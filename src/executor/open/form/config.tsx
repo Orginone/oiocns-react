@@ -27,7 +27,7 @@ const buildSpeciesFiledsTree = (fields: model.FieldModel[]): MenuItemType[] => {
           size={18}
         />
       ),
-      children: buildSpeciesItemsTree(filed.lookups || []),
+      children: buildSpeciesItemsTree(filed.id, filed.lookups || []),
     });
   }
   return result;
@@ -35,6 +35,7 @@ const buildSpeciesFiledsTree = (fields: model.FieldModel[]): MenuItemType[] => {
 
 /** 创建字典项字段菜单 */
 const buildSpeciesItemsTree = (
+  fieldId: string,
   lookups: model.FiledLookup[],
   parentId?: string,
 ): MenuItemType[] => {
@@ -42,7 +43,7 @@ const buildSpeciesItemsTree = (
   for (const item of lookups) {
     if (item.parentId === parentId) {
       result.push({
-        key: item.id,
+        key: `${fieldId}-${item.id}`,
         item: item,
         label: item.text,
         itemType: '分类项',
@@ -60,7 +61,7 @@ const buildSpeciesItemsTree = (
             size={18}
           />
         ),
-        children: buildSpeciesItemsTree(lookups, item.id),
+        children: buildSpeciesItemsTree(fieldId, lookups, item.id),
       });
     }
   }

@@ -24,7 +24,7 @@ const FormView: React.FC<IProps> = ({ form, finished }) => {
   const [select, setSelcet] = useState();
   const [loaded] = useAsyncLoad(() => form.loadContent());
   const FormBrower: React.FC = () => {
-    const [key, rootMenu, selectMenu, setSelectMenu] = useMenuUpdate(
+    const [, rootMenu, selectMenu, setSelectMenu] = useMenuUpdate(
       () => config.loadSpeciesItemMenu(form),
       new Controller(form.key),
     );
@@ -37,7 +37,7 @@ const FormView: React.FC<IProps> = ({ form, finished }) => {
       }
       return (
         <GenerateThingTable
-          key={key}
+          key={form.key}
           height={'100%'}
           fields={form.fields}
           onRowDblClick={(e: any) => setSelcet(e.data)}
@@ -61,7 +61,6 @@ const FormView: React.FC<IProps> = ({ form, finished }) => {
             })
           }
           remoteOperations={true}
-          columnChooser={{ enabled: true }}
           toolbar={{
             visible: true,
             items: [

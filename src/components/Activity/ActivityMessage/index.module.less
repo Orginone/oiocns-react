@@ -1,0 +1,71 @@
+.activityItem {
+  padding: 8px 0;
+  border-bottom: 1px solid @border-color-base;
+
+  &Header {
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+    font-weight: 500;
+    gap: 6px;
+  }
+  &ImageList {
+    max-width: 600px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 8px;
+    img {
+      object-fit: cover; /* 这会保持图像的纵横比并居中截取部分内容 */
+      object-position: center center; /* 图像在容器中水平和垂直居中 */
+    }
+  }
+  &Footer {
+    display: flex;
+    align-items: center;
+    margin: 8px 0;
+    justify-content: space-between;
+    &Likes {
+      flex: 1;
+      background-color: #f2f2f2;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      padding: 4px;
+      gap: 16px;
+      height: 30px;
+      font-size: 12px;
+      flex-wrap: wrap;
+      color: rgba(0,0,0,0.65);
+    }
+  }
+
+  &CommentInputBox {
+    transition: 0.2s;
+    margin-top: 16px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    &SendBtn {
+      color: @primary-color;
+    }
+  }
+
+  &CommentList {
+    margin-top: 8px;
+    width: 100%;
+    padding: 4px;
+    border-radius: 4px;
+    background-color: #f2f2f2;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+}
+.activityTime {
+  font-weight: bold;
+  margin-left: 6px;
+  font-size: 12px;
+}

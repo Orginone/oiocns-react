@@ -1,9 +1,8 @@
 import { common, kernel, schema } from '../../base';
-import { storeCollName } from '../public/consts';
 import { TaskStatus } from '../public/enums';
 import { UserProvider } from '../user';
 import { IWorkTask, TaskTypeName, WorkTask } from './task';
-/** 动态集合名 */
+/** 任务集合名 */
 const TaskCollName = 'work-task';
 export interface IWorkProvider {
   /** 用户ID */
@@ -163,7 +162,7 @@ export class WorkProvider implements IWorkProvider {
     }
   }
   async loadCompletedCount(): Promise<number> {
-    const res = await kernel.collectionLoad(this.userId, [], storeCollName.WorkTask, {
+    const res = await kernel.collectionLoad(this.userId, [], TaskCollName, {
       options: {
         match: {
           status: {
@@ -182,7 +181,7 @@ export class WorkProvider implements IWorkProvider {
     return 0;
   }
   async loadApplyCount(): Promise<number> {
-    const res = await kernel.collectionLoad(this.userId, [], storeCollName.WorkTask, {
+    const res = await kernel.collectionLoad(this.userId, [], TaskCollName, {
       options: {
         match: {
           createUser: this.userId,
@@ -202,25 +201,6 @@ export class WorkProvider implements IWorkProvider {
     id: string,
     belongId: string,
   ): Promise<schema.XWorkInstance | undefined> {
-    const res = await kernel.collectionAggregate(
-      belongId,
-      [belongId],
-      storeCollName.WorkInstance,
-      {
-        match: {
-          id: id,
-        },
-        limit: 1,
-        lookup: {
-          from: storeCollName.WorkTask,
-          localField: 'id',
-          foreignField: 'instanceId',
-          as: 'tasks',
-        },
-      },
-    );
-    if (res.data && res.data.length > 0) {
-      return res.data[0];
-    }
+    return await kernel.findInstance(belongId, id);
   }
 }

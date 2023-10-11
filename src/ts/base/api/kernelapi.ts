@@ -658,6 +658,43 @@ export default class KernelApi {
     });
   }
   /**
+   * 根据ID查询流程实例
+   * @param  过滤参数
+   * @returns {schema.XWorkInstance | undefined} 流程实例对象
+   */
+  public async findInstance(
+    belongId: string,
+    instanceId: string,
+  ): Promise<schema.XWorkInstance | undefined> {
+    const res = await this.dataProxy({
+      module: 'Collection',
+      action: 'Load',
+      belongId,
+      params: {
+        options: {
+          match: {
+            id: instanceId,
+          },
+          limit: 1,
+          lookup: {
+            from: 'work-task',
+            localField: 'id',
+            foreignField: 'instanceId',
+            as: 'tasks',
+          },
+        },
+        collName: 'work-instance',
+      },
+      relations: [],
+      flag: '-work-instance-',
+    });
+    if (res.success && res.data && res.data.data) {
+      if (Array.isArray(res.data.data) && res.data.data.length > 0) {
+        return res.data.data[0];
+      }
+    }
+  }
+  /**
    * 获取对象数据
    * @param {string} belongId 对象所在的归属用户ID
    * @param {string} key 对象名称（eg: rootName.person.name）
@@ -882,7 +919,7 @@ export default class KernelApi {
         collName: collName,
       },
       relations,
-      flag: collName,
+      flag: `-${collName}`,
     });
     return { ...res, ...res.data };
   }

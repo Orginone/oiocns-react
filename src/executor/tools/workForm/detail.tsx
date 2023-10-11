@@ -37,7 +37,6 @@ const DetailTable: React.FC<IProps> = (props) => {
       fields={fields}
       height={500}
       dataIndex={'attribute'}
-      columnChooser={{ enabled: true }}
       selection={
         props.allowEdit
           ? {

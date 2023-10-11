@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import Activity, { ActivityItem } from '@/components/Activity';
+import Activity from '@/components/Activity';
+import ActivityMessage from '@/components/Activity/ActivityMessage';
 import cls from './index.module.less';
 import { IActivity } from '@/ts/core';
 import useWindowResize from '@/hooks/useWindowResize';
@@ -29,7 +30,7 @@ const GroupActivityItem: React.FC<{ activity: IActivity }> = ({ activity }) => {
                           className={cls.groupListItem}
                           key={activity.key}
                           onClick={() => setCurrent(activity)}>
-                          <ActivityItem
+                          <ActivityMessage
                             item={activity.activityList[0]}
                             activity={activity}
                             hideResource
