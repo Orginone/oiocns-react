@@ -16,6 +16,7 @@ interface IProps {
   current: IForm;
   sheetList: any;
   selectItem: any;
+  updataKey: string;
   reportChange: any;
   changeType: string;
   classType: any | undefined;
@@ -26,6 +27,7 @@ const HotTableView: React.FC<IProps> = ({
   current,
   sheetList,
   selectItem,
+  updataKey,
   reportChange,
   changeType,
   classType,
@@ -90,12 +92,35 @@ const HotTableView: React.FC<IProps> = ({
   }, [selectItem]);
 
   useEffect(() => {
-    if (changeType !== '' && changeType !== 'onSave') {
-      buttonClickCallback();
-    } else if (changeType == 'onSave') {
-      saveClickCallback();
+    /** 根据工具栏类型进行操作 */
+    switch (changeType) {
+      case 'onSave':
+        saveClickCallback();
+        break;
+      case 'copyStyle':
+        copyStyle();
+        break;
+      case 'pasteStyle':
+        pasteStyle();
+        break;
+      case '':
+        break;
+      default:
+        buttonClickCallback();
     }
-  }, [reportChange]);
+    console.log(changeType, reportChange, '123');
+  }, [updataKey]);
+
+  /** 复制样式 */
+  const copyStyle = () => {
+    const selected = hotRef.current.hotInstance.getSelected() || [];
+    console.log(selected, 'selected');
+  };
+
+  /** 粘贴样式 */
+  const pasteStyle = () => {
+    console.log('2');
+  };
 
   styleList?.forEach((item: any) => {
     hotRef.current.hotInstance.getCellMeta(item.row, item.col).renderer =
@@ -223,7 +248,7 @@ const HotTableView: React.FC<IProps> = ({
       col_w.push(hotRef.current.hotInstance.getColWidth(i));
     }
     for (var k = 0; k < count_row; k++) {
-      row_h.push(hotRef.current.hotInstance.getRowHeight(i));
+      row_h.push(hotRef.current.hotInstance.getRowHeight(k));
     }
     let json = {
       data: hotRef.current.hotInstance.getData(),

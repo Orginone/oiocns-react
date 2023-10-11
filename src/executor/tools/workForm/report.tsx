@@ -88,12 +88,20 @@ const ReportForms: React.FC<IProps> = (props) => {
         });
       }
     }
-    /** 单元格样式处理处理 */
+    /** 报表初始值设置只读 */
+    selectItem?.data?.data.forEach((items: any, index: number) => {
+      items.forEach((itemsData: any, itemsIndex: number) => {
+        if (itemsData != null) {
+          hot.setCellMeta(index, itemsIndex, 'readOnly', true);
+        }
+      });
+    });
+    /** 单元格样式处理 */
     setting?.styleList?.forEach((item: any) => {
       hotRef.current.hotInstance.getCellMeta(item.row, item.col).renderer =
         'cellStylesRenderer';
     });
-    /** 单元格样式处理处理 */
+    /** 单元格样式处理 */
     setting?.classList?.forEach((item: any) => {
       let arr = [];
       let items: any = item.class;
