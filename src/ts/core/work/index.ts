@@ -1,7 +1,7 @@
 import { kernel, model, schema } from '../../base';
 import { IApplication } from '../thing/standard/application';
 import { IForm, Form } from '../thing/standard/form';
-import { FileInfo, IFileInfo } from '../thing/fileinfo';
+import { FileInfo, IFile, IFileInfo } from '../thing/fileinfo';
 import { IDirectory } from '../thing/directory';
 import { IWorkApply, WorkApply } from './apply';
 import { fileOperates } from '../public';
@@ -20,7 +20,10 @@ export interface IWork extends IFileInfo<schema.XWorkDefine> {
   /** 加载事项定义节点 */
   loadWorkNode(reload?: boolean): Promise<model.WorkNodeModel | undefined>;
   /** 生成办事申请单 */
-  createApply(): Promise<IWorkApply | undefined>;
+  createApply(
+    taskId?: string,
+    pdata?: model.InstanceDataModel,
+  ): Promise<IWorkApply | undefined>;
 }
 
 export const fullDefineRule = (data: schema.XWorkDefine) => {
@@ -43,6 +46,7 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
     this.application = _application;
     this.isContainer = _application.isInherited;
   }
+  canDesign: boolean = true;
   primaryForms: IForm[] = [];
   detailForms: IForm[] = [];
   application: IApplication;
@@ -67,6 +71,9 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
       return res.success;
     }
     return false;
+  }
+  hardDelete(_notity: boolean = false): Promise<boolean> {
+    return this.delete(_notity);
   }
   async rename(_name: string): Promise<boolean> {
     const node = await this.loadWorkNode();
@@ -106,7 +113,7 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
           resource: node,
         });
         if (success) {
-          this.directory.propertys = this.directory.propertys.filter(
+          this.directory.standard.propertys = this.directory.standard.propertys.filter(
             (i) => i.key != this.key,
           );
           this.application = app;
@@ -119,7 +126,7 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
     }
     return false;
   }
-  content(_mode: number = 0): IFileInfo<schema.XEntity>[] {
+  content(_mode: number = 0): IFile[] {
     if (this.node) {
       return this.forms.filter(
         (a) => this.node!.forms.findIndex((s) => s.id == a.id) > -1,
@@ -152,7 +159,10 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
     }
     return this.node;
   }
-  async createApply(): Promise<IWorkApply | undefined> {
+  async createApply(
+    taskId: string = '0',
+    pdata?: model.InstanceDataModel,
+  ): Promise<IWorkApply | undefined> {
     await this.loadWorkNode();
     if (this.node && this.forms.length > 0) {
       const data: model.InstanceDataModel = {
@@ -164,16 +174,19 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
         allowEdit: this.metadata.allowEdit,
         allowSelect: this.metadata.allowSelect,
       };
-      await Promise.all(
-        this.forms.map(async (form) => {
-          await form.loadContent();
-          data.fields[form.id] = form.fields;
-        }),
-      );
+      this.forms.forEach((form) => {
+        data.fields[form.id] = form.fields;
+        if (pdata && pdata.data[form.id]) {
+          const after = pdata.data[form.id]?.at(-1);
+          if (after) {
+            data.data[form.id] = [{ ...after, nodeId: this.node!.id }];
+          }
+        }
+      });
       return new WorkApply(
         {
           hook: '',
-          taskId: '0',
+          taskId: taskId,
           title: this.name,
           defineId: this.id,
         } as model.WorkInstanceModel,
@@ -197,23 +210,23 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
     node.primaryForms = await this.directory.resource.formColl.find(
       node.forms?.filter((a) => a.typeName == '主表').map((s) => s.id),
     );
-    node.primaryForms.forEach(async (a) => {
+    for (const a of node.primaryForms) {
       const form = new Form({ ...a, id: a.id + '_' }, this.directory);
+      await form.loadFields();
       this.primaryForms.push(form);
-      await form.loadFields();
-    });
-    node.detailForms.forEach(async (a) => {
+    }
+    for (const a of node.detailForms) {
       const form = new Form({ ...a, id: a.id + '_' }, this.directory);
-      this.detailForms.push(form);
       await form.loadFields();
-    });
+      this.detailForms.push(form);
+    }
     if (node.children) {
       await this.recursionForms(node.children);
     }
     if (node.branches) {
       for (const branch of node.branches) {
         if (branch.children) {
-          this.recursionForms(branch.children);
+          await this.recursionForms(branch.children);
         }
       }
     }

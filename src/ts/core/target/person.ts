@@ -9,10 +9,9 @@ import { ITarget } from './base/target';
 import { ITeam } from './base/team';
 import { IStorage, Storage } from './outTeam/storage';
 import { personJoins, targetOperates } from '../public';
-import { IFileInfo } from '../thing/fileinfo';
+import { IFile } from '../thing/fileinfo';
 import { ISession } from '../chat/session';
 import { XObject } from '../public/object';
-import { FriendsActivity, IActivity } from '../chat/activity';
 
 /** 人员类型接口 */
 export interface IPerson extends IBelong {
@@ -23,9 +22,7 @@ export interface IPerson extends IBelong {
   /** 用户缓存对象 */
   cacheObj: XObject<schema.Xbase>;
   /** 拷贝的文件 */
-  copyFiles: Map<string, IFileInfo<schema.XEntity>>;
-  /** 朋友圈动态 */
-  friendsActivity: IActivity;
+  copyFiles: Map<string, IFile>;
   /** 根据ID查询共享信息 */
   findShareById(id: string): model.ShareIcon;
   /** 根据Id查询共享信息 */
@@ -50,13 +47,11 @@ export class Person extends Belong implements IPerson {
     super(_metadata, []);
     this.copyFiles = new Map();
     this.cacheObj = new XObject(_metadata, 'target-cache', [], [this.key]);
-    this.friendsActivity = new FriendsActivity(this);
   }
   companys: ICompany[] = [];
-  friendsActivity: IActivity;
   cacheObj: XObject<schema.Xbase>;
   givedIdentitys: schema.XIdProof[] = [];
-  copyFiles: Map<string, IFileInfo<schema.XEntity>>;
+  copyFiles: Map<string, IFile>;
   private _cohortLoaded: boolean = false;
   private _givedIdentityLoaded: boolean = false;
   async loadGivedIdentitys(reload: boolean = false): Promise<schema.XIdProof[]> {
@@ -133,7 +128,7 @@ export class Person extends Belong implements IPerson {
     data.public = false;
     data.teamCode = data.teamCode || data.code;
     data.teamName = data.teamName || data.name;
-    const res = await this.create(data);
+    const res = await this.create(data, true);
     if (res && res.id) {
       const company = createCompany(res, this);
       await company.deepLoad();
@@ -170,9 +165,6 @@ export class Person extends Belong implements IPerson {
         .filter((i) => orgIds.includes(i.identity!.shareId))
         .filter((i) => authIds.includes(i.identity!.authId)).length > 0
     );
-  }
-  async pullMembers(members: schema.XTarget[]): Promise<boolean> {
-    return await this.applyJoin(members);
   }
   async applyJoin(members: schema.XTarget[]): Promise<boolean> {
     members = members.filter(
@@ -264,6 +256,7 @@ export class Person extends Belong implements IPerson {
       await this.loadCohorts(reload),
       await this.loadMembers(reload),
       await this.loadSuperAuth(reload),
+      await this.loadIdentitys(reload),
       await this.loadGivedIdentitys(reload),
       await this.directory.loadDirectoryResource(reload),
     ]);

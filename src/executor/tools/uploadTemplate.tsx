@@ -110,7 +110,7 @@ const generate = async (dir: IDirectory, name: string, excel: IExcel) => {
     showErrors(errors);
     return;
   }
-  command.emitter('-', 'taskList', dir);
+  command.emitter('executor', 'taskList', dir);
   const task: model.TaskModel = {
     name: name,
     size: 0,
@@ -119,7 +119,7 @@ const generate = async (dir: IDirectory, name: string, excel: IExcel) => {
   };
   dir.taskList.push(task);
   const counting = (dir: IDirectory) => {
-    let count = dir.forms.length + dir.specieses.length;
+    let count = dir.standard.forms.length + dir.standard.specieses.length;
     for (let child of dir.children) {
       count += counting(child);
     }
@@ -188,6 +188,12 @@ const showErrors = (errors: Error[]) => {
           {
             title: '行数',
             dataIndex: 'row',
+            render: (_, data) => {
+              if (typeof data.row == 'number') {
+                return <>{data.row}</>;
+              }
+              return <>{data.row.join(',')}</>;
+            },
           },
           {
             title: '错误信息',

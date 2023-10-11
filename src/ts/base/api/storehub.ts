@@ -24,7 +24,7 @@ export default class StoreHub implements IDisposable {
    * @param timeout 超时检测默认8000ms
    * @param interval 心跳间隔默认3000ms
    */
-  constructor(url: string, protocol = 'json', timeout = 8000, interval = 3000) {
+  constructor(url: string, protocol = 'json', timeout = 6000, interval = 2000) {
     this._isStarted = false;
     this._timeout = timeout;
     this._connectedCallbacks = [];
@@ -166,7 +166,11 @@ export default class StoreHub implements IDisposable {
             if (!res.success) {
               if (res.code === 401) {
                 logger.unauth();
-              } else if (res.msg != '' && !res.msg.includes('的成员')) {
+              } else if (
+                res.msg != '' &&
+                !res.msg.includes('的成员') &&
+                !res.msg.includes('不在线')
+              ) {
                 logger.warn('操作失败,' + res.msg);
               }
             }

@@ -1,7 +1,7 @@
 import { command, kernel, model, schema } from '../../../base';
 import { PageAll, directoryOperates, fileOperates } from '../../public';
 import { IDirectory } from '../directory';
-import { IFileInfo, IStandardFileInfo, StandardFileInfo } from '../fileinfo';
+import { IFile, IStandardFileInfo, StandardFileInfo } from '../fileinfo';
 import { IWork, Work } from '../../work';
 
 /** 应用/模块接口类 */
@@ -12,6 +12,8 @@ export interface IApplication extends IStandardFileInfo<schema.XApplication> {
   children: IApplication[];
   /** 流程定义 */
   works: IWork[];
+  /** 根据id查找办事 */
+  findWork(id: string): Promise<IWork | undefined>;
   /** 加载办事 */
   loadWorks(reload?: boolean): Promise<IWork[]>;
   /** 新建办事 */
@@ -48,13 +50,13 @@ export class Application
   get cacheFlag(): string {
     return 'applications';
   }
-  content(_mode: number = 0): IFileInfo<schema.XEntity>[] {
+  content(_mode: number = 0): IFile[] {
     return [...this.children, ...this.works].sort((a, b) =>
       a.metadata.updateTime < b.metadata.updateTime ? 1 : -1,
     );
   }
   structCallback(): void {
-    command.emitter('-', 'refresh', this);
+    command.emitter('executor', 'refresh', this);
   }
   async copy(_: IDirectory): Promise<boolean> {
     return false;
@@ -82,6 +84,28 @@ export class Application
       return await super.delete();
     }
     return success;
+  }
+  async hardDelete(): Promise<boolean> {
+    const success = await this.directory.resource.applicationColl.removeMany(
+      this.getChildren(this),
+    );
+    if (success) {
+      return await super.hardDelete();
+    }
+    return success;
+  }
+  async findWork(id: string): Promise<IWork | undefined> {
+    await this.loadWorks();
+    const find = this.works.find((i) => i.id === id);
+    if (find) {
+      return find;
+    }
+    for (const item of this.children) {
+      const find = await item.findWork(id);
+      if (find) {
+        return find;
+      }
+    }
   }
   async loadWorks(reload?: boolean | undefined): Promise<IWork[]> {
     if (!this._worksLoaded || reload) {

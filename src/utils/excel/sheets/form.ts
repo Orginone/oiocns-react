@@ -64,6 +64,29 @@ export class FormHandler extends i.SheetHandler<FormSheet> {
     });
     const attrHandler = excel.handlers.find((item) => item.sheet.name == '表单特性');
     const propHandler = excel.handlers.find((item) => item.sheet.name == '属性定义');
+    const groups = new t.List(
+      attrHandler?.sheet.data
+        .map((item, index) => {
+          return {
+            index: index,
+            data: item,
+          };
+        })
+        .filter((item) => item.data.formCode) ?? [],
+    ).GroupBy((item) => item.data.formCode);
+    for (const group in groups) {
+      const attrs = groups[group];
+      const propGroup = new t.List(attrs).GroupBy((item) => item.data.propCode);
+      for (const key in propGroup) {
+        const props = propGroup[key];
+        const errors =
+          attrHandler?.assert(
+            props.map((item) => item.index),
+            [{ res: props.length > 1, error: `${key} 表单下存在多个相同属性的特性！` }],
+          ) ?? [];
+        allErrors.push(...errors);
+      }
+    }
     attrHandler?.sheet.data.forEach((item, index) => {
       let hasForm = this.sheet.data.find((dir) => dir.code == item.formCode);
       let hasProp = propHandler?.sheet.data.find((prop) => prop.code == item.propCode);

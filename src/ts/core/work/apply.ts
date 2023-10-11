@@ -42,8 +42,7 @@ export class WorkApply implements IWorkApply {
     fromData: Map<string, model.FormEditData>,
   ): Promise<boolean> {
     fromData.forEach((data, k) => {
-      const { after, before, createTime, creator, nodeId } = data;
-      this.instanceData.data[k] = [{ after, before, createTime, creator, nodeId }];
+      this.instanceData.data[k] = [data];
     });
 
     const res = await kernel.createWorkInstance({

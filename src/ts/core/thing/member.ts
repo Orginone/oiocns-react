@@ -21,6 +21,9 @@ export class Member extends FileInfo<schema.XTarget> implements IMemeber {
   get cacheFlag(): string {
     return 'members';
   }
+  get groupTags(): string[] {
+    return ['成员'];
+  }
   get fullId(): string {
     return `${this.directory.belongId}-${this._metadata.id}`;
   }
@@ -35,6 +38,9 @@ export class Member extends FileInfo<schema.XTarget> implements IMemeber {
     throw new Error('暂不支持.');
   }
   async delete(): Promise<boolean> {
+    throw new Error('暂不支持.');
+  }
+  async hardDelete(): Promise<boolean> {
     throw new Error('暂不支持.');
   }
   override operates(): OperateModel[] {

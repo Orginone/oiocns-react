@@ -1,13 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { ProColumns } from '@ant-design/pro-components';
 import cls from './index.module.less';
-import { Dropdown, Pagination, Result, Segmented } from 'antd';
+import { Dropdown } from 'antd';
 import { ProTable } from '@ant-design/pro-components';
-import * as fa from '@/icons/fa';
 import { PageShowType } from 'typings/globelType';
 import { PageModel } from '@/ts/base/model';
 import { RiMoreFill } from '@/icons/ri';
-import useStorage from '@/hooks/useStorage';
 
 interface PageType<T> {
   dataSource: T[]; // 展示数据源
@@ -103,7 +101,6 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
     }
     return result;
   }, [columns, operation]);
-
 
   // 表格主体 卡片与表格切换功能--增加缓存
   const renderTable = useMemo(() => {

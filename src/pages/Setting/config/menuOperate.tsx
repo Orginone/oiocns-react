@@ -20,9 +20,6 @@ const createMenu = (target: ITarget, children: MenuItemType[]) => {
     tag: [target.typeName],
     icon: <EntityIcon notAvatar={true} entityId={target.id} size={18} />,
     children: children,
-    beforeLoad: async () => {
-      await target.loadContent();
-    },
   };
 };
 /** 编译部门树 */
@@ -46,26 +43,25 @@ const buildGroupTree = (groups: IGroup[]): MenuItemType[] => {
 
 /** 编译目录树 */
 const buildDirectoryTree = (directorys: IDirectory[]): MenuItemType[] => {
-  return directorys.map((directory) => {
-    return {
-      key: directory.key,
-      item: directory,
-      label: directory.name,
-      tag: [directory.typeName],
-      icon: (
-        <EntityIcon entityId={directory.id} typeName={directory.typeName} size={18} />
-      ),
-      itemType: directory.typeName,
-      menus: loadFileMenus(directory),
-      children: [
-        ...buildDirectoryTree(directory.children),
-        ...buildApplicationTree(directory.applications),
-      ],
-      beforeLoad: async () => {
-        await directory.loadContent();
-      },
-    };
-  });
+  return directorys
+    .filter((i) => !i.groupTags.includes('已删除'))
+    .map((directory) => {
+      return {
+        key: directory.key,
+        item: directory,
+        label: directory.name,
+        tag: [directory.typeName],
+        icon: (
+          <EntityIcon entityId={directory.id} typeName={directory.typeName} size={18} />
+        ),
+        itemType: directory.typeName,
+        menus: loadFileMenus(directory),
+        children: [
+          ...buildDirectoryTree(directory.children),
+          ...buildApplicationTree(directory.applications),
+        ],
+      };
+    });
 };
 
 const buildWorks = (works: IWork[]): MenuItemType[] => {
@@ -81,9 +77,6 @@ const buildWorks = (works: IWork[]): MenuItemType[] => {
         itemType: work.typeName,
         menus: loadFileMenus(work),
         children: buildForms(work),
-        beforeLoad: async () => {
-          await work.loadContent();
-        },
       };
     });
 };
@@ -99,7 +92,6 @@ const buildForms = (work: IWork): MenuItemType[] => {
       itemType: form.typeName,
       menus: loadFileMenus(form),
       children: [],
-      beforeLoad: async () => {},
     };
   });
 };
@@ -121,9 +113,6 @@ const buildApplicationTree = (applications: IApplication[]): MenuItemType[] => {
         ...buildApplicationTree(application.children),
         ...buildWorks(application.works),
       ],
-      beforeLoad: async () => {
-        await application.loadContent();
-      },
     };
   });
 };

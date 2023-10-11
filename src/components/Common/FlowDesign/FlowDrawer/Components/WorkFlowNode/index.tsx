@@ -1,16 +1,15 @@
 import React, { useState } from 'react';
 import { AiOutlineSetting } from '@/icons/ai';
-import { Row, Button, Space, Modal, message } from 'antd';
+import { Row, Button, Space } from 'antd';
 import cls from './index.module.less';
 import { NodeModel } from '../../../processType';
-import { IBelong } from '@/ts/core';
-import SelectDefine from '@/components/Common/SelectDefine';
+import { IBelong, IWork } from '@/ts/core';
 import ShareShowComp from '@/components/Common/ShareShowComp';
-import { schema } from '@/ts/base';
+import OpenFileDialog from '@/components/OpenFileDialog';
 
 interface IProps {
   current: NodeModel;
-  excludeIds: string[];
+  define: IWork;
   belong: IBelong;
 }
 
@@ -21,7 +20,6 @@ interface IProps {
 
 const WorkFlowNode: React.FC<IProps> = (props) => {
   const [isOpen, setIsOpen] = useState<boolean>(false); // 打开弹窗
-  const [selectChildWork, setSelectChildWork] = useState<schema.XWorkDefine>();
   const [currentData, setCurrentData] = useState({
     id: props.current.destId,
     name: props.current.destName,
@@ -49,7 +47,7 @@ const WorkFlowNode: React.FC<IProps> = (props) => {
           {currentData.id != '' ? (
             <ShareShowComp
               departData={[currentData]}
-              deleteFuc={(_id: string) => {
+              deleteFuc={() => {
                 props.current.destId = '';
                 props.current.destName = '';
                 setCurrentData({ id: '', name: '' });
@@ -57,30 +55,30 @@ const WorkFlowNode: React.FC<IProps> = (props) => {
           ) : null}
         </div>
       </div>
-
-      <Modal
-        width="80%"
-        title="选择其他办事"
-        open={isOpen}
-        destroyOnClose={true}
-        onOk={() => {
-          if (!selectChildWork) {
-            message.warn('请选择办事');
-            return;
-          }
-          let name = `${selectChildWork.name} [${props.belong.name}]`;
-          props.current.destId = selectChildWork.id;
-          props.current.destName = name;
-          setCurrentData({ id: selectChildWork.id, name: name });
-          setIsOpen(false);
-        }}
-        onCancel={() => setIsOpen(false)}>
-        <SelectDefine
-          excludeIds={props.excludeIds}
-          belong={props.belong}
-          onChecked={setSelectChildWork}
+      {isOpen && (
+        <OpenFileDialog
+          title={'选中其它办事'}
+          rootKey={'disk'}
+          accepts={['办事']}
+          allowInherited
+          excludeIds={[props.define.id]}
+          onCancel={() => setIsOpen(false)}
+          onOk={(files) => {
+            if (files.length > 0) {
+              let name = `${files[0].name} [${props.belong.name}]`;
+              props.current.destId = files[0].id;
+              props.current.destName = name;
+              setCurrentData({ id: files[0].id, name: name });
+            } else {
+              setCurrentData({
+                id: '',
+                name: '',
+              });
+            }
+            setIsOpen(false);
+          }}
         />
-      </Modal>
+      )}
     </div>
   );
 };

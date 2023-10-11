@@ -47,11 +47,7 @@ const FlowDrawer: React.FC<IProps> = (props) => {
         return <ApprovalNode current={props.current} belong={belong} />;
       case AddNodeType.CHILDWORK:
         return (
-          <WorkFlowNode
-            current={props.current}
-            belong={belong}
-            excludeIds={[props.define.id]}
-          />
+          <WorkFlowNode current={props.current} belong={belong} define={props.define} />
         );
       case AddNodeType.CC:
         return <CcNode current={props.current} belong={belong} />;

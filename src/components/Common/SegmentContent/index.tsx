@@ -7,7 +7,7 @@ import * as fa from '@/icons/fa';
 type segmentedTypes = 'icon' | 'table' | 'list';
 
 interface IProps {
-  description: string;
+  descriptions: string;
   content: React.ReactNode;
   onSegmentChanged: (type: segmentedTypes) => void;
 }
@@ -16,7 +16,7 @@ interface IProps {
  */
 const SegmentContent: React.FC<IProps> = ({
   content,
-  description,
+  descriptions,
   onSegmentChanged,
 }: IProps) => {
   const [segmented, setSegmented] = useStorage('segmented', 'list');
@@ -67,7 +67,7 @@ const SegmentContent: React.FC<IProps> = ({
       </Affix>
       <Affix style={{ position: 'absolute', left: 10, bottom: 0 }}>
         <Space split={<Divider type="vertical" />}>
-          <Typography.Link>{description}</Typography.Link>
+          <Typography.Link>{descriptions}</Typography.Link>
         </Space>
       </Affix>
     </Card>

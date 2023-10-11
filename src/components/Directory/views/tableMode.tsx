@@ -1,25 +1,34 @@
-import React from 'react';
-import { IFileInfo, ISysFileInfo } from '@/ts/core';
-import { schema } from '@/ts/base';
+import React, { useState } from 'react';
+import { IFile, ISysFileInfo } from '@/ts/core';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import { showChatTime } from '@/utils/tools';
 import { formatSize } from '@/ts/base/common';
 import DataGrid, { Column, Scrolling } from 'devextreme-react/data-grid';
-import { Dropdown, MenuProps, Modal } from 'antd';
+import { Dropdown, MenuProps } from 'antd';
 
 const TableMode = ({
+  focusFile,
   content,
   fileOpen,
   contextMenu,
+  selectFiles,
 }: {
-  content: IFileInfo<schema.XEntity>[];
-  fileOpen: (file: IFileInfo<schema.XEntity>) => Promise<void>;
-  contextMenu: (file?: IFileInfo<schema.XEntity>, clicked?: Function) => MenuProps;
+  focusFile: IFile | undefined;
+  content: IFile[];
+  selectFiles: IFile[];
+  fileOpen: (file: IFile | undefined, dblclick: boolean) => Promise<void>;
+  contextMenu: (file?: IFile, clicked?: Function) => MenuProps;
 }) => {
+  const [cxtItem, setCxtItem] = useState<IFile>();
+  if (focusFile) {
+    selectFiles.push(focusFile);
+  }
   return (
-    <Dropdown menu={contextMenu()} trigger={['contextMenu']} destroyPopupOnHide>
-      <div style={{ width: '100%', height: '100%' }}>
-        <DataGrid<IFileInfo<schema.XEntity>, string>
+    <Dropdown menu={contextMenu(cxtItem)} trigger={['contextMenu']} destroyPopupOnHide>
+      <div
+        style={{ width: '100%', height: '100%' }}
+        onContextMenu={(e) => e.stopPropagation()}>
+        <DataGrid<IFile, string>
           id="grid"
           width="100%"
           height="100%"
@@ -27,63 +36,29 @@ const TableMode = ({
           columnAutoWidth
           allowColumnResizing
           hoverStateEnabled
-          activeStateEnabled
+          selectedRowKeys={selectFiles.map((i) => i.id)}
+          selection={{ mode: 'single' }}
           columnResizingMode={'nextColumn'}
           showColumnLines={false}
-          selection={{
-            mode: 'single',
+          onRowClick={async (e) => {
+            await fileOpen(e.data, false);
           }}
           onRowDblClick={async (e) => {
-            await fileOpen(e.data);
+            await fileOpen(e.data, true);
           }}
           headerFilter={{
             visible: true,
             allowSearch: true,
           }}
-          dataSource={content}
-          onContextMenuPreparing={(e: any) => {
-            if (e.row?.data) {
-              e.component.selectRowsByIndexes([e.rowIndex]);
-              const modal = Modal.info({
-                mask: false,
-                icon: <></>,
-                width: 1,
-                style: {
-                  position: 'fixed',
-                  left: e.event.pageX,
-                  top: e.event.pageY,
-                  padding: 0,
-                },
-                bodyStyle: {
-                  padding: 0,
-                  height: 1,
-                },
-                maskClosable: true,
-                okButtonProps: {
-                  style: {
-                    display: 'none',
-                  },
-                },
-                content: (
-                  <Dropdown
-                    menu={contextMenu(e.row.data, () => {
-                      modal.destroy();
-                    })}
-                    open>
-                    <div style={{ width: 1 }}></div>
-                  </Dropdown>
-                ),
-              });
-              e.items = [];
-            }
-          }}>
+          onContextMenuPreparing={(e) => setCxtItem(e.row?.data)}
+          dataSource={content}>
           <Scrolling mode="virtual" />
           <Column
             width={250}
             dataField="name"
             caption="名称"
             cellRender={(e) => {
-              return <EntityIcon entity={e.data} showName size={20} />;
+              return <EntityIcon entity={e.data.metadata} showName size={20} />;
             }}
           />
           <Column dataField="code" caption="代码" width={200} />
@@ -94,7 +69,7 @@ const TableMode = ({
             width={200}
             dataType={'datetime'}
             allowFiltering={false}
-            calculateDisplayValue={(e: IFileInfo<schema.XEntity>) => {
+            calculateDisplayValue={(e: IFile) => {
               return showChatTime(e.metadata.createTime);
             }}
           />
@@ -103,7 +78,7 @@ const TableMode = ({
             caption="更新时间"
             width={200}
             allowFiltering={false}
-            calculateDisplayValue={(e: IFileInfo<schema.XEntity>) => {
+            calculateDisplayValue={(e: IFile) => {
               return showChatTime(e.metadata.updateTime);
             }}
           />
@@ -112,7 +87,7 @@ const TableMode = ({
             dataField="size"
             caption="大小"
             allowFiltering={false}
-            calculateCellValue={(e: IFileInfo<schema.XEntity>) => {
+            calculateCellValue={(e: IFile) => {
               if ('filedata' in e) {
                 return formatSize((e as ISysFileInfo).filedata.size);
               }

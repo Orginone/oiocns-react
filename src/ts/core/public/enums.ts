@@ -40,6 +40,7 @@ export enum SpeciesType {
 export enum MessageType {
   File = '文件',
   Text = '文本',
+  Html = '网页',
   Image = '图片',
   Video = '视频',
   Voice = '语音',

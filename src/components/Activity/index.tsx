@@ -1,84 +1,83 @@
 import React, { useEffect, useState } from 'react';
 import cls from './index.module.less';
-import BasicTitle from '@/pages/Home/components/BaseTitle';
 import {
   Button,
-  Col,
+  Card,
   Divider,
   Empty,
   Image,
   Input,
-  Popover,
-  Row,
+  List,
   Space,
-  Spin,
   Tag,
   Typography,
 } from 'antd';
-import { IActivity, IActivityMessage } from '@/ts/core';
-import {
-  EllipsisOutlined,
-  HeartFilled,
-  HeartOutlined,
-  MessageOutlined,
-} from '@ant-design/icons';
-import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
-import { shareOpenLink, showChatTime } from '@/utils/tools';
-import ActivityPublisher from '@/components/Activity/ActivityPublisher';
+import { IActivity, IActivityMessage, MessageType } from '@/ts/core';
+import { DeleteOutlined, LikeOutlined, MessageOutlined } from '@ant-design/icons';
+import { parseHtmlToText, showChatTime } from '@/utils/tools';
 import orgCtrl from '@/ts/controller';
-import { FileItemShare } from '@/ts/base/model';
-import ActivityComment from '@/components/Activity/ActivityComment';
 import { XEntity } from '@/ts/base/schema';
-import { generateUuid } from '@/ts/base/common';
+import { ScrollView } from 'devextreme-react';
+import dxScrollView from 'devextreme/ui/scroll_view';
+import { command } from '@/ts/base';
+import ActivityResource from './ActivityResource';
+import EntityIcon from '../Common/GlobalComps/entityIcon';
+import ActivityComment from '../Activity/ActivityComment';
 
-const Activity: React.FC<{ activity: IActivity; title?: string }> = ({
+interface ActivityProps {
+  height: number | string;
+  activity: IActivity;
+  title?: string;
+}
+
+interface ActivityItemProps {
+  hideResource?: boolean;
+  item: IActivityMessage;
+  activity: IActivity;
+}
+export const ActivityItem: React.FC<ActivityItemProps> = ({
+  item,
   activity,
-  title,
+  hideResource,
 }) => {
-  const [actionList, setActivityList] = useState(activity.activityList);
-
-  const ActivityResponsiveImage: React.FC<{
-    item: FileItemShare;
-    number: number;
-  }> = ({ item, number }) => {
-    const [computedHeight, setComputedHeight] = useState(100);
-    const id = String(new Date().getTime() + Math.floor(Math.random() * 100));
-    useEffect(() => {
-      const ele = document.querySelector(`.file-${id}`);
-      ele && setComputedHeight(ele.clientWidth);
-    }, []);
-    return (
-      <div
-        className={`file-${id}`}
-        style={{
-          width: computedWidth(number),
-          height: computedHeight,
-        }}>
-        <Image
-          width={'100%'}
-          height={'100%'}
-          src={shareOpenLink(item.shareLink)}
-          preview={{
-            src: shareOpenLink(item.shareLink),
-          }}></Image>
-      </div>
-    );
+  const [metadata, setMetadata] = useState(item.metadata);
+  useEffect(() => {
+    const id = item.subscribe(() => {
+      setMetadata(item.metadata);
+    });
+    return () => {
+      item.unsubscribe(id);
+    };
+  }, [item]);
+  const renderContent = () => {
+    switch (metadata.typeName) {
+      case MessageType.Text:
+        return (
+          <Typography.Paragraph ellipsis={hideResource}>
+            {metadata.content}
+          </Typography.Paragraph>
+        );
+      case MessageType.Html:
+        if (hideResource) {
+          return (
+            <Typography.Paragraph ellipsis={hideResource}>
+              {parseHtmlToText(metadata.content)}
+            </Typography.Paragraph>
+          );
+        } else {
+          return (
+            <div
+              dangerouslySetInnerHTML={{
+                __html: metadata.content,
+              }}></div>
+          );
+        }
+    }
   };
-  const ActivityItem: React.FC<{ item: IActivityMessage }> = ({ item }) => {
+  const RenderCtxMore: React.FC<ActivityItemProps> = ({ item, hideResource }) => {
     const [commenting, setCommenting] = useState(false);
     const [comment, setComment] = useState('');
     const [replyTo, setReplyTo] = useState<XEntity | null>(null);
-    const [metadata, setMetadata] = useState(item.metadata);
-
-    useEffect(() => {
-      const id = item.subscribe(() => {
-        setMetadata(item.metadata);
-      });
-      return () => {
-        item.unsubscribe(id);
-      };
-    }, []);
-
     const handleReply = async (userId: string = '') => {
       setReplyTo(null);
       if (userId) {
@@ -87,220 +86,227 @@ const Activity: React.FC<{ activity: IActivity; title?: string }> = ({
       }
       setCommenting(true);
     };
-    return (
-      <div className={cls.activityItem}>
-        <div className={cls.activityItemHeader}>
-          <EntityIcon entityId={metadata.createUser} showName />
-          <span style={{ fontSize: 14 }}>{showChatTime(metadata.createTime)}</span>
-          {metadata.tags.map((tag, index) => {
-            return (
-              <Tag color="processing" key={index}>
-                {tag}
-              </Tag>
-            );
-          })}
-        </div>
-        <div onClick={() => setCommenting(false)}>
-          <Typography.Paragraph>{metadata.content}</Typography.Paragraph>
-          <div className={cls.activityItemImageList}>
-            <Image.PreviewGroup>
-              {metadata.resource.map((perItem, index) => {
-                return (
-                  <ActivityResponsiveImage
-                    item={perItem}
-                    number={metadata.resource.length}
-                    key={index}></ActivityResponsiveImage>
-                );
-              })}
-            </Image.PreviewGroup>
+    const renderOperate = () => {
+      return (
+        <Space split={<Divider type="vertical" />} wrap size={2}>
+          <Button
+            type="text"
+            size="small"
+            onClick={async () => {
+              await item.like();
+            }}>
+            {metadata.likes.includes(orgCtrl.user.id) ? (
+              <>
+                <LikeOutlined style={{ color: '#cb4747' }} /> <span>取消</span>
+              </>
+            ) : (
+              <>
+                <LikeOutlined /> <span>点赞</span>
+              </>
+            )}
+          </Button>
+          <Button type="text" size="small" onClick={() => handleReply()}>
+            <MessageOutlined /> <span>评论</span>
+          </Button>
+          {item.canDelete && (
+            <Button type="text" size="small" onClick={() => item.delete()}>
+              <DeleteOutlined /> <span>删除</span>
+            </Button>
+          )}
+        </Space>
+      );
+    };
+    if (hideResource === true) {
+      return (
+        <>
+          <div className={cls.activityItemFooter}>
+            <div>
+              <EntityIcon entityId={metadata.createUser} showName />
+              <span className={cls.activityTime}>
+                发布于{showChatTime(item.metadata.createTime)}
+              </span>
+            </div>
           </div>
-        </div>
-
-        <div className={cls.activityItemFooter}>
           <div
             className={cls.activityItemFooterLikes}
             style={{ display: metadata.likes.length ? 'flex' : 'none' }}>
-            {metadata.likes.map((userId, index) => {
+            {metadata.likes.length > 0 && (
+              <span style={{ fontSize: 18, color: '#888' }}>
+                <LikeOutlined style={{ color: '#cb4747', fontSize: 18 }} />
+                <b style={{ marginLeft: 6 }}>{metadata.likes.length}</b>
+              </span>
+            )}
+            {metadata.comments.length > 0 && (
+              <span style={{ fontSize: 18, color: '#888' }}>
+                <MessageOutlined style={{ color: '#4747cb', fontSize: 18 }} />
+                <b style={{ marginLeft: 6 }}>{metadata.comments.length}</b>
+              </span>
+            )}
+          </div>
+        </>
+      );
+    }
+    return (
+      <>
+        <div className={cls.activityItemFooter}>
+          <div>
+            <EntityIcon entityId={metadata.createUser} showName />
+            <span className={cls.activityTime}>
+              发布于{showChatTime(item.metadata.createTime)}
+            </span>
+          </div>
+          {!hideResource && <div>{renderOperate()}</div>}
+        </div>
+        <div
+          className={cls.activityItemFooterLikes}
+          style={{ display: metadata.likes.length ? 'flex' : 'none' }}>
+          <LikeOutlined style={{ color: '#cb4747', fontSize: 18 }} />
+          {metadata.likes.map((userId) => {
+            return (
+              <div key={userId} style={{ alignItems: 'center', display: 'flex' }}>
+                <EntityIcon entityId={userId} showName></EntityIcon>
+              </div>
+            );
+          })}
+        </div>
+        {metadata.comments?.length > 0 && (
+          <div className={cls.activityItemCommentList}>
+            {metadata.comments.map((item) => {
               return (
-                <div key={index} style={{ alignItems: 'center', display: 'flex' }}>
-                  <EntityIcon entityId={userId} showName></EntityIcon>
-                </div>
+                <ActivityComment
+                  comment={item}
+                  key={item.time}
+                  onClick={(comment) => handleReply(comment.userId)}></ActivityComment>
               );
             })}
-            等{metadata.likes.length}人认为很不错
           </div>
-          <Popover
-            placement="left"
-            content={
-              <Space split={<Divider type="vertical" />} size="small">
-                <Button
-                  type="text"
-                  size="small"
-                  onClick={async () => {
-                    await item.like();
-                  }}>
-                  {metadata.likes.includes(orgCtrl.user.id) ? (
-                    <>
-                      <HeartFilled style={{ color: 'red' }} /> 取消
-                    </>
-                  ) : (
-                    <>
-                      <HeartOutlined /> 赞
-                    </>
-                  )}
-                </Button>
-                <Button type="text" size="small" onClick={() => handleReply()}>
-                  <MessageOutlined /> 评论
-                </Button>
-              </Space>
-            }
-            trigger="click">
-            <Button type="text" size="small">
-              <EllipsisOutlined />
-            </Button>
-          </Popover>
-        </div>
-
-        {metadata.comments.length ? (
-          <>
-            <div className={cls.activityItemCommentList}>
-              {metadata.comments.map((item, index) => {
-                return (
-                  <ActivityComment
-                    comment={item}
-                    key={index}
-                    onClick={(comment) => handleReply(comment.userId)}></ActivityComment>
-                );
-              })}
-            </div>
-          </>
-        ) : (
-          <></>
         )}
-
         <div
           style={{ display: commenting ? 'flex' : 'none' }}
           className={cls.activityItemCommentInputBox}>
           <Input.TextArea
             placeholder={replyTo ? `回复${replyTo.name} :` : ''}
             style={{ height: 12 }}
+            value={comment}
             onChange={(e) => setComment(e.currentTarget.value)}></Input.TextArea>
           <Button
             type="primary"
             size="small"
             onClick={async () => {
               await item.comment(comment, replyTo?.id);
+              setCommenting(false);
+              setComment('');
             }}>
             发送
           </Button>
         </div>
+      </>
+    );
+  };
+  return (
+    <List.Item>
+      <List.Item.Meta
+        title={
+          <div style={{ width: '100%' }}>
+            <span style={{ fontWeight: 'bold', marginRight: 10 }}>
+              {activity.metadata.name}
+            </span>
+            {metadata.tags.map((tag, index) => {
+              return (
+                <Tag color="processing" key={index}>
+                  {tag}
+                </Tag>
+              );
+            })}
+          </div>
+        }
+        avatar={<EntityIcon entity={activity.metadata} size={50} />}
+        description={
+          <div className={cls.activityItem}>
+            <div>
+              {renderContent()}
+              {hideResource !== true && (
+                <div className={cls.activityItemImageList}>
+                  <Image.PreviewGroup>
+                    {ActivityResource(metadata.resource, 600)}
+                  </Image.PreviewGroup>
+                </div>
+              )}
+            </div>
+            <RenderCtxMore item={item} hideResource={hideResource} activity={activity} />
+          </div>
+        }
+      />
+    </List.Item>
+  );
+};
+/** 动态 */
+const Activity: React.FC<ActivityProps> = ({ height, activity, title }) => {
+  const ActivityBody: React.FC<{ activity: IActivity }> = ({ activity }) => {
+    const [actionList, setActivityList] = useState(activity.activityList);
+    useEffect(() => {
+      const id = activity.subscribe(() => {
+        setActivityList([...activity.activityList]);
+      });
+      return () => {
+        activity.unsubscribe(id);
+      };
+    }, [activity]);
+    if (actionList.length > 0) {
+      return actionList.map((actionItem) => (
+        <ActivityItem
+          key={actionItem.key}
+          item={actionItem}
+          activity={actionItem.activity}></ActivityItem>
+      ));
+    }
+    return (
+      <div className={cls.emptyList}>
+        <Empty description={false}></Empty>
       </div>
     );
   };
 
-  useEffect(() => {
-    const id = activity.subscribe(() => {
-      setActivityList([...activity.activityList]);
-    });
-    if (activity.activityList.length < 1 && !loading) {
-      activity.load(10).then(() => {
-        setActivityList([...activity.activityList]);
-      });
-      setLoading(false);
+  const loadMoreActivity = async (component: dxScrollView | undefined) => {
+    const news = await activity.load(10);
+    if (news.length > 0) {
+      activity.changCallback();
     }
-    return () => {
-      activity.unsubscribe(id);
-    };
-  }, []);
-  const [activityPublisherOpen, setActivityPublisherOpen] = useState(false);
-  const [containerHeight, setContainerHeight] = useState(0);
-  const [loading, setLoading] = useState(false);
-  const [page, setPage] = useState(1);
-
-  useEffect(() => {
-    const element = document.querySelector('#' + containerId);
-    if (!element) return;
-    const height = element.scrollHeight;
-    height && setContainerHeight(height);
-  }, [activity.activityList]);
-
-  const containerId = 'activity-' + generateUuid();
-
-  const computedWidth = (number: number) => {
-    if (number === 1) {
-      return '100%';
+    if (component) {
+      await component.release(news.length < 10);
     }
-    if (number % 2 === 0) {
-      return '49%';
-    }
-    if (number % 3 === 0) {
-      return '32%';
-    }
-    return '100%';
   };
+
   return (
-    <div
-      className={cls.activityList}
-      id={containerId}
-      onScroll={(e) => {
-        const scrollTop = (e.target as HTMLElement).scrollTop;
-        console.log((e.target as HTMLElement).scrollTop, containerHeight);
-        console.log(page * 10);
-        if (
-          scrollTop >= containerHeight &&
-          !loading &&
-          page * 10 < activity.activityList.length
-        ) {
-          setLoading(true);
-          activity.load(10);
-          setPage(page + 1);
-        }
-      }}>
-      <div>
-        <BasicTitle
-          title={title || '动态'}
-          onClick={() => activity.load(10)}
-          left={
-            <Button
-              type="link"
-              onClick={() => {
-                activity.allPublish && setActivityPublisherOpen(true);
-              }}>
-              发布动态
-            </Button>
-          }></BasicTitle>
-        <Row gutter={[16, 0]}>
-          {actionList.map((item, index) => {
-            return (
-              <Col key={index} span={24}>
-                <ActivityItem item={item}></ActivityItem>
-              </Col>
-            );
-          })}
-          {actionList.length === 0 && (
-            <div
-              style={{
-                width: '100%',
-                height: '300px',
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}>
-              <Empty description={false}></Empty>
-            </div>
-          )}
-        </Row>
-        {activity.allPublish && (
-          <ActivityPublisher
-            open={activityPublisherOpen}
-            activity={activity}
-            finish={() => {
-              setActivityPublisherOpen(false);
-            }}></ActivityPublisher>
-        )}
-        {loading && <Spin></Spin>}
-      </div>
-    </div>
+    <Card
+      bordered={false}
+      title={title || '动态'}
+      extra={
+        activity.allPublish ? (
+          <Button
+            type="link"
+            onClick={() => {
+              command.emitter('executor', 'pubActivity', activity);
+            }}>
+            发布动态
+          </Button>
+        ) : (
+          <></>
+        )
+      }>
+      <ScrollView
+        key={activity.key}
+        bounceEnabled
+        width={'100%'}
+        height={height}
+        reachBottomText="加载更多..."
+        onReachBottom={(e) => loadMoreActivity(e.component)}
+        onInitialized={(e) => loadMoreActivity(e.component)}>
+        <div className={cls.actionList}>
+          <ActivityBody activity={activity} />
+        </div>
+      </ScrollView>
+    </Card>
   );
 };
 

@@ -157,6 +157,17 @@ const OioFormItem = ({
         return defaultFilsUrl[2];
     }
   };
+  const buildTreeNode = (id: string, items: model.FiledLookup[]): any[] => {
+    return items
+      .filter((i) => i.parentId === id)
+      .map((i) => {
+        return {
+          label: i.text,
+          value: i.value,
+          children: buildTreeNode(i.id, items),
+        };
+      });
+  };
   if (disabled) {
     switch (rule.widget) {
       case 'dept':
@@ -241,7 +252,6 @@ const OioFormItem = ({
         />
       );
     }
-
     case 'date':
       return (
         <ProFormDatePicker
@@ -330,6 +340,27 @@ const OioFormItem = ({
             options: (field.lookups || []).map((i) => {
               return { label: i.text, value: i.value };
             }),
+          }}
+          rules={rules}
+        />
+      );
+    case 'species':
+      return (
+        <ProFormTreeSelect
+          name={field.id}
+          required={rule.required === true || rule.required === 'true'}
+          tooltip={field.remark}
+          fieldProps={{
+            ...rules,
+            treeData: (field.lookups || [])
+              .filter((i) => !(i.parentId?.length ?? 0 > 0))
+              .map((i) => {
+                return {
+                  label: i.text,
+                  value: i.value,
+                  children: buildTreeNode(i.id, field.lookups || []),
+                };
+              }),
           }}
           rules={rules}
         />

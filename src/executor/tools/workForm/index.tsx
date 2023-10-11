@@ -1,5 +1,5 @@
 import React from 'react';
-import { model } from '../../../ts/base';
+import { model, schema } from '../../../ts/base';
 import { IBelong } from '@/ts/core';
 import PrimaryForms from './primary';
 import DetailForms from './detail';
@@ -33,18 +33,18 @@ const WorkForm: React.FC<IWorkFormProps> = (props) => {
   const node = getNodeByNodeId(props.nodeId, props.data.node);
   if (!node) return <></>;
   /** 根据需求获取数据 */
-  const getFormData = (id: string): model.FormEditData => {
-    const source: model.AnyThingModel[] = [];
-    if (props.data.data && props.data.data[id]) {
-      const beforeData = props.data.data[id];
+  const getFormData = (form: schema.XForm): model.FormEditData => {
+    const source: schema.XThing[] = [];
+    if (props.data.data && props.data.data[form.id]) {
+      const beforeData = props.data.data[form.id];
       if (beforeData.length > 0) {
         if (!props.allowEdit) {
           const nodeData = beforeData.filter((i) => i.nodeId === node.id);
           if (nodeData && nodeData.length > 0) {
-            return nodeData.slice(-1)[0];
+            return nodeData.at(-1)!;
           }
         } else {
-          source.push(...beforeData.slice(-1)[0].after);
+          source.push(...beforeData.at(-1)!.after);
         }
       }
     }
@@ -52,6 +52,7 @@ const WorkForm: React.FC<IWorkFormProps> = (props) => {
       before: [...source],
       after: [...source],
       nodeId: node.id,
+      formName: form.name,
       creator: props.belong.userId,
       createTime: formatDate(new Date(), 'yyyy-MM-dd hh:mm:ss.S'),
     };

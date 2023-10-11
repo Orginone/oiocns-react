@@ -1,14 +1,15 @@
-import { Empty } from 'antd';
-import React, { useEffect, useState } from 'react';
+import { Empty, Spin } from 'antd';
+import React, { useState } from 'react';
 import orgCtrl from '@/ts/controller';
-import { ICompany, ISession } from '@/ts/core';
+import { ISession } from '@/ts/core';
 import useStorage from '@/hooks/useStorage';
 import IconMode from './views/iconMode';
 import ListMode from './views/listMode';
 import TableMode from './views/tableMode';
 import SegmentContent from '@/components/Common/SegmentContent';
+import TagsBar from '@/components/Directory/tagsBar';
 import { command } from '@/ts/base';
-import { generateUuid } from '@/ts/base/common';
+import { useFlagCmdEmitter } from '@/hooks/useCtrlUpdate';
 
 /**
  * @description: 通讯录
@@ -21,18 +22,11 @@ const Book: React.FC<any> = ({
 }: {
   chats: ISession[];
   filter: string;
-  belong: ICompany;
 }) => {
+  const [currentTag, setCurrentTag] = useState('全部');
+  const [select, setSelect] = useState<ISession>();
+  const [loaded, msgKey] = useFlagCmdEmitter('session');
   const [segmented, setSegmented] = useStorage('segmented', 'list');
-  const [msgKey, setKey] = useState(generateUuid());
-  useEffect(() => {
-    const id = command.subscribeByFlag('session', () => {
-      setKey(generateUuid());
-    });
-    return () => {
-      command.unsubscribeByFlag(id);
-    };
-  }, []);
   if (chats === undefined) {
     chats = orgCtrl.chats.filter((i) => i.isMyChat);
   }
@@ -54,25 +48,58 @@ const Book: React.FC<any> = ({
       }
       return num;
     });
-
-  return (
-    <SegmentContent
-      key={msgKey}
-      onSegmentChanged={setSegmented}
-      description={`${chats.length}个会话`}
-      content={
-        <>
-          {segmented === 'table' ? (
-            <TableMode chats={chats} />
-          ) : segmented === 'icon' ? (
-            <IconMode chats={chats} />
-          ) : (
-            <ListMode chats={chats} />
-          )}
-          {chats.length == 0 && <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />}
-        </>
+  const sessionOpen = async (session: ISession | undefined, dblclick: boolean) => {
+    if (dblclick && session) {
+      command.emitter('preview', 'open', session);
+      orgCtrl.currentKey = session.chatdata.fullId;
+      orgCtrl.changCallback();
+    } else if (!dblclick) {
+      if (session?.id === select?.id) {
+        setSelect(undefined);
+        command.emitter('preview', 'open');
+      } else {
+        setSelect(session);
+        command.emitter('preview', 'open', session);
       }
-    />
+    }
+  };
+  const getChats = (tag?: string) => {
+    const filter = tag ?? currentTag;
+    return chats.filter((i) => filter === '全部' || i.groupTags.includes(filter));
+  };
+  return (
+    <>
+      <TagsBar
+        select={currentTag}
+        initTags={['全部', '@我', '未读', '单聊', '群聊']}
+        entitys={chats}
+        selectFiles={[]}
+        badgeCount={(tag) => {
+          let count = 0;
+          getChats(tag).forEach((i) => {
+            count += i.chatdata.noReadCount;
+          });
+          return count;
+        }}
+        onChanged={(t) => setCurrentTag(t)}></TagsBar>
+      <SegmentContent
+        key={msgKey}
+        onSegmentChanged={setSegmented}
+        descriptions={`${getChats().length}个会话`}
+        content={
+          <Spin spinning={!loaded} tip={'加载中...'} delay={200}>
+            {segmented === 'table' ? (
+              <TableMode chats={getChats()} select={select} sessionOpen={sessionOpen} />
+            ) : segmented === 'icon' ? (
+              <IconMode chats={getChats()} select={select} sessionOpen={sessionOpen} />
+            ) : (
+              <ListMode chats={getChats()} select={select} sessionOpen={sessionOpen} />
+            )}
+            {chats.length == 0 && <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />}
+          </Spin>
+        }
+      />
+    </>
   );
 };
 export default Book;

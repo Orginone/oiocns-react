@@ -2,7 +2,7 @@ import { kernel, model, schema } from '../../../base';
 import { Entity, IEntity, OperateType, entityOperates, fileOperates } from '../../public';
 import { PageAll } from '../../public/consts';
 import { IDirectory } from '../../thing/directory';
-import { IFileInfo } from '../../thing/fileinfo';
+import { IFile } from '../../thing/fileinfo';
 import { ITarget } from '../base/target';
 
 /** 身份（角色）接口 */
@@ -26,15 +26,16 @@ export interface IIdentity extends IEntity<schema.XIdentity> {
 /** 身份（角色）实现类 */
 export class Identity extends Entity<schema.XIdentity> implements IIdentity {
   constructor(_metadata: schema.XIdentity, current: ITarget) {
-    super({
-      ..._metadata,
-      typeName: '角色',
-    });
+    super(
+      {
+        ..._metadata,
+        typeName: '角色',
+      },
+      [],
+    );
     this.current = current;
-    this.isInherited = false;
     this.directory = current.directory;
   }
-  isInherited: boolean;
   directory: IDirectory;
   async rename(name: string): Promise<boolean> {
     return await this.update({ ...this.metadata, name: name });
@@ -140,7 +141,7 @@ export class Identity extends Entity<schema.XIdentity> implements IIdentity {
     operates.push(...super.operates(1));
     return operates.sort((a, b) => (a.menus ? -10 : b.menus ? 10 : 0));
   }
-  content(_mode?: number | undefined): IFileInfo<schema.XEntity>[] {
+  content(_mode?: number | undefined): IFile[] {
     return [];
   }
   async _sendIdentityChangeMsg(

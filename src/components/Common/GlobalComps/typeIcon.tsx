@@ -2,7 +2,7 @@ import { TargetType } from '@/ts/core';
 import React from 'react';
 import * as im from '@/icons/im';
 import * as fa from '@/icons/fa';
-import { IconBaseProps } from 'react-icons';
+import { IconBaseProps } from '@react-icons/all-files/lib';
 
 interface TypeIconInfo {
   avatar?: boolean;
@@ -36,6 +36,8 @@ const TypeIcon = ({ avatar, iconType, size }: TypeIconInfo) => {
   };
   const loadIcon = () => {
     switch (iconType) {
+      case '动态':
+        return <im.ImSafari {...config} />;
       case '目录':
         return <im.ImFolder {...config} />;
       case '成员目录':
@@ -56,8 +58,9 @@ const TypeIcon = ({ avatar, iconType, size }: TypeIconInfo) => {
         return <im.ImDelicious {...config} />;
       case '办事':
         return <im.ImShuffle {...config} />;
+      case '表单':
+      case '报表':
       case '事项配置':
-        return <im.ImInsertTemplate {...config} />;
       case '实体配置':
         return <im.ImPaste {...config} />;
       case '角色':
@@ -101,6 +104,8 @@ const TypeIcon = ({ avatar, iconType, size }: TypeIconInfo) => {
         return <im.ImWrench {...config} />;
       case 'open':
         return <im.ImDelicious {...config} />;
+      case 'design':
+        return <im.ImEqualizer {...config} />;
       case 'copy':
         return <im.ImCopy {...config} />;
       case 'move':
@@ -111,6 +116,8 @@ const TypeIcon = ({ avatar, iconType, size }: TypeIconInfo) => {
         return <im.ImPencil {...config} />;
       case 'delete':
         return <im.ImBin {...config} />;
+      case 'restore':
+        return <im.ImUndo2 {...config} />;
       case 'remove':
         return <im.ImUserMinus {...config} />;
       case 'update':

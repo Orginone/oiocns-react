@@ -296,7 +296,10 @@ function getJsonText(fileUrl: string): Promise<string> {
 }
 
 const ellipsisText = (text: string, length: number) => {
-  return text.substring(0, length) + '...';
+  if (text.length > length) {
+    return text.substring(0, length) + '...';
+  }
+  return text;
 };
 
 /**
@@ -331,6 +334,7 @@ function assignment(oldObj: { [key: string]: any }, newObj: { [key: string]: any
 }
 
 export {
+  assignment,
   ellipsisText,
   filterEmptyPropObj,
   formatDate,
@@ -342,5 +346,4 @@ export {
   isSpecialChar,
   sortObjByKeys,
   visitTree,
-  assignment
 };

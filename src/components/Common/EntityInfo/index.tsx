@@ -10,12 +10,13 @@ interface IProps {
   entity: IEntity<schema.XEntity>;
   other?: any;
   extra?: any;
+  column?: number;
 }
 /**
  * @description: 机构信息内容
  * @return {*}
  */
-const EntityInfo: React.FC<IProps> = ({ entity, other, extra }: IProps) => {
+const EntityInfo: React.FC<IProps> = ({ entity, other, extra, column }: IProps) => {
   const [tkey] = useCtrlUpdate(entity);
   const [ellipsis] = useState(true);
   return (
@@ -26,7 +27,7 @@ const EntityInfo: React.FC<IProps> = ({ entity, other, extra }: IProps) => {
         extra={extra}
         bordered
         colon
-        column={3}
+        column={column ?? 3}
         labelStyle={{
           textAlign: 'left',
           color: '#606266',
@@ -40,7 +41,7 @@ const EntityInfo: React.FC<IProps> = ({ entity, other, extra }: IProps) => {
               text: entity.id,
               tooltips: [entity.id, '复制成功'],
             }}>
-            <EntityIcon entityId={entity.id} showName />
+            <EntityIcon entity={entity.metadata} showName />
           </Typography.Paragraph>
         </Descriptions.Item>
         <Descriptions.Item label="代码">
@@ -53,6 +54,7 @@ const EntityInfo: React.FC<IProps> = ({ entity, other, extra }: IProps) => {
           </Typography.Paragraph>
         </Descriptions.Item>
         {other}
+        <Descriptions.Item label="类型">{entity.typeName}</Descriptions.Item>
         {entity.metadata.belongId != entity.id && (
           <Descriptions.Item label="归属">
             <EntityIcon entityId={entity.metadata.belongId} showName />
@@ -81,14 +83,14 @@ const EntityInfo: React.FC<IProps> = ({ entity, other, extra }: IProps) => {
         <Descriptions
           bordered
           colon
-          column={3}
+          column={column ?? 3}
           labelStyle={{
             textAlign: 'left',
             color: '#606266',
             width: 120,
           }}
           contentStyle={{ textAlign: 'left', color: '#606266' }}>
-          <Descriptions.Item label="描述信息" span={3}>
+          <Descriptions.Item label="描述信息" span={column ?? 3}>
             <Typography.Paragraph
               ellipsis={ellipsis ? { rows: 2, expandable: true, symbol: '更多' } : false}>
               {entity.remark}

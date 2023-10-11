@@ -1,6 +1,6 @@
 @import '~antd/es/style/themes/variable';
 .pageCard {
-  height: 100%;
+  height: calc(100% - 35px);
   & > :global(.ogo-card-body) {
     height: calc(100% - 8px);
   }
@@ -19,6 +19,14 @@
   &:hover {
     background-color: #efefef;
   }
+}
+.fileCard_select {
+  width: 160px;
+  max-width: 160px;
+  min-width: 160px;
+  cursor: pointer;
+  border-radius: 6px;
+  background-color: @active-background;
 }
 .file {
   width: 100%;

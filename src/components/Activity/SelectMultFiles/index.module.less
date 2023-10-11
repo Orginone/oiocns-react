@@ -1,0 +1,27 @@
+.imageUploader {
+  display: flex;
+  gap: 8px;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  :global {
+    .ogo-upload-picture-card-wrapper {
+      width: auto;
+    }
+  }
+  .selectFileBtn {
+    height: 100px;
+    width: 100px;
+    padding: 16px;
+    cursor: pointer;
+    border-radius: 10px;
+    margin: 46px;
+    border: 1px solid #e7e7e7;
+    text-align: center;
+    font-size: 16px;
+    &:hover {
+      color: blue;
+      background-color: #e7e7e7;
+    }
+  }
+}

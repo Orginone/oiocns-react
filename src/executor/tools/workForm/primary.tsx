@@ -1,5 +1,4 @@
 import OioForm from '@/components/Common/FormDesign/OioFormNext';
-import FormRenders from './form';
 import { kernel, model, schema } from '../../../ts/base';
 import { IBelong } from '@/ts/core';
 import { useEffect, useState } from 'react';
@@ -14,7 +13,7 @@ interface IProps {
   forms: schema.XForm[];
   data: model.InstanceDataModel;
   ruleService?: WorkFormRulesType;
-  getFormData: (id: string) => model.FormEditData;
+  getFormData: (form: schema.XForm) => model.FormEditData;
   onChanged?: (id: string, data: model.FormEditData) => void;
 }
 
@@ -23,13 +22,13 @@ const PrimaryForm: React.FC<IProps> = (props) => {
   const form = props.forms[0];
   if (!props.data.fields[form.id]) return <></>;
   const fields = props.data.fields[form.id];
-  const formData = props.getFormData(form.id);
+  const formData = props.getFormData(form);
   const [data, setData] = useState(
     formData.after.length > 0 ? formData.after[0] : undefined,
   );
   useEffect(() => {
     if (!data) {
-      kernel.createThing(props.belong.userId, [], '').then((res) => {
+      kernel.createThing(props.belong.id, [], form.name).then((res) => {
         if (res.success && res.data) {
           setData(res.data);
         }
@@ -61,7 +60,6 @@ const PrimaryForm: React.FC<IProps> = (props) => {
           });
           formData.after = [data];
           props.onChanged?.apply(this, [form.id, formData]);
-          setData({ ...data });
         }
       }}
     />

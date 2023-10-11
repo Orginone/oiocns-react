@@ -1,42 +1,54 @@
 import { Dropdown, Card, Typography, MenuProps } from 'antd';
 
 import React from 'react';
-import cls from './less/icon.module.less';
-import { IFileInfo } from '@/ts/core';
-import { schema } from '@/ts/base';
+import css from './less/icon.module.less';
+import { IFile } from '@/ts/core';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 
 const IconMode = ({
+  focusFile,
   content,
   fileOpen,
   contextMenu,
+  selectFiles,
 }: {
-  content: IFileInfo<schema.XEntity>[];
-  fileOpen: (file: IFileInfo<schema.XEntity>) => Promise<void>;
-  contextMenu: (file?: IFileInfo<schema.XEntity>) => MenuProps;
+  focusFile: IFile | undefined;
+  content: IFile[];
+  selectFiles: IFile[];
+  fileOpen: (file: IFile | undefined, dblclick: boolean) => Promise<void>;
+  contextMenu: (file?: IFile) => MenuProps;
 }) => {
-  const FileCard = (item: IFileInfo<schema.XEntity>) => (
+  const getItemClassName = (item: IFile) => {
+    if (focusFile?.id === item.id || selectFiles.some((i) => i.id === item.id)) {
+      return css.list_item_select;
+    }
+    return css.list_item;
+  };
+  const FileCard = (item: IFile) => (
     <Dropdown key={item.id} menu={contextMenu(item)} trigger={['contextMenu']}>
       <Card
         size="small"
-        className={cls.fileCard}
+        className={getItemClassName(item)}
         bordered={false}
         key={item.key}
+        onClick={async () => {
+          await fileOpen(item, false);
+        }}
         onDoubleClick={async () => {
-          await fileOpen(item);
+          await fileOpen(item, true);
         }}
         onContextMenu={(e) => {
           e.stopPropagation();
         }}>
-        <div className={cls.fileImage}>
+        <div className={css.fileImage}>
           <EntityIcon entity={item.metadata} size={50} />
         </div>
-        <div className={cls.fileName} title={item.name}>
+        <div className={css.fileName} title={item.name}>
           <Typography.Text title={item.name} ellipsis>
             {item.name}
           </Typography.Text>
         </div>
-        <div className={cls.fileName} title={item.typeName}>
+        <div className={css.fileName} title={item.typeName}>
           <Typography.Text
             style={{ fontSize: 12, color: '#888' }}
             title={item.typeName}
@@ -50,7 +62,7 @@ const IconMode = ({
   return (
     <Dropdown menu={contextMenu()} trigger={['contextMenu']} destroyPopupOnHide>
       <div
-        className={cls.content}
+        className={css.content}
         onContextMenu={(e) => {
           e.stopPropagation();
         }}>

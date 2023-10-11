@@ -1,28 +1,26 @@
+import React from 'react';
 import {
   IApplication,
   IDirectory,
   IEntity,
-  IFileInfo,
+  IFile,
   IMemeber,
   ISession,
   IStorage,
   ISysFileInfo,
   ITarget,
-  IWork,
   TargetType,
 } from '@/ts/core';
 import orgCtrl from '@/ts/controller';
-import { command, model, schema } from '@/ts/base';
-import { Drawer, List, Modal, Progress, Tabs, Upload, message } from 'antd';
 import QrCode from 'qrcode.react';
-import React, { useEffect, useState } from 'react';
+import { command, model, schema } from '@/ts/base';
+import { List, Modal, Upload, message } from 'antd';
 import { uploadTemplate } from './tools/uploadTemplate';
 import TypeIcon from '@/components/Common/GlobalComps/typeIcon';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
-import { TaskModel } from '@/ts/base/model';
 import { shareOpenLink } from '@/utils/tools';
 /** 执行非页面命令 */
-export const executeCmd = (cmd: string, entity: any, args: any[], type: string) => {
+export const executeCmd = (cmd: string, entity: any) => {
   switch (cmd) {
     case 'qrcode':
       return entityQrCode(entity);
@@ -42,7 +40,11 @@ export const executeCmd = (cmd: string, entity: any, args: any[], type: string) 
     case 'parse':
       return copyBoard(entity);
     case 'delete':
-      return deleteEntity(entity);
+      return deleteEntity(entity, false);
+    case 'hardDelete':
+      return deleteEntity(entity, true);
+    case 'restore':
+      return restoreEntity(entity);
     case 'remove':
       return removeMember(entity);
     case 'newFile':
@@ -52,7 +54,7 @@ export const executeCmd = (cmd: string, entity: any, args: any[], type: string) 
         }
       });
     case 'open':
-      return openDirectory(entity, type);
+      return openDirectory(entity);
     case 'standard':
       return uploadTemplate(entity);
     case 'online':
@@ -79,13 +81,7 @@ const activateStorage = (store: IStorage) => {
 };
 
 /** 进入目录 */
-const openDirectory = (
-  entity: IEntity<schema.XEntity> | IFileInfo<schema.XEntity> | ITarget | IWork,
-  type: string,
-) => {
-  if (type === 'data' && 'node' in entity) {
-    return false;
-  }
+const openDirectory = (entity: IEntity<schema.XEntity> | IFile | ITarget) => {
   if ('identitys' in entity && entity.typeName != TargetType.Station) {
     if (entity.typeName === TargetType.Storage) {
       return false;
@@ -93,17 +89,15 @@ const openDirectory = (
     entity = entity.directory;
   }
   if ('isContainer' in entity && entity.isContainer) {
-    entity.loadContent().then(() => {
-      orgCtrl.currentKey = entity.key;
-      orgCtrl.changCallback();
-    });
+    orgCtrl.currentKey = entity.key;
+    orgCtrl.changCallback();
     return;
   }
   return false;
 };
 
 /** 拷贝/剪切文件 */
-const setCopyFiles = (cmd: string, file: IFileInfo<schema.XEntity>) => {
+const setCopyFiles = (cmd: string, file: IFile) => {
   const key = cmd + '_' + file.id;
   for (const k of orgCtrl.user.copyFiles.keys()) {
     if (k.endsWith(file.id)) {
@@ -111,7 +105,7 @@ const setCopyFiles = (cmd: string, file: IFileInfo<schema.XEntity>) => {
     }
   }
   orgCtrl.user.copyFiles.set(key, file);
-  message.info(`${file.name}已放入剪切板`);
+  message.info(`${file.name}已放入剪切板`, 0.5);
 };
 
 /** 剪贴板操作 */
@@ -193,26 +187,34 @@ const openChat = (entity: IDirectory | IMemeber | ISession | ITarget) => {
   } else {
     orgCtrl.currentKey = entity.chatdata.fullId;
   }
-  command.emitter('_', 'link', '/chat');
+  command.emitter('executor', 'link', '/chat');
+};
+
+/** 恢复实体 */
+const restoreEntity = (entity: IFile) => {
+  entity.restore().then((success: boolean) => {
+    if (success) {
+      orgCtrl.changCallback();
+    }
+  });
 };
 
 /** 删除实体 */
-const deleteEntity = (entity: IFileInfo<schema.XEntity>) => {
+const deleteEntity = (entity: IFile, hardDelete: boolean) => {
   Modal.confirm({
     okText: '确认',
     cancelText: '取消',
     title: '删除询问框',
     content: (
       <div style={{ fontSize: 16 }}>
-        确认要删除{entity.typeName}[{entity.name}]吗?
+        确认要{hardDelete ? '彻底' : ''}删除{entity.typeName}[{entity.name}]吗?
       </div>
     ),
-    onOk: () => {
-      entity.delete().then((success: boolean) => {
-        if (success) {
-          orgCtrl.changCallback();
-        }
-      });
+    onOk: async () => {
+      const success = await (hardDelete ? entity.hardDelete() : entity.delete());
+      if (success) {
+        orgCtrl.changCallback();
+      }
     },
   });
 };
@@ -296,10 +298,7 @@ const onlineChanged = (cmd: string, info: model.OnlineInfo) => {
 };
 
 /** 文件上传 */
-const uploadFile = (
-  dir: IDirectory,
-  uploaded?: (file: IFileInfo<schema.XEntity> | undefined) => void,
-) => {
+const uploadFile = (dir: IDirectory, uploaded?: (file: IFile | undefined) => void) => {
   const modal = Modal.info({
     icon: <></>,
     okText: '关闭',
@@ -315,7 +314,7 @@ const uploadFile = (
         style={{ width: 550, height: 300 }}
         customRequest={async (options) => {
           modal.destroy();
-          command.emitter('-', 'taskList', dir);
+          command.emitter('executor', 'taskList', dir);
           const file = options.file as File;
           if (file) {
             uploaded?.apply(this, [await dir.createFile(file)]);
@@ -325,79 +324,4 @@ const uploadFile = (
       </Upload>
     ),
   });
-};
-
-/** 文件上传列表 */
-export const FileTaskList = ({ directory }: { directory: IDirectory }) => {
-  const [taskList, setTaskList] = useState(directory.taskList);
-  useEffect(() => {
-    const id = directory.taskEmitter.subscribe(() => {
-      setTaskList([...directory.taskList]);
-    });
-    return () => {
-      directory.unsubscribe(id);
-    };
-  }, []);
-  const getProcess = (f: number, s: number) => {
-    s = s == 0 ? 1 : s;
-    return parseInt(((f * 10000.0) / s).toFixed(0)) / 100;
-  };
-  const loadTasks = (tlst: TaskModel[]) => {
-    return (
-      <List
-        itemLayout="horizontal"
-        dataSource={tlst}
-        renderItem={(item) => {
-          return (
-            <List.Item
-              style={{ cursor: 'pointer', padding: 6 }}
-              actions={[
-                <div key={item.name} style={{ width: 60 }}>
-                  {getProcess(item.finished, item.size)}%
-                </div>,
-              ]}>
-              <List.Item.Meta
-                avatar={<TypeIcon iconType={'文件'} size={50} />}
-                title={<strong>{item.name}</strong>}
-                description={
-                  <Progress
-                    status={item.finished === -1 ? 'exception' : 'success'}
-                    percent={getProcess(item.finished, item.size)}
-                  />
-                }
-              />
-            </List.Item>
-          );
-        }}
-      />
-    );
-  };
-  return (
-    <Drawer
-      title="操作记录"
-      open
-      width={500}
-      placement="right"
-      onClose={() => command.emitter('-', '-')}>
-      <Tabs
-        centered
-        items={[
-          {
-            key: 'uploading',
-            label: '上传中',
-            children: loadTasks(
-              taskList.filter((i) => i.finished >= 0 && i.finished < i.size),
-            ),
-          },
-          {
-            key: 'uploaded',
-            label: '已完成',
-            children: loadTasks(
-              taskList.filter((i) => i.finished < 0 || i.finished >= i.size),
-            ),
-          },
-        ]}
-      />
-    </Drawer>
-  );
 };

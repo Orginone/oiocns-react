@@ -8,6 +8,7 @@ import { model, schema } from '@/ts/base';
 import { ImInfo } from '@/icons/im';
 import { RuleTriggers } from '@/ts/core/public';
 import { WorkFormRulesType } from '@/ts/core/work/rules/workFormRules';
+import { generateUuid } from '@/ts/base/common';
 type IProps = {
   form: schema.XForm;
   fields: model.FieldModel[];
@@ -113,15 +114,13 @@ const OioForm: React.FC<IProps> = ({
           column={colNum}
           labelStyle={{ minWidth: '200px', textAlign: 'right' }}>
           {fields.map((field) => {
-            //增加对必填，隐藏的展示响应
-
             const { required = false, hidden = false } = JSON.parse(field.rule ?? '{}');
             if (hidden === true || hidden === 'true') {
               return <></>;
             }
             return (
               <Descriptions.Item
-                key={field.id}
+                key={generateUuid()}
                 span={1}
                 style={{ padding: '2px 10px' }}
                 label={

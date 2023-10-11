@@ -5,5 +5,11 @@ import { RiRepeatOneFill } from '@react-icons/all-files/ri/RiRepeatOneFill';
 import { RiShareForwardFill } from '@react-icons/all-files/ri/RiShareForwardFill';
 import { RiShareForwardLine } from '@react-icons/all-files/ri/RiShareForwardLine';
 
-
-export { RiMore2Fill, RiMoreFill, RiRepeatOneFill, RiRepeatOneLine, RiShareForwardFill, RiShareForwardLine };
+export {
+  RiMore2Fill,
+  RiMoreFill,
+  RiRepeatOneFill,
+  RiRepeatOneLine,
+  RiShareForwardFill,
+  RiShareForwardLine,
+};

@@ -1,24 +1,38 @@
 import TypeIcon from '@/components/Common/GlobalComps/typeIcon';
-import { command, schema } from '@/ts/base';
-import { IFileInfo } from '@/ts/core';
+import { command } from '@/ts/base';
+import { OperateModel } from '@/ts/base/model';
+import { IFile } from '@/ts/core';
+import { entityOperates } from '@/ts/core/public';
 import React from 'react';
 import { OperateMenuType } from 'typings/globelType';
 
 /** 加载文件菜单 */
-export const loadFileMenus = (file: IFileInfo<schema.XEntity>, mode: number = 0) => {
-  return file
-    .operates(mode)
+export const loadFileMenus = (file: IFile, mode: number = 0) => {
+  const operates: OperateModel[] = [];
+  if (file.groupTags.includes('已删除')) {
+    if (file.directory.target.hasRelationAuth()) {
+      operates.push(entityOperates.Restore, entityOperates.HardDelete);
+    }
+    operates.push(entityOperates.Remark);
+  } else {
+    operates.push(...file.operates(mode));
+  }
+  const parseLabel = (label: string) => {
+    if ('filedata' in file) {
+      return label.replaceAll('{0}', '文件');
+    }
+    return label.replaceAll('{0}', file.typeName);
+  };
+  return operates
     .sort((a, b) => a.sort - b.sort)
     .map((o) => {
       return {
         key: o.cmd,
-        label: o.label,
+        label: parseLabel(o.label),
+        model: o.model ?? 'inside',
         icon: o.menus ? <></> : <TypeIcon iconType={o.iconType} size={16} />,
         beforeLoad: async () => {
-          if (o.cmd === 'open') {
-            await file.loadContent();
-          }
-          command.emitter('config', o.cmd, file);
+          command.emitter('executor', o.cmd, file);
           return true;
         },
         children: o.menus
@@ -26,13 +40,10 @@ export const loadFileMenus = (file: IFileInfo<schema.XEntity>, mode: number = 0)
           .map((s) => {
             return {
               key: s.cmd,
-              label: s.label,
+              label: parseLabel(s.label),
               icon: <TypeIcon iconType={s.iconType} size={16} />,
               beforeLoad: async () => {
-                if (s.cmd === 'open') {
-                  await file.loadContent();
-                }
-                command.emitter('config', s.cmd, file);
+                command.emitter('executor', s.cmd, file);
                 return true;
               },
             };

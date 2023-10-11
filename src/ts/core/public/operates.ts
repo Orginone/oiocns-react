@@ -1,10 +1,16 @@
 /** 实体的操作 */
 export const entityOperates = {
   Open: {
-    sort: 10,
+    sort: 3,
     cmd: 'open',
-    label: '打开',
+    label: '打开{0}',
     iconType: 'open',
+  },
+  Design: {
+    sort: 4,
+    cmd: 'design',
+    label: '设计{0}',
+    iconType: 'design',
   },
   Update: {
     sort: 11,
@@ -15,6 +21,18 @@ export const entityOperates = {
   Delete: {
     sort: 24,
     cmd: 'delete',
+    label: '标记删除',
+    iconType: 'delete',
+  },
+  Restore: {
+    sort: 25,
+    cmd: 'restore',
+    label: '放回原处',
+    iconType: 'restore',
+  },
+  HardDelete: {
+    sort: 26,
+    cmd: 'hardDelete',
     label: '彻底删除',
     iconType: 'delete',
   },
@@ -71,6 +89,7 @@ export const directoryOperates = {
     sort: 4,
     cmd: 'refresh',
     label: '刷新目录',
+    model: 'outside',
     iconType: 'refresh',
   },
   OpenFolderWithEditor: {
@@ -83,12 +102,14 @@ export const directoryOperates = {
     sort: 5,
     cmd: 'newFile',
     label: '上传文件',
+    model: 'outside',
     iconType: 'newFile',
   },
   TaskList: {
     sort: 6,
     cmd: 'taskList',
     label: '上传列表',
+    model: 'outside',
     iconType: 'taskList',
   },
   NewDir: {

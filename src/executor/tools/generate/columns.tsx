@@ -1,5 +1,5 @@
 import React from 'react';
-import { model, parseAvatar } from '../../../ts/base';
+import { model, parseAvatar, schema } from '../../../ts/base';
 import { Column, IColumnProps } from 'devextreme-react/data-grid';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import { formatSize, generateUuid } from '@/ts/base/common';
@@ -8,7 +8,7 @@ import { formatDate } from '@/utils';
 /** 使用form生成表单列 */
 export const GenerateColumn = (
   field: model.FieldModel,
-  beforeSource: model.AnyThingModel[] | undefined,
+  beforeSource: schema.XThing[] | undefined,
   hideColumns: string[] | undefined,
   dataIndex: 'attribute' | 'property' | undefined,
 ) => {
@@ -63,7 +63,7 @@ export const GenerateColumn = (
       props.dataType = 'number';
       props.width = 150;
       props.allowHeaderFiltering = false;
-      props.fixed = field.id === 'Id';
+      props.fixed = field.id === 'id';
       break;
     case '用户型':
       props.dataType = 'string';
@@ -96,8 +96,8 @@ export const GenerateColumn = (
   if (beforeSource && beforeSource.length > 0) {
     props.cellRender = (data: any) => {
       const text = cellRender.render ? cellRender.render(data) : data.text;
-      if (data?.data?.Id && data?.column?.dataField) {
-        const before = beforeSource.find((i) => i.Id === data.data.Id);
+      if (data?.data?.id && data?.column?.dataField) {
+        const before = beforeSource.find((i) => i.id === data.data.id);
         if (before) {
           const beforeValue = before[data.column.dataField];
           if (beforeValue != data.value) {

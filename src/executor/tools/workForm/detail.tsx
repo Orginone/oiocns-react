@@ -14,7 +14,7 @@ interface IProps {
   forms: schema.XForm[];
   data: model.InstanceDataModel;
   ruleService?: WorkFormRulesType;
-  getFormData: (id: string) => model.FormEditData;
+  getFormData: (form: schema.XForm) => model.FormEditData;
   onChanged?: (id: string, data: model.FormEditData) => void;
 }
 
@@ -23,7 +23,7 @@ const DetailTable: React.FC<IProps> = (props) => {
   const form = props.forms[0];
   if (!props.data.fields[form.id]) return <></>;
   const fields = props.data.fields[form.id];
-  const [formData, setFormData] = useState(props.getFormData(form.id));
+  const [formData, setFormData] = useState(props.getFormData(form));
   const [selectKeys, setSelectKeys] = useState<string[]>([]);
   useEffect(() => {
     props.onChanged?.apply(this, [form.id, formData]);
@@ -89,7 +89,7 @@ const DetailTable: React.FC<IProps> = (props) => {
                   create: false,
                   onSave: (values) => {
                     formData.after = formData.after.map((item) => {
-                      if (selectKeys.includes(item.Id)) {
+                      if (selectKeys.includes(item.id)) {
                         Object.keys(values).forEach((k) => {
                           item[k] = values[k];
                         });
@@ -118,10 +118,10 @@ const DetailTable: React.FC<IProps> = (props) => {
                   belong: props.belong,
                   onSave: (values) => {
                     values.forEach((item) => {
-                      if (formData.after.every((i) => i.Id !== item.Id)) {
+                      if (formData.after.every((i) => i.id !== item.id)) {
                         formData.after.unshift(item);
                       }
-                      if (formData.before.every((i) => i.Id !== item.Id)) {
+                      if (formData.before.every((i) => i.id !== item.id)) {
                         formData.before.unshift({ ...item });
                       }
                     });
@@ -141,9 +141,9 @@ const DetailTable: React.FC<IProps> = (props) => {
               icon: 'remove',
               onClick: () => {
                 formData.before = formData.before.filter(
-                  (i) => !selectKeys.includes(i.Id),
+                  (i) => !selectKeys.includes(i.id),
                 );
-                formData.after = formData.after.filter((i) => !selectKeys.includes(i.Id));
+                formData.after = formData.after.filter((i) => !selectKeys.includes(i.id));
                 setSelectKeys([]);
                 setFormData({ ...formData });
               },
@@ -162,7 +162,14 @@ const DetailTable: React.FC<IProps> = (props) => {
       }}
       dataSource={formData.after}
       beforeSource={formData.before}
-      hideColumns={['Creater', 'CreateTime', 'ModifiedTime']}
+      hideColumns={[
+        'createTime',
+        'createUser',
+        'createUser',
+        'updateTime',
+        'chainId',
+        'code',
+      ]}
     />
   );
 };

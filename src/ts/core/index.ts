@@ -1,4 +1,5 @@
 export type { IActivity, IActivityMessage } from './chat/activity';
+export { GroupActivity } from './chat/activity';
 export type { IMessage, IMessageLabel } from './chat/message';
 export type { ISession } from './chat/session';
 export type { IEntity } from './public';
@@ -25,7 +26,7 @@ export type { IStorage } from './target/outTeam/storage';
 export type { IPerson } from './target/person';
 export type { ICompany } from './target/team/company';
 export type { IDirectory } from './thing/directory';
-export type { IFileInfo, ISysFileInfo } from './thing/fileinfo';
+export type { IFile, IFileInfo, ISysFileInfo } from './thing/fileinfo';
 export type { IMemeber } from './thing/member';
 export type { IApplication } from './thing/standard/application';
 export type { IForm } from './thing/standard/form';

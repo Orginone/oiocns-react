@@ -3,39 +3,27 @@ import React, { useState } from 'react';
 import cls from './index.module.less';
 import { EllipsisOutlined, MinusCircleFilled, PlusCircleFilled } from '@ant-design/icons';
 import { NavigationItem } from '@/pages/Home';
-import BasicTitle from '@/pages/Home/components/BaseTitle';
+import BasicTitle from '../BaseTitle';
 import { Badge, Button, message, Space, Typography } from 'antd';
 
 const allPages: NavigationItem[] = [
   {
+    key: 'dashboard',
+    label: '工作台',
+    backgroundImageUrl: '/img/banner/1.png',
+    component: React.lazy(() => import('../Content/WorkBench')),
+  },
+  {
     key: 'activity',
     label: '群动态',
     backgroundImageUrl: '/img/banner/activity-bg.png',
-    component: React.lazy(() => import('@/pages/Home/components/Content/Activity')),
+    component: React.lazy(() => import('../Content/Activity/cohort')),
   },
   {
     key: 'circle',
     label: '好友圈',
     backgroundImageUrl: '/img/banner/circle-bg.jpeg',
-    component: React.lazy(() => import('@/pages/Home/components/Content/Circle')),
-  },
-  {
-    key: 'warehouse',
-    label: '公物仓',
-    backgroundImageUrl: '/img/banner/activity-bg.png',
-    component: React.lazy(() => import('@/pages/Home/components/Content/Warehouse')),
-  },
-  {
-    key: 'digital-asset',
-    label: '数据资产',
-    backgroundImageUrl: '/img/banner/digital-asset-bg.png',
-    component: React.lazy(() => import('@/pages/Home/components/Content/DigitalAsset')),
-  },
-  {
-    key: 'dashboard',
-    label: '工作台',
-    backgroundImageUrl: '/img/banner/digital-asset-bg.png',
-    component: React.lazy(() => import('@/pages/Home/components/Content/WorkBench')),
+    component: React.lazy(() => import('../Content/Activity/friends')),
   },
 ];
 const NavigationBar: React.FC<{

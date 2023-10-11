@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { ProFormSelect } from '@ant-design/pro-components';
-import orgCtrl from '@/ts/controller';
 import { Rule } from 'antd/lib/form';
 import { FormLabelAlign } from 'antd/lib/form/interface';
 import { LabelTooltipType } from 'antd/es/form/FormItemLabel';

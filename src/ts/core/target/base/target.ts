@@ -5,11 +5,11 @@ import { PageAll } from '../../public/consts';
 import { ITeam, Team } from './team';
 import { targetOperates } from '../../public';
 import { Directory, IDirectory } from '../../thing/directory';
-import { IFileInfo } from '../../thing/fileinfo';
+import { IFile, IFileInfo } from '../../thing/fileinfo';
 import { DataResource } from '../../thing/resource';
 import { ISession, Session } from '../../chat/session';
 import { IPerson } from '../person';
-import { logger } from '@/ts/base/common';
+import { logger, sleep } from '@/ts/base/common';
 import { IBelong } from './belong';
 
 /** 用户抽象接口类 */
@@ -110,8 +110,18 @@ export abstract class Target extends Team implements ITarget {
   get cachePath(): string {
     return `targets.${this.cache.fullId}`;
   }
+  get isInherited(): boolean {
+    return this.metadata.belongId !== this.spaceId;
+  }
   private _identityLoaded: boolean = false;
-
+  async restore(): Promise<boolean> {
+    await sleep(0);
+    return true;
+  }
+  async hardDelete(): Promise<boolean> {
+    await sleep(0);
+    return true;
+  }
   async loadUserData(keys: string[], _metadata: schema.XTarget): Promise<void> {
     kernel.subscribe(
       `${_metadata.belongId}-${_metadata.id}-identity`,
@@ -207,7 +217,7 @@ export abstract class Target extends Team implements ITarget {
   abstract get chats(): ISession[];
   abstract get targets(): ITarget[];
   abstract get subTarget(): ITarget[];
-  abstract content(_mode?: number | undefined): IFileInfo<schema.XEntity>[];
+  abstract content(_mode?: number | undefined): IFile[];
   createTarget(_data: model.TargetModel): Promise<ITeam | undefined> {
     return new Promise((resolve) => {
       resolve(undefined);

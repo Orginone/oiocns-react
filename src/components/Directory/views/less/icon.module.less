@@ -1,6 +1,6 @@
 @import '~antd/es/style/themes/variable';
 .pageCard {
-  height: 100%;
+  height: calc(100% - 35px);
   & > :global(.ogo-card-body) {
     height: calc(100% - 8px);
   }
@@ -10,15 +10,23 @@
     overflow: hidden;
   }
 }
-.fileCard {
+.list_item {
   width: 160px;
   max-width: 160px;
   min-width: 160px;
   cursor: pointer;
-  border-radius: 6px;
+  border-radius: 10px;
   &:hover {
     background-color: #efefef;
   }
+}
+.list_item_select {
+  width: 160px;
+  max-width: 160px;
+  min-width: 160px;
+  cursor: pointer;
+  border-radius: 10px;
+  background-color: @active-background !important;
 }
 .file {
   width: 100%;
@@ -37,6 +45,7 @@
   flex-wrap: wrap;
   align-content: flex-start;
   gap: 16px;
+  padding: 16px;
 }
 
 .fileImage {

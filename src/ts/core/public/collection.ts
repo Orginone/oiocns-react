@@ -1,3 +1,4 @@
+import { LoadResult } from '@/ts/base/model';
 import { kernel, schema } from '../../base';
 
 /** 集合工具类 */
@@ -29,9 +30,24 @@ export class XCollection<T extends schema.Xbase> {
     return `${this._target.belongId}-${id || this._target.id}-${this._collName}`;
   }
 
-  async all(reload: boolean = false): Promise<T[]> {
+  async all(reload: boolean = false, skip: number = 0): Promise<T[]> {
     if (!this._loaded || reload) {
-      this._cache = await this.load({});
+      if (skip === 0) {
+        this._cache = [];
+      }
+      const res = await this.loadResult({
+        skip: skip,
+        take: 100,
+        requireTotalCount: true,
+      });
+      if (res.success) {
+        if (res.data && res.data.length > 0) {
+          this._cache.push(...res.data);
+          if (this._cache.length < res.totalCount && res.data.length === 100) {
+            await this.all(true, this._cache.length);
+          }
+        }
+      }
       this._loaded = true;
     }
     return this._cache;
@@ -42,7 +58,7 @@ export class XCollection<T extends schema.Xbase> {
       return await this.loadSpace({
         options: {
           match: {
-            _id: {
+            id: {
               _in_: ids,
             },
           },
@@ -52,18 +68,21 @@ export class XCollection<T extends schema.Xbase> {
     return [];
   }
 
-  async loadSpace(options: any): Promise<T[]> {
+  async loadResult(options: any): Promise<LoadResult<T[]>> {
     options = options || {};
     options.userData = options.userData || [];
     options.collName = this._collName;
     options.options = options.options || {};
     options.options.match = options.options.match || {};
-    options.options.match.isDeleted = false;
-    const res = await kernel.collectionLoad<T[]>(
+    return await kernel.collectionLoad<T[]>(
       this._target.belongId,
       this._relations,
       options,
     );
+  }
+
+  async loadSpace(options: any): Promise<T[]> {
+    const res = await this.loadResult(options);
     if (res.success && res.data) {
       return res.data || [];
     }
@@ -193,7 +212,7 @@ export class XCollection<T extends schema.Xbase> {
       this._relations,
       this._collName,
       {
-        match: { _id: data.id },
+        match: { id: data.id },
         update: {
           _set_: {
             isDeleted: true,
@@ -216,7 +235,7 @@ export class XCollection<T extends schema.Xbase> {
       this._collName,
       {
         match: {
-          _id: {
+          id: {
             _in_: data.map((i) => i.id),
           },
         },
@@ -261,7 +280,7 @@ export class XCollection<T extends schema.Xbase> {
       this._relations,
       this._collName,
       {
-        _id: data.id,
+        id: data.id,
       },
       copyId,
     );
@@ -277,10 +296,24 @@ export class XCollection<T extends schema.Xbase> {
       this._relations,
       this._collName,
       {
-        _id: {
+        id: {
           _in_: data.map((i) => i.id),
         },
       },
+      copyId,
+    );
+    if (res.success) {
+      return res.data?.MatchedCount > 0;
+    }
+    return false;
+  }
+
+  async removeMatch(match: any, copyId?: string): Promise<boolean> {
+    const res = await kernel.collectionRemove(
+      this._target.belongId,
+      this._relations,
+      this._collName,
+      match,
       copyId,
     );
     if (res.success) {

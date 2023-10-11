@@ -1,6 +1,6 @@
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import orgCtrl from '@/ts/controller';
-import { IApplication, IDirectory, IGroup, ITarget } from '@/ts/core';
+import { IApplication, IDirectory, IGroup, ITarget, TargetType } from '@/ts/core';
 import React from 'react';
 import { MenuItemType } from 'typings/globelType';
 import { loadFileMenus } from '@/executor/fileOperate';
@@ -17,11 +17,6 @@ const createMenu = (team: ITarget, children: MenuItemType[]) => {
     tag: [team.typeName],
     icon: <EntityIcon notAvatar={true} entityId={team.id} size={18} />,
     children: children,
-    beforeLoad: async () => {
-      if ('directory' in team) {
-        await (team as ITarget).directory.loadContent();
-      }
-    },
   };
 };
 /** 编译组织集群树 */
@@ -36,26 +31,25 @@ const buildGroupTree = (groups: IGroup[]): MenuItemType[] => {
 
 /** 编译目录树 */
 const buildDirectoryTree = (directorys: IDirectory[]): MenuItemType[] => {
-  return directorys.map((directory) => {
-    return {
-      key: directory.key,
-      item: directory,
-      label: directory.name,
-      tag: [directory.typeName],
-      icon: (
-        <EntityIcon entityId={directory.id} typeName={directory.typeName} size={18} />
-      ),
-      itemType: directory.typeName,
-      menus: loadFileMenus(directory, 1),
-      children: [
-        ...buildDirectoryTree(directory.children),
-        ...buildApplicationTree(directory.applications),
-      ],
-      beforeLoad: async () => {
-        await directory.loadContent();
-      },
-    };
-  });
+  return directorys
+    .filter((i) => !i.groupTags.includes('已删除'))
+    .map((directory) => {
+      return {
+        key: directory.key,
+        item: directory,
+        label: directory.name,
+        tag: [directory.typeName],
+        icon: (
+          <EntityIcon entityId={directory.id} typeName={directory.typeName} size={18} />
+        ),
+        itemType: directory.typeName,
+        menus: loadFileMenus(directory, 1),
+        children: [
+          ...buildDirectoryTree(directory.children),
+          ...buildApplicationTree(directory.applications),
+        ],
+      };
+    });
 };
 
 /** 编译目录树 */
@@ -72,9 +66,6 @@ const buildApplicationTree = (applications: IApplication[]): MenuItemType[] => {
       itemType: application.typeName,
       menus: loadFileMenus(application),
       children: buildApplicationTree(application.children),
-      beforeLoad: async () => {
-        await application.loadContent();
-      },
     };
   });
 };
@@ -96,6 +87,7 @@ const getTeamMenu = () => {
       createMenu(company, [
         ...buildDirectoryTree(company.directory.children),
         ...company.targets
+          .filter((i) => i.typeName !== TargetType.Group)
           .filter((i) => i.session.isMyChat && i.id != company.id)
           .map((i) => createMenu(i, buildDirectoryTree(i.directory.children))),
         ...buildGroupTree(company.groups),

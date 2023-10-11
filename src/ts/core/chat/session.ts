@@ -67,7 +67,7 @@ export class Session extends Entity<schema.XEntity> implements ISession {
   messages: IMessage[] = [];
   private messageNotify?: (messages: IMessage[]) => void;
   constructor(id: string, target: ITarget, _metadata: schema.XTarget, tags?: string[]) {
-    super(_metadata);
+    super(_metadata, []);
     this.sessionId = id;
     this.target = target;
     if (tags === undefined) {
@@ -105,12 +105,13 @@ export class Session extends Entity<schema.XEntity> implements ISession {
   }
   get sessionMatch(): any {
     return this.isGroup
-      ? { toId: this.sessionId }
+      ? { toId: this.sessionId, isDeleted: false }
       : {
           _or_: [
             { fromId: this.sessionId, toId: this.userId },
             { fromId: this.userId, toId: this.sessionId },
           ],
+          isDeleted: false,
         };
   }
   get isBelongPerson(): boolean {
@@ -151,7 +152,29 @@ export class Session extends Entity<schema.XEntity> implements ISession {
   get canDeleteMessage(): boolean {
     return this.target.id === this.userId || this.target.hasRelationAuth();
   }
-
+  get groupTags(): string[] {
+    const gtags: string[] = [];
+    if (this.target.space.id !== this.userId) {
+      gtags.push(this.target.space.name);
+    } else {
+      gtags.push('我的');
+    }
+    if (this.isGroup) {
+      gtags.push('群聊');
+    } else if (!this.chatdata.labels.includes('同事')) {
+      gtags.push('单聊');
+    }
+    if (this.chatdata.noReadCount > 0) {
+      gtags.push('未读');
+    }
+    if (this.chatdata.mentionMe) {
+      gtags.push('@我');
+    }
+    if (this.chatdata.isToping) {
+      gtags.push('置顶');
+    }
+    return gtags;
+  }
   async moreMessage(): Promise<number> {
     const data = await this.coll.loadSpace({
       take: 30,
@@ -343,14 +366,14 @@ export class Session extends Entity<schema.XEntity> implements ISession {
       this.coll.subscribe(
         [this.key],
         (res: { operate: string; data: model.ChatMessageType[] }) => {
-          res.data.map((item) => this.receiveMessage(res.operate, item));
+          res?.data?.map((item) => this.receiveMessage(res.operate, item));
         },
       );
     } else {
       this.coll.subscribe(
         [this.key],
         (res: { operate: string; data: model.ChatMessageType[] }) => {
-          res.data.forEach((item) => {
+          res?.data?.forEach((item) => {
             if (
               [item.fromId, item.toId].includes(this.sessionId) &&
               [item.fromId, item.toId].includes(this.userId)

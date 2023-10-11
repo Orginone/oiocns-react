@@ -1,5 +1,5 @@
 import { generateUuid } from './uuid';
-export type cmdType = (type: string, cmd: string, ...args: any) => any;
+export type cmdType = (type: string, cmd: string, ...args: any[]) => any;
 /** 日志 */
 export class Command {
   private callbacks: { [id: string]: cmdType };
@@ -41,7 +41,7 @@ export class Command {
    * @param cmd 命令
    * @param args 参数
    */
-  public emitter(type: string, cmd: string, ...args: any): void {
+  public emitter(type: string, cmd: string, ...args: any[]): void {
     Object.keys(this.callbacks).forEach((key) => {
       this.callbacks[key].apply(this, [type, cmd, ...args]);
     });
@@ -77,7 +77,7 @@ export class Command {
    * @param cmd 命令
    * @param args 参数
    */
-  public emitterFlag(flag: string = '', ...args: any): void {
+  public emitterFlag(flag: string = '', ...args: any[]): void {
     Object.keys(this.flagCallbacks).forEach((id) => {
       if (flag === '' || id.endsWith(`-${flag}`)) {
         this.flagCallbacks[id].apply(this, [...args]);

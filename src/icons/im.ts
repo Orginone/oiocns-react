@@ -5,6 +5,7 @@ import { ImBooks } from '@react-icons/all-files/im/ImBooks';
 import { ImFileExcel } from '@react-icons/all-files/im/ImFileExcel';
 import { ImBook } from '@react-icons/all-files/im/ImBook';
 import { ImTree } from '@react-icons/all-files/im/ImTree';
+import { ImHeart } from '@react-icons/all-files/im/ImHeart';
 import { ImPriceTags } from '@react-icons/all-files/im/ImPriceTags';
 import { ImJoomla } from '@react-icons/all-files/im/ImJoomla';
 import { ImDropbox } from '@react-icons/all-files/im/ImDropbox';
@@ -60,6 +61,8 @@ import { ImSpinner4 } from '@react-icons/all-files/im/ImSpinner4';
 import { ImCompass } from '@react-icons/all-files/im/ImCompass';
 import { ImPowerCord } from '@react-icons/all-files/im/ImPowerCord';
 import { ImDrive } from '@react-icons/all-files/im/ImDrive';
+import { ImSafari } from '@react-icons/all-files/im/ImSafari';
+import { ImEqualizer } from '@react-icons/all-files/im/ImEqualizer';
 
 export {
   ImAddressBook,
@@ -80,12 +83,14 @@ export {
   ImDrive,
   ImDropbox,
   ImEnter,
+  ImEqualizer,
   ImFileExcel,
   ImFilesEmpty,
   ImFilter,
   ImFlickr4,
   ImFolder,
   ImFolderPlus,
+  ImHeart,
   ImInfo,
   ImInsertTemplate,
   ImJoomla,
@@ -102,6 +107,7 @@ export {
   ImPriceTags,
   ImProfile,
   ImQrcode,
+  ImSafari,
   ImSearch,
   ImShield,
   ImShuffle,

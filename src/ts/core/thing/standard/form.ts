@@ -10,10 +10,7 @@ export interface IForm extends IStandardFileInfo<schema.XForm> {
   /** 表单字段 */
   fields: model.FieldModel[];
   /** 新建表单特性 */
-  createAttribute(
-    data: model.AttributeModel,
-    property?: schema.XProperty,
-  ): Promise<schema.XAttribute | undefined>;
+  createAttribute(propertys: schema.XProperty[]): Promise<schema.XAttribute[]>;
   /** 更新表单特性 */
   updateAttribute(
     data: model.AttributeModel,
@@ -28,16 +25,28 @@ export class Form extends StandardFileInfo<schema.XForm> implements IForm {
     super(_metadata, _directory, _directory.resource.formColl);
     this.setEntity();
   }
+  canDesign: boolean = true;
   private _fieldsLoaded: boolean = false;
   fields: model.FieldModel[] = [];
   get attributes(): schema.XAttribute[] {
-    return this.metadata.attributes || [];
+    const attrs: schema.XAttribute[] = [];
+    const prodIds: string[] = [];
+    for (const item of this.metadata.attributes || []) {
+      if (item.propId && item.propId.length > 0 && !prodIds.includes(item.propId)) {
+        attrs.push(item);
+        prodIds.push(item.propId);
+      }
+    }
+    return attrs;
   }
   get id(): string {
     return this._metadata.id.replace('_', '');
   }
   get cacheFlag(): string {
     return 'forms';
+  }
+  get groupTags(): string[] {
+    return ['表单', ...super.groupTags];
   }
   async loadContent(reload: boolean = false): Promise<boolean> {
     await this.loadFields(reload);
@@ -46,61 +55,61 @@ export class Form extends StandardFileInfo<schema.XForm> implements IForm {
   async loadFields(reload: boolean = false): Promise<model.FieldModel[]> {
     if (!this._fieldsLoaded || reload) {
       this.fields = [];
-      await Promise.all(
-        this.attributes.map(async (attr) => {
-          if (attr.property) {
-            const field: model.FieldModel = {
-              id: attr.id,
-              rule: attr.rule,
-              name: attr.name,
-              code: 'T' + attr.property.id,
-              remark: attr.remark,
-              lookups: [],
-              valueType: attr.property.valueType,
-            };
-            if (attr.property.speciesId && attr.property.speciesId.length > 0) {
-              const data = await this.directory.resource.speciesItemColl.loadSpace({
-                options: { match: { speciesId: attr.property.speciesId } },
+      const speciesIds = this.attributes
+        .map((i) => i.property?.speciesId)
+        .filter((i) => i && i.length > 0);
+      const data = await this.directory.resource.speciesItemColl.loadSpace({
+        options: { match: { speciesId: { _in_: speciesIds } } },
+      });
+      this.attributes.forEach(async (attr) => {
+        if (attr.property) {
+          const field: model.FieldModel = {
+            id: attr.id,
+            rule: attr.rule,
+            name: attr.name,
+            code: 'T' + attr.property.id,
+            remark: attr.remark,
+            lookups: [],
+            valueType: attr.property.valueType,
+          };
+          if (attr.property.speciesId && attr.property.speciesId.length > 0) {
+            field.lookups = data
+              .filter((i) => i.speciesId === attr.property!.speciesId)
+              .map((i) => {
+                return {
+                  id: i.id,
+                  text: i.name,
+                  value: i.code || `S${i.id}`,
+                  icon: i.icon,
+                  parentId: i.parentId,
+                };
               });
-              if (data.length > 0) {
-                field.lookups = data.map((i) => {
-                  return {
-                    id: i.id,
-                    text: i.name,
-                    value: i.code,
-                    icon: i.icon,
-                    parentId: i.parentId,
-                  };
-                });
-              }
-            }
-            this.fields.push(field);
           }
-        }),
-      );
+          this.fields.push(field);
+        }
+      });
       this._fieldsLoaded = true;
     }
     return this.fields;
   }
-  async createAttribute(
-    data: schema.XAttribute,
-    property?: schema.XProperty,
-  ): Promise<schema.XAttribute | undefined> {
-    if (property) {
-      data.property = property;
-      data.propId = property.id;
-    }
-    if (!data.authId || data.authId.length < 5) {
-      data.authId = orgAuth.SuperAuthId;
-    }
-    data.id = 'snowId()';
-    const res = await this.update({
-      ...this.metadata,
-      attributes: [...(this.metadata.attributes || []), data],
+  async createAttribute(propertys: schema.XProperty[]): Promise<schema.XAttribute[]> {
+    const data = propertys.map((prop) => {
+      return {
+        id: 'snowId()',
+        propId: prop.id,
+        name: prop.name,
+        code: prop.code,
+        rule: '{}',
+        remark: prop.remark,
+        property: prop,
+        authId: orgAuth.SuperAuthId,
+      } as schema.XAttribute;
     });
-    if (res) {
-      return data;
-    }
+    await this.update({
+      ...this.metadata,
+      attributes: [...(this.metadata.attributes || []), ...data],
+    });
+    return data;
   }
   async updateAttribute(
     data: schema.XAttribute,

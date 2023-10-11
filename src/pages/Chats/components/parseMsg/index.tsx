@@ -27,9 +27,26 @@ export const parseMsg = (item: IMessage): any => {
             <div
               className={`${css.con_content_txt}`}
               onClick={() => {
-                command.emitter('data', 'open', img);
+                command.emitter('executor', 'open', img);
               }}>
               <Image width={300} src={shareOpenLink(img.shareLink)} preview={false} />
+            </div>
+          </>
+        );
+      }
+      return <div className={`${css.con_content_txt}`}>消息异常</div>;
+    }
+    case MessageType.Video: {
+      const img: FileItemShare = parseAvatar(item.msgBody);
+      if (img && img.shareLink) {
+        return (
+          <>
+            <div
+              className={`${css.con_content_txt}`}
+              onClick={() => {
+                command.emitter('executor', 'open', img);
+              }}>
+              <Image width={300} src={img.thumbnail} preview={false} />
             </div>
           </>
         );
@@ -50,7 +67,7 @@ export const parseMsg = (item: IMessage): any => {
           <div
             className={`${css.con_content_txt}`}
             onClick={() => {
-              command.emitter('data', 'open', file);
+              command.emitter('executor', 'open', file);
             }}>
             <div>{file.name}</div>
             <div>{formatSize(file.size)}</div>
@@ -229,7 +246,7 @@ export const parseForwardMsg = (
         // 默认只展示3条记录
         if (idx > 2) return;
         if (!msg.msgBody && msg.forward?.length) {
-          msg = msg.forward[0]
+          msg = msg.forward[0];
         }
         switch (msg.msgType) {
           case MessageType.Image: {

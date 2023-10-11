@@ -234,102 +234,82 @@ export const WorkColumns: ProColumns<IWorkTask>[] = [
   },
 ];
 
-/** 物的默认列信息 */
-export const AnyThingColumns: model.FieldModel[] = [
-  {
-    id: 'Id',
-    code: 'Id',
-    name: '唯一标识',
-    valueType: '描述型',
-    remark: '由系统生成的唯一标记,无实义.',
-  },
-  {
-    id: 'Name',
-    code: 'Name',
-    name: '名称',
-    valueType: '描述型',
-    remark: '描述信息',
-  },
-  {
-    id: 'Creater',
-    code: 'Creater',
-    name: '创建人',
-    valueType: '用户型',
-    remark: '创建标识的人',
-  },
-  {
-    id: 'Status',
-    code: 'Status',
-    name: '状态',
-    valueType: '选择型',
-    remark: '数据状态',
-    lookups: [
-      {
-        id: 'normal',
-        text: '正常',
-        value: '正常',
-      },
-      {
-        id: 'dead',
-        text: '已销毁',
-        value: '已销毁',
-      },
-    ],
-  },
-  {
-    id: 'CreateTime',
-    code: 'CreateTime',
-    name: '创建时间',
-    valueType: '时间型',
-    remark: '创建标识的时间',
-  },
-  {
-    id: 'ModifiedTime',
-    code: 'ModifiedTime',
-    name: '修改时间',
-    valueType: '时间型',
-    remark: '最新修改时间',
-  },
-];
+/** 补齐物的列 */
+export const FullThingColumns = (fields: model.FieldModel[]) => {
+  return FullEntityColumns([
+    {
+      id: 'chainId',
+      code: 'chainId',
+      name: '标识',
+      valueType: '描述型',
+      remark: '链标识',
+    },
+    ...fields,
+  ]);
+};
 
-/** 实体默认列信息 */
-export const EntityColumns: model.FieldModel[] = [
-  {
-    id: 'id',
-    code: 'id',
-    name: '唯一标识',
-    valueType: '描述型',
-    remark: '由系统生成的唯一标记,无实义.',
-  },
-  {
-    id: 'name',
-    code: 'name',
-    name: '名称',
-    valueType: '描述型',
-    remark: '描述信息',
-  },
-  {
-    id: 'code',
-    code: 'code',
-    name: '代码',
-    valueType: '描述型',
-    remark: '标识代码',
-  },
-  {
-    id: 'createTime',
-    code: 'createTime',
-    name: '创建时间',
-    valueType: '时间型',
-    remark: '创建标识的时间',
-  },
-  {
-    id: 'updateTime',
-    code: 'updateTime',
-    name: '修改时间',
-    valueType: '时间型',
-    remark: '最新修改时间',
-  },
-];
+/** 补齐实体的列 */
+export const FullEntityColumns = (fields: model.FieldModel[]) => {
+  return [
+    {
+      id: 'id',
+      code: 'id',
+      name: '唯一标识',
+      valueType: '描述型',
+      remark: '由系统生成的唯一标记,无实义.',
+    },
+    {
+      id: 'name',
+      code: 'name',
+      name: '名称',
+      valueType: '描述型',
+      remark: '描述信息',
+    },
+    {
+      id: 'code',
+      code: 'code',
+      name: '代码',
+      valueType: '描述型',
+      remark: '标识代码',
+    },
+    ...fields,
+    {
+      id: 'belongId',
+      code: 'belongId',
+      name: '归属',
+      valueType: '用户型',
+      remark: '归属用户',
+    },
+    {
+      id: 'createUser',
+      code: 'createUser',
+      name: '创建人',
+      valueType: '用户型',
+      remark: '创建标识的人',
+    },
+    {
+      id: 'updateUser',
+      code: 'updateUser',
+      name: '变更人',
+      valueType: '用户型',
+      remark: '变更数据的人',
+    },
+    {
+      id: 'createTime',
+      code: 'createTime',
+      name: '创建时间',
+      valueType: '时间型',
+      remark: '创建标识的时间',
+    },
+    {
+      id: 'updateTime',
+      code: 'updateTime',
+      name: '修改时间',
+      valueType: '时间型',
+      remark: '最新修改时间',
+    },
+  ];
+};
 
 /** 办事列 */
 export const WorkTaskColumns: model.FieldModel[] = [

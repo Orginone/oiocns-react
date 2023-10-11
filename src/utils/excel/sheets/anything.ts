@@ -1,7 +1,7 @@
 import * as i from '../impl';
 import * as t from '../type';
 
-export class AnySheet extends i.Sheet<t.model.AnyThingModel> {
+export class AnySheet extends i.Sheet<t.schema.XThing> {
   constructor(name: string, columns: t.model.Column[], dir: t.IDirectory) {
     super(name, columns, dir);
   }

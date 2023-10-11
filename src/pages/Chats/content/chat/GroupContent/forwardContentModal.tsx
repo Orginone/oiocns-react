@@ -4,7 +4,11 @@ import moment from 'moment';
 import { showChatTime } from '@/utils/tools';
 
 import { IMessage, MessageType } from '@/ts/core';
-import { parseCiteMsg, parseMsg, parseForwardMsg } from '@/pages/Chats/components/parseMsg';
+import {
+  parseCiteMsg,
+  parseMsg,
+  parseForwardMsg,
+} from '@/pages/Chats/components/parseMsg';
 import TeamIcon from '@/components/Common/GlobalComps/entityIcon';
 import css from './index.module.less';
 interface IForwardContentModalProps {
@@ -13,7 +17,7 @@ interface IForwardContentModalProps {
   title: string;
   isBelongPerson?: boolean;
   handleClose: () => void;
-  viewForward?: (item: IMessage[]) => void
+  viewForward?: (item: IMessage[]) => void;
 }
 
 const ForwardContentModal: FC<IForwardContentModalProps> = (props) => {

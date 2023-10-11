@@ -34,6 +34,8 @@ export interface IEntity<T> extends Emitter {
   updater: model.ShareIcon;
   /** 归属 */
   belong: model.ShareIcon;
+  /** 分组标签 */
+  groupTags: string[];
   /** 查找元数据 */
   findMetadata<U>(id: string): U | undefined;
   /** 更新元数据 */
@@ -50,14 +52,16 @@ export abstract class Entity<T extends schema.XEntity>
   extends Emitter
   implements IEntity<T>
 {
-  constructor(_metadata: T) {
+  constructor(_metadata: T, gtags: string[]) {
     super();
+    this._gtags = gtags;
     this.key = generateUuid();
     this._metadata = _metadata;
     ShareIdSet.set(_metadata.id, _metadata);
   }
   _metadata: T;
   key: string;
+  _gtags: string[];
   get id(): string {
     return this._metadata.id;
   }
@@ -97,10 +101,20 @@ export abstract class Entity<T extends schema.XEntity>
   get belong(): model.ShareIcon {
     return this.findShare(this.metadata.belongId);
   }
+  get groupTags(): string[] {
+    if (
+      ('isDeleted' in this._metadata && this._metadata.isDeleted === true) ||
+      ('isDeleted' in this.metadata && this.metadata.isDeleted === true)
+    ) {
+      return ['已删除'];
+    }
+    return this._gtags;
+  }
   setMetadata(_metadata: T): void {
     if (_metadata.id === this.id) {
       this._metadata = _metadata;
       ShareIdSet.set(this.id, _metadata);
+
       this.changCallback();
     }
   }
@@ -128,6 +142,6 @@ export abstract class Entity<T extends schema.XEntity>
     };
   }
   operates(mode?: number | undefined): model.OperateModel[] {
-    return [entityOperates.Remark, entityOperates.QrCode];
+    return [entityOperates.Open, entityOperates.Remark, entityOperates.QrCode];
   }
 }

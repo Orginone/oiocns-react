@@ -1,7 +1,7 @@
 import { generateUuid } from './uuid';
 
 export class Emitter {
-  private _refreshCallback: { [name: string]: (key: string, ...args: any) => void } = {};
+  private _refreshCallback: { [name: string]: (key: string, ...args: any[]) => void };
   private _partRefreshCallback: {
     [name: string]: { [p: string]: (key: string) => void };
   };
@@ -12,12 +12,18 @@ export class Emitter {
   /**
    * @desc 订阅变更
    * @param callback 变更回调
+   * @param target 订阅时是否触发，默认为true
    * @returns 订阅ID
    */
-  public subscribe(callback: (key: string, ...args: any) => void): string {
+  public subscribe(
+    callback: (key: string, ...args: any[]) => void,
+    target: boolean = true,
+  ): string {
     const id = generateUuid();
     if (callback) {
-      callback(id);
+      if (target === true) {
+        callback.apply(this, [id]);
+      }
       this._refreshCallback[id] = callback;
     }
     return id;
@@ -42,7 +48,7 @@ export class Emitter {
   /**
    * @desc 变更回调
    */
-  public changCallback(...args: any) {
+  public changCallback(...args: any[]) {
     Object.keys(this._refreshCallback).forEach((key) => {
       this._refreshCallback[key].apply(this, [generateUuid(), ...args]);
     });

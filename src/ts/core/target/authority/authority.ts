@@ -37,7 +37,7 @@ export interface IAuthority extends IEntity<schema.XAuthority> {
 /** 权限实现类 */
 export class Authority extends Entity<schema.XAuthority> implements IAuthority {
   constructor(_metadata: schema.XAuthority, _space: IBelong, _parent?: IAuthority) {
-    super(_metadata);
+    super({ ..._metadata, typeName: '权限' }, []);
     this.space = _space;
     this.parent = _parent;
     for (const node of _metadata.nodes || []) {

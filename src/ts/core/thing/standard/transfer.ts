@@ -74,7 +74,7 @@ export class Transfer extends StandardFileInfo<model.Transfer> implements ITrans
   taskList: ITask[];
   curTask?: ITask;
   getData?: GraphData;
-
+  canDesign: boolean = true;
   constructor(metadata: model.Transfer, dir: IDirectory) {
     super(metadata, dir, dir.resource.transferColl);
     this.taskList = [];
@@ -200,6 +200,7 @@ export class Transfer extends StandardFileInfo<model.Transfer> implements ITrans
             const editForm: model.FormEditData = {
               before: [],
               after: [],
+              formName: '资产卡片',
               nodeId: work.node.id,
               creator: apply.belong.userId,
               createTime: formatDate(new Date(), 'yyyy-MM-dd hh:mm:ss.S'),
@@ -208,7 +209,7 @@ export class Transfer extends StandardFileInfo<model.Transfer> implements ITrans
             for (const item of array) {
               const res = await kernel.createThing(belongId, [], '资产卡片');
               if (res.success) {
-                const one: model.AnyThingModel = { ...item, ...res.data };
+                const one: schema.XThing = { ...item, ...res.data };
                 editForm.after.push(one);
               }
             }
@@ -234,7 +235,7 @@ export class Transfer extends StandardFileInfo<model.Transfer> implements ITrans
       });
       for (let item of array) {
         let oldItem: { [key: string]: any } = {};
-        let newItem: { [key: string]: any } = { Id: common.generateUuid() };
+        let newItem: { [key: string]: any } = { id: common.generateUuid() };
         Object.keys(item).forEach((key) => {
           if (sourceMap.has(key)) {
             const attr = sourceMap.get(key)!;

@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { Button, Divider, Modal, Row } from 'antd';
+import { Button, Divider, Row } from 'antd';
 import cls from './index.module.less';
 import { NodeModel } from '../../../processType';
 import ShareShowComp from '@/components/Common/ShareShowComp';
 import { AiOutlineSetting } from '@/icons/ai';
 import SelectAuth from '@/components/Common/SelectAuth';
-import SelectForms from '@/components/Common/SelectForms';
-import { IBelong } from '@/ts/core';
+import { IBelong, IForm } from '@/ts/core';
+import OpenFileDialog from '@/components/OpenFileDialog';
 import ViewFormModal from '@/components/Common/FormDesign/viewFormModal';
 import { XForm } from '@/ts/base/schema';
 interface IProps {
@@ -21,8 +21,10 @@ interface IProps {
 const RootNode: React.FC<IProps> = (props) => {
   const [viewForm, setViewForm] = useState<XForm>();
   const [formModel, setFormModel] = useState<string>('');
-  const [primaryForms, setPrimaryForms] = useState(props.current.primaryForms || []);
-  const [detailForms, setDetailForms] = useState(props.current.detailForms || []);
+  props.current.primaryForms = props.current.primaryForms || [];
+  props.current.detailForms = props.current.detailForms || [];
+  const [primaryForms, setPrimaryForms] = useState(props.current.primaryForms);
+  const [detailForms, setDetailForms] = useState(props.current.detailForms);
   const [selectAuthValue, setSelectAuthValue] = useState<any>(props.current.destId);
   return (
     <div className={cls[`app-roval-node`]}>
@@ -91,46 +93,44 @@ const RootNode: React.FC<IProps> = (props) => {
           </span>
         )}
         {/* </div> */}
-        <div>
-          <Modal
-            title={`选择表单`}
-            width={800}
-            destroyOnClose={true}
-            open={formModel != ''}
-            okText="确定"
-            onOk={() => {
+        {formModel != '' && (
+          <OpenFileDialog
+            multiple
+            title={`选择${formModel}表单`}
+            rootKey={props.belong.directory.key}
+            accepts={['表单']}
+            excludeIds={(formModel === '子表' ? detailForms : primaryForms).map(
+              (i) => i.id,
+            )}
+            onCancel={() => setFormModel('')}
+            onOk={(files) => {
+              if (files.length > 0) {
+                const forms = (files as unknown[] as IForm[]).map((i) => i.metadata);
+                if (formModel === '子表') {
+                  props.current.detailForms.push(...forms);
+                  setDetailForms(props.current.detailForms);
+                } else {
+                  props.current.primaryForms.push(...forms);
+                  setPrimaryForms(props.current.primaryForms);
+                }
+              }
               setFormModel('');
             }}
-            onCancel={() => setFormModel('')}>
-            <SelectForms
-              belong={props.belong}
-              typeName={formModel}
-              selected={formModel === '子表' ? detailForms : primaryForms}
-              setSelected={(forms) => {
-                if (formModel === '子表') {
-                  props.current.detailForms = forms;
-                  setDetailForms(forms);
-                } else {
-                  props.current.primaryForms = forms;
-                  setPrimaryForms(forms);
-                }
-              }}
-            />
-          </Modal>
-          {viewForm && (
-            <ViewFormModal
-              form={viewForm}
-              open={true}
-              belong={props.belong}
-              handleCancel={() => {
-                setViewForm(undefined);
-              }}
-              handleOk={() => {
-                setViewForm(undefined);
-              }}
-            />
-          )}
-        </div>
+          />
+        )}
+        {viewForm && (
+          <ViewFormModal
+            form={viewForm}
+            open={true}
+            belong={props.belong}
+            handleCancel={() => {
+              setViewForm(undefined);
+            }}
+            handleOk={() => {
+              setViewForm(undefined);
+            }}
+          />
+        )}
       </div>
     </div>
   );

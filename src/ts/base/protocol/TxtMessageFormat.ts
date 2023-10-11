@@ -67,11 +67,13 @@ export class TxtMessageFormat {
           ? uint8Array.slice(offset + numBytes, offset + numBytes + size)
           : uint8Array.subarray(offset + numBytes, offset + numBytes + size);
         result.push(
-          this._decoder.decode(
-            buffer.map((item) => {
-              return 0xff - item;
-            }),
-          ) as string,
+          (
+            this._decoder.decode(
+              buffer.map((item) => {
+                return 0xff - item;
+              }),
+            ) as string
+          ).replaceAll('"_id":', '"id":'),
         );
       } else {
         throw new Error('Incomplete message.');

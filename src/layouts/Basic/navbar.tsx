@@ -6,24 +6,25 @@ import { Link } from 'react-router-dom';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import OrgIcons from '@/components/Common/GlobalComps/orgIcons';
 import React from 'react';
-import { command, kernel, model, schema } from '@/ts/base';
+import { kernel, model, schema } from '@/ts/base';
 import { showChatTime } from '@/utils/tools';
+import { useFlagCmdEmitter } from '@/hooks/useCtrlUpdate';
 
 const Navbar: React.FC = () => {
   const [workCount, setWorkCount] = useState(0);
   const [msgCount, setMsgCount] = useState(0);
   const [online, setOnline] = useState(0);
   const [onlineVisible, setOnlineVisible] = useState(false);
-  useEffect(() => {
-    const id = command.subscribeByFlag('session', () => {
-      let noReadCount = 0;
-      for (const item of orgCtrl.chats) {
-        if (item.isMyChat) {
-          noReadCount += item.chatdata.noReadCount;
-        }
+  useFlagCmdEmitter('session', () => {
+    let noReadCount = 0;
+    for (const item of orgCtrl.chats) {
+      if (item.isMyChat) {
+        noReadCount += item.chatdata.noReadCount;
       }
-      setMsgCount(noReadCount);
-    });
+    }
+    setMsgCount(noReadCount);
+  });
+  useEffect(() => {
     const workId = orgCtrl.work.notity.subscribe(async () => {
       setWorkCount(orgCtrl.work.todos.length);
     });
@@ -31,13 +32,12 @@ const Navbar: React.FC = () => {
       setOnline(kernel.onlineIds.length);
     });
     return () => {
-      command.unsubscribeByFlag(id);
       orgCtrl.work.notity.unsubscribe(workId);
     };
   }, []);
   const actions = [
     {
-      text: '首页',
+      text: '门户',
       icon: 'home',
       path: '/home',
       count: 0,

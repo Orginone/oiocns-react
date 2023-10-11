@@ -56,7 +56,7 @@ export abstract class Team extends Entity<schema.XTarget> implements ITeam {
     _relations: string[],
     _memberTypes: TargetType[] = [TargetType.Person],
   ) {
-    super(_metadata);
+    super(_metadata, [_metadata.typeName]);
     this.memberTypes = _memberTypes;
     this.relations = _relations;
     kernel.subscribe(
@@ -71,9 +71,6 @@ export abstract class Team extends Entity<schema.XTarget> implements ITeam {
   relations: string[];
   abstract directory: IDirectory;
   private _memberLoaded: boolean = false;
-  get isInherited(): boolean {
-    return this.metadata.belongId != this.space.id;
-  }
   async loadMembers(reload: boolean = false): Promise<schema.XTarget[]> {
     if (!this._memberLoaded || reload) {
       const res = await kernel.querySubTargetById({
@@ -138,8 +135,13 @@ export abstract class Team extends Entity<schema.XTarget> implements ITeam {
     }
     return true;
   }
-  protected async create(data: model.TargetModel): Promise<schema.XTarget | undefined> {
-    data.belongId = this.space.id;
+  protected async create(
+    data: model.TargetModel,
+    belong: boolean = false,
+  ): Promise<schema.XTarget | undefined> {
+    if (belong === false) {
+      data.belongId = this.space.id;
+    }
     data.teamCode = data.teamCode || data.code;
     data.teamName = data.teamName || data.name;
     const res = await kernel.createTarget(data);

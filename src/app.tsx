@@ -14,7 +14,6 @@ import config from 'devextreme/core/config';
 import { loadMessages, locale } from 'devextreme/localization';
 import zhMessage from 'devextreme/localization/messages/zh.json';
 import { LoggerLevel, logger } from '@/ts/base/common';
-import './components/PageBuilder';
 
 moment.locale('cn');
 config({ defaultCurrency: 'zh' });
@@ -38,16 +37,16 @@ const App = () => {
   logger.onLogger = (level, msg) => {
     switch (level) {
       case LoggerLevel.info:
-        message.info(msg);
+        message.info(msg, 0.5);
         break;
       case LoggerLevel.warn:
-        message.warn(msg);
+        message.warn(msg, 1);
         break;
       case LoggerLevel.error:
-        message.error(msg);
+        message.error(msg, 1);
         break;
       case LoggerLevel.unauth:
-        message.warn(msg);
+        message.warn(msg, 1);
         sessionStorage.clear();
         location.reload();
     }

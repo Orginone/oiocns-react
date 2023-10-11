@@ -1,97 +1,144 @@
 import React, { useEffect, useState } from 'react';
-import './index.less';
-import orgCtrl from '@/ts/controller';
-import { IApplication } from '@/ts/core';
-import { command } from '@/ts/base';
+import cls from './index.module.less';
+import { Badge, Button, Calendar, Divider, Dropdown, Space, Spin } from 'antd';
+import { ImDropbox, ImPriceTags } from '@/icons/im';
 import { useHistory } from 'react-router-dom';
-import { Card, Dropdown, Typography } from 'antd';
+import { command, model } from '@/ts/base';
+import orgCtrl from '@/ts/controller';
+import { formatSize } from '@/ts/base/common';
+import { IApplication } from '@/ts/core';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import { OperateMenuType } from 'typings/globelType';
-interface WorkBenchType {
-  props: []; //入口列表
-}
-export interface IMune {
-  label: string;
-  iconType: string;
-  cmd: string;
-}
-const BannerCom: React.FC<WorkBenchType> = () => {
+import FullScreenModal from '@/components/Common/fullScreen';
+import { useFlagCmdEmitter } from '@/hooks/useCtrlUpdate';
+
+// 工作台
+const WorkBench: React.FC = () => {
   const history = useHistory();
-  const [applications, setApplications] = useState<IApplication[]>([]);
-
-  useEffect(() => {
-    const id = command.subscribeByFlag('applications', async () => {
-      setApplications(await orgCtrl.loadApplications());
-    });
-    return () => {
-      command.unsubscribeByFlag(id);
-    };
-  }, []);
-  // 快捷入口配置
-  const entrys = [
-    {
-      label: '加好友',
-      iconType: 'addFriend',
-      cmd: 'joinFriend',
-    },
-    {
-      label: '建群组',
-      iconType: 'buildGroup',
-      cmd: 'newCohort',
-    },
-    {
-      label: '加群聊',
-      iconType: 'addGroupChat',
-      cmd: 'joinCohort',
-    },
-    {
-      label: '建单位',
-      iconType: 'buildCompany',
-      cmd: 'newCompany',
-    },
-    {
-      label: '加单位',
-      iconType: 'joinCompany',
-      cmd: 'joinCompany',
-    },
-    {
-      label: '定标准',
-      iconType: 'buildStander',
-      cmd: 'standard',
-    },
-  ];
-
-  const EntrysCard = ({ className, menu }: { className: string; menu: IMune }) => {
+  // 渲染数据项
+  const renderDataItem = (title: string, number: string | number) => {
     return (
-      <div
-        className={`${className}`}
-        onClick={() => {
-          command.emitter('config', menu.cmd, orgCtrl.user);
-        }}>
-        {/* <img className="app-icon" src={`/img/icon/${menu.iconType}.png`} alt="" /> */}
-        <div className="app-info">
-          <span className="app-info-name">{menu.label}</span>
-        </div>
+      <div className={cls.dataItem}>
+        <div className={cls.dataItemTitle}>{title}</div>
+        <div className={cls.dataItemNumber}>{number}</div>
       </div>
     );
   };
-
-  const loadAppCard = (title: string, dataSource: IApplication[]) => {
-    const contextMenu = (app: IApplication) => {
-      const menus: OperateMenuType[] = [];
-      if (app.cache.tags?.includes('常用')) {
-        menus.push({
-          key: 'unsetCommon',
-          label: '取消常用',
-          icon: <></>,
-        });
-      } else {
-        menus.push({
-          key: 'setCommon',
-          label: '设为常用',
-          icon: <></>,
-        });
+  // 渲染沟通信息
+  const RenderChat: React.FC = () => {
+    const [msgCount, setMsgCount] = useState(0);
+    const [loaded] = useFlagCmdEmitter('session', () => {
+      let noReadCount = 0;
+      for (const item of orgCtrl.chats) {
+        if (item.isMyChat) {
+          noReadCount += item.chatdata.noReadCount;
+        }
       }
+      setMsgCount(noReadCount);
+    });
+    return (
+      <>
+        <div className={cls.cardItemHeader}>
+          <span className={cls.title}>沟通</span>
+          {msgCount > 0 && <span className={cls.remind}>未读消息·{msgCount}条</span>}
+        </div>
+        <div className={cls.cardItemViewer}>
+          <Spin spinning={!loaded}>
+            <Space wrap split={<Divider type="vertical" />} size={2}>
+              {renderDataItem('好友(人)', orgCtrl.user.members.length)}
+              {renderDataItem(
+                '群聊(个)',
+                orgCtrl.chats.filter((i) => i.isMyChat && i.isGroup).length,
+              )}
+              {renderDataItem('单位(家)', orgCtrl.user.companys.length)}
+            </Space>
+          </Spin>
+        </div>
+      </>
+    );
+  };
+  // 渲染办事信息
+  const RenderWork: React.FC = () => {
+    const [todoCount, setTodoCount] = useState(0);
+    const [ApplyCount, setApplyCount] = useState(0);
+    const [CompletedCount, setCompletedCount] = useState(0);
+    useEffect(() => {
+      const id = orgCtrl.subscribe(() => {
+        setTodoCount(orgCtrl.work.todos.length);
+        orgCtrl.work.loadApplyCount().then((v) => {
+          setApplyCount(v);
+        });
+        orgCtrl.work.loadCompletedCount().then((v) => {
+          setCompletedCount(v);
+        });
+      });
+      return () => {
+        orgCtrl.unsubscribe(id);
+      };
+    }, []);
+    return (
+      <>
+        <div className={cls.cardItemHeader}>
+          <span className={cls.title}>办事</span>
+        </div>
+        <div className={cls.cardItemViewer}>
+          <Space wrap split={<Divider type="vertical" />} size={2}>
+            {renderDataItem('待办(件)', todoCount)}
+            {renderDataItem('已办(件)', CompletedCount)}
+            {renderDataItem('发起(件)', ApplyCount)}
+          </Space>
+        </div>
+      </>
+    );
+  };
+  // 渲染存储信息
+  const RendeStore: React.FC = () => {
+    const [diskInfo, setDiskInfo] = useState<model.DiskInfoType>();
+    useEffect(() => {
+      orgCtrl.user.getDiskInfo().then((value) => {
+        setDiskInfo(value);
+      });
+    }, []);
+    return (
+      <>
+        <div className={cls.cardItemHeader}>
+          <span className={cls.title}>存储</span>
+        </div>
+        <div className={cls.cardItemViewer}>
+          <Space wrap split={<Divider type="vertical" />} size={2}>
+            {diskInfo &&
+              renderDataItem(`文件(${diskInfo.files}个)`, formatSize(diskInfo.fileSize))}
+            {diskInfo &&
+              renderDataItem(
+                `数据(${diskInfo.objects}个)`,
+                formatSize(diskInfo.totalSize),
+              )}
+            {diskInfo &&
+              renderDataItem(
+                `硬件(${formatSize(diskInfo.fsUsedSize)})`,
+                formatSize(diskInfo.fsTotalSize),
+              )}
+          </Space>
+        </div>
+      </>
+    );
+  };
+  // 渲染应用信息
+  const RendeAppInfo: React.FC = () => {
+    const [allAppShow, setAllAppShow] = useState(false);
+    const [applications, setApplications] = useState<IApplication[]>([]);
+    const [loaded] = useFlagCmdEmitter('applications', async () => {
+      setApplications(await orgCtrl.loadApplications());
+    });
+    const contextMenu = (app: IApplication) => {
+      const useAlays = app.cache.tags?.includes('常用');
+      const menus: OperateMenuType[] = [
+        {
+          key: useAlays ? 'unsetCommon' : 'setCommon',
+          label: useAlays ? '取消常用' : '设为常用',
+          icon: <></>,
+        },
+      ];
       return {
         items: menus,
         onClick: async ({ key }: { key: string }) => {
@@ -109,75 +156,164 @@ const BannerCom: React.FC<WorkBenchType> = () => {
         },
       };
     };
+    // 加载应用
     const loadAppCard = (item: IApplication) => (
       <Dropdown key={item.key} menu={contextMenu(item)} trigger={['contextMenu']}>
-        <Card
-          size="small"
-          className={'fileCard'}
-          bordered={false}
-          key={item.key}
-          onDoubleClick={() => {
-            item.loadContent().then(() => {
-              orgCtrl.currentKey = item.key;
-              history.push('/store');
-            });
-          }}
-          onContextMenu={(e) => {
-            e.stopPropagation();
+        <div
+          className={cls.appCard}
+          onClick={() => {
+            orgCtrl.currentKey = item.key;
+            history.push('/store');
           }}>
-          <div className={'fileImage'}>
-            <EntityIcon entity={item.metadata} size={50} />
-          </div>
-          <div className={'fileName'} title={item.name}>
-            <Typography.Text title={item.name} ellipsis>
-              {item.name}
-            </Typography.Text>
-          </div>
-          <div className={'fileName'} title={item.typeName}>
-            <Typography.Text style={{ fontSize: 12, color: '#888' }} ellipsis>
-              {item.directory.target.name}
-            </Typography.Text>
-          </div>
-          <div className={'fileName'} title={item.typeName}>
-            <Typography.Text style={{ fontSize: 12, color: '#888' }} ellipsis>
-              {item.directory.target.space.name}
-            </Typography.Text>
-          </div>
-        </Card>
+          {item.cache.tags?.includes('常用') ? (
+            <Badge dot>
+              <EntityIcon entity={item.metadata} size={35} />
+            </Badge>
+          ) : (
+            <EntityIcon entity={item.metadata} size={35} />
+          )}
+          <div className={cls.appName}>{item.name}</div>
+          <div className={cls.teamName}>{item.directory.target.name}</div>
+          <div className={cls.teamName}>{item.directory.target.space.name}</div>
+        </div>
       </Dropdown>
     );
+    // 加载多个应用
+    const loadMultAppCards = (title: string, apps: IApplication[]) => {
+      if (apps.length < 1) return <></>;
+      return (
+        <>
+          <div className={cls.appGroupTitle}>{title}</div>
+          <Space wrap split={<Divider type="vertical" />} size={2}>
+            {apps.map((app) => {
+              return loadAppCard(app);
+            })}
+          </Space>
+        </>
+      );
+    };
+
+    // 加载所有应用
+    const renderAllApps = () => {
+      return (
+        <FullScreenModal
+          width={'60vw'}
+          bodyHeight={'60vh'}
+          open={allAppShow}
+          onCancel={() => setAllAppShow(false)}>
+          <div className={cls.cardItemViewer}>
+            {loadMultAppCards(
+              '常用应用',
+              applications.filter((i) => i.cache.tags?.includes('常用')),
+            )}
+            {loadMultAppCards(
+              '我的应用',
+              applications.filter((i) => i.metadata.createUser === i.userId),
+            )}
+            {loadMultAppCards(
+              '共享应用',
+              applications.filter((i) => i.metadata.createUser !== i.userId),
+            )}
+          </div>
+        </FullScreenModal>
+      );
+    };
     return (
       <>
-        <div className="app-title">{title}</div>
-        <div className="app-content">
-          {dataSource?.length > 0 && dataSource.map((el) => loadAppCard(el))}
-          {dataSource?.length < 1 && (
-            <div className="app-box">
-              <span className="app-info-name">暂无数据</span>
-            </div>
-          )}
+        <div style={{ minWidth: 490 }} className={cls.cardItemHeader}>
+          <span className={cls.title}>常用应用</span>
+          <span className={cls.extraBtn}>
+            <Button type="text" size="small" onClick={() => setAllAppShow(true)}>
+              <ImDropbox /> <span>全部应用</span>
+            </Button>
+          </span>
         </div>
+        <Spin spinning={!loaded} tip={'加载中...'}>
+          <div className={cls.cardItemViewer}>
+            <Space wrap split={<Divider type="vertical" />} size={2}>
+              {applications
+                .filter((i) => i.cache.tags?.includes('常用'))
+                .map((app) => {
+                  return loadAppCard(app);
+                })}
+            </Space>
+          </div>
+        </Spin>
+        {allAppShow && renderAllApps()}
       </>
     );
   };
-  return (
-    <div className="self-app">
-      <div className="app-title">快捷入口</div>
-      <div className="app-content">
-        {entrys.map((item, index) => {
-          return <EntrysCard className="icon-wrap" key={index} menu={item} />;
-        })}
+  // 日历组件
+  const calendarItem = () => {
+    return (
+      <div className={cls.cardItem}>
+        <div className={cls.cardItemHeader}>
+          <span className={cls.title}>日历</span>
+          {/* <span className={cls.extraBtn}>
+            <Button type="text" size="small">
+              <ImPlus /> <span>创建日程</span>
+            </Button>
+          </span> */}
+        </div>
+        <Calendar />
       </div>
-      {loadAppCard(
-        '常用应用',
-        applications.filter((i) => i.cache.tags?.includes('常用')),
-      )}
-      {loadAppCard(
-        '我的应用',
-        applications.filter((i) => i.metadata.createUser === i.userId),
-      )}
-      {loadAppCard('全部应用', applications)}
+    );
+  };
+  // 发送快捷命令
+  const renderCmdBtn = (cmd: string, title: string) => {
+    return (
+      <Button
+        className={cls.linkBtn}
+        type="text"
+        onClick={() => {
+          command.emitter('executor', cmd, orgCtrl.user);
+        }}>
+        {title}
+      </Button>
+    );
+  };
+
+  return (
+    <div className={cls.content}>
+      <div className={cls.cardGroup}>
+        <div className={cls.cardItem} onClick={() => history.push('chat')}>
+          <RenderChat />
+        </div>
+        <div className={cls.cardItem} onClick={() => history.push('work')}>
+          <RenderWork />
+        </div>
+        <div className={cls.cardItem} onClick={() => history.push('store')}>
+          <RendeStore />
+        </div>
+      </div>
+      <div className={cls.cardGroup}>
+        <div className={cls.cardItem}>
+          <div className={cls.cardItemHeader}>
+            <span className={cls.title}>快捷操作</span>
+            <span className={cls.extraBtn}>
+              <Button type="text" size="small" onClick={() => history.push('setting')}>
+                <ImPriceTags /> <span>更多操作</span>
+              </Button>
+            </span>
+          </div>
+          <div style={{ maxWidth: 500 }} className={cls.cardItemViewer}>
+            <Space wrap split={<Divider type="vertical" />} size={2}>
+              {renderCmdBtn('joinFriend', '添加好友')}
+              {renderCmdBtn('joinStorage', '申请存储')}
+              {renderCmdBtn('newCohort', '创建群组')}
+              {renderCmdBtn('joinCohort', '加入群聊')}
+              {renderCmdBtn('newCompany', '设立单位')}
+              {renderCmdBtn('joinCompany', '加入单位')}
+            </Space>
+          </div>
+        </div>
+        <div className={cls.cardItem}>
+          <RendeAppInfo />
+        </div>
+      </div>
+      <div className={cls.calendar}>{calendarItem()}</div>
     </div>
   );
 };
-export default BannerCom;
+
+export default WorkBench;

@@ -9,6 +9,7 @@ import { RiMore2Fill } from '@/icons/ri';
 import { Resizable } from 'devextreme-react';
 import { LeftBarIcon, RightBarIcon } from '@/components/Common/GlobalComps/customIcon';
 import useStorage from '@/hooks/useStorage';
+import EntityPreview from './preview';
 const { Content, Sider } = Layout;
 
 /**
@@ -16,7 +17,8 @@ const { Content, Sider } = Layout;
  */
 type MainLayoutType = {
   style?: CSSProperties;
-  menusHeight?: number | string;
+  leftShow?: boolean;
+  rightShow?: boolean;
   children?: React.ReactNode; // 子组件
   siderMenuData: MenuItemType;
   rightBar?: React.ReactNode;
@@ -70,7 +72,7 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
   };
   return (
     <Layout className={cls.layout} style={props.style}>
-      <Row className={cls[`content-top`]} justify="space-between">
+      <Row className={cls.contenttop} justify="space-between">
         <Col>
           <CustomBreadcrumb
             selectKey={props.selectMenu.key}
@@ -81,18 +83,22 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
         </Col>
         <Col className={cls.rightstyle}>
           <Space wrap split={<Divider type="vertical" />} size={2}>
-            <Typography.Link
-              title={'切换主测栏'}
-              style={{ fontSize: 18 }}
-              onClick={() => setLeftSider(!leftSider)}>
-              <LeftBarIcon size={18} width={4} selected={leftSider} />
-            </Typography.Link>
-            <Typography.Link
-              title={'切换辅助侧栏'}
-              style={{ fontSize: 18 }}
-              onClick={() => setRightSider(!rightSider)}>
-              <RightBarIcon size={18} width={8} selected={rightSider} />
-            </Typography.Link>
+            {props.leftShow === undefined && (
+              <Typography.Link
+                title={'切换主测栏'}
+                style={{ fontSize: 18 }}
+                onClick={() => setLeftSider(!leftSider)}>
+                <LeftBarIcon size={18} width={4} selected={leftSider} />
+              </Typography.Link>
+            )}
+            {props.rightShow === undefined && (
+              <Typography.Link
+                title={'切换辅助侧栏'}
+                style={{ fontSize: 18 }}
+                onClick={() => setRightSider(!rightSider)}>
+                <RightBarIcon size={18} width={8} selected={rightSider} />
+              </Typography.Link>
+            )}
             {props.rightBar}
             {outside.length > 0 &&
               outside.map((item) => {
@@ -128,7 +134,7 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
         </Col>
       </Row>
       <Layout>
-        {leftSider && (
+        {(props.leftShow ?? leftSider) && (
           <Sider className={cls.sider} width={250}>
             <div className={cls.menuBar}>
               <Typography.Link
@@ -152,10 +158,7 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
               <span style={{ fontSize: 20, margin: '0 6px' }}>{parentMenu.icon}</span>
               <strong>{parentMenu.label}</strong>
             </div>
-            <div
-              className={cls.container}
-              id="templateMenu"
-              style={{ height: props.menusHeight }}>
+            <div className={cls.container} id="templateMenu">
               <CustomMenu
                 item={parentMenu}
                 collapsed={false}
@@ -168,7 +171,7 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
             </div>
           </Sider>
         )}
-        {rightSider ? (
+        {props.rightShow === true || rightSider ? (
           <>
             <Resizable
               handles={'right'}
@@ -178,7 +181,9 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
                 {props.children}
               </Sider>
             </Resizable>
-            <Content className={cls.content}></Content>
+            <Content className={cls.content}>
+              <EntityPreview entity={props.selectMenu.item} />
+            </Content>
           </>
         ) : (
           <Content className={cls.content}>{props.children}</Content>

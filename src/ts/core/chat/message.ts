@@ -138,18 +138,19 @@ export class Message implements IMessage {
   }
   get readedinfo(): string {
     const ids = this.readedIds;
-    if (this._chat.metadata.typeName === TargetType.Person) {
-      return ids.length === 1 ? '已读' : '未读';
-    }
-    const mCount =
-      this._chat.members.filter((i) => i.id != this.metadata.fromId).length || 1;
-    if (ids.length === mCount) {
-      return '全部已读';
-    }
     if (ids.length === 0) {
       return '全部未读';
     }
-    return mCount - ids.length + '人未读';
+    if (this._chat.metadata.typeName === TargetType.Person) {
+      return ids.length === 1 ? '已读' : '未读';
+    }
+    const noread = this._chat.members
+      .filter((i) => i.id != this.metadata.createUser)
+      .filter((i) => !ids.includes(i.id)).length;
+    if (noread === 0) {
+      return '全部已读';
+    }
+    return noread + '人未读';
   }
   get readedIds(): string[] {
     const ids = this.labels.map((v) => v.userId);
@@ -197,7 +198,7 @@ export class Message implements IMessage {
       case MessageType.Voice:
         return `${header}[${MessageType.Voice}]`;
       case MessageType.Forward:
-        return `${this.forward.length}条转发信息`
+        return `${this.forward.length}条转发信息`;
     }
     const file: model.FileItemShare = parseAvatar(this.msgBody);
     if (file) {

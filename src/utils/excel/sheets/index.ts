@@ -23,4 +23,4 @@ export const getSheets = (directory: IDirectory) => {
   ];
 };
 
-export { AnySheet, AnyHandler } from './anything';
+export { AnyHandler, AnySheet } from './anything';

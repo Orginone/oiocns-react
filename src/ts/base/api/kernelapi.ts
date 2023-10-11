@@ -945,32 +945,33 @@ export default class KernelApi {
   /**
    * 加载物
    * @param  过滤参数
-   * @returns {model.ResultType<T>} 移除异步结果
+   * @returns {model.LoadResult<T>} 移除异步结果
    */
-  public async loadThing<T>(
+  public async loadThing(
     belongId: string,
     relations: string[],
     options: any,
-  ): Promise<model.ResultType<T>> {
+  ): Promise<model.LoadResult<schema.XThing[]>> {
     options.belongId = belongId;
-    return await this.dataProxy({
+    const res = await this.dataProxy({
       module: 'Thing',
       action: 'Load',
       belongId,
       relations,
       params: options,
     });
+    return { ...res, ...res.data };
   }
   /**
    * 创建物
    * @param name 物的名称
-   * @returns {model.ResultType<model.AnyThingModel>} 移除异步结果
+   * @returns {model.ResultType<schema.XThing>} 移除异步结果
    */
   public async createThing(
     belongId: string,
     relations: string[],
     name: string,
-  ): Promise<model.ResultType<model.AnyThingModel>> {
+  ): Promise<model.ResultType<schema.XThing>> {
     return await this.dataProxy({
       module: 'Thing',
       action: 'Create',
@@ -1144,7 +1145,7 @@ export default class KernelApi {
               }
               this.onlineNotify.changCallback();
             }
-            command.emitter('_', res.target.toLowerCase(), res.data);
+            command.emitter('executor', res.target.toLowerCase(), res.data);
           }
         }
         break;

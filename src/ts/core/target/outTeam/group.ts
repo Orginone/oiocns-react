@@ -121,6 +121,7 @@ export class Group extends Target implements IGroup {
     await Promise.all([
       await this.loadMembers(reload),
       await this.loadChildren(reload),
+      await this.loadIdentitys(reload),
       await this.directory.loadDirectoryResource(reload),
     ]);
     await Promise.all(

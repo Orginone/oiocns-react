@@ -1,12 +1,13 @@
 import * as im from '@/icons/im';
-import { Button, message, Popover, Spin, Upload, UploadProps } from 'antd';
+import { Button, message, Popover } from 'antd';
 import { CloseCircleFilled } from '@ant-design/icons';
 import React, { useEffect, useState } from 'react';
-import { IMessage, ISession, MessageType } from '@/ts/core';
-import { model, parseAvatar } from '@/ts/base';
+import { IMessage, ISession, ISysFileInfo, MessageType } from '@/ts/core';
+import { parseAvatar } from '@/ts/base';
 import PullDown from '@/pages/Chats/components/pullDown';
 import Cutting from '../../cutting';
 import './index.less';
+import OpenFileDialog from '@/components/OpenFileDialog';
 import { parseCiteMsg } from '@/pages/Chats/components/parseMsg';
 import Emoji from '../../../components/emoji';
 
@@ -26,7 +27,7 @@ interface IProps {
 
 const GroupInputBox = (props: IProps) => {
   const { writeContent, citeText, enterCiteMsg, closeCite } = props;
-  const [task, setTask] = useState<model.TaskModel>();
+  const [open, setOpen] = useState<boolean>(false);
   const [openEmoji, setOpenEmoji] = useState(false);
   const [IsCut, setIsCut] = useState<boolean>(false); // 是否截屏
   const [citeShow, setCiteShow] = useState<boolean>(false); // @展示
@@ -157,46 +158,8 @@ const GroupInputBox = (props: IProps) => {
     document.getElementById('innerHtml')?.append(img);
   };
 
-  /** 文件上传参数 */
-  const uploadProps: UploadProps = {
-    multiple: false,
-    showUploadList: false,
-    async customRequest(options) {
-      const file = options.file as File;
-      if (file) {
-        const result = await props.chat.target.directory.createFile(file, (p: number) => {
-          return setTask({
-            finished: p,
-            size: file.size,
-            name: file.name,
-            createTime: new Date(),
-          });
-        });
-        setTask(undefined);
-        if (result) {
-          await props.chat.sendMessage(
-            result.filedata.thumbnail ? MessageType.Image : MessageType.File,
-            JSON.stringify(result.shareInfo()),
-            [],
-          );
-        }
-      }
-    },
-  };
-
-  const getMessage = () => {
-    if (task) {
-      if (task.finished === -1) {
-        return `${task.name}正在上传失败...`;
-      }
-      const process = ((task.finished * 100.0) / task.size).toFixed(2);
-      return `${task.name}正在上传中${process}%...`;
-    }
-    return '';
-  };
-
   return (
-    <Spin tip={getMessage()} spinning={task != undefined}>
+    <>
       <div className="group-input-box">
         <div className="group-input-box__toolbar">
           <Popover
@@ -222,9 +185,7 @@ const GroupInputBox = (props: IProps) => {
               message.warning('功能暂未开放');
             }}
           />
-          <Upload {...uploadProps}>
-            <im.ImFolder size={18} color={'#9498df'} />
-          </Upload>
+          <im.ImFolder size={18} color={'#9498df'} onClick={() => setOpen(true)} />
           <im.ImVideoCamera
             size={18}
             color={'#9498df'}
@@ -285,7 +246,28 @@ const GroupInputBox = (props: IProps) => {
           setIsCut(false);
         }}
       />
-    </Spin>
+      {open && (
+        <OpenFileDialog
+          rootKey={'disk'}
+          accepts={['文件']}
+          allowInherited
+          onCancel={() => setOpen(false)}
+          onOk={async (files) => {
+            if (files.length > 0) {
+              const file = files[0] as ISysFileInfo;
+              let msgType = MessageType.File;
+              if (file.groupTags.includes('图片')) {
+                msgType = MessageType.Image;
+              } else if (file.groupTags.includes('视频')) {
+                msgType = MessageType.Video;
+              }
+              await props.chat.sendMessage(msgType, JSON.stringify(file.shareInfo()), []);
+            }
+            setOpen(false);
+          }}
+        />
+      )}
+    </>
   );
 };
 

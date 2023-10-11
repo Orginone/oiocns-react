@@ -3,42 +3,51 @@ import { Dropdown, Card, Typography, Badge } from 'antd';
 import React from 'react';
 import cls from './less/icon.module.less';
 import { ISession } from '@/ts/core';
-import orgCtrl from '@/ts/controller';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import { loadChatOperation } from './common';
 
-const IconMode = ({ chats }: { chats: ISession[] }) => {
-  const FileCard = (el: ISession) => (
-    <Dropdown menu={{ items: loadChatOperation(el) }} trigger={['contextMenu']}>
+const IconMode = ({
+  chats,
+  select,
+  sessionOpen,
+}: {
+  chats: ISession[];
+  select: ISession | undefined;
+  sessionOpen: (file: ISession | undefined, dblclick: boolean) => void;
+}) => {
+  const FileCard = (item: ISession) => (
+    <Dropdown menu={{ items: loadChatOperation(item) }} trigger={['contextMenu']}>
       <Card
         size="small"
-        className={cls.fileCard}
+        className={select?.id === item.id ? cls.fileCard_select : cls.fileCard}
         bordered={false}
-        key={el.key}
+        key={item.key}
+        onClick={async () => {
+          await sessionOpen(item, false);
+        }}
         onDoubleClick={async () => {
-          orgCtrl.currentKey = el.chatdata.fullId;
-          orgCtrl.changCallback();
+          await sessionOpen(item, true);
         }}
         onContextMenu={(e) => {
           e.stopPropagation();
         }}>
         <div className={cls.fileImage}>
-          <Badge count={el.chatdata.noReadCount} size="small">
-            {el.chatdata.isToping && <Badge status="error" />}
-            <EntityIcon entity={el.metadata} size={50} />
+          <Badge count={item.chatdata.noReadCount} size="small">
+            {item.chatdata.isToping && <Badge status="error" />}
+            <EntityIcon entity={item.metadata} size={50} />
           </Badge>
         </div>
-        <div className={cls.fileName} title={el.name}>
-          <Typography.Text title={el.name} ellipsis>
-            {el.name}
+        <div className={cls.fileName} title={item.name}>
+          <Typography.Text title={item.name} ellipsis>
+            {item.name}
           </Typography.Text>
         </div>
-        <div className={cls.fileName} title={el.typeName}>
+        <div className={cls.fileName} title={item.typeName}>
           <Typography.Text
             style={{ fontSize: 12, color: '#888' }}
-            title={el.typeName}
+            title={item.typeName}
             ellipsis>
-            {el.typeName}
+            {item.typeName}
           </Typography.Text>
         </div>
       </Card>

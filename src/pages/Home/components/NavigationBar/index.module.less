@@ -1,31 +1,35 @@
 .navigationBar {
-  width: 860px;
-  height: 40px;
   border-radius: 30px;
   position: fixed;
   top: 16px;
-  right: calc(50vw - 430px - 24px);
-  background-color: rgba(@component-background, 0.5);
-  color: @text-color-inverse;
+  right: calc(50vw - 160px);
+  margin-left: 60px;
+  background-color: rgba(@component-background, 0.7);
   display: flex;
-  font-size: 16px;
+  font-size: 14px;
+  color: @text-color;
   align-items: center;
-  padding-left: 50px;
-  padding-right: 20px;
+  padding: 6px 12px;
   transition: 0.2s;
   &Content {
     display: flex;
     justify-content: center;
-    gap: 24px;
+    gap: 16px;
     flex: 1;
     &__item {
-      transition: .2s;
+      transition: 0.2s;
       cursor: pointer;
+      padding: 4px 16px;
+      &:hover {
+        border-radius: 30px;
+        background-color: @active-background;
+      }
       &Active {
-        cursor: pointer;
-        color: @text-color;
-        font-size: 18px;
-        border-bottom: 2px solid @primary-color;
+        cursor: not-allowed;
+        padding: 4px 16px;
+        border-radius: 30px;
+        color: @text-color-inverse;
+        background-color: @focus-background;
       }
     }
   }
@@ -34,6 +38,7 @@
     color: @text-color-inverse;
     font-size: 30px;
     cursor: pointer;
+    margin-left: 20px;
   }
 
   &Open {
@@ -43,7 +48,6 @@
     z-index: 1;
     box-shadow: 0 2px 15px rgba(0, 0, 0, 0.15);
   }
-
 
   &Config {
     width: 100%;
@@ -60,8 +64,8 @@
 
     &PageCard {
       padding: 8px 24px;
-      color: #424A57;
-      background-color: #F7F8FA;
+      color: #424a57;
+      background-color: #f7f8fa;
       border-radius: 27px;
       cursor: pointer;
       display: flex;

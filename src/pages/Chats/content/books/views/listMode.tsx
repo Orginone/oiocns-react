@@ -1,25 +1,39 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ISession } from '@/ts/core';
 import { Badge, Dropdown, List, Tag, Typography } from 'antd';
 import css from '../index.module.less';
 import { showChatTime } from '@/utils/tools';
 import TeamIcon from '@/components/Common/GlobalComps/entityIcon';
-import orgCtrl from '@/ts/controller';
 import { loadChatOperation } from './common';
 const { Text } = Typography;
 
-const ListMode = ({ chats }: { chats: ISession[] }) => {
+const ListMode = ({
+  chats,
+  select,
+  sessionOpen,
+}: {
+  chats: ISession[];
+  select: ISession | undefined;
+  sessionOpen: (file: ISession | undefined, dblclick: boolean) => void;
+}) => {
+  const [cxtItem, setCxtItem] = useState<ISession>();
   return (
     <List
       className="demo-loadmore-list"
       itemLayout="horizontal"
       dataSource={chats}
       renderItem={(item: ISession) => {
+        const style: any = {};
+        if (select?.id === item.id) {
+          style.backgroundColor = '#e6f1ff';
+        }
         return (
-          <div className={css.book_ul}>
-            <Dropdown menu={{ items: loadChatOperation(item) }} trigger={['contextMenu']}>
+          <div className={css.book_ul} style={style}>
+            <Dropdown
+              menu={{ items: loadChatOperation(cxtItem) }}
+              trigger={['contextMenu']}>
               <List.Item
-                style={{ cursor: 'pointer' }}
+                className={css.book_item}
                 extra={
                   <Text type="secondary">
                     {item.chatdata.lastMessage
@@ -27,18 +41,17 @@ const ListMode = ({ chats }: { chats: ISession[] }) => {
                       : ''}
                   </Text>
                 }
+                onContextMenu={() => setCxtItem(item)}
                 onClick={() => {
-                  orgCtrl.currentKey = item.chatdata.fullId;
-                  orgCtrl.changCallback();
+                  sessionOpen(item, false);
+                }}
+                onDoubleClick={() => {
+                  sessionOpen(item, true);
                 }}>
                 <List.Item.Meta
                   avatar={
                     <Badge count={item.chatdata.noReadCount} size="small">
-                      <TeamIcon
-                        typeName={item.metadata.typeName}
-                        entityId={item.sessionId}
-                        size={40}
-                      />
+                      <TeamIcon entity={item.metadata} size={40} />
                     </Badge>
                   }
                   title={

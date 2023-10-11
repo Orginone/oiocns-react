@@ -39,7 +39,7 @@ const CcNode: React.FC<IProps> = (props) => {
           {currentData.id != '' ? (
             <ShareShowComp
               departData={[{ id: props.current.destId, name: props.current.destName }]}
-              deleteFuc={(_id: string) => {
+              deleteFuc={() => {
                 props.current.destId = '';
                 props.current.destName = '';
                 setCurrentData({ id: '', name: '' });

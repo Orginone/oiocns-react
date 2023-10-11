@@ -1,17 +1,16 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { HotTable } from '@handsontable/react';
-import { Modal } from 'antd';
 import { textRenderer, registerRenderer } from 'handsontable/renderers';
 import { registerLanguageDictionary, zhCN } from 'handsontable/i18n';
 registerLanguageDictionary(zhCN);
 import { registerAllModules } from 'handsontable/registry';
 registerAllModules();
 import 'handsontable/dist/handsontable.min.css';
-import SelectPropertys from '../../SelectPropertys';
 import AttributeConfig from '../../FormDesign/attributeConfig';
-import { IForm } from '@/ts/core';
-import useObjectUpdate from '@/hooks/useObjectUpdate';
+import { IForm, IProperty } from '@/ts/core';
 import { schema } from '@/ts/base';
+import OpenFileDialog from '@/components/OpenFileDialog';
+import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 interface IProps {
   current: IForm;
   sheetList: any;
@@ -34,7 +33,7 @@ const HotTableView: React.FC<IProps> = ({
   handEcho,
 }) => {
   const [modalType, setModalType] = useState<string>('');
-  const [tkey, tforceUpdate] = useObjectUpdate('');
+  const [tkey] = useCtrlUpdate(current);
   const [sheetIndex, setSheetIndex] = useState<any>(0); // tabs页签
   const [selectedItem, setSelectedItem] = useState<schema.XAttribute>();
   const [cells, setCells] = useState<any>([]);
@@ -270,36 +269,6 @@ const HotTableView: React.FC<IProps> = ({
       rule: JSON.stringify(newData),
     });
   };
-
-  /** 插入特性 */
-  const saveSpeciality = (prop: schema.XAttribute) => {
-    const selected = hotRef.current.hotInstance.getSelected() || [];
-    for (let index = 0; index < selected.length; index += 1) {
-      const [row1, column1, row2, column2] = selected[index];
-      const startRow = Math.max(Math.min(row1, row2), 0);
-      const endRow = Math.max(row1, row2);
-      const startCol = Math.max(Math.min(column1, column2), 0);
-      const endCol = Math.max(column1, column2);
-      for (let rowIndex = startRow; rowIndex <= endRow; rowIndex += 1) {
-        for (let columnIndex = startCol; columnIndex <= endCol; columnIndex += 1) {
-          let json = { row: rowIndex, col: columnIndex, type: '', prop: prop };
-          if (prop.property?.valueType === '数值型') {
-            json.type = 'numeric';
-            cells.push(json);
-          } else if (prop.property?.valueType === '时间型') {
-            json.type = 'date';
-            cells.push(json);
-          } else {
-            json.type = 'text';
-            cells.push(json);
-          }
-          hotRef.current.hotInstance.getCellMeta(rowIndex, columnIndex).renderer =
-            'customStylesRenderer';
-        }
-      }
-    }
-  };
-
   /** 更新特性rules 但单元格只有只读属性 readOnly */
   const upDataCell = () => {
     cells.forEach((item: any) => {
@@ -403,41 +372,20 @@ const HotTableView: React.FC<IProps> = ({
       />
 
       {modalType.includes('新增特性') && (
-        <Modal
-          open
-          width={800}
-          title="选择属性"
-          destroyOnClose
-          okText="确定"
-          onOk={() => {
+        <OpenFileDialog
+          multiple
+          title={`选择属性`}
+          rootKey={current.spaceKey}
+          accepts={['属性']}
+          excludeIds={current.attributes.filter((i) => i.propId).map((a) => a.propId)}
+          onCancel={() => setModalType('')}
+          onOk={(files) => {
+            if (files.length > 0) {
+              current.createAttribute((files as IProperty[]).map((i) => i.metadata));
+            }
             setModalType('');
           }}
-          onCancel={() => setModalType('')}>
-          <SelectPropertys
-            target={current.directory.target}
-            selected={current.attributes.map((a: any) => a.property!)}
-            onAdded={async (prop: any) => {
-              let res = await current.createAttribute(
-                {
-                  name: prop.name,
-                  code: prop.code,
-                  rule: '{}',
-                  remark: prop.remark,
-                } as schema.XAttribute,
-                prop,
-              );
-              if (res) {
-                saveSpeciality(res);
-              }
-            }}
-            onDeleted={async (id: any) => {
-              const attr = current.attributes.find((i) => i.propId === id);
-              if (attr) {
-                await current.deleteAttribute(attr);
-              }
-            }}
-          />
-        </Modal>
+        />
       )}
 
       {/** 编辑特性模态框 */}
@@ -449,7 +397,6 @@ const HotTableView: React.FC<IProps> = ({
           onClose={() => {
             setSelectedItem(undefined);
             setModalType('');
-            tforceUpdate();
             upDataCell();
           }}
           superAuth={current.directory.target.space.superAuth!.metadata}
