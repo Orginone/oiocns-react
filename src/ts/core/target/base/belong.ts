@@ -70,7 +70,6 @@ export abstract class Belong extends Target implements IBelong {
     const metadata = await this.create(data);
     if (metadata) {
       const cohort = new Cohort(metadata, this, metadata.belongId);
-      await cohort.deepLoad();
       if (this.typeName != TargetType.Person) {
         if (!(await this.pullSubTarget(cohort))) {
           return;
@@ -78,6 +77,7 @@ export abstract class Belong extends Target implements IBelong {
       }
       this.cohorts.push(cohort);
       await cohort.pullMembers([this.user.metadata]);
+      await cohort.deepLoad();
       return cohort;
     }
   }

@@ -35,7 +35,6 @@ const PullMember: React.FC<IProps> = ({ current, finished }) => {
       />
     );
   }
-
   return (
     <Modal
       title="邀请成员"
@@ -51,7 +50,7 @@ const PullMember: React.FC<IProps> = ({ current, finished }) => {
       <SearchTarget
         searchCallback={setSelectMember}
         searchType={
-          current.typeName === TargetType.Group ? TargetType.Company : TargetType.Person
+          target.typeName === TargetType.Group ? TargetType.Company : TargetType.Person
         }
       />
     </Modal>
