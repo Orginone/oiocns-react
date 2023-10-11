@@ -1,28 +1,30 @@
 import { logger } from '@/ts/base/common';
 import { IWork } from '.';
 import { schema, model, kernel } from '../../base';
-import { TaskStatus, storeCollName } from '../public';
+import { TaskStatus, entityOperates, storeCollName } from '../public';
 import { IBelong } from '../target/base/belong';
 import { UserProvider } from '../user';
 import { IWorkApply } from './apply';
+import { FileInfo, IFile } from '../thing/fileinfo';
+export type TaskTypeName = '待办事项' | '已办事项' | '抄送我的' | '我发起的';
 
-export interface IWorkTask {
-  /** 唯一标识 */
-  id: string;
+export interface IWorkTask extends IFile {
   /** 内容 */
-  content: string;
+  comment: string;
   /** 当前用户 */
   user: UserProvider;
   /** 归属空间 */
   belong: IBelong;
   /** 任务元数据 */
-  metadata: schema.XWorkTask;
+  taskdata: schema.XWorkTask;
   /** 流程实例 */
   instance: schema.XWorkInstance | undefined;
   /** 实例携带的数据 */
   instanceData: model.InstanceDataModel | undefined;
   /** 加用户任务信息 */
   targets: schema.XTarget[];
+  /** 是否为指定的任务类型 */
+  isTaskType(type: '已办事项' | '抄送我的' | '我发起的'): boolean;
   /** 是否满足条件 */
   isMatch(filter: string): boolean;
   /** 任务更新 */
@@ -37,36 +39,63 @@ export interface IWorkTask {
   approvalTask(status: number, comment?: string): Promise<boolean>;
 }
 
-export class WorkTask implements IWorkTask {
+export class WorkTask extends FileInfo<schema.XEntity> implements IWorkTask {
   constructor(_metadata: schema.XWorkTask, _user: UserProvider) {
-    this.metadata = _metadata;
+    super(_metadata as any, _user.user!.directory);
+    this.taskdata = _metadata;
     this.user = _user;
   }
   user: UserProvider;
-  metadata: schema.XWorkTask;
+  cacheFlag: string = 'worktask';
+  taskdata: schema.XWorkTask;
   instance: schema.XWorkInstance | undefined;
   instanceData: model.InstanceDataModel | undefined;
-  get id(): string {
-    return this.metadata.id;
+  get groupTags(): string[] {
+    return [this.taskdata.taskType, this.taskdata.approveType];
   }
-  get content(): string {
+  get metadata(): schema.XEntity {
+    let typeName = this.taskdata.taskType;
+    if (
+      this.taskdata.approveType === '子流程' &&
+      this.taskdata.identityId &&
+      this.taskdata.identityId.length > 5
+    ) {
+      typeName = '子流程';
+    }
+    return {
+      ...this.taskdata,
+      icon: '',
+      typeName,
+      belong: undefined,
+      name: this.taskdata.title,
+      code: this.taskdata.instanceId,
+      remark: this.comment || '暂无信息',
+    };
+  }
+  delete(): Promise<boolean> {
+    throw new Error('Method not implemented.');
+  }
+  operates(): model.OperateModel[] {
+    return [entityOperates.Open, entityOperates.Remark, entityOperates.QrCode];
+  }
+  get comment(): string {
     if (this.targets.length === 2) {
       return `${this.targets[0].name}[${this.targets[0].typeName}]申请加入${this.targets[1].name}[${this.targets[1].typeName}]`;
     }
-    return this.metadata.content;
+    return this.taskdata.content;
   }
   get belong(): IBelong {
     for (const company of this.user.user!.companys) {
-      if (company.id === this.metadata.belongId) {
+      if (company.id === this.taskdata.belongId) {
         return company;
       }
     }
     return this.user.user!;
   }
   get targets(): schema.XTarget[] {
-    if (this.metadata.taskType == '加用户') {
+    if (this.taskdata.taskType == '加用户') {
       try {
-        return JSON.parse(this.metadata.content) || [];
+        return JSON.parse(this.taskdata.content) || [];
       } catch (ex) {
         logger.error(ex as Error);
       }
@@ -74,11 +103,23 @@ export class WorkTask implements IWorkTask {
     return [];
   }
   isMatch(filter: string): boolean {
-    return JSON.stringify(this.metadata).includes(filter);
+    return JSON.stringify(this.taskdata).includes(filter);
+  }
+  isTaskType(type: TaskTypeName): boolean {
+    switch (type) {
+      case '已办事项':
+        return this.taskdata.status >= TaskStatus.ApprovalStart;
+      case '我发起的':
+        return this.taskdata.createUser == this.userId;
+      case '待办事项':
+        return this.taskdata.status < TaskStatus.ApprovalStart;
+      case '抄送我的':
+        return this.taskdata.taskType === '抄送';
+    }
   }
   async updated(_metadata: schema.XWorkTask): Promise<boolean> {
-    if (this.metadata.id === _metadata.id) {
-      this.metadata = _metadata;
+    if (this.taskdata.id === _metadata.id) {
+      this.taskdata = _metadata;
       await this.loadInstance(true);
       return true;
     }
@@ -87,13 +128,13 @@ export class WorkTask implements IWorkTask {
   async loadInstance(reload: boolean = false): Promise<boolean> {
     if (this.instanceData !== undefined && !reload) return true;
     const res = await kernel.collectionLoad<schema.XWorkInstance[]>(
-      this.metadata.belongId,
+      this.taskdata.belongId,
       [],
       storeCollName.WorkInstance,
       {
         options: {
           match: {
-            id: this.metadata.instanceId,
+            id: this.taskdata.instanceId,
           },
           limit: 1,
           lookup: {
@@ -127,13 +168,13 @@ export class WorkTask implements IWorkTask {
     return false;
   }
   async approvalTask(status: number, comment: string): Promise<boolean> {
-    if (this.metadata.status < TaskStatus.ApprovalStart) {
+    if (this.taskdata.status < TaskStatus.ApprovalStart) {
       if (status === -1) {
         return await this.recallApply();
       }
-      if (this.metadata.taskType === '加用户' || (await this.loadInstance(true))) {
+      if (this.taskdata.taskType === '加用户' || (await this.loadInstance(true))) {
         const res = await kernel.approvalTask({
-          id: this.metadata.id,
+          id: this.taskdata.id,
           status: status,
           comment: comment,
           data: JSON.stringify(this.instanceData),
@@ -153,9 +194,9 @@ export class WorkTask implements IWorkTask {
     return false;
   }
   async createApply(): Promise<IWorkApply | undefined> {
-    if (this.metadata.approveType == '子流程') {
+    if (this.taskdata.approveType == '子流程') {
       await this.loadInstance();
-      var define = await this.findWorkById(this.metadata.defineId);
+      var define = await this.findWorkById(this.taskdata.defineId);
       if (define) {
         return await define.createApply(this.id, this.instanceData);
       }

@@ -1,28 +1,29 @@
-import { ProFormInstance } from '@ant-design/pro-form';
-import { Button, Card, Collapse, Input, Tabs, TabsProps, Timeline } from 'antd';
-import React, { useRef, useState } from 'react';
+import { Card, Collapse, Empty, Spin, Tabs, TabsProps, Timeline } from 'antd';
+import React, { useState } from 'react';
 import { ImUndo2 } from '@/icons/im';
 import cls from './index.module.less';
-import { IWorkTask, TaskStatus } from '@/ts/core';
+import { IWorkTask } from '@/ts/core';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import WorkForm from '@/executor/tools/workForm';
 import ProcessTree from '@/components/Common/FlowDesign/ProcessTree';
 import { NodeModel, loadResource } from '@/components/Common/FlowDesign/processType';
 import TaskDrawer from './drawer';
+import FullScreenModal from '@/components/Common/fullScreen';
+import useAsyncLoad from '@/hooks/useAsyncLoad';
+import TaskApproval from './approval';
 
 export interface TaskDetailType {
-  task: IWorkTask;
-  onBack?: () => void;
+  current: IWorkTask;
+  finished: () => void;
 }
 
-const Detail: React.FC<TaskDetailType> = ({ task, onBack }) => {
-  const formRef = useRef<ProFormInstance<any>>();
+const TaskContent: React.FC<TaskDetailType> = ({ current, finished }) => {
   const [selectNode, setSelectNode] = useState<NodeModel>();
-  const [comment, setComment] = useState<string>('');
+  const [loaded] = useAsyncLoad(() => current.loadInstance());
 
   /** 加载时间条 */
   const loadTimeline = () => {
-    if (task.instance) {
+    if (current.instance) {
       return (
         <Timeline>
           <Timeline.Item color={'green'}>
@@ -30,27 +31,27 @@ const Detail: React.FC<TaskDetailType> = ({ task, onBack }) => {
               <div style={{ display: 'flex' }}>
                 <div style={{ paddingRight: '24px' }}>起始</div>
                 <div style={{ paddingRight: '24px' }}>
-                  {task.instance.createTime.substring(
+                  {current.instance.createTime.substring(
                     0,
-                    task.instance.createTime.length - 4,
+                    current.instance.createTime.length - 4,
                   )}
                 </div>
                 <div style={{ paddingRight: '24px' }}>
                   发起人：
-                  <EntityIcon entityId={task.instance.createUser} showName />
+                  <EntityIcon entityId={current.instance.createUser} showName />
                 </div>
               </div>
-              {task.instanceData && (
+              {current.instanceData && (
                 <WorkForm
                   allowEdit={false}
-                  belong={task.belong}
-                  nodeId={task.instanceData.node.id}
-                  data={task.instanceData}
+                  belong={current.belong}
+                  nodeId={current.instanceData.node.id}
+                  data={current.instanceData}
                 />
               )}
             </Card>
           </Timeline.Item>
-          {task.instance.tasks?.map((item, index) => {
+          {current.instance.tasks?.map((item, index) => {
             return (
               <div key={`${item.id}_${index}`}>
                 {item.status >= 100 ? (
@@ -75,12 +76,12 @@ const Detail: React.FC<TaskDetailType> = ({ task, onBack }) => {
                             </div>
                           </div>
                           <Collapse ghost>
-                            {task.instanceData && (
+                            {current.instanceData && (
                               <WorkForm
                                 allowEdit={false}
-                                belong={task.belong}
+                                belong={current.belong}
                                 nodeId={item.nodeId}
-                                data={task.instanceData}
+                                data={current.instanceData}
                               />
                             )}
                           </Collapse>
@@ -112,13 +113,6 @@ const Detail: React.FC<TaskDetailType> = ({ task, onBack }) => {
     return <></>;
   };
 
-  // 审批
-  const approvalTask = async (status: number) => {
-    await formRef.current?.validateFields();
-    task.approvalTask(status, comment);
-    onBack?.apply(this);
-  };
-
   /** tab标签页 */
   const items: TabsProps['items'] = [
     {
@@ -130,32 +124,7 @@ const Detail: React.FC<TaskDetailType> = ({ task, onBack }) => {
             {/** 时间轴 */}
             {loadTimeline()}
           </div>
-
-          {task.metadata.status < TaskStatus.ApprovalStart && (
-            <div
-              style={{ padding: 10, display: 'flex', alignItems: 'flex-end', gap: 10 }}>
-              <Input.TextArea
-                style={{ height: 100, width: 'calc(100% - 80px)' }}
-                placeholder="请填写备注信息"
-                onChange={(e) => {
-                  setComment(e.target.value);
-                }}
-              />
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                <Button
-                  type="primary"
-                  onClick={() => approvalTask(TaskStatus.ApprovalStart)}>
-                  通过
-                </Button>
-                <Button
-                  type="primary"
-                  danger
-                  onClick={() => approvalTask(TaskStatus.RefuseStart)}>
-                  驳回
-                </Button>
-              </div>
-            </div>
-          )}
+          <TaskApproval task={current} finished={finished} />
         </>
       ),
     },
@@ -165,43 +134,77 @@ const Detail: React.FC<TaskDetailType> = ({ task, onBack }) => {
       children: (
         <ProcessTree
           isEdit={false}
-          resource={loadResource(JSON.parse(task.instance?.data || '{}').node, '')}
+          resource={loadResource(JSON.parse(current.instance?.data || '{}').node, '')}
           onSelectedNode={(node) => setSelectNode(node)}
         />
       ),
     },
   ];
+  /** 加载内容 */
+  const loadContent = () => {
+    if (!loaded) {
+      return (
+        <Spin tip={'配置信息加载中...'}>
+          <div style={{ width: '100%', height: '100%' }}></div>
+        </Spin>
+      );
+    }
+    if (current.instance && current.instanceData?.node) {
+      return (
+        <>
+          <Card>
+            <Tabs
+              defaultActiveKey="1"
+              items={items}
+              tabBarExtraContent={
+                <div
+                  style={{ display: 'flex', cursor: 'pointer' }}
+                  onClick={() => {
+                    finished.apply(this);
+                  }}>
+                  <a style={{ paddingTop: '2px' }}>
+                    <ImUndo2 />
+                  </a>
+                  <a style={{ paddingLeft: '6px' }}>返回</a>
+                </div>
+              }
+            />
+          </Card>
+          {selectNode && (
+            <TaskDrawer
+              current={selectNode}
+              isOpen={selectNode != undefined}
+              onClose={() => setSelectNode(undefined)}
+              instance={current.instance!}
+            />
+          )}
+        </>
+      );
+    }
+    return (
+      <div style={{ width: '100%', height: '100%', textAlign: 'center' }}>
+        <h3 style={{ padding: 20 }}>办事数据加载失败!</h3>
+        <Empty />
+      </div>
+    );
+  };
 
   return (
     <>
-      <Card>
-        <Tabs
-          defaultActiveKey="1"
-          items={items}
-          tabBarExtraContent={
-            <div
-              style={{ display: 'flex', cursor: 'pointer' }}
-              onClick={() => {
-                onBack?.apply(this);
-              }}>
-              <a style={{ paddingTop: '2px' }}>
-                <ImUndo2 />
-              </a>
-              <a style={{ paddingLeft: '6px' }}>返回</a>
-            </div>
-          }
-        />
-      </Card>
-      {selectNode && (
-        <TaskDrawer
-          current={selectNode}
-          isOpen={selectNode != undefined}
-          onClose={() => setSelectNode(undefined)}
-          instance={task.instance!}
-        />
-      )}
+      <FullScreenModal
+        open
+        centered
+        fullScreen
+        width={'80vw'}
+        bodyHeight={'80vh'}
+        destroyOnClose
+        title={current.taskdata.taskType}
+        footer={[]}
+        onCancel={finished}>
+        {loadContent()}
+      </FullScreenModal>
     </>
   );
 };
 
-export default Detail;
+export default TaskContent;

@@ -69,6 +69,10 @@ const TypeIcon = ({ avatar, iconType, size }: TypeIconInfo) => {
         return <im.ImShield {...config} />;
       case '激活':
         return <im.ImPowerCord {...config} />;
+      case '事项':
+        return <im.ImClipboard {...config} />;
+      case '加用户':
+        return <im.ImUserPlus {...config} />;
       case TargetType.Company:
       case TargetType.University:
       case TargetType.Hospital:
@@ -77,6 +81,7 @@ const TypeIcon = ({ avatar, iconType, size }: TypeIconInfo) => {
         return <im.ImDrive {...config} />;
       case TargetType.Station:
         return <im.ImAddressBook {...config} />;
+      case '子流程':
       case TargetType.Group:
         return <im.ImTree {...config} />;
       case TargetType.Cohort:

@@ -1,8 +1,10 @@
-import { common, kernel, model, schema } from '../../base';
+import { common, kernel, schema } from '../../base';
 import { storeCollName } from '../public/consts';
 import { TaskStatus } from '../public/enums';
 import { UserProvider } from '../user';
-import { IWorkTask, WorkTask } from './task';
+import { IWorkTask, TaskTypeName, WorkTask } from './task';
+/** 动态集合名 */
+const TaskCollName = 'work-task';
 export interface IWorkProvider {
   /** 用户ID */
   userId: string;
@@ -10,18 +12,14 @@ export interface IWorkProvider {
   user: UserProvider;
   /** 待办 */
   todos: IWorkTask[];
+  /** 所有 */
+  tasks: IWorkTask[];
   /** 变更通知 */
   notity: common.Emitter;
   /** 加载已办数量 */
   loadCompletedCount(): Promise<number>;
   /** 加载已完结数量 */
   loadApplyCount(): Promise<number>;
-  /** 加载待办任务 */
-  loadTodos(reload?: boolean): Promise<IWorkTask[]>;
-  /** 加载已办任务 */
-  loadDones(req: model.IdPageModel): Promise<model.PageResult<IWorkTask>>;
-  /** 加载我发起的办事任务 */
-  loadApply(req: model.IdPageModel): Promise<model.PageResult<IWorkTask>>;
   /** 任务更新 */
   updateTask(task: schema.XWorkTask): void;
   /** 加载实例详情 */
@@ -29,6 +27,8 @@ export interface IWorkProvider {
     id: string,
     belongId: string,
   ): Promise<schema.XWorkInstance | undefined>;
+  /** 加载任务事项 */
+  loadContent(typeName: TaskTypeName, reload?: boolean): Promise<IWorkTask[]>;
 }
 
 export class WorkProvider implements IWorkProvider {
@@ -46,6 +46,7 @@ export class WorkProvider implements IWorkProvider {
   user: UserProvider;
   notity: common.Emitter;
   todos: IWorkTask[] = [];
+  tasks: IWorkTask[] = [];
   private _todoLoaded: boolean = false;
   updateTask(task: schema.XWorkTask): void {
     const index = this.todos.findIndex((i) => i.metadata.id === task.id);
@@ -63,7 +64,23 @@ export class WorkProvider implements IWorkProvider {
       }
     }
   }
-  async loadTodos(reload?: boolean): Promise<IWorkTask[]> {
+  async loadContent(
+    typeName: TaskTypeName,
+    reload: boolean = false,
+  ): Promise<IWorkTask[]> {
+    switch (typeName) {
+      case '待办事项':
+        return await this.loadTodos(reload);
+      case '已办事项':
+        return await this.loadDones(reload);
+      case '我发起的':
+        return await this.loadApply(reload);
+      case '抄送我的':
+        return await this.loadCopys(reload);
+    }
+    return [];
+  }
+  async loadTodos(reload: boolean = false): Promise<IWorkTask[]> {
     if (!this._todoLoaded || reload) {
       let res = await kernel.queryApproveTask({ id: '0' });
       if (res.success) {
@@ -74,69 +91,76 @@ export class WorkProvider implements IWorkProvider {
     }
     return this.todos;
   }
-  async loadDones(req: model.IdPageModel): Promise<model.PageResult<IWorkTask>> {
-    const res = await kernel.collectionLoad<schema.XWorkTask[]>(
-      this.userId,
-      [],
-      storeCollName.WorkTask,
+  async loadCopys(reload: boolean = false): Promise<IWorkTask[]> {
+    if (reload) {
+      this.tasks = [];
+    }
+    const skip = this.tasks.filter((i) => i.isTaskType('抄送我的')).length;
+    await this.loadTasks(
       {
-        options: {
-          match: {
-            belongId: req.id,
-            status: {
-              _gte_: 100,
-            },
-            records: {
-              _exists_: true,
-            },
-          },
-          sort: {
-            createTime: -1,
-          },
-        },
-        skip: req.page?.offset ?? 0,
-        take: req.page?.limit ?? 30,
-        requireTotalCount: true,
+        approveType: '抄送',
       },
+      skip,
     );
-    return {
-      offset: req.page?.offset || 0,
-      limit: req.page?.limit || 30,
-      result: (res.data || [])
-        .filter((task) => task.records && task.records.length > 0)
-        .map((task) => new WorkTask(task, this.user)),
-      total: res.totalCount,
-    };
+    return this.tasks.filter((i) => i.isTaskType('抄送我的'));
   }
-  async loadApply(req: model.IdPageModel): Promise<model.PageResult<IWorkTask>> {
-    const res = await kernel.collectionLoad<schema.XWorkTask[]>(
+  async loadDones(reload: boolean = false): Promise<IWorkTask[]> {
+    if (reload) {
+      this.tasks = [];
+    }
+    const skip = this.tasks.filter((i) => i.isTaskType('已办事项')).length;
+    await this.loadTasks(
+      {
+        status: {
+          _gte_: 100,
+        },
+        records: {
+          _exists_: true,
+        },
+      },
+      skip,
+    );
+    return this.tasks.filter((i) => i.isTaskType('已办事项'));
+  }
+  async loadApply(reload: boolean = false): Promise<IWorkTask[]> {
+    if (reload) {
+      this.tasks = [];
+    }
+    const skip = this.tasks.filter((i) => i.isTaskType('我发起的')).length;
+    await this.loadTasks(
+      {
+        createUser: this.userId,
+        nodeId: {
+          _exists_: false,
+        },
+      },
+      skip,
+    );
+    return this.tasks.filter((i) => i.isTaskType('我发起的'));
+  }
+  async loadTasks(match: any, skip: number): Promise<void> {
+    const result = await kernel.collectionLoad<schema.XWorkTask[]>(
       this.userId,
       [],
-      storeCollName.WorkTask,
+      TaskCollName,
       {
         options: {
-          match: {
-            belongId: req.id,
-            createUser: this.userId,
-            nodeId: {
-              _exists_: false,
-            },
-          },
+          match: match,
           sort: {
             createTime: -1,
           },
         },
-        skip: req.page?.offset ?? 0,
-        take: req.page?.limit ?? 30,
-        requireTotalCount: true,
+        skip: skip,
+        take: 30,
       },
     );
-    return {
-      offset: req.page?.offset || 0,
-      limit: req.page?.limit || 30,
-      result: (res.data || []).map((task) => new WorkTask(task, this.user)),
-      total: res.totalCount,
-    };
+    if (result.success && result.data && result.data.length > 0) {
+      result.data.forEach((item) => {
+        if (this.tasks.every((i) => i.id != item.id)) {
+          this.tasks.push(new WorkTask(item, this.user));
+        }
+      });
+    }
   }
   async loadCompletedCount(): Promise<number> {
     const res = await kernel.collectionLoad(this.userId, [], storeCollName.WorkTask, {

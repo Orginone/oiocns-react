@@ -1,17 +1,25 @@
 import ImageView from './image';
 import VideoView from './video';
-import { IEntity, ISession, ISysFileInfo } from '@/ts/core';
+import { IEntity, ISession, ISysFileInfo, IWorkTask } from '@/ts/core';
 import { command, schema } from '@/ts/base';
 import React, { useEffect, useState } from 'react';
 import OfficeView from './office';
 import SessionBody from './session';
+import TaskBody from './task';
+import JoinApply from './task/joinApply';
 import EntityInfo from '@/components/Common/EntityInfo';
 
 const officeExt = ['.md', '.pdf', '.xls', '.xlsx', '.doc', '.docx', '.ppt', '.pptx'];
 const videoExt = ['.mp4', '.avi', '.mov', '.mpg', '.swf', '.flv', '.mpeg'];
 
 interface IOpenProps {
-  entity: IEntity<schema.XEntity> | ISysFileInfo | ISession | string | undefined;
+  entity:
+    | IEntity<schema.XEntity>
+    | ISysFileInfo
+    | ISession
+    | IWorkTask
+    | string
+    | undefined;
 }
 const EntityPreview: React.FC<IOpenProps> = (props: IOpenProps) => {
   const [entity, setEntity] = useState(props.entity);
@@ -46,6 +54,16 @@ const EntityPreview: React.FC<IOpenProps> = (props: IOpenProps) => {
     }
     if ('activity' in entity) {
       return <SessionBody chat={entity} />;
+    }
+    if ('taskdata' in entity) {
+      switch (entity.taskdata.taskType) {
+        case '事项':
+          return <TaskBody task={entity} />;
+        case '加用户':
+          return <JoinApply task={entity} />;
+        default:
+          return <></>;
+      }
     }
     return <EntityInfo entity={entity} column={1} />;
   }

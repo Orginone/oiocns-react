@@ -100,9 +100,18 @@ export abstract class FileInfo<T extends schema.XEntity>
   }
   abstract cacheFlag: string;
   abstract delete(): Promise<boolean>;
-  abstract rename(name: string): Promise<boolean>;
-  abstract copy(destination: IDirectory): Promise<boolean>;
-  abstract move(destination: IDirectory): Promise<boolean>;
+  async rename(_: string): Promise<boolean> {
+    await sleep(0);
+    return true;
+  }
+  async copy(_: IDirectory): Promise<boolean> {
+    await sleep(0);
+    return true;
+  }
+  async move(_: IDirectory): Promise<boolean> {
+    await sleep(0);
+    return true;
+  }
   async restore(): Promise<boolean> {
     await sleep(0);
     return true;

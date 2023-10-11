@@ -36,4 +36,4 @@ export type { ITransfer } from './thing/standard/transfer';
 export { UserProvider } from './user';
 export type { IWork } from './work';
 export type { IWorkApply } from './work/apply';
-export type { IWorkTask } from './work/task';
+export type { IWorkTask, TaskTypeName } from './work/task';

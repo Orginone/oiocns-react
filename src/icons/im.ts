@@ -62,6 +62,7 @@ import { ImCompass } from '@react-icons/all-files/im/ImCompass';
 import { ImPowerCord } from '@react-icons/all-files/im/ImPowerCord';
 import { ImDrive } from '@react-icons/all-files/im/ImDrive';
 import { ImSafari } from '@react-icons/all-files/im/ImSafari';
+import { ImClipboard } from '@react-icons/all-files/im/ImClipboard';
 import { ImEqualizer } from '@react-icons/all-files/im/ImEqualizer';
 
 export {
@@ -74,6 +75,7 @@ export {
   ImBriefcase,
   ImBubbles2,
   ImCheckmark,
+  ImClipboard,
   ImCog,
   ImCoinPound,
   ImCompass,

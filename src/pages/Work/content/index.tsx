@@ -1,166 +1,135 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import useStorage from '@/hooks/useStorage';
+import IconMode from './views/iconMode';
+import ListMode from './views/listMode';
+import TableMode from './views/tableMode';
+import SegmentContent from '@/components/Common/SegmentContent';
+import { IBelong, IFile, IWorkTask, TaskTypeName } from '@/ts/core';
+import { command } from '@/ts/base';
 import orgCtrl from '@/ts/controller';
-import { IBelong, IWorkTask, TaskStatus } from '@/ts/core';
-import { model } from '@/ts/base';
-import { WorkTaskColumns } from '@/config/column';
-import { GroupMenuType } from '../config/menuType';
-import TaskDetail from './detail';
-import GenerateEntityTable from '@/executor/tools/generate/entityTable';
-import CustomStore from 'devextreme/data/custom_store';
-import { ImCopy, ImShuffle, ImTicket } from '@/icons/im';
-import { Modal, message } from 'antd';
-import useCtrlUpdate from '@/hooks/useCtrlUpdate';
-import WorkStartDo from '@/executor/open/work';
+import { Spin, message } from 'antd';
+import TagsBar from './tagsBar';
+import { loadFileMenus } from '@/executor/fileOperate';
 
 interface IProps {
-  taskType: string;
-  space: IBelong;
+  current: IBelong | 'disk';
 }
-
-const TaskContent = (props: IProps) => {
-  const [task, setTask] = useState<IWorkTask>();
-  const [key] = useCtrlUpdate(orgCtrl.work.notity);
-
-  /** 查询任务项 */
-  const getTaskList = async (page: model.PageModel) => {
-    let taskList: model.PageResult<IWorkTask> = {
-      offset: page.offset,
-      limit: page.limit,
-      total: 0,
-      result: [],
+/**
+ * 办事-待办系统
+ */
+const Directory: React.FC<IProps> = (props) => {
+  if (!props.current) return <></>;
+  const [loaded, setLoaded] = useState(true);
+  const [content, setContent] = useState<IFile[]>([]);
+  const [currentTag, setCurrentTag] = useStorage<TaskTypeName>('taskType', '待办事项');
+  const [segmented, setSegmented] = useStorage('segmented', 'list');
+  const [focusFile, setFocusFile] = useState<IFile>();
+  useEffect(() => {
+    const id = orgCtrl.work.notity.subscribe(() => loadContent());
+    return () => {
+      orgCtrl.work.notity.unsubscribe(id);
     };
-    switch (props.taskType) {
-      case GroupMenuType.Done:
-        {
-          taskList = await orgCtrl.work.loadDones({
-            page: page,
-            id: props.space?.id || '0',
-          });
-        }
-        break;
-      case GroupMenuType.Apply:
-        taskList = await orgCtrl.work.loadApply({
-          page: page,
-          id: props.space?.id || '0',
-        });
-        break;
-      default:
-        {
-          let todos = orgCtrl.work.todos;
-          if (props.space) {
-            todos = todos.filter((t) => t.belong.id === props.space.id);
-          }
-          if (page.filter != '') {
-            todos = todos.filter((t) => t.isMatch(page.filter));
-          }
-          taskList.total = todos.length;
-          taskList.result = todos.slice(page.offset, page.limit);
-        }
-        break;
-    }
-    return taskList;
+  }, [props.current]);
+  useEffect(() => {
+    loadContent();
+  }, [currentTag]);
+
+  const contextMenu = (file?: IFile, clicked?: Function) => {
+    return {
+      items: file ? loadFileMenus(file) : [],
+      onClick: ({ key }: { key: string }) => {
+        command.emitter('executor', key, file);
+        clicked?.apply(this, []);
+      },
+    };
   };
 
-  /** 进入详情 */
-  const setTaskDetail = async (data: IWorkTask) => {
-    if (data.metadata.instanceId) {
-      await data.loadInstance(true);
-      if (data.instance && data.instanceData?.node) {
-        setTask(data);
+  const fileOpen = async (file: IFile | undefined, dblclick: boolean) => {
+    if (dblclick && file) {
+      if (!file.groupTags.includes('已删除')) {
+        command.emitter('executor', 'open', file);
       }
-    } else {
-      const readOnly = data.metadata.status >= TaskStatus.ApprovalStart;
-      Modal.confirm({
-        closable: true,
-        maskClosable: true,
-        title: data.metadata.title,
-        okText: readOnly ? '好的' : '同意',
-        cancelText: '拒绝',
-        cancelButtonProps: {
-          style: {
-            display: readOnly ? 'none' : undefined,
-          },
-        },
-        content: data.content,
-        onCancel: async (...args) => {
-          if (args.length == 0) {
-            await data.approvalTask(TaskStatus.RefuseStart, '拒绝');
-          }
-        },
-        onOk: async () => {
-          if (!readOnly) {
-            await data.approvalTask(TaskStatus.ApprovalStart, '同意');
-          }
-        },
-      });
+    } else if (!dblclick) {
+      if (file?.id === focusFile?.id) {
+        setFocusFile(undefined);
+        command.emitter('preview', 'open');
+      } else {
+        setFocusFile(file);
+        command.emitter('preview', 'open', file);
+      }
     }
   };
 
-  if (task) {
-    if (task.metadata.approveType == '子流程' && task.metadata.identityId) {
-      return <WorkStartDo current={task} finished={() => setTask(undefined)} />;
+  const currentFilter = (task: IWorkTask) => {
+    if (props.current === 'disk') {
+      return true;
     }
-    return <TaskDetail task={task} onBack={() => setTask(undefined)} />;
-  }
+    return task.taskdata.belongId === props.current.id;
+  };
+
+  const getBadgeCount = (tag: string) => {
+    if (tag === '待办事项') {
+      return orgCtrl.work.todos.filter(currentFilter).length;
+    }
+    return 0;
+  };
+
+  const loadContent = () => {
+    setLoaded(false);
+    orgCtrl.work
+      .loadContent(currentTag)
+      .then((tasks) => {
+        setContent(tasks.filter(currentFilter));
+        setLoaded(true);
+      })
+      .catch((reason) => {
+        message.error(reason);
+        setContent([]);
+        setLoaded(true);
+      });
+  };
 
   return (
-    <GenerateEntityTable
-      key={key}
-      fields={WorkTaskColumns}
-      dataSource={
-        new CustomStore({
-          key: 'id',
-          async load(loadOptions) {
-            const res = await getTaskList({
-              offset: loadOptions.skip || 0,
-              limit: loadOptions.take || 20,
-              filter: loadOptions.searchValue || '',
-            });
-            return {
-              data: res.result || [],
-              totalCount: res.total || 0,
-            };
-          },
-        })
-      }
-      columnChooser={{ enabled: true }}
-      onRowDblClick={async (e) => await setTaskDetail(e.data)}
-      sorting={{ mode: 'none' }}
-      remoteOperations={{
-        paging: true,
-        filtering: false,
-        groupPaging: true,
-      }}
-      dataMenus={{
-        items: [
-          {
-            key: 'remark',
-            label: '详情',
-            icon: <ImShuffle fontSize={22} color={'#9498df'} />,
-          },
-          {
-            key: 'createNFT',
-            label: '存证',
-            icon: <ImTicket fontSize={22} color={'#9498df'} />,
-            onClick: () => {
-              message.success('存证成功!');
-            },
-          },
-          {
-            key: 'print',
-            label: '打印',
-            icon: <ImCopy fontSize={22} color={'#9498df'} />,
-          },
-        ],
-        async onMenuClick(key, data) {
-          switch (key) {
-            case 'remark':
-              await setTaskDetail(data);
-              break;
-          }
-        },
-      }}
-    />
+    <>
+      <TagsBar
+        select={currentTag}
+        initTags={['待办事项', '已办事项', '抄送我的', '我发起的']}
+        badgeCount={(tag) => getBadgeCount(tag)}
+        onChanged={(t) => setCurrentTag(t as TaskTypeName)}></TagsBar>
+      <SegmentContent
+        onSegmentChanged={setSegmented}
+        descriptions={`${content.length}个项目`}
+        content={
+          <Spin spinning={!loaded} delay={10} tip={'加载中...'}>
+            {segmented === 'table' ? (
+              <TableMode
+                selectFiles={[]}
+                focusFile={focusFile}
+                content={content}
+                fileOpen={fileOpen}
+                contextMenu={contextMenu}
+              />
+            ) : segmented === 'icon' ? (
+              <IconMode
+                selectFiles={[]}
+                focusFile={focusFile}
+                content={content}
+                fileOpen={fileOpen}
+                contextMenu={contextMenu}
+              />
+            ) : (
+              <ListMode
+                selectFiles={[]}
+                focusFile={focusFile}
+                content={content}
+                fileOpen={fileOpen}
+                contextMenu={contextMenu}
+              />
+            )}
+          </Spin>
+        }
+      />
+    </>
   );
 };
-export default TaskContent;
+export default Directory;
