@@ -7,7 +7,7 @@ import React from 'react';
 import { OperateMenuType } from 'typings/globelType';
 
 /** 加载文件菜单 */
-export const loadFileMenus = (file: IFile) => {
+export const loadFileMenus = (file: IFile, target?: IFile) => {
   const operates: OperateModel[] = [];
   if (file.groupTags.includes('已删除')) {
     if (file.directory.target.hasRelationAuth()) {
@@ -32,7 +32,7 @@ export const loadFileMenus = (file: IFile) => {
         model: o.model ?? 'inside',
         icon: o.menus ? <></> : <TypeIcon iconType={o.iconType} size={16} />,
         beforeLoad: async () => {
-          command.emitter('executor', o.cmd, file);
+          command.emitter('executor', o.cmd, target || file);
           return true;
         },
         children: o.menus
@@ -43,7 +43,7 @@ export const loadFileMenus = (file: IFile) => {
               label: parseLabel(s.label),
               icon: <TypeIcon iconType={s.iconType} size={16} />,
               beforeLoad: async () => {
-                command.emitter('executor', s.cmd, file);
+                command.emitter('executor', s.cmd, target || file);
                 return true;
               },
             };

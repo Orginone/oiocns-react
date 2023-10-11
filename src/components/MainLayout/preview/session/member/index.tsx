@@ -10,8 +10,11 @@ import { loadFileMenus } from '@/executor/fileOperate';
 const IconMode = ({ dircetory }: { dircetory: IDirectory }) => {
   const contextMenu = (file?: IFile) => {
     var entity = file || dircetory;
+    if ('targets' in entity) {
+      entity = entity.directory;
+    }
     return {
-      items: loadFileMenus(entity).filter(
+      items: loadFileMenus(entity, file || dircetory).filter(
         (i) => !['openChat', 'copy', 'parse'].includes(i.key),
       ),
       onClick: ({ key }: { key: string }) => {

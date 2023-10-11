@@ -41,7 +41,7 @@ const Directory: React.FC<IProps> = (props) => {
       entity = entity.directory;
     }
     return {
-      items: loadFileMenus(entity),
+      items: loadFileMenus(entity, file || dircetory),
       onClick: ({ key }: { key: string }) => {
         command.emitter('executor', key, file || dircetory, dircetory.key);
         clicked?.apply(this, []);

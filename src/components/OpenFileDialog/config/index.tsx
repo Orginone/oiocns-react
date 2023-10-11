@@ -17,7 +17,7 @@ const createMenu = (target: ITarget, children: MenuItemType[]) => {
     item: target.directory,
     label: target.name,
     itemType: target.directory.typeName,
-    menus: loadFileMenus(target.directory),
+    menus: loadFileMenus(target.directory, target),
     tag: [target.typeName],
     icon: <EntityIcon notAvatar={true} entityId={target.id} size={18} />,
     children: children,
