@@ -52,11 +52,11 @@ const PrimaryForm: React.FC<IProps> = (props) => {
         },
         render: (_: any, _dom: any) => <></>,
       }}
-      onValuesChange={(_val, vals) => {
-        if (props.allowEdit && vals) {
-          Object.keys(vals).forEach((k) => {
-            data[k] = vals[k];
-            props.data.primary[k] = vals[k];
+      onValuesChange={(_val) => {
+        if (props.allowEdit && _val) {
+          Object.keys(_val).forEach((k) => {
+            data[k] = _val[k];
+            props.data.primary[k] = _val[k];
           });
           formData.after = [data];
           props.onChanged?.apply(this, [form.id, formData]);

@@ -16,7 +16,7 @@ type IProps = {
 */
 const PullMember: React.FC<IProps> = ({ current, finished }) => {
   const [selectMember, setSelectMember] = useState<XTarget[]>([]); // 选中的要拉的人
-  const target = 'target' in current ? current.target : current;
+  const target = 'standard' in current ? current.target : current;
   if (
     target.id != target.belongId &&
     target.typeName != TargetType.Cohort &&

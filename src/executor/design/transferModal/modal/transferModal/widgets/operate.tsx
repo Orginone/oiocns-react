@@ -54,7 +54,7 @@ const Operate: React.FC<IProps> = ({ current }) => {
                     form={form.metadata}
                     fields={form.fields}
                     belong={form.directory.target as IBelong}
-                    onValuesChange={(_, values) => {
+                    onValuesChange={(values) => {
                       for (const key in values) {
                         for (const field of form!.fields) {
                           if (field.id == key) {

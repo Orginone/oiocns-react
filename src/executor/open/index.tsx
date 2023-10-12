@@ -18,7 +18,7 @@ const audioExt = ['.mp3', '.wav', '.ogg'];
 
 const officeExt = ['.md', '.pdf', '.xls', '.xlsx', '.doc', '.docx', '.ppt', '.pptx'];
 const videoExt = ['.mp4', '.avi', '.mov', '.mpg', '.swf', '.flv', '.mpeg'];
-const remarkTypes: any = { 分类: 'Species', 字典: 'Dict', 属性: 'Property' };
+const remarkTypes: any = { 分类: 'Species', 字典: 'Dict', 属性: 'Property', 目录: 'Dir' };
 
 interface IOpenProps {
   cmd: string;

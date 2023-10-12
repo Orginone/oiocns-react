@@ -14,11 +14,11 @@ const IconMode = ({ dircetory }: { dircetory: IDirectory }) => {
       entity = entity.directory;
     }
     return {
-      items: loadFileMenus(entity, file || dircetory).filter(
+      items: loadFileMenus(entity)?.filter(
         (i) => !['openChat', 'copy', 'parse'].includes(i.key),
       ),
       onClick: ({ key }: { key: string }) => {
-        command.emitter('executor', key, file || dircetory, dircetory.key);
+        command.emitter('executor', key, entity, dircetory.key);
       },
     };
   };

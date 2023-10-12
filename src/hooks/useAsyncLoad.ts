@@ -12,6 +12,9 @@ function useAsyncLoad<T>(
   const [loaded, setLoaded] = useState(false);
   const [result, setResult] = useState<T>();
   useEffect(() => {
+    if (loaded) {
+      setLoaded(false);
+    }
     setTimeout(async () => {
       const data = await callback();
       if (data) {

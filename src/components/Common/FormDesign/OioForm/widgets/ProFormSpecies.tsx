@@ -67,7 +67,6 @@ const ProFormDict = (props: IProps) => {
       labelAlign={props.labelAlign}
       fieldProps={{
         treeData: treeData,
-        ...props.rules,
         ...{ filterOption },
         ...{ filterSort },
       }}

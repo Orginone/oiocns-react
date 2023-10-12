@@ -143,7 +143,7 @@ const TaskContent: React.FC<TaskDetailType> = ({ task }) => {
   ];
   if (!loaded) {
     return (
-      <Spin tip={'配置信息加载中...'}>
+      <Spin tip={'信息加载中...'} spinning={!loaded}>
         <div style={{ width: '100%', height: '100%' }}></div>
       </Spin>
     );
@@ -152,7 +152,7 @@ const TaskContent: React.FC<TaskDetailType> = ({ task }) => {
     return (
       <>
         <Card>
-          <Tabs defaultActiveKey="1" items={items} />
+          <Tabs items={items} />
         </Card>
         {selectNode && (
           <TaskDrawer

@@ -25,9 +25,7 @@ const Executor = () => {
             );
             return;
           case 'design':
-            setContent(
-              <DesignExecutor cmd={cmd} entity={args[0]} finished={resetContent} />,
-            );
+            setContent(<DesignExecutor entity={args[0]} finished={resetContent} />);
             return;
           default:
             setContent(<OperateExecutor cmd={cmd} args={args} finished={resetContent} />);

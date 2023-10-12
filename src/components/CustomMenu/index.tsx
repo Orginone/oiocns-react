@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { ImSearch } from '@/icons/im';
 import { MenuItemType } from 'typings/globelType';
 import style from './index.module.less';
+import { cleanMenus } from '@/utils/tools';
 
 interface CustomMenuType {
   collapsed: boolean;
@@ -117,7 +118,7 @@ const CustomMenu = (props: CustomMenuType) => {
             {props.selectMenu.key === item.key && (
               <Dropdown
                 menu={{
-                  items: item.menus,
+                  items: cleanMenus(item.menus),
                   onClick: ({ key }) => {
                     setVisibleMenu(false);
                     props.onMenuClick?.apply(this, [item, key]);

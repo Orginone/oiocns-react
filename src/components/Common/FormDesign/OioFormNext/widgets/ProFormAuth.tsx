@@ -55,7 +55,6 @@ const ProFormAuth = (props: IProps) => {
       labelAlign={props.labelAlign}
       allowClear
       fieldProps={{
-        ...props.rules,
         ...{ treeData },
       }}
       rules={props.rules}

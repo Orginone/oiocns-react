@@ -10,6 +10,7 @@ import { Resizable } from 'devextreme-react';
 import { LeftBarIcon, RightBarIcon } from '@/components/Common/GlobalComps/customIcon';
 import useStorage from '@/hooks/useStorage';
 import EntityPreview from './preview';
+import { cleanMenus } from '@/utils/tools';
 const { Content, Sider } = Layout;
 
 /**
@@ -116,7 +117,7 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
             {inside.length > 0 && (
               <Dropdown
                 menu={{
-                  items: inside,
+                  items: cleanMenus(inside),
                   onClick: ({ key }) => {
                     onOperateMenuClick(props.selectMenu, key);
                   },

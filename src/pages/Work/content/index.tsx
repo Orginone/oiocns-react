@@ -10,6 +10,7 @@ import orgCtrl from '@/ts/controller';
 import { Spin, message } from 'antd';
 import TagsBar from './tagsBar';
 import { loadFileMenus } from '@/executor/fileOperate';
+import { cleanMenus } from '@/utils/tools';
 
 interface IProps {
   current: IBelong | 'disk';
@@ -36,7 +37,7 @@ const Directory: React.FC<IProps> = (props) => {
 
   const contextMenu = (file?: IFile, clicked?: Function) => {
     return {
-      items: file ? loadFileMenus(file) : [],
+      items: cleanMenus(loadFileMenus(file)),
       onClick: ({ key }: { key: string }) => {
         command.emitter('executor', key, file);
         clicked?.apply(this, []);

@@ -12,6 +12,7 @@ import orgCtrl from '@/ts/controller';
 import useAsyncLoad from '@/hooks/useAsyncLoad';
 import { Spin } from 'antd';
 import TagsBar from './tagsBar';
+import { cleanMenus } from '@/utils/tools';
 
 interface IProps {
   dialog?: boolean;
@@ -41,9 +42,9 @@ const Directory: React.FC<IProps> = (props) => {
       entity = entity.directory;
     }
     return {
-      items: loadFileMenus(entity, file || dircetory),
+      items: cleanMenus(loadFileMenus(entity)),
       onClick: ({ key }: { key: string }) => {
-        command.emitter('executor', key, file || dircetory, dircetory.key);
+        command.emitter('executor', key, entity, dircetory.key);
         clicked?.apply(this, []);
       },
     };

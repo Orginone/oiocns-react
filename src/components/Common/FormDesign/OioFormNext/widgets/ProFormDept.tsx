@@ -51,7 +51,6 @@ const ProFormDept = (props: IProps) => {
       tooltip={props.tooltip}
       labelAlign={props.labelAlign}
       fieldProps={{
-        ...props.rules,
         ...{ treeData },
       }}
       rules={props.rules}

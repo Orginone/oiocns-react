@@ -2,7 +2,7 @@ import { model } from '@/ts/base';
 import moment from 'moment';
 import { message } from 'antd';
 import { formatDate } from '@/utils/index';
-import { DataType, MenuItemType, PageData } from 'typings/globelType';
+import { DataType, MenuItemType, OperateMenuType, PageData } from 'typings/globelType';
 
 const dateFormat: string = 'YYYY-MM-DD';
 
@@ -279,6 +279,20 @@ const findMenuItemByKey = (item: MenuItemType, key: string): MenuItemType | unde
   return undefined;
 };
 
+const cleanMenus = (items?: OperateMenuType[]): OperateMenuType[] | undefined => {
+  const newItems = items?.map((i) => {
+    return {
+      key: i.key,
+      label: i.label,
+      icon: i.icon,
+      children: cleanMenus(i.children),
+    } as OperateMenuType;
+  });
+  if (newItems && newItems.length > 0) {
+    return newItems;
+  }
+  return undefined;
+};
 /** url下载 */
 const downloadByUrl = (url: string) => {
   if (!url) {
@@ -314,6 +328,7 @@ const parseHtmlToText = (html: string) => {
 };
 
 export {
+  cleanMenus,
   dateFormat,
   debounce,
   downloadByUrl,

@@ -1,6 +1,6 @@
-import { ProForm } from '@ant-design/pro-components';
+import { ProForm, ProFormInstance } from '@ant-design/pro-components';
 import { Descriptions } from 'antd';
-import React, { useRef, useEffect } from 'react';
+import React, { useEffect, RefObject } from 'react';
 import OioFormItem from './FormItems';
 import { IBelong } from '@/ts/core';
 import cls from './index.module.less';
@@ -14,10 +14,10 @@ type IProps = {
   fields: model.FieldModel[];
   belong: IBelong;
   submitter?: any;
-  onValuesChange?: (changedValues: any, values: Record<string, any>) => void;
+  onValuesChange?: (changedValues: any) => void;
   onFinished?: Function;
   fieldsValue?: any;
-  formRef?: any;
+  ref?: RefObject<ProFormInstance<any>>;
   disabled?: boolean;
   showTitle?: boolean;
   ruleService?: WorkFormRulesType;
@@ -34,7 +34,7 @@ const OioForm: React.FC<IProps> = ({
   onValuesChange,
   onFinished,
   fieldsValue,
-  formRef = useRef(),
+  ref,
   disabled,
   showTitle,
 }) => {
@@ -42,10 +42,10 @@ const OioForm: React.FC<IProps> = ({
   const { col: configCol = 8, layout: configLayout = 'horizontal' } = JSON.parse(
     form.rule ?? '{}',
   );
-
+  const formRef = ref ?? React.createRef<ProFormInstance<any>>();
   const colNum = 24 / configCol; //单行展示数量 默认3
   if (fieldsValue) {
-    formRef?.current?.setFieldsValue(fieldsValue);
+    formRef.current?.setFieldsValue(fieldsValue);
   }
   useEffect(() => {
     /* 向规则服务里，加入修改表单数值的回调方法 */
@@ -54,9 +54,8 @@ const OioForm: React.FC<IProps> = ({
       {
         formId: form.id,
         callback: (data: any) => {
-          onValuesChange &&
-            onValuesChange(data, { ...formRef?.current?.getFieldsValue(), ...data });
-          formRef?.current?.setFieldsValue(data);
+          onValuesChange && onValuesChange(data);
+          formRef.current?.setFieldsValue(data);
         },
       },
     );
@@ -103,7 +102,7 @@ const OioForm: React.FC<IProps> = ({
             { id: form.id, data: vals },
             val,
           );
-          onValuesChange && onValuesChange(val, vals);
+          onValuesChange && onValuesChange(val);
         }}
         layout={configLayout}
         labelAlign="left">
@@ -111,7 +110,7 @@ const OioForm: React.FC<IProps> = ({
           bordered
           size="small"
           className={cls.formRow}
-          column={colNum}
+          column={2}
           labelStyle={{ minWidth: '200px', textAlign: 'right' }}>
           {fields.map((field) => {
             const { required = false, hidden = false } = JSON.parse(field.rule ?? '{}');
@@ -121,7 +120,7 @@ const OioForm: React.FC<IProps> = ({
             return (
               <Descriptions.Item
                 key={generateUuid()}
-                span={1}
+                span={field.valueType === '附件型' ? 2 : 1}
                 style={{ padding: '2px 10px' }}
                 label={
                   <div
@@ -140,8 +139,12 @@ const OioForm: React.FC<IProps> = ({
                   belong={belong}
                   disabled={disabled === true}
                   value={fieldsValue ? fieldsValue[field.id] : undefined}
-                  onFilesValueChange={(key, value) => {
-                    fieldsValue[key] = JSON.stringify(value);
+                  onFieldChange={(name, value) => {
+                    const change: any = {};
+                    change[name] = value;
+                    onValuesChange && onValuesChange(change);
+                    formRef.current?.setFieldValue(name, value);
+                    fieldsValue[name] = value;
                   }}
                 />
               </Descriptions.Item>

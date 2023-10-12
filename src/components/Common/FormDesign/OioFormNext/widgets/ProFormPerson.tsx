@@ -34,14 +34,6 @@ const ProFormPerson = (props: IProps) => {
       initOptions();
     }
   }, []);
-
-  const filterOption = (input: any, option: any) =>
-    ((option?.label ?? '') as string).includes(input);
-  const filterSort = (optionA: any, optionB: any) =>
-    ((optionA?.label ?? '') as string)
-      .toLowerCase()
-      .localeCompare(((optionB?.label ?? '') as string).toLowerCase());
-
   return (
     <ProFormSelect
       name={props.name}
@@ -49,10 +41,7 @@ const ProFormPerson = (props: IProps) => {
       tooltip={props.tooltip}
       labelAlign={props.labelAlign}
       fieldProps={{
-        ...props.rules,
         ...{ options },
-        ...{ filterOption },
-        ...{ filterSort },
       }}
       rules={props.rules}
     />

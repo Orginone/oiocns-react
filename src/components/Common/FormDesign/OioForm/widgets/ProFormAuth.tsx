@@ -54,7 +54,6 @@ const ProFormAuth = (props: IProps) => {
       allowClear
       width={150}
       fieldProps={{
-        ...props.rules,
         ...{ treeData },
       }}
       rules={props.rules}

@@ -37,7 +37,7 @@ const FormEditModal = ({
           fields={fields}
           belong={belong}
           fieldsValue={initialValues || {}}
-          onValuesChange={(_, values) => {
+          onValuesChange={(values) => {
             Object.keys(values).forEach((k) => {
               editData[k] = values[k];
             });

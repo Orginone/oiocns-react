@@ -12,10 +12,10 @@ import {
   ProFormRadio,
   ProFormSelect,
   ProFormText,
-  ProFormUploadButton,
 } from '@ant-design/pro-form';
 import { Rule } from 'antd/es/form';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
+import ProFormFile from './widgets/ProFormFile';
 import ProFormAuth from './widgets/ProFormAuth';
 import ProFormDept from './widgets/ProFormDept';
 import ProFormGroup from './widgets/ProFormGroup';
@@ -23,13 +23,7 @@ import ProFormPerson from './widgets/ProFormPerson';
 import ProFormIdentity from './widgets/ProFormIdentity';
 import { IBelong } from '@/ts/core';
 import { loadWidgetsOpts } from '../rule';
-import { Modal, UploadProps } from 'antd';
-import { FileItemShare } from '@/ts/base/model';
-import { downloadByUrl } from '@/utils/tools';
 import { model } from '@/ts/base';
-import PDF from '@/assets/img/flow.png';
-import word from '@/assets/img/flow.png';
-import file from '@/assets/img/flow.png';
 import EntityIcon from '../../GlobalComps/entityIcon';
 
 interface IProps {
@@ -38,10 +32,8 @@ interface IProps {
   belong: IBelong;
   noRule?: boolean;
   value?: any;
-  onFilesValueChange?: (key: string, files: any[]) => void;
+  onFieldChange?: (key: string, value: any) => void;
 }
-
-const defaultFilsUrl = [PDF, word, file];
 /**
  * 表单项渲染
  */
@@ -50,7 +42,7 @@ const OioFormItem = ({
   belong,
   disabled,
   noRule,
-  onFilesValueChange,
+  onFieldChange,
   value,
 }: IProps) => {
   const rule = JSON.parse(field.rule || '{}');
@@ -81,85 +73,9 @@ const OioFormItem = ({
   if (!rule.widget) {
     rule.widget = loadWidgetsOpts(field.valueType)[0].value;
   }
-  const [fileList, setFileList] = useState<any[]>([]);
-  useEffect(() => {
-    if (value && ['file', 'upload'].includes(rule.widget)) {
-      if (Array.isArray(value)) {
-        setFileList(
-          value.map((a: FileItemShare) => {
-            return {
-              uid: a.name,
-              name: a.name,
-              status: 'done',
-              url: a.shareLink,
-              data: a,
-            };
-          }),
-        );
-      }
-    }
-  }, [value]);
-  // 上传文件区域
-  const uploadProps: UploadProps = {
-    multiple: false,
-    showUploadList: true,
-    maxCount: 10,
-    onPreview(file: any) {
-      Modal.confirm({
-        title: '下载文件',
-        content: '是否下载文件？',
-        cancelText: '取消',
-        okText: '下载',
-        onOk: () => downloadByUrl(file.url),
-      });
-    },
-    onRemove(file: { key: string } & any) {
-      const data = fileList.filter((v) => v.uid !== file.uid);
-      setFileList(data);
-      onFilesValueChange && onFilesValueChange(field.id, data);
-    },
-    async customRequest(options: { file: any }) {
-      const file = options.file as File;
-      if (file) {
-        const result = await belong.directory.createFile(file);
-
-        if (result) {
-          const _data = result.shareInfo();
-          const showImg =
-            _data.extension && ['.png', '.jpg', '.jpeg'].includes(_data.extension)
-              ? _data.shareLink
-              : getImgSrc(_data.extension ?? '.file');
-
-          const _file = {
-            uid: result.key,
-            name: _data.name,
-            status: 'done',
-            url: _data.shareLink,
-            data: _data,
-            isImage:
-              _data.extension && ['.png', '.jpg', '.jpeg'].includes(_data.extension),
-            thumbUrl: showImg,
-          };
-          setFileList([...fileList, _file]);
-          onFilesValueChange && onFilesValueChange(field.id, [...fileList, _file]);
-        }
-      }
-    },
-  };
-  const getImgSrc = (fileType: string) => {
-    switch (fileType) {
-      case '.pdf':
-        return defaultFilsUrl[0];
-      case '.doc':
-      case '.docx':
-        return defaultFilsUrl[1];
-      default:
-        return defaultFilsUrl[2];
-    }
-  };
-  const buildTreeNode = (id: string, items: model.FiledLookup[]): any[] => {
+  const buildTreeNode = (id: string | undefined, items: model.FiledLookup[]): any[] => {
     return items
-      .filter((i) => i.parentId === id)
+      .filter((i) => i.parentId == id)
       .map((i) => {
         return {
           label: i.text,
@@ -226,18 +142,16 @@ const OioFormItem = ({
     case 'file':
     case 'upload': {
       return (
-        <ProFormUploadButton
+        <ProFormFile
+          disabled={disabled}
           name={field.id}
-          key={fileList.length}
-          listType="picture"
-          fileList={fileList}
-          fieldProps={{
-            ...rule,
-            ...uploadProps,
-          }}
+          required={rule.required === true || rule.required === 'true'}
+          fieldProps={rule}
           rules={rules}
           tooltip={field.remark}
           labelAlign="right"
+          values={value}
+          onFieldChange={onFieldChange}
         />
       );
     }
@@ -340,16 +254,7 @@ const OioFormItem = ({
           required={rule.required === true || rule.required === 'true'}
           tooltip={field.remark}
           fieldProps={{
-            ...rules,
-            treeData: (field.lookups || [])
-              .filter((i) => !(i.parentId?.length ?? 0 > 0))
-              .map((i) => {
-                return {
-                  label: i.text,
-                  value: i.value,
-                  children: buildTreeNode(i.id, field.lookups || []),
-                };
-              }),
+            treeData: buildTreeNode(undefined, field.lookups || []),
           }}
           rules={rules}
         />

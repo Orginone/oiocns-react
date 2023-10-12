@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { XTarget } from '@/ts/base/schema';
-import { IBelong, TargetType } from '@/ts/core';
+import { IBelong, IDirectory, TargetType } from '@/ts/core';
 import SearchTarget from '@/components/Common/SearchTarget';
 import { Modal } from 'antd';
 import { schema } from '@/ts/base';
 
 type IProps = {
   cmd: string;
-  current: IBelong;
+  current: IBelong | IDirectory;
   finished: () => void;
 };
 
@@ -48,7 +48,8 @@ const JoinTarget: React.FC<IProps> = ({ cmd, current, finished }) => {
       okButtonProps={{ disabled: !selectMembers }}
       open={true}
       onOk={async () => {
-        if (await current.applyJoin(selectMembers)) {
+        const belong = 'standard' in current ? current.target.space : current;
+        if (await belong.applyJoin(selectMembers)) {
           finished();
         }
       }}
