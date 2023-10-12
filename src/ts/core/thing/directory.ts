@@ -22,7 +22,6 @@ import { BucketOpreates, FileItemModel } from '@/ts/base/model';
 import { encodeKey, sleep } from '@/ts/base/common';
 import { DataResource } from './resource';
 import { DirectoryOperate, IDirectoryOperate } from './operate';
-import { IPageTemplate, PageTemplate } from './standard/page';
 /** 可为空的进度回调 */
 export type OnProgress = (p: number) => void;
 
@@ -56,10 +55,6 @@ export interface IDirectory extends IStandardFileInfo<schema.XDirectory> {
   applications: IApplication[];
   /** 加载迁移配置 */
   loadAllTransfer(reload?: boolean): Promise<ITransfer[]>;
-  /** 新建模板配置 */
-  createTemplate(data: model.XPageTemplate): Promise<IPageTemplate | undefined>;
-  /** 加载模板配置 */
-  loadAllTemplate(reload?: boolean): Promise<IPageTemplate[]>;
   /** 加载文件 */
   loadFiles(reload?: boolean): Promise<ISysFileInfo[]>;
   /** 上传文件 */
@@ -108,9 +103,6 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
   }
   get applications(): IApplication[] {
     return this.operater.getContent<IApplication>(['应用']);
-  }
-  get templates(): IPageTemplate[] {
-    return this.operater.getContent<IPageTemplate>(['页面模板']);
   }
   get children(): IDirectory[] {
     return this.operater.getContent<IDirectory>(['目录']);
@@ -295,25 +287,6 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
       links.push(...(await subDirectory.loadAllTransfer(reload)));
     }
     return links;
-  }
-  async createTemplate(data: model.XPageTemplate): Promise<IPageTemplate | undefined> {
-    const res = await this.resource.templateColl.insert({
-      ...data,
-      directoryId: this.id,
-    });
-    if (res) {
-      const template = new PageTemplate(res, this);
-      this.templates.push(template);
-      await this.resource.templateColl.notity({ data: [res], operate: 'insert' });
-      return template;
-    }
-  }
-  async loadAllTemplate(reload?: boolean | undefined): Promise<IPageTemplate[]> {
-    const templates: IPageTemplate[] = [...this.templates];
-    for (const subDirectory of this.children) {
-      templates.push(...(await subDirectory.loadAllTemplate(reload)));
-    }
-    return templates;
   }
   override operates(mode: number = 0): model.OperateModel[] {
     const operates: model.OperateModel[] = [];

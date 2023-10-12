@@ -172,18 +172,6 @@ export const directoryOperates = {
     label: '新建迁移配置',
     iconType: '迁移配置',
   },
-  NewMdText: {
-    sort: 10,
-    cmd: 'newMdText',
-    label: '新建文档',
-    iconType: '文档',
-  },
-  NewPageTemplate: {
-    sort: 11,
-    cmd: 'newPageTemplate',
-    label: '新建页面模板',
-    iconType: '页面模板',
-  },
 };
 
 /** 目录下新增 */
@@ -201,8 +189,6 @@ export const directoryNew = {
     directoryOperates.NewApp,
     directoryOperates.NewForm,
     directoryOperates.NewTransferConfig,
-    directoryOperates.NewMdText,
-    directoryOperates.NewPageTemplate
   ],
 };
 
@@ -218,12 +204,6 @@ export const newWarehouse = {
       cmd: 'newWarehouse',
       label: '新建仓库',
       iconType: 'newWarehouse',
-    },
-    {
-      sort: 201,
-      cmd: 'codeBuild',
-      label: '代码构建',
-      iconType: 'codeBuild',
     },
   ],
 };

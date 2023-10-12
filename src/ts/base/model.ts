@@ -1018,6 +1018,8 @@ export interface Column {
   dataIndex: string;
   // 类型
   valueType: string;
+  // 是否隐藏
+  hide?: boolean;
 }
 
 // 映射
@@ -1185,56 +1187,6 @@ export type SchemaType = {
   properties: Record<string, object>;
   column: 1 | 2 | 3;
 };
-
-export type CommonAppplication = {
-  // 应用Id
-  id: string;
-  // 展示归属组织
-  spaceId: string;
-};
-
-/** 代码构建 */
-export type codeBuildType = {
-  git: string;
-  dockerfile: string;
-  image: string;
-  registry_tokencreateTime: string;
-};
-/** 新建文档 */
-export type documentType = {
-  name: string;
-};
-// 页面设计
-export interface IPageTemplate<T extends string> {
-  kind: T;
-  // 其他属性通过模块补充增加
-}
-
-export interface ShopTemplate extends IPageTemplate<"shop"> {
-
-}
-
-export interface NewsTemplate extends IPageTemplate<"news"> {
-
-}
-
-export interface PageTemplatePresetMap {
-  "shop": ShopTemplate;
-  "news": NewsTemplate;
-}
-
-export type PageTemplatePreset = PageTemplatePresetMap[keyof PageTemplatePresetMap];
-
-/** 类型保护，判断一个模板是不是内置模板 */
-export function isPageTemplatePreset(template: PageTemplate): template is PageTemplatePreset {
-  return ["shop", "news"].includes(template.kind);
-}
-
-export type PageTemplate<T extends string = string> =  T extends keyof PageTemplatePresetMap
-  ? PageTemplatePresetMap[T]
-  : IPageTemplate<T>;
-
-export type XPageTemplate<T extends string = string> = XStandard & PageTemplate<T>;
 
 export type DiskInfoType = {
   // 状态

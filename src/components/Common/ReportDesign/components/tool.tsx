@@ -134,6 +134,11 @@ const ToolBar: React.FC<IProps> = ({ cellStyle, handClick }: IProps) => {
     },
   ];
 
+  /** 保存 */
+  const onSave = () => {
+    handClick('onSave', 'onSave');
+  };
+
   /** 字体设置 */
   const setUpFontWeight = () => {
     setFontWeight(fontWeight === 'bold' ? defaultFontWeight : 'bold');
@@ -331,16 +336,7 @@ const ToolBar: React.FC<IProps> = ({ cellStyle, handClick }: IProps) => {
     <div className={cls['toolbar-start-tab']} key={tkey}>
       <div className={cls['flex-box']}>
         <div className={cls['row-one']}>
-          <Button onClick={() => handClick('onSave', 'onSave')}>保存</Button>
-        </div>
-      </div>
-
-      <div className={cls['flex-box']}>
-        <div className={cls['row-one']}>
-          <Button onClick={() => handClick('', 'copyStyle')}>复制样式</Button>
-        </div>
-        <div className={cls['row-two']}>
-          <Button onClick={() => handClick('', 'pasteStyle')}>粘贴样式</Button>
+          <Button onClick={onSave}>保存</Button>
         </div>
       </div>
 

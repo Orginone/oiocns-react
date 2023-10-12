@@ -4,27 +4,13 @@ import { SheetViewer, DocxViewer } from 'react-office-viewer';
 import { FileItemShare } from '@/ts/base/model';
 import Markdown from './markdown';
 import { shareOpenLink } from '@/utils/tools';
-import { IDirectory } from '@/ts/core';
 
 interface IProps {
   share: FileItemShare;
-  current: IDirectory;
   finished: () => void;
 }
 
-const OfficeView: React.FC<IProps> = ({ share, finished, current }) => {
-  let mkHtml = '<p></p>';
-  const getHtml = (html: any) => {
-    mkHtml = html;
-  };
-  const mkSave = async () => {
-    let directory = current.directory;
-    await current.delete();
-    let blob = new Blob([mkHtml], { type: 'text/plain' });
-    const file = new window.File([blob], share.name);
-    await directory.createFile(file);
-    finished();
-  };
+const OfficeView: React.FC<IProps> = ({ share, finished }) => {
   if (share.shareLink) {
     const LoadViewer = () => {
       const config = {
@@ -50,13 +36,12 @@ const OfficeView: React.FC<IProps> = ({ share, finished, current }) => {
             />
           );
         case '.md':
-          return <Markdown share={share} getHtml={getHtml} />;
+          return <Markdown share={share} />;
       }
       return <></>;
     };
     return (
       <FullScreenModal
-        onSave={mkSave}
         centered
         open={true}
         fullScreen
