@@ -4,12 +4,9 @@ import { PlusOutlined } from '@ant-design/icons';
 import { ISysFileInfo } from '@/ts/core';
 import OpenFileDialog from '@/components/OpenFileDialog';
 import ActivityResource from '@/components/Activity/ActivityResource';
-import { FileItemShare } from '@/ts/base/model';
 const SelectMultFiles: React.FC<{
   maxCount: number;
   types: string[];
-  readonly?: boolean;
-  previewFiles: FileItemShare[];
   onChange: (fileList: ISysFileInfo[]) => void;
 }> = (props) => {
   const [open, setOpen] = useState(false);
@@ -28,7 +25,7 @@ const SelectMultFiles: React.FC<{
   return (
     <div className={cls.imageUploader}>
       {ActivityResource(
-        [...props.previewFiles, ...fileList.map((i) => i.shareInfo())],
+        fileList.map((i) => i.shareInfo()),
         200,
         1,
       )}
@@ -46,7 +43,7 @@ const SelectMultFiles: React.FC<{
           }}
         />
       )}
-      {props.readonly === true || fileList.length >= props.maxCount ? null : uploadButton}
+      {fileList.length >= props.maxCount ? null : uploadButton}
     </div>
   );
 };

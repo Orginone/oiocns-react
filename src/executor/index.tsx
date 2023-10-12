@@ -8,9 +8,14 @@ import { useHistory } from 'react-router-dom';
 
 const Executor = () => {
   const history = useHistory();
+  const [preview, setPreview] = useState(<></>);
   const [content, setContent] = useState(<></>);
-  const resetContent = () => {
-    setContent(<></>);
+  const resetCtx = (ctx: boolean = true) => {
+    if (ctx) {
+      setContent(<></>);
+    } else {
+      setPreview(<></>);
+    }
   };
   useEffect(() => {
     const id = command.subscribe((type, cmd, ...args: any[]) => {
@@ -20,15 +25,23 @@ const Executor = () => {
         switch (cmd) {
           case 'open':
           case 'remark':
-            setContent(
-              <OpenExecutor cmd={cmd} entity={args[0]} finished={resetContent} />,
-            );
+            if (args.length > 1 && args[1] == 'preview') {
+              setPreview(
+                <OpenExecutor
+                  cmd={cmd}
+                  entity={args[0]}
+                  finished={() => resetCtx(false)}
+                />,
+              );
+            } else {
+              setContent(<OpenExecutor cmd={cmd} entity={args[0]} finished={resetCtx} />);
+            }
             return;
           case 'design':
-            setContent(<DesignExecutor entity={args[0]} finished={resetContent} />);
+            setContent(<DesignExecutor entity={args[0]} finished={resetCtx} />);
             return;
           default:
-            setContent(<OperateExecutor cmd={cmd} args={args} finished={resetContent} />);
+            setContent(<OperateExecutor cmd={cmd} args={args} finished={resetCtx} />);
             return;
         }
       }
@@ -37,7 +50,12 @@ const Executor = () => {
       command.unsubscribe(id);
     };
   }, []);
-  return content;
+  return (
+    <>
+      {preview}
+      {content}
+    </>
+  );
 };
 
 export default Executor;

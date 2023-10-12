@@ -145,11 +145,6 @@ const OioFormItem = ({
         <ProFormFile
           disabled={disabled}
           name={field.id}
-          required={rule.required === true || rule.required === 'true'}
-          fieldProps={rule}
-          rules={rules}
-          tooltip={field.remark}
-          labelAlign="right"
           values={value}
           onFieldChange={onFieldChange}
         />

@@ -1,44 +1,81 @@
 import React, { useEffect, useState } from 'react';
-import { Rule } from 'antd/lib/form';
-import { FormLabelAlign } from 'antd/lib/form/interface';
-import { LabelTooltipType } from 'antd/lib/form/FormItemLabel';
-import { FileItemShare } from '@/ts/base/model';
-import SelectMultFiles from '@/components/Activity/SelectMultFiles';
+import cls from './index.module.less';
+import { PlusOutlined } from '@ant-design/icons';
 import { ISysFileInfo } from '@/ts/core';
-
-interface IProps {
-  rules: Rule[];
+import OpenFileDialog from '@/components/OpenFileDialog';
+import { FileItemShare } from '@/ts/base/model';
+import TypeIcon from '@/components/Common/GlobalComps/typeIcon';
+import { command } from '@/ts/base';
+import { ellipsisText } from '@/utils';
+const SelectMultFiles: React.FC<{
   name: string;
-  required: boolean;
   disabled?: boolean;
-  fieldProps: any;
-  labelAlign: FormLabelAlign;
-  tooltip: LabelTooltipType;
   values: string;
   onFieldChange?: (key: string, value: any) => void;
-}
-
-/**
- * 文件选择组件
- */
-const ProFormFile = (props: IProps) => {
-  const [fileList, setFileList] = useState<FileItemShare[]>(
-    JSON.parse(props.values || '[]'),
+}> = (props) => {
+  const initFiles: FileItemShare[] = [];
+  if (props.values && props.values.length > 0) {
+    try {
+      var temps = JSON.parse(props.values);
+      if (temps && Array.isArray(temps) && temps.length > 0) {
+        initFiles.push(...temps);
+      }
+    } catch {
+      /* empty */
+    }
+  }
+  const [open, setOpen] = useState(false);
+  const [fileList, setFileList] = useState<FileItemShare[]>(initFiles);
+  const uploadButton = (
+    <div className={cls.selectFileBtn} onClick={() => setOpen(true)}>
+      <PlusOutlined style={{ fontSize: 20 }} />
+      <div style={{ marginTop: 8 }}>选择文件</div>
+    </div>
   );
+
   useEffect(() => {
-    props.onFieldChange?.apply(this, [props.name, JSON.stringify(fileList)]);
+    if (props.onFieldChange) {
+      props.onFieldChange(props.name, JSON.stringify(fileList));
+    }
   }, [fileList]);
+
   return (
-    <SelectMultFiles
-      maxCount={5}
-      readonly={props.values?.length > 0}
-      previewFiles={fileList}
-      types={['文件']}
-      onChange={(files) => {
-        setFileList(files.map((i) => (i as ISysFileInfo).shareInfo()));
-      }}
-    />
+    <div className={cls.imageUploader}>
+      {fileList.map((i, x) => {
+        return (
+          <div
+            className={cls.fileItem}
+            key={i.name + x}
+            title={i.name}
+            onClick={() => {
+              command.emitter('executor', 'open', i, 'preview');
+            }}>
+            <TypeIcon iconType={i.contentType ?? '文件'} size={50} />
+            <span>{ellipsisText(i.name, 10)}</span>
+          </div>
+        );
+      })}
+      {open && (
+        <OpenFileDialog
+          multiple
+          rootKey={'disk'}
+          accepts={['文件']}
+          allowInherited
+          onCancel={() => setOpen(false)}
+          onOk={(files) => {
+            if (files.length > 0) {
+              setFileList([
+                ...fileList,
+                ...files.map((i) => (i as ISysFileInfo).shareInfo()),
+              ]);
+            }
+            setOpen(false);
+          }}
+        />
+      )}
+      {props.disabled != true && uploadButton}
+    </div>
   );
 };
 
-export default ProFormFile;
+export default SelectMultFiles;

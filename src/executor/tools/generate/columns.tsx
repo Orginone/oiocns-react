@@ -1,9 +1,10 @@
 import React from 'react';
-import { model, parseAvatar, schema } from '../../../ts/base';
+import { command, model, parseAvatar, schema } from '../../../ts/base';
 import { Column, IColumnProps } from 'devextreme-react/data-grid';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
-import { formatSize, generateUuid } from '@/ts/base/common';
-import { formatDate } from '@/utils';
+import { generateUuid } from '@/ts/base/common';
+import { ellipsisText, formatDate } from '@/utils';
+import { Button } from 'antd';
 
 /** 使用form生成表单列 */
 export const GenerateColumn = (
@@ -81,7 +82,17 @@ export const GenerateColumn = (
         const shares = parseAvatar(data.value);
         if (shares) {
           return shares.map((share: model.FileItemShare, i: number) => {
-            return <div key={i}>{`${share.name}(${formatSize(share.size)})`}</div>;
+            return (
+              <Button
+                type="link"
+                key={i}
+                title={share.name}
+                onClick={() => {
+                  command.emitter('executor', 'open', share, 'preview');
+                }}>
+                {ellipsisText(share.name, 10)}
+              </Button>
+            );
           });
         }
         return '';
