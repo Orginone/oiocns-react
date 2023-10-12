@@ -145,7 +145,7 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
     data.applicationId = this.metadata.applicationId;
     const res = await kernel.createWorkDefine(data);
     if (res.success && res.data.id) {
-      this.notify('workReplace', this.metadata);
+      this.notify('workReplace', res.data);
     }
     return res.success;
   }

@@ -4,6 +4,7 @@ import React from 'react';
 import { loadFileMenus } from '@/executor/fileOperate';
 import { MenuItemType } from 'typings/globelType';
 import { IDepartment, IGroup, ITarget, IDirectory, IApplication, IWork } from '@/ts/core';
+import OrgIcons from '@/components/Common/GlobalComps/orgIcons';
 
 /** 创建团队菜单 */
 const createMenu = (target: ITarget, children: MenuItemType[]) => {
@@ -81,21 +82,23 @@ const buildWorks = (works: IWork[]): MenuItemType[] => {
 
 /** 编译目录树 */
 const buildApplicationTree = (applications: IApplication[]): MenuItemType[] => {
-  return applications.map((application) => {
-    return {
-      key: application.key,
-      item: application,
-      label: application.name,
-      tag: [application.typeName],
-      itemType: application.typeName,
-      menus: loadFileMenus(application),
-      children: [
-        ...buildApplicationTree(application.children),
-        ...buildWorks(application.works),
-      ],
-      icon: <EntityIcon entity={application.metadata} size={18} />,
-    };
-  });
+  return applications
+    .filter((i) => !i.groupTags.includes('已删除'))
+    .map((application) => {
+      return {
+        key: application.key,
+        item: application,
+        label: application.name,
+        tag: [application.typeName],
+        itemType: application.typeName,
+        menus: loadFileMenus(application),
+        children: [
+          ...buildApplicationTree(application.children),
+          ...buildWorks(application.works),
+        ],
+        icon: <EntityIcon entity={application.metadata} size={18} />,
+      };
+    });
 };
 
 /** 获取个人菜单 */
@@ -129,11 +132,11 @@ const getTeamMenu = () => {
 /** 加载设置模块菜单 */
 export const loadBrowserMenu = () => {
   return {
-    key: '存储',
-    label: '存储',
+    key: '管理',
+    label: '管理',
     itemType: 'Tab',
     item: 'disk',
     children: [getUserMenu(), ...getTeamMenu()],
-    icon: <EntityIcon entity={orgCtrl.user.metadata} size={18} />,
+    icon: <OrgIcons store />,
   };
 };

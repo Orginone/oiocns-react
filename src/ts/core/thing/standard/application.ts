@@ -12,6 +12,8 @@ export interface IApplication extends IStandardFileInfo<schema.XApplication> {
   children: IApplication[];
   /** 流程定义 */
   works: IWork[];
+  /** 结构变更 */
+  structCallback(): void;
   /** 根据id查找办事 */
   findWork(id: string): Promise<IWork | undefined>;
   /** 加载办事 */
@@ -68,8 +70,11 @@ export class Application
         }),
       );
       if (data && data.length > 0) {
-        await this.directory.notify('refresh', this.directory.metadata);
-        await destination.notify('refresh', destination.metadata);
+        await this.notify('remove', this.metadata);
+        await destination.notify('reload', {
+          ...destination.metadata,
+          directoryId: destination.id,
+        });
       }
     }
     return false;
@@ -190,7 +195,7 @@ export class Application
             break;
         }
       }
-      this.changCallback();
+      this.structCallback();
       return true;
     } else {
       for (const child of this.children) {

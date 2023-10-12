@@ -8,19 +8,14 @@ import {
 } from '../public';
 import { ITarget } from '../target/base/target';
 import { ITransfer } from './standard/transfer';
-import {
-  SysFileInfo,
-  ISysFileInfo,
-  IStandardFileInfo,
-  StandardFileInfo,
-  IFile,
-} from './fileinfo';
+import { IStandardFileInfo, StandardFileInfo, IFile } from './fileinfo';
 import { Member } from './member';
 import { StandardFiles } from './standard';
 import { IApplication } from './standard/application';
 import { BucketOpreates, FileItemModel } from '@/ts/base/model';
 import { encodeKey, sleep } from '@/ts/base/common';
 import { DataResource } from './resource';
+import { ISysFileInfo, SysFileInfo } from './systemfile';
 /** 可为空的进度回调 */
 export type OnProgress = (p: number) => void;
 
@@ -41,7 +36,7 @@ export interface IDirectory extends IStandardFileInfo<schema.XDirectory> {
   /** 任务发射器 */
   taskEmitter: common.Emitter;
   /** 目录结构变更 */
-  structCallback(): void;
+  structCallback(reload?: boolean): void;
   /** 目录下的内容 */
   content(): IFile[];
   /** 创建子目录 */
@@ -58,6 +53,8 @@ export interface IDirectory extends IStandardFileInfo<schema.XDirectory> {
   loadAllApplication(): Promise<IApplication[]>;
   /** 加载目录资源 */
   loadDirectoryResource(reload?: boolean): Promise<void>;
+  /** 通知重新加载文件列表 */
+  notifyReloadFiles(): Promise<boolean>;
 }
 
 /** 目录实现类 */
@@ -110,8 +107,12 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
   get resource(): DataResource {
     return this.target.resource;
   }
-  structCallback(): void {
-    command.emitter('executor', 'refresh', this);
+  structCallback(reload: boolean = false): void {
+    if (reload) {
+      command.emitter('executor', 'reload', this);
+    } else {
+      command.emitter('executor', 'refresh', this);
+    }
   }
   content(): IFile[] {
     const cnt: IFile[] = [...this.children];
@@ -160,7 +161,7 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
           'replaceMany',
           false,
         );
-        await destination.notify('refresh', data);
+        await destination.notify('reload', data);
       }
     }
     return false;
@@ -178,8 +179,8 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
           'replaceMany',
           true,
         );
-        await this.notify('refresh', this._metadata);
-        await destination.notify('refresh', data);
+        await this.notify('remove', this._metadata);
+        await destination.notify('reload', data);
       }
     }
     return false;
@@ -187,7 +188,7 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
   override async delete(): Promise<boolean> {
     if (this.parent) {
       await this.resource.directoryColl.delete(this.metadata);
-      await this.notify('refresh', this.metadata);
+      await this.notify('delete', this.metadata);
     }
     return false;
   }
@@ -195,7 +196,7 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
     if (this.parent) {
       await this.resource.directoryColl.remove(this.metadata);
       await this.operateDirectoryResource(this, this.resource, 'removeMany');
-      await this.notify('refresh', this.metadata);
+      await this.notify('reload', this.metadata);
     }
     return false;
   }
@@ -215,8 +216,8 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
         key: encodeKey(this.id),
         operate: BucketOpreates.List,
       });
-      if (res.success && res.data.length > 0) {
-        this.files = res.data
+      if (res.success) {
+        this.files = (res.data || [])
           .filter((i) => !i.isDirectory)
           .map((item) => {
             return new SysFileInfo(item, this);
@@ -243,6 +244,7 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
       this.taskEmitter.changCallback();
     });
     if (data) {
+      this.notifyReloadFiles();
       const file = new SysFileInfo(data, this);
       this.files.push(file);
       return file;
@@ -324,5 +326,17 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
     super.receive(operate, data);
     this.coll.cache.push(this._metadata);
     return true;
+  }
+  async notifyReloadFiles(): Promise<boolean> {
+    return await this.coll.notity(
+      {
+        data: {
+          ...this.metadata,
+          directoryId: this.id,
+        },
+        operate: 'reloadFiles',
+      },
+      true,
+    );
   }
 }

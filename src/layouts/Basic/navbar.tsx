@@ -55,7 +55,7 @@ const Navbar: React.FC = () => {
       count: workCount,
     },
     {
-      text: '存储',
+      text: '管理',
       icon: 'store',
       path: '/store',
       count: 0,

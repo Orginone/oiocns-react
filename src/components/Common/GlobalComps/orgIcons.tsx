@@ -8,6 +8,7 @@ interface IProps {
   store?: boolean;
   work?: boolean;
   exit?: boolean;
+  setting?: boolean;
   myWork?: boolean;
   workDone?: boolean;
   workStart?: boolean;
@@ -27,6 +28,8 @@ const OrgIcons = (props: IProps) => {
     svgName = 'chat';
   } else if (props.work) {
     svgName = 'work';
+  } else if (props.setting) {
+    svgName = 'setting';
   } else if (props.exit) {
     svgName = 'exit';
   } else if (props.market) {

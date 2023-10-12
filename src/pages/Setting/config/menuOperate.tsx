@@ -2,6 +2,7 @@ import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import orgCtrl from '@/ts/controller';
 import React from 'react';
 import { ITarget, orgAuth } from '@/ts/core';
+import OrgIcons from '@/components/Common/GlobalComps/orgIcons';
 
 /** 创建团队菜单 */
 const createMenu = (target: ITarget) => {
@@ -32,6 +33,6 @@ export const loadBrowserMenu = () => {
     itemType: 'Tab',
     item: 'disk',
     children: getAdminMenu(),
-    icon: <EntityIcon entity={orgCtrl.user.metadata} size={18} />,
+    icon: <OrgIcons setting />,
   };
 };

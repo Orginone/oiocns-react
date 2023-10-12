@@ -10,7 +10,6 @@ import {
   ISysFileInfo,
   ITarget,
   IWork,
-  TargetType,
 } from '@/ts/core';
 import orgCtrl from '@/ts/controller';
 import QrCode from 'qrcode.react';
@@ -25,8 +24,10 @@ export const executeCmd = (cmd: string, entity: any) => {
   switch (cmd) {
     case 'qrcode':
       return entityQrCode(entity);
+    case 'reload':
+      return directoryRefresh(entity, true);
     case 'refresh':
-      return directoryRefresh(entity);
+      return directoryRefresh(entity, false);
     case 'openChat':
       return openChat(entity);
     case 'download':
@@ -70,8 +71,8 @@ export const executeCmd = (cmd: string, entity: any) => {
 };
 
 /** 刷新目录 */
-const directoryRefresh = (dir: IDirectory | IApplication) => {
-  dir.loadContent(true).then(() => {
+const directoryRefresh = (dir: IDirectory | IApplication, reload: boolean) => {
+  dir.loadContent(reload).then(() => {
     orgCtrl.changCallback();
   });
 };
@@ -90,15 +91,13 @@ const openWork = (entity: IWork) => {
 };
 
 /** 进入目录 */
-const openDirectory = (entity: IEntity<schema.XEntity> | IFile | ITarget) => {
-  if ('identitys' in entity && entity.typeName != TargetType.Station) {
-    if (entity.typeName === TargetType.Storage) {
-      return false;
+const openDirectory = (entity: IFile | schema.XEntity | ITarget) => {
+  if (entity && 'isContainer' in entity && entity.isContainer) {
+    if ('session' in entity) {
+      orgCtrl.currentKey = entity.directory.key;
+    } else {
+      orgCtrl.currentKey = entity.key;
     }
-    entity = entity.directory;
-  }
-  if ('isContainer' in entity && entity.isContainer) {
-    orgCtrl.currentKey = entity.key;
     orgCtrl.changCallback();
     return;
   }

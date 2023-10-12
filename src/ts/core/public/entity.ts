@@ -114,7 +114,6 @@ export abstract class Entity<T extends schema.XEntity>
     if (_metadata.id === this.id) {
       this._metadata = _metadata;
       ShareIdSet.set(this.id, _metadata);
-
       this.changCallback();
     }
   }

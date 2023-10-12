@@ -9,6 +9,7 @@ import OfficeView from './office';
 import ReportView from './report';
 import TransferView from './transfer';
 import AudioPlayer from './audio';
+import EntityPreview from './entity';
 import CodeEditor from './codeeditor';
 import EntityForm from '../operate/entityForm';
 import { IEntity, IForm, ISysFileInfo, TargetType } from '@/ts/core';
@@ -22,10 +23,16 @@ const remarkTypes: any = { 分类: 'Species', 字典: 'Dict', 属性: 'Property'
 
 interface IOpenProps {
   cmd: string;
-  entity: IEntity<schema.XEntity> | ISysFileInfo | model.FileItemShare;
+  entity:
+    | IEntity<schema.XEntity>
+    | ISysFileInfo
+    | model.FileItemShare
+    | schema.XEntity
+    | undefined;
   finished: () => void;
 }
 const ExecutorOpen: React.FC<IOpenProps> = (props: IOpenProps) => {
+  if (props.entity === undefined) return <></>;
   if ('size' in props.entity || 'filedata' in props.entity) {
     const data = 'size' in props.entity ? props.entity : props.entity.filedata;
     if (data.contentType?.startsWith('image')) {
@@ -50,7 +57,7 @@ const ExecutorOpen: React.FC<IOpenProps> = (props: IOpenProps) => {
     if (data.contentType?.startsWith('text')) {
       return <CodeEditor share={data} finished={props.finished} />;
     }
-  } else {
+  } else if ('key' in props.entity) {
     switch (props.entity.typeName) {
       case '事项配置':
       case '实体配置': {
@@ -87,6 +94,8 @@ const ExecutorOpen: React.FC<IOpenProps> = (props: IOpenProps) => {
           );
         }
     }
+  } else {
+    return <EntityPreview entity={props.entity} finished={props.finished} />;
   }
   return <></>;
 };

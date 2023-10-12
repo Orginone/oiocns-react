@@ -7,6 +7,7 @@ export class Sheet<T> implements t.model.Sheet<T> {
   name: string;
   columns: t.model.Column[];
   data: T[];
+  headers: number = 0;
   dir: t.IDirectory;
 
   constructor(sheetName: string, columns: t.model.Column[], dir: t.IDirectory) {

@@ -267,8 +267,16 @@ function subscribeCallback<T extends schema.XStandard>(
         case 'remove':
           standardFilesChanged(directory, typeName, operate, entity);
           break;
+        case 'reload':
+          directory.structCallback(true);
+          return true;
         case 'refresh':
           directory.structCallback();
+          return true;
+        case 'reloadFiles':
+          directory.loadFiles(true).then(() => {
+            directory.changCallback();
+          });
           return true;
         default:
           directory.standard.standardFiles
@@ -279,7 +287,7 @@ function subscribeCallback<T extends schema.XStandard>(
           }
           break;
       }
-      directory.changCallback();
+      directory.structCallback();
       return true;
     }
     for (const subdir of directory.standard.directorys) {

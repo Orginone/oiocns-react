@@ -2,9 +2,10 @@ import React from 'react';
 import { Avatar, Spin } from 'antd';
 import orgCtrl from '@/ts/controller';
 import { ShareIcon } from '@/ts/base/model';
-import { parseAvatar, schema } from '@/ts/base';
+import { command, parseAvatar, schema } from '@/ts/base';
 import TypeIcon from './typeIcon';
 import useAsyncLoad from '@/hooks/useAsyncLoad';
+import { ImInfo } from '@/icons/im';
 
 interface teamTypeInfo {
   size?: number;
@@ -70,10 +71,37 @@ const ShareIconById = (info: shareIconInfo) => {
 const ShareIconItem = (info: shareIconInfo) => {
   const size = info.size ?? 22;
   const fontSize = size > 14 ? 14 : size;
+  const infoMore = () => {
+    if (info.entity && size > 18) {
+      return (
+        <span
+          style={{
+            position: 'relative',
+            zIndex: 101,
+            fontSize: 12,
+            top: -8,
+            width: 4,
+          }}
+          onClick={(e) => {
+            e.stopPropagation();
+            command.emitter('executor', 'open', info.entity, 'preview');
+          }}>
+          <ImInfo color={'#abc'} />
+        </span>
+      );
+    }
+    return <></>;
+  };
   if (info.share) {
     if (info.share.avatar?.thumbnail) {
       return (
-        <div style={{ cursor: 'pointer', display: 'contents' }} title={info.title ?? ''}>
+        <div
+          style={{ cursor: 'pointer', display: 'flex' }}
+          title={info.title ?? ''}
+          onClick={() => {
+            command.emitter('executor', 'open', info.entity, 'preview');
+          }}>
+          {infoMore()}
           <Avatar size={size} src={info.share.avatar.thumbnail} />
           {info.showName && (
             <strong style={{ marginLeft: 6, fontSize: fontSize }}>
@@ -94,7 +122,8 @@ const ShareIconItem = (info: shareIconInfo) => {
         return icon;
       }
       return (
-        <div style={{ display: 'contents' }}>
+        <div style={{ display: 'flex' }}>
+          {infoMore()}
           <Avatar
             size={size}
             icon={icon}
@@ -108,7 +137,8 @@ const ShareIconItem = (info: shareIconInfo) => {
     }
   }
   return (
-    <div style={{ cursor: 'pointer', display: 'contents' }} title={info.title ?? ''}>
+    <div style={{ cursor: 'pointer', display: 'flex' }} title={info.title ?? ''}>
+      {infoMore()}
       <Avatar
         size={size}
         icon={<TypeIcon avatar iconType={'其它'} size={size} />}

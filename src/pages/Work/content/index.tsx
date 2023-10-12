@@ -37,7 +37,7 @@ const Directory: React.FC<IProps> = (props) => {
 
   const contextMenu = (file?: IFile, clicked?: Function) => {
     return {
-      items: cleanMenus(loadFileMenus(file)),
+      items: cleanMenus(loadFileMenus(file)) || [],
       onClick: ({ key }: { key: string }) => {
         command.emitter('executor', key, file);
         clicked?.apply(this, []);
@@ -80,7 +80,14 @@ const Directory: React.FC<IProps> = (props) => {
     orgCtrl.work
       .loadContent(currentTag)
       .then((tasks) => {
-        setContent(tasks.filter(currentFilter));
+        setContent(
+          tasks.filter(currentFilter).sort((a, b) => {
+            return (
+              new Date(b.taskdata.createTime).getTime() -
+              new Date(a.taskdata.createTime).getTime()
+            );
+          }),
+        );
         setLoaded(true);
       })
       .catch((reason) => {

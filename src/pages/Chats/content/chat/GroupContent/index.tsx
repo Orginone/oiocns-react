@@ -3,7 +3,7 @@ import { Button, Checkbox, message, Popover, Spin, Badge, Tooltip, Affix } from 
 import moment from 'moment';
 import React, { useEffect, useRef, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
-import TeamIcon from '@/components/Common/GlobalComps/entityIcon';
+import EntityInfo from '@/components/Common/GlobalComps/entityIcon';
 import Information from './information';
 import ForwardContentModal from './forwardContentModal';
 import { showChatTime, downloadByUrl, shareOpenLink } from '@/utils/tools';
@@ -162,7 +162,7 @@ const GroupContent = (props: Iprops) => {
                 )}
               </div>
               <div style={{ color: '#888' }}>
-                <TeamIcon entityId={item.metadata.fromId} size={36} />
+                <EntityInfo entityId={item.metadata.fromId} size={40} />
               </div>
             </div>
           </Popover>
@@ -171,9 +171,9 @@ const GroupContent = (props: Iprops) => {
     } else {
       return (
         <>
-          <div style={{ display: 'flex' }}>
+          <div style={{ display: 'flex', gap: 10 }}>
             <div>
-              <TeamIcon entityId={item.metadata.fromId} size={36} />
+              <EntityInfo entityId={item.metadata.fromId} size={40} />
             </div>
             <div className={`${css.con_content}`}>
               <div className={`${css.name}`}>{item.from.name}</div>

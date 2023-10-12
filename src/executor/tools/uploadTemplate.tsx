@@ -150,7 +150,7 @@ const generate = async (dir: IDirectory, name: string, excel: IExcel) => {
       );
       const dirSheet = excel.handlers.find((item) => item.sheet.name == '目录');
       if (dirSheet) {
-        dir.notify('refresh', dirSheet.sheet.data);
+        dir.notify('reload', { ...dir.metadata, directoryId: dir.id });
       }
     },
     onReadError: (errors) => {
