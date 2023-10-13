@@ -137,7 +137,7 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
     return [];
   }
   async loadContent(_reload: boolean = false): Promise<boolean> {
-    await this.loadWorkNode();
+    await this.loadWorkNode(_reload);
     return this.forms.length > 0;
   }
   async update(data: model.WorkDefineModel): Promise<boolean> {

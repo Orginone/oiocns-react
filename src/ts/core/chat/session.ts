@@ -362,6 +362,37 @@ export class Session extends Entity<schema.XEntity> implements ISession {
   }
 
   async loadCacheChatData(): Promise<void> {
+    const data = await this.target.user.cacheObj.get<model.MsgChatData>(this.cachePath);
+    if (data && data.fullId === this.chatdata.fullId) {
+      this.chatdata = data;
+    }
+    this.target.user.cacheObj.subscribe(
+      this.chatdata.fullId,
+      (data: model.MsgChatData) => {
+        if (data && data.fullId === this.chatdata.fullId) {
+          this.chatdata = data;
+          this.target.user.cacheObj.setValue(this.cachePath, data);
+          command.emitterFlag('session');
+        }
+      },
+    );
+    this._subscribeMessage();
+  }
+
+  async cacheChatData(notify: boolean = false): Promise<boolean> {
+    const success = await this.target.user.cacheObj.set(this.cachePath, this.chatdata);
+    if (success && notify) {
+      await this.target.user.cacheObj.notity(
+        this.chatdata.fullId,
+        this.chatdata,
+        true,
+        true,
+      );
+    }
+    return success;
+  }
+
+  private _subscribeMessage(): void {
     if (this.isGroup) {
       this.coll.subscribe(
         [this.key],
@@ -385,32 +416,5 @@ export class Session extends Entity<schema.XEntity> implements ISession {
         this.sessionId,
       );
     }
-    const data = await this.target.user.cacheObj.get<model.MsgChatData>(this.cachePath);
-    if (data && data.fullId === this.chatdata.fullId) {
-      this.chatdata = data;
-    }
-    this.target.user.cacheObj.subscribe(
-      this.chatdata.fullId,
-      (data: model.MsgChatData) => {
-        if (data && data.fullId === this.chatdata.fullId) {
-          this.chatdata = data;
-          this.target.user.cacheObj.setValue(this.cachePath, data);
-          command.emitterFlag('session');
-        }
-      },
-    );
-  }
-
-  async cacheChatData(notify: boolean = false): Promise<boolean> {
-    const success = await this.target.user.cacheObj.set(this.cachePath, this.chatdata);
-    if (success && notify) {
-      await this.target.user.cacheObj.notity(
-        this.chatdata.fullId,
-        this.chatdata,
-        true,
-        true,
-      );
-    }
-    return success;
   }
 }

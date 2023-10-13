@@ -8,7 +8,7 @@ import SelectMember from '@/components/Common/SelectMember';
 
 type IProps = {
   current: ITarget | IDirectory;
-  finished: (ok: boolean) => void;
+  finished: () => void;
 };
 
 /*
@@ -28,11 +28,10 @@ const PullMember: React.FC<IProps> = ({ current, finished }) => {
         members={target.space.members}
         exclude={target.members}
         finished={async (selected) => {
-          if (await target.pullMembers(selected)) {
-            finished(true);
-          } else {
-            finished(false);
+          if (selected.length > 0) {
+            await target.pullMembers(selected);
           }
+          finished();
         }}
       />
     );
@@ -43,11 +42,10 @@ const PullMember: React.FC<IProps> = ({ current, finished }) => {
       width={900}
       destroyOnClose
       open={true}
-      onCancel={() => finished(false)}
+      onCancel={() => finished()}
       onOk={async () => {
-        if (await target.pullMembers(selectMember)) {
-          finished(true);
-        }
+        await target.pullMembers(selectMember);
+        finished();
       }}>
       <SearchTarget
         searchCallback={setSelectMember}

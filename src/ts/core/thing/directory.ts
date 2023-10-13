@@ -116,7 +116,7 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
   }
   content(): IFile[] {
     const cnt: IFile[] = [...this.children];
-    if (this.target.session.isMyChat) {
+    if (this.target.session.isMyChat || this.target.hasRelationAuth()) {
       if (this.typeName === '成员目录') {
         cnt.push(...this.target.members.map((i) => new Member(i, this)));
       } else {

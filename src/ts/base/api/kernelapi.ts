@@ -1146,8 +1146,8 @@ export default class KernelApi {
               logger.error(e as Error);
             }
           } else if (!data.onlineOnly) {
-            const data = this._cacheData[flag] || [];
-            this._cacheData[flag] = [...data, data.data];
+            const _cache = this._cacheData[flag] || [];
+            this._cacheData[flag] = [..._cache, data.data];
           }
         }
         break;
