@@ -3,7 +3,7 @@ import { encodeKey, formatSize, generateUuid } from '../../base/common';
 import { BucketOpreates, FileItemModel, FileItemShare } from '../../base/model';
 import { FileInfo, IFile, IFileInfo } from './fileinfo';
 import { IDirectory } from './directory';
-import { entityOperates } from '../public';
+import { entityOperates, fileOperates } from '../public';
 
 /** 文件转实体 */
 export const fileToEntity = (
@@ -36,6 +36,8 @@ export interface ISysFileInfo extends IFileInfo<schema.XEntity> {
   filedata: FileItemModel;
   /** 分享信息 */
   shareInfo(): FileItemShare;
+  /** 视频切片 */
+  hslSplit(): Promise<boolean>;
 }
 
 /** 文件类实现 */
@@ -67,6 +69,7 @@ export class SysFileInfo extends FileInfo<schema.XEntity> implements ISysFileInf
     return {
       size: this.filedata.size,
       name: this.filedata.name,
+      poster: this.filedata.poster,
       extension: this.filedata.extension,
       contentType: this.filedata.contentType,
       shareLink: this.filedata.shareLink,
@@ -135,10 +138,24 @@ export class SysFileInfo extends FileInfo<schema.XEntity> implements ISysFileInf
     }
     return false;
   }
+  async hslSplit(): Promise<boolean> {
+    if (this.filedata.contentType?.startsWith('video')) {
+      await this.directory.resource.bucketOpreate<boolean>({
+        key: encodeKey(this.filedata.key),
+        operate: BucketOpreates.HslSplit,
+      });
+      this.directory.loadFiles(true);
+      this.directory.changCallback();
+    }
+    return false;
+  }
   override operates(): model.OperateModel[] {
     const operates = super.operates();
     if (operates.includes(entityOperates.Delete)) {
       operates.push(entityOperates.HardDelete);
+    }
+    if (this.typeName.startsWith('video') && this.target.hasRelationAuth()) {
+      operates.push(fileOperates.HslSplit);
     }
     return operates
       .filter((i) => i != entityOperates.Delete)

@@ -816,6 +816,8 @@ export type FileItemShare = {
   size: number;
   /** 名称 */
   name: string;
+  /** 视频封面 */
+  poster?: string;
   /** 文件类型 */
   contentType?: string;
   /** 共享链接 */
@@ -850,6 +852,7 @@ export enum BucketOpreates {
   'Copy' = 'Copy',
   'Delete' = 'Delete',
   'Upload' = 'Upload',
+  'HslSplit' = 'HslSplit',
   'AbortUpload' = 'AbortUpload',
 }
 

@@ -54,7 +54,7 @@ const ActivityResource = (
               command.emitter('executor', 'open', item);
             }}
             preview={false}
-            src={item.thumbnail}
+            src={item.poster ? shareOpenLink(item.poster) : item.thumbnail}
           />
         </div>
       );

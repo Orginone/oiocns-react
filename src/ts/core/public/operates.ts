@@ -81,6 +81,12 @@ export const fileOperates = {
     label: '重名名',
     iconType: 'rename',
   },
+  HslSplit: {
+    sort: 26,
+    cmd: 'hslSplit',
+    label: '视频切片',
+    iconType: 'video',
+  },
 };
 
 /** 目录支持的操作 */

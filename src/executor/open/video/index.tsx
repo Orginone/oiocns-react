@@ -28,6 +28,7 @@ const VideoView: React.FC<IProps> = ({ share, finished }) => {
             language: 'zh',
             pausePlacement: 'center',
             isShowScreenshot: false,
+            poster: shareOpenLink(share.poster),
             videoSrc: shareOpenLink(share.shareLink),
             videoType: share.contentType === 'video/stream' ? 'hls' : 'h264',
           }}

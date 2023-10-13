@@ -79,7 +79,7 @@ const ShareIconItem = (info: shareIconInfo) => {
             position: 'relative',
             zIndex: 101,
             fontSize: 12,
-            top: -8,
+            top: -size / 2,
             width: 4,
           }}
           onClick={(e) => {
@@ -95,8 +95,8 @@ const ShareIconItem = (info: shareIconInfo) => {
   if (info.share) {
     if (info.share.avatar?.thumbnail) {
       return (
-        <div
-          style={{ cursor: 'pointer', display: 'flex' }}
+        <span
+          style={{ cursor: 'pointer', display: 'contents' }}
           title={info.title ?? ''}
           onClick={() => {
             command.emitter('executor', 'open', info.entity, 'preview');
@@ -108,7 +108,7 @@ const ShareIconItem = (info: shareIconInfo) => {
               {info.share.name}
             </strong>
           )}
-        </div>
+        </span>
       );
     } else {
       const icon = (
@@ -122,7 +122,7 @@ const ShareIconItem = (info: shareIconInfo) => {
         return icon;
       }
       return (
-        <div style={{ display: 'flex' }}>
+        <span style={{ display: 'contents' }}>
           {infoMore()}
           <Avatar
             size={size}
@@ -132,12 +132,12 @@ const ShareIconItem = (info: shareIconInfo) => {
           {info.showName && (
             <b style={{ marginLeft: 6, fontSize: fontSize }}>{info.share.name}</b>
           )}
-        </div>
+        </span>
       );
     }
   }
   return (
-    <div style={{ cursor: 'pointer', display: 'flex' }} title={info.title ?? ''}>
+    <span style={{ cursor: 'pointer', display: 'contents' }} title={info.title ?? ''}>
       {infoMore()}
       <Avatar
         size={size}
@@ -147,7 +147,7 @@ const ShareIconItem = (info: shareIconInfo) => {
       {info.showName && (
         <strong style={{ marginLeft: 6, fontSize: fontSize }}>{info.entity?.id}</strong>
       )}
-    </div>
+    </span>
   );
 };
 

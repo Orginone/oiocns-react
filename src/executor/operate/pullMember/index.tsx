@@ -30,6 +30,8 @@ const PullMember: React.FC<IProps> = ({ current, finished }) => {
         finished={async (selected) => {
           if (await target.pullMembers(selected)) {
             finished(true);
+          } else {
+            finished(false);
           }
         }}
       />

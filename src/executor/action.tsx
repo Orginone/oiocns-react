@@ -66,6 +66,8 @@ export const executeCmd = (cmd: string, entity: any) => {
       return onlineChanged(cmd, entity);
     case 'activate':
       return activateStorage(entity);
+    case 'hslSplit':
+      return videoHslSplit(entity);
   }
   return false;
 };
@@ -82,6 +84,24 @@ const activateStorage = (store: IStorage) => {
   if ('activateStorage' in store) {
     store.activateStorage();
   }
+};
+
+/** 视频切片 */
+const videoHslSplit = (file: ISysFileInfo) => {
+  const modal = Modal.confirm({
+    title: '切片前确认',
+    content: `视频截屏需要较长的时间,默认等待时间为2s,
+              如果提示超时并非失败,请等待片刻后尝试刷新。`,
+    okText: '确认切片',
+    cancelText: '取消',
+    onOk: async () => {
+      await file.hslSplit();
+      modal.destroy();
+    },
+    onCancel: () => {
+      modal.destroy();
+    },
+  });
 };
 
 /** 进入办事 */
