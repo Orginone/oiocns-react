@@ -2,7 +2,7 @@ import EntityIcon from '../../Common/GlobalComps/entityIcon';
 import React from 'react';
 import { CommentType } from '@/ts/base/model';
 import cls from './index.module.less';
-import UserInfo from '@/components/Activity/UserInfo';
+import UserInfo from '../UserInfo';
 
 const ActivityComment: React.FC<{
   comment: CommentType;

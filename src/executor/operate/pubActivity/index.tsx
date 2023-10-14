@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import FullScreenModal from '@/components/Common/fullScreen';
 import { Button, Form } from 'antd';
-import SelectMultFiles from '@/components/Activity/SelectMultFiles';
+import SelectMultFiles from '@/components/TargetActivity/SelectMultFiles';
 import { IActivity, MessageType } from '@/ts/core';
 import { model } from '@/ts/base';
 import { Editor, Toolbar } from '@wangeditor/editor-for-react';

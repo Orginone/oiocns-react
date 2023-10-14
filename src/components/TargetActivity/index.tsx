@@ -14,7 +14,7 @@ interface ActivityProps {
 }
 
 /** 动态 */
-const Activity: React.FC<ActivityProps> = ({ height, activity, title }) => {
+const TargetActivity: React.FC<ActivityProps> = ({ height, activity, title }) => {
   const ActivityBody: React.FC<{ activity: IActivity }> = ({ activity }) => {
     const [actionList, setActivityList] = useState(activity.activityList);
     useEffect(() => {
@@ -83,4 +83,4 @@ const Activity: React.FC<ActivityProps> = ({ height, activity, title }) => {
   );
 };
 
-export default Activity;
+export default TargetActivity;

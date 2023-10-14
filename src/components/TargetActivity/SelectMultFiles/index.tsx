@@ -3,7 +3,7 @@ import cls from './index.module.less';
 import { PlusOutlined } from '@ant-design/icons';
 import { ISysFileInfo } from '@/ts/core';
 import OpenFileDialog from '@/components/OpenFileDialog';
-import ActivityResource from '@/components/Activity/ActivityResource';
+import ActivityResource from '../ActivityResource';
 const SelectMultFiles: React.FC<{
   maxCount: number;
   types: string[];

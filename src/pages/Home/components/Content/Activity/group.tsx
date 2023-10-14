@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import Activity from '@/components/Activity';
-import ActivityMessage from '@/components/Activity/ActivityMessage';
+import TargetActivity from '@/components/TargetActivity';
+import ActivityMessage from '@/components/TargetActivity/ActivityMessage';
 import cls from './index.module.less';
 import { IActivity } from '@/ts/core';
 import useWindowResize from '@/hooks/useWindowResize';
@@ -44,10 +44,10 @@ const GroupActivityItem: React.FC<{ activity: IActivity }> = ({ activity }) => {
           )}
           <div style={{ height: '100%', width: '100%' }}>
             {loaded && (
-              <Activity
+              <TargetActivity
                 height={'calc(100vh - 335px)'}
                 activity={current}
-                title={current.name + '动态'}></Activity>
+                title={current.name + '动态'}></TargetActivity>
             )}
           </div>
         </div>

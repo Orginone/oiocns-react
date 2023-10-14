@@ -7,7 +7,7 @@ import { useHistory } from 'react-router-dom';
 import orgCtrl from '@/ts/controller';
 import { ellipsisText } from '@/utils';
 import { command } from '@/ts/base';
-import Activity from '@/components/Activity';
+import TargetActivity from '@/components/TargetActivity';
 import MemberContent from './member';
 import { ImQrcode } from '@react-icons/all-files/im/ImQrcode';
 import { ImFolder } from '@react-icons/all-files/im/ImFolder';
@@ -110,7 +110,7 @@ const SessionBody = ({ chat, store }: { chat: ISession; store: boolean }) => {
           </div>
         )}
         <div className={css.groupDetailContent}>
-          <Activity height={680} activity={chat.activity}></Activity>
+          <TargetActivity height={680} activity={chat.activity}></TargetActivity>
         </div>
       </div>
     </>
