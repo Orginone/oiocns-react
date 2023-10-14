@@ -14,7 +14,7 @@ const TableMode = ({
 }: {
   chats: ISession[];
   select: ISession | undefined;
-  sessionOpen: (file: ISession | undefined, dblclick: boolean) => void;
+  sessionOpen: (file: ISession | undefined) => void;
 }) => {
   const [cxtItem, setCxtItem] = useState<ISession>();
   return (
@@ -38,10 +38,7 @@ const TableMode = ({
           columnResizingMode={'nextColumn'}
           showColumnLines={false}
           onRowClick={(e) => {
-            sessionOpen(e.data, false);
-          }}
-          onRowDblClick={(e) => {
-            sessionOpen(e.data, true);
+            sessionOpen(e.data);
           }}
           headerFilter={{
             visible: true,

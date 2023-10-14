@@ -14,7 +14,7 @@ const ListMode = ({
 }: {
   chats: ISession[];
   select: ISession | undefined;
-  sessionOpen: (file: ISession | undefined, dblclick: boolean) => void;
+  sessionOpen: (file: ISession | undefined) => void;
 }) => {
   const [cxtItem, setCxtItem] = useState<ISession>();
   return (
@@ -43,10 +43,7 @@ const ListMode = ({
                 }
                 onContextMenu={() => setCxtItem(item)}
                 onClick={() => {
-                  sessionOpen(item, false);
-                }}
-                onDoubleClick={() => {
-                  sessionOpen(item, true);
+                  sessionOpen(item);
                 }}>
                 <List.Item.Meta
                   avatar={

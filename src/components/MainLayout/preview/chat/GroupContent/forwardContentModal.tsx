@@ -4,11 +4,7 @@ import moment from 'moment';
 import { showChatTime } from '@/utils/tools';
 
 import { IMessage, MessageType } from '@/ts/core';
-import {
-  parseCiteMsg,
-  parseMsg,
-  parseForwardMsg,
-} from '@/components/MainLayout/preview/chat/components/parseMsg';
+import { parseCiteMsg, parseMsg, parseForwardMsg } from '../components/parseMsg';
 import TeamIcon from '@/components/Common/GlobalComps/entityIcon';
 import css from './index.module.less';
 interface IForwardContentModalProps {

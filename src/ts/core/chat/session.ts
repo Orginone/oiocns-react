@@ -211,8 +211,8 @@ export class Session extends Entity<schema.XEntity> implements ISession {
       if (this.chatdata.noReadCount > 0) {
         this.chatdata.noReadCount = 0;
         this.cacheChatData(true);
+        command.emitterFlag('session');
       }
-      command.emitterFlag('session');
       this.messageNotify?.apply(this, [this.messages]);
     });
   }

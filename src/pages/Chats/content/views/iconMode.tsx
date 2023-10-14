@@ -13,7 +13,7 @@ const IconMode = ({
 }: {
   chats: ISession[];
   select: ISession | undefined;
-  sessionOpen: (file: ISession | undefined, dblclick: boolean) => void;
+  sessionOpen: (file: ISession | undefined) => void;
 }) => {
   const FileCard = (item: ISession) => (
     <Dropdown menu={{ items: loadChatOperation(item) }} trigger={['contextMenu']}>
@@ -23,10 +23,7 @@ const IconMode = ({
         bordered={false}
         key={item.key}
         onClick={async () => {
-          await sessionOpen(item, false);
-        }}
-        onDoubleClick={async () => {
-          await sessionOpen(item, true);
+          await sessionOpen(item);
         }}
         onContextMenu={(e) => {
           e.stopPropagation();
