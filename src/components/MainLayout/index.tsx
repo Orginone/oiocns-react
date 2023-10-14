@@ -17,6 +17,7 @@ const { Content, Sider } = Layout;
  * 内容区模板类
  */
 type MainLayoutType = {
+  previewFlag?: string;
   leftShow?: boolean;
   rightShow?: boolean;
   children?: React.ReactNode; // 子组件
@@ -171,7 +172,7 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
               </Sider>
             </Resizable>
             <Content className={cls.content}>
-              <EntityPreview entity={props.selectMenu.item} />
+              <EntityPreview entity={props.selectMenu.item} flag={props.previewFlag} />
             </Content>
           </>
         ) : (

@@ -19,6 +19,7 @@ interface IProps {
   accepts?: string[];
   selects?: IFile[];
   excludeIds?: string[];
+  previewFlag: string;
   onFocused?: (file: IFile | undefined) => void;
   onSelected?: (files: IFile[]) => void;
   current: IDirectory | undefined | 'disk';
@@ -62,7 +63,7 @@ const Directory: React.FC<IProps> = (props) => {
         if (props.selects && props.selects.length > 0 && file) {
           props.onSelected?.apply(this, [props.selects.filter((i) => i.id !== file.id)]);
         }
-        command.emitter('preview', 'open');
+        command.emitter('preview', props.previewFlag);
       } else {
         setFocusFile(file);
         props.onFocused?.apply(this, [file]);
@@ -71,7 +72,7 @@ const Directory: React.FC<IProps> = (props) => {
             props.onSelected?.apply(this, [[...props.selects, file]]);
           }
         }
-        command.emitter('preview', 'open', file);
+        command.emitter('preview', props.previewFlag, file);
       }
     }
   };

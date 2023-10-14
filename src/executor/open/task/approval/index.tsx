@@ -14,7 +14,7 @@ const TaskApproval: React.FC<TaskDetailType> = ({ task, finished }) => {
   // 审批
   const approvalTask = async (status: number) => {
     task.approvalTask(status, comment);
-    command.emitter('preview', '-');
+    command.emitter('preview', 'work');
     setComment('');
     finished();
   };

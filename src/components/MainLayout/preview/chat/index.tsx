@@ -10,7 +10,7 @@ import { AiOutlineClose } from '@/icons/ai';
  * @description: 沟通聊天
  * @return {*}
  */
-const Chat: React.FC<any> = ({ chat, filter }: { chat: ISession; filter: string }) => {
+const Chat: React.FC<{ chat: ISession; filter: string }> = ({ chat, filter }) => {
   const [writeContent, setWriteContent] = useState<any>(null); // 重新编辑
   const [citeText, setCiteText] = useState<string>(''); // 引用值
   const [enterCiteMsg, setEnterCiteMsg] = useState<string | any>(); // 回车赋值

@@ -135,7 +135,6 @@ export class WorkTask extends FileInfo<schema.XEntity> implements IWorkTask {
       try {
         this.instance = data;
         this.instanceData = eval(`(${data.data})`);
-        console.log(this.instanceData);
         return this.instanceData !== undefined;
       } catch (ex) {
         logger.error(ex as Error);

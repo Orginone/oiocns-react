@@ -52,6 +52,7 @@ const OpenFileDialog: React.FC<IFileDialogProps> = (props) => {
       }>
       <MainLayout
         leftShow
+        previewFlag={'dialog'}
         selectMenu={selectMenu}
         onSelect={(data) => {
           setSelectMenu(data);
@@ -60,6 +61,7 @@ const OpenFileDialog: React.FC<IFileDialogProps> = (props) => {
         <Directory
           key={key}
           dialog
+          previewFlag={'dialog'}
           accepts={props.accepts}
           selects={selectedFiles}
           current={selectMenu.item}

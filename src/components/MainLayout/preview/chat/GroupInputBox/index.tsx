@@ -4,12 +4,12 @@ import { CloseCircleFilled } from '@ant-design/icons';
 import React, { useEffect, useState } from 'react';
 import { IMessage, ISession, ISysFileInfo, MessageType } from '@/ts/core';
 import { parseAvatar } from '@/ts/base';
-import PullDown from '@/pages/Chats/components/pullDown';
-import Cutting from '../../cutting';
+import PullDown from '../components/pullDown';
+import Cutting from '../components/cutting';
 import './index.less';
 import OpenFileDialog from '@/components/OpenFileDialog';
-import { parseCiteMsg } from '@/pages/Chats/components/parseMsg';
-import Emoji from '../../../components/emoji';
+import { parseCiteMsg } from '../components/parseMsg';
+import Emoji from '../components/emoji';
 
 /**
  * @description: 输入区域

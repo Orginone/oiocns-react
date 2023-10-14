@@ -11,12 +11,13 @@ const FileBrowser: React.FC = () => {
   if (!selectMenu || !rootMenu) return <></>;
   return (
     <MainLayout
+      previewFlag={'store'}
       selectMenu={selectMenu}
       onSelect={async (data) => {
         setSelectMenu(data);
       }}
       siderMenuData={rootMenu}>
-      <Directory key={key} current={selectMenu.item} />
+      <Directory key={key} current={selectMenu.item} previewFlag={'store'} />
     </MainLayout>
   );
 };

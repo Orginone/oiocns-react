@@ -49,7 +49,7 @@ const TaskContent: React.FC<TaskDetailType> = ({ task }) => {
       <TaskApproval
         task={task}
         finished={() => {
-          command.emitter('preview', '-');
+          command.emitter('preview', 'work');
         }}
       />
     </div>

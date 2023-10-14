@@ -53,10 +53,10 @@ const Directory: React.FC<IProps> = (props) => {
     } else if (!dblclick) {
       if (file?.id === focusFile?.id) {
         setFocusFile(undefined);
-        command.emitter('preview', 'open');
+        command.emitter('preview', 'work');
       } else {
         setFocusFile(file);
-        command.emitter('preview', 'open', file);
+        command.emitter('preview', 'work', file);
       }
     }
   };

@@ -12,7 +12,7 @@ import MemberContent from './member';
 import { ImQrcode } from '@react-icons/all-files/im/ImQrcode';
 import { ImFolder } from '@react-icons/all-files/im/ImFolder';
 import { ImAddressBook, ImBin } from '@/icons/im';
-const SessionBody = ({ chat }: { chat: ISession }) => {
+const SessionBody = ({ chat, store }: { chat: ISession; store: boolean }) => {
   const [memberShow, setMemberShow] = useState(false);
   const history = useHistory();
   const sessionActions = () => {
@@ -38,6 +38,7 @@ const SessionBody = ({ chat }: { chat: ISession }) => {
         />,
       );
     }
+    if (store) return actions;
     if (chat.sessionId === chat.target.id) {
       actions.push(
         <ImFolder
@@ -95,7 +96,7 @@ const SessionBody = ({ chat }: { chat: ISession }) => {
               <>
                 <span style={{ marginRight: 10 }}>{chat.chatdata.chatName}</span>
                 {chat.members.length > 0 && (
-                  <span className={css.number}>({chat.members.length}人)</span>
+                  <span className={css.number}>({chat.members.length})</span>
                 )}
               </>
             }

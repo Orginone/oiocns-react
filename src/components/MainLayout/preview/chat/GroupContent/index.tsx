@@ -14,7 +14,7 @@ import {
   parseCiteMsg,
   parseMsg,
   parseForwardMsg,
-} from '@/pages/Chats/components/parseMsg';
+} from '@/components/MainLayout/preview/chat/components/parseMsg';
 import { RiShareForwardFill } from '@/icons/ri';
 import { BsListCheck } from '@/icons/bs';
 import type { CheckboxChangeEvent } from 'antd/es/checkbox';

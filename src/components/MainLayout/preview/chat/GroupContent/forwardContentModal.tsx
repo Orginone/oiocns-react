@@ -8,7 +8,7 @@ import {
   parseCiteMsg,
   parseMsg,
   parseForwardMsg,
-} from '@/pages/Chats/components/parseMsg';
+} from '@/components/MainLayout/preview/chat/components/parseMsg';
 import TeamIcon from '@/components/Common/GlobalComps/entityIcon';
 import css from './index.module.less';
 interface IForwardContentModalProps {

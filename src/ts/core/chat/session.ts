@@ -161,7 +161,7 @@ export class Session extends Entity<schema.XEntity> implements ISession {
     }
     if (this.isGroup) {
       gtags.push('群聊');
-    } else if (!this.chatdata.labels.includes('同事')) {
+    } else {
       gtags.push('单聊');
     }
     if (this.chatdata.noReadCount > 0) {
