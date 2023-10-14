@@ -14,6 +14,7 @@ const Setting: React.FC<any> = () => {
   return (
     <MainLayout
       previewFlag={'chat'}
+      rightShow
       selectMenu={selectMenu}
       onSelect={async (data) => {
         setSelectMenu(data);

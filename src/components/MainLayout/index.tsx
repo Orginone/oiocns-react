@@ -161,7 +161,7 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
             </div>
           </Sider>
         )}
-        {props.rightShow !== false && rightSider ? (
+        {props.rightShow !== false && (props.rightShow || rightSider) ? (
           <>
             <Resizable
               handles={'right'}

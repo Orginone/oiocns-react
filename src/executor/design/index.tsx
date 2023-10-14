@@ -5,6 +5,7 @@ import SpeciesModal from './speciesModal';
 import WorkModal from './workModal';
 import LabelsModal from './labelsModal';
 import ReportModal from './reportModal';
+import FormModal from './formModal';
 import { TransferModal } from './transferModal';
 interface IProps {
   entity: IEntity<schema.XEntity>;
@@ -16,6 +17,8 @@ const OperateModal: React.FC<IProps> = ({ entity, finished }) => {
     case '事项配置':
     case '实体配置':
       return <LabelsModal finished={finished} current={entity as any} />;
+    case '表单':
+      return <FormModal finished={finished} current={entity as any} />;
     case '报表':
       return <ReportModal finished={finished} current={entity as any} />;
     case '迁移配置':

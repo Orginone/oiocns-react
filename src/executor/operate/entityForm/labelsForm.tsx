@@ -79,10 +79,10 @@ const LabelsForm = (props: Iprops) => {
       title: '类型',
       dataIndex: 'typeName',
       valueType: 'select',
-      initialValue: '实体配置',
+      initialValue: '表单',
       readonly: readonly,
       fieldProps: {
-        options: ['实体配置', '事项配置', '报表'].map((i) => {
+        options: ['表单', '实体配置', '事项配置', '报表'].map((i) => {
           return {
             value: i,
             label: i,

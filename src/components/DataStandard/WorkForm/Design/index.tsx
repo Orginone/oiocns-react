@@ -5,7 +5,7 @@ interface IFormDesignProps {
   current: IForm;
 }
 
-const WorkFormDesign: React.FC<IFormDesignProps> = (props) => {
+const WorkFormDesign: React.FC<IFormDesignProps> = ({ current }) => {
   return <></>;
 };
 

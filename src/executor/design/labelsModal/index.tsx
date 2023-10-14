@@ -1,6 +1,6 @@
 import { Button } from 'antd';
 import React, { useState } from 'react';
-// import FormDesign from '@/components/Common/FormDesign';
+import FormDesign from '@/components/Common/FormDesign';
 import cls from './index.module.less';
 import PageCard from '@/components/PageCard';
 import Attribute from './Attritube';
@@ -8,7 +8,6 @@ import FormRules from './formRules';
 import { IForm } from '@/ts/core';
 import FullScreenModal from '@/components/Common/fullScreen';
 import EntityInfo from '@/components/Common/EntityInfo';
-import FormDesign from '@/components/DataStandard/WorkForm/Design';
 
 interface IProps {
   current: IForm;
