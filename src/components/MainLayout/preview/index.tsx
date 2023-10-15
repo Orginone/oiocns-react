@@ -1,6 +1,6 @@
 import ImageView from './image';
 import VideoView from './video';
-import { IEntity, ISession, ISysFileInfo, IWorkTask } from '@/ts/core';
+import { IEntity, IForm, ISession, ISysFileInfo, IWorkTask } from '@/ts/core';
 import { command, schema } from '@/ts/base';
 import React, { useEffect, useState } from 'react';
 import OfficeView from './office';
@@ -9,6 +9,7 @@ import ChatBody from './chat';
 import TaskBody from './task';
 import JoinApply from './task/joinApply';
 import EntityInfo from '@/components/Common/EntityInfo';
+import WorkForm from '@/components/DataStandard/WorkForm';
 
 const officeExt = ['.md', '.pdf', '.xls', '.xlsx', '.doc', '.docx', '.ppt', '.pptx'];
 const videoExt = ['.mp4', '.avi', '.mov', '.mpg', '.swf', '.flv', '.mpeg'];
@@ -20,6 +21,7 @@ interface IOpenProps {
     | ISysFileInfo
     | ISession
     | IWorkTask
+    | IForm
     | string
     | undefined;
 }
@@ -60,6 +62,9 @@ const EntityPreview: React.FC<IOpenProps> = (props: IOpenProps) => {
       }
       if ('session' in entity) {
         return <SessionBody chat={entity.session} store />;
+      }
+      if ('fields' in entity) {
+        return <WorkForm form={entity} />;
       }
       if ('taskdata' in entity) {
         switch (entity.taskdata.taskType) {

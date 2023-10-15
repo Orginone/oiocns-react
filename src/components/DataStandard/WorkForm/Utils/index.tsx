@@ -51,7 +51,7 @@ export const loadwidgetOptions = (attribute: schema.XAttribute) => {
 };
 
 export const getItemNums = () => {
-  return ['一列', '二列', '三列', '四列'];
+  return ['一列', '二列', '三列', '四列', '五列', '六列', '七列', '八列'];
 };
 
 export const getItemWidth = (numStr: string) => {
@@ -64,6 +64,14 @@ export const getItemWidth = (numStr: string) => {
       return 'calc(33.333% - 7px)';
     case '四列':
       return 'calc(25% - 8px)';
+    case '五列':
+      return 'calc(20% - 8px)';
+    case '六列':
+      return 'calc(16.63% - 8px)';
+    case '七列':
+      return 'calc(14.24% - 8px)';
+    case '八列':
+      return 'calc(12.45% - 8px)';
     default:
       return 300;
   }

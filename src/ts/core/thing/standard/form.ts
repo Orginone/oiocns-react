@@ -62,6 +62,7 @@ export class Form extends StandardFileInfo<schema.XForm> implements IForm {
   }
   async loadFields(reload: boolean = false): Promise<model.FieldModel[]> {
     if (!this._fieldsLoaded || reload) {
+      console.log(1);
       this.fields = [];
       const speciesIds = this.attributes
         .map((i) => i.property?.speciesId)

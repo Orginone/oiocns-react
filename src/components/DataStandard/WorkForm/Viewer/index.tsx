@@ -5,6 +5,7 @@ import Toolbar, { Item } from 'devextreme-react/toolbar';
 import FormItem from './formItem';
 import { Emitter } from '@/ts/base/common';
 import { getItemNums } from '../Utils';
+import useStorage from '@/hooks/useStorage';
 
 const WorkFormViewer: React.FC<{
   data?: any;
@@ -17,7 +18,7 @@ const WorkFormViewer: React.FC<{
 }> = (props) => {
   const formData: any = props.data || {};
   const [notifyEmitter] = React.useState(new Emitter());
-  const [colNum, setColNum] = React.useState('二列');
+  const [colNum, setColNum] = useStorage('workFormColNum', '一列');
   return (
     <div style={{ padding: 16 }}>
       <Toolbar height={60}>

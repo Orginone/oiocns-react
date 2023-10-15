@@ -63,7 +63,9 @@ const FormItem: React.FC<IFormItemProps> = (props) => {
     case '文本框':
       return <TextBox {...mixOptions} />;
     case '多行文本框':
-      return <TextArea {...mixOptions} minHeight={100} autoResizeEnabled />;
+      return (
+        <TextArea {...mixOptions} minHeight={100} autoResizeEnabled width={'100%'} />
+      );
     case '富文本框':
       return <HtmlEditItem {...mixOptions} />;
     case '选择框':
