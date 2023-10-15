@@ -3,6 +3,7 @@ import { IForm } from '@/ts/core';
 import { Form } from 'devextreme-react';
 import { GroupItem, SimpleItem } from 'devextreme-react/form';
 import React from 'react';
+import { loadwidgetOptions } from '../../Utils';
 
 interface IAttributeProps {
   index: number;
@@ -32,7 +33,7 @@ const AttributeConfig: React.FC<IAttributeProps> = ({
         editorType="dxSelectBox"
         label={{ text: '组件' }}
         editorOptions={{
-          items: ['文本', '多行文本'],
+          items: loadwidgetOptions(current.metadata.attributes[index]),
         }}
       />
       <SimpleItem

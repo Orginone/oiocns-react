@@ -1,8 +1,10 @@
 import { schema } from '@/ts/base';
 import { Emitter } from '@/ts/base/common';
 import { IForm } from '@/ts/core';
+import HtmlEditItem from './customItem/htmlItem';
 import TreeSelectItem from './customItem/treeItem';
 import SelectFilesItem from './customItem/fileItem';
+import { getWidget } from '../../Utils';
 import { DateBox, NumberBox, SelectBox, TextArea, TextBox } from 'devextreme-react';
 import React, { useEffect, useState } from 'react';
 
@@ -46,58 +48,46 @@ const FormItem: React.FC<{
   if (attribute.options.isRequired) {
     mixOptions.label = mixOptions.label + '*';
   }
-  if (attribute.property) {
-    switch (attribute.property!.valueType) {
-      case '数值型':
-        return <NumberBox {...mixOptions} />;
-      case '描述型':
-        switch (attribute.widget) {
-          case '多行文本':
-            return <TextArea {...mixOptions} height={100} autoResizeEnabled />;
-          default:
-            return <TextBox {...mixOptions} />;
-        }
-      case '选择型':
-        return (
-          <SelectBox
-            {...mixOptions}
-            searchEnabled
-            searchMode="contains"
-            searchExpr={'name'}
-            dataSource={items}
-            displayExpr={'name'}
-            valueExpr={'id'}
-          />
-        );
-      case '分类型':
-        return <TreeSelectItem {...mixOptions} speciesItems={items} />;
-      case '用户型':
-        return <SelectBox {...mixOptions} items={[]} />;
-      case '日期型':
-        return <DateBox {...mixOptions} type={'date'} displayFormat={'yyyy年MM月dd日'} />;
-      case '时间型':
-        return (
-          <DateBox
-            {...mixOptions}
-            type={'datetime'}
-            displayFormat={'yyyy年MM月dd日 HH:mm:ss'}
-          />
-        );
-      case '附件型':
-        return <SelectFilesItem {...mixOptions} />;
-      default:
-        return <TextArea {...mixOptions} />;
-    }
+  switch (getWidget(attribute)) {
+    case '数字框':
+      return <NumberBox {...mixOptions} />;
+    case '文本框':
+      return <TextBox {...mixOptions} />;
+    case '多行文本框':
+      return <TextArea {...mixOptions} minHeight={100} autoResizeEnabled />;
+    case '富文本框':
+      return <HtmlEditItem {...mixOptions} />;
+    case '选择框':
+      return (
+        <SelectBox
+          {...mixOptions}
+          searchEnabled
+          searchMode="contains"
+          searchExpr={'name'}
+          dataSource={items}
+          displayExpr={'name'}
+          valueExpr={'id'}
+        />
+      );
+    case '多级选择框':
+      return <TreeSelectItem {...mixOptions} speciesItems={items} />;
+    case '人员搜索框':
+      return <SelectBox {...mixOptions} items={[]} />;
+    case '日期选择框':
+      return <DateBox {...mixOptions} type={'date'} displayFormat={'yyyy年MM月dd日'} />;
+    case '时间选择框':
+      return (
+        <DateBox
+          {...mixOptions}
+          type={'datetime'}
+          displayFormat={'yyyy年MM月dd日 HH:mm:ss'}
+        />
+      );
+    case '文件选择框':
+      return <SelectFilesItem {...mixOptions} />;
+    default:
+      return <TextArea {...mixOptions} />;
   }
-  return (
-    <TextBox
-      {...mixOptions}
-      showMaskMode="always"
-      readOnly
-      value={'错误的属性'}
-      isValid={false}
-    />
-  );
 };
 
 export default FormItem;

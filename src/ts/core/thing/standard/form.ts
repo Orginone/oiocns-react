@@ -1,4 +1,3 @@
-import { sleep } from '@/ts/base/common';
 import { schema, model } from '../../../base';
 import { entityOperates, fileOperates, orgAuth } from '../../../core/public';
 import { IDirectory } from '../directory';
@@ -55,8 +54,7 @@ export class Form extends StandardFileInfo<schema.XForm> implements IForm {
     return ['表单', ...super.groupTags];
   }
   async save(): Promise<boolean> {
-    await sleep(0);
-    return true;
+    return this.update(this.metadata);
   }
   async loadContent(reload: boolean = false): Promise<boolean> {
     await this.loadFields(reload);

@@ -5,6 +5,7 @@ import { Resizable } from 'devextreme-react';
 import { Layout } from 'antd';
 import FormRender from './form';
 import { Emitter } from '@/ts/base/common';
+import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 
 interface IFormDesignProps {
   current: IForm;
@@ -12,11 +13,12 @@ interface IFormDesignProps {
 
 /** 办事表单设计器 */
 const WorkFormDesign: React.FC<IFormDesignProps> = ({ current }) => {
+  const [key] = useCtrlUpdate(current);
   const [selectIndex, setSelectIndex] = React.useState<number>(-1);
   const [mainWidth, setMainWidth] = React.useState<number>(400);
   const [notifyEmitter] = useState(new Emitter());
   return (
-    <Layout>
+    <Layout key={key}>
       <Resizable
         handles={'right'}
         width={mainWidth}

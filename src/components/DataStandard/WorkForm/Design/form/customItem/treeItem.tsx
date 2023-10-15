@@ -40,6 +40,11 @@ const TreeSelectItem: React.FC<TreeSelectItemProps> = (props) => {
             dataSource={items}
             displayExpr={'name'}
             valueExpr={'id'}
+            onValueChanged={(e) => {
+              if (e.value === null && selectValues[index]) {
+                setSelectValues([...selectValues.slice(0, index)]);
+              }
+            }}
             value={selectValues[index]}
             label={`${props.label}-第${index + 1}级`}
             onItemClick={(item) => {

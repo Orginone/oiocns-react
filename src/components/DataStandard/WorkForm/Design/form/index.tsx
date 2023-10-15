@@ -15,6 +15,10 @@ const FormRender: React.FC<{
 }> = ({ current, notityEmitter, onItemSelected }) => {
   const [openDialog, setDialog] = React.useState(false);
   const showDialog = React.useCallback(() => setDialog(true), []);
+  const onReorder = React.useCallback((e: { fromIndex: number; toIndex: number }) => {
+    const fromAttr = current.metadata.attributes.splice(e.fromIndex, 1);
+    current.metadata.attributes.splice(e.toIndex, 0, ...fromAttr);
+  }, []);
   return (
     <div style={{ padding: 16 }}>
       <Toolbar height={60}>
@@ -91,12 +95,19 @@ const FormRender: React.FC<{
           }
           onItemSelected(e.itemIndex as number);
         }}
+        onItemReordered={onReorder}
         onItemDeleted={() => onItemSelected(-1)}
         itemRender={(attr: schema.XAttribute) => {
           return <FormItem attr={attr} current={current} notityEmitter={notityEmitter} />;
         }}
         itemDeleteMode="static">
-        <ItemDragging allowReordering={true} />
+        <ItemDragging
+          data={current.metadata.attributes}
+          autoScroll
+          allowReordering
+          dropFeedbackMode="push"
+          dragDirection="vertical"
+        />
       </List>
       {openDialog && (
         <OpenFileDialog

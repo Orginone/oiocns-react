@@ -155,36 +155,20 @@ export type XDirectory = {
 export type XForm = {
   // 表单布局
   rule: string;
+  // 配置参数
+  options: XFormProps | undefined;
   // 表单的特性
   attributes: XAttribute[];
   // 使用表单的流程节点
   bindNodes: XWorkNode[] | undefined;
   // 表单的目录
   directory: XDirectory | undefined;
-  // 展示配置
-  setting: XFormSetting;
-  // 子项
-  items: XFormItem[];
 } & XStandard;
 
-export type XFormItem = {
-  // 名称
-  name: string;
-  // 类型
-  typeName: string;
-  // 子项
-  children: XFormItem[];
-  // 特性
-  attribute: XAttribute | undefined;
-} & Xbase;
-
-export type XFormSetting = {
-  // 列数
-  colCount: number;
-  // 标签位置
-  labelLocation: 'top' | 'left';
-  // 标签显示模式
-  labelMode: 'static' | 'outside';
+// 度量特性配置参数
+export type XFormProps = {
+  // 常规项宽度
+  itemWidth: number;
 };
 
 /* 表单规则类型 */
