@@ -13,9 +13,14 @@ const FromModal: React.FC<IProps> = ({ current, finished }: IProps) => {
       open
       centered
       fullScreen
+      hideMaxed
       width={'80vw'}
       destroyOnClose
-      title={current.typeName + '管理'}
+      onSave={async () => {
+        await current.save();
+        finished();
+      }}
+      title={current.name + '(配置)'}
       footer={[]}
       onCancel={finished}>
       <FormDesign current={current} />

@@ -1,3 +1,4 @@
+import { sleep } from '@/ts/base/common';
 import { schema, model } from '../../../base';
 import { entityOperates, fileOperates, orgAuth } from '../../../core/public';
 import { IDirectory } from '../directory';
@@ -9,6 +10,10 @@ export interface IForm extends IStandardFileInfo<schema.XForm> {
   attributes: schema.XAttribute[];
   /** 表单字段 */
   fields: model.FieldModel[];
+  /** 加载分类字典项 */
+  loadItems(speciesIds: string[]): Promise<schema.XSpeciesItem[]>;
+  /** 保存 */
+  save(): Promise<boolean>;
   /** 新建表单特性 */
   createAttribute(propertys: schema.XProperty[]): Promise<schema.XAttribute[]>;
   /** 更新表单特性 */
@@ -49,6 +54,10 @@ export class Form extends StandardFileInfo<schema.XForm> implements IForm {
   get groupTags(): string[] {
     return ['表单', ...super.groupTags];
   }
+  async save(): Promise<boolean> {
+    await sleep(0);
+    return true;
+  }
   async loadContent(reload: boolean = false): Promise<boolean> {
     await this.loadFields(reload);
     return true;
@@ -58,10 +67,9 @@ export class Form extends StandardFileInfo<schema.XForm> implements IForm {
       this.fields = [];
       const speciesIds = this.attributes
         .map((i) => i.property?.speciesId)
-        .filter((i) => i && i.length > 0);
-      const data = await this.directory.resource.speciesItemColl.loadSpace({
-        options: { match: { speciesId: { _in_: speciesIds } } },
-      });
+        .filter((i) => i && i.length > 0)
+        .map((i) => i!);
+      const data = await this.loadItems(speciesIds);
       this.attributes.forEach(async (attr) => {
         if (attr.property) {
           const field: model.FieldModel = {
@@ -92,6 +100,17 @@ export class Form extends StandardFileInfo<schema.XForm> implements IForm {
       this._fieldsLoaded = true;
     }
     return this.fields;
+  }
+  async loadItems(speciesIds: string[]): Promise<schema.XSpeciesItem[]> {
+    const ids = speciesIds.filter((i) => i && i.length > 0);
+    if (ids.length < 1) return [];
+    return await this.directory.resource.speciesItemColl.loadSpace({
+      options: {
+        match: {
+          speciesId: { _in_: ids },
+        },
+      },
+    });
   }
   async createAttribute(propertys: schema.XProperty[]): Promise<schema.XAttribute[]> {
     const data = propertys.map((prop) => {

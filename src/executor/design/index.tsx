@@ -12,11 +12,11 @@ interface IProps {
   finished: () => void;
 }
 
+// return <LabelsModal finished={finished} current={entity as any} />;
 const OperateModal: React.FC<IProps> = ({ entity, finished }) => {
   switch (entity.typeName) {
     case '事项配置':
     case '实体配置':
-      return <LabelsModal finished={finished} current={entity as any} />;
     case '表单':
       return <FormModal finished={finished} current={entity as any} />;
     case '报表':

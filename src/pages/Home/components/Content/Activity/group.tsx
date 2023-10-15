@@ -22,17 +22,20 @@ const GroupActivityItem: React.FC<{ activity: IActivity }> = ({ activity }) => {
             <Resizable handles={'right'}>
               <div key={key} className={cls.groupList}>
                 {activity.activitys
-                  .filter((activity) => activity.activityList.length > 0)
-                  .map((activity) => {
-                    if (activity.activityList.length > 0) {
+                  .filter((item) => item.activityList.length > 0)
+                  .map((item) => {
+                    if (item.activityList.length > 0) {
                       return (
                         <div
                           className={cls.groupListItem}
-                          key={activity.key}
-                          onClick={() => setCurrent(activity)}>
+                          key={item.key}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setCurrent(item);
+                          }}>
                           <ActivityMessage
-                            item={activity.activityList[0]}
-                            activity={activity}
+                            item={item.activityList[0]}
+                            activity={item}
                             hideResource
                           />
                         </div>

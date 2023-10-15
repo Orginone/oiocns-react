@@ -95,17 +95,25 @@ export type XAttribute = {
   formId: string;
   // 归属用户ID
   belongId: string;
-  // 属性关系
-  links: XAttrLinkProp[] | undefined;
+  // 特性显示组件
+  widget?: string;
   // 关联属性
   property: XProperty | undefined;
-  // 单
-  form: XForm | undefined;
-  // 工作职权
-  authority: XAuthority | undefined;
-  // 创建度量标准的用户
-  belong: XTarget | undefined;
+  // 配置参数
+  options: XAttributeProps | undefined;
 } & Xbase;
+
+// 度量特性配置参数
+export type XAttributeProps = {
+  // 是否只读
+  readOnly?: boolean;
+  // 是否可见
+  visible?: boolean;
+  // 是否必填
+  isRequired?: boolean;
+  // 默认值
+  defaultValue?: any;
+};
 
 //权限定义
 export type XAuthority = {

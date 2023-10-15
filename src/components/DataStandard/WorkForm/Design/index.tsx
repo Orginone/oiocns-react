@@ -1,12 +1,55 @@
 import { IForm } from '@/ts/core';
-import React from 'react';
+import React, { useState } from 'react';
+import Config from './config';
+import { Resizable } from 'devextreme-react';
+import { Layout } from 'antd';
+import FormRender from './form';
+import { Emitter } from '@/ts/base/common';
 
 interface IFormDesignProps {
   current: IForm;
 }
 
+/** 办事表单设计器 */
 const WorkFormDesign: React.FC<IFormDesignProps> = ({ current }) => {
-  return <></>;
+  const [selectIndex, setSelectIndex] = React.useState<number>(-1);
+  const [mainWidth, setMainWidth] = React.useState<number>(400);
+  const [notifyEmitter] = useState(new Emitter());
+  return (
+    <Layout>
+      <Resizable
+        handles={'right'}
+        width={mainWidth}
+        maxWidth={800}
+        minWidth={400}
+        onResize={(e) => setMainWidth(e.width)}>
+        <Layout.Sider width={'100%'} style={{ height: '100%' }}>
+          {React.useMemo(
+            () => (
+              <Config
+                current={current}
+                index={selectIndex}
+                notifyEmitter={notifyEmitter}
+              />
+            ),
+            [current, selectIndex],
+          )}
+        </Layout.Sider>
+      </Resizable>
+      <Layout.Content>
+        {React.useMemo(
+          () => (
+            <FormRender
+              current={current}
+              onItemSelected={setSelectIndex}
+              notityEmitter={notifyEmitter}
+            />
+          ),
+          [current],
+        )}
+      </Layout.Content>
+    </Layout>
+  );
 };
 
 export default WorkFormDesign;

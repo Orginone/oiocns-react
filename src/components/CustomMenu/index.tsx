@@ -15,25 +15,22 @@ interface CustomMenuType {
 }
 const CustomMenu = (props: CustomMenuType) => {
   if (props.item === undefined) return <></>;
-  const [filter, setFilter] = useState<string>('');
-  const [selectedKeys, setSelectedKeys] = useState<string[]>([props.selectMenu.key]);
-  const [openKeys, setOpenKeys] = useState<string[]>([]);
-  const [visibleMenu, setVisibleMenu] = useState<boolean>();
-  const [data, setData] = useState<MenuProps['items']>(props.item.children);
-  useEffect(() => {
-    reloadData(loadOpenKeys(props.item.children, props.selectMenu.key));
-  }, [props]);
-
-  useEffect(() => {
-    reloadData(openKeys);
-  }, [visibleMenu, filter]);
-
-  const reloadData = (keys: string[]) => {
-    setData(loadMenus(loopFilterTree(props.item.children), keys));
-    setOpenKeys(keys);
-    setSelectedKeys([props.selectMenu.key]);
+  /** 转换数据,解析成原生菜单数据 */
+  const loadMenus: any = (items: MenuItemType[], expKeys: string[]) => {
+    const result = [];
+    if (Array.isArray(items)) {
+      for (const item of items) {
+        result.push({
+          key: item.key,
+          title: item.label,
+          label: renderLabel(item),
+          children: loadMenus(item.children, expKeys),
+          icon: item.expIcon && expKeys.includes(item.key) ? item.expIcon : item.icon,
+        });
+      }
+    }
+    return result;
   };
-
   const loopFilterTree = (data: MenuItemType[]) => {
     const result: any[] = [];
     for (const item of data) {
@@ -51,23 +48,6 @@ const CustomMenu = (props: CustomMenuType) => {
       }
       if (exsit) {
         result.push(newItem);
-      }
-    }
-    return result;
-  };
-
-  /** 转换数据,解析成原生菜单数据 */
-  const loadMenus: any = (items: MenuItemType[], expKeys: string[]) => {
-    const result = [];
-    if (Array.isArray(items)) {
-      for (const item of items) {
-        result.push({
-          key: item.key,
-          title: item.label,
-          label: renderLabel(item),
-          children: loadMenus(item.children, expKeys),
-          icon: item.expIcon && expKeys.includes(item.key) ? item.expIcon : item.icon,
-        });
       }
     }
     return result;
@@ -142,7 +122,26 @@ const CustomMenu = (props: CustomMenuType) => {
       </span>
     );
   };
+  const [filter, setFilter] = useState<string>('');
+  const [selectedKeys, setSelectedKeys] = useState<string[]>([props.selectMenu.key]);
+  const [openKeys, setOpenKeys] = useState<string[]>([]);
+  const [visibleMenu, setVisibleMenu] = useState<boolean>();
+  const [data, setData] = useState<MenuProps['items']>(
+    loadMenus(props.item.children, []),
+  );
+  useEffect(() => {
+    reloadData(loadOpenKeys(props.item.children, props.selectMenu.key));
+  }, [props]);
 
+  useEffect(() => {
+    reloadData(openKeys);
+  }, [visibleMenu, filter]);
+
+  const reloadData = (keys: string[]) => {
+    setData(loadMenus(loopFilterTree(props.item.children), keys));
+    setOpenKeys(keys);
+    setSelectedKeys([props.selectMenu.key]);
+  };
   return (
     <>
       <span style={{ display: 'flex', justifyContent: 'center' }}>
