@@ -126,6 +126,7 @@ export class StandardFiles {
   async createForm(data: schema.XForm): Promise<schema.XForm | undefined> {
     const result = await this.resource.formColl.insert({
       ...data,
+      attributes: [],
       directoryId: this.id,
     });
     if (result) {

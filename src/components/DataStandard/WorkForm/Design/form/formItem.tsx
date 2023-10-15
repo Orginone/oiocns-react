@@ -48,7 +48,7 @@ const FormItem: React.FC<{
   if (attribute.options.isRequired) {
     mixOptions.label = mixOptions.label + '*';
   }
-  switch (getWidget(attribute)) {
+  switch (getWidget(attribute.property?.valueType, attribute.widget)) {
     case '数字框':
       return <NumberBox {...mixOptions} />;
     case '文本框':
@@ -61,7 +61,6 @@ const FormItem: React.FC<{
       return (
         <SelectBox
           {...mixOptions}
-          searchEnabled
           searchMode="contains"
           searchExpr={'name'}
           dataSource={items}
@@ -74,15 +73,9 @@ const FormItem: React.FC<{
     case '人员搜索框':
       return <SelectBox {...mixOptions} items={[]} />;
     case '日期选择框':
-      return <DateBox {...mixOptions} type={'date'} displayFormat={'yyyy年MM月dd日'} />;
+      return <DateBox {...mixOptions} type={'date'} />;
     case '时间选择框':
-      return (
-        <DateBox
-          {...mixOptions}
-          type={'datetime'}
-          displayFormat={'yyyy年MM月dd日 HH:mm:ss'}
-        />
-      );
+      return <DateBox {...mixOptions} type={'datetime'} />;
     case '文件选择框':
       return <SelectFilesItem {...mixOptions} />;
     default:

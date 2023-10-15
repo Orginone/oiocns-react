@@ -74,6 +74,8 @@ export class Form extends StandardFileInfo<schema.XForm> implements IForm {
             id: attr.id,
             rule: attr.rule,
             name: attr.name,
+            widget: attr.widget,
+            options: attr.options,
             code: 'T' + attr.property.id,
             remark: attr.remark,
             lookups: [],

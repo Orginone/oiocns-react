@@ -13,6 +13,9 @@ const FormRender: React.FC<{
   notityEmitter: Emitter;
   onItemSelected: (index: number) => void;
 }> = ({ current, notityEmitter, onItemSelected }) => {
+  if (current.metadata.attributes === undefined) {
+    current.metadata.attributes = [];
+  }
   const [openDialog, setDialog] = React.useState(false);
   const showDialog = React.useCallback(() => setDialog(true), []);
   const onReorder = React.useCallback((e: { fromIndex: number; toIndex: number }) => {

@@ -1,5 +1,6 @@
 import {
   XApplication,
+  XAttributeProps,
   XAuthority,
   Xbase,
   XDirectory,
@@ -639,6 +640,10 @@ export type FieldModel = {
   valueType: string;
   /** 规则(特性规则) */
   rule?: string;
+  /** 组件 */
+  widget?: string;
+  /** 参数 */
+  options?: XAttributeProps;
   /** 备注(特性描述) */
   remark: string;
   /** 字典(字典项/分类项) */

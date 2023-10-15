@@ -1,10 +1,10 @@
 import { schema } from '@/ts/base';
 
-export const getWidget = (attribute: schema.XAttribute) => {
-  if (attribute.widget) {
-    return attribute.widget;
+export const getWidget = (valueType?: string, widget?: string) => {
+  if (widget) {
+    return widget;
   } else {
-    switch (attribute.property!.valueType) {
+    switch (valueType) {
       case '数值型':
         return '数字框';
       case '描述型':
@@ -47,5 +47,24 @@ export const loadwidgetOptions = (attribute: schema.XAttribute) => {
       return ['文件选择框'];
     default:
       return ['文本框'];
+  }
+};
+
+export const getItemNums = () => {
+  return ['一列', '二列', '三列', '四列'];
+};
+
+export const getItemWidth = (numStr: string) => {
+  switch (numStr) {
+    case '一列':
+      return '100%';
+    case '二列':
+      return 'calc(50% - 5px)';
+    case '三列':
+      return 'calc(33.333% - 7px)';
+    case '四列':
+      return 'calc(25% - 8px)';
+    default:
+      return 300;
   }
 };

@@ -1,4 +1,4 @@
-import OioForm from '@/components/Common/FormDesign/OioFormNext';
+// import OioForm from '@/components/Common/FormDesign/OioFormNext';
 import { kernel, model, schema } from '../../../ts/base';
 import { IBelong } from '@/ts/core';
 import { useEffect, useState } from 'react';
@@ -6,6 +6,7 @@ import React from 'react';
 import { WorkFormRulesType } from '@/ts/core/work/rules/workFormRules';
 import { Tabs } from 'antd';
 import ReportForms from './report';
+import WorkFormViewer from '@/components/DataStandard/WorkForm/Viewer';
 
 interface IProps {
   allowEdit: boolean;
@@ -38,25 +39,23 @@ const PrimaryForm: React.FC<IProps> = (props) => {
   }, []);
   if (!data) return <></>;
   return (
-    <OioForm
-      key={form.id}
+    <WorkFormViewer
       form={form}
       fields={fields}
-      fieldsValue={data}
-      ruleService={props.ruleService}
+      data={data}
       belong={props.belong}
-      disabled={!props.allowEdit}
-      submitter={{
-        resetButtonProps: {
-          style: { display: 'none' },
-        },
-        render: (_: any, _dom: any) => <></>,
-      }}
-      onValuesChange={(_val) => {
-        if (props.allowEdit && _val) {
-          Object.keys(_val).forEach((k) => {
-            data[k] = _val[k];
-            props.data.primary[k] = _val[k];
+      readonly={!props.allowEdit}
+      onValuesChange={(changed, fullData) => {
+        console.log(changed, fullData);
+        if (props.allowEdit && changed) {
+          Object.keys(changed).forEach((k) => {
+            if (changed[k] === undefined || changed[k] === null) {
+              delete data[k];
+              delete props.data.primary[k];
+            } else {
+              data[k] = changed[k];
+              props.data.primary[k] = changed[k];
+            }
           });
           formData.after = [data];
           props.onChanged?.apply(this, [form.id, formData]);

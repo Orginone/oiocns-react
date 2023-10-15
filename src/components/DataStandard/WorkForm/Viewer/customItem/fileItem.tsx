@@ -8,16 +8,12 @@ import { command } from '@/ts/base';
 import { ellipsisText } from '@/utils';
 import { Button, TextArea } from 'devextreme-react';
 import { ITextBoxOptions } from 'devextreme-react/text-box';
-interface TreeSelectItemProps extends ITextBoxOptions {
-  values?: string;
-  onFieldChange?: (name: string, value: string) => void;
-}
 
-const SelectFilesItem: React.FC<TreeSelectItemProps> = (props) => {
+const SelectFilesItem: React.FC<ITextBoxOptions> = (props) => {
   const initFiles: FileItemShare[] = [];
-  if (props.values && props.values.length > 0) {
+  if (props.defaultValue && props.defaultValue.length > 0) {
     try {
-      var temps = JSON.parse(props.values);
+      var temps = JSON.parse(props.defaultValue);
       if (temps && Array.isArray(temps) && temps.length > 0) {
         initFiles.push(...temps);
       }
@@ -28,13 +24,15 @@ const SelectFilesItem: React.FC<TreeSelectItemProps> = (props) => {
   const [open, setOpen] = useState(false);
   const [fileList, setFileList] = useState<FileItemShare[]>(initFiles);
   useEffect(() => {
-    if (props.onFieldChange && props.name) {
-      props.onFieldChange(props.name, JSON.stringify(fileList));
-    }
+    props.onValueChanged?.apply(this, [
+      {
+        value: JSON.stringify(fileList),
+      } as any,
+    ]);
   }, [fileList]);
 
   return (
-    <TextArea {...props} height={130}>
+    <TextArea {...props} height={130} width={'100%'}>
       <div className={cls.imageUploader}>
         {fileList.map((i, x) => {
           return (
