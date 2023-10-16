@@ -105,14 +105,22 @@ export type XAttribute = {
 
 // 度量特性配置参数
 export type XAttributeProps = {
+  /** 表单参数 */
   // 是否只读
   readOnly?: boolean;
-  // 是否可见
-  visible?: boolean;
   // 是否必填
   isRequired?: boolean;
+  // 隐藏特性
+  hideField?: boolean;
   // 默认值
   defaultValue?: any;
+  /** 表格参数 */
+  // 是否可见
+  visible?: boolean;
+  // 是否显示在左侧分类列
+  species?: boolean;
+  // 是否固定列
+  fixed?: boolean;
 };
 
 //权限定义
@@ -169,6 +177,8 @@ export type XForm = {
 export type XFormProps = {
   // 常规项宽度
   itemWidth: number;
+  // 表单根标签集
+  labels: string[];
 };
 
 /* 表单规则类型 */

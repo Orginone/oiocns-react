@@ -23,12 +23,13 @@ const FormConfig: React.FC<IAttributeProps> = ({ notifyEmitter, current }) => {
       <SimpleItem dataField="name" isRequired={true} label={{ text: '名称' }} />
       <SimpleItem dataField="code" isRequired={true} label={{ text: '代码' }} />
       <SimpleItem
-        dataField="remark"
-        editorType="dxTextArea"
-        isRequired={true}
-        label={{ text: '描述' }}
+        dataField="labels"
+        label={{ text: '根标签集' }}
+        editorType="dxTagBox"
         editorOptions={{
-          height: 100,
+          displayExpr: 'name',
+          valueExpr: 'id',
+          dataSource: current.metadata.attributes.filter((i) => i && i.propId),
         }}
       />
       <SimpleItem
@@ -43,6 +44,15 @@ const FormConfig: React.FC<IAttributeProps> = ({ notifyEmitter, current }) => {
           defaultValue: 300,
           showClearButton: true,
           showSpinButtons: true,
+        }}
+      />
+      <SimpleItem
+        dataField="remark"
+        editorType="dxTextArea"
+        isRequired={true}
+        label={{ text: '表单描述' }}
+        editorOptions={{
+          height: 100,
         }}
       />
     </Form>

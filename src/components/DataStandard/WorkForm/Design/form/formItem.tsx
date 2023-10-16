@@ -47,6 +47,7 @@ const FormItem: React.FC<{
     labelMode: 'floating',
     labelLocation: 'left',
     ...attribute.options,
+    visible: attribute.options.hideField != true,
   };
   if (attribute.options.isRequired) {
     mixOptions.label = mixOptions.label + '*';

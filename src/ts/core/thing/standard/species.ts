@@ -39,8 +39,8 @@ export class Species extends StandardFileInfo<schema.XSpecies> implements ISpeci
     }
     return false;
   }
-  async loadContent(_: boolean = false): Promise<boolean> {
-    await this.loadItems(true);
+  async loadContent(reload: boolean = false): Promise<boolean> {
+    await this.loadItems(reload);
     return true;
   }
   async loadItems(reload: boolean = false): Promise<schema.XSpeciesItem[]> {

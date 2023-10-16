@@ -15,7 +15,7 @@ const ListMode = ({
   content: IFile[];
   selectFiles: IFile[];
   focusFile: IFile | undefined;
-  fileOpen: (file: IFile | undefined, dblclick: boolean) => Promise<void>;
+  fileOpen: (file: IFile | undefined, dblclick: boolean) => void;
   contextMenu: (file?: IFile) => MenuProps;
 }) => {
   const [cxtItem, setCxtItem] = useState<IFile>();
@@ -37,11 +37,11 @@ const ListMode = ({
             return (
               <div className={getItemClassName(item)}>
                 <List.Item
-                  onClick={async () => {
-                    await fileOpen(item, false);
+                  onClick={() => {
+                    fileOpen(item, false);
                   }}
-                  onDoubleClick={async () => {
-                    await fileOpen(item, true);
+                  onDoubleClick={() => {
+                    fileOpen(item, true);
                   }}
                   onContextMenu={() => setCxtItem(item)}
                   actions={[

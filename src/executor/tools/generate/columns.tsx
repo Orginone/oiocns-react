@@ -10,12 +10,13 @@ import { Button } from 'antd';
 export const GenerateColumn = (
   field: model.FieldModel,
   beforeSource: schema.XThing[] | undefined,
-  hideColumns: string[] | undefined,
   dataIndex: 'attribute' | 'property' | undefined,
 ) => {
   const props: IColumnProps = {
     caption: field.name,
-    visible: !hideColumns?.includes(field.id),
+    fixedPosition: 'left',
+    fixed: field.options?.fixed === true,
+    visible: field.options?.visible === true,
     dataField: dataIndex === 'attribute' ? field.id : field.code,
   };
   const cellRender: any = {};

@@ -16,7 +16,7 @@ const TableMode = ({
   focusFile: IFile | undefined;
   content: IFile[];
   selectFiles: IFile[];
-  fileOpen: (file: IFile | undefined, dblclick: boolean) => Promise<void>;
+  fileOpen: (file: IFile | undefined, dblclick: boolean) => void;
   contextMenu: (file?: IFile, clicked?: Function) => MenuProps;
 }) => {
   const [cxtItem, setCxtItem] = useState<IFile>();
@@ -40,11 +40,11 @@ const TableMode = ({
           selection={{ mode: 'single' }}
           columnResizingMode={'nextColumn'}
           showColumnLines={false}
-          onRowClick={async (e) => {
-            await fileOpen(e.data, false);
+          onRowClick={(e) => {
+            fileOpen(e.data, false);
           }}
-          onRowDblClick={async (e) => {
-            await fileOpen(e.data, true);
+          onRowDblClick={(e) => {
+            fileOpen(e.data, true);
           }}
           headerFilter={{
             visible: true,

@@ -15,7 +15,7 @@ const IconMode = ({
   focusFile: IFile | undefined;
   content: IFile[];
   selectFiles: IFile[];
-  fileOpen: (file: IFile | undefined, dblclick: boolean) => Promise<void>;
+  fileOpen: (file: IFile | undefined, dblclick: boolean) => void;
   contextMenu: (file?: IFile) => MenuProps;
 }) => {
   const getItemClassName = (item: IFile) => {
@@ -31,11 +31,11 @@ const IconMode = ({
         className={getItemClassName(item)}
         bordered={false}
         key={item.key}
-        onClick={async () => {
-          await fileOpen(item, false);
+        onClick={() => {
+          fileOpen(item, false);
         }}
-        onDoubleClick={async () => {
-          await fileOpen(item, true);
+        onDoubleClick={() => {
+          fileOpen(item, true);
         }}
         onContextMenu={(e) => {
           e.stopPropagation();

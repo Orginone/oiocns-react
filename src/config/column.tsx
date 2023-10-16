@@ -1,10 +1,8 @@
 import React from 'react';
-import { statusMap } from './consts';
-import { Tag, Typography } from 'antd';
+import { Typography } from 'antd';
 import { model, schema } from '@/ts/base';
 import { ProColumns } from '@ant-design/pro-components';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
-import { IWorkTask } from '@/ts/core';
 
 /** 人员信息列 */
 export const PersonColumns: ProColumns<schema.XTarget>[] = [
@@ -127,113 +125,6 @@ export const SpeciesItemColumn: ProColumns<schema.XSpeciesItem>[] = [
   },
 ];
 
-/** 特性信息列 */
-export const AttributeColumn: ProColumns<schema.XAttribute>[] = [
-  {
-    title: '序号',
-    valueType: 'index',
-    width: 50,
-  },
-  {
-    title: '特性编号',
-    dataIndex: 'code',
-    key: 'code',
-    width: 200,
-  },
-  {
-    title: '特性名称',
-    dataIndex: 'name',
-    key: 'name',
-    width: 200,
-  },
-  {
-    title: '值类型',
-    dataIndex: ['property', 'valueType'],
-    key: 'valueType',
-    width: 150,
-  },
-  {
-    title: '特性定义',
-    dataIndex: 'remark',
-    ellipsis: true,
-    key: 'remark',
-  },
-];
-
-/** 办事列 */
-export const WorkColumns: ProColumns<IWorkTask>[] = [
-  {
-    title: '序号',
-    dataIndex: 'index',
-    valueType: 'index',
-    width: 60,
-  },
-  {
-    title: '类型',
-    dataIndex: ['metadata', 'taskType'],
-    width: 80,
-  },
-  {
-    title: '标题',
-    width: 150,
-    dataIndex: ['metadata', 'title'],
-  },
-  {
-    key: 'shareId',
-    width: 150,
-    title: '共享组织',
-    dataIndex: ['metadata', 'shareId'],
-    render: (_: any, record: IWorkTask) => {
-      return <EntityIcon entityId={record.metadata.shareId} showName />;
-    },
-  },
-  {
-    key: 'createUser',
-    width: 100,
-    title: '申请人',
-    dataIndex: ['metadata', 'createUser'],
-    render: (_: any, record: IWorkTask) => {
-      return <EntityIcon entityId={record.metadata.createUser} showName />;
-    },
-  },
-  {
-    title: '发起组织',
-    width: 100,
-    dataIndex: ['metadata', 'applyId'],
-    render: (_: any, record: IWorkTask) => {
-      return <EntityIcon entityId={record.metadata.applyId} showName />;
-    },
-  },
-  {
-    title: '状态',
-    width: 80,
-    dataIndex: ['metadata', 'status'],
-    render: (_: any, record: IWorkTask) => {
-      const status = statusMap.get(record.metadata.status as number);
-      return <Tag color={status!.color}>{status!.text}</Tag>;
-    },
-  },
-  {
-    title: '内容',
-    width: 400,
-    dataIndex: ['metadata', 'content'],
-    render: (_: any, record: IWorkTask) => {
-      if (record.metadata.taskType === '加用户') {
-        if (record.targets.length === 2) {
-          return `${record.targets[0].name}[${record.targets[0].typeName}]申请加入${record.targets[1].name}[${record.targets[1].typeName}]`;
-        }
-      }
-      return record.metadata.content;
-    },
-  },
-  {
-    title: '申请时间',
-    valueType: 'dateTime',
-    width: 200,
-    dataIndex: ['metadata', 'createTime'],
-  },
-];
-
 /** 补齐物的列 */
 export const FullThingColumns = (fields: model.FieldModel[]) => {
   return FullEntityColumns([
@@ -257,6 +148,10 @@ export const FullEntityColumns = (fields: model.FieldModel[]) => {
       name: '唯一标识',
       valueType: '描述型',
       remark: '由系统生成的唯一标记,无实义.',
+      options: {
+        fixed: true,
+        visible: true,
+      },
     },
     {
       id: 'name',
@@ -264,6 +159,9 @@ export const FullEntityColumns = (fields: model.FieldModel[]) => {
       name: '名称',
       valueType: '描述型',
       remark: '描述信息',
+      options: {
+        visible: true,
+      },
     },
     {
       id: 'code',
@@ -310,99 +208,3 @@ export const FullEntityColumns = (fields: model.FieldModel[]) => {
     },
   ];
 };
-
-/** 办事列 */
-export const WorkTaskColumns: model.FieldModel[] = [
-  {
-    id: 'id',
-    code: 'id',
-    name: '唯一标识',
-    valueType: '描述型',
-    remark: '由系统生成的唯一标记,无实义.',
-  },
-  {
-    id: 'taskType',
-    code: 'metadata.taskType',
-    name: '类型',
-    valueType: '选择型',
-    remark: '任务类型',
-    lookups: [
-      {
-        id: '0',
-        text: '加用户',
-        value: '加用户',
-      },
-      {
-        id: '1',
-        text: '事项',
-        value: '事项',
-      },
-    ],
-  },
-  {
-    id: 'title',
-    code: 'metadata.title',
-    name: '标题',
-    valueType: '描述型',
-    remark: '任务类型',
-  },
-  {
-    id: 'shareId',
-    code: 'metadata.shareId',
-    name: '用户',
-    valueType: '用户型',
-    remark: '用户',
-  },
-  {
-    id: 'applyId',
-    code: 'metadata.applyId',
-    name: '发起用户',
-    valueType: '用户型',
-    remark: '发起用户',
-  },
-  {
-    id: 'status',
-    code: 'metadata.status',
-    name: '状态',
-    valueType: '选择型',
-    remark: '状态',
-    lookups: [
-      {
-        id: 'blue',
-        text: '待审批',
-        value: '1',
-      },
-      {
-        id: 'green',
-        text: '已同意',
-        value: '100',
-      },
-      {
-        id: 'red',
-        text: '已拒绝',
-        value: '200',
-      },
-    ],
-  },
-  {
-    id: 'content',
-    code: 'content',
-    name: '内容',
-    valueType: '描述型',
-    remark: '内容',
-  },
-  {
-    id: 'createUser',
-    code: 'metadata.createUser',
-    name: '申请人',
-    valueType: '用户型',
-    remark: '申请人',
-  },
-  {
-    id: 'createTime',
-    code: 'metadata.createTime',
-    name: '申请时间',
-    valueType: '时间型',
-    remark: '申请时间',
-  },
-];

@@ -280,8 +280,11 @@ export abstract class StandardFileInfo<T extends schema.XStandard>
         if (data) {
           if (operate === 'delete') {
             data = { ...data, isDeleted: true } as unknown as T;
+            this.setMetadata(data as T);
+          } else {
+            this.setMetadata(data as T);
+            this.loadContent(true);
           }
-          this.setMetadata(data as T);
         }
     }
     return true;

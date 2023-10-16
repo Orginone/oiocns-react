@@ -23,14 +23,23 @@ interface shareIconInfo extends teamTypeInfo {
 
 /** 实体图标 */
 const EntityIcon = (info: teamTypeInfo) => {
-  if (info.entity) {
+  const getEntity = () => {
+    if (info.entity) {
+      return info.entity;
+    }
+    if (info.entityId) {
+      return orgCtrl.user.findMetadata<schema.XEntity>(info.entityId);
+    }
+  };
+  const entity = getEntity();
+  if (entity) {
     return (
       <ShareIconItem
         {...info}
         share={{
-          name: info.entity.name,
-          typeName: info.entity.typeName,
-          avatar: parseAvatar(info.entity.icon),
+          name: entity.name,
+          typeName: entity.typeName,
+          avatar: parseAvatar(entity.icon),
         }}
       />
     );

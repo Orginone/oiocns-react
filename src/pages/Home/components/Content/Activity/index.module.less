@@ -18,14 +18,19 @@
       background: @component-background;
       box-shadow: 0 0 2px 2px #ededed;
 
+      &Selected {
+        cursor: pointer;
+        padding: 8px;
+        border-radius: 16px;
+        border: 1px solid @border-color;
+        background: @active-background;
+      }
+
       &Item {
         cursor: pointer;
         padding: 8px;
         border-radius: 6px;
         border-bottom: 1px solid @border-color-base;
-        &:hover {
-          background: @active-background;
-        }
       }
     }
   }

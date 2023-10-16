@@ -100,14 +100,6 @@ const FormView: React.FC<IProps> = ({ form, finished }) => {
               console.log(key, data);
             },
           }}
-          hideColumns={[
-            'createTime',
-            'createUser',
-            'createUser',
-            'updateTime',
-            'chainId',
-            'code',
-          ]}
         />
       );
     };

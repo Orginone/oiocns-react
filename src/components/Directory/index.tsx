@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
-import useStorage from '@/hooks/useStorage';
+import React, { useEffect, useState } from 'react';
 import IconMode from './views/iconMode';
 import ListMode from './views/listMode';
 import TableMode from './views/tableMode';
+import useStorage from '@/hooks/useStorage';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
+import useTimeoutHanlder from '@/hooks/useTimeoutHanlder';
 import SegmentContent from '@/components/Common/SegmentContent';
 import { IDirectory, IFile } from '@/ts/core';
 import { loadFileMenus } from '@/executor/fileOperate';
@@ -37,6 +38,10 @@ const Directory: React.FC<IProps> = (props) => {
   const [loaded] = useAsyncLoad(() => dircetory.loadContent());
   const [segmented, setSegmented] = useStorage('segmented', 'list');
   const [focusFile, setFocusFile] = useState<IFile>();
+  const [submitHanlder, clearHanlder] = useTimeoutHanlder();
+  useEffect(() => {
+    command.emitter('preview', props.previewFlag, focusFile);
+  }, [focusFile]);
   const contextMenu = (file?: IFile, clicked?: Function) => {
     var entity = file || dircetory;
     if ('targets' in entity) {
@@ -51,29 +56,54 @@ const Directory: React.FC<IProps> = (props) => {
     };
   };
 
-  const fileOpen = async (file: IFile | undefined, dblclick: boolean) => {
-    if (dblclick && file && props.dialog !== true) {
+  const fileOpen = (file: IFile | undefined) => {
+    if (file && props.dialog !== true) {
       if (!file.groupTags.includes('已删除')) {
         command.emitter('executor', 'open', file);
       }
-    } else if (!dblclick) {
-      if (file?.id === focusFile?.id) {
-        setFocusFile(undefined);
-        props.onFocused?.apply(this, [undefined]);
-        if (props.selects && props.selects.length > 0 && file) {
-          props.onSelected?.apply(this, [props.selects.filter((i) => i.id !== file.id)]);
-        }
-        command.emitter('preview', props.previewFlag);
+    }
+  };
+
+  const selectHanlder = (file: IFile, selected: boolean) => {
+    if (props.selects && props.onSelected) {
+      if (selected) {
+        props.onSelected([...props.selects, file]);
       } else {
-        setFocusFile(file);
-        props.onFocused?.apply(this, [file]);
-        if (props.selects && file) {
-          if (file && props.selects.every((i) => i.id !== file.id)) {
-            props.onSelected?.apply(this, [[...props.selects, file]]);
-          }
-        }
-        command.emitter('preview', props.previewFlag, file);
+        props.onSelected(props.selects.filter((i) => i.id !== file.id));
       }
+    }
+  };
+
+  const fileFocused = (file: IFile | undefined) => {
+    if (file) {
+      if (focusFile && file.id === focusFile.id) {
+        return true;
+      }
+      return props.selects?.find((i) => i.id === file.id) !== undefined;
+    }
+    return false;
+  };
+
+  const focusHanlder = (file: IFile | undefined) => {
+    const focused = fileFocused(file);
+    if (focused) {
+      setFocusFile(undefined);
+      props.onFocused?.apply(this, [undefined]);
+    } else {
+      setFocusFile(file);
+      props.onFocused?.apply(this, [file]);
+    }
+    if (file && props.onSelected) {
+      selectHanlder(file, !focused);
+    }
+  };
+
+  const clickHanlder = (file: IFile | undefined, dblclick: boolean) => {
+    if (dblclick) {
+      clearHanlder();
+      fileOpen(file);
+    } else {
+      submitHanlder(() => focusHanlder(file), 100);
     }
   };
 
@@ -126,7 +156,7 @@ const Directory: React.FC<IProps> = (props) => {
                 selectFiles={props.selects || []}
                 focusFile={focusFile}
                 content={getContent()}
-                fileOpen={fileOpen}
+                fileOpen={clickHanlder}
                 contextMenu={contextMenu}
               />
             ) : segmented === 'icon' ? (
@@ -134,7 +164,7 @@ const Directory: React.FC<IProps> = (props) => {
                 selectFiles={props.selects || []}
                 focusFile={focusFile}
                 content={getContent()}
-                fileOpen={fileOpen}
+                fileOpen={clickHanlder}
                 contextMenu={contextMenu}
               />
             ) : (
@@ -142,7 +172,7 @@ const Directory: React.FC<IProps> = (props) => {
                 selectFiles={props.selects || []}
                 focusFile={focusFile}
                 content={getContent()}
-                fileOpen={fileOpen}
+                fileOpen={clickHanlder}
                 contextMenu={contextMenu}
               />
             )}

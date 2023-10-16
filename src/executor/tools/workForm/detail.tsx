@@ -161,14 +161,6 @@ const DetailTable: React.FC<IProps> = (props) => {
       }}
       dataSource={formData.after}
       beforeSource={formData.before}
-      hideColumns={[
-        'createTime',
-        'createUser',
-        'createUser',
-        'updateTime',
-        'chainId',
-        'code',
-      ]}
     />
   );
 };

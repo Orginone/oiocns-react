@@ -11,7 +11,6 @@ interface IProps extends IDataGridOptions {
   beforeSource?: schema.XThing[];
   fields: model.FieldModel[];
   dataIndex?: 'attribute' | 'property';
-  hideColumns?: string[];
   dataMenus?: {
     items: ItemType[];
     onMenuClick: (key: string, data: any) => void;
@@ -21,21 +20,20 @@ interface IProps extends IDataGridOptions {
 /** 使用form生成表单 */
 const GenerateThingTable = (props: IProps) => {
   const fields = FullThingColumns(props.fields);
-  const hideColumns = props.hideColumns || [];
-  hideColumns.push(...fields.filter((i) => i.valueType === '分类型').map((i) => i.id));
-  hideColumns.push(...fields.slice(10).map((i) => i.id));
   return (
     <DataGrid<schema.XThing, string>
       keyExpr="id"
+      width="100%"
+      height={props.height ?? '100%'}
       columnMinWidth={props.columnMinWidth ?? 80}
-      focusedRowEnabled={true}
-      allowColumnReordering={true}
-      allowColumnResizing={true}
-      columnAutoWidth={true}
-      showColumnLines={true}
-      showRowLines={true}
-      rowAlternationEnabled={true}
-      hoverStateEnabled={true}
+      focusedRowEnabled
+      allowColumnReordering
+      allowColumnResizing
+      columnAutoWidth
+      showColumnLines
+      showRowLines
+      rowAlternationEnabled
+      hoverStateEnabled
       columnResizingMode={'widget'}
       headerFilter={{ visible: true }}
       filterRow={{ visible: true }}
@@ -58,8 +56,6 @@ const GenerateThingTable = (props: IProps) => {
         allowedPageSizes: [10, 30, 40, 50, 200],
       }}
       searchPanel={{ width: 300, highlightCaseSensitive: true, visible: true }}
-      width="100%"
-      height={props.height ?? '100%'}
       showBorders={true}
       {...props}
       onSelectionChanged={(e) => {
@@ -81,9 +77,7 @@ const GenerateThingTable = (props: IProps) => {
         });
         props.onSelectionChanged?.apply(this, [info]);
       }}>
-      {fields.map((field) =>
-        GenerateColumn(field, props.beforeSource, hideColumns, props.dataIndex),
-      )}
+      {fields.map((field) => GenerateColumn(field, props.beforeSource, props.dataIndex))}
       {props.dataMenus && (
         <Column
           dataField="操作"

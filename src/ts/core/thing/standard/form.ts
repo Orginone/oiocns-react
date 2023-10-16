@@ -62,14 +62,14 @@ export class Form extends StandardFileInfo<schema.XForm> implements IForm {
   }
   async loadFields(reload: boolean = false): Promise<model.FieldModel[]> {
     if (!this._fieldsLoaded || reload) {
-      this.fields = [];
       const speciesIds = this.attributes
         .map((i) => i.property?.speciesId)
         .filter((i) => i && i.length > 0)
         .map((i) => i!);
       const data = await this.loadItems(speciesIds);
-      this.attributes.forEach(async (attr) => {
-        if (attr.property) {
+      this.fields = this.attributes
+        .filter((i) => i.property && i.property.id)
+        .map((attr) => {
           const field: model.FieldModel = {
             id: attr.id,
             rule: attr.rule,
@@ -79,9 +79,9 @@ export class Form extends StandardFileInfo<schema.XForm> implements IForm {
             code: `T${attr.propId}`,
             remark: attr.remark,
             lookups: [],
-            valueType: attr.property.valueType,
+            valueType: attr.property!.valueType,
           };
-          if (attr.property.speciesId && attr.property.speciesId.length > 0) {
+          if (attr.property!.speciesId && attr.property!.speciesId.length > 0) {
             field.lookups = data
               .filter((i) => i.speciesId === attr.property!.speciesId)
               .map((i) => {
@@ -94,9 +94,8 @@ export class Form extends StandardFileInfo<schema.XForm> implements IForm {
                 };
               });
           }
-          this.fields.push(field);
-        }
-      });
+          return field;
+        });
       this._fieldsLoaded = true;
     }
     return this.fields;

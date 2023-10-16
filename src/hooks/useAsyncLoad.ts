@@ -12,16 +12,15 @@ function useAsyncLoad<T>(
   const [loaded, setLoaded] = useState(false);
   const [result, setResult] = useState<T>();
   useEffect(() => {
-    if (loaded) {
-      setLoaded(false);
-    }
+    setLoaded(false);
+    setResult(undefined);
     setTimeout(async () => {
       const data = await callback();
       if (data) {
         setResult(data);
       }
       setLoaded(true);
-    }, 20);
+    }, 0);
   }, _depts ?? []);
   return [loaded, result];
 }

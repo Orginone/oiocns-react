@@ -43,6 +43,7 @@ const FormItem: React.FC<IFormItemProps> = (props) => {
     labelMode: 'floating',
     labelLocation: 'left',
     ...props.field.options,
+    visible: props.field.options?.hideField != true,
     defaultValue: props.data[props.field.id] ?? props.field.options?.defaultValue,
     onValueChanged: (e: ValueChangedEvent) => {
       if (e.value !== props.data[props.field.id]) {

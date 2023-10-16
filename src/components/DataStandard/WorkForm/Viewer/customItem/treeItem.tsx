@@ -5,6 +5,7 @@ import { ISelectBoxOptions } from 'devextreme-react/select-box';
 import React, { useEffect, useState } from 'react';
 
 interface TreeSelectItemProps extends ISelectBoxOptions {
+  flexWrap: 'nowrap' | 'wrap';
   speciesItems: model.FiledLookup[];
 }
 
@@ -49,7 +50,7 @@ const TreeSelectItem: React.FC<TreeSelectItemProps> = (props) => {
       style={{
         display: 'flex',
         flexDirection: 'row',
-        flexWrap: 'nowrap',
+        flexWrap: props.flexWrap,
         gap: 10,
         width: '100%',
       }}>

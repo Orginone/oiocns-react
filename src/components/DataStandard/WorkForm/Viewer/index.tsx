@@ -46,6 +46,22 @@ const WorkFormViewer: React.FC<{
         />
       </Toolbar>
       <div style={{ display: 'flex', width: '100%', flexWrap: 'wrap', gap: 10 }}>
+        <FormItem
+          key={'name'}
+          data={formData}
+          numStr={colNum}
+          readOnly={props.readonly}
+          field={{
+            id: 'name',
+            name: '名称',
+            code: 'name',
+            valueType: '描述型',
+            remark: '数据的名称。',
+          }}
+          belong={props.belong}
+          notifyEmitter={notifyEmitter}
+          onValuesChange={props.onValuesChange}
+        />
         {props.fields.map((field) => {
           return (
             <FormItem

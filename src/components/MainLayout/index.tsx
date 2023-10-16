@@ -71,6 +71,9 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
     }
     props.onSelect?.apply(this, [item]);
   };
+  const previewCtx = React.useMemo(() => {
+    return <EntityPreview entity={props.selectMenu.item} flag={props.previewFlag} />;
+  }, [props]);
   return (
     <Layout className={cls.main_layout}>
       <Row className={cls.header} justify="space-between">
@@ -171,9 +174,7 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
                 {props.children}
               </Sider>
             </Resizable>
-            <Content className={cls.content}>
-              <EntityPreview entity={props.selectMenu.item} flag={props.previewFlag} />
-            </Content>
+            <Content className={cls.content}>{previewCtx}</Content>
           </>
         ) : (
           <Content className={cls.content}>{props.children}</Content>
