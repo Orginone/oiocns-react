@@ -7,8 +7,8 @@ import { AiOutlineSetting } from '@/icons/ai';
 import SelectAuth from '@/components/Common/SelectAuth';
 import { IBelong, IForm } from '@/ts/core';
 import OpenFileDialog from '@/components/OpenFileDialog';
-import ViewFormModal from '@/components/Common/FormDesign/viewFormModal';
-import { XForm } from '@/ts/base/schema';
+import { command, schema } from '@/ts/base';
+import { Form } from '@/ts/core/thing/standard/form';
 interface IProps {
   belong: IBelong;
   current: NodeModel;
@@ -19,13 +19,20 @@ interface IProps {
  */
 
 const RootNode: React.FC<IProps> = (props) => {
-  const [viewForm, setViewForm] = useState<XForm>();
   const [formModel, setFormModel] = useState<string>('');
   props.current.primaryForms = props.current.primaryForms || [];
   props.current.detailForms = props.current.detailForms || [];
   const [primaryForms, setPrimaryForms] = useState(props.current.primaryForms);
   const [detailForms, setDetailForms] = useState(props.current.detailForms);
   const [selectAuthValue, setSelectAuthValue] = useState<any>(props.current.destId);
+  const formViewer = React.useCallback((form: schema.XForm) => {
+    command.emitter(
+      'executor',
+      'open',
+      new Form({ ...form, id: '_' + form.id }, props.belong.directory),
+      'preview',
+    );
+  }, []);
   return (
     <div className={cls[`app-roval-node`]}>
       <div className={cls[`roval-node`]}>
@@ -57,9 +64,7 @@ const RootNode: React.FC<IProps> = (props) => {
           <span>
             <ShareShowComp
               departData={primaryForms}
-              onClick={(item: XForm) => {
-                setViewForm(item);
-              }}
+              onClick={formViewer}
               deleteFuc={(id: string) => {
                 props.current.primaryForms = primaryForms?.filter((a) => a.id != id);
                 setPrimaryForms(props.current.primaryForms);
@@ -82,9 +87,7 @@ const RootNode: React.FC<IProps> = (props) => {
           <span>
             <ShareShowComp
               departData={detailForms}
-              onClick={(item: XForm) => {
-                setViewForm(item);
-              }}
+              onClick={formViewer}
               deleteFuc={(id: string) => {
                 props.current.detailForms = detailForms?.filter((a) => a.id != id);
                 setDetailForms(props.current.detailForms);
@@ -115,19 +118,6 @@ const RootNode: React.FC<IProps> = (props) => {
                 }
               }
               setFormModel('');
-            }}
-          />
-        )}
-        {viewForm && (
-          <ViewFormModal
-            form={viewForm}
-            open={true}
-            belong={props.belong}
-            handleCancel={() => {
-              setViewForm(undefined);
-            }}
-            handleOk={() => {
-              setViewForm(undefined);
             }}
           />
         )}

@@ -3,8 +3,8 @@ import React from 'react';
 import { ImUndo2 } from '@/icons/im';
 import ThingArchive from './archive';
 import { IForm } from '@/ts/core';
-import OioForm from '@/components/Common/FormDesign/OioFormNext';
 import { schema } from '@/ts/base';
+import WorkFormViewer from '@/components/DataStandard/WorkForm/Viewer';
 
 interface IProps {
   form: IForm;
@@ -42,19 +42,13 @@ const ThingView: React.FC<IProps> = (props) => {
             key: '2',
             label: `卡片信息`,
             children: (
-              <OioForm
+              <WorkFormViewer
+                readonly
                 key={props.form.id}
                 form={props.form.metadata}
                 fields={props.form.fields}
-                fieldsValue={convertData()}
+                data={convertData()}
                 belong={props.form.directory.target.space}
-                disabled={true}
-                submitter={{
-                  resetButtonProps: {
-                    style: { display: 'none' },
-                  },
-                  render: (_: any, _dom: any) => <></>,
-                }}
               />
             ),
           },

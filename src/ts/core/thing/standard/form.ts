@@ -76,7 +76,7 @@ export class Form extends StandardFileInfo<schema.XForm> implements IForm {
             name: attr.name,
             widget: attr.widget,
             options: attr.options,
-            code: 'T' + attr.property.id,
+            code: `T${attr.propId}`,
             remark: attr.remark,
             lookups: [],
             valueType: attr.property.valueType,
@@ -88,7 +88,7 @@ export class Form extends StandardFileInfo<schema.XForm> implements IForm {
                 return {
                   id: i.id,
                   text: i.name,
-                  value: i.code || `S${i.id}`,
+                  value: `S${i.id}`,
                   icon: i.icon,
                   parentId: i.parentId,
                 };

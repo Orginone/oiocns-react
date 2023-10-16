@@ -3,7 +3,6 @@ import { schema } from '@/ts/base';
 import { IEntity } from '@/ts/core';
 import SpeciesModal from './speciesModal';
 import WorkModal from './workModal';
-import LabelsModal from './labelsModal';
 import ReportModal from './reportModal';
 import FormModal from './formModal';
 import { TransferModal } from './transferModal';
@@ -12,7 +11,6 @@ interface IProps {
   finished: () => void;
 }
 
-// return <LabelsModal finished={finished} current={entity as any} />;
 const OperateModal: React.FC<IProps> = ({ entity, finished }) => {
   switch (entity.typeName) {
     case '事项配置':

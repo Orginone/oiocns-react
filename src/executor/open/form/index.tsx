@@ -5,6 +5,7 @@ import * as config from './config';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import MainLayout from '@/components/MainLayout';
 import useMenuUpdate from '@/hooks/useMenuUpdate';
+import WorkForm from '@/components/DataStandard/WorkForm';
 import GenerateThingTable from '@/executor/tools/generate/thingTable';
 import CustomStore from 'devextreme/data/custom_store';
 import { kernel } from '@/ts/base';
@@ -136,7 +137,11 @@ const FormView: React.FC<IProps> = ({ form, finished }) => {
       destroyOnClose
       onCancel={() => finished()}>
       {loaded ? (
-        <FormBrower />
+        form.canDesign ? (
+          <FormBrower />
+        ) : (
+          <WorkForm form={form} />
+        )
       ) : (
         <Spin tip={'配置信息加载中...'}>
           <div style={{ width: '100%', height: '100%' }}></div>

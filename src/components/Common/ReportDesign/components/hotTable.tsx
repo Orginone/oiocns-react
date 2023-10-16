@@ -6,7 +6,7 @@ registerLanguageDictionary(zhCN);
 import { registerAllModules } from 'handsontable/registry';
 registerAllModules();
 import 'handsontable/dist/handsontable.min.css';
-import AttributeConfig from '../../FormDesign/attributeConfig';
+import AttributeConfig from './attributeConfig';
 import { IForm, IProperty } from '@/ts/core';
 import { schema } from '@/ts/base';
 import OpenFileDialog from '@/components/OpenFileDialog';

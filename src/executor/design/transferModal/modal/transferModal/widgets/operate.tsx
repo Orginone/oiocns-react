@@ -1,4 +1,4 @@
-import OioForm from '@/components/Common/FormDesign/OioFormNext';
+import WorkFormViewer from '@/components/DataStandard/WorkForm/Viewer';
 import { model } from '@/ts/base';
 import { IBelong, IForm, ITransfer } from '@/ts/core';
 import { ProTable } from '@ant-design/pro-components';
@@ -50,7 +50,7 @@ const Operate: React.FC<IProps> = ({ current }) => {
                 const form = await loadForm(openArgs.formId, openArgs.call);
                 if (!form) return;
                 setCenter(
-                  <OioForm
+                  <WorkFormViewer
                     form={form.metadata}
                     fields={form.fields}
                     belong={form.directory.target as IBelong}

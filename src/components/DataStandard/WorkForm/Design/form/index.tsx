@@ -126,7 +126,7 @@ const FormRender: React.FC<{
           onOk={(files) => {
             (files as IProperty[]).forEach((item) => {
               current.metadata.attributes.push({
-                propId: item.metadata.id,
+                propId: item.id,
                 property: item.metadata,
                 ...item.metadata,
                 rule: '{}',

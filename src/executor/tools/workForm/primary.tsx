@@ -45,8 +45,7 @@ const PrimaryForm: React.FC<IProps> = (props) => {
       data={data}
       belong={props.belong}
       readonly={!props.allowEdit}
-      onValuesChange={(changed, fullData) => {
-        console.log(changed, fullData);
+      onValuesChange={(changed) => {
         if (props.allowEdit && changed) {
           Object.keys(changed).forEach((k) => {
             if (changed[k] === undefined || changed[k] === null) {

@@ -1,8 +1,8 @@
 import { Modal } from 'antd';
-import OioForm from '@/components/Common/FormDesign/OioFormNext';
 import React from 'react';
 import { kernel, model, schema } from '@/ts/base';
 import { IBelong } from '@/ts/core';
+import WorkFormViewer from '@/components/DataStandard/WorkForm/Viewer';
 
 interface IFormEditProps {
   form: schema.XForm;
@@ -31,12 +31,11 @@ const FormEditModal = ({
     content: (
       <div
         style={{ maxHeight: '70vh', width: '100%', overflowY: 'scroll', minHeight: 600 }}>
-        <OioForm
-          showTitle
+        <WorkFormViewer
           form={form}
           fields={fields}
+          data={initialValues || {}}
           belong={belong}
-          fieldsValue={initialValues || {}}
           onValuesChange={(values) => {
             Object.keys(values).forEach((k) => {
               editData[k] = values[k];

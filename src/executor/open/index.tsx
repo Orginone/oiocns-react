@@ -12,9 +12,8 @@ import AudioPlayer from './audio';
 import EntityPreview from './entity';
 import CodeEditor from './codeeditor';
 import EntityForm from '../operate/entityForm';
-import { IEntity, IForm, ISysFileInfo, TargetType } from '@/ts/core';
+import { IEntity, ISysFileInfo, TargetType } from '@/ts/core';
 import { model, schema } from '@/ts/base';
-import LabelModal from '../design/labelsModal';
 const audioExt = ['.mp3', '.wav', '.ogg'];
 
 const officeExt = ['.md', '.pdf', '.xls', '.xlsx', '.doc', '.docx', '.ppt', '.pptx'];
@@ -59,14 +58,10 @@ const ExecutorOpen: React.FC<IOpenProps> = (props: IOpenProps) => {
     }
   } else if ('key' in props.entity) {
     switch (props.entity.typeName) {
+      case '表单':
       case '事项配置':
-      case '实体配置': {
-        const form = props.entity as IForm;
-        if (form.canDesign && props.cmd === 'open') {
-          return <FormView form={form} finished={props.finished} />;
-        }
-        return <LabelModal current={form} finished={props.finished} />;
-      }
+      case '实体配置':
+        return <FormView form={props.entity as any} finished={props.finished} />;
       case '迁移配置':
         return <TransferView current={props.entity as any} finished={props.finished} />;
       case '办事':
