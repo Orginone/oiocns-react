@@ -110,6 +110,9 @@ const FormRender: React.FC<{
           allowReordering
           dropFeedbackMode="push"
           dragDirection="vertical"
+          bindingOptions={{
+            location: 'before',
+          }}
         />
       </List>
       {openDialog && (

@@ -54,6 +54,7 @@ const WorkFormViewer: React.FC<{
               numStr={colNum}
               readOnly={props.readonly}
               field={field}
+              belong={props.belong}
               notifyEmitter={notifyEmitter}
               onValuesChange={props.onValuesChange}
             />

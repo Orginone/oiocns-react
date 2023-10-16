@@ -11,7 +11,7 @@ const HtmlEditItem: React.FC<TreeSelectItemProps> = (props) => {
   const [editor, setEditor] = useState<IDomEditor | null>(null); // 存储 editor 实例
 
   return (
-    <TextArea {...props} minHeight={350} width={'100%'}>
+    <TextArea {...props} minHeight={350} width={'100%'} defaultValue="" value="">
       <div style={{ padding: 30, display: 'block', height: '100%', width: '100%' }}>
         {props.readOnly !== true && (
           <Toolbar

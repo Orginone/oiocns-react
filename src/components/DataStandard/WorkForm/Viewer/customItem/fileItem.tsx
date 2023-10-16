@@ -32,7 +32,7 @@ const SelectFilesItem: React.FC<ITextBoxOptions> = (props) => {
   }, [fileList]);
 
   return (
-    <TextArea {...props} height={130} width={'100%'}>
+    <TextArea {...props} height={130} width={'100%'} defaultValue="" value="">
       <div className={cls.imageUploader}>
         {fileList.map((i, x) => {
           return (

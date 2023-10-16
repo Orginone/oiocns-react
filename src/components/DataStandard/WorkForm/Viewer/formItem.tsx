@@ -3,11 +3,14 @@ import { Emitter } from '@/ts/base/common';
 import HtmlEditItem from './customItem/htmlItem';
 import TreeSelectItem from './customItem/treeItem';
 import SelectFilesItem from './customItem/fileItem';
+import SearchTargetItem from './customItem/searchTarget';
+import CurrentTargetItem from './customItem/currentTarget';
 import { getItemWidth, getWidget } from '../Utils';
 import { DateBox, NumberBox, SelectBox, TextArea, TextBox } from 'devextreme-react';
 import React, { useEffect } from 'react';
 import { ValueChangedEvent } from 'devextreme/ui/text_box';
 import { formatDate } from '@/utils';
+import { IBelong, TargetType } from '@/ts/core';
 
 interface IFormItemProps {
   data: any;
@@ -15,6 +18,7 @@ interface IFormItemProps {
   notifyEmitter: Emitter;
   field: model.FieldModel;
   readOnly?: boolean;
+  belong: IBelong;
   onValuesChange?: (changedValues: any, data: any) => void;
 }
 
@@ -82,8 +86,18 @@ const FormItem: React.FC<IFormItemProps> = (props) => {
       );
     case '多级选择框':
       return <TreeSelectItem {...mixOptions} speciesItems={props.field.lookups} />;
+    case '操作人':
+      return <CurrentTargetItem {...mixOptions} target={props.belong.user.metadata} />;
+    case '操作组织':
+      return <CurrentTargetItem {...mixOptions} target={props.belong.metadata} />;
     case '人员搜索框':
-      return <SelectBox {...mixOptions} items={[]} />;
+      return <SearchTargetItem {...mixOptions} typeName={TargetType.Person} />;
+    case '单位搜索框':
+      return <SearchTargetItem {...mixOptions} typeName={TargetType.Company} />;
+    case '群组搜索框':
+      return <SearchTargetItem {...mixOptions} typeName={TargetType.Cohort} />;
+    case '组织群搜索框':
+      return <SearchTargetItem {...mixOptions} typeName={TargetType.Group} />;
     case '日期选择框':
       return (
         <DateBox

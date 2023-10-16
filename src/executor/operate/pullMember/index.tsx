@@ -48,6 +48,7 @@ const PullMember: React.FC<IProps> = ({ current, finished }) => {
         finished();
       }}>
       <SearchTarget
+        autoSelect
         searchCallback={setSelectMember}
         searchType={
           target.typeName === TargetType.Group ? TargetType.Company : TargetType.Person

@@ -73,7 +73,6 @@ const AttributeConfig: React.FC<IAttributeProps> = ({
         break;
       case '选择框':
       case '多级选择框':
-      case '人员搜索框':
         options.push(
           <SimpleItem
             dataField="options.searchEnabled"
@@ -87,7 +86,7 @@ const AttributeConfig: React.FC<IAttributeProps> = ({
             editorOptions={{
               displayExpr: 'name',
               valueExpr: 'id',
-              items: items,
+              dataSource: items,
             }}
           />,
         );

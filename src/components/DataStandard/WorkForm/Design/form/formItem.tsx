@@ -1,9 +1,11 @@
 import { schema } from '@/ts/base';
 import { Emitter } from '@/ts/base/common';
-import { IForm } from '@/ts/core';
+import { IForm, TargetType } from '@/ts/core';
 import HtmlEditItem from './customItem/htmlItem';
 import TreeSelectItem from './customItem/treeItem';
 import SelectFilesItem from './customItem/fileItem';
+import CurrentTargetItem from './customItem/currentTarget';
+import SearchTargetItem from './customItem/searchTarget';
 import { getWidget } from '../../Utils';
 import { DateBox, NumberBox, SelectBox, TextArea, TextBox } from 'devextreme-react';
 import React, { useEffect, useState } from 'react';
@@ -13,6 +15,7 @@ const FormItem: React.FC<{
   notityEmitter: Emitter;
   attr: schema.XAttribute;
 }> = ({ attr, current, notityEmitter }) => {
+  const target = current.directory.target;
   const [items, setItems] = useState<schema.XSpeciesItem[]>([]);
   const [attribute, setAttribute] = useState(attr);
   useEffect(() => {
@@ -70,8 +73,18 @@ const FormItem: React.FC<{
       );
     case '多级选择框':
       return <TreeSelectItem {...mixOptions} speciesItems={items} />;
+    case '操作人':
+      return <CurrentTargetItem {...mixOptions} target={target.user.metadata} />;
+    case '操作组织':
+      return <CurrentTargetItem {...mixOptions} target={target.space.metadata} />;
     case '人员搜索框':
-      return <SelectBox {...mixOptions} items={[]} />;
+      return <SearchTargetItem {...mixOptions} typeName={TargetType.Person} />;
+    case '单位搜索框':
+      return <SearchTargetItem {...mixOptions} typeName={TargetType.Company} />;
+    case '群组搜索框':
+      return <SearchTargetItem {...mixOptions} typeName={TargetType.Cohort} />;
+    case '组织群搜索框':
+      return <SearchTargetItem {...mixOptions} typeName={TargetType.Group} />;
     case '日期选择框':
       return <DateBox {...mixOptions} type={'date'} />;
     case '时间选择框':

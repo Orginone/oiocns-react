@@ -12,6 +12,7 @@ import TeamIcon from '@/components/Common/GlobalComps/entityIcon';
 
 type CompanySearchTableProps = {
   [key: string]: any;
+  autoSelect?: boolean;
   searchType: TargetType;
   searchCallback: (target: XTarget[]) => void;
 };
@@ -42,7 +43,7 @@ const SearchTarget: React.FC<CompanySearchTableProps> = (props) => {
         setSearchPlace('请输入群组的编码');
         break;
     }
-  }, []);
+  }, [props]);
 
   // 单位卡片渲染
   const personInfoList = () => {
@@ -140,8 +141,10 @@ const SearchTarget: React.FC<CompanySearchTableProps> = (props) => {
                 break;
             }
             setDataSource(res);
-            setChecked(res.map((i) => i.id));
-            tableProps.searchCallback(res);
+            if (props.autoSelect) {
+              setChecked(res.map((i) => i.id));
+              tableProps.searchCallback(res);
+            }
           }
         }}
       />

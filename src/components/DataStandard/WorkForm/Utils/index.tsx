@@ -42,7 +42,14 @@ export const loadwidgetOptions = (attribute: schema.XAttribute) => {
     case '时间型':
       return ['时间选择框'];
     case '用户型':
-      return ['人员搜索框'];
+      return [
+        '操作人',
+        '操作组织',
+        '人员搜索框',
+        '单位搜索框',
+        '组织群搜索框',
+        '群组搜索框',
+      ];
     case '附件型':
       return ['文件选择框'];
     default:
