@@ -14,7 +14,8 @@ import {
 import orgCtrl from '@/ts/controller';
 import QrCode from 'qrcode.react';
 import { command, model, schema } from '@/ts/base';
-import { List, Modal, Upload, message } from 'antd';
+import { List, Modal, Upload } from 'antd';
+import message from '@/utils/message';
 import { uploadTemplate } from './tools/uploadTemplate';
 import TypeIcon from '@/components/Common/GlobalComps/typeIcon';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
@@ -133,7 +134,7 @@ const setCopyFiles = (cmd: string, file: IFile) => {
     }
   }
   orgCtrl.user.copyFiles.set(key, file);
-  message.info(`${file.name}已放入剪切板`, 0.5);
+  message.info(`${file.name}已放入剪切板`);
 };
 
 /** 剪贴板操作 */
@@ -302,23 +303,9 @@ const onlineChanged = (cmd: string, info: model.OnlineInfo) => {
     orgCtrl.user.findEntityAsync(info.userId).then((target) => {
       if (target) {
         if (cmd === 'online') {
-          message.success({
-            duration: 1,
-            content: (
-              <div style={{ display: 'contents' }}>
-                {target.name} [{target.code}] 从{info.remoteAddr}上线啦
-              </div>
-            ),
-          });
+          message.info(`${target.name} [${target.code}] 从${info.remoteAddr}上线啦`);
         } else {
-          message.error({
-            duration: 1,
-            content: (
-              <div style={{ display: 'contents' }}>
-                {target.name} [{target.code}] 从{info.remoteAddr}下线啦
-              </div>
-            ),
-          });
+          message.error(`${target.name} [${target.code}] 从${info.remoteAddr}下线啦`);
         }
       }
     });

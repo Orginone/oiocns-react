@@ -103,7 +103,7 @@ const Directory: React.FC<IProps> = (props) => {
       clearHanlder();
       fileOpen(file);
     } else {
-      submitHanlder(() => focusHanlder(file), 100);
+      submitHanlder(() => focusHanlder(file), 200);
     }
   };
 

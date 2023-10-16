@@ -4,6 +4,7 @@ import { ITarget } from '../target/base/target';
 import { XCollection } from '../public/collection';
 import { IMessage, Message } from './message';
 import { Activity, IActivity } from './activity';
+import { logger } from '@/ts/base/common';
 // 空时间
 const nullTime = new Date('2022-07-01').getTime();
 /** 会话接口类 */
@@ -327,6 +328,9 @@ export class Session extends Entity<schema.XEntity> implements ISession {
         this.chatdata.noReadCount += imsg.isMySend ? 0 : 1;
         if (!this.chatdata.mentionMe) {
           this.chatdata.mentionMe = imsg.mentions.includes(this.userId);
+        }
+        if (this.chatdata.noReadCount > 0) {
+          logger.info(`[${this.chatdata.chatName}]:${imsg.msgTitle}`);
         }
         command.emitterFlag('session');
       } else if (!imsg.isReaded) {

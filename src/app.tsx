@@ -1,7 +1,8 @@
-import { ConfigProvider, Spin, message, notification } from 'antd';
+import { ConfigProvider, Spin, notification } from 'antd';
 import React, { Suspense, useState } from 'react';
 import { renderRoutes } from 'react-router-config';
 import { HashRouter } from 'react-router-dom';
+import message from '@/utils/message';
 
 import routes from '@/routes';
 import 'devextreme/dist/css/dx.common.css';
@@ -20,10 +21,6 @@ config({ defaultCurrency: 'zh' });
 loadMessages(zhMessage);
 locale('zh');
 
-message.config({
-  prefixCls: 'ogo-message',
-});
-
 ConfigProvider.config({
   prefixCls: 'ogo',
 });
@@ -37,16 +34,16 @@ const App = () => {
   logger.onLogger = (level, msg) => {
     switch (level) {
       case LoggerLevel.info:
-        message.info(msg, 0.5);
+        message.info(msg);
         break;
       case LoggerLevel.warn:
-        message.warn(msg, 1);
+        message.warn(msg);
         break;
       case LoggerLevel.error:
-        message.error(msg, 1);
+        message.error(msg);
         break;
       case LoggerLevel.unauth:
-        message.warn(msg, 1);
+        message.error(msg);
         sessionStorage.clear();
         location.reload();
     }
