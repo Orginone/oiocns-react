@@ -29,11 +29,11 @@ const TableMode = ({
           id="grid"
           width="100%"
           height="100%"
-          keyExpr="id"
+          keyExpr="key"
           columnAutoWidth
           allowColumnResizing
           hoverStateEnabled
-          selectedRowKeys={select ? [select.id] : []}
+          selectedRowKeys={select ? [select.key] : []}
           selection={{ mode: 'single' }}
           columnResizingMode={'nextColumn'}
           showColumnLines={false}

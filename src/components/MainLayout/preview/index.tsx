@@ -5,7 +5,6 @@ import { command, schema } from '@/ts/base';
 import React, { useEffect, useState } from 'react';
 import OfficeView from './office';
 import SessionBody from './session';
-import ChatBody from './chat';
 import TaskBody from './task';
 import JoinApply from './task/joinApply';
 import EntityInfo from '@/components/Common/EntityInfo';
@@ -58,7 +57,7 @@ const EntityPreview: React.FC<IOpenProps> = (props: IOpenProps) => {
         }
       }
       if ('activity' in entity) {
-        return <ChatBody chat={entity} filter={''} />;
+        return <SessionBody chat={entity} />;
       }
       if ('session' in entity) {
         return <SessionBody chat={entity.session} store />;

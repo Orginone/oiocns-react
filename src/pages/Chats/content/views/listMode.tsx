@@ -24,7 +24,7 @@ const ListMode = ({
       dataSource={chats}
       renderItem={(item: ISession) => {
         const style: any = {};
-        if (select?.id === item.id) {
+        if (select?.key === item.key) {
           style.backgroundColor = '#e6f1ff';
         }
         return (

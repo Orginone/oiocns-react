@@ -64,6 +64,7 @@ import { ImDrive } from '@react-icons/all-files/im/ImDrive';
 import { ImSafari } from '@react-icons/all-files/im/ImSafari';
 import { ImClipboard } from '@react-icons/all-files/im/ImClipboard';
 import { ImEqualizer } from '@react-icons/all-files/im/ImEqualizer';
+import { ImLifebuoy } from '@react-icons/all-files/im/ImLifebuoy';
 
 export {
   ImAddressBook,
@@ -99,6 +100,7 @@ export {
   ImKey,
   ImKey2,
   ImLibrary,
+  ImLifebuoy,
   ImList,
   ImMic,
   ImOffice,

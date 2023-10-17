@@ -19,7 +19,7 @@ const IconMode = ({
     <Dropdown menu={{ items: loadChatOperation(item) }} trigger={['contextMenu']}>
       <Card
         size="small"
-        className={select?.id === item.id ? cls.fileCard_select : cls.fileCard}
+        className={select?.key === item.key ? cls.fileCard_select : cls.fileCard}
         bordered={false}
         key={item.key}
         onClick={async () => {

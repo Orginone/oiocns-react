@@ -46,7 +46,7 @@ const Book: React.FC<{
       return num;
     });
   const sessionOpen = async (session: ISession | undefined) => {
-    if (session?.id === select?.id) {
+    if (session?.key === select?.key) {
       setSelect(undefined);
       command.emitter('preview', 'chat');
     } else {
