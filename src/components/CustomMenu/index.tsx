@@ -3,7 +3,6 @@ import { Dropdown, Menu, MenuProps, Typography, Input, Badge } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { ImSearch } from '@/icons/im';
 import { MenuItemType } from 'typings/globelType';
-import style from './index.module.less';
 
 interface CustomMenuType {
   collapsed: boolean;
@@ -98,22 +97,22 @@ const CustomMenu = (props: CustomMenuType) => {
             props.onSelect?.apply(this, [item]);
           }
         }}
-        className={style.customlabel}
+        className="oio-customMenu-customlabel"
         onMouseLeave={() => {
           setVisibleMenu(false);
         }}>
-        <Typography.Text className={style.label} ellipsis={{ tooltip: item.label }}>
+        <Typography.Text className="oio-customMenu-customlabel-label" ellipsis={{ tooltip: item.label }}>
           {item.label}
         </Typography.Text>
         {item.count && item.count > 0 ? (
-          <span className={style.badge}>
+          <span className="oio-customMenu-customlabel-badge">
             <Badge key={item.key} count={item.count} size="small" />
           </span>
         ) : (
           <></>
         )}
         {Array.isArray(item.menus) && item.menus.length > 0 && (
-          <span onClick={(e: any) => e.stopPropagation()} className={style.moreButton}>
+          <span onClick={(e: any) => e.stopPropagation()} className="oio-customMenu-customlabel-moreButton">
             {props.selectMenu.key === item.key && (
               <Dropdown
                 menu={{
@@ -141,10 +140,9 @@ const CustomMenu = (props: CustomMenuType) => {
       </span>
     );
   };
-
   return (
-    <>
-      <span style={{ display: 'flex', justifyContent: 'center' }}>
+    <div className='oio-customMenu'>
+      <span className="oio-customMenu-search">
         {props.collapsed ? (
           <ImSearch />
         ) : (
@@ -160,7 +158,7 @@ const CustomMenu = (props: CustomMenuType) => {
       </span>
 
       <Menu
-        className={`${style.customMenu} ${props.className ?? ''}`}
+        className={`oio-customMenu-wrap ${props.className ?? ''}`}
         mode="inline"
         inlineIndent={10}
         items={data}
@@ -175,7 +173,7 @@ const CustomMenu = (props: CustomMenuType) => {
           setOpenKeys(keys);
         }}
         selectedKeys={selectedKeys}></Menu>
-    </>
+    </div>
   );
 };
 

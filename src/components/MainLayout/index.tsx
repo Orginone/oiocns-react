@@ -1,6 +1,6 @@
 import { Col, Divider, Dropdown, Layout, Row, Space, Typography, Button } from 'antd';
 import React, { CSSProperties } from 'react';
-import cls from './index.module.less';
+import '@/global.less'
 import CustomMenu from '@/components/CustomMenu';
 import CustomBreadcrumb from '@/components/CustomBreadcrumb';
 import { MenuItemType, OperateMenuType } from 'typings/globelType';
@@ -71,8 +71,8 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
     props.onSelect?.apply(this, [item]);
   };
   return (
-    <Layout className={cls.layout} style={props.style}>
-      <Row className={cls.contenttop} justify="space-between">
+    <Layout className="oio-mainLayout-layout" style={props.style}>
+      <Row className="oio-mainLayout-contenttop" justify="space-between">
         <Col>
           <CustomBreadcrumb
             selectKey={props.selectMenu.key}
@@ -81,7 +81,7 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
               onSelectClick(item);
             }}></CustomBreadcrumb>
         </Col>
-        <Col className={cls.rightstyle}>
+        <Col className="oio-mainLayout-rightstyle">
           <Space wrap split={<Divider type="vertical" />} size={2}>
             {props.leftShow === undefined && (
               <Typography.Link
@@ -135,22 +135,22 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
       </Row>
       <Layout>
         {(props.leftShow ?? leftSider) && (
-          <Sider className={cls.sider} width={250}>
-            <div className={cls.menuBar}>
+          <Sider className="oio-mainLayout-sider" width={250}>
+            <div className="oio-mainLayout-menuBar">
               <Typography.Link
                 style={{ fontSize: 16 }}
                 onClick={() => {
                   onSelectClick(parentMenu);
                 }}>
                 {parentMenu.key != props.siderMenuData.key && (
-                  <div className={cls.backup}>
+                  <div className="oio-mainLayout-backup">
                     <ImArrowLeft2 fontSize={20} />
                   </div>
                 )}
               </Typography.Link>
             </div>
             <div
-              className={cls.title}
+              className="oio-mainLayout-title"
               title={parentMenu.label}
               onClick={() => {
                 onSelectClick(parentMenu);
@@ -158,7 +158,7 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
               <span style={{ fontSize: 20, margin: '0 6px' }}>{parentMenu.icon}</span>
               <strong>{parentMenu.label}</strong>
             </div>
-            <div className={cls.container} id="templateMenu">
+            <div className="oio-mainLayout-container" id="templateMenu">
               <CustomMenu
                 item={parentMenu}
                 collapsed={false}
@@ -177,16 +177,16 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
               handles={'right'}
               width={mainWidth}
               onResize={(e) => setMainWidth(e.width)}>
-              <Sider className={cls.content} width={'100%'}>
+              <Sider className="oio-mainLayout-content" width={'100%'}>
                 {props.children}
               </Sider>
             </Resizable>
-            <Content className={cls.content}>
+            <Content className="oio-mainLayout-content">
               <EntityPreview entity={props.selectMenu.item} />
             </Content>
           </>
         ) : (
-          <Content className={cls.content}>{props.children}</Content>
+          <Content className="oio-mainLayout-content">{props.children}</Content>
         )}
       </Layout>
     </Layout>
