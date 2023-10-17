@@ -65,7 +65,13 @@ const SessionBody = ({ chat, store }: { chat: ISession; store?: boolean }) => {
       case 'chat':
         return <ChatBody chat={chat} filter={''} />;
       case 'member':
-        return <MemberContent dircetory={chat.target.memberDirectory} />;
+        if (chat.members.length > 0) {
+          return <MemberContent dircetory={chat.target.memberDirectory} />;
+        } else if (store) {
+          return <TargetActivity height={700} activity={chat.activity}></TargetActivity>;
+        } else {
+          return <ChatBody chat={chat} filter={''} />;
+        }
       case 'activity':
         return <TargetActivity height={700} activity={chat.activity}></TargetActivity>;
     }
