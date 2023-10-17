@@ -4,27 +4,24 @@ const useTimeoutHanlder = (): [
   (hanlder: Function, timeout: number) => void,
   () => void,
 ] => {
-  const [timeoutHanlder, setTimeoutHanlder] =
-    React.useState<ReturnType<typeof setTimeout>>();
+  const timeoutHanlder = React.useRef<ReturnType<typeof setTimeout>>();
   // 提交句柄
   const submitHanlder = (hanlder: Function, timeout: number) => {
     if (timeout === 0) {
       hanlder();
     } else {
       clearHanlder();
-      setTimeoutHanlder(
-        setTimeout(() => {
-          clearHanlder();
-          hanlder();
-        }, timeout),
-      );
+      timeoutHanlder.current = setTimeout(() => {
+        clearHanlder();
+        hanlder();
+      }, timeout);
     }
   };
   // 清理句柄
   const clearHanlder = () => {
-    if (timeoutHanlder) {
-      clearTimeout(timeoutHanlder);
-      setTimeoutHanlder(undefined);
+    if (timeoutHanlder.current) {
+      clearTimeout(timeoutHanlder.current);
+      timeoutHanlder.current = undefined;
     }
   };
   return [submitHanlder, clearHanlder];
