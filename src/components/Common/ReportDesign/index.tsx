@@ -21,6 +21,7 @@ const ReportDesign: React.FC<IProps> = ({ current }) => {
   const [sheetList, setSheetList] = useState<any>([]);
   const [selectItem, setSelectedItem] = useState<any>();
   const [cellStyle, setCellStyle] = useState<any>();
+  const [key, setKey] = useState<string>('');
 
   useEffect(() => {
     /** 获取报表数据，没有数据默认给个sheet页 */
@@ -78,22 +79,26 @@ const ReportDesign: React.FC<IProps> = ({ current }) => {
         <ToolBar
           cellStyle={cellStyle}
           handClick={(value: string | any, type: string, classType?: any) => {
+            setKey(Math.random().toString(36));
             setReportChange(value);
             setChangeType(type);
             setClassType(classType);
           }}></ToolBar>
       </div>
-      <HotTableView
-        current={current}
-        handEcho={(cellStyle: any) => {
-          /** 单元格样式回显到工具栏 */
-          setCellStyle(cellStyle);
-        }}
-        selectItem={selectItem}
-        sheetList={sheetList}
-        reportChange={reportChange}
-        changeType={changeType}
-        classType={classType}></HotTableView>
+      <div>
+        <HotTableView
+          updataKey={key}
+          current={current}
+          handEcho={(cellStyle: any) => {
+            /** 单元格样式回显到工具栏 */
+            setCellStyle(cellStyle);
+          }}
+          selectItem={selectItem}
+          sheetList={sheetList}
+          reportChange={reportChange}
+          changeType={changeType}
+          classType={classType}></HotTableView>
+      </div>
       <Tabs
         key={tkey}
         tabPosition={'bottom'}

@@ -15,6 +15,7 @@ interface IProps {
   current: IForm;
   sheetList: any;
   selectItem: any;
+  updataKey: string;
   reportChange: any;
   changeType: string;
   classType: any | undefined;
@@ -25,6 +26,7 @@ const HotTableView: React.FC<IProps> = ({
   current,
   sheetList,
   selectItem,
+  updataKey,
   reportChange,
   changeType,
   classType,
@@ -37,6 +39,7 @@ const HotTableView: React.FC<IProps> = ({
   const [cells, setCells] = useState<any>([]);
   const [styleList, setStyleList] = useState<any>([]);
   const [classList, setClassList] = useState<any>([]);
+  const [copySelected, setCopySelected] = useState<any>();
   const initRowCount: number = 8;
   const initColCount: number = 60;
   const defaultRowHeight: number = 23;
@@ -89,12 +92,113 @@ const HotTableView: React.FC<IProps> = ({
   }, [selectItem]);
 
   useEffect(() => {
-    if (changeType !== '' && changeType !== 'onSave') {
-      buttonClickCallback();
-    } else if (changeType == 'onSave') {
-      saveClickCallback();
+    /** 根据工具栏类型进行操作 */
+    switch (changeType) {
+      case 'onSave':
+        saveClickCallback();
+        break;
+      case 'copyStyle':
+        copyStyle();
+        return;
+      case 'pasteStyle':
+        pasteStyle();
+        return;
+      case 'border':
+        setBorder(classType);
+        return;
+      case '':
+        return;
+      default:
+        buttonClickCallback();
+        return;
     }
-  }, [reportChange]);
+  }, [updataKey]);
+
+  /** 复制样式 */
+  const copyStyle = () => {
+    const selected = hotRef.current.hotInstance.getSelected() || [];
+    if (selected) {
+      const items = styleList.find(
+        (it: any) => it.col === selected[0][1] && it.row === selected[0][0],
+      );
+      setCopySelected(items);
+    }
+  };
+
+  /** 粘贴样式 */
+  const pasteStyle = () => {
+    clearStyle();
+    const selected = hotRef.current.hotInstance.getSelected() || [];
+    for (let index = 0; index < selected.length; index += 1) {
+      const [row1, column1, row2, column2] = selected[index];
+      const startRow = Math.max(Math.min(row1, row2), 0);
+      const endRow = Math.max(row1, row2);
+      const startCol = Math.max(Math.min(column1, column2), 0);
+      const endCol = Math.max(column1, column2);
+      for (let rowIndex = startRow; rowIndex <= endRow; rowIndex += 1) {
+        for (let columnIndex = startCol; columnIndex <= endCol; columnIndex += 1) {
+          /** 存储 */
+          const item = styleList.find(
+            (a: any) => a.col === columnIndex && a.row === rowIndex,
+          );
+          if (item) {
+            item.styles = copySelected.styles;
+          } else {
+            let json: any = {
+              col: columnIndex,
+              row: rowIndex,
+              styles: copySelected.styles,
+            };
+            styleList.push(json);
+          }
+          /** 渲染 */
+          const kv =
+            hotRef.current.hotInstance.getCellMeta(rowIndex, columnIndex).style || {};
+          if (copySelected) {
+            Object.keys(copySelected?.styles).map((key) => {
+              kv[key] = copySelected.styles[key];
+            });
+          }
+          hotRef.current.hotInstance.setCellMeta(rowIndex, columnIndex, 'style', kv);
+        }
+      }
+    }
+  };
+
+  // 清除格式
+  const clearStyle = () => {
+    const selected = hotRef.current.hotInstance.getSelected() || [];
+    for (let index = 0; index < selected.length; index += 1) {
+      const [row1, column1, row2, column2] = selected[index];
+      const startRow = Math.max(Math.min(row1, row2), 0);
+      const endRow = Math.max(row1, row2);
+      const startCol = Math.max(Math.min(column1, column2), 0);
+      const endCol = Math.max(column1, column2);
+      for (let rowIndex = startRow; rowIndex <= endRow; rowIndex += 1) {
+        for (let columnIndex = startCol; columnIndex <= endCol; columnIndex += 1) {
+          /** 清除存储 */
+          const index = classList.findIndex(
+            (a: any) => a.col === columnIndex && a.row === rowIndex,
+          );
+          if (index > -1) {
+            classList.splice(index, 1);
+          }
+          /** 清除meta */
+          let className =
+            hotRef.current.hotInstance.getCellMeta(rowIndex, columnIndex).className || '';
+          className = className.replace(/htCenter|htLeft|htRight/, 'htLeft');
+          className = className.replace(/htMiddle|htTop|htBottom/, 'htMiddle');
+          hotRef.current.hotInstance.removeCellMeta(rowIndex, columnIndex, 'style');
+          hotRef.current.hotInstance.setCellMeta(
+            rowIndex,
+            columnIndex,
+            'className',
+            className,
+          );
+        }
+      }
+    }
+  };
 
   styleList?.forEach((item: any) => {
     hotRef.current.hotInstance.getCellMeta(item.row, item.col).renderer =
@@ -120,20 +224,88 @@ const HotTableView: React.FC<IProps> = ({
       'customStylesRenderer';
   });
 
+  /** 设置边框 */
+  const setBorder = (border: string, { width = 1, color = '#000000' } = {}) => {
+    const customBordersPlugin = hotRef.current.hotInstance.getPlugin('customBorders');
+    const { xMin, xMax, yMin, yMax } = getSelected();
+    console.log(xMin, xMax, yMin, yMax, 'xMin, xMax, yMin, yMax');
+    const range = [];
+    const customBorder: any = {};
+    switch (border) {
+      case 'start':
+        range.push([xMin, yMin, xMax, yMin]);
+        customBorder.left = { hide: false, width, color };
+        break;
+      case 'end':
+        range.push([xMin, yMax, xMax, yMax]);
+        customBorder.right = { hide: false, width, color };
+        break;
+      case 'top':
+        range.push([xMin, yMin, xMin, yMax]);
+        customBorder.top = { hide: false, width, color };
+        break;
+      case 'bottom':
+        range.push([xMax, yMin, xMax, yMax]);
+        customBorder.bottom = { hide: false, width, color };
+        break;
+      case 'all':
+        range.push([xMin, yMin, xMax, yMax]);
+        customBorder.left = { hide: false, width, color };
+        customBorder.right = { hide: false, width, color };
+        customBorder.top = { hide: false, width, color };
+        customBorder.bottom = { hide: false, width, color };
+        break;
+      case 'border-outline':
+        setBorder('start', { width, color });
+        setBorder('end', { width, color });
+        setBorder('top', { width, color });
+        setBorder('bottom', { width, color });
+        return;
+      case 'border-outline-2':
+        setBorder('start', { width: 2, color });
+        setBorder('end', { width: 2, color });
+        setBorder('top', { width: 2, color });
+        setBorder('bottom', { width: 2, color });
+        return;
+      case 'none':
+        customBordersPlugin.clearBorders(hotRef.current.hotInstance.getSelectedRange());
+        return;
+      default:
+        break;
+    }
+    // setBorderList
+    customBordersPlugin.setBorders(range, customBorder);
+  };
+
+  /** 格式化所选, 返回从左上到右下的坐标，只返回最后一个 */
+  const getSelected = () => {
+    const selected = hotRef.current.hotInstance.getSelectedLast(); // [startRow, startCol, endRow, endCol]
+    /** 没有选择区域，返回左上角，并标记 */
+    if (!selected) {
+      return {
+        xMin: 0,
+        yMin: 0,
+        xMax: 0,
+        yMax: 0,
+        unselected: true,
+      };
+    }
+    /** 因为会从不同的方向选择，需要重新排序 */
+    const xMin = Math.min(selected[0], selected[2]);
+    const xMax = Math.max(selected[0], selected[2]);
+    const yMin = Math.min(selected[1], selected[3]);
+    const yMax = Math.max(selected[1], selected[3]);
+    return {
+      xMin,
+      xMax,
+      yMin,
+      yMax,
+    };
+  };
+
   /** 工具栏按钮点击 */
   const buttonClickCallback = () => {
     const selected = hotRef.current.hotInstance.getSelected() || [];
-    hotRef.current.hotInstance.suspendRender();
-    if (changeType === 'border') {
-      const customBordersPlugin = hotRef.current.hotInstance.getPlugin('customBorders');
-      if (classType !== 'none') {
-        customBordersPlugin.setBorders(hotRef.current.hotInstance.getSelectedRange(), {
-          [classType]: { hide: false, width: 1, color: '#000000' },
-        });
-      } else {
-        customBordersPlugin.clearBorders(hotRef.current.hotInstance.getSelectedRange());
-      }
-    }
     for (let index = 0; index < selected.length; index += 1) {
       const [row1, column1, row2, column2] = selected[index];
       const startRow = Math.max(Math.min(row1, row2), 0);
@@ -179,9 +351,10 @@ const HotTableView: React.FC<IProps> = ({
               'className',
               arr.join(' '),
             );
-          } else if (changeType !== 'border') {
+          } else {
             if (styleList.length > 0) {
-              let items = styleList.find(
+              const newStyleList = JSON.parse(JSON.stringify(styleList));
+              let items = newStyleList.find(
                 (it: any) => it.col === columnIndex && it.row === rowIndex,
               );
               if (items) {
@@ -192,6 +365,7 @@ const HotTableView: React.FC<IProps> = ({
                     items.styles[changeType] = reportChange;
                   }
                 }
+                setStyleList(newStyleList);
               } else {
                 let json: any = { col: columnIndex, row: rowIndex, styles: {} };
                 json.styles[changeType] = reportChange;
@@ -208,8 +382,6 @@ const HotTableView: React.FC<IProps> = ({
         }
       }
     }
-    hotRef.current.hotInstance.render();
-    hotRef.current.hotInstance.resumeRender();
   };
 
   /** 保存 保存数据结构---还未更新完 */
@@ -222,7 +394,7 @@ const HotTableView: React.FC<IProps> = ({
       col_w.push(hotRef.current.hotInstance.getColWidth(i));
     }
     for (var k = 0; k < count_row; k++) {
-      row_h.push(hotRef.current.hotInstance.getRowHeight(i));
+      row_h.push(hotRef.current.hotInstance.getRowHeight(k));
     }
     let json = {
       data: hotRef.current.hotInstance.getData(),
@@ -244,6 +416,7 @@ const HotTableView: React.FC<IProps> = ({
       rule: JSON.stringify(newData),
     });
   };
+
   /** 更新特性rules 但单元格只有只读属性 readOnly */
   const upDataCell = () => {
     cells.forEach((item: any) => {

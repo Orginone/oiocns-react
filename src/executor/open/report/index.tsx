@@ -29,7 +29,7 @@ const ReportView: React.FC<IProps> = ({ current, finished }) => {
     const item = selectMenu?.item?.value ?? selectMenu?.item?.code;
     let request: any = {
       filter: undefined,
-      group: null,
+      group: '',
       requireTotalCount: true,
       searchExpr: undefined,
       searchOperation: 'contains',
