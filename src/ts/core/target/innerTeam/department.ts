@@ -36,6 +36,7 @@ export class Department extends Target implements IDepartment {
     switch (_metadata.typeName as TargetType) {
       case TargetType.College:
         this.childrenTypes = [
+          TargetType.Department,
           TargetType.Major,
           TargetType.Office,
           TargetType.Working,
@@ -46,6 +47,7 @@ export class Department extends Target implements IDepartment {
       case TargetType.Section:
       case TargetType.Department:
         this.childrenTypes = [
+          TargetType.Department,
           TargetType.Office,
           TargetType.Working,
           TargetType.Research,

@@ -54,7 +54,7 @@ const ListMode = ({
                   title={
                     <div>
                       <span style={{ marginRight: 10 }}>{item.chatdata.chatName}</span>
-                      {item.chatdata.labels
+                      {item.labels
                         .filter((i) => i.length > 0)
                         .map((label) => {
                           return (

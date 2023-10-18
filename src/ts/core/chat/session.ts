@@ -9,6 +9,8 @@ import { logger } from '@/ts/base/common';
 const nullTime = new Date('2022-07-01').getTime();
 /** 会话接口类 */
 export interface ISession extends IEntity<schema.XEntity> {
+  /** 会话的标签集 */
+  labels: string[];
   /** 是否归属人员 */
   isBelongPerson: boolean;
   /** 成员是否有我 */
@@ -66,15 +68,22 @@ export class Session extends Entity<schema.XEntity> implements ISession {
   activity: IActivity;
   chatdata: model.MsgChatData;
   messages: IMessage[] = [];
+  private _labels: string[] = [];
   private messageNotify?: (messages: IMessage[]) => void;
   constructor(id: string, target: ITarget, _metadata: schema.XTarget, tags?: string[]) {
     super(_metadata, []);
     this.sessionId = id;
     this.target = target;
-    if (tags === undefined) {
-      tags = [_metadata.typeName];
-      if (_metadata.belong) {
-        tags.unshift(_metadata.belong.name);
+    if (id === this.userId) {
+      this._labels.push('本人');
+    } else {
+      if (tags === undefined) {
+        this._labels.push(_metadata.typeName);
+        if (_metadata.belong) {
+          this._labels.unshift(_metadata.belong.name);
+        }
+      } else {
+        this._labels.push(...tags);
       }
     }
     this.chatdata = {
@@ -85,7 +94,7 @@ export class Session extends Entity<schema.XEntity> implements ISession {
       noReadCount: 0,
       lastMsgTime: nullTime,
       mentionMe: false,
-      labels: id === this.userId ? ['本人'] : tags,
+      labels: [],
     };
     this.activity = new Activity(_metadata, this);
     setTimeout(
@@ -94,6 +103,9 @@ export class Session extends Entity<schema.XEntity> implements ISession {
       },
       this.id === this.userId ? 100 : 0,
     );
+  }
+  get labels(): string[] {
+    return [...this._labels, ...this.chatdata.labels];
   }
   get coll(): XCollection<model.ChatMessageType> {
     return this.target.resource.messageColl;
@@ -368,12 +380,14 @@ export class Session extends Entity<schema.XEntity> implements ISession {
   async loadCacheChatData(): Promise<void> {
     const data = await this.target.user.cacheObj.get<model.MsgChatData>(this.cachePath);
     if (data && data.fullId === this.chatdata.fullId) {
+      data.labels = data.labels.filter((i) => i == '置顶');
       this.chatdata = data;
     }
     this.target.user.cacheObj.subscribe(
       this.chatdata.fullId,
       (data: model.MsgChatData) => {
         if (data && data.fullId === this.chatdata.fullId) {
+          data.labels = data.labels.filter((i) => i == '置顶');
           this.chatdata = data;
           this.target.user.cacheObj.setValue(this.cachePath, data);
           command.emitterFlag('session');
