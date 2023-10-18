@@ -66,7 +66,6 @@ const Params: React.FC<IProps> = ({ transfer, current }) => {
 
   const onChange = (params: readonly Param[]) => {
     current.data.uri = toUrlParams(current.data.uri, params);
-    transfer.updNode(current);
     transfer.command.emitter('node', 'params', params);
   };
 

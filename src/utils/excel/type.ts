@@ -129,6 +129,9 @@ export interface IExcel {
 // 基本模型
 export { List, model, schema } from '@/ts/base';
 
+// 工具
+export { generateUuid } from '@/ts/base/common';
+
 // 文件模型
 export { orgAuth, ValueType } from '@/ts/core';
 

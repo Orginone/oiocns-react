@@ -1,3 +1,16 @@
+.mapper {
+  display: flex;
+  flex-direction: row;
+  margin-top: 10px;
+}
+
+.dictMapper {
+  display: flex;
+  flex-direction: row;
+  margin-top: 10px;
+  height: 100%;
+}
+
 .flex-column {
   display: flex;
   align-items: center;
@@ -6,17 +19,15 @@
 
 .fields {
   margin-top: 10px;
-  height: calc(100vh - 20px);
+  width: 100%;
+  max-height: calc(80vh);
   overflow: scroll;
 }
 
-.field {
-  display: flex;
-  align-items: center;
-  flex-direction: row;
-  height: 30px;
-  margin-left: 20px;
-  justify-content: space-between;
+.dicts {
+  max-height: calc(70vh);
+  margin-top: 10px;
+  overflow: scroll;
 }
 
 .center {
@@ -31,4 +42,10 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.tagName {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
 }

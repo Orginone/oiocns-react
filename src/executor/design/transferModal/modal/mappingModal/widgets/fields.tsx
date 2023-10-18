@@ -1,10 +1,9 @@
-import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
-import { model, schema } from '@/ts/base';
-import { XAttribute } from '@/ts/base/schema';
+import { ShareIconItem } from '@/components/Common/GlobalComps/entityIcon';
+import { model } from '@/ts/base';
 import { ITransfer } from '@/ts/core';
 import { Radio, Space, Tag } from 'antd';
 import React, { useEffect, useState } from 'react';
-import cls from '../index.module.less';
+import cls from './../index.module.less';
 
 interface IProps {
   transfer: ITransfer;
@@ -12,54 +11,63 @@ interface IProps {
   target: 'source' | 'target';
 }
 
+export const getAttrs = (
+  transfer: ITransfer,
+  current: model.Mapping,
+  target: 'source' | 'target',
+) => {
+  const formId = current[target];
+  const used = new Set(current.mappings.map((item) => item[target]));
+  if (formId) {
+    const form = transfer.forms[formId];
+    return form?.attributes.filter((field) => !used.has(field.id)) ?? [];
+  }
+  return [];
+};
+
 const Fields: React.FC<IProps> = ({ transfer, current, target }) => {
-  const [attrs, setAttrs] = useState<XAttribute[]>([]);
-  const [value, setValue] = useState<string>();
+  const [attrs, setAttrs] = useState(getAttrs(transfer, current, target));
+  const [value, setValue] = useState('');
   useEffect(() => {
-    const subscribeId = transfer.subscribe(() => {
-      const used = new Set(current.mappings.map((item) => item[target]));
-      const form = transfer.findMetadata<schema.XForm>(current[target]);
-      if (form) {
-        setAttrs(form.attributes.filter((field) => !used.has(field.id)));
-      }
-    });
     const id = transfer.command.subscribe((type, cmd) => {
-      if (type == 'fields') {
-        switch (cmd) {
-          case 'clear':
-            setValue(undefined);
-            break;
-        }
+      if (type != 'fields') return;
+      switch (cmd) {
+        case 'clear':
+          setValue('');
+          break;
+        case 'refresh':
+          setAttrs(getAttrs(transfer, current, target));
+          break;
       }
     });
     return () => {
       transfer.command.unsubscribe(id);
-      transfer.unsubscribe(subscribeId);
     };
-  }, [transfer]);
+  });
+  const formId = current[target];
   return (
-    <div className={cls['flex-column']}>
-      <EntityIcon entity={transfer.findMetadata(current[target])} showName />
-      <div className={cls['fields']}>
+    <div style={{ flex: 1 }} className={cls['flex-column']}>
+      <ShareIconItem
+        share={{ name: formId ? transfer.forms[formId]?.name : '', typeName: '映射' }}
+        showName
+      />
+      <div className={cls.fields}>
         <Radio.Group value={value} buttonStyle="outline">
           <Space direction="vertical">
-            {attrs
-              .sort((f, s) => f.property?.info.localeCompare(s.property?.info ?? '') ?? 0)
-              .map((item) => (
-                <Radio
-                  key={item.id}
-                  className={cls['field']}
-                  value={item.id}
-                  onChange={(e) => {
-                    setValue(e.target.value);
-                    transfer.command.emitter('fields', 'choose', [target, item]);
-                  }}>
-                  <Space>
-                    <Tag color="cyan">{item.property?.valueType}</Tag>
-                    {item.name + ' ' + item.property?.info}
-                  </Space>
-                </Radio>
-              ))}
+            {attrs.map((item) => (
+              <Radio
+                key={item.id}
+                value={item.id}
+                onChange={(e) => {
+                  setValue(e.target.value);
+                  transfer.command.emitter('fields', 'choose', [target, item]);
+                }}>
+                <div className={cls.tagName}>
+                  <Tag color="cyan">{item.property?.valueType}</Tag>
+                  {item.name + ' ' + item.property?.info}
+                </div>
+              </Radio>
+            ))}
           </Space>
         </Radio.Group>
       </div>

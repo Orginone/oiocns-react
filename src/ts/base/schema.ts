@@ -624,3 +624,5 @@ export type XWorkTask = {
   // 办事的定义
   instance: XWorkInstance | undefined;
 } & Xbase;
+
+export interface XPageTemplate extends XStandard {}
