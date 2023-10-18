@@ -6,7 +6,6 @@ import { IMessage, ISession, ISysFileInfo, MessageType } from '@/ts/core';
 import { parseAvatar } from '@/ts/base';
 import PullDown from '@/pages/Chats/components/pullDown';
 import Cutting from '../../cutting';
-import './index.less';
 import OpenFileDialog from '@/components/OpenFileDialog';
 import { parseCiteMsg } from '@/pages/Chats/components/parseMsg';
 import Emoji from '../../../components/emoji';
@@ -35,11 +34,11 @@ const GroupInputBox = (props: IProps) => {
   /** 引用展示 */
   const citeShowText = (val: IMessage) => {
     return (
-      <div className="cite-text">
-        <div className="cite-text__content">{parseCiteMsg(val)}</div>
+      <div className="oio-group-input-box-input-area-cite-text">
+        <div className="oio-group-input-box-input-area-cite-text-content">{parseCiteMsg(val)}</div>
         <CloseCircleFilled
           onClick={() => closeCite('')}
-          className="cite-text__close-icon"
+          className="oio-group-input-box-input-area-cite-text-close-icon"
         />
       </div>
     );
@@ -152,7 +151,7 @@ const GroupInputBox = (props: IProps) => {
   const handleCutImgSelect = async (result: any) => {
     const img = document.createElement('img');
     img.src = result.shareInfo().shareLink;
-    img.className = `cutImg`;
+    img.className = `oio-group-input-box-input-area-textarea-cutImg`;
     img.style.display = 'block';
     img.style.marginBottom = '10px';
     document.getElementById('innerHtml')?.append(img);
@@ -160,8 +159,8 @@ const GroupInputBox = (props: IProps) => {
 
   return (
     <>
-      <div className="group-input-box">
-        <div className="group-input-box__toolbar">
+      <div className="oio-group-input-box">
+        <div className="oio-group-input-box-toolbar">
           <Popover
             content={
               <Emoji
@@ -195,7 +194,7 @@ const GroupInputBox = (props: IProps) => {
           />
         </div>
         {/* @功能 */}
-        <div className="group-input-box__input-area">
+        <div className="oio-group-input-box-input-area">
           {citeShow && (
             <PullDown
               style={{ display: `${!citeShow ? 'none' : 'block'}` }}
@@ -222,14 +221,14 @@ const GroupInputBox = (props: IProps) => {
             id="innerHtml"
             autoFocus={true}
             ref={(ref) => ref && !citeShow && ref.focus()}
-            className={'textarea'}
+            className={'oio-group-input-box-input-area-textarea'}
             contentEditable="true"
             spellCheck="false"
             placeholder="请输入内容"
             onKeyDown={keyDown}></div>
           {citeText && citeShowText(citeText)}
         </div>
-        <div className="group-input-box__action-bar">
+        <div className="oio-group-input-box-action-bar">
           <Button
             type="primary"
             style={{ color: '#fff', border: 'none' }}

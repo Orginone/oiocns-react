@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import GroupContent from './GroupContent';
 import GroupInputBox from './GroupInputBox';
-import charsStyle from './index.module.less';
 import ChatShareForward from './ChatShareForward';
 import { ISession, IMessage } from '@/ts/core';
 import { RiShareForwardLine } from '@/icons/ri';
@@ -35,9 +34,9 @@ const Chat: React.FC<any> = ({ chat, filter }: { chat: ISession; filter: string 
     setBatchType('merge');
   };
   return (
-    <div className={charsStyle.cohort_wrap}>
+    <div className="oio-chart">
       {/* 主体 */}
-      <div className={charsStyle.chart_page}>
+      <div className="oio-chart-page">
         {/* 聊天区域 */}
         <GroupContent
           chat={chat}
@@ -64,7 +63,7 @@ const Chat: React.FC<any> = ({ chat, filter }: { chat: ISession; filter: string 
           enterCiteMsg={enterCiteMsg}
         />
         {/* 输入区域 */}
-        <div className={charsStyle.chart_input}>
+        <div className="oio-chart-page-input">
           <GroupInputBox
             chat={chat}
             writeContent={writeContent}
@@ -75,20 +74,19 @@ const Chat: React.FC<any> = ({ chat, filter }: { chat: ISession; filter: string 
         </div>
         {/* 多选操作内容 */}
         {multiSelectShow && (
-          <div className={charsStyle.chart_mulit_select}>
-            <div className={charsStyle.chart_mulit_select_wrap}>
+          <div className="oio-chart-page-mulit-select">
               <div
-                className={charsStyle.chart_mulit_select_action}
+                className="oio-chart-page-mulit-select-action"
                 onClick={() => multiSingleSend()}>
-                <span className={charsStyle.chart_mulit_select_icon}>
+                <span className="oio-chart-page-mulit-select-icon">
                   <RiShareForwardLine size={22} />
                 </span>
                 <span>逐条转发</span>
               </div>
               <div
-                className={charsStyle.chart_mulit_select_action}
+                className="oio-chart-page-mulit-select-action"
                 onClick={() => multiBatchSend()}>
-                <span className={charsStyle.chart_mulit_select_icon}>
+                <span className="oio-chart-page-mulit-select-icon">
                   <RiShareForwardLine size={22} />
                 </span>
                 <span>合并转发</span>
@@ -102,7 +100,6 @@ const Chat: React.FC<any> = ({ chat, filter }: { chat: ISession; filter: string 
                   }}
                 />
               </div>
-            </div>
           </div>
         )}
       </div>

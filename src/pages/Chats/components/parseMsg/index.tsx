@@ -4,7 +4,6 @@ import { MessageType, IMessage } from '@/ts/core';
 import { FileItemShare } from '@/ts/base/model';
 import { command, parseAvatar } from '@/ts/base';
 import { formatSize } from '@/ts/base/common';
-import css from '../../content/chat/GroupContent/index.module.less';
 import { shareOpenLink, truncateString } from '@/utils/tools';
 
 /** 将链接转化为超链接 */
@@ -25,7 +24,7 @@ export const parseMsg = (item: IMessage): any => {
         return (
           <>
             <div
-              className={`${css.con_content_txt}`}
+              className={`con_content_txt`}
               onClick={() => {
                 command.emitter('executor', 'open', img);
               }}>
@@ -34,7 +33,7 @@ export const parseMsg = (item: IMessage): any => {
           </>
         );
       }
-      return <div className={`${css.con_content_txt}`}>消息异常</div>;
+      return <div className={`con_content_txt`}>消息异常</div>;
     }
     case MessageType.Video: {
       const img: FileItemShare = parseAvatar(item.msgBody);
@@ -42,7 +41,7 @@ export const parseMsg = (item: IMessage): any => {
         return (
           <>
             <div
-              className={`${css.con_content_txt}`}
+              className={`con_content_txt`}
               onClick={() => {
                 command.emitter('executor', 'open', img);
               }}>
@@ -51,13 +50,13 @@ export const parseMsg = (item: IMessage): any => {
           </>
         );
       }
-      return <div className={`${css.con_content_txt}`}>消息异常</div>;
+      return <div className={`con_content_txt`}>消息异常</div>;
     }
     case MessageType.File: {
       const file: FileItemShare = parseAvatar(item.msgBody);
       if (!file) {
         return (
-          <div className={`${css.con_content_txt}`} style={{ color: '#af1212' }}>
+          <div className={`con_content_txt`} style={{ color: '#af1212' }}>
             文件消息异常
           </div>
         );
@@ -65,7 +64,7 @@ export const parseMsg = (item: IMessage): any => {
       return (
         <>
           <div
-            className={`${css.con_content_txt}`}
+            className={`con_content_txt`}
             onClick={() => {
               command.emitter('executor', 'open', file);
             }}>
@@ -81,7 +80,7 @@ export const parseMsg = (item: IMessage): any => {
       const url = URL.createObjectURL(blob);
       return (
         <>
-          <div className={css.voiceStyle}>
+          <div className='voiceStyle'>
             <audio src={url} controls />
           </div>
         </>
@@ -102,10 +101,10 @@ export const parseMsg = (item: IMessage): any => {
         // 垂直展示截图信息。把文字消息统一放在底部
         return (
           <>
-            <div className={`${css.con_content_txt}`}>
+            <div className={`con_content_txt`}>
               {imgUrls.map((url, idx) => (
                 <Image
-                  className={css.cut_img}
+                  className='cut_img'
                   src={url}
                   key={idx}
                   preview={{ src: url }}
@@ -118,7 +117,7 @@ export const parseMsg = (item: IMessage): any => {
       }
       // 默认文本展示
       return (
-        <div className={`${css.con_content_txt}`}>
+        <div className={`con_content_txt`}>
           <div dangerouslySetInnerHTML={{ __html: linkText(item.msgBody) }}></div>
         </div>
       );
@@ -138,7 +137,7 @@ export const parseCiteMsg = (item: IMessage): any => {
       if (img && img.thumbnail) {
         return (
           <>
-            <div className={`${css.con_content_cite_txt}`}>
+            <div className='con_content_cite_txt'>
               <span>{item.from.name}:</span>
               <Image
                 src={img.thumbnail}
@@ -148,12 +147,12 @@ export const parseCiteMsg = (item: IMessage): any => {
           </>
         );
       }
-      return <div className={`${css.con_content_cite_txt}`}>消息异常</div>;
+      return <div className='con_content_cite_txt'>消息异常</div>;
     }
     case MessageType.File: {
       const file: FileItemShare = parseAvatar(item.msgBody);
       return (
-        <div className={`${css.con_content_cite_txt}`}>
+        <div className='con_content_cite_txt'>
           <span>{item.from.name}:</span>
           <a href={shareOpenLink(file.shareLink, true)} title="点击下载">
             <div>
@@ -169,9 +168,9 @@ export const parseCiteMsg = (item: IMessage): any => {
       const blob = new Blob([new Uint8Array(bytes)], { type: 'audio/mpeg' });
       const url = URL.createObjectURL(blob);
       return (
-        <div className={`${css.con_content_cite_txt}`}>
+        <div className='css.con_content_cite_txt'>
           <span>{item.from.name}:</span>
-          <div className={css.voiceStyle}>
+          <div className='voiceStyle'>
             <audio src={url} controls />
           </div>
         </div>
@@ -192,11 +191,11 @@ export const parseCiteMsg = (item: IMessage): any => {
         // 垂直展示截图信息。把文字消息统一放在底部
         return (
           <>
-            <div className={`${css.con_content_cite_txt}`}>
+            <div className='con_content_cite_txt'>
               <span>{item.from.name}:</span>
               {imgUrls.map((url, idx) => (
                 <Image
-                  className={css.cut_img}
+                  className='cut_img'
                   src={url}
                   key={idx}
                   preview={{ src: url }}
@@ -209,7 +208,7 @@ export const parseCiteMsg = (item: IMessage): any => {
       }
       // 默认文本展示
       return (
-        <div className={`${css.con_content_cite_txt}`}>
+        <div className='css.con_content_cite_txt'>
           <span>{item.from.name}:</span>
           <div
             dangerouslySetInnerHTML={{
@@ -239,9 +238,9 @@ export const parseForwardMsg = (
       : `${formName[0]}${formName[1] ? '和' + formName[1] : ''}的`;
   return (
     <div
-      className={`${css.con_content_forward_txt}`}
+      className={`con_content_forward_txt`}
       onClick={() => viewForward && viewForward(item)}>
-      <div className={`${css.con_content_forward_session}`}>{`${showName}会话消息`}</div>
+      <div className={`con_content_forward_session`}>{`${showName}会话消息`}</div>
       {item.map((msg: IMessage, idx: number) => {
         // 默认只展示3条记录
         if (idx > 2) return;
@@ -253,16 +252,16 @@ export const parseForwardMsg = (
             const img: FileItemShare = parseAvatar(msg.msgBody);
             if (img)
               return (
-                <div className={css.con_content_forward_msg}>
+                <div className={`con_content_forward_msg`}>
                   {msg.from.name}:{img.name}
                 </div>
               );
-            return <div className={css.con_content_forward_msg}>消息异常</div>;
+            return <div className={`con_content_forward_msg`}>消息异常</div>;
           }
           case MessageType.File: {
             const file: FileItemShare = parseAvatar(msg.msgBody);
             return (
-              <div className={css.con_content_forward_msg}>
+              <div className={`con_content_forward_msg`}>
                 {msg.from.name}:{file.name}
               </div>
             );
@@ -272,7 +271,7 @@ export const parseForwardMsg = (
             const blob = new Blob([new Uint8Array(bytes)], { type: 'audio/mpeg' });
             const url = URL.createObjectURL(blob);
             return (
-              <div className={css.con_content_forward_msg}>
+              <div className={`con_content_forward_msg`}>
                 {msg.from.name}:{url}
               </div>
             );
@@ -291,14 +290,14 @@ export const parseForwardMsg = (
               });
               // 垂直展示截图信息。把文字消息统一放在底部
               return (
-                <div className={css.con_content_forward_msg}>
+                <div className={`con_content_forward_msg`}>
                   {msg.from.name}:【图片】{str.trim()}
                 </div>
               );
             }
             // 默认文本展示
             return (
-              <div className={css.con_content_forward_msg}>
+              <div className={`con_content_forward_msg`}>
                 <span>{msg.from.name}：</span>
                 <span
                   dangerouslySetInnerHTML={{

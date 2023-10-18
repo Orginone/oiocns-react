@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import cls from './index.module.less';
 import {
   Button,
   Card,
@@ -119,16 +118,16 @@ export const ActivityItem: React.FC<ActivityItemProps> = ({
     if (hideResource === true) {
       return (
         <>
-          <div className={cls.activityItemFooter}>
+          <div className="oio-activity-list-item-footer">
             <div>
               <EntityIcon entityId={metadata.createUser} showName />
-              <span className={cls.activityTime}>
+              <span className="oio-activity-list-item-footer-time">
                 发布于{showChatTime(item.metadata.createTime)}
               </span>
             </div>
           </div>
           <div
-            className={cls.activityItemFooterLikes}
+            className="oio-activity-list-item-footer-likes"
             style={{ display: metadata.likes.length ? 'flex' : 'none' }}>
             {metadata.likes.length > 0 && (
               <span style={{ fontSize: 18, color: '#888' }}>
@@ -148,17 +147,17 @@ export const ActivityItem: React.FC<ActivityItemProps> = ({
     }
     return (
       <>
-        <div className={cls.activityItemFooter}>
+        <div className="oio-activity-list-item-footer">
           <div>
             <EntityIcon entityId={metadata.createUser} showName />
-            <span className={cls.activityTime}>
+            <span className="oio-activity-list-item-footer-time">
               发布于{showChatTime(item.metadata.createTime)}
             </span>
           </div>
           {!hideResource && <div>{renderOperate()}</div>}
         </div>
         <div
-          className={cls.activityItemFooterLikes}
+          className="oio-activity-list-item-footer-likes"
           style={{ display: metadata.likes.length ? 'flex' : 'none' }}>
           <LikeOutlined style={{ color: '#cb4747', fontSize: 18 }} />
           {metadata.likes.map((userId) => {
@@ -170,7 +169,7 @@ export const ActivityItem: React.FC<ActivityItemProps> = ({
           })}
         </div>
         {metadata.comments?.length > 0 && (
-          <div className={cls.activityItemCommentList}>
+          <div className="oio-activity-list-item-comment-list">
             {metadata.comments.map((item) => {
               return (
                 <ActivityComment
@@ -183,7 +182,7 @@ export const ActivityItem: React.FC<ActivityItemProps> = ({
         )}
         <div
           style={{ display: commenting ? 'flex' : 'none' }}
-          className={cls.activityItemCommentInputBox}>
+          className="oio-activity-list-item-comment-input">
           <Input.TextArea
             placeholder={replyTo ? `回复${replyTo.name} :` : ''}
             style={{ height: 12 }}
@@ -222,11 +221,11 @@ export const ActivityItem: React.FC<ActivityItemProps> = ({
         }
         avatar={<EntityIcon entity={activity.metadata} size={50} />}
         description={
-          <div className={cls.activityItem}>
+          <div className="oio-activity-list-item">
             <div>
               {renderContent()}
               {hideResource !== true && (
-                <div className={cls.activityItemImageList}>
+                <div className="oio-activity-list-item-images">
                   <Image.PreviewGroup>
                     {ActivityResource(metadata.resource, 600)}
                   </Image.PreviewGroup>
@@ -261,7 +260,7 @@ const Activity: React.FC<ActivityProps> = ({ height, activity, title }) => {
       ));
     }
     return (
-      <div className={cls.emptyList}>
+      <div className="oio-activity-list-empty">
         <Empty description={false}></Empty>
       </div>
     );
@@ -302,7 +301,7 @@ const Activity: React.FC<ActivityProps> = ({ height, activity, title }) => {
         reachBottomText="加载更多..."
         onReachBottom={(e) => loadMoreActivity(e.component)}
         onInitialized={(e) => loadMoreActivity(e.component)}>
-        <div className={cls.actionList}>
+        <div className="oio-activity-list">
           <ActivityBody activity={activity} />
         </div>
       </ScrollView>
