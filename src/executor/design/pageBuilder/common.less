@@ -1,0 +1,59 @@
+.o-page-host {
+  height: 100%;
+  width: 100%;
+  .element-root {
+    height: 100%;
+    width: 100%;
+    position: relative;
+    overflow: auto;
+    &.is-design {
+      .design-tip {
+        position: absolute;
+        z-index: 100;
+        pointer-events: none;
+        height: 100%;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        div {
+          color: rgba(0, 0, 0, 0.1);
+          font-size: 32px;
+          letter-spacing: 16px;
+        }
+      }
+    }
+    &.is-full {
+      .element-wrapper {
+        height: 100%;
+      }
+    }
+  }
+
+  .element-wrapper {
+    position: relative;
+    &.is-current::before {
+      content: '';
+      display: block;
+      z-index: 100;
+      position: absolute;
+      height: 100%;
+      width: 100%;
+      pointer-events: none;
+      border: 1px solid @primary-color;
+      background-color: rgba(@primary-color, 0.25);
+    }
+  }
+}
+
+.ogo-tabs.is-full-height {
+  height: 100%;
+  .ogo-tabs-content {
+    height: 100%;
+    .ogo-tabs-tabpane {
+      height: 100%;
+      overflow: auto;
+    }
+  }
+}

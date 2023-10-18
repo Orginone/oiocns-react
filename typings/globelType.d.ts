@@ -1,6 +1,7 @@
 import React from 'react';
 import { ICompany } from '@/ts/core';
 import { RouteConfig } from 'react-router-config';
+import type { Properties, PropertiesHyphen } from 'csstype';
 
 interface DataType {
   [key: string]: any;
@@ -62,4 +63,52 @@ interface OperateMenuType {
   children?: OperateMenuType[];
   icon: React.ReactNode;
   beforeLoad?: () => Promise<boolean>;
+}
+
+type LastInUnion<U> = UnionToIntersection<
+  U extends unknown ? (x: U) => 0 : never
+> extends (x: infer L) => 0
+  ? L
+  : never;
+
+declare global {
+  interface Dictionary<T> {
+    [key: string]: T;
+  }
+
+  interface AnyFunction {
+    (...args: any[]): any;
+  }
+
+  type AnyKey = keyof any;
+
+  interface Constructor<T> {
+    new (...args: any[]): T;
+  }
+
+  /** vue源码方案，将联合类型转成交叉类型 */
+  type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (
+    k: infer I,
+  ) => void
+    ? I
+    : never;
+
+  /** github高星方案，将联合类型转元组 */
+  type UnionToTuple<U, Last = LastInUnion<U>> = [U] extends [never]
+    ? []
+    : [...UnionToTuple<Exclude<U, Last>>, Last];
+}
+
+export interface CSSProperties
+  extends Properties<string | number>,
+    PropertiesHyphen<string | number> {
+  /**
+   * The index signature was removed to enable closed typing for style
+   * using CSSType. You're able to use type assertion or module augmentation
+   * to add properties or an index signature of your own.
+   *
+   * For examples and more information, visit:
+   * https://github.com/frenic/csstype#what-should-i-do-when-i-get-type-errors
+   */
+  [v: `--${string}`]: string | number | undefined;
 }

@@ -3,6 +3,7 @@ import { IDirectory } from '../directory';
 import { IStandard } from '../fileinfo';
 import { DataResource } from '../resource';
 import { Form, IForm } from './form';
+import { IPageTemplate, PageTemplate } from './page';
 import { IProperty, Property } from './property';
 import { ISpecies, Species } from './species';
 import { ITransfer, Transfer } from './transfer';
@@ -17,10 +18,13 @@ export class StandardFiles {
   propertys: IProperty[] = [];
   /** 分类字典 */
   specieses: ISpecies[] = [];
+  /** 页面模板 */
+  templates: IPageTemplate[] = [];
   formLoaded: boolean = false;
   transfersLoaded: boolean = false;
   speciesesLoaded: boolean = false;
   propertysLoaded: boolean = false;
+  templatesLoaded: boolean = false;
   constructor(_directory: IDirectory) {
     this.directory = _directory;
   }
@@ -31,7 +35,13 @@ export class StandardFiles {
     return this.directory.resource;
   }
   get standardFiles(): IStandard[] {
-    return [...this.forms, ...this.transfers, ...this.propertys, ...this.specieses];
+    return [
+      ...this.forms,
+      ...this.transfers,
+      ...this.propertys,
+      ...this.specieses,
+      ...this.templates,
+    ];
   }
   async loadStandardFiles(reload: boolean = false): Promise<IStandard[]> {
     await Promise.all([
@@ -39,6 +49,7 @@ export class StandardFiles {
       this.loadTransfers(reload),
       this.loadPropertys(reload),
       this.loadSpecieses(reload),
+      this.loadTemplates(reload),
     ]);
     return this.standardFiles;
   }
@@ -81,6 +92,16 @@ export class StandardFiles {
       this.transfers = data.map((i) => new Transfer(i, this.directory));
     }
     return this.transfers;
+  }
+  async loadTemplates(reload: boolean = false): Promise<IPageTemplate[]> {
+    if (this.templatesLoaded === false || reload) {
+      this.templatesLoaded = true;
+      const data = await this.resource.templateColl.load({
+        options: { match: { directoryId: this.id } },
+      });
+      this.templates = data.map((i) => new PageTemplate(i, this.directory));
+    }
+    return this.templates;
   }
   async createForm(data: schema.XForm): Promise<schema.XForm | undefined> {
     const res = await this.resource.formColl.insert({
@@ -126,6 +147,18 @@ export class StandardFiles {
       this.transfers.push(link);
       await this.resource.transferColl.notity({ data: [res], operate: 'insert' });
       return link;
+    }
+  }
+  async createTemplate(data: schema.XPageTemplate): Promise<IPageTemplate | undefined> {
+    const res = await this.resource.templateColl.insert({
+      ...data,
+      directoryId: this.id,
+    });
+    if (res) {
+      const template = new PageTemplate(res, this.directory);
+      this.templates.push(template);
+      await this.resource.templateColl.notity({ data: [res], operate: 'insert' });
+      return template;
     }
   }
   async operateStandradFile(

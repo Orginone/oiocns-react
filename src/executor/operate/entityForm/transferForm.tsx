@@ -4,8 +4,6 @@ import { IDirectory } from '@/ts/core';
 import { ITransfer } from '@/ts/core/';
 import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components';
 import React, { createRef } from 'react';
-import CodeMirror from '@uiw/react-codemirror';
-import { javascript } from '@codemirror/lang-javascript';
 
 interface IProps {
   formType: string;
@@ -34,32 +32,6 @@ const TransferForm: React.FC<IProps> = ({ formType, current, finished }) => {
       dataIndex: 'code',
       formItemProps: {
         rules: [{ required: true, message: '编码为必填项' }],
-      },
-    },
-    {
-      title: '是否自循环',
-      dataIndex: 'isSelfCirculation',
-      valueType: 'switch',
-      initialValue: false,
-      formItemProps: {
-        rules: [{ required: true, message: '编码为必填项' }],
-      },
-    },
-    {
-      title: '循环退出判断',
-      dataIndex: 'judge',
-      colProps: { span: 24 },
-      renderFormItem: () => {
-        return (
-          <CodeMirror
-            value={formRef.current?.getFieldValue('judge')}
-            height={'200px'}
-            extensions={[javascript()]}
-            onChange={(code: string) => {
-              formRef.current?.setFieldValue('judge', code);
-            }}
-          />
-        );
       },
     },
     {

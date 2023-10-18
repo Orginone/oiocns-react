@@ -60,5 +60,24 @@ module.exports = {
     'no-undef': 'off',
     'import/prefer-default-export': 'off',
     'no-import-assign': 'error',
+
+    // 对于自定义扩展FC的类型，eslint会误判，并且使用ts时不需要
+    'react/prop-types': 'off',
+
+    'no-fallthrough': 'warn',
+    'prefer-const': 'off',
+    'no-useless-escape': 'warn',
+    'no-var': 'warn', //自己的代码中不应该使用var，但第三方库可能会用到
+    'no-redeclare': 'warn',
+    'prefer-rest-params': 'warn',
+    'no-mixed-spaces-and-tabs': 'error',
+
+    '@typescript-eslint/ban-types': 'off',
+    '@typescript-eslint/member-delimiter-style': 'off',
+    '@typescript-eslint/no-explicit-any': 'off',
+    '@typescript-eslint/no-non-null-assertion': 'off',
+    '@typescript-eslint/no-inferrable-types': 'off',
+    '@typescript-eslint/type-annotation-spacing': 'off',
+    '@typescript-eslint/no-empty-interface': 'off',
   },
 };

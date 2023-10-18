@@ -23,7 +23,7 @@ const Request: React.FC<IProps> = ({ transfer, current }) => {
           current={current}
           send={async () => {
             try {
-              let res = await transfer.request(current, transfer.getCurEnv()?.params);
+              let res = await transfer.request(current, transfer.curEnv?.params);
               transfer.command.emitter('request', 'onValueChange', res);
             } catch (error) {
               if (error instanceof AxiosError) {
