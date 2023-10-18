@@ -123,6 +123,7 @@ const GroupContent = (props: Iprops) => {
     else return <React.Fragment>{parseMsg(item)}</React.Fragment>;
   };
   const viewMsg = (item: IMessage) => {
+    const popoverContent = forwardModalOpen ? {} : {content: msgAction(item)}
     if (item.isMySend) {
       return (
         <>
@@ -135,9 +136,10 @@ const GroupContent = (props: Iprops) => {
               return triggerNode.parentElement || document.body;
             }}
             overlayInnerStyle={{ marginRight: '-16px', padding: '3px' }}
-            content={msgAction(item)}>
+            {...popoverContent}
+            >
             <div style={{ display: 'flex' }}>
-              <div className={`${css.con_content}`}>
+              <div className={`con-content`}>
                 {props.chat.isBelongPerson ? (
                   showMsg(item)
                 ) : (
@@ -152,8 +154,8 @@ const GroupContent = (props: Iprops) => {
                       {item.cite && parseCiteMsg(item.cite)}
                     </Badge>
                     <div
-                      className={`${css.information} ${
-                        item.readedinfo.includes('已读') ? css.readed : ''
+                      className={`information ${
+                        item.readedinfo.includes('已读') ? 'readed' : ''
                       }`}
                       onClick={() => setInfoMsg(item)}>
                       {item.readedinfo}
@@ -175,8 +177,8 @@ const GroupContent = (props: Iprops) => {
             <div>
               <TeamIcon entityId={item.metadata.fromId} size={36} />
             </div>
-            <div className={`${css.con_content}`}>
-              <div className={`${css.name}`}>{item.from.name}</div>
+            <div className="con-content">
+              <div className="name">{item.from.name}</div>
               <Popover
                 autoAdjustOverflow={false}
                 trigger="hover"
@@ -186,7 +188,8 @@ const GroupContent = (props: Iprops) => {
                   return triggerNode.parentElement || document.body;
                 }}
                 overlayInnerStyle={{ marginLeft: '-18px', padding: '3px' }}
-                content={msgAction(item)}>
+                {...popoverContent}
+                >
                 {showMsg(item)}
               </Popover>
               {item.cite && parseCiteMsg(item.cite)}
@@ -200,14 +203,14 @@ const GroupContent = (props: Iprops) => {
   const loadMsgItem = (item: IMessage) => {
     return (
       <div
-        className={css.con_body}
+        className="oio-chart-group-content-con-body"
         onContextMenu={(e) => {
           e.preventDefault();
           e.stopPropagation();
         }}>
         {multiSelect && (
           <Checkbox
-            className={css.multiSelectStyl}
+            className="multi-select-styl"
             onClick={(e) => {
               props.multiSelectMsg(
                 item,
@@ -226,34 +229,34 @@ const GroupContent = (props: Iprops) => {
   };
   const moreAction = (item: IMessage) => {
     return (
-      <div className={css.moreActionWrap}>
+      <div className='more-action'>
         {props.chat.canDeleteMessage && (
           <Button
             type="text"
-            className={css.multiBtn}
+            className='more-action-btns'
             onClick={async () => {
               if (await props.chat.deleteMessage(item.id)) {
                 message.success('删除成功');
               }
             }}>
-            <AiOutlineDelete size={19} className={css.actionIconStyl} />
-            <span className={css.moreActionTxt}>删除</span>
+            <AiOutlineDelete size={19} className='more-action-btns-icon' />
+            <span className='more-action-btns-txt'>删除</span>
           </Button>
         )}
-        <Button className={css.multiBtn} type="text" onClick={handleMore}>
-          <BsListCheck size={19} className={css.actionIconStyl} />
-          <span className={css.moreActionTxt}>多选</span>
+        <Button className='more-action-btns' type="text" onClick={handleMore}>
+          <BsListCheck size={19} className='more-action-btns-icon' />
+          <span className='more-action-btns-txt'>多选</span>
         </Button>
         {['文件', '视频', '图片'].includes(item.msgType) && item.forward?.length < 1 && (
           <Button
             type="text"
-            className={css.multiBtn}
+            className='more-action-btns'
             onClick={() => {
               const url = parseAvatar(item.msgBody).shareLink;
               downloadByUrl(shareOpenLink(url, true));
             }}>
-            <AiOutlineDownload size={19} className={css.actionIconStyl} />
-            <span className={css.moreActionTxt}>下载</span>
+            <AiOutlineDownload size={19} className='more-action-btns-icon' />
+            <span className='more-action-btns-txt'>下载</span>
           </Button>
         )}
       </div>
@@ -262,12 +265,13 @@ const GroupContent = (props: Iprops) => {
 
   const msgAction = (item: IMessage) => {
     return (
-      <div className={css.msgAction}>
+      <div className='msg-action'>
         <CopyToClipboard text={item.msgBody}>
           <Tooltip title="复制">
             <AiOutlineCopy
               size={19}
-              className={css.actionIconStyl}
+              // className={css.actionIconStyl}
+              className="msg-action-icon"
               onClick={() => {
                 message.success('复制成功');
               }}
@@ -277,14 +281,14 @@ const GroupContent = (props: Iprops) => {
         <Tooltip title="引用">
           <AiOutlineMessage
             size={19}
-            className={css.actionIconStyl}
+            className="msg-action-icon"
             onClick={() => props.citeText(item)}
           />
         </Tooltip>
         <Tooltip title="转发">
           <RiShareForwardFill
             size={19}
-            className={css.actionIconStyl}
+            className="msg-action-icon"
             onClick={() => props.forward(item)}
           />
         </Tooltip>
@@ -292,7 +296,7 @@ const GroupContent = (props: Iprops) => {
           <Tooltip title="撤回">
             <AiOutlineRollback
               size={19}
-              className={css.actionIconStyl}
+              className="msg-action-icon"
               onClick={async () => {
                 await props.chat.recallMessage(item.id);
               }}
@@ -306,8 +310,11 @@ const GroupContent = (props: Iprops) => {
               content={moreAction(item)}
               title=""
               trigger="click"
+              getPopupContainer={(triggerNode: HTMLElement) => {
+                return triggerNode.parentElement || document.body;
+              }}
               overlayInnerStyle={{ marginTop: '-12px' }}>
-              <AiOutlineEllipsis size={19} className={css.actionIconStyl} />
+              <AiOutlineEllipsis size={19} className="msg-action-icon" />
             </Popover>
           </Tooltip>
         }
@@ -319,11 +326,11 @@ const GroupContent = (props: Iprops) => {
     switch (item.msgType) {
       case MessageType.Recall:
         return (
-          <div className={`${css.group_content_left} ${css.con} ${css.recall}`}>
+          <div className={`oio-chart-group-content-left oio-chart-group-content-con oio-chart-group-content-recall`}>
             {item.msgBody}
             {item.allowEdit && (
               <span
-                className={css.reWrite}
+                className='oio-chart-group-content-recall-reWrite'
                 onClick={() => {
                   handleReWrites(item.msgSource);
                 }}>
@@ -334,20 +341,20 @@ const GroupContent = (props: Iprops) => {
         );
       case MessageType.Notify:
         return (
-          <div className={`${css.group_content_left} ${css.con} ${css.recall}`}>
+          <div className={`oio-chart-group-content-left oio-chart-group-content-con oio-chart-group-content-recall`}>
             {item.msgBody}
           </div>
         );
       default:
         if (item.isMySend) {
           return (
-            <div className={`${css.group_content_right} ${css.con}`}>
+            <div className={`oio-chart-group-content-right oio-chart-group-content-con`}>
               {loadMsgItem(item)}
             </div>
           );
         } else {
           return (
-            <div className={`${css.group_content_left} ${css.con}`}>
+            <div className={`oio-chart-group-content-left oio-chart-group-content-con`}>
               {loadMsgItem(item)}
             </div>
           );
@@ -356,9 +363,9 @@ const GroupContent = (props: Iprops) => {
   };
 
   return (
-    <div className={css.chart_content} ref={body} onScroll={onScroll}>
+    <div className="oio-chart-group" ref={body} onScroll={onScroll}>
       <Spin tip="加载中..." spinning={loading}>
-        <div className={css.group_content_wrap}>
+        <div className="oio-chart-group-content">
           {messages
             .filter((i) => i.msgBody.includes(props.filter))
             .map((item, index: any) => {
@@ -369,7 +376,7 @@ const GroupContent = (props: Iprops) => {
                     item.createTime,
                     index > 0 ? messages[index - 1].createTime : '',
                   ) ? (
-                    <div className={css.chats_space_Time}>
+                    <div className="oio-chart-group-content-chart-time">
                       <span>{showChatTime(item.createTime)}</span>
                     </div>
                   ) : (
@@ -386,10 +393,32 @@ const GroupContent = (props: Iprops) => {
         handleClose={handleForwadModalClose}
         open={forwardModalOpen}
         messages={forwardMessages}
-        isBelongPerson={true}
         title={''}
         viewForward={viewForward}
-      />
+      >
+         <div className="oio-chart-group-content">
+          {forwardMessages
+            .filter((i) => i.msgBody.includes(props.filter))
+            .map((item, index: any) => {
+              return (
+                <React.Fragment key={item.id}>
+                  {/* 聊天间隔时间3分钟则 显示时间 */}
+                  {isShowTime(
+                    item.createTime,
+                    index > 0 ? forwardMessages[index - 1].createTime : '',
+                  ) ? (
+                    <div className="oio-chart-group-content-chart-time">
+                      <span>{showChatTime(item.createTime)}</span>
+                    </div>
+                  ) : (
+                    ''
+                  )}
+                  {renderMessage(item)}
+                </React.Fragment>
+              );
+            })}
+        </div>
+      </ForwardContentModal>
     </div>
   );
 };
