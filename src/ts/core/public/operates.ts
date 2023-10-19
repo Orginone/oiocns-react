@@ -78,7 +78,7 @@ export const fileOperates = {
   Rename: {
     sort: 25,
     cmd: 'rename',
-    label: '重名名',
+    label: '重命名',
     iconType: 'rename',
   },
   HslSplit: {

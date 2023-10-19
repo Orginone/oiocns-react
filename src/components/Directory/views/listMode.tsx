@@ -79,7 +79,7 @@ const ListMode = ({
           }}
         />
         <div
-          style={{ height: `calc(100% - ${content.length * 75}px)` }}
+          style={{ height: `calc(100% - ${content.length * 78}px)` }}
           className={css.blank_area}
           onContextMenu={() => setCxtItem(undefined)}></div>
       </div>
