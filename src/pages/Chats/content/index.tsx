@@ -1,15 +1,11 @@
-import { Empty, Spin } from 'antd';
+import { Spin } from 'antd';
 import React, { useState } from 'react';
 import orgCtrl from '@/ts/controller';
 import { ISession } from '@/ts/core';
-import useStorage from '@/hooks/useStorage';
-import IconMode from './views/iconMode';
-import ListMode from './views/listMode';
-import TableMode from './views/tableMode';
-import SegmentContent from '@/components/Common/SegmentContent';
-import TagsBar from '@/components/Directory/tagsBar';
+import DirectoryViewer from '@/components/Directory/views';
 import { command } from '@/ts/base';
 import { useFlagCmdEmitter } from '@/hooks/useCtrlUpdate';
+import { loadChatOperation } from './common';
 
 /**
  * @description: 通讯录
@@ -20,10 +16,8 @@ const Book: React.FC<{
   chats: ISession[];
   filter: string;
 }> = ({ chats, filter }) => {
-  const [currentTag, setCurrentTag] = useState('全部');
-  const [select, setSelect] = useState<ISession>();
+  const [focusFile, setFocusFile] = useState<ISession>();
   const [loaded, msgKey] = useFlagCmdEmitter('session');
-  const [segmented, setSegmented] = useStorage('segmented', 'list');
   if (chats === undefined) {
     chats = orgCtrl.chats.filter((i) => i.isMyChat);
   }
@@ -32,7 +26,7 @@ const Book: React.FC<{
       (a) =>
         a.chatdata.chatName.includes(filter) ||
         a.chatdata.chatRemark.includes(filter) ||
-        a.labels.filter((l) => l.includes(filter)).length > 0,
+        a.groupTags.filter((l) => l.includes(filter)).length > 0,
     )
     .sort((a, b) => {
       var num = (b.chatdata.isToping ? 10 : 0) - (a.chatdata.isToping ? 10 : 0);
@@ -45,52 +39,45 @@ const Book: React.FC<{
       }
       return num;
     });
-  const sessionOpen = async (session: ISession | undefined) => {
-    if (session?.key === select?.key) {
-      setSelect(undefined);
+
+  const contextMenu = (session: ISession | undefined) => {
+    return {
+      items: loadChatOperation(session) || [],
+    };
+  };
+
+  const sessionOpen = (session: ISession | undefined) => {
+    if (session?.key === focusFile?.key) {
+      setFocusFile(undefined);
       command.emitter('preview', 'chat');
     } else {
-      setSelect(session);
+      setFocusFile(session);
       command.emitter('preview', 'chat', session);
     }
   };
-  const getChats = (tag?: string) => {
-    const filter = tag ?? currentTag;
-    return chats.filter((i) => filter === '全部' || i.groupTags.includes(filter));
-  };
   return (
-    <>
-      <TagsBar
-        select={currentTag}
-        initTags={['全部', '@我', '未读', '单聊', '群聊']}
-        entitys={chats}
+    <Spin spinning={!loaded} tip={'加载中...'}>
+      <DirectoryViewer
+        key={msgKey}
+        extraTags
+        initTags={['全部', '@我', '未读', '置顶', '好友']}
+        excludeTags={['本人', '同事']}
         selectFiles={[]}
+        focusFile={focusFile}
+        content={chats}
         badgeCount={(tag) => {
           let count = 0;
-          getChats(tag).forEach((i) => {
-            count += i.chatdata.noReadCount;
-          });
+          chats
+            .filter((i) => tag === '全部' || i.groupTags.includes(tag))
+            .forEach((i) => {
+              count += i.badgeCount;
+            });
           return count;
         }}
-        onChanged={(t) => setCurrentTag(t)}></TagsBar>
-      <SegmentContent
-        key={msgKey}
-        onSegmentChanged={setSegmented}
-        descriptions={`${getChats().length}个会话`}
-        content={
-          <Spin spinning={!loaded} tip={'加载中...'} delay={200}>
-            {segmented === 'table' ? (
-              <TableMode chats={getChats()} select={select} sessionOpen={sessionOpen} />
-            ) : segmented === 'icon' ? (
-              <IconMode chats={getChats()} select={select} sessionOpen={sessionOpen} />
-            ) : (
-              <ListMode chats={getChats()} select={select} sessionOpen={sessionOpen} />
-            )}
-            {chats.length == 0 && <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />}
-          </Spin>
-        }
+        fileOpen={(entity) => sessionOpen(entity as ISession)}
+        contextMenu={(entity) => contextMenu(entity as ISession)}
       />
-    </>
+    </Spin>
   );
 };
 export default Book;

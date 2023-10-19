@@ -2,10 +2,10 @@ import { Emitter } from '@/ts/base/common';
 import { schema, model, parseAvatar, kernel } from '../../base';
 import { generateUuid } from '../../base/common/uuid';
 import { entityOperates } from './operates';
-
+/** 默认实体类接口 */
+export interface IDEntity extends IEntity<schema.XEntity> {}
 /** 共享信息数据集 */
 export const ShareIdSet = new Map<string, any>();
-
 /** 实体类接口 */
 export interface IEntity<T> extends Emitter {
   /** 实体唯一键 */
@@ -20,6 +20,8 @@ export interface IEntity<T> extends Emitter {
   typeName: string;
   /** 实体描述 */
   remark: string;
+  /** 提示数量 */
+  badgeCount: number;
   /** 数据实体 */
   metadata: T;
   /** 用户ID */
@@ -52,6 +54,7 @@ export abstract class Entity<T extends schema.XEntity>
   extends Emitter
   implements IEntity<T>
 {
+  private _gtags: string[];
   constructor(_metadata: T, gtags: string[]) {
     super();
     this._gtags = gtags;
@@ -61,7 +64,6 @@ export abstract class Entity<T extends schema.XEntity>
   }
   _metadata: T;
   key: string;
-  _gtags: string[];
   get id(): string {
     return this._metadata.id;
   }
@@ -100,6 +102,9 @@ export abstract class Entity<T extends schema.XEntity>
   }
   get belong(): model.ShareIcon {
     return this.findShare(this.metadata.belongId);
+  }
+  get badgeCount(): number {
+    return 0;
   }
   get groupTags(): string[] {
     if (

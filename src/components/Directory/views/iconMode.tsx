@@ -1,8 +1,8 @@
-import { Dropdown, Card, Typography, MenuProps } from 'antd';
+import { Dropdown, Card, Typography, MenuProps, Badge } from 'antd';
 
 import React from 'react';
 import css from './less/icon.module.less';
-import { IFile } from '@/ts/core';
+import { IDEntity } from '@/ts/core';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 
 const IconMode = ({
@@ -12,19 +12,19 @@ const IconMode = ({
   contextMenu,
   selectFiles,
 }: {
-  focusFile: IFile | undefined;
-  content: IFile[];
-  selectFiles: IFile[];
-  fileOpen: (file: IFile | undefined, dblclick: boolean) => void;
-  contextMenu: (file?: IFile) => MenuProps;
+  focusFile: IDEntity | undefined;
+  content: IDEntity[];
+  selectFiles: IDEntity[];
+  fileOpen: (file: IDEntity | undefined, dblclick: boolean) => void;
+  contextMenu: (file?: IDEntity) => MenuProps;
 }) => {
-  const getItemClassName = (item: IFile) => {
+  const getItemClassName = (item: IDEntity) => {
     if (focusFile?.id === item.id || selectFiles.some((i) => i.id === item.id)) {
       return css.list_item_select;
     }
     return css.list_item;
   };
-  const FileCard = (item: IFile) => (
+  const FileCard = (item: IDEntity) => (
     <Dropdown key={item.id} menu={contextMenu(item)} trigger={['contextMenu']}>
       <Card
         size="small"
@@ -41,7 +41,9 @@ const IconMode = ({
           e.stopPropagation();
         }}>
         <div className={css.fileImage}>
-          <EntityIcon entity={item.metadata} size={50} />
+          <Badge count={item.badgeCount} size="small">
+            <EntityIcon entity={item.metadata} size={50} />
+          </Badge>
         </div>
         <div className={css.fileName} title={item.name}>
           <Typography.Text title={item.name} ellipsis>

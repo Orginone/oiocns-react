@@ -1,18 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import IconMode from './views/iconMode';
-import ListMode from './views/listMode';
-import TableMode from './views/tableMode';
-import useStorage from '@/hooks/useStorage';
+import DirectoryViewer from './views';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import useTimeoutHanlder from '@/hooks/useTimeoutHanlder';
-import SegmentContent from '@/components/Common/SegmentContent';
 import { IDirectory, IFile } from '@/ts/core';
 import { loadFileMenus } from '@/executor/fileOperate';
 import { command } from '@/ts/base';
 import orgCtrl from '@/ts/controller';
 import useAsyncLoad from '@/hooks/useAsyncLoad';
 import { Spin } from 'antd';
-import TagsBar from './tagsBar';
 import { cleanMenus } from '@/utils/tools';
 
 interface IProps {
@@ -34,9 +29,7 @@ const Directory: React.FC<IProps> = (props) => {
     props.current === 'disk' ? orgCtrl.user.directory : props.current,
   );
   const [key] = useCtrlUpdate(dircetory);
-  const [currentTag, setCurrentTag] = useState('全部');
   const [loaded] = useAsyncLoad(() => dircetory.loadContent());
-  const [segmented, setSegmented] = useStorage('segmented', 'list');
   const [focusFile, setFocusFile] = useState<IFile>();
   const [submitHanlder, clearHanlder] = useTimeoutHanlder();
   useEffect(() => {
@@ -69,17 +62,17 @@ const Directory: React.FC<IProps> = (props) => {
       if (selected) {
         props.onSelected([...props.selects, file]);
       } else {
-        props.onSelected(props.selects.filter((i) => i.id !== file.id));
+        props.onSelected(props.selects.filter((i) => i.key !== file.key));
       }
     }
   };
 
   const fileFocused = (file: IFile | undefined) => {
     if (file) {
-      if (focusFile && file.id === focusFile.id) {
+      if (focusFile && file.key === focusFile.key) {
         return true;
       }
-      return props.selects?.find((i) => i.id === file.id) !== undefined;
+      return props.selects?.find((i) => i.key === file.key) !== undefined;
     }
     return false;
   };
@@ -107,79 +100,31 @@ const Directory: React.FC<IProps> = (props) => {
     }
   };
 
-  const getContent = (filter: boolean = true) => {
-    if (filter && currentTag == '已选中') {
-      return props.selects || [];
-    }
+  const getContent = () => {
     const contents: IFile[] = [];
     if (props.current === 'disk') {
       contents.push(orgCtrl.user, ...orgCtrl.user.companys);
     } else {
       contents.push(...props.current!.content());
     }
-    const tagFilter = (file: IFile) => {
-      let success = true;
-      if (props.excludeIds && props.excludeIds.length > 0) {
-        success = !props.excludeIds.includes(file.id);
-      }
-      if (filter && success) {
-        if (currentTag !== '全部') {
-          success = file.groupTags.includes(currentTag);
-        } else {
-          success = !file.groupTags.includes('已删除');
-        }
-      }
-      if (success && props.accepts && props.accepts.length > 0) {
-        success = file.groupTags.some((i) => props.accepts!.includes(i));
-      }
-      return success;
-    };
-    return contents.filter(tagFilter);
+    return contents;
   };
 
   return (
-    <>
-      <TagsBar
-        select={currentTag}
-        initTags={['全部']}
-        selectFiles={props.selects || []}
-        entitys={getContent(false)}
-        onChanged={(t) => setCurrentTag(t)}></TagsBar>
-      <SegmentContent
+    <Spin spinning={!loaded} tip={'加载中...'}>
+      <DirectoryViewer
         key={key}
-        onSegmentChanged={setSegmented}
-        descriptions={`${getContent().length}个项目`}
-        content={
-          <Spin spinning={!loaded} delay={10} tip={'加载中...'}>
-            {segmented === 'table' ? (
-              <TableMode
-                selectFiles={props.selects || []}
-                focusFile={focusFile}
-                content={getContent()}
-                fileOpen={clickHanlder}
-                contextMenu={contextMenu}
-              />
-            ) : segmented === 'icon' ? (
-              <IconMode
-                selectFiles={props.selects || []}
-                focusFile={focusFile}
-                content={getContent()}
-                fileOpen={clickHanlder}
-                contextMenu={contextMenu}
-              />
-            ) : (
-              <ListMode
-                selectFiles={props.selects || []}
-                focusFile={focusFile}
-                content={getContent()}
-                fileOpen={clickHanlder}
-                contextMenu={contextMenu}
-              />
-            )}
-          </Spin>
-        }
+        extraTags
+        initTags={['全部']}
+        accepts={props.accepts}
+        excludeIds={props.excludeIds}
+        selectFiles={props.selects || []}
+        focusFile={focusFile}
+        content={getContent()}
+        fileOpen={(entity, dblclick) => clickHanlder(entity as IFile, dblclick)}
+        contextMenu={(entity) => contextMenu(entity as IFile)}
       />
-    </>
+    </Spin>
   );
 };
 export default Directory;

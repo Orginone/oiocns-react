@@ -1,14 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import useStorage from '@/hooks/useStorage';
-import IconMode from './views/iconMode';
-import ListMode from './views/listMode';
-import TableMode from './views/tableMode';
-import SegmentContent from '@/components/Common/SegmentContent';
 import { IBelong, IFile, IWorkTask, TaskTypeName } from '@/ts/core';
 import { command } from '@/ts/base';
 import orgCtrl from '@/ts/controller';
 import { Spin, message } from 'antd';
-import TagsBar from './tagsBar';
+import DirectoryViewer from '@/components/Directory/views';
 import { loadFileMenus } from '@/executor/fileOperate';
 import { cleanMenus } from '@/utils/tools';
 
@@ -22,30 +17,24 @@ const Directory: React.FC<IProps> = (props) => {
   if (!props.current) return <></>;
   const [loaded, setLoaded] = useState(true);
   const [content, setContent] = useState<IFile[]>([]);
-  const [currentTag, setCurrentTag] = useStorage<TaskTypeName>('taskType', '待办事项');
-  const [segmented, setSegmented] = useStorage('segmented', 'list');
   const [focusFile, setFocusFile] = useState<IFile>();
   useEffect(() => {
-    const id = orgCtrl.work.notity.subscribe(() => loadContent());
+    const id = orgCtrl.work.notity.subscribe(() => loadContent('待办事项'));
     return () => {
       orgCtrl.work.notity.unsubscribe(id);
     };
   }, [props.current]);
-  useEffect(() => {
-    loadContent();
-  }, [currentTag]);
 
-  const contextMenu = (file?: IFile, clicked?: Function) => {
+  const contextMenu = (file?: IFile) => {
     return {
       items: cleanMenus(loadFileMenus(file)) || [],
       onClick: ({ key }: { key: string }) => {
         command.emitter('executor', key, file);
-        clicked?.apply(this, []);
       },
     };
   };
 
-  const fileOpen = async (file: IFile | undefined, dblclick: boolean) => {
+  const fileOpen = (file: IFile | undefined, dblclick: boolean) => {
     if (dblclick && file) {
       if (!file.groupTags.includes('已删除')) {
         command.emitter('executor', 'open', file);
@@ -75,10 +64,10 @@ const Directory: React.FC<IProps> = (props) => {
     return 0;
   };
 
-  const loadContent = () => {
+  const loadContent = (tag: string) => {
     setLoaded(false);
     orgCtrl.work
-      .loadContent(currentTag)
+      .loadContent(tag as TaskTypeName)
       .then((tasks) => {
         setContent(
           tasks.filter(currentFilter).sort((a, b) => {
@@ -98,46 +87,19 @@ const Directory: React.FC<IProps> = (props) => {
   };
 
   return (
-    <>
-      <TagsBar
-        select={currentTag}
+    <Spin spinning={!loaded} tip={'加载中...'}>
+      <DirectoryViewer
         initTags={['待办事项', '已办事项', '抄送我的', '我发起的']}
-        badgeCount={(tag) => getBadgeCount(tag)}
-        onChanged={(t) => setCurrentTag(t as TaskTypeName)}></TagsBar>
-      <SegmentContent
-        onSegmentChanged={setSegmented}
-        descriptions={`${content.length}个项目`}
-        content={
-          <Spin spinning={!loaded} delay={10} tip={'加载中...'}>
-            {segmented === 'table' ? (
-              <TableMode
-                selectFiles={[]}
-                focusFile={focusFile}
-                content={content}
-                fileOpen={fileOpen}
-                contextMenu={contextMenu}
-              />
-            ) : segmented === 'icon' ? (
-              <IconMode
-                selectFiles={[]}
-                focusFile={focusFile}
-                content={content}
-                fileOpen={fileOpen}
-                contextMenu={contextMenu}
-              />
-            ) : (
-              <ListMode
-                selectFiles={[]}
-                focusFile={focusFile}
-                content={content}
-                fileOpen={fileOpen}
-                contextMenu={contextMenu}
-              />
-            )}
-          </Spin>
-        }
+        selectFiles={[]}
+        focusFile={focusFile}
+        content={content}
+        extraTags={false}
+        badgeCount={getBadgeCount}
+        tagChanged={loadContent}
+        fileOpen={(entity, dblclick) => fileOpen(entity as IWorkTask, dblclick)}
+        contextMenu={(entity) => contextMenu(entity as IWorkTask)}
       />
-    </>
+    </Spin>
   );
 };
 export default Directory;

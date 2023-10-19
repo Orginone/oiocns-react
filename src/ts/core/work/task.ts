@@ -51,7 +51,7 @@ export class WorkTask extends FileInfo<schema.XEntity> implements IWorkTask {
   instance: schema.XWorkInstance | undefined;
   instanceData: model.InstanceDataModel | undefined;
   get groupTags(): string[] {
-    return [this.taskdata.taskType, this.taskdata.approveType];
+    return [this.belong.name, this.taskdata.taskType, this.taskdata.approveType];
   }
   get metadata(): schema.XEntity {
     let typeName = this.taskdata.taskType;
@@ -114,7 +114,7 @@ export class WorkTask extends FileInfo<schema.XEntity> implements IWorkTask {
       case '待办事项':
         return this.taskdata.status < TaskStatus.ApprovalStart;
       case '抄送我的':
-        return this.taskdata.taskType === '抄送';
+        return this.taskdata.approveType === '抄送';
     }
   }
   async updated(_metadata: schema.XWorkTask): Promise<boolean> {

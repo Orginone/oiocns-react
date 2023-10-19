@@ -1,5 +1,5 @@
 export { companyTypes, departmentTypes, formModalType, orgAuth, PageAll } from './consts';
-export type { IEntity } from './entity';
+export type { IDEntity, IEntity } from './entity';
 export { Entity } from './entity';
 export {
   MessageType,

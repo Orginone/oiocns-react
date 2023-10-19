@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { IFile, ISysFileInfo } from '@/ts/core';
+import { IDEntity, ISysFileInfo } from '@/ts/core';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import { showChatTime } from '@/utils/tools';
 import { formatSize } from '@/ts/base/common';
 import DataGrid, { Column, Scrolling } from 'devextreme-react/data-grid';
-import { Dropdown, MenuProps } from 'antd';
+import { Badge, Dropdown, MenuProps } from 'antd';
 
 const TableMode = ({
   focusFile,
@@ -13,13 +13,13 @@ const TableMode = ({
   contextMenu,
   selectFiles,
 }: {
-  focusFile: IFile | undefined;
-  content: IFile[];
-  selectFiles: IFile[];
-  fileOpen: (file: IFile | undefined, dblclick: boolean) => void;
-  contextMenu: (file?: IFile, clicked?: Function) => MenuProps;
+  focusFile: IDEntity | undefined;
+  content: IDEntity[];
+  selectFiles: IDEntity[];
+  fileOpen: (file: IDEntity | undefined, dblclick: boolean) => void;
+  contextMenu: (file?: IDEntity, clicked?: Function) => MenuProps;
 }) => {
-  const [cxtItem, setCxtItem] = useState<IFile>();
+  const [cxtItem, setCxtItem] = useState<IDEntity>();
   if (focusFile) {
     selectFiles.push(focusFile);
   }
@@ -28,7 +28,7 @@ const TableMode = ({
       <div
         style={{ width: '100%', height: '100%' }}
         onContextMenu={(e) => e.stopPropagation()}>
-        <DataGrid<IFile, string>
+        <DataGrid<IDEntity, string>
           id="grid"
           width="100%"
           height="100%"
@@ -58,7 +58,11 @@ const TableMode = ({
             dataField="name"
             caption="名称"
             cellRender={(e) => {
-              return <EntityIcon entity={e.data.metadata} showName size={20} />;
+              return (
+                <Badge count={e.data.badgeCount} size="small">
+                  <EntityIcon entity={e.data.metadata} showName size={20} />
+                </Badge>
+              );
             }}
           />
           <Column dataField="code" caption="代码" width={200} />
@@ -69,7 +73,7 @@ const TableMode = ({
             width={200}
             dataType={'datetime'}
             allowFiltering={false}
-            calculateDisplayValue={(e: IFile) => {
+            calculateDisplayValue={(e: IDEntity) => {
               return showChatTime(e.metadata.createTime);
             }}
           />
@@ -78,7 +82,7 @@ const TableMode = ({
             caption="更新时间"
             width={200}
             allowFiltering={false}
-            calculateDisplayValue={(e: IFile) => {
+            calculateDisplayValue={(e: IDEntity) => {
               return showChatTime(e.metadata.updateTime);
             }}
           />
@@ -87,7 +91,7 @@ const TableMode = ({
             dataField="size"
             caption="大小"
             allowFiltering={false}
-            calculateCellValue={(e: IFile) => {
+            calculateCellValue={(e: IDEntity) => {
               if ('filedata' in e) {
                 return formatSize((e as ISysFileInfo).filedata.size);
               }

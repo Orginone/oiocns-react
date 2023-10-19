@@ -7,6 +7,8 @@ import { IEntity } from '@/ts/core';
 interface IProps {
   select: string;
   initTags: string[];
+  excludeTags: string[];
+  extraTags: boolean;
   selectFiles: IEntity<schema.XEntity>[];
   badgeCount?: (tag: string) => number;
   entitys: IEntity<schema.XEntity>[];
@@ -22,16 +24,20 @@ const TagsBar: React.FC<IProps> = (props) => {
     if (props.selectFiles.length > 0) {
       tags.push({ tag: '已选中', count: props.selectFiles.length });
     }
-    props.entitys.forEach((entity) => {
-      entity.groupTags.forEach((tag) => {
-        const index = tags.findIndex((i) => i.tag === tag);
-        if (index > -1) {
-          tags[index].count += 1;
-        } else {
-          tags.push({ tag, count: 1 });
-        }
+    if (props.extraTags) {
+      props.entitys.forEach((entity) => {
+        entity.groupTags.forEach((tag) => {
+          if (!props.excludeTags.includes(tag)) {
+            const index = tags.findIndex((i) => i.tag === tag);
+            if (index > -1) {
+              tags[index].count += 1;
+            } else {
+              tags.push({ tag, count: 1 });
+            }
+          }
+        });
       });
-    });
+    }
     return tags.sort((a, b) => {
       const aqz = a.tag === '已删除' ? 10 : 0;
       const bqz = b.tag === '已删除' ? 10 : 0;

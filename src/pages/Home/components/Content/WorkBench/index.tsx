@@ -31,7 +31,7 @@ const WorkBench: React.FC = () => {
       let noReadCount = 0;
       for (const item of orgCtrl.chats) {
         if (item.isMyChat) {
-          noReadCount += item.chatdata.noReadCount;
+          noReadCount += item.badgeCount;
         }
       }
       setMsgCount(noReadCount);
