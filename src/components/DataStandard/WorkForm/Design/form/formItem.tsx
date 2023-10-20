@@ -4,6 +4,7 @@ import { IForm, TargetType } from '@/ts/core';
 import HtmlEditItem from './customItem/htmlItem';
 import TreeSelectItem from './customItem/treeItem';
 import SelectFilesItem from './customItem/fileItem';
+import MemberBoxProps from './customItem/memberBox';
 import CurrentTargetItem from './customItem/currentTarget';
 import SearchTargetItem from './customItem/searchTarget';
 import { getWidget } from '../../Utils';
@@ -86,6 +87,8 @@ const FormItem: React.FC<{
       return <SearchTargetItem {...mixOptions} typeName={TargetType.Cohort} />;
     case '组织群搜索框':
       return <SearchTargetItem {...mixOptions} typeName={TargetType.Group} />;
+    case '成员选择框':
+      return <MemberBoxProps {...mixOptions} target={target.space.metadata} />;
     case '日期选择框':
       return <DateBox {...mixOptions} type={'date'} />;
     case '时间选择框':

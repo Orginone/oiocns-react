@@ -6,6 +6,7 @@ import React, { useEffect, useState } from 'react';
 import { getWidget, loadwidgetOptions } from '../../Utils';
 import { schema } from '@/ts/base';
 import TreeSelectItem from '../../Viewer/customItem/treeItem';
+import OpenFileDialog from '@/components/OpenFileDialog';
 
 interface IAttributeProps {
   index: number;
@@ -18,6 +19,7 @@ const AttributeConfig: React.FC<IAttributeProps> = ({
   notifyEmitter,
   index,
 }) => {
+  const [openDialog, setOpenDialog] = useState(false);
   const [attribute, setAttribute] = React.useState(current.metadata.attributes[index]);
   const [items, setItems] = useState<schema.XSpeciesItem[]>([]);
   const notityAttrChanged = () => {
@@ -243,6 +245,25 @@ const AttributeConfig: React.FC<IAttributeProps> = ({
             items: loadwidgetOptions(attribute),
           }}
         />
+        {attribute.widget === '成员选择框' && (
+          <SimpleItem
+            dataField="options.teamId"
+            editorType="dxSelectBox"
+            label={{ text: '选择上级组织' }}
+            editorOptions={{
+              valueExpr: 'id',
+              displayExpr: 'name',
+              dataSource: current.directory.target.space.targets,
+            }}
+          />
+        )}
+        {attribute.widget === '成员选择框' && (
+          <SimpleItem
+            dataField="options.isOperator"
+            editorType="dxCheckBox"
+            label={{ text: '限定为操作用户' }}
+          />
+        )}
         <SimpleItem
           dataField="remark"
           editorType="dxTextArea"
@@ -290,6 +311,17 @@ const AttributeConfig: React.FC<IAttributeProps> = ({
           />
         )}
       </GroupItem>
+      {openDialog && (
+        <OpenFileDialog
+          multiple
+          rootKey={current.spaceKey}
+          accepts={['用户']}
+          allowInherited
+          maxCount={1}
+          onCancel={() => setOpenDialog(false)}
+          onOk={(files) => {}}
+        />
+      )}
     </Form>
   );
 };

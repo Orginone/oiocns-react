@@ -114,6 +114,10 @@ export type XAttributeProps = {
   hideField?: boolean;
   // 默认值
   defaultValue?: any;
+  // 成员的上级组织
+  teamId?: string;
+  // 是否限定为操作主体
+  isOperator?: boolean;
   /** 表格参数 */
   // 是否可见
   visible?: boolean;
