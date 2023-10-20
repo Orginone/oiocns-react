@@ -57,11 +57,13 @@ export class Storage extends Target implements IStorage {
     return this.id === this.space.metadata.storeId;
   }
   async activateStorage(): Promise<boolean> {
+    console.log(1);
     if (!this.isActivate) {
       const res = await kernel.activateStorage({
         id: this.id,
         subId: this.space.id,
       });
+      console.log(res);
       if (res.success) {
         this.space.updateMetadata(res.data);
         this.space.sendTargetNotity(OperateType.Update);

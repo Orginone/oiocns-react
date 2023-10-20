@@ -26,6 +26,8 @@ export interface IWorkProvider {
     id: string,
     belongId: string,
   ): Promise<schema.XWorkInstance | undefined>;
+  /** 加载待办 */
+  loadTodos(reload?: boolean): Promise<IWorkTask[]>;
   /** 加载任务事项 */
   loadContent(typeName: TaskTypeName, reload?: boolean): Promise<IWorkTask[]>;
 }

@@ -203,6 +203,7 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
   async create(data: schema.XDirectory): Promise<schema.XDirectory | undefined> {
     const result = await this.resource.directoryColl.insert({
       ...data,
+      typeName: '目录',
       directoryId: this.id,
     });
     if (result) {

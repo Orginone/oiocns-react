@@ -83,7 +83,7 @@ const TableMode = ({
             width={200}
             allowFiltering={false}
             calculateDisplayValue={(e: IDEntity) => {
-              return showChatTime(e.metadata.updateTime);
+              return showChatTime(e.updateTime);
             }}
           />
           <Column

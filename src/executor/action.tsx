@@ -81,9 +81,11 @@ const directoryRefresh = (dir: IDirectory | IApplication, reload: boolean) => {
 };
 
 /** 激活存储 */
-const activateStorage = (store: IStorage) => {
+const activateStorage = (store: IStorage | IDirectory) => {
   if ('activateStorage' in store) {
     store.activateStorage();
+  } else {
+    activateStorage(store.target as IStorage);
   }
 };
 

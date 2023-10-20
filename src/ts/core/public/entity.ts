@@ -20,6 +20,8 @@ export interface IEntity<T> extends Emitter {
   typeName: string;
   /** 实体描述 */
   remark: string;
+  /** 最后变更时间 */
+  updateTime: string;
   /** 提示数量 */
   badgeCount: number;
   /** 数据实体 */
@@ -77,7 +79,10 @@ export abstract class Entity<T extends schema.XEntity>
     return this.metadata.typeName;
   }
   get remark(): string {
-    return this.metadata?.remark ?? '';
+    return this.metadata.remark ?? '';
+  }
+  get updateTime(): string {
+    return this.metadata.updateTime;
   }
   get metadata(): T {
     if (ShareIdSet.has(this._metadata.id)) {

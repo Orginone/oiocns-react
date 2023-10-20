@@ -142,6 +142,12 @@ export class Session extends Entity<schema.XEntity> implements ISession {
     }
     return this.metadata.remark.substring(0, 60);
   }
+  get updateTime(): string {
+    if (this.chatdata.lastMessage) {
+      return this.chatdata.lastMessage.createTime;
+    }
+    return super.updateTime;
+  }
   get cachePath(): string {
     return `session.${this.chatdata.fullId}`;
   }

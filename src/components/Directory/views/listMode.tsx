@@ -45,8 +45,8 @@ const ListMode = ({
                   }}
                   onContextMenu={() => setCxtItem(item)}
                   actions={[
-                    <div key={item.id} title={item.metadata.updateTime}>
-                      {showChatTime(item.metadata.updateTime)}
+                    <div key={item.id} title={item.updateTime}>
+                      {showChatTime(item.updateTime)}
                     </div>,
                   ]}>
                   <List.Item.Meta
