@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import css from './less/table.module.less';
 import { IDEntity, ISysFileInfo } from '@/ts/core';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import { showChatTime } from '@/utils/tools';
@@ -23,6 +24,31 @@ const TableMode = ({
   if (focusFile) {
     selectFiles.push(focusFile);
   }
+  const dataRowRender = (e: { data: IDEntity | ISysFileInfo }) => {
+    const sizeText = 'filedata' in e.data ? formatSize(e.data.filedata.size) : '';
+    return (
+      <React.Fragment>
+        <tr onContextMenu={() => setCxtItem(e.data)}>
+          <td style={{ padding: 12 }} rowSpan={2}>
+            <Badge count={e.data.badgeCount} size="small">
+              <EntityIcon entity={e.data.metadata} size={40} />
+            </Badge>
+          </td>
+          <td>{e.data.name}</td>
+          <td>{e.data.code}</td>
+          <td>{e.data.typeName}</td>
+          <td>{showChatTime(e.data.metadata.createTime)}</td>
+          <td>{showChatTime(e.data.updateTime)}</td>
+          <td>{sizeText}</td>
+        </tr>
+        <tr className={css.remarkRow} onContextMenu={() => setCxtItem(e.data)}>
+          <td colSpan={6}>
+            <div style={{ color: '#999' }}>{e.data.remark}</div>
+          </td>
+        </tr>
+      </React.Fragment>
+    );
+  };
   return (
     <Dropdown menu={contextMenu(cxtItem)} trigger={['contextMenu']} destroyPopupOnHide>
       <div
@@ -50,55 +76,17 @@ const TableMode = ({
             visible: true,
             allowSearch: true,
           }}
+          dataRowRender={dataRowRender}
           onContextMenuPreparing={(e) => setCxtItem(e.row?.data)}
           dataSource={content}>
           <Scrolling mode="virtual" />
-          <Column
-            width={250}
-            dataField="name"
-            caption="名称"
-            cellRender={(e) => {
-              return (
-                <Badge count={e.data.badgeCount} size="small">
-                  <EntityIcon entity={e.data.metadata} showName size={20} />
-                </Badge>
-              );
-            }}
-          />
-          <Column dataField="code" caption="代码" width={200} />
-          <Column dataField="typeName" caption="类型" width={200} />
-          <Column
-            dataField="metadata.createTime"
-            caption="创建时间"
-            width={200}
-            dataType={'datetime'}
-            allowFiltering={false}
-            calculateDisplayValue={(e: IDEntity) => {
-              return showChatTime(e.metadata.createTime);
-            }}
-          />
-          <Column
-            dataField="metadata.updateTime"
-            caption="更新时间"
-            width={200}
-            allowFiltering={false}
-            calculateDisplayValue={(e: IDEntity) => {
-              return showChatTime(e.updateTime);
-            }}
-          />
-          <Column
-            width={100}
-            dataField="size"
-            caption="大小"
-            allowFiltering={false}
-            calculateCellValue={(e: IDEntity) => {
-              if ('filedata' in e) {
-                return formatSize((e as ISysFileInfo).filedata.size);
-              }
-              return '';
-            }}
-          />
-          <Column width={250} dataField="remark" caption="描述" allowFiltering={false} />
+          <Column width={80} dataField="id" caption="图标" allowFiltering={false} />
+          <Column dataField="name" width={200} caption="名称" />
+          <Column dataField="code" width={200} caption="代码" />
+          <Column dataField="typeName" width={150} caption="类型" />
+          <Column dataField="metadata.createTime" width={200} caption="创建时间" />
+          <Column dataField="metadata.updateTime" width={200} caption="变更时间" />
+          <Column dataField="size" width={100} caption="大小" allowFiltering={false} />
         </DataGrid>
       </div>
     </Dropdown>

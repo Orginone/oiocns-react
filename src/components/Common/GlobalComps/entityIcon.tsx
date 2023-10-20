@@ -90,12 +90,14 @@ const ShareIconItem = (info: shareIconInfo) => {
             fontSize: 12,
             top: -size / 2,
             width: 4,
-          }}
-          onClick={(e) => {
-            e.stopPropagation();
-            command.emitter('executor', 'open', info.entity, 'preview');
           }}>
-          <ImInfo color={'#abc'} />
+          <ImInfo
+            color={'#abc'}
+            onClick={(e) => {
+              e.stopPropagation();
+              command.emitter('executor', 'open', info.entity, 'preview');
+            }}
+          />
         </span>
       );
     }

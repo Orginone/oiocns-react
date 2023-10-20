@@ -25,6 +25,9 @@ const AttributeConfig: React.FC<IAttributeProps> = ({
   const notityAttrChanged = () => {
     current.metadata.attributes[index] = attribute;
     notifyEmitter.changCallback('attr', attribute);
+    if (attribute.property?.valueType === '用户型') {
+      setAttribute({ ...attribute });
+    }
   };
   useEffect(() => {
     const speciesId = attribute.property?.speciesId;
