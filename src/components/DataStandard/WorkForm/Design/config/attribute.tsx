@@ -18,13 +18,14 @@ const AttributeConfig: React.FC<IAttributeProps> = ({
   notifyEmitter,
   index,
 }) => {
-  const attribute = current.metadata.attributes[index];
+  const [attribute, setAttribute] = React.useState(current.metadata.attributes[index]);
   const [items, setItems] = useState<schema.XSpeciesItem[]>([]);
   const notityAttrChanged = () => {
-    notifyEmitter.changCallback('attr', current.metadata.attributes[index]);
+    current.metadata.attributes[index] = attribute;
+    notifyEmitter.changCallback('attr', attribute);
   };
   useEffect(() => {
-    const speciesId = current.metadata.attributes[index].property?.speciesId;
+    const speciesId = attribute.property?.speciesId;
     if (speciesId && speciesId.length > 5) {
       current.loadItems([speciesId]).then((data) => {
         setItems(data);
@@ -32,10 +33,19 @@ const AttributeConfig: React.FC<IAttributeProps> = ({
     } else {
       setItems([]);
     }
+  }, [attribute]);
+  useEffect(() => {
+    setAttribute({
+      ...current.metadata.attributes[index],
+      widget: getWidget(
+        current.metadata.attributes[index].property?.valueType,
+        current.metadata.attributes[index].widget,
+      ),
+    });
   }, [index]);
   const loadItemConfig = () => {
     const options = [];
-    switch (getWidget(attribute.property?.valueType, attribute.widget)) {
+    switch (attribute.widget) {
       case '数字框':
         options.push(
           <SimpleItem
@@ -216,10 +226,11 @@ const AttributeConfig: React.FC<IAttributeProps> = ({
   };
   return (
     <Form
+      key={index}
       height={'calc(100vh - 130px)'}
       scrollingEnabled
       labelMode="floating"
-      formData={current.metadata.attributes[index]}
+      formData={attribute}
       onFieldDataChanged={notityAttrChanged}>
       <GroupItem caption={'特性参数'}>
         <SimpleItem dataField="name" isRequired={true} label={{ text: '名称' }} />
@@ -229,10 +240,7 @@ const AttributeConfig: React.FC<IAttributeProps> = ({
           editorType="dxSelectBox"
           label={{ text: '组件' }}
           editorOptions={{
-            items: loadwidgetOptions(current.metadata.attributes[index]),
-            value:
-              current.metadata.attributes[index]['widget'] ??
-              loadwidgetOptions(current.metadata.attributes[index])[0],
+            items: loadwidgetOptions(attribute),
           }}
         />
         <SimpleItem

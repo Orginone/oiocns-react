@@ -159,7 +159,7 @@ const ConditionNode: React.FC<Iprops> = (props) => {
         item.label = conkeys ? conkeys?.label : '';
         /** 查询符合条件的枚举值 */
         if (item.type === dataType.DICT) {
-          const findConLabel = findCon.lookups.find((innItem) => {
+          const findConLabel = findCon?.lookups?.find((innItem) => {
             return innItem.value === currentValue.allContent[index].val;
           });
           /** 枚举值赋值 */
@@ -179,12 +179,12 @@ const ConditionNode: React.FC<Iprops> = (props) => {
       </div>{' '}
       <div>
         <Form key={key} form={form} onValuesChange={onChange}>
-          {[...(currentNode?.conditions || [])]?.map((condition, index) => (
+          {(currentNode?.conditions || []).map((condition, index) => (
             <div key={index + '_g'} className={cls['group']}>
               <div className={cls['group-header']}>
                 <div
                   onClick={() => {
-                    currentNode?.conditions.splice(index, 1);
+                    currentNode!.conditions.splice(index, 1);
                     setCurrentNode(currentNode);
                     setKey(key + 1);
                   }}>
@@ -199,11 +199,9 @@ const ConditionNode: React.FC<Iprops> = (props) => {
                     style={{ width: 130 }}
                     placeholder="请选择参数"
                     allowClear
-                    fieldNames={{
-                      label: 'name',
-                      value: 'id',
-                    }}
-                    options={props.conditions}
+                    options={(props.conditions || []).map((i) => {
+                      return { label: i.name, value: i.id };
+                    })}
                     onChange={(e) => {
                       props.conditions.forEach((element) => {
                         if (element.id == e) {

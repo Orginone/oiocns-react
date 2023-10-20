@@ -4,8 +4,8 @@ import { DefaultOptionType } from 'rc-select/lib/Select';
 import { IAuthority, IBelong } from '@/ts/core';
 interface IProps {
   value?: string;
-  onChange: any;
   space: IBelong;
+  onChange: (newValue: string, label: string) => void;
 }
 const SelectAuth: React.FC<IProps> = (props: IProps) => {
   const [treeData, setTreeData] = useState<any[]>([]);
@@ -44,7 +44,9 @@ const SelectAuth: React.FC<IProps> = (props: IProps) => {
       onClick={(e) => {
         e.stopPropagation();
       }}
-      onChange={props.onChange}
+      onSelect={(_, options) =>
+        props.onChange?.apply(this, [options.value, options.label])
+      }
       treeData={treeData}
     />
   );

@@ -78,7 +78,7 @@ const ApprovalNode: React.FC<IProps> = (props) => {
               <InputNumber
                 min={1}
                 onChange={(e: number | null) => {
-                  props.current.num = e || 1;
+                  props.current.num = e ?? 1;
                 }}
                 value={props.current.num}
                 placeholder="请设置会签人数"

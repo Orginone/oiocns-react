@@ -15,7 +15,6 @@ const SearchTargetItem: React.FC<SearchTargetItemProps> = (props) => {
   const [searchEnabled, setSearchEnabled] = useState(false);
   const [selectTarget, setSelectTarget] = useState<schema.XTarget>();
   useEffect(() => {
-    console.log(props.typeName);
     setSelectTarget(undefined);
   }, [props]);
   const fieldRender = React.useCallback(() => {
