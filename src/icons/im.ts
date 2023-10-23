@@ -41,6 +41,7 @@ import { ImList } from '@react-icons/all-files/im/ImList';
 import { ImFilesEmpty } from '@react-icons/all-files/im/ImFilesEmpty';
 import { ImSearch } from '@react-icons/all-files/im/ImSearch';
 import { ImArrowLeft2 } from '@react-icons/all-files/im/ImArrowLeft2';
+import { ImArrowRight2 } from '@react-icons/all-files/im/ImArrowRight2';
 import { ImVolumeHigh } from '@react-icons/all-files/im/ImVolumeHigh';
 import { ImVolumeLow } from '@react-icons/all-files/im/ImVolumeLow';
 import { ImVolumeMedium } from '@react-icons/all-files/im/ImVolumeMedium';
@@ -67,6 +68,7 @@ import { ImEqualizer } from '@react-icons/all-files/im/ImEqualizer';
 export {
   ImAddressBook,
   ImArrowLeft2,
+  ImArrowRight2,
   ImBell,
   ImBin,
   ImBook,

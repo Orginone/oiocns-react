@@ -4,12 +4,16 @@
   overflow-y: hidden;
   overflow-x: scroll;
   border-bottom: 1px solid #efefef;
+  display: flex;
+  position: relative;
+  flex-direction: row;
   .tags_item {
     cursor: pointer;
     white-space: nowrap;
     padding: 4px 16px;
     font-size: 12px;
     height: 26px;
+    line-height: 18px;
     .item_count {
       color: #2b00ff;
       font-style: italic;
@@ -19,18 +23,28 @@
       border-radius: 30px;
       background-color:@active-background;
     }
-    &_active {
-      cursor: not-allowed;
-      border-radius: 30px;
-      padding: 4px 16px;
-      font-size: 12px;
-      height: 26px;
-      .item_count {
-        font-style: italic;
-        transform: scale(0.9);
-      }
-      color: @text-color-inverse;
-      background-color:@focus-background;
-    }
+    
   }
+  .tags_item_active {
+    cursor: not-allowed;
+    border-radius: 30px;
+    white-space: nowrap;
+    padding: 4px 16px;
+    font-size: 12px;
+    height: 26px;
+    .item_count {
+      font-style: italic;
+      transform: scale(0.9);
+    }
+    color: @text-color-inverse;
+    background-color:@focus-background;
+  }
+}
+.tags_leftArrow {
+  position: absolute;
+  left: 0;
+}
+.tags_rightArrow {
+  position: absolute;
+  right: 0;
 }
