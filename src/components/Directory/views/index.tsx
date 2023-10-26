@@ -70,6 +70,7 @@ const DirectoryView: React.FC<IProps> = (props) => {
         entitys={getContent(false)}
         badgeCount={props.badgeCount}
         onChanged={(t) => setCurrentTag(t)}></TagsBar>
+      <div></div>
       <SegmentContent
         onSegmentChanged={setSegmented}
         descriptions={`${getContent().length}个项目`}

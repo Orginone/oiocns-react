@@ -20,11 +20,11 @@
     -ms-flex-align: start;
     align-items: flex-start;
     flex-direction: row;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     justify-content: flex-start;
     .cardItem {
-      min-width: 400px;
-      height: 180px;
+      width: 100%;
+      min-height: 180px;
       border-radius: 6px;
       padding: 16px;
       cursor: pointer;
@@ -48,7 +48,7 @@
 .cardItemHeader {
   .title {
     font-weight: bolder;
-    font-size: 18px;
+    font-size: 17px;
   }
   .remind {
     font-size: 12px;
@@ -61,14 +61,14 @@
   .extraBtn {
     float: right;
     font-size: 14px;
-    color: #686868;
+    color: #585858;
     cursor: pointer;
     padding-top: 4px;
     span {
       margin-left: 2px;
       margin-bottom: 2px;
     }
-    :hover {
+    &:hover {
       color:#3838b9;
     }
   }
@@ -76,11 +76,11 @@
 
 .cardItemViewer {
   padding-top: 12px;
-  height: 100px;
+  min-height: 100px;
   .linkBtn {
     margin: 10px;
     height: 35px;
-    width: 90px;
+    display: flex;
     background-color: #f5f5f5;
     &:hover {
       background: @active-background;
@@ -108,7 +108,7 @@
     padding: 16px 2px;
   }
   .dataItem {
-    min-width: 120px;
+    min-width: 110px;
     padding: 16px;
     text-align: center;
     &Title{

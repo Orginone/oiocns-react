@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import style from './index.module.less';
-import { Segmented, Card, Space, Divider, Typography, Affix } from 'antd';
+import { Segmented, Space, Divider, Typography, Affix } from 'antd';
 import useStorage from '@/hooks/useStorage';
 import * as fa from '@/icons/fa';
 
@@ -23,7 +23,7 @@ const SegmentContent: React.FC<IProps> = ({
   const parentRef = useRef<any>();
 
   return (
-    <Card className={style.pageCard} bordered={false}>
+    <div className={style.pageCard}>
       <div className={style.mainContent} ref={parentRef}>
         {content}
       </div>
@@ -70,7 +70,7 @@ const SegmentContent: React.FC<IProps> = ({
           <Typography.Link>{descriptions}</Typography.Link>
         </Space>
       </Affix>
-    </Card>
+    </div>
   );
 };
 export default SegmentContent;

@@ -15,10 +15,6 @@ export interface IWorkProvider {
   tasks: IWorkTask[];
   /** 变更通知 */
   notity: common.Emitter;
-  /** 加载已办数量 */
-  loadCompletedCount(): Promise<number>;
-  /** 加载已完结数量 */
-  loadApplyCount(): Promise<number>;
   /** 任务更新 */
   updateTask(task: schema.XWorkTask): void;
   /** 加载实例详情 */
@@ -28,6 +24,8 @@ export interface IWorkProvider {
   ): Promise<schema.XWorkInstance | undefined>;
   /** 加载待办 */
   loadTodos(reload?: boolean): Promise<IWorkTask[]>;
+  /** 加载任务数量 */
+  loadTaskCount(typeName: TaskTypeName): Promise<number>;
   /** 加载任务事项 */
   loadContent(typeName: TaskTypeName, reload?: boolean): Promise<IWorkTask[]>;
 }
@@ -69,17 +67,10 @@ export class WorkProvider implements IWorkProvider {
     typeName: TaskTypeName,
     reload: boolean = false,
   ): Promise<IWorkTask[]> {
-    switch (typeName) {
-      case '待办事项':
-        return await this.loadTodos(reload);
-      case '已办事项':
-        return await this.loadDones(reload);
-      case '我发起的':
-        return await this.loadApply(reload);
-      case '抄送我的':
-        return await this.loadCopys(reload);
+    if (typeName === '待办事项') {
+      return await this.loadTodos(reload);
     }
-    return [];
+    return await this.loadTasks(typeName, reload);
   }
   async loadTodos(reload: boolean = false): Promise<IWorkTask[]> {
     if (!this._todoLoaded || reload) {
@@ -92,61 +83,18 @@ export class WorkProvider implements IWorkProvider {
     }
     return this.todos;
   }
-  async loadCopys(reload: boolean = false): Promise<IWorkTask[]> {
+  async loadTasks(typeName: TaskTypeName, reload: boolean = false): Promise<IWorkTask[]> {
     if (reload) {
       this.tasks = [];
     }
-    const skip = this.tasks.filter((i) => i.isTaskType('抄送我的')).length;
-    await this.loadTasks(
-      {
-        approveType: '抄送',
-      },
-      skip,
-    );
-    return this.tasks.filter((i) => i.isTaskType('抄送我的'));
-  }
-  async loadDones(reload: boolean = false): Promise<IWorkTask[]> {
-    if (reload) {
-      this.tasks = [];
-    }
-    const skip = this.tasks.filter((i) => i.isTaskType('已办事项')).length;
-    await this.loadTasks(
-      {
-        status: {
-          _gte_: 100,
-        },
-        records: {
-          _exists_: true,
-        },
-      },
-      skip,
-    );
-    return this.tasks.filter((i) => i.isTaskType('已办事项'));
-  }
-  async loadApply(reload: boolean = false): Promise<IWorkTask[]> {
-    if (reload) {
-      this.tasks = [];
-    }
-    const skip = this.tasks.filter((i) => i.isTaskType('我发起的')).length;
-    await this.loadTasks(
-      {
-        createUser: this.userId,
-        nodeId: {
-          _exists_: false,
-        },
-      },
-      skip,
-    );
-    return this.tasks.filter((i) => i.isTaskType('我发起的'));
-  }
-  async loadTasks(match: any, skip: number): Promise<void> {
+    const skip = this.tasks.filter((i) => i.isTaskType(typeName)).length;
     const result = await kernel.collectionLoad<schema.XWorkTask[]>(
       this.userId,
       [],
       TaskCollName,
       {
         options: {
-          match: match,
+          match: this._typeMatch(typeName),
           sort: {
             createTime: -1,
           },
@@ -162,35 +110,12 @@ export class WorkProvider implements IWorkProvider {
         }
       });
     }
+    return this.tasks.filter((i) => i.isTaskType(typeName));
   }
-  async loadCompletedCount(): Promise<number> {
+  async loadTaskCount(typeName: TaskTypeName): Promise<number> {
     const res = await kernel.collectionLoad(this.userId, [], TaskCollName, {
       options: {
-        match: {
-          status: {
-            _gte_: 100,
-          },
-          records: {
-            _exists_: true,
-          },
-        },
-      },
-      isCountQuery: true,
-    });
-    if (res.success) {
-      return res.totalCount;
-    }
-    return 0;
-  }
-  async loadApplyCount(): Promise<number> {
-    const res = await kernel.collectionLoad(this.userId, [], TaskCollName, {
-      options: {
-        match: {
-          createUser: this.userId,
-          nodeId: {
-            _exists_: false,
-          },
-        },
+        match: this._typeMatch(typeName),
       },
       isCountQuery: true,
     });
@@ -204,5 +129,35 @@ export class WorkProvider implements IWorkProvider {
     belongId: string,
   ): Promise<schema.XWorkInstance | undefined> {
     return await kernel.findInstance(belongId, id);
+  }
+  private _typeMatch(typeName: TaskTypeName): any {
+    switch (typeName) {
+      case '已办事项':
+        return {
+          status: {
+            _gte_: 100,
+          },
+          records: {
+            _exists_: true,
+          },
+        };
+      case '我发起的':
+        return {
+          createUser: this.userId,
+          nodeId: {
+            _exists_: false,
+          },
+        };
+      case '抄送我的':
+        return {
+          approveType: '抄送',
+        };
+      default:
+        return {
+          status: {
+            _lt_: 100,
+          },
+        };
+    }
   }
 }

@@ -3,15 +3,26 @@ import { TextArea } from 'devextreme-react';
 import { Editor, Toolbar } from '@wangeditor/editor-for-react';
 import { ITextBoxOptions } from 'devextreme-react/text-box';
 import { IDomEditor } from '@wangeditor/editor';
-interface TreeSelectItemProps extends ITextBoxOptions {
-  onFieldChange?: (name: string, value: string) => void;
-}
 
-const HtmlEditItem: React.FC<TreeSelectItemProps> = (props) => {
+const HtmlEditItem: React.FC<ITextBoxOptions> = (props) => {
+  const [isValid, setIsValid] = useState(props.isValid);
   const [editor, setEditor] = useState<IDomEditor | null>(null); // 存储 editor 实例
+  const onChanged = React.useCallback((e: IDomEditor) => {
+    const html = e.getHtml();
+    setIsValid(e.getText().length > 0);
+    if (html) {
+      props.onValueChanged?.apply(this, [{ value: html } as any]);
+    }
+  }, []);
 
   return (
-    <TextArea {...props} minHeight={350} width={'100%'} defaultValue="" value="">
+    <TextArea
+      {...props}
+      isValid={isValid}
+      minHeight={350}
+      width={'100%'}
+      defaultValue=""
+      value="">
       <div style={{ padding: 30, display: 'block', height: '100%', width: '100%' }}>
         {props.readOnly !== true && (
           <Toolbar
@@ -37,9 +48,13 @@ const HtmlEditItem: React.FC<TreeSelectItemProps> = (props) => {
         )}
         <Editor
           mode="simple"
-          defaultHtml={props.value}
+          defaultHtml={props.defaultValue}
           onCreated={setEditor}
-          defaultConfig={{ placeholder: '在此输入内容', readOnly: props.readOnly }}
+          onChange={onChanged}
+          defaultConfig={{
+            placeholder: '在此输入内容',
+            readOnly: props.readOnly,
+          }}
           style={{ height: 220 }}
         />
       </div>

@@ -24,7 +24,7 @@ export interface IWorkTask extends IFile {
   /** 加用户任务信息 */
   targets: schema.XTarget[];
   /** 是否为指定的任务类型 */
-  isTaskType(type: '已办事项' | '抄送我的' | '我发起的'): boolean;
+  isTaskType(type: TaskTypeName): boolean;
   /** 是否满足条件 */
   isMatch(filter: string): boolean;
   /** 任务更新 */

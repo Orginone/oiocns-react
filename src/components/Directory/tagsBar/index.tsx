@@ -1,8 +1,10 @@
 import React from 'react';
-import { Badge, Divider, Space } from 'antd';
+import { Badge, Button, Divider, Space } from 'antd';
 import cls from './index.module.less';
 import { schema } from '@/ts/base';
 import { IEntity } from '@/ts/core';
+import { ImArrowLeft2 } from '@react-icons/all-files/im/ImArrowLeft2';
+import { ImArrowRight2 } from '@react-icons/all-files/im/ImArrowRight2';
 
 interface IProps {
   select: string;
@@ -16,6 +18,7 @@ interface IProps {
 }
 /** 标签条 */
 const TagsBar: React.FC<IProps> = (props) => {
+  const ref = React.createRef<HTMLDivElement>();
   // 获取分组标签集
   const groupTags = () => {
     const tags = props.initTags.map((tag) => {
@@ -64,11 +67,20 @@ const TagsBar: React.FC<IProps> = (props) => {
     }
     return barItem;
   };
+  const arrowLeft = (num: number) => {
+    if (ref.current) {
+      ref.current.scrollLeft = ref.current.scrollLeft + num;
+    }
+  };
   return (
     <div className={cls.tags_bar}>
-      <Space split={<Divider type="vertical" style={{ height: 20 }} />} size={2}>
-        {groupTags().map((item) => loadBarItem(item.tag, item.count))}
-      </Space>
+      <Button type="link" icon={<ImArrowLeft2 />} onClick={() => arrowLeft(-100)} />
+      <div ref={ref} className={cls.tags_body}>
+        <Space split={<Divider type="vertical" style={{ height: 20 }} />} size={2}>
+          {groupTags().map((item) => loadBarItem(item.tag, item.count))}
+        </Space>
+      </div>
+      <Button type="link" icon={<ImArrowRight2 />} onClick={() => arrowLeft(100)} />
     </div>
   );
 };

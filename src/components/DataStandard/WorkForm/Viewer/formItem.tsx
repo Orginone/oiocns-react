@@ -3,6 +3,7 @@ import { Emitter } from '@/ts/base/common';
 import HtmlEditItem from './customItem/htmlItem';
 import TreeSelectItem from './customItem/treeItem';
 import SelectFilesItem from './customItem/fileItem';
+import MemberBoxProps from './customItem/memberBox';
 import SearchTargetItem from './customItem/searchTarget';
 import CurrentTargetItem from './customItem/currentTarget';
 import { getItemWidth, getWidget } from '../Utils';
@@ -23,6 +24,7 @@ interface IFormItemProps {
 }
 
 const FormItem: React.FC<IFormItemProps> = (props) => {
+  const [isValid, setIsValid] = React.useState(false);
   useEffect(() => {
     const id = props.notifyEmitter.subscribe((_, type, data) => {});
     return () => {
@@ -49,8 +51,14 @@ const FormItem: React.FC<IFormItemProps> = (props) => {
       if (e.value !== props.data[props.field.id]) {
         if (e.value === undefined || e.value === null) {
           delete props.data[props.field.id];
+          if (props.field.options?.isRequired) {
+            setIsValid(false);
+          }
         } else {
           props.data[props.field.id] = e.value;
+          if (props.field.options?.isRequired) {
+            setIsValid(`${e.value}`.length > 0);
+          }
         }
         const changedValues: any = {};
         changedValues[props.field.id] = e.value;
@@ -60,6 +68,7 @@ const FormItem: React.FC<IFormItemProps> = (props) => {
     width: getItemWidth(props.numStr),
   };
   if (props.field.options.isRequired) {
+    mixOptions.isValid = isValid;
     mixOptions.label = mixOptions.label + '*';
   }
   switch (getWidget(props.field.valueType, props.field.widget)) {
@@ -99,6 +108,8 @@ const FormItem: React.FC<IFormItemProps> = (props) => {
       return <SearchTargetItem {...mixOptions} typeName={TargetType.Cohort} />;
     case '组织群搜索框':
       return <SearchTargetItem {...mixOptions} typeName={TargetType.Group} />;
+    case '成员选择框':
+      return <MemberBoxProps {...mixOptions} target={props.belong.metadata} />;
     case '日期选择框':
       return (
         <DateBox

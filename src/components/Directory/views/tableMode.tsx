@@ -4,7 +4,7 @@ import { IDEntity, ISysFileInfo } from '@/ts/core';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import { showChatTime } from '@/utils/tools';
 import { formatSize } from '@/ts/base/common';
-import DataGrid, { Column, Scrolling } from 'devextreme-react/data-grid';
+import DataGrid, { Column } from 'devextreme-react/data-grid';
 import { Badge, Dropdown, MenuProps } from 'antd';
 
 const TableMode = ({
@@ -29,7 +29,7 @@ const TableMode = ({
     return (
       <React.Fragment>
         <tr onContextMenu={() => setCxtItem(e.data)}>
-          <td style={{ padding: 12 }} rowSpan={2}>
+          <td style={{ padding: 12, width: 60 }} rowSpan={2}>
             <Badge count={e.data.badgeCount} size="small">
               <EntityIcon entity={e.data.metadata} size={40} />
             </Badge>
@@ -55,13 +55,14 @@ const TableMode = ({
         style={{ width: '100%', height: '100%' }}
         onContextMenu={(e) => e.stopPropagation()}>
         <DataGrid<IDEntity, string>
-          id="grid"
           width="100%"
           height="100%"
           keyExpr="id"
           columnAutoWidth
           allowColumnResizing
           hoverStateEnabled
+          style={{ overflow: 'hidden' }}
+          scrolling={{ showScrollbar: 'onHover', mode: 'virtual' }}
           selectedRowKeys={selectFiles.map((i) => i.id)}
           selection={{ mode: 'single' }}
           columnResizingMode={'nextColumn'}
@@ -79,8 +80,7 @@ const TableMode = ({
           dataRowRender={dataRowRender}
           onContextMenuPreparing={(e) => setCxtItem(e.row?.data)}
           dataSource={content}>
-          <Scrolling mode="virtual" />
-          <Column width={80} dataField="id" caption="图标" allowFiltering={false} />
+          <Column width={80} dataField="id" caption="" allowFiltering={false} />
           <Column dataField="name" width={200} caption="名称" />
           <Column dataField="code" width={200} caption="代码" />
           <Column dataField="typeName" width={150} caption="类型" />

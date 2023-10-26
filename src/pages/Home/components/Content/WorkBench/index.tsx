@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import cls from './index.module.less';
 import { Badge, Button, Calendar, Divider, Dropdown, Space, Spin } from 'antd';
-import { ImDropbox, ImPriceTags } from '@/icons/im';
+import { ImBubbles2, ImDropbox, ImList, ImPlus, ImStack } from '@/icons/im';
 import { useHistory } from 'react-router-dom';
 import { command, model } from '@/ts/base';
 import orgCtrl from '@/ts/controller';
@@ -11,16 +11,20 @@ import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import { OperateMenuType } from 'typings/globelType';
 import FullScreenModal from '@/components/Common/fullScreen';
 import { useFlagCmdEmitter } from '@/hooks/useCtrlUpdate';
+import TypeIcon from '@/components/Common/GlobalComps/typeIcon';
 
 // 工作台
 const WorkBench: React.FC = () => {
   const history = useHistory();
   // 渲染数据项
-  const renderDataItem = (title: string, number: string | number) => {
+  const renderDataItem = (title: string, number: string | number, size?: number) => {
     return (
       <div className={cls.dataItem}>
         <div className={cls.dataItemTitle}>{title}</div>
         <div className={cls.dataItemNumber}>{number}</div>
+        {size && size > 0 && (
+          <div className={cls.dataItemTitle}>大小:{formatSize(size)}</div>
+        )}
       </div>
     );
   };
@@ -40,7 +44,12 @@ const WorkBench: React.FC = () => {
       <>
         <div className={cls.cardItemHeader}>
           <span className={cls.title}>沟通</span>
-          {msgCount > 0 && <span className={cls.remind}>未读消息·{msgCount}条</span>}
+          <span className={cls.extraBtn}>
+            <ImBubbles2 />
+            <span>
+              未读<b>{msgCount}</b>条
+            </span>
+          </span>
         </div>
         <div className={cls.cardItemViewer}>
           <Spin spinning={!loaded}>
@@ -61,14 +70,18 @@ const WorkBench: React.FC = () => {
   const RenderWork: React.FC = () => {
     const [todoCount, setTodoCount] = useState(0);
     const [ApplyCount, setApplyCount] = useState(0);
+    const [CopysCount, setCopysCount] = useState(0);
     const [CompletedCount, setCompletedCount] = useState(0);
     useEffect(() => {
       const id = orgCtrl.subscribe(() => {
         setTodoCount(orgCtrl.work.todos.length);
-        orgCtrl.work.loadApplyCount().then((v) => {
+        orgCtrl.work.loadTaskCount('我发起的').then((v) => {
           setApplyCount(v);
         });
-        orgCtrl.work.loadCompletedCount().then((v) => {
+        orgCtrl.work.loadTaskCount('抄送我的').then((v) => {
+          setCopysCount(v);
+        });
+        orgCtrl.work.loadTaskCount('已办事项').then((v) => {
           setCompletedCount(v);
         });
       });
@@ -80,12 +93,19 @@ const WorkBench: React.FC = () => {
       <>
         <div className={cls.cardItemHeader}>
           <span className={cls.title}>办事</span>
+          <span className={cls.extraBtn}>
+            <ImList />
+            <span>
+              待办<b>{todoCount}</b>件
+            </span>
+          </span>
         </div>
         <div className={cls.cardItemViewer}>
           <Space wrap split={<Divider type="vertical" />} size={2}>
-            {renderDataItem('待办(件)', todoCount)}
-            {renderDataItem('已办(件)', CompletedCount)}
-            {renderDataItem('发起(件)', ApplyCount)}
+            {renderDataItem('待办事项', todoCount)}
+            {renderDataItem('已办事项', CompletedCount)}
+            {renderDataItem('我发起的', ApplyCount)}
+            {renderDataItem('抄送我的', CopysCount)}
           </Space>
         </div>
       </>
@@ -102,22 +122,24 @@ const WorkBench: React.FC = () => {
     return (
       <>
         <div className={cls.cardItemHeader}>
-          <span className={cls.title}>存储</span>
+          <span className={cls.title}>数据</span>
+          <span className={cls.extraBtn}>
+            <ImPlus /> <span>管理数据</span>
+          </span>
         </div>
         <div className={cls.cardItemViewer}>
           <Space wrap split={<Divider type="vertical" />} size={2}>
-            {diskInfo &&
-              renderDataItem(`文件(${diskInfo.files}个)`, formatSize(diskInfo.fileSize))}
-            {diskInfo &&
-              renderDataItem(
-                `数据(${diskInfo.objects}个)`,
-                formatSize(diskInfo.totalSize),
-              )}
-            {diskInfo &&
-              renderDataItem(
-                `硬件(${formatSize(diskInfo.fsUsedSize)})`,
-                formatSize(diskInfo.fsTotalSize),
-              )}
+            {diskInfo && (
+              <>
+                {renderDataItem(`文件(个)`, diskInfo.files, diskInfo.fileSize)}
+                {renderDataItem(`数据(个)`, diskInfo.objects, diskInfo.totalSize)}
+                {renderDataItem(
+                  `硬件`,
+                  formatSize(diskInfo.fsUsedSize),
+                  diskInfo.fsTotalSize,
+                )}
+              </>
+            )}
           </Space>
         </div>
       </>
@@ -220,12 +242,10 @@ const WorkBench: React.FC = () => {
     };
     return (
       <>
-        <div style={{ minWidth: 490 }} className={cls.cardItemHeader}>
+        <div className={cls.cardItemHeader}>
           <span className={cls.title}>常用应用</span>
-          <span className={cls.extraBtn}>
-            <Button type="text" size="small" onClick={() => setAllAppShow(true)}>
-              <ImDropbox /> <span>全部应用</span>
-            </Button>
+          <span className={cls.extraBtn} onClick={() => setAllAppShow(true)}>
+            <ImDropbox /> <span>全部应用</span>
           </span>
         </div>
         <Spin spinning={!loaded} tip={'加载中...'}>
@@ -259,22 +279,51 @@ const WorkBench: React.FC = () => {
       </div>
     );
   };
-  // 发送快捷命令
-  const renderCmdBtn = (cmd: string, title: string) => {
+  // 操作组件
+  const RenderOperate = () => {
+    // 发送快捷命令
+    const renderCmdBtn = (cmd: string, title: string, iconType: string) => {
+      return (
+        <Button
+          className={cls.linkBtn}
+          type="text"
+          icon={<TypeIcon iconType={iconType} size={18} />}
+          onClick={() => {
+            command.emitter('executor', cmd, orgCtrl.user);
+          }}>
+          {title}
+        </Button>
+      );
+    };
     return (
-      <Button
-        className={cls.linkBtn}
-        type="text"
-        onClick={() => {
-          command.emitter('executor', cmd, orgCtrl.user);
-        }}>
-        {title}
-      </Button>
+      <>
+        <div className={cls.cardItemHeader}>
+          <span className={cls.title}>快捷操作</span>
+          <span className={cls.extraBtn} onClick={() => history.push('store')}>
+            <ImStack /> <span>更多操作</span>
+          </span>
+        </div>
+        <div style={{ width: '100%', minHeight: 60 }} className={cls.cardItemViewer}>
+          <Space wrap split={<Divider type="vertical" />} size={2}>
+            {renderCmdBtn('joinFriend', '添加好友', 'joinFriend')}
+            {renderCmdBtn('joinStorage', '申请存储', '存储资源')}
+            {renderCmdBtn('newCohort', '创建群组', '群组')}
+            {renderCmdBtn('joinCohort', '加入群聊', 'joinCohort')}
+            {renderCmdBtn('newCompany', '设立单位', '单位')}
+            {renderCmdBtn('joinCompany', '加入单位', 'joinCompany')}
+          </Space>
+        </div>
+      </>
     );
   };
 
   return (
     <div className={cls.content}>
+      <div className={cls.cardGroup}>
+        <div style={{ minHeight: 80 }} className={cls.cardItem}>
+          <RenderOperate />
+        </div>
+      </div>
       <div className={cls.cardGroup}>
         <div className={cls.cardItem} onClick={() => history.push('chat')}>
           <RenderChat />
@@ -282,31 +331,13 @@ const WorkBench: React.FC = () => {
         <div className={cls.cardItem} onClick={() => history.push('work')}>
           <RenderWork />
         </div>
+      </div>
+      <div className={cls.cardGroup}>
         <div className={cls.cardItem} onClick={() => history.push('store')}>
           <RendeStore />
         </div>
       </div>
       <div className={cls.cardGroup}>
-        <div className={cls.cardItem}>
-          <div className={cls.cardItemHeader}>
-            <span className={cls.title}>快捷操作</span>
-            <span className={cls.extraBtn}>
-              <Button type="text" size="small" onClick={() => history.push('store')}>
-                <ImPriceTags /> <span>更多操作</span>
-              </Button>
-            </span>
-          </div>
-          <div style={{ maxWidth: 500 }} className={cls.cardItemViewer}>
-            <Space wrap split={<Divider type="vertical" />} size={2}>
-              {renderCmdBtn('joinFriend', '添加好友')}
-              {renderCmdBtn('joinStorage', '申请存储')}
-              {renderCmdBtn('newCohort', '创建群组')}
-              {renderCmdBtn('joinCohort', '加入群聊')}
-              {renderCmdBtn('newCompany', '设立单位')}
-              {renderCmdBtn('joinCompany', '加入单位')}
-            </Space>
-          </div>
-        </div>
         <div className={cls.cardItem}>
           <RendeAppInfo />
         </div>
