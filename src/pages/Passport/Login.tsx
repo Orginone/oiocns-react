@@ -3,6 +3,7 @@ import { Button, Checkbox, Form, Input, message, Tabs } from 'antd';
 import React, { useState } from 'react';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import orgCtrl from '@/ts/controller';
+import '@/global.less';
 
 import cls from './index.module.less';
 
@@ -12,6 +13,7 @@ const PassportLogin: React.FC<RouteComponentProps> = (props) => {
     <div>
       {/*<div className={cls.DivideLine}></div>*/}
       <Tabs
+        className={cls[`ogo-passport-tabs-wrap`]}
         size="large"
         items={[
           { label: '已有账号登陆', key: 'account' },

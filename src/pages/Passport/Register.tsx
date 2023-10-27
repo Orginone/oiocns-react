@@ -3,6 +3,7 @@ import { Alert, Button, Form, Input, message, Modal } from 'antd';
 import React, { useState } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import orgCtrl from '@/ts/controller';
+import '@/global.less';
 
 import cls from './index.module.less';
 const PassportRegister: React.FC = () => {

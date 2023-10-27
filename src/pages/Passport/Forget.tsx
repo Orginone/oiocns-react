@@ -2,6 +2,7 @@ import { Button, Form, Input, message, Tabs } from 'antd';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import orgCtrl from '@/ts/controller';
+import '@/global.less';
 
 import cls from './index.module.less';
 
