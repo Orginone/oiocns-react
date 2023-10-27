@@ -1,0 +1,164 @@
+@leftWidth: 62.5vw;
+@slider-title-light: #fff;
+@slider-content-light: #fff;
+@slider-title-dark: #15181d;
+@slider-content-dark: #424a57;
+.logo {
+  position: absolute;
+  top: 43px;
+  left: 55.14px;
+  z-index: 1;
+  overflow: hidden;
+}
+body {
+  min-height: 700px;
+  min-width: 1000px;
+  font-family: 'PingFang SC';
+}
+.container {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  align-items: center;
+}
+
+.background {
+  top: 0;
+  position: fixed;
+  height: 100%;
+  width: @leftWidth;
+  img {
+    width: 100%;
+  }
+}
+
+.slider {
+  position: absolute;
+  z-index: 1;
+  width: @leftWidth;
+  bottom: 50px;
+  &Slides {
+    &Item {
+      height: 100%;
+      display: flex !important;
+      z-index: 1;
+      width: @leftWidth;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      &Img {
+        height: 300px;
+      }
+      &Title {
+        width: 80%;
+        font-size: 36px;
+        font-weight: bold;
+        line-height: 44px;
+        letter-spacing: 0;
+        text-align: center;
+        &.dark {
+          color: @slider-title-dark;
+        }
+        &.light {
+          color: @slider-title-light;
+        }
+      }
+      &Content {
+        margin-top: 23px;
+        font-size: 16px;
+        font-weight: 400;
+        line-height: 24px;
+        letter-spacing: 0;
+        text-align: center;
+        width: 500px;
+        margin-bottom: 150px;
+        &.dark {
+          color: @slider-content-dark;
+        }
+        &.light {
+          color: @slider-content-light;
+        }
+      }
+    }
+  }
+}
+
+.box {
+  width: 25vw;
+  height: 65%;
+  position: absolute;
+  left: @leftWidth + 6.25vw;
+  top: 28%;
+}
+
+.copyright {
+  position: absolute;
+  color: #8a8a8a;
+  width: 100vw - @leftWidth;
+  left: @leftWidth;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  bottom: 20px;
+  &Zh {
+    display: flex;
+    justify-content: center;
+    //不换行
+    white-space: nowrap;
+  }
+  &En {
+    display: flex;
+    justify-content: center;
+  }
+}
+
+.loginLabel {
+  width: 100%;
+  height: 50px;
+  img {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+@media (max-width: 1020px) {
+  .background {
+    width: 50vw;
+  }
+  .slider {
+    width: 50vw;
+    &SlidesItem {
+      width: 50vw;
+      &Content {
+        width: 300px;
+      }
+    }
+  }
+  .box {
+    left: 60vw;
+    width: 30vw;
+  }
+  .copyright {
+    width: 50vw;
+    left: 50vw;
+  }
+}
+
+@media (max-width: 800px) {
+  .slider,
+  .background {
+    display: none;
+  }
+  .copyright {
+    width: 100vw;
+    left: 0;
+  }
+  .logo {
+    display: none;
+  }
+  .box {
+    width: 80vw;
+    left: 10vw;
+  }
+}
