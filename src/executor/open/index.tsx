@@ -8,6 +8,7 @@ import ReportView from './report';
 import TransferView from './transfer';
 import AudioPlayer from './audio';
 import CodeEditor from './codeeditor';
+import CodeRepository from './codeRepository';
 import EntityForm from '../operate/entityForm';
 import { IEntity, ISysFileInfo, TargetType } from '@/ts/core';
 import { model, schema } from '@/ts/base';
@@ -60,6 +61,8 @@ const ExecutorOpen: React.FC<IOpenProps> = (props: IOpenProps) => {
         return <WorkStart current={props.entity as any} finished={props.finished} />;
       case '报表':
         return <ReportView current={props.entity as any} finished={props.finished} />;
+      case '代码仓库配置':
+        return <CodeRepository current={props.entity as any} finished={props.finished} />;
       default:
         if (Object.values(TargetType).includes(props.entity.typeName as TargetType)) {
           return (

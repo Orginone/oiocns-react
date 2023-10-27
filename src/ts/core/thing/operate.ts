@@ -8,6 +8,7 @@ import { Form } from './standard/form';
 import { Property } from './standard/property';
 import { Species } from './standard/species';
 import { Transfer } from './standard/transfer';
+import { Repository } from './standard/repository';
 export interface IDirectoryOperate {
   /** 是否为空 */
   isEmpty: boolean;
@@ -51,6 +52,9 @@ export class DirectoryOperate implements IDirectoryOperate {
       });
       this.subscribe(_resource.directoryColl, (s, l) => {
         return new Directory(s, this.directory.target, l);
+      });
+      this.subscribe(_resource.repositoryColl, (s, l) => {
+        return new Repository(s, l);
       });
     }
   }

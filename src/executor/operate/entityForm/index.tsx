@@ -12,6 +12,7 @@ import LabelsForm from './labelsForm';
 import RenameForm from './renameForm';
 import TransferForm from './transferForm';
 import PageTemplateForm from './templateForm';
+import RepositoryForm from './repositoryForm';
 
 interface IProps {
   cmd: string;
@@ -101,6 +102,9 @@ const EntityForm: React.FC<IProps> = ({ cmd, entity, finished }) => {
           finished={reloadFinish}
         />
       );
+    case 'newWarehouse':
+    case 'updateWarehouse':
+      return <RepositoryForm cmd={cmd} entity={entity as any} finished={finished} />;
     default: {
       var target = entity as ITarget;
       if (entity.typeName === '目录') {

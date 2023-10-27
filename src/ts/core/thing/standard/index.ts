@@ -7,6 +7,7 @@ import { IPageTemplate, PageTemplate } from './page';
 import { IProperty, Property } from './property';
 import { ISpecies, Species } from './species';
 import { ITransfer, Transfer } from './transfer';
+import { Repository, IRepository } from './repository';
 
 export class StandardFiles {
   directory: IDirectory;
@@ -18,6 +19,8 @@ export class StandardFiles {
   propertys: IProperty[] = [];
   /** 分类字典 */
   specieses: ISpecies[] = [];
+  /** 代码仓库 */
+  repository: IRepository[] = [];
   /** 页面模板 */
   templates: IPageTemplate[] = [];
   formLoaded: boolean = false;
@@ -25,6 +28,7 @@ export class StandardFiles {
   speciesesLoaded: boolean = false;
   propertysLoaded: boolean = false;
   templatesLoaded: boolean = false;
+  repositoryLoaded: boolean = false;
   constructor(_directory: IDirectory) {
     this.directory = _directory;
   }
@@ -41,6 +45,7 @@ export class StandardFiles {
       ...this.propertys,
       ...this.specieses,
       ...this.templates,
+      ...this.repository,
     ];
   }
   async loadStandardFiles(reload: boolean = false): Promise<IStandard[]> {
@@ -50,6 +55,7 @@ export class StandardFiles {
       this.loadPropertys(reload),
       this.loadSpecieses(reload),
       this.loadTemplates(reload),
+      this.loadRepository(reload),
     ]);
     return this.standardFiles;
   }
@@ -103,6 +109,16 @@ export class StandardFiles {
     }
     return this.templates;
   }
+  async loadRepository(reload: boolean = false): Promise<IRepository[]> {
+    if (this.repositoryLoaded === false || reload) {
+      this.repositoryLoaded = true;
+      const data = await this.resource.repositoryColl.load({
+        options: { match: { directoryId: this.id } },
+      });
+      this.repository = data.map((i) => new Repository(i, this.directory));
+    }
+    return this.repository;
+  }
   async createForm(data: schema.XForm): Promise<schema.XForm | undefined> {
     const res = await this.resource.formColl.insert({
       ...data,
@@ -120,6 +136,20 @@ export class StandardFiles {
     });
     if (res) {
       await this.resource.speciesColl.notity({ data: [res], operate: 'insert' });
+      return res;
+    }
+  }
+  async createRepository(data: any): Promise<IRepository | undefined> {
+    let colldata = data;
+    let res1 = await Repository.createRepo(data, this.directory.target);
+    colldata.HTTPS = res1.data.data.HTTPS;
+    colldata.SSH = res1.data.data.SSH;
+    const res = await this.resource.repositoryColl.insert({
+      ...colldata,
+      directoryId: this.id,
+    });
+    if (res) {
+      await this.resource.repositoryColl.notity({ data: [res], operate: 'insert' });
       return res;
     }
   }
