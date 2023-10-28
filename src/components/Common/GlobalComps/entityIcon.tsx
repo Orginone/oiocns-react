@@ -106,12 +106,7 @@ const ShareIconItem = (info: shareIconInfo) => {
   if (info.share) {
     if (info.share.avatar?.thumbnail) {
       return (
-        <span
-          style={{ cursor: 'pointer', display: 'contents' }}
-          title={info.title ?? ''}
-          onClick={() => {
-            command.emitter('executor', 'open', info.entity, 'preview');
-          }}>
+        <span style={{ display: 'contents' }} title={info.title ?? ''}>
           {infoMore()}
           <Avatar size={size} src={info.share.avatar.thumbnail} />
           {info.showName && (
@@ -148,7 +143,7 @@ const ShareIconItem = (info: shareIconInfo) => {
     }
   }
   return (
-    <span style={{ cursor: 'pointer', display: 'contents' }} title={info.title ?? ''}>
+    <span style={{ display: 'contents' }} title={info.title ?? ''}>
       {infoMore()}
       <Avatar
         size={size}
