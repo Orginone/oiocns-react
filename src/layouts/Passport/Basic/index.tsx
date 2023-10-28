@@ -4,7 +4,6 @@ import { renderRoutes } from 'react-router-config';
 import type { IRouteConfig } from 'typings/globelType';
 
 import cls from './index.module.less';
-import './index.less';
 import { Carousel } from 'antd';
 
 export interface eachSlider {
