@@ -5,24 +5,25 @@ import { EllipsisOutlined, MinusCircleFilled, PlusCircleFilled } from '@ant-desi
 import { NavigationItem } from '@/pages/Home';
 import BasicTitle from '../BaseTitle';
 import { Badge, Button, message, Space, Typography } from 'antd';
-
-const allPages: NavigationItem[] = [
+import { getResouces } from '@/config/location';
+const resource = getResouces();
+export const allPages: NavigationItem[] = [
   {
     key: 'dashboard',
     label: '工作台',
-    backgroundImageUrl: '/img/banner/1.png',
+    backgroundImageUrl: `/img/${resource.location}/banner/workbench.png`,
     component: React.lazy(() => import('../Content/WorkBench')),
   },
   {
     key: 'activity',
     label: '群动态',
-    backgroundImageUrl: '/img/banner/activity-bg.png',
+    backgroundImageUrl: `/img/${resource.location}/banner/groupactivity.png`,
     component: React.lazy(() => import('../Content/Activity/cohort')),
   },
   {
     key: 'circle',
     label: '好友圈',
-    backgroundImageUrl: '/img/banner/circle-bg.jpeg',
+    backgroundImageUrl: `/img/${resource.location}/banner/friendactivity.png`,
     component: React.lazy(() => import('../Content/Activity/friends')),
   },
 ];

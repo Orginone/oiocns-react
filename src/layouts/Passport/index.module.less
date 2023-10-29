@@ -1,143 +1,55 @@
-div {
-  font-family: 'PingFang SC';
-}
 .container {
   width: 100%;
   height: 100%;
-  display: grid;
-  align-items: center;
-}
-
-.background {
-  position: fixed;
-  height: 100%;
-  width: 62.5vw;
-  background-color: #011736;
-  img {
-    position: absolute;
-    width: 100%;
-    bottom: 0;
-  }
-}
-.logo {
-  position: absolute;
-  top: 43px;
-  left: 55.14px;
-  z-index: 1;
-  height: 24px;
-  font-family: Figtree;
-  font-size: 26px;
-  font-weight: 700;
-  line-height: 44px;
-  letter-spacing: 0em;
-  text-align: center;
-  color: white;
-}
-
-input[type='radio'] {
-  display: none;
-}
-.count {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  position: absolute;
-  width: 5vw;
-  height: 8px;
-  top: 92vh;
-  left: 28.75vw;
-  gap: 8px;
-  label {
-    width: 8px;
-    height: 8px;
-    display: block;
-    cursor: pointer;
-    border-radius: 5px;
-    transition: width 0.5s;
-  }
-}
+  flex-wrap: nowrap;
+  .slider {
+    width: 100%;
+    overflow: hidden;
+    flex: 2;
+    max-width: calc(100vw - 400px);
 
-.slider {
-  z-index: 1;
-  width: 62.5vw;
-  overflow: hidden;
-  &Slides {
-    display: -webkit-box;
-    transition: margin 0.8s;
-    &Item {
+    input[type='radio'] {
+      display: none;
+    }
+    .count {
+      width: 100%;
+      position: relative;
+      bottom: 100px;
+      text-align: center;
+      z-index: 2;
       display: flex;
-      z-index: 1;
-      width: 62.5vw;
-      flex-direction: column;
+      flex-direction: row;
       justify-content: center;
-      align-items: center;
-      &Img {
-        position: relative;
-        float: right;
-        object-fit: contain;
-        height: 300px;
+      gap: 10px;
+      label {
+        width: 8px;
+        height: 8px;
+        display: block;
+        cursor: pointer;
+        border-radius: 5px;
+        transition: width 0.5s;
       }
-      &Title {
-        color: #ffffff;
-        font-size: 36px;
-        font-weight: bold;
-        line-height: 44px;
-        letter-spacing: 0;
-        text-align: center;
-      }
-      &Content {
-        margin-top: 23px;
-        color: #ffffff;
-        font-size: 16px;
-        font-weight: 400;
-        line-height: 24px;
-        letter-spacing: 0;
-        text-align: center;
-        width: 500px;
-      }
+    }
+  }
+  .content {
+    flex: 1;
+    height: 100vh;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    align-content: center;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    padding: 16px;
+    .copyright {
+      color: #8a8a8a;
+      text-align: center;
     }
   }
 }
 
-.higher_img {
-  height: 65vh;
-}
-.higher_text {
-  position: relative;
-  bottom: 5vh;
-}
-
-.box {
-  width: 25vw;
-  height: 65%;
-  position: absolute;
-  left: 68.75vw;
-  top: 28%;
-}
-.copyright {
-  color: #8a8a8a;
-  width: 100%;
-  &Zh {
-    position: absolute;
-    bottom: 10px;
-    align-items: center;
-    left: 31.25%;
-    transform: translate(-50%, 0);
-  }
-  &En {
-    position: absolute;
-    bottom: 10px;
-    right: 10px;
-  }
-}
-
-@media (max-width: 1200px) {
-  .sliderSlidesItemContent {
-    width: 300px;
-  }
-}
-
-@media (max-width: 800px) {
+@media (max-width: 500px) {
   .logo {
     color: black;
   }
@@ -149,30 +61,5 @@ input[type='radio'] {
   }
   .background {
     display: none;
-  }
-  .box {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    top: auto;
-    left: auto;
-  }
-  .copyright {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    right: 0;
-    &Zh {
-      justify-content: center;
-      display: inline-flex;
-      left: auto;
-      transform: translate(0, 0);
-      width: 100%;
-    }
-    &En {
-      display: none;
-    }
   }
 }
