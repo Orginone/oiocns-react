@@ -1,7 +1,6 @@
 import { kernel, model } from '../../base';
 import { IBelong } from '../target/base/belong';
 import { IForm } from '../thing/standard/form';
-import WorkFormRules, { WorkFormRulesType } from './rules/workFormRules';
 export interface IWorkApply {
   /** 办事空间 */
   belong: IBelong;
@@ -9,8 +8,8 @@ export interface IWorkApply {
   metadata: model.WorkInstanceModel;
   /** 实例携带的数据 */
   instanceData: model.InstanceDataModel;
-  /** 业务规则触发器  */
-  ruleService: WorkFormRulesType;
+  /** 校验表单数据 */
+  validation(fromData: Map<string, model.FormEditData>): boolean;
   /** 发起申请 */
   createApply(
     applyId: string,
@@ -29,13 +28,29 @@ export class WorkApply implements IWorkApply {
     this.metadata = _metadata;
     this.instanceData = _data;
     this.belong = _belong;
-    WorkFormRules.initRules(_forms, _belong);
-    this.ruleService = WorkFormRules as any;
   }
   belong: IBelong;
   metadata: model.WorkInstanceModel;
   instanceData: model.InstanceDataModel;
-  ruleService: WorkFormRulesType;
+  validation(fromData: Map<string, model.FormEditData>): boolean {
+    const valueIsNull = (value: any) => {
+      return (
+        value === null ||
+        value === undefined ||
+        (typeof value === 'string' && value.length < 1)
+      );
+    };
+    for (const formId of fromData.keys()) {
+      const data: any = fromData.get(formId)?.after.at(-1) ?? {};
+      for (const item of this.instanceData.fields[formId]) {
+        if (item.options?.isRequired && valueIsNull(data[item.id])) {
+          console.log(item, data);
+          return false;
+        }
+      }
+    }
+    return true;
+  }
   async createApply(
     applyId: string,
     content: string,
@@ -44,7 +59,6 @@ export class WorkApply implements IWorkApply {
     fromData.forEach((data, k) => {
       this.instanceData.data[k] = [data];
     });
-
     const res = await kernel.createWorkInstance({
       ...this.metadata,
       applyId: applyId,

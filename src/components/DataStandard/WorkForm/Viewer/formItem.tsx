@@ -24,7 +24,20 @@ interface IFormItemProps {
 }
 
 const FormItem: React.FC<IFormItemProps> = (props) => {
-  const [isValid, setIsValid] = React.useState(false);
+  const getValid = () => {
+    if (props.field.options?.isRequired) {
+      const value = props.data[props.field.id];
+      if (
+        value === null ||
+        value === undefined ||
+        (typeof value === 'string' && value.length < 1)
+      ) {
+        return false;
+      }
+    }
+    return true;
+  };
+  const [isValid, setIsValid] = React.useState(getValid());
   useEffect(() => {
     const id = props.notifyEmitter.subscribe((_, type, data) => {});
     return () => {
@@ -51,15 +64,10 @@ const FormItem: React.FC<IFormItemProps> = (props) => {
       if (e.value !== props.data[props.field.id]) {
         if (e.value === undefined || e.value === null) {
           delete props.data[props.field.id];
-          if (props.field.options?.isRequired) {
-            setIsValid(false);
-          }
         } else {
           props.data[props.field.id] = e.value;
-          if (props.field.options?.isRequired) {
-            setIsValid(`${e.value}`.length > 0);
-          }
         }
+        setIsValid(getValid());
         const changedValues: any = {};
         changedValues[props.field.id] = e.value;
         props.onValuesChange?.apply(this, [changedValues, props.data]);

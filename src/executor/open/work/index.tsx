@@ -1,5 +1,6 @@
 import { IWork, IWorkTask } from '@/ts/core';
-import { Button, Empty, Input, Spin, message } from 'antd';
+import { Button, Empty, Input, Spin } from 'antd';
+import message from '@/utils/message';
 import React from 'react';
 import WorkForm from '@/executor/tools/workForm';
 import FullScreenModal from '@/components/Common/fullScreen';
@@ -47,12 +48,11 @@ const WorkStartDo: React.FC<IProps> = ({ current, finished }) => {
             <Button
               type="primary"
               onClick={async () => {
-                const data = await apply.ruleService.handleSubmit(formData);
-                if (data.success) {
-                  apply.createApply(apply.belong.id, info.content, data.values);
+                if (apply.validation(formData)) {
+                  await apply.createApply(apply.belong.id, info.content, formData);
                   finished();
                 } else {
-                  message.warning('表单提交规则验证失败，请检查');
+                  message.warn('请完善表单内容再提交!');
                 }
               }}>
               提交
