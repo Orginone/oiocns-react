@@ -6,13 +6,8 @@ import DirectoryViewer from '@/components/Directory/views';
 import { command } from '@/ts/base';
 import { useFlagCmdEmitter } from '@/hooks/useCtrlUpdate';
 import { loadChatOperation } from './common';
-
-/**
- * @description: 通讯录
- * @return {*}
- */
-
-const Book: React.FC<{
+/** 沟通-通讯录 */
+const Content: React.FC<{
   chats: ISession[];
   filter: string;
 }> = ({ chats, filter }) => {
@@ -80,4 +75,4 @@ const Book: React.FC<{
     </Spin>
   );
 };
-export default Book;
+export default Content;

@@ -1,6 +1,12 @@
 import { OperateModel } from '@/ts/base/model';
 import { kernel, schema } from '../../../base';
-import { OperateType, TargetType, companyTypes, targetOperates } from '../../public';
+import {
+  OperateType,
+  TargetType,
+  companyTypes,
+  entityOperates,
+  targetOperates,
+} from '../../public';
 import { IBelong } from '../base/belong';
 import { ITarget, Target } from '../base/target';
 import { ISession } from '../../chat/session';
@@ -38,7 +44,10 @@ export class Storage extends Target implements IStorage {
     return success;
   }
   override operates(): OperateModel[] {
-    const operates = [...super.operates()];
+    const operates = [entityOperates.Remark, entityOperates.QrCode];
+    if (this.hasRelationAuth()) {
+      operates.unshift(entityOperates.Update, entityOperates.HardDelete);
+    }
     if (!this.isActivate) {
       operates.push(targetOperates.Activate);
     }
@@ -57,13 +66,11 @@ export class Storage extends Target implements IStorage {
     return this.id === this.space.metadata.storeId;
   }
   async activateStorage(): Promise<boolean> {
-    console.log(1);
     if (!this.isActivate) {
       const res = await kernel.activateStorage({
         id: this.id,
         subId: this.space.id,
       });
-      console.log(res);
       if (res.success) {
         this.space.updateMetadata(res.data);
         this.space.sendTargetNotity(OperateType.Update);
@@ -73,8 +80,9 @@ export class Storage extends Target implements IStorage {
     return false;
   }
   async deepLoad(reload: boolean = false): Promise<void> {
-    if (this.metadata.belongId === this.userId) {
+    if (this.hasRelationAuth()) {
       await this.loadMembers(reload);
+      await this.loadIdentitys(reload);
     }
   }
 }

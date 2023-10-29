@@ -81,12 +81,8 @@ const directoryRefresh = (dir: IDirectory | IApplication, reload: boolean) => {
 };
 
 /** 激活存储 */
-const activateStorage = (store: IStorage | IDirectory) => {
-  if ('activateStorage' in store) {
-    store.activateStorage();
-  } else {
-    activateStorage(store.target as IStorage);
-  }
+const activateStorage = (store: IStorage) => {
+  store.activateStorage();
 };
 
 /** 视频切片 */
@@ -114,13 +110,9 @@ const openWork = (entity: IWork) => {
 };
 
 /** 进入目录 */
-const openDirectory = (entity: IFile | schema.XEntity | ITarget) => {
+const openDirectory = (entity: IFile | schema.XEntity) => {
   if (entity && 'isContainer' in entity && entity.isContainer) {
-    if ('session' in entity) {
-      orgCtrl.currentKey = entity.directory.key;
-    } else {
-      orgCtrl.currentKey = entity.key;
-    }
+    orgCtrl.currentKey = entity.key;
     orgCtrl.changCallback();
     return;
   }

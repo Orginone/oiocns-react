@@ -1,6 +1,7 @@
 import ImageView from './image';
 import VideoView from './video';
 import {
+  IDirectory,
   IEntity,
   IForm,
   ISession,
@@ -13,6 +14,7 @@ import { command, schema } from '@/ts/base';
 import React, { useEffect, useState } from 'react';
 import OfficeView from './office';
 import SessionBody from './session';
+import StorageBody from './storage';
 import TaskBody from './task';
 import JoinApply from './task/joinApply';
 import EntityInfo from '@/components/Common/EntityInfo';
@@ -28,6 +30,7 @@ type EntityType =
   | IWorkTask
   | IForm
   | ITarget
+  | IDirectory
   | string
   | undefined;
 
@@ -74,10 +77,13 @@ const EntityPreview: React.FC<IOpenProps> = (props: IOpenProps) => {
       return <FilePreview file={entity} />;
     }
     if ('activity' in entity) {
-      return <SessionBody chat={entity} />;
+      return <SessionBody target={entity.target} />;
     }
-    if ('session' in entity && entity.typeName !== TargetType.Storage) {
-      return <SessionBody chat={entity.session} store />;
+    if ('session' in entity) {
+      if (entity.typeName === TargetType.Storage) {
+        return <StorageBody storage={entity as any} />;
+      }
+      return <SessionBody target={entity} setting />;
     }
     if ('fields' in entity) {
       return <WorkForm form={entity} />;

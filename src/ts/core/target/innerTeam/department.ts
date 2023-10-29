@@ -6,6 +6,7 @@ import { PageAll } from '../../public/consts';
 import { ITeam } from '../base/team';
 import { targetOperates } from '../../public';
 import { ISession } from '../../chat/session';
+import { IFile } from '../../thing/fileinfo';
 
 /** 单位内部机构（部门）接口 */
 export interface IDepartment extends ITarget {
@@ -136,8 +137,8 @@ export class Department extends Target implements IDepartment {
     }
     return targets;
   }
-  content(): ITarget[] {
-    return [...this.children];
+  content(): IFile[] {
+    return [this.memberDirectory, ...this.children];
   }
   async deepLoad(reload: boolean = false): Promise<void> {
     await Promise.all([

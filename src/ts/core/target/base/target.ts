@@ -215,7 +215,7 @@ export abstract class Target extends Team implements ITarget {
   abstract get targets(): ITarget[];
   abstract get subTarget(): ITarget[];
   content(): IFile[] {
-    return [];
+    return [this.memberDirectory];
   }
   createTarget(_data: model.TargetModel): Promise<ITeam | undefined> {
     return new Promise((resolve) => {

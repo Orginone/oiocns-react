@@ -35,7 +35,7 @@ const Directory: React.FC<IProps> = (props) => {
   useEffect(() => {
     command.emitter('preview', props.previewFlag, focusFile);
   }, [focusFile]);
-  const contextMenu = (file?: IFile, clicked?: Function) => {
+  const contextMenu = (file?: IFile) => {
     var entity = file || dircetory;
     if ('targets' in entity) {
       entity = entity.directory;
@@ -44,7 +44,6 @@ const Directory: React.FC<IProps> = (props) => {
       items: cleanMenus(loadFileMenus(entity)) || [],
       onClick: ({ key }: { key: string }) => {
         command.emitter('executor', key, entity, dircetory.key);
-        clicked?.apply(this, []);
       },
     };
   };
@@ -103,7 +102,10 @@ const Directory: React.FC<IProps> = (props) => {
   const getContent = () => {
     const contents: IFile[] = [];
     if (props.current === 'disk') {
-      contents.push(orgCtrl.user, ...orgCtrl.user.companys);
+      contents.push(
+        orgCtrl.user.directory,
+        ...orgCtrl.user.companys.map((i) => i.directory),
+      );
     } else {
       contents.push(...props.current!.content());
     }

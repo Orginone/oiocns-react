@@ -11,9 +11,9 @@ interface IProps {
   current: IBelong | 'disk';
 }
 /**
- * 办事-待办系统
+ * 办事-事项清单
  */
-const Directory: React.FC<IProps> = (props) => {
+const Content: React.FC<IProps> = (props) => {
   if (!props.current) return <></>;
   const [loaded, setLoaded] = useState(true);
   const [content, setContent] = useState<IFile[]>([]);
@@ -102,4 +102,4 @@ const Directory: React.FC<IProps> = (props) => {
     </Spin>
   );
 };
-export default Directory;
+export default Content;

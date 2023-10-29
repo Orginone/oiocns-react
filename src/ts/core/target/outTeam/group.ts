@@ -6,6 +6,7 @@ import { ICompany } from '../team/company';
 import { ITeam } from '../base/team';
 import { targetOperates } from '../../public';
 import { ISession } from '../../chat/session';
+import { IFile } from '../../thing/fileinfo';
 
 /** 组织集群接口 */
 export interface IGroup extends ITarget {
@@ -114,8 +115,8 @@ export class Group extends Target implements IGroup {
     }
     return targets;
   }
-  content(): ITarget[] {
-    return [...this.children];
+  content(): IFile[] {
+    return [this.memberDirectory, ...this.children];
   }
   async deepLoad(reload: boolean = false): Promise<void> {
     await Promise.all([

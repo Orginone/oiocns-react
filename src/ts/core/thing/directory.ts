@@ -2,6 +2,7 @@ import { command, common, model, schema } from '../../base';
 import {
   directoryNew,
   directoryOperates,
+  entityOperates,
   fileOperates,
   memberOperates,
   teamOperates,
@@ -16,6 +17,7 @@ import { BucketOpreates, FileItemModel } from '@/ts/base/model';
 import { encodeKey, sleep } from '@/ts/base/common';
 import { DataResource } from './resource';
 import { ISysFileInfo, SysFileInfo } from './systemfile';
+import { IStorage } from '../target/outTeam/storage';
 /** 可为空的进度回调 */
 export type OnProgress = (p: number) => void;
 
@@ -129,8 +131,12 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
           cnt.push(...this.standard.transfers);
         }
         if (!this.parent) {
-          cnt.unshift(this.target.memberDirectory);
-          cnt.push(...this.target.content());
+          for (const item of this.target.content()) {
+            const target = item as ITarget | IDirectory | IStorage;
+            if (!('standard' in target || 'isActivate' in target)) {
+              cnt.push(target.directory);
+            }
+          }
         }
       }
     }
@@ -295,7 +301,7 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
       if (this.parent) {
         operates.push(...super.operates());
       } else {
-        operates.push(...this.target.operates());
+        operates.push(entityOperates.Open);
       }
     }
     return operates;

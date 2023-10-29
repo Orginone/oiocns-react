@@ -1,7 +1,7 @@
 import React from 'react';
 import { schema } from '@/ts/base';
 import orgCtrl from '@/ts/controller';
-import { IDirectory, IEntity } from '@/ts/core';
+import { IEntity } from '@/ts/core';
 import WorkForm from './workForm';
 import DirectoryForm from './directoryForm';
 import ApplicationForm from './applicationForm';
@@ -30,17 +30,9 @@ const EntityForm: React.FC<IProps> = ({ cmd, entity, finished }) => {
     case 'newDir':
     case 'updateDir':
     case 'remarkDir': {
-      const directory = entity as IDirectory;
-      if (!directory.parent && cmd !== 'newDir') {
-        return (
-          <TargetForm
-            formType={cmd.replace('Dir', '')}
-            current={directory.target}
-            finished={reloadFinish}
-          />
-        );
-      }
-      return <DirectoryForm formType={cmd} current={directory} finished={reloadFinish} />;
+      return (
+        <DirectoryForm formType={cmd} current={entity as any} finished={reloadFinish} />
+      );
     }
     case 'newApp':
     case 'newModule':

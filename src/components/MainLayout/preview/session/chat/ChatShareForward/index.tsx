@@ -28,7 +28,7 @@ const ChatShareForward: FC<IChatShareForward> = (props) => {
       (a) =>
         a.chatdata.chatName.includes(filter) ||
         a.chatdata.chatRemark.includes(filter) ||
-        a.labels.filter((l) => l.includes(filter)).length > 0,
+        a.groupTags.filter((l) => l.includes(filter)).length > 0,
     )
     .sort((a, b) => {
       var num = (b.chatdata.isToping ? 10 : 0) - (a.chatdata.isToping ? 10 : 0);

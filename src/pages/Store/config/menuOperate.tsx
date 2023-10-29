@@ -8,10 +8,7 @@ import OrgIcons from '@/components/Common/GlobalComps/orgIcons';
 
 /** 创建团队菜单 */
 const createMenu = (target: ITarget, children: MenuItemType[]) => {
-  children.unshift(
-    ...buildDirectoryTree([target.memberDirectory]),
-    ...buildApplicationTree(target.directory.standard.applications),
-  );
+  children.unshift(...buildApplicationTree(target.directory.standard.applications));
   return {
     key: target.directory.key,
     item: target.directory,
@@ -19,7 +16,7 @@ const createMenu = (target: ITarget, children: MenuItemType[]) => {
     itemType: target.directory.typeName,
     menus: loadFileMenus(target.directory),
     tag: [target.typeName],
-    icon: <EntityIcon entity={target.metadata} size={18} />,
+    icon: <EntityIcon entity={target.directory.metadata} size={18} />,
     children: children,
   };
 };
@@ -132,8 +129,8 @@ const getTeamMenu = () => {
 /** 加载设置模块菜单 */
 export const loadBrowserMenu = () => {
   return {
-    key: '管理',
-    label: '管理',
+    key: '存储',
+    label: '存储',
     itemType: 'Tab',
     item: 'disk',
     children: [getUserMenu(), ...getTeamMenu()],
