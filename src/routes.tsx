@@ -1,14 +1,14 @@
 import React from 'react';
 
 import { AiFillHome } from '@/icons/ai';
-import { IRouteConfig } from '../../typings/globelType.d';
-// 资产共享云登录页
+import { IRouteConfig } from '../typings/globelType';
 import PassportLayout from '@/layouts/Passport';
 import PassportForget from '@/pages/Passport/Forget';
 import PassportLogin from '@/pages/Passport/Login';
 import PassportRegister from '@/pages/Passport/Register';
-import Redirect from '@/pages/Redirect';
+import NotFound from '@/layouts/NotFound';
 import BasicLayout from '@/layouts/Basic';
+import { Redirect } from 'react-router-dom';
 export interface RouteComponentConfig extends Omit<IRouteConfig, 'component' | 'routes'> {
   routes?: RouteComponentConfig[];
   component?: React.LazyExoticComponent<React.FC<Record<string, unknown>>>;
@@ -90,7 +90,7 @@ const Routers: IRouteConfig[] = [
     path: '/',
     title: '/',
     exact: true,
-    component: Redirect,
+    render: () => <Redirect to="/passport/login" />,
   },
   {
     path: '/passport',
@@ -112,7 +112,7 @@ const Routers: IRouteConfig[] = [
       {
         path: '*',
         title: '页面不存在',
-        component: React.lazy(() => import('@/pages/NoFond')),
+        component: NotFound,
         // render: () => <RouterRedirect to="/noFond" />,
       },
     ],
@@ -120,7 +120,7 @@ const Routers: IRouteConfig[] = [
   {
     path: '/noFond',
     title: '页面不存在',
-    component: React.lazy(() => import('@/pages/NoFond')),
+    component: NotFound,
   },
 ];
 

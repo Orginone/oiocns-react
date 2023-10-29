@@ -4,7 +4,7 @@ import { renderRoutes } from 'react-router-config';
 import { HashRouter } from 'react-router-dom';
 import message from '@/utils/message';
 
-import routes from '@/routes';
+import routes from './routes';
 import 'devextreme/dist/css/dx.common.css';
 import 'devextreme/dist/css/dx.light.css';
 import './global.less';
@@ -45,7 +45,7 @@ const App = () => {
       case LoggerLevel.unauth:
         message.error(msg);
         sessionStorage.clear();
-        location.reload();
+        window.location.reload();
     }
   };
   return (
@@ -53,7 +53,6 @@ const App = () => {
       <ConfigProvider prefixCls="ogo" locale={locale}>
         <Suspense fallback={<Spin size="large" className="layout__loading" />}>
           {renderRoutes(routes)}
-          <div className="DialogTempalte" id="DialogTempalte"></div>
         </Suspense>
       </ConfigProvider>
     </HashRouter>

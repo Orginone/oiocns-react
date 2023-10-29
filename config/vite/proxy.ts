@@ -19,7 +19,6 @@ type ProxyTargetList = Record<
 export function createProxy() {
   const ProxyList: ProxyTargetList = {
     '/orginone': {
-      // target: 'http://localhost:7000', // 后台接口
       target: 'https://asset.orginone.cn', // 后台接口
       changeOrigin: true, // 是否允许跨域
       ws: true,

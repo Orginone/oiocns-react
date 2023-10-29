@@ -12,9 +12,11 @@ div {
   position: fixed;
   height: 100%;
   width: 62.5vw;
-  background-color: #deeaff;
+  background-color: #011736;
   img {
+    position: absolute;
     width: 100%;
+    bottom: 0;
   }
 }
 .logo {
@@ -22,7 +24,14 @@ div {
   top: 43px;
   left: 55.14px;
   z-index: 1;
-  height: 40px;
+  height: 24px;
+  font-family: Figtree;
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 44px;
+  letter-spacing: 0em;
+  text-align: center;
+  color: white;
 }
 
 input[type='radio'] {
@@ -34,15 +43,16 @@ input[type='radio'] {
   justify-content: center;
   position: absolute;
   width: 5vw;
-  height: 6px;
+  height: 8px;
   top: 92vh;
   left: 28.75vw;
-  gap: 6px;
+  gap: 8px;
   label {
+    width: 8px;
+    height: 8px;
     display: block;
-    width: 6px;
-    height: 6px;
-    border-radius: 3px;
+    cursor: pointer;
+    border-radius: 5px;
     transition: width 0.5s;
   }
 }
@@ -68,7 +78,7 @@ input[type='radio'] {
         height: 300px;
       }
       &Title {
-        color: #15181d;
+        color: #ffffff;
         font-size: 36px;
         font-weight: bold;
         line-height: 44px;
@@ -77,7 +87,7 @@ input[type='radio'] {
       }
       &Content {
         margin-top: 23px;
-        color: #424a57;
+        color: #ffffff;
         font-size: 16px;
         font-weight: 400;
         line-height: 24px;
@@ -128,6 +138,9 @@ input[type='radio'] {
 }
 
 @media (max-width: 800px) {
+  .logo {
+    color: black;
+  }
   .count {
     display: none;
   }

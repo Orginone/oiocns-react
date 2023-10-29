@@ -29,7 +29,7 @@ const BasicLayout: React.FC<BasicLayoutProps> = (props) => {
     });
   }, []);
   return (
-    <Layout className={styles['page-layout']}>
+    <Layout className={styles.main_body}>
       {inited ? (
         <>
           <Navbar />
@@ -45,8 +45,6 @@ const BasicLayout: React.FC<BasicLayoutProps> = (props) => {
                 closable
               />
             )}
-            {/* 公共头部 */}
-            {/* <BasicHeader /> */}
             {/* 内容区域 */}
             {renderRoutes(route.routes)}
           </Layout>
