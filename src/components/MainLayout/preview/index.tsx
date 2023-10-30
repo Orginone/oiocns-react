@@ -77,13 +77,13 @@ const EntityPreview: React.FC<IOpenProps> = (props: IOpenProps) => {
       return <FilePreview file={entity} />;
     }
     if ('activity' in entity) {
-      return <SessionBody target={entity.target} />;
+      return <SessionBody target={entity.target} session={entity} />;
     }
     if ('session' in entity) {
       if (entity.typeName === TargetType.Storage) {
         return <StorageBody storage={entity as any} />;
       }
-      return <SessionBody target={entity} setting />;
+      return <SessionBody target={entity} session={entity.session} setting />;
     }
     if ('fields' in entity) {
       return <WorkForm form={entity} />;
