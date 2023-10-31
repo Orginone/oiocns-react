@@ -64,7 +64,7 @@ export const loadBrowserMenu = () => {
     label: '设置',
     itemType: 'Tab',
     item: 'disk',
-    icon: <OrgIcons setting />,
+    icon: <OrgIcons setting selected />,
     children: [getUserMenu(), ...getTeamMenu()],
   };
 };

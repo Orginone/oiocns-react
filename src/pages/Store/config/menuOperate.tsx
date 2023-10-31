@@ -134,6 +134,6 @@ export const loadBrowserMenu = () => {
     itemType: 'Tab',
     item: 'disk',
     children: [getUserMenu(), ...getTeamMenu()],
-    icon: <OrgIcons store />,
+    icon: <OrgIcons store selected />,
   };
 };

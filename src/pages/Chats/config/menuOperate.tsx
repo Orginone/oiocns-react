@@ -34,6 +34,6 @@ export const loadChatMenu = () => {
     label: '沟通',
     itemType: 'Tab',
     children: loadBookMenu(),
-    icon: <OrgIcons chat />,
+    icon: <OrgIcons chat selected />,
   };
 };

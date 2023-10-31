@@ -31,6 +31,6 @@ export const loadBrowserMenu = () => {
     itemType: 'Tab',
     item: 'disk',
     children: getAdminMenu(),
-    icon: <OrgIcons work />,
+    icon: <OrgIcons work selected />,
   };
 };
