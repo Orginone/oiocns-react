@@ -59,7 +59,7 @@ export const getResouces = () => {
   return {
     location: 'orginone',
     passport: [1, 2, 3, 4, 5, 6],
-    unitName: '杭州电子科技大学',
-    unitPage: 'https://www.hdu.edu.cn',
+    unitName: '',
+    unitPage: '',
   };
 };

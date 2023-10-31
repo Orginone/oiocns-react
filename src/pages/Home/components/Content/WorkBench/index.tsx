@@ -65,10 +65,13 @@ const WorkBench: React.FC = () => {
                 '同事(个)',
                 orgCtrl.user.companys
                   .map((i) => i.members.map((i) => i.id))
-                  .reduce((ids, current) => [
-                    ...ids,
-                    ...current.filter((i) => !ids.includes(i)),
-                  ]).length,
+                  .reduce(
+                    (ids, current) => [
+                      ...ids,
+                      ...current.filter((i) => !ids.includes(i)),
+                    ],
+                    [],
+                  ).length,
               )}
               {renderDataItem(
                 '群聊(个)',
