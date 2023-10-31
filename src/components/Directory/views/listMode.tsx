@@ -20,7 +20,7 @@ const ListMode = ({
 }) => {
   const [cxtItem, setCxtItem] = useState<IDEntity>();
   const getItemClassName = (item: IDEntity) => {
-    if (focusFile?.id === item.id || selectFiles.some((i) => i.id === item.id)) {
+    if (focusFile?.key === item.key || selectFiles.some((i) => i.key === item.key)) {
       return css.list_item_select;
     }
     return css.list_item;

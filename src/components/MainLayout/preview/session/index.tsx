@@ -95,8 +95,8 @@ const SessionBody = ({
             title={
               <>
                 <span style={{ marginRight: 10 }}>{session.chatdata.chatName}</span>
-                {target.members.length > 0 && (
-                  <span className={css.number}>({target.members.length})</span>
+                {session.members.length > 0 && (
+                  <span className={css.number}>({session.members.length})</span>
                 )}
               </>
             }

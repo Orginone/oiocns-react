@@ -14,9 +14,10 @@ const IconMode = ({ dircetory }: { dircetory: IDirectory }) => {
       entity = entity.directory;
     }
     return {
-      items: loadFileMenus(entity)?.filter(
-        (i) => !['openChat', 'copy', 'parse'].includes(i.key),
-      ),
+      items:
+        loadFileMenus(entity)?.filter(
+          (i) => !['openChat', 'copy', 'parse'].includes(i.key),
+        ) ?? [],
       onClick: ({ key }: { key: string }) => {
         command.emitter('executor', key, entity, dircetory.key);
       },

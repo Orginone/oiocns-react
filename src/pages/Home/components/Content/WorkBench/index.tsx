@@ -6,7 +6,7 @@ import { useHistory } from 'react-router-dom';
 import { command, model } from '@/ts/base';
 import orgCtrl from '@/ts/controller';
 import { formatSize } from '@/ts/base/common';
-import { IApplication } from '@/ts/core';
+import { IApplication, TargetType } from '@/ts/core';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import { OperateMenuType } from 'typings/globelType';
 import FullScreenModal from '@/components/Common/fullScreen';
@@ -17,7 +17,12 @@ import TypeIcon from '@/components/Common/GlobalComps/typeIcon';
 const WorkBench: React.FC = () => {
   const history = useHistory();
   // 渲染数据项
-  const renderDataItem = (title: string, number: string | number, size?: number) => {
+  const renderDataItem = (
+    title: string,
+    number: string | number,
+    size?: number,
+    info?: string,
+  ) => {
     return (
       <div className={cls.dataItem}>
         <div className={cls.dataItemTitle}>{title}</div>
@@ -25,6 +30,7 @@ const WorkBench: React.FC = () => {
         {size && size > 0 && (
           <div className={cls.dataItemTitle}>大小:{formatSize(size)}</div>
         )}
+        {info && info.length > 0 && <div className={cls.dataItemTitle}>{info}</div>}
       </div>
     );
   };
@@ -32,13 +38,13 @@ const WorkBench: React.FC = () => {
   const RenderChat: React.FC = () => {
     const [msgCount, setMsgCount] = useState(0);
     const [loaded] = useFlagCmdEmitter('session', () => {
-      let noReadCount = 0;
-      for (const item of orgCtrl.chats) {
-        if (item.isMyChat) {
-          noReadCount += item.badgeCount;
-        }
-      }
-      setMsgCount(noReadCount);
+      setMsgCount(
+        orgCtrl.chats
+          .map((i) => {
+            return i.isMyChat ? i.badgeCount : 0;
+          })
+          .reduce((total, count) => total + count, 0),
+      );
     });
     return (
       <>
@@ -55,6 +61,15 @@ const WorkBench: React.FC = () => {
           <Spin spinning={!loaded}>
             <Space wrap split={<Divider type="vertical" />} size={2}>
               {renderDataItem('好友(人)', orgCtrl.user.members.length)}
+              {renderDataItem(
+                '同事(个)',
+                orgCtrl.user.companys
+                  .map((i) => i.members.map((i) => i.id))
+                  .reduce((ids, current) => [
+                    ...ids,
+                    ...current.filter((i) => !ids.includes(i)),
+                  ]).length,
+              )}
               {renderDataItem(
                 '群聊(个)',
                 orgCtrl.chats.filter((i) => i.isMyChat && i.isGroup).length,
@@ -128,11 +143,20 @@ const WorkBench: React.FC = () => {
           </span>
         </div>
         <div className={cls.cardItemViewer}>
-          <Space wrap split={<Divider type="vertical" />} size={2}>
+          <Space wrap split={<Divider type="vertical" />} size={6}>
             {diskInfo && (
               <>
+                {renderDataItem(
+                  `关系(个)`,
+                  orgCtrl.chats.filter(
+                    (i) => i.isMyChat && i.typeName !== TargetType.Group,
+                  ).length,
+                  -1,
+                  `共计:${orgCtrl.chats.length}个`,
+                )}
+                {renderDataItem(`数据集(个)`, diskInfo.collections, diskInfo.dataSize)}
+                {renderDataItem(`对象数(个)`, diskInfo.objects, diskInfo.totalSize)}
                 {renderDataItem(`文件(个)`, diskInfo.files, diskInfo.fileSize)}
-                {renderDataItem(`数据(个)`, diskInfo.objects, diskInfo.totalSize)}
                 {renderDataItem(
                   `硬件`,
                   formatSize(diskInfo.fsUsedSize),
@@ -206,7 +230,7 @@ const WorkBench: React.FC = () => {
       return (
         <>
           <div className={cls.appGroupTitle}>{title}</div>
-          <Space wrap split={<Divider type="vertical" />} size={2}>
+          <Space wrap split={<Divider type="vertical" />} size={6}>
             {apps.map((app) => {
               return loadAppCard(app);
             })}
@@ -304,7 +328,7 @@ const WorkBench: React.FC = () => {
           </span>
         </div>
         <div style={{ width: '100%', minHeight: 60 }} className={cls.cardItemViewer}>
-          <Space wrap split={<Divider type="vertical" />} size={2}>
+          <Space wrap split={<Divider type="vertical" />} size={6}>
             {renderCmdBtn('joinFriend', '添加好友', 'joinFriend')}
             {renderCmdBtn('joinStorage', '申请存储', '存储资源')}
             {renderCmdBtn('newCohort', '创建群组', '群组')}
