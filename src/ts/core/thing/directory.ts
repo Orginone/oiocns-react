@@ -125,11 +125,9 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
         cnt.push(...this.files);
         cnt.push(...this.standard.forms);
         cnt.push(...this.standard.applications);
-        if (this.target.hasRelationAuth()) {
-          cnt.push(...this.standard.propertys);
-          cnt.push(...this.standard.specieses);
-          cnt.push(...this.standard.transfers);
-        }
+        cnt.push(...this.standard.propertys);
+        cnt.push(...this.standard.specieses);
+        cnt.push(...this.standard.transfers);
         if (!this.parent) {
           for (const item of this.target.content()) {
             const target = item as ITarget | IDirectory | IStorage;
