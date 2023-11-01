@@ -7,6 +7,7 @@ import ActivityResource from '../ActivityResource';
 const SelectMultFiles: React.FC<{
   maxCount: number;
   types: string[];
+  currentKey?: string;
   onChange: (fileList: ISysFileInfo[]) => void;
 }> = (props) => {
   const [open, setOpen] = useState(false);
@@ -33,6 +34,7 @@ const SelectMultFiles: React.FC<{
         <OpenFileDialog
           multiple
           rootKey={'disk'}
+          currentKey={props.currentKey}
           maxCount={props.maxCount}
           accepts={props.types}
           allowInherited
