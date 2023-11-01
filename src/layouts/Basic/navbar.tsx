@@ -113,7 +113,8 @@ const Navbar: React.FC = () => {
           sessionStorage.clear();
           location.reload();
         }}>
-        <OrgIcons size={26} exit selected />
+        <OrgIcons size={22} exit selected />
+        <div className={styles.title_selected}>退出</div>
       </Link>
     </Layout.Sider>
   );
