@@ -36,11 +36,11 @@ export default class StoreHub implements IDisposable {
     if (protocol == 'txt') {
       hubProtocol = new TxtHubProtocol();
     }
-    const logger = createLogger(signalR.LogLevel.Error);
-    this._http = new signalR.DefaultHttpClient(logger);
+    const _logger = createLogger(signalR.LogLevel.Error);
+    this._http = new signalR.DefaultHttpClient(_logger);
     this._connection = new signalR.HubConnectionBuilder()
       .withUrl(url)
-      .configureLogging(logger)
+      .configureLogging(_logger)
       .withHubProtocol(hubProtocol)
       .build();
     this._connection.serverTimeoutInMilliseconds = timeout;
@@ -50,7 +50,7 @@ export default class StoreHub implements IDisposable {
         this._disconnectedCallbacks.forEach((c) => {
           c.apply(this, [err]);
         });
-        // logger.warn(`连接断开,${this._timeout}ms后重试。` + (err ? err!.message : ''));
+        logger.warn(`连接断开,${this._timeout}ms后重试。` + (err ? err!.message : ''));
         setTimeout(() => {
           this._starting();
         }, this._timeout);
