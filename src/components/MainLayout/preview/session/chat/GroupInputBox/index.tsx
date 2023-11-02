@@ -1,6 +1,5 @@
 import * as im from '@/icons/im';
 import { Button, message, Popover } from 'antd';
-import { CloseCircleFilled } from '@ant-design/icons';
 import React, { useEffect, useState } from 'react';
 import { IMessage, ISession, ISysFileInfo, MessageType } from '@/ts/core';
 import { parseAvatar } from '@/ts/base';
@@ -10,6 +9,7 @@ import './index.less';
 import OpenFileDialog from '@/components/OpenFileDialog';
 import { parseCiteMsg } from '../components/parseMsg';
 import Emoji from '../components/emoji';
+import { AiOutlineCloseCircle } from '@/icons/ai';
 
 /**
  * @description: 输入区域
@@ -37,7 +37,8 @@ const GroupInputBox = (props: IProps) => {
     return (
       <div className="cite-text">
         <div className="cite-text__content">{parseCiteMsg(val)}</div>
-        <CloseCircleFilled
+        <AiOutlineCloseCircle
+          size={20}
           onClick={() => closeCite('')}
           className="cite-text__close-icon"
         />

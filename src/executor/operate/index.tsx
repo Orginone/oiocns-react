@@ -21,7 +21,6 @@ const entityMap: any = {
   角色: 'Identity',
   岗位: 'Station',
   办事: 'Work',
-  报表: 'Report',
   迁移配置: 'TransferConfig',
   事项配置: 'WorkConfig',
   实体配置: 'ThingConfig',

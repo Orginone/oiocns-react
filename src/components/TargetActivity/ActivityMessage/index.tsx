@@ -2,13 +2,13 @@ import React, { useEffect, useState } from 'react';
 import cls from './index.module.less';
 import { Button, Divider, Image, Input, List, Space, Tag, Typography } from 'antd';
 import { IActivity, IActivityMessage, MessageType } from '@/ts/core';
-import { DeleteOutlined, LikeOutlined, MessageOutlined } from '@ant-design/icons';
 import { parseHtmlToText, showChatTime } from '@/utils/tools';
 import orgCtrl from '@/ts/controller';
 import { XEntity } from '@/ts/base/schema';
 import ActivityResource from '../ActivityResource';
 import ActivityComment from '../ActivityComment';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
+import { AiOutlineDelete, AiOutlineLike, AiOutlineMessage } from '@/icons/ai';
 
 interface ActivityItemProps {
   hideResource?: boolean;
@@ -77,20 +77,20 @@ export const ActivityMessage: React.FC<ActivityItemProps> = ({
             }}>
             {metadata.likes.includes(orgCtrl.user.id) ? (
               <>
-                <LikeOutlined style={{ color: '#cb4747' }} /> <span>取消</span>
+                <AiOutlineLike style={{ color: '#cb4747' }} size={18} /> <span>取消</span>
               </>
             ) : (
               <>
-                <LikeOutlined /> <span>点赞</span>
+                <AiOutlineLike size={18} /> <span>点赞</span>
               </>
             )}
           </Button>
           <Button type="text" size="small" onClick={() => handleReply()}>
-            <MessageOutlined /> <span>评论</span>
+            <AiOutlineMessage size={18} /> <span>评论</span>
           </Button>
           {item.canDelete && (
             <Button type="text" size="small" onClick={() => item.delete()}>
-              <DeleteOutlined /> <span>删除</span>
+              <AiOutlineDelete size={18} /> <span>删除</span>
             </Button>
           )}
         </Space>
@@ -112,13 +112,13 @@ export const ActivityMessage: React.FC<ActivityItemProps> = ({
             <div className={cls.activityItemFooterLikes}>
               {metadata.likes.length > 0 && (
                 <span style={{ fontSize: 18, color: '#888' }}>
-                  <LikeOutlined style={{ color: '#cb4747', fontSize: 18 }} />
+                  <AiOutlineLike style={{ color: '#cb4747' }} size={18} />
                   <b style={{ marginLeft: 6 }}>{metadata.likes.length}</b>
                 </span>
               )}
               {metadata.comments.length > 0 && (
                 <span style={{ fontSize: 18, color: '#888' }}>
-                  <MessageOutlined style={{ color: '#4747cb', fontSize: 18 }} />
+                  <AiOutlineMessage style={{ color: '#4747cb' }} size={18} />
                   <b style={{ marginLeft: 6 }}>{metadata.comments.length}</b>
                 </span>
               )}
@@ -141,7 +141,7 @@ export const ActivityMessage: React.FC<ActivityItemProps> = ({
         <div
           className={cls.activityItemFooterLikes}
           style={{ display: metadata.likes.length ? 'flex' : 'none' }}>
-          <LikeOutlined style={{ color: '#cb4747', fontSize: 18 }} />
+          <AiOutlineLike style={{ color: '#cb4747' }} size={18} />
           {metadata.likes.map((userId) => {
             return (
               <div key={userId} style={{ alignItems: 'center', display: 'flex' }}>

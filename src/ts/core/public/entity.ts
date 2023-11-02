@@ -1,4 +1,4 @@
-import { Emitter } from '@/ts/base/common';
+import { Emitter } from '../../base/common';
 import { schema, model, parseAvatar, kernel } from '../../base';
 import { generateUuid } from '../../base/common/uuid';
 import { entityOperates } from './operates';

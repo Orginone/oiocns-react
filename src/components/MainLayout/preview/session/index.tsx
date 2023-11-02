@@ -21,7 +21,7 @@ const SessionBody = ({
   setting?: boolean;
 }) => {
   const history = useHistory();
-  const [bodyType, setBodyType] = useState(setting ? 'activity' : 'chat');
+  const [bodyType, setBodyType] = useState(setting ? 'member' : 'chat');
   const sessionActions = () => {
     const actions = [];
     if (session.isMyChat && target.typeName !== TargetType.Group) {

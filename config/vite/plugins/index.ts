@@ -7,15 +7,8 @@ import legacy from '@vitejs/plugin-legacy';
 // 使用 @vitejs/plugin-react代替
 import react from '@vitejs/plugin-react';
 import type { PluginOption } from 'vite';
-import viteCompression from 'vite-plugin-compression';
 
-import {
-  VITE_APP_ANALYZE,
-  VITE_APP_COMPRESS_GZIP,
-  VITE_APP_COMPRESS_GZIP_DELETE_FILE,
-  VITE_APP_LEGACY,
-} from '../../constant';
-import configVisualizerPlugin from './visualizer';
+// import configVisualizerPlugin from './visualizer';
 
 export function createVitePlugins(viteEnv: string, isBuild: boolean) {
   const vitePlugins: (PluginOption | PluginOption[])[] = [
@@ -24,11 +17,10 @@ export function createVitePlugins(viteEnv: string, isBuild: boolean) {
   ];
 
   // @vitejs/plugin-legacy
-  VITE_APP_LEGACY &&
-    isBuild &&
+  isBuild &&
     vitePlugins.push(
       legacy({
-        targets: ['chrome 52'],
+        targets: ['defaults'],
         renderLegacyChunks: true,
       }),
     );
@@ -37,19 +29,12 @@ export function createVitePlugins(viteEnv: string, isBuild: boolean) {
   // vitePlugins.push(configStyleImportPlugin(isBuild));
 
   // rollup-plugin-visualizer
-  VITE_APP_ANALYZE && vitePlugins.push(configVisualizerPlugin());
+  // if (isBuild) {
+  //   vitePlugins.push(configVisualizerPlugin());
+  // }
 
   //vite-plugin-theme
   // vitePlugins.push(configThemePlugin(isBuild));
-
-  // The following plugins only work in the production environment
-  if (isBuild) {
-    // rollup-plugin-gzip
-    VITE_APP_COMPRESS_GZIP &&
-      vitePlugins.push(
-        viteCompression({ deleteOriginFile: VITE_APP_COMPRESS_GZIP_DELETE_FILE }),
-      );
-  }
 
   return vitePlugins;
 }

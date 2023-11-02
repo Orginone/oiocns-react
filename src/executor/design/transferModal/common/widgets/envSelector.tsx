@@ -1,6 +1,6 @@
+import { AiOutlineClose, AiOutlineEdit } from '@/icons/ai';
 import { model } from '@/ts/base';
 import { ITransfer } from '@/ts/core';
-import { CloseOutlined, EditOutlined } from '@ant-design/icons';
 import { Space, Select } from 'antd';
 import { DefaultOptionType } from 'antd/lib/select';
 import React, { useState, useEffect } from 'react';
@@ -18,13 +18,13 @@ export const EnvSelector: React.FC<IProps> = ({ current, initStatus }) => {
         label: (
           <Space>
             {item.name}
-            <CloseOutlined
+            <AiOutlineClose
               onClick={(e) => {
                 e.preventDefault();
                 current.delEnv(item.id);
               }}
             />
-            <EditOutlined
+            <AiOutlineEdit
               onClick={(e) => {
                 e.preventDefault();
                 current.command.emitter('tools', 'updateEnvironment', item);

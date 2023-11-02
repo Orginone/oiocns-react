@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { Divider, Modal, ModalProps, Space, Typography } from 'antd';
 import {
-  CloseOutlined,
-  FullscreenExitOutlined,
-  FullscreenOutlined,
-  SaveOutlined,
-} from '@ant-design/icons';
+  AiOutlineClose,
+  AiOutlineFullscreen,
+  AiOutlineFullscreenExit,
+  AiOutlineSave,
+} from '@/icons/ai';
 
 interface IFullModalProps extends ModalProps {
   hideMaxed?: boolean;
@@ -62,7 +62,7 @@ const FullScreenModal: React.FC<IFullModalProps> = (props) => {
               onClick={() => {
                 props.onSave?.apply(this, []);
               }}>
-              <SaveOutlined />
+              <AiOutlineSave size={20} />
             </Typography.Link>
           )}
           {!props.hideMaxed && (
@@ -72,7 +72,11 @@ const FullScreenModal: React.FC<IFullModalProps> = (props) => {
               onClick={() => {
                 setModalState(!modalState);
               }}>
-              {modalState ? <FullscreenOutlined /> : <FullscreenExitOutlined />}
+              {modalState ? (
+                <AiOutlineFullscreen size={20} />
+              ) : (
+                <AiOutlineFullscreenExit size={20} />
+              )}
             </Typography.Link>
           )}
           <Typography.Link
@@ -81,7 +85,7 @@ const FullScreenModal: React.FC<IFullModalProps> = (props) => {
             onClick={(e) => {
               props.onCancel?.apply(this, [e]);
             }}>
-            <CloseOutlined />
+            <AiOutlineClose size={20} />
           </Typography.Link>
         </Space>
       </div>
