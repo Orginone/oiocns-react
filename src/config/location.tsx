@@ -28,8 +28,8 @@ export const getResouces = () => {
     return {
       location: 'dataexp',
       passport: [1, 2, 3, 4],
-      unitName: '杭州电子科技大学',
-      unitPage: 'https://www.hdu.edu.cn',
+      unitName: '浙江省财政厅',
+      unitPage: 'https://czt.zj.gov.cn',
     };
   }
   if (hostname.startsWith('company')) {
