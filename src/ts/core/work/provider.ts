@@ -67,7 +67,7 @@ export class WorkProvider implements IWorkProvider {
     typeName: TaskTypeName,
     reload: boolean = false,
   ): Promise<IWorkTask[]> {
-    if (typeName === '待办事项') {
+    if (typeName === '待办') {
       return await this.loadTodos(reload);
     }
     return await this.loadTasks(typeName, reload);
@@ -132,7 +132,7 @@ export class WorkProvider implements IWorkProvider {
   }
   private _typeMatch(typeName: TaskTypeName): any {
     switch (typeName) {
-      case '已办事项':
+      case '已办':
         return {
           status: {
             _gte_: 100,
@@ -141,14 +141,14 @@ export class WorkProvider implements IWorkProvider {
             _exists_: true,
           },
         };
-      case '我发起的':
+      case '发起的':
         return {
           createUser: this.userId,
           nodeId: {
             _exists_: false,
           },
         };
-      case '抄送我的':
+      case '抄送':
         return {
           approveType: '抄送',
         };

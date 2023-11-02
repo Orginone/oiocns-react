@@ -6,7 +6,7 @@ import { IBelong } from '../target/base/belong';
 import { UserProvider } from '../user';
 import { IWorkApply } from './apply';
 import { FileInfo, IFile } from '../thing/fileinfo';
-export type TaskTypeName = '待办事项' | '已办事项' | '抄送我的' | '我发起的';
+export type TaskTypeName = '待办' | '已办' | '抄送' | '发起的';
 
 export interface IWorkTask extends IFile {
   /** 内容 */
@@ -107,13 +107,13 @@ export class WorkTask extends FileInfo<schema.XEntity> implements IWorkTask {
   }
   isTaskType(type: TaskTypeName): boolean {
     switch (type) {
-      case '已办事项':
+      case '已办':
         return this.taskdata.status >= TaskStatus.ApprovalStart;
-      case '我发起的':
+      case '发起的':
         return this.taskdata.createUser == this.userId;
-      case '待办事项':
+      case '待办':
         return this.taskdata.status < TaskStatus.ApprovalStart;
-      case '抄送我的':
+      case '抄送':
         return this.taskdata.approveType === '抄送';
     }
   }

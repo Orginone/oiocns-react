@@ -49,23 +49,25 @@ const TagsBar: React.FC<IProps> = (props) => {
   };
   const loadBarItem = (tag: string, count: number) => {
     const className = tag === props.select ? cls.tags_item_active : cls.tags_item;
-    const barItem = (
+    if (props.badgeCount) {
+      const badge = props.badgeCount(tag);
+      if (badge > 0) {
+        return (
+          <div key={tag} className={className} onClick={() => props.onChanged(tag)}>
+            <Badge key={tag + '_bdg'} count={badge} size="small" offset={[16, 0]}>
+              {tag}
+              {count > 0 && <span className={cls.item_count}>{count}</span>}
+            </Badge>
+          </div>
+        );
+      }
+    }
+    return (
       <div key={tag} className={className} onClick={() => props.onChanged(tag)}>
         {tag}
         {count > 0 && <span className={cls.item_count}>{count}</span>}
       </div>
     );
-    if (props.badgeCount) {
-      const badge = props.badgeCount(tag);
-      if (badge > 0) {
-        return (
-          <Badge key={tag + '_bdg'} count={badge} size="small" offset={[-7, 7]}>
-            {barItem}
-          </Badge>
-        );
-      }
-    }
-    return barItem;
   };
   const arrowLeft = (num: number) => {
     if (ref.current) {
@@ -76,7 +78,7 @@ const TagsBar: React.FC<IProps> = (props) => {
     <div className={cls.tags_bar}>
       <Button type="link" icon={<ImArrowLeft2 />} onClick={() => arrowLeft(-100)} />
       <div ref={ref} className={cls.tags_body}>
-        <Space split={<Divider type="vertical" style={{ height: 20 }} />} size={2}>
+        <Space split={<Divider type="vertical" style={{ height: 20 }} />} size={0}>
           {groupTags().map((item) => loadBarItem(item.tag, item.count))}
         </Space>
       </div>

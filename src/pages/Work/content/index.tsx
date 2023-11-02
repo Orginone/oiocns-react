@@ -19,7 +19,7 @@ const Content: React.FC<IProps> = (props) => {
   const [content, setContent] = useState<IFile[]>([]);
   const [focusFile, setFocusFile] = useState<IFile>();
   useEffect(() => {
-    const id = orgCtrl.work.notity.subscribe(() => loadContent('待办事项'));
+    const id = orgCtrl.work.notity.subscribe(() => loadContent('待办'));
     return () => {
       orgCtrl.work.notity.unsubscribe(id);
     };
@@ -58,7 +58,7 @@ const Content: React.FC<IProps> = (props) => {
   };
 
   const getBadgeCount = (tag: string) => {
-    if (tag === '待办事项') {
+    if (tag === '待办') {
       return orgCtrl.work.todos.filter(currentFilter).length;
     }
     return 0;
@@ -89,7 +89,7 @@ const Content: React.FC<IProps> = (props) => {
   return (
     <Spin spinning={!loaded} tip={'加载中...'}>
       <DirectoryViewer
-        initTags={['待办事项', '已办事项', '抄送我的', '我发起的']}
+        initTags={['待办', '已办', '抄送', '发起的']}
         selectFiles={[]}
         focusFile={focusFile}
         content={content}
