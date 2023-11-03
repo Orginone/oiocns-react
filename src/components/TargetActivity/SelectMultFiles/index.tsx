@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import cls from './index.module.less';
 import { PlusOutlined } from '@ant-design/icons';
 import { ISysFileInfo } from '@/ts/core';
 import OpenFileDialog from '@/components/OpenFileDialog';
@@ -12,7 +11,7 @@ const SelectMultFiles: React.FC<{
   const [open, setOpen] = useState(false);
   const [fileList, setFileList] = useState<ISysFileInfo[]>([]);
   const uploadButton = (
-    <div className={cls.selectFileBtn} onClick={() => setOpen(true)}>
+    <div className="selectFileBtn" onClick={() => setOpen(true)}>
       <PlusOutlined style={{ fontSize: 30 }} />
       <div style={{ marginTop: 8 }}>选择文件</div>
     </div>
@@ -23,7 +22,7 @@ const SelectMultFiles: React.FC<{
   }, [fileList]);
 
   return (
-    <div className={cls.imageUploader}>
+    <div className={"selectMultFiles"}>
       {ActivityResource(
         fileList.map((i) => i.shareInfo()),
         200,
