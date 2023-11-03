@@ -2,9 +2,14 @@ import SchemaForm from '@/components/SchemaForm';
 import { model } from '@/ts/base';
 import { ITransfer } from '@/ts/core';
 import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components';
-import { javascript } from '@codemirror/lang-javascript';
-import CodeMirror from '@uiw/react-codemirror';
-import React, { useEffect, useRef } from 'react';
+import React, { useRef } from 'react';
+import {
+  CodeColumn,
+  NameColumn,
+  PostScriptColumn,
+  PreScriptColumn,
+  RemarkColumn,
+} from './common';
 
 interface IProps {
   transfer: ITransfer;
@@ -12,80 +17,19 @@ interface IProps {
   finished: () => void;
 }
 
-export const RequestForm: React.FC<IProps> = ({ transfer, current, finished }) => {
-  const formRef = useRef<ProFormInstance>();
-  useEffect(() => {
-    const id = transfer.command.subscribe((type, cmd, args) => {
-      if (type == 'node' && cmd == 'update') {
-        formRef.current?.setFieldsValue(args);
-      }
-    });
-    return () => {
-      transfer.command.unsubscribe(id);
-    };
-  });
+export const RequestForm: React.FC<IProps> = ({ current, finished }) => {
+  const form = useRef<ProFormInstance>();
   const columns: ProFormColumnsType<model.Request>[] = [
-    {
-      title: '名称',
-      dataIndex: 'name',
-      formItemProps: {
-        rules: [{ required: true, message: '名称为必填项' }],
-      },
-    },
-    {
-      title: '编码',
-      dataIndex: 'code',
-      formItemProps: {
-        rules: [{ required: true, message: '编码为必填项' }],
-      },
-    },
-    {
-      title: '前置脚本',
-      dataIndex: 'preScripts',
-      valueType: 'select',
-      colProps: { span: 24 },
-      renderFormItem: () => {
-        return (
-          <CodeMirror
-            value={formRef.current?.getFieldValue('preScripts')}
-            height={'200px'}
-            extensions={[javascript()]}
-            onChange={(code: string) => {
-              formRef.current?.setFieldValue('preScripts', code);
-            }}
-          />
-        );
-      },
-    },
-    {
-      title: '后置脚本',
-      dataIndex: 'postScripts',
-      valueType: 'select',
-      colProps: { span: 24 },
-      renderFormItem: () => {
-        return (
-          <CodeMirror
-            value={formRef.current?.getFieldValue('postScripts')}
-            height={'200px'}
-            extensions={[javascript()]}
-            onChange={(code: string) => {
-              formRef.current?.setFieldValue('postScripts', code);
-            }}
-          />
-        );
-      },
-    },
-    {
-      title: '备注',
-      dataIndex: 'remark',
-      valueType: 'textarea',
-      colProps: { span: 24 },
-    },
+    NameColumn,
+    CodeColumn,
+    PreScriptColumn,
+    PostScriptColumn,
+    RemarkColumn,
   ];
   return (
     <SchemaForm<model.Request>
       open
-      formRef={formRef}
+      formRef={form}
       title="请求定义"
       width={800}
       columns={columns}
@@ -100,8 +44,7 @@ export const RequestForm: React.FC<IProps> = ({ transfer, current, finished }) =
         }
       }}
       onFinish={async (values) => {
-        const node = { ...current, ...values };
-        await transfer.updNode(node);
+        Object.assign(current, values);
         finished();
       }}
     />

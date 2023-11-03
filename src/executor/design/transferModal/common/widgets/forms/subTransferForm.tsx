@@ -1,12 +1,18 @@
+import SchemaForm from '@/components/SchemaForm';
 import { model } from '@/ts/base';
 import { ITransfer } from '@/ts/core';
 import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components';
-import React, { useEffect, useRef, useState } from 'react';
-import CodeMirror from '@uiw/react-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
-import SchemaForm from '@/components/SchemaForm';
-import { MenuItem, expand, loadTransfersMenu } from '../menus';
-import { message } from 'antd';
+import CodeMirror from '@uiw/react-codemirror';
+import { Input, message } from 'antd';
+import React, { useEffect, useRef } from 'react';
+import {
+  CodeColumn,
+  NameColumn,
+  PostScriptColumn,
+  PreScriptColumn,
+  RemarkColumn,
+} from './common';
 
 interface IProps {
   transfer: ITransfer;
@@ -14,24 +20,18 @@ interface IProps {
   finished: () => void;
 }
 
-const getTransferTrees = (transfer: ITransfer): MenuItem[] => {
-  const tree = [loadTransfersMenu(transfer.directory.target.directory)];
-  return tree;
-};
-
-const getExpandKeys = (treeData: MenuItem[]) => {
-  return expand(treeData, ['迁移配置']);
-};
-
 export const SubTransferForm: React.FC<IProps> = ({ transfer, current, finished }) => {
-  const formRef = useRef<ProFormInstance>();
-  const [transferTree, setTransferTree] = useState<MenuItem[]>(
-    getTransferTrees(transfer),
-  );
+  const form = useRef<ProFormInstance>();
   useEffect(() => {
     const id = transfer.command.subscribe((type, cmd, args) => {
-      if (type == 'node' && cmd == 'update') {
-        formRef.current?.setFieldsValue(args);
+      if (type == 'data' && cmd == 'fileCollect') {
+        const { prop, files } = args;
+        if (files && files.length > 0) {
+          const meta = files[0].metadata;
+          transfer.loadTransfers([meta.id]).then(() => {
+            form.current?.setFieldValue(prop, meta.id);
+          });
+        }
       }
     });
     return () => {
@@ -39,92 +39,64 @@ export const SubTransferForm: React.FC<IProps> = ({ transfer, current, finished 
     };
   });
   const columns: ProFormColumnsType<model.SubTransfer>[] = [
+    NameColumn,
+    CodeColumn,
     {
-      title: '名称',
-      dataIndex: 'name',
+      title: '绑定子图',
+      dataIndex: 'transferId',
+      colProps: { span: 12 },
       formItemProps: {
-        rules: [{ required: true, message: '名称为必填项' }],
+        rules: [{ required: true, message: '子图为必填项' }],
+      },
+      renderFormItem: (_, __, form) => {
+        const item = transfer.transfers[form.getFieldValue('transferId')];
+        return (
+          <Input
+            value={item?.name}
+            onClick={() => {
+              transfer.command.emitter('data', 'file', {
+                prop: 'transferId',
+                accepts: ['迁移配置'],
+              });
+            }}
+          />
+        );
       },
     },
     {
-      title: '编码',
-      dataIndex: 'code',
+      title: '是否自循环',
+      dataIndex: 'isSelfCirculation',
+      colProps: { span: 12 },
+      valueType: 'switch',
       formItemProps: {
         rules: [{ required: true, message: '编码为必填项' }],
       },
     },
     {
-      title: '绑定子图',
-      dataIndex: 'nextId',
-      valueType: 'treeSelect',
-      colProps: { span: 24 },
-      formItemProps: {
-        rules: [{ required: true, message: '子图为必填项' }],
-      },
-      fieldProps: {
-        fieldNames: {
-          label: 'label',
-          value: 'key',
-          children: 'children',
-        },
-        showSearch: true,
-        loadData: async (node: MenuItem): Promise<void> => {
-          if (!node.isLeaf) {
-            setTransferTree(getTransferTrees(transfer));
-          }
-        },
-        treeDefaultExpandedKeys: getExpandKeys(transferTree),
-        treeNodeFilterProp: 'label',
-        treeData: transferTree,
-      },
-    },
-    {
-      title: '前置脚本',
-      dataIndex: 'preScripts',
-      valueType: 'select',
+      title: '循环退出判断',
+      dataIndex: 'judge',
       colProps: { span: 24 },
       renderFormItem: () => {
         return (
           <CodeMirror
-            value={formRef.current?.getFieldValue('preScripts')}
+            value={form.current?.getFieldValue('judge')}
             height={'200px'}
             extensions={[javascript()]}
             onChange={(code: string) => {
-              formRef.current?.setFieldValue('preScripts', code);
+              form.current?.setFieldValue('judge', code);
             }}
           />
         );
       },
     },
-    {
-      title: '后置脚本',
-      dataIndex: 'postScripts',
-      valueType: 'select',
-      colProps: { span: 24 },
-      renderFormItem: () => {
-        return (
-          <CodeMirror
-            value={formRef.current?.getFieldValue('postScripts')}
-            height={'200px'}
-            extensions={[javascript()]}
-            onChange={(code: string) => {
-              formRef.current?.setFieldValue('postScripts', code);
-            }}
-          />
-        );
-      },
-    },
-    {
-      title: '备注',
-      dataIndex: 'remark',
-      valueType: 'textarea',
-      colProps: { span: 24 },
-    },
+    PreScriptColumn,
+    PostScriptColumn,
+    RemarkColumn,
   ];
   return (
     <SchemaForm<model.SubTransfer>
       open
-      formRef={formRef}
+      formRef={form}
       title="子图定义"
       width={800}
       columns={columns}
@@ -139,13 +111,15 @@ export const SubTransferForm: React.FC<IProps> = ({ transfer, current, finished 
         }
       }}
       onFinish={async (values) => {
-        const node = { ...current, ...values };
-        if (node.nextId == transfer.id) {
-          message.error('无法嵌入当前配置！');
-          return;
+        const combine = { ...current, ...values };
+        if (await transfer.hasRefLoop(combine)) {
+          message.error('子图存在循环引用！');
+        } else if (combine.isSelfCirculation && !combine.judge) {
+          message.error('自循环节点必须填写退出判断！');
+        } else {
+          Object.assign(current, values);
+          finished();
         }
-        await transfer.updNode(node);
-        finished();
       }}
     />
   );

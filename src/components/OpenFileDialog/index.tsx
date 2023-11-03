@@ -8,7 +8,7 @@ import { Button, Divider, Space } from 'antd';
 import { IFile } from '@/ts/core';
 import orgCtrl, { Controller } from '@/ts/controller';
 
-interface IFileDialogProps {
+export interface IFileDialogProps {
   title?: string;
   accepts: string[];
   multiple?: boolean;

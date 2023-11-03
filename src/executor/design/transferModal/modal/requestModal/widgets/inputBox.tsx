@@ -49,7 +49,6 @@ const InputBox: React.FC<IProps> = ({ transfer, current, send }) => {
             })}
             onChange={(value) => {
               current.data.method = value;
-              transfer.updNode(current);
               transfer.command.emitter('node', 'method', value);
             }}
           />
@@ -59,11 +58,10 @@ const InputBox: React.FC<IProps> = ({ transfer, current, send }) => {
         placeholder="输入 URL 地址"
         onChange={(event) => {
           current.data.uri = event.target.value;
-          transfer.updNode(current);
           transfer.command.emitter('node', 'uri', event.target.value);
         }}
       />
-      <EnvSelector current={transfer} initStatus={'Editable'} />
+      <EnvSelector current={transfer} />
       <Button onClick={() => send()}>Send</Button>
     </Space.Compact>
   );

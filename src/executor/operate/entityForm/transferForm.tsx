@@ -4,8 +4,6 @@ import { IDirectory } from '@/ts/core';
 import { ITransfer } from '@/ts/core/';
 import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components';
 import React, { createRef } from 'react';
-import CodeMirror from '@uiw/react-codemirror';
-import { javascript } from '@codemirror/lang-javascript';
 
 interface IProps {
   formType: string;
@@ -37,32 +35,6 @@ const TransferForm: React.FC<IProps> = ({ formType, current, finished }) => {
       },
     },
     {
-      title: '是否自循环',
-      dataIndex: 'isSelfCirculation',
-      valueType: 'switch',
-      initialValue: false,
-      formItemProps: {
-        rules: [{ required: true, message: '编码为必填项' }],
-      },
-    },
-    {
-      title: '循环退出判断',
-      dataIndex: 'judge',
-      colProps: { span: 24 },
-      renderFormItem: () => {
-        return (
-          <CodeMirror
-            value={formRef.current?.getFieldValue('judge')}
-            height={'200px'}
-            extensions={[javascript()]}
-            onChange={(code: string) => {
-              formRef.current?.setFieldValue('judge', code);
-            }}
-          />
-        );
-      },
-    },
-    {
       title: '备注',
       dataIndex: 'remark',
       valueType: 'textarea',
@@ -73,7 +45,7 @@ const TransferForm: React.FC<IProps> = ({ formType, current, finished }) => {
     <SchemaForm<Transfer>
       formRef={formRef}
       open
-      title="迁移配置定义"
+      title="配置定义"
       width={640}
       columns={columns}
       initialValues={initialValue}
@@ -91,14 +63,14 @@ const TransferForm: React.FC<IProps> = ({ formType, current, finished }) => {
           case 'newTransferConfig': {
             values.typeName = '迁移配置';
             let directory = current as IDirectory;
-            let request = await directory.standard.createTransfer(values);
-            finished(request as ITransfer);
+            await directory.standard.createTransfer(values);
+            finished();
             break;
           }
           case 'updateTransferConfig': {
             let transfer = current as ITransfer;
             transfer.update({ ...initialValue, ...values });
-            finished(transfer);
+            finished();
             break;
           }
         }

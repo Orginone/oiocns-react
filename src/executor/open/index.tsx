@@ -13,6 +13,7 @@ import CodeEditor from './codeeditor';
 import EntityForm from '../operate/entityForm';
 import { IEntity, ISysFileInfo, TargetType } from '@/ts/core';
 import { model, schema } from '@/ts/base';
+import TemplateView from './page';
 const audioExt = ['.mp3', '.wav', '.ogg'];
 
 const officeExt = ['.md', '.pdf', '.xls', '.xlsx', '.doc', '.docx', '.ppt', '.pptx'];
@@ -63,6 +64,8 @@ const ExecutorOpen: React.FC<IOpenProps> = (props: IOpenProps) => {
         return <FormView form={props.entity as any} finished={props.finished} />;
       case '迁移配置':
         return <TransferView current={props.entity as any} finished={props.finished} />;
+      case '页面模板':
+        return <TemplateView current={props.entity as any} finished={props.finished} />;
       case '办事':
       case '子流程':
         return <WorkStart current={props.entity as any} finished={props.finished} />;

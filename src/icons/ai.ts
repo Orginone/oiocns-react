@@ -44,6 +44,9 @@ import { AiOutlineCopy } from '@react-icons/all-files/ai/AiOutlineCopy';
 import { AiOutlineRollback } from '@react-icons/all-files/ai/AiOutlineRollback';
 import { AiOutlineDownload } from '@react-icons/all-files/ai/AiOutlineDownload';
 import { AiOutlineFileUnknown } from '@react-icons/all-files/ai/AiOutlineFileUnknown';
+import { AiOutlineShoppingCart } from '@react-icons/all-files/ai/AiOutlineShoppingCart';
+import { AiOutlineRead } from '@react-icons/all-files/ai/AiOutlineRead';
+import { AiOutlinePlusSquare } from '@react-icons/all-files/ai/AiOutlinePlusSquare';
 
 export {
   AiFillCloseCircle,
@@ -80,6 +83,8 @@ export {
   AiOutlinePlayCircle,
   AiOutlinePlus,
   AiOutlinePlusCircle,
+  AiOutlinePlusSquare,
+  AiOutlineRead,
   AiOutlineRight,
   AiOutlineRollback,
   AiOutlineSave,
@@ -88,6 +93,7 @@ export {
   AiOutlineSend,
   AiOutlineSetting,
   AiOutlineShareAlt,
+  AiOutlineShoppingCart,
   AiOutlineSmile,
   AiOutlineStar,
   AiOutlineTeam,
