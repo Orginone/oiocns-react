@@ -1,5 +1,4 @@
 import React from 'react';
-import { ICompany } from '@/ts/core';
 import { RouteConfig } from 'react-router-config';
 
 interface DataType {

@@ -6,7 +6,6 @@ import WorkStart from './work';
 import TaskContent from './task';
 import JoinApply from './task/joinApply';
 import OfficeView from './office';
-import ReportView from './report';
 import TransferView from './transfer';
 import AudioPlayer from './audio';
 import EntityPreview from './entity';
@@ -67,8 +66,6 @@ const ExecutorOpen: React.FC<IOpenProps> = (props: IOpenProps) => {
       case '办事':
       case '子流程':
         return <WorkStart current={props.entity as any} finished={props.finished} />;
-      case '报表':
-        return <ReportView current={props.entity as any} finished={props.finished} />;
       case '加用户':
         return <JoinApply current={props.entity as any} finished={props.finished} />;
       case '事项':

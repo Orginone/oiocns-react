@@ -1,7 +1,6 @@
 import StoreHub from './storehub';
 import * as model from '../model';
 import type * as schema from '../schema';
-import axios from 'axios';
 import { Emitter, logger } from '../common';
 import { command } from '../common/command';
 /**
@@ -12,8 +11,6 @@ export default class KernelApi {
   userId: string = '';
   // 存储集线器
   private _storeHub: StoreHub;
-  // axios实例
-  private readonly _axiosInstance = axios.create({});
   // 单例
   private static _instance: KernelApi;
   // 必达消息缓存
@@ -117,16 +114,10 @@ export default class KernelApi {
    * @returns {Promise<model.ResultType<any>>} 异步登录结果
    */
   public async login(userName: string, password: string): Promise<model.ResultType<any>> {
-    var res: model.ResultType<any>;
-    var req = {
+    const res = await this._storeHub.invoke('Login', {
       account: userName,
       pwd: password,
-    };
-    if (this._storeHub.isConnected) {
-      res = await this._storeHub.invoke('Login', req);
-    } else {
-      res = await this._restRequest('login', req);
-    }
+    });
     if (res.success) {
       this.accessToken = res.data.accessToken;
     }
@@ -143,18 +134,11 @@ export default class KernelApi {
     password: string,
     privatekey: string,
   ): Promise<model.ResultType<any>> {
-    var res: model.ResultType<any>;
-    var req = {
+    return await this._storeHub.invoke('ResetPassword', {
       account: userName,
       password: password,
       privateKey: privatekey,
-    };
-    if (this._storeHub.isConnected) {
-      res = await this._storeHub.invoke('ResetPassword', req);
-    } else {
-      res = await this._restRequest('resetpassword', req);
-    }
-    return res;
+    });
   }
   /**
    * 注册到后台核心获取accessToken
@@ -167,12 +151,7 @@ export default class KernelApi {
    * @returns {Promise<model.ResultType<any>>} 异步注册结果
    */
   public async register(params: model.RegisterType): Promise<model.ResultType<any>> {
-    var res: model.ResultType<any>;
-    if (this._storeHub.isConnected) {
-      res = await this._storeHub.invoke('Register', params);
-    } else {
-      res = await this._restRequest('Register', params);
-    }
+    var res = await this._storeHub.invoke('Register', params);
     if (res.success) {
       this.accessToken = res.data.accessToken;
     }
@@ -1012,11 +991,7 @@ export default class KernelApi {
   public async httpForward(
     req: model.HttpRequestType,
   ): Promise<model.ResultType<model.HttpResponseType>> {
-    if (this._storeHub.isConnected) {
-      return await this._storeHub.invoke('HttpForward', req);
-    } else {
-      return await this._restRequest('httpForward', req, 20);
-    }
+    return await this._storeHub.invoke('HttpForward', req);
   }
   /**
    * 请求一个数据核方法
@@ -1024,11 +999,7 @@ export default class KernelApi {
    * @returns 异步结果
    */
   public async dataProxy(req: model.DataProxyType): Promise<model.ResultType<any>> {
-    if (this._storeHub.isConnected) {
-      return await this._storeHub.invoke('DataProxy', req);
-    } else {
-      return await this._restRequest('dataProxy', req);
-    }
+    return await this._storeHub.invoke('DataProxy', req);
   }
   /**
    * 数据变更通知
@@ -1039,11 +1010,7 @@ export default class KernelApi {
     if (req.ignoreSelf) {
       req.ignoreConnectionId = this._storeHub.connectionId;
     }
-    if (this._storeHub.isConnected) {
-      return await this._storeHub.invoke('DataNotify', req);
-    } else {
-      return await this._restRequest('dataNotify', req);
-    }
+    return await this._storeHub.invoke('DataNotify', req);
   }
   /**
    * 请求一个内核方法
@@ -1051,11 +1018,7 @@ export default class KernelApi {
    * @returns 异步结果
    */
   public async request(req: model.ReqestType): Promise<model.ResultType<any>> {
-    if (this._storeHub.isConnected) {
-      return await this._storeHub.invoke('Request', req);
-    } else {
-      return await this._restRequest('request', req);
-    }
+    return await this._storeHub.invoke('Request', req);
   }
   /**
    * 请求多个内核方法,使用同一个事务
@@ -1063,11 +1026,7 @@ export default class KernelApi {
    * @returns 异步结果
    */
   public async requests(reqs: model.ReqestType[]): Promise<model.ResultType<any>> {
-    if (this._storeHub.isConnected) {
-      return await this._storeHub.invoke('Requests', reqs);
-    } else {
-      return await this._restRequest('requests', reqs);
-    }
+    return await this._storeHub.invoke('Requests', reqs);
   }
   /**
    * 订阅变更
@@ -1184,38 +1143,5 @@ export default class KernelApi {
         }
       }
     }
-  }
-  /**
-   * 使用rest请求后端
-   * @param methodName 方法
-   * @param data 参数
-   * @returns 返回结果
-   */
-  private async _restRequest(
-    methodName: string,
-    args: any,
-    timeout: number = 2,
-  ): Promise<model.ResultType<any>> {
-    const res = await this._axiosInstance({
-      method: 'post',
-      timeout: timeout * 1000,
-      url: '/orginone/kernel/rest/' + methodName,
-      headers: {
-        Authorization: this.accessToken,
-      },
-      data: args,
-    });
-    if (res.data && (res.data as model.ResultType<any>)) {
-      const result = res.data as model.ResultType<any>;
-      if (!result.success) {
-        if (result.code === 401) {
-          logger.unauth();
-        } else {
-          logger.warn('操作失败,' + result.msg);
-        }
-      }
-      return result;
-    }
-    return model.badRequest();
   }
 }

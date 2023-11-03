@@ -5,7 +5,6 @@ import { useEffect, useState } from 'react';
 import React from 'react';
 import { WorkFormRulesType } from '@/ts/core/work/rules/workFormRules';
 import { Tabs } from 'antd';
-import ReportForms from './report';
 import WorkFormViewer from '@/components/DataStandard/WorkForm/Viewer';
 
 interface IProps {
@@ -69,20 +68,11 @@ const PrimaryForms: React.FC<IProps> = (props) => {
   const [activeTabKey, setActiveTabKey] = useState(props.forms[0].id);
   const loadItems = () => {
     return props.forms.map((form) => {
-      switch (form.typeName) {
-        case '报表':
-          return {
-            key: form.id,
-            label: form.name,
-            children: <ReportForms {...props} forms={[form]} />,
-          };
-        default:
-          return {
-            key: form.id,
-            label: form.name,
-            children: <PrimaryForm {...props} forms={[form]} />,
-          };
-      }
+      return {
+        key: form.id,
+        label: form.name,
+        children: <PrimaryForm {...props} forms={[form]} />,
+      };
     });
   };
   return (

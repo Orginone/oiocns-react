@@ -4,6 +4,7 @@ import { logger } from '../common';
 import { IDisposable } from '../common/lifecycle';
 import { badRequest, ResultType } from '../model';
 import { TxtHubProtocol } from '../protocol';
+import { createLogger } from '@microsoft/signalr/dist/esm/Utils';
 /**
  * 存储层Hub
  */
@@ -12,6 +13,8 @@ export default class StoreHub implements IDisposable {
   private _timeout: number;
   // 是否已经启动
   private _isStarted: boolean;
+  // http 请求客户端
+  private _http: signalR.HttpClient;
   // signalr 连接
   private _connection: signalR.HubConnection;
   // 连接成功回调
@@ -33,10 +36,12 @@ export default class StoreHub implements IDisposable {
     if (protocol == 'txt') {
       hubProtocol = new TxtHubProtocol();
     }
+    const logger = createLogger(signalR.LogLevel.Error);
+    this._http = new signalR.DefaultHttpClient(logger);
     this._connection = new signalR.HubConnectionBuilder()
       .withUrl(url)
+      .configureLogging(logger)
       .withHubProtocol(hubProtocol)
-      .configureLogging(signalR.LogLevel.None)
       .build();
     this._connection.serverTimeoutInMilliseconds = timeout;
     this._connection.keepAliveIntervalInMilliseconds = interval;
@@ -64,6 +69,14 @@ export default class StoreHub implements IDisposable {
     return (
       this._isStarted && this._connection.state === signalR.HubConnectionState.Connected
     );
+  }
+  // 获取accessToken
+  public get accessToken(): string {
+    return sessionStorage.getItem('accessToken') || '';
+  }
+  // 设置accessToken
+  private set accessToken(val: string) {
+    sessionStorage.setItem('accessToken', val);
   }
   /**
    * 销毁连接
@@ -159,30 +172,64 @@ export default class StoreHub implements IDisposable {
    */
   public invoke(methodName: string, ...args: any[]): Promise<ResultType<any>> {
     return new Promise((resolve) => {
+      const success = (res: ResultType<any>) => {
+        if (!res.success) {
+          if (res.code === 401) {
+            logger.unauth();
+          } else if (res.msg != '' && !res.msg.includes('不在线')) {
+            logger.warn('操作失败,' + res.msg);
+          }
+        }
+        resolve(res);
+      };
+      const error = (reason: any) => {
+        let msg = '请求异常';
+        if (reason && reason.Error) {
+          msg += ',' + reason.Error();
+          logger.warn(msg);
+        }
+        resolve(badRequest(msg));
+      };
       if (this.isConnected) {
         this._connection
           .invoke(methodName, ...args)
-          .then((res: ResultType<any>) => {
-            if (!res.success) {
-              if (res.code === 401) {
-                logger.unauth();
-              } else if (res.msg != '' && !res.msg.includes('不在线')) {
-                logger.warn('操作失败,' + res.msg);
-              }
-            }
-            resolve(res);
-          })
-          .catch((err) => {
-            let msg = '请求异常';
-            if (err && err.Error) {
-              msg += ',' + err.Error();
-              logger.warn(msg);
-            }
-            resolve(badRequest(msg));
-          });
+          .then(success)
+          .catch(error);
       } else {
-        resolve(badRequest());
+        this.restRequest(
+          'post',
+          '/orginone/kernel/rest/' + methodName.toLowerCase(),
+          args.length > 0 ? args[0] : {},
+        )
+          .then(success)
+          .catch(error);
       }
     });
+  }
+  /**
+   * Http请求服务端方法
+   * @param {string} methodName 方法名
+   * @param {any[]} args 参数
+   * @returns {Promise<ResultType>} 异步结果
+   */
+  public async restRequest(
+    method: string,
+    url: string,
+    args: any,
+  ): Promise<ResultType<any>> {
+    const res = await this._http.send({
+      url: url,
+      timeout: 30000,
+      method: method,
+      content: JSON.stringify(args),
+      headers: {
+        Authorization: this.accessToken,
+      },
+    });
+    if (res.statusCode === 200 && typeof res.content === 'string') {
+      return JSON.parse(res.content.replaceAll('"_id":', '"id":'));
+    } else {
+      return badRequest(res.statusText, res.statusCode);
+    }
   }
 }

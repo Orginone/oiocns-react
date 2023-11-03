@@ -2,8 +2,8 @@ import React from 'react';
 import { Image } from 'antd';
 import { FileItemShare } from '@/ts/base/model';
 import { shareOpenLink } from '@/utils/tools';
-import { FileUnknownOutlined } from '@ant-design/icons';
 import { command } from '@/ts/base';
+import { AiOutlineFileUnknown } from '@/icons/ai';
 const ActivityResource = (
   fileList: FileItemShare[],
   maxWidth: number,
@@ -70,9 +70,7 @@ const ActivityResource = (
         />
       );
     }
-    return (
-      <FileUnknownOutlined style={{ width: computedSize(), height: computedSize() }} />
-    );
+    return <AiOutlineFileUnknown size={computedSize()} />;
   };
   return fileList.map((item) => renderResource(item));
 };

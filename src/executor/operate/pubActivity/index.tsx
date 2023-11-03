@@ -74,6 +74,7 @@ const ActivityPublisher: React.FC<{
           <SelectMultFiles
             maxCount={9}
             types={['图片', '视频']}
+            currentKey={props.activity.session.target.directory.key}
             onChange={(fileList) => {
               setResource(fileList.map((item) => item.shareInfo()));
             }}></SelectMultFiles>

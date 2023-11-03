@@ -93,13 +93,13 @@ const WorkBench: React.FC = () => {
     useEffect(() => {
       const id = orgCtrl.subscribe(() => {
         setTodoCount(orgCtrl.work.todos.length);
-        orgCtrl.work.loadTaskCount('我发起的').then((v) => {
+        orgCtrl.work.loadTaskCount('发起的').then((v) => {
           setApplyCount(v);
         });
-        orgCtrl.work.loadTaskCount('抄送我的').then((v) => {
+        orgCtrl.work.loadTaskCount('抄送').then((v) => {
           setCopysCount(v);
         });
-        orgCtrl.work.loadTaskCount('已办事项').then((v) => {
+        orgCtrl.work.loadTaskCount('已办').then((v) => {
           setCompletedCount(v);
         });
       });
@@ -120,10 +120,10 @@ const WorkBench: React.FC = () => {
         </div>
         <div className={cls.cardItemViewer}>
           <Space wrap split={<Divider type="vertical" />} size={2}>
-            {renderDataItem('待办事项', todoCount)}
-            {renderDataItem('已办事项', CompletedCount)}
-            {renderDataItem('我发起的', ApplyCount)}
-            {renderDataItem('抄送我的', CopysCount)}
+            {renderDataItem('待办', todoCount)}
+            {renderDataItem('已办', CompletedCount)}
+            {renderDataItem('抄送', CopysCount)}
+            {renderDataItem('发起的', ApplyCount)}
           </Space>
         </div>
       </>
