@@ -630,3 +630,21 @@ export type XWorkTask = {
   // 办事的定义
   instance: XWorkInstance | undefined;
 } & Xbase;
+
+//暂存
+export type XStaging = {
+  // 类型
+  typeName: string;
+  // 数据
+  data: XThing;
+  // 归属+关系举证
+  relations: string;
+} & Xbase;
+
+// 页面模板
+export interface XPageTemplate extends XStandard {
+  // 是否发布至首页
+  public: boolean;
+  // 模板类型
+  kind?: string;
+}

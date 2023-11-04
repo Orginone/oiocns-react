@@ -1,30 +1,31 @@
-import { AiOutlineClose, AiOutlineEdit } from '@/icons/ai';
 import { model } from '@/ts/base';
 import { ITransfer } from '@/ts/core';
+import { CloseOutlined, EditOutlined } from '@ant-design/icons';
 import { Space, Select } from 'antd';
 import { DefaultOptionType } from 'antd/lib/select';
 import React, { useState, useEffect } from 'react';
 
 interface IProps {
   current: ITransfer;
-  initStatus: 'Editable' | 'Viewable';
 }
 
-export const EnvSelector: React.FC<IProps> = ({ current, initStatus }) => {
+export const EnvSelector: React.FC<IProps> = ({ current }) => {
   const getOptions = (current: ITransfer) => {
     return current.metadata.envs.map((item) => {
       return {
         value: item.id,
         label: (
-          <Space>
+          <Space key={item.id}>
             {item.name}
-            <AiOutlineClose
+            <CloseOutlined
               onClick={(e) => {
                 e.preventDefault();
-                current.delEnv(item.id);
+                current.metadata.envs = current.envs.filter((env) => env.id != item.id);
+                current.metadata.curEnv = undefined;
+                current.command.emitter('environments', 'refresh');
               }}
             />
-            <AiOutlineEdit
+            <EditOutlined
               onClick={(e) => {
                 e.preventDefault();
                 current.command.emitter('tools', 'updateEnvironment', item);
@@ -35,7 +36,7 @@ export const EnvSelector: React.FC<IProps> = ({ current, initStatus }) => {
       };
     });
   };
-  const [status, setStatus] = useState<model.GStatus>(initStatus);
+  const [status, setStatus] = useState<model.GStatus>('Editable');
   const [curEnv, setCurEnv] = useState<string | undefined>(current.metadata.curEnv);
   const [options, setOptions] = useState<DefaultOptionType[]>(getOptions(current));
   useEffect(() => {
@@ -68,7 +69,10 @@ export const EnvSelector: React.FC<IProps> = ({ current, initStatus }) => {
       disabled={status == 'Running'}
       placeholder="选择运行环境"
       value={curEnv}
-      onChange={(value) => current.changeEnv(value)}
+      onChange={(value) => {
+        current.metadata.curEnv = value;
+        current.command.emitter('environments', 'refresh');
+      }}
       options={options}
     />
   );

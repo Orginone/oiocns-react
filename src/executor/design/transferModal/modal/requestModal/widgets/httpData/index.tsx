@@ -13,11 +13,10 @@ interface IProps {
 
 const HttpData: React.FC<IProps> = ({ transfer, current }) => {
   const [curTab, setCurTab] = useState<string>('Param');
-  // eslint-disable-next-line no-unused-vars
   const keys: { [key in string]: () => React.ReactNode } = {
-    Param: () => <Params transfer={transfer} current={current} />,
-    Header: () => <Headers transfer={transfer} current={current} />,
-    Body: () => <Body current={transfer} node={current} />,
+    Param: () => <Params current={current} transfer={transfer} />,
+    Header: () => <Headers current={current} />,
+    Body: () => <Body node={current} />,
   };
   return (
     <>

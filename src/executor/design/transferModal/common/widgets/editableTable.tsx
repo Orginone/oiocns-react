@@ -18,7 +18,7 @@ export interface Row {
   id: string;
 }
 
-const EditableTable = <T extends Row>({ value, onChange, columns }: IProps<T>) => {
+function EditableTable<T extends Row>({ value, onChange, columns }: IProps<T>) {
   const formRef = useRef<ProFormInstance>();
   const [editableKeys, setEditableRowKeys] = useState<React.Key[]>(() => []);
   const edited = useRef<boolean>(true);
@@ -60,7 +60,7 @@ const EditableTable = <T extends Row>({ value, onChange, columns }: IProps<T>) =
       }}
     />
   );
-};
+}
 
 export const AutoTextArea: React.FC<{
   value?: string;

@@ -5,6 +5,7 @@ export class SpeciesSheet extends i.Sheet<t.Species> {
   typeName: string;
   constructor(directory: t.IDirectory, typeName: string) {
     super(
+      t.generateUuid(),
       typeName + '定义',
       [
         { title: '目录代码', dataIndex: 'directoryCode', valueType: '描述型' },

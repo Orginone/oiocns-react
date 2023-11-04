@@ -1,0 +1,14 @@
+.element-layout-flex {
+  display: flex;
+  min-height: 100px;
+  position: relative;
+}
+
+.element-wrapper.is-current {
+  > .element-layout-flex.is-design {
+    background-color: rgb(195, 222, 183);
+    > * {
+      background-color: white;
+    }
+  }
+}
