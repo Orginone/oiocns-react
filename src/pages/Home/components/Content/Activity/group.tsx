@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import TargetActivity from '@/components/TargetActivity';
 import ActivityMessage from '@/components/TargetActivity/ActivityMessage';
-import cls from './index.module.less';
 import { IActivity } from '@/ts/core';
 import useWidthToggle from '@/hooks/useWidthToggle';
 import { Resizable } from 'devextreme-react';
@@ -18,7 +17,7 @@ const GroupActivityItem: React.FC<{ activity: IActivity }> = ({ activity }) => {
     if (!loaded || !toggle) return <></>;
     return (
       <Resizable handles={'right'}>
-        <div className={cls.groupList}>
+        <div className={'groupList'}>
           {activity.activitys
             .filter((item) => item.activityList.length > 0)
             .map((item) => {
@@ -26,7 +25,7 @@ const GroupActivityItem: React.FC<{ activity: IActivity }> = ({ activity }) => {
                 const _name = item.id === current.id ? 'Selected' : 'Item';
                 return (
                   <div
-                    className={cls[`groupList${_name}`]}
+                    className={`groupList-${_name}`}
                     key={item.key}
                     onClick={(e) => {
                       e.stopPropagation();
@@ -49,7 +48,7 @@ const GroupActivityItem: React.FC<{ activity: IActivity }> = ({ activity }) => {
   const loadContext = React.useCallback(() => {
     if (!loaded) return <></>;
     return (
-      <div style={{ height: '100%', width: '100%' }}>
+      <div className={'loadContext'}>
         <TargetActivity
           height={'calc(100vh - 110px)'}
           activity={current}
@@ -57,11 +56,10 @@ const GroupActivityItem: React.FC<{ activity: IActivity }> = ({ activity }) => {
       </div>
     );
   }, [loaded, current]);
-
   return (
-    <div className={cls.content}>
+    <div className={'activityContent'}>
       <Spin tip="加载中,请稍后..." size="large" spinning={!loaded} delay={100}>
-        <div className={cls.groupCtx}>
+        <div className="groupCtx">
           {loadMenus()}
           {loadContext()}
         </div>

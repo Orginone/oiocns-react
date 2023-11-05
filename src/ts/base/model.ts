@@ -648,6 +648,8 @@ export type FieldModel = {
   remark: string;
   /** 字典(字典项/分类项) */
   lookups?: FiledLookup[];
+  /** 计量单位 */
+  unit?: string;
 };
 
 export type FiledLookup = {
@@ -981,11 +983,11 @@ export type Node = {
   // 名称
   name: string;
   // 类型
-  typeName: string;
+  typeName: NodeType;
   // 前置脚本
-  preScripts?: string;
+  preScript?: string;
   // 后置脚本
-  postScripts?: string;
+  postScript?: string;
   // 状态
   status?: NStatus;
 };
@@ -1006,18 +1008,21 @@ export type Request = {
 } & Node;
 
 // 表格
-export type Tables = { formIds: string[]; file?: FileItemModel } & Node;
+export type Tables = {
+  formIds: string[];
+  file?: FileItemModel;
+} & Node;
 
 // 页
 export type Sheet<T> = {
+  // 主键
+  id: string;
   // 名称
   name: string;
   // 列信息
   columns: Column[];
   // 数据
   data: T[];
-  // 其它
-  headers: number;
 };
 
 /**
@@ -1030,16 +1035,20 @@ export interface Column {
   dataIndex: string;
   // 类型
   valueType: string;
-  // 是否隐藏
-  hide?: boolean;
+  // 映射
+  lookups?: { id: string; text: string; value: string }[];
 }
 
 // 映射
 export type Mapping = {
   // 源
-  source: string;
+  source?: string;
   // 目标
-  target: string;
+  target?: string;
+  // 原 Id 字段名称
+  idName: string;
+  // 映射类型
+  mappingType: MappingType;
   // 映射
   mappings: SubMapping[];
 } & Node;
@@ -1050,26 +1059,34 @@ export type SubMapping = {
   source: string;
   // 目标对象
   target: string;
+  // 类型
+  typeName?: string;
   // 子映射
   mappings?: SubMapping[];
 };
 
 // 存储
 export type Store = {
-  // 存储目录
-  directoryId: string;
+  // 应用
+  applicationId?: string;
   // 办事
-  workId: string;
-  // 表单
-  formIds: string[];
-  // 是否直接存入平台
-  directIs: boolean;
+  workId?: string;
 } & Node;
 
 // 子配置
 export type SubTransfer = {
   // 子配置 ID
-  nextId: string;
+  transferId?: string;
+  // 是否自循环
+  isSelfCirculation: boolean;
+  // 退出循环脚本
+  judge?: string;
+} & Node;
+
+// 表单
+export type Form = {
+  // 表单 ID
+  formId?: string;
 } & Node;
 
 // 选择
@@ -1098,22 +1115,25 @@ export type Script = {
 };
 
 // 图状态
-export type GStatus = 'Editable' | 'Viewable' | 'Running' | 'Completed' | 'Error';
+export type GStatus = 'Editable' | 'Viewable' | 'Running' | 'Error';
 
 // 图事件
-export type GEvent = 'EditRun' | 'ViewRun' | 'Throw' | 'Completed';
+export type GEvent = 'Prepare' | 'Run' | 'Complete' | 'Edit' | 'Throw' | 'Recover';
 
 // 节点状态
-export type NStatus = GStatus;
+export type NStatus = 'Stop' | 'Running' | 'Error' | 'Completed';
 
 // 节点事件
-export type NEvent = '';
+export type NEvent = 'Start' | 'Throw' | 'Complete';
 
 // 节点类型
 export type NodeType = '表单' | '表格' | '请求' | '子图' | '映射' | '存储';
 
 // 脚本位置
 export type Pos = 'pre' | 'post';
+
+// 映射类型（外部系统 => 内部系统，外部系统 => 外部系统，内部系统 => 外部系统，内部系统 => 内部系统）
+export type MappingType = 'OToI' | 'OToO' | 'IToO' | 'IToI';
 
 // 键值对
 export type KeyValue = { [key: string]: string | undefined };
@@ -1142,10 +1162,6 @@ export type Transfer = {
   edges: Edge[];
   // 图数据
   graph: any;
-  // 是否自循环
-  isSelfCirculation: boolean;
-  // 退出循环脚本
-  judge: string;
 } & XStandard;
 
 // 任务
