@@ -40,8 +40,6 @@ export const NodeForms: React.FC<IProps> = ({ current }) => {
             环境: 'updateEnvironment',
             存储: 'updateStore',
             表格: 'updateTable',
-            事项配置: 'updateWorkConfig',
-            实体配置: 'updateThingConfig',
           };
           setCommands({ ...commands, [args.id]: mapping[args.typeName] });
           break;

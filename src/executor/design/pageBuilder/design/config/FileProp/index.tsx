@@ -139,7 +139,7 @@ export const Form: React.FC<IExistTypeProps<SEntity>> = (props) => {
   return (
     <BaseFile
       {...props}
-      accepts={['实体配置', '事项配置']}
+      accepts={['表单']}
       showName={props.value?.name ?? '绑定表单'}
       onOk={(fs) => props.onChange(pick(fs[0].metadata, 'id', 'name'))}
     />

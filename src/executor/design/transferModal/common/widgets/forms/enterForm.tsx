@@ -54,7 +54,7 @@ export const EnterForm: React.FC<IProps> = ({ transfer, current, finished }) => 
             onClick={() => {
               transfer.command.emitter('data', 'file', {
                 prop: 'formId',
-                accepts: ['实体配置', '事项配置'],
+                accepts: ['表单'],
               });
             }}
           />
