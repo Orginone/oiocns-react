@@ -3,7 +3,6 @@ import { Dropdown, Menu, MenuProps, Typography, Input, Badge } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { ImSearch } from '@/icons/im';
 import { MenuItemType } from 'typings/globelType';
-import style from './index.module.less';
 import { cleanMenus } from '@/utils/tools';
 
 interface CustomMenuType {
@@ -79,22 +78,22 @@ const CustomMenu = (props: CustomMenuType) => {
             props.onSelect?.apply(this, [item]);
           }
         }}
-        className={style.customlabel}
+        className={"customlabel"}
         onMouseLeave={() => {
           setVisibleMenu(false);
         }}>
-        <Typography.Text className={style.label} ellipsis={{ tooltip: item.label }}>
+        <Typography.Text className={"label"} ellipsis={{ tooltip: item.label }}>
           {item.label}
         </Typography.Text>
         {item.count && item.count > 0 ? (
-          <span className={style.badge}>
+          <span className={"badge"}>
             <Badge key={item.key} count={item.count} size="small" />
           </span>
         ) : (
           <></>
         )}
         {Array.isArray(item.menus) && item.menus.length > 0 && (
-          <span onClick={(e: any) => e.stopPropagation()} className={style.moreButton}>
+          <span onClick={(e: any) => e.stopPropagation()} className={"moreButton"}>
             {props.selectMenu.key === item.key && (
               <Dropdown
                 menu={{
@@ -160,7 +159,7 @@ const CustomMenu = (props: CustomMenuType) => {
       </span>
 
       <Menu
-        className={style.customMenu}
+        className={"customMenu"}
         mode="inline"
         inlineIndent={10}
         items={data}
