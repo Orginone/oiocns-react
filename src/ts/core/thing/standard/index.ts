@@ -7,6 +7,7 @@ import { Form, IForm } from './form';
 import { IProperty, Property } from './property';
 import { ISpecies, Species } from './species';
 import { ITransfer, Transfer } from './transfer';
+import { Repository, IRepository } from './repository';
 
 export class StandardFiles {
   /** 目录对象 */
@@ -23,6 +24,8 @@ export class StandardFiles {
   directorys: IDirectory[] = [];
   /** 应用 */
   applications: IApplication[] = [];
+  /** 代码仓库 */
+  repository: IRepository[] = [];
   /** 表单加载完成标志 */
   formLoaded: boolean = false;
   /** 迁移配置加载完成标志 */
@@ -31,6 +34,8 @@ export class StandardFiles {
   speciesesLoaded: boolean = false;
   /** 属性加载完成标志 */
   propertysLoaded: boolean = false;
+  /** 代码仓库加载完成标志 */
+  repositoryLoaded: boolean = false;
   constructor(_directory: IDirectory) {
     this.directory = _directory;
     if (this.directory.parent === undefined) {
@@ -51,6 +56,7 @@ export class StandardFiles {
       ...this.specieses,
       ...this.directorys,
       ...this.applications,
+      ...this.repository,
     ];
   }
   async loadStandardFiles(reload: boolean = false): Promise<IStandard[]> {
@@ -59,6 +65,7 @@ export class StandardFiles {
       this.loadTransfers(reload),
       this.loadPropertys(reload),
       this.loadSpecieses(reload),
+      this.loadRepository(reload),
     ]);
     return this.standardFiles;
   }
@@ -101,6 +108,16 @@ export class StandardFiles {
       this.transfers = data.map((i) => new Transfer(i, this.directory));
     }
     return this.transfers;
+  }
+  async loadRepository(reload: boolean = false): Promise<IRepository[]> {
+    if (this.repositoryLoaded === false || reload) {
+      this.repositoryLoaded = true;
+      const data = await this.resource.repositoryColl.load({
+        options: { match: { directoryId: this.id } },
+      });
+      this.repository = data.map((i) => new Repository(i, this.directory));
+    }
+    return this.repository;
   }
   async loadApplications(_: boolean = false): Promise<IApplication[]> {
     var apps = this.resource.applicationColl.cache.filter(
@@ -155,6 +172,20 @@ export class StandardFiles {
       return result;
     }
   }
+  async createRepository(data: any): Promise<IRepository | undefined> {
+    let colldata = data;
+    let res1 = await Repository.createRepo(data, this.directory.target);
+    colldata.HTTPS = res1.data.data.HTTPS;
+    colldata.SSH = res1.data.data.SSH;
+    const res = await this.resource.repositoryColl.insert({
+      ...colldata,
+      directoryId: this.id,
+    });
+    if (res) {
+      await this.resource.repositoryColl.notity({ data: res, operate: 'insert' });
+      return res;
+    }
+  }
   async createTransfer(data: model.Transfer): Promise<ITransfer | undefined> {
     const result = await this.resource.transferColl.insert({
       ...data,
@@ -193,6 +224,8 @@ export class StandardFiles {
     await to.speciesColl[action](this.specieses.map((a) => a.metadata));
     await to.propertyColl[action](this.propertys.map((a) => a.metadata));
     await to.directoryColl[action](this.directorys.map((a) => a.metadata));
+    await to.repositoryColl[action](this.repository.map((a) => a.metadata));
+
     if (action == 'replaceMany' && move) {
       var apps = this.resource.applicationColl.cache.filter(
         (i) => i.directoryId === this.id,
@@ -250,6 +283,9 @@ const subscribeNotity = (directory: IDirectory) => {
   });
   directory.resource.applicationColl.subscribe([directory.key], (data) => {
     subscribeCallback<schema.XApplication>(directory, '应用', data);
+  });
+  directory.resource.repositoryColl.subscribe([directory.key], (data) => {
+    subscribeCallback<schema.XApplication>(directory, '代码仓库配置', data);
   });
 };
 
@@ -338,6 +374,14 @@ function standardFilesChanged(
         operate,
         data,
         () => new Transfer(data, directory),
+      );
+      break;
+    case '代码仓库配置':
+      directory.standard.repository = ArrayChanged(
+        directory.standard.repository,
+        operate,
+        data,
+        () => new Repository(data, directory),
       );
       break;
     case '目录':

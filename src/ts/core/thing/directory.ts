@@ -5,6 +5,7 @@ import {
   entityOperates,
   fileOperates,
   memberOperates,
+  newWarehouse,
   teamOperates,
 } from '../public';
 import { ITarget } from '../target/base/target';
@@ -128,6 +129,7 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
         cnt.push(...this.standard.propertys);
         cnt.push(...this.standard.specieses);
         cnt.push(...this.standard.transfers);
+        cnt.push(...this.standard.repository);
         if (!this.parent) {
           for (const item of this.target.content()) {
             const target = item as ITarget | IDirectory | IStorage;
@@ -292,6 +294,7 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
       );
       if (this.target.hasRelationAuth()) {
         operates.push(directoryNew);
+        operates.push(newWarehouse);
         if (this.target.user.copyFiles.size > 0) {
           operates.push(fileOperates.Parse);
         }

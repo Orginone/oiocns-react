@@ -31,6 +31,7 @@ export class DataResource {
     this.directoryColl = this.genTargetColl<XDirectory>('resource-directory');
     this.applicationColl = this.genTargetColl<XApplication>('standard-application');
     this.speciesItemColl = this.genTargetColl<XSpeciesItem>('standard-species-item');
+    this.repositoryColl = this.genTargetColl<any>('code-repository');
   }
   /** 表单集合 */
   formColl: XCollection<XForm>;
@@ -48,6 +49,8 @@ export class DataResource {
   messageColl: XCollection<ChatMessageType>;
   /** 数据传输配置集合 */
   transferColl: XCollection<Transfer>;
+  /** 代码仓库集合 */
+  repositoryColl: XCollection<any>;
   /** 资源对应的用户信息 */
   get targetMetadata() {
     return this.target;

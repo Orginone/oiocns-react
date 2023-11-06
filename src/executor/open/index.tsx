@@ -10,6 +10,7 @@ import TransferView from './transfer';
 import AudioPlayer from './audio';
 import EntityPreview from './entity';
 import CodeEditor from './codeeditor';
+import CodeRepository from './codeRepository';
 import EntityForm from '../operate/entityForm';
 import { IEntity, ISysFileInfo, TargetType } from '@/ts/core';
 import { model, schema } from '@/ts/base';
@@ -70,6 +71,8 @@ const ExecutorOpen: React.FC<IOpenProps> = (props: IOpenProps) => {
         return <JoinApply current={props.entity as any} finished={props.finished} />;
       case '事项':
         return <TaskContent current={props.entity as any} finished={props.finished} />;
+      case '代码仓库配置':
+        return <CodeRepository current={props.entity as any} finished={props.finished} />;
       default:
         if (remarkTypes[props.entity.typeName]) {
           return (
