@@ -12,6 +12,8 @@ import LabelsForm from './labelsForm';
 import RenameForm from './renameForm';
 import TransferForm from './transferForm';
 import RepositoryForm from './repositoryForm';
+import PageTemplateForm from './templateForm';
+
 interface IProps {
   cmd: string;
   entity: IEntity<schema.XEntity>;
@@ -86,6 +88,15 @@ const EntityForm: React.FC<IProps> = ({ cmd, entity, finished }) => {
     case 'newWarehouse':
     case 'updateWarehouse':
       return <RepositoryForm cmd={cmd} entity={entity as any} finished={finished} />;
+    case 'newPageTemplate':
+    case 'updatePageTemplate':
+      return (
+        <PageTemplateForm
+          formType={cmd}
+          current={entity as any}
+          finished={reloadFinish}
+        />
+      );
     default: {
       return (
         <TargetForm formType={cmd} current={entity as any} finished={reloadFinish} />

@@ -1,11 +1,9 @@
 import { EditableTable } from '@/executor/design/transferModal';
 import { model } from '@/ts/base';
 import { generateUuid } from '@/ts/base/common';
-import { ITransfer } from '@/ts/core';
 import React, { useState } from 'react';
 
 export interface IProps {
-  transfer: ITransfer;
   current: model.Request;
 }
 
@@ -37,12 +35,11 @@ const toKvHeader = (headers: readonly HeaderData[]) => {
   return final;
 };
 
-const Header: React.FC<IProps> = ({ transfer, current }) => {
+const Header: React.FC<IProps> = ({ current }) => {
   const [headers, setHeaders] = useState(toHeader(current.data.header));
 
   const onChange = (headers: readonly HeaderData[]) => {
     current.data.header = toKvHeader(headers);
-    transfer.updNode(current);
     setHeaders([...headers]);
   };
 

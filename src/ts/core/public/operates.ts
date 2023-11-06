@@ -175,8 +175,14 @@ export const directoryOperates = {
   NewTransferConfig: {
     sort: 9,
     cmd: 'newTransferConfig',
-    label: '新建迁移配置',
-    iconType: '迁移配置',
+    label: '新建数据迁移',
+    iconType: '数据迁移',
+  },
+  NewPageTemplate: {
+    sort: 11,
+    cmd: 'newPageTemplate',
+    label: '新建页面模板',
+    iconType: '页面模板',
   },
 };
 
@@ -195,6 +201,7 @@ export const directoryNew = {
     directoryOperates.NewApp,
     directoryOperates.NewForm,
     directoryOperates.NewTransferConfig,
+    directoryOperates.NewPageTemplate,
   ],
 };
 

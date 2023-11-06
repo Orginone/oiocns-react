@@ -119,7 +119,7 @@ const generate = async (dir: IDirectory, name: string, excel: el.IExcel) => {
   };
   dir.taskList.push(task);
   const counting = (dir: IDirectory) => {
-    let count = dir.standard.forms.length + dir.standard.specieses.length;
+    let count = 1;
     for (let child of dir.children) {
       count += counting(child);
     }
@@ -165,14 +165,14 @@ const showErrors = (errors: el.Error[]) => {
   Modal.info({
     icon: <></>,
     okText: '关闭',
-    width: 860,
+    width: 1000,
     title: '错误信息',
     maskClosable: true,
     content: (
       <ProTable
         dataSource={errors}
         cardProps={{ bodyStyle: { padding: 0 } }}
-        scroll={{ y: 300 }}
+        scroll={{ y: 500 }}
         options={false}
         search={false}
         columns={[

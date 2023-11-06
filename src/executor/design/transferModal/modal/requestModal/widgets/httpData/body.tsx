@@ -1,21 +1,18 @@
-import React, { useState } from 'react';
 import { model } from '@/ts/base';
-import { ITransfer } from '@/ts/core';
-import CodeMirror from '@uiw/react-codemirror';
 import { langs } from '@uiw/codemirror-extensions-langs';
+import CodeMirror from '@uiw/react-codemirror';
 import { Dropdown } from 'antd';
+import React, { useState } from 'react';
 
 export interface IProps {
-  current: ITransfer;
   node: model.Request;
 }
 
-const Body: React.FC<IProps> = ({ current, node }) => {
+const Body: React.FC<IProps> = ({ node }) => {
   const [value, setValue] = useState<string>(node.data.content);
   const onChange = (value: string) => {
     setValue(value);
     node.data.content = value ?? '';
-    current.updNode(node);
   };
   return (
     <Dropdown

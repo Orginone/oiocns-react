@@ -163,22 +163,15 @@ const using = (graph: Graph) => {
   );
 };
 
-type Status = 'Viewable' | 'Editable';
-type Event = 'EditRun' | 'ViewRun';
-
 /** 临时存储插件 */
-export class TransferStore extends Basecoat<{}> implements Graph.Plugin {
+export class Store extends Basecoat<{}> implements Graph.Plugin {
   name: string;
   transfer: ITransfer;
-  graphStatus: Status;
-  graphEvent: Event;
 
-  constructor(transfer: ITransfer, graphStatus: Status, graphEvent: Event) {
+  constructor(transfer: ITransfer) {
     super();
     this.name = 'TransferStore';
     this.transfer = transfer;
-    this.graphStatus = graphStatus;
-    this.graphEvent = graphEvent;
   }
 
   init(_graph: Graph, ..._: any[]) {}

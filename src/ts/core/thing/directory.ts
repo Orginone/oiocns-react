@@ -9,7 +9,6 @@ import {
   teamOperates,
 } from '../public';
 import { ITarget } from '../target/base/target';
-import { ITransfer } from './standard/transfer';
 import { IStandardFileInfo, StandardFileInfo, IFile } from './fileinfo';
 import { Member } from './member';
 import { StandardFiles } from './standard';
@@ -19,6 +18,8 @@ import { encodeKey, sleep } from '@/ts/base/common';
 import { DataResource } from './resource';
 import { ISysFileInfo, SysFileInfo } from './systemfile';
 import { IStorage } from '../target/outTeam/storage';
+import { IPageTemplate } from './standard/page';
+
 /** 可为空的进度回调 */
 export type OnProgress = (p: number) => void;
 
@@ -46,8 +47,8 @@ export interface IDirectory extends IStandardFileInfo<schema.XDirectory> {
   create(data: schema.XDirectory): Promise<schema.XDirectory | undefined>;
   /** 目录下的文件 */
   files: ISysFileInfo[];
-  /** 加载迁移配置 */
-  loadAllTransfer(reload?: boolean): Promise<ITransfer[]>;
+  /** 加载模板配置 */
+  loadAllTemplate(reload?: boolean): Promise<IPageTemplate[]>;
   /** 加载文件 */
   loadFiles(reload?: boolean): Promise<ISysFileInfo[]>;
   /** 上传文件 */
@@ -130,6 +131,7 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
         cnt.push(...this.standard.specieses);
         cnt.push(...this.standard.transfers);
         cnt.push(...this.standard.repository);
+        cnt.push(...this.standard.templates);
         if (!this.parent) {
           for (const item of this.target.content()) {
             const target = item as ITarget | IDirectory | IStorage;
@@ -264,12 +266,12 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
     }
     return applications;
   }
-  async loadAllTransfer(reload: boolean = false): Promise<ITransfer[]> {
-    const links: ITransfer[] = await this.standard.loadTransfers(reload);
-    for (const subDirectory of this.children) {
-      links.push(...(await subDirectory.loadAllTransfer(reload)));
+  async loadAllTemplate(reload?: boolean | undefined): Promise<IPageTemplate[]> {
+    const templates: IPageTemplate[] = [...this.standard.templates];
+    for (const item of this.children) {
+      templates.push(...(await item.loadAllTemplate(reload)));
     }
-    return links;
+    return templates;
   }
   override operates(): model.OperateModel[] {
     const operates: model.OperateModel[] = [];
@@ -313,6 +315,7 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
     }
     await this.standard.loadApplications();
     await this.standard.loadDirectorys();
+    await this.standard.loadTemplates();
   }
   /** 对目录下所有资源进行操作 */
   private async operateDirectoryResource(
