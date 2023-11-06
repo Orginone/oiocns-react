@@ -135,7 +135,7 @@ const TaskContent: React.FC<TaskDetailType> = ({ task }) => {
           },
           {
             key: '2',
-            label: `流程图`,
+            label: `流程跟踪`,
             children: (
               <ProcessTree
                 isEdit={false}

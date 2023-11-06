@@ -59,8 +59,6 @@ const ExecutorOpen: React.FC<IOpenProps> = (props: IOpenProps) => {
   } else if ('key' in props.entity) {
     switch (props.entity.typeName) {
       case '表单':
-      case '事项配置':
-      case '实体配置':
         return <FormView form={props.entity as any} finished={props.finished} />;
       case '迁移配置':
         return <TransferView current={props.entity as any} finished={props.finished} />;
