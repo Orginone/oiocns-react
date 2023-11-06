@@ -57,7 +57,7 @@ const ExcelForm: React.FC<IProps> = ({ transfer, current, finished }) => {
                 transfer.command.emitter('data', 'file', {
                   prop: 'formIds',
                   multiple: true,
-                  accepts: ['实体配置', '事项配置'],
+                  accepts: ['表单'],
                 });
               }}
             />
