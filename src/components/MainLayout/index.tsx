@@ -37,7 +37,7 @@ type MainLayoutType = {
  */
 const MainLayout: React.FC<MainLayoutType> = (props) => {
   const [leftSider, setLeftSider] = useStorage<boolean>('leftSider', false);
-  const [rightSider, setRightSider] = useStorage<boolean>('rightSider', false);
+  const [rightSider, setRightSider] = useStorage<boolean>('rightSider', true);
   const [mainWidth, setMainWidth] = useStorage<string | number>('mainWidth', '40%');
   const parentMenu = props.selectMenu.parentMenu ?? props.siderMenuData;
   const outside =
