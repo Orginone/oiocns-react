@@ -2,7 +2,6 @@ import { AiOutlineCaretRight } from '@/icons/ai';
 import { Breadcrumb, Divider, Space, Tag } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { MenuItemType } from 'typings/globelType';
-import css from './index.module.less';
 
 interface CustomBreadcrumbType {
   leftBar?: React.ReactNode;
@@ -59,7 +58,7 @@ const CustomBreadcrumb = (props: CustomBreadcrumbType) => {
   return (
     <Space wrap split={<Divider type="vertical" />} size={2}>
       {props.leftBar && props.leftBar}
-      <Breadcrumb separator={<AiOutlineCaretRight />} className={css.customBreadcrumb}>
+      <Breadcrumb separator={<AiOutlineCaretRight />} className={"customBreadcrumb"}>
         {items.map((item) => {
           return (
             <Breadcrumb.Item
