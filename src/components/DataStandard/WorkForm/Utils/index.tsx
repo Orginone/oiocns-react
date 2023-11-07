@@ -46,6 +46,7 @@ export const loadwidgetOptions = (attribute: schema.XAttribute) => {
         '操作人',
         '操作组织',
         '成员选择框',
+        '内部机构选择框',
         '人员搜索框',
         '单位搜索框',
         '组织群搜索框',
