@@ -6,6 +6,7 @@ import WorkForm from '@/executor/tools/workForm';
 import FullScreenModal from '@/components/Common/fullScreen';
 import { model } from '@/ts/base';
 import useAsyncLoad from '@/hooks/useAsyncLoad';
+import orgCtrl from '@/ts/controller';
 // 卡片渲染
 interface IProps {
   current: IWork | IWorkTask;
@@ -49,7 +50,35 @@ const WorkStartDo: React.FC<IProps> = ({ current, finished }) => {
               type="primary"
               onClick={async () => {
                 if (apply.validation(formData)) {
-                  await apply.createApply(apply.belong.id, info.content, formData);
+                  const remarks: string[] = [];
+                  for (const key of Object.keys(apply.instanceData.fields)) {
+                    var data = formData.get(key);
+                    if (data) {
+                      for (const field of apply.instanceData.fields[key].filter(
+                        (a) => a.options && a.options.showToRemark,
+                      )) {
+                        var value = data.after[0][field.id];
+                        switch (field.valueType) {
+                          case '用户型':
+                            value = (await orgCtrl.user.findEntityAsync(value))?.name;
+                            break;
+                          case '选择型':
+                            value = field.lookups?.find(
+                              (a) => a.id === (value as string).substring(1),
+                            )?.text;
+                            break;
+                          default:
+                            break;
+                        }
+                        remarks.push(`${field.name}:${value}`);
+                      }
+                    }
+                  }
+                  await apply.createApply(
+                    apply.belong.id,
+                    remarks.join(' ') + info.content,
+                    formData,
+                  );
                   finished();
                 } else {
                   message.warn('请完善表单内容再提交!');

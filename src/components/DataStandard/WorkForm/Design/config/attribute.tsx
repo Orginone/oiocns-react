@@ -293,6 +293,11 @@ const AttributeConfig: React.FC<IAttributeProps> = ({
           editorType="dxCheckBox"
           label={{ text: '必填特性' }}
         />
+        <SimpleItem
+          dataField="options.showToRemark"
+          editorType="dxCheckBox"
+          label={{ text: '展示至摘要' }}
+        />
         {loadItemConfig()}
       </GroupItem>
       <GroupItem caption={'表格参数'}>

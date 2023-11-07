@@ -125,6 +125,8 @@ export type XAttributeProps = {
   species?: boolean;
   // 是否固定列
   fixed?: boolean;
+  // 是否展示至摘要
+  showToRemark?: boolean;
 };
 
 //权限定义
