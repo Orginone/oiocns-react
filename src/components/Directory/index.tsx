@@ -15,7 +15,7 @@ interface IProps {
   accepts?: string[];
   selects?: IFile[];
   excludeIds?: string[];
-  previewFlag: string;
+  previewFlag?: string;
   onFocused?: (file: IFile | undefined) => void;
   onSelected?: (files: IFile[]) => void;
   current: IDirectory | undefined | 'disk';
@@ -33,7 +33,9 @@ const Directory: React.FC<IProps> = (props) => {
   const [focusFile, setFocusFile] = useState<IFile>();
   const [submitHanlder, clearHanlder] = useTimeoutHanlder();
   useEffect(() => {
-    command.emitter('preview', props.previewFlag, focusFile);
+    if (props.previewFlag) {
+      command.emitter('preview', props.previewFlag, focusFile);
+    }
   }, [focusFile]);
   const contextMenu = (file?: IFile) => {
     var entity = file || dircetory;
@@ -51,7 +53,11 @@ const Directory: React.FC<IProps> = (props) => {
   const fileOpen = (file: IFile | undefined) => {
     if (file && props.dialog !== true) {
       if (!file.groupTags.includes('已删除')) {
-        command.emitter('executor', 'open', file);
+        if (props.previewFlag === undefined && 'standard' in file) {
+          command.emitter('executor', 'open', dircetory);
+        } else {
+          command.emitter('executor', 'open', file);
+        }
       }
     }
   };

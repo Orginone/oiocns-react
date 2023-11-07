@@ -107,7 +107,10 @@ export class BoxProvider implements IBoxProvider {
       if (res && res.data) {
         for (const staging of groups[key]) {
           for (const thing of res.data) {
-            staging.data = thing;
+            if (staging.data.id == thing.id) {
+              staging.data = thing;
+              break;
+            }
           }
         }
       }

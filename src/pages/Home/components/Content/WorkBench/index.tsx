@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import cls from './index.module.less';
 import { Badge, Button, Calendar, Divider, Dropdown, Space, Spin } from 'antd';
 import { ImBubbles2, ImDropbox, ImList, ImPlus, ImStack } from '@/icons/im';
 import { useHistory } from 'react-router-dom';
@@ -24,13 +23,13 @@ const WorkBench: React.FC = () => {
     info?: string,
   ) => {
     return (
-      <div className={cls.dataItem}>
-        <div className={cls.dataItemTitle}>{title}</div>
-        <div className={cls.dataItemNumber}>{number}</div>
+      <div className="dataItem">
+        <div className="dataItemTitle">{title}</div>
+        <div className="dataItemNumber">{number}</div>
         {size && size > 0 && (
-          <div className={cls.dataItemTitle}>大小:{formatSize(size)}</div>
+          <div className="dataItemTitle">大小:{formatSize(size)}</div>
         )}
-        {info && info.length > 0 && <div className={cls.dataItemTitle}>{info}</div>}
+        {info && info.length > 0 && <div className="dataItemTitle">{info}</div>}
       </div>
     );
   };
@@ -48,16 +47,16 @@ const WorkBench: React.FC = () => {
     });
     return (
       <>
-        <div className={cls.cardItemHeader}>
-          <span className={cls.title}>沟通</span>
-          <span className={cls.extraBtn}>
+        <div className="cardItem-header">
+          <span className="title">沟通</span>
+          <span className="extraBtn">
             <ImBubbles2 />
             <span>
               未读<b>{msgCount}</b>条
             </span>
           </span>
         </div>
-        <div className={cls.cardItemViewer}>
+        <div className="cardItem-viewer">
           <Spin spinning={!loaded}>
             <Space wrap split={<Divider type="vertical" />} size={2}>
               {renderDataItem('好友(人)', orgCtrl.user.members.length)}
@@ -109,16 +108,16 @@ const WorkBench: React.FC = () => {
     }, []);
     return (
       <>
-        <div className={cls.cardItemHeader}>
-          <span className={cls.title}>办事</span>
-          <span className={cls.extraBtn}>
+        <div className="cardItem-header">
+          <span className="title">办事</span>
+          <span className="extraBtn">
             <ImList />
             <span>
               待办<b>{todoCount}</b>件
             </span>
           </span>
         </div>
-        <div className={cls.cardItemViewer}>
+        <div className="cardItem-viewer">
           <Space wrap split={<Divider type="vertical" />} size={2}>
             {renderDataItem('待办', todoCount)}
             {renderDataItem('已办', CompletedCount)}
@@ -139,13 +138,13 @@ const WorkBench: React.FC = () => {
     }, []);
     return (
       <>
-        <div className={cls.cardItemHeader}>
-          <span className={cls.title}>数据</span>
-          <span className={cls.extraBtn}>
+        <div className="cardItem-header">
+          <span className="title">数据</span>
+          <span className="extraBtn">
             <ImPlus /> <span>管理数据</span>
           </span>
         </div>
-        <div className={cls.cardItemViewer}>
+        <div className="cardItem-viewer">
           <Space wrap split={<Divider type="vertical" />} size={6}>
             {diskInfo && (
               <>
@@ -209,7 +208,7 @@ const WorkBench: React.FC = () => {
     const loadAppCard = (item: IApplication) => (
       <Dropdown key={item.key} menu={contextMenu(item)} trigger={['contextMenu']}>
         <div
-          className={cls.appCard}
+          className="appCard"
           onClick={() => {
             orgCtrl.currentKey = item.key;
             history.push('/store');
@@ -221,9 +220,9 @@ const WorkBench: React.FC = () => {
           ) : (
             <EntityIcon entity={item.metadata} size={35} />
           )}
-          <div className={cls.appName}>{item.name}</div>
-          <div className={cls.teamName}>{item.directory.target.name}</div>
-          <div className={cls.teamName}>{item.directory.target.space.name}</div>
+          <div className="appName">{item.name}</div>
+          <div className="teamName">{item.directory.target.name}</div>
+          <div className="teamName">{item.directory.target.space.name}</div>
         </div>
       </Dropdown>
     );
@@ -232,7 +231,7 @@ const WorkBench: React.FC = () => {
       if (apps.length < 1) return <></>;
       return (
         <>
-          <div className={cls.appGroupTitle}>{title}</div>
+          <div className="appGroup-title">{title}</div>
           <Space wrap split={<Divider type="vertical" />} size={6}>
             {apps.map((app) => {
               return loadAppCard(app);
@@ -250,7 +249,7 @@ const WorkBench: React.FC = () => {
           bodyHeight={'60vh'}
           open={allAppShow}
           onCancel={() => setAllAppShow(false)}>
-          <div className={cls.cardItemViewer}>
+          <div className="cardItem-viewer">
             {loadMultAppCards(
               '常用应用',
               applications.filter((i) => i.cache.tags?.includes('常用')),
@@ -269,14 +268,14 @@ const WorkBench: React.FC = () => {
     };
     return (
       <>
-        <div className={cls.cardItemHeader}>
-          <span className={cls.title}>常用应用</span>
-          <span className={cls.extraBtn} onClick={() => setAllAppShow(true)}>
+        <div className="cardItem-header">
+          <span className="title">常用应用</span>
+          <span className="extraBtn" onClick={() => setAllAppShow(true)}>
             <ImDropbox /> <span>全部应用</span>
           </span>
         </div>
         <Spin spinning={!loaded} tip={'加载中...'}>
-          <div className={cls.cardItemViewer}>
+          <div className="cardItem-viewer">
             <Space wrap split={<Divider type="vertical" />} size={2}>
               {applications
                 .filter((i) => i.cache.tags?.includes('常用'))
@@ -293,9 +292,9 @@ const WorkBench: React.FC = () => {
   // 日历组件
   const calendarItem = () => {
     return (
-      <div className={cls.cardItem}>
-        <div className={cls.cardItemHeader}>
-          <span className={cls.title}>日历</span>
+      <div className="cardItem">
+        <div className="cardItem-header">
+          <span className="title">日历</span>
           {/* <span className={cls.extraBtn}>
             <Button type="text" size="small">
               <ImPlus /> <span>创建日程</span>
@@ -312,7 +311,7 @@ const WorkBench: React.FC = () => {
     const renderCmdBtn = (cmd: string, title: string, iconType: string) => {
       return (
         <Button
-          className={cls.linkBtn}
+          className="linkBtn"
           type="text"
           icon={<TypeIcon iconType={iconType} size={18} />}
           onClick={() => {
@@ -324,13 +323,13 @@ const WorkBench: React.FC = () => {
     };
     return (
       <>
-        <div className={cls.cardItemHeader}>
-          <span className={cls.title}>快捷操作</span>
-          <span className={cls.extraBtn} onClick={() => history.push('setting')}>
+        <div className="cardItem-header">
+          <span className="title">快捷操作</span>
+          <span className="extraBtn" onClick={() => history.push('setting')}>
             <ImStack /> <span>更多操作</span>
           </span>
         </div>
-        <div style={{ width: '100%', minHeight: 60 }} className={cls.cardItemViewer}>
+        <div style={{ width: '100%', minHeight: 60 }} className="cardItem-viewer">
           <Space wrap split={<Divider type="vertical" />} size={6}>
             {renderCmdBtn('joinFriend', '添加好友', 'joinFriend')}
             {renderCmdBtn('joinStorage', '申请存储', '存储资源')}
@@ -343,33 +342,32 @@ const WorkBench: React.FC = () => {
       </>
     );
   };
-
   return (
-    <div className={cls.content}>
-      <div className={cls.cardGroup}>
-        <div style={{ minHeight: 80 }} className={cls.cardItem}>
+    <div className="workbench-content">
+      <div className="cardGroup">
+        <div style={{ minHeight: 80 }} className="cardItem">
           <RenderOperate />
         </div>
       </div>
-      <div className={cls.cardGroup}>
-        <div className={cls.cardItem} onClick={() => history.push('chat')}>
+      <div className="cardGroup">
+        <div className="cardItem" onClick={() => history.push('chat')}>
           <RenderChat />
         </div>
-        <div className={cls.cardItem} onClick={() => history.push('work')}>
+        <div className="cardItem" onClick={() => history.push('work')}>
           <RenderWork />
         </div>
       </div>
-      <div className={cls.cardGroup}>
-        <div className={cls.cardItem} onClick={() => history.push('store')}>
+      <div className="cardGroup">
+        <div className="cardItem" onClick={() => history.push('store')}>
           <RendeStore />
         </div>
       </div>
-      <div className={cls.cardGroup}>
-        <div className={cls.cardItem}>
+      <div className="cardGroup">
+        <div className="cardItem">
           <RendeAppInfo />
         </div>
       </div>
-      <div className={cls.calendar}>{calendarItem()}</div>
+      <div className="calendar">{calendarItem()}</div>
     </div>
   );
 };
