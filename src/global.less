@@ -750,7 +750,93 @@ h3 {
   }
 }
 
-
-
-
-
+/** 
+  ChatShareForward
+*/
+.chat-shareForward {
+  position: relative;
+  :global {
+      .ogo-checkbox-wrapper {
+          width: 100%;
+      }
+      .ogo-list-item-meta {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+      }
+      .ogo-list-items {
+          position: relative;
+      }
+  }
+  .chatMem-list-item, .listItem {
+      min-width: 240px;
+  }
+  .chatMem {
+      position: relative;
+  }
+  .departLine {
+      border-right: 1px solid #ebeef5;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      z-index: 99;
+      left: 50%;
+      background-color: rgba(0, 0, 0, 0);
+  }
+  .chatShare-title {
+      display: flex;
+      align-items: center;
+      .chatMem-search, .chosen-num {
+          width: 30%;
+          margin-left: 10px;
+      }
+  }
+  
+  .chatMem-list {
+      padding-left: 5px;
+      padding-right: 5px;
+      margin-left: 5px;
+      cursor: pointer;
+  }
+  .chatMem-list:hover {
+      background-color: rgb(248, 245, 245);
+  }
+  .chosen-list {
+      margin-left: 10px;
+  }
+  .chatMem {
+      position: relative;
+      padding-bottom: 10px;
+  }
+  .chosenMem {
+      position: relative;
+  }
+  .mem-wrap {
+      height: calc(460px);
+      overflow-y: scroll;
+      padding-bottom: 20px;
+  }
+  .chosenMem-wrap {
+      height: calc(460px);
+      overflow-y: scroll;
+      padding-bottom: 20px;
+  }
+  
+  .forwardTextWrap {
+      position: absolute;
+      width: 100%;
+      top: calc(400px - 60px);
+      left: 5px;
+      z-index: 999;
+      background-color: #fff;
+  }
+  .forwardText {
+      padding: 10px 10px;
+      margin-left: 5px;
+      height: 40px;
+      overflow: hidden;
+      background-color: rgb(226, 224, 224);
+      border-radius: 5px;
+      width: calc(100% - 15px);
+  }
+}
