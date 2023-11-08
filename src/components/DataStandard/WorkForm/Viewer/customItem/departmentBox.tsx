@@ -56,11 +56,8 @@ const DepartmentBox: React.FC<DepartmentBoxProps> = (props) => {
           paddingTop: 2,
         }}>
         {target && <EntityIcon entity={target} />}
-        {textBox ? (
-          <TextBox value={value} />
-        ) : (
-          <span style={{ paddingLeft: 8 }}>{value}</span>
-        )}
+        <span style={{ paddingLeft: 8 }}>{value}</span>
+        {textBox && <TextBox readOnly />}
       </div>
     );
   };
@@ -75,10 +72,12 @@ const DepartmentBox: React.FC<DepartmentBoxProps> = (props) => {
         selectionMode="single"
         selectByClick={true}
         onItemClick={() => setOpened(false)}
-        itemRender={() => itemRender(selectTarget, false)}
+        itemRender={(e) => itemRender(e, false)}
         onItemSelectionChanged={(e) => {
           const targets = e.component.getSelectedNodes();
-          setSelectTarget(targets.at(-1)?.itemData as DTarget);
+          if (targets.length > 0) {
+            setSelectTarget(targets[0].itemData as DTarget);
+          }
         }}
       />
     );
@@ -91,6 +90,7 @@ const DepartmentBox: React.FC<DepartmentBoxProps> = (props) => {
       readOnly={props.readOnly}
       value={selectTarget?.id}
       contentRender={treeViewRender}
+      labelMode={selectTarget ? 'static' : 'floating'}
       fieldRender={() => itemRender(selectTarget, true)}
       onOptionChanged={(e) => {
         if (e.name === 'opened') {
