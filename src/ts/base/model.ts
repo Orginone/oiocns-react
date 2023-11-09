@@ -165,8 +165,6 @@ export type PageResult<T> = {
 
 export type DynamicCodeModel = {
   // 动态密码Id
-  Id?: string;
-  // 动态密码Id
   dynamicId: string;
   // 账户(手机号)
   account: string;
@@ -231,23 +229,6 @@ export type TokenResultModel = {
   privateKey: string;
 }
 
-// 注册消息类型
-export type RegisterType = {
-  // 昵称
-  nickName: string;
-  // 姓名
-  name: string;
-  // 电话
-  phone: string;
-  // 账户
-  account: string;
-  // 密码
-  password: string;
-  // 座右铭
-  motto: string;
-  // 头像
-  avatar: string;
-};
 export type IdPair = {
   // 唯一ID
   id: string;

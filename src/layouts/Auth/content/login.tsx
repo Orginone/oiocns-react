@@ -116,7 +116,7 @@ const PassportLogin: React.FC<{ to: (flag: string) => void }> = ({ to }) => {
       });
       console.log(res);
       if (res.success && res.data) {
-        setFormData({ ...formData, dynamicId: res.data.Id });
+        setFormData({ ...formData, dynamicId: res.data.dynamicId });
       }
     }, [formData]);
     return (

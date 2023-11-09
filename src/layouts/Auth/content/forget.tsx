@@ -121,7 +121,7 @@ const PassportForget: React.FC<{ to: (flag: string) => void }> = ({ to }) => {
         dynamicId: '',
       });
       if (res.success && res.data) {
-        setFormData({ ...formData, dynamicId: res.data.Id });
+        setFormData({ ...formData, dynamicId: res.data.dynamicId });
       }
     }, [formData]);
     return (

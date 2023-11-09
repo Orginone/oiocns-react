@@ -30,8 +30,8 @@ const PassportRegister: React.FC<{ to: (flag: string) => void }> = ({ to }) => {
       dynamicId: '',
     });
     console.log(res);
-    if (res.success && res.data?.Id) {
-      setFormData({ ...formData, dynamicId: res.data.Id });
+    if (res.success && res.data) {
+      setFormData({ ...formData, dynamicId: res.data.dynamicId });
     }
   }, [formData]);
 
