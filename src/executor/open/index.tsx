@@ -6,7 +6,6 @@ import WorkStart from './work';
 import TaskContent from './task';
 import JoinApply from './task/joinApply';
 import OfficeView from './office';
-import ReportView from './report';
 import TransferView from './transfer';
 import AudioPlayer from './audio';
 import EntityPreview from './entity';
@@ -14,6 +13,7 @@ import CodeEditor from './codeeditor';
 import EntityForm from '../operate/entityForm';
 import { IEntity, ISysFileInfo, TargetType } from '@/ts/core';
 import { model, schema } from '@/ts/base';
+import TemplateView from './page';
 const audioExt = ['.mp3', '.wav', '.ogg'];
 
 const officeExt = ['.md', '.pdf', '.xls', '.xlsx', '.doc', '.docx', '.ppt', '.pptx'];
@@ -64,11 +64,11 @@ const ExecutorOpen: React.FC<IOpenProps> = (props: IOpenProps) => {
         return <FormView form={props.entity as any} finished={props.finished} />;
       case '迁移配置':
         return <TransferView current={props.entity as any} finished={props.finished} />;
+      case '页面模板':
+        return <TemplateView current={props.entity as any} finished={props.finished} />;
       case '办事':
       case '子流程':
         return <WorkStart current={props.entity as any} finished={props.finished} />;
-      case '报表':
-        return <ReportView current={props.entity as any} finished={props.finished} />;
       case '加用户':
         return <JoinApply current={props.entity as any} finished={props.finished} />;
       case '事项':

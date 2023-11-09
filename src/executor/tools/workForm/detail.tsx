@@ -7,7 +7,6 @@ import { EditModal } from '../editModal';
 import GenerateThingTable from '../generate/thingTable';
 import { WorkFormRulesType } from '@/ts/core/work/rules/workFormRules';
 import { RuleTriggers } from '@/ts/core/public';
-import ReportForms from './report';
 interface IProps {
   allowEdit: boolean;
   belong: IBelong;
@@ -170,20 +169,11 @@ const DetailForms: React.FC<IProps> = (props) => {
   const [activeTabKey, setActiveTabKey] = useState(props.forms[0].id);
   const loadItems = () => {
     return props.forms.map((f) => {
-      switch (f.typeName) {
-        case '报表':
-          return {
-            key: f.id,
-            label: f.name,
-            children: <ReportForms {...props} forms={[f]} />,
-          };
-        default:
-          return {
-            key: f.id,
-            label: f.name,
-            children: <DetailTable {...props} forms={[f]} />,
-          };
-      }
+      return {
+        key: f.id,
+        label: f.name,
+        children: <DetailTable {...props} forms={[f]} />,
+      };
     });
   };
   return (

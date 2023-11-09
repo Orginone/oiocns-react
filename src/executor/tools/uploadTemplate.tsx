@@ -1,7 +1,7 @@
 import { command, model } from '@/ts/base';
 import { IDirectory } from '@/ts/core';
 import { formatDate } from '@/utils';
-import { Error, IExcel, Excel, getSheets, generateXlsx, readXlsx } from '@/utils/excel';
+import * as el from '@/utils/excel';
 import { ProTable } from '@ant-design/pro-components';
 import { Button, Modal, Spin, Tabs, Upload, message } from 'antd';
 import React, { useState } from 'react';
@@ -10,7 +10,7 @@ import React, { useState } from 'react';
 export const uploadTemplate = (dir: IDirectory) => {
   // 默认在根目录导入
   dir = dir.target.directory;
-  const show = (excel: IExcel, name: string) => {
+  const show = (excel: el.IExcel, name: string) => {
     showData(
       excel,
       (modal) => {
@@ -27,7 +27,7 @@ export const uploadTemplate = (dir: IDirectory) => {
         <div style={{ marginTop: 20 }}>
           <Button
             onClick={async () => {
-              generateXlsx(new Excel(getSheets(dir)), '导入模板');
+              el.generateXlsx(new el.Excel(el.getSheets(dir)), '导入模板');
             }}>
             导入模板下载
           </Button>
@@ -42,7 +42,7 @@ export const uploadTemplate = (dir: IDirectory) => {
             customRequest={async (options) => {
               const file = options.file as Blob;
               setLoading(true);
-              let excel = await readXlsx(file, new Excel(getSheets(dir)));
+              let excel = await el.readXlsx(file, new el.Excel(el.getSheets(dir)));
               setLoading(false);
               modal.destroy();
               show(excel, file.name);
@@ -64,7 +64,7 @@ export const uploadTemplate = (dir: IDirectory) => {
 };
 
 /** 展示数据 */
-const showData = (excel: IExcel, confirm: (modal: any) => void, okText: string) => {
+const showData = (excel: el.IExcel, confirm: (modal: any) => void, okText: string) => {
   const modal = Modal.info({
     icon: <></>,
     okText: okText,
@@ -104,7 +104,7 @@ const showData = (excel: IExcel, confirm: (modal: any) => void, okText: string) 
 };
 
 /** 开始导入 */
-const generate = async (dir: IDirectory, name: string, excel: IExcel) => {
+const generate = async (dir: IDirectory, name: string, excel: el.IExcel) => {
   let errors = excel.handlers.flatMap((item) => item.checkData(excel));
   if (errors.length > 0) {
     showErrors(errors);
@@ -119,7 +119,7 @@ const generate = async (dir: IDirectory, name: string, excel: IExcel) => {
   };
   dir.taskList.push(task);
   const counting = (dir: IDirectory) => {
-    let count = dir.standard.forms.length + dir.standard.specieses.length;
+    let count = 1;
     for (let child of dir.children) {
       count += counting(child);
     }
@@ -144,7 +144,7 @@ const generate = async (dir: IDirectory, name: string, excel: IExcel) => {
         (modal) => {
           modal.destroy();
           let fileName = `数据导入模板(${formatDate(new Date(), 'yyyy-MM-dd HH:mm')})`;
-          generateXlsx(excel, fileName);
+          el.generateXlsx(excel, fileName);
         },
         '生成数据模板',
       );
@@ -161,18 +161,18 @@ const generate = async (dir: IDirectory, name: string, excel: IExcel) => {
 };
 
 /** 错误数据 */
-const showErrors = (errors: Error[]) => {
+const showErrors = (errors: el.Error[]) => {
   Modal.info({
     icon: <></>,
     okText: '关闭',
-    width: 860,
+    width: 1000,
     title: '错误信息',
     maskClosable: true,
     content: (
       <ProTable
         dataSource={errors}
         cardProps={{ bodyStyle: { padding: 0 } }}
-        scroll={{ y: 300 }}
+        scroll={{ y: 500 }}
         options={false}
         search={false}
         columns={[
@@ -188,7 +188,7 @@ const showErrors = (errors: Error[]) => {
           {
             title: '行数',
             dataIndex: 'row',
-            render: (_, data) => {
+            render: (_: any, data: el.Error) => {
               if (typeof data.row == 'number') {
                 return <>{data.row}</>;
               }

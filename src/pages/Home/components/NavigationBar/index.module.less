@@ -2,9 +2,9 @@
   border-radius: 30px;
   position: fixed;
   top: 16px;
-  right: calc(50vw - 160px);
-  margin-left: 60px;
-  background-color: rgba(@component-background, 0.7);
+  left: 50%;
+  transform: translate(-50%);
+  background-color: rgba(@component-background, 0.6);
   display: flex;
   font-size: 14px;
   color: @text-color;
@@ -14,28 +14,29 @@
   &Content {
     display: flex;
     justify-content: center;
-    gap: 16px;
     flex: 1;
+    gap: 8px;
+    white-space: nowrap;
     &__item {
-      transition: .2s;
+      transition: 0.2s;
       cursor: pointer;
       padding: 4px 16px;
       &:hover {
         border-radius: 30px;
-        background-color:@active-background;
+        background-color: @active-background;
       }
       &Active {
         cursor: not-allowed;
         padding: 4px 16px;
         border-radius: 30px;
         color: @text-color-inverse;
-        background-color:@focus-background;
+        background-color: @focus-background;
       }
     }
   }
 
   &More {
-    color: @text-color-inverse;
+    color: #000;
     font-size: 30px;
     cursor: pointer;
     margin-left: 20px;
@@ -49,9 +50,10 @@
     box-shadow: 0 2px 15px rgba(0, 0, 0, 0.15);
   }
 
-
   &Config {
-    width: 100%;
+    max-width: 800px;
+    min-width: 400px;
+
     &Header {
       display: flex;
       justify-content: space-between;
@@ -65,8 +67,8 @@
 
     &PageCard {
       padding: 8px 24px;
-      color: #424A57;
-      background-color: #F7F8FA;
+      color: #424a57;
+      background-color: #f7f8fa;
       border-radius: 27px;
       cursor: pointer;
       display: flex;

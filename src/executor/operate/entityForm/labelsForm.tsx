@@ -82,7 +82,7 @@ const LabelsForm = (props: Iprops) => {
       initialValue: '表单',
       readonly: readonly,
       fieldProps: {
-        options: ['表单', '实体配置', '事项配置', '报表'].map((i) => {
+        options: ['表单'].map((i) => {
           return {
             value: i,
             label: i,

@@ -8,7 +8,9 @@ import ChatBody from './chat';
 import { command } from '@/ts/base';
 import TargetActivity from '@/components/TargetActivity';
 import MemberContent from './member';
-import { ImAddressBook, ImQrcode, ImBubbles2, ImLifebuoy } from '@/icons/im';
+import orgCtrl from '@/ts/controller';
+import { ImAddressBook, ImQrcode, ImBubbles2, ImLifebuoy, ImFolder } from '@/icons/im';
+import { useHistory } from 'react-router-dom';
 const SessionBody = ({
   target,
   session,
@@ -18,7 +20,8 @@ const SessionBody = ({
   session: ISession;
   setting?: boolean;
 }) => {
-  const [bodyType, setBodyType] = useState(setting ? 'activity' : 'chat');
+  const history = useHistory();
+  const [bodyType, setBodyType] = useState(setting ? 'member' : 'chat');
   const sessionActions = () => {
     const actions = [];
     if (session.isMyChat && target.typeName !== TargetType.Group) {
@@ -45,6 +48,15 @@ const SessionBody = ({
     );
     if (session.members.length > 0 || session.id === session.userId) {
       actions.push(
+        <ImFolder
+          key="store"
+          size={26}
+          title="存储"
+          onClick={() => {
+            orgCtrl.currentKey = target.directory.key;
+            history.push('/store');
+          }}
+        />,
         <ImAddressBook
           key="setting"
           size={26}

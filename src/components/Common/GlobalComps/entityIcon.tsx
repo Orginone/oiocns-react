@@ -77,7 +77,7 @@ const ShareIconById = (info: shareIconInfo) => {
 };
 
 /** 实体图标 */
-const ShareIconItem = (info: shareIconInfo) => {
+export const ShareIconItem = (info: shareIconInfo) => {
   const size = info.size ?? 22;
   const fontSize = size > 14 ? 14 : size;
   const infoMore = () => {

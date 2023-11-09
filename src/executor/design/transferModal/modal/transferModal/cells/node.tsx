@@ -1,6 +1,7 @@
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
-import { model } from '@/ts/base';
+import { model, schema } from '@/ts/base';
 import { XTarget } from '@/ts/base/schema';
+import { ITransfer } from '@/ts/core';
 import {
   CheckCircleOutlined,
   CloseCircleOutlined,
@@ -9,23 +10,24 @@ import {
   StopOutlined,
 } from '@ant-design/icons';
 import { Graph, Node } from '@antv/x6';
+import { message } from 'antd';
 import React, { CSSProperties, createRef, memo, useEffect, useState } from 'react';
 import { MenuItemType } from 'typings/globelType';
-import cls from '../index.module.less';
-import { ITransfer } from '@/ts/core';
-import { TransferStore } from './graph';
-import { message } from 'antd';
-import GraphEditor from '../widgets/graphEditor';
+import { GraphView } from '../running/graphView';
+import cls from './../index.module.less';
+import { Store } from './graph';
 
 interface IProps {
   node: Node;
   graph: Graph;
 }
 
-const useNode = (node: Node, graph: Graph) => {
-  const store = graph.getPlugin<TransferStore>('TransferStore');
+function useNode<T extends model.Node>(node: Node, graph: Graph) {
+  const store = graph.getPlugin<Store>('TransferStore');
   const transfer = store?.transfer;
-  const [data, setData] = useState(transfer?.getNode(node.id) ?? node.getData());
+  const item = transfer?.nodes.find((item) => item.id == node.id);
+  const [data, setData] = useState((item ?? node.getData()) as T);
+  const [tag, refresh] = useState(false);
   useEffect(() => {
     const id = transfer?.command.subscribe(async (type, cmd, args) => {
       switch (type) {
@@ -39,6 +41,7 @@ const useNode = (node: Node, graph: Graph) => {
             case 'update':
               if (args.id == node.id) {
                 setData(args);
+                refresh(!tag);
               }
               break;
           }
@@ -56,12 +59,14 @@ const useNode = (node: Node, graph: Graph) => {
     store,
     transfer,
   };
-};
+}
 
-// eslint-disable-next-line react/display-name, react/prop-types
-export const GraphNode: React.FC<IProps> = memo(({ node, graph }) => {
-  const { store, transfer, data } = useNode(node, graph);
-  const nextTransfer = transfer?.getTransfer((data as model.SubTransfer).nextId);
+export const GraphNode: React.FC<IProps> = memo(({ node, graph }: IProps) => {
+  const { store, transfer, data } = useNode<model.SubTransfer>(node, graph);
+  let nextTransfer = undefined;
+  if (data.transferId) {
+    nextTransfer = transfer?.transfers[data.transferId];
+  }
   return (
     <div
       className={`${cls.transferNode} ${cls['border']}`}
@@ -69,11 +74,13 @@ export const GraphNode: React.FC<IProps> = memo(({ node, graph }) => {
       onMouseLeave={() => transfer?.command.emitter('node', 'closeRemove', node)}
       onDoubleClick={() => transfer?.command.emitter('tools', 'edit', data)}>
       {nextTransfer && (
-        <GraphEditor
+        <GraphView
           current={nextTransfer}
-          options={{ background: { color: '#F2F7FA' }, panning: false, mousewheel: true }}
-          initStatus={'Viewable'}
-          initEvent={'ViewRun'}
+          options={{
+            background: { color: '#F2F7FA' },
+            panning: false,
+            mousewheel: true,
+          }}
         />
       )}
       <NodeStatus
@@ -88,12 +95,14 @@ export const GraphNode: React.FC<IProps> = memo(({ node, graph }) => {
         transfer={transfer}
         style={{ position: 'absolute', left: 40, top: 20 }}
       />
-      <Info name={data.name} style={{ left: 200, top: 16 }} />
-      <Remove store={store} node={node} transfer={transfer} data={data} />
-      <ContextMenu store={store} node={node} transfer={transfer} data={data} />
+      <Info node={data} style={{ left: 200, top: 16 }} />
+      <Remove node={node} transfer={transfer} />
+      <ContextMenu node={node} transfer={transfer} data={data} />
     </div>
   );
 });
+
+GraphNode.displayName = '节点';
 
 export const ProcessingNode: React.FC<IProps> = ({ node, graph }) => {
   const { data, store, transfer } = useNode(node, graph);
@@ -104,27 +113,22 @@ export const ProcessingNode: React.FC<IProps> = ({ node, graph }) => {
       onMouseLeave={() => transfer?.command.emitter('node', 'closeRemove', node)}
       onDoubleClick={() => transfer?.command.emitter('tools', 'edit', data)}>
       <Tag typeName={data.typeName} transfer={transfer} />
-      <Info name={data.name} />
+      <Info node={data} />
       <NodeStatus store={store} transfer={transfer} node={node} data={data} />
-      <Remove store={store} transfer={transfer} node={node} data={data} />
-      <ContextMenu store={store} transfer={transfer} node={node} data={data} />
+      <Remove transfer={transfer} node={node} />
+      <ContextMenu transfer={transfer} node={node} data={data} />
     </div>
   );
 };
 
 interface RemoveProps {
-  store?: TransferStore;
   transfer?: ITransfer;
   node: Node;
-  data: model.Node;
 }
 
-const Remove: React.FC<RemoveProps> = ({ store, transfer, node, data }) => {
+const Remove: React.FC<RemoveProps> = ({ transfer, node }) => {
   const [show, setShow] = useState<boolean>(false);
-  const graphStatus = store?.graphStatus;
-  const dataStatus = data.status ?? graphStatus ?? 'Editable';
-  const [status, setStatus] = useState<model.NStatus>(dataStatus);
-  const editableStatus = ['Editable', 'Viewable', 'Completed'];
+  const [status, setStatus] = useState(transfer?.status);
   useEffect(() => {
     const id = transfer?.command.subscribe((type, cmd, args) => {
       switch (type) {
@@ -145,6 +149,12 @@ const Remove: React.FC<RemoveProps> = ({ store, transfer, node, data }) => {
         case 'running':
           setStatus(args[0].status);
           break;
+        case 'graph':
+          switch (cmd) {
+            case 'status':
+              setStatus(args);
+              break;
+          }
       }
     });
     return () => {
@@ -153,7 +163,7 @@ const Remove: React.FC<RemoveProps> = ({ store, transfer, node, data }) => {
   });
   return (
     <>
-      {show && graphStatus == 'Editable' && editableStatus.indexOf(status) != -1 && (
+      {show && status == 'Editable' && (
         <CloseCircleOutlined
           style={{ color: '#9498df', fontSize: 12 }}
           className={cls.remove}
@@ -165,22 +175,15 @@ const Remove: React.FC<RemoveProps> = ({ store, transfer, node, data }) => {
 };
 
 export interface StatusProps {
-  store?: TransferStore;
+  store?: Store;
   transfer?: ITransfer;
   node: Node;
   data: model.Node;
   style?: CSSProperties;
 }
 
-export const NodeStatus: React.FC<StatusProps> = ({
-  store,
-  transfer,
-  node,
-  data,
-  style,
-}) => {
-  const dataStatus = data.status ?? store?.graphStatus ?? 'Editable';
-  const [status, setStatus] = useState<model.NStatus>(dataStatus);
+export const NodeStatus: React.FC<StatusProps> = ({ transfer, node, data, style }) => {
+  const [status, setStatus] = useState<model.NStatus>(data.status ?? 'Stop');
   useEffect(() => {
     const id = transfer?.command.subscribe((type, cmd, args) => {
       switch (type) {
@@ -188,11 +191,11 @@ export const NodeStatus: React.FC<StatusProps> = ({
           const [data, error] = args;
           if (data.id == node.id) {
             switch (cmd) {
-              case 'start':
-              case 'completed':
+              case 'Start':
+              case 'Complete':
                 setStatus(data.status);
                 break;
-              case 'error':
+              case 'Throw':
                 setStatus('Error');
                 message.error(error.message);
                 break;
@@ -210,15 +213,13 @@ export const NodeStatus: React.FC<StatusProps> = ({
 };
 
 interface SProps {
-  status: model.GStatus;
+  status: model.NStatus;
   style?: CSSProperties;
 }
 
 export const Status: React.FC<SProps> = ({ status, style }) => {
   switch (status) {
-    case 'Editable':
-      return <PauseCircleOutlined style={{ color: '#9498df', fontSize: 18, ...style }} />;
-    case 'Viewable':
+    case 'Stop':
       return <PauseCircleOutlined style={{ color: '#9498df', fontSize: 18, ...style }} />;
     case 'Running':
       return <LoadingOutlined style={{ color: '#9498df', fontSize: 18, ...style }} />;
@@ -248,13 +249,12 @@ const Tag: React.FC<TagProps> = ({ typeName, transfer, style }) => {
 };
 
 interface ContextProps {
-  store?: TransferStore;
   transfer?: ITransfer;
   node: Node;
   data: model.Node;
 }
 
-const ContextMenu: React.FC<ContextProps> = ({ store, transfer, node, data }) => {
+const ContextMenu: React.FC<ContextProps> = ({ transfer, node, data }) => {
   const menus: { [key: string]: MenuItemType } = {
     open: {
       key: 'edit',
@@ -284,10 +284,7 @@ const ContextMenu: React.FC<ContextProps> = ({ store, transfer, node, data }) =>
   const div = createRef<HTMLDivElement>();
   const [menu, setMenu] = useState<boolean>();
   const [pos, setPos] = useState<{ x: number; y: number }>();
-  const graphStatus = store?.graphStatus;
-  const dataStatus = data.status ?? graphStatus ?? 'Editable';
-  const [status, setStatus] = useState<model.NStatus>(dataStatus);
-  const editableStatus = ['Editable', 'Viewable', 'Completed'];
+  const [status, setStatus] = useState(transfer?.status);
   useEffect(() => {
     div.current?.focus();
     const id = transfer?.command.subscribe((type, cmd, args) => {
@@ -303,9 +300,12 @@ const ContextMenu: React.FC<ContextProps> = ({ store, transfer, node, data }) =>
               break;
           }
           break;
-        case 'running':
-          setStatus(args[0].status);
-          break;
+        case 'graph':
+          switch (cmd) {
+            case 'status':
+              setStatus(args);
+              break;
+          }
       }
     });
     return () => {
@@ -314,7 +314,7 @@ const ContextMenu: React.FC<ContextProps> = ({ store, transfer, node, data }) =>
   });
   return (
     <>
-      {menu && graphStatus == 'Editable' && editableStatus.indexOf(status) != -1 && (
+      {menu && status == 'Editable' && (
         <div
           ref={div}
           style={{ left: pos?.x, top: pos?.y }}
@@ -346,16 +346,17 @@ const ContextMenu: React.FC<ContextProps> = ({ store, transfer, node, data }) =>
 };
 
 interface InfoProps {
-  name: string;
+  node: model.Node;
   style?: CSSProperties;
 }
 
 // 节点信息
-const Info: React.FC<InfoProps> = ({ name, style }) => {
+const Info: React.FC<InfoProps> = ({ node, style }) => {
+  const entity = { name: node.name, typeName: node.typeName } as schema.XEntity;
   return (
     <div style={style} className={`${cls['flex-row']} ${cls['info']} ${cls['border']}`}>
-      <EntityIcon entityId={name} />
-      <div style={{ marginLeft: 10 }}>{name}</div>
+      <EntityIcon entity={entity} />
+      <div style={{ marginLeft: 10 }}>{node.name}</div>
     </div>
   );
 };

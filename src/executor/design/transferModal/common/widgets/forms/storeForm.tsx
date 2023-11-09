@@ -2,8 +2,15 @@ import SchemaForm from '@/components/SchemaForm';
 import { model } from '@/ts/base';
 import { ITransfer } from '@/ts/core';
 import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components';
-import React, { createRef, useEffect, useState } from 'react';
-import { MenuItem, loadApplicationsMenu, loadDirs, loadFormsMenu } from '../menus';
+import { Input } from 'antd';
+import React, { createRef, useEffect } from 'react';
+import {
+  CodeColumn,
+  NameColumn,
+  PostScriptColumn,
+  PreScriptColumn,
+  RemarkColumn,
+} from './common';
 
 interface IProps {
   transfer: ITransfer;
@@ -11,149 +18,66 @@ interface IProps {
   finished: () => void;
 }
 
-const getDirTrees = (transfer: ITransfer): MenuItem[] => {
-  const tree = [
-    loadDirs(transfer.directory.target.directory, (item) => (item.selectable = true)),
-  ];
-  return tree;
-};
-
-const getWorkTrees = (transfer: ITransfer): MenuItem[] => {
-  const tree = [loadApplicationsMenu(transfer.directory.target.directory)];
-  return tree;
-};
-
-const getFormTrees = (transfer: ITransfer): MenuItem[] => {
-  const tree = [loadFormsMenu(transfer.directory.target.directory)];
-  return tree;
-};
-
 export const StoreForm: React.FC<IProps> = ({ transfer, current, finished }) => {
-  const formRef = createRef<ProFormInstance>();
-  const [notInit, setNotInit] = useState<boolean>(true);
-  const [treeData, setTreeData] = useState<MenuItem[]>(getDirTrees(transfer));
-  const [workTree, setWorkTree] = useState<MenuItem[]>([]);
-  const [formTree, setFormTree] = useState<MenuItem[]>(getFormTrees(transfer));
+  const form = createRef<ProFormInstance>();
   useEffect(() => {
-    if (notInit) {
-      transfer.directory.target.directory.loadAllApplication().then(async (apps) => {
-        for (let app of apps) {
-          await app.loadWorks();
+    const id = transfer.command.subscribe((type, cmd, args) => {
+      if (type == 'data' && cmd == 'fileCollect') {
+        const { prop, files } = args;
+        if (files && files.length > 0 && prop == 'workId') {
+          const meta = files[0].metadata;
+          transfer.loadWorks([meta.applicationId], [meta.id]).then(() => {
+            form.current?.setFieldValue('applicationId', meta.applicationId);
+            form.current?.setFieldValue('workId', meta.id);
+          });
         }
-        setWorkTree(getWorkTrees(transfer));
-        setNotInit(false);
-      });
-    }
+      }
+    });
+    return () => {
+      transfer.command.unsubscribe(id);
+    };
   });
   const columns: ProFormColumnsType<model.Store>[] = [
+    NameColumn,
+    CodeColumn,
     {
-      title: '名称',
-      dataIndex: 'name',
+      title: '应用',
+      dataIndex: 'applicationId',
       colProps: { span: 12 },
-      formItemProps: {
-        rules: [{ required: true, message: '名称为必填项' }],
+      renderFormItem: (_, __, form) => {
+        const item = transfer.applications[form.getFieldValue('applicationId')];
+        return <Input disabled value={item?.name} />;
       },
     },
     {
-      title: '编码',
-      dataIndex: 'code',
-      colProps: { span: 12 },
-      formItemProps: {
-        rules: [{ required: true, message: '编码为必填项' }],
-      },
-    },
-    {
-      title: '存储目录',
-      dataIndex: 'directoryId',
-      valueType: 'treeSelect',
-      colProps: { span: 24 },
-      formItemProps: {
-        rules: [{ required: true, message: '编码为必填项' }],
-      },
-      fieldProps: {
-        fieldNames: {
-          label: 'label',
-          value: 'key',
-          children: 'children',
-        },
-        showSearch: true,
-        loadData: async (node: MenuItem): Promise<void> => {
-          if (!node.isLeaf) {
-            setTreeData(getDirTrees(transfer));
-          }
-        },
-        treeNodeFilterProp: 'label',
-        treeData: treeData,
-      },
-    },
-    {
-      title: '应用（办事）',
+      title: '办事',
       dataIndex: 'workId',
-      valueType: 'treeSelect',
-      colProps: { span: 24 },
-      formItemProps: {
-        rules: [{ required: true, message: '应用（办事）为必填项' }],
-      },
-      fieldProps: {
-        fieldNames: {
-          label: 'label',
-          value: 'key',
-          children: 'children',
-        },
-        showSearch: true,
-        loadData: async (node: MenuItem): Promise<void> => {
-          if (!node.isLeaf) {
-            setWorkTree(getWorkTrees(transfer));
-          }
-        },
-        treeNodeFilterProp: 'label',
-        treeData: workTree,
-      },
-    },
-    {
-      title: '绑定表单',
-      dataIndex: 'formIds',
-      valueType: 'treeSelect',
-      colProps: { span: 24 },
-      formItemProps: {
-        rules: [{ required: true, message: '编码为必填项' }],
-      },
-      fieldProps: {
-        fieldNames: {
-          label: 'label',
-          value: 'key',
-          children: 'children',
-        },
-        showSearch: true,
-        loadData: async (node: MenuItem): Promise<void> => {
-          if (!node.isLeaf) {
-            setFormTree(getFormTrees(transfer));
-          }
-        },
-        multiple: true,
-        treeNodeFilterProp: 'label',
-        treeData: formTree,
-      },
-    },
-    {
-      title: '是否直接存入平台',
-      dataIndex: 'directIs',
-      valueType: 'switch',
       colProps: { span: 12 },
       formItemProps: {
-        rules: [{ required: true, message: '编码为必填项' }],
+        rules: [{ required: true, message: '办事为必填项' }],
+      },
+      renderFormItem: (_, __, form) => {
+        const item = transfer.works[form.getFieldValue('workId')];
+        return (
+          <Input
+            value={item?.name}
+            onClick={() => {
+              transfer.command.emitter('data', 'file', {
+                prop: 'workId',
+                accepts: ['办事'],
+              });
+            }}
+          />
+        );
       },
     },
-    {
-      title: '备注',
-      dataIndex: 'remark',
-      valueType: 'textarea',
-      colProps: { span: 24 },
-    },
+    PreScriptColumn,
+    PostScriptColumn,
+    RemarkColumn,
   ];
   return (
     <SchemaForm<model.Store>
-      ref={formRef}
+      formRef={form}
       open
       title="存储配置"
       width={640}
@@ -169,7 +93,7 @@ export const StoreForm: React.FC<IProps> = ({ transfer, current, finished }) => 
         }
       }}
       onFinish={async (values) => {
-        await transfer.updNode({ ...current, ...values });
+        Object.assign(current, values);
         finished();
       }}
     />

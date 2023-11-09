@@ -19,6 +19,7 @@ import TaskBody from './task';
 import JoinApply from './task/joinApply';
 import EntityInfo from '@/components/Common/EntityInfo';
 import WorkForm from '@/components/DataStandard/WorkForm';
+import Directory from '@/components/Directory';
 
 const officeExt = ['.md', '.pdf', '.xls', '.xlsx', '.doc', '.docx', '.ppt', '.pptx'];
 const videoExt = ['.mp4', '.avi', '.mov', '.mpg', '.swf', '.flv', '.mpeg'];
@@ -97,6 +98,9 @@ const EntityPreview: React.FC<IOpenProps> = (props: IOpenProps) => {
         default:
           return <></>;
       }
+    }
+    if ('standard' in entity) {
+      return <Directory current={entity} />;
     }
     return <EntityInfo entity={entity} column={1} />;
   }

@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import cls from './index.module.less';
+// import cls from './index.module.less';
 import { Button, Divider, Image, Input, List, Space, Tag, Typography } from 'antd';
 import { IActivity, IActivityMessage, MessageType } from '@/ts/core';
-import { DeleteOutlined, LikeOutlined, MessageOutlined } from '@ant-design/icons';
 import { parseHtmlToText, showChatTime } from '@/utils/tools';
 import orgCtrl from '@/ts/controller';
 import { XEntity } from '@/ts/base/schema';
 import ActivityResource from '../ActivityResource';
 import ActivityComment from '../ActivityComment';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
+import { AiOutlineDelete, AiOutlineLike, AiOutlineMessage } from '@/icons/ai';
 
 interface ActivityItemProps {
   hideResource?: boolean;
@@ -77,20 +77,21 @@ export const ActivityMessage: React.FC<ActivityItemProps> = ({
             }}>
             {metadata.likes.includes(orgCtrl.user.id) ? (
               <>
-                <LikeOutlined style={{ color: '#cb4747' }} /> <span>取消</span>
+                {/* <LikeOutlined className={cls.likeColor} /> <span>取消</span> */}
+                <AiOutlineLike style={{ color: '#cb4747' }} size={18} /> <span>取消</span>
               </>
             ) : (
               <>
-                <LikeOutlined /> <span>点赞</span>
+                <AiOutlineLike size={18} /> <span>点赞</span>
               </>
             )}
           </Button>
           <Button type="text" size="small" onClick={() => handleReply()}>
-            <MessageOutlined /> <span>评论</span>
+            <AiOutlineMessage size={18} /> <span>评论</span>
           </Button>
           {item.canDelete && (
             <Button type="text" size="small" onClick={() => item.delete()}>
-              <DeleteOutlined /> <span>删除</span>
+              <AiOutlineDelete size={18} /> <span>删除</span>
             </Button>
           )}
         </Space>
@@ -100,25 +101,28 @@ export const ActivityMessage: React.FC<ActivityItemProps> = ({
       const showLikes = metadata.likes?.length > 0 || metadata.comments?.length > 0;
       return (
         <>
-          <div className={cls.activityItemFooter}>
+          {/* <div className={cls.activityItemFooter}> */}
+          <div className={'activityItem-footer'}>
             <div>
               <EntityIcon entityId={metadata.createUser} showName />
-              <span className={cls.activityTime}>
+              {/* <span className={cls.activityTime}> */}
+              <span className={'activityTime'}>
                 发布于{showChatTime(item.metadata.createTime)}
               </span>
             </div>
           </div>
           {showLikes && (
-            <div className={cls.activityItemFooterLikes}>
+            // <div className={cls.activityItemFooterLikes}>
+            <div className={'activityItem-footer-likes'}>
               {metadata.likes.length > 0 && (
                 <span style={{ fontSize: 18, color: '#888' }}>
-                  <LikeOutlined style={{ color: '#cb4747', fontSize: 18 }} />
+                  <AiOutlineLike className="likeColor" size={18} />
                   <b style={{ marginLeft: 6 }}>{metadata.likes.length}</b>
                 </span>
               )}
               {metadata.comments.length > 0 && (
                 <span style={{ fontSize: 18, color: '#888' }}>
-                  <MessageOutlined style={{ color: '#4747cb', fontSize: 18 }} />
+                  <AiOutlineMessage style={{ color: '#4747cb' }} size={18} />
                   <b style={{ marginLeft: 6 }}>{metadata.comments.length}</b>
                 </span>
               )}
@@ -129,19 +133,19 @@ export const ActivityMessage: React.FC<ActivityItemProps> = ({
     }
     return (
       <>
-        <div className={cls.activityItemFooter}>
+        <div className={'activityItem-footer'}>
           <div>
             <EntityIcon entityId={metadata.createUser} showName />
-            <span className={cls.activityTime}>
+            <span className={'activityTime'}>
               发布于{showChatTime(item.metadata.createTime)}
             </span>
           </div>
           {!hideResource && <div>{renderOperate()}</div>}
         </div>
         <div
-          className={cls.activityItemFooterLikes}
+          className={'activityItem-footer-likes'}
           style={{ display: metadata.likes.length ? 'flex' : 'none' }}>
-          <LikeOutlined style={{ color: '#cb4747', fontSize: 18 }} />
+          <AiOutlineLike className="likeColor" size={18} />
           {metadata.likes.map((userId) => {
             return (
               <div key={userId} style={{ alignItems: 'center', display: 'flex' }}>
@@ -151,7 +155,7 @@ export const ActivityMessage: React.FC<ActivityItemProps> = ({
           })}
         </div>
         {metadata.comments?.length > 0 && (
-          <div className={cls.activityItemCommentList}>
+          <div className={'activityItem-commentList'}>
             {metadata.comments.map((item) => {
               return (
                 <ActivityComment
@@ -164,7 +168,7 @@ export const ActivityMessage: React.FC<ActivityItemProps> = ({
         )}
         <div
           style={{ display: commenting ? 'flex' : 'none' }}
-          className={cls.activityItemCommentInputBox}>
+          className={'activityItem-commentInputBox'}>
           <Input.TextArea
             placeholder={replyTo ? `回复${replyTo.name} :` : ''}
             style={{ height: 12 }}
@@ -204,11 +208,11 @@ export const ActivityMessage: React.FC<ActivityItemProps> = ({
         }
         avatar={<EntityIcon entity={activity.metadata} size={50} />}
         description={
-          <div className={cls.activityItem}>
+          <div className={'activityItem'}>
             <div>
               {renderContent()}
               {hideResource !== true && (
-                <div className={cls.activityItemImageList}>
+                <div className={'activityItem-imageList'}>
                   <Image.PreviewGroup>
                     {ActivityResource(metadata.resource, 600)}
                   </Image.PreviewGroup>

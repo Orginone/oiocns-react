@@ -1,0 +1,23 @@
+.top {
+  height: 40px;
+}
+
+.content {
+  width: 100%;
+  height: 100%;
+  flex: auto;
+  display: flex;
+  gap: 8px;
+  > div {
+    background-color: white;
+  }
+  :global(.o-page-host) {
+    width: 1px;
+    flex: auto;
+    background-color: @layout-body-background;
+  }
+}
+
+.designConfig {
+  width: 400px;
+}

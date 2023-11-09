@@ -75,7 +75,25 @@ export const collecting = (
         sheet.columns.forEach((column) => {
           let value = item[column.title];
           if (value || value === 0) {
-            ansItem[column.dataIndex] = String(value);
+            switch (column.valueType) {
+              case '选择型':
+              case '分类型':
+                if (column.lookups) {
+                  for (const item of column.lookups) {
+                    if (item.text == value) {
+                      ansItem[column.dataIndex] = item.value;
+                      ansItem[item.value] = item.text;
+                      break;
+                    }
+                  }
+                }
+                break;
+              case '数值型':
+                ansItem[column.dataIndex] = Number(value);
+                break;
+              default:
+                ansItem[column.dataIndex] = String(value);
+            }
           }
         });
         ansData.push(ansItem);

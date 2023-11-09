@@ -4,6 +4,7 @@ import * as t from '../type';
 export class FormSheet extends i.Sheet<t.Form> {
   constructor(directory: t.IDirectory) {
     super(
+      t.generateUuid(),
       '表单定义',
       [
         { title: '目录代码', dataIndex: 'directoryCode', valueType: '描述型' },
@@ -26,6 +27,7 @@ export class FormSheet extends i.Sheet<t.Form> {
 export class AttrSheet extends i.Sheet<t.Attribute> {
   constructor(directory: t.IDirectory) {
     super(
+      t.generateUuid(),
       '表单特性',
       [
         { title: '表单代码', dataIndex: 'formCode', valueType: '描述型' },
@@ -50,14 +52,13 @@ export class FormHandler extends i.SheetHandler<FormSheet> {
     const allErrors: t.Error[] = [];
     const dirHandler = excel.handlers.find((item) => item.sheet.name == '目录');
     this.sheet.data.forEach((item, index) => {
-      let right = ['实体配置', '事项配置'].indexOf(item.typeName) != -1;
       let hasDir = dirHandler?.sheet.data.find((dir) => dir.code == item.directoryCode);
       let errors = this.assert(index, [
         { res: !item.directoryCode, error: '目录未填写' },
         { res: !item.typeName, error: '表单类型未填写' },
         { res: !item.name, error: '表单名称未填写' },
         { res: !item.code, error: '表单代码未填写' },
-        { res: !right, error: '表单类型只能填写实体配置或事项配置' },
+        { res: !(item.typeName == '表单'), error: '表单类型只能填写表单' },
         { res: !hasDir, error: `未获取到目录代码：${item.directoryCode}` },
       ]);
       allErrors.push(...errors);
