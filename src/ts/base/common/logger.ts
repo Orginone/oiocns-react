@@ -14,7 +14,6 @@ class Logger {
   onLogger?: (level: LoggerLevel, message: string) => void;
   constructor() {}
   info(message: MessageType): void {
-    console.info(message);
     this._callback(LoggerLevel.info, message);
   }
   warn(message: MessageType): void {

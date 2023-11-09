@@ -47,6 +47,9 @@ import { AiOutlineFileUnknown } from '@react-icons/all-files/ai/AiOutlineFileUnk
 import { AiOutlineShoppingCart } from '@react-icons/all-files/ai/AiOutlineShoppingCart';
 import { AiOutlineRead } from '@react-icons/all-files/ai/AiOutlineRead';
 import { AiOutlinePlusSquare } from '@react-icons/all-files/ai/AiOutlinePlusSquare';
+import { AiOutlineQq } from '@react-icons/all-files/ai/AiOutlineQq';
+import { AiFillWechat } from '@react-icons/all-files/ai/AiFillWechat';
+import { AiOutlineAlipayCircle } from '@react-icons/all-files/ai/AiOutlineAlipayCircle';
 
 export {
   AiFillCloseCircle,
@@ -54,6 +57,8 @@ export {
   AiFillPlusCircle,
   AiFillStepBackward,
   AiFillStepForward,
+  AiFillWechat,
+  AiOutlineAlipayCircle,
   AiOutlineApartment,
   AiOutlineArrowRight,
   AiOutlineBank,
@@ -84,6 +89,7 @@ export {
   AiOutlinePlus,
   AiOutlinePlusCircle,
   AiOutlinePlusSquare,
+  AiOutlineQq,
   AiOutlineRead,
   AiOutlineRight,
   AiOutlineRollback,

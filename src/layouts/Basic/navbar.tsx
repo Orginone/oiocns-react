@@ -8,9 +8,10 @@ import React from 'react';
 import { kernel, model, schema } from '@/ts/base';
 import { showChatTime } from '@/utils/tools';
 import { useFlagCmdEmitter } from '@/hooks/useCtrlUpdate';
-import { Link } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 
 const Navbar: React.FC = () => {
+  const history = useHistory();
   const [workCount, setWorkCount] = useState(0);
   const [msgCount, setMsgCount] = useState(0);
   const [online, setOnline] = useState(0);
@@ -79,16 +80,16 @@ const Navbar: React.FC = () => {
       );
     }
     return (
-      <Link
+      <a
         key={item.path}
-        to={item.path}
         onClick={() => {
+          history.push(item.path);
           orgCtrl.currentKey = '';
           orgCtrl.changCallback();
         }}>
         {content}
         <div className={selected ? styles.title_selected : styles.title}>{item.text}</div>
-      </Link>
+      </a>
     );
   };
 
@@ -107,15 +108,14 @@ const Navbar: React.FC = () => {
         {actions.map((item) => NavItem(item))}
         {onlineVisible && <OnlineInfo onClose={() => setOnlineVisible(false)} />}
       </Space>
-      <Link
-        to={'/passport/login'}
+      <a
         onClick={() => {
           sessionStorage.clear();
           location.reload();
         }}>
         <OrgIcons size={22} exit selected />
         <div className={styles.title_selected}>退出</div>
-      </Link>
+      </a>
     </Layout.Sider>
   );
 };
