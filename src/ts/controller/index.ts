@@ -3,6 +3,7 @@ import { common } from '@/ts/base';
 import { IWorkProvider } from '../core/work/provider';
 import { IPageTemplate } from '../core/thing/standard/page';
 import { IBoxProvider } from '../core/work/box';
+import { AuthProvider } from '../core/auth';
 /** 控制器基类 */
 export class Controller extends common.Emitter {
   public currentKey: string;
@@ -29,6 +30,10 @@ class IndexController extends Controller {
       IndexController._provider = new UserProvider(this);
     }
     return IndexController._provider;
+  }
+  /** 授权方法 */
+  get auth(): AuthProvider {
+    return this.provider.auth;
   }
   /** 当前用户 */
   get user(): IPerson {
