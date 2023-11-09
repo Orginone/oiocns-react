@@ -6,6 +6,7 @@ import WorkForm from '@/executor/tools/workForm';
 import FullScreenModal from '@/components/Common/fullScreen';
 import { model } from '@/ts/base';
 import useAsyncLoad from '@/hooks/useAsyncLoad';
+import ExtraButton from '@/executor/open/work/extraButton';
 // 卡片渲染
 interface IProps {
   current: IWork | IWorkTask;
@@ -80,6 +81,7 @@ const WorkStartDo: React.FC<IProps> = ({ current, finished }) => {
         footer={[]}
         onCancel={finished}>
         {loadContent()}
+        <ExtraButton title={apply?.metadata.title ?? ' '} current={current} />
       </FullScreenModal>
     </>
   );

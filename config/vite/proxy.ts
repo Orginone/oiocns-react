@@ -23,6 +23,11 @@ export function createProxy() {
       changeOrigin: true, // 是否允许跨域
       ws: true,
     },
+    '/apparatus': {
+      target: 'http://localhost:5000',
+      changeOrigin: true, // 是否允许跨域
+      ws: true,
+    },
   };
   return ProxyList;
 }
