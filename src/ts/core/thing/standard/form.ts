@@ -11,6 +11,8 @@ export interface IForm extends IStandardFileInfo<schema.XForm> {
   fields: model.FieldModel[];
   /** 加载分类字典项 */
   loadItems(speciesIds: string[]): Promise<schema.XSpeciesItem[]>;
+  /** 加载字段 */
+  loadFields(reload?: boolean): Promise<model.FieldModel[]>;
   /** 保存 */
   save(): Promise<boolean>;
   /** 新建表单特性 */

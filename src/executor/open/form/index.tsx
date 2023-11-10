@@ -42,6 +42,7 @@ const FormView: React.FC<IProps> = ({ form, finished }) => {
           height={'100%'}
           fields={form.fields}
           onRowDblClick={(e: any) => setSelcet(e.data)}
+          filterValue={JSON.parse(form.metadata.searchRule ?? '[]')}
           dataSource={
             new CustomStore({
               key: 'id',

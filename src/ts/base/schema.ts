@@ -169,6 +169,8 @@ export type XDirectory = {
 export type XForm = {
   // 表单布局
   rule: string;
+  // 表单查看数据规则
+  searchRule: string;
   // 配置参数
   options: XFormProps | undefined;
   // 表单的特性
