@@ -11,6 +11,7 @@ import cls from './index.module.less';
 import { ViewerHost } from '@/executor/open/page/view/ViewerHost';
 import ViewerManager from '@/executor/open/page/view/ViewerManager';
 import { getResouces } from '@/config/location';
+import { generateUuid } from '@/utils/excel';
 const resource = getResouces();
 
 export const allPages: NavigationItem[] = [
@@ -46,7 +47,7 @@ const NavigationBar: React.FC<{
   const [pages, setPages] = useState<IPageTemplate[]>([]);
   const mapping = (item: IPageTemplate) => {
     const navigation: NavigationItem = {
-      key: item.id,
+      key: generateUuid(),
       label: item.name,
       backgroundImageUrl: '',
       type: 'page',

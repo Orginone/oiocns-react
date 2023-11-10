@@ -17,15 +17,15 @@ export abstract class SheetHandler<S extends t.model.Sheet<any>>
     asserts: { res: boolean; error: string }[],
   ): t.Error[] {
     let errors: t.Error[] = [];
+    if (typeof index == 'number') {
+      index += 2;
+    } else {
+      for (let i = 0; i < index.length; i++) {
+        index[i] += 2;
+      }
+    }
     asserts.forEach((item) => {
       if (item.res) {
-        if (typeof index == 'number') {
-          index += 2;
-        } else {
-          for (let i = 0; i < index.length; i++) {
-            index[i] += 2;
-          }
-        }
         errors.push({
           name: this.sheet.name,
           row: index,
