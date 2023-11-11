@@ -6,25 +6,22 @@ interface IProps {
   finished: () => void;
   children: React.ReactNode;
   fullScreen?: boolean;
+  onSave?: () => void;
 }
 
-const FullModal: React.FC<IProps> = ({
-  title,
-  finished,
-  children,
-  fullScreen = true,
-}) => {
+const FullModal: React.FC<IProps> = (props) => {
   return (
     <FullScreenModal
       open
       centered
-      fullScreen={fullScreen}
+      fullScreen={props.fullScreen ?? true}
       width={'80vw'}
       bodyHeight={'80vh'}
       destroyOnClose
-      title={title}
-      onCancel={() => finished()}>
-      {children}
+      title={props.title}
+      onSave={props.onSave}
+      onCancel={() => props.finished()}>
+      {props.children}
     </FullScreenModal>
   );
 };

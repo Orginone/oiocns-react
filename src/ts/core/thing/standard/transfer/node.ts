@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { ITransfer } from '.';
 import { kernel, model, schema } from '../../../../base';
 import { formatDate, generateUuid, sleep } from '../../../../base/common';

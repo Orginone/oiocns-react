@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { Command, common, kernel, model } from '../../../../base';
 import { IDirectory } from '../../directory';
 import { IStandardFileInfo, StandardFileInfo } from '../../fileinfo';
