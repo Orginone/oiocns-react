@@ -3,6 +3,7 @@ import { ColumnsType } from 'antd/lib/table';
 import React, { useEffect, useState } from 'react';
 import cls from './../index.module.less';
 import { ITransfer } from '@/ts/core';
+import { generateUuid } from '@/utils/excel';
 
 interface IProps {
   current: ITransfer;
@@ -79,7 +80,7 @@ const Settings: React.FC<IProps> = ({ current }) => {
   });
   return (
     <div className={cls.settings}>
-      <Table rowKey={'index'} columns={columns} dataSource={kvs} />
+      <Table rowKey={() => generateUuid()} columns={columns} dataSource={kvs} />
     </div>
   );
 };
