@@ -31,3 +31,7 @@ export const hasPrefix: ParameterInfo = {
   type: { type: 'type' } as ExistTypeMeta<boolean | undefined>,
 };
 
+export const hasTip: ParameterInfo = {
+  label: '是否有字段名前缀',
+  type: { type: 'type' } as ExistTypeMeta<boolean | undefined>,
+};

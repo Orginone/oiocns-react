@@ -241,7 +241,7 @@ function Template<T>(props: ItemProps<T>) {
                   case '选择型':
                     {
                       const item = up as schema.XSpeciesItem;
-                      const args = [`T${props.item.id}`, '=', item.code || `S${item.id}`];
+                      const args = [`T${props.item.id}`, '=', `S${item.id}`];
                       props.ctx.view.emitter('dicts', 'changed', {
                         id: props.item.id,
                         data: args,

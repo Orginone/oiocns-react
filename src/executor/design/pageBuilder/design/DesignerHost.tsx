@@ -3,12 +3,7 @@ import React, { ReactNode, useContext, useState } from 'react';
 import { DesignContext, PageContext } from '../render/PageContext';
 import FullScreenModal from '@/components/Common/fullScreen';
 import { AiOutlineApartment } from '@/icons/ai';
-import {
-  CheckOutlined,
-  FileOutlined,
-  RightCircleOutlined,
-  SettingOutlined,
-} from '@ant-design/icons';
+import { CheckOutlined, FileOutlined, RightCircleOutlined } from '@ant-design/icons';
 import { json } from '@codemirror/lang-json';
 import CodeMirror from '@uiw/react-codemirror';
 import { ViewerHost } from '../../../open/page/view/ViewerHost';
@@ -64,11 +59,6 @@ export function DesignerHost({ ctx }: DesignerProps) {
         key: 'tree',
         label: '元素树',
         icon: <AiOutlineApartment />,
-      },
-      {
-        key: 'element',
-        label: '元素配置',
-        icon: <SettingOutlined />,
       },
       {
         key: 'data',
@@ -136,6 +126,9 @@ export function DesignerHost({ ctx }: DesignerProps) {
         </div>
         <div className="o-page-host" style={{ flex: 'auto' }}>
           <RootRender element={ctx.view.rootElement} />
+        </div>
+        <div className="is-full-height">
+          <ElementProps />
         </div>
       </div>
       {center}

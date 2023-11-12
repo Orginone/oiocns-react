@@ -90,14 +90,12 @@ const ViewEntities: React.FC<IProps> = (props) => {
   props.ctx.view.subscribe((type, cmd, args) => {
     if (type == 'species' && cmd == 'checked') {
       userData.current = args;
-      loadData(size, 1);
     } else if (type == 'dicts') {
       if (cmd == 'changed') {
         dictFilter.current[args.id] = args.data;
       } else if (cmd == 'delete') {
         delete dictFilter.current[args];
       }
-      loadData(size, 1);
     } else if (type == 'ranges') {
       if (cmd == 'changed') {
         rangeFilter.current[args.id] = args.data;

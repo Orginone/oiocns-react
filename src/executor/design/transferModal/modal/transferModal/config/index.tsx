@@ -22,11 +22,17 @@ export const TransferModal: React.FC<IProps> = ({ current, finished }) => {
     const id = current.subscribe(() => setKey(generateUuid()));
     return () => {
       current.unsubscribe(id);
-      current.update(current.metadata);
     };
   }, [current.metadata]);
   return (
-    <FullModal key={key} title={'迁移配置'} finished={finished}>
+    <FullModal
+      key={key}
+      title={'迁移配置'}
+      onSave={async () => {
+        await current.update(current.metadata);
+        finished();
+      }}
+      finished={finished}>
       <Spin spinning={loading}>
         <Editor current={current} />
         <Tools current={current} />

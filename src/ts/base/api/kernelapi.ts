@@ -114,12 +114,19 @@ export default class KernelApi {
    * @returns {Promise<model.ResultType<any>>} 异步登录结果
    */
   public async login(userName: string, password: string): Promise<model.ResultType<any>> {
-    const res = await this._storeHub.invoke('Login', {
-      account: userName,
-      pwd: password,
+    const res = await this._storeHub.invoke('Auth', {
+      module: 'auth',
+      action: 'Login',
+      params: {
+        account: userName,
+        password: password,
+      },
     });
     if (res.success) {
       this.accessToken = res.data.accessToken;
+      if (this._storeHub.isConnected) {
+        await this._storeHub.invoke('TokenAuth', this.accessToken);
+      }
     }
     return res;
   }
@@ -151,9 +158,16 @@ export default class KernelApi {
    * @returns {Promise<model.ResultType<any>>} 异步注册结果
    */
   public async register(params: model.RegisterType): Promise<model.ResultType<any>> {
-    var res = await this._storeHub.invoke('Register', params);
+    const res = await this._storeHub.invoke('Auth', {
+      module: 'auth',
+      action: 'Register',
+      params: params,
+    });
     if (res.success) {
       this.accessToken = res.data.accessToken;
+      if (this._storeHub.isConnected) {
+        await this._storeHub.invoke('TokenAuth', this.accessToken);
+      }
     }
     return res;
   }

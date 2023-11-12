@@ -24,7 +24,8 @@
     }
   },
   "include": [
-    "src/*",
+    "src/**/*.ts",
+    "src/**/*.tsx",
     "typings/*.d.ts",
     "config/**/*",
     "vite.config.ts",
