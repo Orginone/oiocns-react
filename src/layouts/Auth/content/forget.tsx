@@ -156,6 +156,7 @@ const PassportForget: React.FC<{ to: (flag: string) => void }> = ({ to }) => {
           size="large"
           placeholder="请输入新密码"
           width={410}
+          onChange={(e) => setFormData({ ...formData, password: e.target.value })}
         />
         <Button block type="primary" size="large" onClick={login}>
           重置密码
