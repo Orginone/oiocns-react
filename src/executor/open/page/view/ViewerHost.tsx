@@ -1,5 +1,8 @@
 import React from 'react';
-import { IPageContext, PageContext } from '../../../design/pageBuilder/render/PageContext';
+import {
+  IPageContext,
+  PageContext,
+} from '../../../design/pageBuilder/render/PageContext';
 
 export interface ViewerProps {
   ctx: IPageContext<'view'>;

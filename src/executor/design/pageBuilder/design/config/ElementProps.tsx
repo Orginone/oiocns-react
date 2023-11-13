@@ -1,11 +1,12 @@
 import { $confirm } from '@/utils/react/antd';
-import { Empty, Tag, message } from 'antd';
+import { Tag, message } from 'antd';
 import React, { useContext, useState } from 'react';
 import { TypeMeta } from '../../core/ElementMeta';
 import { PageElement } from '../../core/PageElement';
 import { DesignContext, PageContext } from '../../render/PageContext';
 import ElementPropsItem from './ElementPropsItem';
 import './index.less';
+import { CloseCircleOutlined } from '@ant-design/icons';
 
 export async function removeElement(element: PageElement | null, ctx: DesignContext) {
   if (!element) {
@@ -55,11 +56,7 @@ export default function ElementProps() {
   };
 
   if (!element) {
-    return (
-      <div>
-        <Empty description={`请选择一个元素`} />
-      </div>
-    );
+    return <></>;
   }
 
   const meta = ctx.view.elements.elementMeta[element.kind] || {};
@@ -72,7 +69,9 @@ export default function ElementProps() {
         <Tag color="processing" className="header-kind">
           {meta.label || element.kind}
         </Tag>
-        <div style={{ flex: 'auto' }}></div>
+        <div style={{ flex: 'auto', display: 'flex', flexDirection: 'row-reverse' }}>
+          <CloseCircleOutlined onClick={() => (ctx.view.currentElement = null)} />
+        </div>
       </div>
       <div className="props-content">
         {Object.entries(commonTypeMeta).map(([prop, meta]) => {

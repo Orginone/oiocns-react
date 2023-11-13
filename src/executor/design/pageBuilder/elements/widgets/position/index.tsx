@@ -1,8 +1,9 @@
 import { schema } from '@/ts/base';
+import orgCtrl from '@/ts/controller';
 import { shareOpenLink } from '@/utils/tools';
 import { DeleteOutlined } from '@ant-design/icons';
 import { Button, Image, Space, Tag } from 'antd';
-import React, { ReactNode } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ExistTypeMeta } from '../../../core/ElementMeta';
 import { File, SProperty, TipDesignText, TipText } from '../../../design/config/FileProp';
 import { Context } from '../../../render/PageContext';
@@ -17,6 +18,7 @@ interface IProps {
   width?: number;
   height?: number;
   hasPrefix?: boolean;
+  hasTip?: boolean;
   props: any;
   label: string;
   valueType: DisplayType;
@@ -85,70 +87,90 @@ const Design: React.FC<IProps> = (props) => {
   }
 };
 
-const View: React.FC<IProps> = (props) => {
-  const getValue = (data: schema.XThing, property: SProperty) => {
-    let suffix: any = '';
+const getOriginValue = async (property?: SProperty, data?: schema.XThing) => {
+  if (property && data) {
     switch (property.valueType) {
       case '选择型':
       case '分类型':
-        suffix = data[data['T' + property.id]] ?? '';
-        break;
+        return data[data['T' + property.id]] ?? '';
+      case '数值型':
+        return (data['T' + property.id] ?? '') + (property.unit ?? '');
+      case '用户型':
+        return await getTargetValue(data['T' + property.id]);
       default:
-        suffix = data['T' + property.id] ?? '';
-        break;
+        return data['T' + property.id] ?? '';
     }
-    return suffix;
-  };
+  }
+};
+
+const getTargetValue = async (targetId?: string) => {
+  if (targetId) {
+    let res = await orgCtrl.user.findEntityAsync(targetId);
+    return res?.name;
+  }
+};
+
+const getValue = async (props: IProps) => {
+  let value = await getOriginValue(props.property, props.data);
   switch (props.valueType) {
     case 'Photo':
-    case 'Avatar': {
-      let shareLink = '';
-      if (props.data && props.property) {
-        let value = getValue(props.data, props.property);
-        if (value) {
-          const parsedFile = JSON.parse(value);
-          if (parsedFile.length > 0) {
-            shareLink = parsedFile[0].shareLink;
+    case 'Avatar':
+      if (value) {
+        const parsedFile = JSON.parse(value);
+        if (parsedFile.length > 0) {
+          value = parsedFile[0].shareLink;
+        } else {
+          value = undefined;
+        }
+      }
+      break;
+    case 'Tags':
+      {
+        let value: string[] = [];
+        for (const item of props.properties) {
+          let originValue = await getOriginValue(item, props.data);
+          if (originValue) {
+            value.push(originValue);
           }
         }
       }
+      break;
+    default:
+      if (props.hasTip) {
+        value = value || value === 0 ? value : '[暂无数据]';
+      }
+      if (props.hasPrefix && props.property) {
+        value = props.property.name + '：' + value;
+      }
+      break;
+  }
+  return value;
+};
+
+const View: React.FC<IProps> = (props) => {
+  const [value, setValue] = useState<any>();
+  useEffect(() => {
+    getValue(props).then((res) => setValue(res));
+  }, []);
+  switch (props.valueType) {
+    case 'Photo':
+    case 'Avatar':
       return (
         <Image
           style={{ objectFit: 'cover', width: props.width, height: props.height }}
-          src={shareLink ? shareOpenLink(shareLink) : Asset}
+          src={value ? shareOpenLink(value) : Asset}
         />
       );
-    }
-    case 'Tags': {
-      const tags: ReactNode[] = [];
-      if (props.data) {
-        for (const index in props.properties) {
-          const item = props.properties[index];
-          let value = getValue(props.data, item);
-          if (value) {
-            tags.push(
-              <Tag key={index} color="green">
-                {value}
-              </Tag>,
-            );
-          }
-        }
-      }
-      return <Space direction={'horizontal'}>{tags}</Space>;
-    }
+    case 'Tags':
+      return (
+        <Space direction={'horizontal'}>
+          {value?.map((item: any, index: number) => {
+            return <Tag key={index}>{item}</Tag>;
+          })}
+        </Space>
+      );
     default: {
-      let value = '[暂无数据]';
-      if (props.data && props.property) {
-        let current = getValue(props.data, props.property);
-        if (current || current === 0) {
-          if (props.hasPrefix || props.property.valueType == '数值型') {
-            value = props.property.name + '：' + current + (props.property.unit ?? '');
-          } else {
-            value = current;
-          }
-        }
-      }
-      return <TipText value={value} />;
+      return <TipText>{value}</TipText>;
     }
   }
 };
@@ -170,16 +192,20 @@ export default defineElement({
         label: '名称',
       },
       width: {
-        type: 'type',
+        type: 'number',
         label: '宽度',
-      } as ExistTypeMeta<number | undefined>,
+      },
       height: {
-        type: 'type',
+        type: 'number',
         label: '高度',
-      } as ExistTypeMeta<number | undefined>,
+      },
       hasPrefix: {
         type: 'type',
         label: '是否有前缀',
+      } as ExistTypeMeta<boolean | undefined>,
+      hasTip: {
+        type: 'type',
+        label: '是否有[暂无数据]字样',
       } as ExistTypeMeta<boolean | undefined>,
       valueType: {
         type: 'type',

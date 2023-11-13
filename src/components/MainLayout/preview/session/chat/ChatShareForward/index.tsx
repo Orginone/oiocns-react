@@ -2,7 +2,6 @@ import React, { FC, useState } from 'react';
 import { Modal, Button, Row, Col, Badge, Input, List, Checkbox } from 'antd';
 import { MenuItemType } from 'typings/globelType';
 import { ImSearch } from '@/icons/im';
-import css from './index.module.less';
 import type { CheckboxChangeEvent } from 'antd/es/checkbox';
 import orgCtrl from '@/ts/controller';
 import TeamIcon from '@/components/Common/GlobalComps/entityIcon';
@@ -79,13 +78,36 @@ const ChatShareForward: FC<IChatShareForward> = (props) => {
       ]);
     }
   };
+  const renderTitle = () => {
+    return <div className="chatShare-title">
+      <span>转发</span>
+      <Input
+        className="chatMem-search"
+        placeholder="搜索"
+        prefix={<ImSearch />}
+        value={filter}
+        onChange={(e) => {
+          setFilter(e.target.value);
+        }}
+      />
+      <div className="chosen-num">{`已选：${selectedKeys.length}会话`}</div>
+    </div>
+  }
   return (
     <Modal
       width="70%"
-      title="转发"
+      title={renderTitle()}
       open={open}
       // bodyStyle={{height: `calc(${innerHeight / 2}px)`}}
-      bodyStyle={{ height: '400px' }}
+      bodyStyle={{ maxHeight: '600px', height: '80%', position: 'relative' }}
+      className="chat-shareForward"
+      onCancel={handleCancel}
+      maskClosable
+      afterClose={() => {
+        setSelectedData([])
+        setSelectedKeys([])
+        setFilter('')
+      }}
       footer={[
         <Button key="back" onClick={handleCancel}>
           取消
@@ -94,39 +116,24 @@ const ChatShareForward: FC<IChatShareForward> = (props) => {
           发送
         </Button>,
       ]}>
-      <Row className={css.searchAndChosen}>
-        <Col span={12}>
-          <Input
-            className={css.chatMemberInput}
-            placeholder="搜索"
-            prefix={<ImSearch />}
-            onChange={(e) => {
-              setFilter(e.target.value);
-            }}
-          />
-        </Col>
-        <Col span={12}>
-          <div className={css.chosenNum}>{`已选：${selectedKeys.length}会话`}</div>
-        </Col>
-      </Row>
-      <div className={css.departLine}>&nbsp;</div>
-      <Row className={css.chatShareForwardModal}>
-        <Col className={css.chatMember} span={12}>
-          <div className={css.memberWrap}>
+      <Row>
+        <div className="departLine">&nbsp;</div>
+        <Col className="chatMem" span={12}>
+          <div className="mem-wrap">
             <List
               header={null}
               footer={null}
               dataSource={chats}
               renderItem={(item) => {
                 return (
-                  <Row className={css.chatMemlistRow}>
-                    <Col className={css.chatMemlistCol} span={24}>
+                  <Row className="chatMem-list">
+                    <Col span={24}>
                       <Checkbox
                         checked={!!selectedKeys.find((key) => key === item.key)}
                         onChange={(e: CheckboxChangeEvent) => {
                           onCheck(e.target.checked, item);
                         }}>
-                        <List.Item className={css.listItem}>
+                        <List.Item className="chatMem-list-item">
                           <List.Item.Meta
                             avatar={
                               <Badge size="small">
@@ -153,8 +160,8 @@ const ChatShareForward: FC<IChatShareForward> = (props) => {
               }}></List>
           </div>
         </Col>
-        <Col span={12} className={css.chosenMember}>
-          <div className={css.chosenMemberWrap}>
+        <Col span={12} className="chosenMem">
+          <div className="chosenMem-wrap">
             <List
               header={null}
               footer={null}
@@ -162,10 +169,11 @@ const ChatShareForward: FC<IChatShareForward> = (props) => {
               dataSource={selectedData}
               renderItem={(item) => {
                 return (
-                  <Row className={`${css.chatMemlistRow} ${css.chosenListRow}`}>
+                  // <Row className={`${css.chatMemlist} ${css.chosenListRow}`}>
+                  <Row className="chatMem-list chosen-list">
                     <Col span={24}>
                       <List.Item
-                        className={css.listItem}
+                        className="chatMem-list-item"
                         actions={[
                           <AiOutlineClose
                             style={{ cursor: 'pointer' }}
