@@ -28,7 +28,7 @@ const TaskContent: React.FC<TaskDetailType> = ({ current, finished }) => {
     getNodeByNodeId(current.taskdata.nodeId, current.instanceData.node)?.destName ==
       '提交人'
   ) {
-    return <Tijiaoren current={current} finished={finished} />;
+    return <Tijiaoren current={current} belong={current.belong} finished={finished} />;
   }
 
   /** 加载时间条 */

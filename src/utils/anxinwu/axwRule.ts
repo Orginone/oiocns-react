@@ -246,7 +246,8 @@ export const validate = async (
       {
         const form1 = formData.get(shouyifenpei_formId);
         const form2 = formData.get(shouyifenpei_xuanze_formId);
-        if (form1 && form2) {
+        const neibushouyi = formData.get('505330906203037697');
+        if (form1 && form2 && neibushouyi) {
           if (form2.after.length > 0) {
             const form2Data = form2.after.at(-1);
             if (form2Data) {
@@ -256,12 +257,45 @@ export const validate = async (
               form1.after[0][shouyifenpei_jingbanren] =
                 form2Data[shouyifenpei_xuanze_jingbanren];
               form2.after = [form2Data];
+              const shouyiAfter = [];
+              {
+                const result = await kernel.createThing(
+                  belongId,
+                  [],
+                  neibushouyi.formName,
+                );
+                if (result) {
+                  result.data['505330906244980737'] = '一种忆阻器等效电路的构建方法';
+                  result.data['505330906244980738'] = '刘国华';
+                  result.data['505330906244980739'] = '40193';
+                  result.data['505330906244980743'] = 100;
+                  result.data['505330906244980744'] = form1.after[0][shouyifenpei_htjine];
+                  shouyiAfter.push(result.data);
+                }
+              }
+              {
+                const result = await kernel.createThing(
+                  belongId,
+                  [],
+                  neibushouyi.formName,
+                );
+                if (result) {
+                  result.data['505330906244980737'] = '一种忆阻器等效电路的构建方法';
+                  result.data['505330906244980738'] = '王光义';
+                  result.data['505330906244980739'] = '40110';
+                  result.data['505330906244980743'] = 0;
+                  result.data['505330906244980744'] = 0;
+                  shouyiAfter.push(result.data);
+                }
+              }
+              neibushouyi.after = shouyiAfter;
             }
           } else {
             delete form1.after[0][shouyifenpei_htname];
             delete form1.after[0][shouyifenpei_name];
             delete form1.after[0][shouyifenpei_htjine];
             delete form1.after[0][shouyifenpei_jingbanren];
+            neibushouyi.after = [];
           }
           return true;
         }

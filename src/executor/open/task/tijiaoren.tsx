@@ -5,22 +5,20 @@ import WorkForm from '@/executor/tools/workForm';
 import FullScreenModal from '@/components/Common/fullScreen';
 import { initApplyData } from '@/utils/anxinwu/axwRule';
 import { model } from '@/ts/base';
-import orgCtrl from '@/ts/controller';
 // 卡片渲染
 interface IProps {
   current: IWorkTask;
+  belong: IBelong;
   finished: () => void;
 }
 
 var formdata = new Map<string, model.FormEditData>();
 /** 办事-业务流程--发起 */
-const Tijiaoren: React.FC<IProps> = ({ current, finished }) => {
-  const company = orgCtrl.targets.find((a) => a.id == current.instance!.belongId);
-  if (!company) return <></>;
+const Tijiaoren: React.FC<IProps> = ({ current, belong, finished }) => {
   const info: { content: string } = { content: '' };
   if (current.instanceData) {
     formdata = new Map<string, model.FormEditData>();
-    initApplyData(company?.id, current.instanceData, formdata);
+    initApplyData(belong.id, current.instanceData, formdata);
   }
   const loadContent = () => {
     if (current.instanceData) {
@@ -28,9 +26,9 @@ const Tijiaoren: React.FC<IProps> = ({ current, finished }) => {
         <>
           <WorkForm
             allowEdit={true}
-            belong={company as IBelong}
+            belong={belong}
             data={current.instanceData}
-            nodeId={current.instanceData.node.id}
+            nodeId={current.taskdata.nodeId}
             onChanged={(id, data, _changed) => {
               const oldData = formdata.get(id);
               if (oldData) {
@@ -57,9 +55,8 @@ const Tijiaoren: React.FC<IProps> = ({ current, finished }) => {
                     current.instanceData!.data[k] = [data];
                   });
                 }
-                if (await current.approvalTask(100, info.content)) {
-                  finished();
-                }
+                await current.approvalTask(100, info.content);
+                finished();
               }}>
               提交
             </Button>

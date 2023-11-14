@@ -44,7 +44,7 @@ export const approvelWork = async (work: IWorkTask) => {
     //转化申请
     case '507470117328789504':
       if (work.taskdata.identityId == '507468792658534400') {
-        return await pushAchievement(work.instanceData!);
+        await pushAchievement(work.instanceData!);
       }
       break;
     default:

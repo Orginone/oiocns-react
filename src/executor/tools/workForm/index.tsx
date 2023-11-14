@@ -28,11 +28,19 @@ export const getNodeByNodeId = (
     }
   }
 };
+const loadNodeinfo = (id: string, node: model.WorkNodeModel | undefined) => {
+  const ret = getNodeByNodeId(id, node);
+  if (ret && ret.destName == '提交人') {
+    ret.primaryForms = node!.primaryForms;
+    ret.detailForms = node!.detailForms;
+  }
+  return ret;
+};
 
 /** 流程节点表单 */
 const WorkForm: React.FC<IWorkFormProps> = (props) => {
   const [key] = useObjectUpdate(props.data);
-  const node = getNodeByNodeId(props.nodeId, props.data.node);
+  const node = loadNodeinfo(props.nodeId, props.data.node);
   if (!node) return <></>;
   /** 根据需求获取数据 */
   const getFormData = (form: schema.XForm): model.FormEditData => {
