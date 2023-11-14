@@ -1,6 +1,5 @@
 import { kernel, model, schema } from '@/ts/base';
 import { formatDate } from '@/utils';
-import { getLoginToken } from './axwWork';
 // 转化申请_填写信息表单ID
 const zhuanhua_tianxiexinxi_formId = '505330904395292673';
 // 转化申请_选择成果表单ID
@@ -11,8 +10,8 @@ const zhuanhua_shouyifenpei_formId = '505330904923774977';
 const zhuanhua_tianxiexinxi_name = '505330903522877455';
 //转化申请_填写信息_金额
 const zhuanhua_tianxiexinxi_jine = '505330903510294534';
-//转化申请_填写信息_成果类型
-const zhuanhua_tianxiexinxi_chengguoleixing = '505330904445624337';
+//转化申请_填写信息_转让方式
+const zhuanhua_tianxiexinxi_zrfs = '505330904445624336';
 //转化申请_选择成果_成果名称
 const zhuanhua_xuanzechengguo_name = '505330903506100235';
 //转化申请_选择成果_金额
@@ -85,16 +84,16 @@ export const validate = async (
     case zhuanhua_xuanzechengguo_formId:
       if (
         formId == zhuanhua_xuanzechengguo_formId ||
-        changedValues[zhuanhua_tianxiexinxi_chengguoleixing] != undefined
+        changedValues[zhuanhua_tianxiexinxi_zrfs] != undefined
       ) {
         var form1 = formData.get(zhuanhua_tianxiexinxi_formId);
         var form2 = formData.get(zhuanhua_xuanzechengguo_formId);
         var form3 = formData.get(zhuanhua_shouyifenpei_formId);
         if (form1 && form2 && form3 && form2.after.length > 0) {
-          const cgtype = form1.after[0][zhuanhua_tianxiexinxi_chengguoleixing];
+          const cgtype = form1.after[0][zhuanhua_tianxiexinxi_zrfs];
           if (cgtype) {
             var typeText = fields[zhuanhua_tianxiexinxi_formId]
-              .find((a) => a.id == zhuanhua_tianxiexinxi_chengguoleixing)
+              .find((a) => a.id == zhuanhua_tianxiexinxi_zrfs)
               ?.lookups?.find((a) => a.value == cgtype)?.text;
             // 项目名称
             form1.after[0][zhuanhua_tianxiexinxi_name] = `${

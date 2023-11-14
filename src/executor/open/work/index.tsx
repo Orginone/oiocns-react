@@ -40,7 +40,7 @@ const WorkStartDo: React.FC<IProps> = ({ current, finished }) => {
         setData({ ...apply.instanceData });
       }
     }
-  }, 1500);
+  }, 100);
   const loadContent = () => {
     if (!loaded) {
       return (

@@ -4,13 +4,15 @@ import { ImUndo2 } from '@/icons/im';
 import cls from './index.module.less';
 import { IWorkTask } from '@/ts/core';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
-import WorkForm from '@/executor/tools/workForm';
+import WorkForm, { getNodeByNodeId } from '@/executor/tools/workForm';
 import ProcessTree from '@/components/Common/FlowDesign/ProcessTree';
 import { NodeModel, loadResource } from '@/components/Common/FlowDesign/processType';
 import TaskDrawer from './drawer';
 import FullScreenModal from '@/components/Common/fullScreen';
 import useAsyncLoad from '@/hooks/useAsyncLoad';
 import TaskApproval from './approval';
+import { XWorkTask } from '@/ts/base/schema';
+import Tijiaoren from './tijiaoren';
 
 export interface TaskDetailType {
   current: IWorkTask;
@@ -20,6 +22,14 @@ export interface TaskDetailType {
 const TaskContent: React.FC<TaskDetailType> = ({ current, finished }) => {
   const [selectNode, setSelectNode] = useState<NodeModel>();
   const [loaded] = useAsyncLoad(() => current.loadInstance());
+
+  if (
+    current.instanceData &&
+    getNodeByNodeId(current.taskdata.nodeId, current.instanceData.node)?.destName ==
+      '提交人'
+  ) {
+    return <Tijiaoren current={current} finished={finished} />;
+  }
 
   /** 加载时间条 */
   const loadTimeline = () => {
@@ -51,11 +61,13 @@ const TaskContent: React.FC<TaskDetailType> = ({ current, finished }) => {
               )}
             </Card>
           </Timeline.Item>
-          {current.instance.tasks?.map((item, index) => {
-            return (
-              <div key={`${item.id}_${index}`}>
-                {item.status >= 100 ? (
-                  item.records?.map((record) => {
+          {current.instance.tasks
+            ?.filter((a) => a.status >= 100)
+            ?.sort((a, b) => (a.createTime < b.createTime ? -1 : 1))
+            .map((item, index) => {
+              return (
+                <div key={`${item.id}_100_${index}`}>
+                  {item.records?.map((record) => {
                     return (
                       <Timeline.Item key={`${record.id}_${index}`} color={'green'}>
                         <Card>
@@ -75,21 +87,29 @@ const TaskContent: React.FC<TaskDetailType> = ({ current, finished }) => {
                               {record.comment && <div>审批意见：{record.comment}</div>}
                             </div>
                           </div>
-                          <Collapse ghost>
-                            {current.instanceData && (
-                              <WorkForm
-                                allowEdit={false}
-                                belong={current.belong}
-                                nodeId={item.nodeId}
-                                data={current.instanceData}
-                              />
-                            )}
-                          </Collapse>
+                          {/* <Collapse ghost>
+                              {current.instanceData && (
+                                <WorkForm
+                                  allowEdit={false}
+                                  belong={current.belong}
+                                  nodeId={item.nodeId}
+                                  data={current.instanceData}
+                                />
+                              )}
+                            </Collapse> */}
                         </Card>
                       </Timeline.Item>
                     );
-                  })
-                ) : (
+                  })}
+                </div>
+              );
+            })}
+          {current.instance.tasks
+            ?.filter((a) => a.status >= 100)
+            ?.sort((a, b) => (a.createTime < b.createTime ? -1 : 1))
+            .map((item, index) => {
+              return (
+                <div key={`${item.id}_100_${index}`}>
                   <Timeline.Item color={'red'}>
                     <Card>
                       <div style={{ display: 'flex' }}>
@@ -100,19 +120,40 @@ const TaskContent: React.FC<TaskDetailType> = ({ current, finished }) => {
                         <div style={{ color: 'red' }}>待审批</div>
                       </div>
                       {/* {task.node?.bindFroms &&
-                        loadFormItem(task.node.bindFroms, task.status == 100)} */}
+                loadFormItem(task.node.bindFroms, task.status == 100)} */}
                     </Card>
                   </Timeline.Item>
-                )}
-              </div>
-            );
-          })}
+                </div>
+              );
+            })}
         </Timeline>
       );
     }
     return <></>;
   };
 
+  // 安心屋规则
+  const loadTodoForm = (work: XWorkTask) => {
+    if (current.instanceData) {
+      const node = getNodeByNodeId(work.nodeId, current.instanceData.node);
+      if (node && node.destName == '提交人') {
+        return (
+          <WorkForm
+            allowEdit={true}
+            belong={current.belong}
+            nodeId={current.instanceData.node.id}
+            data={current.instanceData}
+            onChanged={(id, data, _changed) => {
+              if (current.instanceData?.data[id]) {
+                current.instanceData.data[id] = [data];
+              }
+            }}
+          />
+        );
+      }
+    }
+    return <></>;
+  };
   /** tab标签页 */
   const items: TabsProps['items'] = [
     {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { model, schema } from '../../../ts/base';
 import { IBelong } from '@/ts/core';
 import PrimaryForms from './primary';
@@ -14,7 +14,7 @@ interface IWorkFormProps {
   onChanged?: (id: string, data: model.FormEditData, changedValues: any) => void;
 }
 
-const getNodeByNodeId = (
+export const getNodeByNodeId = (
   id: string,
   node: model.WorkNodeModel | undefined,
 ): model.WorkNodeModel | undefined => {

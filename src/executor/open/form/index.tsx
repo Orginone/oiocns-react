@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import FullScreenModal from '@/components/Common/fullScreen';
 import { IForm } from '@/ts/core';
 import * as config from './config';

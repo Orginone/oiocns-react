@@ -51,9 +51,12 @@ export class Application
     return 'applications';
   }
   content(): IFile[] {
-    return [...this.children, ...this.works].sort((a, b) =>
-      a.metadata.updateTime < b.metadata.updateTime ? 1 : -1,
-    );
+    return [...this.children, ...this.works].sort((a, b) => {
+      return a.code < b.code ? -1 : 1;
+    });
+    // return [...this.children, ...this.works].sort((a, b) =>
+    //   a.metadata.updateTime < b.metadata.updateTime ? 1 : -1,
+    // );
   }
   structCallback(): void {
     command.emitter('executor', 'refresh', this);

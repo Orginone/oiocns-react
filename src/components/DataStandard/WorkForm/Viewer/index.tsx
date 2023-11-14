@@ -57,6 +57,7 @@ const WorkFormViewer: React.FC<{
             code: 'name',
             valueType: '描述型',
             remark: '数据的名称。',
+            options: { hideField: true },
           }}
           belong={props.belong}
           notifyEmitter={notifyEmitter}
