@@ -98,20 +98,17 @@ export default class KernelApi {
   }
   /** 连接信息 */
   public async onlines(): Promise<model.OnlineSet | undefined> {
-    if (this.onlineIds.length > 0) {
-      const result = await this._storeHub.invoke('Online');
-      if (result.success && result.data) {
-        var data: model.OnlineSet = result.data;
-        var uids = data?.users?.map((i) => i.connectionId) || [];
-        var sids = data?.storages?.map((i) => i.connectionId) || [];
-        var ids = [...uids, ...sids];
-        if (ids.length != this.onlineIds.length) {
-          this.onlineIds = ids;
-          this.onlineNotify.changCallback();
-        }
+    const result = await this._storeHub.invoke('Online');
+    if (result.success && result.data) {
+      var data: model.OnlineSet = result.data;
+      var uids = data?.users?.map((i) => i.connectionId) || [];
+      var sids = data?.storages?.map((i) => i.connectionId) || [];
+      var ids = [...uids, ...sids];
+      if (ids.length != this.onlineIds.length) {
         this.onlineIds = ids;
-        return result.data;
       }
+      this.onlineIds = ids;
+      return result.data;
     }
   }
   /** 激活存储 */
