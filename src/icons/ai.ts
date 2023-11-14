@@ -47,9 +47,31 @@ import { AiOutlineFileUnknown } from '@react-icons/all-files/ai/AiOutlineFileUnk
 import { AiOutlineShoppingCart } from '@react-icons/all-files/ai/AiOutlineShoppingCart';
 import { AiOutlineRead } from '@react-icons/all-files/ai/AiOutlineRead';
 import { AiOutlinePlusSquare } from '@react-icons/all-files/ai/AiOutlinePlusSquare';
+import { AiFillFileWord } from '@react-icons/all-files/ai/AiFillFileWord';
+import { AiFillFileExcel } from '@react-icons/all-files/ai/AiFillFileExcel';
+import { AiFillFileExclamation } from '@react-icons/all-files/ai/AiFillFileExclamation';
+import { AiFillFileImage } from '@react-icons/all-files/ai/AiFillFileImage';
+import { AiFillFileMarkdown } from '@react-icons/all-files/ai/AiFillFileMarkdown';
+import { AiFillFilePdf } from '@react-icons/all-files/ai/AiFillFilePdf';
+import { AiFillFilePpt } from '@react-icons/all-files/ai/AiFillFilePpt';
+import { AiFillFileText } from '@react-icons/all-files/ai/AiFillFileText';
+import { AiFillFileUnknown } from '@react-icons/all-files/ai/AiFillFileUnknown';
+import { AiFillFileZip } from '@react-icons/all-files/ai/AiFillFileZip';
+import { AiFillFile } from '@react-icons/all-files/ai/AiFillFile';
 
 export {
   AiFillCloseCircle,
+  AiFillFile,
+  AiFillFileExcel,
+  AiFillFileExclamation,
+  AiFillFileImage,
+  AiFillFileMarkdown,
+  AiFillFilePdf,
+  AiFillFilePpt,
+  AiFillFileText,
+  AiFillFileUnknown,
+  AiFillFileWord,
+  AiFillFileZip,
   AiFillHome,
   AiFillPlusCircle,
   AiFillStepBackward,
