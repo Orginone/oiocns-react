@@ -34,6 +34,7 @@ const FormSelectModal = ({ form, fields, belong, onSave }: IFormSelectProps) => 
         onSelectionChanged={(e) => {
           editData.rows = e.selectedRowsData;
         }}
+        filterValue={JSON.parse(form.searchRule ?? '[]')}
         dataSource={
           new CustomStore({
             key: 'id',

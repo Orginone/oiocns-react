@@ -14,7 +14,7 @@ interface IProps {
   data: model.InstanceDataModel;
   ruleService?: WorkFormRulesType;
   getFormData: (form: schema.XForm) => model.FormEditData;
-  onChanged?: (id: string, data: model.FormEditData) => void;
+  onChanged?: (id: string, data: model.FormEditData, changedValues: any) => void;
 }
 
 const PrimaryForm: React.FC<IProps> = (props) => {
@@ -55,8 +55,9 @@ const PrimaryForm: React.FC<IProps> = (props) => {
               props.data.primary[k] = changed[k];
             }
           });
+          data.name = form.name;
           formData.after = [data];
-          props.onChanged?.apply(this, [form.id, formData]);
+          props.onChanged?.apply(this, [form.id, formData, changed]);
         }
       }}
     />

@@ -1,16 +1,17 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { model, schema } from '../../../ts/base';
 import { IBelong } from '@/ts/core';
 import PrimaryForms from './primary';
 import DetailForms from './detail';
 import { formatDate } from '@/utils';
+import useObjectUpdate from '@/hooks/useObjectUpdate';
 
 interface IWorkFormProps {
   allowEdit: boolean;
   belong: IBelong;
   nodeId: string;
   data: model.InstanceDataModel;
-  onChanged?: (id: string, data: model.FormEditData) => void;
+  onChanged?: (id: string, data: model.FormEditData, changedValues: any) => void;
 }
 
 const getNodeByNodeId = (
@@ -30,6 +31,7 @@ const getNodeByNodeId = (
 
 /** 流程节点表单 */
 const WorkForm: React.FC<IWorkFormProps> = (props) => {
+  const [key] = useObjectUpdate(props.data);
   const node = getNodeByNodeId(props.nodeId, props.data.node);
   if (!node) return <></>;
   /** 根据需求获取数据 */
@@ -58,7 +60,7 @@ const WorkForm: React.FC<IWorkFormProps> = (props) => {
     };
   };
   return (
-    <div style={{ padding: 10 }}>
+    <div style={{ padding: 10 }} key={key}>
       {node.primaryForms && node.primaryForms.length > 0 && (
         <PrimaryForms {...props} forms={node.primaryForms} getFormData={getFormData} />
       )}

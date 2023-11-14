@@ -1,23 +1,46 @@
 import { IWork, IWorkTask } from '@/ts/core';
 import { Button, Empty, Input, Spin } from 'antd';
 import message from '@/utils/message';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import WorkForm from '@/executor/tools/workForm';
 import FullScreenModal from '@/components/Common/fullScreen';
 import { model } from '@/ts/base';
 import useAsyncLoad from '@/hooks/useAsyncLoad';
 import orgCtrl from '@/ts/controller';
+import { validate, initApplyData } from '../../../utils/anxinwu/axwRule';
+import { useDebounceFn } from '@ant-design/pro-components';
 // 卡片渲染
 interface IProps {
   current: IWork | IWorkTask;
   finished: () => void;
 }
 
+var formData = new Map<string, model.FormEditData>();
+const oldFormData: Map<string, string> = new Map<string, string>();
+
 /** 办事-业务流程--发起 */
 const WorkStartDo: React.FC<IProps> = ({ current, finished }) => {
+  const [data, setData] = useState<model.InstanceDataModel>();
   const [loaded, apply] = useAsyncLoad(() => current.createApply());
   const info: { content: string } = { content: '' };
-  const formData = new Map<string, model.FormEditData>();
+  useEffect(() => {
+    if (apply) {
+      formData = new Map<string, model.FormEditData>();
+      initApplyData(apply.belong.id, apply.instanceData, formData);
+    }
+  }, [apply]);
+
+  const fun = useDebounceFn(async (id, data) => {
+    if (apply) {
+      if ((oldFormData.get(id) ?? '[]') != JSON.stringify(data.after)) {
+        formData.forEach((data, k) => {
+          oldFormData.set(k, JSON.stringify(data.after));
+          apply.instanceData.data[k] = [data];
+        });
+        setData({ ...apply.instanceData });
+      }
+    }
+  }, 1500);
   const loadContent = () => {
     if (!loaded) {
       return (
@@ -32,10 +55,21 @@ const WorkStartDo: React.FC<IProps> = ({ current, finished }) => {
           <WorkForm
             allowEdit
             belong={apply.belong}
-            data={apply.instanceData}
+            data={data ?? apply.instanceData}
             nodeId={apply.instanceData.node.id}
-            onChanged={(id, data) => {
+            onChanged={(id, data, changed) => {
               formData.set(id, data);
+              validate(
+                id,
+                formData,
+                current.belongId,
+                apply.instanceData.fields,
+                changed,
+              ).then((a) => {
+                if (a) {
+                  fun.run(id, data);
+                }
+              });
             }}
           />
           <div style={{ padding: 10, display: 'flex', alignItems: 'flex-end' }}>

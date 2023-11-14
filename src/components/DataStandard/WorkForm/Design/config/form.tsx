@@ -59,7 +59,14 @@ const FormConfig: React.FC<IAttributeProps> = ({ notifyEmitter, current }) => {
             };
         }
       });
-      setFields(fields);
+      setFields([
+        {
+          dataField: 'name',
+          caption: '表单名称',
+          dataType: 'string',
+        },
+        ...fields,
+      ]);
     });
   }, [current]);
   return (
