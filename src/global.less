@@ -421,10 +421,9 @@ h3 {
 */
 .customBreadcrumb {
   cursor: pointer;
-  :global {
-    .anticon-down {
-      display: none;
-    }
+  // TODO 临时处理
+  .anticon-down {
+    display: none;
   }
 }
 
@@ -617,7 +616,7 @@ h3 {
 }
 
 /**
-  Workbench
+  WorkBench
 */
 
 .workbench-content {
@@ -768,7 +767,7 @@ h3 {
           position: relative;
       }
   }
-  .chatMem-list-item, .listItem {
+  .chatMem-list-item {
       min-width: 240px;
   }
   .chatMem {
@@ -821,22 +820,88 @@ h3 {
       overflow-y: scroll;
       padding-bottom: 20px;
   }
-  
-  .forwardTextWrap {
-      position: absolute;
-      width: 100%;
-      top: calc(400px - 60px);
-      left: 5px;
-      z-index: 999;
-      background-color: #fff;
+}
+
+/**
+  NavigationBar
+*/
+
+.navigationBar {
+  border-radius: 30px;
+  position: fixed;
+  top: 16px;
+  left: 50%;
+  transform: translate(-50%);
+  background-color: rgba(@component-background, 0.6);
+  display: flex;
+  font-size: 14px;
+  color: @text-color;
+  align-items: center;
+  padding: 6px 12px;
+  transition: 0.2s;
+  &-content {
+    display: flex;
+    justify-content: center;
+    flex: 1;
+    gap: 8px;
+    white-space: nowrap;
+    &__item {
+      transition: 0.2s;
+      cursor: pointer;
+      padding: 4px 16px;
+      &:hover {
+        border-radius: 30px;
+        background-color: @active-background;
+      }
+      &Active {
+        cursor: not-allowed;
+        padding: 4px 16px;
+        border-radius: 30px;
+        color: @text-color-inverse;
+        background-color: @focus-background;
+      }
+    }
   }
-  .forwardText {
-      padding: 10px 10px;
-      margin-left: 5px;
-      height: 40px;
-      overflow: hidden;
-      background-color: rgb(226, 224, 224);
-      border-radius: 5px;
-      width: calc(100% - 15px);
+
+  &-more {
+    color: #000;
+    font-size: 30px;
+    cursor: pointer;
+    margin-left: 20px;
+  }
+
+  &-open {
+    height: auto;
+    padding: 30px 20px 40px;
+    background-color: @component-background;
+    z-index: 1;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.15);
+  }
+
+  &-config {
+    max-width: 800px;
+    min-width: 400px;
+
+    &-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+
+    &-section {
+      margin-bottom: 20px;
+    }
+
+    &-pageCard {
+      padding: 8px 24px;
+      color: #424a57;
+      background-color: #f7f8fa;
+      border-radius: 27px;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
   }
 }

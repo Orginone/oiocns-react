@@ -7,7 +7,6 @@ import { IPageTemplate } from '@/ts/core/thing/standard/page';
 import { EllipsisOutlined, MinusCircleFilled, PlusCircleFilled } from '@ant-design/icons';
 import { Badge, Button, Row, Typography, message } from 'antd';
 import { NavigationItem } from '../..';
-import cls from './index.module.less';
 import { ViewerHost } from '@/executor/open/page/view/ViewerHost';
 import ViewerManager from '@/executor/open/page/view/ViewerManager';
 import { getResouces } from '@/config/location';
@@ -19,7 +18,6 @@ export const allPages: NavigationItem[] = [
     key: 'dashboard',
     label: '工作台',
     type: 'inner',
-    backgroundImageUrl: `/img/${resource.location}/banner/workbench.png`,
     component: React.lazy(() => import('../Content/WorkBench')),
   },
   {
@@ -65,7 +63,7 @@ const NavigationBar: React.FC<{
   }, []);
   const regularNavigation = (
     <>
-      <div className={cls.navigationBarContent}>
+      <div className="navigationBar-content">
         {[
           ...list,
           ...pages.filter((item) => item.cache.tags?.includes('常用')).map(mapping),
@@ -75,8 +73,8 @@ const NavigationBar: React.FC<{
               key={item.key}
               className={
                 current === index
-                  ? cls.navigationBarContent__itemActive
-                  : cls.navigationBarContent__item
+                  ? 'navigationBar-content__itemActive'
+                  : 'navigationBar-content__item'
               }
               onClick={() => {
                 setCurrent(index);
@@ -91,21 +89,21 @@ const NavigationBar: React.FC<{
         onClick={() => {
           setMore(true);
         }}
-        className={cls.navigationBarMore}
+        className="navigationBar-more"
       />
     </>
   );
 
   const configNavigation = (
     <>
-      <div className={cls.navigationBarConfig}>
-        <div className={cls.navigationBarConfigHeader}>
+      <div className="navigatioin-bar-config">
+        <div className="navigationBar-config-hearder">
           <BasicTitle title="页面管理"></BasicTitle>
           <Button type="primary" onClick={() => onSave()}>
             保存
           </Button>
         </div>
-        <div className={cls.navigationBarConfigSection}>
+        <div className="navigationBar-config-section">
           <Typography.Title level={5}>常用页面</Typography.Title>
           <Row gutter={[16, 16]}>
             {pages
@@ -122,13 +120,13 @@ const NavigationBar: React.FC<{
                       />
                     }
                     key={index}>
-                    <div className={cls.navigationBarConfigPageCard}>{item.name}</div>
+                    <div className="navigationBar-config-page-card">{item.name}</div>
                   </Badge>
                 );
               })}
           </Row>
         </div>
-        <div className={cls.navigationBarConfigSection}>
+        <div className="navigationBar-config-section">
           <Typography.Title level={5}>全部页面</Typography.Title>
           <Row gutter={[16, 16]}>
             {pages.map((item, index) => {
@@ -147,7 +145,7 @@ const NavigationBar: React.FC<{
                     )
                   }
                   key={index}>
-                  <div className={cls.navigationBarConfigPageCard}>{item.name}</div>
+                  <div className="navigationBar-config-page-card">{item.name}</div>
                 </Badge>
               );
             })}
@@ -175,7 +173,7 @@ const NavigationBar: React.FC<{
     setMore(false);
   };
   return (
-    <div className={`${cls.navigationBar} ${more && cls.navigationBarOpen}`}>
+    <div className={`navigationBar ${more && 'navigationBar-Open'}`}>
       {more ? configNavigation : regularNavigation}
     </div>
   );

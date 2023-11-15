@@ -6,11 +6,59 @@ import { command, parseAvatar } from '@/ts/base';
 import { formatSize } from '@/ts/base/common';
 import css from '../../GroupContent/index.module.less';
 import { shareOpenLink, truncateString } from '@/utils/tools';
-
+import {
+  AiFillFile,
+  AiFillFileExcel,
+  AiFillFilePdf,
+  AiFillFilePpt,
+  AiFillFileText,
+  AiFillFileWord,
+  AiFillFileZip,
+} from '@/icons/ai';
 /** 将链接转化为超链接 */
 const linkText = (val: string) => {
   let reg = /(https?:\/\/[^\s]+)/g;
   return val.replace(reg, '<a target=_blank href="$1"> $1 </a>');
+};
+
+/**
+ * 文件类型icon展示
+ */
+
+export const getFileIcon = (type?: string) => {
+  if (!type) return;
+  const size = 28;
+  const color = 'blue';
+  let icon = <AiFillFile size={size} color={color} />;
+  switch (type) {
+    case '.pdf':
+      icon = <AiFillFilePdf size={size} color={color} />;
+      break;
+    case '.xlsx':
+      icon = <AiFillFileExcel size={size} color={color} />;
+      break;
+    case '.xls':
+      icon = <AiFillFileExcel size={size} color={color} />;
+      break;
+    case '.txt':
+      icon = <AiFillFileText size={size} color={color} />;
+      break;
+    case '.pptx':
+      icon = <AiFillFilePpt size={size} color={color} />;
+      break;
+    case '.docx':
+      icon = <AiFillFileWord size={size} color={color} />;
+      break;
+    case '.doc':
+      icon = <AiFillFileWord size={size} color={color} />;
+      break;
+    case '.zip':
+      icon = <AiFillFileZip size={size} color={color} />;
+      break;
+    default:
+      icon = <AiFillFile size={size} color={color} />;
+  }
+  return icon;
 };
 
 /**
@@ -62,15 +110,19 @@ export const parseMsg = (item: IMessage): any => {
           </div>
         );
       }
+      const iconDiv = getFileIcon(file.extension);
       return (
         <>
           <div
-            className={`${css.con_content_txt}`}
+            className={`${css.con_content_txt} ${css.con_content_file}`}
             onClick={() => {
               command.emitter('executor', 'open', file);
             }}>
-            <div>{file.name}</div>
-            <div>{formatSize(file.size)}</div>
+            <div className={`${css.con_content_txt_inner}`}>
+              <div>{file.name}</div>
+              <div className={`${css.con_content_size}`}>{formatSize(file.size)}</div>
+            </div>
+            {iconDiv}
           </div>
         </>
       );
@@ -152,6 +204,7 @@ export const parseCiteMsg = (item: IMessage): any => {
     }
     case MessageType.File: {
       const file: FileItemShare = parseAvatar(item.msgBody);
+      const iconDiv = getFileIcon(file.extension);
       return (
         <div className={`${css.con_content_cite_txt}`}>
           <span>{item.from.name}:</span>
@@ -160,6 +213,7 @@ export const parseCiteMsg = (item: IMessage): any => {
               <b>{file.name}</b>
             </div>
             <div>{formatSize(file.size)}</div>
+            {iconDiv}
           </a>
         </div>
       );
