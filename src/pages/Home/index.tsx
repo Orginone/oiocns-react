@@ -11,7 +11,6 @@ export interface NavigationItem {
 
 const Home: React.FC = () => {
   const [current, setCurrent] = useState(allPages[0]);
-
   return (
     <div className={cls.homepage}>
       {current.type == 'inner' && (
@@ -19,7 +18,9 @@ const Home: React.FC = () => {
           className={cls.headBanner}
           style={{ backgroundImage: `url(${current.backgroundImageUrl})` }}></div>
       )}
-      {current.type == 'inner' && React.createElement(current.component)}
+      <div className={cls.content}>
+        {current.type == 'inner' && React.createElement(current.component)}
+      </div>
       {current.type == 'page' && current.component}
       <NavigationBar
         list={allPages}

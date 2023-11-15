@@ -72,6 +72,7 @@ export const ActivityMessage: React.FC<ActivityItemProps> = ({
           <Button
             type="text"
             size="small"
+            className="activityItem-operate"
             onClick={async () => {
               await item.like();
             }}>
@@ -86,11 +87,19 @@ export const ActivityMessage: React.FC<ActivityItemProps> = ({
               </>
             )}
           </Button>
-          <Button type="text" size="small" onClick={() => handleReply()}>
+          <Button
+            className="activityItem-operate"
+            type="text"
+            size="small"
+            onClick={() => handleReply()}>
             <AiOutlineMessage size={18} /> <span>评论</span>
           </Button>
           {item.canDelete && (
-            <Button type="text" size="small" onClick={() => item.delete()}>
+            <Button
+              className="activityItem-operate"
+              type="text"
+              size="small"
+              onClick={() => item.delete()}>
               <AiOutlineDelete size={18} /> <span>删除</span>
             </Button>
           )}

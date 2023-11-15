@@ -432,9 +432,7 @@ h3 {
 */
 
 .activityContent {
-  background-color: #f1f1f1;
-  background: linear-gradient(#f5f5f5ee, #f1f1f1);
-  .loadContext {
+  .loadContext { 
     height: 100%;
     width: 100%;
   }
@@ -453,8 +451,6 @@ h3 {
       padding: 8px;
       min-width: 500px;
       background: @component-background;
-      box-shadow: 0 0 2px 2px #ededed;
-
       &-selected {
         cursor: pointer;
         padding: 8px;
@@ -545,6 +541,9 @@ h3 {
   .likeColor {
     color: #cb4747
   }
+  .activityItem-operate {
+    display: flex;
+  }
   .activityTime {
     font-weight: bold;
     margin-left: 6px;
@@ -622,17 +621,14 @@ h3 {
 .workbench-content {
   width: 100%;
   color: #4c4c4c;
-  height: calc(100vh - 200px);
+  height: calc(100vh - 300px);
   box-sizing: border-box;
   padding: 12px;
   gap: 16px;
-  overflow-y: auto;
   display: flex;
   flex-direction: column;
   flex-wrap: nowrap;
   align-items: flex-start;
-  background-color: #f1f1f1;
-  background: linear-gradient(#f5f5f5f5, #f1f1f1);
   .cardGroup {
     display: flex;
     gap: 16px;
@@ -651,7 +647,7 @@ h3 {
       cursor: pointer;
       background-color: #ffffff;
       border: 1px solid #ffffff;
-      box-shadow: 0 0 2px 2px #ededed;
+      // box-shadow: 0 0 2px 2px #ededed;
     }
   }
 
