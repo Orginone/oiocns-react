@@ -3,7 +3,7 @@ import React from 'react';
 import CustomMenu from '@/components/CustomMenu';
 import CustomBreadcrumb from '@/components/CustomBreadcrumb';
 import { MenuItemType, OperateMenuType } from 'typings/globelType';
-import { ImArrowLeft2 } from '@/icons/im';
+import { ImUndo2 } from '@/icons/im';
 import { RiMore2Fill } from '@/icons/ri';
 import { Resizable } from 'devextreme-react';
 import { LeftBarIcon, RightBarIcon } from '@/components/Common/GlobalComps/customIcon';
@@ -74,8 +74,8 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
     return <EntityPreview entity={props.selectMenu.item} flag={props.previewFlag} />;
   }, [props]);
   return (
-    <Layout className={"main_layout"}>
-      <Row className={"header"} justify="space-between">
+    <Layout className={'main_layout'}>
+      <Row className={'header'} justify="space-between">
         <Col>
           <CustomBreadcrumb
             selectKey={props.selectMenu.key}
@@ -136,22 +136,21 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
           </Space>
         </Col>
       </Row>
-      <Layout className={"body"}>
+      <Layout className={'body'}>
         {(props.leftShow ?? leftSider) && (
-          <Sider className={"sider"} width={250}>
-            <div className={"title"}>
+          <Sider className={'sider'} width={250}>
+            <div className={'title'}>
               {parentMenu.key != props.siderMenuData.key && (
-                <span className={"backup"} onClick={() => onSelectClick(parentMenu)}>
-                  <ImArrowLeft2 fontSize={20} />
+                <span className={'backup'} onClick={() => onSelectClick(parentMenu)}>
+                  <ImUndo2 size={16} />
                 </span>
               )}
-              <div className={"label"} onClick={() => onSelectClick(parentMenu)}>
+              <div className={'label'} onClick={() => onSelectClick(parentMenu)}>
                 <span style={{ marginRight: 6 }}>{parentMenu.icon}</span>
                 <Typography.Text ellipsis>{parentMenu.label}</Typography.Text>
               </div>
             </div>
-            <div className={"container"} id="templateMenu">
-              
+            <div className={'container'} id="templateMenu">
               <CustomMenu
                 item={parentMenu}
                 collapsed={false}
@@ -170,14 +169,14 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
               handles={'right'}
               width={mainWidth}
               onResize={(e) => setMainWidth(e.width)}>
-              <Sider className={"content"} width={'100%'}>
+              <Sider className={'content'} width={'100%'}>
                 {props.children}
               </Sider>
             </Resizable>
-            <Content className={"content"}>{previewCtx}</Content>
+            <Content className={'content'}>{previewCtx}</Content>
           </>
         ) : (
-          <Content className={"content"}>{props.children}</Content>
+          <Content className={'content'}>{props.children}</Content>
         )}
       </Layout>
     </Layout>

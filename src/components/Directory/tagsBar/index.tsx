@@ -5,16 +5,19 @@ import { schema } from '@/ts/base';
 import { IEntity } from '@/ts/core';
 import { ImArrowLeft2 } from '@react-icons/all-files/im/ImArrowLeft2';
 import { ImArrowRight2 } from '@react-icons/all-files/im/ImArrowRight2';
+import { ImUndo2 } from '@react-icons/all-files/im/ImUndo2';
 
 interface IProps {
   select: string;
   initTags: string[];
   excludeTags: string[];
   extraTags: boolean;
+  showBack?: boolean;
   selectFiles: IEntity<schema.XEntity>[];
   badgeCount?: (tag: string) => number;
   entitys: IEntity<schema.XEntity>[];
   onChanged: (tag: string) => void;
+  onBack: () => void;
 }
 /** 标签条 */
 const TagsBar: React.FC<IProps> = (props) => {
@@ -76,6 +79,9 @@ const TagsBar: React.FC<IProps> = (props) => {
   };
   return (
     <div className={cls.tags_bar}>
+      {props.showBack && (
+        <Button type="link" title="返回" icon={<ImUndo2 />} onClick={props.onBack} />
+      )}
       <Button type="link" icon={<ImArrowLeft2 />} onClick={() => arrowLeft(-100)} />
       <div ref={ref} className={cls.tags_body}>
         <Space split={<Divider type="vertical" style={{ height: 20 }} />} size={0}>

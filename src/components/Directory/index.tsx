@@ -129,6 +129,7 @@ const Directory: React.FC<IProps> = (props) => {
         selectFiles={props.selects || []}
         focusFile={focusFile}
         content={getContent()}
+        preDirectory={dircetory.parent}
         fileOpen={(entity, dblclick) => clickHanlder(entity as IFile, dblclick)}
         contextMenu={(entity) => contextMenu(entity as IFile)}
       />

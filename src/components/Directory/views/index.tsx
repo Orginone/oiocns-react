@@ -16,6 +16,7 @@ interface IProps {
   initTags: string[];
   extraTags: boolean;
   excludeTags?: string[];
+  preDirectory?: IDEntity;
   focusFile: IDEntity | undefined;
   badgeCount?: (tag: string) => number;
   tagChanged?: (tag: string) => void;
@@ -63,12 +64,14 @@ const DirectoryView: React.FC<IProps> = (props) => {
     <>
       <TagsBar
         select={currentTag}
+        showBack={props.preDirectory != undefined}
         extraTags={props.extraTags}
         excludeTags={props.excludeTags || []}
         initTags={props.initTags}
         selectFiles={props.selectFiles}
         entitys={getContent(false)}
         badgeCount={props.badgeCount}
+        onBack={() => props.fileOpen(props.preDirectory, true)}
         onChanged={(t) => setCurrentTag(t)}></TagsBar>
       <div></div>
       <SegmentContent
