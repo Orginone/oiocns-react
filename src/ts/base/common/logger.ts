@@ -5,6 +5,7 @@ export enum LoggerLevel {
   warn = '警告',
   error = '错误',
   unauth = '登录过期',
+  qrauthed = '二维码登录',
 }
 
 export type MessageType = string | Error | undefined | Object;
@@ -27,6 +28,10 @@ class Logger {
   unauth(): void {
     console.warn('登录已过期');
     this._callback(LoggerLevel.unauth, '登录已过期');
+  }
+  qrauthed(): void {
+    console.warn('扫码登录成功');
+    this._callback(LoggerLevel.qrauthed, '扫码登录成功');
   }
   private _callback(level: LoggerLevel, message: MessageType): void {
     if (this.onLogger) {

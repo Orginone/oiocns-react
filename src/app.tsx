@@ -1,7 +1,7 @@
 import { ConfigProvider, Spin, notification } from 'antd';
 import React, { Suspense, useState } from 'react';
 import { renderRoutes } from 'react-router-config';
-import { HashRouter } from 'react-router-dom';
+import { HashRouter, useHistory } from 'react-router-dom';
 import message from '@/utils/message';
 
 import routes from './routes';
@@ -31,6 +31,7 @@ notification.config({
 
 const App = () => {
   const [locale] = useState(zhCN);
+  const history = useHistory();
   logger.onLogger = (level, msg) => {
     switch (level) {
       case LoggerLevel.info:
@@ -46,6 +47,12 @@ const App = () => {
         message.error(msg);
         sessionStorage.clear();
         window.location.reload();
+        break;
+      case LoggerLevel.qrauthed:
+        message.info(msg);
+        window.location.href = '/#/home';
+        window.location.reload();
+        break;
     }
   };
   return (

@@ -19,6 +19,7 @@ class IndexController extends Controller {
   static _provider: UserProvider;
   constructor() {
     super('');
+    console.log(this.logined);
   }
   /** 是否已登录 */
   get logined(): boolean {
@@ -50,6 +51,11 @@ class IndexController extends Controller {
   /** 所有相关的用户 */
   get targets(): ITarget[] {
     return this.provider.targets;
+  }
+  /** 退出 */
+  exit(): void {
+    sessionStorage.clear();
+    IndexController._provider = new UserProvider(this);
   }
   async loadApplications(): Promise<IApplication[]> {
     const apps: IApplication[] = [];
