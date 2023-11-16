@@ -7,9 +7,10 @@ import { schema } from '@/ts/base';
 import { formatZhDate } from '@/utils/tools';
 import orgCtrl from '@/ts/controller';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
+import TypeIcon from '@/components/Common/GlobalComps/typeIcon';
 
 interface Iprops {
-  entity: schema.XEntity;
+  entity: schema.XEntity | schema.XTarget;
   finished: () => void;
 }
 /*
@@ -52,17 +53,15 @@ const EntityPreview: React.FC<Iprops> = ({ entity, finished }) => {
       dataIndex: 'code',
       readonly: true,
     },
-    {
-      title: '简称',
-      dataIndex: 'teamName',
-      readonly: true,
-    },
-    {
-      title: '标识',
-      dataIndex: 'teamCode',
-      readonly: true,
-    },
   ];
+  if ('storeId' in entity) {
+    columns.push({
+      title: '当前数据核',
+      dataIndex: 'storeId',
+      readonly: true,
+      render: () => <EntityIcon entityId={entity.storeId} showName />,
+    });
+  }
   if (entity.belongId !== entity.id) {
     columns.push({
       title: '归属',
@@ -111,7 +110,12 @@ const EntityPreview: React.FC<Iprops> = ({ entity, finished }) => {
   return (
     <SchemaForm<TargetModel>
       open
-      title={entity.name}
+      title={
+        <div style={{ display: 'flex', flexWrap: 'nowrap' }}>
+          <TypeIcon iconType={entity.typeName} size={20} />
+          {entity.name}
+        </div>
+      }
       width={640}
       columns={columns}
       initialValues={entity}

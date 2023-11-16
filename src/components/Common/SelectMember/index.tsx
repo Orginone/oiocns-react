@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { AiOutlineSearch } from '@/icons/ai';
+import { AiOutlineSearch } from 'react-icons/ai';
 import { Input, Modal, Tooltip } from 'antd';
 import { schema } from '@/ts/base';
 import cls from './index.module.less';

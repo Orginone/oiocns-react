@@ -1,4 +1,4 @@
-import * as im from '@/icons/im';
+import * as im from 'react-icons/im';
 import { Button, message, Popover } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { IMessage, ISession, ISysFileInfo, MessageType } from '@/ts/core';
@@ -9,7 +9,7 @@ import './index.less';
 import OpenFileDialog from '@/components/OpenFileDialog';
 import { parseCiteMsg } from '../components/parseMsg';
 import Emoji from '../components/emoji';
-import { AiOutlineCloseCircle } from '@/icons/ai';
+import { AiOutlineCloseCircle } from 'react-icons/ai';
 
 /**
  * @description: 输入区域
@@ -252,6 +252,7 @@ const GroupInputBox = (props: IProps) => {
           rootKey={'disk'}
           accepts={['文件']}
           allowInherited
+          currentKey={props.chat.target.directory.key}
           onCancel={() => setOpen(false)}
           onOk={async (files) => {
             if (files.length > 0) {

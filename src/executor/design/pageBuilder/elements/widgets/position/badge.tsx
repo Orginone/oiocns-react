@@ -4,7 +4,7 @@ import { defineElement } from '../../defineElement';
 import React from 'react';
 import { Badge, Button } from 'antd';
 import { command } from '@/ts/base';
-import { AiOutlineShoppingCart } from '@react-icons/all-files/ai/AiOutlineShoppingCart';
+import { AiOutlineShoppingCart } from 'react-icons/ai';
 import { Context } from '../../../render/PageContext';
 
 interface IProps {

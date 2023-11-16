@@ -65,8 +65,6 @@ const TargetForm = (props: Iprops) => {
       initialValue = {};
       break;
     case 'update':
-      initialValue.teamCode = props.current.metadata.team?.code;
-      initialValue.teamName = props.current.metadata.team?.name;
       typeName = props.current.typeName;
       title = '更新' + props.current.name;
       if (props.current.id === props.current.belongId) {
@@ -78,8 +76,6 @@ const TargetForm = (props: Iprops) => {
       }
       break;
     case 'remark':
-      initialValue.teamCode = props.current.metadata.team?.code;
-      initialValue.teamName = props.current.metadata.team?.name;
       typeName = props.current.typeName;
       title = '查看' + props.current.name;
       if (props.current.id === props.current.belongId) {
@@ -179,6 +175,8 @@ const TargetForm = (props: Iprops) => {
       onFinish={async (values) => {
         switch (props.formType) {
           case 'update':
+            values.teamName = values.name;
+            values.teamCode = values.code;
             await props.current.update(values);
             break;
           default:

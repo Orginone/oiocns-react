@@ -30,7 +30,7 @@ class Logger {
     this._callback(LoggerLevel.unauth, '登录已过期');
   }
   qrauthed(): void {
-    console.warn('扫码登录成功');
+    console.info('扫码登录成功');
     this._callback(LoggerLevel.qrauthed, '扫码登录成功');
   }
   private _callback(level: LoggerLevel, message: MessageType): void {

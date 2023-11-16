@@ -1,7 +1,7 @@
 import React from 'react';
 import { model, schema } from '@/ts/base';
 import { Dropdown } from 'antd';
-import { AiOutlineEllipsis } from '@/icons/ai';
+import { AiOutlineEllipsis } from 'react-icons/ai';
 import { GenerateColumn } from './columns';
 import { Column, DataGrid, IDataGridOptions } from 'devextreme-react/data-grid';
 import { FullThingColumns } from '@/config/column';
@@ -44,9 +44,11 @@ const GenerateThingTable = (props: IProps) => {
       }}
       columnChooser={{
         enabled: true,
-        allowSearch: true,
         mode: 'select',
         height: 500,
+        search: {
+          enabled: true,
+        },
       }}
       paging={{ pageSize: 20, enabled: true }}
       pager={{

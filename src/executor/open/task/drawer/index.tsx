@@ -16,7 +16,6 @@ interface IProps {
 }
 
 const FlowDrawer: React.FC<IProps> = (props) => {
-  console.log(props);
   const Component = () => {
     return props.instance.tasks
       ?.find((a) => a.nodeId == props.current.id)

@@ -200,8 +200,8 @@ export abstract class Target extends Team implements ITarget {
     return this.update({
       ...this.metadata,
       name: name,
-      teamCode: this.metadata.team?.code ?? this.code,
-      teamName: this.metadata.team?.name ?? this.name,
+      teamCode: this.code,
+      teamName: this.name,
     });
   }
   copy(_destination: IDirectory): Promise<boolean> {

@@ -9,7 +9,7 @@ import WorkForm from '@/components/DataStandard/WorkForm';
 import GenerateThingTable from '@/executor/tools/generate/thingTable';
 import CustomStore from 'devextreme/data/custom_store';
 import { kernel } from '@/ts/base';
-import { ImCopy, ImShuffle, ImTicket } from '@/icons/im';
+import { ImCopy, ImShuffle, ImTicket } from 'react-icons/im';
 import { Controller } from '@/ts/controller';
 import { Spin, message } from 'antd';
 import ThingView from './detail';
@@ -97,7 +97,7 @@ const FormView: React.FC<IProps> = ({ form, finished }) => {
               },
             ],
             onMenuClick(key, data) {
-              console.log(key, data);
+              // console.log(key, data);
             },
           }}
         />

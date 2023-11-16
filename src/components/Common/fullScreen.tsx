@@ -5,7 +5,7 @@ import {
   AiOutlineFullscreen,
   AiOutlineFullscreenExit,
   AiOutlineSave,
-} from '@/icons/ai';
+} from 'react-icons/ai';
 
 interface IFullModalProps extends ModalProps {
   hideMaxed?: boolean;

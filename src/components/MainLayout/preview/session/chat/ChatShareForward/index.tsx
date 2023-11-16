@@ -1,12 +1,12 @@
 import React, { FC, useState } from 'react';
 import { Modal, Button, Row, Col, Badge, Input, List, Checkbox } from 'antd';
 import { MenuItemType } from 'typings/globelType';
-import { ImSearch } from '@/icons/im';
+import { ImSearch } from 'react-icons/im';
 import type { CheckboxChangeEvent } from 'antd/es/checkbox';
 import orgCtrl from '@/ts/controller';
 import TeamIcon from '@/components/Common/GlobalComps/entityIcon';
 import { IMessage, ISession, MessageType } from '@/ts/core';
-import { AiOutlineClose } from '@/icons/ai';
+import { AiOutlineClose } from 'react-icons/ai';
 interface IChatShareForward {
   open: boolean;
   selectMenu?: MenuItemType;

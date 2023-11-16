@@ -2,7 +2,7 @@ import { Layout, Menu, message } from 'antd';
 import React, { ReactNode, useContext, useState } from 'react';
 import { DesignContext, PageContext } from '../render/PageContext';
 import FullScreenModal from '@/components/Common/fullScreen';
-import { AiOutlineApartment } from '@/icons/ai';
+import { AiOutlineApartment } from 'react-icons/ai';
 import { CheckOutlined, FileOutlined, RightCircleOutlined } from '@ant-design/icons';
 import { json } from '@codemirror/lang-json';
 import CodeMirror from '@uiw/react-codemirror';
@@ -50,8 +50,6 @@ export function DesignerHost({ ctx }: DesignerProps) {
       setStatus(!status);
     }
   });
-
-  console.log('re-render');
 
   function renderTabs() {
     return [

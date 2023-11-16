@@ -286,17 +286,6 @@ export class Person extends Belong implements IPerson {
   content(): IFile[] {
     return [this.memberDirectory, ...this.cohorts, ...this.storages];
   }
-  async findEntityAsync(id: string): Promise<schema.XEntity | undefined> {
-    const metadata = this.findMetadata<schema.XEntity>(id);
-    if (metadata) {
-      return metadata;
-    }
-    const res = await kernel.queryEntityById({ id: id });
-    if (res.success && res.data?.id) {
-      this.updateMetadata(res.data);
-      return res.data;
-    }
-  }
   findShareById(id: string): model.ShareIcon {
     const metadata = this.findMetadata<schema.XEntity>(id);
     if (metadata === undefined) {

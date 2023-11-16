@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { AiFillHome } from '@/icons/ai';
+import { AiFillHome } from 'react-icons/ai';
 import { IRouteConfig } from '../typings/globelType';
 import NotFound from '@/layouts/NotFound';
 import BasicLayout from '@/layouts/Basic';

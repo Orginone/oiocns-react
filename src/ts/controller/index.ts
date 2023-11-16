@@ -19,7 +19,9 @@ class IndexController extends Controller {
   static _provider: UserProvider;
   constructor() {
     super('');
-    console.log(this.logined);
+    if (IndexController._provider === undefined) {
+      IndexController._provider = new UserProvider(this);
+    }
   }
   /** 是否已登录 */
   get logined(): boolean {

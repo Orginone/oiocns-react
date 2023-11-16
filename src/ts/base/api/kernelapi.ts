@@ -47,7 +47,6 @@ export default class KernelApi {
         if (id && id.length > 0) {
           this._connectionId = id;
         }
-        console.log(id);
       });
       this.tokenAuth().then((success) => {
         if (success) {

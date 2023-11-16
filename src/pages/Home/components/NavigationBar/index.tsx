@@ -97,8 +97,8 @@ const NavigationBar: React.FC<{
 
   const configNavigation = (
     <>
-      <div className="navigatioin-bar-config">
-        <div className="navigationBar-config-hearder">
+      <div className="navigationBar-config">
+        <div className="navigationBar-config-header">
           <BasicTitle title="页面管理"></BasicTitle>
           <Button type="primary" onClick={() => onSave()}>
             保存
@@ -121,7 +121,7 @@ const NavigationBar: React.FC<{
                       />
                     }
                     key={index}>
-                    <div className="navigationBar-config-page-card">{item.name}</div>
+                    <div className="navigationBar-config-pageCard">{item.name}</div>
                   </Badge>
                 );
               })}
@@ -146,7 +146,7 @@ const NavigationBar: React.FC<{
                     )
                   }
                   key={index}>
-                  <div className="navigationBar-config-page-card">{item.name}</div>
+                  <div className="navigationBar-config-pageCard">{item.name}</div>
                 </Badge>
               );
             })}
@@ -174,7 +174,7 @@ const NavigationBar: React.FC<{
     setMore(false);
   };
   return (
-    <div className={`navigationBar ${more && 'navigationBar-Open'}`}>
+    <div className={`navigationBar ${more && 'navigationBar-open'}`}>
       {more ? configNavigation : regularNavigation}
     </div>
   );

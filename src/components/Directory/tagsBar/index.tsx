@@ -3,9 +3,7 @@ import { Badge, Button, Divider, Space } from 'antd';
 import cls from './index.module.less';
 import { schema } from '@/ts/base';
 import { IEntity } from '@/ts/core';
-import { ImArrowLeft2 } from '@react-icons/all-files/im/ImArrowLeft2';
-import { ImArrowRight2 } from '@react-icons/all-files/im/ImArrowRight2';
-import { ImUndo2 } from '@react-icons/all-files/im/ImUndo2';
+import { ImArrowLeft2, ImArrowRight2, ImUndo2 } from 'react-icons/im';
 
 interface IProps {
   select: string;

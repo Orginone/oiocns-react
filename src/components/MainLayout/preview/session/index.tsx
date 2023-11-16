@@ -9,7 +9,7 @@ import { command } from '@/ts/base';
 import TargetActivity from '@/components/TargetActivity';
 import MemberContent from './member';
 import orgCtrl from '@/ts/controller';
-import { ImAddressBook, ImQrcode, ImBubbles2, ImLifebuoy, ImFolder } from '@/icons/im';
+import { ImAddressBook, ImQrcode, ImBubbles2, ImLifebuoy, ImFolder } from 'react-icons/im';
 import { useHistory } from 'react-router-dom';
 const SessionBody = ({
   target,

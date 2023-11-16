@@ -14,7 +14,7 @@ import {
   AiFillFileText,
   AiFillFileWord,
   AiFillFileZip,
-} from '@/icons/ai';
+} from 'react-icons/ai';
 /** 将链接转化为超链接 */
 const linkText = (val: string) => {
   let reg = /(https?:\/\/[^\s]+)/g;

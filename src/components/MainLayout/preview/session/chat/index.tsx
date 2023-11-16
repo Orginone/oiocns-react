@@ -4,8 +4,8 @@ import GroupInputBox from './GroupInputBox';
 import charsStyle from './index.module.less';
 import ChatShareForward from './ChatShareForward';
 import { ISession, IMessage } from '@/ts/core';
-import { RiShareForwardLine } from '@/icons/ri';
-import { AiOutlineClose } from '@/icons/ai';
+import { RiShareForwardLine } from 'react-icons/ri';
+import { AiOutlineClose } from 'react-icons/ai';
 /**
  * @description: 沟通聊天
  * @return {*}

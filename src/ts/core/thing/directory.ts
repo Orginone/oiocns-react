@@ -89,6 +89,13 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
   get cacheFlag(): string {
     return 'directorys';
   }
+  get groupTags(): string[] {
+    if (this.parent) {
+      return super.groupTags;
+    } else {
+      return [this.target.typeName];
+    }
+  }
   get spaceKey(): string {
     return this.target.space.directory.key;
   }

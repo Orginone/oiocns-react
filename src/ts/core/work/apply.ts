@@ -44,7 +44,6 @@ export class WorkApply implements IWorkApply {
       const data: any = fromData.get(formId)?.after.at(-1) ?? {};
       for (const item of this.instanceData.fields[formId]) {
         if (item.options?.isRequired && valueIsNull(data[item.id])) {
-          console.log(item, data);
           return false;
         }
       }

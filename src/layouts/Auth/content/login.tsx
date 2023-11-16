@@ -4,7 +4,7 @@ import {
   AiOutlineLock,
   AiOutlineQq,
   AiOutlineUser,
-} from '@/icons/ai';
+} from 'react-icons/ai';
 import { Button, Checkbox, Form, Input, message, Space, Tabs } from 'antd';
 import React from 'react';
 import QrCode from 'qrcode.react';
@@ -99,7 +99,6 @@ const PassportLogin: React.FC<{ to: (flag: string) => void }> = ({ to }) => {
         return false;
       }
       const res = await orgCtrl.auth.login(formData);
-      console.log(res);
       if (res.success && res.data) {
         history.push('/home');
       }
@@ -114,7 +113,6 @@ const PassportLogin: React.FC<{ to: (flag: string) => void }> = ({ to }) => {
         platName: resources.platName,
         dynamicId: '',
       });
-      console.log(res);
       if (res.success && res.data) {
         setFormData({ ...formData, dynamicId: res.data.dynamicId });
       }

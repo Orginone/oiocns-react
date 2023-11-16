@@ -1,8 +1,7 @@
 import { TargetType } from '@/ts/core';
 import React from 'react';
-import * as im from '@/icons/im';
-import * as fa from '@/icons/fa';
-import { IconBaseProps } from '@react-icons/all-files/lib';
+import * as im from 'react-icons/im';
+import * as fa from 'react-icons/fa';
 
 interface TypeIconInfo {
   avatar?: boolean;
@@ -13,7 +12,7 @@ interface TypeIconInfo {
 /** 类型图标 */
 const TypeIcon = ({ avatar, iconType, size }: TypeIconInfo) => {
   const iconSize = size || 12;
-  const config: IconBaseProps = { size: iconSize, color: '#9498df' };
+  const config: any = { size: iconSize, color: '#9498df' };
   const loadFileIcon = () => {
     switch (iconType) {
       case 'application/pdf':

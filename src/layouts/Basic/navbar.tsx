@@ -52,13 +52,13 @@ const Navbar: React.FC = () => {
       count: workCount,
     },
     {
-      text: '存储',
+      text: '数据',
       icon: 'store',
       path: '/store',
       count: 0,
     },
     {
-      text: '设置',
+      text: '关系',
       icon: 'setting',
       path: '/setting',
       count: 0,
@@ -91,7 +91,10 @@ const Navbar: React.FC = () => {
 
   return (
     <Layout.Sider className={styles.header} width={60}>
-      <div className="ogo-space-item" onClick={() => setOnlineVisible(!onlineVisible)}>
+      <div
+        className="ogo-space-item"
+        style={{ cursor: 'pointer' }}
+        onClick={() => setOnlineVisible(!onlineVisible)}>
         <EntityIcon entityId={orgCtrl.user.id} size={45} />
       </div>
       <Space direction="vertical" wrap align="center" size={25} className={styles.navbar}>

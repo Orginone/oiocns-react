@@ -5,7 +5,7 @@ import { ShareIcon } from '@/ts/base/model';
 import { command, parseAvatar, schema } from '@/ts/base';
 import TypeIcon from './typeIcon';
 import useAsyncLoad from '@/hooks/useAsyncLoad';
-import { ImInfo } from '@/icons/im';
+import { ImInfo } from 'react-icons/im';
 
 interface teamTypeInfo {
   size?: number;

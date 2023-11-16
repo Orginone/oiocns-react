@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Dropdown, MenuProps } from 'antd';
-import { BsMusicNoteList } from '@/icons/bs';
+import { BsMusicNoteList } from 'react-icons/bs';
 import cls from './index.module.less';
 import { FileItemShare } from 'src/ts/base/model';
-import { ImSpinner4 } from '@/icons/im';
+import { ImSpinner4 } from 'react-icons/im';
 import { IDirectory } from '@/ts/core';
 interface IProp {
   audioData: FileItemShare;

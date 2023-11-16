@@ -11,8 +11,8 @@ import { IMessage, ISession, MessageType } from '@/ts/core';
 import { parseAvatar } from '@/ts/base';
 import css from './index.module.less';
 import { parseCiteMsg, parseMsg, parseForwardMsg } from '../components/parseMsg';
-import { RiShareForwardFill } from '@/icons/ri';
-import { BsListCheck } from '@/icons/bs';
+import { RiShareForwardFill } from 'react-icons/ri';
+import { BsListCheck } from 'react-icons/bs';
 import type { CheckboxChangeEvent } from 'antd/es/checkbox';
 import {
   AiOutlineCopy,
@@ -21,7 +21,7 @@ import {
   AiOutlineDelete,
   AiOutlineDownload,
   AiOutlineEllipsis,
-} from '@/icons/ai';
+} from 'react-icons/ai';
 /**
  * @description: 聊天区域
  * @return {*}

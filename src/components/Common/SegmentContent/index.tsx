@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 import style from './index.module.less';
 import { Segmented, Space, Divider, Typography, Affix } from 'antd';
 import useStorage from '@/hooks/useStorage';
-import * as fa from '@/icons/fa';
+import * as fa from 'react-icons/fa';
 
 type segmentedTypes = 'icon' | 'table' | 'list';
 

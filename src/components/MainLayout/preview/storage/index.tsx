@@ -6,7 +6,7 @@ import { IStorage } from '@/ts/core';
 import { ellipsisText } from '@/utils';
 import { command } from '@/ts/base';
 import MemberContent from './member';
-import { ImAddressBook, ImQrcode } from '@/icons/im';
+import { ImAddressBook, ImQrcode } from 'react-icons/im';
 const StorageBody = ({ storage }: { storage: IStorage }) => {
   const [bodyType, setBodyType] = useState('member');
   const sessionActions = () => {
