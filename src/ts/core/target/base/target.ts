@@ -11,6 +11,7 @@ import { ISession, Session } from '../../chat/session';
 import { IPerson } from '../person';
 import { logger, sleep } from '@/ts/base/common';
 import { IBelong } from './belong';
+import { MemberDirectory } from './member';
 
 /** 用户抽象接口类 */
 export interface ITarget extends ITeam, IFileInfo<schema.XTarget> {
@@ -70,19 +71,7 @@ export abstract class Target extends Team implements ITarget {
       } as unknown as schema.XDirectory,
       this,
     );
-    this.memberDirectory = new Directory(
-      {
-        ...this.directory.metadata,
-        typeName: '成员目录',
-        id: _metadata.id + '__',
-        name:
-          _metadata.typeName === TargetType.Person
-            ? '我的好友'
-            : `${_metadata.typeName}成员`,
-      },
-      this,
-      this.directory,
-    );
+    this.memberDirectory = new MemberDirectory(this);
     this.isContainer = true;
     this.session = new Session(this.id, this, _metadata);
     setTimeout(

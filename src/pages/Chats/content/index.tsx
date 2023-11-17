@@ -1,5 +1,5 @@
 import { Spin } from 'antd';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import orgCtrl from '@/ts/controller';
 import { ISession } from '@/ts/core';
 import DirectoryViewer from '@/components/Directory/views';
@@ -13,6 +13,19 @@ const Content: React.FC<{
 }> = ({ chats, filter }) => {
   const [focusFile, setFocusFile] = useState<ISession>();
   const [loaded, msgKey] = useFlagCmdEmitter('session');
+  useEffect(() => {
+    const id = command.subscribe((type, cmd, ...args: any[]) => {
+      if (type != 'session' || args.length < 1) return;
+      switch (cmd) {
+        case 'open':
+          sessionOpen(args[0]);
+          break;
+      }
+    });
+    return () => {
+      command.unsubscribe(id);
+    };
+  }, []);
   if (chats === undefined) {
     chats = orgCtrl.chats.filter((i) => i.isMyChat);
   }
@@ -23,6 +36,7 @@ const Content: React.FC<{
         a.chatdata.chatRemark.includes(filter) ||
         a.groupTags.filter((l) => l.includes(filter)).length > 0,
     )
+    .filter((i) => i.chatdata.lastMessage || i.chatdata.recently)
     .sort((a, b) => {
       var num = (b.chatdata.isToping ? 10 : 0) - (a.chatdata.isToping ? 10 : 0);
       if (num === 0) {

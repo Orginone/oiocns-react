@@ -79,20 +79,22 @@ const ChatShareForward: FC<IChatShareForward> = (props) => {
     }
   };
   const renderTitle = () => {
-    return <div className="chatShare-title">
-      <span>转发</span>
-      <Input
-        className="chatMem-search"
-        placeholder="搜索"
-        prefix={<ImSearch />}
-        value={filter}
-        onChange={(e) => {
-          setFilter(e.target.value);
-        }}
-      />
-      <div className="chosen-num">{`已选：${selectedKeys.length}会话`}</div>
-    </div>
-  }
+    return (
+      <div className="chatShare-title">
+        <span>转发</span>
+        <Input
+          className="chatMem-search"
+          placeholder="搜索"
+          prefix={<ImSearch />}
+          value={filter}
+          onChange={(e) => {
+            setFilter(e.target.value);
+          }}
+        />
+        <div className="chosen-num">{`已选：${selectedKeys.length}会话`}</div>
+      </div>
+    );
+  };
   return (
     <Modal
       width="70%"
@@ -104,9 +106,9 @@ const ChatShareForward: FC<IChatShareForward> = (props) => {
       onCancel={handleCancel}
       maskClosable
       afterClose={() => {
-        setSelectedData([])
-        setSelectedKeys([])
-        setFilter('')
+        setSelectedData([]);
+        setSelectedKeys([]);
+        setFilter('');
       }}
       footer={[
         <Button key="back" onClick={handleCancel}>

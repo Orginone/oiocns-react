@@ -78,6 +78,7 @@ export class Session extends Entity<schema.XEntity> implements ISession {
       lastMsgTime: nullTime,
       mentionMe: false,
       labels: [],
+      recently: false,
     };
     this.activity = new Activity(_metadata, this);
     setTimeout(

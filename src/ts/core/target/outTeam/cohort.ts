@@ -19,6 +19,9 @@ export class Cohort extends Target implements ICohort {
     }
     return tags;
   }
+  findChat(id: string): ISession | undefined {
+    return this.user.memberChats.find((i) => i.id === id);
+  }
   async exit(): Promise<boolean> {
     if (this.metadata.belongId !== this.space.id) {
       if (await this.removeMembers([this.user.metadata])) {

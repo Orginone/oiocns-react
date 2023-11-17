@@ -5,7 +5,6 @@ import {
   IEntity,
   IFile,
   IMemeber,
-  ISession,
   IStorage,
   ISysFileInfo,
   ITarget,
@@ -200,17 +199,16 @@ const copyBoard = (dir: IDirectory) => {
 };
 
 /** 打开会话 */
-const openChat = (entity: IDirectory | IMemeber | ISession | ITarget) => {
-  if ('taskList' in entity) {
-    orgCtrl.currentKey = entity.target.session.chatdata.fullId;
-  } else if ('fullId' in entity) {
-    orgCtrl.currentKey = entity.fullId;
-  } else if ('session' in entity) {
-    orgCtrl.currentKey = entity.session.chatdata.fullId;
-  } else {
-    orgCtrl.currentKey = entity.chatdata.fullId;
+const openChat = (entity: IMemeber | ITarget) => {
+  if (entity.session) {
+    entity.session.chatdata.recently = true;
+    entity.session.chatdata.lastMsgTime = new Date().getTime();
+    entity.session.cacheChatData();
   }
   command.emitter('executor', 'link', '/chat');
+  setTimeout(() => {
+    command.emitter('session', 'open', entity.session);
+  }, 200);
 };
 
 /** 恢复实体 */

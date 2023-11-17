@@ -1,9 +1,8 @@
-import { List } from 'antd';
+import { List, Tag } from 'antd';
 import React, { useEffect, useState } from 'react';
 import TeamIcon from '@/components/Common/GlobalComps/entityIcon';
 import css from './index.module.less';
 import { IFile, ISession, ITarget, TargetType } from '@/ts/core';
-import { ellipsisText } from '@/utils';
 import { command } from '@/ts/base';
 import DirectoryViewer from '@/components/Directory/views';
 import TargetActivity from '@/components/TargetActivity';
@@ -16,12 +15,16 @@ const SessionBody = ({ target, session }: { target: ITarget; session: ISession }
   const [bodyType, setBodyType] = useState('');
   useEffect(() => {
     const newActions: string[] = [];
-    if (session.isMyChat && target.typeName !== TargetType.Group) {
-      newActions.push('chat');
-    }
-    newActions.push('activity');
-    if (session.members.length > 0 || session.id === session.userId) {
-      newActions.push('store', 'setting');
+    if (target.typeName === TargetType.Storage) {
+      newActions.push('setting', 'activity');
+    } else {
+      if (session.isMyChat && target.typeName !== TargetType.Group) {
+        newActions.push('chat');
+      }
+      newActions.push('activity');
+      if (session.members.length > 0 || session.id === session.userId) {
+        newActions.push('store', 'setting');
+      }
     }
     setActons(newActions);
     if (!newActions.includes(bodyType)) {
@@ -61,6 +64,20 @@ const SessionBody = ({ target, session }: { target: ITarget; session: ISession }
     }
   };
 
+  const getTitle = (flag: string) => {
+    switch (flag) {
+      case 'chat':
+        return '沟通';
+      case 'activity':
+        return '动态';
+      case 'store':
+        return '数据';
+      case 'setting':
+      default:
+        return '关系';
+    }
+  };
+
   return (
     <>
       <div className={css.groupDetail}>
@@ -71,6 +88,7 @@ const SessionBody = ({ target, session }: { target: ITarget; session: ISession }
             return (
               <a
                 key={flag}
+                title={getTitle(flag)}
                 onClick={() => {
                   setBodyType(flag);
                 }}>
@@ -88,7 +106,15 @@ const SessionBody = ({ target, session }: { target: ITarget; session: ISession }
               </>
             }
             avatar={<TeamIcon entity={session.metadata} size={50} />}
-            description={ellipsisText(session.chatdata.chatRemark, 50)}
+            description={session.groupTags
+              .filter((i) => i.length > 0)
+              .map((label) => {
+                return (
+                  <Tag key={label} color={label === '置顶' ? 'red' : 'success'}>
+                    {label}
+                  </Tag>
+                );
+              })}
           />
         </List.Item>
         <div className={css.groupDetailContent}>{loadContext()}</div>

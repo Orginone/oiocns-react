@@ -1,15 +1,7 @@
 import { command, common, model, schema } from '../../base';
-import {
-  directoryNew,
-  directoryOperates,
-  entityOperates,
-  fileOperates,
-  memberOperates,
-  teamOperates,
-} from '../public';
+import { directoryNew, directoryOperates, entityOperates, fileOperates } from '../public';
 import { ITarget } from '../target/base/target';
 import { IStandardFileInfo, StandardFileInfo, IFile } from './fileinfo';
-import { Member } from './member';
 import { StandardFiles } from './standard';
 import { IApplication } from './standard/application';
 import { BucketOpreates, FileItemModel } from '@/ts/base/model';
@@ -127,22 +119,18 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
   content(store: boolean = true): IFile[] {
     const cnt: IFile[] = [...this.children];
     if (this.target.session.isMyChat || this.target.hasRelationAuth()) {
-      if (this.typeName === '成员目录') {
-        cnt.push(...this.target.members.map((i) => new Member(i, this)));
-      } else {
-        cnt.push(...this.files);
-        cnt.push(...this.standard.forms);
-        cnt.push(...this.standard.applications);
-        cnt.push(...this.standard.propertys);
-        cnt.push(...this.standard.specieses);
-        cnt.push(...this.standard.transfers);
-        cnt.push(...this.standard.templates);
-        if (!this.parent && store) {
-          for (const item of this.target.content()) {
-            const target = item as ITarget | IDirectory | IStorage;
-            if (!('standard' in target || 'isActivate' in target)) {
-              cnt.push(target.directory);
-            }
+      cnt.push(...this.files);
+      cnt.push(...this.standard.forms);
+      cnt.push(...this.standard.applications);
+      cnt.push(...this.standard.propertys);
+      cnt.push(...this.standard.specieses);
+      cnt.push(...this.standard.transfers);
+      cnt.push(...this.standard.templates);
+      if (!this.parent && store) {
+        for (const item of this.target.content()) {
+          const target = item as ITarget | IDirectory | IStorage;
+          if (!('standard' in target || 'isActivate' in target)) {
+            cnt.push(target.directory);
           }
         }
       }
@@ -152,14 +140,8 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
   async loadContent(reload: boolean = false): Promise<boolean> {
     await this.loadFiles(reload);
     await this.standard.loadStandardFiles(reload);
-    if (reload) {
-      if (this.typeName === '成员目录') {
-        await this.target.loadContent(reload);
-      } else {
-        await this.loadDirectoryResource(reload);
-      }
-    }
-    return false;
+    await this.loadDirectoryResource(reload);
+    return true;
   }
   override async copy(destination: IDirectory): Promise<boolean> {
     if (this.allowCopy(destination)) {
@@ -280,36 +262,21 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
   }
   override operates(): model.OperateModel[] {
     const operates: model.OperateModel[] = [];
-    if (this.typeName === '成员目录') {
-      if (this.target.hasRelationAuth()) {
-        if (this.target.user.copyFiles.size > 0) {
-          operates.push(fileOperates.Parse);
-        }
-        operates.push(teamOperates.Pull, memberOperates.SettingIdentity);
-        if ('superAuth' in this.target) {
-          operates.unshift(memberOperates.SettingAuth);
-          if ('stations' in this.target) {
-            operates.unshift(memberOperates.SettingStation);
-          }
-        }
+    operates.push(
+      directoryOperates.NewFile,
+      directoryOperates.TaskList,
+      directoryOperates.Refesh,
+    );
+    if (this.target.hasRelationAuth()) {
+      operates.push(directoryNew);
+      if (this.target.user.copyFiles.size > 0) {
+        operates.push(fileOperates.Parse);
       }
+    }
+    if (this.parent) {
+      operates.push(...super.operates());
     } else {
-      operates.push(
-        directoryOperates.NewFile,
-        directoryOperates.TaskList,
-        directoryOperates.Refesh,
-      );
-      if (this.target.hasRelationAuth()) {
-        operates.push(directoryNew);
-        if (this.target.user.copyFiles.size > 0) {
-          operates.push(fileOperates.Parse);
-        }
-      }
-      if (this.parent) {
-        operates.push(...super.operates());
-      } else {
-        operates.push(entityOperates.Open);
-      }
+      operates.push(entityOperates.Open);
     }
     return operates;
   }

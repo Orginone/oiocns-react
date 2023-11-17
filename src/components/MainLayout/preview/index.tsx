@@ -4,17 +4,16 @@ import {
   IDirectory,
   IEntity,
   IForm,
+  IMemeber,
   ISession,
   ISysFileInfo,
   ITarget,
   IWorkTask,
-  TargetType,
 } from '@/ts/core';
 import { command, schema } from '@/ts/base';
 import React, { useEffect, useState } from 'react';
 import OfficeView from './office';
 import SessionBody from './session';
-import StorageBody from './storage';
 import TaskBody from './task';
 import JoinApply from './task/joinApply';
 import EntityInfo from '@/components/Common/EntityInfo';
@@ -32,6 +31,7 @@ type EntityType =
   | IForm
   | ITarget
   | IDirectory
+  | IMemeber
   | string
   | undefined;
 
@@ -78,13 +78,16 @@ const EntityPreview: React.FC<IOpenProps> = (props: IOpenProps) => {
       return <FilePreview key={entity.key} file={entity} />;
     }
     if ('activity' in entity) {
-      return <SessionBody target={entity.target} session={entity} />;
+      return <SessionBody key={entity.key} target={entity.target} session={entity} />;
     }
-    if ('session' in entity) {
-      if (entity.typeName === TargetType.Storage) {
-        return <StorageBody key={entity.key} storage={entity as any} />;
-      }
-      return <SessionBody target={entity} session={entity.session} />;
+    if ('session' in entity && entity.session) {
+      return (
+        <SessionBody
+          key={entity.key}
+          target={entity.session.target}
+          session={entity.session}
+        />
+      );
     }
     if ('fields' in entity) {
       return <WorkForm key={entity.key} form={entity} />;
