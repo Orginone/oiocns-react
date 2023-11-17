@@ -23,6 +23,11 @@ export function createProxy() {
       changeOrigin: true, // 是否允许跨域
       ws: true,
     },
+    '/warehouse': {
+      target: 'http://gittest.jx868.com', // 后台接口
+      changeOrigin: true, // 是否允许跨域
+      rewrite: (path) => path.replace(/^\/warehouse/, ''),
+    },
   };
   return ProxyList;
 }

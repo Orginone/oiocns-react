@@ -33,6 +33,7 @@ export class DataResource {
     this.directoryColl = this.genTargetColl<XDirectory>('resource-directory');
     this.applicationColl = this.genTargetColl<XApplication>('standard-application');
     this.speciesItemColl = this.genTargetColl<XSpeciesItem>('standard-species-item');
+    this.repositoryColl = this.genTargetColl<any>('code-repository');
     this.templateColl = this.genTargetColl<XPageTemplate>('standard-page-template');
     this.stagingColl = this.genTargetColl<XStaging>('resource-staging');
   }
@@ -52,6 +53,8 @@ export class DataResource {
   messageColl: XCollection<ChatMessageType>;
   /** 数据传输配置集合 */
   transferColl: XCollection<Transfer>;
+  /** 代码仓库集合 */
+  repositoryColl: XCollection<any>;
   /** 页面模板集合 */
   templateColl: XCollection<XPageTemplate>;
   /** 暂存集合 */
