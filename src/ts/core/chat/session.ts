@@ -163,7 +163,7 @@ export class Session extends Entity<schema.XEntity> implements ISession {
       if (this.target.space.id !== this.userId) {
         gtags.push(this.target.space.name);
       } else {
-        gtags.push(this.belong.name);
+        gtags.push(this.target.user.findShareById(this.belongId).name);
       }
       gtags.push(this.typeName);
     }
