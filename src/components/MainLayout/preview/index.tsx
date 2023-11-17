@@ -32,7 +32,6 @@ type EntityType =
   | ITarget
   | IDirectory
   | IMemeber
-  | string
   | undefined;
 
 interface IOpenProps {
@@ -73,7 +72,7 @@ const EntityPreview: React.FC<IOpenProps> = (props: IOpenProps) => {
     };
   }, [props.flag]);
 
-  if (entity && typeof entity != 'string') {
+  if (entity && !Array.isArray(entity) && typeof entity != 'string') {
     if ('filedata' in entity) {
       return <FilePreview key={entity.key} file={entity} />;
     }
