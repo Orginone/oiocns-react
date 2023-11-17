@@ -71,12 +71,6 @@ const PassportLogin: React.FC<{ to: (flag: string) => void }> = ({ to }) => {
         </Form.Item>
         <Form.Item>
           <div style={flexStyle}>
-            <div style={{ fontSize: 22, ...flexStyle, gap: 10, color: '#666666' }}>
-              <span style={{ fontSize: 14 }}>其它登录方式</span>
-              <AiOutlineAlipayCircle />
-              <AiFillWechat />
-              <AiOutlineQq />
-            </div>
             <Button type="link" onClick={() => to('register')}>
               注册用户
             </Button>
@@ -118,7 +112,7 @@ const PassportLogin: React.FC<{ to: (flag: string) => void }> = ({ to }) => {
       }
     }, [formData]);
     return (
-      <Space direction="vertical" size={32}>
+      <Space direction="vertical" size={30}>
         <Input
           size="large"
           prefix={<AiOutlineUser />}
@@ -148,12 +142,6 @@ const PassportLogin: React.FC<{ to: (flag: string) => void }> = ({ to }) => {
           登录
         </Button>
         <div style={flexStyle}>
-          <div style={{ fontSize: 22, ...flexStyle, gap: 10, color: '#666666' }}>
-            <span style={{ fontSize: 14 }}>其它登录方式</span>
-            <AiOutlineAlipayCircle />
-            <AiFillWechat />
-            <AiOutlineQq />
-          </div>
           <Button type="link" onClick={() => to('register')}>
             注册用户
           </Button>
@@ -187,15 +175,20 @@ const PassportLogin: React.FC<{ to: (flag: string) => void }> = ({ to }) => {
           </div>
         </div>
         <div style={flexStyle}>
-          <div style={{ fontSize: 22, ...flexStyle, gap: 10, color: '#666666' }}>
+          <div
+            style={{
+              fontSize: 26,
+              ...flexStyle,
+              gap: 10,
+              color: '#666666',
+              cursor: 'pointer',
+            }}>
             <span style={{ fontSize: 14 }}>其它登录方式</span>
             <AiOutlineAlipayCircle />
             <AiFillWechat />
             <AiOutlineQq />
           </div>
-          <Button type="link" onClick={() => to('register')}>
-            注册用户
-          </Button>
+          <Button type="link">下载移动端</Button>
         </div>
       </Space>
     );
