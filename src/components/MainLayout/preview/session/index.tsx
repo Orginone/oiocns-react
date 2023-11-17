@@ -10,7 +10,15 @@ import { loadFileMenus } from '@/executor/fileOperate';
 import OrgIcons from '@/components/Common/GlobalComps/orgIcons';
 import ChatBody from './chat';
 import StoreBody from './store';
-const SessionBody = ({ target, session }: { target: ITarget; session: ISession }) => {
+const SessionBody = ({
+  target,
+  session,
+  setting,
+}: {
+  target: ITarget;
+  session: ISession;
+  setting?: boolean;
+}) => {
   const [actions, setActons] = useState<string[]>([]);
   const [bodyType, setBodyType] = useState('');
   useEffect(() => {
@@ -28,7 +36,11 @@ const SessionBody = ({ target, session }: { target: ITarget; session: ISession }
     }
     setActons(newActions);
     if (!newActions.includes(bodyType)) {
-      setBodyType(newActions[0]);
+      if (setting && newActions.includes('setting')) {
+        setBodyType('setting');
+      } else {
+        setBodyType(newActions[0]);
+      }
     }
   }, [target]);
 
@@ -99,7 +111,7 @@ const SessionBody = ({ target, session }: { target: ITarget; session: ISession }
           <List.Item.Meta
             title={
               <>
-                <span style={{ marginRight: 10 }}>{session.chatdata.chatName}</span>
+                <span style={{ marginRight: 10 }}>{session.name}</span>
                 {session.members.length > 0 && (
                   <span className={css.number}>({session.members.length})</span>
                 )}

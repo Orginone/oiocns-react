@@ -7,6 +7,7 @@ import { loadFileMenus } from '@/executor/fileOperate';
 import { cleanMenus } from '@/utils/tools';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import useTimeoutHanlder from '@/hooks/useTimeoutHanlder';
+import { Spin } from 'antd';
 
 interface IProps {
   current: IBelong | 'disk';
@@ -66,16 +67,18 @@ const Content: React.FC<IProps> = (props) => {
   };
 
   return (
-    <DirectoryViewer
-      key={key}
-      initTags={['全部']}
-      selectFiles={[]}
-      extraTags={true}
-      focusFile={focusFile}
-      content={getContent()}
-      fileOpen={(entity, dblclick) => clickHanlder(entity as IFile, dblclick)}
-      contextMenu={(entity) => contextMenu(entity as IWorkTask)}
-    />
+    <Spin spinning={false} tip={'加载中...'}>
+      <DirectoryViewer
+        key={key}
+        initTags={['全部']}
+        selectFiles={[]}
+        extraTags={true}
+        focusFile={focusFile}
+        content={getContent()}
+        fileOpen={(entity, dblclick) => clickHanlder(entity as IFile, dblclick)}
+        contextMenu={(entity) => contextMenu(entity as IWorkTask)}
+      />
+    </Spin>
   );
 };
 export default Content;

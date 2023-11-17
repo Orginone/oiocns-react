@@ -82,6 +82,7 @@ const EntityPreview: React.FC<IOpenProps> = (props: IOpenProps) => {
     if ('session' in entity && entity.session) {
       return (
         <SessionBody
+          setting
           key={entity.key}
           target={entity.session.target}
           session={entity.session}
