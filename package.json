@@ -65,7 +65,7 @@
     "antd": "^4.24.4",
     "axios": "^1.1.2",
     "codemirror": "^6.0.1",
-    "crypto-js": "^4.2.0",
+    "crypto-js": "^4.1.1",
     "dayjs": "^1.10.6",
     "devextreme": "^23.1.6",
     "devextreme-react": "^23.1.6",

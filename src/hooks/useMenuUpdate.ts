@@ -52,7 +52,6 @@ const useMenuUpdate = (
       setKey(key);
       refreshMenu();
     });
-    console.log(id,key,'1234')
     return () => {
       ctrl.unsubscribe(id);
     };
