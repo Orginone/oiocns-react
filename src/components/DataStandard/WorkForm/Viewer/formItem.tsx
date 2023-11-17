@@ -76,7 +76,7 @@ const FormItem: React.FC<IFormItemProps> = (props) => {
     width: getItemWidth(props.numStr),
   };
   if (props.field.options.isRequired) {
-    mixOptions.isValid = isValid;
+    mixOptions.isValid = mixOptions.defaultValue ? true : isValid;
     mixOptions.label = mixOptions.label + '*';
   }
   switch (getWidget(props.field.valueType, props.field.widget)) {

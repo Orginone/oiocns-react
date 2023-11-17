@@ -1,8 +1,8 @@
 import React from 'react';
+import Content from './content';
 import MainLayout from '@/components/MainLayout';
 import * as config from './config/menuOperate';
 import useMenuUpdate from '@/hooks/useMenuUpdate';
-import Directory from '@/components/Directory';
 /** 文件浏览器 */
 const FileBrowser: React.FC = () => {
   const [key, rootMenu, selectMenu, setSelectMenu] = useMenuUpdate(
@@ -17,7 +17,7 @@ const FileBrowser: React.FC = () => {
         setSelectMenu(data);
       }}
       siderMenuData={rootMenu}>
-      <Directory key={key} current={selectMenu.item} previewFlag={'store'} />
+      <Content key={key} current={selectMenu.item} />
     </MainLayout>
   );
 };

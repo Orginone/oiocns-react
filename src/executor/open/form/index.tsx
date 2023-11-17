@@ -80,7 +80,7 @@ const FormView: React.FC<IProps> = ({ form, finished }) => {
               {
                 key: 'createNFT',
                 label: '生成存证',
-                icon: <ImTicket fontSize={22} color={'#9498df'} />,
+                icon: <ImTicket fontSize={22} color={'#3838b9'} />,
                 onClick: () => {
                   message.success('存证成功!');
                 },
@@ -88,12 +88,12 @@ const FormView: React.FC<IProps> = ({ form, finished }) => {
               {
                 key: 'copyBoard',
                 label: '复制数据',
-                icon: <ImCopy fontSize={22} color={'#9498df'} />,
+                icon: <ImCopy fontSize={22} color={'#3838b9'} />,
               },
               {
                 key: 'startWork',
                 label: '发起办事',
-                icon: <ImShuffle fontSize={22} color={'#9498df'} />,
+                icon: <ImShuffle fontSize={22} color={'#3838b9'} />,
               },
             ],
             onMenuClick(key, data) {

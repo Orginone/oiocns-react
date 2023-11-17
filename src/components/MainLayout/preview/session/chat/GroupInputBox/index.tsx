@@ -176,20 +176,20 @@ const GroupInputBox = (props: IProps) => {
             trigger={['click', 'contextMenu']}
             onOpenChange={setOpenEmoji}>
             <div onClick={() => setOpenEmoji(!openEmoji)} style={{ paddingTop: '6px' }}>
-              <im.ImSmile size={18} color={'#9498df'} />
+              <im.ImSmile size={18} color={'#3838b9'} />
             </div>
           </Popover>
           <im.ImMic
             size={18}
-            color={'#9498df'}
+            color={'#3838b9'}
             onClick={() => {
               message.warning('功能暂未开放');
             }}
           />
-          <im.ImFolder size={18} color={'#9498df'} onClick={() => setOpen(true)} />
+          <im.ImFolder size={18} color={'#3838b9'} onClick={() => setOpen(true)} />
           <im.ImVideoCamera
             size={18}
-            color={'#9498df'}
+            color={'#3838b9'}
             onClick={() => {
               message.warning('功能暂未开放');
             }}

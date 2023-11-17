@@ -41,7 +41,7 @@ export interface IDirectory extends IStandardFileInfo<schema.XDirectory> {
   /** 目录结构变更 */
   structCallback(reload?: boolean): void;
   /** 目录下的内容 */
-  content(): IFile[];
+  content(store?: boolean): IFile[];
   /** 创建子目录 */
   create(data: schema.XDirectory): Promise<schema.XDirectory | undefined>;
   /** 目录下的文件 */
@@ -124,7 +124,7 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
       command.emitter('executor', 'refresh', this);
     }
   }
-  content(): IFile[] {
+  content(store: boolean = true): IFile[] {
     const cnt: IFile[] = [...this.children];
     if (this.target.session.isMyChat || this.target.hasRelationAuth()) {
       if (this.typeName === '成员目录') {
@@ -137,7 +137,7 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
         cnt.push(...this.standard.specieses);
         cnt.push(...this.standard.transfers);
         cnt.push(...this.standard.templates);
-        if (!this.parent) {
+        if (!this.parent && store) {
           for (const item of this.target.content()) {
             const target = item as ITarget | IDirectory | IStorage;
             if (!('standard' in target || 'isActivate' in target)) {

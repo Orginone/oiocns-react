@@ -3,7 +3,8 @@ import { ProFormColumnsType } from '@ant-design/pro-components';
 import SchemaForm from '@/components/SchemaForm';
 import { TargetModel } from '@/ts/base/model';
 import UploadItem from '../../tools/uploadItem';
-import { schema } from '@/ts/base';
+import { model, parseAvatar, schema } from '@/ts/base';
+import QrCode from 'qrcode.react';
 import { formatZhDate } from '@/utils/tools';
 import orgCtrl from '@/ts/controller';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
@@ -19,9 +20,28 @@ interface Iprops {
 const EntityPreview: React.FC<Iprops> = ({ entity, finished }) => {
   const columns: ProFormColumnsType<TargetModel>[] = [
     {
+      dataIndex: 'id',
+      renderFormItem: () => {
+        const avatar: model.FileItemShare = parseAvatar(entity.icon);
+        return (
+          <QrCode
+            level="H"
+            size={150}
+            fgColor={'#3838b9'}
+            value={`${location.origin}/${entity.id}`}
+            imageSettings={{
+              src: avatar?.thumbnail ?? '',
+              width: 50,
+              height: 50,
+              excavate: true,
+            }}
+          />
+        );
+      },
+    },
+    {
       title: '图标',
       dataIndex: 'icon',
-      colProps: { span: 24 },
       renderFormItem: (_, __, form) => {
         return (
           <UploadItem

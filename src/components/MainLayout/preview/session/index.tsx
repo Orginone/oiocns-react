@@ -1,108 +1,83 @@
 import { List } from 'antd';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import TeamIcon from '@/components/Common/GlobalComps/entityIcon';
 import css from './index.module.less';
-import { ISession, ITarget, TargetType } from '@/ts/core';
+import { IFile, ISession, ITarget, TargetType } from '@/ts/core';
 import { ellipsisText } from '@/utils';
-import ChatBody from './chat';
 import { command } from '@/ts/base';
+import DirectoryViewer from '@/components/Directory/views';
 import TargetActivity from '@/components/TargetActivity';
-import MemberContent from './member';
-import orgCtrl from '@/ts/controller';
-import { ImAddressBook, ImQrcode, ImBubbles2, ImLifebuoy, ImFolder } from 'react-icons/im';
-import { useHistory } from 'react-router-dom';
-const SessionBody = ({
-  target,
-  session,
-  setting,
-}: {
-  target: ITarget;
-  session: ISession;
-  setting?: boolean;
-}) => {
-  const history = useHistory();
-  const [bodyType, setBodyType] = useState(setting ? 'member' : 'chat');
-  const sessionActions = () => {
-    const actions = [];
+import { loadFileMenus } from '@/executor/fileOperate';
+import OrgIcons from '@/components/Common/GlobalComps/orgIcons';
+import ChatBody from './chat';
+import StoreBody from './store';
+const SessionBody = ({ target, session }: { target: ITarget; session: ISession }) => {
+  const [actions, setActons] = useState<string[]>([]);
+  const [bodyType, setBodyType] = useState('');
+  useEffect(() => {
+    const newActions: string[] = [];
     if (session.isMyChat && target.typeName !== TargetType.Group) {
-      actions.push(
-        <ImBubbles2
-          key="chat"
-          size={26}
-          title="沟通"
-          onClick={() => {
-            setBodyType('chat');
-          }}
-        />,
-      );
+      newActions.push('chat');
     }
-    actions.push(
-      <ImLifebuoy
-        key="activity"
-        size={26}
-        title="动态"
-        onClick={() => {
-          setBodyType('activity');
-        }}
-      />,
-    );
+    newActions.push('activity');
     if (session.members.length > 0 || session.id === session.userId) {
-      actions.push(
-        <ImFolder
-          key="store"
-          size={26}
-          title="存储"
-          onClick={() => {
-            orgCtrl.currentKey = target.directory.key;
-            history.push('/store');
-          }}
-        />,
-        <ImAddressBook
-          key="setting"
-          size={26}
-          title="成员"
-          onClick={() => {
-            setBodyType('member');
-          }}
-        />,
-      );
+      newActions.push('store', 'setting');
     }
-    actions.push(
-      <ImQrcode
-        key="qrcode"
-        size={26}
-        title="二维码"
-        onClick={() => {
-          command.emitter('executor', 'qrcode', target);
-        }}
-      />,
-    );
-    return actions;
-  };
+    setActons(newActions);
+    if (!newActions.includes(bodyType)) {
+      setBodyType(newActions[0]);
+    }
+  }, [target]);
 
   const loadContext = () => {
     switch (bodyType) {
       case 'chat':
-        return <ChatBody chat={session} filter={''} />;
-      case 'member':
-        if (session.members.length > 0 || session.id === session.userId) {
-          return <MemberContent dircetory={target.memberDirectory} />;
-        } else if (setting) {
-          return (
-            <TargetActivity height={700} activity={session.activity}></TargetActivity>
-          );
-        } else {
-          return <ChatBody chat={session} filter={''} />;
-        }
+        return <ChatBody key={target.key} chat={session} filter={''} />;
       case 'activity':
-        return <TargetActivity height={700} activity={session.activity}></TargetActivity>;
+        return <TargetActivity height={700} activity={session.activity} />;
+      case 'store':
+        return <StoreBody key={target.key} target={target} />;
+      case 'setting':
+        return (
+          <DirectoryViewer
+            extraTags
+            initTags={['成员']}
+            selectFiles={[]}
+            content={target.memberDirectory.content()}
+            fileOpen={() => {}}
+            contextMenu={(entity) => {
+              const file = (entity as IFile) || target.memberDirectory;
+              return {
+                items: loadFileMenus(file),
+                onClick: ({ key }: { key: string }) => {
+                  command.emitter('executor', key, file);
+                },
+              };
+            }}
+          />
+        );
+      default:
+        return <></>;
     }
   };
 
   return (
     <>
       <div className={css.groupDetail}>
-        <List.Item className={css.header} actions={sessionActions()}>
+        <List.Item
+          className={css.header}
+          actions={actions.map((flag) => {
+            const selected = flag === bodyType;
+            return (
+              <a
+                key={flag}
+                onClick={() => {
+                  setBodyType(flag);
+                }}>
+                <OrgIcons type={flag} selected={selected} size={26} />
+              </a>
+            );
+          })}>
           <List.Item.Meta
             title={
               <>

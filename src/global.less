@@ -456,7 +456,7 @@ h3 {
         padding: 8px;
         border-radius: 16px;
         border: 1px solid @border-color;
-        background: @active-background;
+        background-color: @active-background;
       }
 
       &-item {
@@ -464,6 +464,9 @@ h3 {
         padding: 8px;
         border-radius: 6px;
         border-bottom: 1px solid @border-color-base;
+        &:hover {
+          background-color: @active-background;
+        }
       }
     }
   }

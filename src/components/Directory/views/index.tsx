@@ -17,7 +17,7 @@ interface IProps {
   extraTags: boolean;
   excludeTags?: string[];
   preDirectory?: IDEntity;
-  focusFile: IDEntity | undefined;
+  focusFile?: IDEntity;
   badgeCount?: (tag: string) => number;
   tagChanged?: (tag: string) => void;
   fileOpen: (file: IDEntity | undefined, dblclick: boolean) => void;
@@ -27,8 +27,15 @@ interface IProps {
  * 存储-文件系统
  */
 const DirectoryView: React.FC<IProps> = (props) => {
-  const [currentTag, setCurrentTag] = useState(props.initTags[0]);
+  const [currentTag, setCurrentTag] = useState(
+    props.initTags.length > 0 ? props.initTags[0] : '',
+  );
   const [segmented, setSegmented] = useStorage('segmented', 'list');
+  useEffect(() => {
+    if (props.initTags.length > 0 && !props.initTags.includes(currentTag)) {
+      setCurrentTag(props.initTags[0]);
+    }
+  }, [props]);
   if (props.tagChanged) {
     useEffect(() => {
       props.tagChanged?.apply(this, [currentTag]);
@@ -73,7 +80,6 @@ const DirectoryView: React.FC<IProps> = (props) => {
         badgeCount={props.badgeCount}
         onBack={() => props.fileOpen(props.preDirectory, true)}
         onChanged={(t) => setCurrentTag(t)}></TagsBar>
-      <div></div>
       <SegmentContent
         onSegmentChanged={setSegmented}
         descriptions={`${getContent().length}个项目`}

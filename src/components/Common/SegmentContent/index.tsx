@@ -40,7 +40,7 @@ const SegmentContent: React.FC<IProps> = ({
               icon: (
                 <fa.FaList
                   fontSize={20}
-                  color={segmented === 'list' ? 'blue' : '#9498df'}
+                  color={segmented === 'list' ? 'blue' : '#3838b9'}
                 />
               ),
             },
@@ -49,7 +49,7 @@ const SegmentContent: React.FC<IProps> = ({
               icon: (
                 <fa.FaTh
                   fontSize={20}
-                  color={segmented === 'icon' ? 'blue' : '#9498df'}
+                  color={segmented === 'icon' ? 'blue' : '#3838b9'}
                 />
               ),
             },
@@ -58,7 +58,7 @@ const SegmentContent: React.FC<IProps> = ({
               icon: (
                 <fa.FaTable
                   fontSize={20}
-                  color={segmented === 'table' ? 'blue' : '#9498df'}
+                  color={segmented === 'table' ? 'blue' : '#3838b9'}
                 />
               ),
             },

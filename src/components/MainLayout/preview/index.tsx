@@ -75,32 +75,32 @@ const EntityPreview: React.FC<IOpenProps> = (props: IOpenProps) => {
 
   if (entity && typeof entity != 'string') {
     if ('filedata' in entity) {
-      return <FilePreview file={entity} />;
+      return <FilePreview key={entity.key} file={entity} />;
     }
     if ('activity' in entity) {
       return <SessionBody target={entity.target} session={entity} />;
     }
     if ('session' in entity) {
       if (entity.typeName === TargetType.Storage) {
-        return <StorageBody storage={entity as any} />;
+        return <StorageBody key={entity.key} storage={entity as any} />;
       }
-      return <SessionBody target={entity} session={entity.session} setting />;
+      return <SessionBody target={entity} session={entity.session} />;
     }
     if ('fields' in entity) {
-      return <WorkForm form={entity} />;
+      return <WorkForm key={entity.key} form={entity} />;
     }
     if ('taskdata' in entity) {
       switch (entity.taskdata.taskType) {
         case '事项':
-          return <TaskBody task={entity} />;
+          return <TaskBody key={entity.key} task={entity} />;
         case '加用户':
-          return <JoinApply task={entity} />;
+          return <JoinApply key={entity.key} task={entity} />;
         default:
           return <></>;
       }
     }
     if ('standard' in entity) {
-      return <Directory current={entity} />;
+      return <Directory key={entity.key} current={entity} />;
     }
     return <EntityInfo entity={entity} column={1} />;
   }

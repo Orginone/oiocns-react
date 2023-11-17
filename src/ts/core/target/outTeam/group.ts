@@ -48,6 +48,17 @@ export class Group extends Target implements IGroup {
   keys: string[];
   relations: string[];
   private _childrenLoaded: boolean = false;
+  get groupTags(): string[] {
+    const tags = [...super.groupTags];
+    if (this.id != this.belongId) {
+      if (this.belongId != this.spaceId) {
+        tags.push('加入的集群');
+      } else {
+        tags.push('创建的集群');
+      }
+    }
+    return tags;
+  }
   async loadChildren(reload?: boolean | undefined): Promise<IGroup[]> {
     if (!this._childrenLoaded || reload) {
       const res = await kernel.querySubTargetById({
