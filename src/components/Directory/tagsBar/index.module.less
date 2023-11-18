@@ -1,17 +1,19 @@
-.tags_bar {
+.tags {
   width: 100%;
   height: 35px;
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  flex-direction: row;
+  justify-content: space-between;
+  border-bottom: 1px solid #efefef;
+}
+.tags_bar {
   gap: 8px;
   display: flex;
   padding: 0 16px;
   align-items: center;
-  justify-content: space-between;
-  border-bottom: 1px solid #efefef;
-  .tags_body {
-    overflow: hidden;
-    padding: 0 8px;
-    width: 100%;
-  }
+  overflow: scroll;
   .tags_item {
     cursor: pointer;
     white-space: nowrap;

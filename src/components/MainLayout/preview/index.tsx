@@ -50,12 +50,12 @@ const FilePreview: React.FC<{ file: ISysFileInfo }> = ({ file }) => {
 };
 
 /** 实体预览 */
-const EntityPreview: React.FC<{ flag?: string }> = ({ flag }) => {
-  if (!(flag && flag.length > 0)) return <></>;
+const EntityPreview: React.FC<{ flag?: string }> = (props) => {
+  if (!(props.flag && props.flag.length > 0)) return <></>;
   const [entity, setEntity] = useState<EntityType>();
   useEffect(() => {
     const id = command.subscribe((type, flag, ...args: any[]) => {
-      if (type != 'preview' || flag != flag) return;
+      if (type != 'preview' || flag != props.flag) return;
       if (args && args.length > 0) {
         setEntity(args[0]);
       } else {
@@ -65,24 +65,17 @@ const EntityPreview: React.FC<{ flag?: string }> = ({ flag }) => {
     return () => {
       command.unsubscribe(id);
     };
-  }, [flag]);
+  }, [props]);
 
   if (entity && typeof entity != 'string') {
     if ('filedata' in entity) {
       return <FilePreview key={entity.key} file={entity} />;
     }
     if ('activity' in entity) {
-      return <SessionBody key={entity.key} target={entity.target} session={entity} />;
+      return <SessionBody key={entity.key} session={entity} />;
     }
     if ('session' in entity && entity.session) {
-      return (
-        <SessionBody
-          setting
-          key={entity.key}
-          target={entity.session.target}
-          session={entity.session}
-        />
-      );
+      return <SessionBody setting key={entity.key} session={entity.session} />;
     }
     if ('fields' in entity) {
       return <WorkForm key={entity.key} form={entity} />;

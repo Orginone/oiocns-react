@@ -2,7 +2,7 @@ import { List, Tag } from 'antd';
 import React, { useEffect, useState } from 'react';
 import TeamIcon from '@/components/Common/GlobalComps/entityIcon';
 import css from './index.module.less';
-import { IFile, ISession, ITarget, TargetType } from '@/ts/core';
+import { IFile, ISession, TargetType } from '@/ts/core';
 import { command } from '@/ts/base';
 import Directory from '@/components/Directory';
 import DirectoryViewer from '@/components/Directory/views';
@@ -10,58 +10,53 @@ import TargetActivity from '@/components/TargetActivity';
 import { loadFileMenus } from '@/executor/fileOperate';
 import OrgIcons from '@/components/Common/GlobalComps/orgIcons';
 import ChatBody from './chat';
-const SessionBody = ({
-  target,
-  session,
-  setting,
-}: {
-  target: ITarget;
-  session: ISession;
-  setting?: boolean;
-}) => {
+const SessionBody = ({ session, setting }: { session: ISession; setting?: boolean }) => {
   const [actions, setActons] = useState<string[]>([]);
   const [bodyType, setBodyType] = useState('');
   useEffect(() => {
     const newActions: string[] = [];
-    if (target.typeName === TargetType.Storage) {
-      newActions.push('setting', 'activity');
+    if (session.target.typeName === TargetType.Storage) {
+      newActions.push('relation', 'activity');
     } else {
-      if (session.isMyChat && target.typeName !== TargetType.Group) {
+      if (session.isMyChat && session.target.typeName !== TargetType.Group) {
         newActions.push('chat');
       }
       newActions.push('activity');
       if (session.members.length > 0 || session.id === session.userId) {
-        newActions.push('store', 'setting');
+        newActions.push('store', 'relation');
       }
+    }
+    if (session.target.hasRelationAuth()) {
+      newActions.push('setting');
     }
     setActons(newActions);
     if (!newActions.includes(bodyType)) {
-      if (setting && newActions.includes('setting')) {
-        setBodyType('setting');
+      if (setting && newActions.includes('relation')) {
+        setBodyType('relation');
       } else {
         setBodyType(newActions[0]);
       }
     }
-  }, [target]);
+  }, [session]);
 
   const loadContext = () => {
     switch (bodyType) {
       case 'chat':
-        return <ChatBody key={target.key} chat={session} filter={''} />;
+        return <ChatBody key={session.target.key} chat={session} filter={''} />;
       case 'activity':
         return <TargetActivity height={700} activity={session.activity} />;
       case 'store':
-        return <Directory key={target.key} root={target.directory} />;
-      case 'setting':
+        return <Directory key={session.target.key} root={session.target.directory} />;
+      case 'relation':
         return (
           <DirectoryViewer
             extraTags
             initTags={['成员']}
             selectFiles={[]}
-            content={target.memberDirectory.content()}
+            content={session.target.memberDirectory.content()}
             fileOpen={() => {}}
             contextMenu={(entity) => {
-              const file = (entity as IFile) || target.memberDirectory;
+              const file = (entity as IFile) || session.target.memberDirectory;
               return {
                 items: loadFileMenus(file),
                 onClick: ({ key }: { key: string }) => {
@@ -84,9 +79,10 @@ const SessionBody = ({
         return '动态';
       case 'store':
         return '数据';
-      case 'setting':
-      default:
+      case 'relation':
         return '关系';
+      default:
+        return '设置';
     }
   };
 

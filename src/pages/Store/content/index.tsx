@@ -29,7 +29,7 @@ const Directory: React.FC<IProps> = (props) => {
     command.emitter('preview', 'store', focusFile);
   }, [focusFile]);
   const contextMenu = (file?: IFile) => {
-    const entity = file ?? dircetory;
+    const entity = orgCtrl.currentKey != 'disk' ? file ?? dircetory : undefined;
     return {
       items: cleanMenus(loadFileMenus(entity)) || [],
       onClick: ({ key }: { key: string }) => {

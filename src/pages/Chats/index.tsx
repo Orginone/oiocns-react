@@ -13,8 +13,8 @@ const Setting: React.FC<any> = () => {
   if (!selectMenu || !rootMenu) return <></>;
   return (
     <MainLayout
-      previewFlag={'chat'}
       rightShow
+      previewFlag={'chat'}
       selectMenu={selectMenu}
       onSelect={async (data) => {
         setSelectMenu(data);

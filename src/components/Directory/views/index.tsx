@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import IconMode from './iconMode';
 import ListMode from './listMode';
-import TableMode from './tableMode';
 import useStorage from '@/hooks/useStorage';
 import SegmentContent from '@/components/Common/SegmentContent';
 import { IDEntity } from '@/ts/core';
@@ -52,7 +51,7 @@ const DirectoryView: React.FC<IProps> = (props) => {
           success = !props.excludeIds.includes(file.id);
         }
         if (filter && success) {
-          if (currentTag !== '全部') {
+          if (currentTag !== '全部' && currentTag != '最近') {
             success = file.groupTags.includes(currentTag);
           } else {
             success = !file.groupTags.includes('已删除');
@@ -78,21 +77,14 @@ const DirectoryView: React.FC<IProps> = (props) => {
         selectFiles={props.selectFiles}
         entitys={getContent(false)}
         badgeCount={props.badgeCount}
+        menus={props.contextMenu()}
         onBack={() => props.fileOpen(props.preDirectory, true)}
         onChanged={(t) => setCurrentTag(t)}></TagsBar>
       <SegmentContent
         onSegmentChanged={setSegmented}
         descriptions={`${getContent().length}个项目`}
         content={
-          segmented === 'table' ? (
-            <TableMode
-              selectFiles={props.selectFiles}
-              focusFile={props.focusFile}
-              content={getContent()}
-              fileOpen={props.fileOpen}
-              contextMenu={props.contextMenu}
-            />
-          ) : segmented === 'icon' ? (
+          segmented === 'icon' ? (
             <IconMode
               selectFiles={props.selectFiles}
               focusFile={props.focusFile}

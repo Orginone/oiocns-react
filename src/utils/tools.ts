@@ -285,6 +285,7 @@ const cleanMenus = (items?: OperateMenuType[]): OperateMenuType[] | undefined =>
       key: i.key,
       label: i.label,
       icon: i.icon,
+      model: i.model,
       children: cleanMenus(i.children),
     } as OperateMenuType;
   });

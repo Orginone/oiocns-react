@@ -16,7 +16,6 @@ interface IProps {
  * 设置-配置清单
  */
 const Content: React.FC<IProps> = (props) => {
-  console.log(orgCtrl.currentKey);
   if (!props.current) return <></>;
   const [current] = useState<IBelong>(
     props.current === 'disk' ? orgCtrl.user : props.current,
@@ -28,7 +27,7 @@ const Content: React.FC<IProps> = (props) => {
     command.emitter('preview', 'setting', focusFile);
   }, [focusFile]);
   const contextMenu = (file?: IFile) => {
-    const entity = file ?? current;
+    const entity = orgCtrl.currentKey != 'disk' ? file ?? current : undefined;
     return {
       items: cleanMenus(loadFileMenus(entity)) || [],
       onClick: ({ key }: { key: string }) => {

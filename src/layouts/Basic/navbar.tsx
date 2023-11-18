@@ -59,8 +59,8 @@ const Navbar: React.FC = () => {
     },
     {
       text: '关系',
-      icon: 'setting',
-      path: '/setting',
+      icon: 'relation',
+      path: '/relation',
       count: 0,
     },
   ];

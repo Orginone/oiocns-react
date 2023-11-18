@@ -58,7 +58,7 @@ const CustomBreadcrumb = (props: CustomBreadcrumbType) => {
   return (
     <Space wrap split={<Divider type="vertical" />} size={2}>
       {props.leftBar && props.leftBar}
-      <Breadcrumb separator={<AiOutlineCaretRight />} className={"customBreadcrumb"}>
+      <Breadcrumb separator={<AiOutlineCaretRight />} className="customBreadcrumb">
         {items.map((item) => {
           return (
             <Breadcrumb.Item

@@ -69,7 +69,7 @@ const Content: React.FC<{
       <DirectoryViewer
         key={msgKey}
         extraTags
-        initTags={['全部', '@我', '未读', '置顶', '好友']}
+        initTags={['最近', '@我', '未读', '置顶', '好友']}
         excludeTags={['本人', '同事']}
         selectFiles={[]}
         focusFile={focusFile}
@@ -77,7 +77,7 @@ const Content: React.FC<{
         badgeCount={(tag) => {
           let count = 0;
           chats
-            .filter((i) => tag === '全部' || i.groupTags.includes(tag))
+            .filter((i) => tag === '最近' || i.groupTags.includes(tag))
             .forEach((i) => {
               count += i.badgeCount;
             });

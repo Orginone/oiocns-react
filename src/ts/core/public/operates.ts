@@ -226,6 +226,7 @@ export const teamOperates = {
   Pull: {
     sort: 30,
     cmd: 'pull',
+    model: 'outside',
     label: '邀请成员',
     iconType: 'pull',
   },
@@ -277,6 +278,7 @@ export const targetOperates = {
   },
   Activate: {
     sort: 15,
+    model: 'outside',
     cmd: 'activate',
     label: '激活存储',
     iconType: '激活',
@@ -343,18 +345,21 @@ export const companyJoins = {
 export const memberOperates = {
   SettingAuth: {
     sort: 56,
+    model: 'outside',
     cmd: 'settingAuth',
     label: '权限设置',
     iconType: '权限',
   },
   SettingIdentity: {
     sort: 57,
+    model: 'outside',
     cmd: 'settingIdentity',
     label: '角色设置',
     iconType: '角色',
   },
   SettingStation: {
     sort: 58,
+    model: 'outside',
     cmd: 'settingStation',
     label: '岗位设置',
     iconType: '岗位',

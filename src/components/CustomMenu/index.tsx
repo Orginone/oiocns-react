@@ -78,22 +78,22 @@ const CustomMenu = (props: CustomMenuType) => {
             props.onSelect?.apply(this, [item]);
           }
         }}
-        className={"customlabel"}
+        className="customlabel"
         onMouseLeave={() => {
           setVisibleMenu(false);
         }}>
-        <Typography.Text className={"label"} ellipsis={{ tooltip: item.label }}>
+        <Typography.Text className="label" ellipsis={{ tooltip: item.label }}>
           {item.label}
         </Typography.Text>
         {item.count && item.count > 0 ? (
-          <span className={"badge"}>
+          <span className="badge">
             <Badge key={item.key} count={item.count} size="small" />
           </span>
         ) : (
           <></>
         )}
         {Array.isArray(item.menus) && item.menus.length > 0 && (
-          <span onClick={(e: any) => e.stopPropagation()} className={"moreButton"}>
+          <span onClick={(e: any) => e.stopPropagation()} className="moreButton">
             {props.selectMenu.key === item.key && (
               <Dropdown
                 menu={{
@@ -159,7 +159,7 @@ const CustomMenu = (props: CustomMenuType) => {
       </span>
 
       <Menu
-        className={"customMenu"}
+        className="customMenu"
         mode="inline"
         inlineIndent={10}
         items={data}

@@ -53,15 +53,15 @@ const SegmentContent: React.FC<IProps> = ({
                 />
               ),
             },
-            {
-              value: 'table',
-              icon: (
-                <fa.FaTable
-                  fontSize={20}
-                  color={segmented === 'table' ? 'blue' : '#3838b9'}
-                />
-              ),
-            },
+            // {
+            //   value: 'table',
+            //   icon: (
+            //     <fa.FaTable
+            //       fontSize={20}
+            //       color={segmented === 'table' ? 'blue' : '#3838b9'}
+            //     />
+            //   ),
+            // },
           ]}
         />
       </Affix>
