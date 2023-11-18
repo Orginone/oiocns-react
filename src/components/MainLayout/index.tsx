@@ -71,7 +71,7 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
     props.onSelect?.apply(this, [item]);
   };
   const previewCtx = React.useMemo(() => {
-    return <EntityPreview entity={props.selectMenu.item} flag={props.previewFlag} />;
+    return <EntityPreview flag={props.previewFlag} />;
   }, [props]);
   return (
     <Layout className={'main_layout'}>

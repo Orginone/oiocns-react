@@ -34,11 +34,6 @@ type EntityType =
   | IMemeber
   | undefined;
 
-interface IOpenProps {
-  flag?: string;
-  entity: EntityType;
-}
-
 /** 文件预览 */
 const FilePreview: React.FC<{ file: ISysFileInfo }> = ({ file }) => {
   const data = file.filedata;
@@ -55,12 +50,12 @@ const FilePreview: React.FC<{ file: ISysFileInfo }> = ({ file }) => {
 };
 
 /** 实体预览 */
-const EntityPreview: React.FC<IOpenProps> = (props: IOpenProps) => {
-  if (!(props.flag && props.flag.length > 0)) return <></>;
+const EntityPreview: React.FC<{ flag?: string }> = ({ flag }) => {
+  if (!(flag && flag.length > 0)) return <></>;
   const [entity, setEntity] = useState<EntityType>();
   useEffect(() => {
     const id = command.subscribe((type, flag, ...args: any[]) => {
-      if (type != 'preview' || flag != props.flag) return;
+      if (type != 'preview' || flag != flag) return;
       if (args && args.length > 0) {
         setEntity(args[0]);
       } else {
@@ -70,7 +65,7 @@ const EntityPreview: React.FC<IOpenProps> = (props: IOpenProps) => {
     return () => {
       command.unsubscribe(id);
     };
-  }, [props.flag]);
+  }, [flag]);
 
   if (entity && typeof entity != 'string') {
     if ('filedata' in entity) {

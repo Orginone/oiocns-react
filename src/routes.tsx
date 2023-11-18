@@ -82,7 +82,6 @@ const Routers: IRouteConfig[] = [
         path: '*',
         title: '页面不存在',
         component: NotFound,
-        // render: () => <RouterRedirect to="/noFond" />,
       },
     ],
   },
