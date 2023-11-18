@@ -57,7 +57,7 @@ const FilePreview: React.FC<{ file: ISysFileInfo }> = ({ file }) => {
 /** 实体预览 */
 const EntityPreview: React.FC<IOpenProps> = (props: IOpenProps) => {
   if (!(props.flag && props.flag.length > 0)) return <></>;
-  const [entity, setEntity] = useState<EntityType>(props.entity);
+  const [entity, setEntity] = useState<EntityType>();
   useEffect(() => {
     const id = command.subscribe((type, flag, ...args: any[]) => {
       if (type != 'preview' || flag != props.flag) return;
@@ -72,7 +72,7 @@ const EntityPreview: React.FC<IOpenProps> = (props: IOpenProps) => {
     };
   }, [props.flag]);
 
-  if (entity && !Array.isArray(entity) && typeof entity != 'string') {
+  if (entity && typeof entity != 'string') {
     if ('filedata' in entity) {
       return <FilePreview key={entity.key} file={entity} />;
     }
@@ -102,8 +102,8 @@ const EntityPreview: React.FC<IOpenProps> = (props: IOpenProps) => {
           return <></>;
       }
     }
-    if ('standard' in entity) {
-      return <Directory key={entity.key} current={entity} />;
+    if ('isContainer' in entity && entity.isContainer) {
+      return <Directory key={entity.key} root={entity} />;
     }
     return <EntityInfo entity={entity} column={1} />;
   }

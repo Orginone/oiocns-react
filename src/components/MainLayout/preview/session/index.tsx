@@ -4,12 +4,12 @@ import TeamIcon from '@/components/Common/GlobalComps/entityIcon';
 import css from './index.module.less';
 import { IFile, ISession, ITarget, TargetType } from '@/ts/core';
 import { command } from '@/ts/base';
+import Directory from '@/components/Directory';
 import DirectoryViewer from '@/components/Directory/views';
 import TargetActivity from '@/components/TargetActivity';
 import { loadFileMenus } from '@/executor/fileOperate';
 import OrgIcons from '@/components/Common/GlobalComps/orgIcons';
 import ChatBody from './chat';
-import StoreBody from './store';
 const SessionBody = ({
   target,
   session,
@@ -51,7 +51,7 @@ const SessionBody = ({
       case 'activity':
         return <TargetActivity height={700} activity={session.activity} />;
       case 'store':
-        return <StoreBody key={target.key} target={target} />;
+        return <Directory key={target.key} root={target.directory} />;
       case 'setting':
         return (
           <DirectoryViewer

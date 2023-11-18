@@ -69,7 +69,6 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
       _target.resource.directoryColl,
     );
     this.parent = _parent;
-    this.isContainer = true;
     this.taskEmitter = new common.Emitter();
     this.standard = new StandardFiles(this);
   }
@@ -78,8 +77,14 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
   parent: IDirectory | undefined;
   taskList: model.TaskModel[] = [];
   files: ISysFileInfo[] = [];
+  get isContainer(): boolean {
+    return true;
+  }
   get cacheFlag(): string {
     return 'directorys';
+  }
+  get superior(): IFile {
+    return this.parent ?? this.target.superior.directory;
   }
   get groupTags(): string[] {
     if (this.parent) {
@@ -140,7 +145,9 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
   async loadContent(reload: boolean = false): Promise<boolean> {
     await this.loadFiles(reload);
     await this.standard.loadStandardFiles(reload);
-    await this.loadDirectoryResource(reload);
+    if (reload) {
+      await this.loadDirectoryResource(reload);
+    }
     return true;
   }
   override async copy(destination: IDirectory): Promise<boolean> {

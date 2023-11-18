@@ -129,7 +129,7 @@ const getTeamMenu = () => {
 /** 加载设置模块菜单 */
 export const loadBrowserMenu = () => {
   return {
-    key: '数据',
+    key: 'disk',
     label: '数据',
     itemType: 'Tab',
     item: 'disk',

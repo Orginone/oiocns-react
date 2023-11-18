@@ -60,7 +60,7 @@ const getTeamMenu = () => {
 /** 加载设置模块菜单 */
 export const loadBrowserMenu = () => {
   return {
-    key: '关系',
+    key: 'disk',
     label: '关系',
     itemType: 'Tab',
     item: 'disk',

@@ -30,7 +30,7 @@ const loadBookMenu = () => {
 /** 加载会话菜单 */
 export const loadChatMenu = () => {
   return {
-    key: '沟通',
+    key: 'disk',
     label: '沟通',
     itemType: 'Tab',
     children: loadBookMenu(),

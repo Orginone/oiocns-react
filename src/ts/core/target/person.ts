@@ -54,6 +54,9 @@ export class Person extends Belong implements IPerson {
   copyFiles: Map<string, IFile>;
   private _cohortLoaded: boolean = false;
   private _givedIdentityLoaded: boolean = false;
+  get superior(): IFile {
+    return this;
+  }
   async loadGivedIdentitys(reload: boolean = false): Promise<schema.XIdProof[]> {
     if (!this._givedIdentityLoaded || reload) {
       const res = await kernel.queryGivedIdentitys();

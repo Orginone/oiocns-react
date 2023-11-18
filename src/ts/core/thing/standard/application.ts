@@ -37,7 +37,6 @@ export class Application
   ) {
     super(_metadata, _directory, _directory.resource.applicationColl);
     this.parent = _parent;
-    this.isContainer = true;
     this.loadChildren(_applications);
   }
   works: IWork[] = [];
@@ -49,6 +48,12 @@ export class Application
   }
   get cacheFlag(): string {
     return 'applications';
+  }
+  get isContainer(): boolean {
+    return true;
+  }
+  get superior(): IFile {
+    return this.parent ?? this.directory;
   }
   content(): IFile[] {
     return [...this.children, ...this.works].sort((a, b) =>

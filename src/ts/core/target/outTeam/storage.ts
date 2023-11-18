@@ -26,7 +26,9 @@ export class Storage extends Target implements IStorage {
       TargetType.Person,
     ]);
   }
-  isContainer: boolean = false;
+  get isContainer(): boolean {
+    return false;
+  }
   async exit(): Promise<boolean> {
     if (this.metadata.belongId !== this.space.id) {
       if (await this.removeMembers([this.user.metadata])) {

@@ -72,7 +72,6 @@ export abstract class Target extends Team implements ITarget {
       this,
     );
     this.memberDirectory = new MemberDirectory(this);
-    this.isContainer = true;
     this.session = new Session(this.id, this, _metadata);
     setTimeout(
       async () => {
@@ -84,7 +83,6 @@ export abstract class Target extends Team implements ITarget {
   user: IPerson;
   space: IBelong;
   session: ISession;
-  isContainer: boolean;
   directory: IDirectory;
   resource: DataResource;
   cache: schema.XCache;
@@ -102,6 +100,12 @@ export abstract class Target extends Team implements ITarget {
   }
   get isInherited(): boolean {
     return this.metadata.belongId !== this.spaceId;
+  }
+  get isContainer(): boolean {
+    return true;
+  }
+  get superior(): IFile {
+    return this.space;
   }
   private _identityLoaded: boolean = false;
   async restore(): Promise<boolean> {

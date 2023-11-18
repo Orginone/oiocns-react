@@ -51,6 +51,9 @@ export class Group extends Target implements IGroup {
   findChat(id: string): ISession | undefined {
     return this.user.companys.find((i) => i.id === id)?.session;
   }
+  get superior(): IFile {
+    return this.parent ?? this.space;
+  }
   get groupTags(): string[] {
     const tags = [...super.groupTags];
     if (this.id != this.belongId) {

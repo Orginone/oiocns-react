@@ -109,8 +109,12 @@ const openWork = (entity: IWork) => {
 };
 
 /** 进入目录 */
-const openDirectory = (entity: IFile | schema.XEntity) => {
-  if (entity && 'isContainer' in entity && entity.isContainer) {
+const openDirectory = (entity: IFile | schema.XEntity | string) => {
+  if (typeof entity === 'string') {
+    orgCtrl.currentKey = 'disk';
+    orgCtrl.changCallback();
+    return;
+  } else if (entity && 'isContainer' in entity && entity.isContainer) {
     orgCtrl.currentKey = entity.key;
     orgCtrl.changCallback();
     return;

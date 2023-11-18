@@ -55,6 +55,9 @@ export class Company extends Belong implements ICompany {
   stations: IStation[] = [];
   departments: IDepartment[] = [];
   departmentTypes: string[] = [];
+  get superior(): IFile {
+    return this.user;
+  }
   private _groupLoaded: boolean = false;
   private _departmentLoaded: boolean = false;
   async loadGroups(reload: boolean = false): Promise<IGroup[]> {

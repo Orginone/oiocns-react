@@ -86,6 +86,9 @@ export class MemberDirectory extends Directory {
       _target.directory,
     );
   }
+  get superior(): IFile {
+    return this.target;
+  }
   override content(): IFile[] {
     if (this.target.session.isMyChat || this.target.hasRelationAuth()) {
       return this.target.members

@@ -16,6 +16,7 @@ interface IProps {
  * 设置-配置清单
  */
 const Content: React.FC<IProps> = (props) => {
+  console.log(orgCtrl.currentKey);
   if (!props.current) return <></>;
   const [current] = useState<IBelong>(
     props.current === 'disk' ? orgCtrl.user : props.current,
@@ -49,7 +50,16 @@ const Content: React.FC<IProps> = (props) => {
     if (dblclick) {
       clearHanlder();
       if (file) {
-        command.emitter('executor', 'open', file);
+        if (
+          file.key === orgCtrl.user.key &&
+          [orgCtrl.user.key, ...orgCtrl.user.companys.map((i) => i.key)].includes(
+            orgCtrl.currentKey,
+          )
+        ) {
+          command.emitter('executor', 'open', 'disk');
+        } else {
+          command.emitter('executor', 'open', file);
+        }
       }
     } else {
       submitHanlder(() => focusHanlder(file), 200);
@@ -75,6 +85,7 @@ const Content: React.FC<IProps> = (props) => {
         extraTags={true}
         focusFile={focusFile}
         content={getContent()}
+        preDirectory={orgCtrl.currentKey === 'disk' ? undefined : current.superior}
         fileOpen={(entity, dblclick) => clickHanlder(entity as IFile, dblclick)}
         contextMenu={(entity) => contextMenu(entity as IWorkTask)}
       />
