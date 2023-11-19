@@ -79,6 +79,7 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
           manualChunks: {
             'react-vendor': [
               'react',
+              'react-use',
               'react-dom',
               'react-icons',
               'qrcode.react',

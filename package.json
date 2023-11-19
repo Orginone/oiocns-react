@@ -81,6 +81,7 @@
     "react-office-viewer": "^1.0.4",
     "react-router-config": "^5.1.1",
     "react-router-dom": "^5.2.0",
+    "react-use": "^17.4.0",
     "terser": "^5.15.1",
     "xlsx": "^0.18.5"
   },

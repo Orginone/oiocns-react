@@ -27,7 +27,7 @@ const Content: React.FC<IProps> = (props) => {
     command.emitter('preview', 'setting', focusFile);
   }, [focusFile]);
   const contextMenu = (file?: IFile) => {
-    const entity = orgCtrl.currentKey != 'disk' ? file ?? current : undefined;
+    const entity = file ?? current;
     return {
       items: cleanMenus(loadFileMenus(entity)) || [],
       onClick: ({ key }: { key: string }) => {

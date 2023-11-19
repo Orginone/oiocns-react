@@ -3,7 +3,7 @@ import FullScreenModal from '@/components/Common/fullScreen';
 import { IForm } from '@/ts/core';
 import * as config from './config';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
-import MainLayout from '@/components/MainLayout';
+import MinLayout from '@/components/MainLayout/minLayout';
 import useMenuUpdate from '@/hooks/useMenuUpdate';
 import WorkForm from '@/components/DataStandard/WorkForm';
 import GenerateThingTable from '@/executor/tools/generate/thingTable';
@@ -104,17 +104,14 @@ const FormView: React.FC<IProps> = ({ form, finished }) => {
       );
     };
     return (
-      <MainLayout
-        notExitIcon
-        leftShow
-        rightShow={false}
+      <MinLayout
         selectMenu={selectMenu}
         onSelect={(data) => {
           setSelectMenu(data);
         }}
         siderMenuData={rootMenu}>
         {loadContent()}
-      </MainLayout>
+      </MinLayout>
     );
   };
   return (

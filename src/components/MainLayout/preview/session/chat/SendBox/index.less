@@ -1,0 +1,111 @@
+.send-box {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 16px;
+  padding: 12px 16px 2px 16px;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-end;
+  svg {
+    cursor: pointer;
+  }
+}
+
+.at-list {
+  max-height: 300px;
+  overflow: scroll;
+  display: flex;
+  gap: 8px;
+  width: 300px;
+  flex-direction: column;
+  .at-list-item {
+    height: 30px;
+    border-bottom: 1px solid #efefef;
+    &:hover {
+      background-color: #e6f1ff;
+    }
+  }
+}
+
+.cite-text {
+  display: flex;
+  &-content {
+    background-color: #e5e5e5;
+    word-wrap: break-word;
+    word-break: break-all;
+    width: fit-content;
+    overflow: auto;
+    border-radius: 5px;
+    padding: 5px;
+    font-size: 12px;
+    color: #8b8b8b;
+    .con_content_txt {
+      img {
+        width: 100%;
+      }
+    }
+    .con_content_file {
+      display: flex;
+      text-align: left;
+      width: 220px;
+      height: 80px;
+      background-color: #fffff7;
+      padding: 7px 10px;
+      margin: 0px 0px;
+      margin-top: -20px;
+      color: #3e5ed8;
+      border-radius: 6px;
+      z-index: 1;
+      font-size: small;
+      word-wrap: break-word;
+      word-break: normal;
+      position: relative;
+
+      &_info {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        height: 100%;
+
+        &_label {
+          width: 140px;
+          flex-grow: 1;
+          padding-right: 10px;
+          display: -webkit-box;
+          text-overflow: ellipsis;
+          overflow: hidden;
+          -webkit-box-orient: vertical;
+          -webkit-line-clamp: 2;
+        }
+      }
+
+      &_Icon {
+        padding: 5px;
+        font-size: 50px;
+        background-color: aliceblue;
+      }
+
+      :global {
+        .ogo-btn-primary {
+          background-color: #89c6ff85;
+          border-color: #89c6ff85;
+          color: #3e5ed8;
+          box-shadow: none;
+          text-shadow: none;
+        }
+
+        .ogo-btn-primary:hover {
+          color: #f4f4ee;
+        }
+      }
+    }
+  }
+
+  &-close-icon {
+    cursor: pointer;
+    color: #d0d0d0;
+    height: 14px;
+    max-width: 16px;
+    margin-left: 4px;
+  }
+}

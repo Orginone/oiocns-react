@@ -34,8 +34,6 @@ interface Iprops {
   /** 返回值，引用 */
   citeText: any;
   forward: any;
-  /** 回车设置引用消息 */
-  enterCiteMsg: IMessage;
   multiSelectShow: boolean;
   multiSelectMsg: (item: IMessage, checked: boolean) => void;
   multiSelectFn: (multi: boolean) => void;

@@ -22,7 +22,6 @@ type MainLayoutType = {
   siderMenuData: MenuItemType;
   rightBar?: React.ReactNode;
   selectMenu: MenuItemType;
-  notExitIcon?: boolean;
   onSelect?: (item: MenuItemType) => void;
   onMenuClick?: (item: MenuItemType, menuKey: string) => void;
 };

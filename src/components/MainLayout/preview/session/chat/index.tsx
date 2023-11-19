@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import GroupContent from './GroupContent';
-import GroupInputBox from './GroupInputBox';
+import SendBox from './SendBox';
 import charsStyle from './index.module.less';
 import ChatShareForward from './ChatShareForward';
 import { ISession, IMessage } from '@/ts/core';
@@ -12,8 +12,7 @@ import { AiOutlineClose } from 'react-icons/ai';
  */
 const Chat: React.FC<{ chat: ISession; filter: string }> = ({ chat, filter }) => {
   const [writeContent, setWriteContent] = useState<any>(null); // 重新编辑
-  const [citeText, setCiteText] = useState<string>(''); // 引用值
-  const [enterCiteMsg, setEnterCiteMsg] = useState<string | any>(); // 回车赋值
+  const [citeText, setCiteText] = useState<IMessage>(); // 引用值
   const [forwardMessage, setForwardMessage] = useState<IMessage[]>([]);
   const [showShareForward, setShowShareForward] = useState(false);
   const [multiSelectShow, setMultiSelectShow] = useState(false);
@@ -44,7 +43,7 @@ const Chat: React.FC<{ chat: ISession; filter: string }> = ({ chat, filter }) =>
           multiSelectShow={multiSelectShow}
           handleReWrites={handleReWrites}
           filter={filter}
-          citeText={(text: any) => setCiteText(text)}
+          citeText={(msg: IMessage) => setCiteText(msg)}
           forward={(item: IMessage) => {
             setForwardMessage([item]);
             setShowShareForward(true);
@@ -61,16 +60,14 @@ const Chat: React.FC<{ chat: ISession; filter: string }> = ({ chat, filter }) =>
           multiSelectFn={(multi: boolean) => {
             setMultiSelectShow(multi);
           }}
-          enterCiteMsg={enterCiteMsg}
         />
         {/* 输入区域 */}
         <div className={charsStyle.chart_input}>
-          <GroupInputBox
+          <SendBox
             chat={chat}
             writeContent={writeContent}
-            citeText={citeText as any} // 传递引用的值给聊天框组件
-            closeCite={(e: string) => setCiteText(e)} // 设置关闭引用下的值
-            enterCiteMsg={(e: any) => setEnterCiteMsg(e)} // 设置回车时把所引用的值赋值
+            citeText={citeText} // 传递引用的值给聊天框组件
+            closeCite={() => setCiteText(undefined)} // 设置关闭引用下的值
           />
         </div>
         {/* 多选操作内容 */}
