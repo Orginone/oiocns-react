@@ -19,10 +19,8 @@ export const loadFileMenus = (file?: IFile) => {
       operates.push(...file.operates());
     }
     const parseLabel = (label: string) => {
-      if ('filedata' in file) {
-        return label.replaceAll('{0}', '文件');
-      }
-      return label.replaceAll('{0}', file.typeName);
+      const toName = 'filedata' in file ? '文件' : file.typeName;
+      return label.replace('{0}', toName);
     };
     if (operates.length > 0) {
       return operates

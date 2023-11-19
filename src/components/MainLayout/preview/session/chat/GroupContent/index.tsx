@@ -1,8 +1,7 @@
-/* eslint-disable no-unused-vars */
-import { Button, Checkbox, message, Popover, Spin, Badge, Tooltip, Affix } from 'antd';
+import { Button, Checkbox, message, Popover, Spin, Badge, Tooltip } from 'antd';
 import moment from 'moment';
 import React, { useEffect, useRef, useState } from 'react';
-import { CopyToClipboard } from 'react-copy-to-clipboard';
+import { useCopyToClipboard } from 'react-use';
 import EntityInfo from '@/components/Common/GlobalComps/entityIcon';
 import Information from './information';
 import ForwardContentModal from './forwardContentModal';
@@ -49,6 +48,7 @@ const GroupContent = (props: Iprops) => {
   const [forwardModalOpen, setForwardModalOpen] = useState<boolean>(false); // 转发时用户
   const [forwardMessages, setForwardMessages] = useState<IMessage[]>([]);
   const [multiSelect, setMultiSelect] = useState(multiSelectShow);
+  const [, copyToClipboard] = useCopyToClipboard();
   useEffect(() => {
     props.chat.onMessage((ms) => {
       setMessages([...ms]);
@@ -257,17 +257,16 @@ const GroupContent = (props: Iprops) => {
   const msgAction = (item: IMessage) => {
     return (
       <div className={css.msgAction}>
-        <CopyToClipboard text={item.msgBody}>
-          <Tooltip title="复制">
-            <AiOutlineCopy
-              size={19}
-              className={css.actionIconStyl}
-              onClick={() => {
-                message.success('复制成功');
-              }}
-            />
-          </Tooltip>
-        </CopyToClipboard>
+        <Tooltip title="复制">
+          <AiOutlineCopy
+            size={19}
+            className={css.actionIconStyl}
+            onClick={() => {
+              copyToClipboard(item.msgBody);
+              message.success('复制成功');
+            }}
+          />
+        </Tooltip>
         <Tooltip title="引用">
           <AiOutlineMessage
             size={19}

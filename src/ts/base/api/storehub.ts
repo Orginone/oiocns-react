@@ -233,7 +233,7 @@ export default class StoreHub implements IDisposable {
       },
     });
     if (res.statusCode === 200 && typeof res.content === 'string') {
-      return JSON.parse(res.content.replaceAll('"_id":', '"id":'));
+      return JSON.parse(res.content.replace(/"_id":/gm, '"id":'));
     } else {
       return badRequest(res.statusText, res.statusCode);
     }

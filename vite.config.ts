@@ -83,11 +83,9 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
               'react-dom',
               'react-icons',
               'qrcode.react',
-              'react-cropper',
               'react-router-dom',
               'react-office-viewer',
               'react-router-config',
-              'react-copy-to-clipboard',
             ],
             'antv-vendor': [
               '@antv/x6',
