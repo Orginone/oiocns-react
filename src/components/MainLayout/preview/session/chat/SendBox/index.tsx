@@ -135,7 +135,7 @@ const GroupInputBox = (props: IProps) => {
           showClearButton
           autoResizeEnabled
           stylingMode="underlined"
-          valueChangeEvent="keyup"
+          valueChangeEvent="input"
           style={{ fontSize: 16 }}
           placeholder={`发送到${props.chat.name}`}
           onValueChanged={(e) => {

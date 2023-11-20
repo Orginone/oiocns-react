@@ -2,15 +2,15 @@ import TypeIcon from '@/components/Common/GlobalComps/typeIcon';
 import { command } from '@/ts/base';
 import { OperateModel } from '@/ts/base/model';
 import { IFile } from '@/ts/core';
-import { entityOperates } from '@/ts/core/public';
+import { IDEntity, entityOperates } from '@/ts/core/public';
 import React from 'react';
 import { OperateMenuType } from 'typings/globelType';
 
 /** 加载文件菜单 */
-export const loadFileMenus = (file?: IFile) => {
+export const loadFileMenus = (file?: IDEntity | IFile) => {
   if (file) {
     const operates: OperateModel[] = [];
-    if (file.groupTags.includes('已删除')) {
+    if (file.groupTags.includes('已删除') && 'directory' in file) {
       if (file.directory.target.hasRelationAuth()) {
         operates.push(entityOperates.Restore, entityOperates.HardDelete);
       }

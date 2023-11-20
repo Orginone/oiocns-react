@@ -5,7 +5,8 @@ import { ISession } from '@/ts/core';
 import DirectoryViewer from '@/components/Directory/views';
 import { command } from '@/ts/base';
 import { useFlagCmdEmitter } from '@/hooks/useCtrlUpdate';
-import { loadChatOperation } from './common';
+import { cleanMenus } from '@/utils/tools';
+import { loadFileMenus } from '@/executor/fileOperate';
 /** 沟通-通讯录 */
 const Content: React.FC<{
   chats: ISession[];
@@ -51,7 +52,10 @@ const Content: React.FC<{
 
   const contextMenu = (session: ISession | undefined) => {
     return {
-      items: loadChatOperation(session) || [],
+      items: cleanMenus(loadFileMenus(session)) || [],
+      onClick: ({ key }: { key: string }) => {
+        command.emitter('executor', key, session);
+      },
     };
   };
 

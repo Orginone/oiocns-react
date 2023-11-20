@@ -223,6 +223,12 @@ export const newWarehouse = {
 
 /** 团队的操作 */
 export const teamOperates = {
+  applyFriend: {
+    sort: 40,
+    cmd: 'applyFriend',
+    label: '加为好友',
+    iconType: 'joinFriend',
+  },
   Pull: {
     sort: 30,
     cmd: 'pull',
@@ -381,5 +387,44 @@ export const memberOperates = {
     cmd: 'exit',
     label: '退出',
     iconType: 'exit',
+  },
+};
+
+/** 会话操作 */
+export const sessionOperates = {
+  SetNoReaded: {
+    sort: 58,
+    model: 'outside',
+    cmd: 'readedToggle',
+    label: '标记未读',
+    iconType: 'setNoReaded',
+  },
+  SetReaded: {
+    sort: 59,
+    model: 'outside',
+    cmd: 'readedToggle',
+    label: '标记已读',
+    iconType: 'setReaded',
+  },
+  SetToping: {
+    sort: 60,
+    model: 'outside',
+    cmd: 'topingToggle',
+    label: '置顶会话',
+    iconType: 'setToping',
+  },
+  RemoveToping: {
+    sort: 61,
+    model: 'outside',
+    cmd: 'topingToggle',
+    label: '取消置顶',
+    iconType: 'removeToping',
+  },
+  RemoveSession: {
+    sort: 62,
+    model: 'outside',
+    cmd: 'removeSession',
+    label: '移除会话',
+    iconType: 'delete',
   },
 };

@@ -5,6 +5,7 @@ import {
   IEntity,
   IFile,
   IMemeber,
+  ISession,
   IStorage,
   ISysFileInfo,
   ITarget,
@@ -68,6 +69,14 @@ export const executeCmd = (cmd: string, entity: any) => {
       return activateStorage(entity);
     case 'hslSplit':
       return videoHslSplit(entity);
+    case 'removeSession':
+      return removeSession(entity);
+    case 'topingToggle':
+      return sessionTopingToggle(entity);
+    case 'readedToggle':
+      return sessionReadedToggle(entity);
+    case 'applyFriend':
+      return applyFriend(entity);
   }
   return false;
 };
@@ -99,6 +108,40 @@ const videoHslSplit = (file: ISysFileInfo) => {
     onCancel: () => {
       modal.destroy();
     },
+  });
+};
+
+/** 移除会话 */
+const removeSession = (entity: ISession) => {
+  entity.chatdata.recently = false;
+  entity.chatdata.lastMessage = undefined;
+  entity.cacheChatData();
+  orgCtrl.changCallback();
+  command.emitter('preview', 'chat', undefined);
+};
+
+/** 会话置顶变更 */
+const sessionTopingToggle = (entity: ISession) => {
+  entity.chatdata.isToping = !entity.chatdata.isToping;
+  entity.cacheChatData();
+  orgCtrl.changCallback();
+};
+
+/** 会话已读/未读变更 */
+const sessionReadedToggle = (entity: ISession) => {
+  if (entity.chatdata.noReadCount > 0) {
+    entity.chatdata.noReadCount = 0;
+  } else {
+    entity.chatdata.noReadCount = 1;
+  }
+  entity.cacheChatData();
+  orgCtrl.changCallback();
+};
+
+/** 申请加为好友 */
+const applyFriend = (entity: ISession) => {
+  orgCtrl.user.applyJoin([entity.metadata as schema.XTarget]).then(() => {
+    orgCtrl.changCallback();
   });
 };
 

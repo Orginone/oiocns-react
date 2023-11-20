@@ -141,6 +141,14 @@ const TypeIcon = ({ avatar, iconType, size }: TypeIconInfo) => {
         return <im.ImUpload {...config} />;
       case 'taskList':
         return <im.ImList {...config} />;
+      case 'setToping':
+        return <im.ImUpload3 {...config} />;
+      case 'removeToping':
+        return <im.ImDownload3 {...config} />;
+      case 'setReaded':
+        return <im.ImCheckmark {...config} />;
+      case 'setNoReaded':
+        return <im.ImBell {...config} />;
       default:
         return loadFileIcon();
     }
