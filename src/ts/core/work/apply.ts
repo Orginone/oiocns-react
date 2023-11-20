@@ -59,13 +59,41 @@ export class WorkApply implements IWorkApply {
     fromData.forEach((data, k) => {
       this.instanceData.data[k] = [data];
     });
+    const mark = await this.getMarkInfo();
     const res = await kernel.createWorkInstance({
       ...this.metadata,
       applyId: applyId,
-      content: content,
+      content: mark + `备注:${content}`,
       contentType: 'Text',
       data: JSON.stringify(this.instanceData),
     });
     return res.success;
+  }
+  async getMarkInfo(): Promise<string> {
+    const remarks: string[] = [];
+    for (const primaryForm of this.instanceData.node.primaryForms) {
+      const key = primaryForm.id;
+      const data = this.instanceData.data[key];
+      const fields = this.instanceData.fields[key];
+      if (data && fields) {
+        for (const field of fields.filter((a) => a.options && a.options.showToRemark)) {
+          var value = data.at(-1)?.after[0][field.id];
+          switch (field.valueType) {
+            case '用户型':
+              value = (await this.belong.user.findEntityAsync(value))?.name;
+              break;
+            case '选择型':
+              value = field.lookups?.find(
+                (a) => a.id === (value as string).substring(1),
+              )?.text;
+              break;
+            default:
+              break;
+          }
+          remarks.push(`${field.name}:${value}  `);
+        }
+      }
+    }
+    return remarks.join('');
   }
 }
