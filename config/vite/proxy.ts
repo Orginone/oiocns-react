@@ -23,16 +23,6 @@ export function createProxy() {
       changeOrigin: true, // 是否允许跨域
       ws: true,
     },
-    '/userinfo': {
-      target: 'https://51jishu.com', // 后台接口
-      changeOrigin: true, // 是否允许跨域
-      ws: true,
-    },
-    '/api': {
-      target: 'https://51jishu.com', // 后台接口
-      changeOrigin: true, // 是否允许跨域
-      ws: true,
-    },
   };
   return ProxyList;
 }

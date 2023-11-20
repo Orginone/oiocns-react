@@ -1,6 +1,5 @@
 import { command } from '@/ts/base';
 import { IWorkTask, TaskStatus } from '@/ts/core';
-import { approvelWork } from '@/utils/anxinwu/axwWork';
 import { Input, Button } from 'antd';
 import React, { useState } from 'react';
 
@@ -33,16 +32,7 @@ const TaskApproval: React.FC<TaskDetailType> = ({ task, finished }) => {
         }}
       />
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-        <Button
-          type="primary"
-          onClick={async () => {
-            if (task.instanceData && task.instance) {
-              const success = await approvelWork(task);
-              if (success) {
-                await approvalTask(TaskStatus.ApprovalStart);
-              }
-            }
-          }}>
+        <Button type="primary" onClick={() => approvalTask(TaskStatus.ApprovalStart)}>
           通过
         </Button>
         <Button

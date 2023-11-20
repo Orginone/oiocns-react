@@ -2,7 +2,7 @@ import { model, schema } from '../../../ts/base';
 import { IBelong } from '@/ts/core';
 import { useEffect, useState } from 'react';
 import React from 'react';
-import { Affix, Tabs } from 'antd';
+import { Tabs } from 'antd';
 import { EditModal } from '../editModal';
 import GenerateThingTable from '../generate/thingTable';
 import { WorkFormRulesType } from '@/ts/core/work/rules/workFormRules';

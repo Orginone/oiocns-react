@@ -15,7 +15,7 @@ interface IProps {
   onChanged?: (id: string, data: model.FormEditData, changedValues: any) => void;
 }
 
-export const PrimaryForm: React.FC<IProps> = (props) => {
+const PrimaryForm: React.FC<IProps> = (props) => {
   if (props.forms.length < 1) return <></>;
   const form = props.forms[0];
   if (!props.data.fields[form.id]) return <></>;
@@ -32,7 +32,6 @@ export const PrimaryForm: React.FC<IProps> = (props) => {
         }
       });
     }
-    // props?.ruleService && (props.ruleService.currentMainFormId = form.id);
   }, []);
   if (!data) return <></>;
   return (
