@@ -11,6 +11,7 @@ const Todo: React.FC<any> = () => {
 
   return (
     <MainLayout
+      rightShow
       previewFlag={'work'}
       selectMenu={selectMenu}
       onSelect={async (data) => {

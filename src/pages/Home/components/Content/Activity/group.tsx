@@ -22,7 +22,7 @@ const GroupActivityItem: React.FC<{ activity: IActivity }> = ({ activity }) => {
             .filter((item) => item.activityList.length > 0)
             .map((item) => {
               if (item.activityList.length > 0) {
-                const _name = item.id === current.id ? 'Selected' : 'Item';
+                const _name = item.id === current.id ? 'selected' : 'item';
                 return (
                   <div
                     className={`groupList-${_name}`}

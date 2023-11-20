@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { AiFillHome } from '@/icons/ai';
+import { AiFillHome } from 'react-icons/ai';
 import { IRouteConfig } from '../typings/globelType';
 import NotFound from '@/layouts/NotFound';
 import BasicLayout from '@/layouts/Basic';
@@ -44,18 +44,18 @@ const StoreRouter: IRouteConfig[] = [
   {
     path: '/store',
     title: '存储',
-    icon: 'icon-setting',
+    icon: 'icon-store',
     component: React.lazy(() => import('@/pages/Store')),
     routes: [],
   },
 ];
 
-const SettingRouter: IRouteConfig[] = [
+const RelationRouter: IRouteConfig[] = [
   {
-    path: '/setting',
+    path: '/relation',
     title: '设置',
-    icon: 'icon-setting',
-    component: React.lazy(() => import('@/pages/Setting')),
+    icon: 'icon-relation',
+    component: React.lazy(() => import('@/pages/Relation')),
   },
 ];
 
@@ -77,12 +77,11 @@ const Routers: IRouteConfig[] = [
       ...ChatRouter,
       ...TodoRouter,
       ...StoreRouter,
-      ...SettingRouter,
+      ...RelationRouter,
       {
         path: '*',
         title: '页面不存在',
         component: NotFound,
-        // render: () => <RouterRedirect to="/noFond" />,
       },
     ],
   },

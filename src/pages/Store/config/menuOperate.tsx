@@ -129,8 +129,8 @@ const getTeamMenu = () => {
 /** 加载设置模块菜单 */
 export const loadBrowserMenu = () => {
   return {
-    key: '存储',
-    label: '存储',
+    key: 'disk',
+    label: '数据',
     itemType: 'Tab',
     item: 'disk',
     children: [getUserMenu(), ...getTeamMenu()],

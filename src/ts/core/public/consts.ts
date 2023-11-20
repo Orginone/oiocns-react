@@ -7,10 +7,8 @@ export const orgAuth = {
   SuperAuthId: '361356410044420096',
   // 关系管理权限
   RelationAuthId: '361356410623234048',
-  // 物，标准等管理权限
-  ThingAuthId: '361356410698731520',
-  // 办事管理权限
-  WorkAuthId: '361356410774228992',
+  // 数据管理权限
+  DataAuthId: '361356410698731520',
 };
 /** 支持的单位类型 */
 export const companyTypes = [

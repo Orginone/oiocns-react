@@ -3,7 +3,7 @@ import { Button, Divider, Row } from 'antd';
 import cls from './index.module.less';
 import { NodeModel } from '../../../processType';
 import ShareShowComp from '@/components/Common/ShareShowComp';
-import { AiOutlineSetting } from '@/icons/ai';
+import { AiOutlineSetting } from 'react-icons/ai';
 import SelectAuth from '@/components/Common/SelectAuth';
 import { IBelong, IForm } from '@/ts/core';
 import OpenFileDialog from '@/components/OpenFileDialog';

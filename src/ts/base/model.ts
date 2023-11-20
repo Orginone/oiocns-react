@@ -978,6 +978,8 @@ export type MsgChatData = {
   lastMessage?: ChatMessageType;
   /** 提及我 */
   mentionMe: boolean;
+  /** 常用会话 */
+  recently: boolean;
 };
 
 // 动态

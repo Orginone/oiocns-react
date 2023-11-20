@@ -66,11 +66,29 @@ const ExecutorOpen: React.FC<IOpenProps> = (props: IOpenProps) => {
         return <TemplateView current={props.entity as any} finished={props.finished} />;
       case '办事':
       case '子流程':
-        return <WorkStart current={props.entity as any} finished={props.finished} />;
+        return (
+          <WorkStart
+            key={props.entity.key}
+            current={props.entity as any}
+            finished={props.finished}
+          />
+        );
       case '加用户':
-        return <JoinApply current={props.entity as any} finished={props.finished} />;
+        return (
+          <JoinApply
+            key={props.entity.key}
+            current={props.entity as any}
+            finished={props.finished}
+          />
+        );
       case '事项':
-        return <TaskContent current={props.entity as any} finished={props.finished} />;
+        return (
+          <TaskContent
+            key={props.entity.key}
+            current={props.entity as any}
+            finished={props.finished}
+          />
+        );
       default:
         if (remarkTypes[props.entity.typeName]) {
           return (

@@ -1,11 +1,12 @@
 import { Spin } from 'antd';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import orgCtrl from '@/ts/controller';
 import { ISession } from '@/ts/core';
 import DirectoryViewer from '@/components/Directory/views';
 import { command } from '@/ts/base';
 import { useFlagCmdEmitter } from '@/hooks/useCtrlUpdate';
-import { loadChatOperation } from './common';
+import { cleanMenus } from '@/utils/tools';
+import { loadFileMenus } from '@/executor/fileOperate';
 /** 沟通-通讯录 */
 const Content: React.FC<{
   chats: ISession[];
@@ -13,6 +14,19 @@ const Content: React.FC<{
 }> = ({ chats, filter }) => {
   const [focusFile, setFocusFile] = useState<ISession>();
   const [loaded, msgKey] = useFlagCmdEmitter('session');
+  useEffect(() => {
+    const id = command.subscribe((type, cmd, ...args: any[]) => {
+      if (type != 'session' || args.length < 1) return;
+      switch (cmd) {
+        case 'open':
+          sessionOpen(args[0]);
+          break;
+      }
+    });
+    return () => {
+      command.unsubscribe(id);
+    };
+  }, []);
   if (chats === undefined) {
     chats = orgCtrl.chats.filter((i) => i.isMyChat);
   }
@@ -23,6 +37,7 @@ const Content: React.FC<{
         a.chatdata.chatRemark.includes(filter) ||
         a.groupTags.filter((l) => l.includes(filter)).length > 0,
     )
+    .filter((i) => i.chatdata.lastMessage || i.chatdata.recently)
     .sort((a, b) => {
       var num = (b.chatdata.isToping ? 10 : 0) - (a.chatdata.isToping ? 10 : 0);
       if (num === 0) {
@@ -37,7 +52,10 @@ const Content: React.FC<{
 
   const contextMenu = (session: ISession | undefined) => {
     return {
-      items: loadChatOperation(session) || [],
+      items: cleanMenus(loadFileMenus(session)) || [],
+      onClick: ({ key }: { key: string }) => {
+        command.emitter('executor', key, session);
+      },
     };
   };
 
@@ -55,7 +73,7 @@ const Content: React.FC<{
       <DirectoryViewer
         key={msgKey}
         extraTags
-        initTags={['全部', '@我', '未读', '置顶', '好友']}
+        initTags={['最近', '@我', '未读', '置顶', '好友']}
         excludeTags={['本人', '同事']}
         selectFiles={[]}
         focusFile={focusFile}
@@ -63,7 +81,7 @@ const Content: React.FC<{
         badgeCount={(tag) => {
           let count = 0;
           chats
-            .filter((i) => tag === '全部' || i.groupTags.includes(tag))
+            .filter((i) => tag === '最近' || i.groupTags.includes(tag))
             .forEach((i) => {
               count += i.badgeCount;
             });

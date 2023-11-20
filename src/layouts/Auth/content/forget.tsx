@@ -4,7 +4,7 @@ import { useHistory } from 'react-router-dom';
 import orgCtrl from '@/ts/controller';
 
 import cls from '../index.module.less';
-import { AiOutlineLock, AiOutlineUser } from '@/icons/ai';
+import { AiOutlineLock, AiOutlineUser } from 'react-icons/ai';
 import { getResouces } from '@/config/location';
 import { model } from '@/ts/base';
 
@@ -156,6 +156,7 @@ const PassportForget: React.FC<{ to: (flag: string) => void }> = ({ to }) => {
           size="large"
           placeholder="请输入新密码"
           width={410}
+          onChange={(e) => setFormData({ ...formData, password: e.target.value })}
         />
         <Button block type="primary" size="large" onClick={login}>
           重置密码

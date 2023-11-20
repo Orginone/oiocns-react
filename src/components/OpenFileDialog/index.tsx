@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import MainLayout from '../MainLayout';
-import Directory from '../Directory';
+import Content from './content';
 import useMenuUpdate from '@/hooks/useMenuUpdate';
 import { loadSettingMenu } from './config';
 import FullScreenModal from '../Common/fullScreen';
@@ -59,10 +59,8 @@ const OpenFileDialog: React.FC<IFileDialogProps> = (props) => {
           setSelectMenu(data);
         }}
         siderMenuData={rootMenu}>
-        <Directory
+        <Content
           key={key}
-          dialog
-          previewFlag={'dialog'}
           accepts={props.accepts}
           selects={selectedFiles}
           current={selectMenu.item}

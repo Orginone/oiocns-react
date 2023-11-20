@@ -6,6 +6,11 @@ export class AuthProvider {
   private onAuthed: (user: schema.XTarget) => Promise<void>;
   constructor(authed: (user: schema.XTarget) => Promise<void>) {
     this.onAuthed = authed;
+    kernel.tokenAuth().then(async (success) => {
+      if (success) {
+        await this.onAuthed(kernel.user!);
+      }
+    });
   }
   /**
    * 获取动态密码

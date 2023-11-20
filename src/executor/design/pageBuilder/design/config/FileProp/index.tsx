@@ -69,11 +69,11 @@ export const TipDesignText: React.FC<TextProps> = (props) => {
   );
 };
 
-export const TipText: React.FC<{ value?: string }> = (props) => {
+export const TipText: React.FC<{ children?: ReactNode }> = (props) => {
   return (
-    <Tooltip title={props.value}>
+    <Tooltip title={props.children}>
       <div className={cls.viewText}>
-        <div className={cls.textOverflow}>{props.value}</div>
+        <div className={cls.textOverflow}>{props.children}</div>
       </div>
     </Tooltip>
   );

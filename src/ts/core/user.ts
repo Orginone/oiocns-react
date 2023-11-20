@@ -1,11 +1,9 @@
 import { IPerson, Person } from './target/person';
-import { command, common, kernel, schema } from '../base';
+import { command, common, schema } from '../base';
 import { IWorkProvider, WorkProvider } from './work/provider';
 import { BoxProvider, IBoxProvider } from './work/box';
 import { AuthProvider } from './auth';
 import { ITarget } from './target/base/target';
-
-const sessionUserName = 'sessionUser';
 
 /** 当前用户提供层 */
 export class UserProvider {
@@ -20,10 +18,6 @@ export class UserProvider {
     this._auth = new AuthProvider(async (data) => {
       await this._loadUser(data);
     });
-    const userJson = sessionStorage.getItem(sessionUserName);
-    if (userJson && userJson.length > 0) {
-      this._loadUser(JSON.parse(userJson));
-    }
   }
   /** 授权方法 */
   get auth(): AuthProvider {
@@ -58,8 +52,6 @@ export class UserProvider {
   }
   /** 加载用户 */
   private async _loadUser(person: schema.XTarget) {
-    sessionStorage.setItem(sessionUserName, JSON.stringify(person));
-    kernel.userId = person.id;
     this._user = new Person(person);
     this._work = new WorkProvider(this);
     this._box = new BoxProvider(this);

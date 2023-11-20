@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { WorkNodeModel } from '@/ts/base/model';
 import { Card, Modal } from 'antd';
-import { ImWarning } from '@/icons/im';
+import { ImWarning } from 'react-icons/im';
 import { IWork } from '@/ts/core';
 import {
   AddNodeType,

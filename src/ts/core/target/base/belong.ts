@@ -65,6 +65,17 @@ export abstract class Belong extends Target implements IBelong {
     }
     return this.superAuth;
   }
+  async findEntityAsync(id: string): Promise<schema.XEntity | undefined> {
+    const metadata = this.findMetadata<schema.XEntity>(id);
+    if (metadata) {
+      return metadata;
+    }
+    const res = await kernel.queryEntityById({ id: id });
+    if (res.success && res.data?.id) {
+      this.updateMetadata(res.data);
+      return res.data;
+    }
+  }
   async createCohort(data: model.TargetModel): Promise<ICohort | undefined> {
     data.typeName = TargetType.Cohort;
     const metadata = await this.create(data);

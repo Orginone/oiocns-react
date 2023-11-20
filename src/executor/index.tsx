@@ -6,7 +6,7 @@ import React, { useEffect, useState } from 'react';
 import { executeCmd } from './action';
 import { useHistory } from 'react-router-dom';
 
-const Executor = () => {
+const Executor: React.FC = () => {
   const history = useHistory();
   const [preview, setPreview] = useState(<></>);
   const [content, setContent] = useState(<></>);

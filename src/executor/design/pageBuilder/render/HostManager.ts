@@ -19,7 +19,6 @@ export default class HostManagerBase<T extends HostMode>
   readonly pageInfo: IPageTemplate;
 
   constructor(mode: T, pageFile: IPageTemplate) {
-    console.info('create HostManager');
     this.mode = mode;
     this.pageInfo = pageFile;
 

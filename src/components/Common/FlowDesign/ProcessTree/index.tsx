@@ -5,7 +5,7 @@ import { decodeAppendDom } from './Components';
 import { ITarget } from '@/ts/core';
 import React, { useState } from 'react';
 import { isBranchNode, getNodeName, getNodeCode } from '../processType';
-import { AiOutlineMinus, AiOutlinePlus } from '@/icons/ai';
+import { AiOutlineMinus, AiOutlinePlus } from 'react-icons/ai';
 import { generateUuid } from '@/ts/base/common';
 
 type IProps = {

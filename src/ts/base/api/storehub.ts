@@ -57,10 +57,6 @@ export default class StoreHub implements IDisposable {
       }
     });
   }
-  /** 连接ID */
-  public get connectionId(): string {
-    return this._connection.connectionId || '';
-  }
   /**
    * 是否处于连接着的状态
    * @return {boolean} 状态
@@ -129,7 +125,6 @@ export default class StoreHub implements IDisposable {
         this._disconnectedCallbacks.forEach((c) => {
           c.apply(this, [err]);
         });
-        // logger.warn(`连接失败,${this._timeout}ms后重试。` + err.message);
         setTimeout(() => {
           this._starting();
         }, this._timeout);
@@ -207,6 +202,17 @@ export default class StoreHub implements IDisposable {
     });
   }
   /**
+   * 向连接发送数据
+   * @param {string} methodName 方法名
+   * @param {any[]} args 参数
+   * @returns {Promise<T|undefined>} 异步结果
+   */
+  public async send<T>(methodName: string, ...args: any[]): Promise<T | undefined> {
+    if (this.isConnected) {
+      return await this._connection.invoke(methodName, ...args);
+    }
+  }
+  /**
    * Http请求服务端方法
    * @param {string} methodName 方法名
    * @param {any[]} args 参数
@@ -227,7 +233,7 @@ export default class StoreHub implements IDisposable {
       },
     });
     if (res.statusCode === 200 && typeof res.content === 'string') {
-      return JSON.parse(res.content.replaceAll('"_id":', '"id":'));
+      return JSON.parse(res.content.replace(/"_id":/gm, '"id":'));
     } else {
       return badRequest(res.statusText, res.statusCode);
     }

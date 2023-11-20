@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react';
-import { AiOutlineSmile } from '@/icons/ai';
+import { AiOutlineSmile } from 'react-icons/ai';
 import { Result, Row, Col, Descriptions, Space, Tag } from 'antd';
 import { CheckCard } from '@ant-design/pro-components';
 import SearchInput from '@/components/SearchInput';

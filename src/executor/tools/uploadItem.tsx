@@ -47,12 +47,12 @@ const UploadItem: React.FC<IProps> = ({
   return (
     <Space>
       <Avatar
-        size={64}
+        size={100}
         style={{ background: '#f9f9f9', color: '#606060', fontSize: 10 }}
         src={
           avatar ? (
             <Image
-              width={64}
+              width={100}
               src={avatar.thumbnail}
               preview={{ src: avatar.shareLink }}
             />

@@ -5,7 +5,7 @@ import { ShareIcon } from '@/ts/base/model';
 import { command, parseAvatar, schema } from '@/ts/base';
 import TypeIcon from './typeIcon';
 import useAsyncLoad from '@/hooks/useAsyncLoad';
-import { ImInfo } from '@/icons/im';
+import { ImInfo } from 'react-icons/im';
 
 interface teamTypeInfo {
   size?: number;
@@ -15,6 +15,7 @@ interface teamTypeInfo {
   notAvatar?: boolean;
   title?: string;
   showName?: boolean;
+  onClick?: (entity?: schema.XEntity) => void;
 }
 
 interface shareIconInfo extends teamTypeInfo {
@@ -106,7 +107,10 @@ export const ShareIconItem = (info: shareIconInfo) => {
   if (info.share) {
     if (info.share.avatar?.thumbnail) {
       return (
-        <span style={{ display: 'contents' }} title={info.title ?? ''}>
+        <span
+          style={{ display: 'contents', cursor: 'pointer' }}
+          title={info.title ?? ''}
+          onClick={() => info.onClick?.apply(this, [info.entity])}>
           {infoMore()}
           <Avatar size={size} src={info.share.avatar.thumbnail} />
           {info.showName && (
@@ -128,7 +132,9 @@ export const ShareIconItem = (info: shareIconInfo) => {
         return icon;
       }
       return (
-        <span style={{ display: 'contents' }}>
+        <span
+          style={{ display: 'contents', cursor: 'pointer' }}
+          onClick={() => info.onClick?.apply(this, [info.entity])}>
           {infoMore()}
           <Avatar
             size={size}
@@ -143,7 +149,10 @@ export const ShareIconItem = (info: shareIconInfo) => {
     }
   }
   return (
-    <span style={{ display: 'contents' }} title={info.title ?? ''}>
+    <span
+      style={{ display: 'contents', cursor: 'pointer' }}
+      title={info.title ?? ''}
+      onClick={() => info.onClick?.apply(this, [info.entity])}>
       {infoMore()}
       <Avatar
         size={size}

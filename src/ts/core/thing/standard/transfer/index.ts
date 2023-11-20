@@ -312,7 +312,7 @@ export class Transfer extends StandardFileInfo<model.Transfer> implements ITrans
       decrypt: common.decrypt,
       encrypt: common.encrypt,
       log: (args: any) => {
-        console.log(args);
+        // console.log(args);
       },
     };
     common.Sandbox(code)(runtime);

@@ -1,4 +1,4 @@
-import { AiOutlineArrowRight, AiOutlineLock, AiOutlineUser } from '@/icons/ai';
+import { AiOutlineArrowRight, AiOutlineLock, AiOutlineUser } from 'react-icons/ai';
 import { Alert, Button, Input, message, Modal, Space } from 'antd';
 import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
@@ -29,7 +29,6 @@ const PassportRegister: React.FC<{ to: (flag: string) => void }> = ({ to }) => {
       platName: resources.platName,
       dynamicId: '',
     });
-    console.log(res);
     if (res.success && res.data) {
       setFormData({ ...formData, dynamicId: res.data.dynamicId });
     }

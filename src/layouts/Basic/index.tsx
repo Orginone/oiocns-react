@@ -23,7 +23,7 @@ const BasicLayout: React.FC<BasicLayoutProps> = (props) => {
       if (!orgCtrl.logined) {
         return history.push('/auth');
       }
-    }, 1500);
+    }, 500);
     kernel.onConnectedChanged((res: boolean) => {
       setConnectStatus(res);
     });

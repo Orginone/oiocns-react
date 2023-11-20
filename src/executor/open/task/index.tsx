@@ -1,6 +1,6 @@
 import { Card, Empty, Spin, Tabs, TabsProps, Timeline } from 'antd';
 import React, { useState } from 'react';
-import { ImUndo2 } from '@/icons/im';
+import { ImUndo2 } from 'react-icons/im';
 import cls from './index.module.less';
 import { IWorkTask } from '@/ts/core';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';

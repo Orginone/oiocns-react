@@ -7,7 +7,7 @@ import {
   NodeModel,
 } from '../../../processType';
 import cls from './index.module.less';
-import { AiOutlineDelete } from '@/icons/ai';
+import { AiOutlineDelete } from 'react-icons/ai';
 import { model } from '@/ts/base';
 
 interface Iprops {

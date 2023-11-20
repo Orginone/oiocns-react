@@ -52,9 +52,6 @@ export class Form extends StandardFileInfo<schema.XForm> implements IForm {
   get cacheFlag(): string {
     return 'forms';
   }
-  get groupTags(): string[] {
-    return ['表单', ...super.groupTags];
-  }
   async save(): Promise<boolean> {
     return this.update(this.metadata);
   }

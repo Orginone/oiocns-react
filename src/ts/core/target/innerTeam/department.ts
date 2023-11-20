@@ -68,6 +68,12 @@ export class Department extends Target implements IDepartment {
   children: IDepartment[] = [];
   childrenTypes: string[] = [];
   private _childrenLoaded: boolean = false;
+  findChat(id: string): ISession | undefined {
+    return this.space.memberChats.find((i) => i.id === id);
+  }
+  get superior(): IFile {
+    return this.parent ?? this.space;
+  }
   async loadChildren(reload?: boolean | undefined): Promise<IDepartment[]> {
     if (this.childrenTypes.length > 0 && (!this._childrenLoaded || reload)) {
       const res = await kernel.querySubTargetById({

@@ -8,7 +8,7 @@ import { XEntity } from '@/ts/base/schema';
 import ActivityResource from '../ActivityResource';
 import ActivityComment from '../ActivityComment';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
-import { AiOutlineDelete, AiOutlineLike, AiOutlineMessage } from '@/icons/ai';
+import { AiOutlineDelete, AiOutlineLike, AiOutlineMessage } from 'react-icons/ai';
 
 interface ActivityItemProps {
   hideResource?: boolean;

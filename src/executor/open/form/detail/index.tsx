@@ -1,6 +1,6 @@
 import { Card, Tabs } from 'antd';
 import React from 'react';
-import { ImUndo2 } from '@/icons/im';
+import { ImUndo2 } from 'react-icons/im';
 import ThingArchive from './archive';
 import { IForm } from '@/ts/core';
 import { schema } from '@/ts/base';

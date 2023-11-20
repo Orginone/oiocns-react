@@ -6,6 +6,7 @@ import { Spin, message } from 'antd';
 import DirectoryViewer from '@/components/Directory/views';
 import { loadFileMenus } from '@/executor/fileOperate';
 import { cleanMenus } from '@/utils/tools';
+import useTimeoutHanlder from '@/hooks/useTimeoutHanlder';
 
 interface IProps {
   current: IBelong | 'disk';
@@ -18,12 +19,18 @@ const Content: React.FC<IProps> = (props) => {
   const [loaded, setLoaded] = useState(true);
   const [content, setContent] = useState<IFile[]>([]);
   const [focusFile, setFocusFile] = useState<IFile>();
+  const [submitHanlder, clearHanlder] = useTimeoutHanlder();
+
   useEffect(() => {
     const id = orgCtrl.work.notity.subscribe(() => loadContent('待办'));
     return () => {
       orgCtrl.work.notity.unsubscribe(id);
     };
   }, [props.current]);
+
+  useEffect(() => {
+    command.emitter('preview', 'work', focusFile);
+  }, [focusFile]);
 
   const contextMenu = (file?: IFile) => {
     return {
@@ -34,19 +41,23 @@ const Content: React.FC<IProps> = (props) => {
     };
   };
 
-  const fileOpen = (file: IFile | undefined, dblclick: boolean) => {
-    if (dblclick && file) {
-      if (!file.groupTags.includes('已删除')) {
+  const focusHanlder = (file: IFile | undefined) => {
+    const focused = file && focusFile && file.key === focusFile.key;
+    if (focused) {
+      setFocusFile(undefined);
+    } else {
+      setFocusFile(file);
+    }
+  };
+
+  const clickHanlder = (file: IFile | undefined, dblclick: boolean) => {
+    if (dblclick) {
+      clearHanlder();
+      if (file) {
         command.emitter('executor', 'open', file);
       }
-    } else if (!dblclick) {
-      if (file?.id === focusFile?.id) {
-        setFocusFile(undefined);
-        command.emitter('preview', 'work');
-      } else {
-        setFocusFile(file);
-        command.emitter('preview', 'work', file);
-      }
+    } else {
+      submitHanlder(() => focusHanlder(file), 200);
     }
   };
 
@@ -65,6 +76,7 @@ const Content: React.FC<IProps> = (props) => {
   };
 
   const loadContent = (tag: string) => {
+    if (tag?.length < 2) return;
     setLoaded(false);
     orgCtrl.work
       .loadContent(tag as TaskTypeName)
@@ -96,7 +108,7 @@ const Content: React.FC<IProps> = (props) => {
         extraTags={false}
         badgeCount={getBadgeCount}
         tagChanged={loadContent}
-        fileOpen={(entity, dblclick) => fileOpen(entity as IWorkTask, dblclick)}
+        fileOpen={(entity, dblclick) => clickHanlder(entity as IWorkTask, dblclick)}
         contextMenu={(entity) => contextMenu(entity as IWorkTask)}
       />
     </Spin>

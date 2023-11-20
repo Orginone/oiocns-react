@@ -1,20 +1,21 @@
 import StoreHub from './storehub';
 import * as model from '../model';
 import type * as schema from '../schema';
-import { Emitter, logger } from '../common';
-import { command } from '../common/command';
+import { logger } from '../common';
 /**
  * 资产共享云内核api
  */
 export default class KernelApi {
   // 当前用户
-  userId: string = '';
+  user: schema.XTarget | undefined;
   // 存储集线器
   private _storeHub: StoreHub;
   // 单例
   private static _instance: KernelApi;
   // 必达消息缓存
   private _cacheData: any = {};
+  // 当前连接ID
+  private _connectionId: string = '';
   // 监听方法
   private _methods: { [name: string]: ((...args: any[]) => void)[] };
   // 订阅方法
@@ -24,10 +25,6 @@ export default class KernelApi {
       operation: (...args: any[]) => void;
     }[];
   };
-  // 上下线提醒
-  onlineNotify = new Emitter();
-  // 在线的连接
-  onlineIds: string[] = [];
   // 获取accessToken
   public get accessToken(): string {
     return sessionStorage.getItem('accessToken') || '';
@@ -46,18 +43,16 @@ export default class KernelApi {
     this._storeHub = new StoreHub(url, 'txt');
     this._storeHub.on('Receive', (res) => this._receive(res));
     this._storeHub.onConnected(() => {
-      if (this.accessToken.length > 0) {
-        this._storeHub
-          .invoke('TokenAuth', this.accessToken)
-          .then((res: model.ResultType<any>) => {
-            if (res.success) {
-              logger.info('连接到内核成功!');
-            }
-          })
-          .catch((err) => {
-            logger.error(err);
-          });
-      }
+      this._storeHub.send<string>('GetConnectionId').then((id) => {
+        if (id && id.length > 0) {
+          this._connectionId = id;
+        }
+      });
+      this.tokenAuth().then((success) => {
+        if (success) {
+          logger.info('连接到内核成功!');
+        }
+      });
     });
     this._storeHub.start();
   }
@@ -87,7 +82,7 @@ export default class KernelApi {
    * @returns {string} 链接ID
    */
   public get connectionId(): string {
-    return this._storeHub.connectionId;
+    return this._connectionId;
   }
   /**
    * 是否在线
@@ -98,20 +93,9 @@ export default class KernelApi {
   }
   /** 连接信息 */
   public async onlines(): Promise<model.OnlineSet | undefined> {
-    if (this.onlineIds.length > 0) {
-      const result = await this._storeHub.invoke('Online');
-      if (result.success && result.data) {
-        var data: model.OnlineSet = result.data;
-        var uids = data?.users?.map((i) => i.connectionId) || [];
-        var sids = data?.storages?.map((i) => i.connectionId) || [];
-        var ids = [...uids, ...sids];
-        if (ids.length != this.onlineIds.length) {
-          this.onlineIds = ids;
-          this.onlineNotify.changCallback();
-        }
-        this.onlineIds = ids;
-        return result.data;
-      }
+    const result = await this._storeHub.invoke('Online');
+    if (result.success && result.data) {
+      return result.data;
     }
   }
   /** 激活存储 */
@@ -958,11 +942,22 @@ export default class KernelApi {
       'accessToken' in res.data
     ) {
       this.accessToken = res.data.accessToken;
-      if (this._storeHub.isConnected) {
-        await this._storeHub.invoke('TokenAuth', this.accessToken);
-      }
+      await this.tokenAuth();
     }
     return res;
+  }
+  /**
+   * 根据token获取用户信息
+   */
+  public async tokenAuth(): Promise<boolean> {
+    if (this.accessToken?.length > 0) {
+      const res = await this._storeHub.invoke('TokenAuth', this.accessToken);
+      if (res.success) {
+        this.user = res.data;
+        return true;
+      }
+    }
+    return false;
   }
   /**
    * 由内核代理一个http请求
@@ -988,8 +983,8 @@ export default class KernelApi {
    * @returns 异步结果
    */
   public async dataNotify(req: model.DataNotityType): Promise<model.ResultType<boolean>> {
-    if (req.ignoreSelf) {
-      req.ignoreConnectionId = this._storeHub.connectionId;
+    if (req.ignoreSelf && this._storeHub.isConnected && this._connectionId.length > 0) {
+      req.ignoreConnectionId = this._connectionId;
     }
     return await this._storeHub.invoke('DataNotify', req);
   }
@@ -1074,7 +1069,7 @@ export default class KernelApi {
       case 'DataNotify':
         {
           const data: model.DataNotityType = res.data;
-          if (data.ignoreConnectionId === this._storeHub.connectionId) {
+          if (data.ignoreConnectionId === this._connectionId) {
             return;
           }
           const flag = `${data.belongId}-${data.targetId}-${data.flag}`.toLowerCase();
@@ -1091,27 +1086,9 @@ export default class KernelApi {
           }
         }
         break;
-      case 'Online':
-      case 'Outline':
-        {
-          const connectionId = res.data.connectionId;
-          if (connectionId && connectionId.length > 0) {
-            if (this.onlineIds.length < 1) {
-              this.onlineIds.push('');
-              this.onlines();
-            } else {
-              if (res.target === 'Online') {
-                if (this.onlineIds.every((i) => i != connectionId)) {
-                  this.onlineIds.push(connectionId);
-                }
-              } else {
-                this.onlineIds = this.onlineIds.filter((i) => i != connectionId);
-              }
-              this.onlineNotify.changCallback();
-            }
-            command.emitter('executor', res.target.toLowerCase(), res.data);
-          }
-        }
+      case 'QrAuth':
+        this.accessToken = res.data;
+        logger.qrauthed();
         break;
       default: {
         const methods = this._methods[res.target.toLowerCase()];
