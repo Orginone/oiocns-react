@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import TeamIcon from '@/components/Common/GlobalComps/entityIcon';
 import css from './index.module.less';
 import { ISession, ITarget, TargetType } from '@/ts/core';
-import { ellipsisText } from '@/utils';
 import ChatBody from './chat';
 import { command } from '@/ts/base';
 import TargetActivity from '@/components/TargetActivity';
@@ -113,7 +112,7 @@ const SessionBody = ({
               </>
             }
             avatar={<TeamIcon entity={session.metadata} size={50} />}
-            description={ellipsisText(session.chatdata.chatRemark, 50)}
+            description={<div className="ellipsis1">{session.chatdata.chatRemark}</div>}
           />
         </List.Item>
         <div className={css.groupDetailContent}>{loadContext()}</div>
