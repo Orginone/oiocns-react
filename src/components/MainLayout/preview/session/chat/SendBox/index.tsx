@@ -1,6 +1,6 @@
 import * as im from 'react-icons/im';
 import { Divider, Popover, Space } from 'antd';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { IMessage, ISession, ISysFileInfo, MessageType } from '@/ts/core';
 import './index.less';
 import OpenFileDialog from '@/components/OpenFileDialog';
@@ -18,7 +18,7 @@ import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 interface IProps {
   chat: ISession;
   citeText?: IMessage;
-  writeContent: any;
+  writeContent?: string;
   closeCite: () => void;
 }
 
@@ -28,6 +28,12 @@ const GroupInputBox = (props: IProps) => {
   const [citeShow, setCiteShow] = useState<boolean>(false); // @展示
   const [message, setMessage] = useState<string>('');
   const [mentions, setMentions] = useState<{ text: string; id: string }[]>([]);
+
+  useEffect(() => {
+    if (props.writeContent) {
+      setMessage(props.writeContent);
+    }
+  }, [props.writeContent]);
 
   /** 发送消息 */
   const sendMessage = () => {

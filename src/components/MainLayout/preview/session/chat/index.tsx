@@ -11,7 +11,7 @@ import { AiOutlineClose } from 'react-icons/ai';
  * @return {*}
  */
 const Chat: React.FC<{ chat: ISession; filter: string }> = ({ chat, filter }) => {
-  const [writeContent, setWriteContent] = useState<any>(null); // 重新编辑
+  const [writeContent, setWriteContent] = useState<string>(); // 重新编辑
   const [citeText, setCiteText] = useState<IMessage>(); // 引用值
   const [forwardMessage, setForwardMessage] = useState<IMessage[]>([]);
   const [showShareForward, setShowShareForward] = useState(false);
