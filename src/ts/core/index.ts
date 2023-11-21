@@ -6,6 +6,7 @@ export type { IDEntity, IEntity } from './public';
 export type { XCollection } from './public/collection';
 export { companyTypes, departmentTypes, orgAuth, valueTypes } from './public/consts';
 export {
+  FromOrigin,
   MessageType,
   SpeciesType,
   TargetType,

@@ -26,9 +26,7 @@ const WorkBench: React.FC = () => {
       <div className="dataItem">
         <div className="dataItemTitle">{title}</div>
         <div className="dataItemNumber">{number}</div>
-        {size && size > 0 && (
-          <div className="dataItemTitle">大小:{formatSize(size)}</div>
-        )}
+        {size && size > 0 && <div className="dataItemTitle">大小:{formatSize(size)}</div>}
         {info && info.length > 0 && <div className="dataItemTitle">{info}</div>}
       </div>
     );

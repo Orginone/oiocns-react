@@ -15,6 +15,7 @@ interface teamTypeInfo {
   notAvatar?: boolean;
   title?: string;
   showName?: boolean;
+  iconSize?: number;
 }
 
 interface shareIconInfo extends teamTypeInfo {
@@ -32,19 +33,22 @@ const EntityIcon = (info: teamTypeInfo) => {
     }
   };
   const entity = getEntity();
-  if (entity) {
-    return (
-      <ShareIconItem
-        {...info}
-        share={{
-          name: entity.name,
-          typeName: entity.typeName,
-          avatar: parseAvatar(entity.icon),
-        }}
-      />
-    );
-  }
-  return <ShareIconById {...info} />;
+  return (
+    <div className="entityIcon">
+      {entity ? (
+        <ShareIconItem
+          {...info}
+          share={{
+            name: entity.name,
+            typeName: entity.typeName,
+            avatar: parseAvatar(entity.icon),
+          }}
+        />
+      ) : (
+        <ShareIconById {...info} />
+      )}
+    </div>
+  );
 };
 
 /** 实体ID查找 */
@@ -106,11 +110,15 @@ export const ShareIconItem = (info: shareIconInfo) => {
   if (info.share) {
     if (info.share.avatar?.thumbnail) {
       return (
-        <span style={{ display: 'contents' }} title={info.title ?? ''}>
+        <span title={info.title ?? ''} className="flex flexCenter">
           {infoMore()}
-          <Avatar size={size} src={info.share.avatar.thumbnail} />
+          <Avatar
+            size={info.iconSize || size}
+            src={info.share.avatar.thumbnail}
+            className="avatarIcon"
+          />
           {info.showName && (
-            <strong style={{ marginLeft: 6, fontSize: fontSize }}>
+            <strong className="pickupName" style={{ fontSize: fontSize }}>
               {info.share.name}
             </strong>
           )}
@@ -121,7 +129,7 @@ export const ShareIconItem = (info: shareIconInfo) => {
         <TypeIcon
           avatar
           iconType={info.share.typeName || info.typeName || '其它'}
-          size={size}
+          size={info.iconSize || size}
         />
       );
       if (info.notAvatar) {
@@ -131,13 +139,11 @@ export const ShareIconItem = (info: shareIconInfo) => {
         <span style={{ display: 'contents' }}>
           {infoMore()}
           <Avatar
-            size={size}
+            size={info.iconSize || size}
             icon={icon}
             style={{ background: 'transparent', color: '#606060' }}
           />
-          {info.showName && (
-            <b style={{ marginLeft: 6, fontSize: fontSize }}>{info.share.name}</b>
-          )}
+          {info.showName && <b className="pickupName">{info.share.name}</b>}
         </span>
       );
     }
@@ -150,9 +156,7 @@ export const ShareIconItem = (info: shareIconInfo) => {
         icon={<TypeIcon avatar iconType={'其它'} size={size} />}
         style={{ background: 'transparent', color: '#606060' }}
       />
-      {info.showName && (
-        <strong style={{ marginLeft: 6, fontSize: fontSize }}>{info.entity?.id}</strong>
-      )}
+      {info.showName && <strong className="pickupName">{info.entity?.id}</strong>}
     </span>
   );
 };

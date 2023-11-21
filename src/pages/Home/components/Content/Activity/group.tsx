@@ -1,14 +1,17 @@
 import React, { useState } from 'react';
 import TargetActivity from '@/components/TargetActivity';
 import ActivityMessage from '@/components/TargetActivity/ActivityMessage';
-import { IActivity } from '@/ts/core';
+import { IActivity, FromOrigin } from '@/ts/core';
 import useWidthToggle from '@/hooks/useWidthToggle';
 import { Resizable } from 'devextreme-react';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import useAsyncLoad from '@/hooks/useAsyncLoad';
 import { Spin } from 'antd';
-
-const GroupActivityItem: React.FC<{ activity: IActivity }> = ({ activity }) => {
+// import ActivityPush from '@/components/TargetActivity/ActivityPush';
+const GroupActivityItem: React.FC<{ activity: IActivity; messageFrom?: FromOrigin }> = ({
+  activity,
+  messageFrom,
+}) => {
   const toggle = useWidthToggle(1000);
   const [key] = useCtrlUpdate(activity);
   const [loaded] = useAsyncLoad(() => activity.load(10), [activity]);
@@ -16,16 +19,16 @@ const GroupActivityItem: React.FC<{ activity: IActivity }> = ({ activity }) => {
   const loadMenus = React.useCallback(() => {
     if (!loaded || !toggle) return <></>;
     return (
-      <Resizable handles={'right'}>
+      <Resizable handles={'right'} minWidth={200}>
         <div className={'groupList'}>
           {activity.activitys
             .filter((item) => item.activityList.length > 0)
             .map((item) => {
               if (item.activityList.length > 0) {
-                const _name = item.id === current.id ? 'Selected' : 'Item';
+                const _seleted = item.id === current.id ? 'groupList-selected' : '';
                 return (
                   <div
-                    className={`groupList-${_name}`}
+                    className={`groupList-item ${_seleted}`}
                     key={item.key}
                     onClick={(e) => {
                       e.stopPropagation();
@@ -52,7 +55,9 @@ const GroupActivityItem: React.FC<{ activity: IActivity }> = ({ activity }) => {
         <TargetActivity
           height={'calc(100vh - 110px)'}
           activity={current}
-          title={current.name + '动态'}></TargetActivity>
+          messageFrom={messageFrom}
+          title={current.name + '动态'}
+        />
       </div>
     );
   }, [loaded, current]);

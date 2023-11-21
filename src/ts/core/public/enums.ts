@@ -84,3 +84,9 @@ export enum RuleTriggers {
   'Submit' = 'Submit',//提交前
   'ThingsChanged' = 'ThingsChanged',//子表变化后
 }
+
+/** 个人 群组 */
+export enum FromOrigin {
+  'Person' = 'Person',
+  'Group' = 'Group',
+}
