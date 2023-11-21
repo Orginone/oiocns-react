@@ -10,6 +10,7 @@ import TargetActivity from '@/components/TargetActivity';
 import { loadFileMenus } from '@/executor/fileOperate';
 import OrgIcons from '@/components/Common/GlobalComps/orgIcons';
 import ChatBody from './chat';
+import { cleanMenus } from '@/utils/tools';
 const SessionBody = ({ session, setting }: { session: ISession; setting?: boolean }) => {
   const [actions, setActons] = useState<string[]>([]);
   const [bodyType, setBodyType] = useState('');
@@ -58,7 +59,7 @@ const SessionBody = ({ session, setting }: { session: ISession; setting?: boolea
             contextMenu={(entity) => {
               const file = (entity as IFile) || session.target.memberDirectory;
               return {
-                items: loadFileMenus(file),
+                items: cleanMenus(loadFileMenus(file)) || [],
                 onClick: ({ key }: { key: string }) => {
                   command.emitter('executor', key, file);
                 },
