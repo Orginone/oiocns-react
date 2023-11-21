@@ -4,6 +4,7 @@ import { IBelong } from '@/ts/core';
 import PrimaryForms from './primary';
 import DetailForms from './detail';
 import { formatDate } from '@/utils';
+import { getNodeByNodeId } from '@/utils/tools';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 
 interface IWorkFormProps {
@@ -13,21 +14,6 @@ interface IWorkFormProps {
   data: model.InstanceDataModel;
   onChanged?: (id: string, data: model.FormEditData, changedValues: any) => void;
 }
-
-const getNodeByNodeId = (
-  id: string,
-  node: model.WorkNodeModel | undefined,
-): model.WorkNodeModel | undefined => {
-  if (node) {
-    if (id === node.id) return node;
-    const find = getNodeByNodeId(id, node.children);
-    if (find) return find;
-    for (const subNode of node?.branches ?? []) {
-      const find = getNodeByNodeId(id, subNode.children);
-      if (find) return find;
-    }
-  }
-};
 
 /** 流程节点表单 */
 const WorkForm: React.FC<IWorkFormProps> = (props) => {

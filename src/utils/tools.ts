@@ -328,6 +328,22 @@ const parseHtmlToText = (html: string) => {
   return text.replace(/[\r\n]/g, ''); //去掉回车换行
 };
 
+/** 根据节点id获取节点信息 */
+const getNodeByNodeId = (
+  id: string,
+  node: model.WorkNodeModel | undefined,
+): model.WorkNodeModel | undefined => {
+  if (node) {
+    if (id === node.id) return node;
+    const find = getNodeByNodeId(id, node.children);
+    if (find) return find;
+    for (const subNode of node?.branches ?? []) {
+      const find = getNodeByNodeId(id, subNode.children);
+      if (find) return find;
+    }
+  }
+};
+
 export {
   cleanMenus,
   dateFormat,
@@ -349,4 +365,5 @@ export {
   showMessage,
   truncateString,
   validIsSocialCreditCode,
+  getNodeByNodeId,
 };

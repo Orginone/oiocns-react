@@ -58,11 +58,14 @@ export class WorkApply implements IWorkApply {
     fromData.forEach((data, k) => {
       this.instanceData.data[k] = [data];
     });
-    const mark = await this.getMarkInfo();
+    var mark = await this.getMarkInfo();
+    if (content.length > 0) {
+      mark += `备注:${content}`;
+    }
     const res = await kernel.createWorkInstance({
       ...this.metadata,
       applyId: applyId,
-      content: mark + `备注:${content}`,
+      content: mark,
       contentType: 'Text',
       data: JSON.stringify(this.instanceData),
     });

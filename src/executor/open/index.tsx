@@ -4,7 +4,6 @@ import React from 'react';
 import FormView from './form';
 import WorkStart from './work';
 import TaskContent from './task';
-import JoinApply from './task/joinApply';
 import OfficeView from './office';
 import TransferView from './transfer';
 import AudioPlayer from './audio';
@@ -12,6 +11,7 @@ import EntityPreview from './entity';
 import CodeEditor from './codeeditor';
 import EntityForm from '../operate/entityForm';
 import { IEntity, ISysFileInfo, TargetType } from '@/ts/core';
+import JoinApply from './task/joinApply';
 import { model, schema } from '@/ts/base';
 import TemplateView from './page';
 const audioExt = ['.mp3', '.wav', '.ogg'];
@@ -75,11 +75,13 @@ const ExecutorOpen: React.FC<IOpenProps> = (props: IOpenProps) => {
         );
       case '加用户':
         return (
-          <JoinApply
-            key={props.entity.key}
-            current={props.entity as any}
-            finished={props.finished}
-          />
+          <>
+            <JoinApply
+              key={props.entity.key}
+              current={props.entity as any}
+              finished={props.finished}
+            />
+          </>
         );
       case '事项':
         return (
