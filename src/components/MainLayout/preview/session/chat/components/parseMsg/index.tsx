@@ -17,8 +17,8 @@ import {
 } from 'react-icons/ai';
 /** 将链接转化为超链接 */
 const linkText = (val: string) => {
-  let reg = /(https?:\/\/[^\s]+)/g;
-  return val.replace(reg, '<a target=_blank href="$1"> $1 </a>');
+  val = val.replace(/(https?:\/\/[^\s]+)/g, '<a target=_blank href="$1">$1</a>');
+  return val.replace(/\n/g, '<br/>');
 };
 
 /**
