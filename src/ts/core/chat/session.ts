@@ -351,7 +351,7 @@ export class Session extends Entity<schema.XEntity> implements ISession {
           this.chatdata.mentionMe = imsg.mentions.includes(this.userId);
         }
         if (this.chatdata.noReadCount > 0) {
-          logger.info(`[${this.chatdata.chatName}]:${imsg.msgTitle}`);
+          logger.msg(`[${this.chatdata.chatName}]:${imsg.msgTitle}`);
         }
         command.emitterFlag('session');
       } else if (!imsg.isReaded) {

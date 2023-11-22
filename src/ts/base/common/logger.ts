@@ -2,6 +2,7 @@
 /** 日志等级 */
 export enum LoggerLevel {
   info = '信息',
+  msg = '消息',
   warn = '警告',
   error = '错误',
   unauth = '登录过期',
@@ -16,6 +17,9 @@ class Logger {
   constructor() {}
   info(message: MessageType): void {
     this._callback(LoggerLevel.info, message);
+  }
+  msg(message: MessageType): void {
+    this._callback(LoggerLevel.msg, message);
   }
   warn(message: MessageType): void {
     console.warn(message);
