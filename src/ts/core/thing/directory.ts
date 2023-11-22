@@ -120,6 +120,7 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
     } else {
       command.emitter('executor', 'refresh', this);
     }
+    this.changCallback();
   }
   content(store: boolean = true): IFile[] {
     const cnt: IFile[] = [...this.children];

@@ -146,16 +146,13 @@ const GroupInputBox = (props: IProps) => {
           placeholder={`发送到${props.chat.name}`}
           onValueChanged={(e) => {
             const value: string = e.value ?? '';
-            if (!value.endsWith('\n')) {
-              if (value.endsWith('@')) {
-                setMessage(value);
-                setCiteShow(true);
-              } else {
-                setMessage(value);
-              }
+            if (value.endsWith('@')) {
+              setMessage(value);
+              setCiteShow(true);
+            } else {
+              setMessage(value);
             }
           }}
-          onEnterKey={() => sendMessage()}
         />
         {props.citeText && citeShowText(props.citeText)}
       </div>
