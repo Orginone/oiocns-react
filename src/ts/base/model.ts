@@ -170,7 +170,7 @@ export type DynamicCodeModel = {
   account: string;
   // 平台入口
   platName: string;
-}
+};
 
 export type LoginModel = {
   // 账户(手机号/账号)
@@ -181,7 +181,7 @@ export type LoginModel = {
   dynamicId?: string;
   // 动态密码
   dynamicCode?: string;
-}
+};
 
 export type RegisterModel = {
   // 账户(手机号)
@@ -196,7 +196,7 @@ export type RegisterModel = {
   name: string;
   // 描述
   remark: string;
-}
+};
 
 export type ResetPwdModel = {
   // 账户(手机号/账号)
@@ -209,7 +209,7 @@ export type ResetPwdModel = {
   dynamicCode?: string;
   // 新密码
   password: string;
-}
+};
 
 //认证结果返回
 export type TokenResultModel = {
@@ -227,7 +227,7 @@ export type TokenResultModel = {
   target: XTarget;
   // 私钥
   privateKey: string;
-}
+};
 
 export type IdPair = {
   // 唯一ID
@@ -1288,4 +1288,4 @@ export type DiskInfoType = {
   fsTotalSize: number;
   // 查询时间
   getTime: string;
-}
+};

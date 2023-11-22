@@ -126,12 +126,14 @@ const ApprovalNode: React.FC<IProps> = (props) => {
                   case '1':
                     props.current.destId = '';
                     props.current.destName = '';
+                    props.current.destType = '角色';
                     setCurrentData({ id: '', name: '' });
                     break;
                   case '2':
                     props.current.num = 1;
-                    props.current.destId = '1';
+                    props.current.destId = '0';
                     props.current.destName = '发起人';
+                    props.current.destType = '发起人';
                     setCurrentData({ id: '1', name: '发起人' });
                     break;
                   default:
