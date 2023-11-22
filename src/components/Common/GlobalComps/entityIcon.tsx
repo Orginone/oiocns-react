@@ -136,7 +136,7 @@ export const ShareIconItem = (info: shareIconInfo) => {
         return icon;
       }
       return (
-        <span style={{ display: 'contents' }}>
+        <span className="flex flexCenter">
           {infoMore()}
           <Avatar
             size={info.iconSize || size}
@@ -149,7 +149,7 @@ export const ShareIconItem = (info: shareIconInfo) => {
     }
   }
   return (
-    <span style={{ display: 'contents' }} title={info.title ?? ''}>
+    <span className="flex flexCenter" title={info.title ?? ''}>
       {infoMore()}
       <Avatar
         size={size}

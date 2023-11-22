@@ -203,7 +203,7 @@ export const ActivityMessage: React.FC<ActivityItemProps> = ({
             })} */}
           </div>
         }
-        avatar={<EntityIcon entity={activity.metadata} size={50} />}
+        avatar={<EntityIcon iconSize={48} entity={activity.metadata} size={50} />}
         description={
           <div className={'activityItem'}>
             <div className={'activityItem-content'}>
