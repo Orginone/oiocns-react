@@ -76,9 +76,11 @@ const FormItem: React.FC<IFormItemProps> = (props) => {
     width: getItemWidth(props.numStr),
   };
   if (props.field.options.isRequired) {
-    mixOptions.isValid = isValid;
+    /** 增加是否有defaultValue值的判断 */
+    mixOptions.isValid = mixOptions.defaultValue ? 'true' : isValid;
     mixOptions.label = mixOptions.label + '*';
   }
+
   switch (getWidget(props.field.valueType, props.field.widget)) {
     case '数字框':
       return <NumberBox {...mixOptions} />;
