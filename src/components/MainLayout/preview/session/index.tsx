@@ -23,7 +23,7 @@ const SessionBody = ({ session, setting }: { session: ISession; setting?: boolea
         newActions.push('chat');
       }
       newActions.push('activity');
-      if (session.members.length > 0 || session.id === session.userId) {
+      if (session.id === session.target.id) {
         newActions.push('store', 'relation');
       }
     }

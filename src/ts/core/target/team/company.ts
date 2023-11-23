@@ -281,13 +281,7 @@ export class Company extends Belong implements ICompany {
   }
 
   content(): IFile[] {
-    return [
-      this.memberDirectory,
-      ...this.groups,
-      ...this.departments,
-      ...this.cohorts,
-      ...this.storages,
-    ];
+    return [...this.groups, ...this.departments, ...this.cohorts, ...this.storages];
   }
 
   override async removeMembers(
