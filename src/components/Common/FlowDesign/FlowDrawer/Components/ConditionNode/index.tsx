@@ -13,6 +13,7 @@ import { model } from '@/ts/base';
 interface Iprops {
   current: NodeModel;
   conditions: model.FieldModel[];
+  refresh: () => void;
 }
 
 /**
@@ -168,6 +169,7 @@ const ConditionNode: React.FC<Iprops> = (props) => {
       }
       item.display = `${item.paramLabel} ${item.label} ${item.valLabel || item.val} `;
     });
+    props.refresh();
   };
 
   return (

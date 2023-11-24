@@ -495,6 +495,8 @@ export type XWorkDefine = {
   shareId: string;
   // 允许新增
   allowAdd: boolean;
+  // 允许补充办事
+  allowFillWork: boolean;
   // 允许变更
   allowEdit: boolean;
   // 允许选择
@@ -645,6 +647,16 @@ export type XStaging = {
   relations: string;
 } & Xbase;
 
+export type XMemberNodeInfo = {
+  /** 办事定义Id */
+  defineId: string;
+  /** 成员节点Id */
+  memberNodeId: string;
+  /** 成员关联组织 */
+  targetId: string;
+  /** 成员关联的办事Id */
+  memberDefine: XWorkDefine;
+} & Xbase;
 // 页面模板
 export interface XPageTemplate extends XStandard {
   // 是否发布至首页

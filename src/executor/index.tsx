@@ -38,7 +38,8 @@ const Executor: React.FC = () => {
             }
             return;
           case 'design':
-            setContent(<DesignExecutor entity={args[0]} finished={resetCtx} />);
+          case 'fillWork':
+            setContent(<DesignExecutor cmd={cmd} entity={args[0]} finished={resetCtx} />);
             return;
           default:
             setContent(<OperateExecutor cmd={cmd} args={args} finished={resetCtx} />);

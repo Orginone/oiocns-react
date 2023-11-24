@@ -75,6 +75,14 @@ const InsertButton: React.FC<InsertButtonProps> = (props: any) => {
             <ai.AiOutlineFork color="#af343e" />
             <span>其他办事</span>
           </div>
+          <div
+            onClick={() => {
+              props.onInsertNode(AddNodeType.MEMBER);
+              setOpen(false);
+            }}>
+            <ai.AiOutlineForm color="#af343e" />
+            <span>成员办事</span>
+          </div>
         </div>
       }
       trigger="click">

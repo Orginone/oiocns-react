@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { Drawer, Typography } from 'antd';
 import ApprovalNode from './Components/ApprovalNode';
 import WorkFlowNode from './Components/WorkFlowNode';
 import CcNode from './Components/CcNode';
@@ -7,9 +6,10 @@ import RootNode from './Components/RootNode';
 import ConcurrentNode from './Components/ConcurrentNode';
 import ConditionNode from './Components/ConditionNode';
 import { AddNodeType, NodeModel } from '../processType';
-import orgCtrl from '@/ts/controller';
-import { IBelong, IWork } from '@/ts/core';
+import { IWork } from '@/ts/core';
 import { model } from '@/ts/base';
+import { Card } from 'antd';
+import MemberWorkNode from './Components/MemberWorkNode';
 /**
  * @description: 流程设置抽屉
  * @return {*}
@@ -17,73 +17,65 @@ import { model } from '@/ts/base';
 
 interface IProps {
   define: IWork;
-  isOpen: boolean;
-  current: NodeModel;
-  onClose: () => void;
+  node: NodeModel;
+  refresh: () => void;
 }
 
-const FlowDrawer: React.FC<IProps> = (props) => {
+const Config: React.FC<IProps> = (props) => {
+  const belong = props.define.directory.target.space;
   const [conditions, setConditions] = useState<model.FieldModel[]>([]);
-
   useEffect(() => {
-    if (props.define && props.current.type == AddNodeType.CONDITION) {
+    if (props.define && props.node.type == AddNodeType.CONDITION) {
       const fields: model.FieldModel[] = [];
       props.define.primaryForms.forEach((f) => {
         fields.push(...f.fields);
       });
       setConditions(fields);
     }
-  }, []);
+  }, [props.define]);
 
-  const Component = () => {
-    const belong = orgCtrl.targets.find(
-      (a) => a.id == props.define!.metadata.belongId,
-    ) as IBelong;
-    if (belong == undefined) return <></>;
-    switch (props.current.type) {
+  const loadContent = () => {
+    switch (props.node.type) {
       case AddNodeType.ROOT:
-        return <RootNode current={props.current} belong={belong} />;
+        return <RootNode current={props.node} belong={belong} refresh={props.refresh} />;
       case AddNodeType.APPROVAL:
-        return <ApprovalNode current={props.current} belong={belong} />;
+        return (
+          <ApprovalNode current={props.node} belong={belong} refresh={props.refresh} />
+        );
+      case AddNodeType.MEMBER:
+        return (
+          <MemberWorkNode current={props.node} define={props.define}></MemberWorkNode>
+        );
       case AddNodeType.CHILDWORK:
         return (
-          <WorkFlowNode current={props.current} belong={belong} define={props.define} />
+          <WorkFlowNode
+            current={props.node}
+            belong={belong}
+            define={props.define}
+            refresh={props.refresh}
+          />
         );
       case AddNodeType.CC:
-        return <CcNode current={props.current} belong={belong} />;
+        return <CcNode current={props.node} belong={belong} refresh={props.refresh} />;
       case AddNodeType.CONDITION:
-        return <ConditionNode current={props.current} conditions={conditions} />;
+        return (
+          <ConditionNode
+            current={props.node}
+            conditions={conditions}
+            refresh={props.refresh}
+          />
+        );
       case AddNodeType.CONCURRENTS:
-        return <ConcurrentNode current={props.current} />;
+        return <ConcurrentNode current={props.node} />;
       default:
         return <div>暂无需要处理的数据</div>;
     }
   };
-
   return (
-    <Drawer
-      title={
-        <div>
-          <Typography.Title
-            editable={{
-              onChange: (e: any) => {
-                props.current.name = e;
-              },
-            }}
-            level={5}
-            style={{ margin: 0 }}>
-            {props.current.name}
-          </Typography.Title>
-        </div>
-      }
-      open={props.isOpen}
-      destroyOnClose
-      placement="right"
-      onClose={() => props.onClose()}
-      width={500}>
-      {Component()}
-    </Drawer>
+    <Card type="inner" title={props.node.name + '配置'}>
+      {loadContent()}
+    </Card>
   );
 };
 
-export default FlowDrawer;
+export default Config;

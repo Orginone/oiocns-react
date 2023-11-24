@@ -13,7 +13,7 @@ export const getResouces = (): IResources => {
     return {
       platName: '安心屋',
       location: 'anxinwu',
-      passport: [1, 2, 3, 4, 5],
+      passport: [6],
       unitName: '浙江省科学技术厅',
       favicon: '/favicon/anxinwu.ico',
       unitPage: 'https://kjt.zj.gov.cn',

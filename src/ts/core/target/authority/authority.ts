@@ -80,11 +80,11 @@ export class Authority extends Entity<schema.XAuthority> implements IAuthority {
   }
   async update(data: schema.XAuthority): Promise<boolean> {
     data.id = this.id;
-    data.shareId = this.metadata.shareId;
     data.parentId = this.metadata.parentId;
     data.name = data.name || this.name;
     data.code = data.code || this.code;
     data.icon = data.icon || this.metadata.icon;
+    data.shareId = data.shareId || this.metadata.shareId;
     data.remark = data.remark || this.remark;
     const res = await kernel.updateAuthority(data);
     if (res.success && res.data?.id) {

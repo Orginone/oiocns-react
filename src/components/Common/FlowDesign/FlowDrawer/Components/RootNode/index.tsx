@@ -12,6 +12,7 @@ import { Form } from '@/ts/core/thing/standard/form';
 interface IProps {
   belong: IBelong;
   current: NodeModel;
+  refresh: () => void;
 }
 /**
  * @description: 角色
@@ -46,6 +47,7 @@ const RootNode: React.FC<IProps> = (props) => {
             props.current.destId = newValue;
             props.current.destName = label;
             setSelectAuthValue(newValue);
+            props.refresh();
           }}
           value={selectAuthValue}></SelectAuth>
         <Divider />

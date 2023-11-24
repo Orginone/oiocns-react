@@ -9,6 +9,7 @@ import SelectIdentity from '@/components/Common/SelectIdentity';
 interface IProps {
   current: NodeModel;
   belong: IBelong;
+  refresh: () => void;
 }
 /**
  * @description: 抄送对象
@@ -43,6 +44,7 @@ const CcNode: React.FC<IProps> = (props) => {
                 props.current.destId = '';
                 props.current.destName = '';
                 setCurrentData({ id: '', name: '' });
+                props.refresh();
               }}></ShareShowComp>
           ) : null}
         </div>
@@ -60,6 +62,7 @@ const CcNode: React.FC<IProps> = (props) => {
             props.current.destName = item.name;
             setCurrentData(item);
           }
+          props.refresh();
           setIsApprovalOpen(false);
         }}
       />

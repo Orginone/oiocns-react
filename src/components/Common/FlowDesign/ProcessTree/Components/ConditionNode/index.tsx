@@ -19,7 +19,7 @@ type IProps = {
  */
 const ConditionNode: React.FC<IProps> = (props) => {
   return (
-    <div className={cls['node']}>
+    <div className={cls['node']} onClick={() => props.onSelected()}>
       <div className={`${cls['node-body']}`}>
         <div className={cls['node-body-main']}>
           <div className={cls['node-body-main-header']}>
@@ -35,9 +35,7 @@ const ConditionNode: React.FC<IProps> = (props) => {
               </span>
             )}
           </div>
-          <div
-            className={cls['node-body-main-content']}
-            onClick={() => props.onSelected()}>
+          <div className={cls['node-body-main-content']}>
             <span className={cls['name']}>
               {props.config.conditions?.map((a) => a.display).join('且') || '请设置条件'}
             </span>

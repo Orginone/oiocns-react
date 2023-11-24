@@ -5,6 +5,7 @@ import { FileInfo, IFile, IFileInfo } from '../thing/fileinfo';
 import { IDirectory } from '../thing/directory';
 import { IWorkApply, WorkApply } from './apply';
 import { entityOperates, fileOperates } from '../public';
+import { AddNodeType } from '@/components/Common/FlowDesign/processType';
 
 export interface IWork extends IFileInfo<schema.XWorkDefine> {
   /** 主表 */
@@ -13,12 +14,23 @@ export interface IWork extends IFileInfo<schema.XWorkDefine> {
   detailForms: IForm[];
   /** 应用 */
   application: IApplication;
+  /** 成员节点 */
+  memberNodes: model.WorkNodeModel[];
+  /** 成员节点绑定信息 */
+  memberNodeInfo: schema.XMemberNodeInfo[];
   /** 流程节点 */
   node: model.WorkNodeModel | undefined;
   /** 更新办事定义 */
   update(req: model.WorkDefineModel): Promise<boolean>;
   /** 加载事项定义节点 */
   loadWorkNode(reload?: boolean): Promise<model.WorkNodeModel | undefined>;
+  /** 加载成员节点信息 */
+  loadMemberNodeInfo(reload?: boolean): Promise<schema.XMemberNodeInfo[]>;
+  /** 绑定成员节点 */
+  bingdingMember(
+    nodeId: string,
+    define: schema.XWorkDefine,
+  ): Promise<schema.XMemberNodeInfo | undefined>;
   /** 生成办事申请单 */
   createApply(
     taskId?: string,
@@ -34,11 +46,13 @@ export const fullDefineRule = (data: schema.XWorkDefine) => {
   data.allowAdd = true;
   data.allowEdit = true;
   data.allowSelect = true;
+  data.allowFillWork = false;
   if (data.rule && data.rule.includes('{') && data.rule.includes('}')) {
     const rule = JSON.parse(data.rule);
     data.allowAdd = rule.allowAdd;
     data.allowEdit = rule.allowEdit;
     data.allowSelect = rule.allowSelect;
+    data.allowFillWork = rule.allowFillWork;
   }
   data.typeName = '办事';
   return data;
@@ -54,6 +68,8 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
   detailForms: IForm[] = [];
   application: IApplication;
   node: model.WorkNodeModel | undefined;
+  memberNodes: model.WorkNodeModel[] = [];
+  memberNodeInfo: schema.XMemberNodeInfo[] = [];
   get locationKey(): string {
     return this.application.key;
   }
@@ -138,6 +154,10 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
   }
   async loadContent(_reload: boolean = false): Promise<boolean> {
     await this.loadWorkNode(_reload);
+    await this.loadAllMemberNodeInfo(_reload);
+    if (this.node) {
+      this.memberNodes = this.loadMemberNodes(this.node, []);
+    }
     return this.forms.length > 0;
   }
   async update(data: model.WorkDefineModel): Promise<boolean> {
@@ -149,6 +169,46 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
     }
     return res.success;
   }
+  async loadAllMemberNodeInfo(
+    reload: boolean = false,
+  ): Promise<schema.XMemberNodeInfo[]> {
+    if (this.memberNodeInfo.length > 0 || reload) {
+      this.memberNodeInfo = await this.directory.resource.memberNodeColl.loadSpace({
+        options: {
+          match: {
+            defineId: this.id,
+          },
+        },
+      });
+    }
+    return this.memberNodeInfo;
+  }
+  async loadMemberNodeInfo(reload: boolean = false): Promise<schema.XMemberNodeInfo[]> {
+    await this.loadAllMemberNodeInfo(reload);
+    return this.memberNodeInfo.filter((a) => a.targetId == this.directory.target.id);
+  }
+  async bingdingMember(
+    nodeId: string,
+    define: schema.XWorkDefine,
+  ): Promise<schema.XMemberNodeInfo | undefined> {
+    var last = this.memberNodeInfo.find(
+      (a) => a.targetId == this.directory.target.id && a.memberNodeId == nodeId,
+    );
+    if (last) {
+      return await this.directory.resource.memberNodeColl.replace({
+        ...last,
+        memberDefine: define,
+        defineId: define.id,
+      });
+    } else {
+      return await this.directory.resource.memberNodeColl.insert({
+        targetId: this.directory.target.id,
+        memberNodeId: nodeId,
+        memberDefine: define,
+        defineId: this.id,
+      } as schema.XMemberNodeInfo);
+    }
+  }
   async loadWorkNode(reload: boolean = false): Promise<model.WorkNodeModel | undefined> {
     if (this.node === undefined || reload) {
       const res = await kernel.queryWorkNodes({ id: this.id });
@@ -159,6 +219,22 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
     }
     return this.node;
   }
+
+  loadMemberNodes = (node: model.WorkNodeModel, memberNodes: model.WorkNodeModel[]) => {
+    if (node.type == AddNodeType.MEMBER) {
+      memberNodes.push(node);
+    }
+    if (node.children) {
+      memberNodes = this.loadMemberNodes(node.children, memberNodes);
+    }
+    for (const branch of node.branches ?? []) {
+      if (branch.children) {
+        memberNodes = this.loadMemberNodes(branch.children, memberNodes);
+      }
+    }
+    return memberNodes;
+  };
+
   async createApply(
     taskId: string = '0',
     pdata?: model.InstanceDataModel,
@@ -200,6 +276,14 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
     const operates = super.operates();
     if (this.isInherited) {
       operates.push({ sort: 3, cmd: 'workForm', label: '查看表单', iconType: '表单' });
+    }
+    if (this.metadata.allowFillWork) {
+      operates.push({
+        sort: 4,
+        cmd: 'fillWork',
+        label: '补充成员办事',
+        iconType: '办事',
+      });
     }
     if (operates.includes(entityOperates.Delete)) {
       operates.push(entityOperates.HardDelete);

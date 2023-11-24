@@ -22,6 +22,7 @@ import OpenFileDialog from '@/components/OpenFileDialog';
 interface IProps {
   current: NodeModel;
   belong: IBelong;
+  refresh: () => void;
 }
 
 /**
@@ -34,7 +35,9 @@ const ApprovalNode: React.FC<IProps> = (props) => {
   const [formModel, setFormModel] = useState<string>('');
   const [primaryForms, setPrimaryForms] = useState(props.current.primaryForms);
   const [radioValue, setRadioValue] = useState(props.current.num == 0 ? 1 : 2);
-  const [destType, setDestType] = useState(props.current.destId != '1' ? '1' : '2');
+  const [destType, setDestType] = useState(
+    props.current.destType != '发起人' ? '1' : '2',
+  );
   const formViewer = React.useCallback((form: schema.XForm) => {
     command.emitter(
       'executor',
@@ -70,22 +73,19 @@ const ApprovalNode: React.FC<IProps> = (props) => {
               deleteFuc={(_) => {
                 props.current.destId = '';
                 props.current.destName = '';
-                setCurrentData({
-                  id: '',
-                  name: '',
-                });
+                props.refresh();
               }}
             />
           </>
         );
       case '2':
         return <a>发起人</a>;
-        break;
       default:
         return <></>;
     }
     return <></>;
   };
+
   return (
     <div className={cls[`app-roval-node`]}>
       <div className={cls[`roval-node`]}>
@@ -134,7 +134,8 @@ const ApprovalNode: React.FC<IProps> = (props) => {
                     props.current.destId = '0';
                     props.current.destName = '发起人';
                     props.current.destType = '发起人';
-                    setCurrentData({ id: '1', name: '发起人' });
+                    setCurrentData({ id: '0', name: '发起人' });
+                    props.refresh();
                     break;
                   default:
                     break;
@@ -200,6 +201,7 @@ const ApprovalNode: React.FC<IProps> = (props) => {
             props.current.destId = item.id;
             props.current.destName = item.name;
             setCurrentData(item);
+            props.refresh();
           }
           setIsOpen(false);
         }}

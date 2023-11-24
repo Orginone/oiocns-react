@@ -11,6 +11,7 @@ interface IProps {
   current: NodeModel;
   define: IWork;
   belong: IBelong;
+  refresh: () => void;
 }
 
 /**
@@ -51,6 +52,7 @@ const WorkFlowNode: React.FC<IProps> = (props) => {
                 props.current.destId = '';
                 props.current.destName = '';
                 setCurrentData({ id: '', name: '' });
+                props.refresh();
               }}></ShareShowComp>
           ) : null}
         </div>
@@ -76,6 +78,7 @@ const WorkFlowNode: React.FC<IProps> = (props) => {
                 name: '',
               });
             }
+            props.refresh();
             setIsOpen(false);
           }}
         />
