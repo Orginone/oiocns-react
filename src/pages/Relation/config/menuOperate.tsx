@@ -11,9 +11,9 @@ const createMenu = (
   target: ITarget | IDirectory,
   children: MenuItemType[],
 ): MenuItemType => {
-  if ('memberDirectory' in target) {
-    children.unshift(createMenu(target.memberDirectory, []));
-  }
+  // if ('memberDirectory' in target) {
+  //   children.unshift(createMenu(target.memberDirectory, []));
+  // }
   return {
     key: target.key,
     item: target,

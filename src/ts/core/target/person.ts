@@ -287,7 +287,7 @@ export class Person extends Belong implements IPerson {
     return operates;
   }
   content(): IFile[] {
-    return [this.memberDirectory, ...this.cohorts, ...this.storages];
+    return [...this.cohorts, ...this.storages];
   }
   findShareById(id: string): model.ShareIcon {
     const metadata = this.findMetadata<schema.XEntity>(id);

@@ -144,7 +144,7 @@ export class Department extends Target implements IDepartment {
     return targets;
   }
   content(): IFile[] {
-    return [this.memberDirectory, ...this.children];
+    return this.children;
   }
   async deepLoad(reload: boolean = false): Promise<void> {
     await Promise.all([

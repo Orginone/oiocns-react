@@ -8,10 +8,7 @@ import { findMenuItemByKey } from '@/utils/tools';
 
 /** 创建团队菜单 */
 const createMenu = (target: ITarget, children: MenuItemType[]) => {
-  children.unshift(
-    ...buildDirectoryTree([target.memberDirectory]),
-    ...buildApplicationTree(target.directory.standard.applications),
-  );
+  children.unshift(...buildApplicationTree(target.directory.standard.applications));
   return {
     key: target.directory.key,
     item: target.directory,

@@ -133,7 +133,7 @@ export class Group extends Target implements IGroup {
     return targets;
   }
   content(): IFile[] {
-    return [this.memberDirectory, ...this.children];
+    return this.children;
   }
   async deepLoad(reload: boolean = false): Promise<void> {
     await Promise.all([
