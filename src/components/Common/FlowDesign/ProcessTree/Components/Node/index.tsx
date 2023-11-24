@@ -19,6 +19,7 @@ type NodeProps = {
 const Node: React.FC<NodeProps> = (props: NodeProps) => {
   let isRoot = false;
   let placeholder = '';
+  console.log(props);
   switch (props.config.type) {
     case AddNodeType.ROOT:
       isRoot = true;
@@ -32,6 +33,9 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
       break;
     case AddNodeType.CHILDWORK:
       placeholder = '请选择其他办事';
+      break;
+    case AddNodeType.MEMBERWORK:
+      placeholder = '成员办事节点';
       break;
     case AddNodeType.EMPTY:
       placeholder = '空节点';

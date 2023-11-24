@@ -47,7 +47,7 @@ const TaskContent: React.FC<TaskDetailType> = ({ current, finished }) => {
       title={`申请加入${current.targets[1].name}`}
       footer={loadOperates()}
       onCancel={finished}>
-      <JoinApply key={current.key} current={current as any} finished={finished} />
+      <JoinApply key={current.key} current={current as any} />
     </FullScreenModal>
   );
 };

@@ -53,8 +53,8 @@ const ApprovalNode: React.FC<IProps> = (props) => {
 
   const loadDestType = () => {
     switch (destType) {
-      case '1':
-        const data = [];
+      case '1': {
+        const data: any[] = [];
         if (!['', '1'].includes(currentData.id ?? '')) {
           data.push(currentData);
         }
@@ -78,12 +78,12 @@ const ApprovalNode: React.FC<IProps> = (props) => {
             />
           </>
         );
+      }
       case '2':
         return <a>发起人</a>;
       default:
         return <></>;
     }
-    return <></>;
   };
 
   return (
@@ -212,7 +212,7 @@ const ApprovalNode: React.FC<IProps> = (props) => {
           title={`选择表单`}
           rootKey={props.belong.directory.key}
           accepts={['表单']}
-          excludeIds={primaryForms.map((i) => i.id)}
+          excludeIds={primaryForms?.map((i) => i.id)}
           onCancel={() => setFormModel('')}
           onOk={(files) => {
             if (files.length > 0) {

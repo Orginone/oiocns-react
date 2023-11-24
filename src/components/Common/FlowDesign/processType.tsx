@@ -64,7 +64,7 @@ export enum AddNodeType {
   'CONCURRENTS' = '全部',
   'ORGANIZATIONA' = '组织',
   'CHILDWORK' = '子流程',
-  'MEMBERWORK' = '成员流程',
+  'MEMBERWORK' = '多流程',
   'END' = '结束',
 }
 
