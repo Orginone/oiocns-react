@@ -28,7 +28,7 @@ export const getNodeName = (type: AddNodeType) => {
       return '并行分支';
     case AddNodeType.ORGANIZATIONA:
       return '组织分支';
-    case AddNodeType.MEMBER:
+    case AddNodeType.MEMBERWORK:
       return '成员办事';
     default:
       return '';
@@ -64,7 +64,7 @@ export enum AddNodeType {
   'CONCURRENTS' = '全部',
   'ORGANIZATIONA' = '组织',
   'CHILDWORK' = '子流程',
-  'MEMBER' = '成员流程',
+  'MEMBERWORK' = '成员流程',
   'END' = '结束',
 }
 
@@ -212,7 +212,7 @@ export const convertNode = (
           validation.isPass = false;
         }
         break;
-      case AddNodeType.MEMBER:
+      case AddNodeType.MEMBERWORK:
         validation.allowFillWork = true;
         break;
       case AddNodeType.CC:

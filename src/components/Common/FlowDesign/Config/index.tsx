@@ -42,7 +42,7 @@ const Config: React.FC<IProps> = (props) => {
         return (
           <ApprovalNode current={props.node} belong={belong} refresh={props.refresh} />
         );
-      case AddNodeType.MEMBER:
+      case AddNodeType.MEMBERWORK:
         return (
           <MemberWorkNode current={props.node} define={props.define}></MemberWorkNode>
         );
