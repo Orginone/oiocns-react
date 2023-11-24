@@ -29,7 +29,7 @@ export const getNodeName = (type: AddNodeType) => {
     case AddNodeType.ORGANIZATIONA:
       return '组织分支';
     case AddNodeType.MEMBERWORK:
-      return '成员办事';
+      return '分流网关';
     default:
       return '';
   }
@@ -64,7 +64,7 @@ export enum AddNodeType {
   'CONCURRENTS' = '全部',
   'ORGANIZATIONA' = '组织',
   'CHILDWORK' = '子流程',
-  'MEMBERWORK' = '多流程',
+  'MEMBERWORK' = '网关',
   'END' = '结束',
 }
 

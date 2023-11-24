@@ -81,7 +81,7 @@ const InsertButton: React.FC<InsertButtonProps> = (props: any) => {
               setOpen(false);
             }}>
             <ai.AiOutlineForm color="#af343e" />
-            <span>成员办事</span>
+            <span>分流网关</span>
           </div>
         </div>
       }

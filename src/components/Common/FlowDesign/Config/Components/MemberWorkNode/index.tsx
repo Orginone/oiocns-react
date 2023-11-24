@@ -26,7 +26,7 @@ const MemberWorkNode: React.FC<IProps> = (props) => {
   const MemberInfoColumns: ProColumns<schema.XMemberNodeInfo>[] = [
     { title: '序号', valueType: 'index', width: 50 },
     {
-      title: '名称',
+      title: '办事名称',
       dataIndex: 'name',
       render: (_: any, record: schema.XMemberNodeInfo) => {
         return <EntityIcon entityId={record.targetId} showName />;
