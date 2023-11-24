@@ -5,7 +5,7 @@ import ProcessTree from './ProcessTree';
 import { Resizable } from 'devextreme-react';
 import { Layout } from 'antd';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
-import Config from './FlowDrawer';
+import Config from './Config';
 
 interface IProps {
   current: IWork;
