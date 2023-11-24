@@ -5,7 +5,6 @@ import { FileInfo, IFile, IFileInfo } from '../thing/fileinfo';
 import { IDirectory } from '../thing/directory';
 import { IWorkApply, WorkApply } from './apply';
 import { entityOperates, fileOperates } from '../public';
-import { AddNodeType } from '@/components/Common/FlowDesign/processType';
 
 export interface IWork extends IFileInfo<schema.XWorkDefine> {
   /** 主表 */
@@ -221,7 +220,7 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
   }
 
   loadMemberNodes = (node: model.WorkNodeModel, memberNodes: model.WorkNodeModel[]) => {
-    if (node.type == AddNodeType.MEMBER) {
+    if (node.type == '网关') {
       memberNodes.push(node);
     }
     if (node.children) {
@@ -281,7 +280,7 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
       operates.push({
         sort: 4,
         cmd: 'fillWork',
-        label: '补充成员办事',
+        label: '关联我的办事',
         iconType: '办事',
       });
     }
