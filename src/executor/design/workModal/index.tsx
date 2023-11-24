@@ -24,7 +24,7 @@ type IProps = {
 const ApplicationModal: React.FC<IProps> = ({ current, finished }) => {
   const [loaded, resource] = useAsyncLoad(async () => {
     if (current) {
-      const node = await current.loadWorkNode();
+      const node = await current.loadGatewayNode();
       if (node && node.code) {
         return loadResource(node, '');
       }
@@ -44,7 +44,7 @@ const ApplicationModal: React.FC<IProps> = ({ current, finished }) => {
   const Save = async () => {
     const validation: ValidationInfo = {
       isPass: true,
-      allowFillWork: false,
+      hasGateway: false,
     };
     //数据结构转化
     const resource_ = convertNode(resource, validation);
@@ -53,7 +53,7 @@ const ApplicationModal: React.FC<IProps> = ({ current, finished }) => {
         allowAdd: current.metadata.allowAdd,
         allowEdit: current.metadata.allowEdit,
         allowSelect: current.metadata.allowSelect,
-        allowFillWork: validation.allowFillWork,
+        hasGateway: validation.hasGateway,
       });
       if (
         await current.update({

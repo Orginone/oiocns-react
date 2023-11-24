@@ -19,7 +19,7 @@ const FillWorkModal: React.FC<IProps> = ({ current, finished }) => {
   const [selectNode, setSelectNode] = useState<model.WorkNodeModel>();
   const [loaded, memberNodeInfo] = useAsyncLoad(async () => {
     await current.loadContent();
-    return await current.loadMemberNodeInfo(true);
+    return await current.loadGatewayInfo(true);
   });
 
   const loadContent = () => {
@@ -51,7 +51,7 @@ const FillWorkModal: React.FC<IProps> = ({ current, finished }) => {
         />
       );
     };
-    return current.memberNodes?.map((a) => {
+    return current.gatewayNodes?.map((a) => {
       return loadCard(a as model.WorkNodeModel);
     });
   };
@@ -78,7 +78,7 @@ const FillWorkModal: React.FC<IProps> = ({ current, finished }) => {
           onOk={async (works) => {
             if (works.length > 0) {
               const work = works[0] as IWork;
-              const ret = await current.bingdingMember(selectNode!.id, work.metadata);
+              const ret = await current.bingdingGateway(selectNode!.id, work.metadata);
               if (ret) {
                 memberNodeInfo?.push(ret);
                 message.info('绑定成功!');

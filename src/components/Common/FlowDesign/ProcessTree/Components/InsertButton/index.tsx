@@ -77,7 +77,7 @@ const InsertButton: React.FC<InsertButtonProps> = (props: any) => {
           </div>
           <div
             onClick={() => {
-              props.onInsertNode(AddNodeType.MEMBERWORK);
+              props.onInsertNode(AddNodeType.GATEWAY);
               setOpen(false);
             }}>
             <ai.AiOutlineForm color="#af343e" />

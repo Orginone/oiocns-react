@@ -10,7 +10,6 @@ import {
   Xbase,
   XPageTemplate,
   XStaging,
-  XMemberNodeInfo,
 } from '../../base/schema';
 import { BucketOpreates, ChatMessageType, Transfer } from '@/ts/base/model';
 import { kernel, model } from '@/ts/base';
@@ -36,7 +35,6 @@ export class DataResource {
     this.speciesItemColl = this.genTargetColl<XSpeciesItem>('standard-species-item');
     this.templateColl = this.genTargetColl<XPageTemplate>('standard-page-template');
     this.stagingColl = this.genTargetColl<XStaging>('resource-staging');
-    this.memberNodeColl = this.genTargetColl<XMemberNodeInfo>('standard-membernode');
   }
 
   /** 表单集合 */
@@ -59,8 +57,6 @@ export class DataResource {
   templateColl: XCollection<XPageTemplate>;
   /** 暂存集合 */
   stagingColl: XCollection<XStaging>;
-  /** 暂存集合 */
-  memberNodeColl: XCollection<XMemberNodeInfo>;
   /** 资源对应的用户信息 */
   get targetMetadata() {
     return this.target;

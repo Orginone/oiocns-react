@@ -729,6 +729,23 @@ export type FormEditData = {
   createTime: string;
 };
 
+/* 节点网关 */
+export type WorkGatewayModel = {
+  // 网关节点ID
+  nodeId: string;
+  // 关联组织ID
+  targetId: string;
+  // 关联流程ID
+  defineId: string;
+};
+
+/* 节点网关 */
+export type GetWorkGatewaysModel = {
+  // 流程ID
+  defineId: string;
+  // 组织ID
+  targetId: string;
+};
 export type WorkNodeModel = {
   id: string;
   // 节点编号

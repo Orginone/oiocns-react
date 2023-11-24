@@ -14,22 +14,24 @@ export interface IWork extends IFileInfo<schema.XWorkDefine> {
   /** 应用 */
   application: IApplication;
   /** 成员节点 */
-  memberNodes: model.WorkNodeModel[];
+  gatewayNodes: model.WorkNodeModel[];
   /** 成员节点绑定信息 */
-  memberNodeInfo: schema.XMemberNodeInfo[];
+  gatwayInfo: schema.XWorkGateway[];
   /** 流程节点 */
   node: model.WorkNodeModel | undefined;
   /** 更新办事定义 */
   update(req: model.WorkDefineModel): Promise<boolean>;
   /** 加载事项定义节点 */
-  loadWorkNode(reload?: boolean): Promise<model.WorkNodeModel | undefined>;
+  loadGatewayNode(reload?: boolean): Promise<model.WorkNodeModel | undefined>;
   /** 加载成员节点信息 */
-  loadMemberNodeInfo(reload?: boolean): Promise<schema.XMemberNodeInfo[]>;
+  loadGatewayInfo(reload?: boolean): Promise<schema.XWorkGateway[]>;
+  /** 删除绑定 */
+  deleteGateway(id: string): Promise<boolean>;
   /** 绑定成员节点 */
-  bingdingMember(
+  bingdingGateway(
     nodeId: string,
     define: schema.XWorkDefine,
-  ): Promise<schema.XMemberNodeInfo | undefined>;
+  ): Promise<schema.XWorkGateway | undefined>;
   /** 生成办事申请单 */
   createApply(
     taskId?: string,
@@ -45,13 +47,13 @@ export const fullDefineRule = (data: schema.XWorkDefine) => {
   data.allowAdd = true;
   data.allowEdit = true;
   data.allowSelect = true;
-  data.allowFillWork = false;
+  data.hasGateway = false;
   if (data.rule && data.rule.includes('{') && data.rule.includes('}')) {
     const rule = JSON.parse(data.rule);
     data.allowAdd = rule.allowAdd;
     data.allowEdit = rule.allowEdit;
     data.allowSelect = rule.allowSelect;
-    data.allowFillWork = rule.allowFillWork;
+    data.hasGateway = rule.hasGateway;
   }
   data.typeName = '办事';
   return data;
@@ -67,8 +69,8 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
   detailForms: IForm[] = [];
   application: IApplication;
   node: model.WorkNodeModel | undefined;
-  memberNodes: model.WorkNodeModel[] = [];
-  memberNodeInfo: schema.XMemberNodeInfo[] = [];
+  gatewayNodes: model.WorkNodeModel[] = [];
+  gatwayInfo: schema.XWorkGateway[] = [];
   get locationKey(): string {
     return this.application.key;
   }
@@ -95,7 +97,7 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
     return this.delete(_notity);
   }
   async rename(_name: string): Promise<boolean> {
-    const node = await this.loadWorkNode();
+    const node = await this.loadGatewayNode();
     return await this.update({
       ...this.metadata,
       name: _name,
@@ -106,7 +108,7 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
     if (destination.id != this.application.id) {
       if ('works' in destination) {
         const app = destination as unknown as IApplication;
-        const node = await this.loadWorkNode();
+        const node = await this.loadGatewayNode();
         const res = await app.createWork({
           ...this.metadata,
           applicationId: app.id,
@@ -126,7 +128,7 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
       if ('works' in destination) {
         const app = destination as unknown as IApplication;
         this.setMetadata({ ...this.metadata, applicationId: app.id });
-        const node = await this.loadWorkNode();
+        const node = await this.loadGatewayNode();
         const success = await this.update({
           ...this.metadata,
           resource: node,
@@ -152,10 +154,10 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
     return [];
   }
   async loadContent(_reload: boolean = false): Promise<boolean> {
-    await this.loadWorkNode(_reload);
-    await this.loadAllMemberNodeInfo(_reload);
+    await this.loadGatewayNode(_reload);
+    await this.loadGatewayInfo(_reload);
     if (this.node) {
-      this.memberNodes = this.loadMemberNodes(this.node, []);
+      this.gatewayNodes = this.loadMemberNodes(this.node, []);
     }
     return this.forms.length > 0;
   }
@@ -168,47 +170,39 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
     }
     return res.success;
   }
-  async loadAllMemberNodeInfo(
-    reload: boolean = false,
-  ): Promise<schema.XMemberNodeInfo[]> {
-    if (this.memberNodeInfo.length > 0 || reload) {
-      this.memberNodeInfo = await this.directory.resource.memberNodeColl.loadSpace({
-        options: {
-          match: {
-            defineId: this.id,
-          },
-        },
+  async loadGatewayInfo(reload: boolean = false): Promise<schema.XWorkGateway[]> {
+    if (this.gatwayInfo.length == 0 || reload) {
+      const res = await kernel.queryWorkGateways({
+        defineId: this.id,
+        targetId: this.directory.target.id,
       });
+      if (res.success && res.data) {
+        this.gatwayInfo = res.data.result;
+      }
     }
-    return this.memberNodeInfo;
+    return this.gatwayInfo;
   }
-  async loadMemberNodeInfo(reload: boolean = false): Promise<schema.XMemberNodeInfo[]> {
-    await this.loadAllMemberNodeInfo(reload);
-    return this.memberNodeInfo.filter((a) => a.targetId == this.directory.target.id);
+  async deleteGateway(id: string): Promise<boolean> {
+    const res = await kernel.deleteWorkGateway({ id });
+    if (res.success) {
+      this.gatwayInfo = this.gatwayInfo.filter((a) => a.id != id);
+    }
+    return res.success;
   }
-  async bingdingMember(
+  async bingdingGateway(
     nodeId: string,
     define: schema.XWorkDefine,
-  ): Promise<schema.XMemberNodeInfo | undefined> {
-    var last = this.memberNodeInfo.find(
-      (a) => a.targetId == this.directory.target.id && a.memberNodeId == nodeId,
-    );
-    if (last) {
-      return await this.directory.resource.memberNodeColl.replace({
-        ...last,
-        memberDefine: define,
-        defineId: define.id,
-      });
-    } else {
-      return await this.directory.resource.memberNodeColl.insert({
-        targetId: this.directory.target.id,
-        memberNodeId: nodeId,
-        memberDefine: define,
-        defineId: this.id,
-      } as schema.XMemberNodeInfo);
-    }
+  ): Promise<schema.XWorkGateway | undefined> {
+    const res = await kernel.createWorkGeteway({
+      nodeId: nodeId,
+      defineId: define.id,
+      targetId: this.directory.target.id,
+    });
+    return res.data;
   }
-  async loadWorkNode(reload: boolean = false): Promise<model.WorkNodeModel | undefined> {
+  async loadGatewayNode(
+    reload: boolean = false,
+  ): Promise<model.WorkNodeModel | undefined> {
     if (this.node === undefined || reload) {
       const res = await kernel.queryWorkNodes({ id: this.id });
       if (res.success) {
@@ -238,7 +232,7 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
     taskId: string = '0',
     pdata?: model.InstanceDataModel,
   ): Promise<IWorkApply | undefined> {
-    await this.loadWorkNode();
+    await this.loadGatewayNode();
     if (this.node && this.forms.length > 0) {
       const data: model.InstanceDataModel = {
         data: {},
@@ -276,7 +270,7 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
     if (this.isInherited) {
       operates.push({ sort: 3, cmd: 'workForm', label: '查看表单', iconType: '表单' });
     }
-    if (this.metadata.allowFillWork) {
+    if (this.metadata.hasGateway) {
       operates.push({
         sort: 4,
         cmd: 'fillWork',

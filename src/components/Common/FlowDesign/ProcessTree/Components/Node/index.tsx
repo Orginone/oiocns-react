@@ -34,7 +34,7 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
     case AddNodeType.CHILDWORK:
       placeholder = '请选择其他办事';
       break;
-    case AddNodeType.MEMBERWORK:
+    case AddNodeType.GATEWAY:
       placeholder = '由成员关联办事';
       break;
     case AddNodeType.EMPTY:

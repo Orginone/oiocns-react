@@ -17,19 +17,26 @@ interface IProps {
  * @return {*}
  */
 
-const MemberWorkNode: React.FC<IProps> = (props) => {
+const GatewayNode: React.FC<IProps> = (props) => {
   const [loaded, nodeInfo] = useAsyncLoad(async () => {
-    await props.define.loadMemberNodeInfo();
-    return props.define.memberNodeInfo.filter((a) => a.memberNodeId == props.current.id);
+    await props.define.loadGatewayInfo();
+    return props.define.gatwayInfo.filter((a) => a.nodeId == props.current.id);
   });
   /** 人员信息列 */
-  const MemberInfoColumns: ProColumns<schema.XMemberNodeInfo>[] = [
+  const MemberInfoColumns: ProColumns<schema.XWorkGateway>[] = [
     { title: '序号', valueType: 'index', width: 50 },
+    {
+      title: '组织',
+      dataIndex: 'target',
+      render: (_: any, record: schema.XWorkGateway) => {
+        return <EntityIcon entityId={record.targetId} showName />;
+      },
+    },
     {
       title: '办事名称',
       dataIndex: 'name',
-      render: (_: any, record: schema.XMemberNodeInfo) => {
-        return <EntityIcon entityId={record.targetId} showName />;
+      render: (_: any, record: schema.XWorkGateway) => {
+        return record.define?.name;
       },
     },
     {
@@ -41,7 +48,7 @@ const MemberWorkNode: React.FC<IProps> = (props) => {
     <div className={cls[`app-roval-node`]}>
       <div className={cls[`roval-node`]}>
         {loaded && (
-          <CardOrTableComp<schema.XMemberNodeInfo>
+          <CardOrTableComp<schema.XWorkGateway>
             dataSource={nodeInfo ?? []}
             hideOperation={true}
             scroll={{ y: 'calc(60vh - 150px)' }}
@@ -53,4 +60,4 @@ const MemberWorkNode: React.FC<IProps> = (props) => {
     </div>
   );
 };
-export default MemberWorkNode;
+export default GatewayNode;

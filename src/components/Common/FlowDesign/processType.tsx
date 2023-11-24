@@ -28,7 +28,7 @@ export const getNodeName = (type: AddNodeType) => {
       return '并行分支';
     case AddNodeType.ORGANIZATIONA:
       return '组织分支';
-    case AddNodeType.MEMBERWORK:
+    case AddNodeType.GATEWAY:
       return '分流网关';
     default:
       return '';
@@ -64,7 +64,7 @@ export enum AddNodeType {
   'CONCURRENTS' = '全部',
   'ORGANIZATIONA' = '组织',
   'CHILDWORK' = '子流程',
-  'MEMBERWORK' = '网关',
+  'GATEWAY' = '网关',
   'END' = '结束',
 }
 
@@ -186,7 +186,7 @@ const loadBranch = (resource: any, parentCode: string, parentType: string) => {
 
 export type ValidationInfo = {
   isPass: boolean;
-  allowFillWork: boolean;
+  hasGateway: boolean;
 };
 
 export const convertNode = (
@@ -212,8 +212,8 @@ export const convertNode = (
           validation.isPass = false;
         }
         break;
-      case AddNodeType.MEMBERWORK:
-        validation.allowFillWork = true;
+      case AddNodeType.GATEWAY:
+        validation.hasGateway = true;
         break;
       case AddNodeType.CC:
       case AddNodeType.CHILDWORK:

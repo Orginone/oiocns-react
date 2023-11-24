@@ -494,6 +494,20 @@ export default class KernelApi {
     });
   }
   /**
+   * 创建节点网关信息
+   * @param {model.WorkGatewayModel} params 请求参数
+   * @returns {model.ResultType<schema.XWorkGateway>} 请求结果
+   */
+  public async createWorkGeteway(
+    params: model.WorkGatewayModel,
+  ): Promise<model.ResultType<schema.XWorkGateway>> {
+    return await this.request({
+      module: 'work',
+      action: 'CreateWorkGeteway',
+      params: params,
+    });
+  }
+  /**
    * 删除办事定义
    * @param {model.IdModel} params 请求参数
    * @returns {model.ResultType<boolean>} 请求结果
@@ -504,6 +518,20 @@ export default class KernelApi {
     return await this.request({
       module: 'work',
       action: 'DeleteWorkDefine',
+      params: params,
+    });
+  }
+  /**
+   * 删除节点网关
+   * @param {model.IdModel} params 请求参数
+   * @returns {model.ResultType<boolean>} 请求结果
+   */
+  public async deleteWorkGateway(
+    params: model.IdModel,
+  ): Promise<model.ResultType<boolean>> {
+    return await this.request({
+      module: 'work',
+      action: 'DeleteWorkGateway',
       params: params,
     });
   }
@@ -532,6 +560,20 @@ export default class KernelApi {
     return await this.request({
       module: 'work',
       action: 'QueryWorkDefine',
+      params: params,
+    });
+  }
+  /**
+   * 查询办事网关节点信息
+   * @param {model.GetWorkGatewaysModel} params 请求参数
+   * @returns {model.ResultType<model.PageResult<schema.XWorkGateway>>} 请求结果
+   */
+  public async queryWorkGateways(
+    params: model.GetWorkGatewaysModel,
+  ): Promise<model.ResultType<model.PageResult<schema.XWorkGateway>>> {
+    return await this.request({
+      module: 'work',
+      action: 'QueryWorkGateways',
       params: params,
     });
   }

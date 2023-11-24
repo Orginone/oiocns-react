@@ -5,11 +5,11 @@ import CcNode from './Components/CcNode';
 import RootNode from './Components/RootNode';
 import ConcurrentNode from './Components/ConcurrentNode';
 import ConditionNode from './Components/ConditionNode';
+import GatewayNode from './Components/GatewayNode';
 import { AddNodeType, NodeModel } from '../processType';
 import { IWork } from '@/ts/core';
 import { model } from '@/ts/base';
 import { Card } from 'antd';
-import MemberWorkNode from './Components/MemberWorkNode';
 /**
  * @description: 流程设置抽屉
  * @return {*}
@@ -42,10 +42,8 @@ const Config: React.FC<IProps> = (props) => {
         return (
           <ApprovalNode current={props.node} belong={belong} refresh={props.refresh} />
         );
-      case AddNodeType.MEMBERWORK:
-        return (
-          <MemberWorkNode current={props.node} define={props.define}></MemberWorkNode>
-        );
+      case AddNodeType.GATEWAY:
+        return <GatewayNode current={props.node} define={props.define} />;
       case AddNodeType.CHILDWORK:
         return (
           <WorkFlowNode

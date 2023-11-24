@@ -496,7 +496,7 @@ export type XWorkDefine = {
   // 允许新增
   allowAdd: boolean;
   // 允许补充办事
-  allowFillWork: boolean;
+  hasGateway: boolean;
   // 允许变更
   allowEdit: boolean;
   // 允许选择
@@ -510,6 +510,18 @@ export type XWorkDefine = {
   // 归属用户
   target: XTarget | undefined;
 } & XEntity;
+
+//节点网关
+export type XWorkGateway = {
+  // 网关节点Id
+  nodeId: string;
+  // 关联办事Id
+  defineId: string;
+  // 组织Id
+  targetId: string;
+  // 关联的办事
+  define: XWorkDefine | undefined;
+} & Xbase;
 
 //办事实例
 export type XWorkInstance = {
@@ -647,16 +659,6 @@ export type XStaging = {
   relations: string;
 } & Xbase;
 
-export type XMemberNodeInfo = {
-  /** 办事定义Id */
-  defineId: string;
-  /** 成员节点Id */
-  memberNodeId: string;
-  /** 成员关联组织 */
-  targetId: string;
-  /** 成员关联的办事Id */
-  memberDefine: XWorkDefine;
-} & Xbase;
 // 页面模板
 export interface XPageTemplate extends XStandard {
   // 是否发布至首页
