@@ -1,5 +1,5 @@
-import * as i from '../impl';
-import * as t from '../type';
+import * as i from '../../impl';
+import * as t from '../../type';
 
 export class DictItemSheet extends i.Sheet<t.SpeciesItem> {
   constructor(directory: t.IDirectory) {
@@ -92,7 +92,7 @@ export class DictItemHandler extends i.SheetHandler<DictItemSheet> {
     const groups = new t.List(this.sheet.data).GroupBy((item) => item.speciesCode);
     for (const key of Object.keys(groups)) {
       const items = groups[key];
-      const species = excel.searchSpecies(key)!;
+      const species = excel.context.species[key]!;
       for (const item of items) {
         item.speciesId = species.meta.id;
         const oldItem = species.items[item.info];
@@ -168,7 +168,7 @@ export class ClassifyItemHandler extends i.SheetHandler<ClassifyItemSheet> {
         (item) => item.info,
         (item) => item.parentInfo,
       );
-      const species = excel.searchSpecies(key)!;
+      const species = excel.context.species[key];
       await this.recursion(species, tree.root, excel, onItemCompleted);
     }
   }
