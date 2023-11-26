@@ -16,7 +16,7 @@ export interface IWork extends IFileInfo<schema.XWorkDefine> {
   /** 成员节点 */
   gatewayNodes: model.WorkNodeModel[];
   /** 成员节点绑定信息 */
-  gatwayInfo: schema.XWorkGateway[];
+  gatewayInfo: schema.XWorkGateway[];
   /** 流程节点 */
   node: model.WorkNodeModel | undefined;
   /** 更新办事定义 */
@@ -70,7 +70,7 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
   application: IApplication;
   node: model.WorkNodeModel | undefined;
   gatewayNodes: model.WorkNodeModel[] = [];
-  gatwayInfo: schema.XWorkGateway[] = [];
+  gatewayInfo: schema.XWorkGateway[] = [];
   get locationKey(): string {
     return this.application.key;
   }
@@ -155,7 +155,7 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
   }
   async loadContent(_reload: boolean = false): Promise<boolean> {
     await this.loadGatewayNode(_reload);
-    await this.loadGatewayInfo(_reload);
+    await this.loadGatewayInfo(true);
     if (this.node) {
       this.gatewayNodes = this.loadMemberNodes(this.node, []);
     }
@@ -171,21 +171,21 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
     return res.success;
   }
   async loadGatewayInfo(reload: boolean = false): Promise<schema.XWorkGateway[]> {
-    if (this.gatwayInfo.length == 0 || reload) {
+    if (this.gatewayInfo.length == 0 || reload) {
       const res = await kernel.queryWorkGateways({
         defineId: this.id,
         targetId: this.directory.target.id,
       });
       if (res.success && res.data) {
-        this.gatwayInfo = res.data.result;
+        this.gatewayInfo = res.data.result || [];
       }
     }
-    return this.gatwayInfo;
+    return this.gatewayInfo;
   }
   async deleteGateway(id: string): Promise<boolean> {
     const res = await kernel.deleteWorkGateway({ id });
     if (res.success) {
-      this.gatwayInfo = this.gatwayInfo.filter((a) => a.id != id);
+      this.gatewayInfo = this.gatewayInfo.filter((a) => a.id != id);
     }
     return res.success;
   }
@@ -198,6 +198,10 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
       defineId: define.id,
       targetId: this.directory.target.id,
     });
+    if (res.success) {
+      this.gatewayInfo = this.gatewayInfo.filter((a) => a.nodeId != nodeId);
+      this.gatewayInfo.push({ ...res.data, define });
+    }
     return res.data;
   }
   async loadGatewayNode(

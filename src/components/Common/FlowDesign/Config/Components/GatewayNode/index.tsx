@@ -20,7 +20,7 @@ interface IProps {
 const GatewayNode: React.FC<IProps> = (props) => {
   const [loaded, nodeInfo] = useAsyncLoad(async () => {
     await props.define.loadGatewayInfo();
-    return props.define.gatwayInfo.filter((a) => a.nodeId == props.current.id);
+    return props.define.gatewayInfo.filter((a) => a.nodeId == props.current.id);
   });
   /** 人员信息列 */
   const MemberInfoColumns: ProColumns<schema.XWorkGateway>[] = [

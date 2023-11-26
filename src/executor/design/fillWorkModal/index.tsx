@@ -17,11 +17,9 @@ type IProps = {
 const FillWorkModal: React.FC<IProps> = ({ current, finished }) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [selectNode, setSelectNode] = useState<model.WorkNodeModel>();
-  const [loaded, memberNodeInfo] = useAsyncLoad(async () => {
+  const [loaded] = useAsyncLoad(async () => {
     await current.loadContent();
-    return await current.loadGatewayInfo(true);
   });
-
   const loadContent = () => {
     if (!loaded) {
       return (
@@ -31,14 +29,11 @@ const FillWorkModal: React.FC<IProps> = ({ current, finished }) => {
       );
     }
     const loadCard = (node: model.WorkNodeModel) => {
-      const info = memberNodeInfo!.find((a) => a.memberNodeId == node.id);
-
+      const info = current.gatewayInfo!.find((a) => a.nodeId == node.id);
       return (
         <Card
           type="inner"
-          title={`${node.name}[${node.destName}]     ${
-            info ? info.memberDefine.name : '暂未绑定!'
-          }`}
+          title={`${node.name}    ${info ? `--- ${info.define?.name}` : '暂未绑定!'}`}
           extra={
             <Button
               onClick={() => {
@@ -73,14 +68,15 @@ const FillWorkModal: React.FC<IProps> = ({ current, finished }) => {
           rootKey={'disk'}
           accepts={['办事']}
           allowInherited
-          excludeIds={[]}
+          excludeIds={[current.
+          
+          ]}
           onCancel={() => setIsOpen(false)}
           onOk={async (works) => {
             if (works.length > 0) {
               const work = works[0] as IWork;
               const ret = await current.bingdingGateway(selectNode!.id, work.metadata);
               if (ret) {
-                memberNodeInfo?.push(ret);
                 message.info('绑定成功!');
                 setIsOpen(false);
               }
