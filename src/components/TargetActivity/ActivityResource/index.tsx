@@ -10,26 +10,13 @@ const ActivityResource = (
   columns: number = 3,
 ) => {
   if (fileList.length < 1) return <></>;
-  const computedSize = () => {
-    if (fileList.length >= columns) {
-      return maxWidth / columns - 8;
-    } else if (fileList.length > 1) {
-      return maxWidth / fileList.length - 8;
-    }
-    return maxWidth - 8;
-  };
   const renderResource = (item: FileItemShare) => {
     if (item.contentType?.startsWith('image')) {
       return (
-        <div
-          key={item.shareLink}
-          style={{
-            width: computedSize(),
-            height: computedSize(),
-          }}>
+        <div key={item.shareLink}>
           <Image
-            width={'100%'}
-            height={'100%'}
+            width={'190px'}
+            height={'190px'}
             src={shareOpenLink(item.shareLink)}
             preview={{
               src: shareOpenLink(item.shareLink),
@@ -39,17 +26,10 @@ const ActivityResource = (
     }
     if (item.contentType?.startsWith('video')) {
       return (
-        <div
-          key={item.shareLink}
-          title={`点击播放${item.name}`}
-          style={{
-            cursor: 'pointer',
-            width: computedSize(),
-            height: computedSize(),
-          }}>
+        <div key={item.shareLink} title={`点击播放${item.name}`}>
           <Image
-            width={'100%'}
-            height={'100%'}
+            width={'190px'}
+            height={'190px'}
             onClick={() => {
               command.emitter('executor', 'open', item);
             }}
@@ -70,7 +50,7 @@ const ActivityResource = (
         />
       );
     }
-    return <AiOutlineFileUnknown size={computedSize()} />;
+    return <AiOutlineFileUnknown size={190} />;
   };
   return fileList.map((item) => renderResource(item));
 };

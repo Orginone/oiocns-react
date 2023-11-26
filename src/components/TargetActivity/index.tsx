@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import cls from './index.module.less';
 import { Button, Card, Empty } from 'antd';
-import { IActivity } from '@/ts/core';
+import { FromOrigin, IActivity } from '@/ts/core';
 import { ScrollView } from 'devextreme-react';
 import dxScrollView from 'devextreme/ui/scroll_view';
 import ActivityMessage from './ActivityMessage';
@@ -11,10 +11,16 @@ interface ActivityProps {
   height: number | string;
   activity: IActivity;
   title?: string;
+  messageFrom?: FromOrigin;
 }
 
 /** 动态 */
-const TargetActivity: React.FC<ActivityProps> = ({ height, activity, title }) => {
+const TargetActivity: React.FC<ActivityProps> = ({
+  height,
+  activity,
+  title,
+  messageFrom,
+}) => {
   const ActivityBody: React.FC<{ activity: IActivity }> = ({ activity }) => {
     const [actionList, setActivityList] = useState(activity.activityList);
     useEffect(() => {
@@ -30,6 +36,7 @@ const TargetActivity: React.FC<ActivityProps> = ({ height, activity, title }) =>
         <ActivityMessage
           key={actionItem.key}
           item={actionItem}
+          messageFrom={messageFrom}
           activity={actionItem.activity}></ActivityMessage>
       ));
     }
@@ -63,9 +70,7 @@ const TargetActivity: React.FC<ActivityProps> = ({ height, activity, title }) =>
             }}>
             发布动态
           </Button>
-        ) : (
-          <></>
-        )
+        ) : null
       }>
       <ScrollView
         key={activity.key}
