@@ -1,5 +1,5 @@
-import * as i from '../impl';
-import * as t from '../type';
+import * as i from '../../impl';
+import * as t from '../../type';
 
 export class PropSheet extends i.Sheet<t.Property> {
   constructor(directory: t.IDirectory) {
@@ -83,23 +83,21 @@ export class PropHandler extends i.SheetHandler<PropSheet> {
   async operating(excel: t.IExcel, onItemCompleted: () => void): Promise<void> {
     const species: string[] = ['选择型', '分类型'];
     for (const row of this.sheet.data) {
-      const dir = excel.context[row.directoryCode];
+      const dir = excel.context.directories[row.directoryCode];
       row.directoryId = dir.meta.id;
       if (row.speciesCode && species.indexOf(row.valueType) != -1) {
-        const species = excel.searchSpecies(row.speciesCode)!;
+        const species = excel.context.species[row.speciesCode]!;
         row.speciesId = species.meta.id;
       }
-      const oldProp = dir.props[row.code];
+      const oldProp = excel.context.properties[row.code];
       if (oldProp) {
         t.assignment(oldProp, row);
       } else {
-        dir.props[row.code] = row;
+        excel.context.properties[row.code] = row;
       }
       onItemCompleted();
     }
     let res = await this.sheet.coll.replaceMany(this.sheet.data);
-    res.forEach((item, index) => {
-      Object.assign(this.sheet.data[index], item);
-    });
+    res.forEach((item, index) => Object.assign(this.sheet.data[index], item));
   }
 }
