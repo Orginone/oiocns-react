@@ -206,7 +206,7 @@ const View: React.FC<Omit<IProps, 'data'>> = (props) => {
                   return;
                 }
                 const work = files[0] as IWork;
-                await work.loadGatewayNode();
+                await work.loadNode();
                 setCenter(
                   <Modal
                     open

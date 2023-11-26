@@ -7,6 +7,8 @@ import { schema } from '@/ts/base';
 import { ProColumns } from '@ant-design/pro-components';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import useAsyncLoad from '@/hooks/useAsyncLoad';
+import message from '@/utils/message';
+import useObjectUpdate from '@/hooks/useObjectUpdate';
 interface IProps {
   current: NodeModel;
   define: IWork;
@@ -18,6 +20,7 @@ interface IProps {
  */
 
 const GatewayNode: React.FC<IProps> = (props) => {
+  const [tkey, tforceUpdate] = useObjectUpdate(props.current);
   const [loaded, nodeInfo] = useAsyncLoad(async () => {
     await props.define.loadGatewayInfo();
     return props.define.gatewayInfo.filter((a) => a.nodeId == props.current.id);
@@ -44,16 +47,33 @@ const GatewayNode: React.FC<IProps> = (props) => {
       dataIndex: 'createTime',
     },
   ];
+  // 操作内容渲染函数
+  const renderOperate = (item: schema.XWorkGateway) => {
+    return [
+      {
+        key: item.id,
+        label: `解绑`,
+        onClick: async () => {
+          const success = await props.define.deleteGateway(item.id);
+          if (success) {
+            message.info('解绑成功!');
+            tforceUpdate();
+          }
+        },
+      },
+    ];
+  };
   return (
     <div className={cls[`app-roval-node`]}>
       <div className={cls[`roval-node`]}>
         {loaded && (
           <CardOrTableComp<schema.XWorkGateway>
-            dataSource={nodeInfo ?? []}
-            hideOperation={true}
-            scroll={{ y: 'calc(60vh - 150px)' }}
-            columns={MemberInfoColumns}
+            key={tkey}
             rowKey={'id'}
+            dataSource={nodeInfo ?? []}
+            scroll={{ y: 'calc(60vh - 150px)' }}
+            operation={renderOperate}
+            columns={MemberInfoColumns}
           />
         )}
       </div>

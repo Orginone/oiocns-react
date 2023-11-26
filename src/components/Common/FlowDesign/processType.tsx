@@ -135,6 +135,7 @@ export const loadResource = (resource: any, parentCode: string): any => {
       type: resource.type as AddNodeType,
       name: resource.name,
       destId: resource.destId,
+      destType: resource.destType,
       destName: resource.destName,
       num: resource.num || 1,
       forms: resource.forms,

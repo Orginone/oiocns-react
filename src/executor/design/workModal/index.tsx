@@ -24,7 +24,7 @@ type IProps = {
 const ApplicationModal: React.FC<IProps> = ({ current, finished }) => {
   const [loaded, resource] = useAsyncLoad(async () => {
     if (current) {
-      const node = await current.loadGatewayNode();
+      const node = await current.loadNode();
       if (node && node.code) {
         return loadResource(node, '');
       }

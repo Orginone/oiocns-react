@@ -22,7 +22,7 @@ export interface IWork extends IFileInfo<schema.XWorkDefine> {
   /** 更新办事定义 */
   update(req: model.WorkDefineModel): Promise<boolean>;
   /** 加载事项定义节点 */
-  loadGatewayNode(reload?: boolean): Promise<model.WorkNodeModel | undefined>;
+  loadNode(reload?: boolean): Promise<model.WorkNodeModel | undefined>;
   /** 加载成员节点信息 */
   loadGatewayInfo(reload?: boolean): Promise<schema.XWorkGateway[]>;
   /** 删除绑定 */
@@ -97,7 +97,7 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
     return this.delete(_notity);
   }
   async rename(_name: string): Promise<boolean> {
-    const node = await this.loadGatewayNode();
+    const node = await this.loadNode();
     return await this.update({
       ...this.metadata,
       name: _name,
@@ -108,7 +108,7 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
     if (destination.id != this.application.id) {
       if ('works' in destination) {
         const app = destination as unknown as IApplication;
-        const node = await this.loadGatewayNode();
+        const node = await this.loadNode();
         const res = await app.createWork({
           ...this.metadata,
           applicationId: app.id,
@@ -128,7 +128,7 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
       if ('works' in destination) {
         const app = destination as unknown as IApplication;
         this.setMetadata({ ...this.metadata, applicationId: app.id });
-        const node = await this.loadGatewayNode();
+        const node = await this.loadNode();
         const success = await this.update({
           ...this.metadata,
           resource: node,
@@ -154,7 +154,7 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
     return [];
   }
   async loadContent(_reload: boolean = false): Promise<boolean> {
-    await this.loadGatewayNode(_reload);
+    await this.loadNode(_reload);
     await this.loadGatewayInfo(true);
     if (this.node) {
       this.gatewayNodes = this.loadMemberNodes(this.node, []);
@@ -207,9 +207,7 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
     }
     return res.data;
   }
-  async loadGatewayNode(
-    reload: boolean = false,
-  ): Promise<model.WorkNodeModel | undefined> {
+  async loadNode(reload: boolean = false): Promise<model.WorkNodeModel | undefined> {
     if (this.node === undefined || reload) {
       const res = await kernel.queryWorkNodes({ id: this.id });
       if (res.success) {
@@ -239,7 +237,7 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
     taskId: string = '0',
     pdata?: model.InstanceDataModel,
   ): Promise<IWorkApply | undefined> {
-    await this.loadGatewayNode();
+    await this.loadNode();
     if (this.node && this.forms.length > 0) {
       const data: model.InstanceDataModel = {
         data: {},
