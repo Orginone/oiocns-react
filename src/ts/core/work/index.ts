@@ -172,9 +172,12 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
   }
   async loadGatewayInfo(reload: boolean = false): Promise<schema.XWorkGateway[]> {
     if (this.gatewayInfo.length == 0 || reload) {
+      const destId = this.canDesign
+        ? this.directory.target.id
+        : this.directory.target.spaceId;
       const res = await kernel.queryWorkGateways({
         defineId: this.id,
-        targetId: this.directory.target.id,
+        targetId: destId,
       });
       if (res.success && res.data) {
         this.gatewayInfo = res.data.result || [];
@@ -196,7 +199,7 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
     const res = await kernel.createWorkGeteway({
       nodeId: nodeId,
       defineId: define.id,
-      targetId: this.directory.target.id,
+      targetId: this.directory.target.spaceId,
     });
     if (res.success) {
       this.gatewayInfo = this.gatewayInfo.filter((a) => a.nodeId != nodeId);

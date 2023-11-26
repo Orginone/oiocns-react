@@ -36,7 +36,7 @@ const ApprovalNode: React.FC<IProps> = (props) => {
   const [primaryForms, setPrimaryForms] = useState(props.current.primaryForms);
   const [radioValue, setRadioValue] = useState(props.current.num == 0 ? 1 : 2);
   const [destType, setDestType] = useState(
-    props.current.destType != '发起人' ? '1' : '2',
+    props.current.destName != '发起人' ? '1' : '2',
   );
   const formViewer = React.useCallback((form: schema.XForm) => {
     command.emitter(

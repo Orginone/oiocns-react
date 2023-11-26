@@ -68,9 +68,7 @@ const FillWorkModal: React.FC<IProps> = ({ current, finished }) => {
           rootKey={'disk'}
           accepts={['办事']}
           allowInherited
-          excludeIds={[current.
-          
-          ]}
+          excludeIds={[current.id]}
           onCancel={() => setIsOpen(false)}
           onOk={async (works) => {
             if (works.length > 0) {
