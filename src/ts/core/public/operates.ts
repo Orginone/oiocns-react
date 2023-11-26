@@ -133,7 +133,7 @@ export const directoryOperates = {
   Standard: {
     sort: 2,
     cmd: 'standard',
-    label: '导入数据标准',
+    label: '导入标准模板',
     iconType: '标准',
   },
   Business: {

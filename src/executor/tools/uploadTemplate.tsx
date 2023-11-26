@@ -27,7 +27,7 @@ export const upload = (
     icon: <></>,
     okText: '关闭',
     width: 610,
-    title: '导入模板',
+    title: '导入' + templateName,
     maskClosable: true,
     content: (
       <Center
@@ -68,7 +68,7 @@ const Center: React.FC<IProps> = ({ templateName, dir, excel, finished }) => {
     <Space direction="vertical">
       <div style={{ marginTop: 20 }}>
         <Button onClick={async () => el.generateXlsx(excel, templateName)}>
-          导入模板下载
+          {templateName}下载
         </Button>
         {loading && <Progress percent={progress} showInfo={false} />}
         {loading && <span>{text}</span>}
