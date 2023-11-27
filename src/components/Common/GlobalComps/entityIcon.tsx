@@ -14,6 +14,7 @@ interface teamTypeInfo {
   typeName?: string;
   notAvatar?: boolean;
   title?: string;
+  hideInfo?: boolean; //不展示小圆点
   showName?: boolean;
   onClick?: (entity?: schema.XEntity) => void;
 }
@@ -111,7 +112,7 @@ export const ShareIconItem = (info: shareIconInfo) => {
           style={{ display: 'contents', cursor: 'pointer' }}
           title={info.title ?? ''}
           onClick={() => info.onClick?.apply(this, [info.entity])}>
-          {infoMore()}
+          {!info.hideInfo && infoMore()}
           <Avatar size={size} src={info.share.avatar.thumbnail} />
           {info.showName && (
             <strong style={{ marginLeft: 6, fontSize: fontSize }}>
@@ -135,7 +136,7 @@ export const ShareIconItem = (info: shareIconInfo) => {
         <span
           style={{ display: 'contents', cursor: 'pointer' }}
           onClick={() => info.onClick?.apply(this, [info.entity])}>
-          {infoMore()}
+          {!info.hideInfo && infoMore()}
           <Avatar
             size={size}
             icon={icon}
@@ -153,7 +154,7 @@ export const ShareIconItem = (info: shareIconInfo) => {
       style={{ display: 'contents', cursor: 'pointer' }}
       title={info.title ?? ''}
       onClick={() => info.onClick?.apply(this, [info.entity])}>
-      {infoMore()}
+      {!info.hideInfo && infoMore()}
       <Avatar
         size={size}
         icon={<TypeIcon avatar iconType={'其它'} size={size} />}

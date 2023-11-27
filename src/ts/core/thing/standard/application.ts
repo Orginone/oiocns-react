@@ -16,6 +16,8 @@ export interface IApplication extends IStandardFileInfo<schema.XApplication> {
   structCallback(): void;
   /** 根据id查找办事 */
   findWork(id: string): Promise<IWork | undefined>;
+  /** 根据id查找模块 */
+  findModule(id: string): Promise<IApplication | undefined>;
   /** 加载办事 */
   loadWorks(reload?: boolean): Promise<IWork[]>;
   /** 新建办事 */
@@ -56,9 +58,9 @@ export class Application
     return this.parent ?? this.directory;
   }
   content(): IFile[] {
-    return [...this.children, ...this.works].sort((a, b) =>
-      a.metadata.updateTime < b.metadata.updateTime ? 1 : -1,
-    );
+    return [...this.children, ...this.works].sort((a, b) => {
+      return a.code < b.code ? -1 : 1;
+    });
   }
   structCallback(): void {
     command.emitter('executor', 'refresh', this);
@@ -100,6 +102,18 @@ export class Application
     }
     for (const item of this.children) {
       const find = await item.findWork(id);
+      if (find) {
+        return find;
+      }
+    }
+  }
+  async findModule(id: string): Promise<IApplication | undefined> {
+    const find = this.children.find((i) => i.id === id);
+    if (find) {
+      return find;
+    }
+    for (const item of this.children) {
+      const find = await item.findModule(id);
       if (find) {
         return find;
       }

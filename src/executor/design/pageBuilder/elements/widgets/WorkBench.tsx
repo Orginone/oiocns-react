@@ -1,4 +1,4 @@
-import WorkBench from '@/pages/Home/components/Content/WorkBench';
+import WorkBench from '@/pages/Home/components/Content/WorkBench/anxinwu';
 import { defineElement } from '../defineElement';
 import React from 'react';
 

@@ -9,16 +9,14 @@ interface IResources {
 export const getResouces = (): IResources => {
   const hostname = window.location.hostname;
   //安心屋
-  if (hostname.startsWith('anxinwu')) {
-    return {
-      platName: '安心屋',
-      location: 'anxinwu',
-      passport: [6],
-      unitName: '浙江省科学技术厅',
-      favicon: '/favicon/anxinwu.ico',
-      unitPage: 'https://kjt.zj.gov.cn',
-    };
-  }
+  return {
+    platName: '安心屋',
+    location: 'anxinwu',
+    passport: [1],
+    unitName: '浙江省科学技术厅',
+    favicon: '/favicon/anxinwu.ico',
+    unitPage: 'https://kjt.zj.gov.cn',
+  };
   //公益仓
   if (hostname.startsWith('gongyicang')) {
     return {
