@@ -15,6 +15,7 @@ export interface IWorkApply {
     applyId: string,
     content: string,
     fromData: Map<string, model.FormEditData>,
+    gateways: Map<string, string>,
   ): Promise<boolean>;
 }
 
@@ -54,9 +55,17 @@ export class WorkApply implements IWorkApply {
     applyId: string,
     content: string,
     fromData: Map<string, model.FormEditData>,
+    gateways: Map<string, string>,
   ): Promise<boolean> {
     fromData.forEach((data, k) => {
       this.instanceData.data[k] = [data];
+    });
+    var gatewayInfos: model.WorkGatewayInfoModel[] = [];
+    gateways.forEach((v, k) => {
+      gatewayInfos.push({
+        nodeId: k,
+        TargetId: v,
+      });
     });
     var mark = await this.getMarkInfo();
     if (content.length > 0) {
@@ -68,6 +77,7 @@ export class WorkApply implements IWorkApply {
       content: mark,
       contentType: 'Text',
       data: JSON.stringify(this.instanceData),
+      gateways: JSON.stringify(gatewayInfos),
     });
     return res.success;
   }

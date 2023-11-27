@@ -650,6 +650,15 @@ export type WorkInstanceModel = {
   taskId: string;
   // 发起用户ID
   applyId: string;
+  // 网关节点信息
+  gateways: string;
+};
+
+export type WorkGatewayInfoModel = {
+  // 网关节点ID
+  nodeId: string;
+  // 关联组织ID
+  TargetId: string;
 };
 
 export type InstanceDataModel = {

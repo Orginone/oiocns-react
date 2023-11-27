@@ -32,6 +32,7 @@ const FillWorkModal: React.FC<IProps> = ({ current, finished }) => {
       const info = current.gatewayInfo!.find((a) => a.nodeId == node.id);
       return (
         <Card
+          key={node.id}
           type="inner"
           title={`${node.name}    ${info ? `--- ${info.define?.name}` : '暂未绑定!'}`}
           extra={

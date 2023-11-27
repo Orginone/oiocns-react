@@ -5,6 +5,7 @@ import { FileInfo, IFile, IFileInfo } from '../thing/fileinfo';
 import { IDirectory } from '../thing/directory';
 import { IWorkApply, WorkApply } from './apply';
 import { entityOperates, fileOperates } from '../public';
+import { loadGatewayNodes } from '@/utils/tools';
 
 export interface IWork extends IFileInfo<schema.XWorkDefine> {
   /** 主表 */
@@ -157,7 +158,7 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
     await this.loadNode(_reload);
     await this.loadGatewayInfo(true);
     if (this.node) {
-      this.gatewayNodes = this.loadMemberNodes(this.node, []);
+      this.gatewayNodes = loadGatewayNodes(this.node, []);
     }
     return this.forms.length > 0;
   }
@@ -217,21 +218,6 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
     }
     return this.node;
   }
-
-  loadMemberNodes = (node: model.WorkNodeModel, memberNodes: model.WorkNodeModel[]) => {
-    if (node.type == '网关') {
-      memberNodes.push(node);
-    }
-    if (node.children) {
-      memberNodes = this.loadMemberNodes(node.children, memberNodes);
-    }
-    for (const branch of node.branches ?? []) {
-      if (branch.children) {
-        memberNodes = this.loadMemberNodes(branch.children, memberNodes);
-      }
-    }
-    return memberNodes;
-  };
 
   async createApply(
     taskId: string = '0',

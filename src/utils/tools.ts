@@ -344,6 +344,24 @@ const getNodeByNodeId = (
   }
 };
 
+const loadGatewayNodes = (
+  node: model.WorkNodeModel,
+  memberNodes: model.WorkNodeModel[],
+) => {
+  if (node.type == '网关') {
+    memberNodes.push(node);
+  }
+  if (node.children) {
+    memberNodes = loadGatewayNodes(node.children, memberNodes);
+  }
+  for (const branch of node.branches ?? []) {
+    if (branch.children) {
+      memberNodes = loadGatewayNodes(branch.children, memberNodes);
+    }
+  }
+  return memberNodes;
+};
+
 export {
   cleanMenus,
   dateFormat,
@@ -353,8 +371,10 @@ export {
   findMenuItemByKey,
   formatZhDate,
   getNewKeyWithString,
+  getNodeByNodeId,
   getUuid,
   handleFormatDate,
+  loadGatewayNodes,
   parseHtmlToText,
   pySegSort,
   pySegSortObj,
@@ -365,5 +385,4 @@ export {
   showMessage,
   truncateString,
   validIsSocialCreditCode,
-  getNodeByNodeId,
 };
