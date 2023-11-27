@@ -9,7 +9,7 @@ interface IProps {
   work?: boolean;
   activity?: boolean;
   exit?: boolean;
-  setting?: boolean;
+  relation?: boolean;
   myWork?: boolean;
   workDone?: boolean;
   workStart?: boolean;
@@ -24,20 +24,17 @@ interface IProps {
 
 const OrgIcons = (props: IProps) => {
   const size = props.size ?? 22;
-  const hostname = window.location.hostname;
   //安心屋
   const getUrl = (name: string) => {
-    return hostname.startsWith('anxinwu')
-      ? `/anxinwusvg/${name}.svg`
-      : `/svg/${name}.svg`;
+    return `/anxinwusvg/${name}.svg`;
   };
   let svgName = 'home';
   if (props.chat) {
     svgName = 'chat';
   } else if (props.work) {
     svgName = 'work';
-  } else if (props.setting) {
-    svgName = 'setting';
+  } else if (props.relation) {
+    svgName = 'relation';
   } else if (props.exit) {
     svgName = 'exit';
   } else if (props.market) {

@@ -97,7 +97,7 @@ function useConpanyCacheData(dataTag: string, tagName: string): resultProps {
               (v) => v.id === '445708344880140288',
             )?.directory;
             orgCtrl.currentKey = _directory.key;
-            history.push('/setting');
+            history.push('/relation');
             const _dir = await findSysItem(data);
             command.emitter('settingIdentity', _dir, () => {});
             return;
