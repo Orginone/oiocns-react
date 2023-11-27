@@ -4,11 +4,6 @@ body {
   font-family: 'Han Sans SC', Arial, Helvetica, 'Helvetica Neue', sans-serif;
 }
 
-//删除安心屋特有样式
-div[class*="axw-"] {
-  display: none !important;
-}
-
 ul,
 li {
   padding: 0;
@@ -22,44 +17,6 @@ li {
   height: 100vh;
   overflow: hidden;
   background-color: @component-background !important;
-}
-
-.flex {
-  display: flex !important;
-}
-
-.flexCenter {
-  align-items: center;
-  justify-content: center;
-}
-.pdr4 {
-  margin-right: 4px;
-}
-.pdr2 {
-  margin-right: 2px;
-}
-.mgl4 {
-  margin-left: 4px!important;
-}
-.mgt8 {
-  margin-top: 8px;
-}
-
-.fs12 {
-  font-size: 12px!important;
-}
-
-.ellipsis1 {
-  display: inline-block;
-  white-space: nowrap;
-  width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.line20 {
-  font-size: 14px;
-  line-height: 24px;
 }
 
 .layout__loading {
@@ -82,6 +39,13 @@ h2 {
 
 h3 {
   font-size: 20px;
+}
+
+@primary-color: #1DA57A;
+
+//屏蔽部分奥集能统一样式
+div[class*="org-"] {
+  display: none !important;
 }
 
 .ogo-spin-nested-loading {
@@ -113,6 +77,32 @@ h3 {
 .ogo-modal-footer {
   border-top: 0 !important;
   padding: 12px !important;
+}
+
+.homepage {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow-y: scroll;
+  background-color: @portal-background;
+  position: relative;
+
+  .headBanner {
+    width: 100%;
+    min-height: 350px;
+    background-size: 100% 350px;
+    background-repeat: no-repeat;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+  }
+
+  .content {
+    width: 100%;
+    position: absolute;
+    top: 300px;
+  }
+
 }
 
 // end 全局弹出框modal样式调整
@@ -268,7 +258,7 @@ h3 {
 
 .dx-resizable-handle:active,
 .dx-resizable-handle:hover {
-  border: 1px dotted #154ad8;
+  border: 1px dotted #00BEA5;
 }
 
 .dx-data-row {
@@ -293,23 +283,6 @@ h3 {
 
 .dx-button {
   border-color: @border-color;
-}
-/* 首页样式 */
-.homepage {
-  display: flex;
-  flex-direction: column;
-  overflow: auto;
-  height: 100%;
-
-  .headBanner {
-    width: 100%;
-    height: 200px;
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-    background-position: 50% 20%;
-    background-size: cover;
-  }
 }
 
 /**
@@ -353,7 +326,7 @@ h3 {
       cursor: pointer;
 
       .backup {
-        color: #154ad8;
+        color: #00BEA5;
         float: left;
         padding: 6px;
       }
@@ -522,12 +495,17 @@ h3 {
 */
 
 .activityContent {
-  .loadContext { 
+  background-color: #F7FAF9;
+  background: linear-gradient(#f5f5f5ee, #f1f1f1);
+
+  .loadContext {
     height: 100%;
     width: 100%;
+
     .ogo-card-body {
-      background-color: rgba(0,0,0,0)
+      background-color: rgba(0, 0, 0, 0)
     }
+
     .ogo-list-item {
       border-bottom: 1px solid @border-color-base;
       margin: 8px 0;
@@ -541,6 +519,7 @@ h3 {
     padding: 12px;
     display: flex;
     gap: 6px;
+
     .groupList {
       display: flex;
       flex-direction: column;
@@ -550,6 +529,8 @@ h3 {
       padding: 8px;
       min-width: 500px;
       background: @component-background;
+      box-shadow: 0 0 2px 1px #f5f5f5;
+
       &-selected {
         cursor: pointer;
         // padding: 8px;
@@ -563,10 +544,12 @@ h3 {
         cursor: pointer;
         // padding: 8px;
         border-radius: 6px;
+
         // border-bottom: 1px solid @border-color-base;
         .ogo-list-item {
           padding: 8px 0;
         }
+
         .ogo-list-item-meta-title {
           margin-bottom: 0;
         }
@@ -581,6 +564,7 @@ h3 {
 */
 
 .activityItem {
+
   // padding: 8px 0;
   // border-bottom: 1px solid @border-color-base;
   &-header {
@@ -656,6 +640,7 @@ h3 {
     // color: @primary-color;
     color: #003CAB;
   }
+
   .activityItem-operate {
     font-size: 14px;
   }
@@ -669,7 +654,9 @@ h3 {
     text-align: left;
     // margin: 8px 0;
   }
+
   .activityItem-content {
+
     // margin-bottom: 8px;
     .ogo-typography {
       margin-bottom: 0px;
@@ -681,6 +668,7 @@ h3 {
       color: #424A57
     }
   }
+
   .activityItem-name {
     color: #15181D;
     /* 16/CN-Medium */
@@ -688,7 +676,8 @@ h3 {
     font-size: 16px;
     font-style: normal;
     font-weight: 400;
-    line-height: 24px; /* 150% */
+    line-height: 24px;
+    /* 150% */
   }
 }
 
@@ -704,6 +693,7 @@ h3 {
   transition: 0.2s;
   padding: 4px;
   align-items: center;
+
   &:active {
     background: rgba(0, 0, 0, 0.05);
   }
@@ -745,7 +735,7 @@ h3 {
     font-size: 16px;
 
     &:hover {
-      color: blue;
+      color: #008775;
       background-color: #e7e7e7;
     }
   }
@@ -759,32 +749,7 @@ h3 {
   color: rgba(0, 0, 0, 0.65);
   font-weight: 700;
 }
-/**
-  WorkBench-top
-*/
-.homepage {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  overflow-y: scroll;
-  background-color: @portal-background;
-  position: relative;
-  .headBanner {
-    width: 100%;
-    min-height: 400px;
-    background-size: 100% 400px;
-    background-repeat: no-repeat;
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-  }
-  .content {
-    width: 100%;
-    position: absolute;
-    top: 315px;
-  }
-  
-}
+
 /**
   WorkBench
 */
@@ -800,6 +765,10 @@ h3 {
   flex-direction: column;
   flex-wrap: nowrap;
   align-items: flex-start;
+  background-color: #F7FAF9 !important;
+  // background: linear-gradient(#f5f5f5f5, #F7FAF9);
+  background: linear-gradient(#e2f8fc, #F7FAF9, #F7FAF9);
+
   .cardGroup {
     display: flex;
     gap: 16px;
@@ -814,6 +783,7 @@ h3 {
     .cardItem {
       width: 100%;
       min-height: 180px;
+      height: 100%;
       border-radius: 6px;
       padding: 16px;
       cursor: pointer;
@@ -856,14 +826,29 @@ h3 {
       cursor: pointer;
       padding-top: 4px;
 
+      &.hidden {
+        display: none; //隐藏配置按钮
+      }
+
       span {
         margin-left: 2px;
         margin-bottom: 2px;
       }
 
       &:hover {
-        color: #3838b9;
+        color: #00BEA5;
       }
+    }
+  }
+
+  .cardItem-header.center {
+    display: flex;
+    justify-content: center;
+    position: relative;
+
+    .extraBtn {
+      position: absolute;
+      right: 5px;
     }
   }
 
@@ -871,14 +856,44 @@ h3 {
     padding-top: 12px;
     min-height: 100px;
 
+    .cardItem-content {
+      display: flex;
+      width: 100%;
+      justify-content: space-around;
+    }
+
+    .cardItem-box {
+      display: flex;
+      width: 100%;
+      justify-content: start;
+      flex-wrap: wrap;
+
+    }
+
     .linkBtn {
       height: 40px;
       display: flex;
-      padding: 8px 30px;
-      background-color: #f5f5f5;
+      align-items: center;
+      background-color: transparent;
 
       &:hover {
         background: @active-background;
+      }
+
+      &>div {}
+
+      div:has(>svg) {
+        height: min-content;
+
+        >svg {
+          width: 32px;
+          height: 32px;
+          padding: 7px;
+          color: #00BEA5 !important;
+          background-color: #E6F9F6;
+          border-radius: 4px;
+        }
+
       }
     }
 
@@ -886,9 +901,21 @@ h3 {
       padding: 12px;
       text-align: center;
 
+      &.chengguo {
+        width: 30%;
+        max-width: 150px;
+        height: 110px;
+      }
+
       .appName {
         font-size: 14px;
         font-weight: bold;
+        margin-top: 5px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
       }
 
       .teamName {
@@ -909,7 +936,7 @@ h3 {
     }
 
     .dataItem {
-      min-width: 120px;
+      min-width: 105px;
       padding: 16px;
       text-align: center;
 
@@ -1114,6 +1141,7 @@ h3 {
 .entityIcon {
   padding: 2px 1px;
   display: inline-block;
+
   .pickupName {
     color: #003CAB;
     margin-left: 6px;
@@ -1121,9 +1149,9 @@ h3 {
     vertical-align: middle;
     // font-size: @fontSize 
   }
+
   .avatarIcon {
     background: 'transparent';
     color: '#606060';
   }
 }
-

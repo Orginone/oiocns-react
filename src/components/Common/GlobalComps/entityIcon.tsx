@@ -15,6 +15,7 @@ interface teamTypeInfo {
   notAvatar?: boolean;
   title?: string;
   showName?: boolean;
+  hideInfo?: boolean; //不展示小圆点
   iconSize?: number;
 }
 
@@ -111,7 +112,7 @@ export const ShareIconItem = (info: shareIconInfo) => {
     if (info.share.avatar?.thumbnail) {
       return (
         <span title={info.title ?? ''} className="flex flexCenter">
-          {infoMore()}
+          {!info.hideInfo && infoMore()}
           <Avatar
             size={info.iconSize || size}
             src={info.share.avatar.thumbnail}
@@ -137,7 +138,7 @@ export const ShareIconItem = (info: shareIconInfo) => {
       }
       return (
         <span className="flex flexCenter">
-          {infoMore()}
+          {!info.hideInfo && infoMore()}
           <Avatar
             size={info.iconSize || size}
             icon={icon}
@@ -150,7 +151,7 @@ export const ShareIconItem = (info: shareIconInfo) => {
   }
   return (
     <span className="flex flexCenter" title={info.title ?? ''}>
-      {infoMore()}
+      {!info.hideInfo && infoMore()}
       <Avatar
         size={size}
         icon={<TypeIcon avatar iconType={'其它'} size={size} />}

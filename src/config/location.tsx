@@ -10,7 +10,7 @@ export const getResouces = (): IResources => {
   if (hostname.startsWith('anxinwu')) {
     return {
       location: 'anxinwu',
-      passport: [1, 2, 3, 4, 5],
+      passport: [1],
       unitName: '浙江省科学技术厅',
       unitPage: 'https://kjt.zj.gov.cn',
     };

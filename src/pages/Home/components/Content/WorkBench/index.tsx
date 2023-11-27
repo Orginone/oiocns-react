@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from 'react';
 import { Badge, Button, Calendar, Divider, Dropdown, Space, Spin } from 'antd';
 import { ImBubbles2, ImDropbox, ImList, ImPlus, ImStack } from '@/icons/im';
@@ -11,10 +12,17 @@ import { OperateMenuType } from 'typings/globelType';
 import FullScreenModal from '@/components/Common/fullScreen';
 import { useFlagCmdEmitter } from '@/hooks/useCtrlUpdate';
 import TypeIcon from '@/components/Common/GlobalComps/typeIcon';
+import { SYS_AXW, CmdBtns, WorkDatas } from './pageConfig';
+import SysItemCard from './sysItemCard';
 
 // 工作台
 const WorkBench: React.FC = () => {
   const history = useHistory();
+  const [applications, setApplications] = useState<IApplication[]>([]);
+  const [loaded] = useFlagCmdEmitter('applications', async () => {
+    setApplications(await orgCtrl.loadApplications());
+  });
+
   // 渲染数据项
   const renderDataItem = (
     title: string,
@@ -31,6 +39,34 @@ const WorkBench: React.FC = () => {
       </div>
     );
   };
+  // 设置常用标签
+  const contextMenu = (app: IApplication, cacheTagName: string = '常用') => {
+    const useAlays = app.cache.tags?.includes(cacheTagName);
+    const menus: OperateMenuType[] = [
+      {
+        key: useAlays ? 'unsetCommon' : 'setCommon',
+        label: useAlays ? '取消常用' : '设为常用',
+        icon: <></>,
+      },
+    ];
+    return {
+      items: menus,
+      onClick: async ({ key }: { key: string }) => {
+        switch (key) {
+          case 'setCommon':
+            app.cache.tags = app.cache.tags || [];
+            app.cache.tags.push(cacheTagName);
+            app.cacheUserData();
+            break;
+          default:
+            app.cache.tags = app.cache.tags?.filter((i) => i != cacheTagName);
+            app.cacheUserData();
+            break;
+        }
+      },
+    };
+  };
+
   // 渲染沟通信息
   const RenderChat: React.FC = () => {
     const [msgCount, setMsgCount] = useState(0);
@@ -45,7 +81,7 @@ const WorkBench: React.FC = () => {
     });
     return (
       <>
-        <div className="cardItem-header">
+        <div className="cardItem-header center">
           <span className="title">沟通</span>
           <span className="extraBtn">
             <ImBubbles2 />
@@ -104,9 +140,10 @@ const WorkBench: React.FC = () => {
         orgCtrl.unsubscribe(id);
       };
     }, []);
+    const counts = [todoCount, CompletedCount, CopysCount, ApplyCount];
     return (
       <>
-        <div className="cardItem-header">
+        <div className="cardItem-header center">
           <span className="title">办事</span>
           <span className="extraBtn">
             <ImList />
@@ -117,10 +154,7 @@ const WorkBench: React.FC = () => {
         </div>
         <div className="cardItem-viewer">
           <Space wrap split={<Divider type="vertical" />} size={2}>
-            {renderDataItem('待办', todoCount)}
-            {renderDataItem('已办', CompletedCount)}
-            {renderDataItem('抄送', CopysCount)}
-            {renderDataItem('发起的', ApplyCount)}
+            {WorkDatas.map((item, idx) => renderDataItem(item.title, counts[idx]))}
           </Space>
         </div>
       </>
@@ -136,7 +170,7 @@ const WorkBench: React.FC = () => {
     }, []);
     return (
       <>
-        <div className="cardItem-header">
+        <div className="cardItem-header center">
           <span className="title">数据</span>
           <span className="extraBtn">
             <ImPlus /> <span>管理数据</span>
@@ -146,15 +180,17 @@ const WorkBench: React.FC = () => {
           <Space wrap split={<Divider type="vertical" />} size={6}>
             {diskInfo && (
               <>
-                {renderDataItem(
-                  `关系(个)`,
-                  orgCtrl.chats.filter(
-                    (i) => i.isMyChat && i.typeName !== TargetType.Group,
-                  ).length,
-                  -1,
-                  `共计:${orgCtrl.chats.length}个`,
-                )}
-                {renderDataItem(`数据集(个)`, diskInfo.collections, diskInfo.dataSize)}
+                {!SYS_AXW &&
+                  renderDataItem(
+                    `关系(个)`,
+                    orgCtrl.chats.filter(
+                      (i) => i.isMyChat && i.typeName !== TargetType.Group,
+                    ).length,
+                    -1,
+                    `共计:${orgCtrl.chats.length}个`,
+                  )}
+                {!SYS_AXW &&
+                  renderDataItem(`数据集(个)`, diskInfo.collections, diskInfo.dataSize)}
                 {renderDataItem(`对象数(个)`, diskInfo.objects, diskInfo.totalSize)}
                 {renderDataItem(`文件(个)`, diskInfo.files, diskInfo.fileSize)}
                 {renderDataItem(
@@ -172,36 +208,6 @@ const WorkBench: React.FC = () => {
   // 渲染应用信息
   const RendeAppInfo: React.FC = () => {
     const [allAppShow, setAllAppShow] = useState(false);
-    const [applications, setApplications] = useState<IApplication[]>([]);
-    const [loaded] = useFlagCmdEmitter('applications', async () => {
-      setApplications(await orgCtrl.loadApplications());
-    });
-    const contextMenu = (app: IApplication) => {
-      const useAlays = app.cache.tags?.includes('常用');
-      const menus: OperateMenuType[] = [
-        {
-          key: useAlays ? 'unsetCommon' : 'setCommon',
-          label: useAlays ? '取消常用' : '设为常用',
-          icon: <></>,
-        },
-      ];
-      return {
-        items: menus,
-        onClick: async ({ key }: { key: string }) => {
-          switch (key) {
-            case 'setCommon':
-              app.cache.tags = app.cache.tags || [];
-              app.cache.tags.push('常用');
-              app.cacheUserData();
-              break;
-            default:
-              app.cache.tags = app.cache.tags?.filter((i) => i != '常用');
-              app.cacheUserData();
-              break;
-          }
-        },
-      };
-    };
     // 加载应用
     const loadAppCard = (item: IApplication) => (
       <Dropdown key={item.key} menu={contextMenu(item)} trigger={['contextMenu']}>
@@ -328,18 +334,14 @@ const WorkBench: React.FC = () => {
           </span>
         </div>
         <div style={{ width: '100%', minHeight: 60 }} className="cardItem-viewer">
-          <Space wrap split={<Divider type="vertical" />} size={6}>
-            {renderCmdBtn('joinFriend', '添加好友', 'joinFriend')}
-            {renderCmdBtn('joinStorage', '申请存储', '存储资源')}
-            {renderCmdBtn('newCohort', '创建群组', '群组')}
-            {renderCmdBtn('joinCohort', '加入群聊', 'joinCohort')}
-            {renderCmdBtn('newCompany', '设立单位', '单位')}
-            {renderCmdBtn('joinCompany', '加入单位', 'joinCompany')}
+          <Space className="cardItem-content" wrap split={<Divider type="vertical" />}>
+            {CmdBtns.map((cmd) => renderCmdBtn(cmd.cmd, cmd.title, cmd.iconType))}
           </Space>
         </div>
       </>
     );
   };
+
   return (
     <div className="workbench-content">
       <div className="cardGroup">
@@ -347,25 +349,47 @@ const WorkBench: React.FC = () => {
           <RenderOperate />
         </div>
       </div>
-      <div className="cardGroup">
-        <div className="cardItem" onClick={() => history.push('chat')}>
-          <RenderChat />
+      <div className="cardGroup axw-group">
+        <div className="cardItem">
+          <SysItemCard title="成果管理" tagName="成果管理" />
         </div>
-        <div className="cardItem" onClick={() => history.push('work')}>
-          <RenderWork />
+        <div className="cardItem">
+          <SysItemCard title="合同收益管理" tagName="合同收益管理" />
+        </div>
+        <div className="cardItem">
+          <SysItemCard title="赋权管理" />
         </div>
       </div>
-      <div className="cardGroup">
+      <div className="cardGroup axw-group">
+        <div className="cardItem">
+          <SysItemCard title="工作流配置" />
+        </div>
+        <div className="cardItem">
+          <SysItemCard title="表单配置" />
+        </div>
+      </div>
+      <div className="cardGroup dataGroup">
+        <div className="cardItem chartCard" onClick={() => history.push('chat')}>
+          <RenderChat />
+        </div>
+        <div className="cardItem workCard" onClick={() => history.push('work')}>
+          <RenderWork />
+        </div>
+        <div className="cardItem axw-storeCard" onClick={() => history.push('store')}>
+          <RendeStore />
+        </div>
+      </div>
+      <div className="cardGroup org-sroreCard">
         <div className="cardItem" onClick={() => history.push('store')}>
           <RendeStore />
         </div>
       </div>
-      <div className="cardGroup">
+      <div className="cardGroup org-appCard">
         <div className="cardItem">
           <RendeAppInfo />
         </div>
       </div>
-      <div className="calendar">{calendarItem()}</div>
+      <div className="calendar org-calendar">{calendarItem()}</div>
     </div>
   );
 };

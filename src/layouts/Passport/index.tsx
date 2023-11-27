@@ -38,7 +38,7 @@ const passportLayout: React.FC<{ route: IRouteConfig }> = ({ route }) => {
             target="_blank"
             style={{ color: '#8a8a8a' }}
             rel="noopener noreferrer">
-            Powered by Orginone{' '}
+            Powered by Orginone
           </a>
         </div>
         <div className={cls.copyrightZh}>
