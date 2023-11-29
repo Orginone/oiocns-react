@@ -1,119 +1,129 @@
-import { List } from 'antd';
-import React, { useState } from 'react';
+import { List, Tag } from 'antd';
+import React, { useEffect, useState } from 'react';
 import TeamIcon from '@/components/Common/GlobalComps/entityIcon';
 import css from './index.module.less';
-import { ISession, ITarget, TargetType } from '@/ts/core';
-import { ellipsisText } from '@/utils';
-import ChatBody from './chat';
+import { IFile, ISession, TargetType } from '@/ts/core';
 import { command } from '@/ts/base';
+import Directory from '@/components/Directory';
+import DirectoryViewer from '@/components/Directory/views';
 import TargetActivity from '@/components/TargetActivity';
-import MemberContent from './member';
-import orgCtrl from '@/ts/controller';
-import { ImAddressBook, ImQrcode, ImBubbles2, ImLifebuoy, ImFolder } from '@/icons/im';
-import { useHistory } from 'react-router-dom';
-const SessionBody = ({
-  target,
-  session,
-  setting,
-}: {
-  target: ITarget;
-  session: ISession;
-  setting?: boolean;
-}) => {
-  const history = useHistory();
-  const [bodyType, setBodyType] = useState(setting ? 'member' : 'chat');
-  const sessionActions = () => {
-    const actions = [];
-    if (session.isMyChat && target.typeName !== TargetType.Group) {
-      actions.push(
-        <ImBubbles2
-          key="chat"
-          size={26}
-          title="沟通"
-          onClick={() => {
-            setBodyType('chat');
-          }}
-        />,
-      );
+import { loadFileMenus } from '@/executor/fileOperate';
+import OrgIcons from '@/components/Common/GlobalComps/orgIcons';
+import ChatBody from './chat';
+import { cleanMenus } from '@/utils/tools';
+const SessionBody = ({ session, setting }: { session: ISession; setting?: boolean }) => {
+  const [actions, setActons] = useState<string[]>([]);
+  const [bodyType, setBodyType] = useState('');
+  useEffect(() => {
+    const newActions: string[] = [];
+    if (session.target.typeName === TargetType.Storage) {
+      newActions.push('relation', 'activity');
+    } else {
+      if (session.isMyChat && session.target.typeName !== TargetType.Group) {
+        newActions.push('chat');
+      }
+      newActions.push('activity');
+      if (session.id === session.target.id) {
+        newActions.push('store', 'relation');
+      }
     }
-    actions.push(
-      <ImLifebuoy
-        key="activity"
-        size={26}
-        title="动态"
-        onClick={() => {
-          setBodyType('activity');
-        }}
-      />,
-    );
-    if (session.members.length > 0 || session.id === session.userId) {
-      actions.push(
-        <ImFolder
-          key="store"
-          size={26}
-          title="存储"
-          onClick={() => {
-            orgCtrl.currentKey = target.directory.key;
-            history.push('/store');
-          }}
-        />,
-        <ImAddressBook
-          key="setting"
-          size={26}
-          title="成员"
-          onClick={() => {
-            setBodyType('member');
-          }}
-        />,
-      );
+    if (session.target.hasRelationAuth()) {
+      newActions.push('setting');
     }
-    actions.push(
-      <ImQrcode
-        key="qrcode"
-        size={26}
-        title="二维码"
-        onClick={() => {
-          command.emitter('executor', 'qrcode', target);
-        }}
-      />,
-    );
-    return actions;
-  };
+    setActons(newActions);
+    if (!newActions.includes(bodyType)) {
+      if (setting && newActions.includes('relation')) {
+        setBodyType('relation');
+      } else {
+        setBodyType(newActions[0]);
+      }
+    }
+  }, [session]);
 
   const loadContext = () => {
     switch (bodyType) {
       case 'chat':
-        return <ChatBody chat={session} filter={''} />;
-      case 'member':
-        if (session.members.length > 0 || session.id === session.userId) {
-          return <MemberContent dircetory={target.memberDirectory} />;
-        } else if (setting) {
-          return (
-            <TargetActivity height={700} activity={session.activity}></TargetActivity>
-          );
-        } else {
-          return <ChatBody chat={session} filter={''} />;
-        }
+        return <ChatBody key={session.target.key} chat={session} filter={''} />;
       case 'activity':
-        return <TargetActivity height={700} activity={session.activity}></TargetActivity>;
+        return <TargetActivity height={700} activity={session.activity} />;
+      case 'store':
+        return <Directory key={session.target.key} root={session.target.directory} />;
+      case 'relation':
+        return (
+          <DirectoryViewer
+            extraTags
+            initTags={['成员']}
+            selectFiles={[]}
+            content={session.target.memberDirectory.content()}
+            fileOpen={() => {}}
+            contextMenu={(entity) => {
+              const file = (entity as IFile) || session.target.memberDirectory;
+              return {
+                items: cleanMenus(loadFileMenus(file)) || [],
+                onClick: ({ key }: { key: string }) => {
+                  command.emitter('executor', key, file);
+                },
+              };
+            }}
+          />
+        );
+      default:
+        return <></>;
+    }
+  };
+
+  const getTitle = (flag: string) => {
+    switch (flag) {
+      case 'chat':
+        return '沟通';
+      case 'activity':
+        return '动态';
+      case 'store':
+        return '数据';
+      case 'relation':
+        return '关系';
+      default:
+        return '设置';
     }
   };
 
   return (
     <>
       <div className={css.groupDetail}>
-        <List.Item className={css.header} actions={sessionActions()}>
+        <List.Item
+          className={css.header}
+          actions={actions.map((flag) => {
+            const selected = flag === bodyType;
+            return (
+              <a
+                key={flag}
+                title={getTitle(flag)}
+                onClick={() => {
+                  setBodyType(flag);
+                }}>
+                <OrgIcons type={flag} selected={selected} size={26} />
+              </a>
+            );
+          })}>
           <List.Item.Meta
             title={
               <>
-                <span style={{ marginRight: 10 }}>{session.chatdata.chatName}</span>
+                <span style={{ marginRight: 10 }}>{session.name}</span>
                 {session.members.length > 0 && (
                   <span className={css.number}>({session.members.length})</span>
                 )}
               </>
             }
             avatar={<TeamIcon entity={session.metadata} size={50} />}
-            description={ellipsisText(session.chatdata.chatRemark, 50)}
+            description={session.groupTags
+              .filter((i) => i.length > 0)
+              .map((label) => {
+                return (
+                  <Tag key={label} color={label === '置顶' ? 'red' : 'success'}>
+                    {label}
+                  </Tag>
+                );
+              })}
           />
         </List.Item>
         <div className={css.groupDetailContent}>{loadContext()}</div>

@@ -5,6 +5,7 @@ import { XCollection } from '../public/collection';
 import { IMessage, Message } from './message';
 import { Activity, IActivity } from './activity';
 import { logger } from '@/ts/base/common';
+import { sessionOperates, teamOperates } from '../public/operates';
 // 空时间
 const nullTime = new Date('2022-07-01').getTime();
 /** 会话接口类 */
@@ -78,6 +79,7 @@ export class Session extends Entity<schema.XEntity> implements ISession {
       lastMsgTime: nullTime,
       mentionMe: false,
       labels: [],
+      recently: false,
     };
     this.activity = new Activity(_metadata, this);
     setTimeout(
@@ -162,7 +164,7 @@ export class Session extends Entity<schema.XEntity> implements ISession {
       if (this.target.space.id !== this.userId) {
         gtags.push(this.target.space.name);
       } else {
-        gtags.push(this.belong.name);
+        gtags.push(this.target.user.findShareById(this.belongId).name);
       }
       gtags.push(this.typeName);
     }
@@ -175,7 +177,28 @@ export class Session extends Entity<schema.XEntity> implements ISession {
     if (this.chatdata.isToping) {
       gtags.push('置顶');
     }
+    if (this.isGroup) {
+      gtags.push('群聊');
+    }
     return [...gtags, ...this.chatdata.labels];
+  }
+  override operates(): model.OperateModel[] {
+    const operates: model.OperateModel[] = [];
+    if (this.chatdata.isToping) {
+      operates.push(sessionOperates.RemoveToping);
+    } else {
+      operates.push(sessionOperates.SetToping);
+    }
+    if (!this.isFriend && this.id !== this.userId) {
+      operates.push(teamOperates.applyFriend);
+    }
+    if (this.chatdata.noReadCount > 0) {
+      operates.push(sessionOperates.SetReaded);
+    } else {
+      operates.push(sessionOperates.SetNoReaded);
+    }
+    operates.push(sessionOperates.RemoveSession);
+    return operates;
   }
   async moreMessage(): Promise<number> {
     const data = await this.coll.loadSpace({
@@ -331,7 +354,7 @@ export class Session extends Entity<schema.XEntity> implements ISession {
           this.chatdata.mentionMe = imsg.mentions.includes(this.userId);
         }
         if (this.chatdata.noReadCount > 0) {
-          logger.info(`[${this.chatdata.chatName}]:${imsg.msgTitle}`);
+          logger.msg(`[${this.chatdata.chatName}]:${imsg.msgTitle}`);
         }
         command.emitterFlag('session');
       } else if (!imsg.isReaded) {

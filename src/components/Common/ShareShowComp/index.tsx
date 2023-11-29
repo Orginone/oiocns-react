@@ -1,4 +1,4 @@
-import { AiOutlineCloseCircle } from '@/icons/ai';
+import { AiOutlineCloseCircle } from 'react-icons/ai';
 import React from 'react';
 import cls from './index.module.less';
 type ShareShowRecentProps = {

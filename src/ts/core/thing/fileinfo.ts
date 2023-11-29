@@ -23,6 +23,8 @@ export interface IFileInfo<T extends schema.XEntity> extends IEntity<T> {
   isContainer: boolean;
   /** 目录 */
   directory: IDirectory;
+  /** 上级 */
+  superior: IFile;
   /** 路径Key */
   locationKey: string;
   /** 撤回已删除 */
@@ -49,7 +51,7 @@ export interface IFileInfo<T extends schema.XEntity> extends IEntity<T> {
   /** 加载文件内容 */
   loadContent(reload?: boolean): Promise<boolean>;
   /** 目录下的内容 */
-  content(): IFile[];
+  content(args?: boolean): IFile[];
   /** 缓存用户数据 */
   cacheUserData(notify?: boolean): Promise<boolean>;
 }
@@ -61,7 +63,6 @@ export abstract class FileInfo<T extends schema.XEntity>
   constructor(_metadata: T, _directory: IDirectory) {
     super(_metadata, [_metadata.typeName]);
     this.directory = _directory;
-    this.isContainer = false;
     this.cache = { fullId: `${this.spaceId}_${_metadata.id}` };
     setTimeout(
       async () => {
@@ -71,11 +72,13 @@ export abstract class FileInfo<T extends schema.XEntity>
     );
   }
   cache: schema.XCache;
-  isContainer: boolean;
   directory: IDirectory;
   canDesign: boolean = false;
   get isInherited(): boolean {
     return this.directory.isInherited;
+  }
+  get isContainer(): boolean {
+    return false;
   }
   get target(): ITarget {
     if (this.directory.typeName.includes('目录')) {
@@ -95,6 +98,9 @@ export abstract class FileInfo<T extends schema.XEntity>
   }
   get cachePath(): string {
     return `${this.cacheFlag}.${this.cache.fullId}`;
+  }
+  get superior(): IFile {
+    return this.directory;
   }
   abstract cacheFlag: string;
   abstract delete(): Promise<boolean>;

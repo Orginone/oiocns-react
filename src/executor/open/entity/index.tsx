@@ -3,13 +3,15 @@ import { ProFormColumnsType } from '@ant-design/pro-components';
 import SchemaForm from '@/components/SchemaForm';
 import { TargetModel } from '@/ts/base/model';
 import UploadItem from '../../tools/uploadItem';
-import { schema } from '@/ts/base';
+import { model, parseAvatar, schema } from '@/ts/base';
+import QrCode from 'qrcode.react';
 import { formatZhDate } from '@/utils/tools';
 import orgCtrl from '@/ts/controller';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
+import TypeIcon from '@/components/Common/GlobalComps/typeIcon';
 
 interface Iprops {
-  entity: schema.XEntity;
+  entity: schema.XEntity | schema.XTarget;
   finished: () => void;
 }
 /*
@@ -18,9 +20,28 @@ interface Iprops {
 const EntityPreview: React.FC<Iprops> = ({ entity, finished }) => {
   const columns: ProFormColumnsType<TargetModel>[] = [
     {
+      dataIndex: 'id',
+      renderFormItem: () => {
+        const avatar: model.FileItemShare = parseAvatar(entity.icon);
+        return (
+          <QrCode
+            level="H"
+            size={150}
+            fgColor={'#3838b9'}
+            value={`${location.origin}/${entity.id}`}
+            imageSettings={{
+              src: avatar?.thumbnail ?? '',
+              width: 50,
+              height: 50,
+              excavate: true,
+            }}
+          />
+        );
+      },
+    },
+    {
       title: '图标',
       dataIndex: 'icon',
-      colProps: { span: 24 },
       renderFormItem: (_, __, form) => {
         return (
           <UploadItem
@@ -52,17 +73,15 @@ const EntityPreview: React.FC<Iprops> = ({ entity, finished }) => {
       dataIndex: 'code',
       readonly: true,
     },
-    {
-      title: '简称',
-      dataIndex: 'teamName',
-      readonly: true,
-    },
-    {
-      title: '标识',
-      dataIndex: 'teamCode',
-      readonly: true,
-    },
   ];
+  if ('storeId' in entity) {
+    columns.push({
+      title: '当前数据核',
+      dataIndex: 'storeId',
+      readonly: true,
+      render: () => <EntityIcon entityId={entity.storeId} showName />,
+    });
+  }
   if (entity.belongId !== entity.id) {
     columns.push({
       title: '归属',
@@ -111,7 +130,12 @@ const EntityPreview: React.FC<Iprops> = ({ entity, finished }) => {
   return (
     <SchemaForm<TargetModel>
       open
-      title={entity.name}
+      title={
+        <div style={{ display: 'flex', flexWrap: 'nowrap' }}>
+          <TypeIcon iconType={entity.typeName} size={20} />
+          {entity.name}
+        </div>
+      }
       width={640}
       columns={columns}
       initialValues={entity}

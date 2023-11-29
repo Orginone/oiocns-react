@@ -11,6 +11,7 @@ import { ISession, Session } from '../../chat/session';
 import { IPerson } from '../person';
 import { logger, sleep } from '@/ts/base/common';
 import { IBelong } from './belong';
+import { MemberDirectory } from './member';
 
 /** 用户抽象接口类 */
 export interface ITarget extends ITeam, IFileInfo<schema.XTarget> {
@@ -70,20 +71,7 @@ export abstract class Target extends Team implements ITarget {
       } as unknown as schema.XDirectory,
       this,
     );
-    this.memberDirectory = new Directory(
-      {
-        ...this.directory.metadata,
-        typeName: '成员目录',
-        id: _metadata.id + '__',
-        name:
-          _metadata.typeName === TargetType.Person
-            ? '我的好友'
-            : `${_metadata.typeName}成员`,
-      },
-      this,
-      this.directory,
-    );
-    this.isContainer = true;
+    this.memberDirectory = new MemberDirectory(this);
     this.session = new Session(this.id, this, _metadata);
     setTimeout(
       async () => {
@@ -95,7 +83,6 @@ export abstract class Target extends Team implements ITarget {
   user: IPerson;
   space: IBelong;
   session: ISession;
-  isContainer: boolean;
   directory: IDirectory;
   resource: DataResource;
   cache: schema.XCache;
@@ -113,6 +100,12 @@ export abstract class Target extends Team implements ITarget {
   }
   get isInherited(): boolean {
     return this.metadata.belongId !== this.spaceId;
+  }
+  get isContainer(): boolean {
+    return true;
+  }
+  get superior(): IFile {
+    return this.space;
   }
   private _identityLoaded: boolean = false;
   async restore(): Promise<boolean> {
@@ -200,8 +193,8 @@ export abstract class Target extends Team implements ITarget {
     return this.update({
       ...this.metadata,
       name: name,
-      teamCode: this.metadata.team?.code ?? this.code,
-      teamName: this.metadata.team?.name ?? this.name,
+      teamCode: this.code,
+      teamName: this.name,
     });
   }
   copy(_destination: IDirectory): Promise<boolean> {
@@ -215,7 +208,8 @@ export abstract class Target extends Team implements ITarget {
   abstract get targets(): ITarget[];
   abstract get subTarget(): ITarget[];
   content(): IFile[] {
-    return [this.memberDirectory];
+    return [];
+    // return [this.memberDirectory];
   }
   createTarget(_data: model.TargetModel): Promise<ITeam | undefined> {
     return new Promise((resolve) => {

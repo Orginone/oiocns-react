@@ -1,8 +1,7 @@
-/* eslint-disable no-unused-vars */
-import { Button, Checkbox, message, Popover, Spin, Badge, Tooltip, Affix } from 'antd';
+import { Button, Checkbox, message, Popover, Spin, Badge, Tooltip } from 'antd';
 import moment from 'moment';
 import React, { useEffect, useRef, useState } from 'react';
-import { CopyToClipboard } from 'react-copy-to-clipboard';
+import { useCopyToClipboard } from 'react-use';
 import EntityInfo from '@/components/Common/GlobalComps/entityIcon';
 import Information from './information';
 import ForwardContentModal from './forwardContentModal';
@@ -11,8 +10,8 @@ import { IMessage, ISession, MessageType } from '@/ts/core';
 import { parseAvatar } from '@/ts/base';
 import css from './index.module.less';
 import { parseCiteMsg, parseMsg, parseForwardMsg } from '../components/parseMsg';
-import { RiShareForwardFill } from '@/icons/ri';
-import { BsListCheck } from '@/icons/bs';
+import { RiShareForwardFill } from 'react-icons/ri';
+import { BsListCheck } from 'react-icons/bs';
 import type { CheckboxChangeEvent } from 'antd/es/checkbox';
 import {
   AiOutlineCopy,
@@ -21,7 +20,7 @@ import {
   AiOutlineDelete,
   AiOutlineDownload,
   AiOutlineEllipsis,
-} from '@/icons/ai';
+} from 'react-icons/ai';
 /**
  * @description: 聊天区域
  * @return {*}
@@ -34,8 +33,6 @@ interface Iprops {
   /** 返回值，引用 */
   citeText: any;
   forward: any;
-  /** 回车设置引用消息 */
-  enterCiteMsg: IMessage;
   multiSelectShow: boolean;
   multiSelectMsg: (item: IMessage, checked: boolean) => void;
   multiSelectFn: (multi: boolean) => void;
@@ -51,6 +48,7 @@ const GroupContent = (props: Iprops) => {
   const [forwardModalOpen, setForwardModalOpen] = useState<boolean>(false); // 转发时用户
   const [forwardMessages, setForwardMessages] = useState<IMessage[]>([]);
   const [multiSelect, setMultiSelect] = useState(multiSelectShow);
+  const [, copyToClipboard] = useCopyToClipboard();
   useEffect(() => {
     props.chat.onMessage((ms) => {
       setMessages([...ms]);
@@ -259,17 +257,16 @@ const GroupContent = (props: Iprops) => {
   const msgAction = (item: IMessage) => {
     return (
       <div className={css.msgAction}>
-        <CopyToClipboard text={item.msgBody}>
-          <Tooltip title="复制">
-            <AiOutlineCopy
-              size={19}
-              className={css.actionIconStyl}
-              onClick={() => {
-                message.success('复制成功');
-              }}
-            />
-          </Tooltip>
-        </CopyToClipboard>
+        <Tooltip title="复制">
+          <AiOutlineCopy
+            size={19}
+            className={css.actionIconStyl}
+            onClick={() => {
+              copyToClipboard(item.msgBody);
+              message.success('复制成功');
+            }}
+          />
+        </Tooltip>
         <Tooltip title="引用">
           <AiOutlineMessage
             size={19}

@@ -5,6 +5,7 @@ import { FileInfo, IFile, IFileInfo } from '../thing/fileinfo';
 import { IDirectory } from '../thing/directory';
 import { IWorkApply, WorkApply } from './apply';
 import { entityOperates, fileOperates } from '../public';
+import { loadGatewayNodes } from '@/utils/tools';
 
 export interface IWork extends IFileInfo<schema.XWorkDefine> {
   /** 主表 */
@@ -13,12 +14,25 @@ export interface IWork extends IFileInfo<schema.XWorkDefine> {
   detailForms: IForm[];
   /** 应用 */
   application: IApplication;
+  /** 成员节点 */
+  gatewayNodes: model.WorkNodeModel[];
+  /** 成员节点绑定信息 */
+  gatewayInfo: schema.XWorkGateway[];
   /** 流程节点 */
   node: model.WorkNodeModel | undefined;
   /** 更新办事定义 */
   update(req: model.WorkDefineModel): Promise<boolean>;
   /** 加载事项定义节点 */
-  loadWorkNode(reload?: boolean): Promise<model.WorkNodeModel | undefined>;
+  loadNode(reload?: boolean): Promise<model.WorkNodeModel | undefined>;
+  /** 加载成员节点信息 */
+  loadGatewayInfo(reload?: boolean): Promise<schema.XWorkGateway[]>;
+  /** 删除绑定 */
+  deleteGateway(id: string): Promise<boolean>;
+  /** 绑定成员节点 */
+  bingdingGateway(
+    nodeId: string,
+    define: schema.XWorkDefine,
+  ): Promise<schema.XWorkGateway | undefined>;
   /** 生成办事申请单 */
   createApply(
     taskId?: string,
@@ -34,11 +48,13 @@ export const fullDefineRule = (data: schema.XWorkDefine) => {
   data.allowAdd = true;
   data.allowEdit = true;
   data.allowSelect = true;
+  data.hasGateway = false;
   if (data.rule && data.rule.includes('{') && data.rule.includes('}')) {
     const rule = JSON.parse(data.rule);
     data.allowAdd = rule.allowAdd;
     data.allowEdit = rule.allowEdit;
     data.allowSelect = rule.allowSelect;
+    data.hasGateway = rule.hasGateway;
   }
   data.typeName = '办事';
   return data;
@@ -54,6 +70,8 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
   detailForms: IForm[] = [];
   application: IApplication;
   node: model.WorkNodeModel | undefined;
+  gatewayNodes: model.WorkNodeModel[] = [];
+  gatewayInfo: schema.XWorkGateway[] = [];
   get locationKey(): string {
     return this.application.key;
   }
@@ -80,7 +98,7 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
     return this.delete(_notity);
   }
   async rename(_name: string): Promise<boolean> {
-    const node = await this.loadWorkNode();
+    const node = await this.loadNode();
     return await this.update({
       ...this.metadata,
       name: _name,
@@ -91,7 +109,7 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
     if (destination.id != this.application.id) {
       if ('works' in destination) {
         const app = destination as unknown as IApplication;
-        const node = await this.loadWorkNode();
+        const node = await this.loadNode();
         const res = await app.createWork({
           ...this.metadata,
           applicationId: app.id,
@@ -111,7 +129,7 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
       if ('works' in destination) {
         const app = destination as unknown as IApplication;
         this.setMetadata({ ...this.metadata, applicationId: app.id });
-        const node = await this.loadWorkNode();
+        const node = await this.loadNode();
         const success = await this.update({
           ...this.metadata,
           resource: node,
@@ -137,7 +155,11 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
     return [];
   }
   async loadContent(_reload: boolean = false): Promise<boolean> {
-    await this.loadWorkNode(_reload);
+    await this.loadNode(_reload);
+    await this.loadGatewayInfo(true);
+    if (this.node) {
+      this.gatewayNodes = loadGatewayNodes(this.node, []);
+    }
     return this.forms.length > 0;
   }
   async update(data: model.WorkDefineModel): Promise<boolean> {
@@ -149,7 +171,44 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
     }
     return res.success;
   }
-  async loadWorkNode(reload: boolean = false): Promise<model.WorkNodeModel | undefined> {
+  async loadGatewayInfo(reload: boolean = false): Promise<schema.XWorkGateway[]> {
+    if (this.gatewayInfo.length == 0 || reload) {
+      const destId = this.canDesign
+        ? this.directory.target.id
+        : this.directory.target.spaceId;
+      const res = await kernel.queryWorkGateways({
+        defineId: this.id,
+        targetId: destId,
+      });
+      if (res.success && res.data) {
+        this.gatewayInfo = res.data.result || [];
+      }
+    }
+    return this.gatewayInfo;
+  }
+  async deleteGateway(id: string): Promise<boolean> {
+    const res = await kernel.deleteWorkGateway({ id });
+    if (res.success) {
+      this.gatewayInfo = this.gatewayInfo.filter((a) => a.id != id);
+    }
+    return res.success;
+  }
+  async bingdingGateway(
+    nodeId: string,
+    define: schema.XWorkDefine,
+  ): Promise<schema.XWorkGateway | undefined> {
+    const res = await kernel.createWorkGeteway({
+      nodeId: nodeId,
+      defineId: define.id,
+      targetId: this.directory.target.spaceId,
+    });
+    if (res.success) {
+      this.gatewayInfo = this.gatewayInfo.filter((a) => a.nodeId != nodeId);
+      this.gatewayInfo.push({ ...res.data, define });
+    }
+    return res.data;
+  }
+  async loadNode(reload: boolean = false): Promise<model.WorkNodeModel | undefined> {
     if (this.node === undefined || reload) {
       const res = await kernel.queryWorkNodes({ id: this.id });
       if (res.success) {
@@ -159,11 +218,12 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
     }
     return this.node;
   }
+
   async createApply(
     taskId: string = '0',
     pdata?: model.InstanceDataModel,
   ): Promise<IWorkApply | undefined> {
-    await this.loadWorkNode();
+    await this.loadNode();
     if (this.node && this.forms.length > 0) {
       const data: model.InstanceDataModel = {
         data: {},
@@ -200,6 +260,14 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
     const operates = super.operates();
     if (this.isInherited) {
       operates.push({ sort: 3, cmd: 'workForm', label: '查看表单', iconType: '表单' });
+    }
+    if (this.metadata.hasGateway) {
+      operates.push({
+        sort: 4,
+        cmd: 'fillWork',
+        label: '关联我的办事',
+        iconType: '办事',
+      });
     }
     if (operates.includes(entityOperates.Delete)) {
       operates.push(entityOperates.HardDelete);

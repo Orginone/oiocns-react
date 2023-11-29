@@ -11,8 +11,6 @@ function scanComponents(): PageBuilderStaticContext<ElementFC> {
     { eager: true },
   );
 
-  console.log(moduleExports);
-
   const elements: Dictionary<ElementFC> = {};
   const metas: Dictionary<ElementMeta> = {};
   let root: FC | null = null;

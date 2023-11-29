@@ -36,7 +36,11 @@ export interface IWorkTask extends IFile {
   /** 创建申请(子流程) */
   createApply(): Promise<IWorkApply | undefined>;
   /** 任务审批 */
-  approvalTask(status: number, comment?: string): Promise<boolean>;
+  approvalTask(
+    status: number,
+    comment?: string,
+    fromData?: Map<string, model.FormEditData>,
+  ): Promise<boolean>;
 }
 
 export class WorkTask extends FileInfo<schema.XEntity> implements IWorkTask {
@@ -152,12 +156,21 @@ export class WorkTask extends FileInfo<schema.XEntity> implements IWorkTask {
     }
     return false;
   }
-  async approvalTask(status: number, comment: string): Promise<boolean> {
+  async approvalTask(
+    status: number,
+    comment: string,
+    fromData: Map<string, model.FormEditData>,
+  ): Promise<boolean> {
     if (this.taskdata.status < TaskStatus.ApprovalStart) {
       if (status === -1) {
         return await this.recallApply();
       }
       if (this.taskdata.taskType === '加用户' || (await this.loadInstance(true))) {
+        fromData?.forEach((data, k) => {
+          if (this.instanceData) {
+            this.instanceData.data[k] = [data];
+          }
+        });
         const res = await kernel.approvalTask({
           id: this.taskdata.id,
           status: status,

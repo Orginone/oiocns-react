@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import FullScreenModal from '@/components/Common/fullScreen';
 import { IAuthority, IBelong } from '@/ts/core';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
-import MainLayout from '@/components/MainLayout';
+import MainLayout from '@/components/MainLayout/minLayout';
 import useMenuUpdate from '@/hooks/useMenuUpdate';
 import EntityInfo from '@/components/Common/EntityInfo';
-import * as im from '@/icons/im';
+import * as im from 'react-icons/im';
 import { MenuItemType, OperateMenuType } from 'typings/globelType';
 import AuthForm from './subModal/authForm';
-import { Descriptions } from 'antd';
+import { Descriptions, Divider, Space, Typography } from 'antd';
 import { Controller } from '@/ts/controller';
 
 interface IProps {
@@ -36,9 +36,6 @@ const SettingAuth: React.FC<IProps> = ({ space, finished }) => {
       destroyOnClose
       onCancel={() => finished()}>
       <MainLayout
-        notExitIcon
-        leftShow
-        rightShow={false}
         selectMenu={selectMenu}
         onSelect={(data) => {
           setSelectMenu(data);
@@ -65,6 +62,30 @@ const SettingAuth: React.FC<IProps> = ({ space, finished }) => {
                 {selectMenu.item.metadata.public ? '开放' : '不开放'}
               </Descriptions.Item>
             </>
+          }
+          extra={
+            <Space split={<Divider type="vertical" />} size={0}>
+              {selectMenu.menus &&
+                selectMenu.menus.length > 0 &&
+                selectMenu.menus.map((item) => {
+                  return (
+                    <Typography.Link
+                      key={item.key}
+                      title={item.label}
+                      style={{ fontSize: 18 }}
+                      onClick={() => {
+                        item.beforeLoad?.apply(this);
+                        if (item.key == '删除') {
+                          setSelectMenu(selectMenu.parentMenu || rootMenu);
+                        } else {
+                          setOperateKey(item.key);
+                        }
+                      }}>
+                      {item.icon}
+                    </Typography.Link>
+                  );
+                })}
+            </Space>
           }
         />
       </MainLayout>

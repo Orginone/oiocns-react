@@ -4,7 +4,6 @@ import type { ConfigEnv, UserConfig } from 'vite';
 
 import { themeVariables } from './config/theme';
 import { createVitePlugins } from './config/vite/plugins';
-import { createProxy } from './config/vite/proxy';
 import pkg from './package.json';
 
 const { dependencies, devDependencies, name, version } = pkg;
@@ -48,7 +47,13 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
       watch: {
         usePolling: true, // WSL必须,否则热更新无效
       },
-      proxy: createProxy(),
+      proxy: {
+        '/orginone': {
+          target: 'https://asset.orginone.cn', // 后台接口
+          changeOrigin: true, // 是否允许跨域
+          ws: true,
+        },
+      },
     },
     build: {
       outDir: 'dist', // 指定输出路径
@@ -57,9 +62,7 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
       chunkSizeWarningLimit: 2048,
       terserOptions: {
         compress: {
-          drop_console: false, // 生产环境移除console
           drop_debugger: true, // 生产环境移除debugger
-          pure_funcs: ['console.log'],
         },
         output: {
           // 去掉注释内容
@@ -70,16 +73,42 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
         treeshake: false,
         external: ['handsontable'],
         output: {
-          chunkFileNames: 'static/js/[name]-[hash].js',
-          entryFileNames: 'static/js/[name]-[hash].js',
-          assetFileNames: 'static/[ext]/[name]-[hash].[ext]',
-          manualChunks(id) {
-            if (id.includes('components')) {
-              return 'components';
-            }
-            if (id.includes('src/ts')) {
-              return 'script';
-            }
+          chunkFileNames: 'static/js/[hash].js',
+          entryFileNames: 'static/js/[hash].js',
+          assetFileNames: 'static/[ext]/[hash].[ext]',
+          manualChunks: {
+            'react-vendor': [
+              'react',
+              'react-use',
+              'react-dom',
+              'react-icons',
+              'qrcode.react',
+              'react-router-dom',
+              'react-office-viewer',
+              'react-router-config',
+            ],
+            'antv-vendor': [
+              '@antv/x6',
+              '@antv/x6-plugin-dnd',
+              '@antv/x6-react-shape',
+              '@antv/x6-plugin-selection',
+            ],
+            'editor-vendor': [
+              'for-editor',
+              'html2canvas',
+              '@wangeditor/editor',
+              '@wangeditor/editor-for-react',
+            ],
+            'uiw-vendor': [
+              '@uiw/codemirror-extensions-langs',
+              '@uiw/codemirror-theme-vscode',
+              '@uiw/react-codemirror',
+            ],
+            'xlsx-vendor': ['xlsx'],
+            'play-vendor': ['jol-player'],
+            'dev-vendor': ['devextreme-react'],
+            'emoji-vendor': ['@emoji-mart/react', '@emoji-mart/data', 'emoji-mart'],
+            'antd-vendor': ['antd', '@ant-design/icons', '@ant-design/pro-components'],
           },
         },
         plugins: [

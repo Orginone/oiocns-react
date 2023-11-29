@@ -120,7 +120,7 @@ export class StringPako {
   public static inflate(input: string) {
     if (input.startsWith('^!:')) {
       try {
-        input = atob(input.substring(8, input.length - 5).replaceAll('*', '='));
+        input = atob(input.substring(8, input.length - 5).replace(/\*/gm, '='));
         let output = this.arrToString(pako.inflate(this.stringToArr(input)));
         return decodeURIComponent(output);
       } catch (err) {
@@ -136,7 +136,7 @@ export class StringPako {
   public static deflate(input: string) {
     input = encodeURIComponent(input);
     let output = btoa(this.arrToString(pako.deflate(input)));
-    return '^!:' + this.randomStr(5) + output.replaceAll('=', '*') + this.randomStr(5);
+    return '^!:' + this.randomStr(5) + output.replace(/=/gm, '*') + this.randomStr(5);
   }
   /**
    * 数组转字符串

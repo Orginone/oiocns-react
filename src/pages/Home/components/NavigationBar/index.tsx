@@ -15,9 +15,10 @@ const resource = getResouces();
 
 export const allPages: NavigationItem[] = [
   {
-    key: 'dashboard',
+    key: 'workbench',
     label: '工作台',
     type: 'inner',
+    backgroundImageUrl: `/img/${resource.location}/banner/workbench.png`,
     component: React.lazy(() => import('../Content/WorkBench')),
   },
   {
@@ -96,8 +97,8 @@ const NavigationBar: React.FC<{
 
   const configNavigation = (
     <>
-      <div className="navigatioin-bar-config">
-        <div className="navigationBar-config-hearder">
+      <div className="navigationBar-config">
+        <div className="navigationBar-config-header">
           <BasicTitle title="页面管理"></BasicTitle>
           <Button type="primary" onClick={() => onSave()}>
             保存
@@ -173,7 +174,7 @@ const NavigationBar: React.FC<{
     setMore(false);
   };
   return (
-    <div className={`navigationBar ${more && 'navigationBar-Open'}`}>
+    <div className={`navigationBar ${more && 'navigationBar-open'}`}>
       {more ? configNavigation : regularNavigation}
     </div>
   );

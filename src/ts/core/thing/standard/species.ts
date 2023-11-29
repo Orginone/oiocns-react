@@ -12,6 +12,8 @@ export interface ISpecies extends IStandardFileInfo<schema.XSpecies> {
   createItem(data: schema.XSpeciesItem): Promise<schema.XSpeciesItem | undefined>;
   /** 删除类目项 */
   deleteItem(item: schema.XSpeciesItem): Promise<boolean>;
+  /** 硬删除类目项 */
+  hardDeleteItem(item: schema.XSpeciesItem): Promise<boolean>;
   /** 更新类目项 */
   updateItem(data: schema.XSpeciesItem): Promise<boolean>;
 }
@@ -65,6 +67,13 @@ export class Species extends StandardFileInfo<schema.XSpecies> implements ISpeci
   }
   async deleteItem(item: schema.XSpeciesItem): Promise<boolean> {
     const success = await this.directory.resource.speciesItemColl.delete(item);
+    if (success) {
+      this.items = this.items.filter((i) => i.id != item.id);
+    }
+    return success;
+  }
+  async hardDeleteItem(item: schema.XSpeciesItem): Promise<boolean> {
+    const success = await this.directory.resource.speciesItemColl.remove(item);
     if (success) {
       this.items = this.items.filter((i) => i.id != item.id);
     }

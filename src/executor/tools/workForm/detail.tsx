@@ -14,7 +14,7 @@ interface IProps {
   data: model.InstanceDataModel;
   ruleService?: WorkFormRulesType;
   getFormData: (form: schema.XForm) => model.FormEditData;
-  onChanged?: (id: string, data: model.FormEditData) => void;
+  onChanged?: (id: string, data: model.FormEditData, changedValues: any) => void;
 }
 
 const DetailTable: React.FC<IProps> = (props) => {
@@ -25,7 +25,11 @@ const DetailTable: React.FC<IProps> = (props) => {
   const [formData, setFormData] = useState(props.getFormData(form));
   const [selectKeys, setSelectKeys] = useState<string[]>([]);
   useEffect(() => {
-    props.onChanged?.apply(this, [form.id, formData]);
+    var after = formData.after.at(-1);
+    if (after) {
+      after.name = form.name;
+    }
+    props.onChanged?.apply(this, [form.id, formData, {}]);
     props.ruleService?.waitingTask(RuleTriggers.ThingsChanged, {
       id: form.id,
       data: formData,

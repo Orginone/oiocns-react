@@ -6,6 +6,7 @@ export type { IDEntity, IEntity } from './public';
 export type { XCollection } from './public/collection';
 export { companyTypes, departmentTypes, orgAuth, valueTypes } from './public/consts';
 export {
+  FromOrigin,
   MessageType,
   SpeciesType,
   TargetType,
@@ -15,6 +16,7 @@ export {
 export type { XObject } from './public/object';
 export type { IAuthority } from './target/authority/authority';
 export type { IBelong } from './target/base/belong';
+export type { IMemeber } from './target/base/member';
 export type { ITarget } from './target/base/target';
 export type { ITeam } from './target/base/team';
 export type { IIdentity } from './target/identity/identity';
@@ -27,7 +29,6 @@ export type { IPerson } from './target/person';
 export type { ICompany } from './target/team/company';
 export type { IDirectory } from './thing/directory';
 export type { IFile, IFileInfo } from './thing/fileinfo';
-export type { IMemeber } from './thing/member';
 export type { IApplication } from './thing/standard/application';
 export type { IForm } from './thing/standard/form';
 export type { IProperty } from './thing/standard/property';

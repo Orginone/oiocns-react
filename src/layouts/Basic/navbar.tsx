@@ -8,12 +8,12 @@ import React from 'react';
 import { kernel, model, schema } from '@/ts/base';
 import { showChatTime } from '@/utils/tools';
 import { useFlagCmdEmitter } from '@/hooks/useCtrlUpdate';
-import { Link } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 
 const Navbar: React.FC = () => {
+  const history = useHistory();
   const [workCount, setWorkCount] = useState(0);
   const [msgCount, setMsgCount] = useState(0);
-  const [online, setOnline] = useState(0);
   const [onlineVisible, setOnlineVisible] = useState(false);
   useFlagCmdEmitter('session', () => {
     let noReadCount = 0;
@@ -27,9 +27,6 @@ const Navbar: React.FC = () => {
   useEffect(() => {
     const workId = orgCtrl.work.notity.subscribe(async () => {
       setWorkCount(orgCtrl.work.todos.length);
-    });
-    kernel.onlineNotify.subscribe(() => {
-      setOnline(kernel.onlineIds.length);
     });
     return () => {
       orgCtrl.work.notity.unsubscribe(workId);
@@ -55,15 +52,15 @@ const Navbar: React.FC = () => {
       count: workCount,
     },
     {
-      text: '存储',
+      text: '数据',
       icon: 'store',
       path: '/store',
       count: 0,
     },
     {
-      text: '设置',
-      icon: 'setting',
-      path: '/setting',
+      text: '关系',
+      icon: 'relation',
+      path: '/relation',
       count: 0,
     },
   ];
@@ -79,43 +76,39 @@ const Navbar: React.FC = () => {
       );
     }
     return (
-      <Link
+      <a
         key={item.path}
-        to={item.path}
         onClick={() => {
+          history.push(item.path);
           orgCtrl.currentKey = '';
           orgCtrl.changCallback();
         }}>
         {content}
         <div className={selected ? styles.title_selected : styles.title}>{item.text}</div>
-      </Link>
+      </a>
     );
   };
 
   return (
     <Layout.Sider className={styles.header} width={60}>
-      <div className="ogo-space-item" onClick={() => setOnlineVisible(!onlineVisible)}>
-        {online > 0 ? (
-          <Badge count={online} size="small" offset={[-15, 0]}>
-            <EntityIcon entityId={orgCtrl.user.id} size={45} />
-          </Badge>
-        ) : (
-          <EntityIcon entityId={orgCtrl.user.id} size={45} />
-        )}
+      <div
+        className="ogo-space-item"
+        style={{ cursor: 'pointer' }}
+        onClick={() => setOnlineVisible(!onlineVisible)}>
+        <EntityIcon entityId={orgCtrl.user.id} size={45} />
       </div>
       <Space direction="vertical" wrap align="center" size={25} className={styles.navbar}>
         {actions.map((item) => NavItem(item))}
         {onlineVisible && <OnlineInfo onClose={() => setOnlineVisible(false)} />}
       </Space>
-      <Link
-        to={'/passport/login'}
+      <a
         onClick={() => {
-          sessionStorage.clear();
-          location.reload();
+          orgCtrl.exit();
+          window.location.reload();
         }}>
         <OrgIcons size={22} exit selected />
         <div className={styles.title_selected}>退出</div>
-      </Link>
+      </a>
     </Layout.Sider>
   );
 };
@@ -124,15 +117,10 @@ const OnlineInfo: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const [key, setKey] = useState('1');
   const [onlines, setOnlines] = useState<model.OnlineSet>();
   useEffect(() => {
-    const id = kernel.onlineNotify.subscribe((key) => {
-      kernel.onlines().then((value) => {
-        setOnlines(value);
-        setKey(key);
-      });
+    kernel.onlines().then((value) => {
+      setOnlines(value);
+      setKey(key);
     });
-    return () => {
-      kernel.onlineNotify.unsubscribe(id);
-    };
   }, []);
   if (!onlines) return <></>;
 

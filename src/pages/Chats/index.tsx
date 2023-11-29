@@ -4,7 +4,7 @@ import * as config from './config/menuOperate';
 import MainLayout from '@/components/MainLayout';
 import useMenuUpdate from '@/hooks/useMenuUpdate';
 import { Input } from 'antd';
-import { ImSearch } from '@/icons/im';
+import { ImSearch } from 'react-icons/im';
 
 const Setting: React.FC<any> = () => {
   const [filter, setFilter] = useState('');
@@ -13,8 +13,8 @@ const Setting: React.FC<any> = () => {
   if (!selectMenu || !rootMenu) return <></>;
   return (
     <MainLayout
-      previewFlag={'chat'}
       rightShow
+      previewFlag={'chat'}
       selectMenu={selectMenu}
       onSelect={async (data) => {
         setSelectMenu(data);

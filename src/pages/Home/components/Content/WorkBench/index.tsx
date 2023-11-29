@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Badge, Button, Calendar, Divider, Dropdown, Space, Spin } from 'antd';
-import { ImBubbles2, ImDropbox, ImList, ImPlus, ImStack } from '@/icons/im';
+import { ImBubbles2, ImDropbox, ImList, ImPlus, ImStack } from 'react-icons/im';
 import { useHistory } from 'react-router-dom';
 import { command, model } from '@/ts/base';
 import orgCtrl from '@/ts/controller';
@@ -26,9 +26,7 @@ const WorkBench: React.FC = () => {
       <div className="dataItem">
         <div className="dataItemTitle">{title}</div>
         <div className="dataItemNumber">{number}</div>
-        {size && size > 0 && (
-          <div className="dataItemTitle">大小:{formatSize(size)}</div>
-        )}
+        {size && size > 0 && <div className="dataItemTitle">大小:{formatSize(size)}</div>}
         {info && info.length > 0 && <div className="dataItemTitle">{info}</div>}
       </div>
     );
@@ -128,12 +126,14 @@ const WorkBench: React.FC = () => {
       </>
     );
   };
-  // 渲染存储信息
+  // 渲染存储数据信息
   const RendeStore: React.FC = () => {
+    const [noStore, setNoStore] = useState(false);
     const [diskInfo, setDiskInfo] = useState<model.DiskInfoType>();
     useEffect(() => {
       orgCtrl.user.getDiskInfo().then((value) => {
         setDiskInfo(value);
+        setNoStore(value === undefined);
       });
     }, []);
     return (
@@ -165,6 +165,15 @@ const WorkBench: React.FC = () => {
                   diskInfo.fsTotalSize,
                 )}
               </>
+            )}
+            {noStore && (
+              <h3 style={{ color: 'red' }}>
+                {`您还未申请存储资源，
+                您将无法使用本系统，
+                请申请加入您的存储资源群（用来存储您的数据），
+                个人用户试用存储群为（orginone_data），
+                申请通过后请在关系中激活使用哦！`}
+              </h3>
             )}
           </Space>
         </div>

@@ -1,7 +1,7 @@
 import { Popover, Slider } from 'antd';
 import React, { ReactElement, useEffect, useState } from 'react';
 import cls from './index.module.less';
-import { ImVolumeHigh, ImVolumeLow, ImVolumeMedium, ImVolumeMute2 } from '@/icons/im';
+import { ImVolumeHigh, ImVolumeLow, ImVolumeMedium, ImVolumeMute2 } from 'react-icons/im';
 interface IProps {
   audioRef: any;
 }

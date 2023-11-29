@@ -1,5 +1,5 @@
 import { Popover, Button } from 'antd';
-import * as ai from '@/icons/ai';
+import * as ai from 'react-icons/ai';
 import React, { useState } from 'react';
 import cls from './index.module.less';
 import { AddNodeType } from '@/components/Common/FlowDesign/processType';
@@ -74,6 +74,14 @@ const InsertButton: React.FC<InsertButtonProps> = (props: any) => {
             }}>
             <ai.AiOutlineFork color="#af343e" />
             <span>其他办事</span>
+          </div>
+          <div
+            onClick={() => {
+              props.onInsertNode(AddNodeType.GATEWAY);
+              setOpen(false);
+            }}>
+            <ai.AiOutlineForm color="#af343e" />
+            <span>分流网关</span>
           </div>
         </div>
       }
