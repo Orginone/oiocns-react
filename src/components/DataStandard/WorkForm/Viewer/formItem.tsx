@@ -79,13 +79,13 @@ const FormItem: React.FC<IFormItemProps> = (props) => {
   if (props.field.options.isRequired) {
     /** 增加是否有defaultValue值的判断 */
     mixOptions.isValid = mixOptions.defaultValue ? 'true' : isValid;
-    /** 增加有默认值的情况下给表单传值 */
-    if (mixOptions.defaultValue) {
-      const changedValues: any = {};
-      changedValues[props.field.id] = mixOptions.defaultValue;
-      props.onValuesChange?.apply(this, [changedValues, props.data]);
-    }
     mixOptions.label = mixOptions.label + '*';
+  }
+  /** 增加有默认值的情况下给表单传值，包含不是必填 */
+  if (mixOptions.defaultValue) {
+    const changedValues: any = {};
+    changedValues[props.field.id] = mixOptions.defaultValue;
+    props.onValuesChange?.apply(this, [changedValues, props.data]);
   }
 
   switch (getWidget(props.field.valueType, props.field.widget)) {
