@@ -1,4 +1,4 @@
-import { AiOutlineEllipsis, AiOutlineSearch } from '@/icons/ai';
+import { AiOutlineEllipsis, AiOutlineSearch } from 'react-icons/ai';
 import { Badge, Dropdown, Input, MenuProps, Tag, Tree, TreeProps } from 'antd';
 import React, { ReactElement, useEffect, useState } from 'react';
 import cls from './index.module.less';
@@ -43,7 +43,7 @@ const CustomTree: React.FC<TreeType> = ({
   const [mouseOverItem, setMouseOverItem] = useState<any>({});
   const [searchValue, setSearchValue] = useState<string>('');
   const [visibleMenu, setVisibleMenu] = useState(false);
-  const [visibleData, setVisibleData] = useState<any[]>([]);
+  const [visibleData, setVisibleData] = useState<any[]>(treeData);
   useEffect(() => {
     if (searchValue && searchValue.length > 0) {
       setVisibleData(loopFilterTree(treeData, searchValue));
@@ -206,6 +206,7 @@ const CustomTree: React.FC<TreeType> = ({
           onRightClick={() => {
             setVisibleMenu(true);
           }}
+          draggable
           fieldNames={fieldNames}
           treeData={visibleData}
           {...rest}
@@ -218,6 +219,7 @@ const CustomTree: React.FC<TreeType> = ({
           onRightClick={() => {
             setVisibleMenu(true);
           }}
+          draggable
           treeData={visibleData}
           {...rest}
         />

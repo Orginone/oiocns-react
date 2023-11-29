@@ -16,7 +16,7 @@ const WorkFormViewer: React.FC<{
   fields: model.FieldModel[];
   onValuesChange?: (changedValues: any, data: any) => void;
 }> = (props) => {
-  const formData: any = props.data || {};
+  const formData: any = { name: props.form.name, ...props.data };
   const [notifyEmitter] = React.useState(new Emitter());
   const [colNum, setColNum] = useStorage('workFormColNum', '一列');
   return (
@@ -57,6 +57,7 @@ const WorkFormViewer: React.FC<{
             code: 'name',
             valueType: '描述型',
             remark: '数据的名称。',
+            options: { hideField: true },
           }}
           belong={props.belong}
           notifyEmitter={notifyEmitter}

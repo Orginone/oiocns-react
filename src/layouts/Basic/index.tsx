@@ -21,9 +21,9 @@ const BasicLayout: React.FC<BasicLayoutProps> = (props) => {
     setTimeout(() => {
       setInited(true);
       if (!orgCtrl.logined) {
-        return history.push('/passport/login');
+        return history.push('/auth');
       }
-    }, 1500);
+    }, 500);
     kernel.onConnectedChanged((res: boolean) => {
       setConnectStatus(res);
     });

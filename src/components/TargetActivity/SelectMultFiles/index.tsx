@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { ISysFileInfo } from '@/ts/core';
 import OpenFileDialog from '@/components/OpenFileDialog';
 import ActivityResource from '../ActivityResource';
-import { AiOutlinePlus } from '@/icons/ai';
+import { AiOutlinePlus } from 'react-icons/ai';
 const SelectMultFiles: React.FC<{
   maxCount: number;
   types: string[];
@@ -23,7 +23,7 @@ const SelectMultFiles: React.FC<{
   }, [fileList]);
 
   return (
-    <div className={"selectMultFiles"}>
+    <div className={'selectMultFiles'}>
       {ActivityResource(
         fileList.map((i) => i.shareInfo()),
         200,

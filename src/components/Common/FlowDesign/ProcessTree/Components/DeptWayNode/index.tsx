@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import InsertButton from '../InsertButton';
-import { AiOutlineClose } from '@/icons/ai';
+import { AiOutlineClose } from 'react-icons/ai';
 import cls from './index.module.less';
 import SelectOrg from '../selectOrg';
 import { ITarget } from '@/ts/core';

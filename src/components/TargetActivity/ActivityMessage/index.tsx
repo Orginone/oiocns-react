@@ -8,7 +8,7 @@ import { XEntity } from '@/ts/base/schema';
 import ActivityResource from '../ActivityResource';
 import ActivityComment from '../ActivityComment';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
-import { AiOutlineDelete, AiOutlineLike, AiOutlineMessage } from '@/icons/ai';
+import { AiOutlineDelete, AiOutlineLike, AiOutlineMessage } from 'react-icons/ai';
 
 interface ActivityItemProps {
   hideResource?: boolean;
@@ -102,18 +102,18 @@ export const ActivityMessage: React.FC<ActivityItemProps> = ({
       return (
         <>
           {/* <div className={cls.activityItemFooter}> */}
-          <div className={"activityItem-footer"}>
+          <div className={'activityItem-footer'}>
             <div>
               <EntityIcon entityId={metadata.createUser} showName />
               {/* <span className={cls.activityTime}> */}
-              <span className={"activityTime"}>
+              <span className={'activityTime'}>
                 发布于{showChatTime(item.metadata.createTime)}
               </span>
             </div>
           </div>
           {showLikes && (
             // <div className={cls.activityItemFooterLikes}>
-            <div className={"activityItem-footer-likes"}>
+            <div className={'activityItem-footer-likes'}>
               {metadata.likes.length > 0 && (
                 <span style={{ fontSize: 18, color: '#888' }}>
                   <AiOutlineLike className="likeColor" size={18} />
@@ -133,19 +133,19 @@ export const ActivityMessage: React.FC<ActivityItemProps> = ({
     }
     return (
       <>
-        <div className={"activityItem-footer"}>
+        <div className={'activityItem-footer'}>
           <div>
             <EntityIcon entityId={metadata.createUser} showName />
-            <span className={"activityTime"}>
+            <span className={'activityTime'}>
               发布于{showChatTime(item.metadata.createTime)}
             </span>
           </div>
           {!hideResource && <div>{renderOperate()}</div>}
         </div>
         <div
-          className={"activityItem-footer-likes"}
+          className={'activityItem-footer-likes'}
           style={{ display: metadata.likes.length ? 'flex' : 'none' }}>
-          <AiOutlineLike className="likeColor"  size={18} />
+          <AiOutlineLike className="likeColor" size={18} />
           {metadata.likes.map((userId) => {
             return (
               <div key={userId} style={{ alignItems: 'center', display: 'flex' }}>
@@ -155,7 +155,7 @@ export const ActivityMessage: React.FC<ActivityItemProps> = ({
           })}
         </div>
         {metadata.comments?.length > 0 && (
-          <div className={"activityItem-commentList"}>
+          <div className={'activityItem-commentList'}>
             {metadata.comments.map((item) => {
               return (
                 <ActivityComment
@@ -168,7 +168,7 @@ export const ActivityMessage: React.FC<ActivityItemProps> = ({
         )}
         <div
           style={{ display: commenting ? 'flex' : 'none' }}
-          className={"activityItem-commentInputBox"}>
+          className={'activityItem-commentInputBox'}>
           <Input.TextArea
             placeholder={replyTo ? `回复${replyTo.name} :` : ''}
             style={{ height: 12 }}
@@ -208,11 +208,11 @@ export const ActivityMessage: React.FC<ActivityItemProps> = ({
         }
         avatar={<EntityIcon entity={activity.metadata} size={50} />}
         description={
-          <div className={"activityItem"}>
+          <div className={'activityItem'}>
             <div>
               {renderContent()}
               {hideResource !== true && (
-                <div className={"activityItem-imageList"}>
+                <div className={'activityItem-imageList'}>
                   <Image.PreviewGroup>
                     {ActivityResource(metadata.resource, 600)}
                   </Image.PreviewGroup>

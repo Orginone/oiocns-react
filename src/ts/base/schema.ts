@@ -125,6 +125,8 @@ export type XAttributeProps = {
   species?: boolean;
   // 是否固定列
   fixed?: boolean;
+  // 是否展示至摘要
+  showToRemark?: boolean;
 };
 
 //权限定义
@@ -167,6 +169,8 @@ export type XDirectory = {
 export type XForm = {
   // 表单布局
   rule: string;
+  // 表单查看数据规则
+  searchRule: string;
   // 配置参数
   options: XFormProps | undefined;
   // 表单的特性
@@ -491,6 +495,8 @@ export type XWorkDefine = {
   shareId: string;
   // 允许新增
   allowAdd: boolean;
+  // 允许补充办事
+  hasGateway: boolean;
   // 允许变更
   allowEdit: boolean;
   // 允许选择
@@ -504,6 +510,18 @@ export type XWorkDefine = {
   // 归属用户
   target: XTarget | undefined;
 } & XEntity;
+
+//节点网关
+export type XWorkGateway = {
+  // 网关节点Id
+  nodeId: string;
+  // 关联办事Id
+  defineId: string;
+  // 组织Id
+  targetId: string;
+  // 关联的办事
+  define: XWorkDefine | undefined;
+} & Xbase;
 
 //办事实例
 export type XWorkInstance = {
@@ -630,3 +648,21 @@ export type XWorkTask = {
   // 办事的定义
   instance: XWorkInstance | undefined;
 } & Xbase;
+
+//暂存
+export type XStaging = {
+  // 类型
+  typeName: string;
+  // 数据
+  data: XThing;
+  // 归属+关系举证
+  relations: string;
+} & Xbase;
+
+// 页面模板
+export interface XPageTemplate extends XStandard {
+  // 是否发布至首页
+  public: boolean;
+  // 模板类型
+  kind?: string;
+}

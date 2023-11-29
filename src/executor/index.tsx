@@ -6,7 +6,7 @@ import React, { useEffect, useState } from 'react';
 import { executeCmd } from './action';
 import { useHistory } from 'react-router-dom';
 
-const Executor = () => {
+const Executor: React.FC = () => {
   const history = useHistory();
   const [preview, setPreview] = useState(<></>);
   const [content, setContent] = useState(<></>);
@@ -38,7 +38,8 @@ const Executor = () => {
             }
             return;
           case 'design':
-            setContent(<DesignExecutor entity={args[0]} finished={resetCtx} />);
+          case 'fillWork':
+            setContent(<DesignExecutor cmd={cmd} entity={args[0]} finished={resetCtx} />);
             return;
           default:
             setContent(<OperateExecutor cmd={cmd} args={args} finished={resetCtx} />);

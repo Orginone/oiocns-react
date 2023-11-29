@@ -95,9 +95,17 @@ const AttributeConfig: React.FC<IAttributeProps> = ({
             editorType="dxSelectBox"
             label={{ text: '默认值' }}
             editorOptions={{
-              displayExpr: 'name',
-              valueExpr: 'id',
-              dataSource: items,
+              displayExpr: 'text',
+              valueExpr: 'value',
+              dataSource: items.map((i) => {
+                return {
+                  id: i.id,
+                  text: i.name,
+                  value: `S${i.id}`,
+                  icon: i.icon,
+                  parentId: i.parentId,
+                };
+              }),
             }}
           />,
         );
@@ -292,6 +300,11 @@ const AttributeConfig: React.FC<IAttributeProps> = ({
           dataField="options.isRequired"
           editorType="dxCheckBox"
           label={{ text: '必填特性' }}
+        />
+        <SimpleItem
+          dataField="options.showToRemark"
+          editorType="dxCheckBox"
+          label={{ text: '展示至摘要' }}
         />
         {loadItemConfig()}
       </GroupItem>

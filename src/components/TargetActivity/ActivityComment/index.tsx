@@ -9,10 +9,10 @@ const ActivityComment: React.FC<{
 }> = ({ comment, onClick }) => {
   return (
     <div className="activityCommet" onClick={() => onClick(comment)}>
-      <div className={"activityCommet-avatar"}>
+      <div className={'activityCommet-avatar'}>
         <EntityIcon entityId={comment.userId} showName></EntityIcon>
       </div>
-      <div className={"activityCommet-content"}>
+      <div className={'activityCommet-content'}>
         {comment.replyTo ? (
           <>
             回复 <UserInfo userId={comment.replyTo}></UserInfo> ：

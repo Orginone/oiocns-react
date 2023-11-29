@@ -54,6 +54,9 @@ export class Person extends Belong implements IPerson {
   copyFiles: Map<string, IFile>;
   private _cohortLoaded: boolean = false;
   private _givedIdentityLoaded: boolean = false;
+  get superior(): IFile {
+    return this;
+  }
   async loadGivedIdentitys(reload: boolean = false): Promise<schema.XIdProof[]> {
     if (!this._givedIdentityLoaded || reload) {
       const res = await kernel.queryGivedIdentitys();
@@ -284,18 +287,7 @@ export class Person extends Belong implements IPerson {
     return operates;
   }
   content(): IFile[] {
-    return [this.memberDirectory, ...this.cohorts, ...this.storages];
-  }
-  async findEntityAsync(id: string): Promise<schema.XEntity | undefined> {
-    const metadata = this.findMetadata<schema.XEntity>(id);
-    if (metadata) {
-      return metadata;
-    }
-    const res = await kernel.queryEntityById({ id: id });
-    if (res.success && res.data?.id) {
-      this.updateMetadata(res.data);
-      return res.data;
-    }
+    return [...this.cohorts, ...this.storages];
   }
   findShareById(id: string): model.ShareIcon {
     const metadata = this.findMetadata<schema.XEntity>(id);

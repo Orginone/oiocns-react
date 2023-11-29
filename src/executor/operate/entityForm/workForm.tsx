@@ -133,6 +133,7 @@ const WorkForm = ({ finished, formType, current }: Iprops) => {
           allowAdd: values.allowAdd,
           allowEdit: values.allowEdit,
           allowSelect: values.allowSelect,
+          allowFillWork: values.allowFillWork,
         });
         switch (formType) {
           case 'updateWork':

@@ -285,6 +285,7 @@ const cleanMenus = (items?: OperateMenuType[]): OperateMenuType[] | undefined =>
       key: i.key,
       label: i.label,
       icon: i.icon,
+      model: i.model,
       children: cleanMenus(i.children),
     } as OperateMenuType;
   });
@@ -327,6 +328,40 @@ const parseHtmlToText = (html: string) => {
   return text.replace(/[\r\n]/g, ''); //去掉回车换行
 };
 
+/** 根据节点id获取节点信息 */
+const getNodeByNodeId = (
+  id: string,
+  node: model.WorkNodeModel | undefined,
+): model.WorkNodeModel | undefined => {
+  if (node) {
+    if (id === node.id) return node;
+    const find = getNodeByNodeId(id, node.children);
+    if (find) return find;
+    for (const subNode of node?.branches ?? []) {
+      const find = getNodeByNodeId(id, subNode.children);
+      if (find) return find;
+    }
+  }
+};
+
+const loadGatewayNodes = (
+  node: model.WorkNodeModel,
+  memberNodes: model.WorkNodeModel[],
+) => {
+  if (node.type == '网关') {
+    memberNodes.push(node);
+  }
+  if (node.children) {
+    memberNodes = loadGatewayNodes(node.children, memberNodes);
+  }
+  for (const branch of node.branches ?? []) {
+    if (branch.children) {
+      memberNodes = loadGatewayNodes(branch.children, memberNodes);
+    }
+  }
+  return memberNodes;
+};
+
 export {
   cleanMenus,
   dateFormat,
@@ -336,8 +371,10 @@ export {
   findMenuItemByKey,
   formatZhDate,
   getNewKeyWithString,
+  getNodeByNodeId,
   getUuid,
   handleFormatDate,
+  loadGatewayNodes,
   parseHtmlToText,
   pySegSort,
   pySegSortObj,

@@ -69,6 +69,7 @@ const SearchTargetItem: React.FC<SearchTargetItemProps> = (props) => {
               } else {
                 setSelectTarget(undefined);
               }
+              setSearchEnabled(false);
             }}
             searchType={props.typeName}
           />

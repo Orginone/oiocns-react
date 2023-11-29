@@ -2,7 +2,7 @@ import { FileItemShare } from 'src/ts/base/model';
 import React, { useEffect, useRef, useState } from 'react';
 import { Draggable } from 'devextreme-react';
 import cls from './index.module.less';
-import { AiOutlineCloseCircle } from '@/icons/ai';
+import { AiOutlineCloseCircle } from 'react-icons/ai';
 import Speaker from './speaker';
 import Menus from './menus';
 import AudioProgress from './progress';

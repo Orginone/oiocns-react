@@ -55,6 +55,11 @@ const EntityInfo: React.FC<IProps> = ({ entity, other, extra, column }: IProps) 
         </Descriptions.Item>
         {other}
         <Descriptions.Item label="类型">{entity.typeName}</Descriptions.Item>
+        {'storeId' in entity.metadata && (
+          <Descriptions.Item label="当前数据核">
+            <EntityIcon entityId={entity.metadata.storeId as string} showName />
+          </Descriptions.Item>
+        )}
         {entity.metadata.belongId != entity.id && (
           <Descriptions.Item label="归属">
             <EntityIcon entityId={entity.metadata.belongId} showName />

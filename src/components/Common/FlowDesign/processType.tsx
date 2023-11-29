@@ -1,6 +1,6 @@
 import { WorkNodeModel } from '@/ts/base/model';
+import message from '@/utils/message';
 import { getUuid } from '@/utils/tools';
-import React from 'react';
 
 export const getNodeCode = () => {
   return `node_${getUuid()}`;
@@ -28,6 +28,8 @@ export const getNodeName = (type: AddNodeType) => {
       return '并行分支';
     case AddNodeType.ORGANIZATIONA:
       return '组织分支';
+    case AddNodeType.GATEWAY:
+      return '分流网关';
     default:
       return '';
   }
@@ -62,6 +64,7 @@ export enum AddNodeType {
   'CONCURRENTS' = '全部',
   'ORGANIZATIONA' = '组织',
   'CHILDWORK' = '子流程',
+  'GATEWAY' = '网关',
   'END' = '结束',
 }
 
@@ -132,6 +135,7 @@ export const loadResource = (resource: any, parentCode: string): any => {
       type: resource.type as AddNodeType,
       name: resource.name,
       destId: resource.destId,
+      destType: resource.destType,
       destName: resource.destName,
       num: resource.num || 1,
       forms: resource.forms,
@@ -181,10 +185,18 @@ const loadBranch = (resource: any, parentCode: string, parentType: string) => {
   }
 };
 
-export const convertNode = (resource: NodeModel | undefined, errors: any[]): any => {
+export type ValidationInfo = {
+  isPass: boolean;
+  hasGateway: boolean;
+};
+
+export const convertNode = (
+  resource: NodeModel | undefined,
+  validation: ValidationInfo,
+): any => {
   if (resource && resource.code) {
     if (resource.type == AddNodeType.EMPTY) {
-      return convertNode(resource.children, errors);
+      return convertNode(resource.children, validation);
     }
     const bandingForms = [
       ...(resource.primaryForms || []).map((a) => {
@@ -197,19 +209,19 @@ export const convertNode = (resource: NodeModel | undefined, errors: any[]): any
     switch (resource.type) {
       case AddNodeType.ROOT:
         if (bandingForms.length == 0) {
-          errors.push('ROOT节点未绑定表单');
+          message.warn('ROOT节点未绑定表单');
+          validation.isPass = false;
         }
+        break;
+      case AddNodeType.GATEWAY:
+        validation.hasGateway = true;
         break;
       case AddNodeType.CC:
       case AddNodeType.CHILDWORK:
       case AddNodeType.APPROVAL:
         if (!resource.destId || resource.destId == '') {
-          errors.push(
-            <>
-              节点： <span style={{ color: 'blue' }}>{resource.name} </span>
-              缺少操作对象
-            </>,
-          );
+          message.warn(`${resource.name}节点缺少审批对象`);
+          validation.isPass = false;
         }
         break;
       case AddNodeType.CONDITION:
@@ -222,12 +234,8 @@ export const convertNode = (resource: NodeModel | undefined, errors: any[]): any
             (a) => a.children == undefined || a.children.code == undefined,
           )
         ) {
-          errors.push(
-            <>
-              节点： <span style={{ color: 'blue' }}>{resource.name} </span>
-              缺少分支信息
-            </>,
-          );
+          message.warn(`${resource.name}节点缺少分支信息`);
+          validation.isPass = false;
         } else if (
           resource.type == AddNodeType.CONDITION &&
           resource.branches.some(
@@ -237,9 +245,8 @@ export const convertNode = (resource: NodeModel | undefined, errors: any[]): any
               a.conditions.find((a) => a.val == undefined || a.val == ''),
           )
         ) {
-          errors.push(
-            <span style={{ color: 'blue' }}>条件节点：{resource.name}条件不可为空 </span>,
-          );
+          message.warn(`${resource.name}条件不可为空`);
+          validation.isPass = false;
         }
     }
     return {
@@ -250,26 +257,17 @@ export const convertNode = (resource: NodeModel | undefined, errors: any[]): any
       name: resource.name,
       num: resource.num || 1,
       destType: resource.destType || '身份',
-      primaryForms:
-        resource.primaryForms?.map((a) => {
-          return { id: a.id, code: a.code, name: a.name };
-        }) || [],
-      detailForms:
-        resource.detailForms?.map((a) => {
-          return { id: a.id, code: a.code, name: a.name };
-        }) || [],
+      primaryForms: resource.primaryForms,
+      detailForms: resource.detailForms,
       destId: resource.destId,
       destName: resource.destName,
-      children: convertNode(resource.children, errors),
-      branches:
-        resource.branches?.map((item: any) => {
-          return convertBranch(item, errors);
-        }) || [],
+      children: convertNode(resource.children, validation),
+      branches: resource.branches?.map((a) => convertBranch(a, validation)),
     };
   }
 };
 
-const convertBranch = (resource: any, errors: any[]) => {
+const convertBranch = (resource: any, validation: ValidationInfo) => {
   return {
     conditions: resource.conditions
       ? resource.conditions.map((item: any) => {
@@ -282,6 +280,6 @@ const convertBranch = (resource: any, errors: any[]) => {
           };
         })
       : [],
-    children: convertNode(resource.children, errors),
+    children: convertNode(resource.children, validation),
   };
 };
