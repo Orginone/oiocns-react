@@ -16,7 +16,6 @@ const FormRuleConfig: React.FC<IAttributeProps> = ({ notifyEmitter, current }) =
   const [value, setValue] = useState<any>(
     JSON.parse(current.metadata.searchRule ?? '{}'),
   );
-  console.log(value, 'value');
   const [fields, setFields] = useState<any[]>([]);
   useEffect(() => {
     current.loadFields().then((f) => {
