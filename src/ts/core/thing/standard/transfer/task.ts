@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { Command, model } from '../../../../base';
 import { deepClone, generateUuid } from '../../../../base/common';
 import { ITransfer } from './index';

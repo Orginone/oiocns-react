@@ -5,17 +5,18 @@ import { ShareIcon } from '@/ts/base/model';
 import { command, parseAvatar, schema } from '@/ts/base';
 import TypeIcon from './typeIcon';
 import useAsyncLoad from '@/hooks/useAsyncLoad';
-import { ImInfo } from '@/icons/im';
+import { ImInfo } from 'react-icons/im';
 
 interface teamTypeInfo {
   size?: number;
+  iconSize?: number;
   entityId?: string;
   entity?: schema.XEntity;
   typeName?: string;
   notAvatar?: boolean;
   title?: string;
   showName?: boolean;
-  iconSize?: number;
+  onClick?: (entity?: schema.XEntity) => void;
 }
 
 interface shareIconInfo extends teamTypeInfo {
@@ -110,7 +111,10 @@ export const ShareIconItem = (info: shareIconInfo) => {
   if (info.share) {
     if (info.share.avatar?.thumbnail) {
       return (
-        <span title={info.title ?? ''} className="flex flexCenter">
+        <span
+          className="flex flexCenter pointer"
+          title={info.title ?? ''}
+          onClick={() => info.onClick?.apply(this, [info.entity])}>
           {infoMore()}
           <Avatar
             size={info.iconSize || size}
@@ -136,7 +140,9 @@ export const ShareIconItem = (info: shareIconInfo) => {
         return icon;
       }
       return (
-        <span className="flex flexCenter">
+        <span
+          className="flex flexCenter pointer"
+          onClick={() => info.onClick?.apply(this, [info.entity])}>
           {infoMore()}
           <Avatar
             size={info.iconSize || size}
@@ -149,7 +155,10 @@ export const ShareIconItem = (info: shareIconInfo) => {
     }
   }
   return (
-    <span className="flex flexCenter" title={info.title ?? ''}>
+    <span
+      className="flex flexCenter pointer"
+      title={info.title ?? ''}
+      onClick={() => info.onClick?.apply(this, [info.entity])}>
       {infoMore()}
       <Avatar
         size={size}

@@ -1,24 +1,29 @@
 import React from 'react';
-import { Badge, Button, Divider, Space } from 'antd';
+import { Badge, Button, Divider, Dropdown, MenuProps, Space, Typography } from 'antd';
 import cls from './index.module.less';
 import { schema } from '@/ts/base';
 import { IEntity } from '@/ts/core';
-import { ImArrowLeft2 } from '@react-icons/all-files/im/ImArrowLeft2';
-import { ImArrowRight2 } from '@react-icons/all-files/im/ImArrowRight2';
+import { ImUndo2 } from 'react-icons/im';
+import { RiMore2Fill } from 'react-icons/ri';
 
 interface IProps {
   select: string;
   initTags: string[];
   excludeTags: string[];
   extraTags: boolean;
+  showBack?: boolean;
+  menus: MenuProps;
   selectFiles: IEntity<schema.XEntity>[];
   badgeCount?: (tag: string) => number;
   entitys: IEntity<schema.XEntity>[];
   onChanged: (tag: string) => void;
+  onBack: () => void;
 }
 /** 标签条 */
 const TagsBar: React.FC<IProps> = (props) => {
-  const ref = React.createRef<HTMLDivElement>();
+  const items = props.menus.items || [];
+  const outside = items.filter((item: any) => item.model === 'outside');
+  const inside = items.filter((item: any) => item.model != 'outside');
   // 获取分组标签集
   const groupTags = () => {
     const tags = props.initTags.map((tag) => {
@@ -69,20 +74,46 @@ const TagsBar: React.FC<IProps> = (props) => {
       </div>
     );
   };
-  const arrowLeft = (num: number) => {
-    if (ref.current) {
-      ref.current.scrollLeft = ref.current.scrollLeft + num;
-    }
-  };
   return (
-    <div className={cls.tags_bar}>
-      <Button type="link" icon={<ImArrowLeft2 />} onClick={() => arrowLeft(-100)} />
-      <div ref={ref} className={cls.tags_body}>
+    <div className={cls.tags}>
+      <div className={cls.tags_bar}>
+        {props.showBack && (
+          <Button type="link" title="返回" icon={<ImUndo2 />} onClick={props.onBack} />
+        )}
         <Space split={<Divider type="vertical" style={{ height: 20 }} />} size={0}>
           {groupTags().map((item) => loadBarItem(item.tag, item.count))}
         </Space>
       </div>
-      <Button type="link" icon={<ImArrowRight2 />} onClick={() => arrowLeft(100)} />
+      <Space split={<Divider type="vertical" />} size={0}>
+        {outside.length > 0 &&
+          outside.map((item: any) => {
+            return (
+              <Typography.Link
+                key={item.key}
+                title={item.label}
+                style={{ fontSize: 18 }}
+                onClick={() => {
+                  props.menus.onClick?.apply(this, [item]);
+                }}>
+                {item.icon}
+              </Typography.Link>
+            );
+          })}
+        {inside.length > 0 && (
+          <Dropdown
+            menu={{
+              items: inside,
+              onClick: props.menus.onClick,
+            }}
+            dropdownRender={(menu) => (
+              <div>{menu && <Button type="link">{menu}</Button>}</div>
+            )}
+            placement="bottom"
+            trigger={['click', 'contextMenu']}>
+            <RiMore2Fill fontSize={22} style={{ cursor: 'pointer' }} />
+          </Dropdown>
+        )}
+      </Space>
     </div>
   );
 };

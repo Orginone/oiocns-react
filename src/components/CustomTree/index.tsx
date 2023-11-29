@@ -1,4 +1,4 @@
-import { AiOutlineEllipsis, AiOutlineSearch } from '@/icons/ai';
+import { AiOutlineEllipsis, AiOutlineSearch } from 'react-icons/ai';
 import { Badge, Dropdown, Input, MenuProps, Tag, Tree, TreeProps } from 'antd';
 import React, { ReactElement, useEffect, useState } from 'react';
 import cls from './index.module.less';

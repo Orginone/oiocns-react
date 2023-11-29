@@ -8,7 +8,7 @@ import { XEntity } from '@/ts/base/schema';
 import ActivityResource from '../ActivityResource';
 import ActivityComment from '../ActivityComment';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
-import { AiOutlineDelete, AiOutlineLike, AiOutlineMessage } from '@/icons/ai';
+import { AiOutlineDelete, AiOutlineLike, AiOutlineMessage } from 'react-icons/ai';
 
 interface ActivityItemProps {
   hideResource?: boolean;
@@ -116,6 +116,40 @@ export const ActivityMessage: React.FC<ActivityItemProps> = ({
         </Space>
       );
     };
+    if (hideResource === true) {
+      const showLikes = metadata.likes?.length > 0 || metadata.comments?.length > 0;
+      return (
+        <>
+          {/* <div className={cls.activityItemFooter}> */}
+          <div className={'activityItem-footer'}>
+            <div>
+              <EntityIcon entityId={metadata.createUser} showName />
+              {/* <span className={cls.activityTime}> */}
+              <span className={'activityTime'}>
+                发布于{showChatTime(item.metadata.createTime)}
+              </span>
+            </div>
+          </div>
+          {showLikes && (
+            // <div className={cls.activityItemFooterLikes}>
+            <div className={'activityItem-footer-likes'}>
+              {metadata.likes.length > 0 && (
+                <span style={{ fontSize: 18, color: '#888' }}>
+                  <AiOutlineLike className="likeColor" size={18} />
+                  <b style={{ marginLeft: 6 }}>{metadata.likes.length}</b>
+                </span>
+              )}
+              {metadata.comments.length > 0 && (
+                <span style={{ fontSize: 18, color: '#888' }}>
+                  <AiOutlineMessage style={{ color: '#4747cb' }} size={18} />
+                  <b style={{ marginLeft: 6 }}>{metadata.comments.length}</b>
+                </span>
+              )}
+            </div>
+          )}
+        </>
+      );
+    }
     return (
       <>
         <div className={'activityItem-footer'}>

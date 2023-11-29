@@ -17,6 +17,7 @@ interface Iprops {
 const TargetForm = (props: Iprops) => {
   let title = '';
   let typeName = '';
+  let tcodeLabel = '代码';
   let types: string[] = [props.current.typeName];
   const readonly = props.formType === 'remark';
   let initialValue: any = props.current.metadata;
@@ -50,6 +51,7 @@ const TargetForm = (props: Iprops) => {
       title = '设立单位';
       types = companyTypes;
       initialValue = {};
+      tcodeLabel = '企业信用代码';
       break;
     case 'newDepartment':
       typeName = '部门';
@@ -63,16 +65,26 @@ const TargetForm = (props: Iprops) => {
       initialValue = {};
       break;
     case 'update':
-      initialValue.teamCode = props.current.metadata.team?.code;
-      initialValue.teamName = props.current.metadata.team?.name;
       typeName = props.current.typeName;
       title = '更新' + props.current.name;
+      if (props.current.id === props.current.belongId) {
+        if (typeName === '人员') {
+          tcodeLabel = '手机号码';
+        } else {
+          tcodeLabel = '企业信用代码';
+        }
+      }
       break;
     case 'remark':
-      initialValue.teamCode = props.current.metadata.team?.code;
-      initialValue.teamName = props.current.metadata.team?.name;
       typeName = props.current.typeName;
       title = '查看' + props.current.name;
+      if (props.current.id === props.current.belongId) {
+        if (typeName === '人员') {
+          tcodeLabel = '手机号码';
+        } else {
+          tcodeLabel = '企业信用代码';
+        }
+      }
       break;
     default:
       return <></>;
@@ -123,22 +135,12 @@ const TargetForm = (props: Iprops) => {
       },
     },
     {
-      title: '代码',
+      title: tcodeLabel,
       dataIndex: 'code',
       readonly: readonly,
       formItemProps: {
         rules: [{ required: true, message: '分类代码为必填项' }],
       },
-    },
-    {
-      title: '简称',
-      dataIndex: 'teamName',
-      readonly: readonly,
-    },
-    {
-      title: '标识',
-      dataIndex: 'teamCode',
-      readonly: readonly,
     },
   ];
   if (readonly) {
@@ -173,6 +175,8 @@ const TargetForm = (props: Iprops) => {
       onFinish={async (values) => {
         switch (props.formType) {
           case 'update':
+            values.teamName = values.name;
+            values.teamCode = values.code;
             await props.current.update(values);
             break;
           default:

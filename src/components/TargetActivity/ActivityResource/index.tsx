@@ -3,7 +3,7 @@ import { Image } from 'antd';
 import { FileItemShare } from '@/ts/base/model';
 import { shareOpenLink } from '@/utils/tools';
 import { command } from '@/ts/base';
-import { AiOutlineFileUnknown } from '@/icons/ai';
+import { AiOutlineFileUnknown } from 'react-icons/ai';
 const ActivityResource = (
   fileList: FileItemShare[],
   maxWidth: number,

@@ -178,7 +178,6 @@ export default class ElementTreeManager {
     }
 
     delete this.allElements[e.id];
-    console.log(`删除 ${e.id}`);
   }
 
   removeElementById(id: string, recursive = true) {

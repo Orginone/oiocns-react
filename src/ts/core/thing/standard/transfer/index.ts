@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { Command, common, kernel, model } from '../../../../base';
 import { IDirectory } from '../../directory';
 import { IStandardFileInfo, StandardFileInfo } from '../../fileinfo';
@@ -313,7 +312,7 @@ export class Transfer extends StandardFileInfo<model.Transfer> implements ITrans
       decrypt: common.decrypt,
       encrypt: common.encrypt,
       log: (args: any) => {
-        console.log(args);
+        // console.log(args);
       },
     };
     common.Sandbox(code)(runtime);

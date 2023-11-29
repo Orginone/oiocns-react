@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { ISysFileInfo } from '@/ts/core';
 import OpenFileDialog from '@/components/OpenFileDialog';
 import ActivityResource from '../ActivityResource';
-import { AiOutlinePlus } from '@/icons/ai';
+import { AiOutlinePlus } from 'react-icons/ai';
 const SelectMultFiles: React.FC<{
   maxCount: number;
   types: string[];

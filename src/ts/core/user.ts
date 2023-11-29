@@ -1,24 +1,27 @@
 import { IPerson, Person } from './target/person';
-import { command, common, kernel, model, schema } from '../base';
+import { command, common, schema } from '../base';
 import { IWorkProvider, WorkProvider } from './work/provider';
 import { BoxProvider, IBoxProvider } from './work/box';
+import { AuthProvider } from './auth';
 import { ITarget } from './target/base/target';
-
-const sessionUserName = 'sessionUser';
 
 /** 当前用户提供层 */
 export class UserProvider {
   private _user: IPerson | undefined;
   private _work: IWorkProvider | undefined;
   private _box: IBoxProvider | undefined;
+  private _auth: AuthProvider;
   private _inited: boolean = false;
   private _emiter: common.Emitter;
   constructor(emiter: common.Emitter) {
     this._emiter = emiter;
-    const userJson = sessionStorage.getItem(sessionUserName);
-    if (userJson && userJson.length > 0) {
-      this._loadUser(JSON.parse(userJson));
-    }
+    this._auth = new AuthProvider(async (data) => {
+      await this._loadUser(data);
+    });
+  }
+  /** 授权方法 */
+  get auth(): AuthProvider {
+    return this._auth;
   }
   /** 当前用户 */
   get user(): IPerson | undefined {
@@ -47,47 +50,8 @@ export class UserProvider {
     }
     return targets;
   }
-  /**
-   * 登录
-   * @param account 账户
-   * @param password 密码
-   */
-  public async login(account: string, password: string): Promise<model.ResultType<any>> {
-    let res = await kernel.login(account, password);
-    if (res.success) {
-      await this._loadUser(res.data.target);
-    }
-    return res;
-  }
-  /**
-   * 注册用户
-   * @param {RegisterType} params 参数
-   */
-  public async register(params: model.RegisterType): Promise<model.ResultType<any>> {
-    let res = await kernel.register(params);
-    if (res.success) {
-      await this._loadUser(res.data.target);
-    }
-    return res;
-  }
-  /**
-   * 变更密码
-   * @param account 账号
-   * @param password 密码
-   * @param privateKey 私钥
-   * @returns
-   */
-  public async resetPassword(
-    account: string,
-    password: string,
-    privateKey: string,
-  ): Promise<model.ResultType<any>> {
-    return await kernel.resetPassword(account, password, privateKey);
-  }
   /** 加载用户 */
   private async _loadUser(person: schema.XTarget) {
-    sessionStorage.setItem(sessionUserName, JSON.stringify(person));
-    kernel.userId = person.id;
     this._user = new Person(person);
     this._work = new WorkProvider(this);
     this._box = new BoxProvider(this);

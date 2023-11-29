@@ -71,6 +71,14 @@ export const executeCmd = (cmd: string, entity: any) => {
       return activateStorage(entity);
     case 'hslSplit':
       return videoHslSplit(entity);
+    case 'removeSession':
+      return removeSession(entity);
+    case 'topingToggle':
+      return sessionTopingToggle(entity);
+    case 'readedToggle':
+      return sessionReadedToggle(entity);
+    case 'applyFriend':
+      return applyFriend(entity);
   }
   return false;
 };
@@ -105,6 +113,40 @@ const videoHslSplit = (file: ISysFileInfo) => {
   });
 };
 
+/** 移除会话 */
+const removeSession = (entity: ISession) => {
+  entity.chatdata.recently = false;
+  entity.chatdata.lastMessage = undefined;
+  entity.cacheChatData();
+  orgCtrl.changCallback();
+  command.emitter('preview', 'chat', undefined);
+};
+
+/** 会话置顶变更 */
+const sessionTopingToggle = (entity: ISession) => {
+  entity.chatdata.isToping = !entity.chatdata.isToping;
+  entity.cacheChatData();
+  orgCtrl.changCallback();
+};
+
+/** 会话已读/未读变更 */
+const sessionReadedToggle = (entity: ISession) => {
+  if (entity.chatdata.noReadCount > 0) {
+    entity.chatdata.noReadCount = 0;
+  } else {
+    entity.chatdata.noReadCount = 1;
+  }
+  entity.cacheChatData();
+  orgCtrl.changCallback();
+};
+
+/** 申请加为好友 */
+const applyFriend = (entity: ISession) => {
+  orgCtrl.user.applyJoin([entity.metadata as schema.XTarget]).then(() => {
+    orgCtrl.changCallback();
+  });
+};
+
 /** 进入办事 */
 const openWork = (entity: IWork) => {
   orgCtrl.currentKey = entity.key;
@@ -112,8 +154,12 @@ const openWork = (entity: IWork) => {
 };
 
 /** 进入目录 */
-const openDirectory = (entity: IFile | schema.XEntity) => {
-  if (entity && 'isContainer' in entity && entity.isContainer) {
+const openDirectory = (entity: IFile | schema.XEntity | string) => {
+  if (typeof entity === 'string') {
+    orgCtrl.currentKey = 'disk';
+    orgCtrl.changCallback();
+    return;
+  } else if (entity && 'isContainer' in entity && entity.isContainer) {
     orgCtrl.currentKey = entity.key;
     orgCtrl.changCallback();
     return;
@@ -202,17 +248,16 @@ const copyBoard = (dir: IDirectory) => {
 };
 
 /** 打开会话 */
-const openChat = (entity: IDirectory | IMemeber | ISession | ITarget) => {
-  if ('taskList' in entity) {
-    orgCtrl.currentKey = entity.target.session.chatdata.fullId;
-  } else if ('fullId' in entity) {
-    orgCtrl.currentKey = entity.fullId;
-  } else if ('session' in entity) {
-    orgCtrl.currentKey = entity.session.chatdata.fullId;
-  } else {
-    orgCtrl.currentKey = entity.chatdata.fullId;
+const openChat = (entity: IMemeber | ITarget) => {
+  if (entity.session) {
+    entity.session.chatdata.recently = true;
+    entity.session.chatdata.lastMsgTime = new Date().getTime();
+    entity.session.cacheChatData();
   }
   command.emitter('executor', 'link', '/chat');
+  setTimeout(() => {
+    command.emitter('session', 'open', entity.session);
+  }, 200);
 };
 
 /** 恢复实体 */

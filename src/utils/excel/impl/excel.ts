@@ -144,7 +144,6 @@ export class Excel implements t.IExcel {
       }
       this.dataHandler?.onCompleted?.();
     } catch (error: any) {
-      console.log(error);
       this.dataHandler?.onError?.('数据处理异常');
     }
   }

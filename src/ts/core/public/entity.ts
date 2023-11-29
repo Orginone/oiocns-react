@@ -91,7 +91,7 @@ export abstract class Entity<T extends schema.XEntity>
     return this._metadata;
   }
   get userId(): string {
-    return kernel.userId;
+    return kernel.user!.id;
   }
   get belongId(): string {
     return this._metadata.belongId;

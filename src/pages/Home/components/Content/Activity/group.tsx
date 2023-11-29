@@ -2,22 +2,21 @@ import React, { useState } from 'react';
 import TargetActivity from '@/components/TargetActivity';
 import ActivityMessage from '@/components/TargetActivity/ActivityMessage';
 import { IActivity, FromOrigin } from '@/ts/core';
-import useWidthToggle from '@/hooks/useWidthToggle';
 import { Resizable } from 'devextreme-react';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import useAsyncLoad from '@/hooks/useAsyncLoad';
 import { Spin } from 'antd';
-// import ActivityPush from '@/components/TargetActivity/ActivityPush';
+import { useMedia } from 'react-use';
 const GroupActivityItem: React.FC<{ activity: IActivity; messageFrom?: FromOrigin }> = ({
   activity,
   messageFrom,
 }) => {
-  const toggle = useWidthToggle(1000);
   const [key] = useCtrlUpdate(activity);
+  const isWide = useMedia('(min-width: 1000px)');
   const [loaded] = useAsyncLoad(() => activity.load(10), [activity]);
   const [current, setCurrent] = useState<IActivity>(activity);
   const loadMenus = React.useCallback(() => {
-    if (!loaded || !toggle) return <></>;
+    if (!loaded || !isWide) return <></>;
     return (
       <Resizable handles={'right'} minWidth={200}>
         <div className={'groupList'}>
@@ -46,7 +45,7 @@ const GroupActivityItem: React.FC<{ activity: IActivity; messageFrom?: FromOrigi
         </div>
       </Resizable>
     );
-  }, [loaded, current, activity, key, toggle]);
+  }, [loaded, current, activity, key, isWide]);
 
   const loadContext = React.useCallback(() => {
     if (!loaded) return <></>;

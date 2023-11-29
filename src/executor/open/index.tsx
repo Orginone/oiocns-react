@@ -4,7 +4,6 @@ import React from 'react';
 import FormView from './form';
 import WorkStart from './work';
 import TaskContent from './task';
-import JoinApply from './task/joinApply';
 import OfficeView from './office';
 import TransferView from './transfer';
 import AudioPlayer from './audio';
@@ -12,6 +11,7 @@ import EntityPreview from './entity';
 import CodeEditor from './codeeditor';
 import EntityForm from '../operate/entityForm';
 import { IEntity, ISysFileInfo, TargetType } from '@/ts/core';
+import JoinApply from './task/joinApply';
 import { model, schema } from '@/ts/base';
 import TemplateView from './page';
 const audioExt = ['.mp3', '.wav', '.ogg'];
@@ -59,8 +59,6 @@ const ExecutorOpen: React.FC<IOpenProps> = (props: IOpenProps) => {
   } else if ('key' in props.entity) {
     switch (props.entity.typeName) {
       case '表单':
-      case '事项配置':
-      case '实体配置':
         return <FormView form={props.entity as any} finished={props.finished} />;
       case '迁移配置':
         return <TransferView current={props.entity as any} finished={props.finished} />;
@@ -68,11 +66,31 @@ const ExecutorOpen: React.FC<IOpenProps> = (props: IOpenProps) => {
         return <TemplateView current={props.entity as any} finished={props.finished} />;
       case '办事':
       case '子流程':
-        return <WorkStart current={props.entity as any} finished={props.finished} />;
+        return (
+          <WorkStart
+            key={props.entity.key}
+            current={props.entity as any}
+            finished={props.finished}
+          />
+        );
       case '加用户':
-        return <JoinApply current={props.entity as any} finished={props.finished} />;
+        return (
+          <>
+            <JoinApply
+              key={props.entity.key}
+              current={props.entity as any}
+              finished={props.finished}
+            />
+          </>
+        );
       case '事项':
-        return <TaskContent current={props.entity as any} finished={props.finished} />;
+        return (
+          <TaskContent
+            key={props.entity.key}
+            current={props.entity as any}
+            finished={props.finished}
+          />
+        );
       default:
         if (remarkTypes[props.entity.typeName]) {
           return (

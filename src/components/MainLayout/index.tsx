@@ -1,15 +1,14 @@
-import { Col, Divider, Dropdown, Layout, Row, Space, Typography, Button } from 'antd';
+import { Button, Col, Divider, Dropdown, Layout, Row, Space, Typography } from 'antd';
 import React from 'react';
 import CustomMenu from '@/components/CustomMenu';
 import CustomBreadcrumb from '@/components/CustomBreadcrumb';
 import { MenuItemType, OperateMenuType } from 'typings/globelType';
-import { ImArrowLeft2 } from '@/icons/im';
-import { RiMore2Fill } from '@/icons/ri';
+import { ImUndo2 } from 'react-icons/im';
 import { Resizable } from 'devextreme-react';
 import { LeftBarIcon, RightBarIcon } from '@/components/Common/GlobalComps/customIcon';
 import useStorage from '@/hooks/useStorage';
 import EntityPreview from './preview';
-import { cleanMenus } from '@/utils/tools';
+import { RiMore2Fill } from 'react-icons/ri';
 const { Content, Sider } = Layout;
 
 /**
@@ -23,7 +22,6 @@ type MainLayoutType = {
   siderMenuData: MenuItemType;
   rightBar?: React.ReactNode;
   selectMenu: MenuItemType;
-  notExitIcon?: boolean;
   onSelect?: (item: MenuItemType) => void;
   onMenuClick?: (item: MenuItemType, menuKey: string) => void;
 };
@@ -39,9 +37,6 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
   const [rightSider, setRightSider] = useStorage<boolean>('rightSider', true);
   const [mainWidth, setMainWidth] = useStorage<string | number>('mainWidth', '40%');
   const parentMenu = props.selectMenu.parentMenu ?? props.siderMenuData;
-  const outside =
-    props.selectMenu.menus?.filter((item) => item.model === 'outside') ?? [];
-  const inside = props.selectMenu.menus?.filter((item) => item.model != 'outside') ?? [];
   const findMenus = (
     key: string,
     menus?: OperateMenuType[],
@@ -71,11 +66,11 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
     props.onSelect?.apply(this, [item]);
   };
   const previewCtx = React.useMemo(() => {
-    return <EntityPreview entity={props.selectMenu.item} flag={props.previewFlag} />;
+    return <EntityPreview flag={props.previewFlag} />;
   }, [props]);
   return (
-    <Layout className={"main_layout"}>
-      <Row className={"header"} justify="space-between">
+    <Layout className={'main_layout'}>
+      <Row className={'header'} justify="space-between">
         <Col>
           <CustomBreadcrumb
             selectKey={props.selectMenu.key}
@@ -103,55 +98,40 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
               </Typography.Link>
             )}
             {props.rightBar}
-            {outside.length > 0 &&
-              outside.map((item) => {
-                return (
-                  <Typography.Link
-                    key={item.key}
-                    title={item.label}
-                    style={{ fontSize: 18 }}
-                    onClick={() => {
-                      onOperateMenuClick(props.selectMenu, item.key);
-                    }}>
-                    {item.icon}
-                  </Typography.Link>
-                );
-              })}
-            {inside.length > 0 && (
-              <Dropdown
-                menu={{
-                  items: cleanMenus(inside),
-                  onClick: ({ key }) => {
-                    onOperateMenuClick(props.selectMenu, key);
-                  },
-                }}
-                dropdownRender={(menu) => (
-                  <div>{menu && <Button type="link">{menu}</Button>}</div>
-                )}
-                placement="bottom"
-                trigger={['click', 'contextMenu']}>
-                <RiMore2Fill fontSize={22} style={{ cursor: 'pointer' }} />
-              </Dropdown>
-            )}
           </Space>
         </Col>
       </Row>
-      <Layout className={"body"}>
+      <Layout className={'body'}>
         {(props.leftShow ?? leftSider) && (
-          <Sider className={"sider"} width={250}>
-            <div className={"title"}>
+          <Sider className={'sider'} width={250}>
+            <div className={'title'}>
               {parentMenu.key != props.siderMenuData.key && (
-                <span className={"backup"} onClick={() => onSelectClick(parentMenu)}>
-                  <ImArrowLeft2 fontSize={20} />
+                <span className={'backup'} onClick={() => onSelectClick(parentMenu)}>
+                  <ImUndo2 size={16} />
                 </span>
               )}
-              <div className={"label"} onClick={() => onSelectClick(parentMenu)}>
+              <div className={'label'} onClick={() => onSelectClick(parentMenu)}>
                 <span style={{ marginRight: 6 }}>{parentMenu.icon}</span>
                 <Typography.Text ellipsis>{parentMenu.label}</Typography.Text>
               </div>
+              {parentMenu.menus && parentMenu.menus.length > 0 && (
+                <Dropdown
+                  menu={{
+                    items: parentMenu.menus,
+                    onClick: ({ key }) => {
+                      onOperateMenuClick(props.selectMenu, key);
+                    },
+                  }}
+                  dropdownRender={(menu) => (
+                    <div>{menu && <Button type="link">{menu}</Button>}</div>
+                  )}
+                  placement="bottom"
+                  trigger={['click', 'contextMenu']}>
+                  <RiMore2Fill fontSize={22} style={{ cursor: 'pointer' }} />
+                </Dropdown>
+              )}
             </div>
-            <div className={"container"} id="templateMenu">
-              
+            <div className={'container'} id="templateMenu">
               <CustomMenu
                 item={parentMenu}
                 collapsed={false}
@@ -170,14 +150,14 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
               handles={'right'}
               width={mainWidth}
               onResize={(e) => setMainWidth(e.width)}>
-              <Sider className={"content"} width={'100%'}>
+              <Sider className={'content'} width={'100%'}>
                 {props.children}
               </Sider>
             </Resizable>
-            <Content className={"content"}>{previewCtx}</Content>
+            <Content className={'content'}>{previewCtx}</Content>
           </>
         ) : (
-          <Content className={"content"}>{props.children}</Content>
+          <Content className={'content'}>{props.children}</Content>
         )}
       </Layout>
     </Layout>

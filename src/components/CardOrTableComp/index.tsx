@@ -5,7 +5,7 @@ import { Dropdown } from 'antd';
 import { ProTable } from '@ant-design/pro-components';
 import { PageShowType } from 'typings/globelType';
 import { PageModel } from '@/ts/base/model';
-import { RiMoreFill } from '@/icons/ri';
+import { RiMoreFill } from 'react-icons/ri';
 
 interface PageType<T> {
   dataSource: T[]; // 展示数据源

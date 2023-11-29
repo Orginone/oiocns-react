@@ -8,6 +8,20 @@ export class Cohort extends Target implements ICohort {
   constructor(_metadata: schema.XTarget, _space: IBelong, relationId: string) {
     super([_space.key], _metadata, [relationId], _space, _space.user);
   }
+  get groupTags(): string[] {
+    const tags = [...super.groupTags];
+    if (this.id != this.belongId) {
+      if (this.belongId != this.spaceId) {
+        tags.push('加入的群');
+      } else {
+        tags.push('创建的群');
+      }
+    }
+    return tags;
+  }
+  findChat(id: string): ISession | undefined {
+    return this.user.memberChats.find((i) => i.id === id);
+  }
   async exit(): Promise<boolean> {
     if (this.metadata.belongId !== this.space.id) {
       if (await this.removeMembers([this.user.metadata])) {

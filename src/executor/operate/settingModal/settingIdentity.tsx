@@ -2,14 +2,14 @@ import React, { useState } from 'react';
 import FullScreenModal from '@/components/Common/fullScreen';
 import { IIdentity, ITarget } from '@/ts/core';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
-import MainLayout from '@/components/MainLayout';
+import MainLayout from '@/components/MainLayout/minLayout';
 import useMenuUpdate from '@/hooks/useMenuUpdate';
 import EntityInfo from '@/components/Common/EntityInfo';
-import * as im from '@/icons/im';
+import * as im from 'react-icons/im';
 import { MenuItemType, OperateMenuType } from 'typings/globelType';
 import IdentityForm from './subModal/IdentityForm';
 import SelectMember from '@/components/Common/SelectMember';
-import { Modal, message } from 'antd';
+import { Divider, Modal, Space, Typography, message } from 'antd';
 import CardOrTableComp from '@/components/CardOrTableComp';
 import { schema } from '@/ts/base';
 import { PersonColumns } from '@/config/column';
@@ -68,9 +68,6 @@ const SettingIdentity: React.FC<IProps> = ({ target, finished }) => {
       destroyOnClose
       onCancel={() => finished()}>
       <MainLayout
-        notExitIcon
-        leftShow
-        rightShow={false}
         selectMenu={selectMenu}
         onSelect={async (data) => {
           if ('current' in data.item) {
@@ -90,7 +87,34 @@ const SettingIdentity: React.FC<IProps> = ({ target, finished }) => {
           }
         }}
         siderMenuData={rootMenu}>
-        <EntityInfo key={key} entity={selectMenu.item} />
+        <EntityInfo
+          key={key}
+          entity={selectMenu.item}
+          extra={
+            <Space split={<Divider type="vertical" />} size={0}>
+              {selectMenu.menus &&
+                selectMenu.menus.length > 0 &&
+                selectMenu.menus.map((item) => {
+                  return (
+                    <Typography.Link
+                      key={item.key}
+                      title={item.label}
+                      style={{ fontSize: 18 }}
+                      onClick={() => {
+                        item.beforeLoad?.apply(this);
+                        if (item.key == '删除') {
+                          setSelectMenu(selectMenu.parentMenu || rootMenu);
+                        } else {
+                          setOperateKey(item.key);
+                        }
+                      }}>
+                      {item.icon}
+                    </Typography.Link>
+                  );
+                })}
+            </Space>
+          }
+        />
         {identity && (
           <>
             <div style={{ flex: 1 }}>

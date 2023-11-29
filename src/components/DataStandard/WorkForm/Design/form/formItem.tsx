@@ -5,6 +5,7 @@ import HtmlEditItem from './customItem/htmlItem';
 import TreeSelectItem from './customItem/treeItem';
 import SelectFilesItem from './customItem/fileItem';
 import MemberBoxProps from './customItem/memberBox';
+import DepartmentBox from './customItem/departmentBox';
 import CurrentTargetItem from './customItem/currentTarget';
 import SearchTargetItem from './customItem/searchTarget';
 import { getWidget } from '../../Utils';
@@ -89,6 +90,8 @@ const FormItem: React.FC<{
       return <SearchTargetItem {...mixOptions} typeName={TargetType.Group} />;
     case '成员选择框':
       return <MemberBoxProps {...mixOptions} target={target.space.metadata} />;
+    case '内部机构选择框':
+      return <DepartmentBox {...mixOptions} target={target.space.metadata} />;
     case '日期选择框':
       return <DateBox {...mixOptions} type={'date'} />;
     case '时间选择框':

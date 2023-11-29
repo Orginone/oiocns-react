@@ -30,6 +30,6 @@
     "config/**/*",
     "vite.config.ts",
     "mock/_createProductionServer.ts"
-  ],
+, "src/layouts/auth"  ],
   "exclude": ["node_modules", "build", "dist", "**/*.js"]
 }

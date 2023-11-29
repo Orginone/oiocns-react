@@ -26,7 +26,7 @@ const getAdminMenu = () => {
 /** 加载办事模块菜单 */
 export const loadBrowserMenu = () => {
   return {
-    key: '办事',
+    key: 'disk',
     label: '办事',
     itemType: 'Tab',
     item: 'disk',

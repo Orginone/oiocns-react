@@ -4,6 +4,7 @@ import HtmlEditItem from './customItem/htmlItem';
 import TreeSelectItem from './customItem/treeItem';
 import SelectFilesItem from './customItem/fileItem';
 import MemberBoxProps from './customItem/memberBox';
+import DepartmentBox from './customItem/departmentBox';
 import SearchTargetItem from './customItem/searchTarget';
 import CurrentTargetItem from './customItem/currentTarget';
 import { getItemWidth, getWidget } from '../Utils';
@@ -76,8 +77,7 @@ const FormItem: React.FC<IFormItemProps> = (props) => {
     width: getItemWidth(props.numStr),
   };
   if (props.field.options.isRequired) {
-    /** 增加是否有defaultValue值的判断 */
-    mixOptions.isValid = mixOptions.defaultValue ? 'true' : isValid;
+    mixOptions.isValid = mixOptions.defaultValue ? true : isValid;
     mixOptions.label = mixOptions.label + '*';
   }
 
@@ -120,6 +120,8 @@ const FormItem: React.FC<IFormItemProps> = (props) => {
       return <SearchTargetItem {...mixOptions} typeName={TargetType.Group} />;
     case '成员选择框':
       return <MemberBoxProps {...mixOptions} target={props.belong.metadata} />;
+    case '内部机构选择框':
+      return <DepartmentBox {...mixOptions} target={props.belong.metadata} />;
     case '日期选择框':
       return (
         <DateBox

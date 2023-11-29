@@ -1,12 +1,12 @@
 import React, { FC, useState } from 'react';
 import { Modal, Button, Row, Col, Badge, Input, List, Checkbox } from 'antd';
 import { MenuItemType } from 'typings/globelType';
-import { ImSearch } from '@/icons/im';
+import { ImSearch } from 'react-icons/im';
 import type { CheckboxChangeEvent } from 'antd/es/checkbox';
 import orgCtrl from '@/ts/controller';
 import TeamIcon from '@/components/Common/GlobalComps/entityIcon';
 import { IMessage, ISession, MessageType } from '@/ts/core';
-import { AiOutlineClose } from '@/icons/ai';
+import { AiOutlineClose } from 'react-icons/ai';
 interface IChatShareForward {
   open: boolean;
   selectMenu?: MenuItemType;
@@ -29,6 +29,7 @@ const ChatShareForward: FC<IChatShareForward> = (props) => {
         a.chatdata.chatRemark.includes(filter) ||
         a.groupTags.filter((l) => l.includes(filter)).length > 0,
     )
+    .filter((i) => i.chatdata.lastMessage || i.chatdata.recently)
     .sort((a, b) => {
       var num = (b.chatdata.isToping ? 10 : 0) - (a.chatdata.isToping ? 10 : 0);
       if (num === 0) {
@@ -79,20 +80,22 @@ const ChatShareForward: FC<IChatShareForward> = (props) => {
     }
   };
   const renderTitle = () => {
-    return <div className="chatShare-title">
-      <span>转发</span>
-      <Input
-        className="chatMem-search"
-        placeholder="搜索"
-        prefix={<ImSearch />}
-        value={filter}
-        onChange={(e) => {
-          setFilter(e.target.value);
-        }}
-      />
-      <div className="chosen-num">{`已选：${selectedKeys.length}会话`}</div>
-    </div>
-  }
+    return (
+      <div className="chatShare-title">
+        <span>转发</span>
+        <Input
+          className="chatMem-search"
+          placeholder="搜索"
+          prefix={<ImSearch />}
+          value={filter}
+          onChange={(e) => {
+            setFilter(e.target.value);
+          }}
+        />
+        <div className="chosen-num">{`已选：${selectedKeys.length}会话`}</div>
+      </div>
+    );
+  };
   return (
     <Modal
       width="70%"
@@ -104,9 +107,9 @@ const ChatShareForward: FC<IChatShareForward> = (props) => {
       onCancel={handleCancel}
       maskClosable
       afterClose={() => {
-        setSelectedData([])
-        setSelectedKeys([])
-        setFilter('')
+        setSelectedData([]);
+        setSelectedKeys([]);
+        setFilter('');
       }}
       footer={[
         <Button key="back" onClick={handleCancel}>

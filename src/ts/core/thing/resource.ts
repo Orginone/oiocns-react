@@ -36,6 +36,7 @@ export class DataResource {
     this.templateColl = this.genTargetColl<XPageTemplate>('standard-page-template');
     this.stagingColl = this.genTargetColl<XStaging>('resource-staging');
   }
+
   /** 表单集合 */
   formColl: XCollection<XForm>;
   /** 属性集合 */

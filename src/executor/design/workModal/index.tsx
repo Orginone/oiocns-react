@@ -1,8 +1,17 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { IWork } from '@/ts/core';
-import { message } from 'antd';
+import { Spin } from 'antd';
 import FlowDesign from '@/components/Common/FlowDesign';
 import FullScreenModal from '@/components/Common/fullScreen';
+import useAsyncLoad from '@/hooks/useAsyncLoad';
+import {
+  AddNodeType,
+  ValidationInfo,
+  convertNode,
+  getNodeCode,
+  loadResource,
+} from '@/components/Common/FlowDesign/processType';
+import message from '@/utils/message';
 
 type IProps = {
   current: IWork;
@@ -13,8 +22,58 @@ type IProps = {
   弹出框表格查询
 */
 const ApplicationModal: React.FC<IProps> = ({ current, finished }) => {
-  const [isSave, setIsSave] = useState<boolean>(false);
+  const [loaded, resource] = useAsyncLoad(async () => {
+    if (current) {
+      const node = await current.loadNode();
+      if (node && node.code) {
+        return loadResource(node, '');
+      }
+    }
+    return {
+      code: getNodeCode(),
+      parentCode: '',
+      type: AddNodeType.ROOT,
+      name: '发起权限',
+      destType: '角色',
+      destId: '0',
+      destName: '全员',
+      num: 1,
+      children: {},
+    };
+  });
+  const Save = async () => {
+    const validation: ValidationInfo = {
+      isPass: true,
+      hasGateway: false,
+    };
+    //数据结构转化
+    const resource_ = convertNode(resource, validation);
+    if (validation.isPass) {
+      current.metadata.rule = JSON.stringify({
+        allowAdd: current.metadata.allowAdd,
+        allowEdit: current.metadata.allowEdit,
+        allowSelect: current.metadata.allowSelect,
+        hasGateway: validation.hasGateway,
+      });
+      if (
+        await current.update({
+          ...current.metadata,
+          resource: resource_,
+        })
+      ) {
+        message.info('保存成功');
+        finished();
+      }
+    }
+  };
 
+  if (!loaded) {
+    return (
+      <Spin tip={'配置信息加载中...'}>
+        <div style={{ width: '100%', height: '100%' }}></div>
+      </Spin>
+    );
+  }
   return (
     <FullScreenModal
       open
@@ -26,19 +85,9 @@ const ApplicationModal: React.FC<IProps> = ({ current, finished }) => {
       okText="发布"
       cancelText="取消"
       title={`事项[${current.name}]设计`}
-      onSave={() => setIsSave(true)}
+      onSave={Save}
       onCancel={() => finished()}>
-      <FlowDesign
-        current={current}
-        onSave={isSave}
-        onSaveFinished={(success) => {
-          if (success) {
-            message.info('保存成功', 0.5);
-            finished();
-          }
-          setIsSave(false);
-        }}
-      />
+      <FlowDesign current={current} resource={resource} />
     </FullScreenModal>
   );
 };

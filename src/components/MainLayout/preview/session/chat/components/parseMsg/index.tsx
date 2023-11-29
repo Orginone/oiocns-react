@@ -14,11 +14,51 @@ import {
   AiFillFileText,
   AiFillFileWord,
   AiFillFileZip,
-} from '@/icons/ai';
+} from 'react-icons/ai';
 /** 将链接转化为超链接 */
 const linkText = (val: string) => {
-  let reg = /(https?:\/\/[^\s]+)/g;
-  return val.replace(reg, '<a target=_blank href="$1"> $1 </a>');
+  val = val.replace(/(https?:\/\/[^\s]+)/g, '<a target=_blank href="$1">$1</a>');
+  return val.replace(/\n/g, '<br/>');
+};
+
+/**
+ * 文件类型icon展示
+ */
+
+export const getFileIcon = (type?: string) => {
+  if (!type) return;
+  const size = 28;
+  const color = 'blue';
+  let icon = <AiFillFile size={size} color={color} />;
+  switch (type) {
+    case '.pdf':
+      icon = <AiFillFilePdf size={size} color={color} />;
+      break;
+    case '.xlsx':
+      icon = <AiFillFileExcel size={size} color={color} />;
+      break;
+    case '.xls':
+      icon = <AiFillFileExcel size={size} color={color} />;
+      break;
+    case '.txt':
+      icon = <AiFillFileText size={size} color={color} />;
+      break;
+    case '.pptx':
+      icon = <AiFillFilePpt size={size} color={color} />;
+      break;
+    case '.docx':
+      icon = <AiFillFileWord size={size} color={color} />;
+      break;
+    case '.doc':
+      icon = <AiFillFileWord size={size} color={color} />;
+      break;
+    case '.zip':
+      icon = <AiFillFileZip size={size} color={color} />;
+      break;
+    default:
+      icon = <AiFillFile size={size} color={color} />;
+  }
+  return icon;
 };
 
 /**

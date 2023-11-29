@@ -2,14 +2,14 @@ import React, { useState } from 'react';
 import FullScreenModal from '@/components/Common/fullScreen';
 import { ICompany, IStation } from '@/ts/core';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
-import MainLayout from '@/components/MainLayout';
+import MinLayout from '@/components/MainLayout/minLayout';
 import useMenuUpdate from '@/hooks/useMenuUpdate';
-import * as im from '@/icons/im';
+import * as im from 'react-icons/im';
 import { MenuItemType, OperateMenuType } from 'typings/globelType';
 import StationForm from './subModal/stationForm';
 import SelectMember from '@/components/Common/SelectMember';
 import SelectIdentity from '@/components/Common/SelectIdentity';
-import { Modal, message } from 'antd';
+import { Divider, Modal, Space, Typography, message } from 'antd';
 import CardOrTableComp from '@/components/CardOrTableComp';
 import { schema } from '@/ts/base';
 import { IdentityColumn, PersonColumns } from '@/config/column';
@@ -88,20 +88,22 @@ const SettingStation: React.FC<IProps> = ({ company, finished }) => {
           />
         );
       case '分配成员':
-        <SelectMember
-          open={operateKey === '分配成员'}
-          members={company.space.members}
-          exclude={station!.members}
-          finished={async (selected) => {
-            if (selected.length > 0) {
-              if (await station!.pullMembers(selected)) {
-                message.success('分配成员成功');
+        return (
+          <SelectMember
+            open={operateKey === '分配成员'}
+            members={company.space.members}
+            exclude={station!.members}
+            finished={async (selected) => {
+              if (selected.length > 0) {
+                if (await station!.pullMembers(selected)) {
+                  message.success('分配成员成功');
+                }
               }
-            }
-            refreshTable();
-            setOperateKey('');
-          }}
-        />;
+              refreshTable();
+              setOperateKey('');
+            }}
+          />
+        );
     }
     return <></>;
   };
@@ -116,10 +118,7 @@ const SettingStation: React.FC<IProps> = ({ company, finished }) => {
       icon={<EntityIcon entity={company.metadata} />}
       destroyOnClose
       onCancel={() => finished()}>
-      <MainLayout
-        notExitIcon
-        leftShow
-        rightShow={false}
+      <MinLayout
         selectMenu={selectMenu}
         onSelect={async (data) => {
           if (data.itemType === '岗位') {
@@ -134,34 +133,58 @@ const SettingStation: React.FC<IProps> = ({ company, finished }) => {
         }}
         onMenuClick={(_, key) => setOperateKey(key)}
         siderMenuData={rootMenu}>
-        {station ? (
-          <>
-            <div style={{ flex: 1, height: '40vh' }}>
-              <CardOrTableComp<schema.XIdentity>
-                key={tabKey}
-                dataSource={station.identitys}
-                scroll={{ y: 'calc(40vh - 150px)' }}
-                columns={IdentityColumn}
-                rowKey={'id'}
-                operation={readerOperation}
-              />
-            </div>
-            <div style={{ flex: 1, height: '40vh' }}>
-              <CardOrTableComp<schema.XTarget>
-                key={tabKey}
-                dataSource={station.members}
-                scroll={{ y: 'calc(60vh - 150px)' }}
-                columns={PersonColumns}
-                rowKey={'id'}
-                operation={readerOperation}
-              />
-            </div>
-            {loadModal()}
-          </>
-        ) : (
-          <EntityInfo key={key} entity={selectMenu.item} />
-        )}
-      </MainLayout>
+        <>
+          <EntityInfo
+            key={key}
+            entity={selectMenu.item}
+            extra={
+              <Space split={<Divider type="vertical" />} size={0}>
+                {selectMenu.menus &&
+                  selectMenu.menus.length > 0 &&
+                  selectMenu.menus.map((item) => {
+                    return (
+                      <Typography.Link
+                        key={item.key}
+                        title={item.label}
+                        style={{ fontSize: 18 }}
+                        onClick={() => {
+                          item.beforeLoad?.apply(this);
+                          setOperateKey(item.key);
+                        }}>
+                        {item.icon}
+                      </Typography.Link>
+                    );
+                  })}
+              </Space>
+            }
+          />
+          {station && (
+            <>
+              <div style={{ flex: 1, height: '40vh' }}>
+                <CardOrTableComp<schema.XIdentity>
+                  key={tabKey}
+                  dataSource={station.identitys}
+                  scroll={{ y: 'calc(40vh - 150px)' }}
+                  columns={IdentityColumn}
+                  rowKey={'id'}
+                  operation={readerOperation}
+                />
+              </div>
+              <div style={{ flex: 1, height: '40vh' }}>
+                <CardOrTableComp<schema.XTarget>
+                  key={tabKey}
+                  dataSource={station.members}
+                  scroll={{ y: 'calc(60vh - 150px)' }}
+                  columns={PersonColumns}
+                  rowKey={'id'}
+                  operation={readerOperation}
+                />
+              </div>
+            </>
+          )}
+          {loadModal()}
+        </>
+      </MinLayout>
       {operateKey.includes('岗位') && (
         <StationForm
           current={selectMenu.item}
