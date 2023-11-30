@@ -72,7 +72,7 @@ const ListMode = ({
                       </Badge>
                     }
                     description={
-                      <div className="ellipsis1">{item.remark || item.code}</div>
+                      <span className="ellipsis1">{item.remark || item.code}</span>
                     }
                   />
                 </List.Item>

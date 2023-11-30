@@ -171,7 +171,9 @@ export const parseMsg = (item: IMessage): any => {
       // 默认文本展示
       return (
         <div className={`${css.con_content_txt}`}>
-          <div dangerouslySetInnerHTML={{ __html: linkText(item.msgBody) }}></div>
+          <div
+            style={{ maxWidth: '40vw' }}
+            dangerouslySetInnerHTML={{ __html: linkText(item.msgBody) }}></div>
         </div>
       );
     }

@@ -312,7 +312,9 @@ const GroupContent = (props: Iprops) => {
   };
 
   const renderMessage = (item: IMessage) => {
-    const cls = item.isMySend ? `${css.group_content_right}` : `${css.group_content_left}`;
+    const cls = item.isMySend
+      ? `${css.group_content_right}`
+      : `${css.group_content_left}`;
     switch (item.msgType) {
       case MessageType.Recall:
         return (
