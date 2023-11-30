@@ -9,7 +9,7 @@ import Emoji from '../components/emoji';
 import { AiOutlineCloseCircle } from 'react-icons/ai';
 import { TextArea } from 'devextreme-react';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
-
+import dxTextArea from 'devextreme/ui/text_area';
 /**
  * @description: 输入区域
  * @return {*}
@@ -28,7 +28,12 @@ const GroupInputBox = (props: IProps) => {
   const [citeShow, setCiteShow] = useState<boolean>(false); // @展示
   const [message, setMessage] = useState<string>('');
   const [mentions, setMentions] = useState<{ text: string; id: string }[]>([]);
-
+  // 禁止回车默认事件
+  dxTextArea.defaultOptions({
+    options: {
+      defaultPrevented: true,
+    },
+  });
   useEffect(() => {
     if (props.writeContent) {
       setMessage(props.writeContent);
@@ -144,6 +149,17 @@ const GroupInputBox = (props: IProps) => {
           valueChangeEvent="input"
           style={{ fontSize: 16 }}
           placeholder={`发送到${props.chat.name}`}
+          onKeyDown={({ event }) => {
+            const altKey = event?.ctrlKey || event?.metaKey;
+            if (altKey && event?.keyCode === 13) {
+              setMessage(message + '\n');
+              return;
+            }
+            if (event?.keyCode === 13) event?.preventDefault();
+          }}
+          onEnterKey={() => {
+            sendMessage();
+          }}
           onValueChanged={(e) => {
             const value: string = e.value ?? '';
             if (value.endsWith('@')) {
