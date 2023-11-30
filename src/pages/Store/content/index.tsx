@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import DirectoryViewer from '@/components/Directory/views';
-import useCtrlUpdate from '@/hooks/useCtrlUpdate';
+import useCtrlUpdate, { useFlagCmdEmitter } from '@/hooks/useCtrlUpdate';
 import useTimeoutHanlder from '@/hooks/useTimeoutHanlder';
 import { IDirectory, IFile } from '@/ts/core';
 import { loadFileMenus } from '@/executor/fileOperate';
@@ -25,6 +25,8 @@ const Directory: React.FC<IProps> = (props) => {
   const [loaded] = useAsyncLoad(() => dircetory.loadContent());
   const [focusFile, setFocusFile] = useState<IFile>();
   const [submitHanlder, clearHanlder] = useTimeoutHanlder();
+  useFlagCmdEmitter('works');
+
   useEffect(() => {
     command.emitter('preview', 'store', focusFile);
   }, [focusFile]);

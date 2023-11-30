@@ -81,6 +81,9 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
   get forms(): IForm[] {
     return [...this.primaryForms, ...this.detailForms];
   }
+  get groupTags(): string[] {
+    return [...super.groupTags, ...(this.cache.tags ?? [])];
+  }
   async delete(_notity: boolean = false): Promise<boolean> {
     if (this.application) {
       const res = await kernel.deleteWorkDefine({
@@ -272,6 +275,13 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
     if (operates.includes(entityOperates.Delete)) {
       operates.push(entityOperates.HardDelete);
     }
+    const used = this.cache.tags?.find((item) => item == '常用');
+    operates.push({
+      sort: 5,
+      cmd: used ? 'unFrequentlyUsed' : 'frequentlyUsed',
+      label: used ? '取消常用' : '设为常用',
+      iconType: '办事',
+    });
     return operates
       .filter((i) => i != fileOperates.Copy)
       .filter((i) => i != fileOperates.Move)

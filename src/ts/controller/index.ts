@@ -1,4 +1,4 @@
-import { IApplication, IPerson, ISession, ITarget, UserProvider } from '@/ts/core';
+import { IApplication, IPerson, ISession, ITarget, IWork, UserProvider } from '@/ts/core';
 import { common } from '@/ts/base';
 import { IWorkProvider } from '../core/work/provider';
 import { IPageTemplate } from '../core/thing/standard/page';
@@ -67,6 +67,21 @@ class IndexController extends Controller {
       apps.push(...(await directory.loadAllApplication()));
     }
     return apps;
+  }
+  async loadWorks(): Promise<IWork[]> {
+    const works: IWork[] = [];
+    const recursion = async (apps: IApplication[]) => {
+      for (const item of apps) {
+        works.push(...(await item.loadWorks()));
+        await recursion(item.children);
+      }
+    };
+    for (const directory of this.targets
+      .filter((i) => i.session.isMyChat)
+      .map((a) => a.directory)) {
+      await recursion(await directory.loadAllApplication());
+    }
+    return works;
   }
   /** 所有相关会话 */
   get chats(): ISession[] {

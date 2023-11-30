@@ -27,10 +27,13 @@ export async function removeElement(element: PageElement | null, ctx: DesignCont
 
 export default function ElementProps() {
   const ctx = useContext<DesignContext>(PageContext as any);
+  const [showProps, setShowProps] = useState(ctx.view.showProps);
   const [element, setElement] = useState<PageElement | null>(ctx.view.currentElement);
-  ctx.view.subscribe((type, cmd) => {
+  ctx.view.subscribe((type, cmd, args) => {
     if (type == 'current' && cmd == 'change') {
       setElement(ctx.view.currentElement);
+    } else if (type == 'current' && cmd == 'showProps') {
+      setShowProps(args);
     }
   });
 
@@ -55,7 +58,7 @@ export default function ElementProps() {
     },
   };
 
-  if (!element) {
+  if (!element || !showProps) {
     return <></>;
   }
 
@@ -70,7 +73,7 @@ export default function ElementProps() {
           {meta.label || element.kind}
         </Tag>
         <div style={{ flex: 'auto', display: 'flex', flexDirection: 'row-reverse' }}>
-          <CloseCircleOutlined onClick={() => (ctx.view.currentElement = null)} />
+          <CloseCircleOutlined onClick={() => (ctx.view.showProps = false)} />
         </div>
       </div>
       <div className="props-content">
