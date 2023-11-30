@@ -62,46 +62,6 @@ export const getFileIcon = (type?: string) => {
 };
 
 /**
- * 文件类型icon展示
- */
-
-export const getFileIcon = (type?: string) => {
-  if (!type) return;
-  const size = 28;
-  const color = 'blue';
-  let icon = <AiFillFile size={size} color={color} />;
-  switch (type) {
-    case '.pdf':
-      icon = <AiFillFilePdf size={size} color={color} />;
-      break;
-    case '.xlsx':
-      icon = <AiFillFileExcel size={size} color={color} />;
-      break;
-    case '.xls':
-      icon = <AiFillFileExcel size={size} color={color} />;
-      break;
-    case '.txt':
-      icon = <AiFillFileText size={size} color={color} />;
-      break;
-    case '.pptx':
-      icon = <AiFillFilePpt size={size} color={color} />;
-      break;
-    case '.docx':
-      icon = <AiFillFileWord size={size} color={color} />;
-      break;
-    case '.doc':
-      icon = <AiFillFileWord size={size} color={color} />;
-      break;
-    case '.zip':
-      icon = <AiFillFileZip size={size} color={color} />;
-      break;
-    default:
-      icon = <AiFillFile size={size} color={color} />;
-  }
-  return icon;
-};
-
-/**
  * 显示消息
  * @param item
  */

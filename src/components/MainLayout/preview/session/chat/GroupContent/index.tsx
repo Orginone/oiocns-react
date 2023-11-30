@@ -133,7 +133,10 @@ const GroupContent = (props: Iprops) => {
             <div style={{ display: 'flex' }}>
               <div className={`${css.con_content}`}>
                 {props.chat.isBelongPerson ? (
-                  showMsg(item)
+                  <div>
+                    {showMsg(item)}
+                    {item.cite && parseCiteMsg(item.cite)}
+                  </div>
                 ) : (
                   <>
                     <Badge
@@ -309,6 +312,7 @@ const GroupContent = (props: Iprops) => {
   };
 
   const renderMessage = (item: IMessage) => {
+    const cls = item.isMySend ? `${css.group_content_right}` : `${css.group_content_left}`;
     switch (item.msgType) {
       case MessageType.Recall:
         return (
@@ -332,19 +336,7 @@ const GroupContent = (props: Iprops) => {
           </div>
         );
       default:
-        if (item.isMySend) {
-          return (
-            <div className={`${css.group_content_right} ${css.con}`}>
-              {loadMsgItem(item)}
-            </div>
-          );
-        } else {
-          return (
-            <div className={`${css.group_content_left} ${css.con}`}>
-              {loadMsgItem(item)}
-            </div>
-          );
-        }
+        return <div className={`${cls} ${css.con}`}>{loadMsgItem(item)}</div>;
     }
   };
 
