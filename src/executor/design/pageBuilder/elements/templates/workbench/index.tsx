@@ -20,12 +20,12 @@ export default defineElement({
               props.props['layouts'] = allLayouts;
             }
           }}>
-          <div key="appInfo">{props.app?.({})}</div>
-          <div key="calendar">{props.calendar?.({})}</div>
-          <div key="chat">{props.chat?.({})}</div>
-          <div key="operate">{props.operate?.({})}</div>
-          <div key="store">{props.store?.({})}</div>
-          <div key="work">{props.work?.({})}</div>
+          {props.app && <div key="appInfo">{props.app({})}</div>}
+          {props.calendar && <div key="calendar">{props.calendar({})}</div>}
+          {props.chat && <div key="chat">{props.chat({})}</div>}
+          {props.operate && <div key="operate">{props.operate({})}</div>}
+          {props.store && <div key="store">{props.store({})}</div>}
+          {props.work && <div key="work">{props.work({})}</div>}
         </Grid>
       </div>
     );
