@@ -26,7 +26,7 @@ const Content: React.FC<IProps> = (props) => {
   useFlagCmdEmitter('works', () => loadWork());
 
   useEffect(() => {
-    const id = orgCtrl.work.notity.subscribe(() => loadContent('待办'));
+    const id = orgCtrl.work.notity.subscribe(() => loadContent('常用办事'));
     return () => {
       orgCtrl.work.notity.unsubscribe(id);
     };
