@@ -7,6 +7,7 @@ import FullScreenModal from '../Common/fullScreen';
 import { Button, Divider, Space } from 'antd';
 import { IFile } from '@/ts/core';
 import orgCtrl, { Controller } from '@/ts/controller';
+import { useFlagCmdEmitter } from '@/hooks/useCtrlUpdate';
 
 export interface IFileDialogProps {
   title?: string;
@@ -27,6 +28,7 @@ const OpenFileDialog: React.FC<IFileDialogProps> = (props) => {
     () => loadSettingMenu(props.rootKey, props.allowInherited || false),
     new Controller(props.currentKey ?? orgCtrl.currentKey),
   );
+  useFlagCmdEmitter('works');
   if (!selectMenu || !rootMenu) return <></>;
   return (
     <FullScreenModal

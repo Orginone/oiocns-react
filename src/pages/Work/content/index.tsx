@@ -8,6 +8,7 @@ import { loadFileMenus } from '@/executor/fileOperate';
 import { cleanMenus } from '@/utils/tools';
 import useTimeoutHanlder from '@/hooks/useTimeoutHanlder';
 import { useFlagCmdEmitter } from '@/hooks/useCtrlUpdate';
+import OpenFileDialog from '@/components/OpenFileDialog';
 
 interface IProps {
   current: IBelong | 'disk';
@@ -21,6 +22,7 @@ const Content: React.FC<IProps> = (props) => {
   const [content, setContent] = useState<IFile[]>([]);
   const [focusFile, setFocusFile] = useState<IFile>();
   const [submitHanlder, clearHanlder] = useTimeoutHanlder();
+  const [center, setCenter] = useState(<></>);
   useFlagCmdEmitter('works', () => loadWork());
 
   useEffect(() => {
@@ -34,10 +36,25 @@ const Content: React.FC<IProps> = (props) => {
     command.emitter('preview', 'work', focusFile);
   }, [focusFile]);
 
+  const openDisk = () => {
+    setCenter(
+      <OpenFileDialog
+        accepts={['办事']}
+        rootKey={'disk'}
+        onOk={() => setCenter(<></>)}
+        onCancel={() => setCenter(<></>)}
+      />,
+    );
+  };
+
   const contextMenu = (file?: IFile) => {
     return {
-      items: cleanMenus(loadFileMenus(file)) || [],
+      items: cleanMenus(loadFileMenus(file)) || [{ key: 'openDisk', label: '设置常用' }],
       onClick: ({ key }: { key: string }) => {
+        if (key == 'openDisk') {
+          openDisk();
+          return;
+        }
         command.emitter('executor', key, file);
       },
     };
@@ -129,6 +146,7 @@ const Content: React.FC<IProps> = (props) => {
         fileOpen={(entity, dblclick) => clickHanlder(entity as IWorkTask, dblclick)}
         contextMenu={(entity) => contextMenu(entity as IWorkTask)}
       />
+      {center}
     </Spin>
   );
 };
