@@ -3,6 +3,7 @@ import { Layout } from 'react-grid-layout';
 import { ExistTypeMeta } from '../../../core/ElementMeta';
 import { defineElement } from '../../defineElement';
 import { Grid } from '../../layout/Grid';
+import Workbench from '/img/workbench.jpg';
 
 export default defineElement({
   render(props, ctx) {
@@ -21,6 +22,7 @@ export default defineElement({
             }
           }}>
           {props.app && <div key="appInfo">{props.app({})}</div>}
+          {props.affairs && <div key="affairs">{props.affairs({})}</div>}
           {props.calendar && <div key="calendar">{props.calendar({})}</div>}
           {props.chat && <div key="chat">{props.chat({})}</div>}
           {props.operate && <div key="operate">{props.operate({})}</div>}
@@ -79,6 +81,7 @@ export default defineElement({
         default: {
           lg: [
             { w: 12, h: 15, x: 0, y: 44, i: 'appInfo', moved: false, static: false },
+            { w: 12, h: 15, x: 0, y: 44, i: 'affairs', moved: false, static: false },
             { w: 12, h: 62, x: 0, y: 57, i: 'calendar', moved: false, static: false },
             { w: 6, h: 14, x: 0, y: 14, i: 'chat', moved: false, static: false },
             { w: 12, h: 14, x: 0, y: 0, i: 'operate', moved: false, static: false },
@@ -87,6 +90,7 @@ export default defineElement({
           ],
           md: [
             { w: 10, h: 24, x: 0, y: 52, i: 'appInfo', moved: false, static: false },
+            { w: 10, h: 24, x: 0, y: 52, i: 'affairs', moved: false, static: false },
             { w: 10, h: 62, x: 0, y: 76, i: 'calendar', moved: false, static: false },
             { w: 5, h: 22, x: 0, y: 14, i: 'chat', moved: false, static: false },
             { w: 10, h: 14, x: 0, y: 0, i: 'operate', moved: false, static: false },
@@ -95,6 +99,7 @@ export default defineElement({
           ],
           sm: [
             { w: 6, h: 22, x: 0, y: 52, i: 'appInfo', moved: false, static: false },
+            { w: 6, h: 22, x: 0, y: 52, i: 'affairs', moved: false, static: false },
             { w: 6, h: 62, x: 0, y: 74, i: 'calendar', moved: false, static: false },
             { w: 3, h: 22, x: 0, y: 14, i: 'chat', moved: false, static: false },
             { w: 6, h: 14, x: 0, y: 0, i: 'operate', moved: false, static: false },
@@ -103,6 +108,7 @@ export default defineElement({
           ],
           xs: [
             { w: 4, h: 22, x: 0, y: 79, i: 'appInfo', moved: false, static: false },
+            { w: 4, h: 22, x: 0, y: 79, i: 'affairs', moved: false, static: false },
             { w: 4, h: 62, x: 0, y: 101, i: 'calendar', moved: false, static: false },
             { w: 2, h: 38, x: 0, y: 14, i: 'chat', moved: false, static: false },
             { w: 4, h: 14, x: 0, y: 0, i: 'operate', moved: false, static: false },
@@ -111,6 +117,7 @@ export default defineElement({
           ],
           xxs: [
             { w: 2, h: 22, x: 0, y: 94, i: 'appInfo', moved: false, static: false },
+            { w: 2, h: 22, x: 0, y: 94, i: 'affairs', moved: false, static: false },
             { w: 2, h: 62, x: 0, y: 116, i: 'calendar', moved: false, static: false },
             { w: 1, h: 38, x: 0, y: 19, i: 'chat', moved: false, static: false },
             { w: 2, h: 19, x: 0, y: 0, i: 'operate', moved: false, static: false },
@@ -163,9 +170,16 @@ export default defineElement({
         params: {},
         default: 'Work',
       },
+      affairs: {
+        label: '常用',
+        single: true,
+        params: {},
+        default: 'Affairs',
+      },
     },
     type: 'Template',
     layoutType: 'scroll',
+    photo: Workbench,
     description: '用于自定义工作台',
     label: '工作台',
   },

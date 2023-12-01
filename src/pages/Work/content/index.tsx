@@ -26,7 +26,7 @@ const Content: React.FC<IProps> = (props) => {
   useFlagCmdEmitter('works', () => loadWork());
 
   useEffect(() => {
-    const id = orgCtrl.work.notity.subscribe(() => loadContent('常用办事'));
+    const id = orgCtrl.work.notity.subscribe(() => loadContent('常用'));
     return () => {
       orgCtrl.work.notity.unsubscribe(id);
     };
@@ -108,7 +108,7 @@ const Content: React.FC<IProps> = (props) => {
 
   const loadContent = (tag: string) => {
     if (tag?.length < 2) return;
-    if (tag == '常用办事') {
+    if (tag == '常用') {
       loadWork();
       return;
     }
@@ -136,7 +136,7 @@ const Content: React.FC<IProps> = (props) => {
   return (
     <Spin spinning={!loaded} tip={'加载中...'}>
       <DirectoryViewer
-        initTags={['常用办事', '待办', '已办', '抄送', '发起的']}
+        initTags={['常用', '待办', '已办', '抄送', '发起的']}
         selectFiles={[]}
         focusFile={focusFile}
         content={content}

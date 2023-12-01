@@ -1,12 +1,14 @@
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import TypeIcon from '@/components/Common/GlobalComps/typeIcon';
 import FullScreenModal from '@/components/Common/fullScreen';
+import OpenFileDialog from '@/components/OpenFileDialog';
+import WorkStartDo from '@/executor/open/work';
 import { useFlagCmdEmitter } from '@/hooks/useCtrlUpdate';
-import { command, model } from '@/ts/base';
+import { command, model, schema } from '@/ts/base';
 import { formatSize } from '@/ts/base/common';
 import orgCtrl from '@/ts/controller';
-import { IApplication, TargetType } from '@/ts/core';
-import { Badge, Button, Calendar, Divider, Dropdown, Space, Spin } from 'antd';
+import { IApplication, IFileInfo, IWork, TargetType } from '@/ts/core';
+import { Badge, Button, Calendar, Divider, Dropdown, Space, Spin, message } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { ImBubbles2, ImDropbox, ImList, ImPlus, ImStack } from 'react-icons/im';
 import { useHistory } from 'react-router-dom';
@@ -190,49 +192,42 @@ export const RenderStore: React.FC = () => {
   );
 };
 
-// 渲染应用信息
-export const RenderAppInfo: React.FC = () => {
-  const history = useHistory();
-  const [allAppShow, setAllAppShow] = useState(false);
-  const [applications, setApplications] = useState<IApplication[]>([]);
-  const [loaded] = useFlagCmdEmitter('applications', async () => {
-    setApplications(await orgCtrl.loadApplications());
-  });
-  const contextMenu = (app: IApplication) => {
-    const useAlays = app.cache.tags?.includes('常用');
-    const menus: OperateMenuType[] = [
-      {
-        key: useAlays ? 'unsetCommon' : 'setCommon',
-        label: useAlays ? '取消常用' : '设为常用',
-        icon: <></>,
-      },
-    ];
-    return {
-      items: menus,
-      onClick: async ({ key }: { key: string }) => {
-        switch (key) {
-          case 'setCommon':
-            app.cache.tags = app.cache.tags || [];
-            app.cache.tags.push('常用');
-            app.cacheUserData();
-            break;
-          default:
-            app.cache.tags = app.cache.tags?.filter((i) => i != '常用');
-            app.cacheUserData();
-            break;
-        }
-      },
-    };
+// 右键
+const contextMenu = (entity: IFileInfo<schema.XEntity>) => {
+  const useAlays = entity.cache.tags?.includes('常用');
+  const menus: OperateMenuType[] = [
+    {
+      key: useAlays ? 'unsetCommon' : 'setCommon',
+      label: useAlays ? '取消常用' : '设为常用',
+      icon: <></>,
+    },
+  ];
+  return {
+    items: menus,
+    onClick: async ({ key }: { key: string }) => {
+      switch (key) {
+        case 'setCommon':
+          entity.cache.tags = entity.cache.tags || [];
+          entity.cache.tags.push('常用');
+          entity.cacheUserData();
+          break;
+        default:
+          entity.cache.tags = entity.cache.tags?.filter((i) => i != '常用');
+          entity.cacheUserData();
+          break;
+      }
+    },
   };
-  // 加载应用
-  const loadAppCard = (item: IApplication) => (
+};
+
+// 卡片
+const loadCard = (
+  item: IFileInfo<schema.XEntity>,
+  onClick?: (item: IFileInfo<schema.XEntity>) => void,
+) => {
+  return (
     <Dropdown key={item.key} menu={contextMenu(item)} trigger={['contextMenu']}>
-      <div
-        className="appCard"
-        onClick={() => {
-          orgCtrl.currentKey = item.key;
-          history.push('/store');
-        }}>
+      <div className="appCard" onClick={() => onClick?.(item)}>
         {item.cache.tags?.includes('常用') ? (
           <Badge dot>
             <EntityIcon entity={item.metadata} size={35} />
@@ -246,21 +241,34 @@ export const RenderAppInfo: React.FC = () => {
       </div>
     </Dropdown>
   );
-  // 加载多个应用
-  const loadMultAppCards = (title: string, apps: IApplication[]) => {
-    if (apps.length < 1) return <></>;
+};
+
+// 渲染应用信息
+export const RenderAppInfo: React.FC = () => {
+  const history = useHistory();
+  const [allAppShow, setAllAppShow] = useState(false);
+  const [applications, setApplications] = useState<IApplication[]>([]);
+  const [loaded] = useFlagCmdEmitter('applications', async () => {
+    setApplications(await orgCtrl.loadApplications());
+  });
+  const toStore = (item: any) => {
+    orgCtrl.currentKey = item.key;
+    history.push('/store');
+  };
+  // 加载多个文件
+  const loadMultiCards = (title: string, items: IFileInfo<schema.XEntity>[]) => {
+    if (items.length < 1) return <></>;
     return (
       <>
         <div className="appGroup-title">{title}</div>
         <Space wrap split={<Divider type="vertical" />} size={6}>
-          {apps.map((app) => {
-            return loadAppCard(app);
+          {items.map((item) => {
+            return loadCard(item, () => toStore(item));
           })}
         </Space>
       </>
     );
   };
-
   // 加载所有应用
   const renderAllApps = () => {
     return (
@@ -270,15 +278,15 @@ export const RenderAppInfo: React.FC = () => {
         open={allAppShow}
         onCancel={() => setAllAppShow(false)}>
         <div className="cardItem-viewer">
-          {loadMultAppCards(
+          {loadMultiCards(
             '常用应用',
             applications.filter((i) => i.cache.tags?.includes('常用')),
           )}
-          {loadMultAppCards(
+          {loadMultiCards(
             '我的应用',
             applications.filter((i) => i.metadata.createUser === i.userId),
           )}
-          {loadMultAppCards(
+          {loadMultiCards(
             '共享应用',
             applications.filter((i) => i.metadata.createUser !== i.userId),
           )}
@@ -301,12 +309,72 @@ export const RenderAppInfo: React.FC = () => {
               {applications
                 .filter((i) => i.cache.tags?.includes('常用'))
                 .map((app) => {
-                  return loadAppCard(app);
+                  return loadCard(app, () => toStore(app));
                 })}
             </Space>
           </div>
         </Spin>
         {allAppShow && renderAllApps()}
+      </div>
+    </div>
+  );
+};
+
+// 渲染常用办事信息
+export const RenderAffairs: React.FC = () => {
+  const [loading, setLoading] = useState(false);
+  const [center, setCenter] = useState(<></>);
+  const [content, setContent] = useState<IWork[]>([]);
+  const [workStart, setWorkStart] = useState(<></>);
+  useFlagCmdEmitter('works', () => loadWorks());
+  const openDisk = () => {
+    setCenter(
+      <OpenFileDialog
+        accepts={['办事']}
+        rootKey={'disk'}
+        onOk={() => setCenter(<></>)}
+        onCancel={() => setCenter(<></>)}
+      />,
+    );
+  };
+  const loadWorks = async () => {
+    setLoading(true);
+    try {
+      const works: IWork[] = await orgCtrl.loadWorks();
+      setContent(works.filter((item) => item.cache.tags?.find((item) => item == '常用')));
+    } catch (error) {
+      message.error((error as Error)?.message);
+      setContent([]);
+    }
+    setLoading(false);
+  };
+  useEffect(() => {
+    loadWorks();
+  }, []);
+  return (
+    <div className="cardGroup">
+      <div className="cardItem">
+        <div className="cardItem-header">
+          <span className="title">常用办事</span>
+          <span className="extraBtn" onClick={() => openDisk()}>
+            <ImDropbox /> <span>配置常用</span>
+          </span>
+        </div>
+        <Spin spinning={loading} tip={'加载中...'}>
+          <div className="cardItem-viewer">
+            <Space wrap split={<Divider type="vertical" />} size={2}>
+              {content.map((item) =>
+                loadCard(item, () =>
+                  setWorkStart(
+                    <WorkStartDo current={item} finished={() => setWorkStart(<></>)} />,
+                  ),
+                ),
+              )}
+            </Space>
+          </div>
+        </Spin>
+        {center}
+        {workStart}
       </div>
     </div>
   );
@@ -383,6 +451,7 @@ const WorkBench: React.FC = () => {
       </div>
       <RenderStore />
       <RenderAppInfo />
+      <RenderAffairs />
       <CalendarItem />
     </div>
   );
