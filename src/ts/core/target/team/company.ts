@@ -14,6 +14,7 @@ import { companyJoins } from '../../public/operates';
 import { Cohort } from '../outTeam/cohort';
 import { ISession } from '../../chat/session';
 import { IFile } from '../../thing/fileinfo';
+import { XObject } from '../../public/object';
 
 /** 单位类型接口 */
 export interface ICompany extends IBelong {
@@ -25,6 +26,8 @@ export interface ICompany extends IBelong {
   departments: IDepartment[];
   /** 支持的内设机构类型 */
   departmentTypes: string[];
+  /** 单位用户缓存对象 */
+  cacheObj: XObject<schema.Xbase>;
   /** 退出单位 */
   exit(): Promise<boolean>;
   /** 加载组织集群 */
@@ -37,6 +40,8 @@ export interface ICompany extends IBelong {
   createGroup(data: model.TargetModel): Promise<IGroup | undefined>;
   /** 设立内部机构 */
   createDepartment(data: model.TargetModel): Promise<IDepartment | undefined>;
+  setCacheData(opt: 'insert' | 'delete', data: any): Promise<boolean>;
+  cacheCompanyData(notify: boolean): Promise<boolean>;
 }
 
 /** 单位类型实现 */
@@ -50,11 +55,16 @@ export class Company extends Belong implements ICompany {
       TargetType.Research,
       TargetType.Laboratory,
     ];
+    this.cacheObj = new XObject(_metadata, 'company-cache', [_metadata.id], [this.key]);
+    setTimeout(async () => {
+      await this.loadCompanyData();
+    }, 0);
   }
   groups: IGroup[] = [];
   stations: IStation[] = [];
   departments: IDepartment[] = [];
   departmentTypes: string[] = [];
+  cacheObj: XObject<schema.Xbase>;
   get superior(): IFile {
     return this.user;
   }
@@ -231,7 +241,11 @@ export class Company extends Belong implements ICompany {
     }
     return targets;
   }
+  getCacheId(id: string) {
+    return `home.${this.id}_${id}`;
+  }
   async deepLoad(reload: boolean = false): Promise<void> {
+    await this.cacheObj.all();
     await Promise.all([
       await this.loadGroups(reload),
       await this.loadDepartments(reload),
@@ -284,6 +298,47 @@ export class Company extends Belong implements ICompany {
     return [...this.groups, ...this.departments, ...this.cohorts, ...this.storages];
   }
 
+  async setCacheData(opt: 'insert' | 'delete', data: any): Promise<boolean> {
+    const cacheId = this.getCacheId(data.id);
+    let success = false;
+    switch (opt) {
+      case 'insert':
+        success = await this.cacheObj.set(cacheId, data);
+        break;
+      case 'delete':
+        success = await this.cacheObj.delete(cacheId);
+        break;
+      default:
+        break;
+    }
+
+    if (success) {
+      await this.cacheObj.notity(cacheId, this.cache, true, true);
+    }
+    return success;
+  }
+  async loadCompanyData(): Promise<void> {
+    const data = await this.cacheObj.get<schema.XCache>(this.cachePath);
+    if (data && data.fullId === this.cache.fullId) {
+      this.cache = data;
+    }
+    this.cacheObj.subscribe(this.cachePath, (data: schema.XCache) => {
+      console.log('监听单位缓存', this.cachePath, data);
+      if (data && data.fullId === this.cache.fullId) {
+        this.cache = data;
+        this.cacheObj.setValue(this.cachePath, data);
+        this.directory.changCallback();
+      }
+    });
+  }
+
+  async cacheCompanyData(notify: boolean = true): Promise<boolean> {
+    const success = await this.cacheObj.set(this.cachePath, this.cache);
+    if (success && notify) {
+      await this.cacheObj.notity(this.cachePath, this.cache, true, true);
+    }
+    return success;
+  }
   override async removeMembers(
     members: schema.XTarget[],
     notity: boolean = false,

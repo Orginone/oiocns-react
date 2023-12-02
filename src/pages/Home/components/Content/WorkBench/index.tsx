@@ -11,6 +11,8 @@ import { OperateMenuType } from 'typings/globelType';
 import FullScreenModal from '@/components/Common/fullScreen';
 import { useFlagCmdEmitter } from '@/hooks/useCtrlUpdate';
 import TypeIcon from '@/components/Common/GlobalComps/typeIcon';
+import SysItemCard from './sysItemCard';
+import { CmdBtns, SYS_AXW, WorkDatas } from './pageConfig';
 
 // 工作台
 const WorkBench: React.FC = () => {
@@ -26,7 +28,7 @@ const WorkBench: React.FC = () => {
       <div className="dataItem">
         <div className="dataItemTitle">{title}</div>
         <div className="dataItemNumber">{number}</div>
-        {size && size > 0 && <div className="dataItemTitle">大小:{formatSize(size)}</div>}
+        {/* {size && size > 0 && <div className="dataItemTitle">大小:{formatSize(size)}</div>} */}
         {info && info.length > 0 && <div className="dataItemTitle">{info}</div>}
       </div>
     );
@@ -45,7 +47,7 @@ const WorkBench: React.FC = () => {
     });
     return (
       <>
-        <div className="cardItem-header">
+        <div className="cardItem-header center">
           <span className="title">沟通</span>
           <span className="extraBtn">
             <ImBubbles2 />
@@ -74,7 +76,7 @@ const WorkBench: React.FC = () => {
                 '群聊(个)',
                 orgCtrl.chats.filter((i) => i.isMyChat && i.isGroup).length,
               )}
-              {renderDataItem('单位(家)', orgCtrl.user.companys.length)}
+              {renderDataItem('加入单位(家)', orgCtrl.user.companys.length)}
             </Space>
           </Spin>
         </div>
@@ -104,9 +106,10 @@ const WorkBench: React.FC = () => {
         orgCtrl.unsubscribe(id);
       };
     }, []);
+    const counts = [todoCount, CompletedCount, CopysCount, ApplyCount];
     return (
       <>
-        <div className="cardItem-header">
+        <div className="cardItem-header center">
           <span className="title">办事</span>
           <span className="extraBtn">
             <ImList />
@@ -117,10 +120,7 @@ const WorkBench: React.FC = () => {
         </div>
         <div className="cardItem-viewer">
           <Space wrap split={<Divider type="vertical" />} size={2}>
-            {renderDataItem('待办', todoCount)}
-            {renderDataItem('已办', CompletedCount)}
-            {renderDataItem('抄送', CopysCount)}
-            {renderDataItem('发起的', ApplyCount)}
+            {WorkDatas.map((item, idx) => renderDataItem(item.title, counts[idx]))}
           </Space>
         </div>
       </>
@@ -138,7 +138,7 @@ const WorkBench: React.FC = () => {
     }, []);
     return (
       <>
-        <div className="cardItem-header">
+        <div className="cardItem-header center">
           <span className="title">数据</span>
           <span className="extraBtn">
             <ImPlus /> <span>管理数据</span>
@@ -149,21 +149,12 @@ const WorkBench: React.FC = () => {
             {diskInfo && (
               <>
                 {renderDataItem(
-                  `关系(个)`,
-                  orgCtrl.chats.filter(
-                    (i) => i.isMyChat && i.typeName !== TargetType.Group,
-                  ).length,
-                  -1,
-                  `共计:${orgCtrl.chats.length}个`,
-                )}
-                {renderDataItem(`数据集(个)`, diskInfo.collections, diskInfo.dataSize)}
-                {renderDataItem(`对象数(个)`, diskInfo.objects, diskInfo.totalSize)}
-                {renderDataItem(`文件(个)`, diskInfo.files, diskInfo.fileSize)}
-                {renderDataItem(
-                  `硬件`,
+                  `存储空间`,
                   formatSize(diskInfo.fsUsedSize),
                   diskInfo.fsTotalSize,
                 )}
+                {renderDataItem(`对象数(个)`, diskInfo.objects, diskInfo.totalSize)}
+                {renderDataItem(`文件(个)`, diskInfo.files, diskInfo.fileSize)}
               </>
             )}
             {noStore && (
@@ -339,18 +330,14 @@ const WorkBench: React.FC = () => {
           </span>
         </div>
         <div style={{ width: '100%', minHeight: 60 }} className="cardItem-viewer">
-          <Space wrap split={<Divider type="vertical" />} size={6}>
-            {renderCmdBtn('joinFriend', '添加好友', 'joinFriend')}
-            {renderCmdBtn('joinStorage', '申请存储', '存储资源')}
-            {renderCmdBtn('newCohort', '创建群组', '群组')}
-            {renderCmdBtn('joinCohort', '加入群聊', 'joinCohort')}
-            {renderCmdBtn('newCompany', '设立单位', '单位')}
-            {renderCmdBtn('joinCompany', '加入单位', 'joinCompany')}
+          <Space className="cardItem-content" wrap split={<Divider type="vertical" />}>
+            {CmdBtns.map((cmd) => renderCmdBtn(cmd.cmd, cmd.title, cmd.iconType))}
           </Space>
         </div>
       </>
     );
   };
+
   return (
     <div className="workbench-content">
       <div className="cardGroup">
@@ -358,25 +345,50 @@ const WorkBench: React.FC = () => {
           <RenderOperate />
         </div>
       </div>
-      <div className="cardGroup">
-        <div className="cardItem" onClick={() => history.push('chat')}>
+      <div className="cardGroup dataGroup">
+        <div className="cardItem chartCard" onClick={() => history.push('chat')}>
           <RenderChat />
         </div>
-        <div className="cardItem" onClick={() => history.push('work')}>
+        <div className="cardItem workCard" onClick={() => history.push('work')}>
           <RenderWork />
         </div>
+        <div className="cardItem axw-storeCard" onClick={() => history.push('store')}>
+          <RendeStore />
+        </div>
       </div>
-      <div className="cardGroup">
+      <div className="cardGroup axw-group">
+        <div className="cardItem">
+          <SysItemCard title="成果管理" tagName="成果管理" />
+        </div>
+        <div className="cardItem">
+          <SysItemCard title="合同收益管理" tagName="合同收益管理" />
+        </div>
+        <div className="cardItem">
+          <SysItemCard title="赋权管理" />
+        </div>
+      </div>
+      <div className="cardGroup axw-group">
+        <div className="cardItem">
+          <SysItemCard title="工作流配置" />
+        </div>
+        <div className="cardItem">
+          <SysItemCard title="表单配置" />
+        </div>
+        <div className="cardItem downLoad">
+          <SysItemCard title="下载" />
+        </div>
+      </div>
+      <div className="cardGroup org-sroreCard">
         <div className="cardItem" onClick={() => history.push('store')}>
           <RendeStore />
         </div>
       </div>
-      <div className="cardGroup">
+      <div className="cardGroup org-appCard">
         <div className="cardItem">
           <RendeAppInfo />
         </div>
       </div>
-      <div className="calendar">{calendarItem()}</div>
+      <div className="calendar org-calendar">{calendarItem()}</div>
     </div>
   );
 };

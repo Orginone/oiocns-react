@@ -666,3 +666,20 @@ export interface XPageTemplate extends XStandard {
   // 模板类型
   kind?: string;
 }
+
+//首页入口缓存数据类型
+export type XHomeCacheData = {
+  //唯一标识
+  id: string;
+  //选择项名称
+  name: string;
+  //基础信息
+  metadata: any;
+  //选则项类型
+  typeName: string;
+  //分组标记
+  tag: string;
+  sort: number;
+  //更新时间
+  updateTime: string;
+};

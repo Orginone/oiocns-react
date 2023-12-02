@@ -33,6 +33,7 @@ interface IProps {
   finished: () => void;
 }
 const ConfigExecutor: React.FC<IProps> = ({ cmd, args, finished }) => {
+  console.log(34444, cmd, args, finished);
   if (Array.isArray(args) && args.length > 0) {
     switch (cmd) {
       case 'pull':
@@ -52,6 +53,19 @@ const ConfigExecutor: React.FC<IProps> = ({ cmd, args, finished }) => {
           const entity: IEntity<schema.XEntity> = args[0];
           if (entity.groupTags && entity.groupTags.includes('表单')) {
             return <EntityForm cmd={cmd + 'Form'} entity={args[0]} finished={finished} />;
+          }
+          if (entity.groupTags && entity.groupTags.includes('首页配置')) {
+            return (
+              <EntityForm
+                cmd={cmd + 'Home'}
+                entity={args[0]}
+                finished={(data: any) => {
+                  const emit = args[2];
+                  typeof emit === 'function' && emit(data);
+                  finished();
+                }}
+              />
+            );
           }
           if (Object.keys(entityMap).includes(args[0].typeName)) {
             return (

@@ -1,41 +1,45 @@
 import React from 'react';
 import { ProFormColumnsType } from '@ant-design/pro-components';
 import SchemaForm from '@/components/SchemaForm';
-import { IDirectory } from '@/ts/core';
+import { ICompany, IDirectory } from '@/ts/core';
 import UploadItem from '../../tools/uploadItem';
 import { EntityColumns } from './entityColumns';
 import { schema } from '@/ts/base';
+import orgCtrl from '@/ts/controller';
 
 interface Iprops {
   formType: string;
-  current: IDirectory;
-  finished: () => void;
+  target: { metadata: any; [key: string]: any };
+  //   current: ICompany;
+  finished: (args: any) => void;
 }
 /*
   编辑
 */
-const DirectoryForm = (props: Iprops) => {
-
-  console.log(342324342,props);
-  
+const HomeSettingForm = (props: Iprops) => {
   let title = '';
-  const readonly = props.formType === 'remarkDir';
-  let initialValue: any = props.current.metadata;
+  let directory: IDirectory = orgCtrl.user.directory.children.find(
+    (directory) => directory.id === '510763133825064961',
+  )!;
+
+  const typeName = '首页配置';
+  const readonly = props.formType === 'remark';
+  let initialValue: any = { ...props.target.metadata, tag: props.target.tag };
   switch (props.formType) {
-    case 'newDir':
-      title = '新建目录';
-      initialValue = { shareId: props.current.target.id };
+    case 'new':
+      title = '新建' + typeName;
+      initialValue = {};
       break;
-    case 'updateDir':
-      title = '更新目录';
+    case 'update':
+      title = '更新' + typeName;
       break;
-    case 'remarkDir':
-      title = '查看目录';
+    case 'remark':
+      title = '查看' + typeName;
       break;
     default:
       return <></>;
   }
-  const columns: ProFormColumnsType<schema.XDirectory>[] = [
+  const columns: ProFormColumnsType<schema.XForm>[] = [
     {
       title: '图标',
       dataIndex: 'icon',
@@ -44,12 +48,12 @@ const DirectoryForm = (props: Iprops) => {
         return (
           <UploadItem
             readonly={readonly}
-            typeName={props.current.typeName}
+            typeName={typeName}
             icon={initialValue.icon}
             onChanged={(icon) => {
               form.setFieldValue('icon', icon);
             }}
-            directory={props.current}
+            directory={directory}
           />
         );
       },
@@ -63,32 +67,34 @@ const DirectoryForm = (props: Iprops) => {
       },
     },
     {
-      title: '代码',
-      dataIndex: 'code',
+      title: '标记名称',
+      dataIndex: 'tag',
       readonly: readonly,
       formItemProps: {
-        rules: [{ required: true, message: '分类代码为必填项' }],
+        rules: [{ required: true, message: '标记名称为必填项' }],
       },
     },
     {
-      title: '制定组织',
-      dataIndex: 'shareId',
+      title: '类型',
+      dataIndex: 'typeName',
       valueType: 'select',
-      hideInForm: true,
-      readonly: readonly,
-      formItemProps: { rules: [{ required: true, message: '组织为必填项' }] },
+      initialValue: '表单',
+      readonly: true,
       fieldProps: {
-        options: [
-          {
-            value: props.current.target.id,
-            label: props.current.target.name,
-          },
-        ],
+        options: ['表单'].map((i) => {
+          return {
+            value: i,
+            label: i,
+          };
+        }),
+      },
+      formItemProps: {
+        rules: [{ required: true, message: '类型为必填项' }],
       },
     },
   ];
   if (readonly) {
-    columns.push(...EntityColumns(props.current.metadata));
+    columns.push(...EntityColumns(props.target!.metadata));
   }
   columns.push({
     title: '备注信息',
@@ -101,7 +107,7 @@ const DirectoryForm = (props: Iprops) => {
     },
   });
   return (
-    <SchemaForm<schema.XDirectory>
+    <SchemaForm<schema.XForm>
       open
       title={title}
       width={640}
@@ -113,21 +119,14 @@ const DirectoryForm = (props: Iprops) => {
       layoutType="ModalForm"
       onOpenChange={(open: boolean) => {
         if (!open) {
-          props.finished();
+          props.finished(undefined);
         }
       }}
-      onFinish={async (values) => {
-        switch (props.formType) {
-          case 'updateDir':
-            await props.current.update(values);
-            break;
-          case 'newDir':
-            await props.current.create(values);
-            break;
-        }
-        props.finished();
+      onFinish={(values) => {
+        console.log('props.target!.metadata', values);
+        props.finished(values);
       }}></SchemaForm>
   );
 };
 
-export default DirectoryForm;
+export default HomeSettingForm;
