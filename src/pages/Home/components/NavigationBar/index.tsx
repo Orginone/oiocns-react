@@ -19,7 +19,7 @@ export const allPages: NavigationItem[] = [
     label: '工作台',
     type: 'inner',
     backgroundImageUrl: `/img/${resource.location}/banner/workbench.png`,
-    component: React.lazy(() => import('../Content/WorkBench/anxinwu')),
+    component: React.lazy(() => import('../Content/WorkBench')),
   },
   {
     key: 'activity',
@@ -121,7 +121,7 @@ const NavigationBar: React.FC<{
                       />
                     }
                     key={index}>
-                    <div className="navigationBar-config-pageCard">{item.name}</div>
+                    <div className="navigationBar-config-page-card">{item.name}</div>
                   </Badge>
                 );
               })}
@@ -146,7 +146,7 @@ const NavigationBar: React.FC<{
                     )
                   }
                   key={index}>
-                  <div className="navigationBar-config-pageCard">{item.name}</div>
+                  <div className="navigationBar-config-page-card">{item.name}</div>
                 </Badge>
               );
             })}

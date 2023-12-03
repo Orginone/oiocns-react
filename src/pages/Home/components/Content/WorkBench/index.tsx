@@ -5,14 +5,14 @@ import { useHistory } from 'react-router-dom';
 import { command, model } from '@/ts/base';
 import orgCtrl from '@/ts/controller';
 import { formatSize } from '@/ts/base/common';
-import { IApplication, TargetType } from '@/ts/core';
+import { IApplication } from '@/ts/core';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import { OperateMenuType } from 'typings/globelType';
 import FullScreenModal from '@/components/Common/fullScreen';
 import { useFlagCmdEmitter } from '@/hooks/useCtrlUpdate';
 import TypeIcon from '@/components/Common/GlobalComps/typeIcon';
 import SysItemCard from './sysItemCard';
-import { CmdBtns, SYS_AXW, WorkDatas } from './pageConfig';
+import { CmdBtns, WorkDatas } from './pageConfig';
 
 // 工作台
 const WorkBench: React.FC = () => {

@@ -1,3 +1,4 @@
+import cls from './index.module.less';
 import React, { useState } from 'react';
 import NavigationBar, { allPages } from './components/NavigationBar';
 export interface NavigationItem {
@@ -10,15 +11,14 @@ export interface NavigationItem {
 
 const Home: React.FC = () => {
   const [current, setCurrent] = useState(allPages[0]);
-
   return (
-    <div className="homepage">
+    <div className={cls.homepage}>
       {current.type == 'inner' && (
         <div
-          className="headBanner"
+          className={cls.headBanner}
           style={{ backgroundImage: `url(${current.backgroundImageUrl})` }}></div>
       )}
-      <div className="content">
+      <div className={cls.content}>
         {current.type == 'inner' && React.createElement(current.component)}
       </div>
       {current.type == 'page' && current.component}
