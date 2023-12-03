@@ -20,7 +20,6 @@ import EntityInfo from '@/components/Common/EntityInfo';
 import WorkForm from '@/components/DataStandard/WorkForm';
 import Directory from '@/components/Directory';
 import TaskApproval from '@/executor/tools/task/approval';
-import TaskStart from '@/executor/open/work';
 
 const officeExt = ['.md', '.pdf', '.xls', '.xlsx', '.doc', '.docx', '.ppt', '.pptx'];
 const videoExt = ['.mp4', '.avi', '.mov', '.mpg', '.swf', '.flv', '.mpeg'];
@@ -85,9 +84,6 @@ const EntityPreview: React.FC<{ flag?: string }> = (props) => {
     if ('taskdata' in entity) {
       switch (entity.taskdata.taskType) {
         case '事项':
-          if (entity.taskdata.approveType == '子流程') {
-            return <TaskStart key={entity.key} current={entity} />;
-          }
           return <TaskBody key={entity.key} current={entity} finished={() => {}} />;
         case '加用户':
           return (

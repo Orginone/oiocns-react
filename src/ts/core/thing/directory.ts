@@ -276,19 +276,7 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
       directoryOperates.Refesh,
     );
     if (this.target.hasRelationAuth()) {
-      if (this.name.includes('业务')) {
-        operates.push({
-          ...directoryNew,
-          menus: [...directoryNew.menus, directoryOperates.Business],
-        });
-      } else if (this.name.includes('标准')) {
-        operates.push({
-          ...directoryNew,
-          menus: [...directoryNew.menus, directoryOperates.Standard],
-        });
-      } else {
-        operates.push(directoryNew);
-      }
+      operates.push(directoryNew);
       if (this.target.user.copyFiles.size > 0) {
         operates.push(fileOperates.Parse);
       }

@@ -1,5 +1,6 @@
 import { command, model } from '@/ts/base';
 import { IWorkTask, TaskStatus } from '@/ts/core';
+import { approvelWork } from '@/utils/anxinwu/axwWork';
 import message from '@/utils/message';
 import { Input, Button } from 'antd';
 import React, { useState } from 'react';
@@ -57,9 +58,12 @@ const TaskApproval: React.FC<TaskDetailType> = ({ task, finished, fromData }) =>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
         <Button
           type="primary"
-          onClick={() => {
+          onClick={async () => {
             if (validation()) {
-              approvalTask(TaskStatus.ApprovalStart);
+              const success = await approvelWork(task);
+              if (success) {
+                await approvalTask(TaskStatus.ApprovalStart);
+              }
             } else {
               message.warn('请完善表单内容再提交!');
             }

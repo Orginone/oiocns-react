@@ -1,5 +1,5 @@
-import * as i from '../../impl';
-import * as t from '../../type';
+import * as i from '../impl';
+import * as t from '../type';
 
 export class SpeciesSheet extends i.Sheet<t.Species> {
   typeName: string;
@@ -68,14 +68,14 @@ export class SpeciesHandler<
    */
   async operating(excel: t.IExcel, onItemCompleted: () => void): Promise<void> {
     for (const row of this.sheet.data) {
-      const dir = excel.context.directories[row.directoryCode];
+      const dir = excel.context[row.directoryCode];
       row.typeName = this.sheet.typeName;
       row.directoryId = dir.meta.id;
-      const oldSpecies = excel.context.species[row.code];
+      const oldSpecies = dir.species[row.code];
       if (oldSpecies) {
         t.assignment(oldSpecies.meta, row);
       } else {
-        excel.context.species[row.code] = { meta: row, items: {} };
+        dir.species[row.code] = { meta: row, items: {} };
       }
       onItemCompleted();
     }

@@ -9,7 +9,7 @@ interface IProps {
   work?: boolean;
   activity?: boolean;
   exit?: boolean;
-  setting?: boolean;
+  relation?: boolean;
   myWork?: boolean;
   workDone?: boolean;
   workStart?: boolean;
@@ -24,13 +24,17 @@ interface IProps {
 
 const OrgIcons = (props: IProps) => {
   const size = props.size ?? 22;
+  //安心屋
+  const getUrl = (name: string) => {
+    return `/anxinwusvg/${name}.svg`;
+  };
   let svgName = 'home';
   if (props.chat) {
     svgName = 'chat';
   } else if (props.work) {
     svgName = 'work';
-  } else if (props.setting) {
-    svgName = 'setting';
+  } else if (props.relation) {
+    svgName = 'relation';
   } else if (props.exit) {
     svgName = 'exit';
   } else if (props.market) {
@@ -58,7 +62,7 @@ const OrgIcons = (props: IProps) => {
         preview={false}
         height={size}
         width={size}
-        src={`/svg/${svgName}.svg`}
+        src={getUrl(svgName)}
         style={props.css}
       />
     );
@@ -67,7 +71,7 @@ const OrgIcons = (props: IProps) => {
       <Avatar
         size={size}
         className={props.className}
-        src={`/svg/${svgName}.svg`}
+        src={getUrl(svgName)}
         style={{ background: 'transparent', color: '#606060', ...props.css }}
       />
     );

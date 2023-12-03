@@ -71,9 +71,7 @@ const ListMode = ({
                         <EntityIcon entity={item.metadata} size={40} />
                       </Badge>
                     }
-                    description={
-                      <div className="ellipsis1">{item.remark || item.code}</div>
-                    }
+                    description={item.remark || item.code}
                   />
                 </List.Item>
               </div>

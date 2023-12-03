@@ -80,7 +80,6 @@ const FormItem: React.FC<IFormItemProps> = (props) => {
     mixOptions.isValid = mixOptions.defaultValue ? true : isValid;
     mixOptions.label = mixOptions.label + '*';
   }
-
   switch (getWidget(props.field.valueType, props.field.widget)) {
     case '数字框':
       return <NumberBox {...mixOptions} />;

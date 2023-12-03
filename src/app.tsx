@@ -7,7 +7,8 @@ import message from '@/utils/message';
 import routes from './routes';
 import 'devextreme/dist/css/dx.common.css';
 import 'devextreme/dist/css/dx.light.css';
-import './global.less';
+// import './global.less';
+import './anxinwu.less'; //安心屋样式
 import zhCN from 'antd/es/locale/zh_CN';
 import moment from 'moment';
 import 'moment/locale/zh-cn';

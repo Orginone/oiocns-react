@@ -1,16 +1,16 @@
 import { IDirectory } from '@/ts/core';
 import { DirectoryHandler, DirectorySheet } from '../sheets/directory';
-import { AttrHandler, AttrSheet, FormHandler, FormSheet } from '../sheets/template/form';
-import { PropHandler, PropSheet } from '../sheets/standard/property';
-import { ClassifySheet, DictSheet, SpeciesHandler } from '../sheets/standard/species';
+import { AttrHandler, AttrSheet, FormHandler, FormSheet } from '../sheets/form';
+import { PropHandler, PropSheet } from '../sheets/property';
+import { ClassifySheet, DictSheet, SpeciesHandler } from '../sheets/species';
 import {
   ClassifyItemHandler,
   ClassifyItemSheet,
   DictItemHandler,
   DictItemSheet,
-} from '../sheets/standard/speciesitem';
+} from '../sheets/speciesitem';
 
-export const getStandardSheets = (directory: IDirectory) => {
+export const getSheets = (directory: IDirectory) => {
   return [
     new DirectoryHandler(new DirectorySheet(directory)),
     new SpeciesHandler(new DictSheet(directory)),
@@ -18,12 +18,6 @@ export const getStandardSheets = (directory: IDirectory) => {
     new SpeciesHandler(new ClassifySheet(directory)),
     new ClassifyItemHandler(new ClassifyItemSheet(directory)),
     new PropHandler(new PropSheet(directory)),
-  ];
-};
-
-export const getBusinessSheets = (directory: IDirectory) => {
-  return [
-    new DirectoryHandler(new DirectorySheet(directory)),
     new FormHandler(new FormSheet(directory)),
     new AttrHandler(new AttrSheet(directory)),
   ];

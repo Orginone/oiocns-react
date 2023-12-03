@@ -9,12 +9,12 @@ import { ImInfo } from 'react-icons/im';
 
 interface teamTypeInfo {
   size?: number;
-  iconSize?: number;
   entityId?: string;
   entity?: schema.XEntity;
   typeName?: string;
   notAvatar?: boolean;
   title?: string;
+  hideInfo?: boolean; //不展示小圆点
   showName?: boolean;
   onClick?: (entity?: schema.XEntity) => void;
 }
@@ -34,22 +34,19 @@ const EntityIcon = (info: teamTypeInfo) => {
     }
   };
   const entity = getEntity();
-  return (
-    <div className="entityIcon">
-      {entity ? (
-        <ShareIconItem
-          {...info}
-          share={{
-            name: entity.name,
-            typeName: entity.typeName,
-            avatar: parseAvatar(entity.icon),
-          }}
-        />
-      ) : (
-        <ShareIconById {...info} />
-      )}
-    </div>
-  );
+  if (entity) {
+    return (
+      <ShareIconItem
+        {...info}
+        share={{
+          name: entity.name,
+          typeName: entity.typeName,
+          avatar: parseAvatar(entity.icon),
+        }}
+      />
+    );
+  }
+  return <ShareIconById {...info} />;
 };
 
 /** 实体ID查找 */
@@ -115,14 +112,10 @@ export const ShareIconItem = (info: shareIconInfo) => {
           style={{ display: 'contents', cursor: 'pointer' }}
           title={info.title ?? ''}
           onClick={() => info.onClick?.apply(this, [info.entity])}>
-          {infoMore()}
-          <Avatar
-            size={info.iconSize || size}
-            src={info.share.avatar.thumbnail}
-            className="avatarIcon"
-          />
+          {!info.hideInfo && infoMore()}
+          <Avatar size={size} src={info.share.avatar.thumbnail} />
           {info.showName && (
-            <strong className="pickupName" style={{ fontSize: fontSize }}>
+            <strong style={{ marginLeft: 6, fontSize: fontSize }}>
               {info.share.name}
             </strong>
           )}
@@ -133,7 +126,7 @@ export const ShareIconItem = (info: shareIconInfo) => {
         <TypeIcon
           avatar
           iconType={info.share.typeName || info.typeName || '其它'}
-          size={info.iconSize || size}
+          size={size}
         />
       );
       if (info.notAvatar) {
@@ -143,13 +136,15 @@ export const ShareIconItem = (info: shareIconInfo) => {
         <span
           style={{ display: 'contents', cursor: 'pointer' }}
           onClick={() => info.onClick?.apply(this, [info.entity])}>
-          {infoMore()}
+          {!info.hideInfo && infoMore()}
           <Avatar
-            size={info.iconSize || size}
+            size={size}
             icon={icon}
             style={{ background: 'transparent', color: '#606060' }}
           />
-          {info.showName && <b className="pickupName">{info.share.name}</b>}
+          {info.showName && (
+            <b style={{ marginLeft: 6, fontSize: fontSize }}>{info.share.name}</b>
+          )}
         </span>
       );
     }
@@ -159,13 +154,15 @@ export const ShareIconItem = (info: shareIconInfo) => {
       style={{ display: 'contents', cursor: 'pointer' }}
       title={info.title ?? ''}
       onClick={() => info.onClick?.apply(this, [info.entity])}>
-      {infoMore()}
+      {!info.hideInfo && infoMore()}
       <Avatar
         size={size}
         icon={<TypeIcon avatar iconType={'其它'} size={size} />}
         style={{ background: 'transparent', color: '#606060' }}
       />
-      {info.showName && <strong className="pickupName">{info.entity?.id}</strong>}
+      {info.showName && (
+        <strong style={{ marginLeft: 6, fontSize: fontSize }}>{info.entity?.id}</strong>
+      )}
     </span>
   );
 };

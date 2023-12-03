@@ -16,7 +16,7 @@ import QrCode from 'qrcode.react';
 import { command, model, schema } from '@/ts/base';
 import { List, Modal, Upload } from 'antd';
 import message from '@/utils/message';
-import { uploadBusiness, uploadStandard } from './tools/uploadTemplate';
+import { uploadTemplate } from './tools/uploadTemplate';
 import TypeIcon from '@/components/Common/GlobalComps/typeIcon';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import { shareOpenLink } from '@/utils/tools';
@@ -61,9 +61,7 @@ export const executeCmd = (cmd: string, entity: any) => {
     case 'workForm':
       return openWork(entity);
     case 'standard':
-      return uploadStandard(entity);
-    case 'business':
-      return uploadBusiness(entity);
+      return uploadTemplate(entity);
     case 'online':
     case 'outline':
       return onlineChanged(cmd, entity);

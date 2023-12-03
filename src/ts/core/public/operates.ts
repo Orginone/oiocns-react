@@ -133,13 +133,7 @@ export const directoryOperates = {
   Standard: {
     sort: 2,
     cmd: 'standard',
-    label: '导入标准模板',
-    iconType: '标准',
-  },
-  Business: {
-    sort: 2,
-    cmd: 'business',
-    label: '导入业务模板',
+    label: '导入标准',
     iconType: '标准',
   },
   NewSpecies: {
@@ -200,6 +194,7 @@ export const directoryNew = {
   iconType: 'new',
   menus: [
     directoryOperates.NewDir,
+    directoryOperates.Standard,
     directoryOperates.NewDict,
     directoryOperates.NewSpecies,
     directoryOperates.NewProperty,

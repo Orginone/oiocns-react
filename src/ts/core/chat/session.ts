@@ -177,9 +177,6 @@ export class Session extends Entity<schema.XEntity> implements ISession {
     if (this.chatdata.isToping) {
       gtags.push('置顶');
     }
-    if (this.isGroup) {
-      gtags.push('群聊');
-    }
     return [...gtags, ...this.chatdata.labels];
   }
   override operates(): model.OperateModel[] {

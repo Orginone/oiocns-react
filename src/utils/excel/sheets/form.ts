@@ -1,5 +1,5 @@
-import * as i from '../../impl';
-import * as t from '../../type';
+import * as i from '../impl';
+import * as t from '../type';
 
 export class FormSheet extends i.Sheet<t.Form> {
   constructor(directory: t.IDirectory) {
@@ -64,6 +64,7 @@ export class FormHandler extends i.SheetHandler<FormSheet> {
       allErrors.push(...errors);
     });
     const attrHandler = excel.handlers.find((item) => item.sheet.name == '表单特性');
+    const propHandler = excel.handlers.find((item) => item.sheet.name == '属性定义');
     const groups = new t.List(
       attrHandler?.sheet.data
         .map((item, index) => {
@@ -89,7 +90,7 @@ export class FormHandler extends i.SheetHandler<FormSheet> {
     }
     attrHandler?.sheet.data.forEach((item, index) => {
       let hasForm = this.sheet.data.find((dir) => dir.code == item.formCode);
-      let hasProp = excel.context.properties[item.propCode];
+      let hasProp = propHandler?.sheet.data.find((prop) => prop.code == item.propCode);
       let errors = attrHandler?.assert(index, [
         { res: !item.formCode, error: '表单代码未填写' },
         { res: !item.name, error: '特性名称未填写' },
@@ -113,7 +114,7 @@ export class FormHandler extends i.SheetHandler<FormSheet> {
     const attrData = new t.List(handler?.sheet.data ?? []);
     const attrGroup = attrData.GroupBy((item) => item.formCode);
     for (const row of this.sheet.data) {
-      const dir = excel.context.directories[row.directoryCode];
+      const dir = excel.context[row.directoryCode];
       row.directoryId = dir.meta.id;
       const old = dir.forms[row.code];
       if (old) {
@@ -130,7 +131,7 @@ export class FormHandler extends i.SheetHandler<FormSheet> {
       const newAttrs = attrGroup[row.code] ?? [];
       newAttrs.forEach((newAttr) => {
         newAttr.formId = row.id;
-        let prop = excel.context.properties[newAttr.propCode]!;
+        let prop = excel.searchProps(newAttr.propCode)!;
         if (!newAttr.code) {
           newAttr.code = prop.code;
         }

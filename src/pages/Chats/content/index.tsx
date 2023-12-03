@@ -11,8 +11,7 @@ import { loadFileMenus } from '@/executor/fileOperate';
 const Content: React.FC<{
   chats: ISession[];
   filter: string;
-}> = (props) => {
-  const [chats, setChats] = useState<ISession[]>([]);
+}> = ({ chats, filter }) => {
   const [focusFile, setFocusFile] = useState<ISession>();
   const [loaded, msgKey] = useFlagCmdEmitter('session');
   useEffect(() => {
@@ -28,30 +27,28 @@ const Content: React.FC<{
       command.unsubscribe(id);
     };
   }, []);
-
-  const filterChats = (tag: string) => {
-    const temps = props.chats || orgCtrl.chats.filter((i) => i.isMyChat);
-    return temps
-      .filter((a) => tag === '最近' || a.groupTags.includes(tag))
-      .filter(
-        (a) =>
-          a.chatdata.chatName.includes(props.filter) ||
-          a.chatdata.chatRemark.includes(props.filter) ||
-          a.groupTags.filter((l) => l.includes(props.filter)).length > 0,
-      )
-      .filter((i) => i.chatdata.lastMessage || i.chatdata.recently)
-      .sort((a, b) => {
-        var num = (b.chatdata.isToping ? 10 : 0) - (a.chatdata.isToping ? 10 : 0);
-        if (num === 0) {
-          if (b.chatdata.lastMsgTime == a.chatdata.lastMsgTime) {
-            num = b.isBelongPerson ? 1 : -1;
-          } else {
-            num = b.chatdata.lastMsgTime > a.chatdata.lastMsgTime ? 5 : -5;
-          }
+  if (chats === undefined) {
+    chats = orgCtrl.chats.filter((i) => i.isMyChat);
+  }
+  chats = chats
+    .filter(
+      (a) =>
+        a.chatdata.chatName.includes(filter) ||
+        a.chatdata.chatRemark.includes(filter) ||
+        a.groupTags.filter((l) => l.includes(filter)).length > 0,
+    )
+    .filter((i) => i.chatdata.lastMessage || i.chatdata.recently)
+    .sort((a, b) => {
+      var num = (b.chatdata.isToping ? 10 : 0) - (a.chatdata.isToping ? 10 : 0);
+      if (num === 0) {
+        if (b.chatdata.lastMsgTime == a.chatdata.lastMsgTime) {
+          num = b.isBelongPerson ? 1 : -1;
+        } else {
+          num = b.chatdata.lastMsgTime > a.chatdata.lastMsgTime ? 5 : -5;
         }
-        return num;
-      });
-  };
+      }
+      return num;
+    });
 
   const contextMenu = (session: ISession | undefined) => {
     return {
@@ -75,17 +72,21 @@ const Content: React.FC<{
     <Spin spinning={!loaded} tip={'加载中...'}>
       <DirectoryViewer
         key={msgKey}
-        extraTags={false}
-        initTags={['最近', '@我', '未读', '置顶', '好友', '同事', '群聊']}
+        extraTags
+        initTags={['最近', '@我', '未读', '置顶', '好友']}
+        excludeTags={['本人', '同事']}
         selectFiles={[]}
         focusFile={focusFile}
         content={chats}
-        badgeCount={(tag) =>
-          filterChats(tag)
-            .map((i) => i.badgeCount ?? 0)
-            .reduce((total, count) => total + count, 0)
-        }
-        tagChanged={(tag) => setChats(filterChats(tag))}
+        badgeCount={(tag) => {
+          let count = 0;
+          chats
+            .filter((i) => tag === '最近' || i.groupTags.includes(tag))
+            .forEach((i) => {
+              count += i.badgeCount;
+            });
+          return count;
+        }}
         fileOpen={(entity) => sessionOpen(entity as ISession)}
         contextMenu={(entity) => contextMenu(entity as ISession)}
       />
