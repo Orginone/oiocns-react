@@ -23,6 +23,14 @@ interface IProps {
 }
 
 const OrgIcons = (props: IProps) => {
+  const hostname = window.location.hostname;
+  //安心屋
+
+  const getUrl = (name: string) => {
+    return hostname.startsWith('anxinwu')
+      ? `/anxinwusvg/${name}.svg`
+      : `/svg/${name}.svg`;
+  };
   const size = props.size ?? 22;
   let svgName = 'home';
   if (props.chat) {
@@ -58,7 +66,7 @@ const OrgIcons = (props: IProps) => {
         preview={false}
         height={size}
         width={size}
-        src={`/svg/${svgName}.svg`}
+        src={getUrl(svgName)}
         style={props.css}
       />
     );
@@ -67,7 +75,7 @@ const OrgIcons = (props: IProps) => {
       <Avatar
         size={size}
         className={props.className}
-        src={`/svg/${svgName}.svg`}
+        src={getUrl(svgName)}
         style={{ background: 'transparent', color: '#606060', ...props.css }}
       />
     );

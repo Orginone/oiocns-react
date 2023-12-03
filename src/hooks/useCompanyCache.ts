@@ -25,8 +25,7 @@ function useConpanyCacheData(dataTag: string, tagName: string): resultProps {
   const [applications, setApplications] = useState<IApplication[]>([]);
   const [isRefresh, setIsRefresh] = useState<boolean>(false);
 
-  // const hostname = window.location.hostname;
-  const hostname = 'anxinwu';
+  const hostname = window.location.hostname;
   if (!hostname.startsWith('anxinwu')) {
     return [true, [], () => {}, () => {}];
   }

@@ -7,8 +7,7 @@ interface IResources {
   unitPage: string;
 }
 export const getResouces = (): IResources => {
-  // const hostname = window.location.hostname;
-  const hostname = 'anxinwu';
+  const hostname = window.location.hostname;
   //安心屋
   if (hostname.startsWith('anxinwu')) {
     return {

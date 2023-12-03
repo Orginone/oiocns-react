@@ -1,7 +1,6 @@
 type CmdBtnItemType = { cmd: string; title: string; iconType: string };
 
-const SYS_AXW = true;
-//window.location.hostname.startsWith('anxinwu');
+const SYS_AXW = window.location.hostname.startsWith('anxinwu');
 //默认公共配置
 const OrgCmdBtns: CmdBtnItemType[] = [
   { cmd: 'joinFriend', title: '添加好友', iconType: 'joinFriend' },
