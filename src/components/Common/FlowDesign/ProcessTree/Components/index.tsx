@@ -14,6 +14,7 @@ export interface NodeProps {
   level: any;
   isEdit: boolean;
   target?: ITarget;
+  active?: boolean;
 }
 
 //解码渲染的时候插入dom到同级

@@ -18,10 +18,13 @@ const SysItemCard: React.FC<SysItemCardType> = ({ title, tagName = '' }) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const dialogParams = {
     title: `${title}选择`,
-    accepts: ['办事', '表单', '目录', '模块'], //, '文件'
+    accepts: ['办事', '表单', '目录', '应用', '模块'], //, '文件'
     excludeIds: ['445708344880140288'],
   };
-  const [loaded, dataSource, OpenItem, refresh] = useConpanyCacheData('home', title);
+  const [loaded, dataSource, OpenItem, refresh] = useConpanyCacheData(
+    'home',
+    tagName || title,
+  );
   return (
     <>
       <div className="cardItem-header">
@@ -95,7 +98,7 @@ const loadSysItem = (
       onClick={async () => {
         OpenItem(item);
       }}>
-      <EntityIcon entity={item.metadata} size={50} hideInfo />
+      <EntityIcon entity={item.metadata} size={40} hideInfo />
       <div className="appName">{item.name}</div>
     </div>
   </Dropdown>
@@ -119,7 +122,8 @@ const contextMenu = (target: any, cacheTagName: string = '常用', refresh: Func
     items: menus,
     onClick: async ({ key }: { key: string }) => {
       const targetCompany: ICompany | undefined = orgCtrl.user.companys.find(
-        (comp) => comp.id === target.metadata.shareId,
+        (comp) => comp.id === '445708344880140288',
+        //target.metadata.shareId,
       );
       if (!targetCompany) {
         return <></>;

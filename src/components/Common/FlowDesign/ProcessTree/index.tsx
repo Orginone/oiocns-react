@@ -11,6 +11,7 @@ import { generateUuid } from '@/ts/base/common';
 type IProps = {
   target?: ITarget;
   resource: NodeModel;
+  activeKey?: string;
   isEdit: boolean;
   onSelectedNode: (params: NodeModel) => void;
 };
@@ -19,7 +20,13 @@ type IProps = {
  * 流程树
  * @returns
  */
-const ProcessTree: React.FC<IProps> = ({ target, resource, onSelectedNode, isEdit }) => {
+const ProcessTree: React.FC<IProps> = ({
+  target,
+  resource,
+  onSelectedNode,
+  activeKey = '',
+  isEdit,
+}) => {
   const [key, setKey] = useState(0);
   const [scale, setScale] = useState<number>(100);
   const [nodeMap] = useState(new Map<string, NodeModel>());
@@ -76,6 +83,7 @@ const ProcessTree: React.FC<IProps> = ({ target, resource, onSelectedNode, isEdi
       isEdit,
       target,
       level: 1,
+      active: node.id === activeKey,
       config: node,
       //定义事件，插入节点，删除节点，选中节点，复制/移动
       onInsertNode: (type: any) => insertNode(type, node),

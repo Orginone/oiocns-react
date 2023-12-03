@@ -75,11 +75,17 @@ function useConpanyCacheData(dataTag: string, tagName: string): resultProps {
    * @returns {void} 无返回值
    */
   async function handleOpenItem(selected: schema.XHomeCacheData) {
+    //'股权管理' 暂不跳转任何页面
+    if (['516944829712830464', '516944828139966464'].includes(selected.id)) {
+      return;
+    }
     const item: any = (await findSysItem(selected)) || {};
     switch (item.typeName || selected.typeName) {
+      case '应用':
       case '目录':
       case '模块':
         {
+          console.log(34242, selected, item);
           orgCtrl.currentKey = item.key;
           history.push('/store');
           command.emitter('executor', 'preview', item);
@@ -93,7 +99,7 @@ function useConpanyCacheData(dataTag: string, tagName: string): resultProps {
         break;
       case '跳转':
         {
-          if (['工作流角色配置', '工作流流程配置'].includes(selected.name)) {
+          if (['角色配置', '流程配置'].includes(selected.name)) {
             const data: any = {
               id: '445708344880140288__',
               typeName: '成员目录',
@@ -132,6 +138,10 @@ function useConpanyCacheData(dataTag: string, tagName: string): resultProps {
       }
       case '目录': {
         return _directory && findDirectoryItem([_directory], item);
+      }
+      case '应用': {
+        const apps = await orgCtrl.loadApplications();
+        return apps.find((app) => app.id === item.id);
       }
       case '办事':
       case '模块':

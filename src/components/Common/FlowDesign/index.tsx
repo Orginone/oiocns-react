@@ -40,14 +40,16 @@ const Design: React.FC<IProps> = ({ current, resource }) => {
             <ProcessTree
               target={current.directory.target}
               isEdit={true}
+              key={currentNode.id}
               resource={resource}
+              activeKey={currentNode.id || ''}
               onSelectedNode={(node) => {
                 console.log(node);
                 setCurrentNode(node);
               }}
             />
           ),
-          [current],
+          [current, currentNode],
         )}
       </Layout.Content>
     </Layout>

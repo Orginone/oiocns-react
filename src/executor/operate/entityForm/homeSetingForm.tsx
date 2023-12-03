@@ -24,7 +24,12 @@ const HomeSettingForm = (props: Iprops) => {
 
   const typeName = '首页配置';
   const readonly = props.formType === 'remark';
-  let initialValue: any = { ...props.target.metadata, tag: props.target.tag };
+  let initialValue: any = {
+    ...props.target.metadata,
+    name: props.target.name,
+    tag: props.target.tag,
+    sort: props.target.sort,
+  };
   switch (props.formType) {
     case 'new':
       title = '新建' + typeName;
@@ -91,6 +96,11 @@ const HomeSettingForm = (props: Iprops) => {
       formItemProps: {
         rules: [{ required: true, message: '类型为必填项' }],
       },
+    },
+    {
+      title: '排序',
+      dataIndex: 'sort',
+      readonly: readonly,
     },
   ];
   if (readonly) {

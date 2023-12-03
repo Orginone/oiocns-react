@@ -369,10 +369,10 @@ const WorkBench: React.FC = () => {
       </div>
       <div className="cardGroup axw-group">
         <div className="cardItem">
-          <SysItemCard title="工作流配置" />
+          <SysItemCard title="成果作价股权管理" tagName="股权管理" />
         </div>
         <div className="cardItem">
-          <SysItemCard title="表单配置" />
+          <SysItemCard title="配置" />
         </div>
         <div className="cardItem downLoad">
           <SysItemCard title="下载" />
