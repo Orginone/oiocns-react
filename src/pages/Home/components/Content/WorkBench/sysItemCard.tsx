@@ -4,7 +4,7 @@ import useConpanyCacheData from '@/hooks/useCompanyCache';
 import { ImPlus } from 'react-icons/im';
 import OpenFileDialog from '@/components/OpenFileDialog';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
-import { ICompany } from '@/ts/core';
+import { ICompany, orgAuth } from '@/ts/core';
 import orgCtrl from '@/ts/controller';
 import { XHomeCacheData } from '@/ts/base/schema';
 import { formatDate } from '@/utils';
@@ -14,7 +14,11 @@ interface SysItemCardType {
   title: string;
   tagName?: string;
 }
+
 const SysItemCard: React.FC<SysItemCardType> = ({ title, tagName = '' }) => {
+  //超级管理员，并且开启编辑允许修改
+  const SuperAuth =
+    orgCtrl.user.hasAuthoritys([orgAuth.SuperAuthId]) && sessionStorage.homeSetting == 1;
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const dialogParams = {
     title: `${title}选择`,
@@ -29,13 +33,15 @@ const SysItemCard: React.FC<SysItemCardType> = ({ title, tagName = '' }) => {
     <>
       <div className="cardItem-header">
         <span className="title">{title}</span>
-        <span
-          className="extraBtn hidden"
-          onClick={() => {
-            setIsOpen(true);
-          }}>
-          <ImPlus /> <span>配置</span>
-        </span>
+        {SuperAuth && (
+          <span
+            className="extraBtn hidden"
+            onClick={() => {
+              setIsOpen(true);
+            }}>
+            <ImPlus /> <span>配置</span>
+          </span>
+        )}
       </div>
       <Spin spinning={!loaded} tip={'加载中...'}>
         <div className="cardItem-viewer">
@@ -105,6 +111,13 @@ const loadSysItem = (
 );
 
 const contextMenu = (target: any, cacheTagName: string = '常用', refresh: Function) => {
+  const SuperAuth =
+    orgCtrl.user.hasAuthoritys([orgAuth.SuperAuthId]) && sessionStorage.homeSetting == 1;
+  if (!SuperAuth) {
+    return {
+      items: [],
+    };
+  }
   const useAlays = true;
   const menus: OperateMenuType[] = [
     {

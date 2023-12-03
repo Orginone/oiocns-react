@@ -154,7 +154,8 @@ const WorkBench: React.FC = () => {
                   diskInfo.fsTotalSize,
                 )}
                 {renderDataItem(`对象数(个)`, diskInfo.objects, diskInfo.totalSize)}
-                {renderDataItem(`文件(个)`, diskInfo.files, diskInfo.fileSize)}
+                {renderDataItem(`数据集(个)`, diskInfo.collections, diskInfo.dataSize)}
+                {/* {renderDataItem(`文件(个)`, diskInfo.files, diskInfo.fileSize)} */}
               </>
             )}
             {noStore && (
