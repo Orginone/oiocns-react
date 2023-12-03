@@ -12,11 +12,13 @@ import LabelsForm from './labelsForm';
 import RenameForm from './renameForm';
 import TransferForm from './transferForm';
 import PageTemplateForm from './templateForm';
+import HomeSettingForm from './homeSetingForm';
 
 interface IProps {
   cmd: string;
   entity: IEntity<schema.XEntity>;
-  finished: () => void;
+  emit?: (data: any) => void;
+  finished: (args?: any) => void;
 }
 
 const EntityForm: React.FC<IProps> = ({ cmd, entity, finished }) => {
@@ -93,6 +95,9 @@ const EntityForm: React.FC<IProps> = ({ cmd, entity, finished }) => {
           finished={reloadFinish}
         />
       );
+    case 'updateHome': {
+      return <HomeSettingForm formType={'update'} target={entity} finished={finished} />;
+    }
     default: {
       return (
         <TargetForm formType={cmd} current={entity as any} finished={reloadFinish} />

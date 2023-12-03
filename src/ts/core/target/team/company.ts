@@ -64,6 +64,7 @@ export class Company extends Belong implements ICompany {
   stations: IStation[] = [];
   departments: IDepartment[] = [];
   departmentTypes: string[] = [];
+  cacheObj: XObject<schema.Xbase>;
   get superior(): IFile {
     return this.user;
   }
@@ -245,6 +246,7 @@ export class Company extends Belong implements ICompany {
     return `home.${this.id}_${id}`;
   }
   async deepLoad(reload: boolean = false): Promise<void> {
+    await this.cacheObj.all();
     await Promise.all([
       await this.loadGroups(reload),
       await this.loadDepartments(reload),
@@ -322,6 +324,7 @@ export class Company extends Belong implements ICompany {
       this.cache = data;
     }
     this.cacheObj.subscribe(this.cachePath, (data: schema.XCache) => {
+      console.log('监听单位缓存', this.cachePath, data);
       if (data && data.fullId === this.cache.fullId) {
         this.cache = data;
         this.cacheObj.setValue(this.cachePath, data);
@@ -337,7 +340,6 @@ export class Company extends Belong implements ICompany {
     }
     return success;
   }
-
   override async removeMembers(
     members: schema.XTarget[],
     notity: boolean = false,

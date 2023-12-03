@@ -97,6 +97,7 @@ export type NodeModel = {
   type: AddNodeType;
   conditions: conditiondType[];
   branches: NodeModel[];
+  active?:boolean;
   children: NodeModel | undefined;
 } & WorkNodeModel;
 

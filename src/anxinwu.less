@@ -257,7 +257,7 @@ div[class*='org-'] {
 
 .dx-resizable-handle:active,
 .dx-resizable-handle:hover {
-  border: 1px dotted #00bea5;
+  border: 1px dotted #00BEA5;
 }
 
 .dx-data-row {
@@ -269,14 +269,14 @@ div[class*='org-'] {
   background-color: @primary-color !important;
 }
 
-.dx-datagrid-rowsview .dx-selection.dx-row:not(.dx-row-focused) > td,
-.dx-datagrid-rowsview .dx-selection.dx-row:not(.dx-row-focused) > tr > td,
-.dx-datagrid-rowsview .dx-selection.dx-row:not(.dx-row-focused):hover > td,
-.dx-datagrid-rowsview .dx-selection.dx-row:not(.dx-row-focused):hover > tr > td {
+.dx-datagrid-rowsview .dx-selection.dx-row:not(.dx-row-focused)>td,
+.dx-datagrid-rowsview .dx-selection.dx-row:not(.dx-row-focused)>tr>td,
+.dx-datagrid-rowsview .dx-selection.dx-row:not(.dx-row-focused):hover>td,
+.dx-datagrid-rowsview .dx-selection.dx-row:not(.dx-row-focused):hover>tr>td {
   background-color: @active-background;
 }
 
-.dx-datagrid-headers .dx-datagrid-table .dx-row > td {
+.dx-datagrid-headers .dx-datagrid-table .dx-row>td {
   border-bottom: 1px solid #ebeef5;
 }
 
@@ -312,7 +312,7 @@ div[class*='org-'] {
     }
 
     .container {
-      height: calc(100% - 60px);
+      height: calc(100% - 75px);
       padding: 0 @padding-xs;
       overflow-y: scroll;
     }
@@ -325,7 +325,7 @@ div[class*='org-'] {
       cursor: pointer;
 
       .backup {
-        color: #00bea5;
+        color: #00BEA5;
         float: left;
         padding: 6px;
       }
@@ -494,7 +494,7 @@ div[class*='org-'] {
 */
 
 .activityContent {
-  background-color: #f7faf9;
+  background-color: #F7FAF9;
   background: linear-gradient(#f5f5f5ee, #f1f1f1);
 
   .loadContext {
@@ -502,7 +502,7 @@ div[class*='org-'] {
     width: 100%;
 
     .ogo-card-body {
-      background-color: rgba(0, 0, 0, 0);
+      background-color: rgba(0, 0, 0, 0)
     }
 
     .ogo-list-item {
@@ -635,7 +635,7 @@ div[class*='org-'] {
 
   .likeColor {
     // color: @primary-color;
-    color: #003cab;
+    color: #003CAB;
   }
 
   .activityItem-operate {
@@ -644,7 +644,7 @@ div[class*='org-'] {
 
   .activityTime {
     font-size: 12px;
-    color: #424a57;
+    color: #424A57;
     font-weight: 400;
     // line-height: 20px;
     letter-spacing: 0em;
@@ -661,12 +661,12 @@ div[class*='org-'] {
       line-height: 22px;
       letter-spacing: 0em;
       text-align: left;
-      color: #424a57;
+      color: #424A57
     }
   }
 
   .activityItem-name {
-    color: #15181d;
+    color: #15181D;
     /* 16/CN-Medium */
     font-family: PingFang SC;
     font-size: 16px;
@@ -699,8 +699,7 @@ div[class*='org-'] {
     display: inherit;
   }
 
-  &-content {
-  }
+  &-content {}
 }
 
 /**
@@ -762,9 +761,10 @@ div[class*='org-'] {
   flex-direction: column;
   flex-wrap: nowrap;
   align-items: flex-start;
-  background-color: #f7faf9 !important;
+  // background-color: #F7FAF9 !important;
+  transform: translateY(-75px);
   // background: linear-gradient(#f5f5f5f5, #F7FAF9);
-  background: linear-gradient(#e2f8fc, #f7faf9, #f7faf9);
+  background: linear-gradient(transparent, #F7FAF9, #F7FAF9);
 
   .cardGroup {
     display: flex;
@@ -782,11 +782,18 @@ div[class*='org-'] {
       min-height: 180px;
       height: 100%;
       border-radius: 6px;
-      padding: 16px;
+      padding: 14px;
       cursor: pointer;
       background-color: #ffffff;
       border: 1px solid #ffffff;
       // box-shadow: 0 0 2px 2px #ededed;
+      box-shadow: 0px 0px 3px 1px #f2f2f2;
+      &.setting{
+        width: 125%;
+      }
+      &.downLoad{
+        width: 75%;
+      }
     }
   }
 
@@ -824,7 +831,7 @@ div[class*='org-'] {
       padding-top: 4px;
 
       &.hidden {
-        display: none; //隐藏配置按钮
+        // display: none; //隐藏配置按钮
       }
 
       span {
@@ -833,7 +840,7 @@ div[class*='org-'] {
       }
 
       &:hover {
-        color: #00bea5;
+        color: #00BEA5;
       }
     }
   }
@@ -862,8 +869,9 @@ div[class*='org-'] {
     .cardItem-box {
       display: flex;
       width: 100%;
-      justify-content: flex-start;
+      justify-content: start;
       flex-wrap: wrap;
+
     }
 
     .linkBtn {
@@ -876,20 +884,20 @@ div[class*='org-'] {
         background: @active-background;
       }
 
-      & > div {
-      }
+      &>div {}
 
-      div:has(> svg) {
+      div:has(>svg) {
         height: min-content;
 
-        > svg {
+        >svg {
           width: 32px;
           height: 32px;
           padding: 7px;
-          color: #00bea5 !important;
-          background-color: #e6f9f6;
+          color: #00BEA5 !important;
+          background-color: #E6F9F6;
           border-radius: 4px;
         }
+
       }
     }
 
@@ -1138,11 +1146,11 @@ div[class*='org-'] {
   display: inline-block;
 
   .pickupName {
-    color: #003cab;
+    color: #003CAB;
     margin-left: 6px;
     font-size: 12px;
     vertical-align: middle;
-    // font-size: @fontSize
+    // font-size: @fontSize 
   }
 
   .avatarIcon {

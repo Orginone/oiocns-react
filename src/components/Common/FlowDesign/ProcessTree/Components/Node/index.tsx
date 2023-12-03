@@ -10,6 +10,7 @@ type NodeProps = {
   onSelected: Function;
   config: any;
   isEdit: boolean;
+  active?: boolean;
 };
 
 /**
@@ -59,7 +60,7 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
 
   return (
     <div className={`${cls['node']} ${isRoot ? cls['root'] : ''}`}>
-      <div className={cls['node-body']}>
+      <div className={`${cls['node-body']} ${props.active ? cls['active'] : ''}`}>
         <div
           className={
             props.config.type === AddNodeType.APPROVAL
