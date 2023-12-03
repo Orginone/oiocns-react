@@ -371,7 +371,7 @@ const WorkBench: React.FC = () => {
         <div className="cardItem">
           <SysItemCard title="成果作价股权管理" tagName="股权管理" />
         </div>
-        <div className="cardItem">
+        <div className="cardItem setting">
           <SysItemCard title="配置" />
         </div>
         <div className="cardItem downLoad">

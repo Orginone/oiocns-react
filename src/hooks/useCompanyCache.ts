@@ -75,10 +75,15 @@ function useConpanyCacheData(dataTag: string, tagName: string): resultProps {
    * @returns {void} 无返回值
    */
   async function handleOpenItem(selected: schema.XHomeCacheData) {
+    //特殊按钮处理 start
     //'股权管理' 暂不跳转任何页面
     if (['516944829712830464', '516944828139966464'].includes(selected.id)) {
       return;
     }
+    if (selected.name === '历史审批流查询') {
+      selected.typeName = '跳转';
+    }
+    //特殊按钮处理 end
     const item: any = (await findSysItem(selected)) || {};
     switch (item.typeName || selected.typeName) {
       case '应用':
@@ -99,7 +104,7 @@ function useConpanyCacheData(dataTag: string, tagName: string): resultProps {
         break;
       case '跳转':
         {
-          if (['角色配置', '流程配置'].includes(selected.name)) {
+          if (['角色配置'].includes(selected.name)) {
             const data: any = {
               id: '445708344880140288__',
               typeName: '成员目录',

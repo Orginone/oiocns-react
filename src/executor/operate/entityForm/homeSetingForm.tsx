@@ -1,7 +1,7 @@
 import React from 'react';
 import { ProFormColumnsType } from '@ant-design/pro-components';
 import SchemaForm from '@/components/SchemaForm';
-import { ICompany, IDirectory } from '@/ts/core';
+import { IDirectory } from '@/ts/core';
 import UploadItem from '../../tools/uploadItem';
 import { EntityColumns } from './entityColumns';
 import { schema } from '@/ts/base';
@@ -18,6 +18,7 @@ interface Iprops {
 */
 const HomeSettingForm = (props: Iprops) => {
   let title = '';
+  //临时文件夹
   let directory: IDirectory = orgCtrl.user.directory.children.find(
     (directory) => directory.id === '510763133825064961',
   )!;

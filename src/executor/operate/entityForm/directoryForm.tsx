@@ -15,9 +15,6 @@ interface Iprops {
   编辑
 */
 const DirectoryForm = (props: Iprops) => {
-
-  console.log(342324342,props);
-  
   let title = '';
   const readonly = props.formType === 'remarkDir';
   let initialValue: any = props.current.metadata;
