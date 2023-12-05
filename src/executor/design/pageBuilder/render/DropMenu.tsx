@@ -11,7 +11,7 @@ interface IProps {
 
 const DropMenu: React.FC<IProps> = ({ ctx, element, children }) => {
   return (
-    <div onContextMenu={(e) => e.stopPropagation()}>
+    <div style={{ height: '100%' }} onContextMenu={(e) => e.stopPropagation()}>
       <Dropdown
         menu={{
           items: [
