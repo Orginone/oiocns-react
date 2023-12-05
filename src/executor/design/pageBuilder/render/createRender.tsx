@@ -13,6 +13,7 @@ import ElementFactory from '../core/ElementFactory';
 import { HostMode } from '../core/IViewHost';
 import { PageElement } from '../core/PageElement';
 import { ElementFC } from '../elements/defineElement';
+import DropMenu from './DropMenu';
 import ErrorBoundary from './ErrorBoundary';
 import { DesignContext, PageContext, ViewContext } from './PageContext';
 import { Slot } from './Slot';
@@ -124,18 +125,20 @@ function createDesignRender(component: ElementFC) {
     });
     return (
       <ErrorBoundary>
-        <div
-          key={key}
-          className={[
-            'element-wrapper',
-            element?.id == props.element.id ? 'is-current' : '',
-          ].join(' ')}
-          onClick={handleClick}>
-          {h(
-            component,
-            mergeProps(props.element, ctx.view.treeManager.factory, props.slotParams),
-          )}
-        </div>
+        <DropMenu ctx={ctx} element={props.element}>
+          <div
+            key={key}
+            className={[
+              'element-wrapper',
+              element?.id == props.element.id ? 'is-current' : '',
+            ].join(' ')}
+            onClick={handleClick}>
+            {h(
+              component,
+              mergeProps(props.element, ctx.view.treeManager.factory, props.slotParams),
+            )}
+          </div>
+        </DropMenu>
       </ErrorBoundary>
     );
   };
