@@ -7,7 +7,11 @@ import { EditModal } from '../editModal';
 import GenerateThingTable from '../generate/thingTable';
 import { WorkFormRulesType } from '@/ts/core/work/rules/workFormRules';
 import { RuleTriggers } from '@/ts/core/public';
+import { IWork, IWorkTask } from '@/ts/core';
+
 interface IProps {
+  form: IWork | IWorkTask;
+  finished: () => void;
   allowEdit: boolean;
   belong: IBelong;
   forms: schema.XForm[];
@@ -116,6 +120,8 @@ const DetailTable: React.FC<IProps> = (props) => {
               onClick: () => {
                 EditModal.showFormSelect({
                   form: form,
+                  formList: props.form,
+                  finished: props.finished,
                   fields: fields,
                   belong: props.belong,
                   onSave: (values) => {

@@ -6,11 +6,14 @@ import DetailForms from './detail';
 import { formatDate } from '@/utils';
 import { getNodeByNodeId } from '@/utils/tools';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
+import { IWork, IWorkTask } from '@/ts/core';
 
 interface IWorkFormProps {
+  finished: () => void;
   allowEdit: boolean;
   belong: IBelong;
   nodeId: string;
+  form: IWork | IWorkTask;
   data: model.InstanceDataModel;
   onChanged?: (id: string, data: model.FormEditData, changedValues: any) => void;
 }

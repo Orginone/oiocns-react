@@ -70,6 +70,8 @@ const WorkStartDo: React.FC<IProps> = ({ current, finished }) => {
         <>
           <WorkForm
             allowEdit
+            form={current}
+            finished={finished}
             belong={apply.belong}
             data={apply.instanceData}
             nodeId={apply.instanceData.node.id}
