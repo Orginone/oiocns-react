@@ -84,12 +84,12 @@ export const ActivityMessage: React.FC<ActivityItemProps> = ({
             }}>
             {metadata.likes.includes(orgCtrl.user.id) ? (
               <span className="flex flexCenter">
-                <AiOutlineLike className="likeColor pdr4" size={18} />
+                <AiOutlineLike className="likeColor mgr4" size={18} />
                 <span className="line20">取消</span>
               </span>
             ) : (
               <span className="flex flexCenter">
-                <AiOutlineLike size={18} className="pdr4" /> <span>点赞</span>
+                <AiOutlineLike size={18} className="mgr4" /> <span>点赞</span>
               </span>
             )}
           </Button>
@@ -99,7 +99,7 @@ export const ActivityMessage: React.FC<ActivityItemProps> = ({
             size="small"
             onClick={() => handleReply()}>
             <span className="flex flexCenter">
-              <AiOutlineMessage size={18} className="pdr4" /> <span>评论</span>
+              <AiOutlineMessage size={18} className="mgr4" /> <span>评论</span>
             </span>
           </Button>
           {item.canDelete && (
@@ -109,7 +109,7 @@ export const ActivityMessage: React.FC<ActivityItemProps> = ({
               size="small"
               onClick={() => item.delete()}>
               <span className="flex flexCenter">
-                <AiOutlineDelete size={18} className="pdr4" /> <span>删除</span>
+                <AiOutlineDelete size={18} className="mgr4" /> <span>删除</span>
               </span>
             </Button>
           )}

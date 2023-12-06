@@ -23,7 +23,6 @@ const ListMode = ({
     if (focusFile?.key === item.key || selectFiles.some((i) => i.key === item.key)) {
       return css.list_item_select;
     }
-    return css.list_item;
   };
   return (
     <Dropdown menu={contextMenu(cxtItem)} trigger={['contextMenu']} destroyPopupOnHide>
@@ -35,7 +34,7 @@ const ListMode = ({
           dataSource={content}
           renderItem={(item) => {
             return (
-              <div className={getItemClassName(item)}>
+              <div className={`${getItemClassName(item)} ${css.list_item}`}>
                 <List.Item
                   onClick={() => {
                     fileOpen(item, false);
@@ -51,20 +50,23 @@ const ListMode = ({
                   ]}>
                   <List.Item.Meta
                     title={
-                      <>
-                        <div className={css.item_title}>{item.name}</div>
-                        {item.groupTags
-                          .filter((i) => i.length > 0)
-                          .map((label) => {
-                            return (
-                              <Tag
-                                key={label}
-                                color={label === '置顶' ? 'red' : 'success'}>
-                                {label}
-                              </Tag>
-                            );
-                          })}
-                      </>
+                      <div className="flex">
+                        <span className={`${css.item_title} ellipsis1`}>
+                          {item.name}
+                          {item.groupTags
+                            .filter((i) => i.length > 0)
+                            .map((label) => {
+                              return (
+                                <Tag
+                                  className="mgl6 mgr0"
+                                  key={label}
+                                  color={label === '置顶' ? 'red' : 'success'}>
+                                  {label}
+                                </Tag>
+                              );
+                            })}
+                        </span>
+                      </div>
                     }
                     avatar={
                       <Badge count={item.badgeCount} size="small">
@@ -72,7 +74,7 @@ const ListMode = ({
                       </Badge>
                     }
                     description={
-                      <span className="ellipsis1">{item.remark || item.code}</span>
+                      <span className="ellipsis1 fs12">{item.remark || item.code}</span>
                     }
                   />
                 </List.Item>

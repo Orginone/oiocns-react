@@ -7,9 +7,12 @@ import OpenFileDialog from '@/components/OpenFileDialog';
 import { parseCiteMsg } from '../components/parseMsg';
 import Emoji from '../components/emoji';
 import { AiOutlineCloseCircle } from 'react-icons/ai';
+import { TbSend } from 'react-icons/tb';
 import { TextArea } from 'devextreme-react';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import dxTextArea from 'devextreme/ui/text_area';
+import { XTarget } from '@/ts/base/schema';
+
 /**
  * @description: 输入区域
  * @return {*}
@@ -28,6 +31,8 @@ const GroupInputBox = (props: IProps) => {
   const [citeShow, setCiteShow] = useState<boolean>(false); // @展示
   const [message, setMessage] = useState<string>('');
   const [mentions, setMentions] = useState<{ text: string; id: string }[]>([]);
+  // const [citeFilter, setCiteFilter] = useState<string>('');
+  const [chatMems, setChatMens] = useState<XTarget[]>();
   // 禁止回车默认事件
   dxTextArea.defaultOptions({
     options: {
@@ -39,6 +44,18 @@ const GroupInputBox = (props: IProps) => {
       setMessage(props.writeContent);
     }
   }, [props.writeContent]);
+
+  useEffect(() => {
+    let otherMems = props.chat.members.filter((i) => i.id != props.chat.userId);
+    const citeSplit = message.split('@');
+    const filterVal = citeSplit.length ? citeSplit[citeSplit.length - 1] : '';
+    if (citeShow && filterVal) {
+      const filterMens = otherMems.filter((i) => i.name.includes(filterVal));
+      setChatMens(filterMens);
+    } else {
+      setChatMens(otherMems);
+    }
+  }, [citeShow, message]);
 
   /** 发送消息 */
   const sendMessage = () => {
@@ -73,70 +90,42 @@ const GroupInputBox = (props: IProps) => {
   window.addEventListener('click', () => {
     setCiteShow(false);
   });
-
   return (
-    <div className="send-box">
-      <Space split={<Divider type="vertical" style={{ height: 20 }} />} size={0}>
-        <Popover
-          content={
-            <Emoji
-              onSelect={(emoji: string) => {
-                setOpenEmoji(false);
-                setMessage((message) => message + emoji);
-              }}
-            />
-          }
-          open={openEmoji}
-          trigger={['click', 'contextMenu']}
-          onOpenChange={setOpenEmoji}>
-          <im.ImSmile
-            size={20}
-            color={'#3838b9'}
-            onClick={() => setOpenEmoji(!openEmoji)}
-          />
-        </Popover>
-        <im.ImMic title="语言" size={20} color={'#3838b9'} />
-        <im.ImFolder
-          title="文件"
-          size={20}
-          color={'#3838b9'}
-          onClick={() => setOpen(true)}
-        />
-        <im.ImVideoCamera title="视频" size={20} color={'#3838b9'} />
-      </Space>
-      <div style={{ width: '100%' }}>
-        {citeShow && (
+    <div className="send-box flexColumn">
+      {props.citeText && citeShowText(props.citeText)}
+      <div className="flex" style={{ width: '100%' }}>
+        {citeShow && !!chatMems?.length && (
           <Popover
             align={{
               points: ['t', 'l'],
             }}
+            style={{ display: 'inline-block', width: '100%' }}
             content={
               <div className="at-list">
-                {props.chat.members
-                  .filter((i) => i.id != props.chat.userId)
-                  .map((i) => {
-                    return (
-                      <div
-                        key={i.id}
-                        className="at-list-item"
-                        onClick={() => {
-                          setMentions((before) => [
-                            ...before,
-                            {
-                              id: i.id,
-                              text: `@${i.name} `,
-                            },
-                          ]);
-                          setMessage((message) => message + i.name + ' ');
-                        }}>
-                        <EntityIcon entity={i} showName size={30} />
-                      </div>
-                    );
-                  })}
+                {chatMems.map((i) => {
+                  return (
+                    <div
+                      key={i.id}
+                      className="at-list-item"
+                      onClick={() => {
+                        setMentions((before) => [
+                          ...before,
+                          {
+                            id: i.id,
+                            text: `@${i.name} `,
+                          },
+                        ]);
+                        setMessage((message) => message + i.name + ' ');
+                        setCiteShow(false);
+                      }}>
+                      <EntityIcon entity={i} showName size={30} />
+                    </div>
+                  );
+                })}
               </div>
             }
             open={citeShow}
-            trigger={['click', 'contextMenu']}
+            trigger={['contextMenu']}
             onOpenChange={setCiteShow}></Popover>
         )}
         <TextArea
@@ -162,22 +151,49 @@ const GroupInputBox = (props: IProps) => {
           }}
           onValueChanged={(e) => {
             const value: string = e.value ?? '';
-            if (value.endsWith('@')) {
-              setMessage(value);
+            if (value.includes('@')) {
               setCiteShow(true);
             } else {
-              setMessage(value);
+              setCiteShow(false);
             }
+            setMessage(value);
           }}
         />
-        {props.citeText && citeShowText(props.citeText)}
+        <Space split={<Divider type="vertical" style={{ height: 20 }} />} size={0}>
+          <Popover
+            content={
+              <Emoji
+                onSelect={(emoji: string) => {
+                  setOpenEmoji(false);
+                  setMessage((message) => message + emoji);
+                }}
+              />
+            }
+            open={openEmoji}
+            trigger={['click', 'contextMenu']}
+            onOpenChange={setOpenEmoji}>
+            <im.ImSmile
+              size={20}
+              color={'#3838b9'}
+              onClick={() => setOpenEmoji(!openEmoji)}
+            />
+          </Popover>
+          <im.ImMic title="语言" size={20} color={'#3838b9'} />
+          <im.ImFolder
+            title="文件"
+            size={20}
+            color={'#3838b9'}
+            onClick={() => setOpen(true)}
+          />
+          <im.ImVideoCamera title="视频" size={20} color={'#3838b9'} />
+          <TbSend
+            size={26}
+            title="发送"
+            color={message.length > 0 ? '#3838b9' : '#909090'}
+            onClick={() => sendMessage()}
+          />
+        </Space>
       </div>
-      <im.ImRocket
-        size={26}
-        title="发送"
-        color={message.length > 0 ? '#3838b9' : '#909090'}
-        onClick={() => sendMessage()}
-      />
       {open && (
         <OpenFileDialog
           rootKey={'disk'}

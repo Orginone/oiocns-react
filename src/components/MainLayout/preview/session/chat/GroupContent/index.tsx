@@ -130,7 +130,7 @@ const GroupContent = (props: Iprops) => {
             }}
             overlayInnerStyle={{ marginRight: '-16px', padding: '3px' }}
             content={msgAction(item)}>
-            <div style={{ display: 'flex' }}>
+            <div className="flex">
               <div className={`${css.con_content}`}>
                 {props.chat.isBelongPerson ? (
                   <div>
@@ -158,7 +158,7 @@ const GroupContent = (props: Iprops) => {
                   </>
                 )}
               </div>
-              <div style={{ color: '#888' }}>
+              <div>
                 <EntityInfo entityId={item.metadata.fromId} size={40} />
               </div>
             </div>
