@@ -21,7 +21,14 @@ interface IProps {
   notAvatar?: boolean;
   className?: string;
 }
-
+// const hostname = window.location.hostname;
+const hostname = 'anxinwu';
+const getUrl: (svgName: string) => string = (svgName) => {
+  if (hostname.startsWith('anxinwu')) {
+    return `/svg/anxinwu/${svgName}.svg`;
+  }
+  return `/svg/${svgName}.svg`;
+};
 const OrgIcons = (props: IProps) => {
   const size = props.size ?? 22;
   let svgName = 'home';
@@ -58,7 +65,7 @@ const OrgIcons = (props: IProps) => {
         preview={false}
         height={size}
         width={size}
-        src={`/svg/${svgName}.svg`}
+        src={getUrl(svgName)}
         style={props.css}
       />
     );
@@ -67,7 +74,7 @@ const OrgIcons = (props: IProps) => {
       <Avatar
         size={size}
         className={props.className}
-        src={`/svg/${svgName}.svg`}
+        src={getUrl(svgName)}
         style={{ background: 'transparent', color: '#606060', ...props.css }}
       />
     );
