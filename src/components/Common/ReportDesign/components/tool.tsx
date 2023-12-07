@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Select, Dropdown, Button, Popover } from 'antd';
 import type { MenuProps } from 'antd';
-import { SketchPicker } from '@hello-pangea/color-picker';
+// import { SketchPicker } from '@hello-pangea/color-picker';
 import cls from './tool.module.less';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 const { Option } = Select;
@@ -295,11 +295,11 @@ const ToolBar: React.FC<IProps> = ({ cellStyle, handClick }: IProps) => {
 
   const content = (
     <div>
-      <SketchPicker
+      {/* <SketchPicker
         onChange={(color) => {
           setBackground(color.hex);
         }}
-      />
+      /> */}
       <div className={cls['save-btn']} onClick={setBackgroundColor}>
         确定
       </div>

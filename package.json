@@ -52,6 +52,7 @@
     "@antv/x6-react-shape": "^2.2.2",
     "@emoji-mart/data": "^1.1.2",
     "@emoji-mart/react": "^1.1.1",
+    "@handsontable/react": "^14.0.0",
     "@microsoft/signalr": "^7.0.12",
     "@msgpack/msgpack": "^3.0.0-beta2",
     "@types/crypto-js": "^4.1.2",
