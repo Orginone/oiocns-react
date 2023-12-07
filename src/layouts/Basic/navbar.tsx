@@ -64,6 +64,7 @@ const Navbar: React.FC = () => {
       count: 0,
     },
   ];
+  // const names = window.location.hostname.split('.')?.[0] || 'anxinwu';
 
   const NavItem = (item: any) => {
     const selected = location.hash.startsWith('#' + item.path);
@@ -78,6 +79,7 @@ const Navbar: React.FC = () => {
     return (
       <a
         key={item.path}
+        className={'anxinwu'}
         onClick={() => {
           history.push(item.path);
           orgCtrl.currentKey = '';

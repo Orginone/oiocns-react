@@ -44,22 +44,25 @@ const authPage: React.FC = () => {
               target="_blank"
               style={{ color: '#8a8a8a' }}
               rel="noopener noreferrer">
-              Powered by Orginone{' '}
+              Powered by Orginone
             </a>
           </div>
-          {resources.unitName !== '' && (
-            <div className={cls.copyrightZh}>
+          {resources.unitName.length && (
+            <div className={`${cls.copyrightZh} ${cls[resources.display || 'block']}`}>
               主办单位：
-              <a
-                href={resources.unitPage}
-                target="_blank"
-                style={{ color: '#8a8a8a' }}
-                rel="noopener noreferrer">
-                {resources.unitName}
-              </a>
+              {resources.unitPage.map((item, idx) => (
+                <a
+                  key={idx}
+                  href={item}
+                  target="_blank"
+                  style={{ color: '#8a8a8a', marginRight: '8px' }}
+                  rel="noopener noreferrer">
+                  {resources.unitName[idx]}
+                </a>
+              ))}
             </div>
           )}
-          <div className={cls.copyrightZh}>
+          <div className={`${cls.copyrightZh} ${cls[resources.display || 'block']}`}>
             技术支持：
             <a
               href="https://assetcloud.orginone.cn/#/"
