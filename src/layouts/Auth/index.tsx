@@ -47,7 +47,7 @@ const authPage: React.FC = () => {
               Powered by Orginone
             </a>
           </div>
-          {resources.unitName.length && (
+          {resources.unitName.length > 0 && (
             <div className={`${cls.copyrightZh} ${cls[resources.display || 'block']}`}>
               主办单位：
               {resources.unitPage.map((item, idx) => (

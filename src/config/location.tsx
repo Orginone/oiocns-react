@@ -8,8 +8,7 @@ interface IResources {
   display?: 'block' | 'inline';
 }
 export const getResouces = (): IResources => {
-  // const hostname = window.location.hostname;
-  const hostname = 'anxinwu';
+  const hostname = window.location.hostname;
   //安心屋
   if (hostname.startsWith('anxinwu')) {
     return {
@@ -93,8 +92,8 @@ export const getResouces = (): IResources => {
     platName: '奥集能',
     location: 'orginone',
     passport: [1, 2, 3, 4, 5, 6],
-    unitName: [''],
-    unitPage: [''],
+    unitName: [],
+    unitPage: [],
     favicon: '/favicon/orginone.ico',
   };
 };

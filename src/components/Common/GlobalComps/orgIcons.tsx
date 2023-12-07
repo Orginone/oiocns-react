@@ -21,8 +21,7 @@ interface IProps {
   notAvatar?: boolean;
   className?: string;
 }
-// const hostname = window.location.hostname;
-const hostname = 'anxinwu';
+const hostname = window.location.hostname;
 const getUrl: (svgName: string) => string = (svgName) => {
   if (hostname.startsWith('anxinwu')) {
     return `/svg/anxinwu/${svgName}.svg`;
