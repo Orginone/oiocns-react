@@ -19,7 +19,7 @@ export const allPages: NavigationItem[] = [
     label: '工作台',
     type: 'inner',
     backgroundImageUrl: `/img/${resource.location}/banner/workbench.png`,
-    component: React.lazy(() => import('../Content/yyWorkBench')),
+    component: React.lazy(() => import('../Content/WorkBench')),
   },
   {
     key: 'activity',

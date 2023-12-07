@@ -69,6 +69,7 @@
     "devextreme-react": "^23.1.6",
     "emoji-mart": "^5.5.2",
     "for-editor": "^0.3.5",
+    "handsontable": "^14.0.0",
     "html2canvas": "^1.4.1",
     "jol-player": "^4.0.0",
     "pako": "^2.0.4",

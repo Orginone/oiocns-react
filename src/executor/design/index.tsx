@@ -7,6 +7,7 @@ import FillWorkModal from './fillWorkModal';
 import FormModal from './formModal';
 import { TransferModal } from './transferModal';
 import TemplateModal from './templateModal';
+import ReportModal from './reportModal';
 interface IProps {
   cmd: string;
   entity: IEntity<schema.XEntity>;
@@ -17,6 +18,8 @@ const OperateModal: React.FC<IProps> = ({ cmd, entity, finished }) => {
   switch (entity.typeName) {
     case '表单':
       return <FormModal finished={finished} current={entity as any} />;
+    case '报表':
+      return <ReportModal finished={finished} current={entity as any} />;
     case '迁移配置':
       return <TransferModal finished={finished} current={entity as any} />;
     case '页面模板':
