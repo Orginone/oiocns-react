@@ -7,7 +7,7 @@ import { RightBarIcon } from '@/components/Common/GlobalComps/customIcon';
 import { Resizable } from 'devextreme-react';
 import useStorage from '@/hooks/useStorage';
 import ReportDesign from '@/components/Common/ReportDesign';
-import RuleSetting from './RuleSetting/index';
+// import RuleSetting from './RuleSetting/index';
 const { Content, Sider } = Layout;
 
 interface IProps {
@@ -54,7 +54,7 @@ const ReportModal: React.FC<IProps> = ({ current, finished }: IProps) => {
                 </Sider>
               </Resizable>
               <Content className={cls.content}>
-                <RuleSetting current={current} activeKey={'3'}></RuleSetting>
+                {/* <RuleSetting current={current} activeKey={'3'}></RuleSetting> */}
               </Content>
             </>
           ) : (

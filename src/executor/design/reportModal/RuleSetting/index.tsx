@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { List, message } from 'antd';
 import Icon, { PlusCircleOutlined, RollbackOutlined } from '@ant-design/icons';
-import CreateModal from './createModal';
+// import CreateModal from './createModal';
 interface listType {
   current: any;
   selectedFiled?: any;
@@ -117,15 +117,7 @@ const RuleList: React.FC<listType> = ({ current, activeKey, selectedFiled }) => 
           )}
         />
       ) : (
-        <CreateModal
-          fields={fields}
-          targetId={selectedFiled?.id}
-          defaultValue={selected}
-          loading={loading}
-          setOpen={setcreateVisible}
-          handleOk={handleRuleInfoUpdata}
-          // current={props.schema.current}
-        />
+        ''
       )}
     </>
   );
