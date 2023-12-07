@@ -1,0 +1,66 @@
+.branch_box {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.4rem 6rem 0.6rem 1rem;
+  box-sizing: border-box;
+  margin-bottom: 0.4rem;
+  border-bottom: 1px solid #ddd;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #ffffee;
+  }
+
+  &:last-child {
+    border-bottom: 0;
+  }
+
+  .flex_public {
+    display: flex;
+    align-items: center;
+
+    .master_tag {
+      display: block;
+      color: #3e5ed8;
+      padding: 0.1rem 0.6rem;
+      background-color: #ddd;
+      border-radius: 0.2rem;
+      margin-right: 0.6rem;
+    }
+    .commit_text {
+      color: #606266;
+    }
+  }
+}
+
+.btn_list {
+  border-radius: 0.2rem;
+  overflow: hidden;
+  user-select: none;
+  min-width: 130px;
+  font-size: 14px;
+  // font-weight: 600;
+  margin-bottom: 10px;
+  .active{
+    background: #f2f2f2;
+  }
+
+  span {
+    color: black;
+    background-color: rgb(255, 255, 255);
+    padding: 0.4rem 0.6rem;
+    white-space: nowrap;
+    line-height: 3vh;
+    height: 4vh;
+    cursor: pointer;
+    border: 1px solid #ccc;
+
+    // &:active {
+    //   background: #f2f2f2;
+    // }
+    &:hover {
+      background: rgba(247, 247, 247, 0.8);
+    }
+  }
+}

@@ -9,6 +9,7 @@ import TransferView from './transfer';
 import AudioPlayer from './audio';
 import EntityPreview from './entity';
 import CodeEditor from './codeeditor';
+import CodeRepository from './codeRepository';
 import EntityForm from '../operate/entityForm';
 import { IEntity, ISysFileInfo, TargetType } from '@/ts/core';
 import JoinApply from './task/joinApply';
@@ -91,6 +92,8 @@ const ExecutorOpen: React.FC<IOpenProps> = (props: IOpenProps) => {
             finished={props.finished}
           />
         );
+      case '代码仓库配置':
+        return <CodeRepository current={props.entity as any} finished={props.finished} />;
       default:
         if (remarkTypes[props.entity.typeName]) {
           return (
