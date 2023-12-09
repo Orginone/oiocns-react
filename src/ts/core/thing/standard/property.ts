@@ -20,6 +20,9 @@ export class Property extends StandardFileInfo<schema.XProperty> implements IPro
   get cacheFlag(): string {
     return 'propertys';
   }
+  get groupTags(): string[] {
+    return [this.metadata.valueType, ...super.groupTags];
+  }
   override async copy(destination: IDirectory): Promise<boolean> {
     if (this.allowCopy(destination)) {
       return await super.copyTo(destination.id, destination.resource.propertyColl);

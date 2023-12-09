@@ -48,6 +48,12 @@ export class Group extends Target implements IGroup {
   keys: string[];
   relations: string[];
   private _childrenLoaded: boolean = false;
+  findChat(id: string): ISession | undefined {
+    return this.user.companys.find((i) => i.id === id)?.session;
+  }
+  get superior(): IFile {
+    return this.parent ?? this.space;
+  }
   async loadChildren(reload?: boolean | undefined): Promise<IGroup[]> {
     if (!this._childrenLoaded || reload) {
       const res = await kernel.querySubTargetById({
@@ -116,20 +122,16 @@ export class Group extends Target implements IGroup {
     return targets;
   }
   content(): IFile[] {
-    return [this.memberDirectory, ...this.children];
+    return this.children;
   }
   async deepLoad(reload: boolean = false): Promise<void> {
+    this.loadMembers(reload);
     await Promise.all([
-      await this.loadMembers(reload),
-      await this.loadChildren(reload),
-      await this.loadIdentitys(reload),
-      await this.directory.loadDirectoryResource(reload),
+      this.loadChildren(reload),
+      this.loadIdentitys(reload),
+      this.directory.loadDirectoryResource(reload),
     ]);
-    await Promise.all(
-      this.children.map(async (group) => {
-        await group.deepLoad(reload);
-      }),
-    );
+    await Promise.all(this.children.map((group) => group.deepLoad(reload)));
   }
   override operates(): model.OperateModel[] {
     const operates = super.operates();

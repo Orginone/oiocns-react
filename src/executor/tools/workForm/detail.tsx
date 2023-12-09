@@ -14,7 +14,7 @@ interface IProps {
   data: model.InstanceDataModel;
   ruleService?: WorkFormRulesType;
   getFormData: (form: schema.XForm) => model.FormEditData;
-  onChanged?: (id: string, data: model.FormEditData) => void;
+  onChanged?: (id: string, data: model.FormEditData, changedValues: any) => void;
 }
 
 const DetailTable: React.FC<IProps> = (props) => {
@@ -22,10 +22,15 @@ const DetailTable: React.FC<IProps> = (props) => {
   const form = props.forms[0];
   if (!props.data.fields[form.id]) return <></>;
   const fields = props.data.fields[form.id];
+  const operateRule = JSON.parse(form.operateRule ?? ' {}');
   const [formData, setFormData] = useState(props.getFormData(form));
   const [selectKeys, setSelectKeys] = useState<string[]>([]);
   useEffect(() => {
-    props.onChanged?.apply(this, [form.id, formData]);
+    var after = formData.after.at(-1);
+    if (after) {
+      after.name = form.name;
+    }
+    props.onChanged?.apply(this, [form.id, formData, {}]);
     props.ruleService?.waitingTask(RuleTriggers.ThingsChanged, {
       id: form.id,
       data: formData,
@@ -70,7 +75,7 @@ const DetailTable: React.FC<IProps> = (props) => {
                 });
               },
             },
-            visible: props.allowEdit && (props.data.allowAdd || false),
+            visible: props.allowEdit && operateRule['allowAdd'],
           },
           {
             name: 'edit',
@@ -99,8 +104,7 @@ const DetailTable: React.FC<IProps> = (props) => {
                 });
               },
             },
-            visible:
-              props.allowEdit && (props.data.allowEdit || false) && selectKeys.length > 0,
+            visible: props.allowEdit && operateRule['allowEdit'] && selectKeys.length > 0,
           },
           {
             name: 'select',
@@ -128,7 +132,7 @@ const DetailTable: React.FC<IProps> = (props) => {
                 });
               },
             },
-            visible: props.allowEdit && (props.data.allowSelect || false),
+            visible: props.allowEdit && operateRule['allowSelect'],
           },
           {
             name: 'remove',

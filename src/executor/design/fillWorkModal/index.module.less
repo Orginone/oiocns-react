@@ -1,0 +1,99 @@
+@import '~antd/es/style/themes/variable';
+
+.sider {
+  background-color: @component-background;
+  height: 100%;
+  .container {
+    padding: 0 @padding-xs;
+    height: calc(100vh - 60px);
+    overflow-y: scroll;
+  }
+  .title {
+    background-color: @system-menu-active-background;
+    border-radius: @border-radius-base;
+    margin: @margin-md @margin-xs;
+    text-align: center;
+    padding: 6px;
+    clear: both;
+  }
+  .backicon {
+    font-size: 12px;
+    float: left;
+    padding: 6px;
+  }
+  .icon {
+    color: @primary-color;
+    font-size: 18px;
+    padding-top: 4px;
+  }
+  :global {
+    .ogo-menu-item-group-title {
+      padding-left: 0;
+    }
+    .ogo-menu-sub.ogo-menu-inline {
+      background: @component-background;
+    }
+
+    .ogo-menu-item,
+    .ogo-menu-submenu-expand-icon,
+    .ogo-menu-submenu-arrow,
+    .ogo-menu-submenu .ogo-badge,
+    .ogo-menu-item .ogo-badge,
+    .ogo-menu-submenu {
+      color: @system-menu-color;
+    }
+    .ogo-menu-submenu-selected,
+    .ogo-menu-submenu-selected .ogo-badge,
+    .ogo-menu-item-selected .ogo-badge,
+    .ogo-menu-item:hover,
+    .ogo-menu:not(.ogo-menu-horizontal) .ogo-menu-item-selected {
+      color: @text-color;
+      background-color: @custom-menu-active-background;
+    }
+    .ogo-menu-submenu-selected .ogo-menu-submenu-title .ogo-menu-item-icon,
+    .ogo-menu-item:hover .ogo-menu-item-icon,
+    .ogo-menu-item.ogo-menu-item-selected .ogo-menu-item-icon {
+      color: @primary-color;
+    }
+    .ogo-menu-vertical,
+    .ogo-menu-inline {
+      border: none;
+    }
+    .ogo-menu-item-acitve,
+    .ogo-menu-item-acitve:hover {
+      color: @text-color;
+    }
+    .ogo-menu-inline .ogo-menu-item-selected::after {
+      opacity: 0;
+    }
+  }
+}
+
+.container {
+  padding: 0 @padding-xs;
+  position: relative;
+}
+.content {
+  position: relative;
+  width: auto;
+  height: 100%;
+  margin-bottom: 0;
+  background-color: @component-background;
+  border-radius: @border-radius-base;
+  overflow-y: auto;
+}
+
+.content-top {
+  background-color: @component-background;
+  padding: @padding-md;
+  border-radius: @border-radius-base;
+  margin-bottom: @margin-xs;
+}
+
+.contenttop {
+  height: 22px;
+  display: flex;
+  justify-content: space-between;
+  background-color: @component-background;
+  border-radius: @border-radius-base;
+}

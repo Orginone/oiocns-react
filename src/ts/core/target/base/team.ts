@@ -22,6 +22,8 @@ export interface ITeam extends IEntity<schema.XTarget> {
   memberTypes: TargetType[];
   /** 成员会话 */
   memberChats: ISession[];
+  /** 获取成员会话 */
+  findChat(id: string): ISession | undefined;
   /** 深加载 */
   deepLoad(reload?: boolean): Promise<void>;
   /** 加载成员 */
@@ -73,6 +75,19 @@ export abstract class Team extends Entity<schema.XTarget> implements ITeam {
   relations: string[];
   abstract directory: IDirectory;
   private _memberLoaded: boolean = false;
+  findChat(id: string): ISession | undefined {
+    return this.memberChats.find((i) => i.id === id);
+  }
+  get groupTags(): string[] {
+    if (this.id === this.userId) {
+      return ['本人'];
+    }
+    const gtags: string[] = [...super.groupTags];
+    if (this.metadata.belongId !== this.space.id) {
+      gtags.push(this.user.findShareById(this.belongId).name);
+    }
+    return gtags;
+  }
   async loadMembers(reload: boolean = false): Promise<schema.XTarget[]> {
     if (!this._memberLoaded || reload) {
       const res = await kernel.querySubTargetById({

@@ -1,4 +1,5 @@
 import * as t from '../type';
+import { DirContext } from './context';
 
 /**
  * 生成一份 Excel 文件
@@ -75,7 +76,25 @@ export const collecting = (
         sheet.columns.forEach((column) => {
           let value = item[column.title];
           if (value || value === 0) {
-            ansItem[column.dataIndex] = String(value);
+            switch (column.valueType) {
+              case '选择型':
+              case '分类型':
+                if (column.lookups) {
+                  for (const item of column.lookups) {
+                    if (item.text == value) {
+                      ansItem[column.dataIndex] = item.value;
+                      ansItem[item.value] = item.text;
+                      break;
+                    }
+                  }
+                }
+                break;
+              case '数值型':
+                ansItem[column.dataIndex] = Number(value);
+                break;
+              default:
+                ansItem[column.dataIndex] = String(value);
+            }
           }
         });
         ansData.push(ansItem);
@@ -93,7 +112,7 @@ export class Excel implements t.IExcel {
   constructor(sheets?: t.ISheetHandler<t.model.Sheet<any>>[], handler?: t.DataHandler) {
     this.handlers = [];
     this.dataHandler = handler;
-    this.context = {};
+    this.context = new DirContext();
     sheets?.forEach((item) => this.appendHandler(item));
   }
 
@@ -120,37 +139,12 @@ export class Excel implements t.IExcel {
       this.dataHandler?.initialize?.(totalRows);
 
       for (const handler of this.handlers) {
-        await handler.operating(this, (count?: number) =>
-          this.dataHandler?.onItemCompleted?.(count),
-        );
+        await handler.operating(this, () => this.dataHandler?.onItemCompleted?.());
         handler.completed?.(this);
       }
       this.dataHandler?.onCompleted?.();
     } catch (error: any) {
-      console.log(error);
       this.dataHandler?.onError?.('数据处理异常');
-    }
-  }
-
-  searchSpecies(code?: string): t.SpeciesData | undefined {
-    if (code) {
-      for (const dirKey of Object.keys(this.context)) {
-        const dir = this.context[dirKey];
-        if (dir.species[code]) {
-          return dir.species[code];
-        }
-      }
-    }
-  }
-
-  searchProps(code?: string | undefined): t.Property | undefined {
-    if (code) {
-      for (const dirKey of Object.keys(this.context)) {
-        const dir = this.context[dirKey];
-        if (dir.props[code]) {
-          return dir.props[code];
-        }
-      }
     }
   }
 }

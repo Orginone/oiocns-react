@@ -49,7 +49,9 @@ export const GenerateColumn = (
     case '分类型':
       props.width = 200;
       props.headerFilter = {
-        allowSearch: true,
+        search: {
+          enabled: true,
+        },
         dataSource: field.lookups,
       };
       props.lookup = {

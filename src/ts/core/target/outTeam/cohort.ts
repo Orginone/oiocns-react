@@ -8,6 +8,9 @@ export class Cohort extends Target implements ICohort {
   constructor(_metadata: schema.XTarget, _space: IBelong, relationId: string) {
     super([_space.key], _metadata, [relationId], _space, _space.user);
   }
+  findChat(id: string): ISession | undefined {
+    return this.user.memberChats.find((i) => i.id === id);
+  }
   async exit(): Promise<boolean> {
     if (this.metadata.belongId !== this.space.id) {
       if (await this.removeMembers([this.user.metadata])) {
@@ -35,9 +38,9 @@ export class Cohort extends Target implements ICohort {
   }
   async deepLoad(reload: boolean = false): Promise<void> {
     await Promise.all([
-      await this.loadMembers(reload),
-      await this.loadIdentitys(reload),
-      await this.directory.loadDirectoryResource(reload),
+      this.loadMembers(reload),
+      this.loadIdentitys(reload),
+      this.directory.loadDirectoryResource(reload),
     ]);
   }
 }

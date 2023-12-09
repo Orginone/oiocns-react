@@ -15,6 +15,7 @@ export interface IWorkApply {
     applyId: string,
     content: string,
     fromData: Map<string, model.FormEditData>,
+    gateways: Map<string, string>,
   ): Promise<boolean>;
 }
 
@@ -44,7 +45,6 @@ export class WorkApply implements IWorkApply {
       const data: any = fromData.get(formId)?.after.at(-1) ?? {};
       for (const item of this.instanceData.fields[formId]) {
         if (item.options?.isRequired && valueIsNull(data[item.id])) {
-          console.log(item, data);
           return false;
         }
       }
@@ -55,17 +55,57 @@ export class WorkApply implements IWorkApply {
     applyId: string,
     content: string,
     fromData: Map<string, model.FormEditData>,
+    gateways: Map<string, string>,
   ): Promise<boolean> {
     fromData.forEach((data, k) => {
       this.instanceData.data[k] = [data];
     });
+    var gatewayInfos: model.WorkGatewayInfoModel[] = [];
+    gateways.forEach((v, k) => {
+      gatewayInfos.push({
+        nodeId: k,
+        TargetId: v,
+      });
+    });
+    var mark = await this.getMarkInfo();
+    if (content.length > 0) {
+      mark += `备注:${content}`;
+    }
     const res = await kernel.createWorkInstance({
       ...this.metadata,
       applyId: applyId,
-      content: content,
+      content: mark,
       contentType: 'Text',
       data: JSON.stringify(this.instanceData),
+      gateways: JSON.stringify(gatewayInfos),
     });
     return res.success;
+  }
+  async getMarkInfo(): Promise<string> {
+    const remarks: string[] = [];
+    for (const primaryForm of this.instanceData.node.primaryForms) {
+      const key = primaryForm.id;
+      const data = this.instanceData.data[key];
+      const fields = this.instanceData.fields[key];
+      if (data && fields) {
+        for (const field of fields.filter((a) => a.options && a.options.showToRemark)) {
+          var value = data.at(-1)?.after[0][field.id];
+          switch (field.valueType) {
+            case '用户型':
+              value = (await this.belong.user.findEntityAsync(value))?.name;
+              break;
+            case '选择型':
+              value = field.lookups?.find(
+                (a) => a.id === (value as string).substring(1),
+              )?.text;
+              break;
+            default:
+              break;
+          }
+          remarks.push(`${field.name}:${value}  `);
+        }
+      }
+    }
+    return remarks.join('');
   }
 }

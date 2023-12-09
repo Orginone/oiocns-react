@@ -26,7 +26,6 @@ export class Storage extends Target implements IStorage {
       TargetType.Person,
     ]);
   }
-  isContainer: boolean = false;
   async exit(): Promise<boolean> {
     if (this.metadata.belongId !== this.space.id) {
       if (await this.removeMembers([this.user.metadata])) {
@@ -57,7 +56,7 @@ export class Storage extends Target implements IStorage {
     return [];
   }
   get chats(): ISession[] {
-    return [];
+    return this.targets.map((i) => i.session);
   }
   get targets(): ITarget[] {
     return [this];
@@ -81,7 +80,7 @@ export class Storage extends Target implements IStorage {
   }
   async deepLoad(reload: boolean = false): Promise<void> {
     if (this.hasRelationAuth()) {
-      await this.loadMembers(reload);
+      this.loadMembers(reload);
       await this.loadIdentitys(reload);
     }
   }

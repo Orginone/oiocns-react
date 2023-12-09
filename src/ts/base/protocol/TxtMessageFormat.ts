@@ -73,7 +73,7 @@ export class TxtMessageFormat {
                 return 0xff - item;
               }),
             ) as string
-          ).replaceAll('"_id":', '"id":'),
+          ).replace(/"_id":/gm, '"id":'),
         );
       } else {
         throw new Error('Incomplete message.');

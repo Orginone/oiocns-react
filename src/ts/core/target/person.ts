@@ -54,6 +54,9 @@ export class Person extends Belong implements IPerson {
   copyFiles: Map<string, IFile>;
   private _cohortLoaded: boolean = false;
   private _givedIdentityLoaded: boolean = false;
+  get superior(): IFile {
+    return this;
+  }
   async loadGivedIdentitys(reload: boolean = false): Promise<schema.XIdProof[]> {
     if (!this._givedIdentityLoaded || reload) {
       const res = await kernel.queryGivedIdentitys();
@@ -93,7 +96,7 @@ export class Person extends Belong implements IPerson {
       idProofs.every((i) => i.identityId !== a.identityId),
     );
   }
-  async loadCohorts(reload?: boolean | undefined): Promise<ICohort[]> {
+  async loadTeams(reload?: boolean | undefined): Promise<ICohort[]> {
     if (!this._cohortLoaded || reload) {
       const res = await kernel.queryJoinedTargetById({
         id: this.id,
@@ -253,28 +256,16 @@ export class Person extends Belong implements IPerson {
   async deepLoad(reload: boolean = false): Promise<void> {
     await this.cacheObj.all();
     await Promise.all([
-      await this.loadCohorts(reload),
-      await this.loadMembers(reload),
-      await this.loadSuperAuth(reload),
-      await this.loadIdentitys(reload),
-      await this.loadGivedIdentitys(reload),
-      await this.directory.loadDirectoryResource(reload),
+      this.loadTeams(reload),
+      this.loadMembers(reload),
+      this.loadSuperAuth(reload),
+      this.loadIdentitys(reload),
+      this.loadGivedIdentitys(reload),
+      this.directory.loadDirectoryResource(reload),
     ]);
-    await Promise.all(
-      this.companys.map(async (company) => {
-        await company.deepLoad(reload);
-      }),
-    );
-    await Promise.all(
-      this.cohorts.map(async (cohort) => {
-        await cohort.deepLoad(reload);
-      }),
-    );
-    await Promise.all(
-      this.storages.map(async (storage) => {
-        await storage.deepLoad(reload);
-      }),
-    );
+    await Promise.all(this.companys.map((company) => company.deepLoad(reload)));
+    await Promise.all(this.cohorts.map((cohort) => cohort.deepLoad(reload)));
+    await Promise.all(this.storages.map((storage) => storage.deepLoad(reload)));
     this.superAuth?.deepLoad(reload);
   }
 
@@ -284,18 +275,7 @@ export class Person extends Belong implements IPerson {
     return operates;
   }
   content(): IFile[] {
-    return [this.memberDirectory, ...this.cohorts, ...this.storages];
-  }
-  async findEntityAsync(id: string): Promise<schema.XEntity | undefined> {
-    const metadata = this.findMetadata<schema.XEntity>(id);
-    if (metadata) {
-      return metadata;
-    }
-    const res = await kernel.queryEntityById({ id: id });
-    if (res.success && res.data?.id) {
-      this.updateMetadata(res.data);
-      return res.data;
-    }
+    return [...this.cohorts, ...this.storages];
   }
   findShareById(id: string): model.ShareIcon {
     const metadata = this.findMetadata<schema.XEntity>(id);

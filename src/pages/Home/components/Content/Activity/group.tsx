@@ -1,32 +1,31 @@
 import React, { useState } from 'react';
 import TargetActivity from '@/components/TargetActivity';
 import ActivityMessage from '@/components/TargetActivity/ActivityMessage';
-import cls from './index.module.less';
 import { IActivity } from '@/ts/core';
-import useWidthToggle from '@/hooks/useWidthToggle';
 import { Resizable } from 'devextreme-react';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import useAsyncLoad from '@/hooks/useAsyncLoad';
 import { Spin } from 'antd';
+import { useMedia } from 'react-use';
 
 const GroupActivityItem: React.FC<{ activity: IActivity }> = ({ activity }) => {
-  const toggle = useWidthToggle(1000);
   const [key] = useCtrlUpdate(activity);
+  const isWide = useMedia('(min-width: 1000px)');
   const [loaded] = useAsyncLoad(() => activity.load(10), [activity]);
   const [current, setCurrent] = useState<IActivity>(activity);
   const loadMenus = React.useCallback(() => {
-    if (!loaded || !toggle) return <></>;
+    if (!loaded || !isWide) return <></>;
     return (
       <Resizable handles={'right'}>
-        <div className={cls.groupList}>
+        <div className={'groupList'}>
           {activity.activitys
             .filter((item) => item.activityList.length > 0)
             .map((item) => {
               if (item.activityList.length > 0) {
-                const _name = item.id === current.id ? 'Selected' : 'Item';
+                const _name = item.id === current.id ? 'selected' : 'item';
                 return (
                   <div
-                    className={cls[`groupList${_name}`]}
+                    className={`groupList-${_name}`}
                     key={item.key}
                     onClick={(e) => {
                       e.stopPropagation();
@@ -44,12 +43,12 @@ const GroupActivityItem: React.FC<{ activity: IActivity }> = ({ activity }) => {
         </div>
       </Resizable>
     );
-  }, [loaded, current, activity, key, toggle]);
+  }, [loaded, current, activity, key, isWide]);
 
   const loadContext = React.useCallback(() => {
     if (!loaded) return <></>;
     return (
-      <div style={{ height: '100%', width: '100%' }}>
+      <div className={'loadContext'}>
         <TargetActivity
           height={'calc(100vh - 110px)'}
           activity={current}
@@ -57,11 +56,10 @@ const GroupActivityItem: React.FC<{ activity: IActivity }> = ({ activity }) => {
       </div>
     );
   }, [loaded, current]);
-
   return (
-    <div className={cls.content}>
+    <div className={'activityContent'}>
       <Spin tip="加载中,请稍后..." size="large" spinning={!loaded} delay={100}>
-        <div className={cls.groupCtx}>
+        <div className="groupCtx">
           {loadMenus()}
           {loadContext()}
         </div>

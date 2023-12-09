@@ -75,7 +75,9 @@ const TableMode = ({
           }}
           headerFilter={{
             visible: true,
-            allowSearch: true,
+            search: {
+              enabled: true,
+            },
           }}
           dataRowRender={dataRowRender}
           onContextMenuPreparing={(e) => setCxtItem(e.row?.data)}

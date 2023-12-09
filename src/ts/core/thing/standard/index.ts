@@ -4,6 +4,7 @@ import { IStandard } from '../fileinfo';
 import { DataResource } from '../resource';
 import { Application, IApplication } from './application';
 import { Form, IForm } from './form';
+import { IPageTemplate, PageTemplate } from './page';
 import { IProperty, Property } from './property';
 import { ISpecies, Species } from './species';
 import { ITransfer, Transfer } from './transfer';
@@ -23,6 +24,8 @@ export class StandardFiles {
   directorys: IDirectory[] = [];
   /** 应用 */
   applications: IApplication[] = [];
+  /** 页面模板 */
+  templates: IPageTemplate[] = [];
   /** 表单加载完成标志 */
   formLoaded: boolean = false;
   /** 迁移配置加载完成标志 */
@@ -51,6 +54,7 @@ export class StandardFiles {
       ...this.specieses,
       ...this.directorys,
       ...this.applications,
+      ...this.templates,
     ];
   }
   async loadStandardFiles(reload: boolean = false): Promise<IStandard[]> {
@@ -59,6 +63,7 @@ export class StandardFiles {
       this.loadTransfers(reload),
       this.loadPropertys(reload),
       this.loadSpecieses(reload),
+      this.loadTemplates(reload),
     ]);
     return this.standardFiles;
   }
@@ -123,6 +128,13 @@ export class StandardFiles {
     }
     return this.directorys;
   }
+  async loadTemplates(_: boolean = false): Promise<IPageTemplate[]> {
+    let templates = this.resource.templateColl.cache.filter(
+      (i) => i.directoryId === this.directory.id,
+    );
+    this.templates = templates.map((i) => new PageTemplate(i, this.directory));
+    return this.templates;
+  }
   async createForm(data: schema.XForm): Promise<schema.XForm | undefined> {
     const result = await this.resource.formColl.insert({
       ...data,
@@ -155,7 +167,7 @@ export class StandardFiles {
       return result;
     }
   }
-  async createTransfer(data: model.Transfer): Promise<ITransfer | undefined> {
+  async createTransfer(data: model.Transfer): Promise<model.Transfer | undefined> {
     const result = await this.resource.transferColl.insert({
       ...data,
       envs: [],
@@ -164,10 +176,8 @@ export class StandardFiles {
       directoryId: this.id,
     });
     if (result) {
-      const link = new Transfer(result, this.directory);
-      this.transfers.push(link);
       await this.resource.transferColl.notity({ data: result, operate: 'insert' });
-      return link;
+      return result;
     }
   }
   async createApplication(
@@ -179,6 +189,18 @@ export class StandardFiles {
     });
     if (result) {
       await this.resource.applicationColl.notity({ data: result, operate: 'insert' });
+      return result;
+    }
+  }
+  async createTemplate(
+    data: schema.XPageTemplate,
+  ): Promise<schema.XPageTemplate | undefined> {
+    const result = await this.resource.templateColl.insert({
+      ...data,
+      directoryId: this.id,
+    });
+    if (result) {
+      await this.resource.templateColl.notity({ data: result, operate: 'insert' });
       return result;
     }
   }
@@ -250,6 +272,9 @@ const subscribeNotity = (directory: IDirectory) => {
   });
   directory.resource.applicationColl.subscribe([directory.key], (data) => {
     subscribeCallback<schema.XApplication>(directory, '应用', data);
+  });
+  directory.resource.templateColl.subscribe([directory.key], (data) => {
+    subscribeCallback<schema.XPageTemplate>(directory, '模板', data);
   });
 };
 
@@ -339,6 +364,19 @@ function standardFilesChanged(
         data,
         () => new Transfer(data, directory),
       );
+      break;
+    case '模板':
+      directory.standard.templates = ArrayChanged(
+        directory.standard.templates,
+        operate,
+        data,
+        () => new PageTemplate(data, directory),
+      );
+      if (operate === 'insert') {
+        directory.resource.templateColl.cache.push(data);
+      } else {
+        directory.resource.templateColl.removeCache((i) => i.id != data.id);
+      }
       break;
     case '目录':
       directory.standard.directorys = ArrayChanged(

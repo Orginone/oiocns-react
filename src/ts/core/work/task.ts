@@ -6,7 +6,7 @@ import { IBelong } from '../target/base/belong';
 import { UserProvider } from '../user';
 import { IWorkApply } from './apply';
 import { FileInfo, IFile } from '../thing/fileinfo';
-export type TaskTypeName = '待办事项' | '已办事项' | '抄送我的' | '我发起的';
+export type TaskTypeName = '待办' | '已办' | '抄送' | '发起的';
 
 export interface IWorkTask extends IFile {
   /** 内容 */
@@ -36,7 +36,11 @@ export interface IWorkTask extends IFile {
   /** 创建申请(子流程) */
   createApply(): Promise<IWorkApply | undefined>;
   /** 任务审批 */
-  approvalTask(status: number, comment?: string): Promise<boolean>;
+  approvalTask(
+    status: number,
+    comment?: string,
+    fromData?: Map<string, model.FormEditData>,
+  ): Promise<boolean>;
 }
 
 export class WorkTask extends FileInfo<schema.XEntity> implements IWorkTask {
@@ -107,13 +111,13 @@ export class WorkTask extends FileInfo<schema.XEntity> implements IWorkTask {
   }
   isTaskType(type: TaskTypeName): boolean {
     switch (type) {
-      case '已办事项':
+      case '已办':
         return this.taskdata.status >= TaskStatus.ApprovalStart;
-      case '我发起的':
+      case '发起的':
         return this.taskdata.createUser == this.userId;
-      case '待办事项':
+      case '待办':
         return this.taskdata.status < TaskStatus.ApprovalStart;
-      case '抄送我的':
+      case '抄送':
         return this.taskdata.approveType === '抄送';
     }
   }
@@ -152,32 +156,7 @@ export class WorkTask extends FileInfo<schema.XEntity> implements IWorkTask {
     }
     return false;
   }
-  async approvalTask(status: number, comment: string): Promise<boolean> {
-    if (this.taskdata.status < TaskStatus.ApprovalStart) {
-      if (status === -1) {
-        return await this.recallApply();
-      }
-      if (this.taskdata.taskType === '加用户' || (await this.loadInstance(true))) {
-        const res = await kernel.approvalTask({
-          id: this.taskdata.id,
-          status: status,
-          comment: comment,
-          data: JSON.stringify(this.instanceData),
-        });
-        if (res.data && status < TaskStatus.RefuseStart) {
-          if (this.targets && this.targets.length === 2) {
-            for (const item of this.user.targets) {
-              if (item.id === this.targets[1].id) {
-                item.pullMembers([this.targets[0]]);
-                break;
-              }
-            }
-          }
-        }
-      }
-    }
-    return false;
-  }
+
   async createApply(): Promise<IWorkApply | undefined> {
     if (this.taskdata.approveType == '子流程') {
       await this.loadInstance();
@@ -197,5 +176,55 @@ export class WorkTask extends FileInfo<schema.XEntity> implements IWorkTask {
         }
       }
     }
+  }
+
+  async approvalTask(
+    status: number,
+    comment: string,
+    fromData: Map<string, model.FormEditData>,
+  ): Promise<boolean> {
+    if (this.taskdata.status < TaskStatus.ApprovalStart) {
+      if (status === -1) {
+        return await this.recallApply();
+      }
+      if (this.taskdata.taskType === '加用户') {
+        return this.approvalJoinTask(status, comment);
+      } else if (await this.loadInstance(true)) {
+        fromData?.forEach((data, k) => {
+          if (this.instanceData) {
+            this.instanceData.data[k] = [data];
+          }
+        });
+        const res = await kernel.approvalTask({
+          id: this.taskdata.id,
+          status: status,
+          comment: comment,
+          data: JSON.stringify(this.instanceData),
+        });
+        return res.data === true;
+      }
+    }
+    return false;
+  }
+
+  // 申请加用户审批
+  private async approvalJoinTask(status: number, comment: string): Promise<boolean> {
+    if (this.targets && this.targets.length === 2) {
+      const res = await kernel.approvalTask({
+        id: this.taskdata.id,
+        status: status,
+        comment: comment,
+        data: JSON.stringify(this.instanceData),
+      });
+      if (res.data && status < TaskStatus.RefuseStart) {
+        for (const item of this.user.targets) {
+          if (item.id === this.targets[1].id) {
+            item.pullMembers([this.targets[0]]);
+            return true;
+          }
+        }
+      }
+    }
+    return false;
   }
 }

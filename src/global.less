@@ -1,4 +1,6 @@
 @import '~antd/dist/antd.less';
+@import '~react-grid-layout/css/styles.css';
+@import '~react-resizable/css/styles.css';
 
 body {
   font-family: 'Han Sans SC', Arial, Helvetica, 'Helvetica Neue', sans-serif;
@@ -17,6 +19,44 @@ li {
   height: 100vh;
   overflow: hidden;
   background-color: @component-background !important;
+}
+
+.flex {
+  display: flex !important;
+}
+
+.flexCenter {
+  align-items: center;
+  justify-content: center;
+}
+.pdr4 {
+  margin-right: 4px;
+}
+.pdr2 {
+  margin-right: 2px;
+}
+.mgl4 {
+  margin-left: 4px!important;
+}
+.mgt8 {
+  margin-top: 8px;
+}
+
+.fs12 {
+  font-size: 12px!important;
+}
+
+.ellipsis1 {
+  display: inline-block;
+  white-space: nowrap;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.line20 {
+  font-size: 14px;
+  line-height: 24px;
 }
 
 .layout__loading {
@@ -168,10 +208,8 @@ h3 {
   border-radius: 10% !important;
 }
 
-:global {
-  .ogo-card-body {
-    padding: 16px;
-  }
+.ogo-card-body {
+  padding: 16px;
 }
 
 .ogo-dropdown-menu {
@@ -239,3 +277,720 @@ h3 {
 .dx-button {
   border-color: @border-color;
 }
+
+/**
+  MainlayOut组件
+*/
+.main_layout {
+  height: 100%;
+  .header {
+    background-color: @component-background;
+    padding: 12px;
+    border-radius: @border-radius-base;
+    border-bottom: 2px solid @border-color;
+    box-shadow: inset -20px 0px 10px 10px #f8f9ff;
+  }
+  .sider {
+    width: 250px;
+    height: 100%;
+    background-color: @component-background;
+    border-right: 1px solid @border-color;
+    .menuBar {
+      display: flex;
+      padding: 0 30px;
+      margin-top: 10px;
+      justify-content: space-between;
+    }
+    .container {
+      height: calc(100% - 60px);
+      padding: 0 @padding-xs;
+      overflow-y: scroll;
+    }
+    .title {
+      border-radius: @border-radius-base;
+      clear: both;
+      padding: 8px;
+      display: flex;
+      gap: 2px;
+      align-items: center;
+      justify-content: space-between;
+      text-align: center;
+      cursor: pointer;
+      .backup {
+        padding-top: 2px;
+        color: #154ad8;
+      }
+      .label {
+        font-size: 16px;
+        white-space: nowrap;
+        width: 160px;
+        padding: 6px;
+      }
+    }
+  }
+  .body {
+    display: flex;
+    flex-direction: row;
+    .content {
+      display: flex;
+      height: 100%;
+      padding: 12px;
+      background-color: @component-background;
+      border-radius: @border-radius-base;
+      overflow-y: auto;
+      flex-direction: column;
+    }
+  }
+}
+
+/**
+  CustomMenu
+*/
+.operateMenu {
+  font-size: 14px;
+  width: 100%;
+  margin: 5px 0px;
+  padding: 10px;
+  color: #888;
+  font-weight: bold;
+  background-color: inherit;
+}
+
+.customMenu {
+  overflow-y: scroll;
+  overflow-x: hidden;
+  border: none;
+  .ogo-menu-submenu-selected {
+    background-color: @custom-menu-active-background;
+  }
+  .ogo-menu-item-group-title {
+    padding-left: 0;
+  }
+  .ogo-menu-sub.ogo-menu-inline {
+    background: @component-background;
+  }
+
+  .ogo-menu-item,
+  .ogo-menu-submenu-expand-icon,
+  .ogo-menu-submenu-arrow,
+  .ogo-menu-submenu .ogo-badge,
+  .ogo-menu-item .ogo-badge,
+  .ogo-menu-submenu {
+    color: @system-menu-color;
+  }
+  .ogo-menu-submenu-selected,
+  .ogo-menu-submenu-selected .ogo-badge,
+  .ogo-menu-item-selected .ogo-badge,
+  .ogo-menu-item:hover,
+  .ogo-menu:not(.ogo-menu-horizontal) .ogo-menu-item-selected {
+    color: @text-color;
+    background-color: @custom-menu-active-background;
+  }
+  .ogo-menu-submenu-selected .ogo-menu-submenu-title .ogo-menu-item-icon,
+  .ogo-menu-item:hover .ogo-menu-item-icon,
+  .ogo-menu-item.ogo-menu-item-selected .ogo-menu-item-icon {
+    color: @primary-color;
+  }
+  .ogo-menu-vertical,
+  .ogo-menu-inline {
+    border: none;
+  }
+  .ogo-menu-item-acitve,
+  .ogo-menu-item-acitve:hover {
+    color: @text-color;
+  }
+  .ogo-menu-inline .ogo-menu-item-selected::after {
+    opacity: 0;
+  }
+  .ogo-menu-title-content {
+    margin-left: 6px;
+  }
+
+  .ogo-menu-submenu-title {
+    padding-top: 6px;
+    padding-right: 6px;
+    height: 35px !important;
+    line-height: 35px !important;
+  }
+
+  .ogo-typography {
+    color: inherit;
+  }
+
+  .ogo-menu-submenu-placement-rightTop {
+    .ogo-menu-vertical .ogo-menu-submenu-title {
+      padding-right: 8px;
+      display: flex;
+    }
+  }
+}
+
+.ogo-menu-submenu-placement-rightTop {
+  .ogo-menu-vertical .ogo-menu-submenu-title {
+    padding-right: 8px;
+    display: flex;
+  }
+
+  .ogo-menu-submenu-active .ogo-menu-submenu-title {
+    color: @text-color;
+    background-color: @custom-menu-active-background;
+  }
+}
+
+.customlabel {
+  display: contents;
+  .label {
+    margin: 0 10px;
+    width: calc(100% - 30px);
+  }
+
+  .badge {
+    position: absolute;
+    right: 20px;
+  }
+
+  .moreButton {
+    position: absolute;
+    right: 2px;
+  }
+}
+
+/**
+  CustomBreadcrumb
+*/
+.customBreadcrumb {
+  cursor: pointer;
+  .anticon-down {
+    display: none;
+  }
+}
+
+/**
+  ActivityContent
+*/
+
+.activityContent {
+  .loadContext {
+    height: 100%;
+    width: 100%;
+    .ogo-card-body {
+      background-color: rgba(0,0,0,0)
+    }
+    .ogo-list-item {
+      border-bottom: 1px solid @border-color-base;
+      margin: 8px 0;
+    }
+  }
+  .groupCtx {
+    width: 100%;
+    // height: calc(100vh - 300px);
+    box-sizing: border-box;
+    padding: 12px;
+    display: flex;
+    gap: 6px;
+    .groupList {
+      display: flex;
+      flex-direction: column;
+      overflow-y: scroll;
+      height: calc(100vh - 30px);
+      border-radius: 4px;
+      padding: 8px;
+      min-width: 500px;
+      background: @component-background;
+      &-selected {
+        cursor: pointer;
+        // padding: 8px;
+        // margin: 8px;
+        // border-radius: 16px;
+        border: 1px solid @border-color;
+        background-color: @active-background;
+      }
+
+      &-item {
+        cursor: pointer;
+        // padding: 8px;
+        border-radius: 6px;
+        border-bottom: 1px solid @border-color-base;
+        &:hover {
+          background-color: @active-background;
+        }
+      }
+    }
+  }
+}
+
+/**
+  ActivityMessage
+*/
+
+.activityItem {
+  // padding: 8px 0;
+  // border-bottom: 1px solid @border-color-base;
+  &-header {
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+    font-weight: 500;
+    gap: 6px;
+  }
+  &-imageList {
+    // max-width: 600px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 8px;
+    img {
+      object-fit: cover; /* 这会保持图像的纵横比并居中截取部分内容 */
+      object-position: center center; /* 图像在容器中水平和垂直居中 */
+    }
+  }
+  &-footer {
+    display: flex;
+    align-items: center;
+    margin: 8px 0;
+    justify-content: space-between;
+    &-likes {
+      flex: 1;
+      background-color: #f2f2f2;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      padding: 4px;
+      gap: 6px;
+      font-size: 12px;
+      line-height: 12px;
+      flex-wrap: wrap;
+      color: rgba(0, 0, 0, 0.65);
+    }
+  }
+
+  &-commentInputBox {
+    transition: 0.2s;
+    margin-top: 16px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    &-sendBtn {
+      color: @primary-color;
+    }
+  }
+
+  &-commentList {
+    margin-top: 8px;
+    width: 100%;
+    padding: 4px;
+    border-radius: 4px;
+    background-color: #f2f2f2;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .likeColor {
+    color: #cb4747;
+  }
+  .activityTime {
+    font-size: 12px;
+    color: #424A57;
+    font-weight: 400;
+    // line-height: 20px;
+    letter-spacing: 0em;
+    text-align: left;
+    // margin: 8px 0;
+  }
+  .activityItem-content {
+    // margin-bottom: 8px;
+    .ogo-typography {
+      margin-bottom: 0px;
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 22px;
+      letter-spacing: 0em;
+      text-align: left;
+      color: #424A57
+    }
+  }
+  .activityItem-name {
+    color: #15181D;
+    /* 16/CN-Medium */
+    font-family: PingFang SC;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 24px; /* 150% */
+  }
+}
+
+/**
+  ActivityComment
+*/
+
+.activityCommet {
+  display: flex;
+  gap: 4px;
+  color: rgba(0, 0, 0, 0.65);
+  cursor: default;
+  transition: 0.2s;
+  padding: 4px;
+  align-items: center;
+  &:active {
+    background: rgba(0, 0, 0, 0.05);
+  }
+  &-avatar {
+    word-break: keep-all;
+    display: inherit;
+  }
+  &-content {
+  }
+}
+
+/**
+  SelectMultFiles
+*/
+
+.selectMultFiles {
+  display: flex;
+  gap: 8px;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  .ogo-upload-picture-card-wrapper {
+    width: auto;
+  }
+  .selectFileBtn {
+    height: 100px;
+    width: 100px;
+    padding: 16px;
+    cursor: pointer;
+    border-radius: 10px;
+    margin: 46px;
+    border: 1px solid #e7e7e7;
+    text-align: center;
+    font-size: 16px;
+    &:hover {
+      color: blue;
+      background-color: #e7e7e7;
+    }
+  }
+}
+
+/**
+  UserInfo
+*/
+
+.userInfo {
+  color: rgba(0, 0, 0, 0.65);
+  font-weight: 700;
+}
+
+/**
+  WorkBench
+*/
+
+.workbench-content {
+  width: 100%;
+  color: #4c4c4c;
+  height: calc(100vh - 300px);
+  box-sizing: border-box;
+  padding: 12px;
+  gap: 16px;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  align-items: flex-start;
+  .cardGroup {
+    display: flex;
+    gap: 16px;
+    width: 100%;
+    -webkit-box-align: start;
+    -ms-flex-align: start;
+    align-items: flex-start;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    .cardItem {
+      width: 100%;
+      min-height: 180px;
+      border-radius: 6px;
+      padding: 16px;
+      cursor: pointer;
+      background-color: #ffffff;
+      border: 1px solid #ffffff;
+      // box-shadow: 0 0 2px 2px #ededed;
+    }
+  }
+
+  .calendar {
+    width: 100%;
+    border-radius: 6px;
+    background-color: #ffffff;
+    border: 1px solid #ffffff;
+    .cardItem {
+      padding: 16px;
+    }
+  }
+
+  .cardItem-header {
+    .title {
+      font-weight: bolder;
+      font-size: 17px;
+    }
+    .remind {
+      font-size: 12px;
+      color: #ff0404;
+      background-color: #fde8e0;
+      padding: 2px 6px;
+      margin-left: 7px;
+      border-radius: 20px;
+    }
+    .extraBtn {
+      float: right;
+      font-size: 14px;
+      color: #585858;
+      cursor: pointer;
+      padding-top: 4px;
+      span {
+        margin-left: 2px;
+        margin-bottom: 2px;
+      }
+      &:hover {
+        color: #3838b9;
+      }
+    }
+  }
+}
+
+.cardItem-viewer {
+  padding-top: 12px;
+  min-height: 100px;
+  .linkBtn {
+    height: 40px;
+    display: flex;
+    padding: 8px 30px;
+    background-color: #f5f5f5;
+    &:hover {
+      background: @active-background;
+    }
+  }
+  .appCard {
+    padding: 12px;
+    text-align: center;
+    cursor: pointer;
+    min-width: 120px;
+    .appName {
+      font-size: 14px;
+      font-weight: bold;
+    }
+    .teamName {
+      color: #686868;
+      font-size: 12px;
+    }
+    &:hover {
+      border-radius: 10px;
+      background: @active-background;
+    }
+  }
+  .appGroup-title {
+    font-weight: bolder;
+    font-size: 18px;
+    padding: 16px 2px;
+  }
+  .dataItem {
+    min-width: 120px;
+    padding: 16px;
+    text-align: center;
+    &Title {
+      color: #686868;
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+    &Number {
+      font-weight: bold;
+      color: #313131;
+      font-size: 28px;
+    }
+    &:hover {
+      border-radius: 10px;
+      background: @active-background;
+    }
+  }
+}
+/**
+  ChatShareForward
+*/
+.chat-shareForward {
+  position: relative;
+  .ogo-checkbox-wrapper {
+    width: 100%;
+  }
+  .ogo-list-item-meta {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .ogo-list-items {
+    position: relative;
+  }
+  .chatMem-list-item,
+  .listItem {
+    min-width: 240px;
+  }
+  .chatMem {
+    position: relative;
+  }
+  .departLine {
+    border-right: 1px solid #ebeef5;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    z-index: 99;
+    left: 50%;
+    background-color: rgba(0, 0, 0, 0);
+  }
+  .chatShare-title {
+    display: flex;
+    align-items: center;
+    .chatMem-search,
+    .chosen-num {
+      width: 30%;
+      margin-left: 10px;
+    }
+  }
+
+  .chatMem-list {
+    padding-left: 5px;
+    padding-right: 5px;
+    margin-left: 5px;
+    cursor: pointer;
+  }
+  .chatMem-list:hover {
+    background-color: rgb(248, 245, 245);
+  }
+  .chosen-list {
+    margin-left: 10px;
+  }
+  .chatMem {
+    position: relative;
+    padding-bottom: 10px;
+  }
+  .chosenMem {
+    position: relative;
+  }
+  .mem-wrap {
+    height: calc(460px);
+    overflow-y: scroll;
+    padding-bottom: 20px;
+  }
+  .chosenMem-wrap {
+    height: calc(460px);
+    overflow-y: scroll;
+    padding-bottom: 20px;
+  }
+}
+
+/**
+  NavigationBar
+*/
+
+.navigationBar {
+  border-radius: 30px;
+  position: fixed;
+  top: 16px;
+  left: 50%;
+  transform: translate(-50%);
+  background-color: rgba(@component-background, 0.6);
+  display: flex;
+  font-size: 14px;
+  color: @text-color;
+  align-items: center;
+  padding: 6px 12px;
+  transition: 0.2s;
+  &-content {
+    display: flex;
+    justify-content: center;
+    flex: 1;
+    gap: 8px;
+    white-space: nowrap;
+    &__item {
+      transition: 0.2s;
+      cursor: pointer;
+      padding: 4px 16px;
+      &:hover {
+        border-radius: 30px;
+        background-color: @active-background;
+      }
+      &Active {
+        cursor: not-allowed;
+        padding: 4px 16px;
+        border-radius: 30px;
+        color: @text-color-inverse;
+        background-color: @focus-background;
+      }
+    }
+  }
+
+  &-more {
+    color: #000;
+    font-size: 30px;
+    cursor: pointer;
+    margin-left: 20px;
+  }
+
+  &-open {
+    height: auto;
+    padding: 30px 20px 40px;
+    background-color: @component-background;
+    z-index: 1;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.15);
+  }
+
+  &-config {
+    max-width: 800px;
+    min-width: 400px;
+
+    &-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+
+    &-section {
+      margin-bottom: 20px;
+    }
+
+    &-page-card {
+      padding: 8px 24px;
+      color: #424a57;
+      background-color: #f7f8fa;
+      border-radius: 27px;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      &:hover {
+        background-color: @active-background;
+      }
+    }
+  }
+}
+
+
+// EntityIcon 组件
+.entityIcon {
+  padding: 2px 1px;
+  display: inline-block;
+  .pickupName {
+    color: #003CAB;
+    margin-left: 6px;
+    font-size: 12px;
+    vertical-align: middle;
+    // font-size: @fontSize
+  }
+  .avatarIcon {
+    background: 'transparent';
+    color: '#606060';
+  }
+}
+
