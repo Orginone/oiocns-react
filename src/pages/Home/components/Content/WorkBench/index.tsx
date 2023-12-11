@@ -158,7 +158,7 @@ const WorkBench: React.FC = () => {
                 )}
                 {renderDataItem(`数据集(个)`, diskInfo.collections, diskInfo.dataSize)}
                 {renderDataItem(`对象数(个)`, diskInfo.objects, diskInfo.totalSize)}
-                {renderDataItem(`文件(个)`, diskInfo.files, diskInfo.fileSize)}
+                {renderDataItem(`文件(个)`, diskInfo.filesCount, diskInfo.filesSize)}
                 {renderDataItem(
                   `硬件`,
                   formatSize(diskInfo.fsUsedSize),
@@ -219,8 +219,11 @@ const WorkBench: React.FC = () => {
         <div
           className="appCard"
           onClick={() => {
-            orgCtrl.currentKey = item.key;
-            history.push('/store');
+            orgCtrl.currentKey = item.directory.target.superior.key;
+            command.emitter('executor', 'link', '/store');
+            setTimeout(() => {
+              command.emitter('preview', 'store', item.directory.target);
+            }, 200);
           }}>
           {item.cache.tags?.includes('常用') ? (
             <Badge dot>
@@ -334,7 +337,7 @@ const WorkBench: React.FC = () => {
       <>
         <div className="cardItem-header">
           <span className="title">快捷操作</span>
-          <span className="extraBtn" onClick={() => history.push('setting')}>
+          <span className="extraBtn" onClick={() => history.push('relation')}>
             <ImStack /> <span>更多操作</span>
           </span>
         </div>

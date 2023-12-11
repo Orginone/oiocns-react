@@ -664,12 +664,6 @@ export type WorkGatewayInfoModel = {
 export type InstanceDataModel = {
   /** 流程节点 */
   node: WorkNodeModel;
-  // 允许新增
-  allowAdd: boolean;
-  // 允许变更
-  allowEdit: boolean;
-  // 允许选择
-  allowSelect: boolean;
   /** 表单字段 */
   fields: {
     /** 表单id */
@@ -1296,14 +1290,14 @@ export type SchemaType = {
 export type DiskInfoType = {
   // 状态
   ok: number;
-  // 文件数量
-  files: number;
   // 对象数量
   objects: number;
   // 集合数量
   collections: number;
+  // 文件数量
+  filesCount: number;
   // 文件的总大小
-  fileSize: number;
+  filesSize: number;
   // 数据的总大小
   dataSize: number;
   // 数据占用磁盘的总大小

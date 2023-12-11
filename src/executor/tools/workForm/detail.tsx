@@ -22,6 +22,7 @@ const DetailTable: React.FC<IProps> = (props) => {
   const form = props.forms[0];
   if (!props.data.fields[form.id]) return <></>;
   const fields = props.data.fields[form.id];
+  const operateRule = JSON.parse(form.operateRule ?? ' {}');
   const [formData, setFormData] = useState(props.getFormData(form));
   const [selectKeys, setSelectKeys] = useState<string[]>([]);
   useEffect(() => {
@@ -74,7 +75,7 @@ const DetailTable: React.FC<IProps> = (props) => {
                 });
               },
             },
-            visible: props.allowEdit && (props.data.allowAdd || false),
+            visible: props.allowEdit && operateRule['allowAdd'],
           },
           {
             name: 'edit',
@@ -103,8 +104,7 @@ const DetailTable: React.FC<IProps> = (props) => {
                 });
               },
             },
-            visible:
-              props.allowEdit && (props.data.allowEdit || false) && selectKeys.length > 0,
+            visible: props.allowEdit && operateRule['allowEdit'] && selectKeys.length > 0,
           },
           {
             name: 'select',
@@ -132,7 +132,7 @@ const DetailTable: React.FC<IProps> = (props) => {
                 });
               },
             },
-            visible: props.allowEdit && (props.data.allowSelect || false),
+            visible: props.allowEdit && operateRule['allowSelect'],
           },
           {
             name: 'remove',

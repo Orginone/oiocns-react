@@ -1,4 +1,6 @@
 @import '~antd/dist/antd.less';
+@import '~react-grid-layout/css/styles.css';
+@import '~react-resizable/css/styles.css';
 
 body {
   font-family: 'Han Sans SC', Arial, Helvetica, 'Helvetica Neue', sans-serif;
@@ -22,25 +24,15 @@ li {
 .flex {
   display: flex !important;
 }
-.flexColumn {
-  display: flex;
-  flex-direction: column;
-}
 .flexCenter {
   align-items: center;
   justify-content: center;
 }
-.mgr4 {
+.pdr4 {
   margin-right: 4px;
 }
-.mgr2 {
+.pdr2 {
   margin-right: 2px;
-}
-.mgl6 {
-  margin-left: 6px;
-}
-.mgr0 {
-  margin-right: 0px;
 }
 .mgl4 {
   margin-left: 4px!important;
@@ -54,13 +46,12 @@ li {
 }
 
 .ellipsis1 {
-  display: block;
+  display: inline-block;
   white-space: nowrap;
   width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-
 
 .line20 {
   font-size: 14px;
@@ -510,7 +501,7 @@ h3 {
         // padding: 8px;
         // margin: 8px;
         // border-radius: 16px;
-        border: 0px solid @border-color;
+        border: 1px solid @border-color;
         background-color: @active-background;
       }
 
@@ -518,18 +509,11 @@ h3 {
         cursor: pointer;
         // padding: 8px;
         border-radius: 6px;
-        // border-bottom: 1px solid @border-color-base;
-        .ogo-list-item {
-          padding: 8px 0;
-        }
-        .ogo-list-item-meta-title {
-          margin-bottom: 0;
-        }
+        border-bottom: 1px solid @border-color-base;
         &:hover {
           background-color: @active-background;
         }
       }
-
     }
   }
 }
@@ -603,11 +587,7 @@ h3 {
     gap: 4px;
   }
   .likeColor {
-    // color: @primary-color;
-    color: #003CAB;
-  }
-  .activityItem-operate {
-    font-size: 14px;
+    color: #cb4747;
   }
   .activityTime {
     font-size: 12px;

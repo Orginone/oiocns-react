@@ -15,17 +15,19 @@ interface SearchTargetItemProps extends IDropDownBoxOptions {
 const SearchTargetItem: React.FC<SearchTargetItemProps> = (props) => {
   const [searchEnabled, setSearchEnabled] = useState(false);
   const [selectTarget, setSelectTarget] = useState<schema.XTarget>();
+  const [value, setValue] = useState<string | undefined>(props.defaultValue);
   useEffect(() => {
-    if (props.defaultValue && props.defaultValue.length > 5) {
-      orgCtrl.user.findEntityAsync(props.defaultValue).then((value) => {
-        setSelectTarget(value as schema.XTarget);
+    if (value && value && value.length > 5) {
+      orgCtrl.user.findEntityAsync(value).then((a) => {
+        setSelectTarget(a as schema.XTarget);
       });
+    } else {
+      setSelectTarget(undefined);
     }
-  }, [props.defaultValue]);
-  useEffect(() => {
-    props.onValueChanged?.apply(this, [{ value: selectTarget?.id } as any]);
-  }, [selectTarget]);
-  const fieldRender = React.useCallback(() => {
+    props.onValueChanged?.apply(this, [{ value } as any]);
+  }, [value, props]);
+
+  const fieldRender = () => {
     if (selectTarget) {
       return (
         <div
@@ -43,12 +45,13 @@ const SearchTargetItem: React.FC<SearchTargetItemProps> = (props) => {
     } else {
       return <TextBox />;
     }
-  }, [selectTarget]);
+  };
+
   return (
     <DropDownBox
       {...props}
       opened={searchEnabled}
-      value={selectTarget?.id}
+      value={props.defaultValue}
       fieldRender={fieldRender}
       onOptionChanged={(e) => {
         if (e.name === 'opened') {
@@ -57,7 +60,7 @@ const SearchTargetItem: React.FC<SearchTargetItemProps> = (props) => {
       }}
       onValueChanged={(e) => {
         if (e.value === null || e.value === undefined) {
-          setSelectTarget(undefined);
+          setValue(undefined);
         }
       }}
       contentRender={() => {
@@ -65,9 +68,7 @@ const SearchTargetItem: React.FC<SearchTargetItemProps> = (props) => {
           <SearchTarget
             searchCallback={(persons: schema.XTarget[]) => {
               if (persons.length > 0) {
-                setSelectTarget(persons[0]);
-              } else {
-                setSelectTarget(undefined);
+                setValue(persons[0].id);
               }
               setSearchEnabled(false);
             }}

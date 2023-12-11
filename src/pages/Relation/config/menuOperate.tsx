@@ -11,9 +11,6 @@ const createMenu = (
   target: ITarget | IDirectory,
   children: MenuItemType[],
 ): MenuItemType => {
-  // if ('memberDirectory' in target) {
-  //   children.unshift(createMenu(target.memberDirectory, []));
-  // }
   return {
     key: target.key,
     item: target,
@@ -39,6 +36,7 @@ const buildGroupTree = (groups: IGroup[]): MenuItemType[] => {
 const getUserMenu = () => {
   return createMenu(orgCtrl.user, [
     ...orgCtrl.user.cohorts.map((i) => createMenu(i, [])),
+    ...orgCtrl.user.storages.map((i) => createMenu(i, [])),
   ]);
 };
 
@@ -51,6 +49,7 @@ const getTeamMenu = () => {
         ...buildDepartmentTree(company.departments),
         ...buildGroupTree(company.groups),
         ...company.cohorts.map((i) => createMenu(i, [])),
+        ...company.storages.map((i) => createMenu(i, [])),
       ]),
     );
   }

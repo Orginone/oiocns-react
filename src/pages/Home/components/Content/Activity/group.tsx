@@ -1,16 +1,14 @@
 import React, { useState } from 'react';
 import TargetActivity from '@/components/TargetActivity';
 import ActivityMessage from '@/components/TargetActivity/ActivityMessage';
-import { IActivity, FromOrigin } from '@/ts/core';
+import { IActivity } from '@/ts/core';
 import { Resizable } from 'devextreme-react';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import useAsyncLoad from '@/hooks/useAsyncLoad';
 import { Spin } from 'antd';
 import { useMedia } from 'react-use';
-const GroupActivityItem: React.FC<{ activity: IActivity; messageFrom?: FromOrigin }> = ({
-  activity,
-  messageFrom,
-}) => {
+
+const GroupActivityItem: React.FC<{ activity: IActivity }> = ({ activity }) => {
   const [key] = useCtrlUpdate(activity);
   const isWide = useMedia('(min-width: 1000px)');
   const [loaded] = useAsyncLoad(() => activity.load(10), [activity]);
@@ -18,16 +16,16 @@ const GroupActivityItem: React.FC<{ activity: IActivity; messageFrom?: FromOrigi
   const loadMenus = React.useCallback(() => {
     if (!loaded || !isWide) return <></>;
     return (
-      <Resizable handles={'right'} minWidth={200}>
+      <Resizable handles={'right'}>
         <div className={'groupList'}>
           {activity.activitys
             .filter((item) => item.activityList.length > 0)
             .map((item) => {
               if (item.activityList.length > 0) {
-                const _seleted = item.id === current.id ? 'groupList-selected' : '';
+                const _name = item.id === current.id ? 'selected' : 'item';
                 return (
                   <div
-                    className={`groupList-item ${_seleted}`}
+                    className={`groupList-${_name}`}
                     key={item.key}
                     onClick={(e) => {
                       e.stopPropagation();

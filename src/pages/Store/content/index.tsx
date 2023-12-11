@@ -1,42 +1,29 @@
 import React, { useEffect, useState } from 'react';
+import { IFile, ITarget } from '@/ts/core';
+import { command } from '@/ts/base';
+import orgCtrl from '@/ts/controller';
 import DirectoryViewer from '@/components/Directory/views';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import useTimeoutHanlder from '@/hooks/useTimeoutHanlder';
-import { IDirectory, IFile } from '@/ts/core';
-import { loadFileMenus } from '@/executor/fileOperate';
-import { command } from '@/ts/base';
-import orgCtrl from '@/ts/controller';
-import useAsyncLoad from '@/hooks/useAsyncLoad';
 import { Spin } from 'antd';
-import { cleanMenus } from '@/utils/tools';
 
 interface IProps {
-  current: IDirectory | 'disk';
+  current: ITarget | 'disk';
 }
 /**
- * 存储-文件系统
+ * 数据-内容导航
  */
-const Directory: React.FC<IProps> = (props) => {
+const Content: React.FC<IProps> = (props) => {
   if (!props.current) return <></>;
-  const [dircetory] = useState<IDirectory>(
-    props.current === 'disk' ? orgCtrl.user.directory : props.current,
+  const [current] = useState<ITarget>(
+    props.current === 'disk' ? orgCtrl.user : props.current,
   );
-  const [key] = useCtrlUpdate(dircetory);
-  const [loaded] = useAsyncLoad(() => dircetory.loadContent());
+  const [key] = useCtrlUpdate(current);
   const [focusFile, setFocusFile] = useState<IFile>();
   const [submitHanlder, clearHanlder] = useTimeoutHanlder();
   useEffect(() => {
     command.emitter('preview', 'store', focusFile);
   }, [focusFile]);
-  const contextMenu = (file?: IFile) => {
-    const entity = file ?? dircetory;
-    return {
-      items: cleanMenus(loadFileMenus(entity)) || [],
-      onClick: ({ key }: { key: string }) => {
-        command.emitter('executor', key, entity, dircetory.key);
-      },
-    };
-  };
 
   const focusHanlder = (file: IFile | undefined) => {
     const focused = file && focusFile && file.key === focusFile.key;
@@ -50,13 +37,12 @@ const Directory: React.FC<IProps> = (props) => {
   const clickHanlder = (file: IFile | undefined, dblclick: boolean) => {
     if (dblclick) {
       clearHanlder();
-      if (file && !file.groupTags.includes('已删除')) {
+      if (file) {
         if (
-          file.key === orgCtrl.user.directory.key &&
-          [
-            orgCtrl.user.directory.key,
-            ...orgCtrl.user.companys.map((i) => i.directory.key),
-          ].includes(orgCtrl.currentKey)
+          file.key === orgCtrl.user.key &&
+          [orgCtrl.user.key, ...orgCtrl.user.companys.map((i) => i.key)].includes(
+            orgCtrl.currentKey,
+          )
         ) {
           command.emitter('executor', 'open', 'disk');
         } else {
@@ -71,10 +57,7 @@ const Directory: React.FC<IProps> = (props) => {
   const getContent = () => {
     const contents: IFile[] = [];
     if (props.current === 'disk') {
-      contents.push(
-        orgCtrl.user.directory,
-        ...orgCtrl.user.companys.map((i) => i.directory),
-      );
+      contents.push(orgCtrl.user, ...orgCtrl.user.companys);
     } else {
       contents.push(...props.current.content());
     }
@@ -82,19 +65,23 @@ const Directory: React.FC<IProps> = (props) => {
   };
 
   return (
-    <Spin spinning={!loaded} tip={'加载中...'}>
+    <Spin spinning={false} tip={'加载中...'}>
       <DirectoryViewer
         key={key}
-        extraTags
         initTags={['全部']}
         selectFiles={[]}
+        extraTags={true}
         focusFile={focusFile}
         content={getContent()}
-        preDirectory={orgCtrl.currentKey === 'disk' ? undefined : dircetory.superior}
+        preDirectory={orgCtrl.currentKey === 'disk' ? undefined : current.superior}
         fileOpen={(entity, dblclick) => clickHanlder(entity as IFile, dblclick)}
-        contextMenu={(entity) => contextMenu(entity as IFile)}
+        contextMenu={() => {
+          return {
+            items: [],
+          };
+        }}
       />
     </Spin>
   );
 };
-export default Directory;
+export default Content;

@@ -112,7 +112,7 @@ export const ShareIconItem = (info: shareIconInfo) => {
     if (info.share.avatar?.thumbnail) {
       return (
         <span
-          className="flex flexCenter pointer"
+          style={{ display: 'contents', cursor: 'pointer' }}
           title={info.title ?? ''}
           onClick={() => info.onClick?.apply(this, [info.entity])}>
           {infoMore()}
@@ -141,7 +141,7 @@ export const ShareIconItem = (info: shareIconInfo) => {
       }
       return (
         <span
-          className="flex flexCenter pointer"
+          style={{ display: 'contents', cursor: 'pointer' }}
           onClick={() => info.onClick?.apply(this, [info.entity])}>
           {infoMore()}
           <Avatar
@@ -156,7 +156,7 @@ export const ShareIconItem = (info: shareIconInfo) => {
   }
   return (
     <span
-      className="flex flexCenter pointer"
+      style={{ display: 'contents', cursor: 'pointer' }}
       title={info.title ?? ''}
       onClick={() => info.onClick?.apply(this, [info.entity])}>
       {infoMore()}

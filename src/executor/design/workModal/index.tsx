@@ -50,9 +50,6 @@ const ApplicationModal: React.FC<IProps> = ({ current, finished }) => {
     const resource_ = convertNode(resource, validation);
     if (validation.isPass) {
       current.metadata.rule = JSON.stringify({
-        allowAdd: current.metadata.allowAdd,
-        allowEdit: current.metadata.allowEdit,
-        allowSelect: current.metadata.allowSelect,
         hasGateway: validation.hasGateway,
       });
       if (

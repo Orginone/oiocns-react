@@ -30,7 +30,7 @@ const Content: React.FC<{
   }, []);
 
   const filterChats = (tag: string) => {
-    const temps = props.chats || orgCtrl.chats.filter((i) => i.isMyChat);
+    const temps = orgCtrl.chats.filter((i) => i.isMyChat);
     return temps
       .filter((a) => tag === '最近' || a.groupTags.includes(tag))
       .filter(

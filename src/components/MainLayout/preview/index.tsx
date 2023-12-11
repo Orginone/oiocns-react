@@ -1,15 +1,6 @@
 import ImageView from './image';
 import VideoView from './video';
-import {
-  IDirectory,
-  IEntity,
-  IForm,
-  IMemeber,
-  ISession,
-  ISysFileInfo,
-  ITarget,
-  IWorkTask,
-} from '@/ts/core';
+import { IEntity, IForm, ISession, ISysFileInfo, ITarget, IWorkTask } from '@/ts/core';
 import { command, schema } from '@/ts/base';
 import React, { useEffect, useState } from 'react';
 import OfficeView from './office';
@@ -20,7 +11,7 @@ import EntityInfo from '@/components/Common/EntityInfo';
 import WorkForm from '@/components/DataStandard/WorkForm';
 import Directory from '@/components/Directory';
 import TaskApproval from '@/executor/tools/task/approval';
-import TaskStart from '@/executor/open/work';
+import TaskStart from '@/executor/tools/task/start';
 
 const officeExt = ['.md', '.pdf', '.xls', '.xlsx', '.doc', '.docx', '.ppt', '.pptx'];
 const videoExt = ['.mp4', '.avi', '.mov', '.mpg', '.swf', '.flv', '.mpeg'];
@@ -32,8 +23,6 @@ type EntityType =
   | IWorkTask
   | IForm
   | ITarget
-  | IDirectory
-  | IMemeber
   | undefined;
 
 /** 文件预览 */
@@ -76,9 +65,6 @@ const EntityPreview: React.FC<{ flag?: string }> = (props) => {
     if ('activity' in entity) {
       return <SessionBody key={entity.key} session={entity} />;
     }
-    if ('session' in entity && entity.session) {
-      return <SessionBody setting key={entity.key} session={entity.session} />;
-    }
     if ('fields' in entity) {
       return <WorkForm key={entity.key} form={entity} />;
     }
@@ -105,8 +91,13 @@ const EntityPreview: React.FC<{ flag?: string }> = (props) => {
           return <></>;
       }
     }
-    if ('isContainer' in entity && entity.isContainer) {
-      return <Directory key={entity.key} root={entity} />;
+    if ('session' in entity) {
+      switch (props.flag) {
+        case 'store':
+          return <Directory key={entity.key} root={entity.directory} />;
+        case 'relation':
+          return <SessionBody key={entity.key} relation session={entity.session} />;
+      }
     }
     return <EntityInfo entity={entity} column={1} />;
   }

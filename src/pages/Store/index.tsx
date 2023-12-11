@@ -12,6 +12,7 @@ const FileBrowser: React.FC = () => {
   return (
     <MainLayout
       rightShow
+      leftShow={false}
       previewFlag={'store'}
       selectMenu={selectMenu}
       onSelect={async (data) => {

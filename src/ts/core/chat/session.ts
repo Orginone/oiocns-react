@@ -157,16 +157,17 @@ export class Session extends Entity<schema.XEntity> implements ISession {
     return this.target.id === this.userId || this.target.hasRelationAuth();
   }
   get groupTags(): string[] {
-    const gtags: string[] = [...super.groupTags];
-    if (this.id === this.userId) {
-      gtags.push('本人');
-    } else if (this.isGroup) {
-      if (this.target.space.id !== this.userId) {
-        gtags.push(this.target.space.name);
-      } else {
+    const gtags: string[] = [];
+    if (this.id === this.target.id) {
+      if (this.id === this.userId) {
+        gtags.push('本人');
+      } else if (this.id != this.belongId) {
         gtags.push(this.target.user.findShareById(this.belongId).name);
+      } else {
+        gtags.push(this.typeName);
       }
-      gtags.push(this.typeName);
+    } else {
+      gtags.push(...super.groupTags);
     }
     if (this.chatdata.noReadCount > 0) {
       gtags.push('未读');

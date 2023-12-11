@@ -1,19 +1,28 @@
 import React, { useState } from 'react';
 import Content from './content';
-import * as config from './config/menuOperate';
 import MainLayout from '@/components/MainLayout';
 import useMenuUpdate from '@/hooks/useMenuUpdate';
 import { Input } from 'antd';
 import { ImSearch } from 'react-icons/im';
+import OrgIcons from '@/components/Common/GlobalComps/orgIcons';
 
 const Setting: React.FC<any> = () => {
   const [filter, setFilter] = useState('');
-  const [key, rootMenu, selectMenu, setSelectMenu] = useMenuUpdate(config.loadChatMenu);
+  const [key, rootMenu, selectMenu, setSelectMenu] = useMenuUpdate(() => {
+    return {
+      key: 'disk',
+      label: '沟通',
+      itemType: 'Tab',
+      children: [],
+      icon: <OrgIcons chat selected />,
+    };
+  });
 
   if (!selectMenu || !rootMenu) return <></>;
   return (
     <MainLayout
       rightShow
+      leftShow={false}
       previewFlag={'chat'}
       selectMenu={selectMenu}
       onSelect={async (data) => {

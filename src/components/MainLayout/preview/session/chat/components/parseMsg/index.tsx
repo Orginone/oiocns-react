@@ -28,7 +28,7 @@ const linkText = (val: string) => {
 export const getFileIcon = (type?: string) => {
   if (!type) return;
   const size = 28;
-  const color = '#fff';
+  const color = 'blue';
   let icon = <AiFillFile size={size} color={color} />;
   switch (type) {
     case '.pdf':

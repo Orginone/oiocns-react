@@ -16,13 +16,11 @@ const Navbar: React.FC = () => {
   const [msgCount, setMsgCount] = useState(0);
   const [onlineVisible, setOnlineVisible] = useState(false);
   useFlagCmdEmitter('session', () => {
-    let noReadCount = 0;
-    for (const item of orgCtrl.chats) {
-      if (item.isMyChat) {
-        noReadCount += item.badgeCount;
-      }
-    }
-    setMsgCount(noReadCount);
+    setMsgCount(
+      orgCtrl.chats
+        .filter((i) => i.isMyChat)
+        .reduce((sum, i) => sum + i.chatdata.noReadCount, 0),
+    );
   });
   useEffect(() => {
     const workId = orgCtrl.work.notity.subscribe(async () => {

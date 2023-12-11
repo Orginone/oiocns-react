@@ -12,7 +12,7 @@ const FileBrowser: React.FC = () => {
   return (
     <MainLayout
       rightShow
-      previewFlag={'setting'}
+      previewFlag={'relation'}
       selectMenu={selectMenu}
       onSelect={async (data) => {
         setSelectMenu(data);

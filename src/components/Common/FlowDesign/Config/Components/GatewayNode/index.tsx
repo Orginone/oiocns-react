@@ -25,8 +25,8 @@ const GatewayNode: React.FC<IProps> = (props) => {
     await props.define.loadGatewayInfo();
     return props.define.gatewayInfo.filter((a) => a.nodeId == props.current.id);
   });
-  /** 人员信息列 */
-  const MemberInfoColumns: ProColumns<schema.XWorkGateway>[] = [
+  /** 分流网关信息列 */
+  const GatewayColumns: ProColumns<schema.XWorkGateway>[] = [
     { title: '序号', valueType: 'index', width: 50 },
     {
       title: '组织',
@@ -73,7 +73,7 @@ const GatewayNode: React.FC<IProps> = (props) => {
             dataSource={nodeInfo ?? []}
             scroll={{ y: 'calc(60vh - 150px)' }}
             operation={renderOperate}
-            columns={MemberInfoColumns}
+            columns={GatewayColumns}
           />
         )}
       </div>

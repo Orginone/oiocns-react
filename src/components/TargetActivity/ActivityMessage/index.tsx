@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 // import cls from './index.module.less';
-import { Button, Image, Input, List, Space, Tag, Typography } from 'antd';
-import { IActivity, IActivityMessage, MessageType, FromOrigin } from '@/ts/core';
+import { Button, Divider, Image, Input, List, Space, Tag, Typography } from 'antd';
+import { IActivity, IActivityMessage, MessageType } from '@/ts/core';
 import { parseHtmlToText, showChatTime } from '@/utils/tools';
 import orgCtrl from '@/ts/controller';
 import { XEntity } from '@/ts/base/schema';
@@ -83,10 +83,10 @@ export const ActivityMessage: React.FC<ActivityItemProps> = ({
               await item.like();
             }}>
             {metadata.likes.includes(orgCtrl.user.id) ? (
-              <span className="flex flexCenter">
-                <AiOutlineLike className="likeColor mgr4" size={18} />
-                <span className="line20">取消</span>
-              </span>
+              <>
+                {/* <LikeOutlined className={cls.likeColor} /> <span>取消</span> */}
+                <AiOutlineLike style={{ color: '#cb4747' }} size={18} /> <span>取消</span>
+              </>
             ) : (
               <span className="flex flexCenter">
                 <AiOutlineLike size={18} className="mgr4" /> <span>点赞</span>
@@ -153,19 +153,9 @@ export const ActivityMessage: React.FC<ActivityItemProps> = ({
     return (
       <>
         <div className={'activityItem-footer'}>
-          <div className="flex flexCenter ">
-            {messageFrom !== FromOrigin.Person && (
-              <EntityIcon
-                iconSize={22}
-                size={12}
-                entityId={metadata.createUser}
-                showName
-              />
-            )}
-            <span
-              className={`activityTime ${
-                messageFrom !== FromOrigin.Person ? 'mgl4' : ''
-              }`}>
+          <div>
+            <EntityIcon entityId={metadata.createUser} showName />
+            <span className={'activityTime'}>
               发布于{showChatTime(item.metadata.createTime)}
             </span>
           </div>
@@ -240,13 +230,10 @@ export const ActivityMessage: React.FC<ActivityItemProps> = ({
         avatar={<EntityIcon iconSize={48} entity={activity.metadata} size={50} />}
         description={
           <div className={'activityItem'}>
-            <div className={'activityItem-content'}>
+            <div>
               {renderContent()}
               {hideResource !== true && (
-                <div
-                  className={`activityItem-imageList ${
-                    metadata.resource?.length ? 'mgt8' : 0
-                  }`}>
+                <div className={'activityItem-imageList'}>
                   <Image.PreviewGroup>
                     {ActivityResource(metadata.resource, 600)}
                   </Image.PreviewGroup>

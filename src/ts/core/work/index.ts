@@ -45,15 +45,9 @@ export interface IWork extends IFileInfo<schema.XWorkDefine> {
 }
 
 export const fullDefineRule = (data: schema.XWorkDefine) => {
-  data.allowAdd = true;
-  data.allowEdit = true;
-  data.allowSelect = true;
   data.hasGateway = false;
   if (data.rule && data.rule.includes('{') && data.rule.includes('}')) {
     const rule = JSON.parse(data.rule);
-    data.allowAdd = rule.allowAdd;
-    data.allowEdit = rule.allowEdit;
-    data.allowSelect = rule.allowSelect;
     data.hasGateway = rule.hasGateway;
   }
   data.typeName = '办事';
@@ -230,9 +224,6 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
         fields: {},
         primary: {},
         node: this.node,
-        allowAdd: this.metadata.allowAdd,
-        allowEdit: this.metadata.allowEdit,
-        allowSelect: this.metadata.allowSelect,
       };
       this.forms.forEach((form) => {
         data.fields[form.id] = form.fields;

@@ -40,7 +40,7 @@ const FormItem: React.FC<IFormItemProps> = (props) => {
   };
   const [isValid, setIsValid] = React.useState(getValid());
   useEffect(() => {
-    const id = props.notifyEmitter.subscribe((_, type, data) => {});
+    const id = props.notifyEmitter.subscribe(() => {});
     return () => {
       props.notifyEmitter.unsubscribe(id);
     };
