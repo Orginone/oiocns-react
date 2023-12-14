@@ -308,11 +308,11 @@ const ToolBar: React.FC<IProps> = ({ cellStyle, handClick }: IProps) => {
 
   const colorContent = (
     <div>
-      <SketchPicker
+      {/* <SketchPicker
         onChange={(color) => {
           setColor(color.hex);
         }}
-      />
+      /> */}
       <div className={cls['save-btn']} onClick={setColors}>
         确定
       </div>

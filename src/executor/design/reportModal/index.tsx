@@ -1,34 +1,29 @@
 import React from 'react';
-import { Col, Divider, Layout, Row, Space, Typography } from 'antd';
-import cls from './index.module.less';
 import { IForm } from '@/ts/core';
 import FullScreenModal from '@/components/Common/fullScreen';
-import { RightBarIcon } from '@/components/Common/GlobalComps/customIcon';
-import { Resizable } from 'devextreme-react';
-import useStorage from '@/hooks/useStorage';
 import ReportDesign from '@/components/Common/ReportDesign';
-// import RuleSetting from './RuleSetting/index';
-const { Content, Sider } = Layout;
-
 interface IProps {
   current: IForm;
   finished: () => void;
 }
 const ReportModal: React.FC<IProps> = ({ current, finished }: IProps) => {
-  const [rightSider, setRightSider] = useStorage<boolean>('rightSider', false);
-  const [mainWidth, setMainWidth] = useStorage<string | number>('mainWidth', '70%');
-
   return (
     <FullScreenModal
       open
       centered
       fullScreen
+      hideMaxed
       width={'80vw'}
       destroyOnClose
+      onSave={async () => {
+        await current.save();
+        finished();
+      }}
       title={current.typeName + '管理'}
       footer={[]}
       onCancel={finished}>
-      <Layout className={cls.layout}>
+      <ReportDesign current={current}></ReportDesign>
+      {/* <Layout className={cls.layout}>
         <Row className={cls[`content-top`]}>
           <Col className={cls.rightstyle}>
             <Space wrap split={<Divider type="vertical" />} size={2}>
@@ -54,7 +49,7 @@ const ReportModal: React.FC<IProps> = ({ current, finished }: IProps) => {
                 </Sider>
               </Resizable>
               <Content className={cls.content}>
-                {/* <RuleSetting current={current} activeKey={'3'}></RuleSetting> */}
+                <RuleSetting current={current} activeKey={'3'}></RuleSetting>
               </Content>
             </>
           ) : (
@@ -63,7 +58,7 @@ const ReportModal: React.FC<IProps> = ({ current, finished }: IProps) => {
             </Content>
           )}
         </Layout>
-      </Layout>
+      </Layout> */}
     </FullScreenModal>
   );
 };

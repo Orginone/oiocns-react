@@ -6,11 +6,10 @@ registerLanguageDictionary(zhCN);
 import { registerAllModules } from 'handsontable/registry';
 registerAllModules();
 import 'handsontable/dist/handsontable.min.css';
-// import AttributeConfig from '../../FormDesign/attributeConfig';
-import { IForm, IProperty } from '@/ts/core';
-import { schema } from '@/ts/base';
+import { IForm, IProperty, orgAuth } from '@/ts/core';
 import OpenFileDialog from '@/components/OpenFileDialog';
-import useCtrlUpdate from '@/hooks/useCtrlUpdate';
+import { Emitter } from '@/ts/base/common';
+import orgCtrl from '@/ts/controller';
 interface IProps {
   current: IForm;
   sheetList: any;
@@ -19,7 +18,9 @@ interface IProps {
   reportChange: any;
   changeType: string;
   classType: any | undefined;
+  notityEmitter: Emitter;
   handEcho: (cellStyle: any) => void;
+  selectCellItem: (cell: any) => void;
 }
 
 const HotTableView: React.FC<IProps> = ({
@@ -30,33 +31,23 @@ const HotTableView: React.FC<IProps> = ({
   reportChange,
   changeType,
   classType,
+  notityEmitter,
   handEcho,
+  selectCellItem,
 }) => {
+  const target = current.directory.target;
   const [modalType, setModalType] = useState<string>('');
-  const [tkey] = useCtrlUpdate(current);
   const [sheetIndex, setSheetIndex] = useState<any>(0); // tabs页签
-  const [selectedItem, setSelectedItem] = useState<schema.XAttribute>();
   const [cells, setCells] = useState<any>([]);
   const [styleList, setStyleList] = useState<any>([]);
   const [classList, setClassList] = useState<any>([]);
+  const [customBorders, setCustomBorders] = useState<any>([]);
   const [copySelected, setCopySelected] = useState<any>();
   const initRowCount: number = 8;
   const initColCount: number = 60;
   const defaultRowHeight: number = 23;
   const defaultColWidth: number = 50;
 
-  // 项配置改变
-  const formValuesChange = (changedValues: any) => {
-    if (selectedItem) {
-      selectedItem.rule = selectedItem.rule || '{}';
-      const rule = { ...JSON.parse(selectedItem.rule), ...changedValues };
-      setSelectedItem({
-        ...selectedItem,
-        rule: JSON.stringify(rule),
-      });
-      current.updateAttribute({ ...selectedItem, ...rule, rule: JSON.stringify(rule) });
-    }
-  };
   const hotRef: any = useRef(null); // ref
 
   useEffect(() => {
@@ -82,17 +73,32 @@ const HotTableView: React.FC<IProps> = ({
     setCells(setting?.cells || []);
     setStyleList(setting?.styleList || []);
     setClassList(setting?.classList || []);
+    setCustomBorders(setting?.customBorders || []);
     hot.updateSettings({
+      customBorder: customBorders,
       data: sheetList[index]?.data?.data,
-      cell: cells,
       mergeCells: mergeCells,
       rowHeights: setting?.row_h || row_h,
       colWidths: setting?.col_w || col_w,
     });
+    initCells(setting?.cells);
+    // const customBordersPlugin = hot.getPlugin('customBorders');
+    // customBorders.forEach((it: any) => {
+    //   customBordersPlugin.setBorders(it.range, it.customBorder);
+    // });
+    const id = notityEmitter.subscribe((_, type, data) => {
+      if (type === 'attr') {
+        updataCells(data, setting?.cells);
+      }
+    });
+    return () => {
+      notityEmitter.unsubscribe(id);
+    };
   }, [selectItem]);
 
   useEffect(() => {
     /** 根据工具栏类型进行操作 */
+    console.log(changeType, 'changeType');
     switch (changeType) {
       case 'onSave':
         saveClickCallback();
@@ -200,6 +206,119 @@ const HotTableView: React.FC<IProps> = ({
     }
   };
 
+  const initCells = (cellsData: any) => {
+    console.log(cellsData, '3333');
+    if (cellsData) {
+      cellsData.forEach((item: any) => {
+        let species: any = [];
+        if (item.property && item.property.speciesId) {
+          current.loadItems([item.property.speciesId]).then((data) => {
+            console.log(data, 'data');
+            data.forEach((items) => {
+              species.push(items.name);
+            });
+          });
+        }
+        current.metadata.attributes.forEach((attr) => {
+          if (item.prop.id === attr.id) {
+            item.prop = attr;
+          }
+        });
+        const options = item.prop.options;
+        Object.keys(options).map((key) => {
+          switch (key) {
+            case 'readOnly':
+              hotRef.current.hotInstance.setCellMeta(
+                item.row,
+                item.col,
+                'readOnly',
+                options[key],
+              );
+              break;
+            case 'defaultValue':
+              hotRef.current.hotInstance.setDataAtCell(item.row, item.col, options[key]);
+              break;
+            case 'max':
+            case 'min':
+              hotRef.current.hotInstance.setCellMeta(
+                item.row,
+                item.col,
+                'validator',
+                function (value: any, callback: any) {
+                  setTimeout(() => {
+                    if (value >= options['min'] && value <= options['max']) {
+                      callback(true);
+                    } else {
+                      callback(false);
+                    }
+                  }, 100);
+                },
+              );
+              break;
+            case 'teamId':
+              // eslint-disable-next-line no-case-declarations
+              const target = orgCtrl.targets.find((i) => i.id === options[key]);
+              if (target) {
+                let arr: any = [];
+                target?.members.forEach((item: any) => {
+                  arr.push(item.name + '(' + item.code + ')');
+                });
+                hotRef.current.hotInstance.setCellMeta(
+                  item.row,
+                  item.col,
+                  'selectOptions',
+                  arr,
+                );
+              }
+              break;
+            default:
+              break;
+          }
+        });
+        let valueType: string = '';
+        switch (item.prop.widget) {
+          case '数字框':
+            valueType = 'numeric';
+            break;
+          case '选择框':
+            valueType = 'select';
+            hotRef.current.hotInstance.setCellMeta(
+              item.row,
+              item.col,
+              'selectOptions',
+              species,
+            );
+            break;
+          case '成员选择框':
+            valueType = 'select';
+            break;
+          case '内部机构选择框':
+            valueType = 'dropdown';
+            break;
+          case '日期选择框':
+            valueType = 'dateEditor';
+            break;
+          case '时间选择框':
+            valueType = 'time';
+            break;
+          case '操作人':
+          case '操作组织':
+            valueType = 'text';
+            hotRef.current.hotInstance.setDataAtCell(
+              item.row,
+              item.col,
+              target.user.metadata?.name + '(' + target.user.metadata?.code + ')',
+            );
+            break;
+          default:
+            valueType = 'text';
+            break;
+        }
+        hotRef.current.hotInstance.setCellMeta(item.row, item.col, 'editor', valueType);
+      });
+    }
+  };
+
   styleList?.forEach((item: any) => {
     hotRef.current.hotInstance.getCellMeta(item.row, item.col).renderer =
       'cellStylesRenderer';
@@ -228,7 +347,6 @@ const HotTableView: React.FC<IProps> = ({
   const setBorder = (border: string, { width = 1, color = '#000000' } = {}) => {
     const customBordersPlugin = hotRef.current.hotInstance.getPlugin('customBorders');
     const { xMin, xMax, yMin, yMax } = getSelected();
-    console.log(xMin, xMax, yMin, yMax, 'xMin, xMax, yMin, yMax');
     const range = [];
     const customBorder: any = {};
     switch (border) {
@@ -273,7 +391,8 @@ const HotTableView: React.FC<IProps> = ({
       default:
         break;
     }
-    // setBorderList
+    let json = { range: range, customBorder: customBorder };
+    customBorders.push(json);
     customBordersPlugin.setBorders(range, customBorder);
   };
 
@@ -354,15 +473,15 @@ const HotTableView: React.FC<IProps> = ({
           } else {
             if (styleList.length > 0) {
               const newStyleList = JSON.parse(JSON.stringify(styleList));
-              let items = newStyleList.find(
+              let index = newStyleList.findIndex(
                 (it: any) => it.col === columnIndex && it.row === rowIndex,
               );
-              if (items) {
-                for (let k in items.styles) {
+              if (index != -1) {
+                for (let k in newStyleList[index]?.styles) {
                   if (k === changeType) {
-                    items.styles[k] = reportChange;
+                    newStyleList[index].styles[k] = reportChange;
                   } else {
-                    items.styles[changeType] = reportChange;
+                    newStyleList[index].styles[changeType] = reportChange;
                   }
                 }
                 setStyleList(newStyleList);
@@ -405,6 +524,7 @@ const HotTableView: React.FC<IProps> = ({
         cells: cells,
         styleList: styleList,
         classList: classList,
+        customBorders: customBorders,
         row_h: row_h,
         col_w: col_w,
       },
@@ -414,28 +534,6 @@ const HotTableView: React.FC<IProps> = ({
     await current.update({
       ...current.metadata,
       rule: JSON.stringify(newData),
-    });
-  };
-
-  /** 更新特性rules 但单元格只有只读属性 readOnly */
-  const upDataCell = () => {
-    cells.forEach((item: any) => {
-      current.attributes.forEach((items: any) => {
-        if (item.prop.propId === items.propId) {
-          item.prop = items;
-          const newRule = JSON.parse(item.prop.rule);
-          if (newRule) {
-            Object.keys(newRule).map((key) => {
-              hotRef.current.hotInstance.setCellMeta(
-                item.row,
-                item.col,
-                key,
-                newRule[key],
-              );
-            });
-          }
-        }
-      });
     });
   };
 
@@ -455,12 +553,107 @@ const HotTableView: React.FC<IProps> = ({
       });
       cells?.forEach((item: any) => {
         if (item.row === coords.row && item.col === coords.col) {
-          setSelectedItem(item.prop);
-          setModalType('配置特性');
+          selectCellItem(item);
         }
       });
       handEcho(classJson);
     }
+  };
+
+  /** 更新单元格特性 */
+  const updataCells = (data: any, cellsData: any) => {
+    console.log(data, 'data');
+    cellsData.forEach((item: any) => {
+      if (data.id === item.prop.id) {
+        Object.keys(data.options).map((key) => {
+          switch (key) {
+            case 'readOnly':
+              hotRef.current.hotInstance.setCellMeta(
+                item.row,
+                item.col,
+                'readOnly',
+                data.options[key],
+              );
+              break;
+            case 'defaultValue':
+              hotRef.current.hotInstance.setDataAtCell(
+                item.row,
+                item.col,
+                data.options[key],
+              );
+              break;
+            case 'max':
+            case 'min':
+              hotRef.current.hotInstance.setCellMeta(
+                item.row,
+                item.col,
+                'validator',
+                function (value: any, callback: any) {
+                  setTimeout(() => {
+                    if (value >= data.options['min'] && value <= data.options['max']) {
+                      callback(true);
+                    } else {
+                      callback(false);
+                    }
+                  }, 100);
+                },
+              );
+              break;
+            case 'teamId':
+              // eslint-disable-next-line no-case-declarations
+              const target = orgCtrl.targets.find((i) => i.id === data.options[key]);
+              console.log(target?.members, 'target');
+              if (target) {
+                let arr: any = [];
+                target?.members.forEach((item: any) => {
+                  arr.push(item.name + '(' + item.code + ')');
+                });
+                hotRef.current.hotInstance.setCellMeta(
+                  item.row,
+                  item.col,
+                  'selectOptions',
+                  arr,
+                );
+              }
+              break;
+            default:
+              break;
+          }
+        });
+        let valueType: string = '';
+        switch (data.widget) {
+          case '数字框':
+            valueType = 'numeric';
+            break;
+          case '选择框':
+          case '成员选择框':
+            valueType = 'select';
+            break;
+          case '内部机构选择框':
+            valueType = 'dropdown';
+            break;
+          case '日期选择框':
+            valueType = 'date';
+            break;
+          case '时间选择框':
+            valueType = 'time';
+            break;
+          case '操作人':
+          case '操作组织':
+            valueType = 'text';
+            hotRef.current.hotInstance.setDataAtCell(
+              item.row,
+              item.col,
+              target.user.metadata?.name + '(' + target.user.metadata?.code + ')',
+            );
+            break;
+          default:
+            valueType = 'text';
+            break;
+        }
+        hotRef.current.hotInstance.setCellMeta(item.row, item.col, 'editor', valueType);
+      }
+    });
   };
 
   /** 渲染特性背景色 **/
@@ -480,6 +673,33 @@ const HotTableView: React.FC<IProps> = ({
       }
     }
   });
+
+  /** 插入特性 */
+  const setAttributes = (attribute: IProperty) => {
+    const item = current.metadata.attributes.find(
+      (it: any) => it.propId === attribute.id,
+    );
+    const selected = hotRef.current.hotInstance.getSelected() || [];
+    for (let index = 0; index < selected.length; index += 1) {
+      const [row1, column1, row2, column2] = selected[index];
+      const startRow = Math.max(Math.min(row1, row2), 0);
+      const endRow = Math.max(row1, row2);
+      const startCol = Math.max(Math.min(column1, column2), 0);
+      const endCol = Math.max(column1, column2);
+      for (let rowIndex = startRow; rowIndex <= endRow; rowIndex += 1) {
+        for (let columnIndex = startCol; columnIndex <= endCol; columnIndex += 1) {
+          let json: any = {
+            col: columnIndex,
+            row: rowIndex,
+            prop: item,
+          };
+          cells.push(json);
+          hotRef.current.hotInstance.getCellMeta(rowIndex, columnIndex).renderer =
+            'customStylesRenderer';
+        }
+      }
+    }
+  };
 
   return (
     <div>
@@ -523,33 +743,30 @@ const HotTableView: React.FC<IProps> = ({
         <OpenFileDialog
           multiple
           title={`选择属性`}
-          rootKey={current.spaceKey}
           accepts={['属性']}
+          rootKey={current.spaceKey}
           excludeIds={current.attributes.filter((i) => i.propId).map((a) => a.propId)}
           onCancel={() => setModalType('')}
           onOk={(files) => {
-            if (files.length > 0) {
-              current.createAttribute((files as IProperty[]).map((i) => i.metadata));
-            }
+            (files as IProperty[]).forEach((item) => {
+              current.metadata.attributes.push({
+                propId: item.id,
+                property: item.metadata,
+                ...item.metadata,
+                rule: '{}',
+                options: {
+                  visible: true,
+                  isRequired: true,
+                },
+                formId: current.id,
+                authId: orgAuth.SuperAuthId,
+              });
+              setAttributes(item);
+            });
             setModalType('');
           }}
         />
       )}
-
-      {/** 编辑特性模态框 */}
-      {/* {modalType.includes('配置特性') && selectedItem && (
-        <AttributeConfig
-          key={tkey}
-          attr={selectedItem}
-          onChanged={formValuesChange}
-          onClose={() => {
-            setSelectedItem(undefined);
-            setModalType('');
-            upDataCell();
-          }}
-          superAuth={current.directory.target.space.superAuth!.metadata}
-        />
-      )} */}
     </div>
   );
 };
