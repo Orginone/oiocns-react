@@ -220,7 +220,7 @@ export class StoreNode extends Node<model.Store> {
         }
       }
     }
-    await apply.createApply(apply.belong.id, '自动写入', map);
+    await apply.createApply(apply.belong.id, '自动写入', map, new Map());
     return data;
   }
 }

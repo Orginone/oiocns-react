@@ -775,6 +775,8 @@ export type WorkNodeModel = {
   defineId: string;
   // 关联表单信息
   forms: FormInfo[];
+  // 执行器
+  executors: Executor[];
   // 主表
   primaryForms: XForm[];
   // 子表
@@ -786,6 +788,16 @@ type FormInfo = {
   id: string;
   // 类型
   typeName: string;
+};
+
+export type Executor = {
+  id: string;
+  time: 'after' | 'before';
+  funcName: string;
+};
+
+export type ExecutorCache = {
+  [id: string]: any;
 };
 
 export type Branche = {

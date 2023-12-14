@@ -19,8 +19,11 @@ export interface TaskDetailType {
 
 const TaskContent: React.FC<TaskDetailType> = ({ current, finished }) => {
   const [selectNode, setSelectNode] = useState<NodeModel>();
-  const [loaded] = useAsyncLoad(() => current.loadInstance());
-  const formData = new Map<string, model.FormEditData>();
+  const [formData] = useState(new Map<string, model.FormEditData>());
+  const [loaded] = useAsyncLoad(async () => {
+    await current.loadInstance();
+    await current.batchExec('before', formData);
+  });
   /** 加载时间条 */
   const loadTimeline = () => {
     if (current.instance) {
