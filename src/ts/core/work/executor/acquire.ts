@@ -1,100 +1,88 @@
-import { kernel, model, schema } from '@/ts/base';
-import { formatDate } from '@/ts/base/common';
-import { Executor, FormData } from '.';
+import { kernel } from '../../../base';
+import { Executor } from '.';
+import { IWork } from '..';
 
 // 数据领用
 export class Acquire extends Executor {
-  async execute(data: FormData): Promise<boolean> {
+  /**
+   * 执行器
+   */
+  async execute(): Promise<boolean> {
     await this.task.loadInstance();
-    const formData = await this.loadContent();
-    if (formData) {
-      formData.forEach((value, key) => {
-        data.set(key, value);
-        if (this.task.instanceData) {
-          this.task.instanceData.data[key] = [value];
-        }
+    const work = await this.task.findWorkById(this.task.taskdata.defineId);
+    if (work) {
+      const totalCount = await this.getTotalCount(work);
+      await this.transfer(work, (p) => {
+        this.changeProgress(Number(((p * 100) / totalCount).toFixed(2)));
       });
     }
+    this.changeProgress(100);
     return true;
   }
-
-  private async loadContent(): Promise<FormData | undefined> {
-    const result = await this.loadTask();
-    if (result) {
-      try {
-        let cache: model.ExecutorCache = {};
-        if (result.content) {
-          cache = JSON.parse(result.content);
-        }
-        if (cache[this.metadata.id]) {
-          return new Map(Object.entries(cache[this.metadata.id]));
-        }
-        const data = await this.loadCache();
-        cache[this.metadata.id] = Object.fromEntries(data.entries());
-        result.content = JSON.stringify(cache);
-        await this.updateTask(result);
-        return data;
-      } catch (error) {
-        console.log(error);
-      }
-    }
+  /**
+   * 改变状态
+   * @param p 进度
+   */
+  private changeProgress(p: number) {
+    this.progress = p;
+    this.command.changCallback();
   }
-
-  private async loadCache(): Promise<FormData> {
-    const data: FormData = new Map();
+  /**
+   * 获取总进度
+   * @param work 办事
+   * @returns 总进度
+   */
+  private async getTotalCount(work: IWork): Promise<number> {
+    let count = 0;
+    for (const form of this.task.instanceData?.node.detailForms ?? []) {
+      const things = await this.loadThing(1, 0, form.id, work);
+      count += things.totalCount;
+    }
+    return count;
+  }
+  /**
+   * 迁移数据
+   * @param work 办事
+   * @param onProgress 进度回调
+   */
+  private async transfer(work: IWork, onProgress: (p: number) => void) {
+    let loaded = 0;
+    let thingColl = work.application.directory.target.space.resource.thingColl;
     for (const form of this.task.instanceData?.node.detailForms ?? []) {
       let take = 500;
       let skip = 0;
-      let formEditData: model.FormEditData = {
-        before: [],
-        after: [],
-        nodeId: this.task.taskdata.nodeId,
-        formName: form.name,
-        creator: this.task.userId,
-        createTime: formatDate(new Date(), 'yyyy-MM-dd hh:mm:ss.S'),
-      };
       while (true) {
-        const loadOptions = {
-          take: take,
-          skip: skip,
-          requireTotalCount: true,
-          userData: [`F${form.id}`],
-          filter: ['belongId', '=', this.task.taskdata.applyId],
-        };
-        const things = await kernel.loadThing(
-          this.task.metadata.belongId,
-          [this.task.metadata.belongId],
-          loadOptions,
-        );
-        formEditData.before.push(...things.data);
-        formEditData.after.push(...things.data);
+        const things = await this.loadThing(take, skip, form.id, work);
+        await thingColl.replaceMany(things.data);
         skip += things.data.length;
+        loaded += things.data.length;
+        onProgress(loaded);
         if (things.data.length == 0) {
           break;
         }
       }
-      data.set(form.id, formEditData);
     }
-    return data;
   }
-
-  private async updateTask(data: schema.XWorkTask) {
-    return await kernel.collectionReplace(this.task.userId, [], 'work-task', data);
-  }
-
-  private async loadTask(): Promise<schema.XWorkTask | undefined> {
-    const result = await kernel.collectionLoad<schema.XWorkTask[]>(
-      this.task.userId,
-      [],
-      'work-task',
-      {
-        options: { match: { id: this.task.id } },
-        skip: 0,
-        take: 1,
-      },
+  /**
+   * 加载物
+   * @param take 拿几个
+   * @param skip 跳过几个
+   * @param form 表单
+   * @param work 办事
+   * @returns 物信息
+   */
+  private async loadThing(take: number, skip: number, form: string, work: IWork) {
+    const loadOptions = {
+      take: take,
+      skip: skip,
+      requireTotalCount: true,
+      userData: [`F${form}`],
+      filter: ['belongId', '=', this.task.taskdata.applyId],
+    };
+    return await kernel.loadThing(
+      work.application.belongId,
+      [this.task.taskdata.applyId, work.application.directory.target.id],
+      loadOptions,
     );
-    if (result.data.length > 0) {
-      return result.data[0];
-    }
   }
 }

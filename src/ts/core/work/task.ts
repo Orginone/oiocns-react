@@ -45,11 +45,8 @@ export interface IWorkTask extends IFile {
     comment?: string,
     fromData?: Map<string, model.FormEditData>,
   ): Promise<boolean>;
-  /** 批量执行执行器 */
-  batchExec(
-    type: 'before' | 'after',
-    form: Map<string, model.FormEditData>,
-  ): Promise<boolean>;
+  /** 获取办事 */
+  findWorkById(wrokId: string): Promise<IWork | undefined>;
 }
 
 export class WorkTask extends FileInfo<schema.XEntity> implements IWorkTask {
@@ -191,7 +188,7 @@ export class WorkTask extends FileInfo<schema.XEntity> implements IWorkTask {
     }
   }
 
-  private async findWorkById(wrokId: string): Promise<IWork | undefined> {
+  async findWorkById(wrokId: string): Promise<IWork | undefined> {
     for (var target of this.user.targets) {
       for (var app of await target.directory.loadAllApplication()) {
         const work = await app.findWork(wrokId);
@@ -250,22 +247,5 @@ export class WorkTask extends FileInfo<schema.XEntity> implements IWorkTask {
       }
     }
     return false;
-  }
-
-  async batchExec(
-    type: 'before' | 'after',
-    form: Map<string, model.FormEditData>,
-  ): Promise<boolean> {
-    try {
-      for (const item of this.executors) {
-        if (item.metadata.time === type) {
-          await item.execute(form);
-        }
-      }
-      return true;
-    } catch (ex) {
-      logger.error(ex as Error);
-      return false;
-    }
   }
 }

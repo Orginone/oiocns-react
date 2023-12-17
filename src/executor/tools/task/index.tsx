@@ -1,5 +1,16 @@
-import { Card, Collapse, Empty, Spin, Tabs, Timeline } from 'antd';
-import React, { useState } from 'react';
+import {
+  Button,
+  Card,
+  Collapse,
+  Empty,
+  Progress,
+  Space,
+  Spin,
+  Tabs,
+  Tag,
+  Timeline,
+} from 'antd';
+import React, { useEffect, useState } from 'react';
 import cls from './index.module.less';
 import { IWorkTask } from '@/ts/core';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
@@ -20,10 +31,7 @@ export interface TaskDetailType {
 const TaskContent: React.FC<TaskDetailType> = ({ current, finished }) => {
   const [selectNode, setSelectNode] = useState<NodeModel>();
   const [formData] = useState(new Map<string, model.FormEditData>());
-  const [loaded] = useAsyncLoad(async () => {
-    await current.loadInstance();
-    await current.batchExec('before', formData);
-  });
+  const [loaded] = useAsyncLoad(async () => await current.loadInstance());
   /** 加载时间条 */
   const loadTimeline = () => {
     if (current.instance) {
@@ -114,6 +122,7 @@ const TaskContent: React.FC<TaskDetailType> = ({ current, finished }) => {
                         </div>
                         <div style={{ color: 'red' }}>待审批</div>
                       </div>
+                      <Executors />
                     </Card>
                   </Timeline.Item>
                 </div>
@@ -123,6 +132,31 @@ const TaskContent: React.FC<TaskDetailType> = ({ current, finished }) => {
       );
     }
     return <></>;
+  };
+
+  const Executors = () => {
+    return (
+      <Space
+        style={{ paddingLeft: 20, paddingTop: 10, width: '100%' }}
+        direction="vertical">
+        {current.executors.map((item, index) => {
+          const [progress, setProgress] = useState(item.progress);
+          useEffect(() => {
+            const id = item.command.subscribe(() => setProgress(item.progress));
+            return () => item.command.unsubscribe(id);
+          }, []);
+          return (
+            <div style={{ display: 'flex', justifyContent: 'space-around' }} key={index}>
+              <Tag>{item.metadata.funcName}</Tag>
+              <Progress style={{ flex: 1, marginRight: 10 }} percent={progress} />
+              <Button size="small" onClick={() => item.execute(formData)}>
+                执行
+              </Button>
+            </div>
+          );
+        })}
+      </Space>
+    );
   };
 
   const loadItems = () => {
