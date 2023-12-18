@@ -11,8 +11,6 @@ export interface IWorkProvider {
   user: UserProvider;
   /** 待办 */
   todos: IWorkTask[];
-  /** 所有 */
-  tasks: IWorkTask[];
   /** 变更通知 */
   notity: common.Emitter;
   /** 任务更新 */
@@ -45,7 +43,6 @@ export class WorkProvider implements IWorkProvider {
   user: UserProvider;
   notity: common.Emitter;
   todos: IWorkTask[] = [];
-  tasks: IWorkTask[] = [];
   private _todoLoaded: boolean = false;
   updateTask(task: schema.XWorkTask): void {
     const index = this.todos.findIndex((i) => i.metadata.id === task.id);
@@ -70,7 +67,7 @@ export class WorkProvider implements IWorkProvider {
     if (typeName === '待办') {
       return await this.loadTodos(reload);
     }
-    return await this.loadTasks(typeName, reload);
+    return await this.loadTasks(typeName, 0);
   }
   async loadTodos(reload: boolean = false): Promise<IWorkTask[]> {
     if (!this._todoLoaded || reload) {
@@ -83,11 +80,8 @@ export class WorkProvider implements IWorkProvider {
     }
     return this.todos;
   }
-  async loadTasks(typeName: TaskTypeName, reload: boolean = false): Promise<IWorkTask[]> {
-    if (reload) {
-      this.tasks = [];
-    }
-    const skip = this.tasks.filter((i) => i.isTaskType(typeName)).length;
+  async loadTasks(typeName: TaskTypeName, skip: number = 0): Promise<IWorkTask[]> {
+    const tasks: IWorkTask[] = [];
     const result = await kernel.collectionLoad<schema.XWorkTask[]>(
       this.userId,
       [],
@@ -105,12 +99,12 @@ export class WorkProvider implements IWorkProvider {
     );
     if (result.success && result.data && result.data.length > 0) {
       result.data.forEach((item) => {
-        if (this.tasks.every((i) => i.id != item.id)) {
-          this.tasks.push(new WorkTask(item, this.user));
+        if (tasks.every((i) => i.id != item.id)) {
+          tasks.push(new WorkTask(item, this.user, true));
         }
       });
     }
-    return this.tasks.filter((i) => i.isTaskType(typeName));
+    return tasks.filter((i) => i.isTaskType(typeName));
   }
   async loadTaskCount(typeName: TaskTypeName): Promise<number> {
     const res = await kernel.collectionLoad(this.userId, [], TaskCollName, {

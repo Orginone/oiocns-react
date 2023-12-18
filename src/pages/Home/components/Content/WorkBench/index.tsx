@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { Badge, Button, Calendar, Divider, Dropdown, Space, Spin } from 'antd';
-import { ImBubbles2, ImDropbox, ImList, ImPlus, ImStack } from 'react-icons/im';
+import { ImBubbles2, ImList, ImPlus, ImStack, ImUngroup } from 'react-icons/im';
 import { useHistory } from 'react-router-dom';
 import { command, model } from '@/ts/base';
 import orgCtrl from '@/ts/controller';
 import { formatSize } from '@/ts/base/common';
-import { IApplication, TargetType } from '@/ts/core';
+import { IFile, TargetType } from '@/ts/core';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
-import { OperateMenuType } from 'typings/globelType';
-import FullScreenModal from '@/components/Common/fullScreen';
 import { useFlagCmdEmitter } from '@/hooks/useCtrlUpdate';
 import TypeIcon from '@/components/Common/GlobalComps/typeIcon';
+import { loadFileMenus } from '@/executor/fileOperate';
+import CommonGroups from './group';
+import { cleanMenus } from '@/utils/tools';
 
 // 工作台
 const WorkBench: React.FC = () => {
@@ -88,7 +89,7 @@ const WorkBench: React.FC = () => {
     const [CopysCount, setCopysCount] = useState(0);
     const [CompletedCount, setCompletedCount] = useState(0);
     useEffect(() => {
-      const id = orgCtrl.subscribe(() => {
+      const id = orgCtrl.work.notity.subscribe(() => {
         setTodoCount(orgCtrl.work.todos.length);
         orgCtrl.work.loadTaskCount('发起的').then((v) => {
           setApplyCount(v);
@@ -180,50 +181,45 @@ const WorkBench: React.FC = () => {
       </>
     );
   };
-  // 渲染应用信息
-  const RendeAppInfo: React.FC = () => {
-    const [allAppShow, setAllAppShow] = useState(false);
-    const [applications, setApplications] = useState<IApplication[]>([]);
-    const [loaded] = useFlagCmdEmitter('applications', async () => {
-      setApplications(await orgCtrl.loadApplications());
+  // 渲染常用信息
+  const RendeCommonInfo: React.FC = () => {
+    const [editMode, setEditMode] = useState<boolean>(false);
+    const [commonFiles, setCommonFiles] = useState<IFile[]>([]);
+    const [loaded] = useFlagCmdEmitter('commons', async () => {
+      setCommonFiles(await orgCtrl.loadCommons());
     });
-    const contextMenu = (app: IApplication) => {
-      const useAlays = app.cache.tags?.includes('常用');
-      const menus: OperateMenuType[] = [
-        {
-          key: useAlays ? 'unsetCommon' : 'setCommon',
-          label: useAlays ? '取消常用' : '设为常用',
-          icon: <></>,
-        },
-      ];
+    const loadGroups = () => {
+      const letGroups: any = { 其它: [] };
+      for (const item of orgCtrl.user.commons) {
+        const file = commonFiles.find(
+          (i) => i.id === item.id && i.spaceId === item.spaceId,
+        );
+        if (file) {
+          const groupName = item.groupName ?? '其它';
+          letGroups[groupName] = letGroups[groupName] || [];
+          letGroups[groupName].push({
+            file,
+            common: item,
+          });
+        }
+      }
+      return letGroups;
+    };
+    const contextMenu = (file: IFile) => {
       return {
-        items: menus,
-        onClick: async ({ key }: { key: string }) => {
-          switch (key) {
-            case 'setCommon':
-              app.cache.tags = app.cache.tags || [];
-              app.cache.tags.push('常用');
-              app.cacheUserData();
-              break;
-            default:
-              app.cache.tags = app.cache.tags?.filter((i) => i != '常用');
-              app.cacheUserData();
-              break;
-          }
+        items: cleanMenus(loadFileMenus(file)) || [],
+        onClick: ({ key }: { key: string }) => {
+          command.emitter('executor', key, file);
         },
       };
     };
-    // 加载应用
-    const loadAppCard = (item: IApplication) => (
+    // 加载常用
+    const loadCommonCard = (item: IFile) => (
       <Dropdown key={item.key} menu={contextMenu(item)} trigger={['contextMenu']}>
         <div
           className="appCard"
           onClick={() => {
-            orgCtrl.currentKey = item.directory.target.superior.key;
-            command.emitter('executor', 'link', '/store');
-            setTimeout(() => {
-              command.emitter('preview', 'store', item.directory.target);
-            }, 200);
+            command.emitter('executor', 'open', item);
           }}>
           {item.cache.tags?.includes('常用') ? (
             <Badge dot>
@@ -232,72 +228,58 @@ const WorkBench: React.FC = () => {
           ) : (
             <EntityIcon entity={item.metadata} size={35} />
           )}
+          <div className="appName">{item.typeName}</div>
           <div className="appName">{item.name}</div>
           <div className="teamName">{item.directory.target.name}</div>
           <div className="teamName">{item.directory.target.space.name}</div>
         </div>
       </Dropdown>
     );
-    // 加载多个应用
-    const loadMultAppCards = (title: string, apps: IApplication[]) => {
-      if (apps.length < 1) return <></>;
-      return (
-        <>
-          <div className="appGroup-title">{title}</div>
-          <Space wrap split={<Divider type="vertical" />} size={6}>
-            {apps.map((app) => {
-              return loadAppCard(app);
-            })}
-          </Space>
-        </>
-      );
-    };
 
-    // 加载所有应用
-    const renderAllApps = () => {
+    const loadGroupItem = (title: string, data: any[]) => {
+      if (data.length < 1) return <></>;
       return (
-        <FullScreenModal
-          width={'60vw'}
-          bodyHeight={'60vh'}
-          open={allAppShow}
-          onCancel={() => setAllAppShow(false)}>
-          <div className="cardItem-viewer">
-            {loadMultAppCards(
-              '常用应用',
-              applications.filter((i) => i.cache.tags?.includes('常用')),
-            )}
-            {loadMultAppCards(
-              '我的应用',
-              applications.filter((i) => i.metadata.createUser === i.userId),
-            )}
-            {loadMultAppCards(
-              '共享应用',
-              applications.filter((i) => i.metadata.createUser !== i.userId),
-            )}
+        <div className="cardItem" style={{ width: 'auto', maxWidth: 500 }}>
+          <div className="cardItem-header">
+            <span className="title">{title}</span>
           </div>
-        </FullScreenModal>
+          <div className="cardItem-viewer">
+            <Space wrap split={<Divider type="vertical" />} size={2}>
+              {data.map((app) => {
+                return loadCommonCard(app.file);
+              })}
+            </Space>
+          </div>
+        </div>
       );
     };
     return (
       <>
         <div className="cardItem-header">
-          <span className="title">常用应用</span>
-          <span className="extraBtn" onClick={() => setAllAppShow(true)}>
-            <ImDropbox /> <span>全部应用</span>
+          <span className="title">常用</span>
+          <span className="extraBtn" onClick={() => setEditMode((pre) => !pre)}>
+            <ImUngroup /> <span>常用分组</span>
           </span>
         </div>
         <Spin spinning={!loaded} tip={'加载中...'}>
           <div className="cardItem-viewer">
-            <Space wrap split={<Divider type="vertical" />} size={2}>
-              {applications
-                .filter((i) => i.cache.tags?.includes('常用'))
-                .map((app) => {
-                  return loadAppCard(app);
-                })}
-            </Space>
+            <div className="cardGroup" style={{ flexWrap: 'wrap' }}>
+              {Object.keys(loadGroups()).map((groupName) => {
+                return loadGroupItem(groupName, loadGroups()[groupName]);
+              })}
+            </div>
           </div>
         </Spin>
-        {allAppShow && renderAllApps()}
+        {editMode && (
+          <CommonGroups
+            preGroups={loadGroups()}
+            commons={orgCtrl.user.commons}
+            onClose={(commons) => {
+              orgCtrl.user.updateCommons(commons);
+              setEditMode(false);
+            }}
+          />
+        )}
       </>
     );
   };
@@ -376,7 +358,7 @@ const WorkBench: React.FC = () => {
       </div>
       <div className="cardGroup">
         <div className="cardItem">
-          <RendeAppInfo />
+          <RendeCommonInfo />
         </div>
       </div>
       <div className="calendar">{calendarItem()}</div>

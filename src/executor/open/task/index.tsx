@@ -21,7 +21,7 @@ const TaskContent: React.FC<TaskDetailType> = ({ current, finished }) => {
         title={current.taskdata.taskType}
         footer={[]}
         onCancel={finished}>
-        <Content current={current} finished={finished}></Content>
+        <Content current={current} finished={finished} />
       </FullScreenModal>
     </>
   );

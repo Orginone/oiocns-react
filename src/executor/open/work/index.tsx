@@ -18,7 +18,7 @@ const WorkStartDo: React.FC<IProps> = ({ current, finished }) => {
       width={'80vw'}
       bodyHeight={'80vh'}
       destroyOnClose
-      title={'子流程发起'}
+      title={'发起流程'}
       footer={[]}
       onCancel={finished}>
       <TaskStart current={current} finished={finished} />

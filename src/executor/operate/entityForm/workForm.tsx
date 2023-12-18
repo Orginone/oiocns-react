@@ -1,10 +1,12 @@
 import { ProFormColumnsType } from '@ant-design/pro-components';
-import React from 'react';
-import { IApplication, IWork } from '@/ts/core';
+import React, { useState } from 'react';
+import { IApplication, IAuthority, IWork } from '@/ts/core';
 import { model } from '@/ts/base';
 import SchemaForm from '@/components/SchemaForm';
 import { WorkDefineModel } from '@/ts/base/model';
 import UploadItem from '../../tools/uploadItem';
+import { DefaultOptionType } from 'antd/lib/select';
+import useAsyncLoad from '@/hooks/useAsyncLoad';
 
 interface Iprops {
   formType: string;
@@ -19,6 +21,45 @@ const WorkForm = ({ finished, formType, current }: Iprops) => {
   let title = '';
   const readonly = formType === 'remarkDir';
   let initialValue: any = current.metadata;
+  const [treeData, setTreeData] = useState<any[]>([]);
+  const [applyAuths, setApplyAuths] = useState<any[]>([]);
+  const [loaded] = useAsyncLoad(async () => {
+    const getTreeData = (targets: IAuthority[]): DefaultOptionType[] => {
+      return targets.map((item: IAuthority) => {
+        return {
+          label: item.name,
+          value: item.id,
+          children:
+            item.children && item.children.length > 0 ? getTreeData(item.children) : [],
+        };
+      });
+    };
+    const getTreeValue = (applyAuth: string, auths: IAuthority[]): string[] => {
+      const applyAuths: string[] = [];
+      if (applyAuth == '0') {
+        return ['0'];
+      }
+      for (const auth of auths) {
+        if (auth.id == applyAuth) {
+          return [auth.id];
+        }
+        const childAuth = getTreeValue(applyAuth, auth.children);
+        if (childAuth.length > 0) {
+          applyAuths.push(auth.id, ...childAuth);
+        }
+      }
+      return applyAuths;
+    };
+    let tree = await current.directory.target.space.loadSuperAuth(false);
+    if (tree) {
+      setApplyAuths(getTreeValue(initialValue.applyAuth ?? '0', [tree]));
+      setTreeData([
+        ...[{ label: '全员', value: '0', children: [] }],
+        ...getTreeData([tree]),
+      ]);
+    }
+  });
+  if (!loaded) return <></>;
   switch (formType) {
     case 'newWork':
       title = '新建办事';
@@ -69,18 +110,21 @@ const WorkForm = ({ finished, formType, current }: Iprops) => {
       },
     },
     {
-      title: '选择共享组织',
+      title: '选择发起权限',
       readonly: readonly,
-      dataIndex: 'shareId',
-      valueType: 'select',
-      formItemProps: { rules: [{ required: true, message: '请选择共享组织' }] },
+      colProps: { span: 24 },
+      dataIndex: 'applyAuths',
+      valueType: 'cascader',
+      initialValue: applyAuths,
+      formItemProps: { rules: [{ required: true, message: '请选择发起权限' }] },
       fieldProps: {
-        options: [
-          {
-            label: current.directory.target.name,
-            value: current.directory.target.id,
-          },
-        ],
+        showCheckedStrategy: 'SHOW_CHILD',
+        changeOnSelect: true,
+        options: treeData,
+        displayRender: (labels: string[]) => labels[labels.length - 1],
+        onSelect: (e) => {
+          console.log(e);
+        },
       },
     },
     {
@@ -111,6 +155,7 @@ const WorkForm = ({ finished, formType, current }: Iprops) => {
         gutter: [24, 0],
       }}
       onFinish={async (values: any) => {
+        values.applyAuth = values.applyAuths.at(-1);
         switch (formType) {
           case 'updateWork':
             await (current as IWork).update(values);

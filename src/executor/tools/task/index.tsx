@@ -30,8 +30,8 @@ export interface TaskDetailType {
 
 const TaskContent: React.FC<TaskDetailType> = ({ current, finished }) => {
   const [selectNode, setSelectNode] = useState<NodeModel>();
-  const [formData] = useState(new Map<string, model.FormEditData>());
-  const [loaded] = useAsyncLoad(async () => await current.loadInstance());
+  const [loaded] = useAsyncLoad(() => current.loadInstance());
+  const formData = new Map<string, model.FormEditData>();
   /** 加载时间条 */
   const loadTimeline = () => {
     if (current.instance) {
@@ -51,6 +51,7 @@ const TaskContent: React.FC<TaskDetailType> = ({ current, finished }) => {
                   发起人：
                   <EntityIcon entityId={current.instance.createUser} showName />
                 </div>
+                <div style={{ paddingRight: '24px' }}>{current.instance.content}</div>
               </div>
               <Collapse ghost>
                 {current.instanceData && (

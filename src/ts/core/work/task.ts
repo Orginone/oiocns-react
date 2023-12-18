@@ -25,6 +25,8 @@ export interface IWorkTask extends IFile {
   instanceData: model.InstanceDataModel | undefined;
   /** 加用户任务信息 */
   targets: schema.XTarget[];
+  /** 是否为历史对象 */
+  isHistory: boolean;
   /** 执行器 */
   executors: IExecutor[];
   /** 是否为指定的任务类型 */
@@ -50,16 +52,25 @@ export interface IWorkTask extends IFile {
 }
 
 export class WorkTask extends FileInfo<schema.XEntity> implements IWorkTask {
-  constructor(_metadata: schema.XWorkTask, _user: UserProvider) {
+  private history: boolean;
+  constructor(
+    _metadata: schema.XWorkTask,
+    _user: UserProvider,
+    history: boolean = false,
+  ) {
     super(_metadata as any, _user.user!.directory);
     this.taskdata = _metadata;
     this.user = _user;
+    this.history = history;
   }
   user: UserProvider;
   cacheFlag: string = 'worktask';
   taskdata: schema.XWorkTask;
   instance: schema.XWorkInstance | undefined;
   instanceData: model.InstanceDataModel | undefined;
+  get isHistory(): boolean {
+    return this.history;
+  }
   executors: IExecutor[] = [];
   get groupTags(): string[] {
     return [this.belong.name, this.taskdata.taskType, this.taskdata.approveType];

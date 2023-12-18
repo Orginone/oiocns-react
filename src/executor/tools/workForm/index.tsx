@@ -12,7 +12,7 @@ interface IWorkFormProps {
   belong: IBelong;
   nodeId: string;
   data: model.InstanceDataModel;
-  onChanged?: (id: string, data: model.FormEditData, changedValues: any) => void;
+  onChanged?: (id: string, data: model.FormEditData, field: string, value: any) => void;
 }
 
 /** 流程节点表单 */
@@ -22,6 +22,7 @@ const WorkForm: React.FC<IWorkFormProps> = (props) => {
   if (!node) return <></>;
   /** 根据需求获取数据 */
   const getFormData = (form: schema.XForm): model.FormEditData => {
+    var rule = {};
     const source: schema.XThing[] = [];
     if (props.data.data && props.data.data[form.id]) {
       const beforeData = props.data.data[form.id];
@@ -33,10 +34,12 @@ const WorkForm: React.FC<IWorkFormProps> = (props) => {
           }
         } else {
           source.push(...beforeData.at(-1)!.after);
+          rule = beforeData.at(-1)!.rule ?? {};
         }
       }
     }
     return {
+      rule: rule,
       before: [...source],
       after: [...source],
       nodeId: node.id,

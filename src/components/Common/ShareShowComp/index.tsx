@@ -1,8 +1,9 @@
 import { AiOutlineCloseCircle } from 'react-icons/ai';
 import React from 'react';
 import cls from './index.module.less';
+import { Typography } from 'antd';
 type ShareShowRecentProps = {
-  departData: any[];
+  departData: { name: string; id: string; type?: string }[];
   deleteFuc: (id: string) => void;
   onClick?: Function;
 };
@@ -22,12 +23,19 @@ const ShareShowRecent: React.FC<ShareShowRecentProps> = (props) => {
               key={el.id}
               className={cls.row}>
               <div
+                style={{ width: '80%' }}
                 onClick={() => {
                   props.onClick?.call(this, el);
                 }}>
-                {props.onClick ? <a>{el.name}</a> : el.name}
+                <Typography.Text
+                  style={{ fontSize: 12, color: '#888' }}
+                  title={el.name}
+                  ellipsis>
+                  {props.onClick ? <a>{el.name}</a> : el.name}
+                </Typography.Text>
               </div>
               <AiOutlineCloseCircle
+                style={{ width: '20%' }}
                 className={cls.closeIcon}
                 onClick={() => {
                   props?.deleteFuc.apply(this, [el.id]);

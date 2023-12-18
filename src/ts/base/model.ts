@@ -627,8 +627,8 @@ export type WorkDefineModel = {
   shareId: string;
   // 应用ID
   applicationId: string;
-  // 是否创建实体
-  rule: string;
+  // 发起权限
+  applyAuth: string;
   // 流程节点
   resource: WorkNodeModel | undefined;
 };
@@ -730,6 +730,8 @@ export type FormEditData = {
   creator: string;
   /** 操作时间 */
   createTime: string;
+  /** 规则 */
+  rule: { [id: string]: { [type: string]: any } };
 };
 
 /* 节点网关 */
@@ -740,6 +742,8 @@ export type WorkGatewayModel = {
   targetId: string;
   // 关联流程ID
   defineId: string;
+  // 通知的角色ID
+  identityId: string;
 };
 
 /* 节点网关 */
@@ -773,8 +777,12 @@ export type WorkNodeModel = {
   belongId: string;
   // 节点归属定义Id
   defineId: string;
+  // 资源
+  resource: string;
   // 关联表单信息
   forms: FormInfo[];
+  // 关联表单信息
+  formRules: FormRules[];
   // 执行器
   executors: Executor[];
   // 主表
@@ -790,9 +798,15 @@ type FormInfo = {
   typeName: string;
 };
 
+type FormRules = {};
+
+// 执行器
 export type Executor = {
+  // ID
   id: string;
-  time: 'after' | 'before';
+  // 执行器触发时机
+  trigger: string;
+  // 执行器方法名称
   funcName: string;
 };
 

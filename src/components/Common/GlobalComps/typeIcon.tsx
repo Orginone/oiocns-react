@@ -147,6 +147,10 @@ const TypeIcon = ({ avatar, iconType, size }: TypeIconInfo) => {
         return <im.ImCheckmark {...config} />;
       case 'setNoReaded':
         return <im.ImBell {...config} />;
+      case 'setCommon':
+        return <im.ImHeart {...config} />;
+      case 'delCommon':
+        return <im.ImHeartBroken {...config} />;
       default:
         return loadFileIcon();
     }

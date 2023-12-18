@@ -5,10 +5,9 @@ import FlowDesign from '@/components/Common/FlowDesign';
 import FullScreenModal from '@/components/Common/fullScreen';
 import useAsyncLoad from '@/hooks/useAsyncLoad';
 import {
-  AddNodeType,
   ValidationInfo,
   convertNode,
-  getNodeCode,
+  loadNilResouce,
   loadResource,
 } from '@/components/Common/FlowDesign/processType';
 import message from '@/utils/message';
@@ -23,23 +22,11 @@ type IProps = {
 */
 const ApplicationModal: React.FC<IProps> = ({ current, finished }) => {
   const [loaded, resource] = useAsyncLoad(async () => {
-    if (current) {
-      const node = await current.loadNode();
-      if (node && node.code) {
-        return loadResource(node, '');
-      }
+    const node = await current.loadNode();
+    if (node && node.code) {
+      return loadResource(node, '');
     }
-    return {
-      code: getNodeCode(),
-      parentCode: '',
-      type: AddNodeType.ROOT,
-      name: '发起权限',
-      destType: '角色',
-      destId: '0',
-      destName: '全员',
-      num: 1,
-      children: {},
-    };
+    return loadNilResouce();
   });
   const Save = async () => {
     const validation: ValidationInfo = {

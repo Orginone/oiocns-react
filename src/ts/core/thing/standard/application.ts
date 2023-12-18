@@ -22,6 +22,8 @@ export interface IApplication extends IStandardFileInfo<schema.XApplication> {
   createWork(data: model.WorkDefineModel): Promise<IWork | undefined>;
   /** 新建模块 */
   createModule(data: schema.XApplication): Promise<schema.XApplication | undefined>;
+  /** 搜索文件 */
+  searchFile(applicationId: string, id: string): Promise<IFile | undefined>;
 }
 
 /** 应用实现类 */
@@ -120,6 +122,7 @@ export class Application
   }
   async createWork(data: model.WorkDefineModel): Promise<IWork | undefined> {
     data.applicationId = this.id;
+    data.shareId = this.directory.target.id;
     const res = await kernel.createWorkDefine(data);
     if (res.success && res.data.id) {
       let work = new Work(res.data, this);
@@ -174,6 +177,19 @@ export class Application
       applications.push(...this.getChildren(child));
     }
     return applications;
+  }
+  async searchFile(applicationId: string, id: string): Promise<IFile | undefined> {
+    if (this.id === applicationId) {
+      await this.loadContent();
+      return this.content().find((i) => i.id === id);
+    } else {
+      for (const item of this.children) {
+        const file = await item.searchFile(applicationId, id);
+        if (file) {
+          return file;
+        }
+      }
+    }
   }
   override receive(operate: string, data: schema.XApplication): boolean {
     if (data.id === this.id) {

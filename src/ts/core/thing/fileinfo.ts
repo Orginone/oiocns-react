@@ -133,12 +133,11 @@ export abstract class FileInfo<T extends schema.XEntity>
       if (data && data.fullId === this.cache.fullId) {
         this.cache = data;
         this.target.user.cacheObj.setValue(this.cachePath, data);
-        this.directory.changCallback();
+        this.superior.changCallback();
         command.emitterFlag(this.cacheFlag);
       }
     });
   }
-
   async cacheUserData(notify: boolean = true): Promise<boolean> {
     const success = await this.target.user.cacheObj.set(this.cachePath, this.cache);
     if (success && notify) {
@@ -184,6 +183,8 @@ export interface IStandardFileInfo<T extends schema.XStandard> extends IFileInfo
   update(data: T): Promise<boolean>;
   /** 接收通知 */
   receive(operate: string, data: schema.XStandard): boolean;
+  /** 常用标签切换 */
+  toggleCommon(): Promise<boolean>;
 }
 export interface IStandard extends IStandardFileInfo<schema.XStandard> {}
 export abstract class StandardFileInfo<T extends schema.XStandard>
@@ -275,6 +276,39 @@ export abstract class StandardFileInfo<T extends schema.XStandard>
       });
     }
     return false;
+  }
+  async toggleCommon(): Promise<boolean> {
+    let set: boolean = false;
+    if (this.cache.tags?.includes('常用')) {
+      this.cache.tags = this.cache.tags?.filter((i) => i != '常用');
+    } else {
+      set = true;
+      this.cache.tags = this.cache.tags ?? [];
+      this.cache.tags.push('常用');
+    }
+    const success = await this.cacheUserData();
+    if (success) {
+      return await this.target.user.toggleCommon(
+        {
+          id: this.id,
+          spaceId: this.spaceId,
+          targetId: this.target.id,
+          directoryId: this.metadata.directoryId,
+          applicationId: this.superior.id,
+        },
+        set,
+      );
+    }
+    return false;
+  }
+  override operates(): model.OperateModel[] {
+    const operates = super.operates();
+    if (this.cache.tags?.includes('常用')) {
+      operates.unshift(fileOperates.DelCommon);
+    } else {
+      operates.unshift(fileOperates.SetCommon);
+    }
+    return operates;
   }
   async notify(operate: string, data: T): Promise<boolean> {
     return await this.coll.notity({ data, operate });

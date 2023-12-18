@@ -29,6 +29,7 @@ const TaskStart: React.FC<IProps> = ({ current, finished }) => {
         {gatewayInfos.map((a) => {
           return (
             <FormItem
+              rule={{}}
               key={a.id}
               data={gatewayData}
               numStr={'1'}

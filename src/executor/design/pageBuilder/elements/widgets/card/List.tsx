@@ -171,13 +171,15 @@ const View: React.FC<Omit<IProps, 'data'>> = (props) => {
             type="primary"
             onClick={async () => {
               if (apply.validation(formData)) {
-                apply.createApply(apply.belong.id, info.content, formData).then(() => {
-                  message.success('发起成功！');
-                  const filter = stagings.filter((item) => keys.includes(item.id));
-                  orgCtrl.box.removeStaging(filter).then(() => {
-                    setKeys([]);
+                apply
+                  .createApply(apply.belong.id, info.content, formData, new Map())
+                  .then(() => {
+                    message.success('发起成功！');
+                    const filter = stagings.filter((item) => keys.includes(item.id));
+                    orgCtrl.box.removeStaging(filter).then(() => {
+                      setKeys([]);
+                    });
                   });
-                });
                 setCenter(<></>);
               } else {
                 message.warning('表单提交规则验证失败，请检查');

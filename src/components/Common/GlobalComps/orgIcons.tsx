@@ -10,6 +10,7 @@ interface IProps {
   activity?: boolean;
   exit?: boolean;
   setting?: boolean;
+  relation?: boolean;
   myWork?: boolean;
   workDone?: boolean;
   workStart?: boolean;
@@ -20,6 +21,9 @@ interface IProps {
   css?: React.CSSProperties;
   notAvatar?: boolean;
   className?: string;
+  onClick?:
+    | ((e?: React.MouseEvent<HTMLElement, MouseEvent> | undefined) => void)
+    | undefined;
 }
 
 const OrgIcons = (props: IProps) => {
@@ -31,6 +35,8 @@ const OrgIcons = (props: IProps) => {
     svgName = 'work';
   } else if (props.setting) {
     svgName = 'setting';
+  } else if (props.relation) {
+    svgName = 'relation';
   } else if (props.exit) {
     svgName = 'exit';
   } else if (props.market) {
@@ -58,8 +64,10 @@ const OrgIcons = (props: IProps) => {
         preview={false}
         height={size}
         width={size}
+        title={props.title}
         src={`/svg/${svgName}.svg`}
         style={props.css}
+        onClick={props.onClick}
       />
     );
   } else {
@@ -68,6 +76,7 @@ const OrgIcons = (props: IProps) => {
         size={size}
         className={props.className}
         src={`/svg/${svgName}.svg`}
+        onClick={props.onClick}
         style={{ background: 'transparent', color: '#606060', ...props.css }}
       />
     );

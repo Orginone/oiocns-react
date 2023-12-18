@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
-import { Button, Divider, Row } from 'antd';
+import { Button, Card } from 'antd';
 import cls from './index.module.less';
-import { NodeModel } from '../../../processType';
+import { NodeModel, executorNames } from '../../../processType';
 import ShareShowComp from '@/components/Common/ShareShowComp';
-import { AiOutlineSetting } from 'react-icons/ai';
-import SelectAuth from '@/components/Common/SelectAuth';
 import { IBelong, IForm } from '@/ts/core';
 import OpenFileDialog from '@/components/OpenFileDialog';
-import { command, schema } from '@/ts/base';
+import { command, model, schema } from '@/ts/base';
 import { Form } from '@/ts/core/thing/standard/form';
+import { SelectBox } from 'devextreme-react';
+import { getUuid } from '@/utils/tools';
 interface IProps {
   belong: IBelong;
   current: NodeModel;
@@ -20,12 +20,14 @@ interface IProps {
  */
 
 const RootNode: React.FC<IProps> = (props) => {
+  const [trigger, setTrigger] = useState<string>('before');
+  const [funcName, setFuncName] = useState<string>('');
   const [formModel, setFormModel] = useState<string>('');
   props.current.primaryForms = props.current.primaryForms || [];
   props.current.detailForms = props.current.detailForms || [];
   const [primaryForms, setPrimaryForms] = useState(props.current.primaryForms);
   const [detailForms, setDetailForms] = useState(props.current.detailForms);
-  const [selectAuthValue, setSelectAuthValue] = useState<any>(props.current.destId);
+  const [executors, setExecutors] = useState<model.Executor[]>(props.current.executors);
   const formViewer = React.useCallback((form: schema.XForm) => {
     command.emitter(
       'executor',
@@ -37,67 +39,131 @@ const RootNode: React.FC<IProps> = (props) => {
   return (
     <div className={cls[`app-roval-node`]}>
       <div className={cls[`roval-node`]}>
-        <Row style={{ marginBottom: '10px' }}>
-          <AiOutlineSetting style={{ marginTop: '3px' }} />
-          <span className={cls[`roval-node-title`]}>选择权限</span>
-        </Row>
-        <SelectAuth
-          space={props.belong}
-          onChange={(newValue: string, label: string) => {
-            props.current.destId = newValue;
-            props.current.destName = label;
-            setSelectAuthValue(newValue);
-            props.refresh();
-          }}
-          value={selectAuthValue}></SelectAuth>
-        <Divider />
-        <Row style={{ marginBottom: '10px' }}>
-          <Button
-            type="primary"
-            shape="round"
-            size="small"
-            onClick={() => {
-              setFormModel('主表');
-            }}>
-            选择主表
-          </Button>
-        </Row>
-        {primaryForms && primaryForms.length > 0 && (
-          <span>
-            <ShareShowComp
-              departData={primaryForms}
-              onClick={formViewer}
-              deleteFuc={(id: string) => {
-                props.current.primaryForms = primaryForms?.filter((a) => a.id != id);
-                setPrimaryForms(props.current.primaryForms);
-              }}
-            />
-          </span>
-        )}
-        <Row style={{ marginBottom: '10px' }}>
-          <Button
-            type="primary"
-            shape="round"
-            size="small"
-            onClick={() => {
-              setFormModel('子表');
-            }}>
-            选择子表
-          </Button>
-        </Row>
-        {detailForms && detailForms.length > 0 && (
-          <span>
-            <ShareShowComp
-              departData={detailForms}
-              onClick={formViewer}
-              deleteFuc={(id: string) => {
-                props.current.detailForms = detailForms?.filter((a) => a.id != id);
-                setDetailForms(props.current.detailForms);
-              }}
-            />
-          </span>
-        )}
-        {/* </div> */}
+        <Card
+          type="inner"
+          title="主表配置"
+          className={cls['card-info']}
+          extra={
+            <a
+              onClick={() => {
+                setFormModel('主表');
+              }}>
+              添加
+            </a>
+          }>
+          {primaryForms && primaryForms.length > 0 && (
+            <span>
+              <ShareShowComp
+                departData={primaryForms}
+                onClick={formViewer}
+                deleteFuc={(id: string) => {
+                  props.current.primaryForms = primaryForms?.filter((a) => a.id != id);
+                  setPrimaryForms(props.current.primaryForms);
+                }}
+              />
+            </span>
+          )}
+        </Card>
+        <Card
+          type="inner"
+          title="子表配置"
+          className={cls[`card-info`]}
+          extra={
+            <a
+              onClick={() => {
+                setFormModel('子表');
+              }}>
+              添加
+            </a>
+          }>
+          {detailForms && detailForms.length > 0 && (
+            <span>
+              <ShareShowComp
+                departData={detailForms}
+                onClick={formViewer}
+                deleteFuc={(id: string) => {
+                  props.current.detailForms = detailForms?.filter((a) => a.id != id);
+                  setDetailForms(props.current.detailForms);
+                }}
+              />
+            </span>
+          )}
+        </Card>
+        <Card
+          type="inner"
+          title="执行器配置"
+          className={cls[`card-info`]}
+          extra={
+            <>
+              <SelectBox
+                width={150}
+                showClearButton
+                value={trigger}
+                style={{ display: 'inline-block' }}
+                dataSource={[
+                  { text: '审批前', value: 'before' },
+                  { text: '审批后', value: 'after' },
+                ]}
+                displayExpr={'text'}
+                valueExpr={'value'}
+                onValueChange={(e) => {
+                  setTrigger(e);
+                }}
+              />
+              <SelectBox
+                width={150}
+                showClearButton
+                style={{ display: 'inline-block' }}
+                dataSource={executorNames.filter(
+                  (a) => executors.find((s) => s.funcName == a) == undefined,
+                )}
+                onValueChange={(e) => {
+                  setFuncName(e);
+                }}
+              />
+              <Button
+                type="link"
+                style={{ display: 'inline-block' }}
+                disabled={!funcName || !trigger}
+                onClick={() => {
+                  executors.push({
+                    id: getUuid(),
+                    trigger: trigger,
+                    funcName: funcName,
+                  });
+                  setFuncName('');
+                  setExecutors([...executors]);
+                  props.current.executors = executors;
+                }}>
+                添加
+              </Button>
+            </>
+          }>
+          {executors && executors.length > 0 && (
+            <span>
+              <ShareShowComp
+                departData={executors?.map((a) => {
+                  return { id: a.id, name: a.funcName };
+                })}
+                deleteFuc={(id: string) => {
+                  var exes = executors.filter((a) => a.id != id);
+                  setExecutors(exes);
+                  props.current.executors = exes;
+                }}
+              />
+            </span>
+          )}
+        </Card>
+        <Card
+          type="inner"
+          title="规则配置"
+          className={cls[`card-info`]}
+          extra={
+            <Button type="link" onClick={() => {}}>
+              添加
+            </Button>
+          }></Card>
+
         {formModel != '' && (
           <OpenFileDialog
             multiple

@@ -176,7 +176,7 @@ export class Session extends Entity<schema.XEntity> implements ISession {
       gtags.push('@我');
     }
     if (this.chatdata.isToping) {
-      gtags.push('置顶');
+      gtags.push('常用');
     }
     if (this.isGroup) {
       gtags.push('群聊');

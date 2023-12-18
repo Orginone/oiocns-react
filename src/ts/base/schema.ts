@@ -47,6 +47,22 @@ export type XStandard = {
   directoryId: string;
 } & XEntity;
 
+// 常用定义
+export type XCommon = {
+  // 唯一标识
+  id: string;
+  // 空间ID
+  spaceId: string;
+  // 用户ID
+  targetId: string;
+  // 目录ID
+  directoryId: string;
+  // 应用ID
+  applicationId: string;
+  // 分组信息
+  groupName?: string;
+};
+
 //应用定义
 export type XApplication = {
   // 父ID
@@ -168,7 +184,7 @@ export type XDirectory = {
 //表单定义
 export type XForm = {
   // 表单布局
-  rule: string;
+  rule: XFormRule1[];
   // 表单查看数据规则
   searchRule: string;
   // 操作规则（允许新增、允许选择、允许删除）
@@ -182,6 +198,28 @@ export type XForm = {
   // 表单的目录
   directory: XDirectory | undefined;
 } & XStandard;
+
+// 表单规则
+export type XFormRule1 = {
+  id: string;
+  name: string;
+  type: 'show' | 'calc';
+  trigger: string[];
+  target: string;
+  remark: string;
+};
+
+// 表单展示规则
+export type FormShowRule = {
+  showType: string;
+  value: boolean;
+  condition: string;
+} & XFormRule1;
+
+// 表单计算规则
+export type FormCalcRule = {
+  formula: string;
+} & XFormRule1;
 
 // 度量特性配置参数
 export type XFormProps = {
@@ -497,6 +535,8 @@ export type XWorkDefine = {
   shareId: string;
   // 允许补充办事
   hasGateway: boolean;
+  // 发起权限
+  applyAuth: string;
   // 办事定义节点
   nodes: XWorkNode[] | undefined;
   // 办事的实例
@@ -505,7 +545,7 @@ export type XWorkDefine = {
   application: XApplication | undefined;
   // 归属用户
   target: XTarget | undefined;
-} & XEntity;
+} & XStandard;
 
 //节点网关
 export type XWorkGateway = {
@@ -517,6 +557,8 @@ export type XWorkGateway = {
   targetId: string;
   // 关联的办事
   define: XWorkDefine | undefined;
+  // 关联的办事
+  identity: XIdentity | undefined;
 } & Xbase;
 
 //办事实例

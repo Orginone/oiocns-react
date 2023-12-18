@@ -1,24 +1,16 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { AiOutlineUser } from 'react-icons/ai';
-import {
-  Button,
-  Divider,
-  Col,
-  Radio,
-  Space,
-  Form,
-  InputNumber,
-  Card,
-  Select,
-} from 'antd';
+import { Button, Col, Radio, Form, InputNumber, Card, Divider } from 'antd';
 import cls from './index.module.less';
-import { NodeModel } from '@/components/Common/FlowDesign/processType';
+import { NodeModel, executorNames } from '@/components/Common/FlowDesign/processType';
 import ShareShowComp from '@/components/Common/ShareShowComp';
 import { IBelong } from '@/ts/core';
 import SelectIdentity from '@/components/Common/SelectIdentity';
-import { command, schema } from '@/ts/base';
+import { command, model, schema } from '@/ts/base';
 import { IForm, Form as SForm } from '@/ts/core/thing/standard/form';
 import OpenFileDialog from '@/components/OpenFileDialog';
+import { SelectBox } from 'devextreme-react';
+import { getUuid } from '@/utils/tools';
 interface IProps {
   current: NodeModel;
   belong: IBelong;
@@ -31,14 +23,25 @@ interface IProps {
  */
 
 const ApprovalNode: React.FC<IProps> = (props) => {
-  props.current.primaryForms = props.current.primaryForms || [];
+  const [funcName, setFuncName] = useState<string>('');
+  const [trigger, setTrigger] = useState<string>('before');
+  const [executors, setExecutors] = useState<model.Executor[]>([]);
   const [isOpen, setIsOpen] = useState<boolean>(false); // 打开弹窗
   const [formModel, setFormModel] = useState<string>('');
-  const [primaryForms, setPrimaryForms] = useState(props.current.primaryForms);
-  const [radioValue, setRadioValue] = useState(props.current.num == 0 ? 1 : 2);
-  const [destType, setDestType] = useState(
-    props.current.destName != '发起人' ? '1' : '2',
-  );
+  const [primaryForms, setPrimaryForms] = useState<schema.XForm[]>();
+  const [radioValue, setRadioValue] = useState(1);
+  const [destType, setDestType] = useState('1');
+  const [currentData, setCurrentData] = useState<{ id: string; name: string }>();
+  useEffect(() => {
+    props.current.primaryForms = props.current.primaryForms || [];
+    setPrimaryForms(props.current.primaryForms);
+    setRadioValue(props.current.num == 0 ? 1 : 2);
+    setDestType(props.current.destName != '发起人' ? '1' : '2');
+    setCurrentData({
+      id: props.current.destId,
+      name: props.current.destName,
+    });
+  }, [props.current]);
   const formViewer = React.useCallback((form: schema.XForm) => {
     command.emitter(
       'executor',
@@ -47,113 +50,24 @@ const ApprovalNode: React.FC<IProps> = (props) => {
       'preview',
     );
   }, []);
-  const [currentData, setCurrentData] = useState<{ id: string; name: string }>({
-    id: props.current.destId,
-    name: props.current.destName,
-  });
 
   const loadDestType = () => {
     switch (destType) {
       case '1': {
-        const data: any[] = [];
-        if (!['', '1'].includes(currentData.id ?? '')) {
-          data.push(currentData);
-        }
         return (
           <>
-            <Space>
-              <Button
-                onClick={() => {
-                  setIsOpen(true);
-                }}>
-                选择角色
-              </Button>
-            </Space>
-            <ShareShowComp
-              departData={data}
-              deleteFuc={(_) => {
-                props.current.destId = '';
-                props.current.destName = '';
-                props.refresh();
-              }}
-            />
-          </>
-        );
-      }
-      case '2':
-        return <a>发起人</a>;
-      default:
-        return <></>;
-    }
-  };
-
-  return (
-    <div className={cls[`app-roval-node`]}>
-      <div className={cls[`roval-node`]}>
-        <Card
-          type="inner"
-          title="表单管理"
-          extra={
-            <a
-              onClick={() => {
-                setFormModel('主表');
-              }}>
-              添加表单
-            </a>
-          }>
-          {primaryForms && primaryForms.length > 0 && (
-            <span>
+            {currentData && currentData.id != '1' && (
               <ShareShowComp
-                departData={primaryForms}
-                onClick={formViewer}
-                deleteFuc={(id: string) => {
-                  props.current.primaryForms = primaryForms?.filter((a) => a.id != id);
-                  setPrimaryForms(props.current.primaryForms);
+                departData={[currentData]}
+                deleteFuc={(_) => {
+                  props.current.destId = '';
+                  props.current.destName = '';
+                  setCurrentData(undefined);
+                  props.refresh();
                 }}
               />
-            </span>
-          )}
-        </Card>
-        <Divider />
-        <Card
-          type="inner"
-          title="审批对象"
-          extra={
-            <Select
-              defaultValue={destType}
-              style={{ width: 120 }}
-              onSelect={(value) => {
-                switch (value) {
-                  case '1':
-                    props.current.destId = '';
-                    props.current.destName = '';
-                    props.current.destType = '角色';
-                    setCurrentData({ id: '', name: '' });
-                    break;
-                  case '2':
-                    props.current.num = 1;
-                    props.current.destId = '1';
-                    props.current.destName = '发起人';
-                    props.current.destType = '发起人';
-                    setCurrentData({ id: '0', name: '发起人' });
-                    props.refresh();
-                    break;
-                  default:
-                    break;
-                }
-                setDestType(value);
-              }}
-              options={[
-                { value: '1', label: '指定角色' },
-                { value: '2', label: '发起人' },
-              ]}
-            />
-          }>
-          {loadDestType()}
-        </Card>
-        <Divider />
-        {destType == '1' && (
-          <Card type="inner" title={'审批方式'}>
+            )}
+            <Divider />
             <div className={cls['roval-node-select']}>
               <Col className={cls['roval-node-select-col']}></Col>
               <Radio.Group
@@ -187,8 +101,155 @@ const ApprovalNode: React.FC<IProps> = (props) => {
                 </Form.Item>
               )}
             </div>
-          </Card>
-        )}
+          </>
+        );
+      }
+      case '2':
+        return <a>发起人</a>;
+      default:
+        return <></>;
+    }
+  };
+
+  return (
+    <div className={cls[`app-roval-node`]}>
+      <div className={cls[`roval-node`]}>
+        {' '}
+        <Card
+          type="inner"
+          title="审批对象"
+          className={cls[`card-info`]}
+          extra={
+            <>
+              <SelectBox
+                value={destType}
+                valueExpr={'value'}
+                displayExpr={'label'}
+                style={{ width: 120, display: 'inline-block' }}
+                onSelectionChanged={(e) => {
+                  switch (e.selectedItem.value) {
+                    case '1':
+                      props.current.destType = '角色';
+                      setCurrentData(undefined);
+                      break;
+                    case '2':
+                      props.current.num = 1;
+                      props.current.destId = '1';
+                      props.current.destName = '发起人';
+                      props.current.destType = '发起人';
+                      setCurrentData({ id: '1', name: '发起人' });
+                      props.refresh();
+                      break;
+                    default:
+                      break;
+                  }
+                  setDestType(e.selectedItem.value);
+                }}
+                dataSource={[
+                  { value: '1', label: '指定角色' },
+                  { value: '2', label: '发起人' },
+                ]}
+              />
+              {destType == '1' && (
+                <a
+                  style={{ paddingLeft: 10, display: 'inline-block' }}
+                  onClick={() => {
+                    setIsOpen(true);
+                  }}>
+                  选择角色
+                </a>
+              )}
+            </>
+          }>
+          {loadDestType()}
+        </Card>
+        <Card
+          type="inner"
+          title="表单管理"
+          className={cls[`card-info`]}
+          extra={
+            <a
+              onClick={() => {
+                setFormModel('主表');
+              }}>
+              添加表单
+            </a>
+          }>
+          {primaryForms && primaryForms.length > 0 && (
+            <span>
+              <ShareShowComp
+                departData={primaryForms}
+                onClick={formViewer}
+                deleteFuc={(id: string) => {
+                  props.current.primaryForms = primaryForms?.filter((a) => a.id != id);
+                  setPrimaryForms(props.current.primaryForms);
+                }}
+              />
+            </span>
+          )}
+        </Card>
+        <Card
+          type="inner"
+          title="执行器配置"
+          className={cls[`card-info`]}
+          extra={
+            <>
+              <SelectBox
+                width={150}
+                showClearButton
+                value={trigger}
+                style={{ display: 'inline-block' }}
+                dataSource={[
+                  { text: '审批前', value: 'before' },
+                  { text: '审批后', value: 'after' },
+                ]}
+                displayExpr={'text'}
+                valueExpr={'value'}
+                onValueChange={(e) => {
+                  setTrigger(e);
+                }}
+              />
+              <SelectBox
+                width={150}
+                showClearButton
+                style={{ display: 'inline-block' }}
+                dataSource={executorNames.filter(
+                  (a) => executors.find((s) => s.funcName == a) == undefined,
+                )}
+                onValueChange={(e) => {
+                  setFuncName(e);
+                }}
+              />
+              <Button
+                type="link"
+                style={{ display: 'inline-block' }}
+                disabled={!funcName || !trigger}
+                onClick={() => {
+                  executors.push({
+                    id: getUuid(),
+                    trigger: trigger,
+                    funcName: funcName,
+                  });
+                  setExecutors([...executors]);
+                  setFuncName('');
+                }}>
+                添加
+              </Button>
+            </>
+          }>
+          {executors && executors.length > 0 && (
+            <span>
+              <ShareShowComp
+                departData={executors?.map((a) => {
+                  return { id: a.id, name: a.funcName };
+                })}
+                deleteFuc={(id: string) => {
+                  setExecutors(executors.filter((a) => a.id != id));
+                }}
+              />
+            </span>
+          )}
+        </Card>
       </div>
       <SelectIdentity
         open={isOpen}

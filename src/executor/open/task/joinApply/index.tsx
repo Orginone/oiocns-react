@@ -12,7 +12,7 @@ export interface TaskDetailType {
 const TaskContent: React.FC<TaskDetailType> = ({ current, finished }) => {
   if (current.targets.length < 2) return <></>;
   const loadOperates = () => {
-    if (current.taskdata.status < TaskStatus.ApprovalStart) {
+    if (current.taskdata.status < TaskStatus.ApprovalStart && !current.isHistory) {
       return [
         <Button
           key={'拒绝'}
