@@ -43,7 +43,14 @@ const Config: React.FC<IProps> = (props) => {
           <ApprovalNode current={props.node} belong={belong} refresh={props.refresh} />
         );
       case AddNodeType.GATEWAY:
-        return <GatewayNode current={props.node} define={props.define} />;
+        return (
+          <GatewayNode
+            current={props.node}
+            belong={belong}
+            refresh={props.refresh}
+            define={props.define}
+          />
+        );
       case AddNodeType.CHILDWORK:
         return (
           <WorkFlowNode
@@ -69,11 +76,7 @@ const Config: React.FC<IProps> = (props) => {
         return <div>暂无需要处理的数据</div>;
     }
   };
-  return (
-    <Card type="inner" title={props.node.name + '配置'}>
-      {loadContent()}
-    </Card>
-  );
+  return <Card title={props.node.name + '配置'}>{loadContent()}</Card>;
 };
 
 export default Config;

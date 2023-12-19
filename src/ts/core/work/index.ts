@@ -31,6 +31,7 @@ export interface IWork extends IFileInfo<schema.XWorkDefine> {
   /** 绑定成员节点 */
   bingdingGateway(
     nodeId: string,
+    identity: schema.XIdentity,
     define: schema.XWorkDefine,
   ): Promise<schema.XWorkGateway | undefined>;
   /** 生成办事申请单 */
@@ -42,6 +43,8 @@ export interface IWork extends IFileInfo<schema.XWorkDefine> {
   notify(operate: string, data: any): void;
   /** 接收通知 */
   receive(operate: string, data: schema.XWorkDefine): boolean;
+  /** 常用标签切换 */
+  toggleCommon(): Promise<boolean>;
 }
 
 export const fullDefineRule = (data: schema.XWorkDefine) => {
@@ -74,6 +77,9 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
   }
   get forms(): IForm[] {
     return [...this.primaryForms, ...this.detailForms];
+  }
+  get superior(): IFile {
+    return this.application;
   }
   async delete(_notity: boolean = false): Promise<boolean> {
     if (this.application) {
@@ -159,6 +165,7 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
   async update(data: model.WorkDefineModel): Promise<boolean> {
     data.id = this.id;
     data.applicationId = this.metadata.applicationId;
+    data.shareId = this.directory.target.id;
     const res = await kernel.createWorkDefine(data);
     if (res.success && res.data.id) {
       this.notify('workReplace', res.data);
@@ -189,16 +196,18 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
   }
   async bingdingGateway(
     nodeId: string,
+    identity: schema.XIdentity,
     define: schema.XWorkDefine,
   ): Promise<schema.XWorkGateway | undefined> {
     const res = await kernel.createWorkGeteway({
       nodeId: nodeId,
       defineId: define.id,
+      identityId: identity.id,
       targetId: this.directory.target.spaceId,
     });
     if (res.success) {
       this.gatewayInfo = this.gatewayInfo.filter((a) => a.nodeId != nodeId);
-      this.gatewayInfo.push({ ...res.data, define });
+      this.gatewayInfo.push({ ...res.data, define, identity });
     }
     return res.data;
   }
@@ -247,10 +256,39 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
       );
     }
   }
+  async toggleCommon(): Promise<boolean> {
+    let set: boolean = false;
+    if (this.cache.tags?.includes('常用')) {
+      this.cache.tags = this.cache.tags?.filter((i) => i != '常用');
+    } else {
+      set = true;
+      this.cache.tags = this.cache.tags ?? [];
+      this.cache.tags.push('常用');
+    }
+    const success = await this.cacheUserData();
+    if (success) {
+      return await this.target.user.toggleCommon(
+        {
+          id: this.id,
+          spaceId: this.spaceId,
+          targetId: this.target.id,
+          applicationId: this.application.id,
+          directoryId: this.application.metadata.directoryId,
+        },
+        set,
+      );
+    }
+    return false;
+  }
   override operates(): model.OperateModel[] {
     const operates = super.operates();
     if (this.isInherited) {
       operates.push({ sort: 3, cmd: 'workForm', label: '查看表单', iconType: '表单' });
+    }
+    if (this.cache.tags?.includes('常用')) {
+      operates.unshift(fileOperates.DelCommon);
+    } else {
+      operates.unshift(fileOperates.SetCommon);
     }
     if (this.metadata.hasGateway) {
       operates.push({
@@ -270,6 +308,16 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
       .filter((i) => i != entityOperates.Delete);
   }
   private async recursionForms(node: model.WorkNodeModel) {
+    if (node.resource) {
+      const resource = JSON.parse(node.resource);
+      if (Array.isArray(resource)) {
+        node.forms = resource;
+      } else {
+        node.forms = resource.forms ?? [];
+        node.formRules = resource.formRules ?? [];
+        node.executors = resource.executors ?? [];
+      }
+    }
     node.detailForms = await this.directory.resource.formColl.find(
       node.forms?.filter((a) => a.typeName == '子表').map((s) => s.id),
     );

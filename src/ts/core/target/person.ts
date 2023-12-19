@@ -1,4 +1,4 @@
-import { kernel, model, parseAvatar, schema } from '@/ts/base';
+import { command, kernel, model, parseAvatar, schema } from '@/ts/base';
 import { IBelong, Belong } from './base/belong';
 import { ICohort, Cohort } from './outTeam/cohort';
 import { createCompany } from './team';
@@ -21,8 +21,14 @@ export interface IPerson extends IBelong {
   givedIdentitys: schema.XIdProof[];
   /** 用户缓存对象 */
   cacheObj: XObject<schema.Xbase>;
+  /** 个人常用文件 */
+  commons: schema.XCommon[];
   /** 拷贝的文件 */
   copyFiles: Map<string, IFile>;
+  /** 更新常用 */
+  updateCommons(datas: schema.XCommon[]): Promise<boolean>;
+  /** 常用设置 */
+  toggleCommon(data: schema.XCommon, set: boolean): Promise<boolean>;
   /** 根据ID查询共享信息 */
   findShareById(id: string): model.ShareIcon;
   /** 根据Id查询共享信息 */
@@ -48,7 +54,9 @@ export class Person extends Belong implements IPerson {
     this.copyFiles = new Map();
     this.cacheObj = new XObject(_metadata, 'target-cache', [], [this.key]);
   }
+
   companys: ICompany[] = [];
+  commons: schema.XCommon[] = [];
   cacheObj: XObject<schema.Xbase>;
   givedIdentitys: schema.XIdProof[] = [];
   copyFiles: Map<string, IFile>;
@@ -57,6 +65,7 @@ export class Person extends Belong implements IPerson {
   get superior(): IFile {
     return this;
   }
+
   async loadGivedIdentitys(reload: boolean = false): Promise<schema.XIdProof[]> {
     if (!this._givedIdentityLoaded || reload) {
       const res = await kernel.queryGivedIdentitys();
@@ -67,6 +76,7 @@ export class Person extends Belong implements IPerson {
     }
     return this.givedIdentitys;
   }
+
   giveIdentity(identitys: schema.XIdentity[], teamId: string = ''): void {
     for (const identity of identitys) {
       if (
@@ -85,6 +95,7 @@ export class Person extends Belong implements IPerson {
       }
     }
   }
+
   removeGivedIdentity(identityIds: string[], teamId?: string): void {
     let idProofs = this.givedIdentitys.filter((a) => identityIds.includes(a.identityId));
     if (teamId) {
@@ -124,6 +135,7 @@ export class Person extends Belong implements IPerson {
     }
     return this.cohorts;
   }
+
   async createCompany(data: model.TargetModel): Promise<ICompany | undefined> {
     if (!companyTypes.includes(data.typeName as TargetType)) {
       data.typeName = TargetType.Company;
@@ -140,6 +152,7 @@ export class Person extends Belong implements IPerson {
       return company;
     }
   }
+
   async createStorage(data: model.TargetModel): Promise<IStorage | undefined> {
     data.typeName = TargetType.Storage;
     const metadata = await this.create(data);
@@ -151,6 +164,7 @@ export class Person extends Belong implements IPerson {
       return storage;
     }
   }
+
   async createTarget(data: model.TargetModel): Promise<ITeam | undefined> {
     switch (data.typeName) {
       case TargetType.Cohort:
@@ -161,6 +175,7 @@ export class Person extends Belong implements IPerson {
         return this.createCompany(data);
     }
   }
+
   authenticate(orgIds: string[], authIds: string[]): boolean {
     return (
       this.givedIdentitys
@@ -169,6 +184,7 @@ export class Person extends Belong implements IPerson {
         .filter((i) => authIds.includes(i.identity!.authId)).length > 0
     );
   }
+
   async applyJoin(members: schema.XTarget[]): Promise<boolean> {
     members = members.filter(
       (i) =>
@@ -190,6 +206,7 @@ export class Person extends Belong implements IPerson {
     }
     return true;
   }
+
   async searchTargets(filter: string, typeNames: string[]): Promise<schema.XTarget[]> {
     const res = await kernel.searchTargets({
       name: filter,
@@ -201,9 +218,11 @@ export class Person extends Belong implements IPerson {
     }
     return [];
   }
+
   async exit(): Promise<boolean> {
     return false;
   }
+
   override async delete(notity: boolean = false): Promise<boolean> {
     if (notity) {
       // TODO 退出
@@ -216,21 +235,26 @@ export class Person extends Belong implements IPerson {
     }
     return true;
   }
+
   get subTarget(): ITarget[] {
     return [];
   }
+
   get shareTarget(): ITarget[] {
     return [this, ...this.cohorts];
   }
+
   get parentTarget(): ITarget[] {
     return [...this.cohorts, ...this.companys];
   }
+
   get chats(): ISession[] {
     const chats: ISession[] = [this.session];
     chats.push(...this.cohortChats);
     chats.push(...this.memberChats);
     return chats;
   }
+
   get cohortChats(): ISession[] {
     const chats: ISession[] = [];
     const companyChatIds: string[] = [];
@@ -246,6 +270,7 @@ export class Person extends Belong implements IPerson {
     }
     return chats;
   }
+
   get targets(): ITarget[] {
     const targets: ITarget[] = [this, ...this.storages];
     for (const item of this.cohorts) {
@@ -253,8 +278,10 @@ export class Person extends Belong implements IPerson {
     }
     return targets;
   }
+
   async deepLoad(reload: boolean = false): Promise<void> {
     await this.cacheObj.all();
+    await this._loadCommons();
     await Promise.all([
       this.loadTeams(reload),
       this.loadMembers(reload),
@@ -271,9 +298,14 @@ export class Person extends Belong implements IPerson {
 
   override operates(): model.OperateModel[] {
     const operates = super.operates();
-    operates.unshift(personJoins, targetOperates.NewCompany, targetOperates.NewStorage);
+    operates.unshift(
+      ...personJoins.menus,
+      targetOperates.NewCompany,
+      targetOperates.NewStorage,
+    );
     return operates;
   }
+
   content(): IFile[] {
     return [...this.cohorts, ...this.storages];
   }
@@ -288,6 +320,32 @@ export class Person extends Belong implements IPerson {
       avatar: parseAvatar(metadata?.icon),
     };
   }
+
+  async toggleCommon(data: schema.XCommon, set: boolean): Promise<boolean> {
+    if (set) {
+      this.commons.unshift(data);
+    } else {
+      this.commons = this.commons.filter(
+        (i) => !(i.id === data.id && i.spaceId === data.spaceId),
+      );
+    }
+    if (await this.cacheObj.set('commons', this.commons)) {
+      await this.cacheObj.notity('commons', this.commons, true, false);
+      return true;
+    }
+    return false;
+  }
+
+  async updateCommons(datas: schema.XCommon[]): Promise<boolean> {
+    if (this.commons.length < 1) return false;
+    this.commons = datas;
+    if (await this.cacheObj.set('commons', this.commons)) {
+      await this.cacheObj.notity('commons', this.commons, true, false);
+      return true;
+    }
+    return false;
+  }
+
   override async _removeJoinTarget(target: schema.XTarget): Promise<string> {
     var find = [...this.cohorts, ...this.companys, ...this.storages].find(
       (i) => i.id === target.id,
@@ -329,5 +387,18 @@ export class Person extends Belong implements IPerson {
         break;
     }
     return '';
+  }
+
+  async _loadCommons(): Promise<void> {
+    const data = await this.cacheObj.get<schema.XCommon[]>('commons');
+    if (data && Array.isArray(data) && data.length > 0) {
+      this.commons = data;
+    }
+    this.cacheObj.subscribe('commons', (res: schema.XCommon[]) => {
+      if (res && Array.isArray(res)) {
+        this.commons = res;
+        command.emitterFlag('commons', true);
+      }
+    });
   }
 }

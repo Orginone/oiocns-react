@@ -272,7 +272,7 @@ export class Company extends Belong implements ICompany {
     const operates = super.operates();
     if (this.hasRelationAuth()) {
       operates.unshift(
-        companyJoins,
+        ...companyJoins.menus,
         targetOperates.NewGroup,
         targetOperates.NewDepartment,
       );

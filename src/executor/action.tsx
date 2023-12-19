@@ -77,6 +77,8 @@ export const executeCmd = (cmd: string, entity: any) => {
       return sessionTopingToggle(entity);
     case 'readedToggle':
       return sessionReadedToggle(entity);
+    case 'commonToggle':
+      return fileCommonToggle(entity);
     case 'applyFriend':
       return applyFriend(entity);
   }
@@ -118,7 +120,7 @@ const removeSession = (entity: ISession) => {
   entity.chatdata.recently = false;
   entity.chatdata.lastMessage = undefined;
   entity.cacheChatData();
-  orgCtrl.changCallback();
+  command.emitterFlag('session', true);
   command.emitter('preview', 'chat', undefined);
 };
 
@@ -126,7 +128,7 @@ const removeSession = (entity: ISession) => {
 const sessionTopingToggle = (entity: ISession) => {
   entity.chatdata.isToping = !entity.chatdata.isToping;
   entity.cacheChatData();
-  orgCtrl.changCallback();
+  command.emitterFlag('session', true);
 };
 
 /** 会话已读/未读变更 */
@@ -137,9 +139,17 @@ const sessionReadedToggle = (entity: ISession) => {
     entity.chatdata.noReadCount = 1;
   }
   entity.cacheChatData();
-  orgCtrl.changCallback();
+  command.emitterFlag('session', true);
 };
 
+/** 常用标签变更 */
+const fileCommonToggle = (entity: any) => {
+  entity.toggleCommon().then((success: boolean) => {
+    if (success) {
+      message.info('设置成功');
+    }
+  });
+};
 /** 申请加为好友 */
 const applyFriend = (entity: ISession) => {
   orgCtrl.user.applyJoin([entity.metadata as schema.XTarget]).then(() => {

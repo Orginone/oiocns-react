@@ -50,7 +50,7 @@ const Content: React.FC<IProps> = (props) => {
         }
       }
     } else {
-      submitHanlder(() => focusHanlder(file), 200);
+      submitHanlder(() => focusHanlder(file), 300);
     }
   };
 

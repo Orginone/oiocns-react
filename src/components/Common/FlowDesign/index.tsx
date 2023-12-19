@@ -14,7 +14,7 @@ interface IProps {
 
 const Design: React.FC<IProps> = ({ current, resource }) => {
   const [key, Refresh] = useCtrlUpdate(current);
-  const [mainWidth, setMainWidth] = React.useState<number>(400);
+  const [mainWidth, setMainWidth] = React.useState<number>(550);
   const [currentNode, setCurrentNode] = useState<NodeModel>(resource);
 
   return (

@@ -276,7 +276,12 @@ h3 {
 .dx-button {
   border-color: @border-color;
 }
-
+.dx-list .dx-empty-message, .dx-list-item {
+  border-top: 1px solid @border-color;
+}
+.dx-list .dx-empty-message, .dx-list-item-content {
+  padding: 0 2px;
+}
 /**
   MainlayOut组件
 */
@@ -708,16 +713,6 @@ h3 {
     flex-direction: row;
     flex-wrap: nowrap;
     justify-content: flex-start;
-    .cardItem {
-      width: 100%;
-      min-height: 180px;
-      border-radius: 6px;
-      padding: 16px;
-      cursor: pointer;
-      background-color: #ffffff;
-      border: 1px solid #ffffff;
-      // box-shadow: 0 0 2px 2px #ededed;
-    }
   }
 
   .calendar {
@@ -760,6 +755,22 @@ h3 {
   }
 }
 
+.cardItem {
+  width: 100%;
+  min-height: 180px;
+  border-radius: 6px;
+  padding: 16px;
+  cursor: pointer;
+  background-color: #ffffff;
+  border: 1px solid #eeeeee;
+  &-sortable {
+    gap: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    min-height: 100px;
+  }
+}
+
 .cardItem-viewer {
   padding-top: 12px;
   min-height: 100px;
@@ -769,24 +780,6 @@ h3 {
     padding: 8px 30px;
     background-color: #f5f5f5;
     &:hover {
-      background: @active-background;
-    }
-  }
-  .appCard {
-    padding: 12px;
-    text-align: center;
-    cursor: pointer;
-    min-width: 120px;
-    .appName {
-      font-size: 14px;
-      font-weight: bold;
-    }
-    .teamName {
-      color: #686868;
-      font-size: 12px;
-    }
-    &:hover {
-      border-radius: 10px;
       background: @active-background;
     }
   }
@@ -813,6 +806,26 @@ h3 {
       border-radius: 10px;
       background: @active-background;
     }
+  }
+}
+
+.appCard {
+  width: auto;
+  padding: 12px;
+  text-align: center;
+  cursor: pointer;
+  min-width: 120px;
+  .appName {
+    font-size: 14px;
+    font-weight: bold;
+  }
+  .teamName {
+    color: #686868;
+    font-size: 12px;
+  }
+  &:hover {
+    border-radius: 10px;
+    background: @active-background;
   }
 }
 /**
@@ -993,3 +1006,12 @@ h3 {
   }
 }
 
+// 左侧目录清单栏样式
+.inventory-search-area {
+  width: 100%;
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 10px;
+  padding: 6px 12px;
+  align-items: center;
+}

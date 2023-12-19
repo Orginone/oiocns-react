@@ -50,23 +50,18 @@ const ListMode = ({
                   ]}>
                   <List.Item.Meta
                     title={
-                      <div className="flex">
-                        <span className={`${css.item_title} ellipsis1`}>
-                          {item.name}
-                          {item.groupTags
-                            .filter((i) => i.length > 0)
-                            .map((label) => {
-                              return (
-                                <Tag
-                                  className="mgl6 mgr0"
-                                  key={label}
-                                  color={label === '置顶' ? 'red' : 'success'}>
-                                  {label}
-                                </Tag>
-                              );
-                            })}
-                        </span>
-                      </div>
+                      <>
+                        <div className={css.item_title}>{item.name}</div>
+                        {item.groupTags
+                          .filter((i) => i.length > 0)
+                          .map((label) => {
+                            return (
+                              <Tag key={label} color={'success'}>
+                                {label}
+                              </Tag>
+                            );
+                          })}
+                      </>
                     }
                     avatar={
                       <Badge count={item.badgeCount} size="small">

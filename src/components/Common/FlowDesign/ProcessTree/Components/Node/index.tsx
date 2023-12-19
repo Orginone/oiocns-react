@@ -23,7 +23,6 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
   switch (props.config.type) {
     case AddNodeType.ROOT:
       isRoot = true;
-      placeholder = '全员';
       break;
     case AddNodeType.APPROVAL:
       placeholder = '请设置审批对象';
@@ -59,34 +58,44 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
 
   return (
     <div className={`${cls['node']} ${isRoot ? cls['root'] : ''}`}>
-      <div className={cls['node-body']}>
-        <div
-          className={
-            props.config.type === AddNodeType.APPROVAL
-              ? cls.nodeAproStyle
-              : cls.nodeNewStyle
-          }>
-          <div
-            style={{ display: 'flex' }}
-            onClick={() => props.onSelected()}
-            title="点击配置">
-            <div className={cls['node-body-header']}>{props.config.type}</div>
-            <div className={cls['node-body-right']}>
-              <div className={cls['name-title']}>{props.config.name}</div>
-              <span className={cls['name-select-title']}>
-                {props.config.destName || (
-                  <span style={{ color: '#999' }}>{placeholder}</span>
-                )}
-              </span>
-            </div>
+      {isRoot && (
+        <div className={cls['all-process-end']} onClick={() => props.onSelected()}>
+          <div className={cls['process-content']}>
+            <div className={cls['process-left']}>发起</div>
+            <div className={cls['process-right']}>流程开始</div>
           </div>
-          {props.isEdit && !isRoot && (
-            <div className={cls.closeBtn}>
-              <ai.AiOutlineClose onClick={() => props.onDelNode()} title="点击删除" />
-            </div>
-          )}
         </div>
-      </div>
+      )}
+      {!isRoot && (
+        <div className={cls['node-body']}>
+          <div
+            className={
+              props.config.type === AddNodeType.APPROVAL
+                ? cls.nodeAproStyle
+                : cls.nodeNewStyle
+            }>
+            <div
+              style={{ display: 'flex' }}
+              onClick={() => props.onSelected()}
+              title="点击配置">
+              <div className={cls['node-body-header']}>{props.config.type}</div>
+              <div className={cls['node-body-right']}>
+                <div className={cls['name-title']}>{props.config.name}</div>
+                <span className={cls['name-select-title']}>
+                  {props.config.destName || (
+                    <span style={{ color: '#999' }}>{placeholder}</span>
+                  )}
+                </span>
+              </div>
+            </div>
+            {props.isEdit && !isRoot && (
+              <div className={cls.closeBtn}>
+                <ai.AiOutlineClose onClick={() => props.onDelNode()} title="点击删除" />
+              </div>
+            )}
+          </div>
+        </div>
+      )}
       <div className={cls['node-footer']}>
         <div className={cls['btn']}>
           {props.isEdit && (

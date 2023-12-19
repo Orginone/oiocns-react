@@ -12,7 +12,7 @@ import { cleanMenus } from '@/utils/tools';
 const Directory: React.FC<{ root: IFile }> = ({ root }) => {
   const [preDirectory, setPreDirectory] = useState<IFile>();
   const [directory, setDirectory] = useState<IFile>(root);
-  const [content, setContent] = useState(directory.content(false));
+  const [content, setContent] = useState(directory.content());
   const [loaded, setLoaded] = useState(false);
   useEffect(() => {
     const id = directory.subscribe(() => {
@@ -32,7 +32,7 @@ const Directory: React.FC<{ root: IFile }> = ({ root }) => {
     setLoaded(false);
     file.loadContent().then(() => {
       if (file.key === directory.key) {
-        setContent(directory.content(false));
+        setContent(directory.content());
       }
       setLoaded(true);
     });

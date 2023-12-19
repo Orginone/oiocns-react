@@ -24,9 +24,10 @@ const SessionBody = ({
     const newActions: string[] = [];
     if (session.target.typeName === TargetType.Storage) {
       if (session.target.hasRelationAuth()) {
-        newActions.push('chat');
+        newActions.push('chat', 'activity', 'store', 'relation');
+      } else {
+        newActions.push('activity');
       }
-      newActions.push('relation', 'activity');
     } else {
       if (session.isMyChat && session.target.typeName !== TargetType.Group) {
         newActions.push('chat');
@@ -135,7 +136,13 @@ const SessionBody = ({
               })}
           />
         </List.Item>
-        <div className={css.groupDetailContent}>{loadContext()}</div>
+        <div
+          style={{
+            height: relation ? 'calc(100vh - 155px)' : 'calc(100vh - 105px)',
+          }}
+          className={css.groupDetailContent}>
+          {loadContext()}
+        </div>
       </div>
     </>
   );

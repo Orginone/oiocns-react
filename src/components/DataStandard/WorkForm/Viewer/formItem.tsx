@@ -9,7 +9,7 @@ import SearchTargetItem from './customItem/searchTarget';
 import CurrentTargetItem from './customItem/currentTarget';
 import { getItemWidth, getWidget } from '../Utils';
 import { DateBox, NumberBox, SelectBox, TextArea, TextBox } from 'devextreme-react';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ValueChangedEvent } from 'devextreme/ui/text_box';
 import { formatDate } from '@/utils';
 import { IBelong, TargetType } from '@/ts/core';
@@ -21,24 +21,12 @@ interface IFormItemProps {
   field: model.FieldModel;
   readOnly?: boolean;
   belong: IBelong;
-  onValuesChange?: (changedValues: any, data: any) => void;
+  rule: { [type: string]: any };
+  onValuesChange?: (field: string, value: any) => void;
 }
 
 const FormItem: React.FC<IFormItemProps> = (props) => {
-  const getValid = () => {
-    if (props.field.options?.isRequired) {
-      const value = props.data[props.field.id];
-      if (
-        value === null ||
-        value === undefined ||
-        (typeof value === 'string' && value.length < 1)
-      ) {
-        return false;
-      }
-    }
-    return true;
-  };
-  const [isValid, setIsValid] = React.useState(getValid());
+  const [isValid, setIsValid] = useState<boolean>(true);
   useEffect(() => {
     const id = props.notifyEmitter.subscribe(() => {});
     return () => {
@@ -60,24 +48,24 @@ const FormItem: React.FC<IFormItemProps> = (props) => {
     labelLocation: 'left',
     ...props.field.options,
     visible: props.field.options?.hideField != true,
+    isRequired: props.field.options?.isRequired == true,
     defaultValue: props.data[props.field.id] ?? props.field.options?.defaultValue,
     onValueChanged: (e: ValueChangedEvent) => {
       if (e.value !== props.data[props.field.id]) {
-        if (e.value === undefined || e.value === null) {
-          delete props.data[props.field.id];
-        } else {
-          props.data[props.field.id] = e.value;
-        }
-        setIsValid(getValid());
-        const changedValues: any = {};
-        changedValues[props.field.id] = e.value;
-        props.onValuesChange?.apply(this, [changedValues, props.data]);
+        setIsValid(!mixOptions.isRequired || !mixOptions.visible || e.value != undefined);
+        props.onValuesChange?.apply(this, [props.field.id, e.value]);
       }
     },
     width: getItemWidth(props.numStr),
   };
-  if (props.field.options.isRequired) {
-    mixOptions.isValid = mixOptions.defaultValue ? true : isValid;
+
+  Object.keys(props.rule).forEach((type) => {
+    mixOptions[type] = props.rule[type];
+  });
+
+  if (mixOptions.isRequired) {
+    mixOptions.isValid =
+      !mixOptions.visible || (mixOptions.defaultValue ? true : isValid);
     mixOptions.label = mixOptions.label + '*';
   }
 

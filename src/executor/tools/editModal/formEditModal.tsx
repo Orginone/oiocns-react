@@ -33,13 +33,12 @@ const FormEditModal = ({
         style={{ maxHeight: '70vh', width: '100%', overflowY: 'scroll', minHeight: 600 }}>
         <WorkFormViewer
           form={form}
+          rule={{}}
           fields={fields}
           data={initialValues || {}}
           belong={belong}
-          onValuesChange={(values) => {
-            Object.keys(values).forEach((k) => {
-              editData[k] = values[k];
-            });
+          onValuesChange={(fields, values) => {
+            editData[fields] = values;
           }}
         />
       </div>

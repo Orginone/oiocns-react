@@ -51,6 +51,18 @@ export const entityOperates = {
 };
 /** 文件支持的操作 */
 export const fileOperates = {
+  SetCommon: {
+    sort: 18,
+    cmd: 'commonToggle',
+    label: '设为常用',
+    iconType: 'setCommon',
+  },
+  DelCommon: {
+    sort: 19,
+    cmd: 'commonToggle',
+    label: '移除常用',
+    iconType: 'delCommon',
+  },
   Download: {
     sort: 20,
     cmd: 'download',
@@ -308,24 +320,28 @@ export const personJoins = {
       cmd: 'joinFriend',
       label: '添加好友',
       iconType: 'joinFriend',
+      model: 'outside',
     },
     {
       sort: 41,
       cmd: 'joinCohort',
       label: '加入群组',
       iconType: 'joinCohort',
+      model: 'outside',
     },
     {
       sort: 42,
       cmd: 'joinCompany',
       label: '加入单位',
-      iconType: 'joinCompany',
+      iconType: '单位',
+      model: 'outside',
     },
     {
       sort: 43,
       cmd: 'joinStorage',
       label: '加入存储资源群',
       iconType: '存储资源',
+      model: 'outside',
     },
   ],
 };
@@ -342,12 +358,14 @@ export const companyJoins = {
       cmd: 'joinGroup',
       label: '加入集群',
       iconType: 'joinGroup',
+      model: 'outside',
     },
     {
       sort: 43,
       cmd: 'joinStorage',
       label: '加入存储资源群',
       iconType: '存储资源',
+      model: 'outside',
     },
   ],
 };
@@ -415,15 +433,15 @@ export const sessionOperates = {
     sort: 60,
     model: 'outside',
     cmd: 'topingToggle',
-    label: '置顶会话',
-    iconType: 'setToping',
+    label: '设为常用',
+    iconType: 'setCommon',
   },
   RemoveToping: {
     sort: 61,
     model: 'outside',
     cmd: 'topingToggle',
-    label: '取消置顶',
-    iconType: 'removeToping',
+    label: '取消常用',
+    iconType: 'delCommon',
   },
   RemoveSession: {
     sort: 62,

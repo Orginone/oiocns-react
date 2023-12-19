@@ -1,8 +1,10 @@
 import { Emitter } from '@/ts/base/common';
 import { IForm } from '@/ts/core';
-import { CheckBox, FilterBuilder, Form } from 'devextreme-react';
-import { GroupItem, SimpleItem } from 'devextreme-react/form';
+import { CheckBox, FilterBuilder } from 'devextreme-react';
 import React, { useEffect, useState } from 'react';
+import Rule from './rule';
+import { Card } from 'antd';
+import { Field } from 'devextreme/ui/filter_builder';
 
 interface IAttributeProps {
   current: IForm;
@@ -19,25 +21,23 @@ const FormRuleConfig: React.FC<IAttributeProps> = ({ notifyEmitter, current }) =
   const [operateRule, setOperateRule] = useState<any>(
     JSON.parse(current.metadata.operateRule ?? '{}'),
   );
-  const [fields, setFields] = useState<any[]>([]);
+  const [fields, setFields] = useState<Field[]>([]);
   useEffect(() => {
     current.loadFields().then((f) => {
       const fields = f.map((a) => {
         switch (a.valueType) {
           case '数值型':
             return {
+              name: a.id,
               dataField: a.code,
               caption: a.name,
               dataType: 'number',
             };
           case '日期型':
-            return {
-              dataField: a.code,
-              caption: a.name,
-              dataType: 'date',
-            };
+            return { name: a.id, dataField: a.code, caption: a.name, dataType: 'date' };
           case '时间型':
             return {
+              name: a.id,
               dataField: a.code,
               caption: a.name,
               dataType: 'datetime',
@@ -45,6 +45,7 @@ const FormRuleConfig: React.FC<IAttributeProps> = ({ notifyEmitter, current }) =
           case '选择型':
           case '分类型':
             return {
+              name: a.id,
               dataField: a.code,
               caption: a.name,
               dataType: 'string',
@@ -56,26 +57,20 @@ const FormRuleConfig: React.FC<IAttributeProps> = ({ notifyEmitter, current }) =
               },
             };
           default:
-            return {
-              dataField: a.code,
-              caption: a.name,
-              dataType: 'string',
-            };
+            return { name: a.id, dataField: a.code, caption: a.name, dataType: 'string' };
         }
       });
       setFields([
-        {
-          dataField: 'name',
-          caption: '表单名称',
-          dataType: 'string',
-        },
-        ...fields,
+        { name: 'name', dataField: 'name', caption: '表单名称', dataType: 'string' },
+        ...(fields as Field[]),
       ]);
     });
   }, [current]);
+
   const loadOperateRule = (label: string, operate: string) => {
     return (
-      <SimpleItem label={{ text: label }}>
+      <span style={{ padding: 10 }}>
+        {label}:
         <CheckBox
           defaultValue={operateRule[operate] ?? true}
           onValueChange={(e) => {
@@ -85,22 +80,19 @@ const FormRuleConfig: React.FC<IAttributeProps> = ({ notifyEmitter, current }) =
             notityAttrChanged();
           }}
         />
-      </SimpleItem>
+      </span>
     );
   };
   return (
-    <Form
-      scrollingEnabled
-      height={'calc(100vh - 130px)'}
-      formData={current.metadata}
-      onFieldDataChanged={notityAttrChanged}>
-      <GroupItem caption={'操作规则参数'} />
-      {loadOperateRule('允许新增', 'allowAdd')}
-      {loadOperateRule('允许选择', 'allowSelect')}
-      {loadOperateRule('允许变更', 'allowEdit')}
-      <GroupItem caption={'数据过滤规则参数'} />
-      {fields.length > 0 && (
-        <SimpleItem>
+    <>
+      <Rule fields={fields} form={current}></Rule>
+      <Card type="inner" title="操作规则配置">
+        {loadOperateRule('允许新增', 'allowAdd')}
+        {loadOperateRule('允许选择', 'allowSelect')}
+        {loadOperateRule('允许变更', 'allowEdit')}
+      </Card>
+      <Card type="inner" title="数据过滤规则配置">
+        {fields.length > 0 && (
           <FilterBuilder
             fields={fields}
             value={value}
@@ -111,9 +103,9 @@ const FormRuleConfig: React.FC<IAttributeProps> = ({ notifyEmitter, current }) =
               notityAttrChanged();
             }}
           />
-        </SimpleItem>
-      )}
-    </Form>
+        )}
+      </Card>
+    </>
   );
 };
 

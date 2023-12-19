@@ -8,7 +8,6 @@ import { BucketOpreates, FileItemModel } from '@/ts/base/model';
 import { encodeKey, sleep } from '@/ts/base/common';
 import { DataResource } from './resource';
 import { ISysFileInfo, SysFileInfo } from './systemfile';
-import { IStorage } from '../target/outTeam/storage';
 import { IPageTemplate } from './standard/page';
 
 /** 可为空的进度回调 */
@@ -50,6 +49,12 @@ export interface IDirectory extends IStandardFileInfo<schema.XDirectory> {
   loadDirectoryResource(reload?: boolean): Promise<void>;
   /** 通知重新加载文件列表 */
   notifyReloadFiles(): Promise<boolean>;
+  /** 搜索文件 */
+  searchFile(
+    directoryId: string,
+    applicationId: string,
+    id: string,
+  ): Promise<IFile | undefined>;
 }
 
 /** 目录实现类 */
@@ -122,7 +127,7 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
     }
     this.changCallback();
   }
-  content(store: boolean = true): IFile[] {
+  content(store: boolean = false): IFile[] {
     const cnt: IFile[] = [...this.children];
     if (this.target.session.isMyChat || this.target.hasRelationAuth()) {
       cnt.push(...this.files);
@@ -132,14 +137,6 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
       cnt.push(...this.standard.specieses);
       cnt.push(...this.standard.transfers);
       cnt.push(...this.standard.templates);
-      if (!this.parent && store) {
-        for (const item of this.target.content()) {
-          const target = item as ITarget | IDirectory | IStorage;
-          if (!('standard' in target || 'isActivate' in target)) {
-            cnt.push(target.directory);
-          }
-        }
-      }
     }
     return cnt.sort((a, b) => (a.metadata.updateTime < b.metadata.updateTime ? 1 : -1));
   }
@@ -267,6 +264,32 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
       templates.push(...(await item.loadAllTemplate(reload)));
     }
     return templates;
+  }
+  async searchFile(
+    directoryId: string,
+    applicationId: string,
+    id: string,
+  ): Promise<IFile | undefined> {
+    if (this.id === directoryId) {
+      if (applicationId === directoryId) {
+        await this.loadContent();
+        return this.content().find((i) => i.id === id);
+      } else {
+        for (const item of this.standard.applications) {
+          const file = await item.searchFile(applicationId, id);
+          if (file) {
+            return file;
+          }
+        }
+      }
+    } else {
+      for (const item of this.children) {
+        const file = await item.searchFile(directoryId, applicationId, id);
+        if (file) {
+          return file;
+        }
+      }
+    }
   }
   override operates(): model.OperateModel[] {
     const operates: model.OperateModel[] = [];

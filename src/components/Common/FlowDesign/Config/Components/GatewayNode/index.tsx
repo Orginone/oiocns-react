@@ -1,7 +1,7 @@
 import React from 'react';
 import cls from './index.module.less';
 import { NodeModel } from '@/components/Common/FlowDesign/processType';
-import { IWork } from '@/ts/core';
+import { IBelong, IWork } from '@/ts/core';
 import CardOrTableComp from '@/components/CardOrTableComp';
 import { schema } from '@/ts/base';
 import { ProColumns } from '@ant-design/pro-components';
@@ -9,9 +9,12 @@ import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import useAsyncLoad from '@/hooks/useAsyncLoad';
 import message from '@/utils/message';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
+import { Card } from 'antd';
 interface IProps {
   current: NodeModel;
   define: IWork;
+  belong: IBelong;
+  refresh: () => void;
 }
 
 /**
@@ -67,14 +70,16 @@ const GatewayNode: React.FC<IProps> = (props) => {
     <div className={cls[`app-roval-node`]}>
       <div className={cls[`roval-node`]}>
         {loaded && (
-          <CardOrTableComp<schema.XWorkGateway>
-            key={tkey}
-            rowKey={'id'}
-            dataSource={nodeInfo ?? []}
-            scroll={{ y: 'calc(60vh - 150px)' }}
-            operation={renderOperate}
-            columns={GatewayColumns}
-          />
+          <Card className={cls[`card-info`]} type="inner" title="网关绑定详情">
+            <CardOrTableComp<schema.XWorkGateway>
+              key={tkey}
+              rowKey={'id'}
+              dataSource={nodeInfo ?? []}
+              scroll={{ y: 'calc(60vh - 150px)' }}
+              operation={renderOperate}
+              columns={GatewayColumns}
+            />
+          </Card>
         )}
       </div>
     </div>

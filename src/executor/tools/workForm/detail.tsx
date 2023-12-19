@@ -5,16 +5,13 @@ import React from 'react';
 import { Tabs } from 'antd';
 import { EditModal } from '../editModal';
 import GenerateThingTable from '../generate/thingTable';
-import { WorkFormRulesType } from '@/ts/core/work/rules/workFormRules';
-import { RuleTriggers } from '@/ts/core/public';
 interface IProps {
   allowEdit: boolean;
   belong: IBelong;
   forms: schema.XForm[];
   data: model.InstanceDataModel;
-  ruleService?: WorkFormRulesType;
   getFormData: (form: schema.XForm) => model.FormEditData;
-  onChanged?: (id: string, data: model.FormEditData, changedValues: any) => void;
+  onChanged?: (id: string, data: model.FormEditData, field: string, value: any) => void;
 }
 
 const DetailTable: React.FC<IProps> = (props) => {
@@ -30,11 +27,7 @@ const DetailTable: React.FC<IProps> = (props) => {
     if (after) {
       after.name = form.name;
     }
-    props.onChanged?.apply(this, [form.id, formData, {}]);
-    props.ruleService?.waitingTask(RuleTriggers.ThingsChanged, {
-      id: form.id,
-      data: formData,
-    });
+    props.onChanged?.apply(this, [form.id, formData, '', {}]);
   }, [formData]);
   return (
     <GenerateThingTable

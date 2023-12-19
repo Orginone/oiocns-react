@@ -2,48 +2,10 @@ import { WorkNodeModel } from '@/ts/base/model';
 import message from '@/utils/message';
 import { getUuid } from '@/utils/tools';
 
-export const getNodeCode = () => {
-  return `node_${getUuid()}`;
-};
-
-export const isBranchNode = (type: AddNodeType) => {
-  return [
-    AddNodeType.CONDITION,
-    AddNodeType.CONCURRENTS,
-    AddNodeType.ORGANIZATIONA,
-  ].includes(type);
-};
-
-export const getNodeName = (type: AddNodeType) => {
-  switch (type) {
-    case AddNodeType.APPROVAL:
-      return '审批对象';
-    case AddNodeType.CC:
-      return '抄送对象';
-    case AddNodeType.CHILDWORK:
-      return '其他办事';
-    case AddNodeType.CONDITION:
-      return '条件分支';
-    case AddNodeType.CONCURRENTS:
-      return '并行分支';
-    case AddNodeType.ORGANIZATIONA:
-      return '组织分支';
-    case AddNodeType.GATEWAY:
-      return '分流网关';
-    default:
-      return '';
-  }
-};
-
-export const getNewBranchNode = (node: NodeModel, index: number, conditions?: any) => {
-  return {
-    code: getNodeCode(),
-    parentCode: node.code,
-    name: getNodeName(node.type) + index,
-    conditions: conditions || [],
-    type: node.type,
-    children: {},
-  };
+export const executorNames = ['数据申领', '归属权变更'];
+export type ValidationInfo = {
+  isPass: boolean;
+  hasGateway: boolean;
 };
 
 // 类型 枚举
@@ -100,6 +62,50 @@ export type NodeModel = {
   children: NodeModel | undefined;
 } & WorkNodeModel;
 
+export const getNodeCode = () => {
+  return `node_${getUuid()}`;
+};
+
+export const isBranchNode = (type: AddNodeType) => {
+  return [
+    AddNodeType.CONDITION,
+    AddNodeType.CONCURRENTS,
+    AddNodeType.ORGANIZATIONA,
+  ].includes(type);
+};
+
+export const getNodeName = (type: AddNodeType) => {
+  switch (type) {
+    case AddNodeType.APPROVAL:
+      return '审批对象';
+    case AddNodeType.CC:
+      return '抄送对象';
+    case AddNodeType.CHILDWORK:
+      return '其他办事';
+    case AddNodeType.CONDITION:
+      return '条件分支';
+    case AddNodeType.CONCURRENTS:
+      return '并行分支';
+    case AddNodeType.ORGANIZATIONA:
+      return '组织分支';
+    case AddNodeType.GATEWAY:
+      return '分流网关';
+    default:
+      return '';
+  }
+};
+
+export const getNewBranchNode = (node: NodeModel, index: number, conditions?: any) => {
+  return {
+    code: getNodeCode(),
+    parentCode: node.code,
+    name: getNodeName(node.type) + index,
+    conditions: conditions || [],
+    type: node.type,
+    children: {},
+  };
+};
+
 export const getConditionKeys: (type: string) => any[] = (type: string) => {
   var keys: any[] = [];
   switch (type) {
@@ -125,20 +131,21 @@ export const getConditionKeys: (type: string) => any[] = (type: string) => {
 };
 
 export const loadResource = (resource: any, parentCode: string): any => {
-  let obj: any;
+  let code = getNodeCode();
   if (resource) {
-    let code = getNodeCode();
-    obj = {
+    return {
       id: resource.id,
       code: resource.code,
       parentCode: parentCode,
-      type: resource.type as AddNodeType,
       name: resource.name,
+      num: resource.num || 1,
+      forms: resource.forms,
       destId: resource.destId,
       destType: resource.destType,
       destName: resource.destName,
-      num: resource.num || 1,
-      forms: resource.forms,
+      executors: resource.executors,
+      formRules: resource.formRules,
+      type: resource.type as AddNodeType,
       primaryForms: resource.primaryForms,
       detailForms: resource.detailForms,
       belongId: resource.belongId,
@@ -155,8 +162,23 @@ export const loadResource = (resource: any, parentCode: string): any => {
           }
         : loadResource(resource.children, resource.code),
     };
-    return obj;
   }
+};
+
+export const loadNilResouce = () => {
+  return {
+    code: getNodeCode(),
+    parentCode: '',
+    type: AddNodeType.ROOT,
+    name: '发起',
+    num: 1,
+    children: {},
+    forms: [],
+    executors: [],
+    formRules: [],
+    primaryForms: [],
+    detailForms: [],
+  };
 };
 
 const loadBranch = (resource: any, parentCode: string, parentType: string) => {
@@ -183,11 +205,6 @@ const loadBranch = (resource: any, parentCode: string, parentType: string) => {
       children: loadResource(resource.children, code),
     };
   }
-};
-
-export type ValidationInfo = {
-  isPass: boolean;
-  hasGateway: boolean;
 };
 
 export const convertNode = (
@@ -260,9 +277,16 @@ export const convertNode = (
       primaryForms: resource.primaryForms,
       detailForms: resource.detailForms,
       destId: resource.destId,
+      executors: resource.executors,
+      formRules: resource.formRules,
       destName: resource.destName,
       children: convertNode(resource.children, validation),
       branches: resource.branches?.map((a) => convertBranch(a, validation)),
+      resource: JSON.stringify({
+        forms: bandingForms,
+        executors: resource.executors ?? [],
+        formRules: resource.formRules ?? [],
+      }),
     };
   }
 };

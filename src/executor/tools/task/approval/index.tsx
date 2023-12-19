@@ -11,6 +11,9 @@ export interface TaskDetailType {
 }
 
 const TaskApproval: React.FC<TaskDetailType> = ({ task, finished, fromData }) => {
+  if (task.isHistory) {
+    return <></>;
+  }
   const [comment, setComment] = useState<string>('');
 
   // 审批
@@ -33,7 +36,13 @@ const TaskApproval: React.FC<TaskDetailType> = ({ task, finished, fromData }) =>
       for (const formId of fromData.keys()) {
         const data: any = fromData.get(formId)?.after.at(-1) ?? {};
         for (const item of task.instanceData.fields[formId]) {
-          if (item.options?.isRequired && valueIsNull(data[item.id])) {
+          const isRequired =
+            task.instanceData.data[formId].at(-1)?.rule[item.id]['isRequired'];
+          if (
+            (isRequired == undefined || isRequired == true) &&
+            item.options?.isRequired &&
+            valueIsNull(data[item.id])
+          ) {
             return false;
           }
         }
@@ -60,6 +69,7 @@ const TaskApproval: React.FC<TaskDetailType> = ({ task, finished, fromData }) =>
           onClick={() => {
             if (validation()) {
               approvalTask(TaskStatus.ApprovalStart);
+              //TODO 执行审批后的执行方法
             } else {
               message.warn('请完善表单内容再提交!');
             }

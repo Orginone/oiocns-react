@@ -79,7 +79,9 @@ export class Command {
    */
   public emitterFlag(flag: string = '', ...args: any[]): void {
     Object.keys(this.flagCallbacks).forEach((id) => {
-      if (flag === '' || id.endsWith(`-${flag}`)) {
+      if ((flag || '') === '' && !id.includes('-_')) {
+        this.flagCallbacks[id].apply(this, [...args]);
+      } else if (id.endsWith(`-${flag}`) || id.endsWith(`-_${flag}`)) {
         this.flagCallbacks[id].apply(this, [...args]);
       }
     });

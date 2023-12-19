@@ -1,6 +1,14 @@
 import ImageView from './image';
 import VideoView from './video';
-import { IEntity, IForm, ISession, ISysFileInfo, ITarget, IWorkTask } from '@/ts/core';
+import {
+  IEntity,
+  IForm,
+  ISession,
+  ISysFileInfo,
+  ITarget,
+  IWork,
+  IWorkTask,
+} from '@/ts/core';
 import { command, schema } from '@/ts/base';
 import React, { useEffect, useState } from 'react';
 import OfficeView from './office';
@@ -23,6 +31,7 @@ type EntityType =
   | IWorkTask
   | IForm
   | ITarget
+  | IWork
   | undefined;
 
 /** 文件预览 */
@@ -71,7 +80,7 @@ const EntityPreview: React.FC<{ flag?: string }> = (props) => {
     if ('taskdata' in entity) {
       switch (entity.taskdata.taskType) {
         case '事项':
-          if (entity.taskdata.approveType == '子流程') {
+          if (['子流程', '网关'].includes(entity.taskdata.approveType)) {
             return <TaskStart key={entity.key} current={entity} />;
           }
           return <TaskBody key={entity.key} current={entity} finished={() => {}} />;
@@ -90,6 +99,9 @@ const EntityPreview: React.FC<{ flag?: string }> = (props) => {
         default:
           return <></>;
       }
+    }
+    if ('node' in entity) {
+      return <TaskStart key={entity.key} current={entity} />;
     }
     if ('session' in entity) {
       switch (props.flag) {
