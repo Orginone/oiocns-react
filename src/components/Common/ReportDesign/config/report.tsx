@@ -14,7 +14,6 @@ interface IAttributeProps {
 }
 
 const ReportConfig: React.FC<IAttributeProps> = ({ notifyEmitter, current }) => {
-  console.log(current, 'current');
   const [value, setValue] = useState<string>('year');
   const [startDate, setStartDate] = useState<any>();
   const [endDate, setEndDate] = useState<any>();

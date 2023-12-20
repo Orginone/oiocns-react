@@ -27,8 +27,8 @@ const ReportDesign: React.FC<IProps> = ({ current, notityEmitter, selectCellItem
 
   useEffect(() => {
     /** 获取报表数据，没有数据默认给个sheet页 */
-    let sheetListData: any = current.metadata?.rule
-      ? JSON.parse(current.metadata?.rule)
+    let sheetListData: any = current.metadata?.reportDatas
+      ? JSON.parse(current.metadata?.reportDatas)
       : { 0: { name: 'sheet1', code: 'test1' } };
     delete sheetListData?.list;
     setSheetList(Object.values(sheetListData));
@@ -51,7 +51,7 @@ const ReportDesign: React.FC<IProps> = ({ current, notityEmitter, selectCellItem
       const newData = Object.assign({}, sheetList);
       await current.update({
         ...current.metadata,
-        rule: JSON.stringify(newData),
+        reportDatas: JSON.stringify(newData),
       });
       tforceUpdate();
     }
@@ -141,7 +141,7 @@ const ReportDesign: React.FC<IProps> = ({ current, notityEmitter, selectCellItem
             const newData = Object.assign({}, sheetList);
             await current.update({
               ...current.metadata,
-              rule: JSON.stringify(newData),
+              reportDatas: JSON.stringify(newData),
             });
             setModalType('');
             tforceUpdate();

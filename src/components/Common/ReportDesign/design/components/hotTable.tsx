@@ -73,11 +73,11 @@ const HotTableView: React.FC<IProps> = ({
     setClassList(setting?.classList || []);
     /** 设置更新边框 */
     setCustomBorders(setting?.customBorders || []);
+    updateBorder(setting?.customBorders || []);
     /** 更新报表 */
     hot.updateSettings({
       data: sheetList[index]?.data?.data,
       mergeCells: mergeCells,
-      customBorders: setting?.customBorders,
       rowHeights: setting?.row_h || row_h,
       colWidths: setting?.col_w || col_w,
     });
@@ -269,27 +269,46 @@ const HotTableView: React.FC<IProps> = ({
         return;
       case 'none':
         range.push([xMin, yMin, xMax, yMax]);
-        customBorder = {};
+        customBorder.left = { hide: true, width: 0 };
+        customBorder.right = { hide: true, width: 0 };
+        customBorder.top = { hide: true, width: 0 };
+        customBorder.bottom = { hide: true, width: 0 };
         customBordersPlugin.clearBorders(hotRef.current.hotInstance.getSelectedRange());
         break;
       default:
         break;
     }
-    const selected = hotRef.current.hotInstance.getSelectedRange();
+    // const selected = hotRef.current.hotInstance.getSelectedRange();
+    // let json = {
+    //   range: {
+    //     from: selected[0]?.from,
+    //     to: selected[0]?.to,
+    //   },
+    //   top: customBorder.top || {},
+    //   left: customBorder.left || {},
+    //   bottom: customBorder.bottom || {},
+    //   right: customBorder.right || {},
+    // };
+    /** 存储边框数据 */
     let json = {
-      range: {
-        from: selected[0]?.from,
-        to: selected[0]?.to,
-      },
-      top: customBorder.top || {},
-      left: customBorder.left || {},
-      bottom: customBorder.bottom || {},
-      right: customBorder.right || {},
+      range: range,
+      border: border,
+      customBorder: customBorder,
     };
     customBorders.push(json);
     if (range.length > 0 && customBorder) {
       customBordersPlugin.setBorders(range, customBorder);
     }
+  };
+
+  /** 更新边框 */
+  const updateBorder = (customBorders: any) => {
+    customBorders.forEach((it: any) => {
+      if (it.range.length > 0) {
+        const customBordersPlugin = hotRef.current.hotInstance.getPlugin('customBorders');
+        customBordersPlugin.setBorders(it.range, it.customBorder);
+      }
+    });
   };
 
   /** 格式化所选, 返回从左上到右下的坐标，只返回最后一个 */
@@ -427,7 +446,7 @@ const HotTableView: React.FC<IProps> = ({
     const newData = Object.assign({}, sheetList);
     await current.update({
       ...current.metadata,
-      rule: JSON.stringify(newData),
+      reportDatas: JSON.stringify(newData),
     });
   };
 
