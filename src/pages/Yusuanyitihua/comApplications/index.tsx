@@ -191,12 +191,7 @@ const ComApplication: FC = () => {
               }}></List>
           </div>
         )}
-        {link && (
-          <iframe
-            width="100%"
-            height="100%"
-						src={link}></iframe>
-        )}
+        {link && <iframe width="100%" height="100%" src={link}></iframe>}
         {/* src={link} */}
         {apply && (
           <div
