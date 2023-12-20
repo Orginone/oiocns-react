@@ -1,4 +1,4 @@
-import { IApplication, IPerson, ISession, ITarget, UserProvider } from '@/ts/core';
+import { IApplication, IFile, IPerson, ISession, ITarget, UserProvider } from '@/ts/core';
 import { common } from '@/ts/base';
 import { IWorkProvider } from '../core/work/provider';
 import { IPageTemplate } from '../core/thing/standard/page';
@@ -67,6 +67,28 @@ class IndexController extends Controller {
       apps.push(...(await directory.loadAllApplication()));
     }
     return apps;
+  }
+  /** 加载所有常用 */
+  async loadCommons(): Promise<IFile[]> {
+    const files: IFile[] = [];
+    if (this.provider.user) {
+      for (const item of this.provider.user.commons) {
+        const target = this.provider.targets.find(
+          (i) => i.id === item.targetId && i.spaceId === item.spaceId,
+        );
+        if (target) {
+          const file = await target.directory.searchFile(
+            item.directoryId,
+            item.applicationId,
+            item.id,
+          );
+          if (file) {
+            files.push(file);
+          }
+        }
+      }
+    }
+    return files;
   }
   /** 所有相关会话 */
   get chats(): ISession[] {

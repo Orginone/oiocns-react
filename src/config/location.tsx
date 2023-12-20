@@ -14,7 +14,7 @@ export const getResouces = (): IResources => {
       platName: '安心屋',
       location: 'anxinwu',
       passport: [6],
-      unitName: '浙江省科学技术厅',
+      unitName: '浙江省财政厅·浙江省科学技术厅',
       favicon: '/favicon/anxinwu.ico',
       unitPage: 'https://kjt.zj.gov.cn',
     };

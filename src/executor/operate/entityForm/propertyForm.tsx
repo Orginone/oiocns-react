@@ -79,7 +79,7 @@ const PropertyForm = (props: Iprops) => {
         dataIndex: 'valueType',
         valueType: 'select',
         readonly: readonly,
-        fieldProps: {
+        fieldProps: { 
           options: valueTypes.map((i) => {
             return {
               value: i,

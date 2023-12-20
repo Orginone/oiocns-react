@@ -18,38 +18,43 @@ export const loadFileMenus = (file?: IDEntity | IFile) => {
     } else {
       operates.push(...file.operates());
     }
-    const parseLabel = (label: string) => {
-      const toName = 'filedata' in file ? '文件' : file.typeName;
-      return label.replace('{0}', toName);
-    };
-    if (operates.length > 0) {
-      return operates
-        .sort((a, b) => a.sort - b.sort)
-        .map((o) => {
-          return {
-            key: o.cmd,
-            label: parseLabel(o.label),
-            model: o.model ?? 'inside',
-            icon: o.menus ? <></> : <TypeIcon iconType={o.iconType} size={16} />,
-            beforeLoad: async () => {
-              command.emitter('executor', o.cmd, file);
-              return true;
-            },
-            children: o.menus
-              ?.sort((a, b) => a.sort - b.sort)
-              .map((s) => {
-                return {
-                  key: s.cmd,
-                  label: parseLabel(s.label),
-                  icon: <TypeIcon iconType={s.iconType} size={16} />,
-                  beforeLoad: async () => {
-                    command.emitter('executor', s.cmd, file);
-                    return true;
-                  },
-                };
-              }),
-          } as OperateMenuType;
-        });
-    }
+    return operatesToMenus(operates, file);
+  }
+};
+
+/** 将操作转为菜单 */
+export const operatesToMenus = (operates: OperateModel[], file: IDEntity) => {
+  const parseLabel = (label: string) => {
+    const toName = 'filedata' in file ? '文件' : file.typeName;
+    return label.replace('{0}', toName);
+  };
+  if (operates.length > 0) {
+    return operates
+      .sort((a, b) => a.sort - b.sort)
+      .map((o) => {
+        return {
+          key: o.cmd,
+          label: parseLabel(o.label),
+          model: o.model ?? 'inside',
+          icon: o.menus ? <></> : <TypeIcon iconType={o.iconType} size={18} />,
+          beforeLoad: async () => {
+            command.emitter('executor', o.cmd, file);
+            return true;
+          },
+          children: o.menus
+            ?.sort((a, b) => a.sort - b.sort)
+            .map((s) => {
+              return {
+                key: s.cmd,
+                label: parseLabel(s.label),
+                icon: <TypeIcon iconType={s.iconType} size={18} />,
+                beforeLoad: async () => {
+                  command.emitter('executor', s.cmd, file);
+                  return true;
+                },
+              };
+            }),
+        } as OperateMenuType;
+      });
   }
 };

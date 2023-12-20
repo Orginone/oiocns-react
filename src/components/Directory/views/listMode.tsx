@@ -57,9 +57,7 @@ const ListMode = ({
                           .filter((i) => i.length > 0)
                           .map((label) => {
                             return (
-                              <Tag
-                                key={label}
-                                color={label === '置顶' ? 'red' : 'success'}>
+                              <Tag key={label} color={'success'}>
                                 {label}
                               </Tag>
                             );

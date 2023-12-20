@@ -1,6 +1,14 @@
 import ImageView from './image';
 import VideoView from './video';
-import { IEntity, IForm, ISession, ISysFileInfo, ITarget, IWorkTask } from '@/ts/core';
+import {
+  IEntity,
+  IForm,
+  ISession,
+  ISysFileInfo,
+  ITarget,
+  IWork,
+  IWorkTask,
+} from '@/ts/core';
 import { command, schema } from '@/ts/base';
 import React, { useEffect, useState } from 'react';
 import OfficeView from './office';
@@ -12,6 +20,7 @@ import WorkForm from '@/components/DataStandard/WorkForm';
 import Directory from '@/components/Directory';
 import TaskApproval from '@/executor/tools/task/approval';
 import TaskStart from '@/executor/tools/task/start';
+import PreviewLayout from './layout';
 
 const officeExt = ['.md', '.pdf', '.xls', '.xlsx', '.doc', '.docx', '.ppt', '.pptx'];
 const videoExt = ['.mp4', '.avi', '.mov', '.mpg', '.swf', '.flv', '.mpeg'];
@@ -23,6 +32,7 @@ type EntityType =
   | IWorkTask
   | IForm
   | ITarget
+  | IWork
   | undefined;
 
 /** 文件预览 */
@@ -58,25 +68,36 @@ const EntityPreview: React.FC<{ flag?: string }> = (props) => {
     };
   }, [props]);
 
+  const renderEntityBody = (entity: any, children?: React.ReactNode) => {
+    return <PreviewLayout entity={entity}>{children && children}</PreviewLayout>;
+  };
+
   if (entity && typeof entity != 'string') {
     if ('filedata' in entity) {
-      return <FilePreview key={entity.key} file={entity} />;
+      return renderEntityBody(entity, <FilePreview key={entity.key} file={entity} />);
     }
     if ('activity' in entity) {
       return <SessionBody key={entity.key} session={entity} />;
     }
     if ('fields' in entity) {
-      return <WorkForm key={entity.key} form={entity} />;
+      return renderEntityBody(entity, <WorkForm key={entity.key} form={entity} />);
     }
     if ('taskdata' in entity) {
       switch (entity.taskdata.taskType) {
         case '事项':
-          if (entity.taskdata.approveType == '子流程') {
-            return <TaskStart key={entity.key} current={entity} />;
+          if (['子流程', '网关'].includes(entity.taskdata.approveType)) {
+            return renderEntityBody(
+              entity,
+              <TaskStart key={entity.key} current={entity} />,
+            );
           }
-          return <TaskBody key={entity.key} current={entity} finished={() => {}} />;
+          return renderEntityBody(
+            entity,
+            <TaskBody key={entity.key} current={entity} finished={() => {}} />,
+          );
         case '加用户':
-          return (
+          return renderEntityBody(
+            entity,
             <>
               <JoinApply key={entity.key} current={entity} />
               <TaskApproval
@@ -85,21 +106,27 @@ const EntityPreview: React.FC<{ flag?: string }> = (props) => {
                   command.emitter('preview', 'work');
                 }}
               />
-            </>
+            </>,
           );
         default:
           return <></>;
       }
     }
+    if ('node' in entity) {
+      return renderEntityBody(entity, <TaskStart key={entity.key} current={entity} />);
+    }
     if ('session' in entity) {
       switch (props.flag) {
         case 'store':
-          return <Directory key={entity.key} root={entity.directory} />;
+          return renderEntityBody(
+            entity,
+            <Directory key={entity.key} root={entity.directory} />,
+          );
         case 'relation':
           return <SessionBody key={entity.key} relation session={entity.session} />;
       }
     }
-    return <EntityInfo entity={entity} column={1} />;
+    return renderEntityBody(entity);
   }
   return <></>;
 };

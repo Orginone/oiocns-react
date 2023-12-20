@@ -51,6 +51,18 @@ export const entityOperates = {
 };
 /** 文件支持的操作 */
 export const fileOperates = {
+  SetCommon: {
+    sort: 18,
+    cmd: 'commonToggle',
+    label: '设为常用',
+    iconType: 'setCommon',
+  },
+  DelCommon: {
+    sort: 19,
+    cmd: 'commonToggle',
+    label: '移除常用',
+    iconType: 'delCommon',
+  },
   Download: {
     sort: 20,
     cmd: 'download',
@@ -281,6 +293,27 @@ export const targetOperates = {
     label: '设立部门',
     iconType: '部门',
   },
+  JoinCompany: {
+    sort: 41,
+    cmd: 'joinCompany',
+    label: '加入单位',
+    iconType: 'joinCompany',
+    model: 'outside',
+  },
+  JoinGroup: {
+    sort: 42,
+    cmd: 'joinGroup',
+    label: '加入集群',
+    iconType: '组织群',
+    model: 'outside',
+  },
+  JoinStorage: {
+    sort: 43,
+    cmd: 'joinStorage',
+    label: '加入存储资源群',
+    iconType: '存储资源',
+    model: 'outside',
+  },
   Chat: {
     sort: 15,
     cmd: 'openChat',
@@ -308,46 +341,21 @@ export const personJoins = {
       cmd: 'joinFriend',
       label: '添加好友',
       iconType: 'joinFriend',
+      model: 'outside',
     },
     {
       sort: 41,
       cmd: 'joinCohort',
       label: '加入群组',
       iconType: 'joinCohort',
+      model: 'outside',
     },
     {
       sort: 42,
       cmd: 'joinCompany',
       label: '加入单位',
-      iconType: 'joinCompany',
-    },
-    {
-      sort: 43,
-      cmd: 'joinStorage',
-      label: '加入存储资源群',
-      iconType: '存储资源',
-    },
-  ],
-};
-
-/** 单位的申请 */
-export const companyJoins = {
-  sort: 1,
-  cmd: 'join',
-  label: '申请加入',
-  iconType: 'join',
-  menus: [
-    {
-      sort: 42,
-      cmd: 'joinGroup',
-      label: '加入集群',
-      iconType: 'joinGroup',
-    },
-    {
-      sort: 43,
-      cmd: 'joinStorage',
-      label: '加入存储资源群',
-      iconType: '存储资源',
+      iconType: '单位',
+      model: 'outside',
     },
   ],
 };
@@ -415,15 +423,15 @@ export const sessionOperates = {
     sort: 60,
     model: 'outside',
     cmd: 'topingToggle',
-    label: '置顶会话',
-    iconType: 'setToping',
+    label: '设为常用',
+    iconType: 'setCommon',
   },
   RemoveToping: {
     sort: 61,
     model: 'outside',
     cmd: 'topingToggle',
-    label: '取消置顶',
-    iconType: 'removeToping',
+    label: '取消常用',
+    iconType: 'delCommon',
   },
   RemoveSession: {
     sort: 62,

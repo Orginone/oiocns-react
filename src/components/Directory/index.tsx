@@ -10,9 +10,10 @@ import { cleanMenus } from '@/utils/tools';
  * @return {*}
  */
 const Directory: React.FC<{ root: IFile }> = ({ root }) => {
+  const [currentTag, setCurrentTag] = useState('全部');
   const [preDirectory, setPreDirectory] = useState<IFile>();
   const [directory, setDirectory] = useState<IFile>(root);
-  const [content, setContent] = useState(directory.content(false));
+  const [content, setContent] = useState(directory.content());
   const [loaded, setLoaded] = useState(false);
   useEffect(() => {
     const id = directory.subscribe(() => {
@@ -32,7 +33,7 @@ const Directory: React.FC<{ root: IFile }> = ({ root }) => {
     setLoaded(false);
     file.loadContent().then(() => {
       if (file.key === directory.key) {
-        setContent(directory.content(false));
+        setContent(directory.content());
       }
       setLoaded(true);
     });
@@ -44,6 +45,8 @@ const Directory: React.FC<{ root: IFile }> = ({ root }) => {
         initTags={['全部']}
         selectFiles={[]}
         content={content}
+        currentTag={currentTag}
+        tagChanged={(t) => setCurrentTag(t)}
         fileOpen={(file) => {
           if (file && 'isContainer' in file && file.isContainer) {
             setDirectory(file as IFile);

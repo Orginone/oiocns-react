@@ -7,15 +7,17 @@ import * as fa from 'react-icons/fa';
 type segmentedTypes = 'icon' | 'table' | 'list';
 
 interface IProps {
+  height?: number | string;
   descriptions: string;
-  content: React.ReactNode;
+  children?: React.ReactNode; // 子组件
   onSegmentChanged: (type: segmentedTypes) => void;
 }
 /**
  * 存储-文件系统
  */
 const SegmentContent: React.FC<IProps> = ({
-  content,
+  height,
+  children,
   descriptions,
   onSegmentChanged,
 }: IProps) => {
@@ -23,9 +25,9 @@ const SegmentContent: React.FC<IProps> = ({
   const parentRef = useRef<any>();
 
   return (
-    <div className={style.pageCard}>
+    <div style={{ height: height }} className={style.pageCard}>
       <div className={style.mainContent} ref={parentRef}>
-        {content}
+        {children && children}
       </div>
       <Affix style={{ position: 'absolute', right: 10, bottom: 0 }}>
         <Segmented

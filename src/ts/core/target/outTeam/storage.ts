@@ -84,4 +84,13 @@ export class Storage extends Target implements IStorage {
       await this.loadIdentitys(reload);
     }
   }
+  override async pullMembers(
+    members: schema.XTarget[],
+    notity?: boolean,
+  ): Promise<boolean> {
+    if (notity && !this.hasRelationAuth()) {
+      return true;
+    }
+    return await super.pullMembers(members, notity);
+  }
 }

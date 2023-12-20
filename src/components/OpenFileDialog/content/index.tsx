@@ -26,6 +26,7 @@ const Directory: React.FC<IProps> = (props) => {
     props.current === 'disk' ? orgCtrl.user.directory : props.current,
   );
   const [key] = useCtrlUpdate(dircetory);
+  const [currentTag, setCurrentTag] = useState('全部');
   const [loaded] = useAsyncLoad(() => dircetory.loadContent());
   const [focusFile, setFocusFile] = useState<IFile>();
   useEffect(() => {
@@ -100,6 +101,8 @@ const Directory: React.FC<IProps> = (props) => {
         selectFiles={props.selects || []}
         focusFile={focusFile}
         content={getContent()}
+        currentTag={currentTag}
+        tagChanged={(t) => setCurrentTag(t)}
         fileOpen={(entity) => clickHanlder(entity as IFile)}
         contextMenu={(entity) => contextMenu(entity as IFile)}
       />

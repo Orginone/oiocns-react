@@ -16,6 +16,7 @@ interface teamTypeInfo {
   notAvatar?: boolean;
   title?: string;
   showName?: boolean;
+  disInfo?: boolean;
   onClick?: (entity?: schema.XEntity) => void;
 }
 
@@ -86,7 +87,7 @@ export const ShareIconItem = (info: shareIconInfo) => {
   const size = info.size ?? 22;
   const fontSize = size > 14 ? 14 : size;
   const infoMore = () => {
-    if (info.entity && size > 18) {
+    if (info.disInfo !== true && info.entity && size > 18) {
       return (
         <span
           style={{

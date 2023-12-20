@@ -26,8 +26,7 @@ const GroupInputBox = (props: IProps) => {
   const [open, setOpen] = useState<boolean>(false);
   const [openEmoji, setOpenEmoji] = useState(false);
   const [citeShow, setCiteShow] = useState<boolean>(false); // @展示
-  const [message, setMessage] = useState<string>('');
-  const [mentions, setMentions] = useState<{ text: string; id: string }[]>([]);
+  const [message, setMessage] = useState(props.chat.inputContent.message);
 
   useEffect(() => {
     if (props.writeContent) {
@@ -35,11 +34,15 @@ const GroupInputBox = (props: IProps) => {
     }
   }, [props.writeContent]);
 
+  useEffect(() => {
+    props.chat.inputContent.message = message;
+  }, [message]);
+
   /** 发送消息 */
   const sendMessage = () => {
     if (message.length > 0) {
       const vaildMentions: string[] = [];
-      for (const mention of mentions) {
+      for (const mention of props.chat.inputContent.mentions) {
         if (message.includes(mention.text) && !vaildMentions.includes(mention.id)) {
           vaildMentions.push(mention.id);
         }
@@ -115,13 +118,10 @@ const GroupInputBox = (props: IProps) => {
                         key={i.id}
                         className="at-list-item"
                         onClick={() => {
-                          setMentions((before) => [
-                            ...before,
-                            {
-                              id: i.id,
-                              text: `@${i.name} `,
-                            },
-                          ]);
+                          props.chat.inputContent.mentions.push({
+                            id: i.id,
+                            text: `@${i.name} `,
+                          });
                           setMessage((message) => message + i.name + ' ');
                         }}>
                         <EntityIcon entity={i} showName size={30} />

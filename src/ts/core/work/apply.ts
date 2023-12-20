@@ -38,13 +38,20 @@ export class WorkApply implements IWorkApply {
       return (
         value === null ||
         value === undefined ||
-        (typeof value === 'string' && value.length < 1)
+        (typeof value === 'string' && (value == '[]' || value.length < 1))
       );
     };
     for (const formId of fromData.keys()) {
-      const data: any = fromData.get(formId)?.after.at(-1) ?? {};
+      const formDataValue = fromData.get(formId);
+      const data: any = formDataValue?.after.at(-1) ?? {};
       for (const item of this.instanceData.fields[formId]) {
-        if (item.options?.isRequired && valueIsNull(data[item.id])) {
+        var isRequired =
+          formDataValue?.rule[item.id]?.isRequired ||
+          formDataValue?.rule[item.id]?.visible;
+        if (isRequired == undefined) {
+          isRequired = item.options?.isRequired;
+        }
+        if (isRequired && valueIsNull(data[item.id])) {
           return false;
         }
       }

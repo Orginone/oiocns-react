@@ -8,6 +8,7 @@ import { ISession, Session } from '../../chat/session';
 import { targetOperates } from '../../public';
 import { IStorage } from '../outTeam/storage';
 import { IPerson } from '../person';
+import { IFile } from '../../thing/fileinfo';
 
 /** 自归属用户接口类 */
 export interface IBelong extends ITarget {
@@ -53,6 +54,9 @@ export abstract class Belong extends Target implements IBelong {
   cohorts: ICohort[] = [];
   storages: IStorage[] = [];
   superAuth: IAuthority | undefined;
+  get superior(): IFile {
+    return 'disk' as unknown as IFile;
+  }
   async loadSuperAuth(reload: boolean = false): Promise<IAuthority | undefined> {
     if (!this.superAuth || reload) {
       const res = await kernel.queryAuthorityTree({

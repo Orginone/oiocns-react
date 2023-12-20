@@ -1,7 +1,8 @@
 import { TreeSelect } from 'antd';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { DefaultOptionType } from 'rc-select/lib/Select';
 import { IAuthority, IBelong } from '@/ts/core';
+import useAsyncLoad from '@/hooks/useAsyncLoad';
 interface IProps {
   value?: string;
   space: IBelong;
@@ -9,7 +10,17 @@ interface IProps {
 }
 const SelectAuth: React.FC<IProps> = (props: IProps) => {
   const [treeData, setTreeData] = useState<any[]>([]);
-  const loadTreeData = async () => {
+  const [loaded] = useAsyncLoad(async () => {
+    const getTreeData = (targets: IAuthority[]): DefaultOptionType[] => {
+      return targets.map((item: IAuthority) => {
+        return {
+          label: item.name,
+          value: item.id,
+          children:
+            item.children && item.children.length > 0 ? getTreeData(item.children) : [],
+        };
+      });
+    };
     let tree = await props.space.loadSuperAuth(false);
     if (tree) {
       setTreeData([
@@ -17,21 +28,8 @@ const SelectAuth: React.FC<IProps> = (props: IProps) => {
         ...getTreeData([tree]),
       ]);
     }
-  };
-  const getTreeData = (targets: IAuthority[]): DefaultOptionType[] => {
-    return targets.map((item: IAuthority) => {
-      return {
-        label: item.name,
-        value: item.id,
-        children:
-          item.children && item.children.length > 0 ? getTreeData(item.children) : [],
-      };
-    });
-  };
-
-  useEffect(() => {
-    loadTreeData();
   }, [props.space]);
+  if (!loaded) return <></>;
 
   return (
     <TreeSelect

@@ -217,7 +217,7 @@ export abstract class Target extends Team implements ITarget {
     });
   }
   override async notifySession(pull: boolean, members: schema.XTarget[]): Promise<void> {
-    if (this.id != this.userId) {
+    if (this.id != this.userId && this.typeName !== '存储资源') {
       for (const member of members) {
         if (member.typeName === TargetType.Person) {
           if (pull) {
@@ -292,6 +292,7 @@ export abstract class Target extends Team implements ITarget {
       if (data.operater?.id != this.user.id) {
         logger.info(message);
       }
+      this.changCallback();
       this.directory.structCallback();
     }
   }

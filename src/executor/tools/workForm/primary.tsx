@@ -1,10 +1,11 @@
 // import OioForm from '@/components/Common/FormDesign/OioFormNext';
 import { kernel, model, schema } from '../../../ts/base';
 import { IBelong } from '@/ts/core';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import React from 'react';
 import { Tabs } from 'antd';
 import WorkFormViewer from '@/components/DataStandard/WorkForm/Viewer';
+import { useEffectOnce } from 'react-use';
 
 interface IProps {
   allowEdit: boolean;
@@ -12,49 +13,49 @@ interface IProps {
   forms: schema.XForm[];
   data: model.InstanceDataModel;
   getFormData: (form: schema.XForm) => model.FormEditData;
-  onChanged?: (id: string, data: model.FormEditData, changedValues: any) => void;
+  onChanged?: (id: string, data: model.FormEditData, field: string, value: any) => void;
 }
 
 const PrimaryForm: React.FC<IProps> = (props) => {
   if (props.forms.length < 1) return <></>;
   const form = props.forms[0];
-  if (!props.data.fields[form.id]) return <></>;
-  const fields = props.data.fields[form.id];
-  const formData = props.getFormData(form);
-  const [data, setData] = useState(
-    formData.after.length > 0 ? formData.after[0] : undefined,
-  );
-  useEffect(() => {
-    if (!data) {
+  const [fields, setFields] = useState<model.FieldModel[]>();
+  const [data, setData] = useState<schema.XThing>();
+  const [formData, setFormData] = useState<model.FormEditData>();
+  useEffectOnce(() => {
+    const fData = props.getFormData(form);
+    const afterData = fData.after.at(0);
+    setFields(props.data.fields[form.id]);
+    setFormData(fData);
+    if (afterData) {
+      setData(afterData);
+    } else {
       kernel.createThing(props.belong.id, [], form.name).then((res) => {
         if (res.success && res.data) {
           setData(res.data);
         }
       });
     }
-  }, []);
-  if (!data) return <></>;
+  });
+  if (!fields || !formData || !data) return <></>;
   return (
     <WorkFormViewer
       form={form}
       fields={fields}
       data={data}
+      rule={formData.rule ?? {}}
       belong={props.belong}
       readonly={!props.allowEdit}
-      onValuesChange={(changed) => {
-        if (props.allowEdit && changed) {
-          Object.keys(changed).forEach((k) => {
-            if (changed[k] === undefined || changed[k] === null) {
-              delete data[k];
-              delete props.data.primary[k];
-            } else {
-              data[k] = changed[k];
-              props.data.primary[k] = changed[k];
-            }
-          });
+      onValuesChange={(field, value, data) => {
+        if (props.allowEdit) {
+          if (value === undefined || value === null) {
+            delete props.data.primary[field];
+          } else {
+            props.data.primary[field] = value;
+          }
           data.name = form.name;
           formData.after = [data];
-          props.onChanged?.apply(this, [form.id, formData, changed]);
+          props.onChanged?.apply(this, [form.id, formData, field, value]);
         }
       }}
     />
