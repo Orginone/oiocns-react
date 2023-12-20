@@ -8,6 +8,8 @@ import { entityOperates, fileOperates } from '../public';
 import { loadGatewayNodes } from '@/utils/tools';
 
 export interface IWork extends IFileInfo<schema.XWorkDefine> {
+  /** 我的办事 */
+  isMyWork: boolean;
   /** 主表 */
   primaryForms: IForm[];
   /** 子表 */
@@ -80,6 +82,25 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
   }
   get superior(): IFile {
     return this.application;
+  }
+  get groupTags(): string[] {
+    const tags = [this.target.space.name];
+    if (this.target.id != this.target.spaceId) {
+      tags.push(this.target.name);
+    }
+    return [...tags, ...super.groupTags];
+  }
+  get isMyWork(): boolean {
+    if (this._metadata.applyAuth?.length > 0) {
+      return (
+        this.target.user.givedIdentitys.filter(
+          (i) =>
+            i.identity?.authId === this._metadata.applyAuth &&
+            i.identity?.belongId === this.target.spaceId,
+        ).length > 0
+      );
+    }
+    return true;
   }
   async delete(_notity: boolean = false): Promise<boolean> {
     if (this.application) {

@@ -10,7 +10,6 @@ import { ITarget } from '../base/target';
 import { ITeam } from '../base/team';
 import { targetOperates } from '../../public';
 import { Storage } from '../outTeam/storage';
-import { companyJoins } from '../../public/operates';
 import { Cohort } from '../outTeam/cohort';
 import { ISession } from '../../chat/session';
 import { IFile } from '../../thing/fileinfo';
@@ -55,9 +54,6 @@ export class Company extends Belong implements ICompany {
   stations: IStation[] = [];
   departments: IDepartment[] = [];
   departmentTypes: string[] = [];
-  get superior(): IFile {
-    return this.user;
-  }
   private _groupLoaded: boolean = false;
   private _departmentLoaded: boolean = false;
   async loadGroups(reload: boolean = false): Promise<IGroup[]> {
@@ -272,7 +268,8 @@ export class Company extends Belong implements ICompany {
     const operates = super.operates();
     if (this.hasRelationAuth()) {
       operates.unshift(
-        ...companyJoins.menus,
+        targetOperates.JoinGroup,
+        targetOperates.JoinStorage,
         targetOperates.NewGroup,
         targetOperates.NewDepartment,
       );

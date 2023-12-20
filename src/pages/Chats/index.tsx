@@ -1,4 +1,4 @@
-import { Spin } from 'antd';
+import { Button, Dropdown, Spin } from 'antd';
 import React, { useEffect, useState } from 'react';
 import orgCtrl from '@/ts/controller';
 import { ISession } from '@/ts/core';
@@ -6,15 +6,23 @@ import DirectoryViewer from '@/components/Directory/views';
 import { command } from '@/ts/base';
 import { useFlagCmdEmitter } from '@/hooks/useCtrlUpdate';
 import { cleanMenus } from '@/utils/tools';
-import { loadFileMenus } from '@/executor/fileOperate';
+import { loadFileMenus, operatesToMenus } from '@/executor/fileOperate';
 import OrgIcons from '@/components/Common/GlobalComps/orgIcons';
 import AppLayout from '@/components/MainLayout/appLayout';
+import { AiOutlinePlus } from 'react-icons/ai';
+import { personJoins } from '@/ts/core/public';
+import SelectChat from './select';
+import FullScreenModal from '@/components/Common/fullScreen';
 
 /** 沟通-通讯录 */
 const ChatContent: React.FC = () => {
+  const [selectOpen, setSelectOpen] = useState(false);
   const [chats, setChats] = useState<ISession[]>([]);
   const [focusFile, setFocusFile] = useState<ISession>();
-  const [loaded, msgKey] = useFlagCmdEmitter('session');
+  const [loaded] = useFlagCmdEmitter('session', () => {
+    setChats(filterChats(currentTag));
+  });
+  const [currentTag, setCurrentTag] = useState('最近');
   useEffect(() => {
     const id = command.subscribe((type, cmd, ...args: any[]) => {
       if (type != 'session' || args.length < 1) return;
@@ -28,6 +36,10 @@ const ChatContent: React.FC = () => {
       command.unsubscribe(id);
     };
   }, []);
+
+  useEffect(() => {
+    setChats(filterChats(currentTag));
+  }, [currentTag]);
 
   const filterChats = (tag: string) => {
     const temps = orgCtrl.chats.filter((i) => i.isMyChat);
@@ -65,6 +77,45 @@ const ChatContent: React.FC = () => {
       command.emitter('preview', 'chat', session);
     }
   };
+
+  const renderMore = () => {
+    return (
+      <Dropdown
+        menu={{
+          items: operatesToMenus(
+            [
+              ...personJoins.menus,
+              {
+                sort: 37,
+                cmd: 'selectChat',
+                label: '选择会话',
+                iconType: '群组',
+              },
+            ],
+            orgCtrl.user,
+          ),
+          onClick: ({ key }: { key: string }) => {
+            if (key === 'selectChat') {
+              setSelectOpen(true);
+            } else {
+              command.emitter('executor', key, orgCtrl.user);
+            }
+          },
+        }}
+        dropdownRender={(menu) => (
+          <div>{menu && <Button type="link">{menu}</Button>}</div>
+        )}
+        placement="bottom"
+        trigger={['click', 'contextMenu']}>
+        <AiOutlinePlus
+          fontSize={22}
+          color={'#3838b9'}
+          title={'更多操作'}
+          style={{ cursor: 'pointer' }}
+        />
+      </Dropdown>
+    );
+  };
   return (
     <AppLayout previewFlag={'chat'}>
       <Spin spinning={!loaded} tip={'加载中...'}>
@@ -73,7 +124,6 @@ const ChatContent: React.FC = () => {
           <span style={{ paddingLeft: 10 }}>沟通</span>
         </div>
         <DirectoryViewer
-          key={msgKey}
           extraTags={false}
           height={'calc(100% - 100px)'}
           initTags={['最近', '常用', '@我', '未读', '好友', '同事', '群聊']}
@@ -85,21 +135,32 @@ const ChatContent: React.FC = () => {
               .map((i) => i.badgeCount ?? 0)
               .reduce((total, count) => total + count, 0)
           }
-          tagChanged={(tag) => setChats(filterChats(tag))}
+          currentTag={currentTag}
+          tagChanged={(t) => setCurrentTag(t)}
           fileOpen={(entity) => sessionOpen(entity as ISession)}
           contextMenu={(entity) => contextMenu(entity as ISession)}
-          rightBars={
-            <OrgIcons
-              relation
-              selected
-              title="查找会话"
-              css={{ cursor: 'pointer' }}
-              onClick={() => {
-                command.emitter('executor', 'link', '/relation');
+          rightBars={renderMore()}
+        />
+        {selectOpen && (
+          <FullScreenModal
+            open
+            title={'选择会话'}
+            onCancel={() => {
+              setSelectOpen(false);
+            }}
+            destroyOnClose
+            width={1000}
+            bodyHeight={'75vh'}>
+            <SelectChat
+              onSelected={(chat: ISession) => {
+                setCurrentTag('最近');
+                setChats(filterChats(currentTag));
+                setSelectOpen(false);
+                sessionOpen(chat);
               }}
             />
-          }
-        />
+          </FullScreenModal>
+        )}
       </Spin>
     </AppLayout>
   );

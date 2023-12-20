@@ -18,6 +18,8 @@ export interface IApplication extends IStandardFileInfo<schema.XApplication> {
   findWork(id: string): Promise<IWork | undefined>;
   /** 加载办事 */
   loadWorks(reload?: boolean): Promise<IWork[]>;
+  /** 加载所有办事 */
+  loadAllWorks(reload?: boolean): Promise<IWork[]>;
   /** 新建办事 */
   createWork(data: model.WorkDefineModel): Promise<IWork | undefined>;
   /** 新建模块 */
@@ -119,6 +121,13 @@ export class Application
       }
     }
     return this.works;
+  }
+  async loadAllWorks(reload?: boolean | undefined): Promise<IWork[]> {
+    const data = await this.loadWorks(reload);
+    for (const item of this.children) {
+      data.push(...(await item.loadAllWorks(reload)));
+    }
+    return data;
   }
   async createWork(data: model.WorkDefineModel): Promise<IWork | undefined> {
     data.applicationId = this.id;

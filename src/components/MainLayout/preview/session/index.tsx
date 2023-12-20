@@ -1,15 +1,12 @@
-import { List, Tag } from 'antd';
 import React, { useEffect, useState } from 'react';
-import TeamIcon from '@/components/Common/GlobalComps/entityIcon';
-import css from './index.module.less';
 import { IFile, ISession, TargetType } from '@/ts/core';
 import { command } from '@/ts/base';
 import Directory from '@/components/Directory';
 import DirectoryViewer from '@/components/Directory/views';
 import TargetActivity from '@/components/TargetActivity';
 import { loadFileMenus } from '@/executor/fileOperate';
-import OrgIcons from '@/components/Common/GlobalComps/orgIcons';
 import ChatBody from './chat';
+import PreviewLayout from '../layout';
 import { cleanMenus } from '@/utils/tools';
 const SessionBody = ({
   session,
@@ -18,36 +15,55 @@ const SessionBody = ({
   session: ISession;
   relation?: boolean;
 }) => {
-  const [actions, setActons] = useState<string[]>([]);
-  const [bodyType, setBodyType] = useState('');
+  const [actions, setActions] = useState<{ key: string; label: string }[]>([]);
+  const [bodyType, setBodyType] = useState('activity');
+
   useEffect(() => {
-    const newActions: string[] = [];
-    if (session.target.typeName === TargetType.Storage) {
-      if (session.target.hasRelationAuth()) {
-        newActions.push('chat', 'activity', 'store', 'relation');
-      } else {
-        newActions.push('activity');
+    const newActions = [
+      {
+        key: 'activity',
+        label: '动态',
+      },
+    ];
+    if (session.isMyChat && session.target.typeName !== TargetType.Group) {
+      if (
+        session.target.typeName !== TargetType.Storage ||
+        session.target.hasRelationAuth()
+      ) {
+        newActions.unshift({
+          key: 'chat',
+          label: '沟通',
+        });
+        if (relation !== true) {
+          setBodyType('chat');
+        }
       }
-    } else {
-      if (session.isMyChat && session.target.typeName !== TargetType.Group) {
-        newActions.push('chat');
-      }
-      newActions.push('activity');
-      if (session.id === session.target.id) {
-        newActions.push('store', 'relation');
+    }
+    if (
+      session.target.typeName !== TargetType.Storage ||
+      (session.target.hasRelationAuth() && session.id === session.target.id)
+    ) {
+      newActions.push(
+        {
+          key: 'store',
+          label: '数据',
+        },
+        {
+          key: 'relation',
+          label: '关系',
+        },
+      );
+      if (relation) {
+        setBodyType('relation');
       }
     }
     if (session.target.hasRelationAuth()) {
-      newActions.push('setting');
+      newActions.push({
+        key: 'setting',
+        label: '设置',
+      });
     }
-    setActons(newActions);
-    if (!newActions.includes(bodyType)) {
-      if (relation && newActions.includes('relation')) {
-        setBodyType('relation');
-      } else {
-        setBodyType(newActions[0]);
-      }
-    }
+    setActions(newActions);
   }, [session]);
 
   const loadContext = () => {
@@ -55,13 +71,14 @@ const SessionBody = ({
       case 'chat':
         return <ChatBody key={session.target.key} chat={session} filter={''} />;
       case 'activity':
-        return <TargetActivity height={700} activity={session.activity} />;
+        return <TargetActivity height={760} activity={session.activity} />;
       case 'store':
         return <Directory key={session.target.key} root={session.target.directory} />;
       case 'relation':
         return (
           <DirectoryViewer
-            extraTags
+            extraTags={false}
+            currentTag={'成员'}
             initTags={['成员']}
             selectFiles={[]}
             content={session.target.memberDirectory.content()}
@@ -82,69 +99,17 @@ const SessionBody = ({
     }
   };
 
-  const getTitle = (flag: string) => {
-    switch (flag) {
-      case 'chat':
-        return '沟通';
-      case 'activity':
-        return '动态';
-      case 'store':
-        return '数据';
-      case 'relation':
-        return '关系';
-      default:
-        return '设置';
-    }
-  };
-
   return (
-    <>
-      <div className={css.groupDetail}>
-        <List.Item
-          className={css.header}
-          actions={actions.map((flag) => {
-            const selected = flag === bodyType;
-            return (
-              <a
-                key={flag}
-                title={getTitle(flag)}
-                onClick={() => {
-                  setBodyType(flag);
-                }}>
-                <OrgIcons type={flag} selected={selected} size={26} />
-              </a>
-            );
-          })}>
-          <List.Item.Meta
-            title={
-              <>
-                <span style={{ marginRight: 10 }}>{session.name}</span>
-                {session.members.length > 0 && (
-                  <span className={css.number}>({session.members.length})</span>
-                )}
-              </>
-            }
-            avatar={<TeamIcon entity={session.metadata} size={50} />}
-            description={session.groupTags
-              .filter((i) => i.length > 0)
-              .map((label) => {
-                return (
-                  <Tag key={label} color={label === '置顶' ? 'red' : 'success'}>
-                    {label}
-                  </Tag>
-                );
-              })}
-          />
-        </List.Item>
-        <div
-          style={{
-            height: relation ? 'calc(100vh - 155px)' : 'calc(100vh - 105px)',
-          }}
-          className={css.groupDetailContent}>
-          {loadContext()}
-        </div>
-      </div>
-    </>
+    <PreviewLayout
+      entity={session}
+      actions={actions}
+      selectKey={bodyType}
+      onActionChanged={(key: string) => {
+        setBodyType(key);
+      }}
+      number={session.members.length}>
+      {loadContext()}
+    </PreviewLayout>
   );
 };
 export default SessionBody;
