@@ -4,10 +4,7 @@ import MainLayout from '@/components/MainLayout';
 import useMenuUpdate from '@/hooks/useMenuUpdate';
 import { Input } from 'antd';
 import { ImSearch } from 'react-icons/im';
-<<<<<<< HEAD
-=======
 import OrgIcons from '@/components/Common/GlobalComps/orgIcons';
->>>>>>> fba29b5bf6084e336c5d8988fd86ed97535f91a3
 
 const Setting: React.FC<any> = () => {
   const [filter, setFilter] = useState('');
@@ -25,10 +22,7 @@ const Setting: React.FC<any> = () => {
   return (
     <MainLayout
       rightShow
-<<<<<<< HEAD
-=======
       leftShow={false}
->>>>>>> fba29b5bf6084e336c5d8988fd86ed97535f91a3
       previewFlag={'chat'}
       selectMenu={selectMenu}
       onSelect={async (data) => {
