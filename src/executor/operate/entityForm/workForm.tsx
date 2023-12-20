@@ -84,24 +84,6 @@ const WorkForm = ({ finished, formType, current }: Iprops) => {
       },
     },
     {
-      title: '允许新增实体',
-      dataIndex: 'allowAdd',
-      valueType: 'switch',
-      readonly: readonly,
-    },
-    {
-      title: '允许变更实体',
-      dataIndex: 'allowEdit',
-      valueType: 'switch',
-      readonly: readonly,
-    },
-    {
-      title: '允许选择实体',
-      dataIndex: 'allowSelect',
-      valueType: 'switch',
-      readonly: readonly,
-    },
-    {
       title: '备注',
       readonly: readonly,
       dataIndex: 'remark',
@@ -129,12 +111,6 @@ const WorkForm = ({ finished, formType, current }: Iprops) => {
         gutter: [24, 0],
       }}
       onFinish={async (values: any) => {
-        values.rule = JSON.stringify({
-          allowAdd: values.allowAdd,
-          allowEdit: values.allowEdit,
-          allowSelect: values.allowSelect,
-          allowFillWork: values.allowFillWork,
-        });
         switch (formType) {
           case 'updateWork':
             await (current as IWork).update(values);

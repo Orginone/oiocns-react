@@ -35,7 +35,7 @@ const JoinTarget: React.FC<IProps> = ({ cmd, current, finished }) => {
       selectTargetType = TargetType.Company;
       break;
     case 'joinGroup':
-      modalTitle = '申请加入集团';
+      modalTitle = '申请加入组织群';
       selectTargetType = TargetType.Group;
       break;
     default:
@@ -45,7 +45,6 @@ const JoinTarget: React.FC<IProps> = ({ cmd, current, finished }) => {
     <Modal
       destroyOnClose
       title={modalTitle}
-      okButtonProps={{ disabled: !selectMembers }}
       open={true}
       onOk={async () => {
         if (await current.applyJoin(selectMembers)) {
@@ -53,6 +52,7 @@ const JoinTarget: React.FC<IProps> = ({ cmd, current, finished }) => {
         }
       }}
       onCancel={finished}
+      okButtonProps={{ disabled: selectMembers.length < 1 }}
       width={670}>
       <SearchTarget
         autoSelect

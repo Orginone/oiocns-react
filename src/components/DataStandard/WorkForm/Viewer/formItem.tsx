@@ -40,7 +40,7 @@ const FormItem: React.FC<IFormItemProps> = (props) => {
   };
   const [isValid, setIsValid] = React.useState(getValid());
   useEffect(() => {
-    const id = props.notifyEmitter.subscribe((_, type, data) => {});
+    const id = props.notifyEmitter.subscribe(() => {});
     return () => {
       props.notifyEmitter.unsubscribe(id);
     };
@@ -77,15 +77,8 @@ const FormItem: React.FC<IFormItemProps> = (props) => {
     width: getItemWidth(props.numStr),
   };
   if (props.field.options.isRequired) {
-    /** 增加是否有defaultValue值的判断 */
-    mixOptions.isValid = mixOptions.defaultValue ? 'true' : isValid;
+    mixOptions.isValid = mixOptions.defaultValue ? true : isValid;
     mixOptions.label = mixOptions.label + '*';
-  }
-  /** 增加有默认值的情况下给表单传值，包含不是必填 */
-  if (mixOptions.defaultValue) {
-    const changedValues: any = {};
-    changedValues[props.field.id] = mixOptions.defaultValue;
-    props.onValuesChange?.apply(this, [changedValues, props.data]);
   }
 
   switch (getWidget(props.field.valueType, props.field.widget)) {

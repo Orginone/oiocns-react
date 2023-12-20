@@ -78,6 +78,16 @@ export abstract class Team extends Entity<schema.XTarget> implements ITeam {
   findChat(id: string): ISession | undefined {
     return this.memberChats.find((i) => i.id === id);
   }
+  get groupTags(): string[] {
+    if (this.id === this.userId) {
+      return ['本人'];
+    }
+    const gtags: string[] = [...super.groupTags];
+    if (this.metadata.belongId !== this.space.id) {
+      gtags.push(this.user.findShareById(this.belongId).name);
+    }
+    return gtags;
+  }
   async loadMembers(reload: boolean = false): Promise<schema.XTarget[]> {
     if (!this._memberLoaded || reload) {
       const res = await kernel.querySubTargetById({

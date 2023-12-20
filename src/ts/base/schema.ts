@@ -171,6 +171,8 @@ export type XForm = {
   rule: string;
   // 表单查看数据规则
   searchRule: string;
+  // 操作规则（允许新增、允许选择、允许删除）
+  operateRule: string;
   // 配置参数
   options: XFormProps | undefined;
   // 表单的特性
@@ -179,6 +181,8 @@ export type XForm = {
   bindNodes: XWorkNode[] | undefined;
   // 表单的目录
   directory: XDirectory | undefined;
+  // 报表的填报周期
+  cycle: string;
 } & XStandard;
 
 // 度量特性配置参数
@@ -493,14 +497,8 @@ export type XWorkDefine = {
   applicationId: string;
   // 共享用户ID
   shareId: string;
-  // 允许新增
-  allowAdd: boolean;
   // 允许补充办事
   hasGateway: boolean;
-  // 允许变更
-  allowEdit: boolean;
-  // 允许选择
-  allowSelect: boolean;
   // 办事定义节点
   nodes: XWorkNode[] | undefined;
   // 办事的实例
@@ -661,8 +659,10 @@ export type XStaging = {
 
 // 页面模板
 export interface XPageTemplate extends XStandard {
-  // 是否发布至首页
+  // 是否发布至门户
   public: boolean;
+  // 是否公开
+  open: boolean;
   // 模板类型
   kind?: string;
 }

@@ -33,7 +33,6 @@ const FormItem: React.FC<{
   useEffect(() => {
     if (attribute.property && attribute.property.speciesId) {
       current.loadItems([attribute.property.speciesId]).then((data) => {
-        console.log(data, 'data');
         setItems(data);
       });
     }

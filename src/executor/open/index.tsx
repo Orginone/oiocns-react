@@ -14,7 +14,6 @@ import { IEntity, ISysFileInfo, TargetType } from '@/ts/core';
 import JoinApply from './task/joinApply';
 import { model, schema } from '@/ts/base';
 import TemplateView from './page';
-import ReportView from './report';
 const audioExt = ['.mp3', '.wav', '.ogg'];
 
 const officeExt = ['.md', '.pdf', '.xls', '.xlsx', '.doc', '.docx', '.ppt', '.pptx'];
@@ -92,8 +91,6 @@ const ExecutorOpen: React.FC<IOpenProps> = (props: IOpenProps) => {
             finished={props.finished}
           />
         );
-      case '报表':
-        return <ReportView current={props.entity as any} finished={props.finished} />;
       default:
         if (remarkTypes[props.entity.typeName]) {
           return (

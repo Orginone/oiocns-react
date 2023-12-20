@@ -133,7 +133,10 @@ const GroupContent = (props: Iprops) => {
             <div style={{ display: 'flex' }}>
               <div className={`${css.con_content}`}>
                 {props.chat.isBelongPerson ? (
-                  showMsg(item)
+                  <>
+                    {showMsg(item)}
+                    {item.cite && parseCiteMsg(item.cite)}
+                  </>
                 ) : (
                   <>
                     <Badge

@@ -19,18 +19,7 @@ export class AuthProvider {
   public async dynamicCode(
     params: model.DynamicCodeModel,
   ): Promise<model.ResultType<model.DynamicCodeModel>> {
-    return new Promise((resolve) => {
-      resolve({
-        success: true,
-        code: 200,
-        msg: '',
-        data: {
-          dynamicId: 'X-12345',
-          account: params.account,
-          platName: params.platName,
-        },
-      });
-    });
+    return await kernel.auth<model.DynamicCodeModel>('dynamicCode', params);
   }
   /**
    * 登录

@@ -38,6 +38,15 @@ export default class DesignerManager
     }
   }
 
+  private _showProps = true;
+  get showProps() {
+    return this._showProps;
+  }
+  set showProps(e) {
+    this._showProps = e;
+    this.emitter('current', 'showProps', e);
+  }
+
   private _currentElement: PageElement | null = null;
   get currentElement() {
     return this._currentElement;

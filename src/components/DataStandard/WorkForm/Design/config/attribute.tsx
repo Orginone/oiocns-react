@@ -335,7 +335,7 @@ const AttributeConfig: React.FC<IAttributeProps> = ({
           allowInherited
           maxCount={1}
           onCancel={() => setOpenDialog(false)}
-          onOk={(files) => {}}
+          onOk={() => {}}
         />
       )}
     </Form>

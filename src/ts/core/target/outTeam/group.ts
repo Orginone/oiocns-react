@@ -54,17 +54,6 @@ export class Group extends Target implements IGroup {
   get superior(): IFile {
     return this.parent ?? this.space;
   }
-  get groupTags(): string[] {
-    const tags = [...super.groupTags];
-    if (this.id != this.belongId) {
-      if (this.belongId != this.spaceId) {
-        tags.push('加入的集群');
-      } else {
-        tags.push('创建的集群');
-      }
-    }
-    return tags;
-  }
   async loadChildren(reload?: boolean | undefined): Promise<IGroup[]> {
     if (!this._childrenLoaded || reload) {
       const res = await kernel.querySubTargetById({
@@ -136,17 +125,13 @@ export class Group extends Target implements IGroup {
     return this.children;
   }
   async deepLoad(reload: boolean = false): Promise<void> {
+    this.loadMembers(reload);
     await Promise.all([
-      await this.loadMembers(reload),
-      await this.loadChildren(reload),
-      await this.loadIdentitys(reload),
-      await this.directory.loadDirectoryResource(reload),
+      this.loadChildren(reload),
+      this.loadIdentitys(reload),
+      this.directory.loadDirectoryResource(reload),
     ]);
-    await Promise.all(
-      this.children.map(async (group) => {
-        await group.deepLoad(reload);
-      }),
-    );
+    await Promise.all(this.children.map((group) => group.deepLoad(reload)));
   }
   override operates(): model.OperateModel[] {
     const operates = super.operates();

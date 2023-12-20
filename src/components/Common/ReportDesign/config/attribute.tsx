@@ -285,7 +285,7 @@ const AttributeConfig: React.FC<IAttributeProps> = ({
           }}
         />
       </GroupItem>
-      <GroupItem caption={'表单参数'}>
+      <GroupItem caption={'报表参数'}>
         <SimpleItem
           dataField="options.readOnly"
           editorType="dxCheckBox"

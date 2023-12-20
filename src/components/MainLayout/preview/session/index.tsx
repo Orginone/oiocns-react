@@ -11,12 +11,21 @@ import { loadFileMenus } from '@/executor/fileOperate';
 import OrgIcons from '@/components/Common/GlobalComps/orgIcons';
 import ChatBody from './chat';
 import { cleanMenus } from '@/utils/tools';
-const SessionBody = ({ session, setting }: { session: ISession; setting?: boolean }) => {
+const SessionBody = ({
+  session,
+  relation,
+}: {
+  session: ISession;
+  relation?: boolean;
+}) => {
   const [actions, setActons] = useState<string[]>([]);
   const [bodyType, setBodyType] = useState('');
   useEffect(() => {
     const newActions: string[] = [];
     if (session.target.typeName === TargetType.Storage) {
+      if (session.target.hasRelationAuth()) {
+        newActions.push('chat');
+      }
       newActions.push('relation', 'activity');
     } else {
       if (session.isMyChat && session.target.typeName !== TargetType.Group) {
@@ -32,7 +41,7 @@ const SessionBody = ({ session, setting }: { session: ISession; setting?: boolea
     }
     setActons(newActions);
     if (!newActions.includes(bodyType)) {
-      if (setting && newActions.includes('relation')) {
+      if (relation && newActions.includes('relation')) {
         setBodyType('relation');
       } else {
         setBodyType(newActions[0]);

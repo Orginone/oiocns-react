@@ -96,7 +96,7 @@ export class Person extends Belong implements IPerson {
       idProofs.every((i) => i.identityId !== a.identityId),
     );
   }
-  async loadCohorts(reload?: boolean | undefined): Promise<ICohort[]> {
+  async loadTeams(reload?: boolean | undefined): Promise<ICohort[]> {
     if (!this._cohortLoaded || reload) {
       const res = await kernel.queryJoinedTargetById({
         id: this.id,
@@ -256,28 +256,16 @@ export class Person extends Belong implements IPerson {
   async deepLoad(reload: boolean = false): Promise<void> {
     await this.cacheObj.all();
     await Promise.all([
-      await this.loadCohorts(reload),
-      await this.loadMembers(reload),
-      await this.loadSuperAuth(reload),
-      await this.loadIdentitys(reload),
-      await this.loadGivedIdentitys(reload),
-      await this.directory.loadDirectoryResource(reload),
+      this.loadTeams(reload),
+      this.loadMembers(reload),
+      this.loadSuperAuth(reload),
+      this.loadIdentitys(reload),
+      this.loadGivedIdentitys(reload),
+      this.directory.loadDirectoryResource(reload),
     ]);
-    await Promise.all(
-      this.companys.map(async (company) => {
-        await company.deepLoad(reload);
-      }),
-    );
-    await Promise.all(
-      this.cohorts.map(async (cohort) => {
-        await cohort.deepLoad(reload);
-      }),
-    );
-    await Promise.all(
-      this.storages.map(async (storage) => {
-        await storage.deepLoad(reload);
-      }),
-    );
+    await Promise.all(this.companys.map((company) => company.deepLoad(reload)));
+    await Promise.all(this.cohorts.map((cohort) => cohort.deepLoad(reload)));
+    await Promise.all(this.storages.map((storage) => storage.deepLoad(reload)));
     this.superAuth?.deepLoad(reload);
   }
 

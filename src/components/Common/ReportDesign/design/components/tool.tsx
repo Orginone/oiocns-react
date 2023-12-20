@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Select, Dropdown, Button, Popover } from 'antd';
 import type { MenuProps } from 'antd';
-// import { SketchPicker } from '@hello-pangea/color-picker';
+import { SketchPicker } from '@hello-pangea/color-picker';
 import cls from './tool.module.less';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 const { Option } = Select;
@@ -29,8 +29,8 @@ const ToolBar: React.FC<IProps> = ({ cellStyle, handClick }: IProps) => {
   /** 单元格样式 */
   const [defaultClass, setDefaultClass] = useState<string>(' htMiddle htLeft');
   /** 缩进 */
-  let defaultPaddingLeft: number = 4;
-  let paddingLeft: number = 4;
+  const defaultPaddingLeft: number = 4;
+  const [paddingLeft, setPaddingLeft] = useState<number>(4);
 
   useEffect(() => {
     const styles = cellStyle?.styles || {};
@@ -45,6 +45,7 @@ const ToolBar: React.FC<IProps> = ({ cellStyle, handClick }: IProps) => {
     setColor(styles?.color ? styles.color : '#000');
     setFontSize(styles?.fontSize ? styles?.fontSize?.slice(0, -2) : '11');
     setFontFamily(styles?.fontFamily ? styles.fontFamily : '宋体');
+    setPaddingLeft(styles?.paddingLeft ? styles.paddingLeft : defaultPaddingLeft);
     tforceUpdate();
   }, [cellStyle]);
 
@@ -196,21 +197,19 @@ const ToolBar: React.FC<IProps> = ({ cellStyle, handClick }: IProps) => {
 
   const reducePaddingLeft = () => {
     let nowLeft = paddingLeft;
-    if (nowLeft > 0) {
-      nowLeft = Math.max(defaultPaddingLeft, nowLeft - 24);
+    if (nowLeft > 4) {
+      nowLeft = nowLeft - 24;
     }
-    paddingLeft = nowLeft;
+    setPaddingLeft(nowLeft);
     handClick(paddingLeft, 'paddingLeft');
   };
 
   const addPaddingLeft = () => {
-    paddingLeft += 24;
-    handClick(paddingLeft, 'paddingLeft');
+    let nowLeft = paddingLeft;
+    nowLeft += 24;
+    setPaddingLeft(nowLeft);
+    handClick(nowLeft, 'paddingLeft');
   };
-
-  // const mergeAndCenter = () => {
-  //   handClick('', 'mergeAndCenter');
-  // };
 
   const handleChange = (value: any, type: any) => {
     handClick(value, type);
@@ -295,11 +294,11 @@ const ToolBar: React.FC<IProps> = ({ cellStyle, handClick }: IProps) => {
 
   const content = (
     <div>
-      {/* <SketchPicker
+      <SketchPicker
         onChange={(color) => {
           setBackground(color.hex);
         }}
-      /> */}
+      />
       <div className={cls['save-btn']} onClick={setBackgroundColor}>
         确定
       </div>
@@ -308,11 +307,11 @@ const ToolBar: React.FC<IProps> = ({ cellStyle, handClick }: IProps) => {
 
   const colorContent = (
     <div>
-      {/* <SketchPicker
+      <SketchPicker
         onChange={(color) => {
           setColor(color.hex);
         }}
-      /> */}
+      />
       <div className={cls['save-btn']} onClick={setColors}>
         确定
       </div>
@@ -535,39 +534,9 @@ const ToolBar: React.FC<IProps> = ({ cellStyle, handClick }: IProps) => {
             </div>
           </div>
           <div className={cls['column-divider']}></div>
-          {/* <div className={cls['column-three']}>
-            <div className={cls['row-one']}>
-              <a className={cls['icon-action']} title="合并居中" onClick={mergeAndCenter}>
-                <span>合并居中</span>
-              </a>
-            </div>
-            <div className={cls['row-two']}>
-              <a
-                className={cls['icon-action']}
-                title="拆分单元格"
-                onClick={mergeAndCenter}>
-                <span>拆分单元格</span>
-              </a>
-            </div>
-          </div> */}
         </div>
         <div className={cls['flex-box-title']}>对齐方式</div>
       </div>
-      {/* <div className={cls['flex-box']}>
-        <div className={cls['row-one']}>
-          <Select defaultValue="求和" style={{ width: 100 }} onChange={handleChange}>
-            {formulasTypes.map((item: any) => {
-              return (
-                <Option key={item.value} value={item.value}>
-                  {item.label}
-                </Option>
-              );
-            })}
-          </Select>
-        </div>
-        <div className={cls['row-two']}></div>
-        <div className={cls['flex-box-title']}>公式</div>
-      </div> */}
     </div>
   );
 };

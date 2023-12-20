@@ -143,14 +143,22 @@ const GroupInputBox = (props: IProps) => {
           stylingMode="underlined"
           valueChangeEvent="input"
           style={{ fontSize: 16 }}
-          placeholder={`发送到${props.chat.name}`}
-          onValueChanged={(e) => {
-            const value: string = e.value ?? '';
-            if (value.endsWith('@')) {
-              setMessage(value);
-              setCiteShow(true);
-            } else {
-              setMessage(value);
+          placeholder={`Enter键发送, Alt+Enter键换行。`}
+          onValueChange={(value) => {
+            if (!value.endsWith('\n')) {
+              if (value.endsWith('@')) {
+                setMessage(value);
+                setCiteShow(true);
+              } else {
+                setMessage(value);
+              }
+            }
+          }}
+          onEnterKey={(e) => {
+            if (e.event?.altKey === true) {
+              setMessage((pre) => pre + '\n');
+            } else if (message.length > 0) {
+              sendMessage();
             }
           }}
         />

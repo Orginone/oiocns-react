@@ -23,42 +23,6 @@ const ReportModal: React.FC<IProps> = ({ current, finished }: IProps) => {
       footer={[]}
       onCancel={finished}>
       <ReportDesign current={current}></ReportDesign>
-      {/* <Layout className={cls.layout}>
-        <Row className={cls[`content-top`]}>
-          <Col className={cls.rightstyle}>
-            <Space wrap split={<Divider type="vertical" />} size={2}>
-              <Typography.Link
-                title={'切换辅助侧栏'}
-                style={{ fontSize: 18 }}
-                onClick={() => setRightSider(!rightSider)}>
-                <RightBarIcon size={18} width={8} selected={rightSider} />
-              </Typography.Link>
-            </Space>
-          </Col>
-        </Row>
-        <Layout>
-          {rightSider}
-          {rightSider ? (
-            <>
-              <Resizable
-                handles={'right'}
-                width={mainWidth}
-                onResize={(e) => setMainWidth(e.width)}>
-                <Sider className={cls.content} width={'100%'}>
-                  <ReportDesign current={current} finished={finished}></ReportDesign>
-                </Sider>
-              </Resizable>
-              <Content className={cls.content}>
-                <RuleSetting current={current} activeKey={'3'}></RuleSetting>
-              </Content>
-            </>
-          ) : (
-            <Content className={cls.content}>
-              <ReportDesign current={current} finished={finished}></ReportDesign>
-            </Content>
-          )}
-        </Layout>
-      </Layout> */}
     </FullScreenModal>
   );
 };

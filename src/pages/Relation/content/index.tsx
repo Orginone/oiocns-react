@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { IBelong, IFile, IWorkTask } from '@/ts/core';
+import { IFile, ITarget, IWorkTask } from '@/ts/core';
 import { command } from '@/ts/base';
 import orgCtrl from '@/ts/controller';
 import DirectoryViewer from '@/components/Directory/views';
@@ -10,21 +10,21 @@ import useTimeoutHanlder from '@/hooks/useTimeoutHanlder';
 import { Spin } from 'antd';
 
 interface IProps {
-  current: IBelong | 'disk';
+  current: ITarget | 'disk';
 }
 /**
- * 设置-配置清单
+ * 关系-内容导航
  */
 const Content: React.FC<IProps> = (props) => {
   if (!props.current) return <></>;
-  const [current] = useState<IBelong>(
+  const [current] = useState<ITarget>(
     props.current === 'disk' ? orgCtrl.user : props.current,
   );
   const [key] = useCtrlUpdate(current);
   const [focusFile, setFocusFile] = useState<IFile>();
   const [submitHanlder, clearHanlder] = useTimeoutHanlder();
   useEffect(() => {
-    command.emitter('preview', 'setting', focusFile);
+    command.emitter('preview', 'relation', focusFile);
   }, [focusFile]);
   const contextMenu = (file?: IFile) => {
     const entity = file ?? current;

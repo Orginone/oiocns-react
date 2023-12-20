@@ -9,7 +9,7 @@ import 'handsontable/dist/handsontable.min.css';
 import { IForm, IProperty, orgAuth } from '@/ts/core';
 import OpenFileDialog from '@/components/OpenFileDialog';
 import { Emitter } from '@/ts/base/common';
-import orgCtrl from '@/ts/controller';
+
 interface IProps {
   current: IForm;
   sheetList: any;
@@ -35,7 +35,6 @@ const HotTableView: React.FC<IProps> = ({
   handEcho,
   selectCellItem,
 }) => {
-  const target = current.directory.target;
   const [modalType, setModalType] = useState<string>('');
   const [sheetIndex, setSheetIndex] = useState<any>(0); // tabs页签
   const [cells, setCells] = useState<any>([]);
@@ -47,7 +46,6 @@ const HotTableView: React.FC<IProps> = ({
   const initColCount: number = 60;
   const defaultRowHeight: number = 23;
   const defaultColWidth: number = 50;
-
   const hotRef: any = useRef(null); // ref
 
   useEffect(() => {
@@ -73,22 +71,20 @@ const HotTableView: React.FC<IProps> = ({
     setCells(setting?.cells || []);
     setStyleList(setting?.styleList || []);
     setClassList(setting?.classList || []);
+    /** 设置更新边框 */
     setCustomBorders(setting?.customBorders || []);
+    /** 更新报表 */
     hot.updateSettings({
-      customBorder: customBorders,
       data: sheetList[index]?.data?.data,
       mergeCells: mergeCells,
+      customBorders: setting?.customBorders,
       rowHeights: setting?.row_h || row_h,
       colWidths: setting?.col_w || col_w,
     });
-    initCells(setting?.cells);
-    // const customBordersPlugin = hot.getPlugin('customBorders');
-    // customBorders.forEach((it: any) => {
-    //   customBordersPlugin.setBorders(it.range, it.customBorder);
-    // });
+    /** 特性监听 */
     const id = notityEmitter.subscribe((_, type, data) => {
       if (type === 'attr') {
-        updataCells(data, setting?.cells);
+        updateCells(data, setting?.cells);
       }
     });
     return () => {
@@ -98,7 +94,6 @@ const HotTableView: React.FC<IProps> = ({
 
   useEffect(() => {
     /** 根据工具栏类型进行操作 */
-    console.log(changeType, 'changeType');
     switch (changeType) {
       case 'onSave':
         saveClickCallback();
@@ -206,119 +201,6 @@ const HotTableView: React.FC<IProps> = ({
     }
   };
 
-  const initCells = (cellsData: any) => {
-    console.log(cellsData, '3333');
-    if (cellsData) {
-      cellsData.forEach((item: any) => {
-        let species: any = [];
-        if (item.property && item.property.speciesId) {
-          current.loadItems([item.property.speciesId]).then((data) => {
-            console.log(data, 'data');
-            data.forEach((items) => {
-              species.push(items.name);
-            });
-          });
-        }
-        current.metadata.attributes.forEach((attr) => {
-          if (item.prop.id === attr.id) {
-            item.prop = attr;
-          }
-        });
-        const options = item.prop.options;
-        Object.keys(options).map((key) => {
-          switch (key) {
-            case 'readOnly':
-              hotRef.current.hotInstance.setCellMeta(
-                item.row,
-                item.col,
-                'readOnly',
-                options[key],
-              );
-              break;
-            case 'defaultValue':
-              hotRef.current.hotInstance.setDataAtCell(item.row, item.col, options[key]);
-              break;
-            case 'max':
-            case 'min':
-              hotRef.current.hotInstance.setCellMeta(
-                item.row,
-                item.col,
-                'validator',
-                function (value: any, callback: any) {
-                  setTimeout(() => {
-                    if (value >= options['min'] && value <= options['max']) {
-                      callback(true);
-                    } else {
-                      callback(false);
-                    }
-                  }, 100);
-                },
-              );
-              break;
-            case 'teamId':
-              // eslint-disable-next-line no-case-declarations
-              const target = orgCtrl.targets.find((i) => i.id === options[key]);
-              if (target) {
-                let arr: any = [];
-                target?.members.forEach((item: any) => {
-                  arr.push(item.name + '(' + item.code + ')');
-                });
-                hotRef.current.hotInstance.setCellMeta(
-                  item.row,
-                  item.col,
-                  'selectOptions',
-                  arr,
-                );
-              }
-              break;
-            default:
-              break;
-          }
-        });
-        let valueType: string = '';
-        switch (item.prop.widget) {
-          case '数字框':
-            valueType = 'numeric';
-            break;
-          case '选择框':
-            valueType = 'select';
-            hotRef.current.hotInstance.setCellMeta(
-              item.row,
-              item.col,
-              'selectOptions',
-              species,
-            );
-            break;
-          case '成员选择框':
-            valueType = 'select';
-            break;
-          case '内部机构选择框':
-            valueType = 'dropdown';
-            break;
-          case '日期选择框':
-            valueType = 'dateEditor';
-            break;
-          case '时间选择框':
-            valueType = 'time';
-            break;
-          case '操作人':
-          case '操作组织':
-            valueType = 'text';
-            hotRef.current.hotInstance.setDataAtCell(
-              item.row,
-              item.col,
-              target.user.metadata?.name + '(' + target.user.metadata?.code + ')',
-            );
-            break;
-          default:
-            valueType = 'text';
-            break;
-        }
-        hotRef.current.hotInstance.setCellMeta(item.row, item.col, 'editor', valueType);
-      });
-    }
-  };
-
   styleList?.forEach((item: any) => {
     hotRef.current.hotInstance.getCellMeta(item.row, item.col).renderer =
       'cellStylesRenderer';
@@ -347,8 +229,8 @@ const HotTableView: React.FC<IProps> = ({
   const setBorder = (border: string, { width = 1, color = '#000000' } = {}) => {
     const customBordersPlugin = hotRef.current.hotInstance.getPlugin('customBorders');
     const { xMin, xMax, yMin, yMax } = getSelected();
-    const range = [];
-    const customBorder: any = {};
+    const range: any = [];
+    let customBorder: any = {};
     switch (border) {
       case 'start':
         range.push([xMin, yMin, xMax, yMin]);
@@ -386,14 +268,28 @@ const HotTableView: React.FC<IProps> = ({
         setBorder('bottom', { width: 2, color });
         return;
       case 'none':
+        range.push([xMin, yMin, xMax, yMax]);
+        customBorder = {};
         customBordersPlugin.clearBorders(hotRef.current.hotInstance.getSelectedRange());
-        return;
+        break;
       default:
         break;
     }
-    let json = { range: range, customBorder: customBorder };
+    const selected = hotRef.current.hotInstance.getSelectedRange();
+    let json = {
+      range: {
+        from: selected[0]?.from,
+        to: selected[0]?.to,
+      },
+      top: customBorder.top || {},
+      left: customBorder.left || {},
+      bottom: customBorder.bottom || {},
+      right: customBorder.right || {},
+    };
     customBorders.push(json);
-    customBordersPlugin.setBorders(range, customBorder);
+    if (range.length > 0 && customBorder) {
+      customBordersPlugin.setBorders(range, customBorder);
+    }
   };
 
   /** 格式化所选, 返回从左上到右下的坐标，只返回最后一个 */
@@ -472,19 +368,17 @@ const HotTableView: React.FC<IProps> = ({
             );
           } else {
             if (styleList.length > 0) {
-              const newStyleList = JSON.parse(JSON.stringify(styleList));
-              let index = newStyleList.findIndex(
+              let index = styleList.findIndex(
                 (it: any) => it.col === columnIndex && it.row === rowIndex,
               );
               if (index != -1) {
-                for (let k in newStyleList[index]?.styles) {
+                for (let k in styleList[index]?.styles) {
                   if (k === changeType) {
-                    newStyleList[index].styles[k] = reportChange;
+                    styleList[index].styles[k] = reportChange;
                   } else {
-                    newStyleList[index].styles[changeType] = reportChange;
+                    styleList[index].styles[changeType] = reportChange;
                   }
                 }
-                setStyleList(newStyleList);
               } else {
                 let json: any = { col: columnIndex, row: rowIndex, styles: {} };
                 json.styles[changeType] = reportChange;
@@ -503,7 +397,7 @@ const HotTableView: React.FC<IProps> = ({
     }
   };
 
-  /** 保存 保存数据结构---还未更新完 */
+  /** 保存 保存数据结构 */
   const saveClickCallback = async () => {
     const count_col = hotRef.current.hotInstance.countCols(); /** 获取列数 **/
     const count_row = hotRef.current.hotInstance.countRows(); /** 获取行数 **/
@@ -561,10 +455,14 @@ const HotTableView: React.FC<IProps> = ({
   };
 
   /** 更新单元格特性 */
-  const updataCells = (data: any, cellsData: any) => {
-    console.log(data, 'data');
+  const updateCells = (data: any, cellsData: any) => {
     cellsData.forEach((item: any) => {
       if (data.id === item.prop.id) {
+        current.metadata.attributes.forEach((attr) => {
+          if (item.prop.id === attr.id) {
+            item.prop = attr;
+          }
+        });
         Object.keys(data.options).map((key) => {
           switch (key) {
             case 'readOnly':
@@ -601,57 +499,24 @@ const HotTableView: React.FC<IProps> = ({
               break;
             case 'teamId':
               // eslint-disable-next-line no-case-declarations
-              const target = orgCtrl.targets.find((i) => i.id === data.options[key]);
-              console.log(target?.members, 'target');
-              if (target) {
-                let arr: any = [];
-                target?.members.forEach((item: any) => {
-                  arr.push(item.name + '(' + item.code + ')');
-                });
-                hotRef.current.hotInstance.setCellMeta(
-                  item.row,
-                  item.col,
-                  'selectOptions',
-                  arr,
-                );
-              }
+              // const target = orgCtrl.targets.find((i) => i.id === data.options[key]);
+              // if (target) {
+              //   let arr: any = [];
+              //   target?.members.forEach((item: any) => {
+              //     arr.push(item.name + '(' + item.code + ')');
+              //   });
+              //   hotRef.current.hotInstance.setCellMeta(
+              //     item.row,
+              //     item.col,
+              //     'selectOptions',
+              //     arr,
+              //   );
+              // }
               break;
             default:
               break;
           }
         });
-        let valueType: string = '';
-        switch (data.widget) {
-          case '数字框':
-            valueType = 'numeric';
-            break;
-          case '选择框':
-          case '成员选择框':
-            valueType = 'select';
-            break;
-          case '内部机构选择框':
-            valueType = 'dropdown';
-            break;
-          case '日期选择框':
-            valueType = 'date';
-            break;
-          case '时间选择框':
-            valueType = 'time';
-            break;
-          case '操作人':
-          case '操作组织':
-            valueType = 'text';
-            hotRef.current.hotInstance.setDataAtCell(
-              item.row,
-              item.col,
-              target.user.metadata?.name + '(' + target.user.metadata?.code + ')',
-            );
-            break;
-          default:
-            valueType = 'text';
-            break;
-        }
-        hotRef.current.hotInstance.setCellMeta(item.row, item.col, 'editor', valueType);
       }
     });
   };
@@ -669,7 +534,11 @@ const HotTableView: React.FC<IProps> = ({
     const td: any = TD.style;
     if (items) {
       for (let key in items.styles) {
-        td[key] = items.styles[key];
+        if (key === 'paddingLeft') {
+          td[key] = items.styles[key] + 'px';
+        } else {
+          td[key] = items.styles[key];
+        }
       }
     }
   });
@@ -707,6 +576,7 @@ const HotTableView: React.FC<IProps> = ({
         ref={hotRef}
         minCols={initRowCount}
         minRows={initColCount}
+        customBorders={true}
         rowHeaders={true}
         colHeaders={true}
         dropdownMenu={true}

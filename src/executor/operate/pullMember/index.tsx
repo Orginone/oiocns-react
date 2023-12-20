@@ -43,6 +43,7 @@ const PullMember: React.FC<IProps> = ({ current, finished }) => {
       destroyOnClose
       open={true}
       onCancel={() => finished()}
+      okButtonProps={{ disabled: selectMember.length < 1 }}
       onOk={async () => {
         await target.pullMembers(selectMember);
         finished();

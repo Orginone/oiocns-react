@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { IBelong, IFile, IWorkTask, TaskTypeName } from '@/ts/core';
+import { IFile, IWorkTask, TaskTypeName } from '@/ts/core';
 import { command } from '@/ts/base';
 import orgCtrl from '@/ts/controller';
 import { Spin, message } from 'antd';
@@ -8,14 +8,10 @@ import { loadFileMenus } from '@/executor/fileOperate';
 import { cleanMenus } from '@/utils/tools';
 import useTimeoutHanlder from '@/hooks/useTimeoutHanlder';
 
-interface IProps {
-  current: IBelong | 'disk';
-}
 /**
  * 办事-事项清单
  */
-const Content: React.FC<IProps> = (props) => {
-  if (!props.current) return <></>;
+const Content: React.FC = () => {
   const [loaded, setLoaded] = useState(true);
   const [content, setContent] = useState<IFile[]>([]);
   const [focusFile, setFocusFile] = useState<IFile>();
@@ -26,7 +22,11 @@ const Content: React.FC<IProps> = (props) => {
     return () => {
       orgCtrl.work.notity.unsubscribe(id);
     };
-  }, [props.current]);
+  }, []);
+
+  useEffect(() => {
+    command.emitter('preview', 'work', focusFile);
+  }, [focusFile]);
 
   useEffect(() => {
     command.emitter('preview', 'work', focusFile);
@@ -61,34 +61,27 @@ const Content: React.FC<IProps> = (props) => {
     }
   };
 
-  const currentFilter = (task: IWorkTask) => {
-    if (props.current === 'disk') {
-      return true;
-    }
-    return task.taskdata.belongId === props.current.id;
-  };
-
   const getBadgeCount = (tag: string) => {
     if (tag === '待办') {
-      return orgCtrl.work.todos.filter(currentFilter).length;
+      return orgCtrl.work.todos.length;
     }
     return 0;
   };
 
   const loadContent = (tag: string) => {
+    console.log(tag);
     if (tag?.length < 2) return;
     setLoaded(false);
     orgCtrl.work
       .loadContent(tag as TaskTypeName)
       .then((tasks) => {
-        setContent(
-          tasks.filter(currentFilter).sort((a, b) => {
-            return (
-              new Date(b.taskdata.createTime).getTime() -
-              new Date(a.taskdata.createTime).getTime()
-            );
-          }),
-        );
+        const newTasks = tasks.sort((a, b) => {
+          return (
+            new Date(b.taskdata.createTime).getTime() -
+            new Date(a.taskdata.createTime).getTime()
+          );
+        });
+        setContent([...newTasks]);
         setLoaded(true);
       })
       .catch((reason) => {

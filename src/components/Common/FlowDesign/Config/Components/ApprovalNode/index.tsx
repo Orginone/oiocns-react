@@ -31,6 +31,7 @@ interface IProps {
  */
 
 const ApprovalNode: React.FC<IProps> = (props) => {
+  props.current.primaryForms = props.current.primaryForms || [];
   const [isOpen, setIsOpen] = useState<boolean>(false); // 打开弹窗
   const [formModel, setFormModel] = useState<string>('');
   const [primaryForms, setPrimaryForms] = useState(props.current.primaryForms);
@@ -131,7 +132,7 @@ const ApprovalNode: React.FC<IProps> = (props) => {
                     break;
                   case '2':
                     props.current.num = 1;
-                    props.current.destId = '0';
+                    props.current.destId = '1';
                     props.current.destName = '发起人';
                     props.current.destType = '发起人';
                     setCurrentData({ id: '0', name: '发起人' });
