@@ -5,6 +5,7 @@ import { IRouteConfig } from '../typings/globelType';
 import NotFound from '@/layouts/NotFound';
 import BasicLayout from '@/layouts/Basic';
 import AuthPage from '@/layouts/Auth';
+import YusuanyitihuaCompfrom from '@/pages/Yusuanyitihua';
 export interface RouteComponentConfig extends Omit<IRouteConfig, 'component' | 'routes'> {
   routes?: RouteComponentConfig[];
   component?: React.LazyExoticComponent<React.FC<Record<string, unknown>>>;
@@ -59,6 +60,14 @@ const RelationRouter: IRouteConfig[] = [
   },
 ];
 
+const Yusuanyitihua: IRouteConfig[] = [
+  {
+    path: '/yusuanyitihua',
+    title: '预算一体化',
+    // icon: 'icon-rela'
+    component: React.lazy(() => import('@/pages/Yusuanyitihua')),
+  },
+];
 // 路由汇总
 const Routers: IRouteConfig[] = [
   {
@@ -78,6 +87,20 @@ const Routers: IRouteConfig[] = [
       ...TodoRouter,
       ...StoreRouter,
       ...RelationRouter,
+      ...Yusuanyitihua,
+      {
+        path: '*',
+        title: '页面不存在',
+        component: NotFound,
+      },
+    ],
+  },
+  {
+    path: '/ysyt',
+    component: YusuanyitihuaCompfrom,
+    title: '预算一体化',
+    routes: [
+      // ...Yusuanyitihua,
       {
         path: '*',
         title: '页面不存在',

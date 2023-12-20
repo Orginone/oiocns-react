@@ -61,6 +61,12 @@ const Navbar: React.FC = () => {
       path: '/relation',
       count: 0,
     },
+    // {
+    //   path: '/yusuanyitihua',
+    //   title: '预算一体化',
+    //   // icon: 'icon-rela'
+    //   component: React.lazy(() => import('@/pages/Yusuanyitihua')),
+    // },
   ];
 
   const NavItem = (item: any) => {

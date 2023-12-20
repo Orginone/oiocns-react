@@ -122,7 +122,7 @@ const ComApplication: FC = () => {
                       setList(dataList);
                     }
                     if (resource.link) {
-                      setLink(link);
+                      setLink(resource.link);
                     }
                   }}>
                   <div style={{ width: '100%' }}>
@@ -191,7 +191,13 @@ const ComApplication: FC = () => {
               }}></List>
           </div>
         )}
-        {link && <iframe src={link}></iframe>}
+        {link && (
+          <iframe
+            width="100%"
+            height="100%"
+						src={link}></iframe>
+        )}
+        {/* src={link} */}
         {apply && (
           <div
             style={{

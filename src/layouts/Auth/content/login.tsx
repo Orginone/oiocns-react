@@ -22,6 +22,10 @@ const PassportLogin: React.FC<{ to: (flag: string) => void }> = ({ to }) => {
     justifyContent: 'space-between',
     alignItems: 'end',
   };
+  const defaultPage = () => {
+    // history.push('/home');
+    history.push('/yusuanyitihua');
+  };
   const AccountLogin: React.FC = () => {
     return (
       <Form
@@ -34,7 +38,7 @@ const PassportLogin: React.FC<{ to: (flag: string) => void }> = ({ to }) => {
             });
             setLoading(false);
             if (res.success) {
-              history.push('/home');
+              defaultPage();
             }
           } else {
             message.warning('请填写账号和密码 ！');
@@ -94,7 +98,7 @@ const PassportLogin: React.FC<{ to: (flag: string) => void }> = ({ to }) => {
       }
       const res = await orgCtrl.auth.login(formData);
       if (res.success && res.data) {
-        history.push('/home');
+        defaultPage();
       }
     }, [formData]);
     const getDynamicCode = React.useCallback(async () => {

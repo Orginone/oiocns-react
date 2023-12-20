@@ -58,7 +58,8 @@ const App = () => {
         break;
       case LoggerLevel.qrauthed:
         message.info(msg);
-        window.location.href = '/#/home';
+        // window.location.href = '/#/home';
+        window.location.href = '/#/yusuanyitihua';
         window.location.reload();
         break;
     }

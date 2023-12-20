@@ -39,6 +39,16 @@ const authPage: React.FC = () => {
         </div>
         <div className={cls.copyright}>
           <div className={cls.copyrightEn}>
+            <div className={cls.copyrightZh}>
+              主办单位：
+              <a
+                href="https://assetcloud.orginone.cn/#/"
+                target="_blank"
+                style={{ color: '#8a8a8a' }}
+                rel="noopener noreferrer">
+                浙江省财政厅
+              </a>
+            </div>
             <a
               href="https://orginone.cn"
               target="_blank"
@@ -59,16 +69,6 @@ const authPage: React.FC = () => {
               </a>
             </div>
           )}
-          <div className={cls.copyrightZh}>
-            技术支持：
-            <a
-              href="https://assetcloud.orginone.cn/#/"
-              target="_blank"
-              style={{ color: '#8a8a8a' }}
-              rel="noopener noreferrer">
-              资产云开放协同创新中心
-            </a>
-          </div>
         </div>
       </div>
     </div>

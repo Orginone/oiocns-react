@@ -88,8 +88,10 @@ export const getResouces = (): IResources => {
   //奥集能
   return {
     platName: '奥集能',
-    location: 'orginone',
-    passport: [1, 2, 3, 4, 5, 6],
+    // location: 'orginone',
+    location: 'ysyt',
+    // passport: [1, 2, 3, 4, 5, 6],
+    passport: [],
     unitName: '',
     unitPage: '',
     favicon: '/favicon/orginone.ico',

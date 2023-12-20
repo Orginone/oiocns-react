@@ -32,7 +32,7 @@ const BasicLayout: React.FC<BasicLayoutProps> = (props) => {
     <Layout className={styles.main_body}>
       {inited ? (
         <>
-          <Navbar />
+          {/* <Navbar /> */}
           <Layout>
             {/** 命令执行器 */}
             <Executor />
