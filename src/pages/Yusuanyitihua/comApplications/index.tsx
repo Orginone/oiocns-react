@@ -176,6 +176,7 @@ const ComApplication: FC = () => {
                               <span
                                 className={cls['ysyt-item-work']}
                                 onClick={() => {
+                                  setList(undefined);
                                   setCurrent(file);
                                 }}
                                 key={file.id}>
@@ -192,7 +193,6 @@ const ComApplication: FC = () => {
           </div>
         )}
         {link && <iframe width="100%" height="100%" src={link}></iframe>}
-        {/* src={link} */}
         {apply && (
           <div
             style={{
