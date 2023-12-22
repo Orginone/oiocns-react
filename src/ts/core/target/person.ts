@@ -294,7 +294,7 @@ export class Person extends Belong implements IPerson {
   }
 
   override operates(): model.OperateModel[] {
-    const operates = super.operates();
+    const operates = super.operates().filter((i) => i.cmd != 'hardDelete');
     operates.unshift(
       ...personJoins.menus,
       targetOperates.JoinStorage,

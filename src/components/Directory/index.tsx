@@ -16,6 +16,7 @@ const Directory: React.FC<{ root: IFile }> = ({ root }) => {
   const [content, setContent] = useState(directory.content());
   const [loaded, setLoaded] = useState(false);
   useEffect(() => {
+    setCurrentTag('全部');
     const id = directory.subscribe(() => {
       loadContent(directory, directory);
     });

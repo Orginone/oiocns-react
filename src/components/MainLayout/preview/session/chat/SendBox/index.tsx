@@ -2,7 +2,6 @@ import * as im from 'react-icons/im';
 import { Divider, Popover, Space } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { IMessage, ISession, ISysFileInfo, MessageType } from '@/ts/core';
-import './index.less';
 import OpenFileDialog from '@/components/OpenFileDialog';
 import { parseCiteMsg } from '../components/parseMsg';
 import Emoji from '../components/emoji';
@@ -73,7 +72,7 @@ const GroupInputBox = (props: IProps) => {
   });
 
   return (
-    <div className="send-box">
+    <div className="chat-send-box">
       <Space split={<Divider type="vertical" style={{ height: 20 }} />} size={0}>
         <Popover
           content={
@@ -109,14 +108,14 @@ const GroupInputBox = (props: IProps) => {
               points: ['t', 'l'],
             }}
             content={
-              <div className="at-list">
+              <div className="chat-at-list">
                 {props.chat.members
                   .filter((i) => i.id != props.chat.userId)
                   .map((i) => {
                     return (
                       <div
                         key={i.id}
-                        className="at-list-item"
+                        className="chat-at-list-item"
                         onClick={() => {
                           props.chat.inputContent.mentions.push({
                             id: i.id,
@@ -124,7 +123,8 @@ const GroupInputBox = (props: IProps) => {
                           });
                           setMessage((message) => message + i.name + ' ');
                         }}>
-                        <EntityIcon entity={i} showName size={30} />
+                        <EntityIcon disInfo entity={i} size={35} />
+                        <span>{i.name}</span>
                       </div>
                     );
                   })}

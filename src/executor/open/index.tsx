@@ -9,6 +9,7 @@ import TransferView from './transfer';
 import AudioPlayer from './audio';
 import EntityPreview from './entity';
 import CodeEditor from './codeeditor';
+import Directory from './directory';
 import EntityForm from '../operate/entityForm';
 import { IEntity, ISysFileInfo, TargetType } from '@/ts/core';
 import JoinApply from './task/joinApply';
@@ -58,6 +59,10 @@ const ExecutorOpen: React.FC<IOpenProps> = (props: IOpenProps) => {
     }
   } else if ('key' in props.entity) {
     switch (props.entity.typeName) {
+      case '目录':
+      case '应用':
+      case '模块':
+        return <Directory current={props.entity as any} finished={props.finished} />;
       case '表单':
         return <FormView form={props.entity as any} finished={props.finished} />;
       case '迁移配置':

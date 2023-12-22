@@ -46,10 +46,8 @@ const TaskStart: React.FC<IProps> = ({ current, finished }) => {
               }}
               belong={current.directory.target.space}
               notifyEmitter={notifyEmitter}
-              onValuesChange={(_, data) => {
-                Object.keys(data).forEach((a) => {
-                  gatewayData.set(a, data[a]);
-                });
+              onValuesChange={(field, data) => {
+                gatewayData.set(field, data);
               }}
             />
           );

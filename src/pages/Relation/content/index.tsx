@@ -25,6 +25,9 @@ const Content: React.FC = () => {
   useEffect(() => {
     command.emitter('preview', 'relation', focusFile);
   }, [focusFile]);
+  useEffect(() => {
+    setCurrentTag('全部');
+  }, [current]);
   const contextMenu = (file?: IFile) => {
     const entity = file ?? current;
     if (entity != 'disk') {

@@ -23,6 +23,10 @@ const Content: React.FC = () => {
     command.emitter('preview', 'store', focusFile);
   }, [focusFile]);
 
+  useEffect(() => {
+    setCurrentTag('全部');
+  }, [current]);
+
   const focusHanlder = (file: IFile | undefined) => {
     const focused = file && focusFile && file.key === focusFile.key;
     if (focused) {
