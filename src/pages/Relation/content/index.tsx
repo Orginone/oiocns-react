@@ -101,8 +101,8 @@ const Content: React.FC = () => {
           </>
         ) : (
           <>
-            <OrgIcons relation selected />
-            <span style={{ paddingLeft: 6 }}>关系</span>
+            <OrgIcons relation />
+            <span style={{ paddingLeft: 6 }}>设置</span>
           </>
         )}
       </div>
@@ -119,7 +119,6 @@ const Content: React.FC = () => {
         focusFile={focusFile}
         content={getContent()}
         currentTag={currentTag}
-        height={'calc(100% - 100px)'}
         tagChanged={(t) => setCurrentTag(t)}
         fileOpen={(entity, dblclick) => clickHanlder(entity as ITarget, dblclick)}
         contextMenu={(entity) => contextMenu(entity as IWorkTask)}

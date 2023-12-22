@@ -58,7 +58,6 @@ const ChatSelect: React.FC<{ onSelected: (chat: ISession) => void }> = ({
   return (
     <DirectoryViewer
       extraTags={false}
-      height={'calc(100% - 100px)'}
       initTags={['全部', '好友', '同事', '群聊']}
       selectFiles={[]}
       content={chats}

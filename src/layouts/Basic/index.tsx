@@ -4,7 +4,7 @@ import { renderRoutes } from 'react-router-config';
 import { IRouteConfig } from 'typings/globelType';
 import orgCtrl from '@/ts/controller';
 import styles from './index.module.less';
-import Navbar from './navbar';
+import Navbar from './header';
 import Executor from '@/executor';
 import { kernel } from '@/ts/base';
 

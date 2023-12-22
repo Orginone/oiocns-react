@@ -175,13 +175,12 @@ const WorkContent: React.FC = () => {
     <AppLayout previewFlag={'work'}>
       <Spin spinning={!loaded} tip={'加载中...'}>
         <div key={key} style={{ marginLeft: 10, padding: 2, fontSize: 16 }}>
-          <OrgIcons work selected />
-          <span style={{ paddingLeft: 10 }}>办事</span>
+          <OrgIcons work />
+          <span style={{ paddingLeft: 10 }}>待办</span>
         </div>
         <DirectoryViewer
           extraTags={false}
           currentTag={currentTag}
-          height={'calc(100% - 100px)'}
           selectFiles={[]}
           focusFile={focusFile}
           content={content}

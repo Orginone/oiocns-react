@@ -13,7 +13,7 @@ interface TypeIconInfo {
 /** 类型图标 */
 const TypeIcon = ({ avatar, iconType, size }: TypeIconInfo) => {
   const iconSize = size || 12;
-  const config: any = { size: iconSize, color: '#3838b9' };
+  const config: any = { size: iconSize, color: '#506cfa' };
   const loadFileIcon = () => {
     switch (iconType) {
       case 'application/pdf':

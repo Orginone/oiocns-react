@@ -50,14 +50,15 @@ const GroupActivityItem: React.FC<{ activity: IActivity }> = ({ activity }) => {
     return (
       <div className={'loadContext'}>
         <TargetActivity
-          height={'calc(100vh - 110px)'}
+          height={'calc(100vh - 230px)'}
           activity={current}
-          title={current.name + '动态'}></TargetActivity>
+          title={current.name + '动态'}
+        />
       </div>
     );
   }, [loaded, current]);
   return (
-    <div className={'activityContent'}>
+    <div className="activityContent">
       <Spin tip="加载中,请稍后..." size="large" spinning={!loaded} delay={100}>
         <div className="groupCtx">
           {loadMenus()}

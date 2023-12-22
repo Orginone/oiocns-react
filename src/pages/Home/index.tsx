@@ -1,34 +1,52 @@
-import cls from './index.module.less';
-import React, { useState } from 'react';
-import NavigationBar, { allPages } from './components/NavigationBar';
-export interface NavigationItem {
-  key: string;
-  label: string;
-  backgroundImageUrl: string;
-  type: string;
-  component: any;
-}
+import React, { useEffect, useState } from 'react';
+import MainLayout from './layout';
+import * as config from './config/menuOperate';
+import useMenuUpdate from '@/hooks/useMenuUpdate';
+import { MenuItemType } from 'typings/globelType';
+import { command } from '@/ts/base';
+/** 首页 */
+const FileBrowser: React.FC = () => {
+  const [menus, setMenus] = useState<MenuItemType>();
+  useEffect(() => {
+    config.loadBrowserMenu().then((res) => {
+      setMenus(res as MenuItemType);
+    });
+  }, []);
+  useEffect(() => {
+    const id = command.subscribeByFlag('home', () => {
+      config.loadBrowserMenu().then((res) => {
+        setMenus({ ...res } as MenuItemType);
+      });
+    });
+    return () => {
+      command.unsubscribe(id);
+    };
+  }, []);
+  if (menus) {
+    return <Budget menus={menus} />;
+  }
+  return <></>;
+};
 
-const Home: React.FC = () => {
-  const [current, setCurrent] = useState(allPages[0]);
+const Budget: React.FC<{ menus: MenuItemType }> = ({ menus }) => {
+  const [, rootMenu, selectMenu, setSelectMenu] = useMenuUpdate(() => {
+    return menus;
+  });
+  if (!selectMenu || !rootMenu) return <></>;
   return (
-    <div className={cls.homepage}>
-      {current.type == 'inner' && (
-        <div
-          className={cls.headBanner}
-          style={{ backgroundImage: `url(${current.backgroundImageUrl})` }}></div>
-      )}
-      <div className={cls.content}>
-        {current.type == 'inner' && React.createElement(current.component)}
-      </div>
-      {current.type == 'page' && current.component}
-      <NavigationBar
-        list={allPages}
-        onChange={(item) => {
-          setCurrent(item);
-        }}
-      />
-    </div>
+    <MainLayout
+      previewFlag={'budget'}
+      rootMenu={rootMenu}
+      selectMenu={selectMenu}
+      onSelect={async (data) => {
+        if (data.item) {
+          command.emitter('preview', 'budget', data.item);
+        }
+        setSelectMenu(data);
+      }}
+      siderMenuData={rootMenu}
+    />
   );
 };
-export default Home;
+
+export default FileBrowser;

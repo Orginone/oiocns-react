@@ -120,12 +120,11 @@ const ChatContent: React.FC = () => {
     <AppLayout previewFlag={'chat'}>
       <Spin spinning={!loaded} tip={'加载中...'}>
         <div style={{ marginLeft: 10, padding: 2, fontSize: 16 }}>
-          <OrgIcons chat selected />
-          <span style={{ paddingLeft: 10 }}>沟通</span>
+          <OrgIcons chat />
+          <span style={{ paddingLeft: 10 }}>消息</span>
         </div>
         <DirectoryViewer
           extraTags={false}
-          height={'calc(100% - 100px)'}
           initTags={['最近', '常用', '@我', '未读', '好友', '同事', '群聊']}
           selectFiles={[]}
           focusFile={focusFile}

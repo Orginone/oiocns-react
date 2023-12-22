@@ -5,22 +5,39 @@
 }
 
 .header {
-  text-align: center;
-  padding: 10px 0;
-  border-right: rgba(227, 226, 226, 0.8) solid 1px;
-  box-shadow: inset -20px 0px 10px 10px #f8f9ff;
+  height: 54px;
+  display: flex;
+  padding: 2px 20px;
+  border-bottom: rgba(227, 226, 226, 0.8) solid 1px;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  align-items: flex-end;
+  .budget {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    cursor: pointer;
+  }
   .navbar {
-    width: 100%;
-    height: calc(100vh - 110px);
-    padding-top: 25px;
+    height: 60px;
+    .barItem {
+      display: flex;
+      flex-wrap: wrap;
+      cursor: pointer;
+      flex-direction: column;
+    }
   }
   .title {
-    font-size: 12px;
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
     text-align: center;
-    color: #888;
   }
   .title_selected {
-    font-size: 12px;
+    color: rgb(246, 255, 144);
+    font-size: 14px;
     font-weight: bold;
     text-align: center;
   }

@@ -60,7 +60,7 @@ const PreviewLayout: React.FC<IProps> = (props) => {
         </List.Item>
         <div
           style={{
-            height: 'calc(100vh - 105px)',
+            height: 'calc(100vh - 155px)',
             overflow: 'scroll',
           }}
           className={css.groupDetailContent}>

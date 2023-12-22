@@ -85,6 +85,17 @@ export const getResouces = (): IResources => {
       unitPage: 'https://kjt.zj.gov.cn',
     };
   }
+  //预算管理一体化
+  if (hostname.startsWith('budget')) {
+    return {
+      platName: '预算管理一体化',
+      location: 'budget',
+      passport: [1],
+      unitName: '浙江省财政厅',
+      favicon: '/img/budget.png',
+      unitPage: 'https://czt.zj.gov.cn',
+    };
+  }
   //奥集能
   return {
     platName: '奥集能',

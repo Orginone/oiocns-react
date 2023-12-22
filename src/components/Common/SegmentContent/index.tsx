@@ -16,7 +16,6 @@ interface IProps {
  * 存储-文件系统
  */
 const SegmentContent: React.FC<IProps> = ({
-  height,
   children,
   descriptions,
   onSegmentChanged,
@@ -25,7 +24,7 @@ const SegmentContent: React.FC<IProps> = ({
   const parentRef = useRef<any>();
 
   return (
-    <div style={{ height: height }} className={style.pageCard}>
+    <div className={style.pageCard}>
       <div className={style.mainContent} ref={parentRef}>
         {children && children}
       </div>

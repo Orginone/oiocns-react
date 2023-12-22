@@ -75,8 +75,8 @@ const Content: React.FC = () => {
           </>
         ) : (
           <>
-            <OrgIcons store selected />
-            <span style={{ paddingLeft: 6 }}>数据</span>
+            <OrgIcons store />
+            <span style={{ paddingLeft: 6 }}>管理</span>
           </>
         )}
       </div>
@@ -94,7 +94,6 @@ const Content: React.FC = () => {
         focusFile={focusFile}
         content={getContent()}
         currentTag={currentTag}
-        height={'calc(100% - 100px)'}
         tagChanged={(t) => setCurrentTag(t)}
         fileOpen={(entity, dblclick) => clickHanlder(entity as ITarget, dblclick)}
         contextMenu={() => {

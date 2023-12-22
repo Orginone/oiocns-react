@@ -21,6 +21,11 @@ import Directory from '@/components/Directory';
 import TaskApproval from '@/executor/tools/task/approval';
 import TaskStart from '@/executor/tools/task/start';
 import PreviewLayout from './layout';
+import { IPageTemplate } from '@/ts/core/thing/standard/page';
+import { ViewerHost } from '@/executor/open/page/view/ViewerHost';
+import ViewerManager from '@/executor/open/page/view/ViewerManager';
+import CohortActivity from './activity/cohort';
+import FriendActivity from './activity/friends';
 
 const officeExt = ['.md', '.pdf', '.xls', '.xlsx', '.doc', '.docx', '.ppt', '.pptx'];
 const videoExt = ['.mp4', '.avi', '.mov', '.mpg', '.swf', '.flv', '.mpeg'];
@@ -33,6 +38,7 @@ type EntityType =
   | IForm
   | ITarget
   | IWork
+  | IPageTemplate
   | undefined;
 
 /** 文件预览 */
@@ -71,6 +77,15 @@ const EntityPreview: React.FC<{ flag?: string }> = (props) => {
   const renderEntityBody = (entity: any, children?: React.ReactNode) => {
     return <PreviewLayout entity={entity}>{children && children}</PreviewLayout>;
   };
+
+  if (typeof entity === 'string') {
+    switch (entity) {
+      case 'cohort':
+        return <CohortActivity />;
+      case 'friend':
+        return <FriendActivity />;
+    }
+  }
 
   if (entity && typeof entity != 'string') {
     if ('filedata' in entity) {
@@ -126,9 +141,12 @@ const EntityPreview: React.FC<{ flag?: string }> = (props) => {
           return <SessionBody key={entity.key} relation session={entity.session} />;
       }
     }
+    if ('command' in entity) {
+      return <ViewerHost ctx={{ view: new ViewerManager(entity) }} />;
+    }
     return renderEntityBody(entity);
   }
-  return <></>;
+  return <img src="/img/ysytBg.png" />;
 };
 
 export default EntityPreview;

@@ -49,7 +49,6 @@ const WorkSelect: React.FC<{ onSelected: (work: IWork) => void }> = ({ onSelecte
     <Spin spinning={!loaded} tip={'加载中...'}>
       <DirectoryViewer
         extraTags
-        height={'calc(100% - 100px)'}
         initTags={['全部']}
         selectFiles={[]}
         content={works}

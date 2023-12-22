@@ -497,7 +497,7 @@ h3 {
       display: flex;
       flex-direction: column;
       overflow-y: scroll;
-      height: calc(100vh - 30px);
+      height: calc(100vh - 140px);
       border-radius: 4px;
       padding: 8px;
       min-width: 500px;
@@ -1465,4 +1465,34 @@ h3 {
   display: flex;
   align-items: center;
   margin-right: 16px;
+}
+
+.ogo-menu-vertical.ogo-menu-sub,
+.ogo-menu-vertical-left.ogo-menu-sub,
+.ogo-menu-vertical-right.ogo-menu-sub {
+  min-width: 200px;
+  max-height: 500px;
+}
+
+.ogo-menu:not(.ogo-menu-horizontal) .ogo-menu-item-selected {
+  color: white;
+  background-color: @focus-background;
+}
+
+.ogo-menu-submenu-selected {
+  color: white;
+  background-color: @focus-background;
+}
+.ogo-menu-vertical .ogo-menu-submenu-selected,
+.ogo-menu-vertical-left .ogo-menu-submenu-selected,
+.ogo-menu-vertical-right .ogo-menu-submenu-selected {
+  color: white;
+  :hover {
+    color: white;
+  }
+
+  .ogo-menu-submenu-expand-icon,
+  .ogo-menu-submenu-arrow {
+    color: white;
+  }
 }
