@@ -32,6 +32,11 @@ export interface ISession extends IEntity<schema.XEntity> {
   activity: IActivity;
   /** 是否可以删除消息 */
   canDeleteMessage: boolean;
+  /** 输入框内容 */
+  inputContent: {
+    message: string;
+    mentions: { text: string; id: string }[];
+  };
   /** 加载更多历史消息 */
   moreMessage(): Promise<number>;
   /** 禁用通知 */
@@ -65,6 +70,10 @@ export class Session extends Entity<schema.XEntity> implements ISession {
   activity: IActivity;
   chatdata: model.MsgChatData;
   messages: IMessage[] = [];
+  inputContent: { message: string; mentions: { text: string; id: string }[] } = {
+    message: '',
+    mentions: [],
+  };
   private messageNotify?: (messages: IMessage[]) => void;
   constructor(id: string, target: ITarget, _metadata: schema.XTarget, tags?: string[]) {
     super(_metadata, tags ?? []);
@@ -138,11 +147,14 @@ export class Session extends Entity<schema.XEntity> implements ISession {
     return undefined;
   }
   get remark(): string {
+    if (this.inputContent.message.length > 0) {
+      return '草稿:' + this.inputContent.message;
+    }
     if (this.chatdata.lastMessage) {
       const msg = new Message(this.chatdata.lastMessage, this);
       return msg.msgTitle;
     }
-    return this.metadata.remark.substring(0, 60);
+    return this.metadata.remark;
   }
   get updateTime(): string {
     if (this.chatdata.lastMessage) {
@@ -249,6 +261,10 @@ export class Session extends Entity<schema.XEntity> implements ISession {
     cite?: IMessage | undefined,
     forward?: IMessage[] | undefined,
   ): Promise<boolean> {
+    this.inputContent = {
+      message: '',
+      mentions: [],
+    };
     if (cite) {
       cite.metadata.comments = [];
     }

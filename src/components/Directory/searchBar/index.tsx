@@ -38,7 +38,7 @@ const SearchBar: React.FC<IProps> = (props) => {
               <Typography.Link
                 key={item.key}
                 title={item.label}
-                style={{ fontSize: 18 }}
+                style={{ fontSize: 22 }}
                 onClick={() => {
                   props.menus.onClick?.apply(this, [item]);
                 }}>
@@ -57,7 +57,7 @@ const SearchBar: React.FC<IProps> = (props) => {
             )}
             placement="bottom"
             trigger={['click', 'contextMenu']}>
-            <RiMore2Fill fontSize={22} style={{ cursor: 'pointer' }} />
+            <RiMore2Fill color={'#3838b9'} fontSize={22} style={{ cursor: 'pointer' }} />
           </Dropdown>
         )}
       </Space>

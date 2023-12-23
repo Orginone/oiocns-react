@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import GroupContent from './GroupContent';
 import SendBox from './SendBox';
-import charsStyle from './index.module.less';
 import ChatShareForward from './ChatShareForward';
 import { ISession, IMessage } from '@/ts/core';
 import { RiShareForwardLine } from 'react-icons/ri';
@@ -34,9 +33,9 @@ const Chat: React.FC<{ chat: ISession; filter: string }> = ({ chat, filter }) =>
     setBatchType('merge');
   };
   return (
-    <div className={charsStyle.cohort_wrap}>
+    <div className="chat">
       {/* 主体 */}
-      <div className={charsStyle.chart_page}>
+      <div className="chat-content">
         {/* 聊天区域 */}
         <GroupContent
           chat={chat}
@@ -62,30 +61,26 @@ const Chat: React.FC<{ chat: ISession; filter: string }> = ({ chat, filter }) =>
           }}
         />
         {/* 输入区域 */}
-        <div className={charsStyle.chart_input}>
-          <SendBox
-            chat={chat}
-            writeContent={writeContent}
-            citeText={citeText} // 传递引用的值给聊天框组件
-            closeCite={() => setCiteText(undefined)} // 设置关闭引用下的值
-          />
-        </div>
+        <SendBox
+          chat={chat}
+          writeContent={writeContent}
+          citeText={citeText} // 传递引用的值给聊天框组件
+          closeCite={() => setCiteText(undefined)} // 设置关闭引用下的值
+        />
         {/* 多选操作内容 */}
         {multiSelectShow && (
-          <div className={charsStyle.chart_mulit_select}>
-            <div className={charsStyle.chart_mulit_select_wrap}>
+          <div className="chart_mulit_select">
+            <div className="chart_mulit_select_wrap">
               <div
-                className={charsStyle.chart_mulit_select_action}
+                className="chart_mulit_select_action"
                 onClick={() => multiSingleSend()}>
-                <span className={charsStyle.chart_mulit_select_icon}>
+                <span className="chart_mulit_select_icon">
                   <RiShareForwardLine size={22} />
                 </span>
                 <span>逐条转发</span>
               </div>
-              <div
-                className={charsStyle.chart_mulit_select_action}
-                onClick={() => multiBatchSend()}>
-                <span className={charsStyle.chart_mulit_select_icon}>
+              <div className="chart_mulit_select_action" onClick={() => multiBatchSend()}>
+                <span className="chart_mulit_select_icon">
                   <RiShareForwardLine size={22} />
                 </span>
                 <span>合并转发</span>

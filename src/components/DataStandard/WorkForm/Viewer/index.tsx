@@ -1,4 +1,4 @@
-import { model, schema } from '@/ts/base';
+import { common, model, schema } from '@/ts/base';
 import { IBelong } from '@/ts/core';
 import React from 'react';
 import Toolbar, { Item } from 'devextreme-react/toolbar';
@@ -118,7 +118,11 @@ const WorkFormViewer: React.FC<{
                 }
               }
               try {
-                props.data[calcRule.target] = eval(formula);
+                props.data[calcRule.target] = running(
+                  `nextData = ${formula}`,
+                  { data: props.data },
+                  { target: calcRule.target },
+                );
               } catch {
                 logger.error(`计算规则[${formula}]执行失败，请确认是否维护正确!`);
               }
@@ -133,6 +137,19 @@ const WorkFormViewer: React.FC<{
       forceUpdate();
     }
   };
+
+  const running = (code: string, args: any, env?: model.KeyValue): any => {
+    const runtime = {
+      environment: env ?? {},
+      preData: args,
+      nextData: {},
+      decrypt: common.decrypt,
+      encrypt: common.encrypt,
+    };
+    common.Sandbox(code)(runtime);
+    return runtime.nextData;
+  };
+
   return (
     <div style={{ padding: 16 }} key={key}>
       <Toolbar height={60}>

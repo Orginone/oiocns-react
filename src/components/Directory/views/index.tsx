@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect, useState } from 'react';
+import React, { ReactNode, useState } from 'react';
 import IconMode from './iconMode';
 import ListMode from './listMode';
 import VListMode from './vlistMode';
@@ -21,6 +21,7 @@ interface IProps {
   focusFile?: IDEntity;
   rightBars?: ReactNode;
   height?: number | string;
+  currentTag: string;
   badgeCount?: (tag: string) => number;
   tagChanged?: (tag: string) => void;
   fileOpen: (file: IDEntity | undefined, dblclick: boolean) => void;
@@ -31,15 +32,7 @@ interface IProps {
  */
 const DirectoryView: React.FC<IProps> = (props) => {
   const [filterText, setFilter] = useState<string>('');
-  const [currentTag, setCurrentTag] = useState(
-    props.initTags.length > 0 ? props.initTags[0] : '',
-  );
   const [segmented, setSegmented] = useStorage('segmented', 'list');
-  if (props.tagChanged) {
-    useEffect(() => {
-      props.tagChanged?.apply(this, [currentTag]);
-    }, [currentTag]);
-  }
   const getContent = (filter: boolean = true) => {
     const filterExp = (file: IDEntity) => {
       return (
@@ -51,7 +44,7 @@ const DirectoryView: React.FC<IProps> = (props) => {
       );
     };
     if (props.extraTags) {
-      if (filter && currentTag == '已选中') {
+      if (filter && props.currentTag == '已选中') {
         return props.selectFiles.filter(filterExp);
       }
       const tagFilter = (file: IDEntity) => {
@@ -60,8 +53,8 @@ const DirectoryView: React.FC<IProps> = (props) => {
           success = !props.excludeIds.includes(file.id);
         }
         if (filter && success) {
-          if (currentTag !== '全部' && currentTag != '最近') {
-            success = file.groupTags.includes(currentTag);
+          if (props.currentTag !== '全部' && props.currentTag != '最近') {
+            success = file.groupTags.includes(props.currentTag);
           } else {
             success = !file.groupTags.includes('已删除');
           }
@@ -109,7 +102,7 @@ const DirectoryView: React.FC<IProps> = (props) => {
         menus={props.contextMenu()}
       />
       <TagsBar
-        select={currentTag}
+        select={props.currentTag}
         showBack={props.preDirectory != undefined}
         extraTags={props.extraTags}
         excludeTags={props.excludeTags || []}
@@ -118,7 +111,7 @@ const DirectoryView: React.FC<IProps> = (props) => {
         entitys={getContent(false)}
         badgeCount={props.badgeCount}
         onBack={() => props.fileOpen(props.preDirectory, true)}
-        onChanged={(t) => setCurrentTag(t)}></TagsBar>
+        onChanged={(t) => props.tagChanged && props.tagChanged(t)}></TagsBar>
       <SegmentContent
         height={props.height}
         onSegmentChanged={setSegmented}

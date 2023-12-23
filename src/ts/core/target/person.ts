@@ -62,9 +62,6 @@ export class Person extends Belong implements IPerson {
   copyFiles: Map<string, IFile>;
   private _cohortLoaded: boolean = false;
   private _givedIdentityLoaded: boolean = false;
-  get superior(): IFile {
-    return this;
-  }
 
   async loadGivedIdentitys(reload: boolean = false): Promise<schema.XIdProof[]> {
     if (!this._givedIdentityLoaded || reload) {
@@ -297,9 +294,10 @@ export class Person extends Belong implements IPerson {
   }
 
   override operates(): model.OperateModel[] {
-    const operates = super.operates();
+    const operates = super.operates().filter((i) => i.cmd != 'hardDelete');
     operates.unshift(
       ...personJoins.menus,
+      targetOperates.JoinStorage,
       targetOperates.NewCompany,
       targetOperates.NewStorage,
     );

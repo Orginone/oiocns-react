@@ -2,6 +2,7 @@ import { TargetType } from '@/ts/core';
 import React from 'react';
 import * as im from 'react-icons/im';
 import * as fa from 'react-icons/fa';
+import { BsHouseAddFill } from 'react-icons/bs';
 
 interface TypeIconInfo {
   avatar?: boolean;
@@ -132,7 +133,7 @@ const TypeIcon = ({ avatar, iconType, size }: TypeIconInfo) => {
       case 'joinCohort':
         return <im.ImUsers {...config} />;
       case 'joinCompany':
-        return <im.ImPlus {...config} />;
+        return <BsHouseAddFill {...config} />;
       case 'joinGroup':
         return <im.ImEnter {...config} />;
       case 'newFile':

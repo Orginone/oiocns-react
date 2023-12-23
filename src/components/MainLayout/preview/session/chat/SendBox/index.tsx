@@ -2,7 +2,6 @@ import * as im from 'react-icons/im';
 import { Divider, Popover, Space } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { IMessage, ISession, ISysFileInfo, MessageType } from '@/ts/core';
-import './index.less';
 import OpenFileDialog from '@/components/OpenFileDialog';
 import { parseCiteMsg } from '../components/parseMsg';
 import Emoji from '../components/emoji';
@@ -26,19 +25,23 @@ const GroupInputBox = (props: IProps) => {
   const [open, setOpen] = useState<boolean>(false);
   const [openEmoji, setOpenEmoji] = useState(false);
   const [citeShow, setCiteShow] = useState<boolean>(false); // @展示
-  const [message, setMessage] = useState<string>('');
-  const [mentions, setMentions] = useState<{ text: string; id: string }[]>([]);
+  const [message, setMessage] = useState(props.chat.inputContent.message);
+
   useEffect(() => {
     if (props.writeContent) {
       setMessage(props.writeContent);
     }
   }, [props.writeContent]);
 
+  useEffect(() => {
+    props.chat.inputContent.message = message;
+  }, [message]);
+
   /** 发送消息 */
   const sendMessage = () => {
     if (message.length > 0) {
       const vaildMentions: string[] = [];
-      for (const mention of mentions) {
+      for (const mention of props.chat.inputContent.mentions) {
         if (message.includes(mention.text) && !vaildMentions.includes(mention.id)) {
           vaildMentions.push(mention.id);
         }
@@ -69,7 +72,7 @@ const GroupInputBox = (props: IProps) => {
   });
 
   return (
-    <div className="send-box">
+    <div className="chat-send-box">
       <Space split={<Divider type="vertical" style={{ height: 20 }} />} size={0}>
         <Popover
           content={
@@ -105,25 +108,23 @@ const GroupInputBox = (props: IProps) => {
               points: ['t', 'l'],
             }}
             content={
-              <div className="at-list">
+              <div className="chat-at-list">
                 {props.chat.members
                   .filter((i) => i.id != props.chat.userId)
                   .map((i) => {
                     return (
                       <div
                         key={i.id}
-                        className="at-list-item"
+                        className="chat-at-list-item"
                         onClick={() => {
-                          setMentions((before) => [
-                            ...before,
-                            {
-                              id: i.id,
-                              text: `@${i.name} `,
-                            },
-                          ]);
+                          props.chat.inputContent.mentions.push({
+                            id: i.id,
+                            text: `@${i.name} `,
+                          });
                           setMessage((message) => message + i.name + ' ');
                         }}>
-                        <EntityIcon entity={i} showName size={30} />
+                        <EntityIcon disInfo entity={i} size={35} />
+                        <span>{i.name}</span>
                       </div>
                     );
                   })}
