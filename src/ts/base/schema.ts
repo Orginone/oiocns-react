@@ -197,9 +197,9 @@ export type XForm = {
   bindNodes: XWorkNode[] | undefined;
   // 表单的目录
   directory: XDirectory | undefined;
-  // 报表存储
+  // 报表存储数据
   reportDatas: string;
-  // 报表的填报周期
+  // 报表填报周期
   cycle: string;
 } & XStandard;
 

@@ -188,6 +188,7 @@ export class WorkTask extends FileInfo<schema.XEntity> implements IWorkTask {
     }
     return false;
   }
+
   async createApply(): Promise<IWorkApply | undefined> {
     if (this.taskdata.approveType == '子流程') {
       await this.loadInstance();

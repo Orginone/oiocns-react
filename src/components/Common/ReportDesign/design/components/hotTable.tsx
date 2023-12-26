@@ -42,6 +42,7 @@ const HotTableView: React.FC<IProps> = ({
   const [classList, setClassList] = useState<any>([]);
   const [customBorders, setCustomBorders] = useState<any>([]);
   const [copySelected, setCopySelected] = useState<any>();
+  const [selectAttr, setSelectAttr] = useState<any>();
   const initRowCount: number = 8;
   const initColCount: number = 60;
   const defaultRowHeight: number = 23;
@@ -303,6 +304,9 @@ const HotTableView: React.FC<IProps> = ({
 
   /** 更新边框 */
   const updateBorder = (customBorders: any) => {
+    // const customBordersPlugin = hotRef.current.hotInstance.getPlugin('customBorders');
+    // console.log(customBordersPlugin, 'customBordersPlugin');
+    // console.log(customBorders, 'customBorders');
     customBorders.forEach((it: any) => {
       if (it.range.length > 0) {
         const customBordersPlugin = hotRef.current.hotInstance.getPlugin('customBorders');
@@ -464,11 +468,15 @@ const HotTableView: React.FC<IProps> = ({
           classJson.class = item.class;
         }
       });
-      cells?.forEach((item: any) => {
-        if (item.row === coords.row && item.col === coords.col) {
-          selectCellItem(item);
-        }
-      });
+      const item = cells.find(
+        (it: any) => it.row === coords.row && it.col === coords.col,
+      );
+      if (item) {
+        setSelectAttr(item);
+        selectCellItem(item);
+      } else {
+        setSelectAttr(undefined);
+      }
       handEcho(classJson);
     }
   };
@@ -546,6 +554,12 @@ const HotTableView: React.FC<IProps> = ({
     TD.style.background = '#e1f3d8';
   });
 
+  /** 删除特性背景色 **/
+  registerRenderer('delStylesRenderer', (hotInstance: any, TD: any, ...rest) => {
+    textRenderer(hotInstance, TD, ...rest);
+    TD.style.background = '#ffffff';
+  });
+
   /** 渲染样式 **/
   registerRenderer('cellStylesRenderer', (hotInstance: any, TD: any, ...rest) => {
     textRenderer(hotInstance, TD, ...rest);
@@ -589,6 +603,33 @@ const HotTableView: React.FC<IProps> = ({
     }
   };
 
+  /** 删除特性 */
+  const delSpeciality = () => {
+    const index = current.metadata.attributes.findIndex(
+      (it: any) => it.propId === selectAttr?.prop.id,
+    );
+    current.metadata.attributes.splice(index, 1);
+    const selected = hotRef.current.hotInstance.getSelected() || [];
+    for (let index = 0; index < selected.length; index += 1) {
+      const [row1, column1, row2, column2] = selected[index];
+      const startRow = Math.max(Math.min(row1, row2), 0);
+      const endRow = Math.max(row1, row2);
+      const startCol = Math.max(Math.min(column1, column2), 0);
+      const endCol = Math.max(column1, column2);
+      for (let rowIndex = startRow; rowIndex <= endRow; rowIndex += 1) {
+        for (let columnIndex = startCol; columnIndex <= endCol; columnIndex += 1) {
+          cells.forEach((items: { row: number; col: number }) => {
+            if (items.row === rowIndex && items.col === columnIndex) {
+              cells.splice(items);
+            }
+          });
+          hotRef.current.hotInstance.getCellMeta(rowIndex, columnIndex).renderer =
+            'delStylesRenderer';
+        }
+      }
+    }
+  };
+
   return (
     <div>
       <HotTable
@@ -603,9 +644,9 @@ const HotTableView: React.FC<IProps> = ({
         language={zhCN.languageCode}
         persistentState={true}
         stretchH="all"
-        manualColumnResize={true}
-        manualRowResize={true}
         multiColumnSorting={true}
+        filters={true}
+        manualRowMove={true}
         contextMenu={{
           items: {
             row_above: {},
@@ -619,6 +660,12 @@ const HotTableView: React.FC<IProps> = ({
               name: '插入特性',
               callback: function () {
                 setModalType('新增特性');
+              },
+            },
+            del_speciality: {
+              name: '删除特性',
+              callback: function () {
+                delSpeciality();
               },
             },
           },
