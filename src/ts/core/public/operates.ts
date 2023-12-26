@@ -354,8 +354,7 @@ export const personJoins = {
       sort: 42,
       cmd: 'joinCompany',
       label: '加入单位',
-      iconType: '单位',
-      model: 'outside',
+      iconType: 'joinCompany',
     },
   ],
 };

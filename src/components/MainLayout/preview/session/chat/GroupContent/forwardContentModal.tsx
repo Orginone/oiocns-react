@@ -6,7 +6,6 @@ import { showChatTime } from '@/utils/tools';
 import { IMessage, MessageType } from '@/ts/core';
 import { parseCiteMsg, parseMsg, parseForwardMsg } from '../components/parseMsg';
 import TeamIcon from '@/components/Common/GlobalComps/entityIcon';
-import css from './index.module.less';
 interface IForwardContentModalProps {
   open: boolean;
   messages: IMessage[];
@@ -53,7 +52,7 @@ const ForwardContentModal: FC<IForwardContentModalProps> = (props) => {
     if (item.isMySend) {
       return (
         <>
-          <div className={`${css.con_content}`}>
+          <div className="con_content">
             {isBelongPerson ? (
               showMsg(item)
             ) : (
@@ -81,8 +80,8 @@ const ForwardContentModal: FC<IForwardContentModalProps> = (props) => {
           <div style={{ color: '#888', paddingRight: 10 }}>
             <TeamIcon entityId={item.metadata.fromId} size={36} />
           </div>
-          <div className={`${css.con_content}`}>
-            <div className={`${css.name}`}>{item.from.name}</div>
+          <div className="con_content">
+            <div className="name">{item.from.name}</div>
             {parseMsg(item)}
             {item.cite && parseCiteMsg(item.cite)}
           </div>
@@ -103,7 +102,7 @@ const ForwardContentModal: FC<IForwardContentModalProps> = (props) => {
         // content={msgAction(item)}
       >
         <div
-          className={css.con_body}
+          className="con_body"
           onContextMenu={(e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -121,8 +120,8 @@ const ForwardContentModal: FC<IForwardContentModalProps> = (props) => {
       footer={null}
       closable={false}
       onCancel={handleClose}>
-      <div className={css.chart_content}>
-        <div className={css.group_content_wrap}>
+      <div className="msg-body">
+        <div className="msg-body-warp">
           {messages.map((item, index: any) => {
             return (
               <React.Fragment key={item.metadata.fromId + index}>
@@ -131,7 +130,7 @@ const ForwardContentModal: FC<IForwardContentModalProps> = (props) => {
                   item.createTime,
                   index > 0 ? messages[index - 1].createTime : '',
                 ) ? (
-                  <div className={css.chats_space_Time}>
+                  <div className="chat-space-time">
                     <span>{showChatTime(item.createTime)}</span>
                   </div>
                 ) : (
@@ -139,15 +138,11 @@ const ForwardContentModal: FC<IForwardContentModalProps> = (props) => {
                 )}
                 {/* 左侧聊天内容显示 */}
                 {!item.isMySend && item.msgType != MessageType.Recall && (
-                  <div className={`${css.group_content_left} ${css.con}`}>
-                    {loadMsgItem(item)}
-                  </div>
+                  <div className="left-msg-body con">{loadMsgItem(item)}</div>
                 )}
                 {/* 右侧聊天内容显示 */}
                 {item.isMySend && item.msgType != MessageType.Recall && (
-                  <div className={`${css.group_content_right} ${css.con}`}>
-                    {loadMsgItem(item)}
-                  </div>
+                  <div className="right-msg-body con">{loadMsgItem(item)}</div>
                 )}
               </React.Fragment>
             );

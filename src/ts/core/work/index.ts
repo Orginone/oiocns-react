@@ -333,6 +333,8 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
       const resource = JSON.parse(node.resource);
       if (Array.isArray(resource)) {
         node.forms = resource;
+        node.formRules = [];
+        node.executors = [];
       } else {
         node.forms = resource.forms ?? [];
         node.formRules = resource.formRules ?? [];

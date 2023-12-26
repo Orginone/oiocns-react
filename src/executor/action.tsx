@@ -56,8 +56,6 @@ export const executeCmd = (cmd: string, entity: any) => {
           entity.changCallback();
         }
       });
-    case 'open':
-      return openDirectory(entity);
     case 'workForm':
       return openWork(entity);
     case 'standard':
@@ -161,20 +159,6 @@ const applyFriend = (entity: ISession) => {
 const openWork = (entity: IWork) => {
   orgCtrl.currentKey = entity.key;
   orgCtrl.changCallback();
-};
-
-/** 进入目录 */
-const openDirectory = (entity: IFile | schema.XEntity | string) => {
-  if (typeof entity === 'string') {
-    orgCtrl.currentKey = 'disk';
-    orgCtrl.changCallback();
-    return;
-  } else if (entity && 'isContainer' in entity && entity.isContainer) {
-    orgCtrl.currentKey = entity.key;
-    orgCtrl.changCallback();
-    return;
-  }
-  return false;
 };
 
 /** 拷贝/剪切文件 */
