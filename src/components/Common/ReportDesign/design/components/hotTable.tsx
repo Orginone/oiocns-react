@@ -282,17 +282,6 @@ const HotTableView: React.FC<IProps> = ({
       default:
         break;
     }
-    // const selected = hotRef.current.hotInstance.getSelectedRange();
-    // let json = {
-    //   range: {
-    //     from: selected[0]?.from,
-    //     to: selected[0]?.to,
-    //   },
-    //   top: customBorder.top || {},
-    //   left: customBorder.left || {},
-    //   bottom: customBorder.bottom || {},
-    //   right: customBorder.right || {},
-    // };
     /** 存储边框数据 */
     let json = {
       range: range,
@@ -525,20 +514,6 @@ const HotTableView: React.FC<IProps> = ({
               );
               break;
             case 'teamId':
-              // eslint-disable-next-line no-case-declarations
-              // const target = orgCtrl.targets.find((i) => i.id === data.options[key]);
-              // if (target) {
-              //   let arr: any = [];
-              //   target?.members.forEach((item: any) => {
-              //     arr.push(item.name + '(' + item.code + ')');
-              //   });
-              //   hotRef.current.hotInstance.setCellMeta(
-              //     item.row,
-              //     item.col,
-              //     'selectOptions',
-              //     arr,
-              //   );
-              // }
               break;
             default:
               break;
