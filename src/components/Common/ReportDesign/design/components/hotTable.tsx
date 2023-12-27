@@ -43,45 +43,19 @@ const HotTableView: React.FC<IProps> = ({
   const [customBorders, setCustomBorders] = useState<any>([]);
   const [copySelected, setCopySelected] = useState<any>();
   const [selectAttr, setSelectAttr] = useState<any>();
-  const initRowCount: number = 8;
-  const initColCount: number = 60;
+  const initRowCount: number = 60;
+  const initColCount: number = 8;
   const defaultRowHeight: number = 23;
   const defaultColWidth: number = 50;
   const hotRef: any = useRef(null); // ref
 
   useEffect(() => {
-    const hot = hotRef.current.hotInstance;
-    /** hot.clear之后会全选报表所有用的update */
-    hot.updateSettings({
-      data: [[]],
-    });
     /** 获取当前sheet页下标 */
     const index = sheetList.findIndex((it: any) => it.code === selectItem.code);
     setSheetIndex(index);
     const setting = sheetList[index]?.data?.setting || {};
-    const mergeCells = setting?.mergeCells || [];
-    /** 初始化行高和列宽 */
-    const row_h = [];
-    for (let i = 0; i < initColCount; i += 1) {
-      row_h.push(defaultRowHeight);
-    }
-    const col_w = [];
-    for (let j = 0; j < initRowCount; j += 1) {
-      col_w.push(defaultColWidth);
-    }
-    setCells(setting?.cells || []);
-    setStyleList(setting?.styleList || []);
-    setClassList(setting?.classList || []);
-    /** 设置更新边框 */
-    setCustomBorders(setting?.customBorders || []);
-    updateBorder(setting?.customBorders || []);
-    /** 更新报表 */
-    hot.updateSettings({
-      data: sheetList[index]?.data?.data,
-      mergeCells: mergeCells,
-      rowHeights: setting?.row_h || row_h,
-      colWidths: setting?.col_w || col_w,
-    });
+    console.log(setting, 'setting');
+    updateHot(setting);
     /** 特性监听 */
     const id = notityEmitter.subscribe((_, type, data) => {
       if (type === 'attr') {
@@ -91,7 +65,7 @@ const HotTableView: React.FC<IProps> = ({
     return () => {
       notityEmitter.unsubscribe(id);
     };
-  }, [selectItem]);
+  }, [sheetIndex]);
 
   useEffect(() => {
     /** 根据工具栏类型进行操作 */
@@ -115,6 +89,35 @@ const HotTableView: React.FC<IProps> = ({
         return;
     }
   }, [updataKey]);
+
+  const updateHot = (setting: any) => {
+    const hot = hotRef.current.hotInstance;
+    const mergeCells = setting?.mergeCells || [];
+    /** 初始化行高和列宽 */
+    const row_h = [];
+    for (let i = 0; i < initRowCount; i += 1) {
+      row_h.push(defaultRowHeight);
+    }
+    const col_w = [];
+    for (let j = 0; j < initColCount; j += 1) {
+      col_w.push(defaultColWidth);
+    }
+    setCells(setting?.cells || []);
+    setStyleList(setting?.styleList || []);
+    setClassList(setting?.classList || []);
+    /** 设置更新边框 */
+    setCustomBorders(setting?.customBorders || []);
+    updateBorder(setting?.customBorders || []);
+    /** 更新报表 */
+    hot.updateSettings({
+      data: sheetList[sheetIndex]?.data?.data,
+      mergeCells: mergeCells,
+      rowHeights: setting?.row_h || row_h,
+      colWidths: setting?.col_w || col_w,
+      minCols: setting?.col_w ? setting?.col_w.length : initColCount,
+      minRows: setting?.row_h ? setting?.row_h.length : initRowCount,
+    });
+  };
 
   /** 复制样式 */
   const copyStyle = () => {
@@ -304,9 +307,6 @@ const HotTableView: React.FC<IProps> = ({
 
   /** 更新边框 */
   const updateBorder = (customBorders: any) => {
-    // const customBordersPlugin = hotRef.current.hotInstance.getPlugin('customBorders');
-    // console.log(customBordersPlugin, 'customBordersPlugin');
-    // console.log(customBorders, 'customBorders');
     customBorders.forEach((it: any) => {
       if (it.range.length > 0) {
         const customBordersPlugin = hotRef.current.hotInstance.getPlugin('customBorders');
@@ -468,12 +468,12 @@ const HotTableView: React.FC<IProps> = ({
           classJson.class = item.class;
         }
       });
-      const item = cells.find(
+      const cellItem = cells.find(
         (it: any) => it.row === coords.row && it.col === coords.col,
       );
-      if (item) {
-        setSelectAttr(item);
-        selectCellItem(item);
+      if (cellItem) {
+        setSelectAttr(cellItem);
+        selectCellItem(cellItem);
       } else {
         setSelectAttr(undefined);
       }
@@ -630,12 +630,41 @@ const HotTableView: React.FC<IProps> = ({
     }
   };
 
+  const getMenu = () => {
+    const menu = {
+      row_above: {},
+      row_below: {},
+      col_left: {},
+      col_right: {},
+      make_read_only: {},
+      alignment: {},
+      mergeCells: {},
+      insert_speciality: {
+        name: '插入特性',
+        callback: function () {
+          setModalType('新增特性');
+        },
+      },
+    };
+    let delMenu = {};
+    if (selectAttr != undefined) {
+      delMenu = {
+        del_speciality: {
+          name: '删除特性',
+          callback: function () {
+            delSpeciality();
+          },
+        },
+      };
+    }
+    const newMenu = Object.assign(menu, delMenu);
+    return newMenu;
+  };
+
   return (
     <div>
       <HotTable
         ref={hotRef}
-        minCols={initRowCount}
-        minRows={initColCount}
         customBorders={true}
         rowHeaders={true}
         colHeaders={true}
@@ -648,27 +677,7 @@ const HotTableView: React.FC<IProps> = ({
         filters={true}
         manualRowMove={true}
         contextMenu={{
-          items: {
-            row_above: {},
-            row_below: {},
-            col_left: {},
-            col_right: {},
-            make_read_only: {},
-            alignment: {},
-            mergeCells: {},
-            insert_speciality: {
-              name: '插入特性',
-              callback: function () {
-                setModalType('新增特性');
-              },
-            },
-            del_speciality: {
-              name: '删除特性',
-              callback: function () {
-                delSpeciality();
-              },
-            },
-          },
+          items: getMenu(),
         }}
         outsideClickDeselects={false}
         licenseKey="non-commercial-and-evaluation" // for non-commercial use only
