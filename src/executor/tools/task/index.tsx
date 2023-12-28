@@ -22,6 +22,7 @@ import useAsyncLoad from '@/hooks/useAsyncLoad';
 import TaskApproval from './approval';
 import { getNodeByNodeId } from '@/utils/tools';
 import { model } from '@/ts/base';
+import { IExecutor } from '@/ts/core/work/executor';
 
 export interface TaskDetailType {
   current: IWorkTask;
@@ -123,7 +124,7 @@ const TaskContent: React.FC<TaskDetailType> = ({ current, finished }) => {
                         </div>
                         <div style={{ color: 'red' }}>待审批</div>
                       </div>
-                      <Executors />
+                      <Executors nodeId={item.nodeId} />
                     </Card>
                   </Timeline.Item>
                 </div>
@@ -135,27 +136,33 @@ const TaskContent: React.FC<TaskDetailType> = ({ current, finished }) => {
     return <></>;
   };
 
-  const Executors = () => {
+  const Executors = ({ nodeId }: { nodeId: string }) => {
+    const node = getNodeByNodeId(nodeId, current.instanceData!.node);
+    const executors: IExecutor[] = node ? current.loadExecutors(node) : [];
     return (
       <Space
         style={{ paddingLeft: 20, paddingTop: 10, width: '100%' }}
         direction="vertical">
-        {current.executors.map((item, index) => {
-          const [progress, setProgress] = useState(item.progress);
-          useEffect(() => {
-            const id = item.command.subscribe(() => setProgress(item.progress));
-            return () => item.command.unsubscribe(id);
-          }, []);
-          return (
-            <div style={{ display: 'flex', justifyContent: 'space-around' }} key={index}>
-              <Tag>{item.metadata.funcName}</Tag>
-              <Progress style={{ flex: 1, marginRight: 10 }} percent={progress} />
-              <Button size="small" onClick={() => item.execute(formData)}>
-                执行
-              </Button>
-            </div>
-          );
-        })}
+        {executors
+          .filter((item) => item.metadata.trigger == 'before')
+          .map((item, index) => {
+            const [progress, setProgress] = useState(item.progress);
+            useEffect(() => {
+              const id = item.command.subscribe(() => setProgress(item.progress));
+              return () => item.command.unsubscribe(id);
+            }, []);
+            return (
+              <div
+                style={{ display: 'flex', justifyContent: 'space-around' }}
+                key={index}>
+                <Tag>{item.metadata.funcName}</Tag>
+                <Progress style={{ flex: 1, marginRight: 10 }} percent={progress} />
+                <Button size="small" onClick={() => item.execute(formData)}>
+                  执行
+                </Button>
+              </div>
+            );
+          })}
       </Space>
     );
   };
