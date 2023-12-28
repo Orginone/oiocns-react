@@ -6,23 +6,40 @@
 
 .header {
   text-align: center;
-  padding: 10px 0;
-  border-right: rgba(227, 226, 226, 0.8) solid 1px;
-  box-shadow: inset -20px 0px 10px 10px #f8f9ff;
+  padding: 10px 5px;
+  background-color: var(--color-brand-Light, #F2F3FF) !important;
   .navbar {
     width: 100%;
     height: calc(100vh - 110px);
     padding-top: 25px;
   }
+  .navbar-item {
+    display: flex;
+    padding: 5px 12px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1px;
+  }
+  .navbar-item_selected {
+    border-radius: var(--radius-md, 8px);
+    background: #FFF;
+  }
   .title {
+    font-family: PingFang SC;
     font-size: 12px;
     text-align: center;
     color: #888;
+    line-height: 20px;
   }
   .title_selected {
-    font-size: 12px;
     font-weight: bold;
-    text-align: center;
+    color: #366EF4;
+  }
+  .navbar-exit { 
+    color: #003CAB;
+    font-family: PingFang SC;
+    font-size: 12px;
+    line-height: 20px;
   }
 }
 
