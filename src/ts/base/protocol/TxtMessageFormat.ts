@@ -1,15 +1,13 @@
-import { Encoder, Decoder } from '@msgpack/msgpack';
+import { StringPako } from '../common';
 /** @private */
 export class TxtMessageFormat {
   public static RecordSeparatorCode = 0x1e;
   public static RecordSeparator = String.fromCharCode(
     TxtMessageFormat.RecordSeparatorCode,
   );
-  private static readonly _encoder: Encoder<undefined> = new Encoder();
-  private static readonly _decoder: Decoder<undefined> = new Decoder();
 
   public static write(out: string): ArrayBuffer {
-    const output = this._encoder.encode(out);
+    const output = StringPako.gzip(out);
     let size = output.byteLength || output.length;
     const lenBuffer: any = [];
     do {
@@ -67,12 +65,10 @@ export class TxtMessageFormat {
           ? uint8Array.slice(offset + numBytes, offset + numBytes + size)
           : uint8Array.subarray(offset + numBytes, offset + numBytes + size);
         result.push(
-          (
-            this._decoder.decode(
-              buffer.map((item) => {
-                return 0xff - item;
-              }),
-            ) as string
+          StringPako.ungzip(
+            buffer.map((item) => {
+              return 0xff - item;
+            }),
           ).replace(/"_id":/gm, '"id":'),
         );
       } else {
