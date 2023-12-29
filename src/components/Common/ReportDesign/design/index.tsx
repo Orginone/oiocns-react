@@ -99,6 +99,7 @@ const ReportDesign: React.FC<IProps> = ({ current, notityEmitter, selectCellItem
           selectCellItem={(cell: any) => {
             selectCellItem(cell);
           }}
+          sheetIndex={sheetIndex}
           selectItem={selectItem}
           sheetList={sheetList}
           reportChange={reportChange}

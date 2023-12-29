@@ -54,7 +54,6 @@ const HotTableView: React.FC<IProps> = ({
     const index = sheetList.findIndex((it: any) => it.code === selectItem.code);
     setSheetIndex(index);
     const setting = sheetList[index]?.data?.setting || {};
-    console.log(setting, 'setting');
     updateHot(setting);
     /** 特性监听 */
     const id = notityEmitter.subscribe((_, type, data) => {
@@ -110,7 +109,7 @@ const HotTableView: React.FC<IProps> = ({
     updateBorder(setting?.customBorders || []);
     /** 更新报表 */
     hot.updateSettings({
-      data: sheetList[sheetIndex]?.data?.data,
+      data: sheetList[sheetIndex]?.data?.data || [[]],
       mergeCells: mergeCells,
       rowHeights: setting?.row_h || row_h,
       colWidths: setting?.col_w || col_w,
@@ -445,6 +444,7 @@ const HotTableView: React.FC<IProps> = ({
 
   /** 点击单元格展示编辑特性 */
   const afterOnCellMouseDown = (event: any, coords: any) => {
+    console.log(event, coords, '1234');
     if (event) {
       let classJson = { styles: {}, class: {} };
       styleList?.forEach((item: any) => {

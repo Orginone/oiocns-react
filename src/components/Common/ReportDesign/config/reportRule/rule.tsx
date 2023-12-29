@@ -5,7 +5,6 @@ import { ProColumns } from '@ant-design/pro-components';
 import { Card, Typography } from 'antd';
 import { Field } from 'devextreme/ui/filter_builder';
 import CalcRuleModal from './modal/calc';
-import ShowRuleModal from './modal/show';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import { schema } from '@/ts/base';
 interface IProps {
@@ -78,14 +77,6 @@ const FormRule: React.FC<IProps> = (props) => {
                 setSelect(undefined);
                 setOpenType(1);
               }}>
-              添加渲染规则
-            </a>
-            <a
-              style={{ padding: 5 }}
-              onClick={() => {
-                setSelect(undefined);
-                setOpenType(2);
-              }}>
               添加计算规则
             </a>
           </>
@@ -100,20 +91,6 @@ const FormRule: React.FC<IProps> = (props) => {
         />
       </Card>
       {openType == 1 && (
-        <ShowRuleModal
-          fields={props.fields}
-          onCancel={() => setOpenType(0)}
-          current={select as schema.FormShowRule}
-          onOk={(rule) => {
-            var rules = [rule, ...data.filter((a) => a.id != rule.id)];
-            setOpenType(0);
-            setData(rules);
-            props.form.metadata.rule = rules;
-            forceUpdate();
-          }}
-        />
-      )}
-      {openType == 2 && (
         <CalcRuleModal
           fields={props.fields}
           onCancel={() => setOpenType(0)}
