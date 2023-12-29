@@ -2,6 +2,7 @@ import { Command, schema } from '@/ts/base';
 import { IDirectory } from '../directory';
 import { IStandardFileInfo, StandardFileInfo } from '../fileinfo';
 import { ISpecies, Species } from './species';
+import { IWork } from '../../work';
 
 export interface IPageTemplate extends IStandardFileInfo<schema.XPageTemplate> {
   /** 触发器 */
@@ -11,7 +12,9 @@ export interface IPageTemplate extends IStandardFileInfo<schema.XPageTemplate> {
   /** 关系 */
   relations: string;
   /** 加载分类 */
-  loadSpecies: (speciesIds: string[]) => Promise<ISpecies[]>;
+  loadSpecies(speciesIds: string[]): Promise<ISpecies[]>;
+  /** 查找办事 */
+  findWorkById(workId: string): Promise<IWork | undefined>;
 }
 
 export class PageTemplate
@@ -72,5 +75,13 @@ export class PageTemplate
       }
     });
     return result;
+  }
+  async findWorkById(workId: string): Promise<IWork | undefined> {
+    for (const app of await this.directory.target.directory.loadAllApplication()) {
+      const work = await app.findWork(workId);
+      if (work) {
+        return work;
+      }
+    }
   }
 }

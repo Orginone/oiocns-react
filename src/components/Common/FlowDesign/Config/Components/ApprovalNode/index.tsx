@@ -34,6 +34,7 @@ const ApprovalNode: React.FC<IProps> = (props) => {
   const [currentData, setCurrentData] = useState<{ id: string; name: string }>();
   useEffect(() => {
     props.current.primaryForms = props.current.primaryForms || [];
+    setExecutors(props.current.executors || []);
     setPrimaryForms(props.current.primaryForms);
     setRadioValue(props.current.num == 0 ? 1 : 2);
     setDestType(props.current.destName != '发起人' ? '1' : '2');

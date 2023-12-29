@@ -12,14 +12,15 @@ import { Emitter } from '@/ts/base/common';
 interface IProps {
   current: IWork | IWorkTask;
   finished?: () => void;
+  data?: model.InstanceDataModel;
 }
 
 /** 办事-业务流程--发起 */
-const TaskStart: React.FC<IProps> = ({ current, finished }) => {
+const TaskStart: React.FC<IProps> = ({ current, finished, data }) => {
   const formData = new Map<string, model.FormEditData>();
   const gatewayData = new Map<string, string>();
   const [notifyEmitter] = React.useState(new Emitter());
-  const [loaded, apply] = useAsyncLoad(() => current.createApply());
+  const [loaded, apply] = useAsyncLoad(() => current.createApply(undefined, data));
   const info: { content: string } = { content: '' };
 
   const loadGateway = (apply: IWorkApply) => {
