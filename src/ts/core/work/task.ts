@@ -77,7 +77,7 @@ export class WorkTask extends FileInfo<schema.XEntity> implements IWorkTask {
   get metadata(): schema.XEntity {
     let typeName = this.taskdata.taskType;
     if (
-      this.taskdata.approveType === '子流程' &&
+      ['子流程', '网关'].includes(this.taskdata.approveType) &&
       this.taskdata.identityId &&
       this.taskdata.identityId.length > 5
     ) {
