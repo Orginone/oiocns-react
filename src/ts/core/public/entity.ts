@@ -4,7 +4,7 @@ import { generateUuid } from '../../base/common/uuid';
 import { entityOperates } from './operates';
 /** 默认实体类接口 */
 export interface IDEntity extends IEntity<schema.XEntity> {}
-/** 共享信息数据集 */
+/** 共享信息数据集 */ 
 export const ShareIdSet = new Map<string, any>();
 /** 实体类接口 */
 export interface IEntity<T> extends Emitter {
@@ -66,8 +66,13 @@ export abstract class Entity<T extends schema.XEntity>
   }
   _metadata: T;
   key: string;
+  
+  /** 是否快捷方式 */
+  get isShortcut() {
+    return !!this._metadata.sourceId;
+  }
   get id(): string {
-    return this._metadata.id;
+    return this._metadata.sourceId || this._metadata.id;
   }
   get name(): string {
     return this.metadata.name;

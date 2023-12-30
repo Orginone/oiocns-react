@@ -110,6 +110,12 @@ export const directoryOperates = {
     model: 'outside',
     iconType: 'refresh',
   },
+  Shortcut: {
+    sort: 11,
+    cmd: 'shortcut',
+    label: '创建快捷方式',
+    iconType: 'shortcut',
+  },
   OpenFolderWithEditor: {
     sort: 10,
     cmd: 'openFolderWithEditor',

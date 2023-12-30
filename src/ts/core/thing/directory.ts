@@ -195,7 +195,9 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
   override async hardDelete(): Promise<boolean> {
     if (this.parent) {
       await this.resource.directoryColl.remove(this.metadata);
-      await this.operateDirectoryResource(this, this.resource, 'removeMany');
+      if (!this.isShortcut) {
+        await this.operateDirectoryResource(this, this.resource, 'removeMany');
+      }
       await this.notify('reload', this.metadata);
     }
     return false;
@@ -315,6 +317,7 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
       if (this.target.user.copyFiles.size > 0) {
         operates.push(fileOperates.Parse);
       }
+      operates.push(directoryOperates.Shortcut);
     }
     if (this.parent) {
       operates.push(...super.operates());

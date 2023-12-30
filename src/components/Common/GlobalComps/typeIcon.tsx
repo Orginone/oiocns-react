@@ -118,6 +118,8 @@ const TypeIcon = ({ avatar, iconType, size }: TypeIconInfo) => {
         return <im.ImPencil {...config} />;
       case 'delete':
         return <im.ImBin {...config} />;
+      case 'shortcut':
+        return <im.ImLink {...config} />;
       case 'restore':
         return <im.ImUndo2 {...config} />;
       case 'remove':

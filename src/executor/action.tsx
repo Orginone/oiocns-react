@@ -20,6 +20,8 @@ import { uploadBusiness, uploadStandard } from './tools/uploadTemplate';
 import TypeIcon from '@/components/Common/GlobalComps/typeIcon';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import { shareOpenLink } from '@/utils/tools';
+import { XStandard } from '@/ts/base/schema';
+import { IStandardFileInfo } from '@/ts/core/thing/fileinfo';
 /** 执行非页面命令 */
 export const executeCmd = (cmd: string, entity: any) => {
   switch (cmd) {
@@ -46,6 +48,8 @@ export const executeCmd = (cmd: string, entity: any) => {
       return deleteEntity(entity, false);
     case 'hardDelete':
       return deleteEntity(entity, true);
+    case 'shortcut':
+      return createShortcut(entity);
     case 'restore':
       return restoreEntity(entity);
     case 'remove':
@@ -374,4 +378,12 @@ const uploadFile = (dir: IDirectory, uploaded?: (file: IFile | undefined) => voi
       </Upload>
     ),
   });
+};
+
+
+/** 创建快捷方式 */
+const createShortcut = async (entity: IStandardFileInfo<XStandard>) => {
+  if (await entity.createShortcut()) {
+    orgCtrl.changCallback();
+  }
 };

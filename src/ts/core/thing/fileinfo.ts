@@ -1,7 +1,7 @@
 import { sleep } from '../../base/common';
 import { command, model, schema } from '../../base';
 import { IDirectory } from './directory';
-import { Entity, IEntity, entityOperates } from '../public';
+import { Entity, IEntity, directoryOperates, entityOperates } from '../public';
 import { fileOperates } from '../public';
 import { XCollection } from '../public/collection';
 import { ITarget } from '../target/base/target';
@@ -102,6 +102,9 @@ export abstract class FileInfo<T extends schema.XEntity>
   get superior(): IFile {
     return this.directory;
   }
+  get isShortcut() {
+    return !!this._metadata.sourceId;
+  }
   abstract cacheFlag: string;
   abstract delete(): Promise<boolean>;
   async rename(_: string): Promise<boolean> {
@@ -124,6 +127,7 @@ export abstract class FileInfo<T extends schema.XEntity>
     await sleep(0);
     return true;
   }
+  abstract createShortcut(newName?: string): Promise<boolean>;
   async loadUserData(): Promise<void> {
     const data = await this.target.user.cacheObj.get<schema.XCache>(this.cachePath);
     if (data && data.fullId === this.cache.fullId) {
@@ -164,6 +168,7 @@ export abstract class FileInfo<T extends schema.XEntity>
         fileOperates.Download,
         entityOperates.Update,
         entityOperates.Delete,
+        // entityOperates.Shortcut,//先只放到目录
       );
       if (this.canDesign) {
         operates.unshift(entityOperates.Design);
@@ -185,6 +190,11 @@ export interface IStandardFileInfo<T extends schema.XStandard> extends IFileInfo
   receive(operate: string, data: schema.XStandard): boolean;
   /** 常用标签切换 */
   toggleCommon(): Promise<boolean>;
+  /**
+   * 创建快捷方式
+   * @param newName 新的实体名称，不传使用原来的
+   */
+  createShortcut(newName?: string): Promise<boolean>;
 }
 export interface IStandard extends IStandardFileInfo<schema.XStandard> {}
 export abstract class StandardFileInfo<T extends schema.XStandard>
@@ -277,6 +287,21 @@ export abstract class StandardFileInfo<T extends schema.XStandard>
     }
     return false;
   }
+  async createShortcut(newName?: string): Promise<boolean> {
+    const newEntity = { ...this._metadata };
+    if (newName) {
+      newEntity.name = newName;
+    }
+    const result = await this.coll.insert({
+      ...newEntity,
+      id: 'snowId()',
+      sourceId: this._metadata.id,
+    });
+    return await this.coll.notity({ 
+      data: result, 
+      operate: 'insert' 
+    });
+  }
   async toggleCommon(): Promise<boolean> {
     let set: boolean = false;
     if (this.cache.tags?.includes('常用')) {
@@ -307,6 +332,17 @@ export abstract class StandardFileInfo<T extends schema.XStandard>
       operates.unshift(fileOperates.DelCommon);
     } else {
       operates.unshift(fileOperates.SetCommon);
+    }
+
+    if (this.isShortcut) {
+      // 快捷方式不能创建快捷方式和复制
+      let i: number;
+      if ((i = operates.indexOf(fileOperates.Copy)) >= 0) {
+        operates.splice(i, 1);
+      }
+      if ((i = operates.indexOf(directoryOperates.Shortcut)) >= 0) {
+        operates.splice(i, 1);
+      }
     }
     return operates;
   }
