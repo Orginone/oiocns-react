@@ -37,6 +37,8 @@ export interface IDirectory extends IStandardFileInfo<schema.XDirectory> {
   create(data: schema.XDirectory): Promise<schema.XDirectory | undefined>;
   /** 目录下的文件 */
   files: ISysFileInfo[];
+  /** 是否快捷方式 */
+  readonly isShortcut: boolean;
   /** 加载模板配置 */
   loadAllTemplate(reload?: boolean): Promise<IPageTemplate[]>;
   /** 加载文件 */
@@ -118,6 +120,9 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
   }
   get resource(): DataResource {
     return this.target.resource;
+  }
+  get isShortcut() {
+    return !!this._metadata.sourceId;
   }
   structCallback(reload: boolean = false): void {
     if (reload) {
