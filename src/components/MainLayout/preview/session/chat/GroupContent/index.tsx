@@ -129,7 +129,7 @@ const GroupContent = (props: Iprops) => {
             }}
             overlayInnerStyle={{ marginRight: '-16px', padding: '3px' }}
             content={msgAction(item)}>
-            <div style={{ display: 'flex' }}>
+            <div className="flex">
               <div className="con_content">
                 {props.chat.isBelongPerson ? (
                   <>
@@ -157,8 +157,8 @@ const GroupContent = (props: Iprops) => {
                   </>
                 )}
               </div>
-              <div style={{ color: '#888' }}>
-                <EntityInfo entityId={item.metadata.fromId} size={40} />
+              <div>
+                <EntityInfo entityId={item.metadata.fromId} size={30} />
               </div>
             </div>
           </Popover>
@@ -167,9 +167,9 @@ const GroupContent = (props: Iprops) => {
     } else {
       return (
         <>
-          <div style={{ display: 'flex', gap: 10 }}>
+          <div className='flex view_msg_gap '>
             <div>
-              <EntityInfo entityId={item.metadata.fromId} size={40} />
+              <EntityInfo entityId={item.metadata.fromId} size={30} />
             </div>
             <div className={`con_content`}>
               <div className={`name`}>{item.from.name}</div>
