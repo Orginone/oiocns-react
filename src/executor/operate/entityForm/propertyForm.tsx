@@ -96,8 +96,8 @@ const PropertyForm = (props: Iprops) => {
         },
       },
     ];
-    if (['选择型', '分类型'].includes(selectType || '')) {
-      const typeName = selectType === '选择型' ? '字典' : '分类';
+    if (['选择型', '分类型', '引用型'].includes(selectType || '')) {
+      const typeName = selectType === '选择型' ? '字典' : selectType === '分类型' ? '分类' : '表单';
       columns.push({
         title: `选择${typeName}`,
         dataIndex: 'speciesId',
@@ -118,6 +118,15 @@ const PropertyForm = (props: Iprops) => {
           );
         },
       });
+
+      if (selectType === '引用型') {
+        columns.push({
+          title: '是否多选',
+          dataIndex: 'multiple',
+          valueType: 'switch',
+          initialValue: false,
+        });
+      }
     }
 
     if (selectType === '数值型') {
