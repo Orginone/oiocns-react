@@ -123,7 +123,8 @@ const WorkFormViewer: React.FC<{
                   { data: props.data },
                   { target: calcRule.target },
                 );
-              } catch {
+              } catch (error) {
+                console.error(error)
                 logger.error(`计算规则[${formula}]执行失败，请确认是否维护正确!`);
               }
               break;

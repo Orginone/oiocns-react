@@ -34,6 +34,9 @@ const FormItem: React.FC<{
     if (attribute.property && attribute.property.speciesId) {
       current.loadItems([attribute.property.speciesId]).then((data) => {
         setItems(data);
+        if (data.length == 0) {
+          console.warn(`标准 ${attribute.property!.speciesId} 未查到值！`);
+        }
       });
     }
   }, [attribute.property?.speciesId]);
