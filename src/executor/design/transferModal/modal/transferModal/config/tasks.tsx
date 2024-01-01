@@ -9,6 +9,7 @@ import {
   CheckCircleOutlined,
   StopOutlined,
 } from '@ant-design/icons';
+import { Theme } from '@/config/theme';
 
 interface IProps {
   current: ITransfer;
@@ -102,11 +103,11 @@ const Tasks: React.FC<IProps> = ({ current }) => {
 export const TaskStatus: React.FC<{ status: model.GStatus }> = ({ status }) => {
   switch (status) {
     case 'Editable':
-      return <PauseCircleOutlined style={{ color: '#3838b9', fontSize: 18 }} />;
+      return <PauseCircleOutlined style={{ color: Theme.FocusColor, fontSize: 18 }} />;
     case 'Viewable':
       return <CheckCircleOutlined style={{ color: '#52c41a', fontSize: 18 }} />;
     case 'Running':
-      return <LoadingOutlined style={{ color: '#3838b9', fontSize: 18 }} />;
+      return <LoadingOutlined style={{ color: Theme.FocusColor, fontSize: 18 }} />;
     case 'Error':
       return <StopOutlined style={{ color: '#ff4d4f', fontSize: 18 }} />;
   }

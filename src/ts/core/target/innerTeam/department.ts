@@ -112,8 +112,10 @@ export class Department extends Target implements IDepartment {
     if (await this.removeMembers([this.user.metadata])) {
       if (this.parent) {
         this.parent.children = this.parent.children.filter((i) => i.key != this.key);
+        this.parent.changCallback();
       } else {
         this.space.departments = this.space.departments.filter((i) => i.key != this.key);
+        this.space.changCallback();
       }
       return true;
     }
@@ -124,8 +126,10 @@ export class Department extends Target implements IDepartment {
     if (success) {
       if (this.parent) {
         this.parent.children = this.parent.children.filter((i) => i.key != this.key);
+        this.parent.changCallback();
       } else {
         this.space.departments = this.space.departments.filter((i) => i.key != this.key);
+        this.space.changCallback();
       }
     }
     return success;
@@ -147,13 +151,10 @@ export class Department extends Target implements IDepartment {
     return this.children;
   }
   async deepLoad(reload: boolean = false): Promise<void> {
-    this.loadMembers(reload);
-    await Promise.all([
-      this.loadChildren(reload),
-      this.loadIdentitys(reload),
-      this.directory.loadDirectoryResource(reload),
-    ]);
+    await Promise.all([this.loadChildren(reload), this.loadIdentitys(reload)]);
     await Promise.all(this.children.map((department) => department.deepLoad(reload)));
+    this.loadMembers(reload);
+    this.directory.loadDirectoryResource(reload);
   }
   override operates(): model.OperateModel[] {
     const operates = super.operates();

@@ -2,54 +2,12 @@
 <html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
-    <link id="icon" rel="shortcut icon" href="favicon/orginone.ico" type="image/x-icon" />
+    <title>预算管理一体化</title>
+    <link id="icon" rel="shortcut icon" href="/img/budget.png" type="image/x-icon" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   </head>
   <body>
     <div id="root"></div>
-    <script type="text/javascript">
-      (function() {
-        const shortcut = document.getElementById('icon');
-        const names = window.location.hostname.split('.');
-        if (names.length > 0) {
-          switch (names[0]) {
-            case 'anxinwu':
-              document.title = '安心屋';
-              shortcut.setAttribute('href', 'favicon/anxinwu.ico');
-              return;
-            case 'gongyicang':
-              document.title = '公益仓';
-              shortcut.setAttribute('href', 'favicon/gongyicang.ico');
-              return;
-            case 'asset':
-              document.title = '资产共享云';
-              shortcut.setAttribute('href', 'favicon/asset.ico');
-              return;
-            case 'dataexp':
-              document.title = '数据资产治理实验平台';
-              shortcut.setAttribute('href', 'favicon/dataexp.ico');
-              return;
-            case 'ocia':
-              document.title = '资产云开放协同创新中心';
-              shortcut.setAttribute('href', 'favicon/ocia.ico');
-              return;
-            case 'apparatus':
-              document.title = '大型科研仪器共享平台';
-              shortcut.setAttribute('href', 'favicon/apparatus.ico');
-              return;
-            case 'company':
-              document.title = '校企监管平台';
-              shortcut.setAttribute('href', 'favicon/company.ico');
-              return;
-            case 'budget':
-              document.title = '预算管理一体化';
-              shortcut.setAttribute('href', '/img/budget.png');
-              return;
-          }
-        }
-        document.title = '奥集能';
-      })();
-    </script>
     <script type="module" src="/src/index.tsx"></script>
   </body>
 </html>

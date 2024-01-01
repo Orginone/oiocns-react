@@ -1,4 +1,3 @@
-// import OioForm from '@/components/Common/FormDesign/OioFormNext';
 import { kernel, model, schema } from '../../../ts/base';
 import { IBelong } from '@/ts/core';
 import { useState } from 'react';
@@ -11,6 +10,7 @@ interface IProps {
   allowEdit: boolean;
   belong: IBelong;
   forms: schema.XForm[];
+  changedFields: model.MappingData[];
   data: model.InstanceDataModel;
   getFormData: (form: schema.XForm) => model.FormEditData;
   onChanged?: (id: string, data: model.FormEditData, field: string, value: any) => void;
@@ -43,7 +43,8 @@ const PrimaryForm: React.FC<IProps> = (props) => {
       form={form}
       fields={fields}
       data={data}
-      rule={formData.rule ?? {}}
+      changedFields={props.changedFields.filter((a) => a.formId == form.id)}
+      rules={[...(props.data.rules ?? []), ...(formData.rules ?? [])]}
       belong={props.belong}
       readonly={!props.allowEdit}
       onValuesChange={(field, value, data) => {
@@ -66,13 +67,22 @@ const PrimaryForms: React.FC<IProps> = (props) => {
   if (props.forms.length < 1) return <></>;
   const [activeTabKey, setActiveTabKey] = useState(props.forms[0].id);
   const loadItems = () => {
-    return props.forms.map((form) => {
-      return {
+    const items = [];
+    for (const form of props.forms) {
+      if (
+        props.data.rules?.find(
+          (a) => a.destId == form.id && a.typeName == 'visible' && a.value == false,
+        )
+      ) {
+        continue;
+      }
+      items.push({
         key: form.id,
         label: form.name,
         children: <PrimaryForm {...props} forms={[form]} />,
-      };
-    });
+      });
+    }
+    return items;
   };
   return (
     <Tabs

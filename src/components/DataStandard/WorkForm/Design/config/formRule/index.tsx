@@ -29,16 +29,16 @@ const FormRuleConfig: React.FC<IAttributeProps> = ({ notifyEmitter, current }) =
           case '数值型':
             return {
               name: a.id,
-              dataField: a.code,
+              dataField: a.id,
               caption: a.name,
               dataType: 'number',
             };
           case '日期型':
-            return { name: a.id, dataField: a.code, caption: a.name, dataType: 'date' };
+            return { name: a.id, dataField: a.id, caption: a.name, dataType: 'date' };
           case '时间型':
             return {
               name: a.id,
-              dataField: a.code,
+              dataField: a.id,
               caption: a.name,
               dataType: 'datetime',
             };
@@ -46,7 +46,7 @@ const FormRuleConfig: React.FC<IAttributeProps> = ({ notifyEmitter, current }) =
           case '分类型':
             return {
               name: a.id,
-              dataField: a.code,
+              dataField: a.id,
               caption: a.name,
               dataType: 'string',
               lookup: {
@@ -57,7 +57,7 @@ const FormRuleConfig: React.FC<IAttributeProps> = ({ notifyEmitter, current }) =
               },
             };
           default:
-            return { name: a.id, dataField: a.code, caption: a.name, dataType: 'string' };
+            return { name: a.id, dataField: a.id, caption: a.name, dataType: 'string' };
         }
       });
       setFields([

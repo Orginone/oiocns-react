@@ -3,6 +3,7 @@ import React from 'react';
 import * as im from 'react-icons/im';
 import * as fa from 'react-icons/fa';
 import { BsHouseAddFill } from 'react-icons/bs';
+import { Theme } from '@/config/theme';
 
 interface TypeIconInfo {
   avatar?: boolean;
@@ -12,8 +13,8 @@ interface TypeIconInfo {
 
 /** 类型图标 */
 const TypeIcon = ({ avatar, iconType, size }: TypeIconInfo) => {
-  const iconSize = size || 12;
-  const config: any = { size: iconSize, color: '#506cfa' };
+  const iconSize = size || 14;
+  const config: any = { size: iconSize - 4, color: Theme.FocusColor };
   const loadFileIcon = () => {
     switch (iconType) {
       case 'application/pdf':
@@ -118,6 +119,8 @@ const TypeIcon = ({ avatar, iconType, size }: TypeIconInfo) => {
         return <im.ImPencil {...config} />;
       case 'delete':
         return <im.ImBin {...config} />;
+      case 'shortcut':
+        return <im.ImLink {...config} />;
       case 'restore':
         return <im.ImUndo2 {...config} />;
       case 'remove':

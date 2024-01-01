@@ -29,6 +29,17 @@
       flex-direction: column;
     }
   }
+  .navbar-item {
+    display: flex;
+    padding: 5px 12px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1px;
+  }
+  .navbar-item_selected {
+    border-radius: var(--radius-md, 8px);
+    background: #FFF;
+  }
   .title {
     color: white;
     font-size: 14px;
@@ -39,7 +50,13 @@
     color: rgb(246, 255, 144);
     font-size: 14px;
     font-weight: bold;
-    text-align: center;
+    color: #366EF4;
+  }
+  .navbar-exit {
+    color: #003CAB;
+    font-family: PingFang SC;
+    font-size: 12px;
+    line-height: 20px;
   }
 }
 

@@ -2,13 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { Field } from 'devextreme/ui/filter_builder';
 import { Modal } from 'antd';
 import { DropDownBox, SelectBox, TextArea, TextBox, TreeView } from 'devextreme-react';
-import { schema } from '@/ts/base';
+import { model } from '@/ts/base';
 import { getUuid } from '@/utils/tools';
 
 interface IProps {
   fields: Field[];
-  current?: schema.FormCalcRule;
-  onOk: (rule: schema.FormCalcRule) => void;
+  current?: model.FormCalcRule;
+  onOk: (rule: model.FormCalcRule) => void;
   onCancel: () => void;
 }
 

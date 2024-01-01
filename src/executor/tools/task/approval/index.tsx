@@ -36,8 +36,11 @@ const TaskApproval: React.FC<TaskDetailType> = ({ task, finished, fromData }) =>
       for (const formId of fromData.keys()) {
         const data: any = fromData.get(formId)?.after.at(-1) ?? {};
         for (const item of task.instanceData.fields[formId]) {
-          const isRequired =
-            task.instanceData.data[formId].at(-1)?.rule[item.id]['isRequired'];
+          const isRequired = task.instanceData.data[formId]
+            .at(-1)
+            ?.rules?.find(
+              (i) => i.destId === item.id && i.typeName === 'isRequired',
+            )?.value;
           if (
             (isRequired == undefined || isRequired == true) &&
             item.options?.isRequired &&

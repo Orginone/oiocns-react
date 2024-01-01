@@ -1,20 +1,19 @@
-import FullScreenModal from '@/components/Common/fullScreen';
-import WorkForm from '@/executor/tools/workForm';
 import { command, model, schema } from '@/ts/base';
-import { deepClone } from '@/ts/base/common';
 import { Enumerable } from '@/ts/base/common/linq';
 import { XStaging } from '@/ts/base/schema';
 import orgCtrl from '@/ts/controller';
-import { IWork, IWorkApply } from '@/ts/core';
 import { ProList, ProListProps } from '@ant-design/pro-components';
-import { Button, Input, Modal, Space, Table, message } from 'antd';
-import React, { Key, ReactNode, useEffect, useRef, useState } from 'react';
+import { Button, Modal, Space, message } from 'antd';
+import React, { Key, ReactNode, useEffect, useState } from 'react';
 import { useStagings } from '../../../core/hooks/useChange';
-import { File, SEntity } from '../../../design/config/FileProp';
+import { SEntity } from '../../../design/config/FileProp';
 import { Context } from '../../../render/PageContext';
 import { defineElement } from '../../defineElement';
 import { DisplayType } from '../position';
 import { data, label, length, valueType } from './type';
+import { deepClone, formatDate } from '@/ts/base/common';
+import WorkStartDo from '@/executor/open/work';
+import { ExistTypeMeta } from '../../../core/ElementMeta';
 
 interface Params {
   data: schema.XThing;
@@ -129,68 +128,7 @@ const Design: React.FC<IProps> = (props) => {
 const View: React.FC<Omit<IProps, 'data'>> = (props) => {
   const stagings = useStagings(orgCtrl.box, props.ctx.view.pageInfo.relations);
   const [keys, setKeys] = useState<Key[]>([]);
-  const selected = useRef<Key[]>([]);
   const [center, setCenter] = useState(<></>);
-  const openWorkForm = (apply: IWorkApply) => {
-    const info: { content: string } = { content: '' };
-    const formData = new Map<string, model.FormEditData>();
-    setCenter(
-      <FullScreenModal
-        open
-        centered
-        fullScreen
-        destroyOnClose
-        onCancel={() => setCenter(<></>)}>
-        <WorkForm
-          allowEdit
-          belong={apply.belong}
-          data={apply.instanceData}
-          nodeId={apply.instanceData.node.id}
-          onChanged={(id, data) => {
-            formData.set(id, data);
-          }}
-        />
-        <div
-          style={{
-            padding: 10,
-            display: 'flex',
-            alignItems: 'flex-end',
-          }}>
-          <Input.TextArea
-            style={{
-              height: 100,
-              width: 'calc(100% - 80px)',
-              marginRight: 10,
-            }}
-            placeholder="请填写备注信息"
-            onChange={(e) => {
-              info.content = e.target.value;
-            }}
-          />
-          <Button
-            type="primary"
-            onClick={async () => {
-              if (apply.validation(formData)) {
-                apply
-                  .createApply(apply.belong.id, info.content, formData, new Map())
-                  .then(() => {
-                    message.success('发起成功！');
-                    const filter = stagings.filter((item) => keys.includes(item.id));
-                    orgCtrl.box.removeStaging(filter).then(() => {
-                      setKeys([]);
-                    });
-                  });
-                setCenter(<></>);
-              } else {
-                message.warning('表单提交规则验证失败，请检查');
-              }
-            }}>
-            提交
-          </Button>
-        </div>
-      </FullScreenModal>,
-    );
-  };
   return (
     <>
       <Design
@@ -199,81 +137,60 @@ const View: React.FC<Omit<IProps, 'data'>> = (props) => {
         rowKey={'id'}
         toolBarRender={() => {
           return [
-            <File
-              key={'first'}
-              accepts={['办事']}
-              onOk={async (files) => {
-                if (keys.length == 0) {
-                  message.error('选中至少一条发起申领！');
+            <Button
+              key={'add'}
+              onClick={async () => {
+                if (props.work?.id) {
+                  const work = await props.ctx.view.pageInfo.findWorkById(props.work.id);
+                  const node = await work?.loadNode();
+                  if (work && node) {
+                    const instance: model.InstanceDataModel = {
+                      data: {},
+                      node: node,
+                      fields: {},
+                      primary: {},
+                      rules: [],
+                    };
+                    for (const form of work.detailForms) {
+                      instance.fields[form.id] = await form.loadFields();
+                      instance.data[form.id] = [
+                        {
+                          nodeId: node.id,
+                          formName: form.name,
+                          before: [],
+                          after: stagings
+                            .filter((item) => keys.includes(item.id))
+                            .filter((item) => item.data['F' + form.id])
+                            .map((item) => {
+                              const data = deepClone(item.data);
+                              for (const field of form.fields) {
+                                if (data[field.code]) {
+                                  data[field.id] = data[field.code];
+                                  delete data[field.code];
+                                }
+                              }
+                              return data;
+                            }),
+                          creator: orgCtrl.user.id,
+                          createTime: formatDate(new Date(), 'yyyy-MM-dd hh:mm:ss.S'),
+                          rules: [],
+                        },
+                      ];
+                    }
+                    setCenter(
+                      <WorkStartDo
+                        current={work}
+                        data={instance}
+                        finished={() => setCenter(<></>)}
+                      />,
+                    );
+                  }
                   return;
                 }
-                const work = files[0] as IWork;
-                await work.loadNode();
-                setCenter(
-                  <Modal
-                    open
-                    title={'选择输入表单'}
-                    width={800}
-                    destroyOnClose
-                    onOk={async () => {
-                      if (selected.current.length > 0) {
-                        const form = work.detailForms.find(
-                          (i) => i.id == selected.current[0],
-                        );
-                        if (form) {
-                          const instance = {
-                            data: {
-                              [form.id]: [
-                                {
-                                  before: [],
-                                  after: stagings
-                                    .filter((item) => keys.includes(item.id))
-                                    .map((item) => {
-                                      const data = deepClone(item.data);
-                                      for (const field of form!.fields) {
-                                        if (data[field.code]) {
-                                          data[field.id] = data[field.code];
-                                          delete data[field.code];
-                                        }
-                                      }
-                                      return data;
-                                    }),
-                                },
-                              ],
-                            },
-                          } as any as model.InstanceDataModel;
-                          const apply = await work.createApply(undefined, instance);
-                          if (apply) {
-                            openWorkForm(apply);
-                          }
-                        }
-                      }
-                    }}>
-                    <Table
-                      rowKey={'id'}
-                      dataSource={work.detailForms}
-                      rowSelection={{
-                        type: 'radio',
-                        onChange: (keys) => {
-                          selected.current = keys;
-                        },
-                      }}
-                      columns={[
-                        {
-                          title: '表单编码',
-                          dataIndex: 'code',
-                        },
-                        {
-                          title: '表单名称',
-                          dataIndex: 'name',
-                        },
-                      ]}
-                    />
-                  </Modal>,
-                );
+                message.warning('商城未绑定办事，发起失败！');
               }}>
-              <Button>发起申领</Button>
-            </File>,
+              发起申领
+            </Button>,
           ];
         }}
         headerTitle={
@@ -318,7 +235,12 @@ export default defineElement({
   },
   displayName: 'ListItem',
   meta: {
-    props: {},
+    props: {
+      work: {
+        type: 'type',
+        label: '每页个数',
+      } as ExistTypeMeta<SEntity | undefined>,
+    },
     slots: {
       title: {
         label: '标题',

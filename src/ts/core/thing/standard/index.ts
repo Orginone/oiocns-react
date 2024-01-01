@@ -24,6 +24,8 @@ export class StandardFiles {
   directorys: IDirectory[] = [];
   /** 应用 */
   applications: IApplication[] = [];
+  /** 目录下级应用实体 */
+  xApplications: schema.XApplication[] = [];
   /** 页面模板 */
   templates: IPageTemplate[] = [];
   /** 表单加载完成标志 */
@@ -41,7 +43,7 @@ export class StandardFiles {
     }
   }
   get id(): string {
-    return this.directory.id;
+    return this.directory.directoryId;
   }
   get resource(): DataResource {
     return this.directory.resource;
@@ -108,18 +110,16 @@ export class StandardFiles {
     return this.transfers;
   }
   async loadApplications(_: boolean = false): Promise<IApplication[]> {
-    var apps = this.resource.applicationColl.cache.filter(
-      (i) => i.directoryId === this.directory.id,
+    this.xApplications = this.resource.applicationColl.cache.filter(
+      (i) => i.directoryId === this.id,
     );
-    this.applications = apps
+    this.applications = this.xApplications
       .filter((a) => !(a.parentId && a.parentId.length > 5))
-      .map((a) => new Application(a, this.directory, undefined, apps));
+      .map((a) => new Application(a, this.directory, undefined, this.xApplications));
     return this.applications;
   }
   async loadDirectorys(_: boolean = false): Promise<IDirectory[]> {
-    var dirs = this.resource.directoryColl.cache.filter(
-      (i) => i.directoryId === this.directory.id,
-    );
+    var dirs = this.resource.directoryColl.cache.filter((i) => i.directoryId === this.id);
     this.directorys = dirs.map(
       (a) => new Directory(a, this.directory.target, this.directory),
     );
@@ -130,7 +130,7 @@ export class StandardFiles {
   }
   async loadTemplates(_: boolean = false): Promise<IPageTemplate[]> {
     let templates = this.resource.templateColl.cache.filter(
-      (i) => i.directoryId === this.directory.id,
+      (i) => i.directoryId === this.id,
     );
     this.templates = templates.map((i) => new PageTemplate(i, this.directory));
     return this.templates;
@@ -204,41 +204,52 @@ export class StandardFiles {
       return result;
     }
   }
-  async operateStandradFile(
-    to: DataResource,
-    action: 'replaceMany' | 'removeMany',
-    move?: boolean,
-  ): Promise<void> {
+  async delete() {
+    await this.resource.formColl.removeMany(this.forms.map((a) => a.metadata));
+    await this.resource.transferColl.removeMany(this.transfers.map((a) => a.metadata));
+    await this.resource.speciesColl.removeMany(this.specieses.map((a) => a.metadata));
+    await this.resource.propertyColl.removeMany(this.propertys.map((a) => a.metadata));
+    await this.resource.directoryColl.removeMany(this.directorys.map((a) => a.metadata));
+    await this.resource.applicationColl.removeMatch({
+      directoryId: this.id,
+    });
+    this.resource.applicationColl.removeCache((i) => i.directoryId != this.id);
+    await this.resource.speciesItemColl.removeMatch({
+      speciesId: {
+        _in_: this.specieses.map((a) => a.id),
+      },
+    });
+  }
+  async moveStandradFile(resource: DataResource): Promise<void> {
     await this.loadStandardFiles();
-    await to.formColl[action](this.forms.map((a) => a.metadata));
-    await to.transferColl[action](this.transfers.map((a) => a.metadata));
-    await to.speciesColl[action](this.specieses.map((a) => a.metadata));
-    await to.propertyColl[action](this.propertys.map((a) => a.metadata));
-    await to.directoryColl[action](this.directorys.map((a) => a.metadata));
-    if (action == 'replaceMany' && move) {
-      var apps = this.resource.applicationColl.cache.filter(
-        (i) => i.directoryId === this.id,
-      );
-      this.resource.applicationColl.removeCache((i) => i.directoryId === this.id);
-      const data = await to.applicationColl.replaceMany(apps);
-      to.applicationColl.cache.push(...data);
-    }
-    if (action == 'removeMany') {
-      await to.applicationColl.removeMatch({
-        directoryId: this.id,
-      });
-      to.applicationColl.removeCache((i) => i.directoryId != this.id);
-      await to.speciesItemColl.removeMatch({
-        speciesId: {
-          _in_: this.specieses.map((a) => a.id),
-        },
-      });
-    }
-    if (
-      !move &&
-      action == 'replaceMany' &&
-      to.targetMetadata.belongId != this.resource.targetMetadata.belongId
-    ) {
+    await resource.formColl.replaceMany(this.forms.map((a) => a.metadata));
+    await resource.transferColl.replaceMany(this.transfers.map((a) => a.metadata));
+    await resource.speciesColl.replaceMany(this.specieses.map((a) => a.metadata));
+    await resource.propertyColl.replaceMany(this.propertys.map((a) => a.metadata));
+  }
+  async copyStandradFile(to: DataResource, directoryId: string): Promise<void> {
+    await this.loadStandardFiles();
+    await to.formColl.insertMany(
+      this.forms.map((a) => {
+        return { ...a.metadata, id: 'snowId()' };
+      }),
+    );
+    await to.transferColl.insertMany(
+      this.transfers.map((a) => {
+        return { ...a.metadata, id: 'snowId()', directoryId };
+      }),
+    );
+    await to.speciesColl.insertMany(
+      this.specieses.map((a) => {
+        return { ...a.metadata, id: 'snowId()', directoryId };
+      }),
+    );
+    await to.propertyColl.insertMany(
+      this.propertys.map((a) => {
+        return { ...a.metadata, id: 'snowId()', directoryId };
+      }),
+    );
+    if (to.targetMetadata.belongId != this.resource.targetMetadata.belongId) {
       const items = await this.resource.speciesItemColl.loadSpace({
         options: {
           match: {
@@ -250,6 +261,20 @@ export class StandardFiles {
       });
       await to.speciesItemColl.replaceMany(items);
     }
+  }
+  async operateStandradFile(to: DataResource): Promise<void> {
+    await this.loadStandardFiles();
+    await to.formColl.replaceMany(this.forms.map((a) => a.metadata));
+    await to.transferColl.replaceMany(this.transfers.map((a) => a.metadata));
+    await to.speciesColl.replaceMany(this.specieses.map((a) => a.metadata));
+    await to.propertyColl.replaceMany(this.propertys.map((a) => a.metadata));
+    await to.directoryColl.replaceMany(this.directorys.map((a) => a.metadata));
+    var apps = this.resource.applicationColl.cache.filter(
+      (i) => i.directoryId === this.id,
+    );
+    this.resource.applicationColl.removeCache((i) => i.directoryId === this.id);
+    const data = await to.applicationColl.replaceMany(apps);
+    to.applicationColl.cache.push(...data);
   }
 }
 
@@ -294,10 +319,9 @@ function subscribeCallback<T extends schema.XStandard>(
           standardFilesChanged(directory, typeName, operate, entity);
           break;
         case 'reload':
-          directory.structCallback(true);
-          return true;
-        case 'refresh':
-          directory.structCallback();
+          directory.loadContent(true).then(() => {
+            directory.changCallback();
+          });
           return true;
         case 'reloadFiles':
           directory.loadFiles(true).then(() => {
@@ -313,7 +337,7 @@ function subscribeCallback<T extends schema.XStandard>(
           }
           break;
       }
-      directory.structCallback();
+      directory.changCallback();
       return true;
     }
     for (const subdir of directory.standard.directorys) {
@@ -395,14 +419,18 @@ function standardFilesChanged(
       if (data.typeName === '模块') {
         directory.standard.applications.forEach((i) => i.receive(operate, data));
       } else {
+        var modules: schema.XApplication[] = [];
+        if ('children' in data && Array.isArray(data.children)) {
+          modules = data.children as schema.XApplication[];
+        }
         directory.standard.applications = ArrayChanged(
           directory.standard.applications,
           operate,
           data,
-          () => new Application(data, directory),
+          () => new Application(data, directory, undefined, modules),
         );
         if (operate === 'insert') {
-          directory.resource.applicationColl.cache.push(data);
+          directory.resource.applicationColl.cache.push(data, ...modules);
         } else {
           directory.resource.applicationColl.removeCache((i) => i.id != data.id);
         }

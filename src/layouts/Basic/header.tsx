@@ -98,7 +98,7 @@ const Navbar: React.FC = () => {
     {
       text: '退出',
       count: 0,
-      icon: <OrgIcons exit selected />,
+      icon: <OrgIcons exit />,
       onClick: () => {
         orgCtrl.exit();
         window.location.reload();

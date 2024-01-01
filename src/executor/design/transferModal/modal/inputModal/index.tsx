@@ -20,7 +20,8 @@ const InputModal: React.FC<IProps> = ({ current, finished }) => {
       cancelText={'关闭'}
       width={1200}>
       <Viewer
-        rule={{}}
+        rules={[]}
+        changedFields={[]}
         data={{}}
         form={current.metadata}
         fields={current.fields}

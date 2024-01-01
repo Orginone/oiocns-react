@@ -66,6 +66,11 @@ export abstract class Entity<T extends schema.XEntity>
   }
   _metadata: T;
   key: string;
+
+  /** 是否快捷方式 */
+  get isShortcut() {
+    return !!this._metadata.sourceId;
+  }
   get id(): string {
     return this._metadata.id;
   }

@@ -4,14 +4,16 @@ import { Button, Col, Radio, Form, InputNumber, Card, Divider } from 'antd';
 import cls from './index.module.less';
 import { NodeModel, executorNames } from '@/components/Common/FlowDesign/processType';
 import ShareShowComp from '@/components/Common/ShareShowComp';
-import { IBelong } from '@/ts/core';
+import { IBelong, IWork } from '@/ts/core';
 import SelectIdentity from '@/components/Common/SelectIdentity';
 import { command, model, schema } from '@/ts/base';
 import { IForm, Form as SForm } from '@/ts/core/thing/standard/form';
 import OpenFileDialog from '@/components/OpenFileDialog';
 import { SelectBox } from 'devextreme-react';
 import { getUuid } from '@/utils/tools';
+import Rule from '../../Rule';
 interface IProps {
+  work: IWork;
   current: NodeModel;
   belong: IBelong;
   refresh: () => void;
@@ -165,6 +167,54 @@ const ApprovalNode: React.FC<IProps> = (props) => {
         </Card>
         <Card
           type="inner"
+          title="审批对象"
+          className={cls[`card-info`]}
+          extra={
+            <>
+              <SelectBox
+                value={destType}
+                valueExpr={'value'}
+                displayExpr={'label'}
+                style={{ width: 120, display: 'inline-block' }}
+                onSelectionChanged={(e) => {
+                  switch (e.selectedItem.value) {
+                    case '1':
+                      props.current.destType = '角色';
+                      setCurrentData(undefined);
+                      break;
+                    case '2':
+                      props.current.num = 1;
+                      props.current.destId = '1';
+                      props.current.destName = '发起人';
+                      props.current.destType = '发起人';
+                      setCurrentData({ id: '1', name: '发起人' });
+                      props.refresh();
+                      break;
+                    default:
+                      break;
+                  }
+                  setDestType(e.selectedItem.value);
+                }}
+                dataSource={[
+                  { value: '1', label: '指定角色' },
+                  { value: '2', label: '发起人' },
+                ]}
+              />
+              {destType == '1' && (
+                <a
+                  style={{ paddingLeft: 10, display: 'inline-block' }}
+                  onClick={() => {
+                    setIsOpen(true);
+                  }}>
+                  选择角色
+                </a>
+              )}
+            </>
+          }>
+          {loadDestType()}
+        </Card>
+        <Card
+          type="inner"
           title="表单管理"
           className={cls[`card-info`]}
           extra={
@@ -250,6 +300,12 @@ const ApprovalNode: React.FC<IProps> = (props) => {
             </span>
           )}
         </Card>
+        <Rule
+          work={props.work}
+          current={props.current}
+          primaryForms={primaryForms ?? []}
+          detailForms={[]}
+        />
       </div>
       <SelectIdentity
         open={isOpen}

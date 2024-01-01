@@ -9,12 +9,11 @@ export interface IWorkApply {
   /** 实例携带的数据 */
   instanceData: model.InstanceDataModel;
   /** 校验表单数据 */
-  validation(fromData: Map<string, model.FormEditData>): boolean;
+  validation(): boolean;
   /** 发起申请 */
   createApply(
     applyId: string,
     content: string,
-    fromData: Map<string, model.FormEditData>,
     gateways: Map<string, string>,
   ): Promise<boolean>;
 }
@@ -33,7 +32,7 @@ export class WorkApply implements IWorkApply {
   belong: IBelong;
   metadata: model.WorkInstanceModel;
   instanceData: model.InstanceDataModel;
-  validation(fromData: Map<string, model.FormEditData>): boolean {
+  validation(): boolean {
     const valueIsNull = (value: any) => {
       return (
         value === null ||
@@ -41,18 +40,27 @@ export class WorkApply implements IWorkApply {
         (typeof value === 'string' && (value == '[]' || value.length < 1))
       );
     };
-    for (const formId of fromData.keys()) {
-      const formDataValue = fromData.get(formId);
-      const data: any = formDataValue?.after.at(-1) ?? {};
-      for (const item of this.instanceData.fields[formId]) {
-        var isRequired =
-          formDataValue?.rule[item.id]?.isRequired ||
-          formDataValue?.rule[item.id]?.visible;
-        if (isRequired == undefined) {
-          isRequired = item.options?.isRequired;
-        }
-        if (isRequired && valueIsNull(data[item.id])) {
-          return false;
+    const hides = this.getHideForms();
+    for (const formId of Object.keys(this.instanceData.data)) {
+      if (!hides.includes(formId)) {
+        const formData = this.instanceData.data[formId].at(-1);
+        const data: any = formData?.after.at(-1) ?? {};
+        for (const item of this.instanceData.fields[formId]) {
+          const rules = formData?.rules.filter((a) => a.destId == item.id);
+          var isRequired = item.options?.isRequired;
+          if (rules) {
+            for (const rule of rules) {
+              if (rule.typeName == 'isRequired') {
+                isRequired = isRequired && rule.value;
+              }
+              if (rule.typeName == 'visible') {
+                isRequired = isRequired && rule.value;
+              }
+            }
+          }
+          if (isRequired && valueIsNull(data[item.id])) {
+            return false;
+          }
         }
       }
     }
@@ -61,12 +69,8 @@ export class WorkApply implements IWorkApply {
   async createApply(
     applyId: string,
     content: string,
-    fromData: Map<string, model.FormEditData>,
     gateways: Map<string, string>,
   ): Promise<boolean> {
-    fromData.forEach((data, k) => {
-      this.instanceData.data[k] = [data];
-    });
     var gatewayInfos: model.WorkGatewayInfoModel[] = [];
     gateways.forEach((v, k) => {
       gatewayInfos.push({
@@ -74,10 +78,15 @@ export class WorkApply implements IWorkApply {
         TargetId: v,
       });
     });
-    var mark = await this.getMarkInfo();
+    const hideFormIds = this.getHideForms();
+    var mark = await this.getMarkInfo(hideFormIds);
     if (content.length > 0) {
       mark += `备注:${content}`;
     }
+    hideFormIds.forEach((a) => {
+      delete this.instanceData.data[a];
+      delete this.instanceData.fields[a];
+    });
     const res = await kernel.createWorkInstance({
       ...this.metadata,
       applyId: applyId,
@@ -88,9 +97,16 @@ export class WorkApply implements IWorkApply {
     });
     return res.success;
   }
-  async getMarkInfo(): Promise<string> {
+  private getHideForms = () => {
+    return this.instanceData.rules
+      .filter((a) => a.typeName == 'visable' && !a.value && a.formId == a.destId)
+      .map((a) => a.destId);
+  };
+  async getMarkInfo(hideFormIds: string[]): Promise<string> {
     const remarks: string[] = [];
-    for (const primaryForm of this.instanceData.node.primaryForms) {
+    for (const primaryForm of this.instanceData.node.primaryForms.filter(
+      (a) => !hideFormIds.includes(a.id),
+    )) {
       const key = primaryForm.id;
       const data = this.instanceData.data[key];
       const fields = this.instanceData.fields[key];

@@ -1,6 +1,7 @@
-import { kernel } from '../../../base';
+import { command, kernel, schema } from '../../../base';
 import { Executor } from '.';
 import { IWork } from '..';
+import { Directory } from '../../thing/directory';
 
 // 数据领用
 export class Acquire extends Executor {
@@ -15,6 +16,7 @@ export class Acquire extends Executor {
       await this.transfer(work, (p) => {
         this.changeProgress(Number(((p * 100) / totalCount).toFixed(2)));
       });
+      this.transferFile(work);
     }
     this.changeProgress(100);
     return true;
@@ -59,6 +61,51 @@ export class Acquire extends Executor {
         onProgress(loaded);
         if (things.data.length == 0) {
           break;
+        }
+      }
+    }
+  }
+  /**
+   * 迁移文件
+   */
+  private async transferFile(work: IWork): Promise<void> {
+    const group = work.application.directory.target;
+    const groupDirs = await group.directory.standard.loadDirectorys();
+    const groupFileDir = groupDirs.find((item) => item.name.includes('数据附件'));
+    if (!groupFileDir) {
+      return;
+    }
+    const childDirs = await groupFileDir.standard.loadDirectorys();
+    const targetDir = childDirs.find((item) => item.code == group.space.code);
+    if (!targetDir) {
+      return;
+    }
+    const spaceDirs = await group.space.directory.standard.loadDirectorys();
+    let fileDir = spaceDirs.find((item) => item.name.includes('数据附件'));
+    if (!fileDir) {
+      const resultDir = await group.space.directory.create({
+        name: '数据附件',
+        code: 'dataFile',
+        typeName: '目录',
+        directoryId: group.space.id,
+      } as schema.XDirectory);
+      if (resultDir) {
+        fileDir = new Directory(resultDir, group.space, group.space.directory);
+      }
+    }
+    if (fileDir) {
+      const ready = (await fileDir.loadFiles()).map((item) => item.code.split('/')[1]);
+      const files = (await targetDir.loadFiles()).filter((item) => {
+        return !ready.includes(item.code.split('/')[1]);
+      });
+      if (files.length > 0) {
+        command.emitter('executor', 'taskList', fileDir);
+      }
+      for (const file of files) {
+        const response = await fetch(file.shareInfo().shareLink ?? '');
+        if (response.ok) {
+          const blob = await response.blob();
+          fileDir.createFile(new File([blob], file.name, { type: blob.type }));
         }
       }
     }

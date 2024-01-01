@@ -20,6 +20,8 @@ import { uploadBusiness, uploadStandard } from './tools/uploadTemplate';
 import TypeIcon from '@/components/Common/GlobalComps/typeIcon';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import { shareOpenLink } from '@/utils/tools';
+import { XStandard } from '@/ts/base/schema';
+import { IStandardFileInfo } from '@/ts/core/thing/fileinfo';
 /** 执行非页面命令 */
 export const executeCmd = (cmd: string, entity: any) => {
   switch (cmd) {
@@ -46,6 +48,8 @@ export const executeCmd = (cmd: string, entity: any) => {
       return deleteEntity(entity, false);
     case 'hardDelete':
       return deleteEntity(entity, true);
+    case 'shortcut':
+      return createShortcut(entity);
     case 'restore':
       return restoreEntity(entity);
     case 'remove':
@@ -173,13 +177,39 @@ const setCopyFiles = (cmd: string, file: IFile) => {
   message.info(`${file.name}已放入剪切板`);
 };
 
+function isDirectory(file: IFile): file is IDirectory {
+  return file.typeName == '目录';
+}
+
+function checkCycle(dir: IDirectory, target: IDirectory): true | string {
+  if (target.isShortcut) {
+    return '不能将目录移动到快捷方式中';
+  }
+
+  // 此处的id都是真实目录id
+  if (dir.id == target.id) {
+    return '移动的目标不能是自身';
+  }
+
+  let parent = target.parent;
+  while (parent) {
+    if (parent.id == dir.id) {
+      return '移动的目标不能是自身的子目录中';
+    }
+    parent = parent.parent;
+  }
+  return true;
+}
+
 /** 剪贴板操作 */
 const copyBoard = (dir: IDirectory) => {
-  const datasource: any[] = [];
+  const datasource: { key: string; cmd: string; file: IFile }[] = [];
   for (const item of orgCtrl.user.copyFiles.entries()) {
     if (
       (item[1].typeName === '人员' && dir.typeName === '成员目录') ||
-      (item[1].typeName !== '人员' && dir.typeName === '目录')
+      (item[1].typeName !== '人员' && dir.typeName === '目录') ||
+      (['应用', '办事', '模块'].includes(item[1].typeName) &&
+        ['应用', '模块'].includes(dir.typeName))
     ) {
       datasource.push({
         key: item[0],
@@ -198,6 +228,14 @@ const copyBoard = (dir: IDirectory) => {
         if (item.cmd === 'copy') {
           await item.file.copy(dir);
         } else {
+          if (isDirectory(item.file)) {
+            let result = checkCycle(item.file, dir);
+            if (typeof result === 'string') {
+              message.warn(result);
+              modal.destroy();
+              return;
+            }
+          }
           await item.file.move(dir);
         }
         orgCtrl.user.copyFiles.delete(item.key);
@@ -374,4 +412,11 @@ const uploadFile = (dir: IDirectory, uploaded?: (file: IFile | undefined) => voi
       </Upload>
     ),
   });
+};
+
+/** 创建快捷方式 */
+const createShortcut = async (entity: IStandardFileInfo<XStandard>) => {
+  if (await entity.createShortcut()) {
+    orgCtrl.changCallback();
+  }
 };

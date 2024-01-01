@@ -6,8 +6,8 @@ import { IBelong } from '../target/base/belong';
 import { UserProvider } from '../user';
 import { IWorkApply } from './apply';
 import { FileInfo, IFile } from '../thing/fileinfo';
-import { IExecutor } from './executor';
 import { Acquire } from './executor/acquire';
+import { IExecutor } from './executor';
 export type TaskTypeName = '待办' | '已办' | '抄送' | '发起的';
 
 export interface IWorkTask extends IFile {
@@ -49,6 +49,8 @@ export interface IWorkTask extends IFile {
   ): Promise<boolean>;
   /** 获取办事 */
   findWorkById(wrokId: string): Promise<IWork | undefined>;
+  /** 加载执行器 */
+  loadExecutors(node: model.WorkNodeModel): IExecutor[];
 }
 
 export class WorkTask extends FileInfo<schema.XEntity> implements IWorkTask {
@@ -157,7 +159,6 @@ export class WorkTask extends FileInfo<schema.XEntity> implements IWorkTask {
       try {
         this.instance = data;
         this.instanceData = eval(`(${data.data})`);
-        await this.loadExecutors();
         return this.instanceData !== undefined;
       } catch (ex) {
         logger.error(ex as Error);
@@ -165,18 +166,18 @@ export class WorkTask extends FileInfo<schema.XEntity> implements IWorkTask {
     }
     return false;
   }
-  async loadExecutors() {
-    this.executors = [];
-    let metadata = this.instanceData?.node.executors ?? [];
-    for (const item of metadata) {
+  loadExecutors(node: model.WorkNodeModel) {
+    let executors: IExecutor[] = [];
+    for (const item of node.executors) {
       switch (item.funcName) {
         case '数据申领':
-          this.executors.push(new Acquire(item, this));
+          executors.push(new Acquire(item, this));
           break;
         case '归属权变更':
           break;
       }
     }
+    return executors;
   }
   async recallApply(): Promise<boolean> {
     if ((await this.loadInstance()) && this.instance) {
@@ -190,7 +191,7 @@ export class WorkTask extends FileInfo<schema.XEntity> implements IWorkTask {
   }
 
   async createApply(): Promise<IWorkApply | undefined> {
-    if (this.taskdata.approveType == '子流程') {
+    if (this.taskdata.approveType == '子流程' || this.taskdata.approveType == '网关') {
       await this.loadInstance();
       var define = await this.findWorkById(this.taskdata.defineId);
       if (define) {

@@ -65,7 +65,7 @@ const Navbar: React.FC = () => {
 
   const NavItem = (item: any) => {
     const selected = location.hash.startsWith('#' + item.path);
-    let content = <OrgIcons size={26} type={item.icon} notAvatar selected={selected} />;
+    let content = <OrgIcons size={24} type={item.icon} notAvatar selected={selected} />;
     if (item.count > 0) {
       content = (
         <Badge count={item.count} size="small">
@@ -76,13 +76,14 @@ const Navbar: React.FC = () => {
     return (
       <a
         key={item.path}
+        className={`${styles['navbar-item']} ${ selected ? styles['navbar-item_selected'] : ''}`}
         onClick={() => {
           history.push(item.path);
           orgCtrl.currentKey = '';
           orgCtrl.changCallback();
         }}>
         {content}
-        <div className={selected ? styles.title_selected : styles.title}>{item.text}</div>
+        <div className={`${styles.title} ${selected ? styles.title_selected : ''}`}>{item.text}</div>
       </a>
     );
   };
@@ -90,12 +91,10 @@ const Navbar: React.FC = () => {
   return (
     <Layout.Sider className={styles.header} width={60}>
       <div
-        className="ogo-space-item"
-        style={{ cursor: 'pointer' }}
         onClick={() => setOnlineVisible(!onlineVisible)}>
-        <EntityIcon entityId={orgCtrl.user.id} size={45} />
+        <EntityIcon entityId={orgCtrl.user.id} size={35} />
       </div>
-      <Space direction="vertical" wrap align="center" size={25} className={styles.navbar}>
+      <Space direction="vertical" wrap align="center" size={6} className={styles.navbar}>
         {actions.map((item) => NavItem(item))}
         {onlineVisible && <OnlineInfo onClose={() => setOnlineVisible(false)} />}
       </Space>
@@ -105,7 +104,7 @@ const Navbar: React.FC = () => {
           window.location.reload();
         }}>
         <OrgIcons size={22} exit selected />
-        <div className={styles.title_selected}>退出</div>
+        <div className={styles['navbar-exit']}>退出</div>
       </a>
     </Layout.Sider>
   );

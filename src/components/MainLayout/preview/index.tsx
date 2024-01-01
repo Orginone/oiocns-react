@@ -1,6 +1,8 @@
 import ImageView from './image';
 import VideoView from './video';
 import {
+  IApplication,
+  IDirectory,
   IEntity,
   IForm,
   ISession,
@@ -38,6 +40,8 @@ type EntityType =
   | IForm
   | ITarget
   | IWork
+  | IDirectory
+  | IApplication
   | IPageTemplate
   | undefined;
 
@@ -143,6 +147,9 @@ const EntityPreview: React.FC<{ flag?: string }> = (props) => {
     }
     if ('command' in entity) {
       return <ViewerHost ctx={{ view: new ViewerManager(entity) }} />;
+    }
+    if ('standard' in entity || 'works' in entity) {
+      return renderEntityBody(entity, <Directory key={entity.key} root={entity} />);
     }
     return renderEntityBody(entity);
   }
