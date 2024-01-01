@@ -1,3 +1,4 @@
+import pako from 'pako';
 const sizeUnits = ['', 'KB', 'MB', 'GB', 'TB', 'PB'];
 /**
  * 格式化大小
@@ -16,7 +17,6 @@ export function formatSize(size: number, unit: string = ''): string {
 export function encodeKey(key: string): string {
   return btoa(unescape(encodeURIComponent(`${key}`)));
 }
-
 /** 将文件切片 */
 export function sliceFile(file: Blob, chunkSize: number): Blob[] {
   const slices: Blob[] = [];
@@ -42,7 +42,6 @@ export function blobToDataUrl(file: Blob): Promise<string> {
     reader.readAsBinaryString(file);
   });
 }
-
 /** 将文件读成字节数组 */
 export function blobToNumberArray(file: Blob): Promise<number[]> {
   return new Promise((resolve) => {
@@ -54,7 +53,6 @@ export function blobToNumberArray(file: Blob): Promise<number[]> {
     reader.readAsArrayBuffer(file);
   });
 }
-
 /** 格式化日期 */
 export function formatDate(date?: any, fmt?: string) {
   if (date === void 0) date = new Date();
@@ -108,9 +106,6 @@ export function formatDate(date?: any, fmt?: string) {
 
   return fmt;
 }
-
-import pako from 'pako';
-
 /** 字符串压缩解压缩 */
 export class StringPako {
   static readonly gzheader = new TextEncoder().encode('^!gz');

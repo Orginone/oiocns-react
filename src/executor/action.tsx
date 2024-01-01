@@ -177,7 +177,6 @@ const setCopyFiles = (cmd: string, file: IFile) => {
   message.info(`${file.name}已放入剪切板`);
 };
 
-
 function isDirectory(file: IFile): file is IDirectory {
   return file.typeName == '目录';
 }
@@ -208,7 +207,9 @@ const copyBoard = (dir: IDirectory) => {
   for (const item of orgCtrl.user.copyFiles.entries()) {
     if (
       (item[1].typeName === '人员' && dir.typeName === '成员目录') ||
-      (item[1].typeName !== '人员' && dir.typeName === '目录')
+      (item[1].typeName !== '人员' && dir.typeName === '目录') ||
+      (['应用', '办事', '模块'].includes(item[1].typeName) &&
+        ['应用', '模块'].includes(dir.typeName))
     ) {
       datasource.push({
         key: item[0],
@@ -223,7 +224,6 @@ const copyBoard = (dir: IDirectory) => {
     cancelText: '取消',
     okText: '全部',
     onOk: async () => {
-      debugger
       for (const item of datasource) {
         if (item.cmd === 'copy') {
           await item.file.copy(dir);
@@ -413,7 +413,6 @@ const uploadFile = (dir: IDirectory, uploaded?: (file: IFile | undefined) => voi
     ),
   });
 };
-
 
 /** 创建快捷方式 */
 const createShortcut = async (entity: IStandardFileInfo<XStandard>) => {

@@ -21,7 +21,7 @@ interface IFormItemProps {
   field: model.FieldModel;
   readOnly?: boolean;
   belong: IBelong;
-  rule: { [type: string]: any };
+  rules: model.RenderRule[];
   onValuesChange?: (field: string, value: any) => void;
 }
 
@@ -36,6 +36,12 @@ const FormItem: React.FC<IFormItemProps> = (props) => {
   props.field.options = props.field.options || {};
   if (props.readOnly) {
     props.field.options.readOnly = true;
+  }
+  if (props.data[props.field.id] == undefined && props.field.options?.defaultValue) {
+    props.onValuesChange?.apply(this, [
+      props.field.id,
+      props.field.options?.defaultValue,
+    ]);
   }
   const mixOptions: any = {
     height: 36,
@@ -59,9 +65,9 @@ const FormItem: React.FC<IFormItemProps> = (props) => {
     width: getItemWidth(props.numStr),
   };
 
-  Object.keys(props.rule).forEach((type) => {
-    mixOptions[type] = props.rule[type];
-  });
+  for (const rule of props.rules) {
+    mixOptions[rule.typeName] = rule.value;
+  }
 
   if (mixOptions.isRequired) {
     mixOptions.isValid =

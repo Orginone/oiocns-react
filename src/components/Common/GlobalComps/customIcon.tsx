@@ -1,4 +1,5 @@
 import React from 'react';
+import { Theme } from '@/config/theme';
 
 interface barInfo {
   size: number;
@@ -12,7 +13,7 @@ export const LeftBarIcon = (info: barInfo) => {
       style={{
         width: info.size,
         height: info.size + 2,
-        border: '2px solid #3838b9',
+        border: `2px solid ${Theme.FocusColor}`,
         borderRadius: 4,
       }}>
       {info.selected ? (
@@ -20,14 +21,14 @@ export const LeftBarIcon = (info: barInfo) => {
           style={{
             height: info.size - 2,
             width: info.width,
-            background: '#3838b9',
+            background: Theme.FocusColor,
           }}></div>
       ) : (
         <div
           style={{
             height: info.size - 2,
             width: info.width,
-            borderRight: '2px solid #3838b9',
+            borderRight: `2px solid ${Theme.FocusColor}`,
           }}></div>
       )}
     </div>
@@ -40,7 +41,7 @@ export const RightBarIcon = (info: barInfo) => {
       style={{
         width: info.size,
         height: info.size + 2,
-        border: '2px solid #3838b9',
+        border: `2px solid ${Theme.FocusColor}`,
         borderRadius: 4,
       }}>
       {info.selected ? (
@@ -49,7 +50,7 @@ export const RightBarIcon = (info: barInfo) => {
             float: 'right',
             height: info.size - 2,
             width: info.width,
-            background: '#3838b9',
+            background: Theme.FocusColor,
           }}></div>
       ) : (
         <div
@@ -57,7 +58,7 @@ export const RightBarIcon = (info: barInfo) => {
             float: 'right',
             height: info.size - 2,
             width: info.width,
-            borderLeft: '2px solid #3838b9',
+            borderLeft: `2px solid ${Theme.FocusColor}`,
           }}></div>
       )}
     </div>

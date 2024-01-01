@@ -208,7 +208,7 @@ export class StoreNode extends Node<model.Store> {
             nodeId: this.work.node.id,
             creator: apply.belong.userId,
             createTime: formatDate(new Date(), 'yyyy-MM-dd hh:mm:ss.S'),
-            rule: {},
+            rules: [],
           };
           for (const item of data[key]) {
             if (!item.id) {
@@ -221,7 +221,7 @@ export class StoreNode extends Node<model.Store> {
         }
       }
     }
-    await apply.createApply(apply.belong.id, '自动写入', map, new Map());
+    await apply.createApply(apply.belong.id, '自动写入', new Map());
     return data;
   }
 }

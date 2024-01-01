@@ -8,6 +8,26 @@ const Download: React.FC = () => {
   const resources = getResouces();
   return (
     <div className={cls.auth_body}>
+      <div
+        className={cls.slider}
+        style={{
+          backgroundImage: `url(/img/${resources.location}/passport/background.png)`,
+        }}>
+        <Carousel
+          autoplay
+          draggable
+          autoplaySpeed={4000}
+          style={{ height: 'calc(100vh - 30px)', cursor: 'pointer' }}
+          dots={{ className: 'carousel' }}>
+          <div>
+            <img
+              className={cls.sliderImg}
+              src={`/img/${resources.location}/passport/page1.png`}
+              alt=""
+            />
+          </div>
+        </Carousel>
+      </div>
       <div className={cls.content}>
         <div className={cls.auth}>
           <DownLoadContent />
@@ -45,26 +65,6 @@ const Download: React.FC = () => {
             </a>
           </div>
         </div>
-      </div>
-      <div
-        className={cls.slider}
-        style={{
-          backgroundImage: `url(/img/${resources.location}/passport/background.png)`,
-        }}>
-        <Carousel
-          autoplay
-          draggable
-          autoplaySpeed={4000}
-          style={{ height: 'calc(100vh - 30px)', cursor: 'pointer' }}
-          dots={{ className: 'carousel' }}>
-          <div>
-            <img
-              className={cls.sliderImg}
-              src={`/img/${resources.location}/passport/page1.png`}
-              alt=""
-            />
-          </div>
-        </Carousel>
       </div>
     </div>
   );

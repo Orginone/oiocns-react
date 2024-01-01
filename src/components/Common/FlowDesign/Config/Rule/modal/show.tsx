@@ -3,23 +3,26 @@ import { Field } from 'devextreme/ui/filter_builder';
 import { FilterBuilder } from 'devextreme-react/filter-builder';
 import { Modal } from 'antd';
 import { SelectBox, TextArea, TextBox } from 'devextreme-react';
-import { model } from '@/ts/base';
+import { model, schema } from '@/ts/base';
 import { getUuid } from '@/utils/tools';
 
 interface IProps {
   fields: Field[];
-  current?: model.FormShowRule;
-  onOk: (rule: model.FormShowRule) => void;
+  primarys: schema.XForm[];
+  details: schema.XForm[];
+  current?: model.NodeShowRule;
+  onOk: (rule: model.NodeShowRule) => void;
   onCancel: () => void;
 }
 
 const ShowRuleModal: React.FC<IProps> = (props) => {
   const [name, setName] = useState<string>();
   const [remark, setRemark] = useState<string>();
-  const [target, setTarget] = useState<string>();
+  const [target, setTarget] = useState<model.MappingData>();
   const [showType, setShowType] = useState<string>();
   const [value, setValue] = useState<boolean>();
   const [condition, setCondition] = useState<any[]>([]);
+  const [targetSource, setTargetSource] = useState<model.MappingData[]>();
   useEffect(() => {
     if (props.current) {
       setName(props.current.name);
@@ -30,6 +33,39 @@ const ShowRuleModal: React.FC<IProps> = (props) => {
       setCondition(JSON.parse(props.current?.condition || '[]'));
     }
   }, [props.current]);
+  useEffect(() => {
+    const tgs: model.MappingData[] = [];
+    tgs.push(
+      ...props.details.map((a) => {
+        return {
+          id: a.id,
+          formName: a.name,
+          formId: a.id,
+          typeName: '表单',
+          trigger: a.id,
+          code: '',
+          name: `[表单]${a.name}`,
+        };
+      }),
+    );
+    props.primarys.forEach((a) => {
+      tgs.push(
+        ...a.attributes.map((s) => {
+          return {
+            id: s.id,
+            formName: a.name,
+            formId: a.id,
+            typeName: '属性',
+            trigger: s.id,
+            code: '',
+            name: `[${a.name}]${s.name}`,
+          };
+        }),
+      );
+    });
+    setTargetSource(tgs.filter((a) => a.id != target?.id));
+  }, [props.details, props.primarys]);
+
   const vaildDisable = () => {
     return (
       name == undefined ||
@@ -84,15 +120,15 @@ const ShowRuleModal: React.FC<IProps> = (props) => {
         }}
       />
       <SelectBox
-        label="目标*"
+        label="目标对象*"
         labelMode="floating"
-        value={target}
+        value={target?.id}
         showClearButton
-        displayExpr="caption"
-        valueExpr="name"
-        dataSource={props.fields}
+        displayExpr="name"
+        valueExpr="id"
+        dataSource={targetSource}
         onSelectionChanged={(e) => {
-          setTarget(e.selectedItem['name']);
+          setTarget(e.selectedItem);
         }}
       />
       <div>
@@ -107,7 +143,11 @@ const ShowRuleModal: React.FC<IProps> = (props) => {
           style={{ display: 'inline-block' }}
           dataSource={[
             { label: '是否展示', value: 'visible' },
-            { label: '是否必填', value: 'isRequired' },
+            {
+              label: '是否必填',
+              value: 'isRequired',
+              visible: target?.typeName == '主表',
+            },
           ]}
           onSelectionChanged={(e) => {
             setShowType(e.selectedItem['value']);

@@ -15,6 +15,7 @@ export class Cohort extends Target implements ICohort {
     if (this.metadata.belongId !== this.space.id) {
       if (await this.removeMembers([this.user.metadata])) {
         this.space.cohorts = this.space.cohorts.filter((i) => i.key != this.key);
+        this.space.changCallback();
         return true;
       }
     }
@@ -24,6 +25,7 @@ export class Cohort extends Target implements ICohort {
     const success = await super.delete(notity);
     if (success) {
       this.space.cohorts = this.space.cohorts.filter((i) => i.key != this.key);
+      this.space.changCallback();
     }
     return success;
   }
@@ -37,10 +39,8 @@ export class Cohort extends Target implements ICohort {
     return [this];
   }
   async deepLoad(reload: boolean = false): Promise<void> {
-    await Promise.all([
-      this.loadMembers(reload),
-      this.loadIdentitys(reload),
-      this.directory.loadDirectoryResource(reload),
-    ]);
+    await Promise.all([this.loadIdentitys(reload)]);
+    this.loadMembers(reload);
+    this.directory.loadDirectoryResource(reload);
   }
 }

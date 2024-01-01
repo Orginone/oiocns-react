@@ -945,7 +945,11 @@ export default class KernelApi {
       flag: 'loadThing',
       params: options,
     });
-    return { ...res, ...res.data };
+    const result: model.LoadResult<any> = { ...res, ...res.data };
+    if (!Array.isArray(result.data)) {
+      result.data = [];
+    }
+    return result;
   }
   /**
    * 创建物

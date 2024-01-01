@@ -9,6 +9,7 @@ import { formatZhDate } from '@/utils/tools';
 import orgCtrl from '@/ts/controller';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import TypeIcon from '@/components/Common/GlobalComps/typeIcon';
+import { Theme } from '@/config/theme';
 
 interface Iprops {
   entity: schema.XEntity | schema.XTarget;
@@ -27,7 +28,7 @@ const EntityPreview: React.FC<Iprops> = ({ entity, finished }) => {
           <QrCode
             level="H"
             size={150}
-            fgColor={'#3838b9'}
+            fgColor={Theme.FocusColor}
             value={`${location.origin}/${entity.id}`}
             imageSettings={{
               src: avatar?.thumbnail ?? '',

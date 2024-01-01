@@ -1,3 +1,5 @@
+import { model } from '.';
+
 export type Xbase = {
   // 雪花ID
   id: string;
@@ -186,7 +188,7 @@ export type XDirectory = {
 //表单定义
 export type XForm = {
   // 表单布局
-  rule: XFormRule1[];
+  rule: model.Rule[];
   // 表单查看数据规则
   searchRule: string;
   // 操作规则（允许新增、允许选择、允许删除）

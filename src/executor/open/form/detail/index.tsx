@@ -44,7 +44,8 @@ const ThingView: React.FC<IProps> = (props) => {
             children: (
               <WorkFormViewer
                 readonly
-                rule={{}}
+                rules={[]}
+                changedFields={[]}
                 key={props.form.id}
                 form={props.form.metadata}
                 fields={props.form.fields}

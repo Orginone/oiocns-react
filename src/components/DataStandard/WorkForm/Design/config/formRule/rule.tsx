@@ -7,7 +7,7 @@ import { Field } from 'devextreme/ui/filter_builder';
 import CalcRuleModal from './modal/calc';
 import ShowRuleModal from './modal/show';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
-import { schema } from '@/ts/base';
+import { model } from '@/ts/base';
 interface IProps {
   form: IForm;
   fields: Field[];
@@ -19,19 +19,31 @@ const FormRule: React.FC<IProps> = (props) => {
   }
   const [key, forceUpdate] = useObjectUpdate(props.fields);
   const [openType, setOpenType] = useState(0);
-  const [data, setData] = useState<schema.XFormRule1[]>(props.form.metadata.rule);
-  const [select, setSelect] = useState<schema.XFormRule1>();
+  const [data, setData] = useState<model.Rule[]>(props.form.metadata.rule);
+  const [select, setSelect] = useState<model.Rule>();
   /** 展示规则信息列 */
-  const ShowRuleColumns: ProColumns<schema.XFormRule1>[] = [
+  const ShowRuleColumns: ProColumns<model.Rule>[] = [
     { title: '序号', valueType: 'index', width: 50 },
     {
       title: '名称',
       dataIndex: 'name',
     },
     {
+      title: '类型',
+      dataIndex: 'type',
+      render: (_: any, record: model.Rule) => {
+        switch (record.type) {
+          case 'show':
+            return '渲染';
+          case 'calc':
+            return '计算';
+        }
+      },
+    },
+    {
       title: '备注',
       dataIndex: 'display',
-      render: (_: any, record: schema.XFormRule1) => {
+      render: (_: any, record: model.Rule) => {
         return (
           <Typography.Text
             style={{ fontSize: 12, color: '#888' }}
@@ -43,7 +55,7 @@ const FormRule: React.FC<IProps> = (props) => {
       },
     },
   ];
-  const renderOperate = (rule: schema.XFormRule1) => {
+  const renderOperate = (rule: model.Rule) => {
     return [
       {
         key: 'edit',
@@ -90,7 +102,7 @@ const FormRule: React.FC<IProps> = (props) => {
             </a>
           </>
         }>
-        <CardOrTableComp<schema.XFormRule1>
+        <CardOrTableComp<model.Rule>
           key={key}
           rowKey={'id'}
           dataSource={data}
@@ -103,7 +115,7 @@ const FormRule: React.FC<IProps> = (props) => {
         <ShowRuleModal
           fields={props.fields}
           onCancel={() => setOpenType(0)}
-          current={select as schema.FormShowRule}
+          current={select as model.FormShowRule}
           onOk={(rule) => {
             var rules = [rule, ...data.filter((a) => a.id != rule.id)];
             setOpenType(0);
@@ -117,7 +129,7 @@ const FormRule: React.FC<IProps> = (props) => {
         <CalcRuleModal
           fields={props.fields}
           onCancel={() => setOpenType(0)}
-          current={select as schema.FormCalcRule}
+          current={select as model.FormCalcRule}
           onOk={(rule) => {
             var rules = [rule, ...data.filter((a) => a.id != rule.id)];
             setOpenType(0);

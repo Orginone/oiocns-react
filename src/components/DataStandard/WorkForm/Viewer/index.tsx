@@ -1,13 +1,12 @@
 import { common, model, schema } from '@/ts/base';
 import { IBelong } from '@/ts/core';
-import React from 'react';
+import React, { useEffect } from 'react';
 import Toolbar, { Item } from 'devextreme-react/toolbar';
 import FormItem from './formItem';
 import { Emitter, logger } from '@/ts/base/common';
 import { getItemNums } from '../Utils';
 import useStorage from '@/hooks/useStorage';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
-import { transformExpression } from '@/utils/script';
 
 const WorkFormViewer: React.FC<{
   data: any;
@@ -16,14 +15,15 @@ const WorkFormViewer: React.FC<{
   readonly?: boolean;
   showTitle?: boolean;
   fields: model.FieldModel[];
-  rule: { [id: string]: { [type: string]: any } };
+  changedFields: model.MappingData[];
+  rules: model.RenderRule[];
   onValuesChange?: (fieldId: string, value: any, data: any) => void;
 }> = (props) => {
-  const [key, forceUpdate] = useObjectUpdate(props.rule);
+  const [key, forceUpdate] = useObjectUpdate(props.rules);
   const formData: any = { name: props.form.name, ...props.data };
   const [notifyEmitter] = React.useState(new Emitter());
   const [colNum, setColNum] = useStorage('workFormColNum', '一列');
-  const onValueChange = (fieldId: string, value: any) => {
+  const onValueChange = (fieldId: string, value: any, refresh: boolean = true) => {
     if (value === undefined || value === null) {
       delete props.data[fieldId];
     } else {
@@ -72,10 +72,10 @@ const WorkFormViewer: React.FC<{
               case 'isnotblank':
                 return `${dataValue}`.trim().length > 0;
               case 'between':
-                const values = rules[2];
-                if (Array.isArray(values) && values.length == 2) {
-                  return dataValue > values[0] && dataValue <= values[1];
+                if (Array.isArray(rules[2]) && rules[2].length == 2) {
+                  return dataValue > rules[2][0] && dataValue <= rules[2][1];
                 }
+                break;
               default:
                 break;
             }
@@ -94,64 +94,81 @@ const WorkFormViewer: React.FC<{
       };
       const rules = props.form.rule?.filter((a) => a.trigger.includes(key)) ?? [];
       for (const rule of rules) {
-        const target = props.fields.find((a) => a.id == rule.target);
-        if (target) {
-          if (props.rule[rule.target] == undefined) {
-            props.rule[rule.target] = {};
-          }
-          switch (rule.type) {
-            case 'show':
-              const showRule = rule as schema.FormShowRule;
-              const value =
-                showRule.showType == 'hideField' ? !showRule.value : showRule.value;
-              var pass = vaildRule(JSON.parse(showRule.condition));
-              props.rule[showRule.target][showRule.showType] = pass ? value : !value;
-              break;
-            case 'calc':
-              const calcRule = rule as schema.FormCalcRule;
-              var formula = calcRule.formula;
-              for (var i = 0; i < calcRule.trigger.length; i++) {
-                const triggerData = props.data[calcRule.trigger[i]];
-                if (!triggerData) {
-                  return false;
-                } else {
-                  formula = formula.replaceAll(`@${i}@`, JSON.stringify(triggerData));
+        if ('target' in rule) {
+          const target = props.fields.find((a) => a.id == rule.target);
+          if (target) {
+            switch (rule.type) {
+              case 'show':
+                {
+                  var showRule = rule as model.FormShowRule;
+                  var value =
+                    showRule.showType == 'visible' ? !showRule.value : showRule.value;
+                  var pass = vaildRule(JSON.parse(showRule.condition));
+                  const oldRule = props.rules.find(
+                    (a) => a.destId == showRule.target && a.typeName == showRule.showType,
+                  );
+                  if (oldRule) {
+                    oldRule.value = pass ? value : !value;
+                  } else {
+                    props.rules.push({
+                      formId: props.form.id,
+                      destId: showRule.target,
+                      typeName: showRule.showType,
+                      value: pass ? value : !value,
+                    });
+                  }
+                  forceUpdate();
                 }
-              }
-              try {
-                props.data[calcRule.target] = running(
-                  `nextData = ${formula}`,
-                  { data: props.data },
-                  { target: calcRule.target },
-                );
-              } catch (error: any) {
-                logger.error(`计算规则[${formula}]执行失败，请确认是否维护正确!\n` + error.message);
-              }
-              break;
+                break;
+              case 'calc':
+                var calcRule = rule as model.FormCalcRule;
+                var formula = calcRule.formula;
+                for (var i = 0; i < calcRule.trigger.length; i++) {
+                  const triggerData = props.data[calcRule.trigger[i]];
+                  if (!triggerData) {
+                    const defaultValue = props.fields.find((a) => a.id == calcRule.target)
+                      ?.options?.defaultValue;
+                    if (defaultValue) {
+                      props.data[calcRule.target] = defaultValue;
+                    } else {
+                      delete props.data[calcRule.target];
+                    }
+                    return true;
+                  } else {
+                    formula = formula.replaceAll(`@${i}@`, JSON.stringify(triggerData));
+                  }
+                }
+                try {
+                  const runtime = {
+                    value: {},
+                    decrypt: common.decrypt,
+                    encrypt: common.encrypt,
+                  };
+                  common.Sandbox('value=' + formula)(runtime);
+                  props.data[calcRule.target] = runtime.value;
+                } catch {
+                  logger.error(`计算规则[${formula}]执行失败，请确认是否维护正确!`);
+                }
+                break;
+            }
           }
         }
       }
       return rules.length > 0;
     };
     props.onValuesChange?.apply(this, [fieldId, value, props.data]);
-    if (runRule(fieldId)) {
+    if (runRule(fieldId) && refresh) {
       forceUpdate();
     }
   };
-
-  const running = (code: string, args: any, env?: model.KeyValue): any => {
-    const runtime = {
-      environment: env ?? {},
-      preData: args,
-      nextData: {},
-      decrypt: common.decrypt,
-      encrypt: common.encrypt,
-    };
-    
-    const result = transformExpression(code);
-    common.Sandbox(result.code)(runtime);
-    return runtime.nextData;
-  };
+  useEffect(() => {
+    if (props.changedFields) {
+      props.changedFields.forEach((s) => {
+        onValueChange(s.id, props.data[s.id], false);
+      });
+      forceUpdate();
+    }
+  }, [props.changedFields]);
 
   return (
     <div style={{ padding: 16 }} key={key}>
@@ -184,7 +201,7 @@ const WorkFormViewer: React.FC<{
           key={'name'}
           data={formData}
           numStr={colNum}
-          rule={{}}
+          rules={[]}
           readOnly={props.readonly}
           field={{
             id: 'name',
@@ -199,13 +216,12 @@ const WorkFormViewer: React.FC<{
           onValuesChange={onValueChange}
         />
         {props.fields.map((field) => {
-          const itemRule = props.rule[field.id] ?? {};
           return (
             <FormItem
               key={field.id}
               data={formData}
               numStr={colNum}
-              rule={itemRule}
+              rules={props.rules.filter((a) => a.destId == field.id)}
               readOnly={props.readonly}
               field={field}
               belong={props.belong}

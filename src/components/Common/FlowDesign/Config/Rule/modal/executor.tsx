@@ -1,45 +1,59 @@
 import React, { useEffect, useState } from 'react';
 import { Field } from 'devextreme/ui/filter_builder';
 import { Modal } from 'antd';
-import { DropDownBox, SelectBox, TextArea, TextBox, TreeView } from 'devextreme-react';
-import { model } from '@/ts/base';
+import { DropDownBox, TextArea, TextBox, TreeView } from 'devextreme-react';
+import { model, schema } from '@/ts/base';
 import { getUuid } from '@/utils/tools';
+import CodeMirror from '@uiw/react-codemirror';
+import { javascript } from '@codemirror/lang-javascript';
 
 interface IProps {
   fields: Field[];
-  current?: model.FormCalcRule;
-  onOk: (rule: model.FormCalcRule) => void;
+  details: schema.XForm[];
+  current?: model.NodeExecutorRule;
+  onOk: (rule: model.NodeExecutorRule) => void;
   onCancel: () => void;
 }
 
-const CalcRuleModal: React.FC<IProps> = (props) => {
+const ExecutorRuleModal: React.FC<IProps> = (props) => {
   const [name, setName] = useState<string>();
   const [remark, setRemark] = useState<string>();
-  const [formula, setFormula] = useState<string>();
+  const [code, setCode] = useState<string>();
   const [trigger, setTrigger] = useState<string[]>();
-  const [target, setTarget] = useState<string>();
+  const [keyMap, setKeyMap] = useState<Map<string, model.MappingData>>();
+  const [triggerSource, setTriggerSource] = useState<Field[]>();
   useEffect(() => {
     if (props.current) {
       setName(props.current.name);
       setRemark(props.current.remark);
-      setTarget(props.current.target);
       setTrigger(props.current.trigger);
-      setFormula(props.current.formula);
+      setCode(props.current.function);
+      setKeyMap(props.current.keyMap);
     }
-  }, [props.current]);
+    setTriggerSource([
+      ...(props.details.map((a) => {
+        return {
+          name: a.id,
+          dataField: a.code,
+          caption: '[表单]' + a.name,
+          dataType: 'string',
+        };
+      }) as Field[]),
+      ...props.fields.map((a) => {
+        return { ...a, caption: '[属性]' + a.caption };
+      }),
+    ]);
+  }, [props.fields, props.current]);
   const vaildDisable = () => {
     return (
-      name == undefined ||
-      trigger == undefined ||
-      target == undefined ||
-      formula == undefined
+      name == undefined || trigger == undefined || code == undefined || code == undefined
     );
   };
 
   return (
     <Modal
       destroyOnClose
-      title={'计算规则'}
+      title={'函数规则'}
       open={true}
       onOk={() => {
         props.onOk.apply(this, [
@@ -47,10 +61,10 @@ const CalcRuleModal: React.FC<IProps> = (props) => {
             id: props.current?.id ?? getUuid(),
             name: name!,
             remark: remark ?? '',
-            target: target!,
             type: 'calc',
             trigger: trigger!,
-            formula: formula!,
+            function: code!,
+            keyMap: keyMap!,
           },
         ]);
       }}
@@ -73,14 +87,14 @@ const CalcRuleModal: React.FC<IProps> = (props) => {
         displayExpr="caption"
         valueExpr="name"
         showClearButton={true}
-        dataSource={props.fields}
+        dataSource={triggerSource}
         onValueChanged={(e) => {
           setTrigger(e.value);
         }}
         contentRender={() => {
           return (
             <TreeView
-              dataSource={props.fields}
+              dataSource={triggerSource}
               displayExpr="caption"
               dataStructure="plain"
               keyExpr="id"
@@ -96,26 +110,12 @@ const CalcRuleModal: React.FC<IProps> = (props) => {
           );
         }}
       />
-      <SelectBox
-        label="目标对象*"
-        labelMode="floating"
-        value={target}
-        showClearButton
-        displayExpr="caption"
-        valueExpr="name"
-        dataSource={props.fields}
-        onSelectionChanged={(e) => {
-          setTarget(e.selectedItem['name']);
-        }}
+      <CodeMirror
+        value={code}
+        height={'100px'}
+        extensions={[javascript()]}
+        onChange={setCode}
       />
-      <TextArea
-        label="计算表达式*"
-        hint="说明：@0@ 表示 所选第一个触发变量，以此类推"
-        labelMode="floating"
-        value={formula}
-        onValueChanged={(e) => {
-          setFormula(e.value);
-        }}></TextArea>
       <TextArea
         label="备注"
         labelMode="floating"
@@ -127,4 +127,4 @@ const CalcRuleModal: React.FC<IProps> = (props) => {
     </Modal>
   );
 };
-export default CalcRuleModal;
+export default ExecutorRuleModal;

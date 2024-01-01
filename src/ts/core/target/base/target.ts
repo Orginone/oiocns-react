@@ -27,6 +27,8 @@ export interface ITarget extends ITeam, IFileInfo<schema.XTarget> {
   targets: ITarget[];
   /** 用户相关的所有会话 */
   chats: ISession[];
+  /** 当前目录 */
+  directory: IDirectory;
   /** 成员目录 */
   memberDirectory: IDirectory;
   /** 退出用户群 */
@@ -209,7 +211,6 @@ export abstract class Target extends Team implements ITarget {
   abstract get subTarget(): ITarget[];
   content(): IFile[] {
     return [];
-    // return [this.memberDirectory];
   }
   createTarget(_data: model.TargetModel): Promise<ITeam | undefined> {
     return new Promise((resolve) => {
@@ -293,7 +294,7 @@ export abstract class Target extends Team implements ITarget {
         logger.info(message);
       }
       this.changCallback();
-      this.directory.structCallback();
+      this.directory.changCallback();
     }
   }
 }

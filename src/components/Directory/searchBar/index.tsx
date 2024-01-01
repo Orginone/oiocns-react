@@ -1,7 +1,8 @@
 import React from 'react';
-import { Button, Dropdown, MenuProps, Space, Typography } from 'antd';
+import { Button, Dropdown, MenuProps, Space } from 'antd';
 import { RiMore2Fill } from 'react-icons/ri';
 import { TextBox } from 'devextreme-react';
+import { Theme } from '@/config/theme';
 
 interface IProps {
   value: string;
@@ -11,9 +12,6 @@ interface IProps {
 }
 /** 标签条 */
 const SearchBar: React.FC<IProps> = (props) => {
-  const items = props.menus.items || [];
-  const outside = items.filter((item: any) => item.model === 'outside');
-  const inside = items.filter((item: any) => item.model != 'outside');
   return (
     <div className="inventory-search-area">
       <div style={{ width: '100%' }}>
@@ -32,24 +30,10 @@ const SearchBar: React.FC<IProps> = (props) => {
       </div>
       <Space size={6}>
         {props.rightBars && props.rightBars}
-        {outside.length > 0 &&
-          outside.map((item: any) => {
-            return (
-              <Typography.Link
-                key={item.key}
-                title={item.label}
-                style={{ fontSize: 22 }}
-                onClick={() => {
-                  props.menus.onClick?.apply(this, [item]);
-                }}>
-                {item.icon}
-              </Typography.Link>
-            );
-          })}
-        {inside.length > 0 && (
+        {(props.menus.items || []).length > 0 && (
           <Dropdown
             menu={{
-              items: inside,
+              items: props.menus.items || [],
               onClick: props.menus.onClick,
             }}
             dropdownRender={(menu) => (
@@ -57,7 +41,11 @@ const SearchBar: React.FC<IProps> = (props) => {
             )}
             placement="bottom"
             trigger={['click', 'contextMenu']}>
-            <RiMore2Fill color={'#3838b9'} fontSize={22} style={{ cursor: 'pointer' }} />
+            <RiMore2Fill
+              color={Theme.FocusColor}
+              fontSize={22}
+              style={{ cursor: 'pointer' }}
+            />
           </Dropdown>
         )}
       </Space>

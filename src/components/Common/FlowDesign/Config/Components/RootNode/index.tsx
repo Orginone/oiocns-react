@@ -3,13 +3,15 @@ import { Button, Card } from 'antd';
 import cls from './index.module.less';
 import { NodeModel, executorNames } from '../../../processType';
 import ShareShowComp from '@/components/Common/ShareShowComp';
-import { IBelong, IForm } from '@/ts/core';
+import { IBelong, IForm, IWork } from '@/ts/core';
 import OpenFileDialog from '@/components/OpenFileDialog';
 import { command, model, schema } from '@/ts/base';
 import { Form } from '@/ts/core/thing/standard/form';
 import { SelectBox } from 'devextreme-react';
 import { getUuid } from '@/utils/tools';
+import Rule from '../../Rule';
 interface IProps {
+  work: IWork;
   belong: IBelong;
   current: NodeModel;
   refresh: () => void;
@@ -154,16 +156,12 @@ const RootNode: React.FC<IProps> = (props) => {
             </span>
           )}
         </Card>
-        <Card
-          type="inner"
-          title="规则配置"
-          className={cls[`card-info`]}
-          extra={
-            <Button type="link" onClick={() => {}}>
-              添加
-            </Button>
-          }></Card>
-
+        <Rule
+          work={props.work}
+          current={props.current}
+          primaryForms={primaryForms}
+          detailForms={detailForms}
+        />
         {formModel != '' && (
           <OpenFileDialog
             multiple

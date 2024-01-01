@@ -2,6 +2,13 @@
   cursor: pointer;
   padding: 0 10px;
   border-radius: 10px;
+  border-bottom: 1px solid @border-color;
+}
+
+.vlist_item {
+  cursor: pointer;
+  padding: 0 10px;
+  border-radius: 10px;
 }
 
 .item_title {
@@ -9,7 +16,7 @@
   margin-right: 10px;
 }
 
-.list_item:hover {
+.list_item:hover, .vlist_item:hover {
   background-color: #f1f1f1;
 }
 
@@ -20,6 +27,14 @@
   border-bottom: 1px solid #ebeef5;
   background-color: @active-background;
 }
+
+.vlist_item_select {
+  cursor: pointer;
+  padding: 0 10px;
+  border-radius: 10px;
+  background-color: @active-background;
+}
+
 
 .blank_area {
   width: 100%;

@@ -102,9 +102,6 @@ export abstract class FileInfo<T extends schema.XEntity>
   get superior(): IFile {
     return this.directory;
   }
-  get isShortcut() {
-    return !!this._metadata.sourceId;
-  }
   abstract cacheFlag: string;
   abstract delete(): Promise<boolean>;
   async rename(_: string): Promise<boolean> {
@@ -127,7 +124,6 @@ export abstract class FileInfo<T extends schema.XEntity>
     await sleep(0);
     return true;
   }
-  abstract createShortcut(newName?: string): Promise<boolean>;
   async loadUserData(): Promise<void> {
     const data = await this.target.user.cacheObj.get<schema.XCache>(this.cachePath);
     if (data && data.fullId === this.cache.fullId) {
@@ -297,9 +293,9 @@ export abstract class StandardFileInfo<T extends schema.XStandard>
       id: 'snowId()',
       sourceId: this._metadata.id,
     });
-    return await this.coll.notity({ 
-      data: result, 
-      operate: 'insert' 
+    return await this.coll.notity({
+      data: result,
+      operate: 'insert',
     });
   }
   async toggleCommon(): Promise<boolean> {

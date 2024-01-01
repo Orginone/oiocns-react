@@ -149,6 +149,7 @@ const View: React.FC<Omit<IProps, 'data'>> = (props) => {
                       node: node,
                       fields: {},
                       primary: {},
+                      rules: [],
                     };
                     for (const form of work.detailForms) {
                       instance.fields[form.id] = await form.loadFields();
@@ -172,7 +173,7 @@ const View: React.FC<Omit<IProps, 'data'>> = (props) => {
                             }),
                           creator: orgCtrl.user.id,
                           createTime: formatDate(new Date(), 'yyyy-MM-dd hh:mm:ss.S'),
-                          rule: {},
+                          rules: [],
                         },
                       ];
                     }
