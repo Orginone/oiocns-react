@@ -7,6 +7,7 @@ import { Emitter, logger } from '@/ts/base/common';
 import { getItemNums } from '../Utils';
 import useStorage from '@/hooks/useStorage';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
+import { transformExpression } from '@/utils/script';
 
 const WorkFormViewer: React.FC<{
   data: any;
@@ -114,7 +115,7 @@ const WorkFormViewer: React.FC<{
                 if (!triggerData) {
                   return false;
                 } else {
-                  formula = formula.replaceAll(`@${i}@`, triggerData);
+                  formula = formula.replaceAll(`@${i}@`, JSON.stringify(triggerData));
                 }
               }
               try {
@@ -123,8 +124,8 @@ const WorkFormViewer: React.FC<{
                   { data: props.data },
                   { target: calcRule.target },
                 );
-              } catch {
-                logger.error(`计算规则[${formula}]执行失败，请确认是否维护正确!`);
+              } catch (error: any) {
+                logger.error(`计算规则[${formula}]执行失败，请确认是否维护正确!\n` + error.message);
               }
               break;
           }
@@ -146,7 +147,9 @@ const WorkFormViewer: React.FC<{
       decrypt: common.decrypt,
       encrypt: common.encrypt,
     };
-    common.Sandbox(code)(runtime);
+    
+    const result = transformExpression(code);
+    common.Sandbox(result.code)(runtime);
     return runtime.nextData;
   };
 

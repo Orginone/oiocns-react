@@ -50,6 +50,7 @@
     "@antv/x6-plugin-dnd": "^2.0.6",
     "@antv/x6-plugin-selection": "^2.1.7",
     "@antv/x6-react-shape": "^2.2.2",
+    "@babel/standalone": "^7.23.7",
     "@emoji-mart/data": "^1.1.2",
     "@emoji-mart/react": "^1.1.1",
     "@microsoft/signalr": "^7.0.12",
@@ -87,6 +88,7 @@
   "devDependencies": {
     "@commitlint/cli": "^13.1.0",
     "@commitlint/config-conventional": "^13.1.0",
+    "@types/babel__standalone": "^7.1.7",
     "@types/lodash": "^4.14.198",
     "@types/node": "^18.8.4",
     "@types/qrcode": "^1.5.0",

@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Field } from 'devextreme/ui/filter_builder';
-import { Modal } from 'antd';
+import { Modal, message } from 'antd';
 import { DropDownBox, SelectBox, TextArea, TextBox, TreeView } from 'devextreme-react';
 import { schema } from '@/ts/base';
 import { getUuid } from '@/utils/tools';
+import { transformExpression } from '@/utils/script';
 
 interface IProps {
   fields: Field[];
@@ -42,6 +43,20 @@ const CalcRuleModal: React.FC<IProps> = (props) => {
       title={'计算规则'}
       open={true}
       onOk={() => {
+        if (formula) {
+          try {
+            let code = formula.replaceAll(/@\d+@/g, '__param__');
+            transformExpression(code);
+          } catch (error: any) {
+            message.error(
+              <pre style={{ textAlign: 'left', whiteSpace: 'pre-wrap' }}>
+                {error.message}
+              </pre>,
+              30,
+            );
+            throw error;
+          }            
+        }
         props.onOk.apply(this, [
           {
             id: props.current?.id ?? getUuid(),
@@ -113,6 +128,8 @@ const CalcRuleModal: React.FC<IProps> = (props) => {
         hint="说明：@0@ 表示 所选第一个触发变量，以此类推"
         labelMode="floating"
         value={formula}
+        autoResizeEnabled
+        minHeight={80}
         onValueChanged={(e) => {
           setFormula(e.value);
         }}></TextArea>
