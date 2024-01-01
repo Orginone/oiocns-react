@@ -37,6 +37,8 @@ export interface IDirectory extends IStandardFileInfo<schema.XDirectory> {
   create(data: schema.XDirectory): Promise<schema.XDirectory | undefined>;
   /** 目录下的文件 */
   files: ISysFileInfo[];
+  /** 是否快捷方式 */
+  readonly isShortcut: boolean;
   /** 加载模板配置 */
   loadAllTemplate(reload?: boolean): Promise<IPageTemplate[]>;
   /** 加载文件 */
@@ -119,6 +121,9 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
   get resource(): DataResource {
     return this.target.resource;
   }
+  get isShortcut() {
+    return !!this._metadata.sourceId;
+  }
   structCallback(reload: boolean = false): void {
     if (reload) {
       command.emitter('executor', 'reload', this);
@@ -195,7 +200,9 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
   override async hardDelete(): Promise<boolean> {
     if (this.parent) {
       await this.resource.directoryColl.remove(this.metadata);
-      await this.operateDirectoryResource(this, this.resource, 'removeMany');
+      if (!this.isShortcut) {
+        await this.operateDirectoryResource(this, this.resource, 'removeMany');
+      }
       await this.notify('reload', this.metadata);
     }
     return false;
@@ -315,6 +322,7 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
       if (this.target.user.copyFiles.size > 0) {
         operates.push(fileOperates.Parse);
       }
+      operates.push(directoryOperates.Shortcut);
     }
     if (this.parent) {
       operates.push(...super.operates());

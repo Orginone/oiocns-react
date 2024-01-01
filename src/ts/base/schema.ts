@@ -37,6 +37,8 @@ export type XEntity = {
   icon: string;
   // 类型
   typeName: string;
+  /** 快捷方式目标 */
+  sourceId?: string;
   // 创建类别标准的用户
   belong: XTarget | undefined;
 } & Xbase;
