@@ -5,6 +5,7 @@ import { IRouteConfig } from '../typings/globelType';
 import NotFound from '@/layouts/NotFound';
 import BasicLayout from '@/layouts/Basic';
 import AuthPage from '@/layouts/Auth';
+import DownLoad from '@/layouts/Download';
 export interface RouteComponentConfig extends Omit<IRouteConfig, 'component' | 'routes'> {
   routes?: RouteComponentConfig[];
   component?: React.LazyExoticComponent<React.FC<Record<string, unknown>>>;
@@ -66,6 +67,13 @@ const Routers: IRouteConfig[] = [
     component: AuthPage,
     title: '授权页',
     redirect: '/auth',
+    routes: [],
+  },
+  {
+    path: '/download',
+    component: DownLoad,
+    title: '下载移动端',
+    redirect: '/download',
     routes: [],
   },
   {
