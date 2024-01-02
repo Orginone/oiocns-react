@@ -17,10 +17,11 @@ const WorkFormViewer: React.FC<{
   fields: model.FieldModel[];
   changedFields: model.MappingData[];
   rules: model.RenderRule[];
+  formData?: model.FormEditData;
   onValuesChange?: (fieldId: string, value: any, data: any) => void;
 }> = (props) => {
+  props.data.name = props.form.name;
   const [key, forceUpdate] = useObjectUpdate(props.rules);
-  const formData: any = { name: props.form.name, ...props.data };
   const [notifyEmitter] = React.useState(new Emitter());
   const [colNum, setColNum] = useStorage('workFormColNum', '一列');
   const onValueChange = (fieldId: string, value: any, refresh: boolean = true) => {
@@ -101,20 +102,18 @@ const WorkFormViewer: React.FC<{
               case 'show':
                 {
                   var showRule = rule as model.FormShowRule;
-                  var value =
-                    showRule.showType == 'visible' ? !showRule.value : showRule.value;
                   var pass = vaildRule(JSON.parse(showRule.condition));
-                  const oldRule = props.rules.find(
+                  const oldRule = props.formData?.rules.find(
                     (a) => a.destId == showRule.target && a.typeName == showRule.showType,
                   );
                   if (oldRule) {
-                    oldRule.value = pass ? value : !value;
+                    oldRule.value = pass ? showRule.value : !showRule.value;
                   } else {
-                    props.rules.push({
+                    props.formData?.rules.push({
                       formId: props.form.id,
                       destId: showRule.target,
                       typeName: showRule.showType,
-                      value: pass ? value : !value,
+                      value: pass ? showRule.value : !showRule.value,
                     });
                   }
                   forceUpdate();
@@ -199,7 +198,7 @@ const WorkFormViewer: React.FC<{
       <div style={{ display: 'flex', width: '100%', flexWrap: 'wrap', gap: 10 }}>
         <FormItem
           key={'name'}
-          data={formData}
+          data={props.data}
           numStr={colNum}
           rules={[]}
           readOnly={props.readonly}
@@ -219,9 +218,11 @@ const WorkFormViewer: React.FC<{
           return (
             <FormItem
               key={field.id}
-              data={formData}
+              data={props.data}
               numStr={colNum}
-              rules={props.rules.filter((a) => a.destId == field.id)}
+              rules={[...(props.formData?.rules ?? []), ...props.rules].filter(
+                (a) => a.destId == field.id,
+              )}
               readOnly={props.readonly}
               field={field}
               belong={props.belong}

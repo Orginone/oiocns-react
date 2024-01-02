@@ -32,7 +32,7 @@ const SelectIdentity: React.FC<IProps> = ({
       setIdentitys(
         target.identitys.map((item) => {
           return {
-            title: `[${target.name}]` + item.name,
+            title: `[${target.typeName}]${target.name}--` + item.name,
             key: item.id,
             data: item,
           };
@@ -118,10 +118,13 @@ const SelectIdentity: React.FC<IProps> = ({
                 if (item) {
                   if (multiple) {
                     if (selected.every((a) => a.id != item.metadata.id)) {
-                      setSelected([item.metadata, ...selected]);
+                      setSelected([
+                        { ...item.metadata, name: info.node.title },
+                        ...selected,
+                      ]);
                     }
                   } else {
-                    setSelected([item.metadata]);
+                    setSelected([{ ...item.metadata, name: info.node.title }]);
                   }
                 }
               }}

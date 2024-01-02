@@ -48,7 +48,7 @@ const AttributeConfig: React.FC<IAttributeProps> = ({
         setItems(data);
       } else {
         setItems([]);
-      }      
+      }
     }
   }
   useEffect(() => {

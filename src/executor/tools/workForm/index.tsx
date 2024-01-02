@@ -155,7 +155,7 @@ const WorkForm: React.FC<IWorkFormProps> = (props) => {
           var calcRule = rule as model.NodeCalcRule;
           var formula = calcRule.formula;
           try {
-            const runtime: any = {
+            var runtime: any = {
               target: {},
             };
             var isLegal = true;

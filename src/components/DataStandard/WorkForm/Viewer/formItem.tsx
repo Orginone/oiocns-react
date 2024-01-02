@@ -13,6 +13,7 @@ import React, { useEffect, useState } from 'react';
 import { ValueChangedEvent } from 'devextreme/ui/text_box';
 import { formatDate } from '@/utils';
 import { IBelong, TargetType } from '@/ts/core';
+import { useEffectOnce } from 'react-use';
 
 interface IFormItemProps {
   data: any;
@@ -37,12 +38,14 @@ const FormItem: React.FC<IFormItemProps> = (props) => {
   if (props.readOnly) {
     props.field.options.readOnly = true;
   }
-  if (props.data[props.field.id] == undefined && props.field.options?.defaultValue) {
-    props.onValuesChange?.apply(this, [
-      props.field.id,
-      props.field.options?.defaultValue,
-    ]);
-  }
+  useEffectOnce(() => {
+    if (props.data[props.field.id] == undefined && props.field.options?.defaultValue) {
+      props.onValuesChange?.apply(this, [
+        props.field.id,
+        props.field.options?.defaultValue,
+      ]);
+    }
+  });
   const mixOptions: any = {
     height: 36,
     name: props.field.id,
