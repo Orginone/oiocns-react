@@ -123,7 +123,7 @@ export const ShareIconItem = (info: shareIconInfo) => {
             className="avatarIcon"
           />
           {info.showName && (
-            <strong className="pickupName">
+            <strong className="pickupName" style={{ fontSize: fontSize }}>
               {info.share.name}
             </strong>
           )}

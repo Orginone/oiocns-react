@@ -16,6 +16,7 @@ import { MenuItemType } from 'typings/globelType';
 import { GraphView } from '../running/graphView';
 import cls from './../index.module.less';
 import { Store } from './graph';
+import { Theme } from '@/config/theme';
 
 interface IProps {
   node: Node;
@@ -165,7 +166,7 @@ const Remove: React.FC<RemoveProps> = ({ transfer, node }) => {
     <>
       {show && status == 'Editable' && (
         <CloseCircleOutlined
-          style={{ color: '#3838b9', fontSize: 12 }}
+          style={{ color: Theme.FocusColor, fontSize: 12 }}
           className={cls.remove}
           onClick={() => node.remove()}
         />
@@ -220,9 +221,15 @@ interface SProps {
 export const Status: React.FC<SProps> = ({ status, style }) => {
   switch (status) {
     case 'Stop':
-      return <PauseCircleOutlined style={{ color: '#3838b9', fontSize: 18, ...style }} />;
+      return (
+        <PauseCircleOutlined
+          style={{ color: Theme.FocusColor, fontSize: 18, ...style }}
+        />
+      );
     case 'Running':
-      return <LoadingOutlined style={{ color: '#3838b9', fontSize: 18, ...style }} />;
+      return (
+        <LoadingOutlined style={{ color: Theme.FocusColor, fontSize: 18, ...style }} />
+      );
     case 'Completed':
       return <CheckCircleOutlined style={{ color: '#52c41a', fontSize: 18, ...style }} />;
     case 'Error':

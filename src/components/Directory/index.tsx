@@ -18,7 +18,7 @@ const Directory: React.FC<{ root: IFile }> = ({ root }) => {
   useEffect(() => {
     setCurrentTag('全部');
     const id = directory.subscribe(() => {
-      loadContent(directory, directory);
+      loadContent(directory, directory, false);
     });
     if (directory != root) {
       setPreDirectory(directory.superior);
@@ -30,10 +30,11 @@ const Directory: React.FC<{ root: IFile }> = ({ root }) => {
     };
   }, [directory]);
   /** 加载目录内容 */
-  const loadContent = (file: IFile, directory: IFile) => {
+  const loadContent = (file: IFile, directory: IFile, reload: boolean) => {
     setLoaded(false);
-    file.loadContent().then(() => {
+    file.loadContent(reload).then(() => {
       if (file.key === directory.key) {
+        setCurrentTag('全部');
         setContent(directory.content());
       }
       setLoaded(true);
@@ -63,7 +64,7 @@ const Directory: React.FC<{ root: IFile }> = ({ root }) => {
             onClick: ({ key }: { key: string }) => {
               const dirRefresh = ['refresh', 'reload'].includes(key);
               if (dirRefresh) {
-                loadContent(file, directory);
+                loadContent(file, directory, key === 'reload');
               } else {
                 command.emitter('executor', key, file);
               }

@@ -5,7 +5,7 @@ import { FileInfo, IFile, IFileInfo } from '../thing/fileinfo';
 import { IDirectory } from '../thing/directory';
 import { IWorkApply, WorkApply } from './apply';
 import { entityOperates, fileOperates } from '../public';
-import { loadGatewayNodes } from '@/utils/tools';
+import { getUuid, loadGatewayNodes } from '@/utils/tools';
 
 export interface IWork extends IFileInfo<schema.XWorkDefine> {
   /** 我的办事 */
@@ -102,6 +102,16 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
     }
     return true;
   }
+  allowCopy(destination: IDirectory): boolean {
+    return ['应用', '模块'].includes(destination.typeName);
+  }
+  allowMove(destination: IDirectory): boolean {
+    return (
+      ['应用', '模块'].includes(destination.typeName) &&
+      destination.id !== this.metadata.applicationId &&
+      destination.target.belongId == this.target.belongId
+    );
+  }
   async delete(_notity: boolean = false): Promise<boolean> {
     if (this.application) {
       const res = await kernel.deleteWorkDefine({
@@ -110,6 +120,7 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
       if (res.success) {
         this.application.works = this.application.works.filter((a) => a.id != this.id);
         this.notify('workRemove', this.metadata);
+        this.application.changCallback();
       }
       return res.success;
     }
@@ -127,43 +138,38 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
     });
   }
   async copy(destination: IDirectory): Promise<boolean> {
-    if (destination.id != this.application.id) {
-      if ('works' in destination) {
-        const app = destination as unknown as IApplication;
-        const node = await this.loadNode();
-        const res = await app.createWork({
-          ...this.metadata,
-          applicationId: app.id,
-          resource: node,
-        });
-        return res != undefined;
+    if (this.allowCopy(destination)) {
+      const app = destination as unknown as IApplication;
+      const node = await this.loadNode();
+      if (node) {
+        delete node.children;
+        delete node.branches;
       }
+      const uuid = getUuid();
+      const res = await app.createWork({
+        ...this.metadata,
+        applicationId: app.id,
+        shareId: app.directory.target.id,
+        resource: node && node.code ? node : undefined,
+        code: `${this.metadata.code}-${uuid}`,
+        name: `${this.metadata.name} - 副本${uuid}`,
+        id: '0',
+      });
+      return res != undefined;
     }
     return false;
   }
 
   async move(destination: IDirectory): Promise<boolean> {
-    if (
-      destination.id != this.directory.id &&
-      destination.metadata.belongId === this.application.metadata.belongId
-    ) {
-      if ('works' in destination) {
-        const app = destination as unknown as IApplication;
-        this.setMetadata({ ...this.metadata, applicationId: app.id });
-        const node = await this.loadNode();
-        const success = await this.update({
-          ...this.metadata,
-          resource: node,
-        });
-        if (success) {
-          this.application = app;
-          app.works.push(this);
-          app.changCallback();
-          this.notify('workRemove', this.metadata);
-        } else {
-          this.setMetadata({ ...this.metadata, applicationId: this.application.id });
-        }
-        return success;
+    if (this.allowMove(destination)) {
+      const app = destination as unknown as IApplication;
+      const work = await app.createWork({
+        ...this.metadata,
+        resource: undefined,
+      });
+      if (work) {
+        this.notify('workRemove', this.metadata);
+        return true;
       }
     }
     return false;
@@ -254,6 +260,7 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
         fields: {},
         primary: {},
         node: this.node,
+        rules: [],
       };
       this.forms.forEach((form) => {
         data.fields[form.id] = form.fields;
@@ -323,8 +330,6 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
       operates.push(entityOperates.HardDelete);
     }
     return operates
-      .filter((i) => i != fileOperates.Copy)
-      .filter((i) => i != fileOperates.Move)
       .filter((i) => i != fileOperates.Download)
       .filter((i) => i != entityOperates.Delete);
   }

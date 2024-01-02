@@ -1,12 +1,12 @@
-import { schema, kernel, model, command } from '../../../base';
+import { schema, kernel, model } from '../../../base';
 import { OperateType, TargetType } from '../../public/enums';
-import { PageAll, orgAuth } from '../../public/consts';
+import { orgAuth } from '../../public/consts';
 import { IBelong } from './belong';
 import { Entity, IEntity, entityOperates } from '../../public';
-import { IDirectory } from '../../thing/directory';
 import { ISession } from '../../chat/session';
 import { IPerson } from '../person';
 import { logger, sleep } from '@/ts/base/common';
+import TargetResources from './resource';
 
 /** 团队抽象接口类 */
 export interface ITeam extends IEntity<schema.XTarget> {
@@ -14,8 +14,8 @@ export interface ITeam extends IEntity<schema.XTarget> {
   user: IPerson;
   /** 加载归属组织 */
   space: IBelong;
-  /** 当前目录 */
-  directory: IDirectory;
+  /** 是否为我的团队 */
+  isMyTeam: boolean;
   /** 成员 */
   members: schema.XTarget[];
   /** 限定成员类型 */
@@ -40,6 +40,8 @@ export interface ITeam extends IEntity<schema.XTarget> {
   pullMembers(members: schema.XTarget[], notity?: boolean): Promise<boolean>;
   /** 用户移除成员 */
   removeMembers(members: schema.XTarget[], notity?: boolean): Promise<boolean>;
+  /** 是否有管理数据的权限 */
+  hasDataAuth(): boolean;
   /** 是否有管理关系的权限 */
   hasRelationAuth(): boolean;
   /** 判断是否拥有某些权限 */
@@ -70,13 +72,22 @@ export abstract class Team extends Entity<schema.XTarget> implements ITeam {
     );
   }
   memberTypes: TargetType[];
-  members: schema.XTarget[] = [];
   memberChats: ISession[] = [];
   relations: string[];
-  abstract directory: IDirectory;
-  private _memberLoaded: boolean = false;
+  get isMyTeam(): boolean {
+    return (
+      this.id === this.userId ||
+      this.typeName === TargetType.Group ||
+      this.hasDataAuth() ||
+      this.hasRelationAuth() ||
+      this.members.filter((i) => i.id === this.userId).length > 0
+    );
+  }
   findChat(id: string): ISession | undefined {
     return this.memberChats.find((i) => i.id === id);
+  }
+  get members(): schema.XTarget[] {
+    return TargetResources.members(this.id);
   }
   get groupTags(): string[] {
     if (this.id === this.userId) {
@@ -88,19 +99,21 @@ export abstract class Team extends Entity<schema.XTarget> implements ITeam {
     }
     return gtags;
   }
-  async loadMembers(reload: boolean = false): Promise<schema.XTarget[]> {
-    if (!this._memberLoaded || reload) {
-      const res = await kernel.querySubTargetById({
-        id: this.id,
-        subTypeNames: this.memberTypes,
-        page: PageAll,
-      });
-      if (res.success) {
-        this._memberLoaded = true;
-        this.members = res.data.result || [];
-        this.members.forEach((i) => this.updateMetadata(i));
-        this.loadMemberChats(this.members, true);
+  async loadMembers(_: boolean = false): Promise<schema.XTarget[]> {
+    if (!TargetResources.membersLoaded(this.id)) {
+      const res = await this.getPartMembers(0);
+      res.offset = 0;
+      TargetResources.pullMembers(this.id, res.result || []);
+      while (res.offset + res.limit < res.total) {
+        res.offset += res.limit;
+        console.log(res.offset);
+        var stime = new Date().getTime();
+        const part = await this.getPartMembers(res.offset);
+        console.log(new Date().getTime() - stime);
+        TargetResources.pullMembers(this.id, part.result || []);
       }
+      this.members.forEach((i) => this.updateMetadata(i));
+      this.loadMemberChats(this.members, true);
     }
     return this.members;
   }
@@ -123,7 +136,7 @@ export abstract class Team extends Entity<schema.XTarget> implements ITeam {
         });
         this.notifySession(true, members);
       }
-      this.members.push(...members);
+      TargetResources.pullMembers(this.id, members);
       this.loadMemberChats(members, true);
     }
     return true;
@@ -146,7 +159,7 @@ export abstract class Team extends Entity<schema.XTarget> implements ITeam {
           this.sendTargetNotity(OperateType.Remove, member, member.id);
           this.notifySession(false, [member]);
         }
-        this.members = this.members.filter((i) => i.id != member.id);
+        TargetResources.removeMembers(this.id, [member]);
         this.loadMemberChats([member], false);
       }
     }
@@ -219,6 +232,9 @@ export abstract class Team extends Entity<schema.XTarget> implements ITeam {
   abstract createTarget(data: model.TargetModel): Promise<ITeam | undefined>;
   loadMemberChats(_newMembers: schema.XTarget[], _isAdd: boolean): void {
     this.memberChats = [];
+  }
+  hasDataAuth(): boolean {
+    return this.hasAuthoritys([orgAuth.DataAuthId]);
   }
   hasRelationAuth(): boolean {
     return this.hasAuthoritys([orgAuth.RelationAuthId]);
@@ -293,9 +309,8 @@ export abstract class Team extends Entity<schema.XTarget> implements ITeam {
       if (data.operater.id != this.user.id) {
         logger.info(message);
       }
-      this.space.directory.structCallback();
-      command.emitterFlag();
     }
+    this.changCallback();
   }
   async _removeJoinTarget(_: schema.XTarget): Promise<string> {
     await sleep(0);
@@ -311,5 +326,17 @@ export abstract class Team extends Entity<schema.XTarget> implements ITeam {
   }
   async notifySession(_: boolean, __: schema.XTarget[]): Promise<void> {
     await sleep(0);
+  }
+  async getPartMembers(offset: number): Promise<model.PageResult<schema.XTarget>> {
+    const res = await kernel.querySubTargetById({
+      id: this.id,
+      subTypeNames: this.memberTypes,
+      page: {
+        offset: offset,
+        limit: 2000,
+        filter: '',
+      },
+    });
+    return res.data || { offset: offset, limit: 2000, result: [] };
   }
 }

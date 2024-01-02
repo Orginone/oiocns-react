@@ -9,10 +9,11 @@ import { cleanMenus } from '@/utils/tools';
 import { loadFileMenus, operatesToMenus } from '@/executor/fileOperate';
 import OrgIcons from '@/components/Common/GlobalComps/orgIcons';
 import AppLayout from '@/components/MainLayout/appLayout';
-import { AiOutlinePlus } from 'react-icons/ai';
 import { personJoins } from '@/ts/core/public';
 import SelectChat from './select';
 import FullScreenModal from '@/components/Common/fullScreen';
+import { RiMore2Fill } from 'react-icons/ri';
+import { Theme } from '@/config/theme';
 
 /** 沟通-通讯录 */
 const ChatContent: React.FC = () => {
@@ -107,9 +108,9 @@ const ChatContent: React.FC = () => {
         )}
         placement="bottom"
         trigger={['click', 'contextMenu']}>
-        <AiOutlinePlus
+        <RiMore2Fill
           fontSize={22}
-          color={'#3838b9'}
+          color={Theme.FocusColor}
           title={'更多操作'}
           style={{ cursor: 'pointer' }}
         />

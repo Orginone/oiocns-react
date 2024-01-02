@@ -74,6 +74,13 @@ const PassportLogin: React.FC<{ to: (flag: string) => void }> = ({ to }) => {
             <Button type="link" onClick={() => to('register')}>
               注册用户
             </Button>
+            <Button
+              type="link"
+              onClick={() => {
+                history.push('/download');
+              }}>
+              下载移动端
+            </Button>
           </div>
         </Form.Item>
       </Form>
@@ -188,7 +195,13 @@ const PassportLogin: React.FC<{ to: (flag: string) => void }> = ({ to }) => {
             <AiFillWechat />
             <AiOutlineQq />
           </div>
-          <Button type="link">下载移动端</Button>
+          <Button
+            type="link"
+            onClick={() => {
+              history.push('/download');
+            }}>
+            下载移动端
+          </Button>
         </div>
       </Space>
     );
