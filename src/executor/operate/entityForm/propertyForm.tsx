@@ -61,7 +61,8 @@ const PropertyForm = (props: Iprops) => {
   const [form, setForm] = useState(findForm());
   useEffect(() => {
     formRef.current?.setFieldValue('speciesId', species?.id);
-  }, [species]);
+    formRef.current?.setFieldValue('formId', form?.id);
+  }, [species, form]);
   const getFromColumns = () => {
     const columns: ProFormColumnsType<schema.XProperty>[] = [
       {
@@ -95,6 +96,7 @@ const PropertyForm = (props: Iprops) => {
           onSelect: (select: string) => {
             setSelectType(select);
             formRef.current?.setFieldValue('speciesId', '');
+            formRef.current?.setFieldValue('formId', '');
           },
         },
         formItemProps: {
@@ -138,7 +140,7 @@ const PropertyForm = (props: Iprops) => {
             <Input
               placeholder={`点击选择表单`}
               readOnly
-              value={species?.name ?? ''}
+              value={form?.name ?? ''}
               style={{ cursor: 'pointer' }}
               onClick={() => setNeedType('表单')}
             />
