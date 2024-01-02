@@ -37,8 +37,8 @@ const AttributeConfig: React.FC<IAttributeProps> = ({
     }
 
     if (attribute.property.valueType == '引用型') {
-      if (attribute.property.speciesId) {
-        const data = await current.loadReferenceForm(attribute.property.speciesId);
+      if (attribute.property.formId) {
+        const data = await current.loadReferenceForm(attribute.property.formId);
         setRefForm(data);
       }
     } else {
