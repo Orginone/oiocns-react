@@ -8,6 +8,7 @@ import Emoji from '../components/emoji';
 import { AiOutlineCloseCircle } from 'react-icons/ai';
 import { TextArea } from 'devextreme-react';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
+import { Theme } from '@/config/theme';
 
 /**
  * @description: 输入区域
@@ -88,18 +89,18 @@ const GroupInputBox = (props: IProps) => {
           onOpenChange={setOpenEmoji}>
           <im.ImSmile
             size={20}
-            color={'#3838b9'}
+            color={Theme.FocusColor}
             onClick={() => setOpenEmoji(!openEmoji)}
           />
         </Popover>
-        <im.ImMic title="语言" size={20} color={'#3838b9'} />
+        <im.ImMic title="语言" size={20} color={Theme.FocusColor} />
         <im.ImFolder
           title="文件"
           size={20}
-          color={'#3838b9'}
+          color={Theme.FocusColor}
           onClick={() => setOpen(true)}
         />
-        <im.ImVideoCamera title="视频" size={20} color={'#3838b9'} />
+        <im.ImVideoCamera title="视频" size={20} color={Theme.FocusColor} />
       </Space>
       <div style={{ width: '100%' }}>
         {citeShow && (
@@ -167,7 +168,7 @@ const GroupInputBox = (props: IProps) => {
       <im.ImRocket
         size={26}
         title="发送"
-        color={message.length > 0 ? '#3838b9' : '#909090'}
+        color={message.length > 0 ? Theme.FocusColor : '#909090'}
         onClick={() => sendMessage()}
       />
       {open && (

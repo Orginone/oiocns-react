@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { IFile, ISession, TargetType } from '@/ts/core';
+import { IFile, ISession, ITarget, TargetType } from '@/ts/core';
 import { command } from '@/ts/base';
 import Directory from '@/components/Directory';
 import DirectoryViewer from '@/components/Directory/views';
@@ -8,6 +8,7 @@ import { loadFileMenus } from '@/executor/fileOperate';
 import ChatBody from './chat';
 import PreviewLayout from '../layout';
 import { cleanMenus } from '@/utils/tools';
+import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 const SessionBody = ({
   session,
   relation,
@@ -66,6 +67,30 @@ const SessionBody = ({
     setActions(newActions);
   }, [session]);
 
+  const RenderMemberDirectory: React.FC<{ target: ITarget }> = ({ target }) => {
+    const [key] = useCtrlUpdate(target);
+    return (
+      <DirectoryViewer
+        key={key}
+        extraTags={false}
+        currentTag={'成员'}
+        initTags={['成员']}
+        selectFiles={[]}
+        content={target.memberDirectory.content()}
+        fileOpen={() => {}}
+        contextMenu={(entity) => {
+          const file = (entity as IFile) || target.memberDirectory;
+          return {
+            items: cleanMenus(loadFileMenus(file)) || [],
+            onClick: ({ key }: { key: string }) => {
+              command.emitter('executor', key, file);
+            },
+          };
+        }}
+      />
+    );
+  };
+
   const loadContext = () => {
     switch (bodyType) {
       case 'chat':
@@ -75,25 +100,7 @@ const SessionBody = ({
       case 'store':
         return <Directory key={session.target.key} root={session.target.directory} />;
       case 'relation':
-        return (
-          <DirectoryViewer
-            extraTags={false}
-            currentTag={'成员'}
-            initTags={['成员']}
-            selectFiles={[]}
-            content={session.target.memberDirectory.content()}
-            fileOpen={() => {}}
-            contextMenu={(entity) => {
-              const file = (entity as IFile) || session.target.memberDirectory;
-              return {
-                items: cleanMenus(loadFileMenus(file)) || [],
-                onClick: ({ key }: { key: string }) => {
-                  command.emitter('executor', key, file);
-                },
-              };
-            }}
-          />
-        );
+        return <RenderMemberDirectory target={session.target} />;
       default:
         return <></>;
     }

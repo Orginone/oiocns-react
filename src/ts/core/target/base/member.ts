@@ -106,7 +106,12 @@ export class MemberDirectory extends Directory {
       if (this.target.user.copyFiles.size > 0) {
         operates.push(fileOperates.Parse);
       }
-      operates.push(teamOperates.Pull, memberOperates.SettingIdentity);
+      if (this.target.id === this.target.userId) {
+        operates.push(targetOperates.JoinFriend);
+      } else {
+        operates.push(teamOperates.Pull);
+      }
+      operates.push(memberOperates.SettingIdentity);
       if ('superAuth' in this.target) {
         operates.unshift(memberOperates.SettingAuth);
         if ('stations' in this.target) {

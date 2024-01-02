@@ -33,7 +33,8 @@ const FormEditModal = ({
         style={{ maxHeight: '70vh', width: '100%', overflowY: 'scroll', minHeight: 600 }}>
         <WorkFormViewer
           form={form}
-          rule={{}}
+          rules={[]}
+          changedFields={[]}
           fields={fields}
           data={initialValues || {}}
           belong={belong}

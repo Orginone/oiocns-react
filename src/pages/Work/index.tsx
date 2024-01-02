@@ -11,9 +11,10 @@ import AppLayout from '@/components/MainLayout/appLayout';
 import OrgIcons from '@/components/Common/GlobalComps/orgIcons';
 import { useFlagCmdEmitter } from '@/hooks/useCtrlUpdate';
 import { useKeyPress } from 'react-use';
-import { AiOutlinePlus } from 'react-icons/ai';
 import SelectWork from './select';
 import FullScreenModal from '@/components/Common/fullScreen';
+import { RiMore2Fill } from 'react-icons/ri';
+import { Theme } from '@/config/theme';
 
 /**
  * 办事-事项清单
@@ -157,9 +158,9 @@ const WorkContent: React.FC = () => {
   const renderMore = () => {
     if (currentTag === '常用') {
       return (
-        <AiOutlinePlus
+        <RiMore2Fill
           fontSize={22}
-          color={'#3838b9'}
+          color={Theme.FocusColor}
           title={'选择事项'}
           style={{ cursor: 'pointer' }}
           onClick={() => {

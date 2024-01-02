@@ -89,8 +89,10 @@ export class Group extends Target implements IGroup {
       if (await this.removeMembers([this.space.metadata])) {
         if (this.parent) {
           this.parent.children = this.parent.children.filter((i) => i.key != this.key);
+          this.parent.changCallback();
         } else {
           this.space.groups = this.space.groups.filter((i) => i.key != this.key);
+          this.space.changCallback();
         }
         return true;
       }
@@ -102,8 +104,10 @@ export class Group extends Target implements IGroup {
     if (success) {
       if (this.parent) {
         this.parent.children = this.parent.children.filter((i) => i.key != this.key);
+        this.parent.changCallback();
       } else {
         this.space.groups = this.space.groups.filter((i) => i.key != this.key);
+        this.space.changCallback();
       }
     }
     return success;
@@ -125,13 +129,10 @@ export class Group extends Target implements IGroup {
     return this.children;
   }
   async deepLoad(reload: boolean = false): Promise<void> {
-    this.loadMembers(reload);
-    await Promise.all([
-      this.loadChildren(reload),
-      this.loadIdentitys(reload),
-      this.directory.loadDirectoryResource(reload),
-    ]);
+    await Promise.all([this.loadChildren(reload), this.loadIdentitys(reload)]);
     await Promise.all(this.children.map((group) => group.deepLoad(reload)));
+    this.loadMembers(reload);
+    this.directory.loadDirectoryResource(reload);
   }
   override operates(): model.OperateModel[] {
     const operates = super.operates();

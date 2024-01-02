@@ -3,13 +3,13 @@ import { Field } from 'devextreme/ui/filter_builder';
 import { FilterBuilder } from 'devextreme-react/filter-builder';
 import { Modal } from 'antd';
 import { SelectBox, TextArea, TextBox } from 'devextreme-react';
-import { schema } from '@/ts/base';
+import { model } from '@/ts/base';
 import { getUuid } from '@/utils/tools';
 
 interface IProps {
   fields: Field[];
-  current?: schema.FormShowRule;
-  onOk: (rule: schema.FormShowRule) => void;
+  current?: model.FormShowRule;
+  onOk: (rule: model.FormShowRule) => void;
   onCancel: () => void;
 }
 

@@ -105,12 +105,13 @@ export class Station extends Team implements IStation {
         this.identitys.map((a) => a.id),
         this.id,
       );
+      this.space.changCallback();
     }
     return success;
   }
   async deepLoad(reload: boolean = false): Promise<void> {
     await this.loadIdentitys(reload);
-    await this.loadMembers(reload);
+    this.loadMembers(reload);
   }
   createTarget(_data: model.TargetModel): Promise<ITeam | undefined> {
     return new Promise((resolve) => {
@@ -210,7 +211,8 @@ export class Station extends Team implements IStation {
       if (data.operater?.id != this.user.id) {
         logger.info(message);
       }
-      this.directory.structCallback();
+      this.changCallback();
+      this.directory.changCallback();
     }
   }
 }

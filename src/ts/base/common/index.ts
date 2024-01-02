@@ -1,3 +1,4 @@
+import { max, min, sum } from 'lodash';
 export { CharCode } from './charCode';
 export { Emitter } from './emitter';
 export { decrypt, encrypt } from './encryption';
@@ -48,6 +49,18 @@ export function Sandbox(code: string) {
   const fn = new Function('sandbox', code);
   const unscopables = {};
   return function (sandbox: any) {
+    sandbox.sum = (array: number[]) => {
+      return sum(array);
+    };
+    sandbox.average = (array: number[]) => {
+      return sum(array) / array.length;
+    };
+    sandbox.max = (array: number[]) => {
+      return max(array);
+    };
+    sandbox.min = (array: number[]) => {
+      return min(array);
+    };
     const sandboxProxy = new Proxy(sandbox, {
       get(target, key) {
         if (key === Symbol.unscopables) return unscopables;

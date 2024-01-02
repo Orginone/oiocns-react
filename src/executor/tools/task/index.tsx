@@ -213,9 +213,6 @@ const TaskContent: React.FC<TaskDetailType> = ({ current, finished }) => {
               belong={current.belong}
               nodeId={current.taskdata.nodeId}
               data={current.instanceData!}
-              onChanged={(id, data) => {
-                formData.set(id, data);
-              }}
             />
             <TaskApproval task={current} fromData={formData} finished={finished} />
           </>

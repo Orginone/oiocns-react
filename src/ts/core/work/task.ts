@@ -27,6 +27,8 @@ export interface IWorkTask extends IFile {
   targets: schema.XTarget[];
   /** 是否为历史对象 */
   isHistory: boolean;
+  /** 执行器 */
+  executors: IExecutor[];
   /** 是否为指定的任务类型 */
   isTaskType(type: TaskTypeName): boolean;
   /** 是否满足条件 */
@@ -71,13 +73,14 @@ export class WorkTask extends FileInfo<schema.XEntity> implements IWorkTask {
   get isHistory(): boolean {
     return this.history;
   }
+  executors: IExecutor[] = [];
   get groupTags(): string[] {
     return [this.belong.name, this.taskdata.taskType, this.taskdata.approveType];
   }
   get metadata(): schema.XEntity {
     let typeName = this.taskdata.taskType;
     if (
-      this.taskdata.approveType === '子流程' &&
+      ['子流程', '网关'].includes(this.taskdata.approveType) &&
       this.taskdata.identityId &&
       this.taskdata.identityId.length > 5
     ) {
@@ -188,7 +191,7 @@ export class WorkTask extends FileInfo<schema.XEntity> implements IWorkTask {
   }
 
   async createApply(): Promise<IWorkApply | undefined> {
-    if (this.taskdata.approveType == '子流程') {
+    if (this.taskdata.approveType == '子流程' || this.taskdata.approveType == '网关') {
       await this.loadInstance();
       var define = await this.findWorkById(this.taskdata.defineId);
       if (define) {

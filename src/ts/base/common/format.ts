@@ -1,3 +1,4 @@
+import pako from 'pako';
 const sizeUnits = ['', 'KB', 'MB', 'GB', 'TB', 'PB'];
 /**
  * 格式化大小
@@ -16,7 +17,6 @@ export function formatSize(size: number, unit: string = ''): string {
 export function encodeKey(key: string): string {
   return btoa(unescape(encodeURIComponent(`${key}`)));
 }
-
 /** 将文件切片 */
 export function sliceFile(file: Blob, chunkSize: number): Blob[] {
   const slices: Blob[] = [];
@@ -42,7 +42,6 @@ export function blobToDataUrl(file: Blob): Promise<string> {
     reader.readAsBinaryString(file);
   });
 }
-
 /** 将文件读成字节数组 */
 export function blobToNumberArray(file: Blob): Promise<number[]> {
   return new Promise((resolve) => {
@@ -54,7 +53,6 @@ export function blobToNumberArray(file: Blob): Promise<number[]> {
     reader.readAsArrayBuffer(file);
   });
 }
-
 /** 格式化日期 */
 export function formatDate(date?: any, fmt?: string) {
   if (date === void 0) date = new Date();
@@ -108,11 +106,35 @@ export function formatDate(date?: any, fmt?: string) {
 
   return fmt;
 }
-
-import pako from 'pako';
-
 /** 字符串压缩解压缩 */
 export class StringPako {
+  static readonly gzheader = new TextEncoder().encode('^!gz');
+  /**
+   * gzip压缩
+   * @param input 字符串
+   */
+  public static gzip(input: string): Uint8Array {
+    if (input.length > 1024) {
+      const gzArr = pako.gzip(input);
+      const gzhlen = StringPako.gzheader.length;
+      const result = new Uint8Array(gzhlen + gzArr.length);
+      result.set(StringPako.gzheader);
+      result.set(gzArr, gzhlen);
+      return result;
+    }
+    return new TextEncoder().encode(input);
+  }
+  /**
+   * ungzip压缩
+   * @param buffer 压缩的字节数组
+   */
+  public static ungzip(buffer: Uint8Array): string {
+    const gzhlen = StringPako.gzheader.length;
+    if (this.arrayStartwith(buffer, StringPako.gzheader)) {
+      return pako.ungzip(buffer.subarray(gzhlen), { to: 'string' });
+    }
+    return new TextDecoder().decode(buffer);
+  }
   /**
    * 解压缩
    * @param input 输入字符串（明文）
@@ -162,6 +184,22 @@ export class StringPako {
     }
     var tmpUint8Array = new Uint8Array(arr);
     return tmpUint8Array;
+  }
+  /**
+   * 判断两个数组是否相同
+   * @param array1 数组1
+   * @param array2 数组2
+   */
+  private static arrayStartwith(array1: Uint8Array, array2: Uint8Array) {
+    if (array1.length < array2.length) {
+      return false;
+    }
+    for (let i = 0; i < array2.length; i++) {
+      if (array1[i] !== array2[i]) {
+        return false;
+      }
+    }
+    return true;
   }
   /**
    * 生成随机字符串

@@ -1,11 +1,11 @@
-import { command, common, model, schema } from '../../base';
+import { common, model, schema } from '../../base';
 import { directoryNew, directoryOperates, entityOperates, fileOperates } from '../public';
 import { ITarget } from '../target/base/target';
 import { IStandardFileInfo, StandardFileInfo, IFile } from './fileinfo';
 import { StandardFiles } from './standard';
 import { IApplication } from './standard/application';
 import { BucketOpreates, FileItemModel } from '@/ts/base/model';
-import { encodeKey, sleep } from '@/ts/base/common';
+import { encodeKey, formatDate, sleep } from '@/ts/base/common';
 import { DataResource } from './resource';
 import { ISysFileInfo, SysFileInfo } from './systemfile';
 import { IPageTemplate } from './standard/page';
@@ -15,6 +15,8 @@ export type OnProgress = (p: number) => void;
 
 /** 目录接口类 */
 export interface IDirectory extends IStandardFileInfo<schema.XDirectory> {
+  /** 真实的目录Id */
+  directoryId: string;
   /** 目录下标准类 */
   standard: StandardFiles;
   /** 当前加载目录的用户 */
@@ -29,14 +31,14 @@ export interface IDirectory extends IStandardFileInfo<schema.XDirectory> {
   taskList: model.TaskModel[];
   /** 任务发射器 */
   taskEmitter: common.Emitter;
-  /** 目录结构变更 */
-  structCallback(reload?: boolean): void;
   /** 目录下的内容 */
   content(store?: boolean): IFile[];
   /** 创建子目录 */
   create(data: schema.XDirectory): Promise<schema.XDirectory | undefined>;
   /** 目录下的文件 */
   files: ISysFileInfo[];
+  /** 是否快捷方式 */
+  readonly isShortcut: boolean;
   /** 加载模板配置 */
   loadAllTemplate(reload?: boolean): Promise<IPageTemplate[]>;
   /** 加载文件 */
@@ -110,6 +112,12 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
     }
     return super.id;
   }
+  get directoryId(): string {
+    if (this.metadata.sourceId && this.metadata.sourceId.length > 0) {
+      return this.metadata.sourceId;
+    }
+    return this.id;
+  }
   get isInherited(): boolean {
     return this.target.isInherited;
   }
@@ -119,13 +127,8 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
   get resource(): DataResource {
     return this.target.resource;
   }
-  structCallback(reload: boolean = false): void {
-    if (reload) {
-      command.emitter('executor', 'reload', this);
-    } else {
-      command.emitter('executor', 'refresh', this);
-    }
-    this.changCallback();
+  override allowCopy(_destination: IDirectory): boolean {
+    return true;
   }
   content(store: boolean = false): IFile[] {
     const cnt: IFile[] = [...this.children];
@@ -143,24 +146,26 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
   async loadContent(reload: boolean = false): Promise<boolean> {
     await this.loadFiles(reload);
     await this.standard.loadStandardFiles(reload);
-    if (reload) {
+    if (reload || this.isShortcut) {
       await this.loadDirectoryResource(reload);
     }
     return true;
   }
   override async copy(destination: IDirectory): Promise<boolean> {
     if (this.allowCopy(destination)) {
+      const uuid = formatDate(new Date(), 'yyyyMMddHHmmss');
+      const name = this.metadata.name.split('-')[0] + `-副本${uuid}`;
+      const code = this.metadata.code.split('-')[0] + uuid;
       const data = await destination.resource.directoryColl.replace({
         ...this.metadata,
         directoryId: destination.id,
+        name: name,
+        code: code,
+        id: 'snowId()',
       });
       if (data) {
-        await this.operateDirectoryResource(
-          this,
-          destination.resource,
-          'replaceMany',
-          false,
-        );
+        const directory = new Directory(data, destination.target, destination);
+        await this.recursionCopy(this, directory);
         await destination.notify('reload', data);
       }
     }
@@ -173,12 +178,7 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
         directoryId: destination.id,
       });
       if (data) {
-        await this.operateDirectoryResource(
-          this,
-          destination.resource,
-          'replaceMany',
-          true,
-        );
+        await this.recursionMove(this, destination.resource);
         await this.notify('remove', this._metadata);
         await destination.notify('reload', data);
       }
@@ -195,7 +195,9 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
   override async hardDelete(): Promise<boolean> {
     if (this.parent) {
       await this.resource.directoryColl.remove(this.metadata);
-      await this.operateDirectoryResource(this, this.resource, 'removeMany');
+      if (!this.isShortcut) {
+        await this.recursionDelete(this);
+      }
       await this.notify('reload', this.metadata);
     }
     return false;
@@ -214,7 +216,7 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
   async loadFiles(reload: boolean = false): Promise<ISysFileInfo[]> {
     if (this.files.length < 1 || reload) {
       const res = await this.resource.bucketOpreate<FileItemModel[]>({
-        key: encodeKey(this.id),
+        key: encodeKey(this.directoryId),
         operate: BucketOpreates.List,
       });
       if (res.success) {
@@ -315,6 +317,7 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
       if (this.target.user.copyFiles.size > 0) {
         operates.push(fileOperates.Parse);
       }
+      operates.push(directoryOperates.Shortcut);
     }
     if (this.parent) {
       operates.push(...super.operates());
@@ -331,20 +334,43 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
     await this.standard.loadDirectorys();
     await this.standard.loadTemplates();
   }
-  /** 对目录下所有资源进行操作 */
-  private async operateDirectoryResource(
-    directory: IDirectory,
-    resource: DataResource,
-    action: 'replaceMany' | 'removeMany',
-    move?: boolean,
-  ) {
-    if (action === 'removeMany') {
-      this.resource.deleteDirectory(directory.id);
-    }
+  /** 文件夹递归拷贝 */
+  private async recursionCopy(directory: IDirectory, destDirectory: IDirectory) {
     for (const child of directory.children) {
-      await this.operateDirectoryResource(child, resource, action, move);
+      const dirData = await destDirectory.resource.directoryColl.insert({
+        ...child.metadata,
+        id: 'snowId()',
+        directoryId: destDirectory.id,
+      });
+      if (dirData) {
+        const newDirectory = new Directory(dirData, destDirectory.target, destDirectory);
+        await this.recursionCopy(child, newDirectory);
+      }
     }
-    await directory.standard.operateStandradFile(resource, action, move);
+    await directory.standard.copyStandradFile(destDirectory.resource, destDirectory.id);
+    for (const app of await directory.standard.applications) {
+      await app.copy(destDirectory);
+    }
+  }
+  /** 文件夹递归移动 */
+  private async recursionMove(directory: IDirectory, to: DataResource) {
+    for (const child of directory.children) {
+      const dirData = await to.directoryColl.replace(child.metadata);
+      if (dirData) {
+        await directory.standard.moveStandradFile(to);
+        await this.recursionMove(child, to);
+      }
+    }
+    for (const app of await directory.standard.applications) {
+      await app.move(directory);
+    }
+  }
+  private async recursionDelete(directory: IDirectory) {
+    for (const child of directory.children) {
+      await this.recursionDelete(child);
+    }
+    this.resource.deleteDirectory(directory.id);
+    await directory.standard.delete();
   }
   override receive(operate: string, data: schema.XStandard): boolean {
     this.coll.removeCache((i) => i.id != data.id);
@@ -353,15 +379,9 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
     return true;
   }
   async notifyReloadFiles(): Promise<boolean> {
-    return await this.coll.notity(
-      {
-        data: {
-          ...this.metadata,
-          directoryId: this.id,
-        },
-        operate: 'reloadFiles',
-      },
-      true,
-    );
+    return await this.notify('reloadFiles', {
+      ...this.metadata,
+      directoryId: this.id,
+    });
   }
 }

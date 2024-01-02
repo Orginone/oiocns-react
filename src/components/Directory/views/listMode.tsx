@@ -53,6 +53,11 @@ const ListMode = ({
                     title={
                       <>
                         <div className={css.item_title}>{item.name}</div>
+                        {item.metadata.sourceId ? (
+                          <Tag color="processing">
+                            快捷方式
+                          </Tag>
+                        ) : <></>}
                         {item.groupTags
                           .filter((i) => i.length > 0)
                           .map((label) => {

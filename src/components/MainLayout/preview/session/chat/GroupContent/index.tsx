@@ -167,7 +167,7 @@ const GroupContent = (props: Iprops) => {
     } else {
       return (
         <>
-          <div className='flex view_msg_gap '>
+          <div className="flex view_msg_gap">
             <div>
               <EntityInfo entityId={item.metadata.fromId} size={30} />
             </div>

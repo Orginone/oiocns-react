@@ -34,9 +34,7 @@ export class Identity extends Entity<schema.XIdentity> implements IIdentity {
       [],
     );
     this.current = current;
-    this.directory = current.directory;
   }
-  directory: IDirectory;
   async rename(name: string): Promise<boolean> {
     return await this.update({ ...this.metadata, name: name });
   }

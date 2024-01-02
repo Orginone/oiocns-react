@@ -3,11 +3,11 @@ import { Button, Empty, Input, Spin } from 'antd';
 import message from '@/utils/message';
 import React from 'react';
 import WorkForm from '@/executor/tools/workForm';
-import { model } from '@/ts/base';
 import useAsyncLoad from '@/hooks/useAsyncLoad';
 import { loadGatewayNodes } from '@/utils/tools';
 import FormItem from '@/components/DataStandard/WorkForm/Viewer/formItem';
 import { Emitter } from '@/ts/base/common';
+import { model } from '@/ts/base';
 // 卡片渲染
 interface IProps {
   current: IWork | IWorkTask;
@@ -16,8 +16,7 @@ interface IProps {
 }
 
 /** 办事-业务流程--发起 */
-const TaskStart: React.FC<IProps> = ({ current, finished, data }) => {
-  const formData = new Map<string, model.FormEditData>();
+const TaskStart: React.FC<IProps> = ({ current, data, finished }) => {
   const gatewayData = new Map<string, string>();
   const [notifyEmitter] = React.useState(new Emitter());
   const [loaded, apply] = useAsyncLoad(() => current.createApply(undefined, data));
@@ -30,7 +29,7 @@ const TaskStart: React.FC<IProps> = ({ current, finished, data }) => {
         {gatewayInfos.map((a) => {
           return (
             <FormItem
-              rule={{}}
+              rules={[]}
               key={a.id}
               data={gatewayData}
               numStr={'1'}
@@ -71,9 +70,6 @@ const TaskStart: React.FC<IProps> = ({ current, finished, data }) => {
           belong={apply.belong}
           data={apply.instanceData}
           nodeId={apply.instanceData.node.id}
-          onChanged={(id, data) => {
-            formData.set(id, data);
-          }}
         />
         {loadGateway(apply)}
         <div style={{ padding: 10, display: 'flex', alignItems: 'flex-end' }}>
@@ -87,13 +83,8 @@ const TaskStart: React.FC<IProps> = ({ current, finished, data }) => {
           <Button
             type="primary"
             onClick={async () => {
-              if (apply.validation(formData)) {
-                await apply.createApply(
-                  apply.belong.id,
-                  info.content,
-                  formData,
-                  gatewayData,
-                );
+              if (apply.validation()) {
+                await apply.createApply(apply.belong.id, info.content, gatewayData);
                 finished?.apply(this, []);
               } else {
                 message.warn('请完善表单内容再提交!');
