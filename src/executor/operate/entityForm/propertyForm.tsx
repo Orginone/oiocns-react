@@ -214,7 +214,7 @@ const PropertyForm = (props: Iprops) => {
           accepts={[needType]}
           onCancel={() => setNeedType('')}
           onOk={(files) => {
-            if (['字典', '分类'].includes(needType || '')) {
+            if (['字典', '分类'].includes(needType)) {
               if (files.length > 0) {
                 setSpecies(files[0].metadata);
               } else {
