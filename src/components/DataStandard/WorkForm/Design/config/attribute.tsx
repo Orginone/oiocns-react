@@ -22,6 +22,7 @@ const AttributeConfig: React.FC<IAttributeProps> = ({
   const [openDialog, setOpenDialog] = useState(false);
   const [attribute, setAttribute] = React.useState(current.metadata.attributes[index]);
   const [items, setItems] = useState<schema.XSpeciesItem[]>([]);
+  const [refForm, setRefForm] = useState<schema.XForm | null>(null);
   const notityAttrChanged = () => {
     current.metadata.attributes[index] = attribute;
     notifyEmitter.changCallback('attr', attribute);
@@ -29,15 +30,29 @@ const AttributeConfig: React.FC<IAttributeProps> = ({
       setAttribute({ ...attribute });
     }
   };
-  useEffect(() => {
-    const speciesId = attribute.property?.speciesId;
-    if (speciesId && speciesId.length > 5) {
-      current.loadItems([speciesId]).then((data) => {
-        setItems(data);
-      });
-    } else {
-      setItems([]);
+
+  async function loadAttributeResource() {
+    if (!attribute.property) {
+      return;
     }
+
+    if (attribute.property.valueType == '引用型') {
+      if (attribute.property.speciesId) {
+        const data = await current.loadReferenceForm(attribute.property.speciesId);
+        setRefForm(data);
+      }
+    } else {
+      const speciesId = attribute.property.speciesId;
+      if (speciesId && speciesId.length > 5) {
+        const data = await current.loadItems([speciesId]);
+        setItems(data);
+      } else {
+        setItems([]);
+      }      
+    }
+  }
+  useEffect(() => {
+    loadAttributeResource();
   }, [attribute]);
   useEffect(() => {
     setAttribute({
@@ -107,6 +122,27 @@ const AttributeConfig: React.FC<IAttributeProps> = ({
                 };
               }),
             }}
+          />,
+        );
+        break;
+      case '引用选择框':
+        options.push(
+          <SimpleItem
+            dataField="options.nameAttribute"
+            editorType="dxSelectBox"
+            label={{ text: '展示文字的特性' }}
+            editorOptions={{
+              displayExpr: 'name',
+              valueExpr: 'id',
+              dataSource: (refForm?.attributes || []).filter((i) => {
+                return i.property?.valueType == '描述型';
+              }),
+            }}
+          />,
+          <SimpleItem
+            dataField="options.allowViewDetial"
+            editorType="dxCheckBox"
+            label={{ text: '允许查看数据详情' }}
           />,
         );
         break;

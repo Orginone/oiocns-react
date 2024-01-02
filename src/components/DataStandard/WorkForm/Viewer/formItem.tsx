@@ -92,6 +92,9 @@ const FormItem: React.FC<IFormItemProps> = (props) => {
           valueExpr={'value'}
         />
       );
+    case '引用选择框':
+      // TODO: 替换成新组件
+      return <TextBox {...mixOptions} />;
     case '多级选择框':
       return <TreeSelectItem {...mixOptions} speciesItems={props.field.lookups} />;
     case '操作人':

@@ -341,6 +341,8 @@ export type XProperty = {
   unit: string;
   // 标签ID
   speciesId: string;
+  // 表单id
+  formId?: string;
   // 来源用户ID
   sourceId: string;
   // 给物的度量标准
