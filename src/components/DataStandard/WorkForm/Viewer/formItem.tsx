@@ -13,6 +13,7 @@ import React, { useEffect, useState } from 'react';
 import { ValueChangedEvent } from 'devextreme/ui/text_box';
 import { formatDate } from '@/utils';
 import { IBelong, TargetType } from '@/ts/core';
+import { useEffectOnce } from 'react-use';
 
 interface IFormItemProps {
   data: any;
@@ -37,12 +38,14 @@ const FormItem: React.FC<IFormItemProps> = (props) => {
   if (props.readOnly) {
     props.field.options.readOnly = true;
   }
-  if (props.data[props.field.id] == undefined && props.field.options?.defaultValue) {
-    props.onValuesChange?.apply(this, [
-      props.field.id,
-      props.field.options?.defaultValue,
-    ]);
-  }
+  useEffectOnce(() => {
+    if (props.data[props.field.id] == undefined && props.field.options?.defaultValue) {
+      props.onValuesChange?.apply(this, [
+        props.field.id,
+        props.field.options?.defaultValue,
+      ]);
+    }
+  });
   const mixOptions: any = {
     height: 36,
     name: props.field.id,
@@ -98,6 +101,9 @@ const FormItem: React.FC<IFormItemProps> = (props) => {
           valueExpr={'value'}
         />
       );
+    case '引用选择框':
+      // TODO: 替换成新组件
+      return <TextBox {...mixOptions} />;
     case '多级选择框':
       return <TreeSelectItem {...mixOptions} speciesItems={props.field.lookups} />;
     case '操作人':

@@ -176,10 +176,10 @@ const RootNode: React.FC<IProps> = (props) => {
               if (files.length > 0) {
                 const forms = (files as unknown[] as IForm[]).map((i) => i.metadata);
                 if (formModel === '子表') {
-                  props.current.detailForms.push(...forms);
+                  props.current.detailForms = [...props.current.detailForms, ...forms];
                   setDetailForms(props.current.detailForms);
                 } else {
-                  props.current.primaryForms.push(...forms);
+                  props.current.primaryForms = [...props.current.primaryForms, ...forms];
                   setPrimaryForms(props.current.primaryForms);
                 }
               }
