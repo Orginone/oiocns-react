@@ -107,8 +107,13 @@ export const directoryOperates = {
     sort: 4,
     cmd: 'reload',
     label: '刷新目录',
-    model: 'outside',
     iconType: 'refresh',
+  },
+  Shortcut: {
+    sort: 11,
+    cmd: 'shortcut',
+    label: '创建快捷方式',
+    iconType: 'shortcut',
   },
   OpenFolderWithEditor: {
     sort: 10,
@@ -120,14 +125,12 @@ export const directoryOperates = {
     sort: 5,
     cmd: 'newFile',
     label: '上传文件',
-    model: 'outside',
     iconType: 'newFile',
   },
   TaskList: {
     sort: 6,
     cmd: 'taskList',
     label: '上传列表',
-    model: 'outside',
     iconType: 'taskList',
   },
   NewDir: {
@@ -249,7 +252,6 @@ export const teamOperates = {
   Pull: {
     sort: 30,
     cmd: 'pull',
-    model: 'outside',
     label: '邀请成员',
     iconType: 'pull',
   },
@@ -263,6 +265,12 @@ export const teamOperates = {
 
 /** 用户的操作 */
 export const targetOperates = {
+  JoinFriend: {
+    sort: 40,
+    cmd: 'joinFriend',
+    label: '添加好友',
+    iconType: 'joinFriend',
+  },
   NewCohort: {
     sort: 32,
     cmd: 'newCohort',
@@ -298,21 +306,18 @@ export const targetOperates = {
     cmd: 'joinCompany',
     label: '加入单位',
     iconType: 'joinCompany',
-    model: 'outside',
   },
   JoinGroup: {
     sort: 42,
     cmd: 'joinGroup',
     label: '加入集群',
     iconType: '组织群',
-    model: 'outside',
   },
   JoinStorage: {
     sort: 43,
     cmd: 'joinStorage',
     label: '加入存储资源群',
     iconType: '存储资源',
-    model: 'outside',
   },
   Chat: {
     sort: 15,
@@ -322,7 +327,6 @@ export const targetOperates = {
   },
   Activate: {
     sort: 15,
-    model: 'outside',
     cmd: 'activate',
     label: '激活存储',
     iconType: '激活',
@@ -363,21 +367,18 @@ export const personJoins = {
 export const memberOperates = {
   SettingAuth: {
     sort: 56,
-    model: 'outside',
     cmd: 'settingAuth',
     label: '权限设置',
     iconType: '权限',
   },
   SettingIdentity: {
     sort: 57,
-    model: 'outside',
     cmd: 'settingIdentity',
     label: '角色设置',
     iconType: '角色',
   },
   SettingStation: {
     sort: 58,
-    model: 'outside',
     cmd: 'settingStation',
     label: '岗位设置',
     iconType: '岗位',
@@ -406,35 +407,30 @@ export const memberOperates = {
 export const sessionOperates = {
   SetNoReaded: {
     sort: 58,
-    model: 'outside',
     cmd: 'readedToggle',
     label: '标记未读',
     iconType: 'setNoReaded',
   },
   SetReaded: {
     sort: 59,
-    model: 'outside',
     cmd: 'readedToggle',
     label: '标记已读',
     iconType: 'setReaded',
   },
   SetToping: {
     sort: 60,
-    model: 'outside',
     cmd: 'topingToggle',
     label: '设为常用',
     iconType: 'setCommon',
   },
   RemoveToping: {
     sort: 61,
-    model: 'outside',
     cmd: 'topingToggle',
     label: '取消常用',
     iconType: 'delCommon',
   },
   RemoveSession: {
     sort: 62,
-    model: 'outside',
     cmd: 'removeSession',
     label: '移除会话',
     iconType: 'delete',

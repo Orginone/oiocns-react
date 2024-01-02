@@ -21,7 +21,7 @@ const useCtrlUpdate = (ctrl: Emitter): [string, () => void] => {
     return () => {
       ctrl.unsubscribe(id);
     };
-  }, []);
+  }, [ctrl]);
   return [key, forceUpdate];
 };
 

@@ -11,8 +11,9 @@ const WorkForm: React.FC<{
   if (loaded) {
     return (
       <Viewer
-        rule={{}}
+        rules={[]}
         data={{}}
+        changedFields={[]}
         form={form.metadata}
         fields={form.fields}
         belong={form.directory.target.space}

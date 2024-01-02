@@ -1,3 +1,4 @@
+import { model, schema } from '.';
 import {
   XApplication,
   XAttributeProps,
@@ -679,6 +680,7 @@ export type InstanceDataModel = {
     /** 特性id */
     [id: string]: any;
   };
+  rules: model.RenderRule[];
 };
 
 export type FieldModel = {
@@ -731,7 +733,7 @@ export type FormEditData = {
   /** 操作时间 */
   createTime: string;
   /** 规则 */
-  rule: { [id: string]: { [type: string]: any } };
+  rules: RenderRule[];
 };
 
 /* 节点网关 */
@@ -782,7 +784,7 @@ export type WorkNodeModel = {
   // 关联表单信息
   forms: FormInfo[];
   // 关联表单信息
-  formRules: FormRules[];
+  formRules: Rule[];
   // 执行器
   executors: Executor[];
   // 主表
@@ -798,7 +800,85 @@ type FormInfo = {
   typeName: string;
 };
 
-type FormRules = {};
+export type Rule = {
+  // 规则Id
+  id: string;
+  // 规则名称
+  name: string;
+  // 规则类型
+  type: 'show' | 'calc' | 'executor';
+  // 触发对象
+  trigger: string[];
+  // 备注
+  remark: string;
+};
+
+// 表单展示规则
+export type FormShowRule = {
+  // 渲染类型
+  showType: string;
+  // 值
+  value: boolean;
+  // 目标对象
+  target: string;
+  // 条件
+  condition: string;
+} & Rule;
+
+// 表单计算规则
+export type FormCalcRule = {
+  // 目标对象
+  target: string;
+  // 表达式
+  formula: string;
+} & Rule;
+// 表单展示规则
+export type NodeShowRule = {
+  // 目标
+  target: MappingData;
+  // 渲染类型
+  showType: string;
+  // 值
+  value: boolean;
+  // 条件
+  condition: string;
+} & Rule;
+
+// 表单计算规则
+export type NodeCalcRule = {
+  // 键值对
+  mappingData: MappingData[];
+  // 目标
+  target: MappingData;
+  // 表达式
+  formula: string;
+} & Rule;
+
+// 表单计算规则
+export type NodeExecutorRule = {
+  // 键值对
+  keyMap: Map<string, MappingData>;
+  // 方法
+  function: string;
+} & Rule;
+
+export type MappingData = {
+  id: string;
+  code: string;
+  name: string;
+  formName: string;
+  formId: string;
+  typeName: string;
+  trigger: string;
+};
+
+// 渲染规则，表单、办事渲染规则
+export type RenderRule = {
+  formId: string;
+  destId: string;
+  typeName: string;
+  value: any;
+};
 
 // 执行器
 export type Executor = {

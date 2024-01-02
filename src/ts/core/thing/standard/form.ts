@@ -1,3 +1,4 @@
+import { getUuid } from '@/utils/tools';
 import { schema, model } from '../../../base';
 import { entityOperates, fileOperates, orgAuth } from '../../../core/public';
 import { IDirectory } from '../directory';
@@ -160,8 +161,21 @@ export class Form extends StandardFileInfo<schema.XForm> implements IForm {
     return false;
   }
   override async copy(destination: IDirectory): Promise<boolean> {
-    if (this.allowCopy(destination)) {
-      return await super.copyTo(destination.id, destination.resource.formColl);
+    var newMetaData = {
+      ...this.metadata,
+      directoryId: destination.id,
+    };
+    if (!this.allowCopy(destination)) {
+      newMetaData.code = getUuid();
+      newMetaData.id = 'snowId()';
+      newMetaData.name = `${this.metadata.name} - 副本[${newMetaData.code}]`;
+    }
+    const data = await destination.resource.formColl.replace(newMetaData);
+    if (data) {
+      return await destination.resource.formColl.notity({
+        data: data,
+        operate: 'insert',
+      });
     }
     return false;
   }

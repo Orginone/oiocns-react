@@ -14,6 +14,7 @@ import { Controller } from '@/ts/controller';
 import { Spin, message } from 'antd';
 import ThingView from './detail';
 import useAsyncLoad from '@/hooks/useAsyncLoad';
+import { Theme } from '@/config/theme';
 
 interface IProps {
   form: IForm;
@@ -41,6 +42,11 @@ const FormView: React.FC<IProps> = ({ form, finished }) => {
           key={form.key}
           height={'100%'}
           fields={form.fields}
+          scrolling={{
+            mode: 'infinite',
+            showScrollbar: 'onHover',
+          }}
+          pager={{ visible: false }}
           onRowDblClick={(e: any) => setSelcet(e.data)}
           filterValue={JSON.parse(form.metadata.searchRule ?? '[]')}
           dataSource={
@@ -81,7 +87,7 @@ const FormView: React.FC<IProps> = ({ form, finished }) => {
               {
                 key: 'createNFT',
                 label: '生成存证',
-                icon: <ImTicket fontSize={22} color={'#3838b9'} />,
+                icon: <ImTicket fontSize={22} color={Theme.FocusColor} />,
                 onClick: () => {
                   message.success('存证成功!');
                 },
@@ -89,12 +95,12 @@ const FormView: React.FC<IProps> = ({ form, finished }) => {
               {
                 key: 'copyBoard',
                 label: '复制数据',
-                icon: <ImCopy fontSize={22} color={'#3838b9'} />,
+                icon: <ImCopy fontSize={22} color={Theme.FocusColor} />,
               },
               {
                 key: 'startWork',
                 label: '发起办事',
-                icon: <ImShuffle fontSize={22} color={'#3838b9'} />,
+                icon: <ImShuffle fontSize={22} color={Theme.FocusColor} />,
               },
             ],
             onMenuClick(key, data) {

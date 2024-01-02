@@ -285,12 +285,12 @@ export class Person extends Belong implements IPerson {
       this.loadSuperAuth(reload),
       this.loadIdentitys(reload),
       this.loadGivedIdentitys(reload),
-      this.directory.loadDirectoryResource(reload),
     ]);
     await Promise.all(this.companys.map((company) => company.deepLoad(reload)));
     await Promise.all(this.cohorts.map((cohort) => cohort.deepLoad(reload)));
     await Promise.all(this.storages.map((storage) => storage.deepLoad(reload)));
     this.superAuth?.deepLoad(reload);
+    this.directory.loadDirectoryResource(reload);
   }
 
   override operates(): model.OperateModel[] {

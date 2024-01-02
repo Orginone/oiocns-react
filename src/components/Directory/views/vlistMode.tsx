@@ -21,9 +21,9 @@ const VListMode = ({
 }) => {
   const getItemClassName = (item: IDEntity) => {
     if (focusFile?.key === item.key || selectFiles.some((i) => i.key === item.key)) {
-      return css.list_item_select;
+      return css.vlist_item_select;
     }
-    return css.list_item;
+    return css.vlist_item;
   };
   return (
     <dev.List<IDEntity, string>

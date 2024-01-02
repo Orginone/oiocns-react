@@ -5,10 +5,12 @@ import React from 'react';
 import { Tabs } from 'antd';
 import { EditModal } from '../editModal';
 import GenerateThingTable from '../generate/thingTable';
+import { getUuid } from '@/utils/tools';
 interface IProps {
   allowEdit: boolean;
   belong: IBelong;
   forms: schema.XForm[];
+  changedFields: model.MappingData[];
   data: model.InstanceDataModel;
   getFormData: (form: schema.XForm) => model.FormEditData;
   onChanged?: (id: string, data: model.FormEditData, field: string, value: any) => void;
@@ -19,7 +21,13 @@ const DetailTable: React.FC<IProps> = (props) => {
   const form = props.forms[0];
   if (!props.data.fields[form.id]) return <></>;
   const fields = props.data.fields[form.id];
-  const operateRule = JSON.parse(form.operateRule ?? ' {}');
+  const operateRule = {
+    allowAdd: true,
+    allowEdit: true,
+    allowSelect: true,
+    ...JSON.parse(form.operateRule ?? '{}'),
+  };
+  const [key, setKey] = useState<string>(form.id);
   const [formData, setFormData] = useState(props.getFormData(form));
   const [selectKeys, setSelectKeys] = useState<string[]>([]);
   useEffect(() => {
@@ -29,8 +37,14 @@ const DetailTable: React.FC<IProps> = (props) => {
     }
     props.onChanged?.apply(this, [form.id, formData, '', {}]);
   }, [formData]);
+  useEffect(() => {
+    if (props.changedFields.find((s) => s.formId == form.id)) {
+      setKey(getUuid());
+    }
+  }, [props.changedFields]);
   return (
     <GenerateThingTable
+      key={key}
       fields={fields}
       height={500}
       dataIndex={'attribute'}
@@ -165,13 +179,22 @@ const DetailForms: React.FC<IProps> = (props) => {
   if (props.forms.length < 1) return <></>;
   const [activeTabKey, setActiveTabKey] = useState(props.forms[0].id);
   const loadItems = () => {
-    return props.forms.map((f) => {
-      return {
-        key: f.id,
-        label: f.name,
-        children: <DetailTable {...props} forms={[f]} />,
-      };
-    });
+    const items = [];
+    for (const form of props.forms) {
+      if (
+        props.data.rules?.find(
+          (a) => a.destId == form.id && a.typeName == 'visible' && !a.value,
+        )
+      ) {
+        continue;
+      }
+      items.push({
+        key: form.id,
+        label: form.name,
+        children: <DetailTable {...props} forms={[form]} />,
+      });
+    }
+    return items;
   };
   return (
     <Tabs

@@ -37,10 +37,22 @@ const Config: React.FC<IProps> = (props) => {
   const loadContent = () => {
     switch (props.node.type) {
       case AddNodeType.ROOT:
-        return <RootNode current={props.node} belong={belong} refresh={props.refresh} />;
+        return (
+          <RootNode
+            work={props.define}
+            current={props.node}
+            belong={belong}
+            refresh={props.refresh}
+          />
+        );
       case AddNodeType.APPROVAL:
         return (
-          <ApprovalNode current={props.node} belong={belong} refresh={props.refresh} />
+          <ApprovalNode
+            work={props.define}
+            current={props.node}
+            belong={belong}
+            refresh={props.refresh}
+          />
         );
       case AddNodeType.GATEWAY:
         return (
