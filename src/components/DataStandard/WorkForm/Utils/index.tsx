@@ -54,6 +54,8 @@ export const loadwidgetOptions = (attribute: schema.XAttribute) => {
       ];
     case '附件型':
       return ['文件选择框'];
+    case '引用型':
+      return ['文本框', '引用选择框'];
     default:
       return ['文本框'];
   }

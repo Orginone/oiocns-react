@@ -34,6 +34,9 @@ const FormItem: React.FC<{
     if (attribute.property && attribute.property.speciesId) {
       current.loadItems([attribute.property.speciesId]).then((data) => {
         setItems(data);
+        if (data.length == 0) {
+          console.warn(`标准 ${attribute.property!.speciesId} 未查到值！`);
+        }
       });
     }
   }, [attribute.property?.speciesId]);
@@ -74,6 +77,9 @@ const FormItem: React.FC<{
           valueExpr={'id'}
         />
       );
+    case '引用选择框':
+      // TODO: 替换成新组件
+      return <TextBox {...mixOptions} />;
     case '多级选择框':
       return <TreeSelectItem {...mixOptions} speciesItems={items} />;
     case '操作人':

@@ -75,6 +75,7 @@ export enum ValueType {
   'Time' = '时间型',
   'Date' = '日期型',
   'Target' = '用户型',
+  'Reference' = '引用型'
 }
 
 /** 规则触发时机 */
