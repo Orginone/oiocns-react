@@ -53,9 +53,16 @@ const PropertyForm = (props: Iprops) => {
     }
   };
   const [species, setSpecies] = useState(findSpecies());
+  const findForm = () => {
+    if (property?.metadata.formId) {
+      return directory.target.user.findMetadata<schema.XEntity>(property.metadata.formId);
+    }
+  };
+  const [form, setForm] = useState(findForm());
   useEffect(() => {
     formRef.current?.setFieldValue('speciesId', species?.id);
-  }, [species]);
+    formRef.current?.setFieldValue('formId', form?.id);
+  }, [species, form]);
   const getFromColumns = () => {
     const columns: ProFormColumnsType<schema.XProperty>[] = [
       {
@@ -79,7 +86,7 @@ const PropertyForm = (props: Iprops) => {
         dataIndex: 'valueType',
         valueType: 'select',
         readonly: readonly,
-        fieldProps: { 
+        fieldProps: {
           options: valueTypes.map((i) => {
             return {
               value: i,
@@ -89,6 +96,7 @@ const PropertyForm = (props: Iprops) => {
           onSelect: (select: string) => {
             setSelectType(select);
             formRef.current?.setFieldValue('speciesId', '');
+            formRef.current?.setFieldValue('formId', '');
           },
         },
         formItemProps: {
@@ -114,6 +122,27 @@ const PropertyForm = (props: Iprops) => {
               value={species?.name ?? ''}
               style={{ cursor: 'pointer' }}
               onClick={() => setNeedType(typeName)}
+            />
+          );
+        },
+      });
+    }
+    if (selectType === '引用型') {
+      columns.push({
+        title: `选择表单`,
+        dataIndex: 'formId',
+        valueType: 'select',
+        renderFormItem() {
+          if (readonly) {
+            return <div>{form?.name ?? ''}</div>;
+          }
+          return (
+            <Input
+              placeholder={`点击选择表单`}
+              readOnly
+              value={form?.name ?? ''}
+              style={{ cursor: 'pointer' }}
+              onClick={() => setNeedType('表单')}
             />
           );
         },
@@ -185,10 +214,18 @@ const PropertyForm = (props: Iprops) => {
           accepts={[needType]}
           onCancel={() => setNeedType('')}
           onOk={(files) => {
-            if (files.length > 0) {
-              setSpecies(files[0].metadata);
-            } else {
-              setSpecies(undefined);
+            if (['字典', '分类'].includes(needType)) {
+              if (files.length > 0) {
+                setSpecies(files[0].metadata);
+              } else {
+                setSpecies(undefined);
+              }
+            } else if ('表单' == needType) {
+              if (files.length > 0) {
+                setForm(files[0].metadata);
+              } else {
+                setForm(undefined);
+              }
             }
             setNeedType('');
           }}
