@@ -1,5 +1,11 @@
 import { common, model, schema } from '../../base';
-import { directoryNew, directoryOperates, entityOperates, fileOperates } from '../public';
+import {
+  directoryNew,
+  directoryOperates,
+  entityOperates,
+  fileOperates,
+  newWarehouse,
+} from '../public';
 import { ITarget } from '../target/base/target';
 import { IStandardFileInfo, StandardFileInfo, IFile } from './fileinfo';
 import { StandardFiles } from './standard';
@@ -140,6 +146,7 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
       cnt.push(...this.standard.specieses);
       cnt.push(...this.standard.transfers);
       cnt.push(...this.standard.templates);
+      cnt.push(...this.standard.repository);
     }
     return cnt.sort((a, b) => (a.metadata.updateTime < b.metadata.updateTime ? 1 : -1));
   }
@@ -313,6 +320,7 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
         });
       } else {
         operates.push(directoryNew);
+        operates.push(newWarehouse);
       }
       if (this.target.user.copyFiles.size > 0) {
         operates.push(fileOperates.Parse);

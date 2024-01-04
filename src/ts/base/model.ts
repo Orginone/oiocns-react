@@ -1411,3 +1411,56 @@ export type DiskInfoType = {
   // 查询时间
   getTime: string;
 };
+
+export type pullRequestList = {
+  IssueId: number;
+  //仓库名称
+  RepoName: string;
+  //提交合并请求的人
+  PosterUser: XTarget;
+  //issue的标题
+  Name: string;
+  //issue的内容
+  Content: string;
+  //是否关闭
+  IsClosed: boolean;
+  //评论数
+  NumComment: number;
+  //创建时间 
+  CreateUnix: number | Date;
+  //更新时间
+  UpdateUnix: number | Date;
+  //是否存在冲突，0为存在冲突，2为不存在冲突
+  Status: number;
+  //需要合并进来的仓库(13684856438/pre)
+  HeadRepo: string;
+  //基本的仓库(13684856438/pre)
+  BaseRepo: string;
+  //需要合并进来的分支(test)
+  HeadBranch: string;
+  //基本分支(master)
+  BaseBranch: string;
+  //hash值
+  MergeBase: string;
+  //hash值
+  MergeCommitId: string;
+  //是否合并
+  HasMerged: boolean;
+  //合并请求的人
+  MergerUser: string | XTarget;
+  //合并时间
+  MergedUnix: number;
+  comment: comment[];
+  }
+export type comment = {
+  Id: number;
+  //仓库名称
+  RepoName: string ;
+  IssueId: number;
+  //评论内容
+  Content: string;
+  CreateUnix: number | Date;
+  UpdateUnix: number | Date;
+  //评论人
+  PosterUser: XTarget;
+  }

@@ -12,6 +12,8 @@ import LabelsForm from './labelsForm';
 import RenameForm from './renameForm';
 import TransferForm from './transferForm';
 import PageTemplateForm from './templateForm';
+import RepositoryForm from './repositoryForm';
+import WarehousePermissionForm from './warehousePermissionForm';
 
 interface IProps {
   cmd: string;
@@ -93,6 +95,11 @@ const EntityForm: React.FC<IProps> = ({ cmd, entity, finished }) => {
           finished={reloadFinish}
         />
       );
+    case 'newWarehouse':
+    case 'updateWarehouse':
+      return <RepositoryForm cmd={cmd} entity={entity as any} finished={finished} />;
+    case 'WarehousePermission':
+      return <WarehousePermissionForm current={entity as any} finished={finished} />;
     default: {
       return (
         <TargetForm formType={cmd} current={entity as any} finished={reloadFinish} />

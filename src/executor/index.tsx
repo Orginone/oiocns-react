@@ -19,6 +19,7 @@ const Executor: React.FC = () => {
   };
   useEffect(() => {
     const id = command.subscribe((type, cmd, ...args: any[]) => {
+      console.log(type, cmd, args);
       if (type != 'executor') return;
       if (cmd === 'link') return history.push(args[0]);
       if (executeCmd(cmd, args[0]) === false) {

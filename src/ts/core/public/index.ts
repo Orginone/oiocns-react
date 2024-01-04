@@ -19,4 +19,5 @@ export {
   personJoins,
   targetOperates,
   teamOperates,
+  warehouseOperates,
 } from './operates';

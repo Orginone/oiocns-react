@@ -181,6 +181,40 @@ export const loadNilResouce = () => {
   };
 };
 
+export const loadcode=()=>{
+  const nodecode1=getNodeCode()
+  const nodecode2=getNodeCode()
+  const codeNode = {
+    forms: [],
+    code: nodecode1,
+    parentCode:nodecode1,
+    type: '起始',
+    name: '发起',
+    num: 1,
+    destType: '身份',
+    primaryForms: [],
+    detailForms: [],
+    executors: [],
+    formRules: [],
+    children: {
+      forms: [],
+      code: nodecode2,
+      parentCode:nodecode1,
+      type: '审批',
+      name: '审批对象',
+      num: 1,
+      // destType: '身份',
+      primaryForms: [],
+      // destId: '456805351245877248',
+      // destName: '管理员',
+      resource: '{"forms":[],"executors":[],"formRules":[]}',
+    },
+    resource:
+      '{"forms":[],"executors":[],"formRules":[]}',
+  };
+  return codeNode;
+}
+
 const loadBranch = (resource: any, parentCode: string, parentType: string) => {
   if (resource) {
     let code = getNodeCode();
