@@ -27,7 +27,7 @@ interface IProps {
 const ApprovalNode: React.FC<IProps> = (props) => {
   const [funcName, setFuncName] = useState<string>('');
   const [trigger, setTrigger] = useState<string>('before');
-  const [executors, setExecutors] = useState<model.Executor[]>([]);
+  const [executors, setExecutors] = useState<model.Executor[]>(props.current.executors);
   const [isOpen, setIsOpen] = useState<boolean>(false); // 打开弹窗
   const [formModel, setFormModel] = useState<string>('');
   const [primaryForms, setPrimaryForms] = useState<schema.XForm[]>();
@@ -233,6 +233,7 @@ const ApprovalNode: React.FC<IProps> = (props) => {
                   });
                   setExecutors([...executors]);
                   setFuncName('');
+                  props.current.executors = executors;
                 }}>
                 添加
               </Button>
