@@ -106,7 +106,7 @@ export const ActivityMessage: React.FC<ActivityItemProps> = ({
             <div>
               <EntityIcon entityId={metadata.createUser} showName />
               {/* <span className={cls.activityTime}> */}
-              <span className={'activityTime'}>
+              <span className={'activityTime mgl4'}>
                 发布于{showChatTime(item.metadata.createTime)}
               </span>
             </div>
@@ -136,7 +136,7 @@ export const ActivityMessage: React.FC<ActivityItemProps> = ({
         <div className={'activityItem-footer'}>
           <div>
             <EntityIcon entityId={metadata.createUser} showName />
-            <span className={'activityTime'}>
+            <span className={'activityTime mgl4'}>
               发布于{showChatTime(item.metadata.createTime)}
             </span>
           </div>
