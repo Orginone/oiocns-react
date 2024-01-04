@@ -1,15 +1,9 @@
-import { IDirectory } from '@/ts/core';
 import { Modal, Button, Spin, message } from 'antd';
 import React, { useState, useEffect } from 'react';
 import { IRepository } from '@/ts/core/thing/standard/repository';
 import SelectIdentity from '@/components/Common/SelectIdentity';
 import ShareShowComp from '@/components/Common/ShareShowComp';
-import {
-  convertNode,
-  loadNilResouce,
-  loadResource,
-  loadcode,
-} from '@/components/Common/FlowDesign/processType';
+import { loadResource, loadcode } from '@/components/Common/FlowDesign/processType';
 import useAsyncLoad from '@/hooks/useAsyncLoad';
 interface Iprops {
   current: IRepository;
@@ -68,7 +62,7 @@ const WarehousePermission = (props: Iprops) => {
               resource: a,
             })
           ) {
-            props.current.loadWorks(true);
+            await props.current.loadWorks(true);
             console.log(props.current.works[0].metadata, a);
             message.info('保存成功');
             props.finished();

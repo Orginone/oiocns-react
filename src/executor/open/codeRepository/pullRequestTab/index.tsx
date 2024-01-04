@@ -31,9 +31,9 @@ const PullRequestTab: React.FC<IProps> = ({
   setActiveTabKey,
   setWordOrder,
 }) => {
-  const [PRdata, setPRdata] = useState(null);
+  const [PRdata, setPRdata] = useState<any>(null);
   //代码提交历史
-  const [historyCommitList, setHistoryCommitList] = useState(null);
+  const [historyCommitList, setHistoryCommitList] = useState<Array<any>>(null);
   //分支列表选项
   const [trees, setTrees] = useState([]);
   //第一个Select框
@@ -47,10 +47,8 @@ const PullRequestTab: React.FC<IProps> = ({
   const [PRlistType, setPRlistType] = useState(0);
   //选择的单条pr列表数据
   const [PRlistData, setPRlistData] = useState<model.pullRequestList>();
-  //选择的单条pr列表id
-  const [PRId, setPRId] = useState<number>();
   // 代码提交文件变动的数量
-  const [titleKeyData, setTitleKeyData] = useState();
+  const [titleKeyData, setTitleKeyData] = useState<any>();
   useEffect(() => {
     (async () => {
       const data = await current.PullRequestcomparison(`/${Select1 + '...' + Select2}`);
@@ -140,14 +138,9 @@ const PullRequestTab: React.FC<IProps> = ({
                               MergeCommitId: pull.MergeCommitId,
                               MergeBase: pull.MergeBase,
                             });
-                            console.log(res);
-                            
                             setTitleKeyData(res.data);
                             setStates(2);
                             setPRlistData(pull);
-                            setPRId(pull.IssueId);
-
-                            // console.log(current.findPRByIssueId(pull.IssueId));
                           }}>
                           <div>
                             <Tag color="#1b1c1d">#{pull.IssueId}</Tag>
@@ -228,7 +221,10 @@ const PullRequestTab: React.FC<IProps> = ({
                               item.BaseBranch === Select1;
                             return ishas;
                           });
-                          return data.HeadRepo + ` #${data.IssueId}`;
+                          if (data) {
+                            return data.HeadRepo + ` #${data.IssueId}`;
+                          }
+                          return '';
                         })()}
                       </span>
                     </div>
@@ -442,6 +438,7 @@ const PullRequestTab: React.FC<IProps> = ({
                           current={current}
                           PRlistData={PRlistData}
                           titleShow={false}
+                          setStates={setStates}
                           onOpenPR={async () => {
                             const isexist = current.pullRequestList.find((value) => {
                               return (

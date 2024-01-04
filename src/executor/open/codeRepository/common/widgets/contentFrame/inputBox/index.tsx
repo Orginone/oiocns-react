@@ -67,7 +67,7 @@ const InputBox: React.FC<IProps> = ({
             <div className="flex" style={{ justifyContent: 'flex-end' }}>
               {PRlistData ? (
                 <>
-                  {PRlistData.IsClosed ? (
+                  {/* {PRlistData.IsClosed ? (
                     <Button
                       type="primary"
                       style={{
@@ -91,7 +91,7 @@ const InputBox: React.FC<IProps> = ({
                       onClick={onClosePR}>
                       关闭
                     </Button>
-                  )}
+                  )} */}
                   <Button
                     type="primary"
                     style={{

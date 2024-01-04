@@ -1,4 +1,5 @@
 import { logger } from '@/ts/base/common';
+import orgCtrl from '@/ts/controller';
 import { IWork } from '.';
 import { schema, model, kernel } from '../../base';
 import { TaskStatus, entityOperates } from '../public';
@@ -8,6 +9,7 @@ import { IWorkApply } from './apply';
 import { FileInfo, IFile } from '../thing/fileinfo';
 import { Acquire } from './executor/acquire';
 import { IExecutor } from './executor';
+import { IRepository } from '../thing/standard/repository';
 export type TaskTypeName = '待办' | '已办' | '抄送' | '发起的';
 
 export interface IWorkTask extends IFile {
@@ -51,6 +53,15 @@ export interface IWorkTask extends IFile {
   findWorkById(wrokId: string): Promise<IWork | undefined>;
   /** 加载执行器 */
   loadExecutors(node: model.WorkNodeModel): IExecutor[];
+  /** 获取代码仓库和代码仓库办事 */
+  findCodeWorkById(wrokId: string): Promise<[IRepository, IWork] | undefined>;
+  /** 代码仓库合并和驳回审批 */
+  approvalCodeTask(
+    status: number,
+    comment: string,
+    Repository?: any,
+    PRlistData?: any,
+  ): Promise<boolean>;
 }
 
 export class WorkTask extends FileInfo<schema.XEntity> implements IWorkTask {
@@ -168,16 +179,19 @@ export class WorkTask extends FileInfo<schema.XEntity> implements IWorkTask {
   }
   loadExecutors(node: model.WorkNodeModel) {
     let executors: IExecutor[] = [];
-    for (const item of node.executors) {
-      switch (item.funcName) {
-        case '数据申领':
-          executors.push(new Acquire(item, this));
-          break;
-        case '归属权变更':
-          break;
+    if (node.executors) {
+      for (const item of node.executors) {
+        switch (item.funcName) {
+          case '数据申领':
+            executors.push(new Acquire(item, this));
+            break;
+          case '归属权变更':
+            break;
+        }
       }
+      return executors;
     }
-    return executors;
+    return [];
   }
   async recallApply(): Promise<boolean> {
     if ((await this.loadInstance()) && this.instance) {
@@ -259,5 +273,98 @@ export class WorkTask extends FileInfo<schema.XEntity> implements IWorkTask {
       }
     }
     return false;
+  }
+  //代码仓库审批
+  async approvalCodeTask(
+    status: number,
+    comment: string,
+    Repository?: IRepository,
+    PRlistData?: any,
+  ): Promise<boolean> {
+    if (await this.loadInstance(true)) {
+      if (this.instanceData) {
+        if (
+          this.taskdata.status < TaskStatus.ApprovalStart &&
+          status == TaskStatus.ApprovalStart &&
+          Repository
+        ) {
+          const res1 = await Repository.MergePull({
+            IssueId: PRlistData.IssueId,
+            UserName: PRlistData.PosterUser.name,
+            HeadRepo: PRlistData.HeadRepo,
+            BaseRepo: PRlistData.BaseRepo,
+            Status: PRlistData.Status,
+            HeadBranch: PRlistData.HeadBranch,
+            BaseBranch: PRlistData.BaseBranch,
+            HasMerged: PRlistData.HasMerged,
+            MergeCommitId: PRlistData.MergeCommitId,
+            MergeBase: PRlistData.MergeBase,
+          });
+          this.instanceData.data[0] = {
+            pulldata: { ...PRlistData, ...res1.data.Pull },
+          };
+          let data = JSON.parse(JSON.stringify(res1.data));
+          data.Pulls.push(data.Pull);
+          data.Pulls.sort((a: any, b: any) => a.IssueId - b.IssueId);
+          Repository.pullRequestList.forEach((val, i) => {
+            const matchingObject = data.Pulls.find((obj: any) => obj.IssueId === val.IssueId);
+            if (matchingObject) {
+              Repository.pullRequestList[i] = {
+                ...Repository.pullRequestList[i],
+                ...matchingObject,
+                MergerUser: orgCtrl.user.metadata,
+                MergedUnix: Date.now(),
+              };
+            }
+          });
+          await Repository.update(Repository.metadata);
+          const res = await kernel.approvalTask({
+            id: this.taskdata.id,
+            status: status,
+            comment: comment,
+            data: JSON.stringify(this.instanceData),
+          });
+          return res.data === true;
+        }
+
+        if (
+          this.taskdata.status < TaskStatus.ApprovalStart &&
+          status == TaskStatus.RefuseStart &&
+          Repository
+        ) {
+          this.instanceData.data[0] = {
+            pulldata: { ...this.instanceData.data[0].pulldata, IsClosed: true },
+          };
+          Repository.pullRequestList.forEach((val, i) => {
+            if (val.IssueId === this.instanceData?.data[0].pulldata.IssueId) {
+              Repository.pullRequestList[i] = {
+                ...Repository.pullRequestList[i],
+                IsClosed: true,
+              };
+            }
+          });
+          await Repository.update(Repository.metadata);
+          const res = await kernel.approvalTask({
+            id: this.taskdata.id,
+            status: status,
+            comment: comment,
+            data: JSON.stringify(this.instanceData),
+          });
+          return res.data === true;
+        }
+      }
+    }
+    return false;
+  }
+  async findCodeWorkById(wrokId: string): Promise<[IRepository, IWork] | undefined> {
+    for (let target of this.user.targets) {
+      for (let app of await target.directory.loadAllRepository()) {
+        const work = await app.findWork(wrokId);
+        if (work) {
+          return [app, work];
+        }
+      }
+    }
+    return undefined;
   }
 }

@@ -16,6 +16,8 @@ export interface IWorkApply {
     content: string,
     gateways: Map<string, string>,
   ): Promise<boolean>;
+  /** 发起代码仓库申请 */
+  createCodeApply(applyId: string, instanceData: any): Promise<boolean>;
 }
 
 export class WorkApply implements IWorkApply {
@@ -95,6 +97,19 @@ export class WorkApply implements IWorkApply {
       data: JSON.stringify(this.instanceData),
       gateways: JSON.stringify(gatewayInfos),
     });
+    return res.success;
+  }
+  async createCodeApply(applyId: string, instanceData: any): Promise<boolean> {
+    this.instanceData.data[0] = instanceData;
+    const res = await kernel.createWorkInstance({
+      ...this.metadata,
+      applyId: applyId,
+      content: 'pr审批写入',
+      contentType: 'Text',
+      data: JSON.stringify(this.instanceData),
+      gateways: '[]',
+    });
+    console.log(res);
     return res.success;
   }
   private getHideForms = () => {

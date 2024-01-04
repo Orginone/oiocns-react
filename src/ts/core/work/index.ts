@@ -41,6 +41,11 @@ export interface IWork extends IFileInfo<schema.XWorkDefine> {
     taskId?: string,
     pdata?: model.InstanceDataModel,
   ): Promise<IWorkApply | undefined>;
+  /** 生成代码仓库办事申请单 */
+  createCodeApply(
+    taskId?: string,
+    pdata?: model.InstanceDataModel,
+  ): Promise<IWorkApply | undefined>;
   /** 通知变更 */
   notify(operate: string, data: any): void;
   /** 接收通知 */
@@ -255,6 +260,41 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
   ): Promise<IWorkApply | undefined> {
     await this.loadNode();
     if (this.node && this.forms.length > 0) {
+      const data: model.InstanceDataModel = {
+        data: {},
+        fields: {},
+        primary: {},
+        node: this.node,
+        rules: [],
+      };
+      this.forms.forEach((form) => {
+        data.fields[form.id] = form.fields;
+        if (pdata && pdata.data[form.id]) {
+          const after = pdata.data[form.id]?.at(-1);
+          if (after) {
+            data.data[form.id] = [{ ...after, nodeId: this.node!.id }];
+          }
+        }
+      });
+      return new WorkApply(
+        {
+          hook: '',
+          taskId: taskId,
+          title: this.name,
+          defineId: this.id,
+        } as model.WorkInstanceModel,
+        data,
+        this.directory.target.space,
+        this.forms,
+      );
+    }
+  }
+  async createCodeApply(
+    taskId: string = '0',
+    pdata?: model.InstanceDataModel,
+  ): Promise<IWorkApply | undefined> {
+    await this.loadNode();
+    if (this.node) {
       const data: model.InstanceDataModel = {
         data: {},
         fields: {},

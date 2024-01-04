@@ -6,32 +6,25 @@ import {
   UserOutlined,
 } from '@ant-design/icons';
 import { Avatar, Button, Input, message } from 'antd';
-import React from 'react';
-import { LabelBox } from './labelBox';
-import { InputBox } from './inputBox';
+import React, { useState } from 'react';
 import { model } from '@/ts/base';
-import { getTimeAgo } from '../../../hook';
-import orgCtrl from '@/ts/controller';
+import { getTimeAgo } from '@/executor/open/codeRepository/hook';
 import { IRepository } from '@/ts/core/thing/standard/repository';
+import { IWorkTask } from '@/ts/core/work/task';
 
 interface IProps {
-  onCreate: (title: string, content: string) => void; //按钮方法
   PRlistData?: model.pullRequestList; //单条pr列表数据 PRlistData存在的时候需要传递onOpenPR，onClosePR
-  current: IRepository;
-  titleShow?: boolean; //默认值为显示
-  onOpenPR?: () => void; //按钮开启pr方法
-  onClosePR?: () => void; //按钮关闭pr方法
-  setStates?: Function;
+  current: IWorkTask;
+  Repository: IRepository;
+  finished: () => void;
 }
 const ContentFrame: React.FC<IProps> = ({
-  onCreate,
   PRlistData,
+  Repository,
   current,
-  titleShow = true,
-  onOpenPR,
-  onClosePR,
-  setStates,
+  finished,
 }) => {
+  const [textarea, setTextarea] = useState<string>('');
   return (
     <div
       className="merge_file"
@@ -63,7 +56,7 @@ const ContentFrame: React.FC<IProps> = ({
                   <div style={{ flex: '1' }}>
                     <div className="content_edit_style" style={{ padding: 0 }}>
                       <p className="content_edit_title">
-                        {value.PosterUser?.name} 评论于 {getTimeAgo(value.UpdateUnix)}
+                        {value.PosterUser?.name} 发布于 {getTimeAgo(value.UpdateUnix)}
                       </p>
                       <p className="common_content">{value.Content}</p>
                     </div>
@@ -91,7 +84,7 @@ const ContentFrame: React.FC<IProps> = ({
                   </div>
                 );
               }
-              if (PRlistData.IsClosed == true) {
+              if (current.taskdata.status == 200) {
                 return (
                   <div
                     className="flex"
@@ -104,7 +97,9 @@ const ContentFrame: React.FC<IProps> = ({
                     </div>
                     <div style={{ flex: '1' }}>
                       <div className="content_edit_style" style={{ padding: 0 }}>
-                        <p className="gev gev4">请重新开启合并请求来完成合并操作。</p>
+                        <p className="gev gev4">
+                          该合并已被关闭，请重新进行提交来完成合并操作。
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -127,60 +122,63 @@ const ContentFrame: React.FC<IProps> = ({
                           <CheckOutlined style={{ margin: '5px' }} />
                           该合并请求可以进行自动合并操作。
                         </p>
-                        {/* <p className="gev">提交说明:</p>
+                        <p className="gev">提交说明:</p>
                         <p className="gev">
-                          <Input.TextArea rows={2} placeholder="请填写内容" />
-                        </p> */}
-                        {/* {orgCtrl.user.metadata.belongId ==
-                          current.target.metadata.belongId && (
-                          <Button
-                            type="primary"
-                            style={{
-                              background: '#21ba45',
-                              border: '1px solid #21ba45',
-                              margin: '0 0 10px 10px',
+                          <Input.TextArea
+                            rows={2}
+                            placeholder="请填写内容"
+                            value={textarea}
+                            onChange={(e) => {
+                              setTextarea(e.target.value);
                             }}
-                            onClick={async () => {
-                              try {
-                                const res = await current.MergePull({
-                                  IssueId: PRlistData.IssueId,
-                                  UserName: PRlistData.PosterUser.name,
-                                  HeadRepo: PRlistData.HeadRepo,
-                                  BaseRepo: PRlistData.BaseRepo,
-                                  Status: PRlistData.Status,
-                                  HeadBranch: PRlistData.HeadBranch,
-                                  BaseBranch: PRlistData.BaseBranch,
-                                  HasMerged: PRlistData.HasMerged,
-                                  MergeCommitId: PRlistData.MergeCommitId,
-                                  MergeBase: PRlistData.MergeBase,
-                                  IsClosed: PRlistData.IsClosed,
-                                });
-                                let data = JSON.parse(JSON.stringify(res.data));
-                                data.Pulls.push(data.Pull);
-                                data.Pulls.sort((a, b) => a.IssueId - b.IssueId);
-                                current.pullRequestList.forEach((val, i) => {
-                                  const matchingObject = data.Pulls.find(
-                                    (obj) => obj.IssueId === val.IssueId,
-                                  );
-                                  if (matchingObject) {
-                                    current.pullRequestList[i] = {
-                                      ...current.pullRequestList[i],
-                                      ...matchingObject,
-                                      MergerUser: orgCtrl.user.metadata,
-                                      MergedUnix: Date.now(),
-                                    };
+                          />
+                        </p>
+                        {current?.instance?.status == 1 &&
+                          current.taskdata.approveType == '审批' && (
+                            <>
+                              <Button
+                                type="primary"
+                                style={{
+                                  background: '#21ba45',
+                                  border: '1px solid #21ba45',
+                                  margin: '0 0 10px 10px',
+                                }}
+                                onClick={async () => {
+                                  try {
+                                    await current.approvalCodeTask(
+                                      100,
+                                      textarea,
+                                      Repository,
+                                      PRlistData,
+                                    );
+                                    setTextarea('');
+                                    finished();
+                                  } catch (error) {
+                                    message.warning('该请求已经合并');
                                   }
-                                });
-                                await current.update(current.metadata);
-                                setStates && setStates(0);
-                              } catch (error) {
-                                console.log(error);
-                                message.warning('该请求已经合并');
-                              }
-                            }}>
-                            合并请求
-                          </Button>
-                        )} */}
+                                }}>
+                                合并请求
+                              </Button>
+                              <Button
+                                type="primary"
+                                style={{
+                                  background: '#ff4d4f',
+                                  border: '1px solid #ff4d4f',
+                                  margin: '0 0 10px 10px',
+                                }}
+                                onClick={async () => {
+                                  await current.approvalCodeTask(
+                                    200,
+                                    textarea,
+                                    Repository,
+                                  );
+                                  setTextarea('');
+                                  finished();
+                                }}>
+                                驳回
+                              </Button>
+                            </>
+                          )}
                       </div>
                     </div>
                   </div>
@@ -207,6 +205,39 @@ const ContentFrame: React.FC<IProps> = ({
                           <InfoCircleOutlined style={{ margin: '5px' }} />
                           请手动拉取代码变更以解决冲突。
                         </p>
+                        <p className="gev">
+                          <Input.TextArea
+                            rows={2}
+                            placeholder="请填写内容"
+                            value={textarea}
+                            onChange={(e) => {
+                              setTextarea(e.target.value);
+                            }}
+                          />
+                        </p>
+                        {current?.instance?.status == 1 &&
+                          current.taskdata.approveType == '审批' && (
+                            <>
+                              <Button
+                                type="primary"
+                                style={{
+                                  background: '#ff4d4f',
+                                  border: '1px solid #ff4d4f',
+                                  margin: '0 0 10px 10px',
+                                }}
+                                onClick={async () => {
+                                  await current.approvalCodeTask(
+                                    200,
+                                    textarea,
+                                    Repository,
+                                  );
+                                  setTextarea('');
+                                  finished();
+                                }}>
+                                驳回
+                              </Button>
+                            </>
+                          )}
                       </div>
                     </div>
                   </div>
@@ -215,16 +246,9 @@ const ContentFrame: React.FC<IProps> = ({
             })()}
           </>
         )}
-        <InputBox
-          onCreate={onCreate}
-          titleShow={titleShow}
-          current={current}
-          PRlistData={PRlistData}
-          onOpenPR={onOpenPR}
-          onClosePR={onClosePR}
-        />
       </div>
-      <LabelBox />
+      <div style={{ width: '8vw', height: '200px' }}></div>
+      {/* <LabelBox /> */}
     </div>
   );
 };

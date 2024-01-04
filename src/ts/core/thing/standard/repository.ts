@@ -67,6 +67,8 @@ export interface IRepository extends IStandardFileInfo<any> {
   findWork(id: string): Promise<IWork | undefined>;
   /** 加载办事如果没有创建 */
   loadWorks(reload?: boolean | undefined): Promise<IWork[]>;
+  /** 根据 IssueId 查找单个条目的方法 */
+  findPRByIssueId(issueId: number): model.pullRequestList | undefined;
 }
 
 interface PullRequest {
@@ -80,6 +82,7 @@ interface PullRequest {
   HasMerged: boolean;
   MergeCommitId: string; // 根据实际情况调整数据类型
   MergeBase: string; // 根据实际情况调整数据类型
+  IsClosed?: boolean; //MergePull需要
 }
 
 export class Repository extends StandardFileInfo<any> implements IRepository {
@@ -89,7 +92,7 @@ export class Repository extends StandardFileInfo<any> implements IRepository {
   works: IWork[];
   node: model.WorkNodeModel | undefined;
   constructor(metadata: any, dir: IDirectory) {
-    console.log(metadata, dir);
+    // console.log(metadata, dir);
     super(metadata, dir, dir.resource.repositoryColl);
     this.HTTPS = metadata.HTTPS;
     this.SSH = metadata.SSH;
@@ -154,6 +157,7 @@ export class Repository extends StandardFileInfo<any> implements IRepository {
         HasMerged: value.HasMerged,
         MergeCommitId: value.MergeCommitId,
         MergeBase: value.MergeBase,
+        IsClosed: value.IsClosed,
       };
     });
   }
@@ -290,7 +294,9 @@ export class Repository extends StandardFileInfo<any> implements IRepository {
       `/warehouse/${this.directory.target.code}/${this.name}/pulls/merge?merge_style=create_merge_commit`,
       {
         Pull: requestData,
-        Pulls: this.getPulls(),
+        Pulls: this.getPulls().filter(
+          (pull) => pull.IssueId !== requestData.IssueId && !pull.IsClosed,
+        ),
       },
     );
     return res.data;
@@ -336,7 +342,6 @@ export class Repository extends StandardFileInfo<any> implements IRepository {
         id: this.id,
         page: PageAll,
       });
-      console.log(res, '看看有没有办事节点');
       if (res.success) {
         if (res.data.result) {
           this.works = res.data.result.map((a) => new Work(a, this));
@@ -357,10 +362,8 @@ export class Repository extends StandardFileInfo<any> implements IRepository {
     data.name = 'pr审批';
     data.remark = '这是一个自定义的pr审批办事';
     const res = await kernel.createWorkDefine(data);
-    console.log(data, res);
     if (res.success && res.data.id) {
       let work = new Work(res.data, this);
-      console.log(work);
       work.notify('workReplace', work.metadata);
       this.works.push(work);
       return work;

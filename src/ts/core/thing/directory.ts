@@ -15,6 +15,7 @@ import { encodeKey, formatDate, sleep } from '@/ts/base/common';
 import { DataResource } from './resource';
 import { ISysFileInfo, SysFileInfo } from './systemfile';
 import { IPageTemplate } from './standard/page';
+import { IRepository } from './standard/repository';
 
 /** 可为空的进度回调 */
 export type OnProgress = (p: number) => void;
@@ -47,6 +48,8 @@ export interface IDirectory extends IStandardFileInfo<schema.XDirectory> {
   readonly isShortcut: boolean;
   /** 加载模板配置 */
   loadAllTemplate(reload?: boolean): Promise<IPageTemplate[]>;
+  /** 加载代码仓库配置 */
+  loadAllRepository(): Promise<IRepository[]>;
   /** 加载文件 */
   loadFiles(reload?: boolean): Promise<ISysFileInfo[]>;
   /** 上传文件 */
@@ -267,6 +270,13 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
     }
     return applications;
   }
+  async loadAllRepository(): Promise<IRepository[]> {
+    const repositorys: IRepository[] = [...this.standard.repository];
+    for (const item of this.children) {
+      repositorys.push(...(await item.loadAllRepository()));
+    }
+    return repositorys;
+  }
   async loadAllTemplate(reload?: boolean | undefined): Promise<IPageTemplate[]> {
     const templates: IPageTemplate[] = [...this.standard.templates];
     for (const item of this.children) {
@@ -341,6 +351,7 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
     await this.standard.loadApplications();
     await this.standard.loadDirectorys();
     await this.standard.loadTemplates();
+    await this.standard.loadRepository();
   }
   /** 文件夹递归拷贝 */
   private async recursionCopy(directory: IDirectory, destDirectory: IDirectory) {

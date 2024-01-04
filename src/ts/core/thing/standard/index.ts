@@ -119,9 +119,9 @@ export class StandardFiles {
   async loadRepository(reload: boolean = false): Promise<IRepository[]> {
     if (this.repositoryLoaded === false || reload) {
       this.repositoryLoaded = true;
-      const data = await this.resource.repositoryColl.load({
-        options: { match: { directoryId: this.id } },
-      });
+      const data = await this.resource.repositoryColl.cache.filter(
+        (i) => i.directoryId === this.directory.id,
+      );
       this.repository = data.map((i) => new Repository(i, this.directory));
     }
     return this.repository;

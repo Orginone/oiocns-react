@@ -21,8 +21,9 @@ import TaskDrawer from './drawer';
 import useAsyncLoad from '@/hooks/useAsyncLoad';
 import TaskApproval from './approval';
 import { getNodeByNodeId } from '@/utils/tools';
-import { model } from '@/ts/base';
+import { command, model } from '@/ts/base';
 import { IExecutor } from '@/ts/core/work/executor';
+import CodePR from './codePR';
 
 export interface TaskDetailType {
   current: IWorkTask;
@@ -227,6 +228,17 @@ const TaskContent: React.FC<TaskDetailType> = ({ current, finished }) => {
       <Spin tip={'配置信息加载中...'}>
         <div style={{ width: '100%', height: '100%' }}></div>
       </Spin>
+    );
+  }
+  if (current.instanceData?.data?.[0]?.pulldata) {
+    return (
+      <CodePR
+        // key={entity.key}
+        current={current}
+        finished={() => {
+          command.emitter('preview', 'work');
+        }}
+      />
     );
   }
   if (current.instance && current.instanceData?.node) {

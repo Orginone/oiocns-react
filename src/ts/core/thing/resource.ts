@@ -75,6 +75,7 @@ export class DataResource {
         this.directoryColl.all(reload),
         this.applicationColl.all(reload),
         this.templateColl.all(reload),
+        this.repositoryColl.all(reload),
       ]);
     }
     this._proLoaded = true;
