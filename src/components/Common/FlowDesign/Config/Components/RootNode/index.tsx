@@ -10,6 +10,7 @@ import { Form } from '@/ts/core/thing/standard/form';
 import { SelectBox } from 'devextreme-react';
 import { getUuid } from '@/utils/tools';
 import Rule from '../../Rule';
+import ExecutorShowComp from '@/components/Common/ExecutorShowComp';
 interface IProps {
   work: IWork;
   belong: IBelong;
@@ -132,6 +133,8 @@ const RootNode: React.FC<IProps> = (props) => {
                     id: getUuid(),
                     trigger: trigger,
                     funcName: funcName,
+                    changes: [],
+                    hookUrl: '',
                   });
                   setFuncName('');
                   setExecutors([...executors]);
@@ -143,10 +146,9 @@ const RootNode: React.FC<IProps> = (props) => {
           }>
           {executors && executors.length > 0 && (
             <span>
-              <ShareShowComp
-                departData={executors?.map((a) => {
-                  return { id: a.id, name: a.funcName };
-                })}
+              <ExecutorShowComp
+                work={props.work}
+                executors={executors}
                 deleteFuc={(id: string) => {
                   var exes = executors.filter((a) => a.id != id);
                   setExecutors(exes);
