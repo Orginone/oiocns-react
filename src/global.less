@@ -307,7 +307,6 @@ h3 {
     }
     .container {
       height: calc(100% - 60px);
-      padding: 0 @padding-xs;
       overflow-y: scroll;
     }
     .title {
@@ -1498,4 +1497,60 @@ h3 {
   .ogo-menu-submenu-arrow {
     color: white;
   }
+}
+
+.menu-bar {
+  width: 100%;
+  height: 50px;
+  line-height: 50px;
+  display: flex;
+  background-color: #fff;
+  justify-content: space-between;
+  cursor: pointer;
+  padding: 0 10%;
+}
+.menu-bar-active {
+  background-color: #3472ea;
+  color: #fff;
+}
+.menu-bar-item-display {
+  position: absolute;
+  left: 193px;
+  top: 54px;
+  width: 535px;
+  height: 90%;
+  background-color: #fff;
+  box-shadow: 4px 0 3px #efefef;
+  z-index: 1999;
+}
+.menu-bar-item {
+  font-weight: 700;
+  color: #467deb;
+  font-size: 17px;
+  width: 88%;
+  margin: 30px;
+  height: 92%;
+  overflow-y: scroll;
+}
+.menu-bar-item-child {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  margin: 15px 0;
+}
+.menu-bar-item-child-item {
+  font-size: 16px;
+  margin-left: 8px;
+  font-weight: 500;
+  font-family: sans-serif;
+  height: 26px;
+  text-align: center;
+  cursor: pointer;
+  display: flex;
+  border-bottom: 0px;
+  border-top: 0px;
+  border-right: 0px;
+  color: #34332f;
+  -webkit-box-orient: vertical;
+  align-items: center;
 }
