@@ -12,7 +12,7 @@ import { getWidget } from '../../Utils';
 import { DateBox, NumberBox, SelectBox, TextArea, TextBox } from 'devextreme-react';
 import React, { useEffect, useState } from 'react';
 
-const FormItem: React.FC<{
+export const FormItem: React.FC<{
   current: IForm;
   notityEmitter: Emitter;
   attr: schema.XAttribute;

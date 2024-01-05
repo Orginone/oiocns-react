@@ -2,7 +2,7 @@ import { WorkNodeModel } from '@/ts/base/model';
 import message from '@/utils/message';
 import { getUuid } from '@/utils/tools';
 
-export const executorNames = ['数据申领', '归属权变更'];
+export const executorNames = ['数据申领', '归属权变更', '字段变更', 'Webhook'];
 export type ValidationInfo = {
   isPass: boolean;
   hasGateway: boolean;

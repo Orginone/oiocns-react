@@ -888,7 +888,37 @@ export type Executor = {
   trigger: string;
   // 执行器方法名称
   funcName: string;
+  // 字段变更
+  changes: FormChange[];
+  // 请求地址
+  hookUrl: string;
 };
+
+export type FormChange = {
+  // 主键
+  id: string;
+  // 名称
+  name: string;
+  // 变动字段集合
+  fieldChanges: FieldChange[];
+};
+
+export type FieldChange = {
+  // 变动字段
+  id: string;
+  // 字段名称
+  name: string;
+  // 字段类型
+  valueType: string;
+  // 变动前字段值
+  before: any;
+  // 变动前名称
+  beforeName: string;
+  // 要变更为的字段值
+  after: any;
+  // 变动后名称
+  afterName: string;
+}
 
 export type Branche = {
   conditions: Condition[] | undefined;

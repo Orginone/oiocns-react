@@ -1,7 +1,10 @@
+import { changeRecords } from '@/components/Common/ExecutorShowComp';
 import { command, model } from '@/ts/base';
 import { IWorkTask, TaskStatus } from '@/ts/core';
-import message from '@/utils/message';
-import { Input, Button } from 'antd';
+import { IExecutor } from '@/ts/core/work/executor';
+import { getNodeByNodeId } from '@/utils/tools';
+import ProTable from '@ant-design/pro-table';
+import { Button, Card, Input, Modal, Space, message } from 'antd';
 import React, { useState } from 'react';
 
 export interface TaskDetailType {
@@ -10,11 +13,17 @@ export interface TaskDetailType {
   fromData?: Map<string, model.FormEditData>;
 }
 
+export interface ConfirmProps {
+  task: IWorkTask;
+  executor: IExecutor;
+}
+
 const TaskApproval: React.FC<TaskDetailType> = ({ task, finished, fromData }) => {
   if (task.isHistory) {
     return <></>;
   }
   const [comment, setComment] = useState<string>('');
+  const [confirm, setConfirm] = useState(<></>);
 
   // 审批
   const approvalTask = async (status: number) => {
@@ -54,6 +63,55 @@ const TaskApproval: React.FC<TaskDetailType> = ({ task, finished, fromData }) =>
     return true;
   };
 
+  const approving = async () => {
+    if (validation()) {
+      await approvalTask(TaskStatus.ApprovalStart);
+      //TODO 执行审批后的执行方法
+    } else {
+      message.warn('请完善表单内容再提交!');
+    }
+  };
+
+  const Confirm: React.FC<ConfirmProps> = (props) => {
+    const [open, setOpen] = useState(true);
+    return (
+      <Modal
+        open={open}
+        title={'字段变更确认'}
+        width={1200}
+        onOk={async () => {
+          try {
+            await props.executor.execute(fromData ?? new Map());
+            await approving();
+            setOpen(false);
+          } catch (error) {
+            message.error((error as Error).message);
+          }
+        }}
+        onCancel={() => {
+          setOpen(false);
+        }}>
+        <Space style={{ width: '100%' }} direction="vertical">
+          <span>确认后，您的数据将自动产生变更操作，变更字段如下</span>
+          {props.executor.metadata.changes.map((item, index) => {
+            return (
+              <Card key={index} title={item.name}>
+                <ProTable
+                  key={'id'}
+                  search={false}
+                  options={false}
+                  tableAlertRender={false}
+                  dataSource={item.fieldChanges}
+                  columns={changeRecords}
+                />
+              </Card>
+            );
+          })}
+        </Space>
+      </Modal>
+    );
+  };
+
   if (task.taskdata.status >= TaskStatus.ApprovalStart) {
     return <></>;
   }
@@ -70,12 +128,16 @@ const TaskApproval: React.FC<TaskDetailType> = ({ task, finished, fromData }) =>
         <Button
           type="primary"
           onClick={() => {
-            if (validation()) {
-              approvalTask(TaskStatus.ApprovalStart);
-              //TODO 执行审批后的执行方法
-            } else {
-              message.warn('请完善表单内容再提交!');
+            const node = getNodeByNodeId(task.taskdata.nodeId, task.instanceData?.node);
+            const executors = node ? task.loadExecutors(node) : [];
+            const executor = executors.find(
+              (item) => item.metadata.funcName == '字段变更',
+            );
+            if (executor) {
+              setConfirm(<Confirm task={task} executor={executor} />);
+              return;
             }
+            approving();
           }}>
           通过
         </Button>
@@ -86,6 +148,7 @@ const TaskApproval: React.FC<TaskDetailType> = ({ task, finished, fromData }) =>
           驳回
         </Button>
       </div>
+      {confirm}
     </div>
   );
 };
