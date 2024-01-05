@@ -22,6 +22,7 @@ interface IProps {
  */
 
 const RootNode: React.FC<IProps> = (props) => {
+  console.log(props, 'props');
   const [trigger, setTrigger] = useState<string>('before');
   const [funcName, setFuncName] = useState<string>('');
   const [formModel, setFormModel] = useState<string>('');
@@ -167,7 +168,7 @@ const RootNode: React.FC<IProps> = (props) => {
             multiple
             title={`选择${formModel}表单`}
             rootKey={props.belong.directory.key}
-            accepts={['表单']}
+            accepts={['表单', '报表']}
             excludeIds={(formModel === '子表' ? detailForms : primaryForms).map(
               (i) => i.id,
             )}

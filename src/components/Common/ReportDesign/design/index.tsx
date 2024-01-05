@@ -21,7 +21,6 @@ const ReportDesign: React.FC<IProps> = ({ current, notityEmitter, selectCellItem
   const [classType, setClassType] = useState<string | undefined>('');
   const [modalType, setModalType] = useState<string>('');
   const [sheetList, setSheetList] = useState<any>([]);
-  const [selectItem, setSelectedItem] = useState<any>();
   const [cellStyle, setCellStyle] = useState<any>();
   const [key, setKey] = useState<string>('');
 
@@ -32,13 +31,11 @@ const ReportDesign: React.FC<IProps> = ({ current, notityEmitter, selectCellItem
       : { 0: { name: 'sheet1', code: 'test1' } };
     delete sheetListData?.list;
     setSheetList(Object.values(sheetListData));
-    setSelectedItem(sheetListData[0]);
   }, []);
 
   /** tabs切换 */
   const onChange = (key: string) => {
     setSheetIndex(key);
-    setSelectedItem(sheetList[key]);
   };
 
   /** tabs操作新增删除 */
@@ -100,7 +97,6 @@ const ReportDesign: React.FC<IProps> = ({ current, notityEmitter, selectCellItem
             selectCellItem(cell);
           }}
           sheetIndex={sheetIndex}
-          selectItem={selectItem}
           sheetList={sheetList}
           reportChange={reportChange}
           changeType={changeType}
@@ -139,7 +135,8 @@ const ReportDesign: React.FC<IProps> = ({ current, notityEmitter, selectCellItem
           }}
           onFinish={async (values) => {
             setSheetList([...sheetList, values]);
-            const newData = Object.assign({}, sheetList);
+            const newList = [...sheetList, values];
+            const newData = Object.assign({}, newList);
             await current.update({
               ...current.metadata,
               reportDatas: JSON.stringify(newData),

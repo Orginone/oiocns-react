@@ -9,11 +9,10 @@ import 'handsontable/dist/handsontable.min.css';
 import { IForm, IProperty, orgAuth } from '@/ts/core';
 import OpenFileDialog from '@/components/OpenFileDialog';
 import { Emitter } from '@/ts/base/common';
-
 interface IProps {
   current: IForm;
   sheetList: any;
-  selectItem: any;
+  sheetIndex: number;
   updataKey: string;
   reportChange: any;
   changeType: string;
@@ -26,7 +25,7 @@ interface IProps {
 const HotTableView: React.FC<IProps> = ({
   current,
   sheetList,
-  selectItem,
+  sheetIndex,
   updataKey,
   reportChange,
   changeType,
@@ -36,7 +35,7 @@ const HotTableView: React.FC<IProps> = ({
   selectCellItem,
 }) => {
   const [modalType, setModalType] = useState<string>('');
-  const [sheetIndex, setSheetIndex] = useState<any>(0); // tabs页签
+  // const [sheetIndex, setSheetIndex] = useState<any>(0); // tabs页签
   const [cells, setCells] = useState<any>([]);
   const [styleList, setStyleList] = useState<any>([]);
   const [classList, setClassList] = useState<any>([]);
@@ -50,11 +49,13 @@ const HotTableView: React.FC<IProps> = ({
   const hotRef: any = useRef(null); // ref
 
   useEffect(() => {
-    /** 获取当前sheet页下标 */
-    const index = sheetList.findIndex((it: any) => it.code === selectItem.code);
-    setSheetIndex(index);
-    const setting = sheetList[index]?.data?.setting || {};
-    updateHot(setting);
+    const sheetListData: any = current.metadata?.reportDatas
+      ? JSON.parse(current.metadata?.reportDatas)
+      : { 0: { name: 'sheet1', code: 'test1' } };
+    const selectItem: any = Object.values(sheetListData)[sheetIndex];
+    const setting = selectItem?.data?.setting || {};
+    const datas = selectItem?.data?.data || [[]];
+    updateHot(setting, datas);
     /** 特性监听 */
     const id = notityEmitter.subscribe((_, type, data) => {
       if (type === 'attr') {
@@ -89,8 +90,10 @@ const HotTableView: React.FC<IProps> = ({
     }
   }, [updataKey]);
 
-  const updateHot = (setting: any) => {
+  const updateHot = (setting: any, data: any) => {
     const hot = hotRef.current.hotInstance;
+    const customBordersPlugin = hot.getPlugin('customBorders');
+    customBordersPlugin.clearBorders();
     const mergeCells = setting?.mergeCells || [];
     /** 初始化行高和列宽 */
     const row_h = [];
@@ -104,18 +107,18 @@ const HotTableView: React.FC<IProps> = ({
     setCells(setting?.cells || []);
     setStyleList(setting?.styleList || []);
     setClassList(setting?.classList || []);
-    /** 设置更新边框 */
     setCustomBorders(setting?.customBorders || []);
-    updateBorder(setting?.customBorders || []);
     /** 更新报表 */
     hot.updateSettings({
-      data: sheetList[sheetIndex]?.data?.data || [[]],
+      minCols: setting?.col_w ? setting?.col_w.length : initColCount,
+      minRows: setting?.row_h ? setting?.row_h.length : initRowCount,
+      data: data,
       mergeCells: mergeCells,
       rowHeights: setting?.row_h || row_h,
       colWidths: setting?.col_w || col_w,
-      minCols: setting?.col_w ? setting?.col_w.length : initColCount,
-      minRows: setting?.row_h ? setting?.row_h.length : initRowCount,
     });
+    /** 设置更新边框 */
+    updateBorder(setting?.customBorders || []);
   };
 
   /** 复制样式 */
@@ -294,13 +297,15 @@ const HotTableView: React.FC<IProps> = ({
   };
 
   /** 更新边框 */
-  const updateBorder = (customBorders: any) => {
-    customBorders.forEach((it: any) => {
-      if (it.range.length > 0) {
-        const customBordersPlugin = hotRef.current.hotInstance.getPlugin('customBorders');
-        customBordersPlugin.setBorders(it.range, it.customBorder);
-      }
-    });
+  const updateBorder = (customBordersProp: any) => {
+    const customBordersPlugin = hotRef.current.hotInstance.getPlugin('customBorders');
+    if (customBordersProp.length > 0) {
+      customBordersProp.forEach((it: any) => {
+        if (it.range.length > 0) {
+          customBordersPlugin.setBorders(it.range, it.customBorder);
+        }
+      });
+    }
   };
 
   /** 格式化所选, 返回从左上到右下的坐标，只返回最后一个 */
@@ -444,7 +449,6 @@ const HotTableView: React.FC<IProps> = ({
 
   /** 点击单元格展示编辑特性 */
   const afterOnCellMouseDown = (event: any, coords: any) => {
-    console.log(event, coords, '1234');
     if (event) {
       let classJson = { styles: {}, class: {} };
       styleList?.forEach((item: any) => {
@@ -643,6 +647,8 @@ const HotTableView: React.FC<IProps> = ({
         customBorders={true}
         rowHeaders={true}
         colHeaders={true}
+        manualColumnResize={true}
+        manualRowResize={true}
         dropdownMenu={true}
         height="610px"
         language={zhCN.languageCode}
