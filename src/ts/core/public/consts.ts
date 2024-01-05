@@ -37,6 +37,7 @@ export const valueTypes = [
   ValueType.Target,
   ValueType.Date,
   ValueType.File,
+  ValueType.Reference,
 ];
 /** 表单弹框支持的类型 */
 export const formModalType = {

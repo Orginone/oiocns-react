@@ -150,7 +150,7 @@ export const ShareIconItem = (info: shareIconInfo) => {
             icon={icon}
             style={{ background: 'transparent', color: '#606060' }}
           />
-          {info.showName && <b className="pickupName">{info.share.name}</b>}
+          {info.showName && <b className="pickupName" style={{ fontSize: fontSize }}>{info.share.name}</b>}
         </span>
       );
     }
@@ -166,7 +166,7 @@ export const ShareIconItem = (info: shareIconInfo) => {
         icon={<TypeIcon avatar iconType={'其它'} size={size} />}
         style={{ background: 'transparent', color: '#606060' }}
       />
-      {info.showName && <strong className="pickupName">{info.entity?.id}</strong>}
+      {info.showName && <strong className="pickupName" style={{ fontSize: fontSize }}>{info.entity?.id}</strong>}
     </span>
   );
 };

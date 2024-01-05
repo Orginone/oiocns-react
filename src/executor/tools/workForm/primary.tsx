@@ -43,8 +43,9 @@ const PrimaryForm: React.FC<IProps> = (props) => {
       form={form}
       fields={fields}
       data={data}
+      formData={formData}
       changedFields={props.changedFields.filter((a) => a.formId == form.id)}
-      rules={[...(props.data.rules ?? []), ...(formData.rules ?? [])]}
+      rules={props.data.rules}
       belong={props.belong}
       readonly={!props.allowEdit}
       onValuesChange={(field, value, data) => {
@@ -71,7 +72,7 @@ const PrimaryForms: React.FC<IProps> = (props) => {
     for (const form of props.forms) {
       if (
         props.data.rules?.find(
-          (a) => a.destId == form.id && a.typeName == 'visible' && a.value == false,
+          (a) => a.destId == form.id && a.typeName == 'visible' && !a.value,
         )
       ) {
         continue;
