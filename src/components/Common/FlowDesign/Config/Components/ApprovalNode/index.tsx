@@ -28,7 +28,7 @@ interface IProps {
 const ApprovalNode: React.FC<IProps> = (props) => {
   const [funcName, setFuncName] = useState<string>('');
   const [trigger, setTrigger] = useState<string>('before');
-  const [executors, setExecutors] = useState<model.Executor[]>(props.current.executors);
+  const [executors, setExecutors] = useState<model.Executor[]>([]);
   const [isOpen, setIsOpen] = useState<boolean>(false); // 打开弹窗
   const [formModel, setFormModel] = useState<string>('');
   const [primaryForms, setPrimaryForms] = useState<schema.XForm[]>();
@@ -37,6 +37,7 @@ const ApprovalNode: React.FC<IProps> = (props) => {
   const [currentData, setCurrentData] = useState<{ id: string; name: string }>();
   useEffect(() => {
     props.current.primaryForms = props.current.primaryForms || [];
+    props.current.executors = props.current.executors || [];
     setExecutors(props.current.executors);
     setPrimaryForms(props.current.primaryForms);
     setRadioValue(props.current.num == 0 ? 1 : 2);
