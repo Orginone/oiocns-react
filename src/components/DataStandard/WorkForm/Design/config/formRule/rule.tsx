@@ -81,7 +81,7 @@ const FormRule: React.FC<IProps> = (props) => {
     <>
       <Card
         type="inner"
-        title="渲染规则配置"
+        title="规则配置"
         extra={
           <>
             <a

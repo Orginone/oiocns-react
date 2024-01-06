@@ -39,8 +39,9 @@ const ShowRuleModal: React.FC<IProps> = (props) => {
       ...props.details.map((a) => {
         return {
           id: a.id,
-          formName: a.name,
           formId: a.id,
+          key: a.id,
+          formName: a.name,
           typeName: '表单',
           trigger: a.id,
           code: '',
@@ -48,13 +49,14 @@ const ShowRuleModal: React.FC<IProps> = (props) => {
         };
       }),
     );
-    props.primarys.forEach((a) => {
+    props.primarys.forEach((a, index) => {
       tgs.push(
         ...a.attributes.map((s) => {
           return {
             id: s.id,
-            formName: a.name,
+            key: index.toString() + s.id,
             formId: a.id,
+            formName: a.name,
             typeName: '属性',
             trigger: s.id,
             code: '',
@@ -63,7 +65,7 @@ const ShowRuleModal: React.FC<IProps> = (props) => {
         }),
       );
     });
-    setTargetSource(tgs.filter((a) => a.id != target?.id));
+    setTargetSource(tgs);
   }, [props.details, props.primarys]);
 
   const vaildDisable = () => {
@@ -122,10 +124,10 @@ const ShowRuleModal: React.FC<IProps> = (props) => {
       <SelectBox
         label="目标对象*"
         labelMode="floating"
-        value={target?.id}
+        value={target?.key}
         showClearButton
         displayExpr="name"
-        valueExpr="id"
+        valueExpr="key"
         dataSource={targetSource}
         onSelectionChanged={(e) => {
           setTarget(e.selectedItem);

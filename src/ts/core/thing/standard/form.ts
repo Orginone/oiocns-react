@@ -1,8 +1,8 @@
-import { getUuid } from '@/utils/tools';
 import { schema, model } from '../../../base';
 import { entityOperates, fileOperates, orgAuth } from '../../../core/public';
 import { IDirectory } from '../directory';
 import { IStandardFileInfo, StandardFileInfo } from '../fileinfo';
+import { formatDate } from '@/utils';
 
 /** 表单类接口 */
 export interface IForm extends IStandardFileInfo<schema.XForm> {
@@ -172,9 +172,10 @@ export class Form extends StandardFileInfo<schema.XForm> implements IForm {
       directoryId: destination.id,
     };
     if (!this.allowCopy(destination)) {
-      newMetaData.code = getUuid();
+      const uuid = formatDate(new Date(), 'yyyyMMddHHmmss');
+      newMetaData.name = this.metadata.name + `-副本${uuid}`;
+      newMetaData.code = this.metadata.code + uuid;
       newMetaData.id = 'snowId()';
-      newMetaData.name = `${this.metadata.name} - 副本[${newMetaData.code}]`;
     }
     const data = await destination.resource.formColl.replace(newMetaData);
     if (data) {

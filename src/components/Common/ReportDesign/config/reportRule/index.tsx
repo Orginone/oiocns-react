@@ -15,12 +15,17 @@ const FormRuleConfig: React.FC<IAttributeProps> = ({ notifyEmitter, current }) =
   const notityAttrChanged = () => {
     notifyEmitter.changCallback('form');
   };
+  if (!current.metadata.options) {
+    current.metadata.options = {
+      itemWidth: 300,
+      dataRange: { labels: [] },
+      workDataRange: { labels: [] },
+    };
+  }
   const [value, setValue] = useState<any>(
-    JSON.parse(current.metadata.searchRule ?? '{}'),
+    JSON.parse(current.metadata.options?.dataRange?.filterExp ?? '{}'),
   );
-  const [operateRule, setOperateRule] = useState<any>(
-    JSON.parse(current.metadata.operateRule ?? '{}'),
-  );
+  const [operateRule, setOperateRule] = useState<any>(current.metadata.options ?? {});
   const [fields, setFields] = useState<Field[]>([]);
   useEffect(() => {
     current.loadFields().then((f) => {
@@ -75,8 +80,8 @@ const FormRuleConfig: React.FC<IAttributeProps> = ({ notifyEmitter, current }) =
           defaultValue={operateRule[operate] ?? true}
           onValueChange={(e) => {
             operateRule[operate] = e;
-            setOperateRule(operateRule);
-            current.metadata.operateRule = JSON.stringify(operateRule);
+            current.metadata.options = operateRule;
+            setOperateRule(current.metadata.options);
             notityAttrChanged();
           }}
         />
@@ -99,7 +104,7 @@ const FormRuleConfig: React.FC<IAttributeProps> = ({ notifyEmitter, current }) =
             groupOperations={['and', 'or']}
             onValueChanged={(e) => {
               setValue(e.value);
-              current.metadata.searchRule = JSON.stringify(e.value);
+              current.metadata.options!.dataRange!.filterExp = JSON.stringify(e.value);
               notityAttrChanged();
             }}
           />

@@ -138,7 +138,7 @@ const WorkFormViewer: React.FC<{
                   }
                 }
                 try {
-                  const runtime = {
+                  var runtime = {
                     value: {},
                     decrypt: common.decrypt,
                     encrypt: common.encrypt,
@@ -162,9 +162,11 @@ const WorkFormViewer: React.FC<{
   };
   useEffect(() => {
     if (props.changedFields) {
-      props.changedFields.forEach((s) => {
-        onValueChange(s.id, props.data[s.id], false);
-      });
+      props.changedFields
+        .filter((a) => a.formId == props.form.id)
+        .forEach((s) => {
+          onValueChange(s.id, props.data[s.id], false);
+        });
       forceUpdate();
     }
   }, [props.changedFields]);
@@ -220,7 +222,7 @@ const WorkFormViewer: React.FC<{
               key={field.id}
               data={props.data}
               numStr={colNum}
-              rules={[...(props.formData?.rules ?? []), ...props.rules].filter(
+              rules={[...(props.formData?.rules ?? []), ...(props?.rules ?? [])].filter(
                 (a) => a.destId == field.id,
               )}
               readOnly={props.readonly}

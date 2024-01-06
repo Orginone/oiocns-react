@@ -863,6 +863,7 @@ export type NodeExecutorRule = {
 } & Rule;
 
 export type MappingData = {
+  key: string;
   id: string;
   code: string;
   name: string;

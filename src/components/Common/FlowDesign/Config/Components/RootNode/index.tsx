@@ -23,7 +23,6 @@ interface IProps {
  */
 
 const RootNode: React.FC<IProps> = (props) => {
-  console.log(props, 'props');
   const [trigger, setTrigger] = useState<string>('before');
   const [funcName, setFuncName] = useState<string>('');
   const [formModel, setFormModel] = useState<string>('');

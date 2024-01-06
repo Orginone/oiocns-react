@@ -150,7 +150,11 @@ export const ShareIconItem = (info: shareIconInfo) => {
             icon={icon}
             style={{ background: 'transparent', color: '#606060' }}
           />
-          {info.showName && <b className="pickupName" style={{ fontSize: fontSize }}>{info.share.name}</b>}
+          {info.showName && (
+            <b className="pickupName" style={{ fontSize: fontSize }}>
+              {info.share.name}
+            </b>
+          )}
         </span>
       );
     }
@@ -161,12 +165,8 @@ export const ShareIconItem = (info: shareIconInfo) => {
       title={info.title ?? ''}
       onClick={() => info.onClick?.apply(this, [info.entity])}>
       {infoMore()}
-      <Avatar
-        size={size}
-        icon={<TypeIcon avatar iconType={'其它'} size={size} />}
-        style={{ background: 'transparent', color: '#606060' }}
-      />
-      {info.showName && <strong className="pickupName" style={{ fontSize: fontSize }}>{info.entity?.id}</strong>}
+      <TypeIcon avatar iconType={'其它'} size={size} />
+      {info.showName && <strong className="pickupName">{info.entity?.id}</strong>}
     </span>
   );
 };

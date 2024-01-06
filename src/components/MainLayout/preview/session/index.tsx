@@ -26,6 +26,24 @@ const SessionBody = ({
         label: '动态',
       },
     ];
+    if (session.id === session.target.id) {
+      newActions.push({
+        key: 'store',
+        label: '数据',
+      });
+      if (
+        session.target.hasRelationAuth() ||
+        session.target.typeName !== TargetType.Storage
+      ) {
+        newActions.push({
+          key: 'relation',
+          label: '关系',
+        });
+        if (relation) {
+          setBodyType('relation');
+        }
+      }
+    }
     if (session.isMyChat && session.target.typeName !== TargetType.Group) {
       if (
         session.target.typeName !== TargetType.Storage ||
@@ -38,24 +56,6 @@ const SessionBody = ({
         if (relation !== true) {
           setBodyType('chat');
         }
-      }
-    }
-    if (
-      session.target.typeName !== TargetType.Storage ||
-      (session.target.hasRelationAuth() && session.id === session.target.id)
-    ) {
-      newActions.push(
-        {
-          key: 'store',
-          label: '数据',
-        },
-        {
-          key: 'relation',
-          label: '关系',
-        },
-      );
-      if (relation) {
-        setBodyType('relation');
       }
     }
     if (session.target.hasRelationAuth()) {

@@ -129,6 +129,7 @@ export class Session extends Entity<schema.XEntity> implements ISession {
   get isMyChat(): boolean {
     return (
       this.metadata.typeName === TargetType.Person ||
+      this.metadata.typeName === TargetType.Storage ||
       this.members.some((i) => i.id === this.userId) ||
       this.metadata.typeName == TargetType.Group ||
       this.chatdata.noReadCount > 0

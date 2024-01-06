@@ -15,7 +15,7 @@ interface IFormDesignProps {
 const WorkFormDesign: React.FC<IFormDesignProps> = ({ current }) => {
   const [key] = useCtrlUpdate(current);
   const [selectIndex, setSelectIndex] = React.useState<number>(-1);
-  const [mainWidth, setMainWidth] = React.useState<number>(400);
+  const [mainWidth, setMainWidth] = React.useState<number>(550);
   const [notifyEmitter] = useState(new Emitter());
   return (
     <Layout key={key}>

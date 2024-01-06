@@ -22,10 +22,9 @@ const DetailTable: React.FC<IProps> = (props) => {
   if (!props.data.fields[form.id]) return <></>;
   const fields = props.data.fields[form.id];
   const operateRule = {
-    allowAdd: true,
-    allowEdit: true,
-    allowSelect: true,
-    ...JSON.parse(form.operateRule ?? '{}'),
+    allowAdd: form.options?.allowAdd ?? true,
+    allowEdit: form.options?.allowEdit ?? true,
+    allowSelect: form.options?.allowSelect ?? true,
   };
   const [key, setKey] = useState<string>(form.id);
   const [formData, setFormData] = useState(props.getFormData(form));
@@ -190,6 +189,7 @@ const DetailForms: React.FC<IProps> = (props) => {
       }
       items.push({
         key: form.id,
+        forceRender: true,
         label: form.name,
         children: <DetailTable {...props} forms={[form]} />,
       });

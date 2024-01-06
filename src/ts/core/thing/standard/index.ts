@@ -227,29 +227,33 @@ export class StandardFiles {
     await resource.speciesColl.replaceMany(this.specieses.map((a) => a.metadata));
     await resource.propertyColl.replaceMany(this.propertys.map((a) => a.metadata));
   }
-  async copyStandradFile(to: DataResource, directoryId: string): Promise<void> {
+  async copyStandradFile(
+    to: DataResource,
+    directoryId: string,
+    isSameBelong: boolean,
+  ): Promise<void> {
     await this.loadStandardFiles();
-    await to.formColl.insertMany(
+    await to.formColl.replaceMany(
       this.forms.map((a) => {
-        return { ...a.metadata, id: 'snowId()' };
+        return { ...a.metadata, id: isSameBelong ? 'snowId()' : a.id, directoryId };
       }),
     );
-    await to.transferColl.insertMany(
+    await to.transferColl.replaceMany(
       this.transfers.map((a) => {
-        return { ...a.metadata, id: 'snowId()', directoryId };
+        return { ...a.metadata, id: isSameBelong ? 'snowId()' : a.id, directoryId };
       }),
     );
-    await to.speciesColl.insertMany(
+    await to.speciesColl.replaceMany(
       this.specieses.map((a) => {
-        return { ...a.metadata, id: 'snowId()', directoryId };
+        return { ...a.metadata, id: isSameBelong ? 'snowId()' : a.id, directoryId };
       }),
     );
-    await to.propertyColl.insertMany(
+    await to.propertyColl.replaceMany(
       this.propertys.map((a) => {
-        return { ...a.metadata, id: 'snowId()', directoryId };
+        return { ...a.metadata, id: isSameBelong ? 'snowId()' : a.id, directoryId };
       }),
     );
-    if (to.targetMetadata.belongId != this.resource.targetMetadata.belongId) {
+    if (!isSameBelong) {
       const items = await this.resource.speciesItemColl.loadSpace({
         options: {
           match: {
@@ -261,6 +265,7 @@ export class StandardFiles {
       });
       await to.speciesItemColl.replaceMany(items);
     }
+    // TODO 同归属拷贝
   }
   async operateStandradFile(to: DataResource): Promise<void> {
     await this.loadStandardFiles();

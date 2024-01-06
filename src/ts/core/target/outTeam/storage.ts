@@ -86,8 +86,9 @@ export class Storage extends Target implements IStorage {
   async deepLoad(reload: boolean = false): Promise<void> {
     if (this.hasRelationAuth()) {
       await this.loadIdentitys(reload);
+      this.loadMembers(reload);
     }
-    this.loadMembers(reload);
+    this.directory.loadDirectoryResource(reload);
   }
   override async pullMembers(
     members: schema.XTarget[],

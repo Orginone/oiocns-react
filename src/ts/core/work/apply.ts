@@ -41,21 +41,23 @@ export class WorkApply implements IWorkApply {
       );
     };
     const hides = this.getHideForms();
-    for (const formId of Object.keys(this.instanceData.data).filter(
+    for (const formId of Object.keys(this.instanceData.fields).filter(
       (a) => !hides.includes(a),
     )) {
-      const formData = this.instanceData.data[formId].at(-1);
+      const formData = this.instanceData.data[formId]?.at(-1);
       const data: any = formData?.after.at(-1) ?? {};
       for (const item of this.instanceData.fields[formId]) {
-        const rules = formData?.rules.filter((a) => a.destId == item.id);
         var isRequired = item.options?.isRequired;
-        if (rules) {
-          for (const rule of rules) {
-            if (rule.typeName == 'isRequired') {
-              isRequired = isRequired && rule.value;
-            }
-            if (rule.typeName == 'visible') {
-              isRequired = isRequired && rule.value;
+        if (formData?.rules && Array.isArray(formData?.rules)) {
+          const rules = formData?.rules.filter((a) => a.destId == item.id);
+          if (rules) {
+            for (const rule of rules) {
+              if (rule.typeName == 'isRequired') {
+                isRequired = isRequired && rule.value;
+              }
+              if (rule.typeName == 'visible') {
+                isRequired = isRequired && rule.value;
+              }
             }
           }
         }

@@ -165,7 +165,6 @@ export abstract class FileInfo<T extends schema.XEntity>
         fileOperates.Download,
         entityOperates.Update,
         entityOperates.Delete,
-        // entityOperates.Shortcut,// 先只放到目录
       );
       if (this.canDesign) {
         operates.unshift(entityOperates.Design);
