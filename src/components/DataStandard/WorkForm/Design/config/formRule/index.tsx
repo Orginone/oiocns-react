@@ -18,32 +18,32 @@ const FormRuleConfig: React.FC<IAttributeProps> = ({ current }) => {
       switch (a.valueType) {
         case '数值型':
           return {
-            name: a.id,
-            dataField: a.id,
+            name: a.code,
+            dataField: a.code,
             caption: a.name,
             dataType: 'number',
             fieldType: '数值型',
           };
         case '日期型':
           return {
-            name: a.id,
-            dataField: a.id,
+            name: a.code,
+            dataField: a.code,
             caption: a.name,
             dataType: 'date',
             fieldType: '日期型',
           };
         case '时间型':
           return {
-            name: a.id,
-            dataField: a.id,
+            name: a.code,
+            dataField: a.code,
             caption: a.name,
             dataType: 'datetime',
             fieldType: '时间型',
           };
         case '选择型':
           return {
-            name: a.id,
-            dataField: a.id,
+            name: a.code,
+            dataField: a.code,
             caption: a.name,
             fieldType: '选择型',
             dataType: 'string',
@@ -56,8 +56,8 @@ const FormRuleConfig: React.FC<IAttributeProps> = ({ current }) => {
           };
         case '分类型':
           return {
-            name: a.id,
-            dataField: a.id,
+            name: a.code,
+            dataField: a.code,
             caption: a.name,
             fieldType: '分类型',
             dataType: 'string',
@@ -70,8 +70,8 @@ const FormRuleConfig: React.FC<IAttributeProps> = ({ current }) => {
           };
         default:
           return {
-            name: a.id,
-            dataField: a.id,
+            name: a.code,
+            dataField: a.code,
             caption: a.name,
             dataType: 'string',
             fieldType: '未知',

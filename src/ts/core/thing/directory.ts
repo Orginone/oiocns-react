@@ -374,11 +374,11 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
     for (const child of directory.children) {
       const dirData = await to.directoryColl.replace(child.metadata);
       if (dirData) {
-        await directory.standard.moveStandradFile(to);
         await this.recursionMove(child, to);
       }
     }
-    for (const app of await directory.standard.applications) {
+    await directory.standard.moveStandradFile(to);
+    for (const app of directory.standard.applications) {
       await app.move(directory);
     }
   }

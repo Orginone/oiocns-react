@@ -30,7 +30,7 @@ const RootNode: React.FC<IProps> = (props) => {
   props.current.detailForms = props.current.detailForms || [];
   const [primaryForms, setPrimaryForms] = useState(props.current.primaryForms);
   const [detailForms, setDetailForms] = useState(props.current.detailForms);
-  const [executors, setExecutors] = useState<model.Executor[]>(props.current.executors);
+  const [executors, setExecutors] = useState<model.Executor[]>([]);
   const formViewer = React.useCallback((form: schema.XForm) => {
     command.emitter(
       'executor',
