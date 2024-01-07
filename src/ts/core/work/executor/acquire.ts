@@ -25,14 +25,6 @@ export class Acquire extends Executor {
     return true;
   }
   /**
-   * 改变状态
-   * @param p 进度
-   */
-  private changeProgress(p: number) {
-    this.progress = p;
-    this.command.changCallback();
-  }
-  /**
    * 获取总进度
    * @param work 办事
    * @returns 总进度

@@ -9,6 +9,7 @@ import { FileInfo, IFile } from '../thing/fileinfo';
 import { Acquire } from './executor/acquire';
 import { IExecutor } from './executor';
 import { FieldsChange } from './executor/change';
+import { Webhook } from './executor/webhook';
 export type TaskTypeName = '待办' | '已办' | '抄送' | '发起的';
 
 export interface IWorkTask extends IFile {
@@ -175,6 +176,9 @@ export class WorkTask extends FileInfo<schema.XEntity> implements IWorkTask {
           break;
         case '字段变更':
           executors.push(new FieldsChange(item, this));
+          break;
+        case 'Webhook':
+          executors.push(new Webhook(item, this));
           break;
       }
     }
