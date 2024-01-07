@@ -2,6 +2,7 @@ import { command, kernel, schema } from '../../../base';
 import { Executor } from '.';
 import { IWork } from '..';
 import { Directory } from '../../thing/directory';
+import orgCtrl from '@/ts/controller';
 
 /**
  * 数据申领
@@ -51,18 +52,22 @@ export class Acquire extends Executor {
    */
   private async transfer(work: IWork, onProgress: (p: number) => void) {
     let loaded = 0;
-    let thingColl = work.application.directory.target.space.resource.thingColl;
-    for (const form of this.task.instanceData?.node.detailForms ?? []) {
-      let take = 500;
-      let skip = 0;
-      while (true) {
-        const things = await this.loadThing(take, skip, form.id, work);
-        await thingColl.replaceMany(things.data);
-        skip += things.data.length;
-        loaded += things.data.length;
-        onProgress(loaded);
-        if (things.data.length == 0) {
-          break;
+    for (const company of orgCtrl.user.companys) {
+      if (company.id == this.task.taskdata.applyId) {
+        const thingColl = company.resource.thingColl;
+        for (const form of this.task.instanceData?.node.detailForms ?? []) {
+          let take = 1000;
+          let skip = 0;
+          while (true) {
+            const things = await this.loadThing(take, skip, form.id, work);
+            await thingColl.replaceMany(things.data);
+            skip += things.data.length;
+            loaded += things.data.length;
+            onProgress(loaded);
+            if (things.data.length == 0) {
+              break;
+            }
+          }
         }
       }
     }
