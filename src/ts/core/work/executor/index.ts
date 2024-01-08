@@ -16,6 +16,8 @@ export interface IExecutor {
   progress: number;
   // 执行
   execute(data: FormData): Promise<boolean>;
+  // 改变状态
+  changeProgress(p: number): void;
 }
 
 export abstract class Executor implements IExecutor {
@@ -30,4 +32,8 @@ export abstract class Executor implements IExecutor {
   task: IWorkTask;
   progress: number;
   abstract execute(data: FormData): Promise<boolean>;
+  changeProgress(p: number) {
+    this.progress = p;
+    this.command.changCallback();
+  }
 }
