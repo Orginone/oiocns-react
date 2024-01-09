@@ -188,7 +188,7 @@ const WorkContent: React.FC = () => {
           content={content}
           badgeCount={getBadgeCount}
           tagChanged={(t) => loadContent(t)}
-          initTags={['常用', '待办', '已办', '抄送', '发起的']}
+          initTags={['常用', '待办', '已办', '抄送', '已发起']}
           fileOpen={(entity, dblclick) => clickHanlder(entity as IWorkTask, dblclick)}
           contextMenu={(entity) => contextMenu(entity as IWorkTask)}
           rightBars={renderMore()}

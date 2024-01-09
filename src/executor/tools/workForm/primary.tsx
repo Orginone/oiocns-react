@@ -44,7 +44,7 @@ const PrimaryForm: React.FC<IProps> = (props) => {
       fields={fields}
       data={data}
       formData={formData}
-      changedFields={props.changedFields.filter((a) => a.formId == form.id)}
+      changedFields={props.changedFields}
       rules={props.data.rules}
       belong={props.belong}
       readonly={!props.allowEdit}
@@ -80,6 +80,7 @@ const PrimaryForms: React.FC<IProps> = (props) => {
       items.push({
         key: form.id,
         label: form.name,
+        forceRender: true,
         children: <PrimaryForm {...props} forms={[form]} />,
       });
     }

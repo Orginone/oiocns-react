@@ -209,7 +209,7 @@ const PropertyForm = (props: Iprops) => {
       />
       {needType !== '' && (
         <OpenFileDialog
-          title={`选择属性`}
+          title={`选择${needType}`}
           rootKey={directory.spaceKey}
           accepts={[needType]}
           onCancel={() => setNeedType('')}

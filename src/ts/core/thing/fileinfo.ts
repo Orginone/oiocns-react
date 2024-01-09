@@ -158,13 +158,13 @@ export abstract class FileInfo<T extends schema.XEntity>
       operates.unshift(fileOperates.Copy);
     }
     if (this.target.hasRelationAuth()) {
+      !operates.includes(fileOperates.Copy) && operates.unshift(fileOperates.Copy);
       operates.unshift(
         fileOperates.Move,
         fileOperates.Rename,
         fileOperates.Download,
         entityOperates.Update,
         entityOperates.Delete,
-        // entityOperates.Shortcut,//先只放到目录
       );
       if (this.canDesign) {
         operates.unshift(entityOperates.Design);

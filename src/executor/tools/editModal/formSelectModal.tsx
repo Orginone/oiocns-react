@@ -31,15 +31,24 @@ const FormSelectModal = ({ form, fields, belong, onSave }: IFormSelectProps) => 
           selectAllMode: 'page',
           showCheckBoxesMode: 'always',
         }}
+        scrolling={{
+          mode: 'infinite',
+          showScrollbar: 'onHover',
+        }}
+        pager={{ visible: false }}
         onSelectionChanged={(e) => {
           editData.rows = e.selectedRowsData;
         }}
-        filterValue={JSON.parse(form.searchRule ?? '[]')}
+        filterValue={JSON.parse(form.options?.workDataRange?.filterExp ?? '[]')}
         dataSource={
           new CustomStore({
             key: 'id',
             async load(loadOptions) {
+              var tags = form.options?.workDataRange?.labels;
               loadOptions.userData = [];
+              if (tags && tags?.length > 0) {
+                loadOptions.userData.push(tags?.map((a) => a.value));
+              }
               let request: any = { ...loadOptions };
               return await kernel.loadThing(belong.id, [belong.id], request);
             },

@@ -26,6 +26,7 @@ const WorkFlowNode: React.FC<IProps> = (props) => {
     name: props.current.destName,
   });
 
+  if (props.current.code.startsWith('JGNODE')) return <></>;
   return (
     <div className={cls[`app-roval-node`]}>
       <div className={cls[`roval-node`]}>

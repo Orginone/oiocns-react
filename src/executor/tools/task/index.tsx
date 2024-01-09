@@ -146,7 +146,9 @@ const TaskContent: React.FC<TaskDetailType> = ({ current, finished }) => {
         direction="vertical">
         {executors
           .filter((item) => item.metadata.trigger == 'before')
+          .filter((item) => ['数据申领', 'Webhook'].includes(item.metadata.funcName))
           .map((item, index) => {
+            const [loading, setLoading] = useState(false);
             const [progress, setProgress] = useState(item.progress);
             useEffect(() => {
               const id = item.command.subscribe(() => setProgress(item.progress));
@@ -158,7 +160,15 @@ const TaskContent: React.FC<TaskDetailType> = ({ current, finished }) => {
                 key={index}>
                 <Tag>{item.metadata.funcName}</Tag>
                 <Progress style={{ flex: 1, marginRight: 10 }} percent={progress} />
-                <Button size="small" onClick={() => item.execute(formData)}>
+                <Button
+                  size="small"
+                  loading={loading}
+                  type="primary"
+                  onClick={async () => {
+                    setLoading(true);
+                    await item.execute(formData);
+                    setLoading(false);
+                  }}>
                   执行
                 </Button>
               </div>

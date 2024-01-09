@@ -65,7 +65,7 @@ const Navbar: React.FC = () => {
 
   const NavItem = (item: any) => {
     const selected = location.hash.startsWith('#' + item.path);
-    let content = <OrgIcons size={24} type={item.icon} notAvatar selected={selected} />;
+    let content = <OrgIcons size={28} type={item.icon} notAvatar selected={selected} />;
     if (item.count > 0) {
       content = (
         <Badge count={item.count} size="small">
@@ -76,23 +76,26 @@ const Navbar: React.FC = () => {
     return (
       <a
         key={item.path}
-        className={`${styles['navbar-item']} ${ selected ? styles['navbar-item_selected'] : ''}`}
+        className={`${styles['navbar-item']} ${
+          selected ? styles['navbar-item_selected'] : ''
+        }`}
         onClick={() => {
           history.push(item.path);
           orgCtrl.currentKey = '';
           orgCtrl.changCallback();
         }}>
         {content}
-        <div className={`${styles.title} ${selected ? styles.title_selected : ''}`}>{item.text}</div>
+        <div className={`${styles.title} ${selected ? styles.title_selected : ''}`}>
+          {item.text}
+        </div>
       </a>
     );
   };
 
   return (
-    <Layout.Sider className={styles.header} width={60}>
-      <div
-        onClick={() => setOnlineVisible(!onlineVisible)}>
-        <EntityIcon entityId={orgCtrl.user.id} size={35} />
+    <Layout.Sider className={styles.header} width={65}>
+      <div onClick={() => setOnlineVisible(!onlineVisible)}>
+        <EntityIcon entityId={orgCtrl.user.id} size={45} />
       </div>
       <Space direction="vertical" wrap align="center" size={6} className={styles.navbar}>
         {actions.map((item) => NavItem(item))}

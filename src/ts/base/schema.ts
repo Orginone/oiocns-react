@@ -189,10 +189,6 @@ export type XDirectory = {
 export type XForm = {
   // 表单布局
   rule: model.Rule[];
-  // 表单查看数据规则
-  searchRule: string;
-  // 操作规则（允许新增、允许选择、允许删除）
-  operateRule: string;
   // 配置参数
   options: XFormProps | undefined;
   // 表单的特性
@@ -202,6 +198,18 @@ export type XForm = {
   // 表单的目录
   directory: XDirectory | undefined;
 } & XStandard;
+
+export type XFormFilter = {
+  filterExp?: string;
+  labels: XTagFilter[];
+};
+export type XTagFilter = {
+  id: string;
+  typeName: string;
+  name: string;
+  code: string;
+  value: string;
+};
 
 // 表单规则
 export type XFormRule1 = {
@@ -229,8 +237,16 @@ export type FormCalcRule = {
 export type XFormProps = {
   // 常规项宽度
   itemWidth: number;
-  // 表单根标签集
-  labels: string[];
+  // 数据范围限制
+  dataRange?: XFormFilter;
+  // 办事数据范围限制
+  workDataRange?: XFormFilter;
+  // 允许新增
+  allowAdd?: boolean;
+  // 允许编辑
+  allowEdit?: boolean;
+  // 允许选择
+  allowSelect?: boolean;
 };
 
 /* 表单规则类型 */

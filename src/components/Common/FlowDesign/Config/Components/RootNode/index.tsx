@@ -10,6 +10,8 @@ import { Form } from '@/ts/core/thing/standard/form';
 import { SelectBox } from 'devextreme-react';
 import { getUuid } from '@/utils/tools';
 import Rule from '../../Rule';
+import ExecutorShowComp from '@/components/Common/ExecutorShowComp';
+import { log } from 'handsontable/helpers';
 interface IProps {
   work: IWork;
   belong: IBelong;
@@ -29,7 +31,7 @@ const RootNode: React.FC<IProps> = (props) => {
   props.current.detailForms = props.current.detailForms || [];
   const [primaryForms, setPrimaryForms] = useState(props.current.primaryForms);
   const [detailForms, setDetailForms] = useState(props.current.detailForms);
-  const [executors, setExecutors] = useState<model.Executor[]>(props.current.executors);
+  const [executors, setExecutors] = useState<model.Executor[]>([]);
   const formViewer = React.useCallback((form: schema.XForm) => {
     command.emitter(
       'executor',
@@ -132,6 +134,8 @@ const RootNode: React.FC<IProps> = (props) => {
                     id: getUuid(),
                     trigger: trigger,
                     funcName: funcName,
+                    changes: [],
+                    hookUrl: '',
                   });
                   setFuncName('');
                   setExecutors([...executors]);
@@ -143,10 +147,9 @@ const RootNode: React.FC<IProps> = (props) => {
           }>
           {executors && executors.length > 0 && (
             <span>
-              <ShareShowComp
-                departData={executors?.map((a) => {
-                  return { id: a.id, name: a.funcName };
-                })}
+              <ExecutorShowComp
+                work={props.work}
+                executors={executors}
                 deleteFuc={(id: string) => {
                   var exes = executors.filter((a) => a.id != id);
                   setExecutors(exes);
@@ -167,7 +170,7 @@ const RootNode: React.FC<IProps> = (props) => {
             multiple
             title={`选择${formModel}表单`}
             rootKey={props.belong.directory.key}
-            accepts={['表单']}
+            accepts={['表单', '报表']}
             excludeIds={(formModel === '子表' ? detailForms : primaryForms).map(
               (i) => i.id,
             )}

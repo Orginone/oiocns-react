@@ -126,7 +126,7 @@ const WorkForm: React.FC<IWorkFormProps> = (props) => {
       return pass;
     };
     const trigger = field == '' ? id : field;
-    const rules = node.formRules.filter(
+    const rules = (node.formRules || []).filter(
       (a) => a.trigger.includes(trigger) || a.trigger.includes(id + '-' + field),
     );
     for (const rule of rules) {

@@ -42,8 +42,8 @@ const TreeSelectItem: React.FC<TreeSelectItemProps> = (props) => {
       newItems.push(filterChildrenItems(id));
     }
     setDataSourceArray(newItems.filter((i) => i.length > 0));
-
-    props.onValueChanged?.apply(this, [{ value: selectValues.at(-1) } as any]);
+    !props.readOnly &&
+      props.onValueChanged?.apply(this, [{ value: selectValues.at(-1) } as any]);
   }, [props, selectValues]);
   return (
     <div

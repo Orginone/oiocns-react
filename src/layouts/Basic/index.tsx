@@ -2,6 +2,7 @@ import { Layout, Spin, Alert } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { renderRoutes } from 'react-router-config';
 import { IRouteConfig } from 'typings/globelType';
+import { ErrorBoundary } from '@ant-design/pro-components';
 import orgCtrl from '@/ts/controller';
 import styles from './index.module.less';
 import Navbar from './navbar';
@@ -46,7 +47,7 @@ const BasicLayout: React.FC<BasicLayoutProps> = (props) => {
               />
             )}
             {/* 内容区域 */}
-            {renderRoutes(route.routes)}
+            <ErrorBoundary>{renderRoutes(route.routes)}</ErrorBoundary>
           </Layout>
         </>
       ) : (
