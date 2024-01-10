@@ -1,5 +1,5 @@
 import { IWork, IWorkTask } from '@/ts/core';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import FullScreenModal from '@/components/Common/fullScreen';
 // import TaskStart from '@/executor/tools/task/start';
 import MultitabTable from '@/executor/tools/task//multitabTable'
@@ -13,6 +13,7 @@ interface IProps {
 
 /** 办事-业务流程--发起 */
 const WorkStartDo: React.FC<IProps> = ({ current, finished, data }) => {
+  const [activeKey, setActiveKey] = useState(1)
   return (
     <FullScreenModal
       open
@@ -25,7 +26,7 @@ const WorkStartDo: React.FC<IProps> = ({ current, finished, data }) => {
       footer={[]}
       onCancel={finished}>
       {/* <TaskStart current={current} finished={finished} data={data} /> */}
-      <MultitabTable />
+      <MultitabTable current={current} finished={finished} data={data} activeKey={activeKey}/>
     </FullScreenModal>
   );
 };
