@@ -15,6 +15,7 @@ import { IEntity, ISysFileInfo, TargetType } from '@/ts/core';
 import JoinApply from './task/joinApply';
 import { model, schema } from '@/ts/base';
 import TemplateView from './page';
+import TabTable from './work/tabTable';
 const audioExt = ['.mp3', '.wav', '.ogg'];
 
 const officeExt = ['.md', '.pdf', '.xls', '.xlsx', '.doc', '.docx', '.ppt', '.pptx'];
@@ -32,6 +33,7 @@ interface IOpenProps {
   finished: () => void;
 }
 const ExecutorOpen: React.FC<IOpenProps> = (props: IOpenProps) => {
+  console.log('props====', props)
   if (props.entity === undefined) return <></>;
   if ('size' in props.entity || 'filedata' in props.entity) {
     const data = 'size' in props.entity ? props.entity : props.entity.filedata;
@@ -70,6 +72,13 @@ const ExecutorOpen: React.FC<IOpenProps> = (props: IOpenProps) => {
       case '页面模板':
         return <TemplateView current={props.entity as any} finished={props.finished} />;
       case '办事':
+        return (
+          <TabTable
+            key={props.entity.key}
+            current={props.entity as any}
+            finished={props.finished}
+          />
+        );
       case '子流程':
         return (
           <WorkStart

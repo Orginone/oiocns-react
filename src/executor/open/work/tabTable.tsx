@@ -1,9 +1,9 @@
 import { IWork, IWorkTask } from '@/ts/core';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import FullScreenModal from '@/components/Common/fullScreen';
-import TaskStart from '@/executor/tools/task/start';
+import MultitabTable from '@/executor/tools/task//multitabTable'
 import { model } from '@/ts/base';
-// 卡片渲染
+
 interface IProps {
   current: IWork | IWorkTask;
   finished?: () => void;
@@ -11,7 +11,8 @@ interface IProps {
 }
 
 /** 办事-业务流程--发起 */
-const WorkStartDo: React.FC<IProps> = ({ current, finished, data }) => {
+const TabTable: React.FC<IProps> = ({ current, finished, data }) => {
+  const [activeKey, setActiveKey] = useState(1)
   return (
     <FullScreenModal
       open
@@ -20,12 +21,12 @@ const WorkStartDo: React.FC<IProps> = ({ current, finished, data }) => {
       width={'80vw'}
       bodyHeight={'80vh'}
       destroyOnClose
-      title={'发起流程'}
+      title={'列表'}
       footer={[]}
       onCancel={finished}>
-      <TaskStart current={current} finished={finished} data={data} />
+      <MultitabTable current={current} finished={finished} data={data} activeKey={activeKey}/>
     </FullScreenModal>
   );
 };
 
-export default WorkStartDo;
+export default TabTable;
