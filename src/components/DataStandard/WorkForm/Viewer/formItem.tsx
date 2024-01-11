@@ -1,4 +1,4 @@
-import { model } from '@/ts/base';
+import { model, schema } from '@/ts/base';
 import { Emitter } from '@/ts/base/common';
 import HtmlEditItem from './customItem/htmlItem';
 import TreeSelectItem from './customItem/treeItem';
@@ -7,6 +7,7 @@ import MemberBoxProps from './customItem/memberBox';
 import DepartmentBox from './customItem/departmentBox';
 import SearchTargetItem from './customItem/searchTarget';
 import CurrentTargetItem from './customItem/currentTarget';
+import DataBox from './customItem/dataBox';
 import { getItemWidth, getWidget } from '../Utils';
 import { DateBox, NumberBox, SelectBox, TextArea, TextBox } from 'devextreme-react';
 import React, { useEffect, useState } from 'react';
@@ -17,6 +18,7 @@ import { useEffectOnce } from 'react-use';
 
 interface IFormItemProps {
   data: any;
+  form: schema.XForm;
   numStr: string;
   notifyEmitter: Emitter;
   field: model.FieldModel;
@@ -102,8 +104,9 @@ const FormItem: React.FC<IFormItemProps> = (props) => {
         />
       );
     case '引用选择框':
-      // TODO: 替换成新组件
-      return <TextBox {...mixOptions} />;
+      return (
+        <DataBox {...mixOptions} attributes={props.form.attributes} field={props.field} />
+      );
     case '多级选择框':
       return <TreeSelectItem {...mixOptions} speciesItems={props.field.lookups} />;
     case '操作人':

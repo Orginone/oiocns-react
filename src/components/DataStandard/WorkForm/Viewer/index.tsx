@@ -221,6 +221,7 @@ const WorkFormViewer: React.FC<{
             <FormItem
               key={field.id}
               data={props.data}
+              form={props.form}
               numStr={colNum}
               rules={[...(props.formData?.rules ?? []), ...(props?.rules ?? [])].filter(
                 (a) => a.destId == field.id,

@@ -128,6 +128,22 @@ const AttributeConfig: React.FC<IAttributeProps> = ({
       case '引用选择框':
         options.push(
           <SimpleItem
+            dataField="options.allowViewDetail"
+            editorType="dxCheckBox"
+            label={{ text: '允许查看数据详情' }}
+            // editorOptions={{
+            //   disabled: true,
+            // }}
+          />,
+          <SimpleItem
+            dataField="options.multiple"
+            editorType="dxCheckBox"
+            label={{ text: '是否支持多选' }}
+            // editorOptions={{
+            //   disabled: true,
+            // }}
+          />,
+          <SimpleItem
             dataField="options.nameAttribute"
             editorType="dxSelectBox"
             label={{ text: '展示文字的特性' }}
@@ -138,11 +154,6 @@ const AttributeConfig: React.FC<IAttributeProps> = ({
                 return i.property?.valueType == '描述型';
               }),
             }}
-          />,
-          <SimpleItem
-            dataField="options.allowViewDetial"
-            editorType="dxCheckBox"
-            label={{ text: '允许查看数据详情' }}
           />,
         );
         break;

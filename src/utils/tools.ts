@@ -362,6 +362,18 @@ const loadGatewayNodes = (
   return memberNodes;
 };
 
+const jsonParse = (val: any, defaultVal = null) => {
+  if (!val || typeof val !== 'string') {
+    // console.warn('JSON.parse need string param');
+    return defaultVal;
+  }
+  try {
+    return JSON.parse(val);
+  } catch (e) {
+    return defaultVal;
+  }
+};
+
 export {
   cleanMenus,
   dateFormat,
@@ -374,6 +386,7 @@ export {
   getNodeByNodeId,
   getUuid,
   handleFormatDate,
+  jsonParse,
   loadGatewayNodes,
   parseHtmlToText,
   pySegSort,
