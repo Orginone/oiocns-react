@@ -184,7 +184,7 @@ const ContentFrame: React.FC<IProps> = ({
                   </div>
                 );
               }
-              if (PRlistData.Status == 0) {
+              if (PRlistData.Status == 0 || PRlistData.Status == -1) {
                 return (
                   <div
                     className="flex"

@@ -310,7 +310,9 @@ export class WorkTask extends FileInfo<schema.XEntity> implements IWorkTask {
           data.Pulls.push(data.Pull);
           data.Pulls.sort((a: any, b: any) => a.IssueId - b.IssueId);
           Repository.pullRequestList.forEach((val, i) => {
-            const matchingObject = data.Pulls.find((obj: any) => obj.IssueId === val.IssueId);
+            const matchingObject = data.Pulls.find(
+              (obj: any) => obj.IssueId === val.IssueId,
+            );
             if (matchingObject) {
               Repository.pullRequestList[i] = {
                 ...Repository.pullRequestList[i],
