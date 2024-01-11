@@ -13,6 +13,7 @@ interface IProps {
 /** 办事-业务流程--发起 */
 const TabTable: React.FC<IProps> = ({ current, finished, data }) => {
   const [activeKey, setActiveKey] = useState(1)
+  const title = current.name;
   return (
     <FullScreenModal
       open
@@ -21,7 +22,7 @@ const TabTable: React.FC<IProps> = ({ current, finished, data }) => {
       width={'80vw'}
       bodyHeight={'80vh'}
       destroyOnClose
-      title={'列表'}
+      title={title}
       footer={[]}
       onCancel={finished}>
       <MultitabTable current={current} finished={finished} data={data} activeKey={activeKey}/>
