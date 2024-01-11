@@ -1241,15 +1241,23 @@ h3 {
     }
   }
   &-send-box {
+    border-radius: 8px;
+    border: 1px solid @color-surface;
+    background: #FFF;
+    padding: 9px 16px;
+    margin: 8px;
+  }
+  &-send-box-main {
     display: flex;
     flex-wrap: nowrap;
     gap: 16px;
-    padding: 12px 16px 2px 16px;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: flex-end;
+    justify-content: center;
+    align-items: center;
     svg {
       cursor: pointer;
+    }
+    textarea {
+      padding: 0;
     }
   }
   .chart_mulit_select {
@@ -1311,16 +1319,21 @@ h3 {
 
 .cite-text {
   display: flex;
+  width: 100%;
+  background: var(--color-surface-, #F7F8FA);
   &-content {
-    background-color: #e5e5e5;
+    display: flex;
+    justify-items: center;
+    align-items: center;
     word-wrap: break-word;
     word-break: break-all;
     width: fit-content;
-    overflow: auto;
     border-radius: 5px;
     padding: 5px;
-    font-size: 12px;
-    color: #8b8b8b;
+    font-size: 14px;
+    color: #6F7686;
+    overflow: hidden;
+    text-overflow: ellipsis;
     .con_content_txt {
       img {
         width: 100%;
@@ -1380,6 +1393,9 @@ h3 {
           color: #f4f4ee;
         }
       }
+    }
+    .con_content_cite_txt {
+      display: flex;
     }
   }
 
