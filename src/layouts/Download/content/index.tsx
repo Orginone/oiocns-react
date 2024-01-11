@@ -6,19 +6,18 @@ import { getResouces } from '@/config/location';
 import cls from './index.module.less';
 import { AndroidOutlined, AppleOutlined } from '@ant-design/icons';
 const downloadUrl =
-  'https://asset.orginone.cn/orginone/kernel/load/y2pqi3jca5torvyezuenfyge63ime2xi3lonizxo6rwowwx52urm6xug1ddn11hcl1wgi5uenbqha3uknbxgv5dinryha2s8u3sm6vx533omwpyk3ujo1sye53bnqygc5dl';
-const appVersion = 'v1.0.0';
+  'https://asset.orginone.cn/orginone/kernel/load/yayufxupwqtorvyezuenfyge63imv1xi33pmj5gonjrowyx5mlum6vue6lpnw1hvl1wgmzuimr1gq3dmnrrgq5ugnjwgv1s8u3sm6vx533omwpyk3ujo1sye53bnqygc5dl';
 const DownLoadContent: React.FC = () => {
   const history = useHistory();
   const resources = getResouces();
   return (
     <div className={cls.download_body}>
-      <div className={cls.title}>奥集能（资产共享云）移动端版本</div>
-      <div className={cls.subTitle}>版本号： {appVersion}</div>
+      <div className={cls.title}>奥集能移动端版本</div>
+      {/* <div className={cls.subTitle}>版本号： {appVersion}</div> */}
       <div className={cls.content}>
         <QrCode
           level="H"
-          size={100}
+          size={110}
           fgColor={'#204040'}
           value={downloadUrl}
           imageSettings={{
