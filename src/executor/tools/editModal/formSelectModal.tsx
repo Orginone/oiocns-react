@@ -10,10 +10,17 @@ interface IFormSelectProps {
   form: schema.XForm;
   fields: model.FieldModel[];
   belong: IBelong;
+  multiple?: Boolean;
   onSave: (values: schema.XThing[]) => void;
 }
 
-const FormSelectModal = ({ form, fields, belong, onSave }: IFormSelectProps) => {
+const FormSelectModal = ({
+  form,
+  fields,
+  belong,
+  multiple = true,
+  onSave,
+}: IFormSelectProps) => {
   const editData: { rows: schema.XThing[] } = { rows: [] };
   const modal = Modal.confirm({
     icon: <EntityIcon entityId={form.id} showName />,
@@ -26,7 +33,7 @@ const FormSelectModal = ({ form, fields, belong, onSave }: IFormSelectProps) => 
         fields={fields}
         height={'70vh'}
         selection={{
-          mode: 'multiple',
+          mode: multiple ? 'multiple' : 'single', // multiple / single
           allowSelectAll: true,
           selectAllMode: 'page',
           showCheckBoxesMode: 'always',
