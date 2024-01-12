@@ -135,7 +135,7 @@ export class WorkProvider implements IWorkProvider {
             _exists_: true,
           },
         };
-      case '发起的':
+      case '已发起':
         return {
           createUser: this.userId,
           nodeId: {

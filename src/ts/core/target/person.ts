@@ -1,10 +1,9 @@
 import { command, kernel, model, parseAvatar, schema } from '@/ts/base';
 import { IBelong, Belong } from './base/belong';
 import { ICohort, Cohort } from './outTeam/cohort';
-import { createCompany } from './team';
-import { PageAll, companyTypes } from '../public/consts';
+import { PageAll } from '../public/consts';
 import { OperateType, TargetType } from '../public/enums';
-import { ICompany } from './team/company';
+import { Company, ICompany } from './team/company';
 import { ITarget } from './base/target';
 import { ITeam } from './base/team';
 import { IStorage, Storage } from './outTeam/storage';
@@ -108,7 +107,7 @@ export class Person extends Belong implements IPerson {
     if (!this._cohortLoaded || reload) {
       const res = await kernel.queryJoinedTargetById({
         id: this.id,
-        typeNames: [TargetType.Cohort, TargetType.Storage, ...companyTypes],
+        typeNames: [TargetType.Cohort, TargetType.Storage, TargetType.Company],
         page: PageAll,
       });
       if (res.success) {
@@ -125,7 +124,7 @@ export class Person extends Belong implements IPerson {
               this.storages.push(new Storage(i, [], this));
               break;
             default:
-              this.companys.push(createCompany(i, this));
+              this.companys.push(new Company(i, this));
           }
         });
       }
@@ -134,15 +133,13 @@ export class Person extends Belong implements IPerson {
   }
 
   async createCompany(data: model.TargetModel): Promise<ICompany | undefined> {
-    if (!companyTypes.includes(data.typeName as TargetType)) {
-      data.typeName = TargetType.Company;
-    }
     data.public = false;
+    data.typeName = TargetType.Company;
     data.teamCode = data.teamCode || data.code;
     data.teamName = data.teamName || data.name;
     const res = await this.create(data, true);
     if (res && res.id) {
-      const company = createCompany(res, this);
+      const company = new Company(res, this);
       this.companys.push(company);
       await company.pullMembers([this.metadata]);
       await company.deepLoad();
@@ -189,7 +186,7 @@ export class Person extends Belong implements IPerson {
           TargetType.Person,
           TargetType.Cohort,
           TargetType.Storage,
-          ...companyTypes,
+          TargetType.Company,
         ].includes(i.typeName as TargetType) && i.id != this.id,
     );
     for (const member of members) {
@@ -373,14 +370,12 @@ export class Person extends Belong implements IPerson {
           return `您已成功加入到${target.name}.`;
         }
         break;
-      default:
-        if (companyTypes.includes(target.typeName as TargetType)) {
-          if (this.companys.every((i) => i.id != target.id)) {
-            const company = createCompany(target, this);
-            await company.deepLoad();
-            this.companys.push(company);
-            return `您已成功加入到${target.name}.`;
-          }
+      case TargetType.Company:
+        if (this.companys.every((i) => i.id != target.id)) {
+          const company = new Company(target, this);
+          await company.deepLoad();
+          this.companys.push(company);
+          return `您已成功加入到${target.name}.`;
         }
         break;
     }

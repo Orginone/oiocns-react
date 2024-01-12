@@ -1,6 +1,6 @@
 import { Modal } from 'antd';
 import React from 'react';
-import { kernel, model, schema } from '@/ts/base';
+import { model, schema } from '@/ts/base';
 import { IBelong } from '@/ts/core';
 import GenerateThingTable from '../generate/thingTable';
 import CustomStore from 'devextreme/data/custom_store';
@@ -22,6 +22,9 @@ const FormSelectModal = ({
   onSave,
 }: IFormSelectProps) => {
   const editData: { rows: schema.XThing[] } = { rows: [] };
+  const dataRange = form.options?.workDataRange;
+  const filterExp: any[] = JSON.parse(dataRange?.filterExp ?? '[]');
+  const labels = dataRange?.labels ?? [];
   const modal = Modal.confirm({
     icon: <EntityIcon entityId={form.id} showName />,
     width: '80vw',
@@ -46,18 +49,18 @@ const FormSelectModal = ({
         onSelectionChanged={(e) => {
           editData.rows = e.selectedRowsData;
         }}
-        filterValue={JSON.parse(form.options?.workDataRange?.filterExp ?? '[]')}
+        filterValue={filterExp}
         dataSource={
           new CustomStore({
             key: 'id',
             async load(loadOptions) {
-              var tags = form.options?.workDataRange?.labels;
-              loadOptions.userData = [];
-              if (tags && tags?.length > 0) {
-                loadOptions.userData.push(tags?.map((a) => a.value));
-              }
+              loadOptions.userData = labels.map((a) => a.value);
               let request: any = { ...loadOptions };
-              return await kernel.loadThing(belong.id, [belong.id], request);
+              const res = await belong.resource.thingColl.loadResult(request);
+              if (res.success && !Array.isArray(res.data)) {
+                res.data = [];
+              }
+              return res;
             },
           })
         }

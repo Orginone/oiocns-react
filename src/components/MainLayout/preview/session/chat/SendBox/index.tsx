@@ -8,7 +8,7 @@ import Emoji from '../components/emoji';
 import { AiOutlineClose } from 'react-icons/ai';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import { Theme } from '@/config/theme';
-const TextArea = Input.TextArea
+const TextArea = Input.TextArea;
 /**
  * @description: 输入区域
  * @return {*}
@@ -59,7 +59,7 @@ const GroupInputBox = (props: IProps) => {
         <div className="cite-text-content">
           <AiOutlineClose
             size={20}
-            style={{marginRight: '6px'}}
+            style={{ marginRight: '6px' }}
             onClick={() => props.closeCite()}
             className="cite-text-close-icon"
           />
@@ -76,7 +76,7 @@ const GroupInputBox = (props: IProps) => {
 
   return (
     <div className="chat-send-box">
-      <div style={{width: '100%'}}>
+      <div style={{ width: '100%' }}>
         {props.citeText && citeShowText(props.citeText)}
       </div>
       <div className="chat-send-box-main">
@@ -115,8 +115,8 @@ const GroupInputBox = (props: IProps) => {
           )}
           <TextArea
             value={message}
-            autoSize={{minRows: 1}}
-            allowClear={true} 
+            autoSize={{ minRows: 1 }}
+            allowClear={true}
             placeholder={`Enter键发送, Alt+Enter键换行。`}
             bordered={false}
             onChange={(e) => {
@@ -129,45 +129,44 @@ const GroupInputBox = (props: IProps) => {
                   setMessage(value);
                 }
               } else {
-                setMessage(value)
+                setMessage(value);
               }
             }}
-            onPressEnter={ (e) => {
+            onPressEnter={(e) => {
               if (e.altKey === true && e.key === 'Enter') {
                 setMessage((pre) => pre + '\n');
               } else {
                 sendMessage();
               }
-            }}            
+            }}
           />
-          
         </div>
-          <Popover
-            content={
-              <Emoji
-                onSelect={(emoji: string) => {
-                  setOpenEmoji(false);
-                  setMessage((message) => message + emoji);
-                }}
-              />
-            }
-            open={openEmoji}
-            trigger={['click', 'contextMenu']}
-            onOpenChange={setOpenEmoji}>
-            <im.ImSmile
-              size={26}
-              color={Theme.FocusColor}
-              onClick={() => setOpenEmoji(!openEmoji)}
+        <Popover
+          content={
+            <Emoji
+              onSelect={(emoji: string) => {
+                setOpenEmoji(false);
+                setMessage((message) => message + emoji);
+              }}
             />
-          </Popover>
-          <im.ImMic title="语言" size={26} color={Theme.FocusColor} />
-          <im.ImFolder
-            title="文件"
+          }
+          open={openEmoji}
+          trigger={['click', 'contextMenu']}
+          onOpenChange={setOpenEmoji}>
+          <im.ImSmile
             size={26}
             color={Theme.FocusColor}
-            onClick={() => setOpen(true)}
+            onClick={() => setOpenEmoji(!openEmoji)}
           />
-          <im.ImVideoCamera title="视频" size={26} color={Theme.FocusColor} />
+        </Popover>
+        <im.ImMic title="语言" size={26} color={Theme.FocusColor} />
+        <im.ImFolder
+          title="文件"
+          size={26}
+          color={Theme.FocusColor}
+          onClick={() => setOpen(true)}
+        />
+        <im.ImVideoCamera title="视频" size={26} color={Theme.FocusColor} />
         <im.ImRocket
           size={26}
           title="发送"

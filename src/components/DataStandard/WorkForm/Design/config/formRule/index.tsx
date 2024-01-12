@@ -2,22 +2,23 @@ import { IForm } from '@/ts/core';
 import { Accordion } from 'devextreme-react';
 import React, { useState } from 'react';
 import Rule from './rule';
-import { Field } from 'devextreme/ui/filter_builder';
 import useAsyncLoad from '@/hooks/useAsyncLoad';
 import FormFilter from './filter';
+import { FieldInfo } from '@/ts/base/model';
 
 interface IAttributeProps {
   current: IForm;
 }
 
 const FormRuleConfig: React.FC<IAttributeProps> = ({ current }) => {
-  const [fields, setFields] = useState<(Field & { fieldType: string })[]>([]);
+  const [fields, setFields] = useState<FieldInfo[]>([]);
   const [loaded] = useAsyncLoad(async () => {
     const resultFields = await current.loadFields();
     const ss = resultFields.map((a) => {
       switch (a.valueType) {
         case '数值型':
           return {
+            id: a.id,
             name: a.code,
             dataField: a.code,
             caption: a.name,
@@ -26,6 +27,7 @@ const FormRuleConfig: React.FC<IAttributeProps> = ({ current }) => {
           };
         case '日期型':
           return {
+            id: a.id,
             name: a.code,
             dataField: a.code,
             caption: a.name,
@@ -34,6 +36,7 @@ const FormRuleConfig: React.FC<IAttributeProps> = ({ current }) => {
           };
         case '时间型':
           return {
+            id: a.id,
             name: a.code,
             dataField: a.code,
             caption: a.name,
@@ -42,6 +45,7 @@ const FormRuleConfig: React.FC<IAttributeProps> = ({ current }) => {
           };
         case '选择型':
           return {
+            id: a.id,
             name: a.code,
             dataField: a.code,
             caption: a.name,
@@ -56,11 +60,13 @@ const FormRuleConfig: React.FC<IAttributeProps> = ({ current }) => {
           };
         case '分类型':
           return {
+            id: a.id,
             name: a.code,
             dataField: a.code,
             caption: a.name,
             fieldType: '分类型',
             dataType: 'string',
+            filterOperations: ['sequal', 'snotequal'],
             lookup: {
               displayExpr: 'text',
               valueExpr: 'value',
@@ -70,6 +76,7 @@ const FormRuleConfig: React.FC<IAttributeProps> = ({ current }) => {
           };
         default:
           return {
+            id: a.id,
             name: a.code,
             dataField: a.code,
             caption: a.name,
@@ -81,13 +88,13 @@ const FormRuleConfig: React.FC<IAttributeProps> = ({ current }) => {
     ss.unshift();
     setFields([
       {
+        id: 'name',
         name: 'name',
         dataField: 'name',
-        caption: '表单名称',
+        caption: '名称',
         dataType: 'string',
-        fieldType: '描述型',
       },
-      ...(ss as (Field & { fieldType: string })[]),
+      ...(ss as FieldInfo[]),
     ]);
   }, [current]);
 

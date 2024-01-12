@@ -17,8 +17,6 @@ export enum TargetType {
   /** 自归属用户 */
   'Person' = '人员',
   'Company' = '单位',
-  'University' = '大学',
-  'Hospital' = '医院',
   'Storage' = '存储资源'
 }
 
