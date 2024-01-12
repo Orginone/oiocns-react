@@ -52,6 +52,32 @@ const MultitabTable: React.FC<IProps> = ({
             visible: true,
           },
           {
+            name: 'add',
+            location: 'after',
+            widget: 'dxButton',
+            options: {
+              text: '编辑',
+              onClick: () => {
+                setTodoModel(!todoModel);
+                command.emitter('executor', 'open', current);
+              },
+            },
+            visible: true,
+          },
+          {
+            name: 'delete',
+            location: 'after',
+            widget: 'dxButton',
+            options: {
+              text: '删除',
+              onClick: () => {
+                setTodoModel(!todoModel);
+                command.emitter('executor', 'open', current);
+              },
+            },
+            visible: true,
+          },
+          {
             name: 'columnChooserButton',
             location: 'after',
           },
@@ -113,9 +139,9 @@ const MultitabTable: React.FC<IProps> = ({
     );
   }
   if (apply) {
+    const node = getNodeByNodeId(apply.instanceData.node.id, apply.instanceData.node);
     const loadItems = () => {
       const items = [];
-      const node = getNodeByNodeId(apply.instanceData.node.id, apply.instanceData.node);
       for (let i = 0; i < tabTableData.length; i++) {
         if (node) {
           const form = node.primaryForms[0];
@@ -125,7 +151,6 @@ const MultitabTable: React.FC<IProps> = ({
           key: tabTableData[i].key,
           forceRender: true,
           label: tabTableData[i].label,
-          children: <ListTable {...current} node={node} tableConfig={tabTableData[i]} />,
         });
       }
       return items;
@@ -136,6 +161,11 @@ const MultitabTable: React.FC<IProps> = ({
           items={loadItems()}
           activeKey={activeTabKey}
           onChange={(key: any) => setActiveTabKey(key)}
+        />
+        <ListTable
+          {...current}
+          node={node}
+          tableConfig={tabTableData[activeTabKey - 1]}
         />
         <FullScreenModal
           open={todoModel}
