@@ -1,7 +1,8 @@
 import { IWork, IWorkTask } from '@/ts/core';
 import React, { useEffect, useState } from 'react';
 import FullScreenModal from '@/components/Common/fullScreen';
-import MultitabTable from '@/executor/tools/task//multitabTable'
+import MultitabTable from '@/executor/tools/task/multitabTable';
+
 import { model } from '@/ts/base';
 
 interface IProps {
@@ -12,7 +13,7 @@ interface IProps {
 
 /** 办事-业务流程--发起 */
 const TabTable: React.FC<IProps> = ({ current, finished, data }) => {
-  const [activeKey, setActiveKey] = useState(1)
+  const [activeKey, setActiveKey] = useState(1);
   return (
     <FullScreenModal
       open
@@ -24,7 +25,12 @@ const TabTable: React.FC<IProps> = ({ current, finished, data }) => {
       title={'列表'}
       footer={[]}
       onCancel={finished}>
-      <MultitabTable current={current} finished={finished} data={data} activeKey={activeKey}/>
+      <MultitabTable
+        current={current}
+        finished={finished}
+        data={data}
+        activeKey={activeKey}
+      />
     </FullScreenModal>
   );
 };
