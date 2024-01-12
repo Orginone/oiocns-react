@@ -4,7 +4,7 @@ import { IGroup, Group } from '../outTeam/group';
 import { IDepartment, Department } from '../innerTeam/department';
 import { IStation, Station } from '../innerTeam/station';
 import { IPerson } from '../person';
-import { PageAll } from '../../public/consts';
+import { PageAll, departmentTypes } from '../../public/consts';
 import { TargetType } from '../../public/enums';
 import { ITarget } from '../base/target';
 import { ITeam } from '../base/team';
@@ -22,8 +22,6 @@ export interface ICompany extends IBelong {
   stations: IStation[];
   /** 设立的部门 */
   departments: IDepartment[];
-  /** 支持的内设机构类型 */
-  departmentTypes: string[];
   /** 退出单位 */
   exit(): Promise<boolean>;
   /** 加载组织集群 */
@@ -42,18 +40,10 @@ export interface ICompany extends IBelong {
 export class Company extends Belong implements ICompany {
   constructor(_metadata: schema.XTarget, _user: IPerson) {
     super(_metadata, [_metadata.id], _user);
-    this.departmentTypes = [
-      TargetType.Department,
-      TargetType.Office,
-      TargetType.Working,
-      TargetType.Research,
-      TargetType.Laboratory,
-    ];
   }
   groups: IGroup[] = [];
   stations: IStation[] = [];
   departments: IDepartment[] = [];
-  departmentTypes: string[] = [];
   private _groupLoaded: boolean = false;
   private _departmentLoaded: boolean = false;
   async loadGroups(reload: boolean = false): Promise<IGroup[]> {
@@ -84,7 +74,7 @@ export class Company extends Belong implements ICompany {
     if (!this._departmentLoaded || reload) {
       const res = await kernel.querySubTargetById({
         id: this.id,
-        subTypeNames: [...this.departmentTypes, TargetType.Cohort, TargetType.Station],
+        subTypeNames: [...departmentTypes, TargetType.Cohort, TargetType.Station],
         page: PageAll,
       });
       if (res.success) {
@@ -120,7 +110,7 @@ export class Company extends Belong implements ICompany {
     }
   }
   async createDepartment(data: model.TargetModel): Promise<IDepartment | undefined> {
-    if (!this.departmentTypes.includes(data.typeName as TargetType)) {
+    if (!departmentTypes.includes(data.typeName as TargetType)) {
       data.typeName = TargetType.Department;
     }
     data.public = false;
@@ -329,7 +319,7 @@ export class Company extends Belong implements ICompany {
         }
         break;
       default:
-        if (this.departmentTypes.includes(target.typeName as TargetType)) {
+        if (departmentTypes.includes(target.typeName as TargetType)) {
           if (this.departments.every((i) => i.id != target.id)) {
             const department = new Department([this.key], target, this);
             await department.deepLoad();

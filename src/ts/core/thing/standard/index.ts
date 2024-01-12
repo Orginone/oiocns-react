@@ -72,7 +72,7 @@ export class StandardFiles {
   async loadForms(reload: boolean = false): Promise<IForm[]> {
     if (this.formLoaded === false || reload) {
       this.formLoaded = true;
-      const data = await this.resource.formColl.load({
+      const data = await this.resource.formColl.loadSpace({
         options: { match: { directoryId: this.id } },
       });
       this.forms = data.map((i) => new Form(i, this.directory));
@@ -82,7 +82,7 @@ export class StandardFiles {
   async loadPropertys(reload: boolean = false): Promise<IProperty[]> {
     if (this.propertysLoaded === false || reload) {
       this.propertysLoaded = true;
-      const data = await this.resource.propertyColl.load({
+      const data = await this.resource.propertyColl.loadSpace({
         options: { match: { directoryId: this.id } },
       });
       this.propertys = data.map((i) => new Property(i, this.directory));
@@ -92,7 +92,7 @@ export class StandardFiles {
   async loadSpecieses(reload: boolean = false): Promise<ISpecies[]> {
     if (this.speciesesLoaded === false || reload) {
       this.speciesesLoaded = true;
-      const data = await this.resource.speciesColl.load({
+      const data = await this.resource.speciesColl.loadSpace({
         options: { match: { directoryId: this.id } },
       });
       this.specieses = data.map((i) => new Species(i, this.directory));
@@ -102,7 +102,7 @@ export class StandardFiles {
   async loadTransfers(reload: boolean = false): Promise<ITransfer[]> {
     if (this.transfersLoaded === false || reload) {
       this.transfersLoaded = true;
-      const data = await this.resource.transferColl.load({
+      const data = await this.resource.transferColl.loadSpace({
         options: { match: { directoryId: this.id } },
       });
       this.transfers = data.map((i) => new Transfer(i, this.directory));
@@ -227,29 +227,33 @@ export class StandardFiles {
     await resource.speciesColl.replaceMany(this.specieses.map((a) => a.metadata));
     await resource.propertyColl.replaceMany(this.propertys.map((a) => a.metadata));
   }
-  async copyStandradFile(to: DataResource, directoryId: string): Promise<void> {
+  async copyStandradFile(
+    to: DataResource,
+    directoryId: string,
+    isSameBelong: boolean,
+  ): Promise<void> {
     await this.loadStandardFiles();
-    await to.formColl.insertMany(
+    await to.formColl.replaceMany(
       this.forms.map((a) => {
-        return { ...a.metadata, id: 'snowId()' };
+        return { ...a.metadata, id: isSameBelong ? 'snowId()' : a.id, directoryId };
       }),
     );
-    await to.transferColl.insertMany(
+    await to.transferColl.replaceMany(
       this.transfers.map((a) => {
-        return { ...a.metadata, id: 'snowId()', directoryId };
+        return { ...a.metadata, id: isSameBelong ? 'snowId()' : a.id, directoryId };
       }),
     );
-    await to.speciesColl.insertMany(
+    await to.speciesColl.replaceMany(
       this.specieses.map((a) => {
-        return { ...a.metadata, id: 'snowId()', directoryId };
+        return { ...a.metadata, id: isSameBelong ? 'snowId()' : a.id, directoryId };
       }),
     );
-    await to.propertyColl.insertMany(
+    await to.propertyColl.replaceMany(
       this.propertys.map((a) => {
-        return { ...a.metadata, id: 'snowId()', directoryId };
+        return { ...a.metadata, id: isSameBelong ? 'snowId()' : a.id, directoryId };
       }),
     );
-    if (to.targetMetadata.belongId != this.resource.targetMetadata.belongId) {
+    if (!isSameBelong) {
       const items = await this.resource.speciesItemColl.loadSpace({
         options: {
           match: {
@@ -261,6 +265,7 @@ export class StandardFiles {
       });
       await to.speciesItemColl.replaceMany(items);
     }
+    // TODO 同归属拷贝
   }
   async operateStandradFile(to: DataResource): Promise<void> {
     await this.loadStandardFiles();

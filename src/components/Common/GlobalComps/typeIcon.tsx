@@ -4,6 +4,7 @@ import * as im from 'react-icons/im';
 import * as fa from 'react-icons/fa';
 import { BsHouseAddFill } from 'react-icons/bs';
 import { Theme } from '@/config/theme';
+import { Avatar } from 'antd';
 
 interface TypeIconInfo {
   avatar?: boolean;
@@ -14,7 +15,7 @@ interface TypeIconInfo {
 /** 类型图标 */
 const TypeIcon = ({ avatar, iconType, size }: TypeIconInfo) => {
   const iconSize = size || 14;
-  const config: any = { size: iconSize - 4, color: Theme.FocusColor };
+  const config: any = { size: iconSize, color: Theme.FocusColor };
   const loadFileIcon = () => {
     switch (iconType) {
       case 'application/pdf':
@@ -72,8 +73,6 @@ const TypeIcon = ({ avatar, iconType, size }: TypeIconInfo) => {
       case '加用户':
         return <im.ImUserPlus {...config} />;
       case TargetType.Company:
-      case TargetType.University:
-      case TargetType.Hospital:
         return <im.ImOffice {...config} />;
       case TargetType.Storage:
         return <im.ImDrive {...config} />;
@@ -160,7 +159,11 @@ const TypeIcon = ({ avatar, iconType, size }: TypeIconInfo) => {
     }
   };
   if (avatar) {
-    return loadIcon();
+    return (
+      <Avatar size={iconSize} style={{ background: '#eceff2' }}>
+        {loadIcon()}
+      </Avatar>
+    );
   }
   return <div style={{ paddingRight: 10 }}>{loadIcon()}</div>;
 };

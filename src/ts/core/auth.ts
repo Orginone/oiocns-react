@@ -19,7 +19,7 @@ export class AuthProvider {
   public async dynamicCode(
     params: model.DynamicCodeModel,
   ): Promise<model.ResultType<model.DynamicCodeModel>> {
-    return await kernel.auth<model.DynamicCodeModel>('dynamicCode', params);
+    return await kernel.auth<model.DynamicCodeModel>('DynamicCode', params);
   }
   /**
    * 登录

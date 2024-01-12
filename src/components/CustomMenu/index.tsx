@@ -45,6 +45,9 @@ const CustomMenu = (props: CustomMenuType) => {
         exsit = exsit || result.length > 0;
         newItem.children = result;
       }
+      if (item.item.groupTags.includes('已删除')) {
+        exsit = false;
+      }
       if (exsit) {
         result.push(newItem);
       }

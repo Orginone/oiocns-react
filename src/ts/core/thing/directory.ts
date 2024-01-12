@@ -127,9 +127,6 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
   get resource(): DataResource {
     return this.target.resource;
   }
-  override allowCopy(_destination: IDirectory): boolean {
-    return true;
-  }
   content(store: boolean = false): IFile[] {
     const cnt: IFile[] = [...this.children];
     if (this.target.session.isMyChat || this.target.hasRelationAuth()) {
@@ -153,19 +150,28 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
   }
   override async copy(destination: IDirectory): Promise<boolean> {
     if (this.allowCopy(destination)) {
-      const uuid = formatDate(new Date(), 'yyyyMMddHHmmss');
-      const name = this.metadata.name.split('-')[0] + `-副本${uuid}`;
-      const code = this.metadata.code.split('-')[0] + uuid;
+      var isSameBelong = destination.belongId == this.belongId;
+      var id = this.id;
+      var name = this.metadata.name;
+      var code = this.metadata.code;
+      if (isSameBelong) {
+        id = 'snowId()';
+        const uuid = formatDate(new Date(), 'yyyyMMddHHmmss');
+        name = this.metadata.name + `-副本${uuid}`;
+        code = this.metadata.code + uuid;
+      }
       const data = await destination.resource.directoryColl.replace({
         ...this.metadata,
         directoryId: destination.id,
         name: name,
         code: code,
-        id: 'snowId()',
+        id: id,
       });
       if (data) {
         const directory = new Directory(data, destination.target, destination);
-        await this.recursionCopy(this, directory);
+        if (!this.isShortcut) {
+          await this.recursionCopy(this, directory, isSameBelong);
+        }
         await destination.notify('reload', data);
       }
     }
@@ -178,7 +184,9 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
         directoryId: destination.id,
       });
       if (data) {
-        await this.recursionMove(this, destination.resource);
+        if (!this.isShortcut) {
+          await this.recursionMove(this, destination.resource);
+        }
         await this.notify('remove', this._metadata);
         await destination.notify('reload', data);
       }
@@ -317,9 +325,11 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
       if (this.target.user.copyFiles.size > 0) {
         operates.push(fileOperates.Parse);
       }
-      operates.push(directoryOperates.Shortcut);
     }
     if (this.parent) {
+      if (this.target.hasRelationAuth()) {
+        operates.push(directoryOperates.Shortcut);
+      }
       operates.push(...super.operates());
     } else {
       operates.push(entityOperates.Open);
@@ -335,19 +345,27 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
     await this.standard.loadTemplates();
   }
   /** 文件夹递归拷贝 */
-  private async recursionCopy(directory: IDirectory, destDirectory: IDirectory) {
+  private async recursionCopy(
+    directory: IDirectory,
+    destDirectory: IDirectory,
+    isSameBelong: boolean,
+  ) {
     for (const child of directory.children) {
-      const dirData = await destDirectory.resource.directoryColl.insert({
+      const dirData = await destDirectory.resource.directoryColl.replace({
         ...child.metadata,
-        id: 'snowId()',
+        id: isSameBelong ? 'snowId()' : child.id,
         directoryId: destDirectory.id,
       });
       if (dirData) {
         const newDirectory = new Directory(dirData, destDirectory.target, destDirectory);
-        await this.recursionCopy(child, newDirectory);
+        await this.recursionCopy(child, newDirectory, isSameBelong);
       }
     }
-    await directory.standard.copyStandradFile(destDirectory.resource, destDirectory.id);
+    await directory.standard.copyStandradFile(
+      destDirectory.resource,
+      destDirectory.id,
+      isSameBelong,
+    );
     for (const app of await directory.standard.applications) {
       await app.copy(destDirectory);
     }
@@ -357,11 +375,11 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
     for (const child of directory.children) {
       const dirData = await to.directoryColl.replace(child.metadata);
       if (dirData) {
-        await directory.standard.moveStandradFile(to);
         await this.recursionMove(child, to);
       }
     }
-    for (const app of await directory.standard.applications) {
+    await directory.standard.moveStandradFile(to);
+    for (const app of directory.standard.applications) {
       await app.move(directory);
     }
   }

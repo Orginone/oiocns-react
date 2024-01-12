@@ -15,29 +15,10 @@ interface IFormDesignProps {
 const WorkFormDesign: React.FC<IFormDesignProps> = ({ current }) => {
   const [key] = useCtrlUpdate(current);
   const [selectIndex, setSelectIndex] = React.useState<number>(-1);
-  const [mainWidth, setMainWidth] = React.useState<number>(400);
+  const [mainWidth, setMainWidth] = React.useState<number>(550);
   const [notifyEmitter] = useState(new Emitter());
   return (
     <Layout key={key}>
-      <Resizable
-        handles={'right'}
-        width={mainWidth}
-        maxWidth={800}
-        minWidth={400}
-        onResize={(e) => setMainWidth(e.width)}>
-        <Layout.Sider width={'100%'} style={{ height: '100%' }}>
-          {React.useMemo(
-            () => (
-              <Config
-                current={current}
-                index={selectIndex}
-                notifyEmitter={notifyEmitter}
-              />
-            ),
-            [current, selectIndex],
-          )}
-        </Layout.Sider>
-      </Resizable>
       <Layout.Content>
         {React.useMemo(
           () => (
@@ -50,6 +31,25 @@ const WorkFormDesign: React.FC<IFormDesignProps> = ({ current }) => {
           [current],
         )}
       </Layout.Content>
+      <Resizable
+        handles={'right'}
+        width={mainWidth}
+        maxWidth={800}
+        minWidth={400}
+        onResize={(e) => setMainWidth(e.width)}>
+        <Layout.Sider width={'100%'} style={{ height: '100%', padding: 20 }}>
+          {React.useMemo(
+            () => (
+              <Config
+                current={current}
+                index={selectIndex}
+                notifyEmitter={notifyEmitter}
+              />
+            ),
+            [current, selectIndex],
+          )}
+        </Layout.Sider>
+      </Resizable>
     </Layout>
   );
 };

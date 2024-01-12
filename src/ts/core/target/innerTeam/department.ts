@@ -2,7 +2,7 @@ import { kernel, model, schema } from '@/ts/base';
 import { ITarget, Target } from '../base/target';
 import { ICompany } from '../team/company';
 import { TargetType } from '../../public/enums';
-import { PageAll } from '../../public/consts';
+import { PageAll, departmentTypes } from '../../public/consts';
 import { ITeam } from '../base/team';
 import { targetOperates } from '../../public';
 import { ISession } from '../../chat/session';
@@ -36,24 +36,9 @@ export class Department extends Target implements IDepartment {
     this.keys = [..._keys, this.key];
     switch (_metadata.typeName as TargetType) {
       case TargetType.College:
-        this.childrenTypes = [
-          TargetType.Department,
-          TargetType.Major,
-          TargetType.Office,
-          TargetType.Working,
-          TargetType.Research,
-          TargetType.Laboratory,
-        ];
-        break;
       case TargetType.Section:
       case TargetType.Department:
-        this.childrenTypes = [
-          TargetType.Department,
-          TargetType.Office,
-          TargetType.Working,
-          TargetType.Research,
-          TargetType.Laboratory,
-        ];
+        this.childrenTypes = [...departmentTypes];
         break;
       case TargetType.Major:
       case TargetType.Research:

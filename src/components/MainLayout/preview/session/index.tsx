@@ -17,7 +17,7 @@ const SessionBody = ({
   relation?: boolean;
 }) => {
   const [actions, setActions] = useState<{ key: string; label: string }[]>([]);
-  const [bodyType, setBodyType] = useState('activity');
+  const [bodyType, setBodyType] = useState('');
 
   useEffect(() => {
     const newActions = [
@@ -26,6 +26,24 @@ const SessionBody = ({
         label: '动态',
       },
     ];
+    if (session.id === session.target.id) {
+      newActions.push({
+        key: 'store',
+        label: '数据',
+      });
+      if (
+        session.target.hasRelationAuth() ||
+        session.target.typeName !== TargetType.Storage
+      ) {
+        newActions.push({
+          key: 'relation',
+          label: '关系',
+        });
+        if (relation) {
+          setBodyType('relation');
+        }
+      }
+    }
     if (session.isMyChat && session.target.typeName !== TargetType.Group) {
       if (
         session.target.typeName !== TargetType.Storage ||
@@ -40,30 +58,13 @@ const SessionBody = ({
         }
       }
     }
-    if (
-      session.target.typeName !== TargetType.Storage ||
-      (session.target.hasRelationAuth() && session.id === session.target.id)
-    ) {
-      newActions.push(
-        {
-          key: 'store',
-          label: '数据',
-        },
-        {
-          key: 'relation',
-          label: '关系',
-        },
-      );
-      if (relation) {
-        setBodyType('relation');
-      }
-    }
     if (session.target.hasRelationAuth()) {
       newActions.push({
         key: 'setting',
         label: '设置',
       });
     }
+    setBodyType((pre) => (pre === '' ? 'activity' : pre));
     setActions(newActions);
   }, [session]);
 

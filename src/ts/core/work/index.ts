@@ -144,6 +144,28 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
       if (node) {
         delete node.children;
         delete node.branches;
+        if (this.directory.target.id != destination.target.id) {
+          node.children = {
+            id: '0',
+            num: 0,
+            type: '子流程',
+            destType: '身份',
+            destName: `[${this.target.name}]${this.name}`,
+            defineId: '0',
+            belongId: '0',
+            code: 'JGNODE' + getUuid(),
+            name: '监管办事',
+            destId: this.metadata.id,
+            resource: '{}',
+            children: undefined,
+            branches: undefined,
+            primaryForms: [],
+            detailForms: [],
+            formRules: [],
+            forms: [],
+            executors: [],
+          };
+        }
       }
       const uuid = getUuid();
       const res = await app.createWork({

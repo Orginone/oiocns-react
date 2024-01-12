@@ -106,6 +106,7 @@ const ProcessTree: React.FC<IProps> = ({ target, resource, onSelectedNode, isEdi
       name: getNodeName(type),
       code: getNodeCode(),
       parentCode: parentNode.code,
+      executors: [],
     };
     let isBrance = true;
     switch (type as AddNodeType) {

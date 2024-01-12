@@ -12,6 +12,7 @@ import OpenFileDialog from '@/components/OpenFileDialog';
 import { SelectBox } from 'devextreme-react';
 import { getUuid } from '@/utils/tools';
 import Rule from '../../Rule';
+import ExecutorShowComp from '@/components/Common/ExecutorShowComp';
 interface IProps {
   work: IWork;
   current: NodeModel;
@@ -32,13 +33,16 @@ const ApprovalNode: React.FC<IProps> = (props) => {
   const [formModel, setFormModel] = useState<string>('');
   const [primaryForms, setPrimaryForms] = useState<schema.XForm[]>();
   const [radioValue, setRadioValue] = useState(1);
-  const [destType, setDestType] = useState('1');
+  const [destType, setDestType] = useState(
+    props.current.destName != '发起人' ? '1' : '2',
+  );
   const [currentData, setCurrentData] = useState<{ id: string; name: string }>();
   useEffect(() => {
     props.current.primaryForms = props.current.primaryForms || [];
+    props.current.executors = props.current.executors || [];
+    setExecutors(props.current.executors);
     setPrimaryForms(props.current.primaryForms);
     setRadioValue(props.current.num == 0 ? 1 : 2);
-    setDestType(props.current.destName != '发起人' ? '1' : '2');
     setCurrentData({
       id: props.current.destId,
       name: props.current.destName,
@@ -279,9 +283,12 @@ const ApprovalNode: React.FC<IProps> = (props) => {
                     id: getUuid(),
                     trigger: trigger,
                     funcName: funcName,
+                    changes: [],
+                    hookUrl: '',
                   });
                   setExecutors([...executors]);
                   setFuncName('');
+                  props.current.executors = executors;
                 }}>
                 添加
               </Button>
@@ -289,10 +296,9 @@ const ApprovalNode: React.FC<IProps> = (props) => {
           }>
           {executors && executors.length > 0 && (
             <span>
-              <ShareShowComp
-                departData={executors?.map((a) => {
-                  return { id: a.id, name: a.funcName };
-                })}
+              <ExecutorShowComp
+                work={props.work}
+                executors={executors}
                 deleteFuc={(id: string) => {
                   setExecutors(executors.filter((a) => a.id != id));
                 }}

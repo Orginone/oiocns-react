@@ -11,6 +11,7 @@ interface TreeSelectItemProps extends ISelectBoxOptions {
 
 const TreeSelectItem: React.FC<TreeSelectItemProps> = (props) => {
   const [selectValues, setSelectValues] = useState<string[]>([]);
+  const [loadValue, setLoadValue] = useState<boolean>(false);
   const [dataSourceArray, setDataSourceArray] = useState<model.FiledLookup[][]>([]);
   const filterChildrenItems = (id?: string) => {
     return props.speciesItems.filter((i) => id === i.parentId);
@@ -31,19 +32,22 @@ const TreeSelectItem: React.FC<TreeSelectItemProps> = (props) => {
       if (item) {
         initValues.push(item.value);
         loopFullValues(initValues, item.parentId);
-        setSelectValues(initValues);
       }
     }
+    setSelectValues(initValues);
+    setLoadValue(true);
   }, [props.defaultValue]);
   useEffect(() => {
-    const newItems = [filterChildrenItems()];
-    for (const item of selectValues) {
-      const id = props.speciesItems.find((i) => i.value === item)?.id ?? item;
-      newItems.push(filterChildrenItems(id));
+    if (loadValue) {
+      const newItems = [filterChildrenItems()];
+      for (const item of selectValues) {
+        const id = props.speciesItems.find((i) => i.value === item)?.id ?? item;
+        newItems.push(filterChildrenItems(id));
+      }
+      setDataSourceArray(newItems.filter((i) => i.length > 0));
+      !props.readOnly &&
+        props.onValueChanged?.apply(this, [{ value: selectValues.at(-1) } as any]);
     }
-    setDataSourceArray(newItems.filter((i) => i.length > 0));
-
-    props.onValueChanged?.apply(this, [{ value: selectValues.at(-1) } as any]);
   }, [props, selectValues]);
   return (
     <div

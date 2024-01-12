@@ -39,10 +39,11 @@ const WorkForm: React.FC<IWorkFormProps> = (props) => {
         }
       }
     }
+    const sourceJson = JSON.stringify(source);
     return {
       rules: rule,
-      before: [...source],
-      after: [...source],
+      before: JSON.parse(sourceJson),
+      after: JSON.parse(sourceJson),
       nodeId: node.id,
       formName: form.name,
       creator: props.belong.userId,
@@ -56,7 +57,12 @@ const WorkForm: React.FC<IWorkFormProps> = (props) => {
     _value: any,
     _formType: string,
   ) => {
-    props.data.data[id] = [data];
+    if (props.data.data[id]) {
+      const temp = props.data.data[id]?.filter((a) => a.nodeId != data.nodeId) ?? {};
+      props.data.data[id] = [...temp, data];
+    } else {
+      props.data.data[id] = [data];
+    }
     const refreshFields: model.MappingData[] = [];
     const vaildRule = (rules: any[]): boolean => {
       var pass: boolean = false;
@@ -126,7 +132,7 @@ const WorkForm: React.FC<IWorkFormProps> = (props) => {
       return pass;
     };
     const trigger = field == '' ? id : field;
-    const rules = node.formRules.filter(
+    const rules = (node.formRules || []).filter(
       (a) => a.trigger.includes(trigger) || a.trigger.includes(id + '-' + field),
     );
     for (const rule of rules) {

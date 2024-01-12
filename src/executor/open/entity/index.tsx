@@ -28,6 +28,7 @@ const EntityPreview: React.FC<Iprops> = ({ entity, finished }) => {
           <QrCode
             level="H"
             size={150}
+            title={`${location.origin}/${entity.id}`}
             fgColor={Theme.FocusColor}
             value={`${location.origin}/${entity.id}`}
             imageSettings={{

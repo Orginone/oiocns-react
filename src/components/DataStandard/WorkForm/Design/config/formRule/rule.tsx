@@ -3,14 +3,14 @@ import { IForm } from '@/ts/core';
 import CardOrTableComp from '@/components/CardOrTableComp';
 import { ProColumns } from '@ant-design/pro-components';
 import { Card, Typography } from 'antd';
-import { Field } from 'devextreme/ui/filter_builder';
 import CalcRuleModal from './modal/calc';
 import ShowRuleModal from './modal/show';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import { model } from '@/ts/base';
+import { FieldInfo } from '@/ts/base/model';
 interface IProps {
   form: IForm;
-  fields: Field[];
+  fields: FieldInfo[];
 }
 
 const FormRule: React.FC<IProps> = (props) => {
@@ -81,7 +81,7 @@ const FormRule: React.FC<IProps> = (props) => {
     <>
       <Card
         type="inner"
-        title="渲染规则配置"
+        title="规则配置"
         extra={
           <>
             <a

@@ -158,7 +158,7 @@ const GroupContent = (props: Iprops) => {
                 )}
               </div>
               <div>
-                <EntityInfo entityId={item.metadata.fromId} size={30} />
+                <EntityInfo entityId={item.metadata.fromId} size={40} />
               </div>
             </div>
           </Popover>

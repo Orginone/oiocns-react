@@ -1,12 +1,6 @@
 import { OperateModel } from '@/ts/base/model';
 import { kernel, schema } from '../../../base';
-import {
-  OperateType,
-  TargetType,
-  companyTypes,
-  entityOperates,
-  targetOperates,
-} from '../../public';
+import { OperateType, TargetType, entityOperates, targetOperates } from '../../public';
 import { IBelong } from '../base/belong';
 import { ITarget, Target } from '../base/target';
 import { ISession } from '../../chat/session';
@@ -22,7 +16,7 @@ export interface IStorage extends ITarget {
 export class Storage extends Target implements IStorage {
   constructor(_metadata: schema.XTarget, _relations: string[], _space: IBelong) {
     super([_space.key], _metadata, [..._relations, _metadata.id], _space, _space.user, [
-      ...companyTypes,
+      TargetType.Company,
       TargetType.Person,
     ]);
   }
@@ -86,8 +80,9 @@ export class Storage extends Target implements IStorage {
   async deepLoad(reload: boolean = false): Promise<void> {
     if (this.hasRelationAuth()) {
       await this.loadIdentitys(reload);
+      this.loadMembers(reload);
     }
-    this.loadMembers(reload);
+    this.directory.loadDirectoryResource(reload);
   }
   override async pullMembers(
     members: schema.XTarget[],

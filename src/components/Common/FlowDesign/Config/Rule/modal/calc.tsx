@@ -36,11 +36,12 @@ const CalcRuleModal: React.FC<IProps> = (props) => {
 
   useEffect(() => {
     const tgs: model.MappingData[] = [];
-    props.primarys.forEach((a) => {
+    props.primarys.forEach((a, i) => {
       tgs.push(
         ...a.attributes.map((s) => {
           return {
             id: s.id,
+            key: i.toString() + s.id,
             formName: a.name,
             formId: a.id,
             typeName: '对象',
@@ -51,12 +52,13 @@ const CalcRuleModal: React.FC<IProps> = (props) => {
         }),
       );
     });
-    props.details.forEach((a) => {
+    props.details.forEach((a, i) => {
       tgs.push(
         ...a.attributes.map((s) => {
           return {
             id: s.id,
             formName: a.name,
+            key: i.toString() + s.id,
             formId: a.id,
             typeName: '集合',
             trigger: a.id,
@@ -113,14 +115,14 @@ const CalcRuleModal: React.FC<IProps> = (props) => {
         }}
       />
       <SelectBox
+        valueExpr="key"
         label="目标对象*"
         labelMode="floating"
-        value={target?.id}
+        value={target?.key}
         showClearButton
         displayExpr={(item) => {
           return item ? `[${item.formName}]${item.name}` : '';
         }}
-        valueExpr="id"
         dataSource={triggers.filter((a) => a.typeName == '对象')}
         onSelectionChanged={(e) => {
           setTarget(e.selectedItem);
@@ -140,12 +142,12 @@ const CalcRuleModal: React.FC<IProps> = (props) => {
             width={'45%'}
             label="变量对象*"
             labelMode="floating"
-            value={select?.id}
+            value={select?.key}
             showClearButton
             displayExpr={(item) => {
               return item ? `[${item.formName}]${item.name}` : '';
             }}
-            valueExpr="id"
+            valueExpr="key"
             dataSource={triggers.filter((a) => !mappingData.find((s) => s.id == a.id))}
             style={{ display: 'inline-block', margin: 2 }}
             onSelectionChanged={(e) => {

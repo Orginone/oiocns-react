@@ -6,13 +6,14 @@ import TreeSelectItem from './customItem/treeItem';
 import SelectFilesItem from './customItem/fileItem';
 import MemberBoxProps from './customItem/memberBox';
 import DepartmentBox from './customItem/departmentBox';
+import DataBox from './customItem/dataBox';
 import CurrentTargetItem from './customItem/currentTarget';
 import SearchTargetItem from './customItem/searchTarget';
 import { getWidget } from '../../Utils';
 import { DateBox, NumberBox, SelectBox, TextArea, TextBox } from 'devextreme-react';
 import React, { useEffect, useState } from 'react';
 
-const FormItem: React.FC<{
+export const FormItem: React.FC<{
   current: IForm;
   notityEmitter: Emitter;
   attr: schema.XAttribute;
@@ -78,8 +79,7 @@ const FormItem: React.FC<{
         />
       );
     case '引用选择框':
-      // TODO: 替换成新组件
-      return <TextBox {...mixOptions} />;
+      return <DataBox {...mixOptions} attributes={current.attributes} field={attr} />;
     case '多级选择框':
       return <TreeSelectItem {...mixOptions} speciesItems={items} />;
     case '操作人':

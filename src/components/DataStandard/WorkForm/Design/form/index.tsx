@@ -35,30 +35,6 @@ const FormRender: React.FC<{
           )}
         />
         <Item
-          location="before"
-          locateInMenu="never"
-          widget="dxButton"
-          options={{
-            icon: 'preferences',
-            text: '表单参数',
-            type: 'default',
-            stylingMode: 'outlined',
-            onClick: () => onItemSelected(-1),
-          }}
-        />
-        <Item
-          location="before"
-          locateInMenu="never"
-          widget="dxButton"
-          options={{
-            icon: 'preferences',
-            text: '规则参数',
-            type: 'default',
-            stylingMode: 'outlined',
-            onClick: () => onItemSelected(-2),
-          }}
-        />
-        <Item
           location="after"
           locateInMenu="never"
           widget="dxButton"

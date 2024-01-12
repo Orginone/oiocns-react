@@ -1,15 +1,14 @@
 import * as im from 'react-icons/im';
-import { Divider, Popover, Space } from 'antd';
+import { Popover, Input } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { IMessage, ISession, ISysFileInfo, MessageType } from '@/ts/core';
 import OpenFileDialog from '@/components/OpenFileDialog';
 import { parseCiteMsg } from '../components/parseMsg';
 import Emoji from '../components/emoji';
-import { AiOutlineCloseCircle } from 'react-icons/ai';
-import { TextArea } from 'devextreme-react';
+import { AiOutlineClose } from 'react-icons/ai';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
 import { Theme } from '@/config/theme';
-
+const TextArea = Input.TextArea;
 /**
  * @description: 输入区域
  * @return {*}
@@ -57,12 +56,15 @@ const GroupInputBox = (props: IProps) => {
   const citeShowText = (val: IMessage) => {
     return (
       <div className="cite-text">
-        <div className="cite-text-content">{parseCiteMsg(val)}</div>
-        <AiOutlineCloseCircle
-          size={20}
-          onClick={() => props.closeCite()}
-          className="cite-text-close-icon"
-        />
+        <div className="cite-text-content">
+          <AiOutlineClose
+            size={20}
+            style={{ marginRight: '6px' }}
+            onClick={() => props.closeCite()}
+            className="cite-text-close-icon"
+          />
+          {parseCiteMsg(val)}
+        </div>
       </div>
     );
   };
@@ -74,7 +76,71 @@ const GroupInputBox = (props: IProps) => {
 
   return (
     <div className="chat-send-box">
-      <Space split={<Divider type="vertical" style={{ height: 20 }} />} size={0}>
+      <div style={{ width: '100%' }}>
+        {props.citeText && citeShowText(props.citeText)}
+      </div>
+      <div className="chat-send-box-main">
+        <div style={{ width: '100%' }}>
+          {citeShow && (
+            <Popover
+              align={{
+                points: ['t', 'l'],
+              }}
+              content={
+                <div className="chat-at-list">
+                  {props.chat.members
+                    .filter((i) => i.id != props.chat.userId)
+                    .map((i) => {
+                      return (
+                        <div
+                          key={i.id}
+                          className="chat-at-list-item"
+                          onClick={() => {
+                            props.chat.inputContent.mentions.push({
+                              id: i.id,
+                              text: `@${i.name} `,
+                            });
+                            setMessage((message) => message + i.name + ' ');
+                          }}>
+                          <EntityIcon disInfo entity={i} size={35} />
+                          <span>{i.name}</span>
+                        </div>
+                      );
+                    })}
+                </div>
+              }
+              open={citeShow}
+              trigger={['click', 'contextMenu']}
+              onOpenChange={setCiteShow}></Popover>
+          )}
+          <TextArea
+            value={message}
+            autoSize={{ minRows: 1 }}
+            allowClear={true}
+            placeholder={`Enter键发送, Alt+Enter键换行。`}
+            bordered={false}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (!value.endsWith('\n')) {
+                if (value.endsWith('@')) {
+                  setMessage(value);
+                  setCiteShow(true);
+                } else {
+                  setMessage(value);
+                }
+              } else {
+                setMessage(value);
+              }
+            }}
+            onPressEnter={(e) => {
+              if (e.altKey === true && e.key === 'Enter') {
+                setMessage((pre) => pre + '\n');
+              } else {
+                sendMessage();
+              }
+            }}
+          />
+        </div>
         <Popover
           content={
             <Emoji
@@ -88,89 +154,26 @@ const GroupInputBox = (props: IProps) => {
           trigger={['click', 'contextMenu']}
           onOpenChange={setOpenEmoji}>
           <im.ImSmile
-            size={20}
+            size={26}
             color={Theme.FocusColor}
             onClick={() => setOpenEmoji(!openEmoji)}
           />
         </Popover>
-        <im.ImMic title="语言" size={20} color={Theme.FocusColor} />
+        <im.ImMic title="语言" size={26} color={Theme.FocusColor} />
         <im.ImFolder
           title="文件"
-          size={20}
+          size={26}
           color={Theme.FocusColor}
           onClick={() => setOpen(true)}
         />
-        <im.ImVideoCamera title="视频" size={20} color={Theme.FocusColor} />
-      </Space>
-      <div style={{ width: '100%' }}>
-        {citeShow && (
-          <Popover
-            align={{
-              points: ['t', 'l'],
-            }}
-            content={
-              <div className="chat-at-list">
-                {props.chat.members
-                  .filter((i) => i.id != props.chat.userId)
-                  .map((i) => {
-                    return (
-                      <div
-                        key={i.id}
-                        className="chat-at-list-item"
-                        onClick={() => {
-                          props.chat.inputContent.mentions.push({
-                            id: i.id,
-                            text: `@${i.name} `,
-                          });
-                          setMessage((message) => message + i.name + ' ');
-                        }}>
-                        <EntityIcon disInfo entity={i} size={35} />
-                        <span>{i.name}</span>
-                      </div>
-                    );
-                  })}
-              </div>
-            }
-            open={citeShow}
-            trigger={['click', 'contextMenu']}
-            onOpenChange={setCiteShow}></Popover>
-        )}
-        <TextArea
-          value={message}
-          width={'100%'}
-          maxHeight={200}
-          showClearButton
-          autoResizeEnabled
-          stylingMode="underlined"
-          valueChangeEvent="input"
-          style={{ fontSize: 16 }}
-          placeholder={`Enter键发送, Alt+Enter键换行。`}
-          onValueChange={(value) => {
-            if (!value.endsWith('\n')) {
-              if (value.endsWith('@')) {
-                setMessage(value);
-                setCiteShow(true);
-              } else {
-                setMessage(value);
-              }
-            }
-          }}
-          onEnterKey={(e) => {
-            if (e.event?.altKey === true) {
-              setMessage((pre) => pre + '\n');
-            } else if (message.length > 0) {
-              sendMessage();
-            }
-          }}
+        <im.ImVideoCamera title="视频" size={26} color={Theme.FocusColor} />
+        <im.ImRocket
+          size={26}
+          title="发送"
+          color={message.length > 0 ? Theme.FocusColor : '#909090'}
+          onClick={() => sendMessage()}
         />
-        {props.citeText && citeShowText(props.citeText)}
       </div>
-      <im.ImRocket
-        size={26}
-        title="发送"
-        color={message.length > 0 ? Theme.FocusColor : '#909090'}
-        onClick={() => sendMessage()}
-      />
       {open && (
         <OpenFileDialog
           rootKey={'disk'}

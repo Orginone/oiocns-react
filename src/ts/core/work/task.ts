@@ -8,7 +8,9 @@ import { IWorkApply } from './apply';
 import { FileInfo, IFile } from '../thing/fileinfo';
 import { Acquire } from './executor/acquire';
 import { IExecutor } from './executor';
-export type TaskTypeName = '待办' | '已办' | '抄送' | '发起的';
+import { FieldsChange } from './executor/change';
+import { Webhook } from './executor/webhook';
+export type TaskTypeName = '待办' | '已办' | '抄送' | '已发起';
 
 export interface IWorkTask extends IFile {
   /** 内容 */
@@ -27,8 +29,6 @@ export interface IWorkTask extends IFile {
   targets: schema.XTarget[];
   /** 是否为历史对象 */
   isHistory: boolean;
-  /** 执行器 */
-  executors: IExecutor[];
   /** 是否为指定的任务类型 */
   isTaskType(type: TaskTypeName): boolean;
   /** 是否满足条件 */
@@ -73,7 +73,6 @@ export class WorkTask extends FileInfo<schema.XEntity> implements IWorkTask {
   get isHistory(): boolean {
     return this.history;
   }
-  executors: IExecutor[] = [];
   get groupTags(): string[] {
     return [this.belong.name, this.taskdata.taskType, this.taskdata.approveType];
   }
@@ -133,7 +132,7 @@ export class WorkTask extends FileInfo<schema.XEntity> implements IWorkTask {
     switch (type) {
       case '已办':
         return this.taskdata.status >= TaskStatus.ApprovalStart;
-      case '发起的':
+      case '已发起':
         return this.taskdata.createUser == this.userId;
       case '待办':
         return this.taskdata.status < TaskStatus.ApprovalStart;
@@ -174,6 +173,12 @@ export class WorkTask extends FileInfo<schema.XEntity> implements IWorkTask {
           executors.push(new Acquire(item, this));
           break;
         case '归属权变更':
+          break;
+        case '字段变更':
+          executors.push(new FieldsChange(item, this));
+          break;
+        case 'Webhook':
+          executors.push(new Webhook(item, this));
           break;
       }
     }
@@ -222,9 +227,15 @@ export class WorkTask extends FileInfo<schema.XEntity> implements IWorkTask {
       }
       if (this.taskdata.taskType === '加用户') {
         return this.approvalJoinTask(status, comment);
-      } else if (await this.loadInstance(true)) {
+      } else {
         fromData?.forEach((data, k) => {
           if (this.instanceData) {
+            if (this.instanceData.data[k]) {
+              this.instanceData.data[k].push(
+                ...this.instanceData.data[k].filter((s) => s.nodeId != data.nodeId),
+                data,
+              );
+            }
             this.instanceData.data[k] = [data];
           }
         });

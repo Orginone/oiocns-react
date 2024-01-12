@@ -6,6 +6,8 @@ import { Tabs } from 'antd';
 import { EditModal } from '../editModal';
 import GenerateThingTable from '../generate/thingTable';
 import { getUuid } from '@/utils/tools';
+import { XThing } from '@/ts/base/schema';
+import { AiFillEdit, AiFillRest } from 'react-icons/ai';
 interface IProps {
   allowEdit: boolean;
   belong: IBelong;
@@ -22,10 +24,9 @@ const DetailTable: React.FC<IProps> = (props) => {
   if (!props.data.fields[form.id]) return <></>;
   const fields = props.data.fields[form.id];
   const operateRule = {
-    allowAdd: true,
-    allowEdit: true,
-    allowSelect: true,
-    ...JSON.parse(form.operateRule ?? '{}'),
+    allowAdd: form.options?.allowAdd ?? true,
+    allowEdit: form.options?.allowEdit ?? true,
+    allowSelect: form.options?.allowSelect ?? true,
   };
   const [key, setKey] = useState<string>(form.id);
   const [formData, setFormData] = useState(props.getFormData(form));
@@ -42,6 +43,57 @@ const DetailTable: React.FC<IProps> = (props) => {
       setKey(getUuid());
     }
   }, [props.changedFields]);
+  const loadMenus = () => {
+    if (props.allowEdit) {
+      var items = [
+        {
+          key: 'remove',
+          label: '移除',
+          icon: <AiFillRest fontSize={22} />,
+        },
+      ];
+      if (operateRule.allowEdit) {
+        items.unshift({
+          key: 'update',
+          label: '更新',
+          icon: <AiFillEdit fontSize={22} />,
+        });
+      }
+      return {
+        items: items,
+        onMenuClick(key: string, data: XThing) {
+          switch (key) {
+            case 'update':
+              EditModal.showFormEdit({
+                form: form,
+                fields: fields,
+                belong: props.belong,
+                create: false,
+                initialValues: data,
+                onSave: (values) => {
+                  formData.after = formData.after.map((item) => {
+                    if (selectKeys.includes(item.id)) {
+                      Object.keys(values).forEach((k) => {
+                        item[k] = values[k];
+                      });
+                    }
+                    return item;
+                  });
+                  setFormData({ ...formData });
+                },
+              });
+              break;
+            case 'remove':
+              formData.before = formData.before.filter((i) => i.id != data.id);
+              formData.after = formData.after.filter((i) => i.id != data.id);
+              setSelectKeys([]);
+              setFormData({ ...formData });
+              break;
+          }
+        },
+      };
+    }
+  };
   return (
     <GenerateThingTable
       key={key}
@@ -169,6 +221,7 @@ const DetailTable: React.FC<IProps> = (props) => {
           },
         ],
       }}
+      dataMenus={loadMenus()}
       dataSource={formData.after}
       beforeSource={formData.before}
     />
@@ -190,6 +243,7 @@ const DetailForms: React.FC<IProps> = (props) => {
       }
       items.push({
         key: form.id,
+        forceRender: true,
         label: form.name,
         children: <DetailTable {...props} forms={[form]} />,
       });
