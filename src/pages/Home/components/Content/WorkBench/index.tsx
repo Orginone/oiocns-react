@@ -92,6 +92,7 @@ const WorkBench: React.FC = () => {
       const id = orgCtrl.work.notity.subscribe(() => {
         setTodoCount(orgCtrl.work.todos.length);
         orgCtrl.work.loadTaskCount('发起的').then((v) => {
+          console.log('v');
           setApplyCount(v);
         });
         orgCtrl.work.loadTaskCount('抄送').then((v) => {

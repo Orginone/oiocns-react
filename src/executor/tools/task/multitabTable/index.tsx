@@ -140,6 +140,28 @@ const MultitabTable: React.FC<IProps> = ({
   }
   if (apply) {
     const node = getNodeByNodeId(apply.instanceData.node.id, apply.instanceData.node);
+    if (node) {
+      const form = node.primaryForms[0];
+      const res = new CustomStore({
+        key: 'id',
+        async load(loadOptions: any) {
+          let loadOption: any = loadOptions;
+          loadOption.belongId = form.belongId;
+          let userId = 'F' + form.id;
+          loadOption.userData = [];
+          loadOption.userData.push(userId);
+          const result = await kernel.loadThing(
+            form.belongId,
+            [form.belongId],
+            loadOptions,
+          );
+          return result;
+        },
+      });
+      res.load().then((res: any) => {
+        tabTableData[2].tableData = res;
+      });
+    }
     const loadItems = () => {
       const items = [];
       for (let i = 0; i < tabTableData.length; i++) {
@@ -151,6 +173,7 @@ const MultitabTable: React.FC<IProps> = ({
           key: tabTableData[i].key,
           forceRender: true,
           label: tabTableData[i].label,
+          children: <ListTable {...current} node={node} tableConfig={tabTableData[i]} />,
         });
       }
       return items;
@@ -161,11 +184,6 @@ const MultitabTable: React.FC<IProps> = ({
           items={loadItems()}
           activeKey={activeTabKey}
           onChange={(key: any) => setActiveTabKey(key)}
-        />
-        <ListTable
-          {...current}
-          node={node}
-          tableConfig={tabTableData[activeTabKey - 1]}
         />
         <FullScreenModal
           open={todoModel}

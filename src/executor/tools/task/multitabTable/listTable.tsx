@@ -1,7 +1,5 @@
 import React from 'react';
 import GenerateThingTable from '@/executor/tools/generate/thingTable';
-import CustomStore from 'devextreme/data/custom_store';
-import { kernel } from '@/ts/base';
 
 interface IConfig {
   label: string;
@@ -18,31 +16,17 @@ interface IProps {
 
 const ListTable: React.FC<IProps> = (props) => {
   const { tableConfig } = props;
-  const { tableHeader = [] } = tableConfig;
+  const { tableHeader = [], tableData = [] } = tableConfig;
   let form = props.node.primaryForms[0];
   return (
     <div>
       <GenerateThingTable
         fields={tableHeader}
         height={'70vh'}
-        dataSource={
-          new CustomStore({
-            key: 'id',
-            async load(loadOptions: any) {
-              let loadOption: any = loadOptions;
-              loadOption.belongId = form.belongId;
-              let userId = 'F' + form.id;
-              loadOption.userData = [];
-              loadOption.userData.push(userId);
-              const result = await kernel.loadThing(
-                form.belongId,
-                [form.belongId],
-                loadOptions,
-              );
-              return result;
-            },
-          })
-        }
+        dataSource={tableData}
+        onSelectionChanged={(res) => {
+          console.log('选中的值', res);
+        }}
         remoteOperations={true}
         toolbar={props.tableConfig.buttonList}
       />
