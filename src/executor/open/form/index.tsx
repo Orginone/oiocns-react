@@ -8,7 +8,6 @@ import useMenuUpdate from '@/hooks/useMenuUpdate';
 import WorkForm from '@/components/DataStandard/WorkForm';
 import GenerateThingTable from '@/executor/tools/generate/thingTable';
 import CustomStore from 'devextreme/data/custom_store';
-import { kernel } from '@/ts/base';
 import { ImCopy, ImShuffle, ImTicket } from 'react-icons/im';
 import { Controller } from '@/ts/controller';
 import { Spin, message } from 'antd';
@@ -26,6 +25,8 @@ const FormView: React.FC<IProps> = ({ form, finished }) => {
   const [select, setSelcet] = useState();
   const [loaded] = useAsyncLoad(() => form.loadContent());
   const dataRange = form.metadata.options?.dataRange;
+  const filterExp: any[] = JSON.parse(dataRange?.filterExp ?? '[]');
+  const labels = dataRange?.labels ?? [];
   const FormBrower: React.FC = () => {
     const [, rootMenu, selectMenu, setSelectMenu] = useMenuUpdate(
       () => config.loadSpeciesItemMenu(form),
@@ -49,25 +50,19 @@ const FormView: React.FC<IProps> = ({ form, finished }) => {
           }}
           pager={{ visible: false }}
           onRowDblClick={(e: any) => setSelcet(e.data)}
-          filterValue={JSON.parse(dataRange?.filterExp ?? '[]')}
+          filterValue={filterExp}
           dataSource={
             new CustomStore({
               key: 'id',
               async load(loadOptions) {
-                const labels = dataRange?.labels ?? [];
-                if (dataRange?.filterExp || labels.length > 0) {
+                if ((filterExp && filterExp.length > 0) || labels.length > 0) {
                   loadOptions.userData = labels.map((a) => a.value);
                   if (selectMenu.item?.value) {
                     loadOptions.userData.push(selectMenu.item.value);
                   } else if (selectMenu.item?.code) {
                     loadOptions.userData.push(selectMenu.item.code);
                   }
-                  const result = await kernel.loadThing(
-                    form.belongId,
-                    [form.belongId],
-                    loadOptions,
-                  );
-                  return result;
+                  return await form.loadThing(loadOptions);
                 }
                 return { data: [], success: true, totalCount: 0, groupCount: 0 };
               },

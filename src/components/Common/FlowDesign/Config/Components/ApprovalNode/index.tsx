@@ -33,7 +33,9 @@ const ApprovalNode: React.FC<IProps> = (props) => {
   const [formModel, setFormModel] = useState<string>('');
   const [primaryForms, setPrimaryForms] = useState<schema.XForm[]>();
   const [radioValue, setRadioValue] = useState(1);
-  const [destType, setDestType] = useState('1');
+  const [destType, setDestType] = useState(
+    props.current.destName != '发起人' ? '1' : '2',
+  );
   const [currentData, setCurrentData] = useState<{ id: string; name: string }>();
   useEffect(() => {
     props.current.primaryForms = props.current.primaryForms || [];
@@ -41,7 +43,6 @@ const ApprovalNode: React.FC<IProps> = (props) => {
     setExecutors(props.current.executors);
     setPrimaryForms(props.current.primaryForms);
     setRadioValue(props.current.num == 0 ? 1 : 2);
-    setDestType(props.current.destName != '发起人' ? '1' : '2');
     setCurrentData({
       id: props.current.destId,
       name: props.current.destName,

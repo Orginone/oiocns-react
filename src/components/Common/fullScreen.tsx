@@ -34,16 +34,16 @@ const FullScreenModal: React.FC<IFullModalProps> = (props) => {
       width: '100vw',
       style: {
         ...props.style,
-        height: 'calc(100vh - 2px)',
-        maxWidth: 'calc(100vw - 2px)',
+        height: 'calc(100vh - 5px)',
+        maxWidth: 'calc(100vw - 5px)',
         top: 1,
       },
       bodyStyle: {
         ...props.bodyStyle,
         padding: 6,
         margin: 2,
-        height: 'calc(100vh - 80px)',
-        maxHeight: 'calc(100vh - 80px)',
+        height: 'calc(100vh - 85px)',
+        maxHeight: 'calc(100vh - 85px)',
       },
     };
   };

@@ -1,6 +1,6 @@
 import { kernel, model, schema } from '@/ts/base';
 import { ITarget, Target } from '../base/target';
-import { PageAll, companyTypes } from '../../public/consts';
+import { PageAll } from '../../public/consts';
 import { TargetType } from '../../public/enums';
 import { ICompany } from '../team/company';
 import { ITeam } from '../base/team';
@@ -29,14 +29,9 @@ export class Group extends Target implements IGroup {
     _company: ICompany,
     _parent?: IGroup,
   ) {
-    super(
-      _keys,
-      _metadata,
-      [..._relations, _metadata.id],
-      _company,
-      _company.user,
-      companyTypes,
-    );
+    super(_keys, _metadata, [..._relations, _metadata.id], _company, _company.user, [
+      TargetType.Company,
+    ]);
     this.space = _company;
     this.parent = _parent;
     this.keys = [..._keys, this.key];

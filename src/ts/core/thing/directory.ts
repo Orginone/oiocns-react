@@ -127,9 +127,6 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
   get resource(): DataResource {
     return this.target.resource;
   }
-  override allowCopy(_destination: IDirectory): boolean {
-    return true;
-  }
   content(store: boolean = false): IFile[] {
     const cnt: IFile[] = [...this.children];
     if (this.target.session.isMyChat || this.target.hasRelationAuth()) {
@@ -172,7 +169,9 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
       });
       if (data) {
         const directory = new Directory(data, destination.target, destination);
-        await this.recursionCopy(this, directory, isSameBelong);
+        if (!this.isShortcut) {
+          await this.recursionCopy(this, directory, isSameBelong);
+        }
         await destination.notify('reload', data);
       }
     }
@@ -185,7 +184,9 @@ export class Directory extends StandardFileInfo<schema.XDirectory> implements ID
         directoryId: destination.id,
       });
       if (data) {
-        await this.recursionMove(this, destination.resource);
+        if (!this.isShortcut) {
+          await this.recursionMove(this, destination.resource);
+        }
         await this.notify('remove', this._metadata);
         await destination.notify('reload', data);
       }

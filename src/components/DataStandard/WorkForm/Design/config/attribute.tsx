@@ -297,7 +297,7 @@ const AttributeConfig: React.FC<IAttributeProps> = ({
       labelMode="floating"
       formData={attribute}
       onFieldDataChanged={notityAttrChanged}>
-      <GroupItem caption={'特性参数'}>
+      <GroupItem>
         <SimpleItem dataField="name" isRequired={true} label={{ text: '名称' }} />
         <SimpleItem dataField="code" isRequired={true} label={{ text: '代码' }} />
         <SimpleItem
@@ -337,7 +337,7 @@ const AttributeConfig: React.FC<IAttributeProps> = ({
           }}
         />
       </GroupItem>
-      <GroupItem caption={'表单参数'}>
+      <GroupItem>
         <SimpleItem
           dataField="options.readOnly"
           editorType="dxCheckBox"
@@ -360,7 +360,7 @@ const AttributeConfig: React.FC<IAttributeProps> = ({
         />
         {loadItemConfig()}
       </GroupItem>
-      <GroupItem caption={'表格参数'}>
+      <GroupItem>
         <SimpleItem
           dataField="options.fixed"
           editorType="dxCheckBox"

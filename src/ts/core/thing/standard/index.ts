@@ -72,7 +72,7 @@ export class StandardFiles {
   async loadForms(reload: boolean = false): Promise<IForm[]> {
     if (this.formLoaded === false || reload) {
       this.formLoaded = true;
-      const data = await this.resource.formColl.load({
+      const data = await this.resource.formColl.loadSpace({
         options: { match: { directoryId: this.id } },
       });
       this.forms = data.map((i) => new Form(i, this.directory));
@@ -82,7 +82,7 @@ export class StandardFiles {
   async loadPropertys(reload: boolean = false): Promise<IProperty[]> {
     if (this.propertysLoaded === false || reload) {
       this.propertysLoaded = true;
-      const data = await this.resource.propertyColl.load({
+      const data = await this.resource.propertyColl.loadSpace({
         options: { match: { directoryId: this.id } },
       });
       this.propertys = data.map((i) => new Property(i, this.directory));
@@ -92,7 +92,7 @@ export class StandardFiles {
   async loadSpecieses(reload: boolean = false): Promise<ISpecies[]> {
     if (this.speciesesLoaded === false || reload) {
       this.speciesesLoaded = true;
-      const data = await this.resource.speciesColl.load({
+      const data = await this.resource.speciesColl.loadSpace({
         options: { match: { directoryId: this.id } },
       });
       this.specieses = data.map((i) => new Species(i, this.directory));
@@ -102,7 +102,7 @@ export class StandardFiles {
   async loadTransfers(reload: boolean = false): Promise<ITransfer[]> {
     if (this.transfersLoaded === false || reload) {
       this.transfersLoaded = true;
-      const data = await this.resource.transferColl.load({
+      const data = await this.resource.transferColl.loadSpace({
         options: { match: { directoryId: this.id } },
       });
       this.transfers = data.map((i) => new Transfer(i, this.directory));

@@ -1,4 +1,4 @@
-import { model, schema } from '.';
+import { model } from '.';
 import {
   XApplication,
   XAttributeProps,
@@ -823,10 +823,14 @@ export type FormShowRule = {
   target: string;
   // 条件
   condition: string;
+  // 条件文本
+  conditionText: string;
 } & Rule;
 
 // 表单计算规则
 export type FormCalcRule = {
+  // 键值对
+  mappingData: MappingData[];
   // 目标对象
   target: string;
   // 表达式
@@ -894,6 +898,7 @@ export type Executor = {
   // 请求地址
   hookUrl: string;
 };
+
 
 export type FormChange = {
   // 主键

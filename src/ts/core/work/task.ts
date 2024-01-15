@@ -10,7 +10,7 @@ import { Acquire } from './executor/acquire';
 import { IExecutor } from './executor';
 import { FieldsChange } from './executor/change';
 import { Webhook } from './executor/webhook';
-export type TaskTypeName = '待办' | '已办' | '抄送' | '发起的';
+export type TaskTypeName = '待办' | '已办' | '抄送' | '已发起';
 
 export interface IWorkTask extends IFile {
   /** 内容 */
@@ -132,7 +132,7 @@ export class WorkTask extends FileInfo<schema.XEntity> implements IWorkTask {
     switch (type) {
       case '已办':
         return this.taskdata.status >= TaskStatus.ApprovalStart;
-      case '发起的':
+      case '已发起':
         return this.taskdata.createUser == this.userId;
       case '待办':
         return this.taskdata.status < TaskStatus.ApprovalStart;
@@ -227,9 +227,15 @@ export class WorkTask extends FileInfo<schema.XEntity> implements IWorkTask {
       }
       if (this.taskdata.taskType === '加用户') {
         return this.approvalJoinTask(status, comment);
-      } else if (await this.loadInstance(true)) {
+      } else {
         fromData?.forEach((data, k) => {
           if (this.instanceData) {
+            if (this.instanceData.data[k]) {
+              this.instanceData.data[k].push(
+                ...this.instanceData.data[k].filter((s) => s.nodeId != data.nodeId),
+                data,
+              );
+            }
             this.instanceData.data[k] = [data];
           }
         });
