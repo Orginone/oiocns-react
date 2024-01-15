@@ -197,6 +197,7 @@ export type XForm = {
   bindNodes: XWorkNode[] | undefined;
   // 表单的目录
   directory: XDirectory | undefined;
+
 } & XStandard;
 
 export type XFormFilter = {
@@ -728,3 +729,13 @@ export interface XPageTemplate extends XStandard {
   // 模板类型
   kind?: string;
 }
+
+// 办事草稿箱
+export type XDrafts = {
+  // 业务类型
+  typeName: string;
+  // 数据
+  data: XThing;
+  // // 归属+关系举证
+  relations: string;
+} & Xbase

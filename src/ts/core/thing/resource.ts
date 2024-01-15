@@ -11,6 +11,7 @@ import {
   XPageTemplate,
   XStaging,
   XThing,
+  XDrafts
 } from '../../base/schema';
 import { BucketOpreates, ChatMessageType, Transfer } from '@/ts/base/model';
 import { kernel, model } from '@/ts/base';
@@ -38,6 +39,7 @@ export class DataResource {
     this.templateColl = this.genTargetColl<XPageTemplate>('standard-page-template');
     this.stagingColl = this.genTargetColl<XStaging>('resource-staging');
     this.thingColl = this.genTargetColl<XThing>('_system-things');
+    this.draftsColl = this.genTargetColl<XDrafts>('resource-drafts');
   }
 
   /** 表单集合 */
@@ -64,6 +66,8 @@ export class DataResource {
   stagingColl: XCollection<XStaging>;
   /** 实体集合 */
   thingColl: XCollection<XThing>;
+  /** 草稿箱集合 */
+  draftsColl: XCollection<XDrafts>;
   /** 资源对应的用户信息 */
   get targetMetadata() {
     return this.target;
