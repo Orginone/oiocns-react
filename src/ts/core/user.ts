@@ -2,7 +2,6 @@ import { IPerson, Person } from './target/person';
 import { command, common, schema } from '../base';
 import { IWorkProvider, WorkProvider } from './work/provider';
 import { BoxProvider, IBoxProvider } from './work/box';
-import { DraftsProvider, IDraftsProvider } from './work/drafts';
 import { AuthProvider } from './auth';
 import { ITarget } from './target/base/target';
 
@@ -11,7 +10,6 @@ export class UserProvider {
   private _user: IPerson | undefined;
   private _work: IWorkProvider | undefined;
   private _box: IBoxProvider | undefined;
-  private _drafts: IDraftsProvider | undefined;
   private _auth: AuthProvider;
   private _inited: boolean = false;
   private _emiter: common.Emitter;
@@ -37,9 +35,6 @@ export class UserProvider {
   get box(): IBoxProvider | undefined {
     return this._box;
   }
-  get drafts(): IDraftsProvider | undefined {
-    return this._drafts;
-  }
   /** 是否完成初始化 */
   get inited(): boolean {
     return this._inited;
@@ -60,7 +55,6 @@ export class UserProvider {
     this._user = new Person(person);
     this._work = new WorkProvider(this);
     this._box = new BoxProvider(this);
-    this._drafts = new DraftsProvider(this);
     this.refresh();
   }
   /** 重载数据 */
@@ -69,7 +63,6 @@ export class UserProvider {
     await this._user?.deepLoad(true);
     await this.work?.loadTodos(true);
     await this.box?.loadStagings(true);
-    await this.drafts?.loadDrafts(true);
     this._inited = true;
     this._emiter.changCallback();
     command.emitterFlag('', true);

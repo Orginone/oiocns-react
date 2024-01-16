@@ -1442,3 +1442,13 @@ export type DiskInfoType = {
   // 查询时间
   getTime: string;
 };
+
+// 草稿
+export type DraftsType = {
+  // 业务类型
+  businessName: string;
+  // 业务ID
+  businessId: string;
+  // 数据
+  data: string[];
+} & Xbase;

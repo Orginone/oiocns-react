@@ -3,7 +3,6 @@ import { common } from '@/ts/base';
 import { IWorkProvider } from '../core/work/provider';
 import { IPageTemplate } from '../core/thing/standard/page';
 import { IBoxProvider } from '../core/work/box';
-import { IDraftsProvider } from '../core/work/drafts';
 import { AuthProvider } from '../core/auth';
 /** 控制器基类 */
 export class Controller extends common.Emitter {
@@ -50,10 +49,6 @@ class IndexController extends Controller {
   /** 暂存提供者 */
   get box(): IBoxProvider {
     return this.provider.box!;
-  }
-  /** 草稿箱数据提供者 */
-  get drafts(): IDraftsProvider {
-    return this.provider.drafts!;
   }
   /** 所有相关的用户 */
   get targets(): ITarget[] {
