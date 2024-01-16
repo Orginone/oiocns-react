@@ -1,7 +1,7 @@
 import { Tabs, Spin, Empty } from 'antd';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import React from 'react';
-import { IWork, IWorkTask } from '@/ts/core';
+import { IWork, IWorkTask, TaskTypeName } from '@/ts/core';
 import { model } from '@/ts/base';
 import ListTable from './listTable';
 import { kernel } from '@/ts/base';
@@ -11,6 +11,8 @@ import { getNodeByNodeId } from '@/utils/tools';
 import { command } from '@/ts/base';
 import FullScreenModal from '@/components/Common/fullScreen';
 import TaskStart from '@/executor/tools/task/start';
+import orgCtrl from '@/ts/controller';
+import Content from '@/executor/tools/task';
 
 interface IProps {
   current: IWork | IWorkTask;
@@ -26,7 +28,7 @@ const MultitabTable: React.FC<IProps> = ({
   data,
   finished,
   activeKey = 1,
-  tabTableData,
+  // tabTableData,
 }) => {
   let tabData = [
     {
@@ -46,7 +48,6 @@ const MultitabTable: React.FC<IProps> = ({
               icon: 'add',
               onClick: () => {
                 setTodoModel(!todoModel);
-                command.emitter('executor', 'open', current);
               },
             },
             visible: true,
@@ -59,7 +60,6 @@ const MultitabTable: React.FC<IProps> = ({
               text: '编辑',
               onClick: () => {
                 setTodoModel(!todoModel);
-                command.emitter('executor', 'open', current);
               },
             },
             visible: true,
@@ -72,7 +72,6 @@ const MultitabTable: React.FC<IProps> = ({
               text: '删除',
               onClick: () => {
                 setTodoModel(!todoModel);
-                command.emitter('executor', 'open', current);
               },
             },
             visible: true,
@@ -96,6 +95,43 @@ const MultitabTable: React.FC<IProps> = ({
       buttonList: {
         visible: true,
         items: [
+          {
+            name: 'add',
+            location: 'after',
+            widget: 'dxButton',
+            options: {
+              text: '新增',
+              icon: 'add',
+              onClick: () => {
+                setTodoModel(!todoModel);
+              },
+            },
+            visible: true,
+          },
+          {
+            name: 'add',
+            location: 'after',
+            widget: 'dxButton',
+            options: {
+              text: '编辑',
+              onClick: () => {
+                setTodoModel(!todoModel);
+              },
+            },
+            visible: true,
+          },
+          {
+            name: 'delete',
+            location: 'after',
+            widget: 'dxButton',
+            options: {
+              text: '删除',
+              onClick: () => {
+                setTodoModel(!todoModel);
+              },
+            },
+            visible: true,
+          },
           {
             name: 'columnChooserButton',
             location: 'after',
@@ -127,7 +163,9 @@ const MultitabTable: React.FC<IProps> = ({
       },
     },
   ];
-  tabTableData = tabData;
+  // tabTableData = tabData;
+  const [editCurrent, setEditCurrent] = useState(current);
+  const [tabTableData, setTabTableData] = useState(tabData);
   const [activeTabKey, setActiveTabKey] = useState(activeKey);
   const [loaded, apply] = useAsyncLoad(() => current.createApply(undefined, data));
   const [todoModel, setTodoModel] = useState(false);
@@ -140,28 +178,35 @@ const MultitabTable: React.FC<IProps> = ({
   }
   if (apply) {
     const node = getNodeByNodeId(apply.instanceData.node.id, apply.instanceData.node);
+    let tags = ['草稿', '已办', '发起的'];
+    let index = Number(activeTabKey) - 1;
     if (node) {
-      const form = node.primaryForms[0];
-      const res = new CustomStore({
-        key: 'id',
-        async load(loadOptions: any) {
-          let loadOption: any = loadOptions;
-          loadOption.belongId = form.belongId;
-          let userId = 'F' + form.id;
-          loadOption.userData = [];
-          loadOption.userData.push(userId);
-          const result = await kernel.loadThing(
-            form.belongId,
-            [form.belongId],
-            loadOptions,
-          );
-          return result;
-        },
-      });
-      res.load().then((res: any) => {
-        tabTableData[2].tableData = res;
+      orgCtrl.work.loadContent(tags[index] as TaskTypeName).then((tasks) => {
+        const newTasks = tasks
+          .sort((a, b) => {
+            return (
+              new Date(b.taskdata.updateTime).getTime() -
+              new Date(a.taskdata.updateTime).getTime()
+            );
+          })
+          .filter((task) => {
+            return task.metadata.defineId == current.metadata.id;
+          });
+        const promiseAll = newTasks.map((item) => {
+          return item.loadInstance();
+        });
+        Promise.all(promiseAll).then((results) => {
+          tabTableData[index].tableData = newTasks;
+          setTabTableData(tabTableData);
+        });
       });
     }
+    const handleValueChange = (val: any) => {
+      const curr = tabTableData[index].tableData.filter((task) => {
+        return task.metadata.id == val.selectedRowsData[0].id;
+      });
+      setEditCurrent(curr[0]);
+    };
     const loadItems = () => {
       const items = [];
       for (let i = 0; i < tabTableData.length; i++) {
@@ -173,7 +218,14 @@ const MultitabTable: React.FC<IProps> = ({
           key: tabTableData[i].key,
           forceRender: true,
           label: tabTableData[i].label,
-          children: <ListTable {...current} node={node} tableConfig={tabTableData[i]} />,
+          children: (
+            <ListTable
+              {...current}
+              node={node}
+              tableConfig={tabTableData[i]}
+              handleValueChange={handleValueChange}
+            />
+          ),
         });
       }
       return items;
@@ -183,7 +235,7 @@ const MultitabTable: React.FC<IProps> = ({
         <Tabs
           items={loadItems()}
           activeKey={activeTabKey}
-          onChange={(key: any) => setActiveTabKey(key)}
+          onChange={(key: string) => setActiveTabKey(key)}
         />
         <FullScreenModal
           open={todoModel}
@@ -194,7 +246,11 @@ const MultitabTable: React.FC<IProps> = ({
           title={'发起流程'}
           footer={[]}
           onCancel={() => setTodoModel(!todoModel)}>
-          <TaskStart current={current} finished={finished} data={data} />
+          <Content
+            current={editCurrent as any}
+            finished={finished}
+            key={editCurrent.key}
+          />
         </FullScreenModal>
       </div>
     );

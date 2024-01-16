@@ -10,7 +10,7 @@ import { Acquire } from './executor/acquire';
 import { IExecutor } from './executor';
 import { FieldsChange } from './executor/change';
 import { Webhook } from './executor/webhook';
-export type TaskTypeName = '待办' | '已办' | '抄送' | '发起的';
+export type TaskTypeName = '待办' | '已办' | '抄送' | '发起的' | '草稿';
 
 export interface IWorkTask extends IFile {
   /** 内容 */

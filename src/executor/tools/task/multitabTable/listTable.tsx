@@ -12,12 +12,12 @@ interface IConfig {
 interface IProps {
   tableConfig: IConfig;
   node: any;
+  handleValueChange: any;
 }
 
 const ListTable: React.FC<IProps> = (props) => {
   const { tableConfig } = props;
   const { tableHeader = [], tableData = [] } = tableConfig;
-  let form = props.node.primaryForms[0];
   return (
     <div>
       <GenerateThingTable
@@ -25,7 +25,7 @@ const ListTable: React.FC<IProps> = (props) => {
         height={'70vh'}
         dataSource={tableData}
         onSelectionChanged={(res) => {
-          console.log('选中的值', res);
+          props.handleValueChange(res);
         }}
         remoteOperations={true}
         toolbar={props.tableConfig.buttonList}
