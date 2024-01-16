@@ -1,4 +1,3 @@
-import * as im from 'react-icons/im';
 import { Popover, Input } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { IMessage, ISession, ISysFileInfo, MessageType } from '@/ts/core';
@@ -7,7 +6,13 @@ import { parseCiteMsg } from '../components/parseMsg';
 import Emoji from '../components/emoji';
 import { AiOutlineClose } from 'react-icons/ai';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
-import { Theme } from '@/config/theme';
+import {
+  HiOutlineFaceSmile,
+  HiOutlineVideoCamera,
+  HiOutlineFolder,
+  HiOutlineMicrophone,
+} from 'react-icons/hi2';
+import { TbSend } from 'react-icons/tb';
 const TextArea = Input.TextArea;
 /**
  * @description: 输入区域
@@ -48,7 +53,6 @@ const GroupInputBox = (props: IProps) => {
       }
       props.chat.sendMessage(MessageType.Text, message, vaildMentions, props.citeText);
       setMessage('');
-      console.log('value13', message);
       props.closeCite();
     }
   };
@@ -122,7 +126,6 @@ const GroupInputBox = (props: IProps) => {
             bordered={false}
             onChange={(e) => {
               const value = e.target.value;
-              console.log('value11', value);
               if (!value.endsWith('\n')) {
                 if (value.endsWith('@')) {
                   setMessage(value);
@@ -156,24 +159,24 @@ const GroupInputBox = (props: IProps) => {
           open={openEmoji}
           trigger={['click', 'contextMenu']}
           onOpenChange={setOpenEmoji}>
-          <im.ImSmile
-            size={26}
-            color={Theme.FocusColor}
+          <HiOutlineFaceSmile
+            size={36}
+            color={'#6F7686'}
             onClick={() => setOpenEmoji(!openEmoji)}
           />
         </Popover>
-        <im.ImMic title="语言" size={26} color={Theme.FocusColor} />
-        <im.ImFolder
+        <HiOutlineMicrophone title="语言" size={36} color={'#6F7686'} />
+        <HiOutlineFolder
           title="文件"
-          size={26}
-          color={Theme.FocusColor}
+          size={36}
+          color={'#6F7686'}
           onClick={() => setOpen(true)}
         />
-        <im.ImVideoCamera title="视频" size={26} color={Theme.FocusColor} />
-        <im.ImRocket
-          size={26}
+        <HiOutlineVideoCamera title="视频" size={36} color={'#6F7686'} />
+        <TbSend
+          size={36}
           title="发送"
-          color={message.length > 0 ? Theme.FocusColor : '#909090'}
+          color={message.length > 0 ? '#366EF4' : '#909090'}
           onClick={() => sendMessage()}
         />
       </div>
