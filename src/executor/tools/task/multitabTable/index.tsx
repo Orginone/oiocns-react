@@ -10,8 +10,6 @@ import FullScreenModal from '@/components/Common/fullScreen';
 import TaskStart from '@/executor/tools/task/start';
 import orgCtrl from '@/ts/controller';
 import Content from '@/executor/tools/task';
-import WorkForm from '@/executor/tools/workForm';
-import useObjectUpdate from '@/hooks/useObjectUpdate';
 
 interface IProps {
   current: IWork | IWorkTask;
@@ -29,18 +27,13 @@ const MultitabTable: React.FC<IProps> = ({
   activeKey = '1',
   // tabTableData,
 }) => {
-  const [key, forceUpdate] = useObjectUpdate('');
   const [editCurrent, setEditCurrent] = useState(current);
   const editForm = () => {
     console.log('editCurrent', editCurrent);
     setTodoModel(!todoModel);
   };
   const deleteForm = () => {
-    console.log('tabTableData[index].tableData ', tabTableData[0].tableData);
-    console.log('editCurrent', editCurrent.key == current.key);
-    // orgCtrl.drafts.removeDraft().then((res) => {
-    //   tabTableData[index].tableData = res;
-    // });
+    console.log('editCurrent', editCurrent);
   };
   let tabData = [
     {
@@ -108,43 +101,6 @@ const MultitabTable: React.FC<IProps> = ({
         visible: true,
         items: [
           {
-            name: 'add',
-            location: 'after',
-            widget: 'dxButton',
-            options: {
-              text: '新增',
-              icon: 'add',
-              onClick: () => {
-                setTodoModel(!todoModel);
-              },
-            },
-            visible: true,
-          },
-          {
-            name: 'add',
-            location: 'after',
-            widget: 'dxButton',
-            options: {
-              text: '编辑',
-              onClick: () => {
-                setTodoModel(!todoModel);
-              },
-            },
-            visible: true,
-          },
-          {
-            name: 'delete',
-            location: 'after',
-            widget: 'dxButton',
-            options: {
-              text: '删除',
-              onClick: () => {
-                setTodoModel(!todoModel);
-              },
-            },
-            visible: true,
-          },
-          {
             name: 'columnChooserButton',
             location: 'after',
           },
@@ -179,7 +135,6 @@ const MultitabTable: React.FC<IProps> = ({
   const [activeTabKey, setActiveTabKey] = useState(activeKey);
   const [loaded, apply] = useAsyncLoad(() => current.createApply(undefined, data));
   const [todoModel, setTodoModel] = useState(false);
-
   if (!loaded) {
     return (
       <Spin tip={'配置信息加载中...'}>
@@ -193,7 +148,7 @@ const MultitabTable: React.FC<IProps> = ({
     let index = Number(activeTabKey) - 1;
     if (node) {
       if (tags[index] === '草稿') {
-        orgCtrl.drafts.loadDrafts().then((res) => {
+        orgCtrl.user.draftsColl.all().then((res) => {
           tabTableData[index].tableData = res;
         });
       } else {
@@ -215,7 +170,6 @@ const MultitabTable: React.FC<IProps> = ({
             console.log('newTasks', newTasks);
             tabTableData[index].tableData = newTasks;
             setTabTableData(tabTableData);
-            forceUpdate();
           });
         });
       }
@@ -248,6 +202,7 @@ const MultitabTable: React.FC<IProps> = ({
             <ListTable
               {...current}
               node={node}
+              setEditCurrent={setEditCurrent}
               tableConfig={tabTableData[i]}
               handleValueChange={handleValueChange}
             />
@@ -277,13 +232,13 @@ const MultitabTable: React.FC<IProps> = ({
               current={current}
               finished={finished}
               data={editCurrent.data || data}
-              saveDraft={(data: schema.XDrafts) => {
+              saveDraft={(data: schema.XdraftsColl) => {
                 let obj = {
                   typeName: '草稿箱',
                   data: data,
                   relations: '',
                 };
-                orgCtrl.drafts.createDraft(obj).then((res) => {
+                orgCtrl.user.draftsColl.createDraft(obj).then((res) => {
                   setTodoModel(!todoModel);
                 });
               }}
