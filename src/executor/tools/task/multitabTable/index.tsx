@@ -167,7 +167,6 @@ const MultitabTable: React.FC<IProps> = ({
             return item.loadInstance();
           });
           Promise.all(promiseAll).then((results) => {
-            console.log('newTasks', newTasks);
             tabTableData[index].tableData = newTasks;
             setTabTableData(tabTableData);
           });
@@ -238,7 +237,7 @@ const MultitabTable: React.FC<IProps> = ({
                   data: data,
                   relations: '',
                 };
-                orgCtrl.user.draftsColl.createDraft(obj).then((res) => {
+                orgCtrl.user.draftsColl.insert(obj).then((res) => {
                   setTodoModel(!todoModel);
                 });
               }}
