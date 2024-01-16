@@ -7,16 +7,17 @@ import useAsyncLoad from '@/hooks/useAsyncLoad';
 import { loadGatewayNodes } from '@/utils/tools';
 import FormItem from '@/components/DataStandard/WorkForm/Viewer/formItem';
 import { Emitter } from '@/ts/base/common';
-import { model } from '@/ts/base';
+import { model, schema } from '@/ts/base';
 // 卡片渲染
 interface IProps {
   current: IWork | IWorkTask;
   finished?: () => void;
   data?: model.InstanceDataModel;
+  saveDraft?: (data: schema.XDrafts) => void;
 }
 
 /** 办事-业务流程--发起 */
-const TaskStart: React.FC<IProps> = ({ current, data, finished }) => {
+const TaskStart: React.FC<IProps> = ({ current, data, finished, saveDraft }) => {
   const gatewayData = new Map<string, string>();
   const [notifyEmitter] = React.useState(new Emitter());
   const [loaded, apply] = useAsyncLoad(() => current.createApply(undefined, data));
@@ -92,6 +93,16 @@ const TaskStart: React.FC<IProps> = ({ current, data, finished }) => {
             }}>
             提交
           </Button>
+          {saveDraft && (
+            <Button
+              type="primary"
+              style={{ marginLeft: 10 }}
+              onClick={async () => {
+                saveDraft(apply.instanceData);
+              }}>
+              保存草稿
+            </Button>
+          )}
         </div>
       </>
     );

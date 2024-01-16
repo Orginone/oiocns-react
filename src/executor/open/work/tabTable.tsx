@@ -13,7 +13,7 @@ interface IProps {
 
 /** 办事-业务流程--发起 */
 const TabTable: React.FC<IProps> = ({ current, finished, data }) => {
-  const [activeKey, setActiveKey] = useState(1);
+  const [activeKey] = useState('1');
   const title = current.name;
   return (
     <FullScreenModal

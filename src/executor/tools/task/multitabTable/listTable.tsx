@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import GenerateThingTable from '@/executor/tools/generate/thingTable';
 
 interface IConfig {
   label: string;
-  key: string | number;
+  key: string;
   tableHeader: [];
   tableData: [];
   buttonList: any;

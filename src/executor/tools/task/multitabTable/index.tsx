@@ -2,23 +2,22 @@ import { Tabs, Spin, Empty } from 'antd';
 import { useEffect, useState } from 'react';
 import React from 'react';
 import { IWork, IWorkTask, TaskTypeName } from '@/ts/core';
-import { model } from '@/ts/base';
+import { model, schema } from '@/ts/base';
 import ListTable from './listTable';
-import { kernel } from '@/ts/base';
-import CustomStore from 'devextreme/data/custom_store';
 import useAsyncLoad from '@/hooks/useAsyncLoad';
 import { getNodeByNodeId } from '@/utils/tools';
-import { command } from '@/ts/base';
 import FullScreenModal from '@/components/Common/fullScreen';
 import TaskStart from '@/executor/tools/task/start';
 import orgCtrl from '@/ts/controller';
 import Content from '@/executor/tools/task';
+import WorkForm from '@/executor/tools/workForm';
+import useObjectUpdate from '@/hooks/useObjectUpdate';
 
 interface IProps {
   current: IWork | IWorkTask;
   finished?: () => void;
   data?: model.InstanceDataModel;
-  activeKey?: string | number;
+  activeKey?: string;
   tabTableData?: any;
 }
 
@@ -27,13 +26,26 @@ const MultitabTable: React.FC<IProps> = ({
   current,
   data,
   finished,
-  activeKey = 1,
+  activeKey = '1',
   // tabTableData,
 }) => {
+  const [key, forceUpdate] = useObjectUpdate('');
+  const [editCurrent, setEditCurrent] = useState(current);
+  const editForm = () => {
+    console.log('editCurrent', editCurrent);
+    setTodoModel(!todoModel);
+  };
+  const deleteForm = () => {
+    console.log('tabTableData[index].tableData ', tabTableData[0].tableData);
+    console.log('editCurrent', editCurrent.key == current.key);
+    // orgCtrl.drafts.removeDraft().then((res) => {
+    //   tabTableData[index].tableData = res;
+    // });
+  };
   let tabData = [
     {
       label: '草稿箱',
-      key: 1,
+      key: '1',
       tableHeader: [],
       tableData: [],
       buttonList: {
@@ -59,7 +71,7 @@ const MultitabTable: React.FC<IProps> = ({
             options: {
               text: '编辑',
               onClick: () => {
-                setTodoModel(!todoModel);
+                editForm();
               },
             },
             visible: true,
@@ -71,7 +83,7 @@ const MultitabTable: React.FC<IProps> = ({
             options: {
               text: '删除',
               onClick: () => {
-                setTodoModel(!todoModel);
+                deleteForm();
               },
             },
             visible: true,
@@ -89,7 +101,7 @@ const MultitabTable: React.FC<IProps> = ({
     },
     {
       label: '已发起',
-      key: 2,
+      key: '2',
       tableHeader: [],
       tableData: [],
       buttonList: {
@@ -145,7 +157,7 @@ const MultitabTable: React.FC<IProps> = ({
     },
     {
       label: '已办结',
-      key: 3,
+      key: '3',
       tableHeader: [],
       tableData: [],
       buttonList: {
@@ -163,12 +175,11 @@ const MultitabTable: React.FC<IProps> = ({
       },
     },
   ];
-  // tabTableData = tabData;
-  const [editCurrent, setEditCurrent] = useState(current);
   const [tabTableData, setTabTableData] = useState(tabData);
   const [activeTabKey, setActiveTabKey] = useState(activeKey);
   const [loaded, apply] = useAsyncLoad(() => current.createApply(undefined, data));
   const [todoModel, setTodoModel] = useState(false);
+
   if (!loaded) {
     return (
       <Spin tip={'配置信息加载中...'}>
@@ -178,34 +189,49 @@ const MultitabTable: React.FC<IProps> = ({
   }
   if (apply) {
     const node = getNodeByNodeId(apply.instanceData.node.id, apply.instanceData.node);
-    let tags = ['草稿', '已办', '发起的'];
+    const tags = ['草稿', '已办', '发起的'];
     let index = Number(activeTabKey) - 1;
     if (node) {
-      orgCtrl.work.loadContent(tags[index] as TaskTypeName).then((tasks) => {
-        const newTasks = tasks
-          .sort((a, b) => {
-            return (
-              new Date(b.taskdata.updateTime).getTime() -
-              new Date(a.taskdata.updateTime).getTime()
-            );
-          })
-          .filter((task) => {
-            return task.metadata.defineId == current.metadata.id;
+      if (tags[index] === '草稿') {
+        orgCtrl.drafts.loadDrafts().then((res) => {
+          tabTableData[index].tableData = res;
+        });
+      } else {
+        orgCtrl.work.loadContent(tags[index] as TaskTypeName).then((tasks) => {
+          const newTasks = tasks
+            .sort((a, b) => {
+              return (
+                new Date(b.taskdata.updateTime).getTime() -
+                new Date(a.taskdata.updateTime).getTime()
+              );
+            })
+            .filter((task) => {
+              return task.metadata.defineId == current.metadata.id;
+            });
+          const promiseAll = newTasks.map((item) => {
+            return item.loadInstance();
           });
-        const promiseAll = newTasks.map((item) => {
-          return item.loadInstance();
+          Promise.all(promiseAll).then((results) => {
+            console.log('newTasks', newTasks);
+            tabTableData[index].tableData = newTasks;
+            setTabTableData(tabTableData);
+            forceUpdate();
+          });
         });
-        Promise.all(promiseAll).then((results) => {
-          tabTableData[index].tableData = newTasks;
-          setTabTableData(tabTableData);
-        });
-      });
+      }
     }
     const handleValueChange = (val: any) => {
-      const curr = tabTableData[index].tableData.filter((task) => {
-        return task.metadata.id == val.selectedRowsData[0].id;
-      });
-      setEditCurrent(curr[0]);
+      if (val.selectedRowsData.length) {
+        const curr = tabTableData[index].tableData.filter((task) => {
+          return (
+            task?.metadata?.defineId == val.selectedRowsData[0].id ||
+            task?.id == val.selectedRowsData[0].id
+          );
+        });
+        setEditCurrent(curr[0]);
+      } else {
+        setEditCurrent(current);
+      }
     };
     const loadItems = () => {
       const items = [];
@@ -246,11 +272,36 @@ const MultitabTable: React.FC<IProps> = ({
           title={'发起流程'}
           footer={[]}
           onCancel={() => setTodoModel(!todoModel)}>
-          <Content
-            current={editCurrent as any}
-            finished={finished}
-            key={editCurrent.key}
-          />
+          {activeTabKey == '1' && (
+            <TaskStart
+              current={current}
+              finished={finished}
+              data={editCurrent.data || data}
+              saveDraft={(data: schema.XDrafts) => {
+                let obj = {
+                  typeName: '草稿箱',
+                  data: data,
+                  relations: '',
+                };
+                orgCtrl.drafts.createDraft(obj).then((res) => {
+                  setTodoModel(!todoModel);
+                });
+              }}
+              // <WorkForm
+              //   allowEdit={false}
+              //   belong={editCurrent.belong}
+              //   nodeId={editCurrent.data?.node?.id}
+              //   data={editCurrent.data}
+              // />
+            />
+          )}
+          {activeTabKey == '2' && (
+            <Content
+              current={editCurrent as any}
+              finished={finished}
+              key={editCurrent.key}
+            />
+          )}
         </FullScreenModal>
       </div>
     );
