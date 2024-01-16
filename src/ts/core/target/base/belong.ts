@@ -25,7 +25,7 @@ export interface IBelong extends ITarget {
   cohortChats: ISession[];
   /** 共享组织 */
   shareTarget: ITarget[];
-  /** 草稿箱数据 */
+  /** 草稿箱集合 */
   draftsColl: XCollection<model.DraftsType>;
   /** 获取存储占用情况 */
   getDiskInfo(): Promise<model.DiskInfoType | undefined>;
