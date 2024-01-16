@@ -213,7 +213,7 @@ const PassportLogin: React.FC<{ to: (flag: string) => void }> = ({ to }) => {
         items={[
           { label: '账户密码登录', key: 'account', children: <AccountLogin /> },
           { label: '验证码登录', key: 'dynamicCode', children: <DynamicCodeLogin /> },
-          { label: '二维码登录', key: 'qrCode', children: <QrCodeLogin /> },
+          // { label: '二维码登录', key: 'qrCode', children: <QrCodeLogin /> },
         ]}
       />
     </div>
