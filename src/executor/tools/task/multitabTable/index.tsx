@@ -135,6 +135,39 @@ const MultitabTable: React.FC<IProps> = ({
   const [activeTabKey, setActiveTabKey] = useState(activeKey);
   const [loaded, apply] = useAsyncLoad(() => current.createApply(undefined, data));
   const [todoModel, setTodoModel] = useState(false);
+  useEffect(() => {
+    orgCtrl.user.draftsColl.all().then((res) => {
+      const newTabTableData = [...tabTableData];
+      newTabTableData[0].tableData = res;
+      console.log('newTabTableData', newTabTableData);
+      setTabTableData(newTabTableData); // 更新 state
+    });
+    const tags = ['草稿', '已办', '发起的'];
+    let index = Number(activeTabKey) - 1;
+    if (index > 0) {
+      orgCtrl.work.loadContent(tags[index] as TaskTypeName).then((tasks) => {
+        const newTasks = tasks
+          .sort((a, b) => {
+            return (
+              new Date(b.taskdata.updateTime).getTime() -
+              new Date(a.taskdata.updateTime).getTime()
+            );
+          })
+          .filter((task) => {
+            return task.metadata.defineId == current.metadata.id;
+          });
+        const promiseAll = newTasks.map((item) => {
+          return item.loadInstance();
+        });
+        Promise.all(promiseAll).then((results) => {
+          const newTabTableData = [...tabTableData];
+          newTabTableData[index].tableData = newTasks;
+          setTabTableData(newTabTableData); // 更新 state
+        });
+      });
+    }
+  }, [activeTabKey]);
+
   if (!loaded) {
     return (
       <Spin tip={'配置信息加载中...'}>
@@ -144,35 +177,6 @@ const MultitabTable: React.FC<IProps> = ({
   }
   if (apply) {
     const node = getNodeByNodeId(apply.instanceData.node.id, apply.instanceData.node);
-    const tags = ['草稿', '已办', '发起的'];
-    let index = Number(activeTabKey) - 1;
-    if (node) {
-      if (tags[index] === '草稿') {
-        orgCtrl.user.draftsColl.all().then((res) => {
-          tabTableData[index].tableData = res;
-        });
-      } else {
-        orgCtrl.work.loadContent(tags[index] as TaskTypeName).then((tasks) => {
-          const newTasks = tasks
-            .sort((a, b) => {
-              return (
-                new Date(b.taskdata.updateTime).getTime() -
-                new Date(a.taskdata.updateTime).getTime()
-              );
-            })
-            .filter((task) => {
-              return task.metadata.defineId == current.metadata.id;
-            });
-          const promiseAll = newTasks.map((item) => {
-            return item.loadInstance();
-          });
-          Promise.all(promiseAll).then((results) => {
-            tabTableData[index].tableData = newTasks;
-            setTabTableData(tabTableData);
-          });
-        });
-      }
-    }
     const handleValueChange = (val: any) => {
       if (val.selectedRowsData.length) {
         const curr = tabTableData[index].tableData.filter((task) => {
