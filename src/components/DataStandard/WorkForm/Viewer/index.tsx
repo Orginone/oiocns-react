@@ -1,12 +1,13 @@
 import { common, model, schema } from '@/ts/base';
 import { IBelong } from '@/ts/core';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Toolbar, { Item } from 'devextreme-react/toolbar';
 import FormItem from './formItem';
 import { Emitter, logger } from '@/ts/base/common';
 import { getItemNums } from '../Utils';
 import useStorage from '@/hooks/useStorage';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
+import { EditModal } from '@/executor/tools/editModal';
 
 const WorkFormViewer: React.FC<{
   data: any;
@@ -212,6 +213,40 @@ const WorkFormViewer: React.FC<{
               <b style={{ fontSize: 28 }}>{props.form.name}</b>
             </div>
           )}
+        />
+        <Item
+          location="after"
+          locateInMenu="never"
+          widget="dxButton"
+          visible={!props.readonly && props.form.options?.allowSelect}
+          options={{
+            text: '数据选择',
+            type: 'default',
+            stylingMode: 'outlined',
+            onClick: () => {
+              EditModal.showFormSelect({
+                form: props.form,
+                fields: props.fields,
+                belong: props.belong,
+                multiple: false,
+                onSave: (values) => {
+                  if (values.length > 0) {
+                    Object.keys(props.data).forEach((key) => {
+                      delete props.data[key];
+                    });
+                    Object.assign(props.data, values[0]);
+                    for (const field of props.fields) {
+                      const value = props.data[field.id];
+                      if (value) {
+                        props.onValuesChange?.(field.id, value, props.data);
+                      }
+                    }
+                    forceUpdate();
+                  }
+                },
+              });
+            },
+          }}
         />
         <Item
           location="after"
