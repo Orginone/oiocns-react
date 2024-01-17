@@ -10,13 +10,19 @@ import FullScreenModal from '@/components/Common/fullScreen';
 import TaskStart from '@/executor/tools/task/start';
 import orgCtrl from '@/ts/controller';
 import Content from '@/executor/tools/task';
-
+interface Itable {
+  label: string;
+  key: string;
+  tableHeader: any[];
+  tableData: model.DraftsType[];
+  buttonList: any;
+}
 interface IProps {
   current: IWork | IWorkTask;
   finished?: () => void;
   data?: model.InstanceDataModel;
   activeKey?: string;
-  tabTableData?: any;
+  tabTableData?: Itable;
 }
 
 /** 多tab表格 */
@@ -35,7 +41,7 @@ const MultitabTable: React.FC<IProps> = ({
   const deleteForm = () => {
     console.log('editCurrent', editCurrent);
   };
-  let tabData = [
+  let tabData: Array<Itable> = [
     {
       label: '草稿箱',
       key: '1',
@@ -135,16 +141,20 @@ const MultitabTable: React.FC<IProps> = ({
   const [activeTabKey, setActiveTabKey] = useState(activeKey);
   const [loaded, apply] = useAsyncLoad(() => current.createApply(undefined, data));
   const [todoModel, setTodoModel] = useState(false);
-  useEffect(() => {
+  const getDrafts = () => {
     orgCtrl.user.draftsColl.all().then((res) => {
+      console.log('res', res);
       const newTabTableData = [...tabTableData];
       newTabTableData[0].tableData = res;
-      console.log('newTabTableData', newTabTableData);
       setTabTableData(newTabTableData); // 更新 state
     });
+  };
+  useEffect(() => {
     const tags = ['草稿', '已办', '发起的'];
     let index = Number(activeTabKey) - 1;
-    if (index > 0) {
+    if (index == 0) {
+      getDrafts();
+    } else {
       orgCtrl.work.loadContent(tags[index] as TaskTypeName).then((tasks) => {
         const newTasks = tasks
           .sort((a, b) => {
@@ -167,7 +177,6 @@ const MultitabTable: React.FC<IProps> = ({
       });
     }
   }, [activeTabKey]);
-
   if (!loaded) {
     return (
       <Spin tip={'配置信息加载中...'}>
@@ -179,13 +188,14 @@ const MultitabTable: React.FC<IProps> = ({
     const node = getNodeByNodeId(apply.instanceData.node.id, apply.instanceData.node);
     const handleValueChange = (val: any) => {
       if (val.selectedRowsData.length) {
-        const curr = tabTableData[index].tableData.filter((task) => {
+        const curr = tabTableData[Number(activeTabKey) - 1].tableData.filter((task) => {
           return (
             task?.metadata?.defineId == val.selectedRowsData[0].id ||
             task?.id == val.selectedRowsData[0].id
           );
         });
         setEditCurrent(curr[0]);
+        console.log('editCurrent', curr[0]);
       } else {
         setEditCurrent(current);
       }
@@ -235,14 +245,15 @@ const MultitabTable: React.FC<IProps> = ({
               current={current}
               finished={finished}
               data={editCurrent.data || data}
-              saveDraft={(data: schema.XdraftsColl) => {
+              saveDraft={(data: any) => {
                 let obj = {
                   typeName: '草稿箱',
                   data: data,
                   relations: '',
                 };
-                orgCtrl.user.draftsColl.insert(obj).then((res) => {
+                orgCtrl.user.draftsColl.insert(obj).then(() => {
                   setTodoModel(!todoModel);
+                  getDrafts();
                 });
               }}
               // <WorkForm
