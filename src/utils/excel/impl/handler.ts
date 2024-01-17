@@ -36,6 +36,10 @@ export abstract class SheetHandler<S extends t.model.Sheet<any>>
     return errors;
   }
 
+  singleAssert(index: number, assert: { res: boolean; error: string }) {
+    return this.assert(index, [assert]);
+  }
+
   abstract checkData(excel: t.IExcel): t.Error[];
   abstract operating(excel: t.IExcel, onItemCompleted: () => void): Promise<void>;
   completed?(excel: t.IExcel): void;
