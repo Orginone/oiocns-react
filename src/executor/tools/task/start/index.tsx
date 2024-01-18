@@ -1,7 +1,7 @@
 import { IWork, IWorkApply, IWorkTask } from '@/ts/core';
 import { Button, Empty, Input, Spin } from 'antd';
 import message from '@/utils/message';
-import React from 'react';
+import React, { useState } from 'react';
 import WorkForm from '@/executor/tools/workForm';
 import useAsyncLoad from '@/hooks/useAsyncLoad';
 import { loadGatewayNodes } from '@/utils/tools';
@@ -13,16 +13,23 @@ interface IProps {
   current: IWork | IWorkTask;
   finished?: () => void;
   data?: model.InstanceDataModel;
-  saveDraft?: (data: schema.XDrafts) => void;
+  saveDraft?: (data: any, content: string) => void;
+  content?: string;
 }
 
 /** 办事-业务流程--发起 */
-const TaskStart: React.FC<IProps> = ({ current, data, finished, saveDraft }) => {
+const TaskStart: React.FC<IProps> = ({
+  current,
+  data,
+  finished,
+  saveDraft,
+  content = '',
+}) => {
+  console.log('content', content);
   const gatewayData = new Map<string, string>();
   const [notifyEmitter] = React.useState(new Emitter());
   const [loaded, apply] = useAsyncLoad(() => current.createApply(undefined, data));
   const info: { content: string } = { content: '' };
-
   const loadGateway = (apply: IWorkApply) => {
     const gatewayInfos = loadGatewayNodes(apply.instanceData.node, []);
     return (
@@ -77,6 +84,7 @@ const TaskStart: React.FC<IProps> = ({ current, data, finished, saveDraft }) => 
           <Input.TextArea
             style={{ height: 100, width: 'calc(100% - 80px)', marginRight: 10 }}
             placeholder="请填写备注信息"
+            defaultValue={content}
             onChange={(e) => {
               info.content = e.target.value;
             }}
@@ -98,7 +106,7 @@ const TaskStart: React.FC<IProps> = ({ current, data, finished, saveDraft }) => 
               type="primary"
               style={{ marginLeft: 10 }}
               onClick={async () => {
-                saveDraft(apply.instanceData);
+                saveDraft(apply.instanceData, info.content);
               }}>
               保存草稿
             </Button>

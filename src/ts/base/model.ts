@@ -919,7 +919,7 @@ export type FieldChange = {
   after: any;
   // 变动后名称
   afterName: string;
-}
+};
 
 export type Branche = {
   conditions: Condition[] | undefined;
@@ -1445,10 +1445,10 @@ export type DiskInfoType = {
 
 // 草稿
 export type DraftsType = {
-  // 业务类型
-  businessName: string;
-  // 业务ID
-  businessId: string;
   // 数据
-  data: string[];
+  typeName: string;
+  relations: string;
+  workId: string;
+  contentText: string;
+  data: model.InstanceDataModel;
 } & Xbase;
