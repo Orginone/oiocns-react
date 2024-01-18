@@ -88,7 +88,7 @@ const Index: React.FC<PrivacyPolicyType> = () => {
           <table border={1} width={'100%'}>
             <thead>
               <td style={{ width: '60px' }}>类目</td>
-              <td style={{ width: '120px' }}>权限</td>
+              <td style={{ width: '100px' }}>权限</td>
               <td style={{ width: '200px' }}>说明</td>
             </thead>
             <tr>
