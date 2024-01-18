@@ -91,7 +91,6 @@ const MultitabTable: React.FC<IProps> = ({
 
   const getDrafts = (type?: boolean) => {
     orgCtrl.user.draftsColl.all(type).then((res) => {
-      console.log('草稿箱数据', res);
       const newTabTableData = [...tabTableData];
       newTabTableData[0].tableData = res
         .sort((a, b) => {
@@ -138,6 +137,7 @@ const MultitabTable: React.FC<IProps> = ({
       workId: current.id,
       contentText: contentText,
       typeName: '草稿箱',
+      id: '',
     };
     orgCtrl.user.draftsColl.insert(obj).then(() => {
       setTodoModel(!todoModel);
