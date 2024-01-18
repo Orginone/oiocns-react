@@ -1450,5 +1450,6 @@ export type DraftsType = {
   relations: string;
   workId: string;
   contentText: string;
+  name?: string;
   data: model.InstanceDataModel;
 } & Xbase;

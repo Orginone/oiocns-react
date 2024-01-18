@@ -1,13 +1,13 @@
 import { IWork, IWorkApply, IWorkTask } from '@/ts/core';
 import { Button, Empty, Input, Spin } from 'antd';
 import message from '@/utils/message';
-import React, { useState } from 'react';
+import React from 'react';
 import WorkForm from '@/executor/tools/workForm';
+import { model } from '@/ts/base';
 import useAsyncLoad from '@/hooks/useAsyncLoad';
 import { loadGatewayNodes } from '@/utils/tools';
 import FormItem from '@/components/DataStandard/WorkForm/Viewer/formItem';
 import { Emitter } from '@/ts/base/common';
-import { model, schema } from '@/ts/base';
 // 卡片渲染
 interface IProps {
   current: IWork | IWorkTask;
@@ -30,6 +30,9 @@ const TaskStart: React.FC<IProps> = ({
   const [notifyEmitter] = React.useState(new Emitter());
   const [loaded, apply] = useAsyncLoad(() => current.createApply(undefined, data));
   const info: { content: string } = { content: '' };
+  if (content) {
+    info.content = content;
+  }
   const loadGateway = (apply: IWorkApply) => {
     const gatewayInfos = loadGatewayNodes(apply.instanceData.node, []);
     return (
@@ -106,7 +109,8 @@ const TaskStart: React.FC<IProps> = ({
               type="primary"
               style={{ marginLeft: 10 }}
               onClick={async () => {
-                saveDraft(apply.instanceData, info.content);
+                let text = info.content ? info.content : content;
+                saveDraft(apply.instanceData, text);
               }}>
               保存草稿
             </Button>

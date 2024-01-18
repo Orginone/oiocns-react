@@ -20,6 +20,7 @@ interface IProps extends IDataGridOptions {
     items: ItemType[];
     onMenuClick: (key: string, data: any) => void;
   };
+  select?: boolean;
 }
 
 /** 使用form生成表单 */
@@ -105,7 +106,7 @@ const GenerateThingTable = (props: IProps) => {
             );
           }}></Column>
       )}
-      <Selection mode="multiple" showCheckBoxesMode={'always'} />
+      {props.select && <Selection mode="multiple" showCheckBoxesMode={'always'} />}
     </DataGrid>
   );
 };

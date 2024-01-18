@@ -7,7 +7,7 @@ import { model } from '@/ts/base';
 
 interface IProps {
   current: IWork | IWorkTask;
-  finished?: () => void;
+  finished: () => void;
   data?: model.InstanceDataModel;
 }
 
