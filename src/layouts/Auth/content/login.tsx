@@ -82,6 +82,16 @@ const PassportLogin: React.FC<{ to: (flag: string) => void }> = ({ to }) => {
               下载移动端
             </Button>
           </div>
+          <div style={flexStyle}>
+            <a
+              type="link"
+              style={{ margin: '20px 14px' }}
+              href={`${location.origin}/#/orginone_yinshi`}
+              target="_blank"
+              rel="noreferrer">
+              查看《个人信息和隐私保护》
+            </a>
+          </div>
         </Form.Item>
       </Form>
     );
@@ -152,6 +162,16 @@ const PassportLogin: React.FC<{ to: (flag: string) => void }> = ({ to }) => {
           <Button type="link" onClick={() => to('register')}>
             注册用户
           </Button>
+        </div>
+        <div style={flexStyle}>
+          <a
+            type="link"
+            style={{ margin: '-10px 14px' }}
+            href={`${location.origin}/#/orginone_yinshi`}
+            target="_blank"
+            rel="noreferrer">
+            查看《个人信息和隐私保护》
+          </a>
         </div>
       </Space>
     );
