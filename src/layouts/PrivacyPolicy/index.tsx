@@ -1,11 +1,9 @@
 import React from 'react';
 import './index.less';
 
-interface PrivacyPolicyType {}
-const Index: React.FC<PrivacyPolicyType> = () => {
+const Index: React.FC = () => {
   return (
-    <div
-      style={{ padding: '20px', height: '100vh', overflowY: 'auto', fontSize: '14px' }}>
+    <div className="privacy_wrap">
       <h3>奥集能 隐私政策</h3>
       <div>本政策仅适用于奥集能产品或服务。最近更新日期：2023年01月01日。</div>
       <div>
@@ -246,9 +244,9 @@ const Index: React.FC<PrivacyPolicyType> = () => {
         十、如何联系我们，如果您对本隐私政策有任何疑问、意见或建议，通过以下方式与我们联系：
       </strong>
       <p>
-        公司名：杭州好好科创有限公司 <br />
+        公&nbsp;司&nbsp;名 ：杭州好好科创有限公司 <br />
         电子邮件：hhkc205502@163.com <br />
-        电　　话：+86 0571-96119
+        电&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;话：+86 0571-96119
       </p>
     </div>
   );
