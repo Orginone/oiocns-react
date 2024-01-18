@@ -806,7 +806,7 @@ export type Rule = {
   // 规则名称
   name: string;
   // 规则类型
-  type: 'show' | 'calc' | 'executor';
+  type: 'show' | 'calc' | 'executor' | 'attribute';
   // 触发对象
   trigger: string[];
   // 备注
@@ -864,6 +864,14 @@ export type NodeExecutorRule = {
   keyMap: Map<string, MappingData>;
   // 方法
   function: string;
+} & Rule;
+
+// 属性筛选
+export type AttributeFilterRule = {
+  // 条件
+  condition: string;
+  // 条件文本
+  conditionText: string;
 } & Rule;
 
 export type MappingData = {
