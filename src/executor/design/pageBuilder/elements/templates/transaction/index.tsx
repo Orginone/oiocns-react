@@ -1,6 +1,7 @@
 import { kernel, schema } from '@/ts/base';
 import { Enumerable } from '@/ts/base/common/linq';
 import orgCtrl from '@/ts/controller';
+import { XForm } from '@/ts/base/schema';
 import { PlusCircleFilled } from '@ant-design/icons';
 import { Button, Col, Empty, Pagination, Row, Space, Spin } from 'antd';
 import React, { ReactNode, useEffect, useRef, useState } from 'react';
@@ -111,20 +112,37 @@ const ViewEntities: React.FC<IProps> = (props) => {
       take: take,
       skip: (page - 1) * take,
       requireTotalCount: true,
+      userData: [],
       filter: [],
     };
-    options.userData = props.forms.map((form) => 'F' + form.id);
+
+    for (let i = 0; i < props.forms?.length; i++) {
+      const formList: XForm[] =
+        await props.ctx?.view?.pageInfo?.directory?.target?.resource?.formColl?.find([
+          props.forms[i].id,
+        ]);
+      const formItem = formList?.[0];
+      options.userData.push(
+        ...(formItem?.options?.dataRange?.labels?.map((item: any) => item.value) || []),
+      );
+      formItem?.options?.dataRange?.filterExp &&
+        options.filter.push(JSON.parse(formItem?.options?.dataRange?.filterExp));
+    }
+
     if (userData.current.length > 0) {
       options.userData.push(...userData.current);
     }
     for (const item of Object.entries(dictFilter.current)) {
-      options.filter.push(item[1], 'and');
+      options.filter.length && options.filter.push('and');
+      options.filter.push(item[1]);
     }
     for (const items of Object.entries(rangeFilter.current)) {
       for (const item of items[1]) {
-        options.filter.push(item, 'and');
+        options.filter.length && options.filter.push('and');
+        options.filter.push(item);
       }
     }
+
     const res = await kernel.loadThing(
       current.belongId,
       [current.directory.target.spaceId, current.directory.target.id],

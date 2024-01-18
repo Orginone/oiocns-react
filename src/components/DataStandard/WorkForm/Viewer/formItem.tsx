@@ -18,7 +18,7 @@ import { useEffectOnce } from 'react-use';
 
 interface IFormItemProps {
   data: any;
-  form: schema.XForm;
+  form?: schema.XForm;
   numStr: string;
   notifyEmitter: Emitter;
   field: model.FieldModel;
@@ -105,7 +105,7 @@ const FormItem: React.FC<IFormItemProps> = (props) => {
       );
     case '引用选择框':
       return (
-        <DataBox {...mixOptions} attributes={props.form.attributes} field={props.field} />
+        <DataBox {...mixOptions} attributes={props.form?.attributes} field={props.field} />
       );
     case '多级选择框':
       return <TreeSelectItem {...mixOptions} speciesItems={props.field.lookups} />;

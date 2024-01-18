@@ -104,14 +104,14 @@ const FormRuleConfig: React.FC<IAttributeProps> = ({ current }) => {
         key: '1',
         title: '表格过滤规则',
         fields: fields,
-        filter: current.metadata.options!.dataRange,
+        filter: current.metadata.options?.dataRange,
         target: current.directory.target.space,
       },
       {
         key: '2',
         title: '办事过滤规则',
         fields: fields,
-        filter: current.metadata.options!.workDataRange,
+        filter: current.metadata.options?.workDataRange,
         target: current.directory.target.space,
       },
     ];

@@ -418,6 +418,7 @@ const ExecutorForm: React.FC<FieldChangeFormProps> = (props) => {
               const id = formRef.current?.getFieldValue('id');
               const field = fields.find((item) => item.id == id);
               if (field) {
+                field.options?.hideField && (field.options.hideField = false);
                 return (
                   <FormItem
                     data={{}}

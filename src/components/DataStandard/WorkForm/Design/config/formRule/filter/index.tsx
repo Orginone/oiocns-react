@@ -73,7 +73,7 @@ const FormFilter: React.FC<IAttributeProps> = ({ filter, target, fields }) => {
         )}
         <List
           itemKeyFn={(a) => a.id}
-          dataSource={filter.labels}
+          dataSource={filter?.labels}
           height={200}
           width={'100%'}
           style={{ paddingTop: 20 }}
