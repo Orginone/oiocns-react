@@ -90,26 +90,27 @@ const MultitabTable: React.FC<IProps> = ({
   };
 
   const handleChange = (val: any, type: string) => {
-    if (type != 'add' && !val.selectedRowsData) return;
-    const curr = tabTableData[Number(activeTabKey) - 1].tableData.filter((task) => {
-      return task?.id == val.selectedRowsData[0].id;
-    });
-    setEditCurrent(curr[0]);
-    switch (type) {
-      case 'remove':
-        orgCtrl.user.draftsColl.remove(curr[0]).then(() => {
-          getDrafts(true);
-          setTypes('remove');
-        });
-        break;
-      case 'edit':
-        setTypes('edit');
-        setTodoModel(!todoModel);
-        break;
-      default:
-        setTypes('add');
-        setEditCurrent({} as model.DraftsType);
-        setTodoModel(!todoModel);
+    if (type == 'add') {
+      setTypes('add');
+      setEditCurrent({} as model.DraftsType);
+      setTodoModel(!todoModel);
+    } else {
+      const curr = tabTableData[Number(activeTabKey) - 1].tableData.filter((task) => {
+        return task?.id == val.selectedRowsData[0].id;
+      });
+      setEditCurrent(curr[0]);
+      switch (type) {
+        case 'remove':
+          orgCtrl.user.draftsColl.remove(curr[0]).then(() => {
+            getDrafts(true);
+            setTypes('remove');
+          });
+          break;
+        default:
+          setTypes('edit');
+          setTodoModel(!todoModel);
+          break;
+      }
     }
   };
 

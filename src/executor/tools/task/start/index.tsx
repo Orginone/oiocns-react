@@ -25,7 +25,6 @@ const TaskStart: React.FC<IProps> = ({
   saveDraft,
   content = '',
 }) => {
-  console.log('content', content);
   const gatewayData = new Map<string, string>();
   const [notifyEmitter] = React.useState(new Emitter());
   const [loaded, apply] = useAsyncLoad(() => current.createApply(undefined, data));
@@ -76,22 +75,26 @@ const TaskStart: React.FC<IProps> = ({
   if (apply) {
     return (
       <>
-        <WorkForm
-          allowEdit
-          belong={apply.belong}
-          data={apply.instanceData}
-          nodeId={apply.instanceData.node.id}
-        />
-        {loadGateway(apply)}
-        <div style={{ padding: 10, display: 'flex', alignItems: 'flex-end' }}>
-          <Input.TextArea
-            style={{ height: 100, width: 'calc(100% - 80px)', marginRight: 10 }}
-            placeholder="请填写备注信息"
-            defaultValue={content}
-            onChange={(e) => {
-              info.content = e.target.value;
-            }}
-          />
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'row-reverse',
+            position: 'relative',
+            top: '16px',
+            height: '0',
+            marginRight: '10px',
+          }}>
+          {saveDraft && (
+            <Button
+              type="primary"
+              style={{ marginLeft: 10 }}
+              onClick={async () => {
+                let text = info.content ? info.content : content;
+                saveDraft(apply.instanceData, text);
+              }}>
+              保存草稿
+            </Button>
+          )}
           <Button
             type="primary"
             onClick={async () => {
@@ -104,17 +107,23 @@ const TaskStart: React.FC<IProps> = ({
             }}>
             提交
           </Button>
-          {saveDraft && (
-            <Button
-              type="primary"
-              style={{ marginLeft: 10 }}
-              onClick={async () => {
-                let text = info.content ? info.content : content;
-                saveDraft(apply.instanceData, text);
-              }}>
-              保存草稿
-            </Button>
-          )}
+        </div>
+        <WorkForm
+          allowEdit
+          belong={apply.belong}
+          data={apply.instanceData}
+          nodeId={apply.instanceData.node.id}
+        />
+        {loadGateway(apply)}
+        <div style={{ padding: 10, display: 'flex', alignItems: 'flex-end' }}>
+          <Input.TextArea
+            style={{ height: 100 }}
+            placeholder="请填写备注信息"
+            defaultValue={content}
+            onChange={(e) => {
+              info.content = e.target.value;
+            }}
+          />
         </div>
       </>
     );
