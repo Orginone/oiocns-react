@@ -178,7 +178,13 @@ const MultitabTable: React.FC<IProps> = ({
     return (
       <div style={{ width: '100%', height: '100%' }}>
         <Tabs
-          style={{ position: 'absolute', left: '10px', top: '50px', zIndex: '2' }}
+          className="ogo-tabs-class"
+          style={{
+            position: 'absolute',
+            left: '10px',
+            top: '50px',
+            zIndex: '2',
+          }}
           items={loadItems()}
           activeKey={activeTabKey}
           onChange={(key: string) => setActiveTabKey(key)}
