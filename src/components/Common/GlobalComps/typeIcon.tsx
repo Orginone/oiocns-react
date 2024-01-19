@@ -73,8 +73,6 @@ const TypeIcon = ({ avatar, iconType, size }: TypeIconInfo) => {
       case '加用户':
         return <im.ImUserPlus {...config} />;
       case TargetType.Company:
-      case TargetType.University:
-      case TargetType.Hospital:
         return <im.ImOffice {...config} />;
       case TargetType.Storage:
         return <im.ImDrive {...config} />;

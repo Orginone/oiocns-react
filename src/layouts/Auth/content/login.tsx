@@ -164,7 +164,11 @@ const PassportLogin: React.FC<{ to: (flag: string) => void }> = ({ to }) => {
             level="H"
             size={250}
             fgColor={'#204040'}
-            value={kernel.connectionId}
+            value={JSON.stringify({
+              location: resources.location,
+              platName: resources.platName,
+              connectionId: kernel.connectionId,
+            })}
             imageSettings={{
               width: 60,
               height: 60,

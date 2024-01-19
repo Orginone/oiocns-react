@@ -17,7 +17,7 @@ const SessionBody = ({
   relation?: boolean;
 }) => {
   const [actions, setActions] = useState<{ key: string; label: string }[]>([]);
-  const [bodyType, setBodyType] = useState('activity');
+  const [bodyType, setBodyType] = useState('');
 
   useEffect(() => {
     const newActions = [
@@ -64,6 +64,7 @@ const SessionBody = ({
         label: '设置',
       });
     }
+    setBodyType((pre) => (pre === '' ? 'activity' : pre));
     setActions(newActions);
   }, [session]);
 

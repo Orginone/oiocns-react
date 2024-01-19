@@ -21,7 +21,7 @@ const FormEditModal = ({
   initialValues,
   onSave,
 }: IFormEditProps) => {
-  const editData: any = {};
+  const editData: any = { ...initialValues };
   const modal = Modal.confirm({
     icon: <></>,
     width: '80vw',
@@ -36,11 +36,8 @@ const FormEditModal = ({
           rules={[]}
           changedFields={[]}
           fields={fields}
-          data={initialValues || {}}
+          data={editData}
           belong={belong}
-          onValuesChange={(fields, values) => {
-            editData[fields] = values;
-          }}
         />
       </div>
     ),
