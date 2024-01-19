@@ -81,8 +81,9 @@ const TaskStart: React.FC<IProps> = ({
             flexDirection: 'row-reverse',
             position: 'relative',
             top: '16px',
-            height: '0',
+            height: '0px',
             marginRight: '10px',
+            zIndex: '1',
           }}>
           {saveDraft && (
             <Button

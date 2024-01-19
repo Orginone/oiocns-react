@@ -176,13 +176,11 @@ const MultitabTable: React.FC<IProps> = ({
       return items;
     };
     return (
-      <div style={{ width: '100%', height: '100%' }}>
+      <div style={{ width: '100%', height: '100%', position: 'relative' }}>
         <Tabs
           className="ogo-tabs-class"
           style={{
             position: 'absolute',
-            left: '10px',
-            top: '50px',
             zIndex: '2',
           }}
           items={loadItems()}
