@@ -150,7 +150,7 @@ export const FullEntityColumns = (fields: model.FieldModel[]) => {
       remark: '由系统生成的唯一标记,无实义.',
       options: {
         fixed: true,
-        visible: true,
+        visible: false,
       },
     },
     {
@@ -160,7 +160,7 @@ export const FullEntityColumns = (fields: model.FieldModel[]) => {
       valueType: '描述型',
       remark: '描述信息',
       options: {
-        visible: true,
+        visible: false,
       },
     },
     {
