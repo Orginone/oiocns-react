@@ -10,6 +10,8 @@ import FullScreenModal from '@/components/Common/fullScreen';
 import TaskStart from '@/executor/tools/task/start';
 import orgCtrl from '@/ts/controller';
 import Content from '@/executor/tools/task';
+import message from '@/utils/message';
+
 interface Itable {
   label: string;
   key: string;
@@ -95,21 +97,28 @@ const MultitabTable: React.FC<IProps> = ({
       setEditCurrent({} as model.DraftsType);
       setTodoModel(!todoModel);
     } else {
-      const curr = tabTableData[Number(activeTabKey) - 1].tableData.filter((task) => {
-        return task?.id == val.selectedRowsData[0].id;
-      });
-      setEditCurrent(curr[0]);
-      switch (type) {
-        case 'remove':
-          orgCtrl.user.draftsColl.remove(curr[0]).then(() => {
-            getDrafts(true);
-            setTypes('remove');
-          });
-          break;
-        default:
-          setTypes('edit');
-          setTodoModel(!todoModel);
-          break;
+      if (val.selectedRowsData && val.selectedRowsData.length > 0) {
+        const curr = tabTableData[Number(activeTabKey) - 1].tableData.filter((task) => {
+          return task?.id == val.selectedRowsData[0].id;
+        });
+        setEditCurrent(curr[0]);
+        switch (type) {
+          case 'remove':
+            orgCtrl.user.draftsColl.remove(curr[0]).then(() => {
+              getDrafts(true);
+              setTypes('remove');
+            });
+            break;
+          case 'view':
+            setTodoModel(!todoModel);
+            break;
+          default:
+            setTypes('edit');
+            setTodoModel(!todoModel);
+            break;
+        }
+      } else {
+        message.warn('请选择一条办事!');
       }
     }
   };

@@ -31,7 +31,7 @@ const ListTable: React.FC<IProps> = (props) => {
         text: '查看',
         icon: '',
         onClick: () => {
-          props.handleChange([], '');
+          props.handleChange(checkList, 'view');
         },
       },
       visible: true,
