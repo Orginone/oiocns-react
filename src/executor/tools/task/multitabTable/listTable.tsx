@@ -1,16 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import GenerateThingTable from '@/executor/tools/generate/thingTable';
+import { model } from '@/ts/base';
 
 interface Itable {
   label: string;
   key: string;
-  tableHeader: any[];
+  tableHeader: model.FieldModel[];
   tableData: any[];
 }
-
+interface FormInfo {
+  id: string;
+  typeName: string;
+}
 interface IProps {
   tableConfig: Itable;
-  node: any;
   handleChange: (checkList: any, type: string) => void;
 }
 
@@ -20,9 +23,10 @@ const ListTable: React.FC<IProps> = (props) => {
   const [checkList, setCheckList] = useState<any>([]);
   const [tableDatas, setTabTableData] = useState(tableConfig.tableData);
   useEffect(() => {
+    if (!tableConfig.tableData.length) return;
     if (Number(props.tableConfig.key) - 1 == 0) {
       let newData = [...tableData];
-      let res = newData[0].data.node.forms.filter((item: any) => {
+      let res = newData[0].data.node.forms.filter((item: FormInfo) => {
         return item.typeName == '主表';
       });
       const formsId = res[0].id;
@@ -36,7 +40,7 @@ const ListTable: React.FC<IProps> = (props) => {
       let newData = [...tableData];
       newData.forEach((element) => {
         for (const key in element?.instanceData?.primary) {
-          (element as any)['T' + key] = element?.instanceData?.primary[key];
+          element['T' + key] = element?.instanceData?.primary[key];
         }
       });
       setTabTableData(newData);

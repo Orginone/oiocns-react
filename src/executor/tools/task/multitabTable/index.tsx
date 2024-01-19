@@ -13,7 +13,7 @@ import Content from '@/executor/tools/task';
 interface Itable {
   label: string;
   key: string;
-  tableHeader: any[];
+  tableHeader: model.FieldModel[];
   tableData: any[];
 }
 interface IProps {
@@ -173,7 +173,6 @@ const MultitabTable: React.FC<IProps> = ({
           children: activeTabKey === tabTableData[i].key && (
             <ListTable
               {...current}
-              node={node}
               tableConfig={tabTableData[i]}
               handleChange={handleChange}
             />
