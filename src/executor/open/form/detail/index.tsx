@@ -33,13 +33,6 @@ const ThingView: React.FC<IProps> = (props) => {
         items={[
           {
             key: '1',
-            label: `归档痕迹`,
-            children: (
-              <ThingArchive instances={Object.values(props.thingData.archives)} />
-            ),
-          },
-          {
-            key: '2',
             label: `卡片信息`,
             children: (
               <WorkFormViewer
@@ -52,6 +45,13 @@ const ThingView: React.FC<IProps> = (props) => {
                 data={convertData()}
                 belong={props.form.directory.target.space}
               />
+            ),
+          },
+          {
+            key: '2',
+            label: `归档痕迹`,
+            children: (
+              <ThingArchive instances={Object.values(props.thingData.archives)} />
             ),
           },
         ]}
