@@ -1447,9 +1447,14 @@ export type DiskInfoType = {
 export type DraftsType = {
   // 数据
   typeName: string;
+  // 关系
   relations: string;
+  // 办事id
   workId: string;
+  // 备注信息
   contentText: string;
+  // 办事名称
   name?: string;
+  // 节点信息
   data: model.InstanceDataModel;
 } & Xbase;

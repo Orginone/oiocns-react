@@ -22,15 +22,24 @@ const ListTable: React.FC<IProps> = (props) => {
   const { tableHeader = [], tableData = [] } = tableConfig;
   const [checkList, setCheckList] = useState<any>([]);
   const [tableDatas, setTabTableData] = useState(tableConfig.tableData);
+  const viewbars = [
+    {
+      name: 'view',
+      location: 'after',
+      widget: 'dxButton',
+      options: {
+        text: '查看',
+        icon: '',
+        onClick: () => {
+          props.handleChange([], '');
+        },
+      },
+      visible: true,
+    },
+  ];
   const toolbars = [
-    {
-      name: 'columnChooserButton',
-      location: 'after',
-    },
-    {
-      name: 'searchPanel',
-      location: 'after',
-    },
+    { name: 'columnChooserButton', location: 'after' },
+    { name: 'searchPanel', location: 'after' },
   ];
   useEffect(() => {
     if (!tableConfig.tableData.length) return;
@@ -106,41 +115,11 @@ const ListTable: React.FC<IProps> = (props) => {
       },
       {
         visible: true,
-        items: [
-          {
-            name: 'view',
-            location: 'after',
-            widget: 'dxButton',
-            options: {
-              text: '查看',
-              icon: '',
-              onClick: () => {
-                props.handleChange([], '');
-              },
-            },
-            visible: true,
-          },
-          ...toolbars,
-        ],
+        items: [...viewbars, ...toolbars],
       },
       {
         visible: true,
-        items: [
-          {
-            name: 'view',
-            location: 'after',
-            widget: 'dxButton',
-            options: {
-              text: '查看',
-              icon: '',
-              onClick: () => {
-                props.handleChange([], '');
-              },
-            },
-            visible: true,
-          },
-          ...toolbars,
-        ],
+        items: [...viewbars, ...toolbars],
       },
     ];
     return data[index];

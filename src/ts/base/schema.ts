@@ -197,7 +197,6 @@ export type XForm = {
   bindNodes: XWorkNode[] | undefined;
   // 表单的目录
   directory: XDirectory | undefined;
-
 } & XStandard;
 
 export type XFormFilter = {
@@ -568,6 +567,8 @@ export type XWorkDefine = {
   application: XApplication | undefined;
   // 归属用户
   target: XTarget | undefined;
+  // 办事打开类型
+  applyType: string;
 } & XStandard;
 
 //节点网关
@@ -729,5 +730,3 @@ export interface XPageTemplate extends XStandard {
   // 模板类型
   kind?: string;
 }
-
-
