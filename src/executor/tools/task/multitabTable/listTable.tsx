@@ -50,8 +50,10 @@ const ListTable: React.FC<IProps> = (props) => {
       });
       const formsId = res[0].id;
       newData.forEach((element) => {
-        for (const key in element.data.data[formsId][0].after[0]) {
-          element['T' + key] = element.data.data[formsId][0].after[0][key];
+        if (element.data?.data[formsId]) {
+          for (const key in element.data?.data[formsId][0]?.after[0]) {
+            element['T' + key] = element.data.data[formsId][0].after[0][key];
+          }
         }
       });
       setTabTableData(newData);
