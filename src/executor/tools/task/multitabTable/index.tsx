@@ -164,6 +164,13 @@ const MultitabTable: React.FC<IProps> = ({
           key: tabTableData[i].key,
           forceRender: true,
           label: tabTableData[i].label,
+          children: activeTabKey === tabTableData[i].key && (
+            <ListTable
+              {...current}
+              tableConfig={tabTableData[i]}
+              handleChange={handleChange}
+            />
+          ),
         });
       }
       return items;
@@ -175,11 +182,6 @@ const MultitabTable: React.FC<IProps> = ({
           items={loadItems()}
           activeKey={activeTabKey}
           onChange={(key: string) => setActiveTabKey(key)}
-        />
-        <ListTable
-          {...current}
-          tableConfig={tabTableData[Number(activeTabKey) - 1]}
-          handleChange={handleChange}
         />
         <FullScreenModal
           open={todoModel}
