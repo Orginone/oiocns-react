@@ -7,7 +7,7 @@ import SearchInput from '@/components/SearchInput';
 import styles from './index.module.less';
 import { XTarget } from '@/ts/base/schema';
 import orgCtrl from '@/ts/controller';
-import { TargetType, companyTypes } from '@/ts/core';
+import { TargetType } from '@/ts/core';
 import TeamIcon from '@/components/Common/GlobalComps/entityIcon';
 
 type CompanySearchTableProps = {
@@ -112,10 +112,10 @@ const SearchTarget: React.FC<CompanySearchTableProps> = (props) => {
                 );
                 break;
               case TargetType.Company:
-              case TargetType.University:
-              case TargetType.Hospital:
                 res.push(
-                  ...(await orgCtrl.user.searchTargets(event.target.value, companyTypes)),
+                  ...(await orgCtrl.user.searchTargets(event.target.value, [
+                    TargetType.Company,
+                  ])),
                 );
                 break;
               case TargetType.Group:

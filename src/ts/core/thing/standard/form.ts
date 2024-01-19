@@ -1,3 +1,4 @@
+import { LoadResult } from '@/ts/base/model';
 import { schema, model } from '../../../base';
 import { entityOperates, fileOperates, orgAuth } from '../../../core/public';
 import { IDirectory } from '../directory';
@@ -27,6 +28,8 @@ export interface IForm extends IStandardFileInfo<schema.XForm> {
   ): Promise<boolean>;
   /** 删除表单特性 */
   deleteAttribute(data: schema.XAttribute): Promise<boolean>;
+  /** 查询表数据 */
+  loadThing(loadOptions: any): Promise<LoadResult<any>>;
 }
 
 export class Form extends StandardFileInfo<schema.XForm> implements IForm {
@@ -197,5 +200,15 @@ export class Form extends StandardFileInfo<schema.XForm> implements IForm {
       return super.operates();
     }
     return [fileOperates.Copy, entityOperates.Remark];
+  }
+  async loadThing(loadOptions: any): Promise<LoadResult<any>> {
+    const res = await this.directory.resource.thingColl.loadResult(loadOptions);
+    if (res.success && !Array.isArray(res.data)) {
+      res.data = [];
+    }
+    res.totalCount = res.totalCount ?? 0;
+    res.groupCount = res.groupCount ?? 0;
+    res.summary = res.summary ?? [];
+    return res;
   }
 }

@@ -91,7 +91,7 @@ const WorkBench: React.FC = () => {
     useEffect(() => {
       const id = orgCtrl.work.notity.subscribe(() => {
         setTodoCount(orgCtrl.work.todos.length);
-        orgCtrl.work.loadTaskCount('发起的').then((v) => {
+        orgCtrl.work.loadTaskCount('已发起').then((v) => {
           setApplyCount(v);
         });
         orgCtrl.work.loadTaskCount('抄送').then((v) => {
@@ -121,7 +121,7 @@ const WorkBench: React.FC = () => {
             {renderDataItem('待办', todoCount)}
             {renderDataItem('已办', CompletedCount)}
             {renderDataItem('抄送', CopysCount)}
-            {renderDataItem('发起的', ApplyCount)}
+            {renderDataItem('已发起', ApplyCount)}
           </Space>
         </div>
       </>

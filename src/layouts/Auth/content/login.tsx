@@ -82,6 +82,16 @@ const PassportLogin: React.FC<{ to: (flag: string) => void }> = ({ to }) => {
               下载移动端
             </Button>
           </div>
+          <div style={flexStyle}>
+            <a
+              type="link"
+              style={{ margin: '20px 14px' }}
+              href={`${location.origin}/#/orginone_yinshi`}
+              target="_blank"
+              rel="noreferrer">
+              查看《个人信息和隐私保护》
+            </a>
+          </div>
         </Form.Item>
       </Form>
     );
@@ -153,6 +163,16 @@ const PassportLogin: React.FC<{ to: (flag: string) => void }> = ({ to }) => {
             注册用户
           </Button>
         </div>
+        <div style={flexStyle}>
+          <a
+            type="link"
+            style={{ margin: '-10px 14px' }}
+            href={`${location.origin}/#/orginone_yinshi`}
+            target="_blank"
+            rel="noreferrer">
+            查看《个人信息和隐私保护》
+          </a>
+        </div>
       </Space>
     );
   };
@@ -164,7 +184,11 @@ const PassportLogin: React.FC<{ to: (flag: string) => void }> = ({ to }) => {
             level="H"
             size={250}
             fgColor={'#204040'}
-            value={kernel.connectionId}
+            value={JSON.stringify({
+              location: resources.location,
+              platName: resources.platName,
+              connectionId: kernel.connectionId,
+            })}
             imageSettings={{
               width: 60,
               height: 60,

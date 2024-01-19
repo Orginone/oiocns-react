@@ -11,15 +11,11 @@ export const orgAuth = {
   DataAuthId: '361356410698731520',
 };
 /** 支持的单位类型 */
-export const companyTypes = [
-  TargetType.Company,
-  TargetType.Hospital,
-  TargetType.University,
-];
+export const companyTypes = [TargetType.Company];
 /** 支持的单位类型 */
 export const departmentTypes = [
-  TargetType.College,
   TargetType.Department,
+  TargetType.College,
   TargetType.Office,
   TargetType.Section,
   TargetType.Major,

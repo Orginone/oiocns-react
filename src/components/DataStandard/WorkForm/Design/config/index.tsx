@@ -1,9 +1,10 @@
 import { IForm } from '@/ts/core';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import FormConfig from './form';
 import FormRuleConfig from './formRule';
 import AttributeConfig from './attribute';
 import { Emitter } from '@/ts/base/common';
+import { Tabs } from 'antd';
 
 interface IAttributeProps {
   current: IForm;
@@ -12,12 +13,43 @@ interface IAttributeProps {
 }
 
 const Config: React.FC<IAttributeProps> = (props) => {
+  const [activeTabKey, setActiveTabKey] = useState<string>('form');
+  useEffect(() => {
+    if (props.index > -1) {
+      setActiveTabKey('property');
+    }
+  }, [props.index]);
+  const loadItems = () => {
+    const items = [
+      {
+        key: 'form',
+        label: '表单设置',
+        forceRender: true,
+        children: <FormConfig {...props} />,
+      },
+      {
+        key: 'rule',
+        label: '规则参数',
+        forceRender: true,
+        children: <FormRuleConfig {...props} />,
+      },
+    ];
+    if (props.index > -1) {
+      items.unshift({
+        key: 'property',
+        label: '属性参数',
+        forceRender: true,
+        children: <AttributeConfig {...props} />,
+      });
+    }
+    return items;
+  };
   return (
-    <div style={{ width: '100%', height: '100%', padding: 16 }}>
-      {props.index > -1 && <AttributeConfig {...props} />}
-      {props.index == -1 && <FormConfig {...props} />}
-      {props.index == -2 && <FormRuleConfig {...props} />}
-    </div>
+    <Tabs
+      items={loadItems()}
+      activeKey={activeTabKey}
+      onChange={(key) => setActiveTabKey(key)}
+    />
   );
 };
 

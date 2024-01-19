@@ -34,7 +34,7 @@ const FormConfig: React.FC<IAttributeProps> = ({ notifyEmitter, current }) => {
         height={'calc(100vh - 130px)'}
         formData={current.metadata}
         onFieldDataChanged={notityAttrChanged}>
-        <GroupItem caption={'表单参数'} />
+        <GroupItem />
         <SimpleItem dataField="name" isRequired={true} label={{ text: '名称' }} />
         <SimpleItem dataField="code" isRequired={true} label={{ text: '代码' }} />
         <SimpleItem

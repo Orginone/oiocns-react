@@ -2,7 +2,7 @@ import React from 'react';
 import { ProFormColumnsType } from '@ant-design/pro-components';
 import SchemaForm from '@/components/SchemaForm';
 import { TargetModel } from '@/ts/base/model';
-import { ITarget, TargetType, companyTypes } from '@/ts/core';
+import { ITarget, TargetType, departmentTypes } from '@/ts/core';
 import UploadItem from '../../tools/uploadItem';
 import { EntityColumns } from './entityColumns';
 
@@ -49,18 +49,17 @@ const TargetForm = (props: Iprops) => {
     case 'newCompany':
       typeName = '单位';
       title = '设立单位';
-      types = companyTypes;
+      types = [TargetType.Company];
       initialValue = {};
       tcodeLabel = '企业信用代码';
       break;
     case 'newDepartment':
       typeName = '部门';
       title = '设立部门';
-      if ('departmentTypes' in props.current) {
-        types = props.current.departmentTypes as string[];
-      }
       if ('childrenTypes' in props.current) {
         types = props.current.childrenTypes as string[];
+      } else {
+        types = [...departmentTypes];
       }
       initialValue = {};
       break;

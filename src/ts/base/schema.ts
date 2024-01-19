@@ -201,6 +201,7 @@ export type XForm = {
 
 export type XFormFilter = {
   filterExp?: string;
+  filterDisplay?: string;
   labels: XTagFilter[];
 };
 export type XTagFilter = {
@@ -379,6 +380,8 @@ export type XProperty = {
   directory: XDirectory | undefined;
   // 字典类型
   species: XSpecies | undefined;
+  //TODO 记录属性变更
+  // record
 } & XStandard;
 
 //用户关系
