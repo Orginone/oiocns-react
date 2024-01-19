@@ -22,6 +22,16 @@ const ListTable: React.FC<IProps> = (props) => {
   const { tableHeader = [], tableData = [] } = tableConfig;
   const [checkList, setCheckList] = useState<any>([]);
   const [tableDatas, setTabTableData] = useState(tableConfig.tableData);
+  const toolbars = [
+    {
+      name: 'columnChooserButton',
+      location: 'after',
+    },
+    {
+      name: 'searchPanel',
+      location: 'after',
+    },
+  ];
   useEffect(() => {
     if (!tableConfig.tableData.length) return;
     if (Number(props.tableConfig.key) - 1 == 0) {
@@ -68,7 +78,7 @@ const ListTable: React.FC<IProps> = (props) => {
             visible: true,
           },
           {
-            name: 'add',
+            name: 'edit',
             location: 'after',
             widget: 'dxButton',
             options: {
@@ -91,66 +101,45 @@ const ListTable: React.FC<IProps> = (props) => {
             },
             visible: true,
           },
-          {
-            name: 'columnChooserButton',
-            location: 'after',
-          },
-          {
-            name: 'searchPanel',
-            location: 'after',
-          },
+          ...toolbars,
         ],
       },
       {
         visible: true,
         items: [
           {
-            name: 'add',
+            name: 'view',
             location: 'after',
             widget: 'dxButton',
             options: {
               text: '查看',
               icon: '',
               onClick: () => {
-                props.handleChange(checkList, 'add');
+                props.handleChange([], '');
               },
             },
             visible: true,
           },
-          {
-            name: 'columnChooserButton',
-            location: 'after',
-          },
-          {
-            name: 'searchPanel',
-            location: 'after',
-          },
+          ...toolbars,
         ],
       },
       {
         visible: true,
         items: [
           {
-            name: 'add',
+            name: 'view',
             location: 'after',
             widget: 'dxButton',
             options: {
               text: '查看',
               icon: '',
               onClick: () => {
-                props.handleChange(checkList, 'add');
+                props.handleChange([], '');
               },
             },
             visible: true,
           },
-          {
-            name: 'columnChooserButton',
-            location: 'after',
-          },
-          {
-            name: 'searchPanel',
-            location: 'after',
-          },
+          ...toolbars,
         ],
       },
     ];
@@ -162,8 +151,7 @@ const ListTable: React.FC<IProps> = (props) => {
         fields={tableHeader}
         height={'70vh'}
         dataSource={tableDatas}
-        onSelectionChanged={(res) => {
-          let list = res;
+        onSelectionChanged={(list) => {
           if (list.selectedRowsData?.length > 1) {
             list.component.deselectRows([list.selectedRowKeys[0]]);
           }

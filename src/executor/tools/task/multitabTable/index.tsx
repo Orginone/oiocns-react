@@ -21,7 +21,6 @@ interface IProps {
   finished: () => void;
   data?: model.InstanceDataModel;
   activeKey?: string;
-  tabTableData?: Itable;
 }
 
 /** 多tab表格 */
@@ -35,24 +34,9 @@ const MultitabTable: React.FC<IProps> = ({
     {} as model.DraftsType,
   );
   let tabData: Array<Itable> = [
-    {
-      label: '草稿箱',
-      key: '1',
-      tableHeader: [],
-      tableData: [],
-    },
-    {
-      label: '已发起',
-      key: '2',
-      tableHeader: [],
-      tableData: [],
-    },
-    {
-      label: '已办结',
-      key: '3',
-      tableHeader: [],
-      tableData: [],
-    },
+    { label: '草稿箱', key: '1', tableHeader: [], tableData: [] },
+    { label: '已发起', key: '2', tableHeader: [], tableData: [] },
+    { label: '已办结', key: '3', tableHeader: [], tableData: [] },
   ];
   const [tabTableData, setTabTableData] = useState(tabData);
   const [activeTabKey, setActiveTabKey] = useState(activeKey);
@@ -106,26 +90,26 @@ const MultitabTable: React.FC<IProps> = ({
   };
 
   const handleChange = (val: any, type: string) => {
-    if (val?.selectedRowsData?.length) {
-      const curr = tabTableData[Number(activeTabKey) - 1].tableData.filter((task) => {
-        return task?.id == val.selectedRowsData[0].id;
-      });
-      switch (type) {
-        case 'remove':
-          orgCtrl.user.draftsColl.remove(curr[0]).then(() => {
-            getDrafts(true);
-            setTypes('remove');
-          });
-          break;
-        default:
-          setTypes('edit');
-          setTodoModel(!todoModel);
-      }
-      setEditCurrent(curr[0]);
-    } else {
-      setTypes('add');
-      setEditCurrent({} as model.DraftsType);
-      setTodoModel(!todoModel);
+    if (type != 'add' && !val.selectedRowsData) return;
+    const curr = tabTableData[Number(activeTabKey) - 1].tableData.filter((task) => {
+      return task?.id == val.selectedRowsData[0].id;
+    });
+    setEditCurrent(curr[0]);
+    switch (type) {
+      case 'remove':
+        orgCtrl.user.draftsColl.remove(curr[0]).then(() => {
+          getDrafts(true);
+          setTypes('remove');
+        });
+        break;
+      case 'edit':
+        setTypes('edit');
+        setTodoModel(!todoModel);
+        break;
+      default:
+        setTypes('add');
+        setEditCurrent({} as model.DraftsType);
+        setTodoModel(!todoModel);
     }
   };
 
@@ -170,13 +154,6 @@ const MultitabTable: React.FC<IProps> = ({
           key: tabTableData[i].key,
           forceRender: true,
           label: tabTableData[i].label,
-          children: activeTabKey === tabTableData[i].key && (
-            <ListTable
-              {...current}
-              tableConfig={tabTableData[i]}
-              handleChange={handleChange}
-            />
-          ),
         });
       }
       return items;
@@ -184,9 +161,15 @@ const MultitabTable: React.FC<IProps> = ({
     return (
       <div style={{ width: '100%', height: '100%' }}>
         <Tabs
+          style={{ position: 'absolute', left: '10px', top: '50px', zIndex: '2' }}
           items={loadItems()}
           activeKey={activeTabKey}
           onChange={(key: string) => setActiveTabKey(key)}
+        />
+        <ListTable
+          {...current}
+          tableConfig={tabTableData[Number(activeTabKey) - 1]}
+          handleChange={handleChange}
         />
         <FullScreenModal
           open={todoModel}
@@ -197,7 +180,7 @@ const MultitabTable: React.FC<IProps> = ({
           title={'发起流程'}
           footer={[]}
           onCancel={() => setTodoModel(!todoModel)}>
-          {activeTabKey == '1' && (
+          {activeTabKey === '1' ? (
             <TaskStart
               current={current}
               finished={clearModel}
@@ -218,8 +201,7 @@ const MultitabTable: React.FC<IProps> = ({
                 }
               }}
             />
-          )}
-          {(activeTabKey == '2' || activeTabKey == '3') && (
+          ) : (
             <Content
               current={editCurrent as any}
               finished={finished}
