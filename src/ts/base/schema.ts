@@ -572,6 +572,8 @@ export type XWorkDefine = {
   application: XApplication | undefined;
   // 归属用户
   target: XTarget | undefined;
+  // 办事打开类型
+  applyType: string;
 } & XStandard;
 
 //节点网关

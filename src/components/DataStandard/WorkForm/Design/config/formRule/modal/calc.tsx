@@ -64,7 +64,7 @@ const CalcRuleModal: React.FC<IProps> = (props) => {
         disabled: vaildDisable(),
       }}>
       <TextBox
-        label="名称*"
+        label="规则名称*"
         labelMode="floating"
         value={name}
         onValueChange={(e) => {

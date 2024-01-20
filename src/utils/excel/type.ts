@@ -68,12 +68,22 @@ export interface Property extends schema.XProperty {
 // 表单
 export interface Form extends schema.XForm {
   directoryCode: string;
+  allowAdd?: string;
+  allowEdit?: string;
+  allowSelect?: string;
 }
 
 // 特性
 export interface Attribute extends schema.XAttribute {
   formCode: string;
   propCode: string;
+  readOnly?: string;
+  isRequired?: string;
+  hideField?: string;
+  visible?: string;
+  showToRemark?: string;
+  species?: string;
+  fixed?: string;
 }
 
 // 分类

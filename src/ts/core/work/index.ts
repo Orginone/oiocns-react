@@ -265,6 +265,8 @@ export class Work extends FileInfo<schema.XWorkDefine> implements IWork {
       const res = await kernel.queryWorkNodes({ id: this.id });
       if (res.success) {
         this.node = res.data;
+        this.primaryForms = [];
+        this.detailForms = [];
         await this.recursionForms(this.node);
       }
     }

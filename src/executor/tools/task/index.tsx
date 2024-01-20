@@ -10,7 +10,7 @@ import {
   Tag,
   Timeline,
 } from 'antd';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import cls from './index.module.less';
 import { IWorkTask } from '@/ts/core';
 import EntityIcon from '@/components/Common/GlobalComps/entityIcon';
@@ -23,6 +23,8 @@ import TaskApproval from './approval';
 import { getNodeByNodeId } from '@/utils/tools';
 import { model } from '@/ts/base';
 import { IExecutor } from '@/ts/core/work/executor';
+import { generateUuid } from '@/utils/excel';
+import { Controller } from '@/ts/controller';
 
 export interface TaskDetailType {
   current: IWorkTask;
@@ -33,6 +35,7 @@ const TaskContent: React.FC<TaskDetailType> = ({ current, finished }) => {
   const [selectNode, setSelectNode] = useState<NodeModel>();
   const [loaded] = useAsyncLoad(() => current.loadInstance());
   const formData = new Map<string, model.FormEditData>();
+  const command = useRef(new Controller('TaskContent'));
   /** 加载时间条 */
   const loadTimeline = () => {
     if (current.instance) {
@@ -166,6 +169,7 @@ const TaskContent: React.FC<TaskDetailType> = ({ current, finished }) => {
                   onClick={async () => {
                     setLoading(true);
                     await item.execute(formData);
+                    command.current.changCallback();
                     setLoading(false);
                   }}>
                   执行
@@ -213,12 +217,18 @@ const TaskContent: React.FC<TaskDetailType> = ({ current, finished }) => {
       },
     ];
     if (existForm) {
-      items.unshift({
-        key: '3',
-        label: `填写表单`,
-        children: (
+      const Center: React.FC = () => {
+        const [key, setKey] = useState(generateUuid());
+        useEffect(() => {
+          const id = command.current.subscribe(() => setKey(generateUuid()));
+          return () => {
+            return command.current.unsubscribe(id);
+          };
+        }, []);
+        return (
           <>
             <WorkForm
+              key={key}
               allowEdit={true}
               belong={current.belong}
               nodeId={current.taskdata.nodeId}
@@ -226,7 +236,12 @@ const TaskContent: React.FC<TaskDetailType> = ({ current, finished }) => {
             />
             <TaskApproval task={current} fromData={formData} finished={finished} />
           </>
-        ),
+        );
+      };
+      items.unshift({
+        key: '3',
+        label: `填写表单`,
+        children: <Center></Center>,
       });
     }
     return items;

@@ -3,18 +3,24 @@ import { IDirectory } from '../directory';
 import { IStandardFileInfo, StandardFileInfo } from '../fileinfo';
 import { ISpecies, Species } from './species';
 import { IWork } from '../../work';
+import { IForm } from '../..';
+import { Form } from './form';
 
 export interface IPageTemplate extends IStandardFileInfo<schema.XPageTemplate> {
   /** 触发器 */
   command: Command;
-  /** 分类 */
-  species: ISpecies[];
   /** 关系 */
   relations: string;
+  /** 分类 */
+  species: ISpecies[];
+  /** 表单 */
+  forms: IForm[];
   /** 加载分类 */
   loadSpecies(speciesIds: string[]): Promise<ISpecies[]>;
+  /** 加载表单 */
+  loadForms(formIds: string[]): Promise<IForm[]>;
   /** 查找办事 */
-  findWorkById(workId: string): Promise<IWork | undefined>;
+  loadWork(workId: string): Promise<IWork | undefined>;
 }
 
 export class PageTemplate
@@ -28,6 +34,7 @@ export class PageTemplate
   canDesign: boolean = true;
   command: Command;
   species: ISpecies[] = [];
+  forms: IForm[] = [];
   get cacheFlag() {
     return 'pages';
   }
@@ -76,7 +83,27 @@ export class PageTemplate
     });
     return result;
   }
-  async findWorkById(workId: string): Promise<IWork | undefined> {
+  async loadForms(formIds: string[]): Promise<IForm[]> {
+    const already = this.forms.map((item) => item.id);
+    const filter = formIds.filter((formId) => !already.includes(formId));
+    if (filter.length > 0) {
+      const species = await this.directory.resource.formColl.find(filter);
+      for (const item of species) {
+        const meta = new Form(item, this.directory);
+        await meta.loadContent();
+        this.forms.push(meta);
+      }
+    }
+    const result: IForm[] = [];
+    formIds.forEach((speciesId) => {
+      const item = this.forms.find((one) => one.id == speciesId);
+      if (item) {
+        result.push(item);
+      }
+    });
+    return result;
+  }
+  async loadWork(workId: string): Promise<IWork | undefined> {
     for (const app of await this.directory.target.directory.loadAllApplication()) {
       const work = await app.findWork(workId);
       if (work) {

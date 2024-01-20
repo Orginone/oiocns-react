@@ -806,7 +806,7 @@ export type Rule = {
   // 规则名称
   name: string;
   // 规则类型
-  type: 'show' | 'calc' | 'executor';
+  type: 'show' | 'calc' | 'executor' | 'attribute';
   // 触发对象
   trigger: string[];
   // 备注
@@ -864,6 +864,14 @@ export type NodeExecutorRule = {
   keyMap: Map<string, MappingData>;
   // 方法
   function: string;
+} & Rule;
+
+// 属性筛选
+export type AttributeFilterRule = {
+  // 条件
+  condition: string;
+  // 条件文本
+  conditionText: string;
 } & Rule;
 
 export type MappingData = {
@@ -924,7 +932,7 @@ export type FieldChange = {
   after: any;
   // 变动后名称
   afterName: string;
-}
+};
 
 export type Branche = {
   conditions: Condition[] | undefined;
@@ -1447,3 +1455,19 @@ export type DiskInfoType = {
   // 查询时间
   getTime: string;
 };
+
+// 草稿
+export type DraftsType = {
+  // 数据
+  typeName: string;
+  // 关系
+  relations: string;
+  // 办事id
+  workId: string;
+  // 备注信息
+  contentText: string;
+  // 办事名称
+  name?: string;
+  // 节点信息
+  data: model.InstanceDataModel;
+} & Xbase;

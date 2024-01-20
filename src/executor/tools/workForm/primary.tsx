@@ -88,6 +88,7 @@ const PrimaryForms: React.FC<IProps> = (props) => {
   };
   return (
     <Tabs
+      className="ogo-tabs-primary"
       items={loadItems()}
       activeKey={activeTabKey}
       onChange={(key) => setActiveTabKey(key)}
