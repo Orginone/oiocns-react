@@ -924,7 +924,7 @@ export type FieldChange = {
   after: any;
   // 变动后名称
   afterName: string;
-}
+};
 
 export type Branche = {
   conditions: Condition[] | undefined;
@@ -1447,3 +1447,19 @@ export type DiskInfoType = {
   // 查询时间
   getTime: string;
 };
+
+// 草稿
+export type DraftsType = {
+  // 数据
+  typeName: string;
+  // 关系
+  relations: string;
+  // 办事id
+  workId: string;
+  // 备注信息
+  contentText: string;
+  // 办事名称
+  name?: string;
+  // 节点信息
+  data: model.InstanceDataModel;
+} & Xbase;

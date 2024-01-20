@@ -9,6 +9,7 @@ import { targetOperates } from '../../public';
 import { IStorage } from '../outTeam/storage';
 import { IPerson } from '../person';
 import { IFile } from '../../thing/fileinfo';
+import { XCollection } from '../../public/collection';
 
 /** 自归属用户接口类 */
 export interface IBelong extends ITarget {
@@ -24,6 +25,8 @@ export interface IBelong extends ITarget {
   cohortChats: ISession[];
   /** 共享组织 */
   shareTarget: ITarget[];
+  /** 草稿箱集合 */
+  draftsColl: XCollection<model.DraftsType>;
   /** 获取存储占用情况 */
   getDiskInfo(): Promise<model.DiskInfoType | undefined>;
   /** 加载超管权限 */
@@ -45,12 +48,19 @@ export abstract class Belong extends Target implements IBelong {
     _memberTypes: TargetType[] = [TargetType.Person],
   ) {
     super([], _metadata, _relations, undefined, _user, _memberTypes);
+    this.draftsColl = new XCollection<model.DraftsType>(
+      _metadata,
+      'resource-drafts',
+      [_metadata.id],
+      [this.key],
+    );
     kernel.subscribe(
       `${_metadata.belongId}-${_metadata.id}-authority`,
       [this.key],
       (data: any) => this.superAuth?.receiveAuthority(data),
     );
   }
+  draftsColl: XCollection<model.DraftsType>;
   cohorts: ICohort[] = [];
   storages: IStorage[] = [];
   superAuth: IAuthority | undefined;
