@@ -95,6 +95,24 @@ const FormRuleConfig: React.FC<IAttributeProps> = ({ current }) => {
       ...(ss as FieldInfo[]),
     ]);
   }, [current]);
+  const loadFilterItem = () => {
+    return [
+      {
+        key: '1',
+        title: '表格过滤规则',
+        fields: fields,
+        filter: current.metadata.options?.dataRange,
+        target: current.directory.target.space,
+      },
+      {
+        key: '2',
+        title: '办事过滤规则',
+        fields: fields,
+        filter: current.metadata.options?.workDataRange,
+        target: current.directory.target.space,
+      },
+    ];
+  };
   return (
     <div
       style={{

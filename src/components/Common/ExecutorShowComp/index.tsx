@@ -8,7 +8,7 @@ import { SelectBox } from 'devextreme-react';
 import React, { ReactNode, useEffect, useRef, useState } from 'react';
 import { AiOutlineCloseCircle } from 'react-icons/ai';
 import cls from './index.module.less';
-import { Emitter } from '@/ts/base/common';
+import { Emitter, deepClone } from '@/ts/base/common';
 import FormItem from '@/components/DataStandard/WorkForm/Viewer/formItem';
 import { ShareIdSet } from '@/ts/core/public/entity';
 import { FieldModel } from '@/ts/base/model';
@@ -363,6 +363,13 @@ const ExecutorForm: React.FC<FieldChangeFormProps> = (props) => {
         break;
     }
   };
+  const cloneField = (field: model.FieldModel) => {
+    const clone = deepClone(field);
+    clone.options = clone.options ?? {};
+    clone.options.hideField = false;
+    clone.options.readOnly = false;
+    return clone;
+  };
   return (
     <>
       <SchemaForm<model.FieldChange>
@@ -418,15 +425,17 @@ const ExecutorForm: React.FC<FieldChangeFormProps> = (props) => {
               const id = formRef.current?.getFieldValue('id');
               const field = fields.find((item) => item.id == id);
               if (field) {
+                const clone = cloneField(field);
                 return (
                   <FormItem
                     data={{}}
                     numStr={'一列'}
                     notifyEmitter={new Emitter()}
-                    field={field}
+                    field={clone}
                     belong={props.work.directory.target.space}
-                    onValuesChange={(_, value) => setField(field, 'before', value)}
+                    onValuesChange={(_, value) => setField(clone, 'before', value)}
                     rules={[]}
+                    form={form.metadata}
                   />
                 );
               }
@@ -453,15 +462,17 @@ const ExecutorForm: React.FC<FieldChangeFormProps> = (props) => {
               const id = formRef.current?.getFieldValue('id');
               const field = fields.find((item) => item.id == id);
               if (field) {
+                const clone = cloneField(field);
                 return (
                   <FormItem
                     data={{}}
                     numStr={'一列'}
                     notifyEmitter={new Emitter()}
-                    field={field}
+                    field={clone}
                     belong={props.work.directory.target.space}
-                    onValuesChange={(_, value) => setField(field, 'after', value)}
+                    onValuesChange={(_, value) => setField(clone, 'after', value)}
                     rules={[]}
+                    form={form.metadata}
                   />
                 );
               }

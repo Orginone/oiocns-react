@@ -4,6 +4,7 @@ import { entityOperates, fileOperates, orgAuth } from '../../../core/public';
 import { IDirectory } from '../directory';
 import { IStandardFileInfo, StandardFileInfo } from '../fileinfo';
 import { formatDate } from '@/utils';
+import { ITemporaryStorage, TemporaryStorage } from '../../work/storage';
 
 /** 表单类接口 */
 export interface IForm extends IStandardFileInfo<schema.XForm> {
@@ -11,6 +12,8 @@ export interface IForm extends IStandardFileInfo<schema.XForm> {
   attributes: schema.XAttribute[];
   /** 表单字段 */
   fields: model.FieldModel[];
+  /** 暂存箱 */
+  storage: ITemporaryStorage;
   /** 加载分类字典项 */
   loadItems(speciesIds: string[]): Promise<schema.XSpeciesItem[]>;
   /** 加载引用表单 */
@@ -37,7 +40,9 @@ export class Form extends StandardFileInfo<schema.XForm> implements IForm {
     super(_metadata, _directory, _directory.resource.formColl);
     this.canDesign = !_metadata.id.includes('_');
     this.setEntity();
+    this.storage = new TemporaryStorage(this);
   }
+  storage: ITemporaryStorage;
   canDesign: boolean;
   private _fieldsLoaded: boolean = false;
   fields: model.FieldModel[] = [];
