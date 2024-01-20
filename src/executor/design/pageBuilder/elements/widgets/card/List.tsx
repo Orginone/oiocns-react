@@ -160,7 +160,7 @@ const View: React.FC<Omit<IProps, 'data'>> = (props) => {
                           before: [],
                           after: stagings
                             .filter((item) => keys.includes(item.id))
-                            .filter((item) => item.data['F' + form.id])
+                            .filter((item) => item.data.labels?.includes('F' + form.id))
                             .map((item) => {
                               const data = deepClone(item.data);
                               for (const field of form.fields) {

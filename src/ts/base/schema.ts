@@ -534,6 +534,8 @@ export type XThing = {
   givenPropertys: XProperty[] | undefined;
   // 物的归属
   belong: XTarget | undefined;
+  // 标签
+  labels: string[];
 } & Xbase;
 
 //物的属性值
