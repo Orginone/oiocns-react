@@ -1,5 +1,5 @@
 import React from 'react';
-import { Image } from 'antd';
+import { Divider, Image } from 'antd';
 import { MessageType, IMessage } from '@/ts/core';
 import { FileItemShare } from '@/ts/base/model';
 import { command, parseAvatar } from '@/ts/base';
@@ -24,9 +24,8 @@ const linkText = (val: string) => {
  * 文件类型icon展示
  */
 
-export const getFileIcon = (type?: string) => {
+export const getFileIcon = (type?: string, size: number = 38) => {
   if (!type) return;
-  const size = 28;
   const color = 'blue';
   let icon = <AiFillFile size={size} color={color} />;
   switch (type) {
@@ -112,16 +111,25 @@ export const parseMsg = (item: IMessage): any => {
       const iconDiv = getFileIcon(file.extension);
       return (
         <>
-          <div
-            className={`con_content_txt con_content_file`}
-            onClick={() => {
-              command.emitter('executor', 'open', file);
-            }}>
-            <div className={`con_content_txt_inner`}>
-              <div>{file.name}</div>
-              <div className={`con_content_size`}>{formatSize(file.size)}</div>
+          <div className={`con_content_txt con_content_file`}>
+            <div className="flex">
+              {iconDiv}
+              <div className={`con_content_txt_inner`}>
+                <div>{file.name}</div>
+                <div className={`con_content_size`}>{formatSize(file.size)}</div>
+              </div>
             </div>
-            {iconDiv}
+            <Divider style={{ marginTop: '10px', marginBottom: '10px' }} />
+            <div className="con_content_txt_action">
+              <span
+                onClick={() => {
+                  command.emitter('executor', 'open', file);
+                }}>
+                在线预览
+              </span>
+              <Divider type="vertical" />
+              <span>在线编辑</span>
+            </div>
           </div>
         </>
       );
@@ -200,14 +208,14 @@ export const parseCiteMsg = (item: IMessage): any => {
       const file: FileItemShare = parseAvatar(item.msgBody);
       const iconDiv = getFileIcon(file.extension);
       return (
-        <div className="con_content_cite_txt">
+        <div className="con_content_cite_txt flex">
           <span>{item.from.name}:</span>
-          <a href={shareOpenLink(file.shareLink, true)} title="点击下载">
+          <a className="flex" href={shareOpenLink(file.shareLink, true)} title="点击下载">
+            {iconDiv}
             <div>
               <b>{file.name}</b>
+              <div>{formatSize(file.size)}</div>
             </div>
-            <div>{formatSize(file.size)}</div>
-            {iconDiv}
           </a>
         </div>
       );

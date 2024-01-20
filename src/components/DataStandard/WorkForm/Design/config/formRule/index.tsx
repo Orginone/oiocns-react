@@ -1,9 +1,7 @@
 import { IForm } from '@/ts/core';
-import { Accordion } from 'devextreme-react';
 import React, { useState } from 'react';
 import Rule from './rule';
 import useAsyncLoad from '@/hooks/useAsyncLoad';
-import FormFilter from './filter';
 import { FieldInfo } from '@/ts/base/model';
 
 interface IAttributeProps {
@@ -97,7 +95,6 @@ const FormRuleConfig: React.FC<IAttributeProps> = ({ current }) => {
       ...(ss as FieldInfo[]),
     ]);
   }, [current]);
-
   const loadFilterItem = () => {
     return [
       {
@@ -116,7 +113,6 @@ const FormRuleConfig: React.FC<IAttributeProps> = ({ current }) => {
       },
     ];
   };
-
   return (
     <div
       style={{
@@ -127,14 +123,6 @@ const FormRuleConfig: React.FC<IAttributeProps> = ({ current }) => {
         overflow: 'scroll',
       }}>
       {loaded && <Rule fields={fields} form={current}></Rule>}
-      <Accordion
-        id="accordion-container"
-        multiple
-        collapsible
-        dataSource={loadFilterItem()}
-        itemTitleRender={(e) => <span style={{ fontSize: 14 }}>{e.title}</span>}
-        itemRender={(e) => <FormFilter {...e} />}
-      />
     </div>
   );
 };
